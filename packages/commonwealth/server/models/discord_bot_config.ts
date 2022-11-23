@@ -7,7 +7,7 @@ export type DiscordBotConfigAttributes = {
   bot_id: string;
   chain_id: string;
   guild_id: string;
-  snapshot_channel_id: Date;
+  snapshot_channel_id: string;
   verification_token: string;
   token_expiration: Date;
 };

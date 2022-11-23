@@ -36,6 +36,7 @@ import updateBanner from './routes/updateBanner';
 import communityStats from './routes/communityStats';
 import setDiscordBotConfig from './routes/setDiscordBotConfig';
 import createDiscordBotConfig from './routes/createDiscordBotConfig';
+import getDiscordChannels from './routes/getDiscordChannels';
 
 import viewSubscriptions from './routes/subscription/viewSubscriptions';
 import createSubscription from './routes/subscription/createSubscription';
@@ -173,15 +174,15 @@ function setupRouter(
   const router = express.Router();
 
   router.use((req, res, next) => {
-    StatsDController.get().increment('cw.path.called', { path: req.path.slice(1) });
+    StatsDController.get().increment('cw.path.called', {
+      path: req.path.slice(1),
+    });
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
-      StatsDController.get().histogram(
-        `cw.path.latency`,
-        latency,
-        { path: req.path.slice(1) }
-      );
+      StatsDController.get().histogram(`cw.path.latency`, latency, {
+        path: req.path.slice(1),
+      });
     });
     next();
   });
@@ -730,6 +731,11 @@ function setupRouter(
     createDiscordBotConfig.bind(this, models)
   );
   router.post('/setDiscordBotConfig', setDiscordBotConfig.bind(this, models));
+  router.post(
+    '/getDiscordChannels',
+    passport.authenticate('jwt', { session: false }),
+    getDiscordChannels.bind(this, models)
+  );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
   router.post('/migrateEvent', migrateEvent.bind(this, models));
@@ -811,7 +817,7 @@ function setupRouter(
   // snapshotAPI
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   // snapshot-commonwealth
-  router.get('/snapshot', getSnapshotProposal.bind(this, models))
+  router.get('/snapshot', getSnapshotProposal.bind(this, models));
   router.get('/communityStats', communityStats.bind(this, models));
 
   // new API

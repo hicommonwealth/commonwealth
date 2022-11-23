@@ -20,9 +20,10 @@ enum SetDiscordBotConfigErrors {
 
 type SetDiscordBotConfigReq = {
   chain_id: string;
-  bot_id: string;
-  guild_id: string;
-  verification_token: string;
+  bot_id?: string;
+  guild_id?: string;
+  verification_token?: string;
+  snapshot_channel_id?: string;
 };
 
 type SetDiscordBotConfigResp = {
@@ -34,10 +35,31 @@ const setDiscordBotConfig = async (
   req: TypedRequestBody<SetDiscordBotConfigReq>,
   res: TypedResponse<SetDiscordBotConfigResp>
 ) => {
-  const { chain_id, bot_id, guild_id, verification_token } = req.body;
+  const {
+    chain_id,
+    bot_id,
+    guild_id,
+    verification_token,
+    snapshot_channel_id,
+  } = req.body;
 
   const [chain, error] = await validateChain(models, { chain_id });
   if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
+
+  if (snapshot_channel_id) {
+    // An update that comes from CW, not the bot. Handle accordingly
+    const configEntry = await models.DiscordBotConfig.findOne({
+      where: {
+        chain_id,
+      },
+    });
+    configEntry.snapshot_channel_id =
+      snapshot_channel_id !== 'disabled' ? snapshot_channel_id : null;
+    await configEntry.save();
+    return success(res, {
+      message: 'Updated channel id',
+    });
+  }
 
   const configEntry = await models.DiscordBotConfig.findOne({
     where: {

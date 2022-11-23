@@ -53,8 +53,17 @@
     margin-top: 24px;
     margin-bottom: 24px;
 
+    .save-snapshot {
+      margin-top: 24px;
+    }
+
+    .notifications-copy {
+      display: flex;
+      flex-direction: column;
+    }
+
     .connect-button {
-      margin-top: 16px;
+      margin-top: 8px;
     }
 
     .connected-line {
@@ -63,6 +72,22 @@
       align-items: center;
       gap: 8px;
       margin-top: 8px;
+
+      .connect-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        margin-left: 16px;
+      }
+    }
+
+    .snapshot-settings {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
     }
 
     .settings-row {

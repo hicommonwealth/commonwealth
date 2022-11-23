@@ -34,6 +34,8 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
 
 type ChainMetadataRowsAttrs = {
   admins: any;
@@ -75,8 +77,12 @@ export class ChainMetadataRows
   communityBanner: string;
   quillBanner: any;
   bannerStateUpdated: boolean;
-  discord_bot_connected: boolean;
-  discord_bot_connecting: boolean;
+  discordBotConnected: boolean;
+  discordBotConnecting: boolean;
+  channelsLoaded: boolean;
+  snapshotChannels: { id: string; name: string }[];
+  selectedSnapshotChannel: { id: string; name: string } | null;
+  snapshotNotificationsEnabled: boolean;
 
   oninit(vnode) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -104,13 +110,38 @@ export class ChainMetadataRows
     this.defaultOverview = chain.defaultOverview;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
-    this.discord_bot_connected = chain.discord_config_id !== null;
-    this.discord_bot_connecting = this.discord_bot_connected;
+    this.discordBotConnected = chain.discord_config_id !== null;
+    this.discordBotConnecting = this.discordBotConnected;
     this.communityBanner = chain.communityBanner;
+    this.channelsLoaded = false;
+    this.snapshotChannels = [];
+    this.snapshotNotificationsEnabled = false;
   }
 
   view(vnode) {
     const chain: ChainInfo = vnode.attrs.chain;
+
+    const getChannels = async () => {
+      try {
+        const discordBotConfig = await $.post(
+          `${app.serverUrl()}/getDiscordChannels`,
+          { chain_id: chain.id, jwt: app.user.jwt }
+        );
+        this.snapshotChannels = discordBotConfig.result.channels;
+        this.selectedSnapshotChannel = discordBotConfig.result.selected_channel;
+        if (this.selectedSnapshotChannel.id) {
+          this.snapshotNotificationsEnabled = true;
+        }
+        this.channelsLoaded = true;
+        m.redraw();
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    if (this.discordBotConnected && !this.channelsLoaded) {
+      getChannels();
+    }
+
     return (
       <div class="ChainMetadataRows">
         <div class="AvatarUploadRow">
@@ -422,11 +453,14 @@ export class ChainMetadataRows
         />
         <div class="commonbot-section">
           <CWText type="h3">Commonbot Settings</CWText>
-          {this.discord_bot_connected ? (
+          {this.discordBotConnected ? (
             <>
               <div class="connected-line">
-                <CWIcon iconName="check" />
-                <CWText>Connected</CWText>
+                <CWText type="h4">Connection Status</CWText>
+                <div class="connect-group">
+                  <CWIcon iconName="check" iconSize="small" />
+                  <CWText>Connected</CWText>
+                </div>
               </div>
               <CWButton
                 label="reconnect"
@@ -454,16 +488,78 @@ export class ChainMetadataRows
                         })
                       )}`
                     );
-                    this.discord_bot_connected = false;
-                    this.discord_bot_connecting = true;
+                    this.discordBotConnected = false;
+                    this.discordBotConnecting = true;
                     m.redraw();
                   } catch (e) {
                     console.log(e);
                   }
                 }}
               />
+              <div class="snapshot-settings">
+                <CWText type="h4">Snapshot Notifications</CWText>
+                <CWToggle
+                  onchange={() => {
+                    this.snapshotNotificationsEnabled =
+                      !this.snapshotNotificationsEnabled;
+                    m.redraw();
+                  }}
+                  checked={this.snapshotNotificationsEnabled}
+                />
+              </div>
+              <div class="connected-line">
+                {this.channelsLoaded && (
+                  <CWDropdown
+                    inputOptions={this.snapshotChannels.map((channel) => {
+                      return {
+                        label: channel.name,
+                      };
+                    })}
+                    initialValue={
+                      this.selectedSnapshotChannel?.name ?? 'Select a Channel'
+                    }
+                    onSelect={(optionLabel, index) => {
+                      this.selectedSnapshotChannel = {
+                        id: this.snapshotChannels[index].id,
+                        name: optionLabel,
+                      };
+                      m.redraw();
+                    }}
+                  />
+                )}
+              </div>
+
+              <CWButton
+                label="Save settings"
+                className="save-snapshot"
+                buttonType="primary-black"
+                onclick={async () => {
+                  if (
+                    this.snapshotNotificationsEnabled &&
+                    !this.selectedSnapshotChannel?.name
+                  ) {
+                    notifyError('Please select a channel');
+                    return;
+                  }
+                  try {
+                    const res = await $.post(
+                      `${app.serverUrl()}/setDiscordBotConfig`,
+                      {
+                        snapshot_channel_id: this.snapshotNotificationsEnabled
+                          ? this.selectedSnapshotChannel?.id
+                          : 'disabled',
+                        chain_id: app.activeChainId(),
+                        jwt: app.user.jwt,
+                      }
+                    );
+                    notifySuccess('Snapshot Notifications Settings Saved');
+                  } catch (e) {
+                    console.log(e);
+                  }
+                }}
+              />
             </>
-          ) : this.discord_bot_connecting ? (
+          ) : this.discordBotConnecting ? (
             <>
               <div class="settings-row">
                 <div class="spinner-group">
@@ -500,7 +596,7 @@ export class ChainMetadataRows
                         })
                       )}`
                     );
-                    this.discord_bot_connecting = true;
+                    this.discordBotConnecting = true;
                     m.redraw();
                   } catch (e) {
                     console.log(e);
