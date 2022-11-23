@@ -116,7 +116,9 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                 showAddressWithDisplayName: true,
                 hideIdentityIcon: true,
               })}
-              <CWText className="last-updated-text">•</CWText>
+              {!this.isWindowSmallInclusive && (
+                <CWText className="last-updated-text">•</CWText>
+              )}
               <CWText
                 type="caption"
                 fontWeight="medium"
