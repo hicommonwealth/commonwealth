@@ -40,7 +40,7 @@ export class MarkdownFormattedText
   truncatedDoc;
   isTruncated: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
@@ -54,7 +54,7 @@ export class MarkdownFormattedText
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
     const {
       doc,
       hideFormatting,

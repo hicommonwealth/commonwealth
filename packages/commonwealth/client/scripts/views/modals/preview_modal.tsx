@@ -27,7 +27,7 @@ type PreviewModalAttrs = {
 };
 
 export class PreviewModal implements m.ClassComponent<PreviewModalAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<PreviewModalAttrs>) {
     const { title } = vnode.attrs;
 
     return (

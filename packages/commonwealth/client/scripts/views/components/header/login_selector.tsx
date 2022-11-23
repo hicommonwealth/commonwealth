@@ -60,7 +60,7 @@ type LoginSelectorMenuLeftAttrs = {
 export class LoginSelectorMenuLeft
   implements m.ClassComponent<LoginSelectorMenuLeftAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
     const { activeAddressesWithRole, nAccountsWithoutRole, mobile } =
       vnode.attrs;
 
@@ -159,7 +159,7 @@ type LoginSelectorMenuRightAttrs = { mobile?: boolean };
 export class LoginSelectorMenuRight
   implements m.Component<LoginSelectorMenuRightAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<LoginSelectorMenuRightAttrs>) {
     const { mobile } = vnode.attrs;
     const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
@@ -249,7 +249,7 @@ type TOSModalAttrs = {
 
 // TODO: Replace this with a proper TOS Compoment when we have one
 class TOSModal implements m.ClassComponent<TOSModalAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<TOSModalAttrs>) {
     return (
       <div class="TOSModal">
         <div class="close-button-wrapper">
@@ -277,7 +277,7 @@ type LoginSelectorAttrs = { small?: boolean };
 export class LoginSelector implements m.ClassComponent<LoginSelectorAttrs> {
   private profileLoadComplete: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<LoginSelectorAttrs>) {
     const { small } = vnode.attrs;
 
     if (!app.isLoggedIn()) {
