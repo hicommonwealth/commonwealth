@@ -1,6 +1,6 @@
 import * as Rascal from 'rascal';
 import {factory, formatFilename} from 'common-common/src/logging';
-import {RascalPublications, RascalSubscriptions, RmqMsgFormatError, rmqMsgToName, TRmqMessages} from "./types";
+import {RascalPublications, RascalSubscriptions, RmqMsgFormatError, TRmqMessages} from "./types";
 import {Sequelize} from "sequelize";
 import {ChainEntityModelStatic} from "chain-events/services/database/models/chain_entity";
 import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
@@ -10,12 +10,10 @@ import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
 
-// TODO: enforce/check/use?
 export type SafeRmqPublishSupported =
   ChainEntityModelStatic
   | ChainEventModelStatic
-  | ChainEventTypeModelStatic
-  | ChainModelStatic;
+  | ChainEventTypeModelStatic;
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
@@ -193,14 +191,14 @@ export class RabbitMQController {
     if (!this._initialized) {
       throw new RabbitMQControllerError("RabbitMQController is not initialized!")
     }
-    const modelName = rmqMsgToName(publishData);
+
     try {
       await DB.sequelize.transaction(async (t) => {
         // yes I know this is ugly/bad, but I have yet to find a workaround to TS2349 when <any> is not applied.
         // We don't get types on the model anyway but at least this way the model above is typed to facilitate calling
         // this 'safPublish' function (arguably more important to ensure this function is not used with incompatible
         // models).
-        (<any>(await DB.model)).update({
+        await (<any>(DB.model)).update({
           queued: -1
         }, {
           where: {
@@ -220,9 +218,9 @@ export class RabbitMQController {
           e
         );
       } else {
-        log.error(`Sequelize error occurred while setting queued to -1 for ${modelName} with id: ${objectId}`, e)
+        log.error(`Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`, e)
         this.rollbar?.warn(
-          `Sequelize error occurred while setting queued to -1 for ${modelName} with id: ${objectId}`,
+          `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
           e
         );
       }

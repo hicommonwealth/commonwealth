@@ -24,18 +24,6 @@ export class RmqMsgFormatError extends Error {
 }
 
 /**
- * This function determines a message's data type and returns the database model it is related to.
- * This function is used by the `safePublish` function of the RabbitMQController to update the `queued`
- * column of the table relevant to the message.
- * @param data
- */
-export function rmqMsgToName(data: TRmqMessages) {
-  if (RmqEntityCUD.isValidMsgFormat(data)) return 'ChainEntity'
-  else if (RmqCENotificationCUD.isValidMsgFormat(data)) return 'ChainEvent'
-  else if (RmqCETypeCUD.isValidMsgFormat(data)) return 'ChainEventType'
-}
-
-/**
  * This type contains ALL the possible RabbitMQ message types. If you are publishing a message to any queue,
  * anywhere, it MUST be one of these types
  */

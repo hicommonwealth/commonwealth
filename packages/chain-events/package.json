@@ -31,7 +31,7 @@
     "start-app": "ts-node --project tsconfig.services.json services/app/Server.ts",
     "start-consumer": "ts-node --project tsconfig.services.json services/ChainEventsConsumer/chainEventsConsumer.ts run-as-script",
     "start-subscriber": "ts-node --project tsconfig.services.json services/ChainSubscriber/chainSubscriber.ts run-as-script",
-    "start": "yarn start-app & yarn start-consumer & yarn start-subscriber",
+    "start-all": "concurrently -p '{name}' -c yellow,blue,magenta -n app,consumer,subscriber 'yarn start-app' 'yarn start-consumer' 'yarn start-subscriber'",
     "create-db": "npx sequelize db:create",
     "migrate-db": "npx sequelize db:migrate",
     "create-migration": "npx sequelize migration:generate --name",
