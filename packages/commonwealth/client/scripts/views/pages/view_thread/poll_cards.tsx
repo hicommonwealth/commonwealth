@@ -91,7 +91,7 @@ export class ThreadPollCard implements m.ClassComponent<{ poll: Poll }> {
             ? null
             : 'You must join this community to vote.'
         }
-        onVoteCast={(option, isSelected, callback) =>
+        onVoteCast={(option, callback, isSelected) =>
           handlePollVote(poll, option, isSelected, callback)
         }
         onResultsClick={(e) => {
