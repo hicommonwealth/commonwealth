@@ -44,6 +44,8 @@
           color: $neutral-500;
         }
       }
+
+      @include flame;
     }
 
     .row-bottom {

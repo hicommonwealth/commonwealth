@@ -22,6 +22,7 @@ import {
   getCommentSubscription,
   getReactionSubscription,
   getThreadSubScriptionMenuItem,
+  isHot,
 } from './helpers';
 
 type ThreadPreviewAttrs = {
@@ -34,20 +35,19 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
 
     const commentsCount = app.comments.nComments(thread);
 
-    const discussionLink = getProposalUrlPath(
-      thread.slug,
-      `${thread.identifier}-${slugify(thread.title)}`
-    );
-
-    const commentSubscription = getCommentSubscription(thread);
-    const reactionSubscription = getReactionSubscription(thread);
     const isSubscribed =
-      commentSubscription?.isActive && reactionSubscription?.isActive;
+      getCommentSubscription(thread)?.isActive &&
+      getReactionSubscription(thread)?.isActive;
 
     return (
       <div
         class="ThreadPreview"
         onclick={(e) => {
+          const discussionLink = getProposalUrlPath(
+            thread.slug,
+            `${thread.identifier}-${slugify(thread.title)}`
+          );
+
           if (isCommandClick(e)) {
             window.open(discussionLink, '_blank');
             return;
@@ -90,22 +90,13 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                 {moment(thread.createdAt).format('l')}
               </CWText>
             </div>
+            {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
+            {isHot(thread) && <div class="flame" />}
             {thread.pinned && <CWIcon iconName="pin" />}
 
-            {/* <div class="row-subheader">
-            {thread.readOnly && (
-              <div class="discussion-locked">
-                {m(Tag, {
-                  size: 'xs',
-                  label: <CWIcon iconName="lock" iconSize="small" />,
-                })}
-              </div>
-            )}
+            {/* {thread.hasPoll && <CWTag label="Poll" size="xs" />} */}
 
-            {thread.hasPoll && (
-              <Button label="Poll" intent="warning" size="xs" compact={true} />
-            )}
-
+            {/*
             {thread.chainEntities?.length > 0 &&
               thread.chainEntities
                 .sort((a, b) => {
@@ -136,13 +127,7 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                 compact={true}
               />
             )}
-
-            {isHot(thread) && (
-              <div class="activity-icons">
-                <span>🔥</span>
-              </div>
-            )}
-          </div> */}
+            */}
           </div>
           <CWText type="h5" fontWeight="semiBold">
             {thread.title}

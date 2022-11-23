@@ -81,6 +81,14 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
   }
 }
 
+@mixin flame {
+  .flame::after {
+    content: '\1F525';
+    display: block;
+    font-size: 22px;
+  }
+}
+
 @mixin header {
   font-family: $fonts;
   font-style: normal;

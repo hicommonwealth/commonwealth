@@ -88,11 +88,7 @@
           display: flex;
           gap: 4px;
 
-          .flame::after {
-            content: '\1F525';
-            display: block;
-            font-size: 22px;
-          }
+          @include flame;
         }
       }
 
