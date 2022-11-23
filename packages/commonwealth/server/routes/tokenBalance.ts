@@ -15,7 +15,12 @@ export const Errors = {
   QueryFailed: 'Balance query failed',
 };
 
-type TokenBalanceReq = { address: string, author_chain: string, chain: string, contract_address: string };
+type TokenBalanceReq = {
+  address: string;
+  author_chain: string;
+  chain: string;
+  contract_address: string;
+};
 type TokenBalanceResp = string;
 
 const tokenBalance = async (
@@ -25,7 +30,7 @@ const tokenBalance = async (
   res: TypedResponse<TokenBalanceResp>
 ) => {
   if (!req.body.address) {
-    throw new AppError(Errors.InvalidAddress)
+    throw new AppError(Errors.InvalidAddress);
   }
 
   let chain: ChainInstance;
