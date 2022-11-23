@@ -31,7 +31,7 @@ type ProposalCardAttrs = {
 };
 
 export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ProposalCardAttrs>) {
     const { proposal, injectedContent } = vnode.attrs;
 
     const secondaryTagText = getSecondaryTagText(proposal);
