@@ -34,7 +34,7 @@ export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
   private balancesCache;
   private balancesCacheInitialized;
 
-  view(vnode) {
+  view(vnode: m.Vnode<VoteListingAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
     const balanceWeighted =

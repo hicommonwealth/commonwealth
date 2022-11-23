@@ -72,16 +72,13 @@ export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
 
 export const cancelProposal = (
   e: Event,
-  votingModalOpen: boolean,
+  toggleVotingModal: (newModalState: boolean) => void,
   proposal: AnyProposal,
-  onModalClose: () => void
+  onModalClose?: () => void
 ) => {
   e.preventDefault();
-  votingModalOpen = true;
+  toggleVotingModal(true);
 
-  if (!onModalClose) {
-    onModalClose = () => undefined;
-  }
   if (proposal instanceof MolochProposal) {
     proposal
       .abortTx()
