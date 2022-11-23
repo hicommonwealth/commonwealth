@@ -177,7 +177,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     this.form.topic = topic;
   }
 
-  oninit(vnode: m.VnodeDOM<NewThreadFormAttrs, this>) {
+  oninit(vnode: m.Vnode<NewThreadFormAttrs>) {
     const { isModal } = vnode.attrs;
     this.form = {
       topic: null,
@@ -255,7 +255,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<NewThreadFormAttrs>) {
     if (!app.chain) return;
     const { isModal, hasTopics } = vnode.attrs;
     const { fromDraft, saving, form } = this;
