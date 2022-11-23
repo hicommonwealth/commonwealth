@@ -59,7 +59,9 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
               txType={txType}
             />
           )}
-          {this.stageName === 'waiting' && <TxSigningModalWaitingStage />}
+          {this.stageName === 'waiting' && (
+            <TxSigningModalWaitingStage next={next} />
+          )}
           {this.stageName === 'success' && (
             <TxSigningModalSuccessStage
               blocknum={this.data.blocknum}
