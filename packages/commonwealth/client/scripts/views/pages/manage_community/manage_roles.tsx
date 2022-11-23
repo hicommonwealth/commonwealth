@@ -15,7 +15,7 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ManageRoleRowAttrs = {
   label: string;
-  onRoleUpdate?: () => void;
+  onRoleUpdate: (oldRole: string, newRole: string) => void;
   roledata?: any;
 };
 
