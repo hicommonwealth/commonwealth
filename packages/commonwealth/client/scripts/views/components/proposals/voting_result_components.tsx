@@ -6,7 +6,15 @@ import m from 'mithril';
 import 'components/proposals/voting_result_components.scss';
 
 import { AnyProposal, IVote } from 'models';
-import { NearSputnikVoteString } from 'controllers/chain/near/sputnik/types';
+import {
+  NearSputnikVote,
+  NearSputnikVoteString,
+} from 'controllers/chain/near/sputnik/types';
+import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
+import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
+import AaveProposal, {
+  AaveProposalVote,
+} from 'controllers/chain/ethereum/aave/proposal';
 import { VoteListing } from './vote_listing';
 import { CWText } from '../component_kit/cw_text';
 
@@ -23,7 +31,7 @@ type VotingResultAttrs = {
 };
 
 export class VotingResult implements m.ClassComponent<VotingResultAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<VotingResultAttrs>) {
     const { getAbstainVotes, getNoVotes, getYesVotes, proposal } = vnode.attrs;
 
     return (
@@ -53,17 +61,99 @@ export class VotingResult implements m.ClassComponent<VotingResultAttrs> {
   }
 }
 
+type CompletedProposalVotingResultAttrs = {
+  abstainPct: string;
+  abstainResults: string;
+  noPct: string;
+  noResults: string;
+  noWithVetoPct: string;
+  noWithVetoResults: string;
+  yesPct: string;
+  yesResults: string;
+};
+
+export class CompletedProposalVotingResult
+  implements m.ClassComponent<CompletedProposalVotingResultAttrs>
+{
+  view(vnode: m.Vnode<CompletedProposalVotingResultAttrs>) {
+    const {
+      abstainPct,
+      abstainResults,
+      noPct,
+      noResults,
+      noWithVetoPct,
+      noWithVetoResults,
+      yesPct,
+      yesResults,
+    } = vnode.attrs;
+
+    return (
+      <div class="VotingResult">
+        <div class="results-column">
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`${yesPct}% voted Yes`}
+          </CWText>
+          <CWText>{`(${yesResults})`}</CWText>
+        </div>
+        <div class="results-column">
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`${noPct}% voted No`}
+          </CWText>
+          <CWText>{`(${noResults})`}</CWText>
+        </div>
+        <div class="results-column">
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`${abstainPct}% voted Abstain`}
+          </CWText>
+          <CWText>{`(${abstainResults})`}</CWText>
+        </div>
+        <div class="results-column">
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`${noWithVetoPct}% voted Veto`}
+          </CWText>
+          <CWText>{`(${noWithVetoResults})`}</CWText>
+        </div>
+      </div>
+    );
+  }
+}
+
+type SimpleYesApprovalVotingResultAttrs = {
+  approvedCount: number;
+} & BaseVotingResultAttrs;
+
+export class SimpleYesApprovalVotingResult
+  implements m.ClassComponent<SimpleYesApprovalVotingResultAttrs>
+{
+  view(vnode: m.Vnode<SimpleYesApprovalVotingResultAttrs>) {
+    const { approvedCount, proposal, votes } = vnode.attrs;
+
+    return (
+      <div class="VotingResult">
+        <div class="results-column">
+          <CWText type="h4" fontWeight="medium" className="results-header">
+            {`Approved ${approvedCount}`}
+          </CWText>
+          <VoteListing proposal={proposal} votes={votes} />
+        </div>
+      </div>
+    );
+  }
+}
+
 type AaveVotingResultAttrs = {
   noBalanceString: string;
   noVotesCount: number;
+  proposal: AaveProposal;
+  votes: Array<AaveProposalVote>;
   yesBalanceString: string;
   yesVotesCount: number;
-} & BaseVotingResultAttrs;
+};
 
 export class AaveVotingResult
   implements m.ClassComponent<AaveVotingResultAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<AaveVotingResultAttrs>) {
     const {
       noBalanceString,
       noVotesCount,
@@ -114,67 +204,15 @@ export class AaveVotingResult
   }
 }
 
-type CompletedProposalVotingResultAttrs = {
-  abstainPct: string;
-  abstainResults: string;
-  noPct: string;
-  noResults: string;
-  noWithVetoPct: string;
-  noWithVetoResults: string;
-  yesPct: string;
-  yesResults: string;
+type YesNoAbstainVetoVotingResultAttrs = {
+  proposal: CosmosProposal;
+  votes: Array<CosmosVote>;
 };
 
-export class CompletedProposalVotingResult
-  implements m.ClassComponent<CompletedProposalVotingResultAttrs>
-{
-  view(vnode) {
-    const {
-      abstainPct,
-      abstainResults,
-      noPct,
-      noResults,
-      noWithVetoPct,
-      noWithVetoResults,
-      yesPct,
-      yesResults,
-    } = vnode.attrs;
-
-    return (
-      <div class="VotingResult">
-        <div class="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`${yesPct}% voted Yes`}
-          </CWText>
-          <CWText>{`(${yesResults})`}</CWText>
-        </div>
-        <div class="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`${noPct}% voted No`}
-          </CWText>
-          <CWText>{`(${noResults})`}</CWText>
-        </div>
-        <div class="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`${abstainPct}% voted Abstain`}
-          </CWText>
-          <CWText>{`(${abstainResults})`}</CWText>
-        </div>
-        <div class="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`${noWithVetoPct}% voted Veto`}
-          </CWText>
-          <CWText>{`(${noWithVetoResults})`}</CWText>
-        </div>
-      </div>
-    );
-  }
-}
-
 export class YesNoAbstainVetoVotingResult
-  implements m.ClassComponent<BaseVotingResultAttrs>
+  implements m.ClassComponent<YesNoAbstainVetoVotingResultAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<YesNoAbstainVetoVotingResultAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
     return (
@@ -224,33 +262,15 @@ export class YesNoAbstainVetoVotingResult
   }
 }
 
-type SimpleYesApprovalVotingResultAttrs = {
-  approvedCount: number;
-} & BaseVotingResultAttrs;
-
-export class SimpleYesApprovalVotingResult
-  implements m.ClassComponent<SimpleYesApprovalVotingResultAttrs>
-{
-  view(vnode) {
-    const { approvedCount, proposal, votes } = vnode.attrs;
-
-    return (
-      <div class="VotingResult">
-        <div class="results-column">
-          <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Approved ${approvedCount}`}
-          </CWText>
-          <VoteListing proposal={proposal} votes={votes} />
-        </div>
-      </div>
-    );
-  }
-}
+type YesNoRejectVotingResultAttrs = {
+  proposal: NearSputnikProposal;
+  votes: Array<NearSputnikVote>;
+};
 
 export class YesNoRejectVotingResult
-  implements m.ClassComponent<BaseVotingResultAttrs>
+  implements m.ClassComponent<YesNoRejectVotingResultAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<YesNoRejectVotingResultAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
     return (
