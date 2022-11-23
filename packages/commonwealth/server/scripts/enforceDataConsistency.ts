@@ -1,68 +1,84 @@
+import models from '../database';
+import {QueryTypes} from "sequelize";
+
 /**
  * This script is meant as the worst case scenario recovery tool or as a method of ensuring consistency without a trace
  * of a doubt. From the script we can fully rehydrate any cross-server data that was lost. This script can be used in
  * emergencies and/or as part of the regular release phase.
  *
+ * To run this file as a script 2 arguments are needed. Example:
+ * `ts-node enforceDataConsistency.ts run-as-script [Chain-event DB URI]`
+ *
  * WARNING:
  * Requires having the dbLink extension created/enabled by a superuser on each of the involved databases `create extension dblink;`
+ * This script should be run while the queues are empty + the chain-event listeners are offline to avoid duplicate
+ * data errors. For example if this script inserts a chain-event-type that is also in a queue, the queue processor will
+ * throw when it attempts to insert and that message will be retried and eventually dead-lettered unnecessarily.
+ *
+ * @param ce_db_uri {string} The URI of the chain-events database to sync with
+ * @param enforceEventTypes {boolean} A  boolean indicating whether chain-event-types should be synced
+ * @param enforceEntities {boolean} A boolean indicating whether chain-event-entities should be synced
  */
-import models from '../database';
-import {DATABASE_URI as CE_DB_URI} from "chain-events/services/config";
-
-
 export async function enforceDataConsistency(
-  ce_db_uri?: string,
-  enforceTypes?: boolean,
-  enforceEntities?: boolean
+  ce_db_uri: string,
+  enforceEventTypes = true,
+  enforceEntities = true
 ) {
   // if the function is called with run-as-script i.e. yarn runEnforceDataConsistency ensure that CONFIRM=true is passed
-  if (process.argv[2] === 'run-as-script' && process.env.confirm != 'true') {
-    console.warn("This script makes changes to the database specified by DATABASE_URI. If you are sure" +
+  if (process.argv[2] === 'run-as-script' && process.env.CONFIRM != 'true') {
+    console.warn("This script makes changes to the database specified by the given database URI. If you are sure " +
       "you want to do this run this script again with the env var 'CONFIRM=true'");
     process.exit(0);
   }
 
-  // must provide the chain-events database uri in one form or another
-  if (!process.env.CE_DB_URI && !ce_db_uri) {
-    console.error("CE_DB_URI must be defined to run this script. All changes in the db specified by CE_DB_URI will be" +
-      "reflected in the db specified by DATABASE_URI.")
-    process.exit(1)
-  }
-
-  // if not run as a script then at least one of the enforced datatypes must be true
-  if (process.argv[2] != 'run-as-script' && !enforceTypes && !enforceEntities) {
-    throw new Error("At least one of enforceTypes, enforceEntities, enforceEventNotifications must be true");
-  }
-
-  const CE_DB_URI = process.env.CE_DB_URI || ce_db_uri;
-
-  const chainEventTypeSync = `
+  const chainEventTypeSyncQuery = `
       WITH existingIds AS (SELECT id FROM "ChainEventTypes")
       INSERT
       INTO "ChainEventTypes"
       SELECT "NewCETypes".id
-      FROM dblink('${CE_DB_URI}',
+      FROM dblink('${ce_db_uri}',
                   'SELECT id FROM "ChainEventTypes"') as "NewCETypes"(id varchar(255))
-      WHERE "NewCETypes".id NOT IN (SELECT * FROM existingIds);
+      WHERE "NewCETypes".id NOT IN (SELECT * FROM existingIds)
+      RETURNING id;
   `;
 
-  const chainEntitySync = `
+  const chainEntitySyncQuery = `
       WITH existingCeIds AS (SELECT ce_id FROM "ChainEntityMeta")
       INSERT INTO "ChainEntityMeta" (ce_id, chain, author)
       SELECT "AllChainEntities".id as ce_id, chain, author
-      FROM dblink('${CE_DB_URI}',
+      FROM dblink('${ce_db_uri}',
                   'SELECT id, chain, author FROM "ChainEntities";') as "AllChainEntities"(id int, chain varchar(255), author varchar(255))
-      WHERE "AllChainEntities".id NOT IN (SELECT * FROM existingCeIds);
+      WHERE "AllChainEntities".id NOT IN (SELECT * FROM existingCeIds)
+      RETURNING ce_id;
   `;
 
   await models.sequelize.transaction(async (t) => {
-    if (enforceTypes) await models.sequelize.query(chainEventTypeSync, {transaction: t});
-    if (enforceEntities) await models.sequelize.query(chainEntitySync, {transaction: t});
+    if (enforceEventTypes) {
+      const result = await models.sequelize.query(
+        chainEventTypeSyncQuery,
+        {type: QueryTypes.INSERT, raw: true, transaction: t}
+      );
+      console.log("ChainEventTypes synced:", result);
+    }
+    if (enforceEntities) {
+      const result = await models.sequelize.query(
+        chainEntitySyncQuery,
+        {type: QueryTypes.INSERT, raw: true, transaction: t}
+      );
+      console.log("ChainEventEntities synced:", result)
+    }
   });
 }
 
 // enables running the enforceDataConsistency function as a standalone script
 if (process.argv[2] == 'run-as-script') {
-  enforceDataConsistency(CE_DB_URI, true, true);
+  enforceDataConsistency(process.argv[3])
+    .then(() => {
+      console.log("Successfully synced the databases")
+    })
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    })
 }
 

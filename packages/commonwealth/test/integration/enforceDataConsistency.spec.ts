@@ -38,7 +38,7 @@ describe('Tests for enforceDataConsistency script', () => {
     `, {raw: true, type: QueryTypes.INSERT, logging: console.log});
 
     // run consistency script
-    await enforceDataConsistency(CE_DB_URI, true);
+    await enforceDataConsistency(CE_DB_URI, true, false);
 
     // ensure type id has been transferred to cw db
     const newResults = await cwModels.ChainEventType.findAll({

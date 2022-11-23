@@ -88,6 +88,10 @@ module.exports = {
                 type: 'unique',
                 transaction: t
             });
+
+            await queryInterface.sequelize.query(`
+                CREATE EXTENSION dblink;
+            `, {transaction: t});
         });
     },
 
