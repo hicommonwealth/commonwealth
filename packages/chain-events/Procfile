@@ -1,4 +1,4 @@
-web: cd packages/chain-events && yarn start-app
-subscriber: cd packages/chain-events && yarn start-subscriber
-consumer: cd packages/chain-events && yarn start-consumer
+web: cd packages/chain-events && node build/services/app/Server.js
+subscriber: cd packages/chain-events && node build/services/chainSubscriber.js
+consumer: cd packages/chain-events && node build/services/chainEventsConsumer.js
 release: cd packages/chain-events && npx sequelize-cli db:migrate --config services/database/sequelize.json

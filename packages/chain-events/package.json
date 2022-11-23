@@ -10,6 +10,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "rimraf dist/ && tsc --project tsconfig.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
+    "build-services": "tsc --project tsconfig.services.json && tsc-alias --project tsconfig.services.json",
     "compile-contracts": "cd eth && npx hardhat compile",
     "check-services-types": "tsc --noEmit --project tsconfig.services.json",
     "check-src-types": "tsc --noEmit --project tsconfig.src.json",
