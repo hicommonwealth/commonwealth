@@ -9,13 +9,12 @@ import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
 
 import {
   notifyError,
@@ -599,25 +598,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             : // false => scope is null
               null;
 
-        /* Deprecating the contract_address => community pipeline.
-        This breaks our mental model of where our site is going. 
-        */
-
-        // if (scope) {
-        //   const scopeIsEthereumAddress =
-        //     scope.startsWith('0x') && scope.length === 42;
-        //   if (scopeIsEthereumAddress) {
-        //     const chains = app.config.chains.getAll();
-        //     const chain = chains.find((o) => o.address === scope);
-        //     if (chain) {
-        //       const pagePath = window.location.href.substr(
-        //         window.location.href.indexOf(scope) + scope.length
-        //       );
-        //       m.route.set(`/${chain.id}${pagePath}`);
-        //     }
-        //   }
-        // }
-
         // Special case to defer chain loading specifically for viewing an offchain thread. We need
         // a special case because Threads and on-chain proposals are all viewed through the
         // same "/:scope/proposal/:type/:id" route.
@@ -1109,9 +1089,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       )
     );
     document.body.insertBefore(script, document.body.firstChild);
-
-    // initialize construct-ui focus manager
-    FocusManager.showFocusOnlyOnTab();
 
     // initialize mixpanel, before adding an alias or tracking identity
     try {

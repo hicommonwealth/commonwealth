@@ -30,7 +30,7 @@ export class UpdateProposalStatusModal
   private snapshotProposalsToSet: SnapshotProposal[];
   private stage: ThreadStage;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
     this.stage = vnode.attrs.thread.stage;
 
     this.chainEntitiesToSet = [];
@@ -40,7 +40,7 @@ export class UpdateProposalStatusModal
     );
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
     if (!app.chain?.meta) return;
 
     const { customStages } = app.chain.meta;

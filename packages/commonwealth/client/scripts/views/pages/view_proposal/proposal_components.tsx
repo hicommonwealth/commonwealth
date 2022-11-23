@@ -4,13 +4,11 @@ import m from 'mithril';
 
 import 'pages/view_proposal/proposal_components.scss';
 
-import { AnyProposal } from 'models';
+import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
+import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  QueueButton,
-  ExecuteButton,
-  CancelButton,
-} from '../../components/proposals/voting_actions_components';
 import {
   getStatusClass,
   getStatusText,
@@ -20,12 +18,112 @@ import {
   BlockExplorerLink,
   VotingInterfaceLink,
 } from './proposal_header_links';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { cancelProposal } from '../../components/proposals/helpers';
+
+type BaseCancelButtonAttrs = {
+  onModalClose: () => void;
+  toggleVotingModal: (newModalState: boolean) => void;
+  votingModalOpen: boolean;
+};
+
+type MolochCancelButtonAttrs = {
+  proposal: MolochProposal;
+  molochMember: MolochMember;
+} & BaseCancelButtonAttrs;
+
+export class MolochCancelButton
+  implements m.ClassComponent<MolochCancelButtonAttrs>
+{
+  view(vnode: m.Vnode<MolochCancelButtonAttrs>) {
+    const {
+      proposal,
+      votingModalOpen,
+      molochMember,
+      onModalClose,
+      toggleVotingModal,
+    } = vnode.attrs;
+
+    return (
+      <CWButton
+        buttonType="primary-red"
+        disabled={
+          !(proposal.canAbort(molochMember) && !proposal.completed) ||
+          votingModalOpen
+        }
+        onclick={(e) =>
+          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
+        }
+        label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
+      />
+    );
+  }
+}
+
+type AaveCancelButtonAttrs = {
+  proposal: AaveProposal;
+} & BaseCancelButtonAttrs;
+
+export class AaveCancelButton
+  implements m.ClassComponent<AaveCancelButtonAttrs>
+{
+  view(vnode: m.Vnode<AaveCancelButtonAttrs>) {
+    const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
+      vnode.attrs;
+
+    return (
+      <CWButton
+        buttonType="primary-red"
+        disabled={!proposal.isCancellable || votingModalOpen}
+        onclick={(e) =>
+          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
+        }
+        label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
+      />
+    );
+  }
+}
+
+type CompoundCancelButtonAttrs = {
+  proposal: CompoundProposal;
+} & BaseCancelButtonAttrs;
+
+export class CompoundCancelButton
+  implements m.ClassComponent<CompoundCancelButtonAttrs>
+{
+  view(vnode: m.Vnode<CompoundCancelButtonAttrs>) {
+    const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
+      vnode.attrs;
+
+    return (
+      <CWButton
+        buttonType="primary-red"
+        disabled={proposal.completed || votingModalOpen}
+        onclick={(e) =>
+          cancelProposal(e, toggleVotingModal, proposal, onModalClose)
+        }
+        label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
+      />
+    );
+  }
+}
+
+type ProposalSubheaderAttrs = {
+  proposal: AaveProposal | CompoundProposal | MolochProposal;
+  molochMember: MolochMember;
+} & BaseCancelButtonAttrs;
 
 export class ProposalSubheader
-  implements m.ClassComponent<{ proposal: AnyProposal }>
+  implements m.ClassComponent<ProposalSubheaderAttrs>
 {
-  view(vnode) {
-    const { proposal } = vnode.attrs;
+  view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
+    const {
+      molochMember,
+      onModalClose,
+      proposal,
+      toggleVotingModal,
+      votingModalOpen,
+    } = vnode.attrs;
 
     return (
       <div class="ProposalSubheader">
@@ -45,9 +143,73 @@ export class ProposalSubheader
             )}
           </div>
         )}
-        <QueueButton proposal={proposal} />
-        <ExecuteButton proposal={proposal} />
-        <CancelButton proposal={proposal} />
+
+        {proposal instanceof AaveProposal && (
+          <div class="proposal-buttons">
+            {proposal.isQueueable && (
+              <CWButton
+                disabled={votingModalOpen}
+                onclick={() => proposal.queueTx().then(() => m.redraw())}
+                label={
+                  proposal.data.queued || proposal.data.executed
+                    ? 'Queued'
+                    : 'Queue'
+                }
+              />
+            )}
+            {proposal.isExecutable && (
+              <CWButton
+                disabled={votingModalOpen}
+                onclick={() => proposal.executeTx().then(() => m.redraw())}
+                label={proposal.data.executed ? 'Executed' : 'Execute'}
+              />
+            )}
+            {proposal.isCancellable && (
+              <AaveCancelButton
+                onModalClose={onModalClose}
+                proposal={proposal}
+                toggleVotingModal={toggleVotingModal}
+                votingModalOpen={votingModalOpen}
+              />
+            )}
+          </div>
+        )}
+        {proposal instanceof CompoundProposal && (
+          <div class="proposal-buttons">
+            {proposal.isQueueable && (
+              <CWButton
+                disabled={votingModalOpen}
+                onclick={() => proposal.queueTx().then(() => m.redraw())}
+                label={
+                  proposal.data.queued || proposal.data.executed
+                    ? 'Queued'
+                    : 'Queue'
+                }
+              />
+            )}
+            {proposal.isExecutable && (
+              <CWButton
+                disabled={votingModalOpen}
+                onclick={() => proposal.executeTx().then(() => m.redraw())}
+                label={proposal.data.executed ? 'Executed' : 'Execute'}
+              />
+            )}
+            <CompoundCancelButton
+              onModalClose={onModalClose}
+              proposal={proposal}
+              toggleVotingModal={toggleVotingModal}
+              votingModalOpen={votingModalOpen}
+            />
+          </div>
+        )}
+        {proposal instanceof MolochProposal && (
+          <MolochCancelButton
+            molochMember={molochMember}
+            onModalClose={onModalClose}
+            proposal={proposal}
+            toggleVotingModal={toggleVotingModal}
+          />
+        )}
       </div>
     );
   }

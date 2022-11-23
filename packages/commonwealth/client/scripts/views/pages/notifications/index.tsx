@@ -104,14 +104,14 @@ class NotificationsPage implements m.ClassComponent {
 
     if (!activeEntity) {
       return m(PageLoading, {
-        title: [
-          'Notifications ',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
+        // title: [
+        //   'Notifications ',
+        //   m(Tag, {
+        //     size: 'xs',
+        //     label: 'Beta',
+        //     style: 'position: relative; top: -2px; margin-left: 6px',
+        //   }),
+        // ],
       });
     }
 
@@ -122,16 +122,16 @@ class NotificationsPage implements m.ClassComponent {
 
     return m(
       Sublayout,
-      {
-        title: [
-          'Notifications ',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-      },
+      // {
+      //   title: [
+      //     'Notifications ',
+      //     m(Tag, {
+      //       size: 'xs',
+      //       label: 'Beta',
+      //       style: 'position: relative; top: -2px; margin-left: 6px',
+      //     }),
+      //   ],
+      // },
       [
         m('.NotificationsPage', [
           m(

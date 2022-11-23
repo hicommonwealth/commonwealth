@@ -7,14 +7,14 @@ import 'components/component_kit/cw_text_area.scss';
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { ValidationStatus } from './cw_validation_text';
-import { MessageRow, TextInputAttrs } from './cw_text_input';
+import { MessageRow, BaseTextInputAttrs } from './cw_text_input';
 
 type TextAreaStyleAttrs = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
 };
 
-export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
+export class CWTextArea implements m.ClassComponent<BaseTextInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';

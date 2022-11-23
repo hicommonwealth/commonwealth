@@ -8,8 +8,10 @@ import app from 'state';
 import { CWBanner } from './component_kit/cw_banner';
 import { CWText } from './component_kit/cw_text';
 
-export class TermsBanner implements m.ClassComponent<{ terms: string }> {
-  view(vnode) {
+type TermsBannerAttrs = { terms: string };
+
+export class TermsBanner implements m.ClassComponent<TermsBannerAttrs> {
+  view(vnode: m.Vnode<TermsBannerAttrs>) {
     const { terms } = vnode.attrs;
 
     return (

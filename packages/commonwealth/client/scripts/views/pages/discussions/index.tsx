@@ -65,7 +65,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
     }
   }
 
-  view(vnode: m.VnodeDOM<DiscussionPageAttrs, this>) {
+  view(vnode: m.Vnode<DiscussionPageAttrs>) {
     if (!app.chain || !app.chain.serverLoaded) {
       return <PageLoading />;
     }

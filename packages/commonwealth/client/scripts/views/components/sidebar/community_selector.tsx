@@ -17,67 +17,62 @@ const renderCommunity = (item) => {
     roles.push(...app.roles.getAllRolesInCommunity({ chain: item.id }));
   }
 
-  return (
-    <ListItem
-      class={app.communities.isStarred(item.id) ? 'starred' : ''}
-      label={<CommunityLabel community={item} />}
-      selected={app.activeChainId() === item.id}
-      onclick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        m.route.set(item.id ? `/${item.id}` : '/');
-      }}
-      contentRight={
-        app.isLoggedIn() &&
-        roles.length > 0 && (
-          <div
-            class="community-star-toggle"
-            onclick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              await app.communities.setStarred(item.id);
-              m.redraw();
-            }}
-          >
-            {roles.map((role) => {
-              // TODO: sometimes address_chain is null here -- why??
-              return m(User, {
-                avatarSize: 18,
-                avatarOnly: true,
-                user: new AddressInfo(
-                  role.address_id,
-                  role.address,
-                  role.address_chain || role.chain_id,
-                  null
-                ),
-              });
-            })}
-            <div class="star-icon">
-              <Icon name={Icons.STAR} key={item.id} />
-            </div>
-          </div>
-        )
-      }
-    />
-  );
+  return m(ListItem, {
+    class: app.communities.isStarred(item.id) ? 'starred' : '',
+    label: <CommunityLabel community={item} />,
+    selected: app.activeChainId() === item.id,
+    onclick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      m.route.set(item.id ? `/${item.id}` : '/');
+    },
+    contentRight: app.isLoggedIn() && roles.length > 0 && (
+      <div
+        class="community-star-toggle"
+        onclick={async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          await app.communities.setStarred(item.id);
+          m.redraw();
+        }}
+      >
+        {roles.map((role) => {
+          // TODO: sometimes address_chain is null here -- why??
+          return m(User, {
+            avatarSize: 18,
+            avatarOnly: true,
+            user: new AddressInfo(
+              role.address_id,
+              role.address,
+              role.address_chain || role.chain_id,
+              null
+            ),
+          });
+        })}
+        <div class="star-icon">
+          {m(Icon, { name: Icons.STAR, key: item.id })}
+        </div>
+      </div>
+    ),
+  });
 };
 
-const homeButton = (
-  <a
-    class="home-button"
-    href="/"
-    onclick={() => {
-      m.route.set('/');
-    }}
-  >
-    <img
-      class="mobile-logo"
-      src="https://commonwealth.im/static/brand_assets/logo_stacked.png"
-      style="height:18px; width:18px;"
-    />
-    <span>Home</span>
-  </a>
-);
+// const homeButton = (
+//   <a
+//     class="home-button"
+//     href="/"
+//     onclick={() => {
+//       m.route.set('/');
+//     }}
+//   >
+//     <img
+//       class="mobile-logo"
+//       src="https://commonwealth.im/static/brand_assets/logo_stacked.png"
+//       style="height:18px; width:18px;"
+//     />
+//     <span>Home</span>
+//   </a>
+// );
 
 export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
   view(vnode) {
@@ -128,15 +123,15 @@ export class CommunitySelector implements m.ClassComponent<{ isMobile: true }> {
     ) : (
       <div class="CommunitySelector">
         <div class="title-selector">
-          <PopoverMenu
-            transitionDuration={0}
-            hasArrow={false}
-            trigger={
+          {m(PopoverMenu, {
+            transitionDuration: 0,
+            hasArrow: false,
+            trigger: (
               <CWIconButton iconName="compass" iconButtonTheme="black" />
-            }
-            class="CommunitySelectList"
-            content={communityList}
-          />
+            ),
+            class: 'CommunitySelectList',
+            content: communityList,
+          })}
         </div>
       </div>
     );

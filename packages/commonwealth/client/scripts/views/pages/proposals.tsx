@@ -50,8 +50,8 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
 }
 
-const ProposalsPage: m.Component<{}> = {
-  oncreate: () => {
+class ProposalsPage implements m.ClassComponent {
+  oncreate() {
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
     if (
@@ -65,7 +65,7 @@ const ProposalsPage: m.Component<{}> = {
         );
       }, 100);
     }
-  },
+  }
 
   view() {
     if (!app.chain || !app.chain.loaded) {
@@ -328,7 +328,7 @@ const ProposalsPage: m.Component<{}> = {
         </div>
       </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default ProposalsPage;

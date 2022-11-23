@@ -1,11 +1,19 @@
-import { Model, Transaction, Op, FindOptions } from 'sequelize';
-import { DB } from '../models';
+import { Transaction, Op, FindOptions } from 'sequelize';
 import {
-  CommunityRoleAttributes,
-  CommunityRoleInstance,
-} from '../models/community_role';
+  computePermissions,
+  Action,
+  isPermitted,
+  PermissionError,
+  BASE_PERMISSIONS,
+} from 'common-common/src/permissions';
+import { NextFunction, Request, Response } from 'express';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
+import { DB } from '../models';
+import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
+import { AddressInstance } from '../models/address';
+import { AppError } from './errors';
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
@@ -44,7 +52,7 @@ export class RoleInstanceWithPermission {
   }
 }
 
-export async function getHighestRole(
+export async function getHighestRoleFromCommunityRoles(
   roles: CommunityRoleAttributes[]
 ): Promise<CommunityRoleAttributes> {
   if (roles.findIndex((r) => r.name === 'admin') !== -1) {
@@ -56,6 +64,7 @@ export async function getHighestRole(
   }
 }
 
+// Server side helpers
 export async function findAllCommunityRolesWithRoleAssignments(
   models: DB,
   findOptions: FindOptions<RoleAssignmentAttributes>,
@@ -136,6 +145,7 @@ export async function findAllRoles(
   return roles;
 }
 
+// Returns highest permission role found
 export async function findOneRole(
   models: DB,
   findOptions: FindOptions<RoleAssignmentAttributes>,
@@ -152,7 +162,7 @@ export async function findOneRole(
   let communityRole: CommunityRoleAttributes;
   if (communityRoles) {
     // find the highest role
-    communityRole = await getHighestRole(communityRoles);
+    communityRole = await getHighestRoleFromCommunityRoles(communityRoles);
   } else {
     throw new Error("Couldn't find any community roles");
   }
@@ -224,9 +234,8 @@ export async function createRole(
   );
   if (communityRoles.findIndex((r) => r.name === role_name) !== -1) {
     // if role is already assigned to address, return current highest role this address has on that chain
-    const highestCommunityRole: CommunityRoleAttributes = await getHighestRole(
-      communityRoles
-    );
+    const highestCommunityRole: CommunityRoleAttributes =
+      await getHighestRoleFromCommunityRoles(communityRoles);
     if (
       highestCommunityRole.RoleAssignments &&
       highestCommunityRole.RoleAssignments.length > 0
@@ -280,4 +289,127 @@ export async function createRole(
     community_role.allow,
     community_role.deny
   );
+}
+
+// Permissions Helpers for Roles
+/// ////////////////////////////////////////////////////////////////////////////////////////////
+
+export async function isAddressPermitted(
+  models: DB,
+  address_id: number,
+  chain_id: string,
+  action: Action
+): Promise<PermissionError | undefined> {
+  const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
+
+  // fetch the default allow and deny permissions for the chain
+  const chain = await models.Chain.findOne({ where: { id: chain_id } });
+  if (!chain) {
+    throw new Error('Chain not found');
+  }
+
+  if (roles.length > 0) {
+    const rolesWithPermission = roles.map((role) => {
+      return {
+        permission: role.permission,
+        allow: role.allow,
+        deny: role.deny,
+      };
+    });
+    const permission = aggregatePermissions(rolesWithPermission, {
+      allow: chain.default_allow_permissions,
+      deny: chain.default_deny_permissions,
+    });
+
+    // check if action is permitted
+    if (!isPermitted(permission, action)) {
+      return PermissionError.NOT_PERMITTED;
+    }
+  }
+}
+
+export async function getActiveAddress(
+  models: DB,
+  user_id: number,
+  chain: string
+): Promise<AddressInstance | undefined> {
+  // get address instances for user on chain
+  const addressInstances = await models.Address.findAll({
+    where: {
+      user_id,
+      chain,
+    },
+    include: [
+      {
+        model: models.RoleAssignment,
+      },
+    ],
+  });
+  if (!addressInstances) {
+    return undefined;
+  }
+  /* check if any of the addresses has a role assignment that is_user_default is true
+  and if true return that address instance */
+  const activeAddress = addressInstances.find((a) => {
+    if (a.RoleAssignments && a.RoleAssignments.length > 0) {
+      if (a.RoleAssignments.some((r) => r.is_user_default)) return a;
+    }
+    return undefined;
+  });
+  return activeAddress;
+}
+
+export async function isAnyonePermitted(
+  models: DB,
+  chain_id: string,
+  action: Action
+): Promise<PermissionError | undefined> {
+  const chain = await models.Chain.findOne({ where: { id: chain_id } });
+  if (!chain) {
+    throw new Error('Chain not found');
+  }
+  const permission = computePermissions(BASE_PERMISSIONS, [
+    {
+      allow: chain.default_allow_permissions,
+      deny: chain.default_deny_permissions,
+    },
+  ]);
+  // check if action is permitted
+  if (!isPermitted(permission, action)) {
+    return PermissionError.NOT_PERMITTED;
+  }
+}
+
+export async function checkReadPermitted(
+  models: DB,
+  chain_id: string,
+  action: Action,
+  user_id?: number,
+) {
+  if (user_id) {
+    // get active address
+    const activeAddressInstance = await getActiveAddress(
+      models,
+      user_id,
+      chain_id
+    );
+
+    if (activeAddressInstance) {
+      // check if the user has permission to view the channel
+      const permission_error = await isAddressPermitted(
+        models,
+        activeAddressInstance.id,
+        chain_id,
+        action
+      );
+      if (permission_error) {
+        throw new AppError(permission_error);
+      }
+      return;
+    }
+  }
+  const permission_error = await isAnyonePermitted(models, chain_id, action);
+  if (permission_error) {
+    throw new AppError(permission_error);
+  }
 }
