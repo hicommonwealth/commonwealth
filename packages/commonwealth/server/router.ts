@@ -309,7 +309,7 @@ function setupRouter(
   router.post(
     '/updateVote',
     passport.authenticate('jwt', { session: false }),
-    updateVote.bind(this, models, tokenBalanceCache, ruleCache)
+    updateVote.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.get('/viewVotes', viewVotes.bind(this, models));
 

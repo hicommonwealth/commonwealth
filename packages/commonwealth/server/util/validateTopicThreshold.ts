@@ -3,31 +3,18 @@ import { TokenBalanceCache, FetchTokenBalanceErrors } from 'token-balance-cache/
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
+import { TopicAttributes } from '../models/topic';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const validateTopicThreshold = async (
   tbc: TokenBalanceCache,
   models: DB,
-  topicId: number,
+  topic: TopicAttributes,
   userAddress: string
 ): Promise<boolean> => {
-  if (!topicId || !userAddress) return true;
+  if (!topic || !userAddress) return true;
   try {
-    const topic = await models.Topic.findOne({
-      where: { id: topicId },
-      include: [
-        {
-          model: models.Chain,
-          required: true,
-          as: 'chain',
-          include: [{
-            model: models.ChainNode,
-            required: true,
-          }]
-        },
-      ]
-    });
     if (!topic?.chain?.ChainNode?.id) {
       // if we have no node, always approve
       return true;
@@ -62,7 +49,7 @@ const validateTopicThreshold = async (
       }
     }
   } catch (err) {
-    log.warn(`Could not validate topic threshold for ${topicId}: ${err.message}`);
+    log.warn(`Could not validate topic threshold for ${topic.id}: ${err.message}`);
     return false;
   }
 

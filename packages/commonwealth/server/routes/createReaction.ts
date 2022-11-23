@@ -1,10 +1,9 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import { ChainNetwork, ChainType, NotificationCategories } from 'common-common/src/types';
+import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import {
@@ -14,15 +13,11 @@ import {
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
-} from '../../shared/analytics/types';
-import { findAllRoles } from '../util/roles';
-import checkRule from '../util/rules/checkRule';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
+import validateRestrictions from '../util/validateRestrictions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -74,64 +69,16 @@ const createReaction = async (
     });
   }
 
-  if (thread) {
-    const topic = await models.Topic.findOne({
-      include: {
-        model: models.Thread,
-        where: { id: thread.id },
-        required: true,
-        as: 'threads',
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        ruleCache,
-        models,
-        topic.rule_id,
-        author.address
-      );
-      if (!passesRules) {
-        return next(new AppError(Errors.RuleCheckFailed));
-      }
-    }
-  }
-
-  // check if author can react
-  if (chain) {
-    const [canInteract, banError] = await banCache.checkBan({
-      chain: chain.id,
-      address: req.body.address,
-    });
-    if (!canInteract) {
-      return next(new AppError(banError));
-    }
-  }
-
-  if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
-    // skip check for admins
-    const isAdmin = await findAllRoles(
+  if (!req.user.isAdmin) {
+    await validateRestrictions(
       models,
-      { where: { address_id: author.id } },
-      chain.id,
-      ['admin']
+      ruleCache,
+      banCache,
+      tokenBalanceCache,
+      author,
+      chain,
+      thread?.topic_id
     );
-    if (thread && !req.user.isAdmin && isAdmin.length === 0) {
-      try {
-        const canReact = await validateTopicThreshold(
-          tokenBalanceCache,
-          models,
-          thread.topic_id,
-          req.body.address
-        );
-        if (!canReact) {
-          return next(new AppError(Errors.BalanceCheckFailed));
-        }
-      } catch (e) {
-        log.error(`hasToken failed: ${e.message}`);
-        return next(new ServerError(Errors.BalanceCheckFailed));
-      }
-    }
   }
 
   let proposal;

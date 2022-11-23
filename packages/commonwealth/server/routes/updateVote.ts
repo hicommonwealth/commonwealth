@@ -2,7 +2,6 @@ import moment from 'moment';
 import { NextFunction } from 'express';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
-import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import validateChain from '../util/validateChain';
@@ -12,9 +11,10 @@ import {
   VoteAttributes,
   VoteInstance,
 } from '../models/vote';
-import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError } from '../util/errors';
+import validateRestrictions from '../util/validateRestrictions';
+import BanCache from '../util/banCheckCache';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -40,6 +40,7 @@ const updateVote = async (
   models: DB,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
+  banCache: BanCache,
   req: TypedRequestBody<UpdateVoteReq>,
   res: TypedResponse<UpdateVoteResp>,
   next: NextFunction
@@ -75,26 +76,16 @@ const updateVote = async (
   });
   if (!thread) return next(new AppError(Errors.NoThread));
 
-  // check token balance threshold if needed
-  const canVote = await validateTopicThreshold(
-    tokenBalanceCache,
-    models,
-    thread.topic_id,
-    address
-  );
-  if (!canVote) {
-    return next(new AppError(Errors.BalanceCheckFailed));
-  }
-
-  const topic = await models.Topic.findOne({
-    where: { id: thread.topic_id },
-    attributes: ['rule_id'],
-  });
-  if (topic?.rule_id) {
-    const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
-    if (!passesRules) {
-      return next(new AppError(Errors.RuleCheckFailed));
-    }
+  if (!req.user.isAdmin) {
+    await validateRestrictions(
+      models,
+      ruleCache,
+      banCache,
+      tokenBalanceCache,
+      author,
+      chain,
+      thread?.topic_id
+    );
   }
 
   let vote: VoteInstance;

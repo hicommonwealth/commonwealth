@@ -1,20 +1,11 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import {
-  NotificationCategories,
-  ProposalType,
-  ChainType,
-  ChainNetwork,
-} from 'common-common/src/types';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { Action, PermissionError } from 'common-common/src/permissions';
-import {
-  findAllRoles,
-  isAddressPermitted,
-} from 'commonwealth/server/util/roles';
-import validateTopicThreshold from '../util/validateTopicThreshold';
+import { isAddressPermitted } from 'commonwealth/server/util/roles';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
@@ -24,13 +15,10 @@ import { sequelize } from '../database';
 import { ThreadInstance } from '../models/thread';
 import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
-} from '../../shared/analytics/types';
-import checkRule from '../util/rules/checkRule';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
+import validateRestrictions from '../util/validateRestrictions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -264,13 +252,16 @@ const createThread = async (
     return next(new AppError(Errors.UnsupportedKind));
   }
 
-  // check if banned
-  const [canInteract, banError] = await banCache.checkBan({
-    chain: chain.id,
-    address: author.address,
-  });
-  if (!canInteract) {
-    return next(new AppError(banError));
+  if (!req.user.isAdmin) {
+    await validateRestrictions(
+      models,
+      ruleCache,
+      banCache,
+      tokenBalanceCache,
+      author,
+      chain,
+      topic_id
+    );
   }
 
   // Render a copy of the thread to plaintext for the search indexer
@@ -329,46 +320,6 @@ const createThread = async (
         return next(
           Error('Must pass a topic_name string and/or a numeric topic_id')
         );
-      }
-    }
-
-    if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
-      // skip check for admins
-      const isAdmin = await findAllRoles(
-        models,
-        { where: { address_id: author.id } },
-        chain.id,
-        ['admin']
-      );
-      if (!req.user.isAdmin && isAdmin.length === 0) {
-        const canReact = await validateTopicThreshold(
-          tokenBalanceCache,
-          models,
-          topic_id,
-          req.body.address
-        );
-        if (!canReact) {
-          return next(new AppError(Errors.BalanceCheckFailed));
-        }
-      }
-    }
-
-    const topic = await models.Topic.findOne({
-      where: {
-        id: topic_id,
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        ruleCache,
-        models,
-        topic.rule_id,
-        author.address,
-        transaction
-      );
-      if (!passesRules) {
-        return next(new AppError(Errors.RuleCheckFailed));
       }
     }
 

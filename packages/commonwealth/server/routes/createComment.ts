@@ -1,14 +1,9 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-  ProposalType,
-} from 'common-common/src/types';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import validateTopicThreshold from '../util/validateTopicThreshold';
+import validateRestrictions from '../util/validateRestrictions';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 
@@ -21,16 +16,11 @@ import {
 } from '../../shared/utils';
 import proposalIdToEntity from '../util/proposalIdToEntity';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
-} from '../../shared/analytics/types';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { SENDGRID_API_KEY } from '../config';
-import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
-import { findAllRoles } from '../util/roles';
+import { AppError } from '../util/errors';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -76,15 +66,6 @@ const createComment = async (
     return next(new AppError(Errors.MissingTextOrAttachment));
   }
 
-  // check if banned
-  const [canInteract, banError] = await banCache.checkBan({
-    chain: chain.id,
-    address: author.address,
-  });
-  if (!canInteract) {
-    return next(new AppError(banError));
-  }
-
   let parentComment;
   if (parent_id) {
     // check that parent comment is in the same community
@@ -115,54 +96,16 @@ const createComment = async (
   const thread = await models.Thread.findOne({
     where: { id: thread_id },
   });
-
-  if (thread?.id) {
-    const topic = await models.Topic.findOne({
-      include: {
-        model: models.Thread,
-        where: { id: thread.id },
-        required: true,
-        as: 'threads',
-      },
-      attributes: ['rule_id'],
-    });
-    if (topic?.rule_id) {
-      const passesRules = await checkRule(
-        ruleCache,
-        models,
-        topic.rule_id,
-        author.address
-      );
-      if (!passesRules) {
-        return next(new AppError(Errors.RuleCheckFailed));
-      }
-    }
-  }
-
-  if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
-    // skip check for admins
-    const isAdmin = await findAllRoles(
+  if (!req.user.isAdmin) {
+    await validateRestrictions(
       models,
-      { where: { address_id: author.id } },
-      chain.id,
-      ['admin']
+      ruleCache,
+      banCache,
+      tokenBalanceCache,
+      author,
+      chain,
+      thread?.topic_id
     );
-    if (thread?.topic_id && !req.user.isAdmin && isAdmin.length === 0) {
-      try {
-        const canReact = await validateTopicThreshold(
-          tokenBalanceCache,
-          models,
-          thread.topic_id,
-          req.body.address
-        );
-        if (!canReact) {
-          return next(new AppError(Errors.BalanceCheckFailed));
-        }
-      } catch (e) {
-        log.error(`hasToken failed: ${e.message}`);
-        return next(new ServerError(Errors.BalanceCheckFailed));
-      }
-    }
   }
 
   const plaintext = (() => {
