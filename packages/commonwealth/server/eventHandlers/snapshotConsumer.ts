@@ -28,10 +28,10 @@ async function processSnapshotMessage(msg: SnapshotNotification) {
       where: { snapshot_space: space },
     });
 
-    // if (eventType === 'proposal/created' && proposal) {
-    //   log.error(`Proposal already exists, cannot create`);
-    //   return;
-    // }
+    if (eventType === 'proposal/created' && proposal) {
+      log.error(`Proposal already exists, cannot create`);
+      return;
+    }
 
     if (!proposal) {
       proposal = await models.SnapshotProposal.create({
