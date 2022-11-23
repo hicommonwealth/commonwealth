@@ -51,7 +51,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private tipAmount: number;
   private votingModalOpen: boolean;
 
-  view(vnode: m.VnodeDOM<ViewProposalPageAttrs, this>) {
+  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {

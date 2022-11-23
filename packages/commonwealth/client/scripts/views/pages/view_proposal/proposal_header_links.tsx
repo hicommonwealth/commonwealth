@@ -10,14 +10,15 @@ import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'common-common/src/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
+type ProposalHeaderLinkAttrs = {
+  proposal: AnyProposal;
+};
+
 // "View in Subscan"
 export class BlockExplorerLink
-  implements
-    m.ClassComponent<{
-      proposal: AnyProposal;
-    }>
+  implements m.ClassComponent<ProposalHeaderLinkAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
@@ -34,12 +35,9 @@ export class BlockExplorerLink
 
 // "Vote on polkadot-js"
 export class VotingInterfaceLink
-  implements
-    m.ClassComponent<{
-      proposal: AnyProposal;
-    }>
+  implements m.ClassComponent<ProposalHeaderLinkAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
@@ -55,8 +53,8 @@ export class VotingInterfaceLink
 }
 
 // "Go to discussion"
-export class ThreadLink implements m.ClassComponent<{ proposal: AnyProposal }> {
-  view(vnode) {
+export class ThreadLink implements m.ClassComponent<ProposalHeaderLinkAttrs> {
+  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     const path = getProposalUrlPath(
@@ -75,13 +73,14 @@ export class ThreadLink implements m.ClassComponent<{ proposal: AnyProposal }> {
   }
 }
 
+type SnapshotThreadLinkAttrs = {
+  thread: { id: string; title: string };
+};
+
 export class SnapshotThreadLink
-  implements
-    m.ClassComponent<{
-      thread: { id: string; title: string };
-    }>
+  implements m.ClassComponent<SnapshotThreadLinkAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotThreadLinkAttrs>) {
     const { id, title } = vnode.attrs.thread;
 
     const proposalLink = getProposalUrlPath(ProposalType.Thread, id);
