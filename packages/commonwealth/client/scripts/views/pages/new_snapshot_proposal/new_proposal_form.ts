@@ -403,7 +403,6 @@ const NewProposalForm: m.Component<
                   },
                   placeholder: 'What is your proposal?',
                   editorNamespace: 'new-proposal',
-                  tabindex: 2,
                 }),
               ]),
               m(FormGroup, { order: 5 }, [

@@ -21,7 +21,7 @@ type UserDashboardRowTopAttrs = {
 export class UserDashboardRowTop
   implements m.ClassComponent<UserDashboardRowTopAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<UserDashboardRowTopAttrs>) {
     const { commentCount } = vnode.attrs.activityData;
 
     const {

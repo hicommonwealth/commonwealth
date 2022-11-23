@@ -15,16 +15,17 @@ function countActiveProposals(proposals: SnapshotProposal[]): number {
   return proposals.filter((proposal) => proposal.state === 'active').length;
 }
 
+type SnapshotSpaceCardAttrs = {
+  proposal: null | Thread;
+  proposals: SnapshotProposal[];
+  redirect_action: string;
+  space: SnapshotSpace;
+};
+
 export class SnapshotSpaceCard
-  implements
-    m.ClassComponent<{
-      proposal: null | Thread;
-      proposals: SnapshotProposal[];
-      redirect_action: string;
-      space: SnapshotSpace;
-    }>
+  implements m.ClassComponent<SnapshotSpaceCardAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotSpaceCardAttrs>) {
     const { space, proposals, redirect_action, proposal } = vnode.attrs;
     if (!space || !proposals) return;
 
