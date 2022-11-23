@@ -31,9 +31,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
 
     const parsedId = event.id.replace(/.*\//, "");
     const eventType = event.event.split("/")[1];
-    console.log({ parsedId });
     const response = await fetchNewSnapshotProposal(parsedId);
-    console.log(response.data.proposal.end);
     event.id = parsedId;
     event.title = response.data.proposal.title;
     event.body = response.data.proposal.body;
@@ -41,7 +39,6 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     event.space = response.data.proposal.space;
     event.start = response.data.proposal.start;
     event.expire = response.data.proposal.end;
-    console.log({ event });
 
     await controller.publish(event, RascalPublications.SnapshotListener);
     res.status(200).send({ message: "Snapshot event received", event });
