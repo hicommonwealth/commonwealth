@@ -13,7 +13,7 @@ type PageLoadingAttrs = {
 };
 
 export class PageLoading implements m.ClassComponent<PageLoadingAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<PageLoadingAttrs>) {
     const { message } = vnode.attrs;
 
     return (
