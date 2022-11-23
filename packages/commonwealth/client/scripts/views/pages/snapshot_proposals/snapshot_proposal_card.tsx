@@ -13,17 +13,16 @@ import { CWCard } from '../../components/component_kit/cw_card';
 import { ProposalTag } from '../../components/proposal_card/proposal_tag';
 import { CWText } from '../../components/component_kit/cw_text';
 
-export class SnapshotProposalCard
-  implements
-    m.ClassComponent<{
-      snapshotId: string;
-      proposal: SnapshotProposal;
-    }>
-{
-  view(vnode) {
-    const { proposal } = vnode.attrs;
+type SnapshotProposalCardAttrs = {
+  snapshotId: string;
+  proposal: SnapshotProposal;
+};
 
-    if (!proposal) return;
+export class SnapshotProposalCard
+  implements m.ClassComponent<SnapshotProposalCardAttrs>
+{
+  view(vnode: m.Vnode<SnapshotProposalCardAttrs>) {
+    const { proposal } = vnode.attrs;
 
     const proposalLink = `/snapshot/${vnode.attrs.snapshotId}/${proposal.id}`;
 

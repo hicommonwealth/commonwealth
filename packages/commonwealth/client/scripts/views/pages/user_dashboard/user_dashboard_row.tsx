@@ -17,13 +17,14 @@ import { UserDashboardRowTop } from './user_dashboard_row_top';
 import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
 import { getClasses } from '../../components/component_kit/helpers';
 
+type UserDashboardRowAttrs = {
+  notification: DashboardActivityNotification;
+};
+
 export class UserDashboardRow
-  implements
-    m.ClassComponent<{
-      notification: DashboardActivityNotification;
-    }>
+  implements m.ClassComponent<UserDashboardRowAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<UserDashboardRowAttrs>) {
     const {
       likeCount,
       viewCount,
