@@ -5,7 +5,6 @@ import {Sequelize} from "sequelize";
 import {ChainEntityModelStatic} from "chain-events/services/database/models/chain_entity";
 import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
 import {ChainEventTypeModelStatic} from "chain-events/services/database/models/chain_event_type";
-import {ChainModelStatic} from "commonwealth/server/models/chain";
 import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
