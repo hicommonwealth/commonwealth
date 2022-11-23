@@ -143,22 +143,27 @@ export class ProposalSubheader
             )}
           </div>
         )}
-        {proposal instanceof AaveProposal && proposal.isQueueable && (
+
+        {proposal instanceof AaveProposal && (
           <div class="proposal-buttons">
-            <CWButton
-              disabled={!proposal.isQueueable || votingModalOpen}
-              onclick={() => proposal.queueTx().then(() => m.redraw())}
-              label={
-                proposal.data.queued || proposal.data.executed
-                  ? 'Queued'
-                  : 'Queue'
-              }
-            />
-            <CWButton
-              disabled={!proposal.isExecutable || votingModalOpen}
-              onclick={() => proposal.executeTx().then(() => m.redraw())}
-              label={proposal.data.executed ? 'Executed' : 'Execute'}
-            />
+            {proposal.isQueueable && (
+              <CWButton
+                disabled={votingModalOpen}
+                onclick={() => proposal.queueTx().then(() => m.redraw())}
+                label={
+                  proposal.data.queued || proposal.data.executed
+                    ? 'Queued'
+                    : 'Queue'
+                }
+              />
+            )}
+            {proposal.isExecutable && (
+              <CWButton
+                disabled={votingModalOpen}
+                onclick={() => proposal.executeTx().then(() => m.redraw())}
+                label={proposal.data.executed ? 'Executed' : 'Execute'}
+              />
+            )}
             {proposal.isCancellable && (
               <AaveCancelButton
                 onModalClose={onModalClose}
@@ -169,22 +174,26 @@ export class ProposalSubheader
             )}
           </div>
         )}
-        {proposal instanceof CompoundProposal && proposal.isQueueable && (
+        {proposal instanceof CompoundProposal && (
           <div class="proposal-buttons">
-            <CWButton
-              disabled={!proposal.isQueueable || votingModalOpen}
-              onclick={() => proposal.queueTx().then(() => m.redraw())}
-              label={
-                proposal.data.queued || proposal.data.executed
-                  ? 'Queued'
-                  : 'Queue'
-              }
-            />
-            <CWButton
-              disabled={!proposal.isExecutable || votingModalOpen}
-              onclick={() => proposal.executeTx().then(() => m.redraw())}
-              label={proposal.data.executed ? 'Executed' : 'Execute'}
-            />
+            {proposal.isQueueable && (
+              <CWButton
+                disabled={votingModalOpen}
+                onclick={() => proposal.queueTx().then(() => m.redraw())}
+                label={
+                  proposal.data.queued || proposal.data.executed
+                    ? 'Queued'
+                    : 'Queue'
+                }
+              />
+            )}
+            {proposal.isExecutable && (
+              <CWButton
+                disabled={votingModalOpen}
+                onclick={() => proposal.executeTx().then(() => m.redraw())}
+                label={proposal.data.executed ? 'Executed' : 'Execute'}
+              />
+            )}
             <CompoundCancelButton
               onModalClose={onModalClose}
               proposal={proposal}
