@@ -31,12 +31,12 @@ type SearchParams = {
 type InviteButtonAttrs = {
   chain?: ChainInfo;
   disabled?: boolean;
-  failureCallback: () => void;
+  failureCallback: (isFailure: boolean, err?: string) => void;
   invitedAddress?: string;
   invitedAddressChain?: string;
   invitedEmail?: string;
   selection: string;
-  successCallback: () => void;
+  successCallback: (isSuccessful: boolean) => void;
 };
 
 type CommunityOption = {
@@ -261,7 +261,7 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
     this.loading = false;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<InviteButtonAttrs>) {
     const {
       selection,
       successCallback,
@@ -363,11 +363,12 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
   }
 }
 
+type CreateInviteModalAttrs = {
+  chainInfo?: ChainInfo;
+};
+
 export class CreateInviteModal
-  implements
-    m.ClassComponent<{
-      chainInfo?: ChainInfo;
-    }>
+  implements m.ClassComponent<CreateInviteModalAttrs>
 {
   private closeResults: () => void;
   private disabled: boolean;
@@ -386,7 +387,7 @@ export class CreateInviteModal
   private searchAddressTerm: string;
   private success: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<CreateInviteModalAttrs>) {
     const { chainInfo } = vnode.attrs;
 
     const chainOrCommunityObj = chainInfo ? { chain: chainInfo } : null;

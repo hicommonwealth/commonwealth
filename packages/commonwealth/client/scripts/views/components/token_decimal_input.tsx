@@ -70,7 +70,6 @@ export class TokenDecimalInput
         {decimals > 0 && (
           <div class="token-settings">
             <CWToggle
-              value={this.isInputInWei}
               checked={!this.isInputInWei}
               onchange={() => {
                 this.isInputInWei = !this.isInputInWei;

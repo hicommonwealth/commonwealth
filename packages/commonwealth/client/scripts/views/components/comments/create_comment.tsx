@@ -35,7 +35,7 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
   private sendingComment;
   private uploadsInProgress;
 
-  view(vnode) {
+  view(vnode: m.Vnode<CreateCommmentAttrs>) {
     const {
       handleIsReplying,
       parentCommentId,
@@ -182,7 +182,6 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
               }}
               editorNamespace={`${document.location.pathname}-commenting`}
               imageUploader
-              tabindex={vnode.attrs.tabindex}
             />
             {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
               <CWText className="token-req-text">
