@@ -44,7 +44,7 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
   private saving: boolean;
   private _contentsDoc: QuillTextContents;
 
-  view(vnode) {
+  view(vnode: m.Vnode<EditTopicModalAttrs>) {
     const {
       defaultOffchainTemplate,
       description,
