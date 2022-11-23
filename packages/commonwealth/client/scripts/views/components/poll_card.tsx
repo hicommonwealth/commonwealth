@@ -85,7 +85,7 @@ export type CastVoteAttrs = {
     selectedOption: string,
     handleVoteCast: () => void,
     isSelected?: boolean
-  ) => any;
+  ) => void;
 };
 
 export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
