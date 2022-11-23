@@ -49,10 +49,23 @@
     width: 100%;
 
     .recent-thread-row {
+      cursor: pointer;
       display: flex;
       flex-direction: column;
       gap: 12px;
       padding: 16px;
+
+      &.isPinned {
+        background: $neutral-100;
+
+        &:hover {
+          background: $neutral-200;
+        }
+      }
+
+      &:hover {
+        background: $neutral-50;
+      }
 
       @include mediumSmallInclusive {
         padding: 16px 0;
@@ -89,12 +102,6 @@
           gap: 4px;
 
           @include flame;
-        }
-      }
-
-      .thread-title-text.Text {
-        &:hover {
-          text-decoration: underline;
         }
       }
 

@@ -28,7 +28,10 @@ import {
   isHot,
 } from './helpers';
 import { CWTag } from '../../components/component_kit/cw_tag';
-import { isWindowSmallInclusive } from '../../components/component_kit/helpers';
+import {
+  getClasses,
+  isWindowSmallInclusive,
+} from '../../components/component_kit/helpers';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 
 type ThreadPreviewAttrs = {
@@ -68,7 +71,10 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
 
     return (
       <div
-        class="ThreadPreview"
+        class={getClasses<{ isPinned?: boolean }>(
+          { isPinned: thread.pinned },
+          'ThreadPreview'
+        )}
         onclick={(e) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,

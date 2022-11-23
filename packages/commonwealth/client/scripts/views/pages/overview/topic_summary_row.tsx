@@ -19,6 +19,7 @@ import { getLastUpdated, isHot } from '../discussions/helpers';
 import { SharePopover } from '../../components/share_popover';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { getClasses } from '../../components/component_kit/helpers';
 
 type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
@@ -89,7 +90,16 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
 
             return (
               <>
-                <div class="recent-thread-row">
+                <div
+                  class={getClasses<{ isPinned?: boolean }>(
+                    { isPinned: thread.pinned },
+                    'recent-thread-row'
+                  )}
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    m.route.set(discussionLink);
+                  }}
+                >
                   <div class="row-top">
                     <div class="user-and-date-row">
                       {m(User, {
@@ -115,15 +125,7 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                       {thread.pinned && <CWIcon iconName="pin" />}
                     </div>
                   </div>
-                  <CWText
-                    type="b2"
-                    fontWeight="bold"
-                    className="thread-title-text"
-                    onclick={(e) => {
-                      e.stopPropagation();
-                      m.route.set(discussionLink);
-                    }}
-                  >
+                  <CWText type="b2" fontWeight="bold">
                     {thread.title}
                   </CWText>
                   <div class="row-bottom">
@@ -141,53 +143,69 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                       </div> */}
                     </div>
                     <div class="row-bottom-menu">
-                      <SharePopover />
+                      <div
+                        onclick={(e) => {
+                          // prevent clicks from propagating to discussion row
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <SharePopover />
+                      </div>
                       {isAdminOrMod && (
-                        <CWPopoverMenu
-                          menuItems={[
-                            {
-                              label: 'Delete',
-                              iconLeft: 'trash',
-                              onclick: async (e) => {
-                                e.preventDefault();
+                        <div
+                          onclick={(e) => {
+                            // prevent clicks from propagating to discussion row
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
+                          <CWPopoverMenu
+                            menuItems={[
+                              {
+                                label: 'Delete',
+                                iconLeft: 'trash',
+                                onclick: async (e) => {
+                                  e.preventDefault();
 
-                                const confirmed =
-                                  await confirmationModalWithText(
-                                    'Delete this entire thread?'
-                                  )();
+                                  const confirmed =
+                                    await confirmationModalWithText(
+                                      'Delete this entire thread?'
+                                    )();
 
-                                if (!confirmed) return;
+                                  if (!confirmed) return;
 
-                                app.threads.delete(thread).then(() => {
-                                  navigateToSubpage('/overview');
-                                });
-                              },
-                            },
-                            {
-                              label: thread.readOnly
-                                ? 'Unlock thread'
-                                : 'Lock thread',
-                              iconLeft: 'lock',
-                              onclick: (e) => {
-                                e.preventDefault();
-                                app.threads
-                                  .setPrivacy({
-                                    threadId: thread.id,
-                                    readOnly: !thread.readOnly,
-                                  })
-                                  .then(() => {
-                                    m.redraw();
+                                  app.threads.delete(thread).then(() => {
+                                    navigateToSubpage('/overview');
                                   });
+                                },
                               },
-                            },
-                          ]}
-                          trigger={
-                            <CWIconButton
-                              iconSize="small"
-                              iconName="dotsVertical"
-                            />
-                          }
-                        />
+                              {
+                                label: thread.readOnly
+                                  ? 'Unlock thread'
+                                  : 'Lock thread',
+                                iconLeft: 'lock',
+                                onclick: (e) => {
+                                  e.preventDefault();
+                                  app.threads
+                                    .setPrivacy({
+                                      threadId: thread.id,
+                                      readOnly: !thread.readOnly,
+                                    })
+                                    .then(() => {
+                                      m.redraw();
+                                    });
+                                },
+                              },
+                            ]}
+                            trigger={
+                              <CWIconButton
+                                iconSize="small"
+                                iconName="dotsVertical"
+                              />
+                            }
+                          />
+                        </div>
                       )}
                     </div>
                   </div>

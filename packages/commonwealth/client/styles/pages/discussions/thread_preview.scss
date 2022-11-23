@@ -6,6 +6,14 @@
   padding: 16px;
   width: 100%;
 
+  &.isPinned {
+    background: $neutral-100;
+
+    &:hover {
+      background: $neutral-200;
+    }
+  }
+
   &:hover {
     background: $neutral-50;
   }
