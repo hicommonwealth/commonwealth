@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "yarn --cwd packages/commonwealth start",
-    "build": "yarn --cwd packages/commonwealth heroku-postbuild && yarn --cwd packages/chain-events build-services",
+    "build": "yarn scripts/build.sh",
     "psql": "yarn --cwd packages/commonwealth psql",
     "test-api": "yarn --cwd packages/commonwealth test-api",
     "dump-db": "yarn --cwd packages/commonwealth dump-db",
