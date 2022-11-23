@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import {
+  ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
@@ -138,7 +139,7 @@ const createComment = async (
     }
   }
 
-  if (chain && chain.type === ChainType.Token) {
+  if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
     // skip check for admins
     const isAdmin = await findAllRoles(
       models,
