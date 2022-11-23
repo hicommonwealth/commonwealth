@@ -18,7 +18,7 @@ import {
   EthFormFields,
 } from 'views/pages/create_community/types';
 import Web3 from 'web3';
-import { processAbiInputsToDataTypes } from 'client/scripts/helpers/abi_form_helpers';
+import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Ethereum;
