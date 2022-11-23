@@ -67,6 +67,10 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
     const { listingStore } = app.threads;
     const { topicName, stageName } = this;
 
+    const onUpdate = () => {
+      m.redraw();
+    };
+
     // Fetch first 20 unpinned threads
     if (
       !listingStore.isInitialized({
@@ -116,10 +120,10 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
           {totalThreadCount > 0 ? (
             <div class="RecentThreads">
               {pinnedThreads.map((t) => (
-                <ThreadPreview thread={t} />
+                <ThreadPreview thread={t} onUpdate={onUpdate} />
               ))}
               {unpinnedThreads.map((t) => (
-                <ThreadPreview thread={t} />
+                <ThreadPreview thread={t} onUpdate={onUpdate} />
               ))}
               {listingStore.isDepleted({ topicName, stageName }) && (
                 <div class="listing-scroll">

@@ -26,12 +26,13 @@ import {
 } from './helpers';
 
 type ThreadPreviewAttrs = {
+  onUpdate: () => void;
   thread: Thread;
 };
 
 export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
   view(vnode: m.Vnode<ThreadPreviewAttrs>) {
-    const { thread } = vnode.attrs;
+    const { thread, onUpdate } = vnode.attrs;
 
     const commentsCount = app.comments.nComments(thread);
 
@@ -156,7 +157,9 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                   }
                 />
               </div>
-              {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}
+              {app.isLoggedIn() && (
+                <ThreadPreviewMenu thread={thread} onUpdate={onUpdate} />
+              )}
             </div>
           </div>
         </div>

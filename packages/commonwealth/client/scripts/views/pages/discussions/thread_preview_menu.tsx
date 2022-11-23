@@ -12,6 +12,7 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 type ThreadPreviewMenuAttrs = {
+  onUpdate: () => void;
   thread: Thread;
 };
 
@@ -21,7 +22,7 @@ export class ThreadPreviewMenu
   view(vnode: m.Vnode<ThreadPreviewMenuAttrs>) {
     if (!app.isLoggedIn()) return;
 
-    const { thread } = vnode.attrs;
+    const { onUpdate, thread } = vnode.attrs;
 
     const hasAdminPermissions =
       app.user.activeAccount &&
@@ -57,7 +58,7 @@ export class ThreadPreviewMenu
 
                       app.threads
                         .pin({ proposal: thread })
-                        .then(() => m.redraw());
+                        .then(() => onUpdate());
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
                   },
@@ -74,7 +75,7 @@ export class ThreadPreviewMenu
                           threadId: thread.id,
                           readOnly: !thread.readOnly,
                         })
-                        .then(() => m.redraw());
+                        .then(() => onUpdate());
                     },
                     label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                   },
