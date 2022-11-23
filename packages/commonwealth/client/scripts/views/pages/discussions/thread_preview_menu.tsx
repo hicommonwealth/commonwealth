@@ -12,7 +12,6 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 type ThreadPreviewMenuAttrs = {
-  onUpdate: () => void;
   thread: Thread;
 };
 
@@ -22,7 +21,7 @@ export class ThreadPreviewMenu
   view(vnode: m.Vnode<ThreadPreviewMenuAttrs>) {
     if (!app.isLoggedIn()) return;
 
-    const { onUpdate, thread } = vnode.attrs;
+    const { thread } = vnode.attrs;
 
     const hasAdminPermissions =
       app.user.activeAccount &&
@@ -58,7 +57,7 @@ export class ThreadPreviewMenu
 
                       app.threads
                         .pin({ proposal: thread })
-                        .then(() => onUpdate());
+                        .then(() => m.redraw());
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
                   },
@@ -75,7 +74,7 @@ export class ThreadPreviewMenu
                           threadId: thread.id,
                           readOnly: !thread.readOnly,
                         })
-                        .then(() => onUpdate());
+                        .then(() => m.redraw());
                     },
                     label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                   },
@@ -127,21 +126,15 @@ export class ThreadPreviewMenu
                     onclick: async (e) => {
                       e.preventDefault();
 
-                      const carat = document.getElementsByClassName(
-                        'cui-popover-trigger-active'
-                      )[0] as HTMLButtonElement;
-
-                      if (carat) carat.click();
-
                       const confirmed = await confirmationModalWithText(
                         'Delete this entire thread?'
                       )();
 
-                      if (!confirmed) return;
-
-                      app.threads.delete(thread).then(() => {
-                        navigateToSubpage('/discussions');
-                      });
+                      if (confirmed) {
+                        app.threads.delete(thread).then(() => {
+                          navigateToSubpage('/discussions');
+                        });
+                      }
                     },
                     label: 'Delete',
                   },

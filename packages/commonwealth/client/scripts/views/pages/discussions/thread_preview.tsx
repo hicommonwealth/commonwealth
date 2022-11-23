@@ -6,7 +6,10 @@ import moment from 'moment';
 import 'pages/discussions/thread_preview.scss';
 
 import app from 'state';
-import { getProposalUrlPath } from 'identifiers';
+import {
+  chainEntityTypeToProposalShortName,
+  getProposalUrlPath,
+} from 'identifiers';
 import { slugify } from 'utils';
 import { isCommandClick } from 'helpers';
 import { AddressInfo, Thread } from 'models';
@@ -24,15 +27,15 @@ import {
   getThreadSubScriptionMenuItem,
   isHot,
 } from './helpers';
+import { CWTag } from '../../components/component_kit/cw_tag';
 
 type ThreadPreviewAttrs = {
-  onUpdate: () => void;
   thread: Thread;
 };
 
 export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
   view(vnode: m.Vnode<ThreadPreviewAttrs>) {
-    const { thread, onUpdate } = vnode.attrs;
+    const { thread } = vnode.attrs;
 
     const commentsCount = app.comments.nComments(thread);
 
@@ -90,49 +93,48 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
+              {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
             </div>
-            {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
-            {isHot(thread) && <div class="flame" />}
-            {thread.pinned && <CWIcon iconName="pin" />}
+            <div class="top-row-icons">
+              {isHot(thread) && <div class="flame" />}
+              {thread.pinned && <CWIcon iconName="pin" />}
+            </div>
+          </div>
+          <div class="title-row">
+            <CWText type="h5" fontWeight="semiBold">
+              {thread.title}
+            </CWText>
+            {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
-            {/* {thread.hasPoll && <CWTag label="Poll" size="xs" />} */}
-
-            {/*
-            {thread.chainEntities?.length > 0 &&
-              thread.chainEntities
+            {thread.snapshotProposal && (
+              <CWTag
+                type="active"
+                label={['Snap ', `${thread.snapshotProposal.slice(0, 4)}…`]}
+              />
+            )}
+          </div>
+          {thread.chainEntities?.length > 0 && (
+            <div class="tags-row">
+              {thread.chainEntities
                 .sort((a, b) => {
                   return +a.typeId - +b.typeId;
                 })
                 .map((ce) => {
                   if (!chainEntityTypeToProposalShortName(ce.type)) return;
-                  return m(Button, {
-                    label: [
-                      chainEntityTypeToProposalShortName(ce.type),
-                      Number.isNaN(parseInt(ce.typeId, 10))
-                        ? ''
-                        : ` #${ce.typeId}`,
-                    ],
-                    intent: 'primary',
-                    class: 'proposal-button',
-                    size: 'xs',
-                    compact: true,
-                  });
+                  return (
+                    <CWTag
+                      type="proposal"
+                      label={[
+                        chainEntityTypeToProposalShortName(ce.type),
+                        Number.isNaN(parseInt(ce.typeId, 10))
+                          ? ''
+                          : ` #${ce.typeId}`,
+                      ]}
+                    />
+                  );
                 })}
-
-            {thread.snapshotProposal && (
-              <Button
-                label={['Snap ', `${thread.snapshotProposal.slice(0, 4)}…`]}
-                intent="primary"
-                class="proposal-button"
-                size="xs"
-                compact={true}
-              />
-            )}
-            */}
-          </div>
-          <CWText type="h5" fontWeight="semiBold">
-            {thread.title}
-          </CWText>
+            </div>
+          )}
           <div class="row-bottom">
             <div class="comments-count">
               <CWIcon iconName="feedback" iconSize="small" />
@@ -157,9 +159,7 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                   }
                 />
               </div>
-              {app.isLoggedIn() && (
-                <ThreadPreviewMenu thread={thread} onUpdate={onUpdate} />
-              )}
+              {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}
             </div>
           </div>
         </div>

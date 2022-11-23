@@ -17,6 +17,7 @@
     width: 100%;
 
     .top-row {
+      align-items: center;
       display: flex;
       justify-content: space-between;
 
@@ -45,7 +46,18 @@
         }
       }
 
-      @include flame;
+      .top-row-icons {
+        display: flex;
+        gap: 8px;
+
+        @include flame;
+      }
+    }
+
+    .title-row,
+    .tags-row {
+      display: flex;
+      gap: 8px;
     }
 
     .row-bottom {

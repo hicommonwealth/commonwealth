@@ -6,6 +6,7 @@ import { debounce } from 'lodash';
 import 'pages/discussions/index.scss';
 
 import app from 'state';
+import { Thread } from 'models';
 import { pluralize } from 'helpers';
 import { isNotUndefined } from 'helpers/typeGuards';
 import { PageLoading } from '../loading';
@@ -61,19 +62,18 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
   }
 
   view(vnode: m.Vnode<DiscussionPageAttrs>) {
+    if (!app.chain || !app.chain.serverLoaded) {
+      return <PageLoading />;
+    }
+
     this.topicName = vnode.attrs.topic;
     this.stageName = m.route.param('stage');
 
-    const { listingStore } = app.threads;
     const { topicName, stageName } = this;
-
-    const onUpdate = () => {
-      m.redraw();
-    };
 
     // Fetch first 20 unpinned threads
     if (
-      !listingStore.isInitialized({
+      !app.threads.listingStore.isInitialized({
         topicName,
         stageName,
       })
@@ -85,13 +85,13 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
       });
     }
 
-    const pinnedThreads = listingStore.getThreads({
+    const pinnedThreads = app.threads.listingStore.getThreads({
       topicName,
       stageName,
       pinned: true,
     });
 
-    const unpinnedThreads = listingStore.getThreads({
+    const unpinnedThreads = app.threads.listingStore.getThreads({
       topicName,
       stageName,
       pinned: false,
@@ -101,7 +101,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
 
     const subpage = topicName || stageName;
 
-    return !app.chain || !app.chain.serverLoaded || this.initializing ? (
+    return this.initializing ? (
       <PageLoading />
     ) : (
       <Sublayout
@@ -120,12 +120,15 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
           {totalThreadCount > 0 ? (
             <div class="RecentThreads">
               {pinnedThreads.map((t) => (
-                <ThreadPreview thread={t} onUpdate={onUpdate} />
+                <ThreadPreview thread={t} />
               ))}
               {unpinnedThreads.map((t) => (
-                <ThreadPreview thread={t} onUpdate={onUpdate} />
+                <ThreadPreview thread={t} />
               ))}
-              {listingStore.isDepleted({ topicName, stageName }) && (
+              {app.threads.listingStore.isDepleted({
+                topicName,
+                stageName,
+              }) && (
                 <div class="listing-scroll">
                   <CWText className="thread-count-text">
                     {`Showing ${totalThreadCount} of ${pluralize(
