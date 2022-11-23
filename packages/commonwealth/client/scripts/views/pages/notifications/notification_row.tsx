@@ -13,20 +13,19 @@ import { Notification, AddressInfo } from 'models';
 import { link } from 'helpers';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { getBatchNotificationFields } from './helpers';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
-export class NotificationRow
-  implements
-    m.ClassComponent<{
-      notifications: Notification[];
-      onListPage?: boolean;
-    }>
-{
+type NotificationRowAttrs = {
+  notifications: Array<Notification>;
+  onListPage?: boolean;
+};
+
+export class NotificationRow implements m.ClassComponent<NotificationRowAttrs> {
   private markingRead: boolean;
   private scrollOrStop: boolean;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.Vnode<NotificationRowAttrs>) {
     if (
       m.route.param('id') &&
       vnode.attrs.onListPage &&
@@ -36,7 +35,7 @@ export class NotificationRow
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<NotificationRowAttrs>) {
     const { notifications } = vnode.attrs;
 
     const notification = notifications[0];
@@ -91,12 +90,8 @@ export class NotificationRow
             m('.comment-body-top.chain-event-notification-top', [
               `${label.heading} on ${chainName}`,
               !vnode.attrs.onListPage &&
-                m(CWIcon, {
+                m(CWIconButton, {
                   iconName: 'close',
-                  onmousedown: (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  },
                   onclick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
