@@ -56,11 +56,11 @@ export class ERC721Form implements m.ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 

@@ -66,10 +66,14 @@ export const getThreadSubScriptionMenuItem = (proposal: Thread) => {
   };
 };
 
+type DiscussionRowMenuAttrs = {
+  proposal: Thread;
+};
+
 export class DiscussionRowMenu
-  implements m.ClassComponent<{ proposal: Thread }>
+  implements m.ClassComponent<DiscussionRowMenuAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<DiscussionRowMenuAttrs>) {
     if (!app.isLoggedIn()) return;
 
     const { proposal } = vnode.attrs;
