@@ -1,5 +1,4 @@
 import m from 'mithril';
-import ClassComponent from 'class_component';
 
 export default abstract class ClassComponent<
   A extends Record<string, unknown> = Record<string, unknown>
