@@ -28,12 +28,35 @@ import {
   isHot,
 } from './helpers';
 import { CWTag } from '../../components/component_kit/cw_tag';
+import { isWindowSmallInclusive } from '../../components/component_kit/helpers';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
 
 type ThreadPreviewAttrs = {
   thread: Thread;
 };
 
 export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
+  private isWindowSmallInclusive: boolean;
+
+  onResize() {
+    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+    m.redraw();
+  }
+
+  oninit() {
+    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+
+    window.addEventListener('resize', () => {
+      this.onResize();
+    });
+  }
+
+  onremove() {
+    window.removeEventListener('resize', () => {
+      this.onResize();
+    });
+  }
+
   view(vnode: m.Vnode<ThreadPreviewAttrs>) {
     const { thread } = vnode.attrs;
 
@@ -68,7 +91,9 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
         }}
         key={thread.id}
       >
-        <ThreadPreviewReactionButton thread={thread} />
+        {!this.isWindowSmallInclusive && (
+          <ThreadPreviewReactionButton thread={thread} />
+        )}
         <div class="main-content">
           <div class="top-row">
             <div class="user-and-date">
@@ -97,7 +122,12 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
             </div>
             <div class="top-row-icons">
               {isHot(thread) && <div class="flame" />}
-              {thread.pinned && <CWIcon iconName="pin" />}
+              {thread.pinned && (
+                <CWIcon
+                  iconName="pin"
+                  iconSize={this.isWindowSmallInclusive ? 'small' : 'medium'}
+                />
+              )}
             </div>
           </div>
           <div class="title-row">
@@ -137,11 +167,24 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
           )}
           <div class="row-bottom">
             <div class="comments-count">
+              {this.isWindowSmallInclusive && (
+                <ThreadReactionButton thread={thread} />
+              )}
               <CWIcon iconName="feedback" iconSize="small" />
-              <CWText type="caption">{commentsCount} comments</CWText>
+              <CWText type="caption">
+                {commentsCount} {!this.isWindowSmallInclusive && `comments`}
+              </CWText>
             </div>
             <div class="row-bottom-menu">
-              <SharePopover />
+              <div
+                onclick={(e) => {
+                  // prevent clicks from propagating to discussion row
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+              >
+                <SharePopover />
+              </div>
               <div
                 onclick={(e) => {
                   // prevent clicks from propagating to discussion row

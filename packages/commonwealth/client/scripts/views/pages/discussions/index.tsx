@@ -6,7 +6,6 @@ import { debounce } from 'lodash';
 import 'pages/discussions/index.scss';
 
 import app from 'state';
-import { Thread } from 'models';
 import { pluralize } from 'helpers';
 import { isNotUndefined } from 'helpers/typeGuards';
 import { PageLoading } from '../loading';
