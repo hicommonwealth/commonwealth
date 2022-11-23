@@ -29,12 +29,11 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       res.status(500).send("Error sending snapshot event");
     }
 
-
     const parsedId = event.id.replace(/.*\//, "");
-    console.log({ parsedId })
+    const eventType = event.event.split("/")[1];
+    console.log({ parsedId });
     const response = await fetchNewSnapshotProposal(parsedId);
-    console.log(response.data.proposal.end)
-
+    console.log(response.data.proposal.end);
     event.id = parsedId;
     event.title = response.data.proposal.title;
     event.body = response.data.proposal.body;
@@ -42,8 +41,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     event.space = response.data.proposal.space;
     event.start = response.data.proposal.start;
     event.expire = response.data.proposal.end;
-    console.log({ event })
-
+    console.log({ event });
 
     await controller.publish(event, RascalPublications.SnapshotListener);
     res.status(200).send({ message: "Snapshot event received", event });
@@ -64,5 +62,5 @@ app.listen(port, async () => {
   } catch (err) {
     log.error(`Error starting server: ${err}`);
   }
-  app.bind
+  app.bind;
 });

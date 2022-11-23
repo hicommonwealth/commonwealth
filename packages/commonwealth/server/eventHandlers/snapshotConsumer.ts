@@ -3,6 +3,7 @@ import {
   RabbitMQSubscription,
 } from 'common-common/src/serviceConsumer';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import axios from 'axios';
 import {
   getRabbitMQConfig,
   RascalSubscriptions,
@@ -18,48 +19,79 @@ async function processSnapshotMessage(msg: SnapshotNotification) {
     console.log('Processing snapshot message', msg);
     const { space, id, title, body, choices, start, expire } = msg;
 
-    // Check if Space Exists, create it if not
-
-    // Check if proposal exists, create it if not
-
-    console.log('message id,', msg.event);
     const eventType = msg.event;
-
-    const proposal = await models.SnapshotProposal.findOne({
+    let proposal = await models.SnapshotProposal.findOne({
       where: { id: msg.id },
     });
 
-    if (eventType === 'proposal/created') {
-      if (!proposal) {
-        await models.SnapshotProposal.create({
-          id,
-          title,
-          body,
-          choices,
-          start,
-          event: eventType,
-          expire,
-          space,
-        });
-      }
-    } else {
-      if (!proposal) {
-        throw new Error('Proposal does not exist');
-      }
-    }
+    await models.SnapshotSpace.findOrCreate({
+      where: { snapshot_space: space },
+    });
+
+    // if (eventType === 'proposal/created' && proposal) {
+    //   log.error(`Proposal already exists, cannot create`);
+    //   return;
+    // }
 
     if (!proposal) {
-      await models.SnapshotProposal.create({
-        id: msg.id,
-        title: msg.title,
-        body: msg.body,
-        choices: msg.choices,
-        space: msg.space,
-        event: msg.event,
-        start: msg.start,
-        expire: msg.expire,
+      proposal = await models.SnapshotProposal.create({
+        id,
+        title,
+        body,
+        choices,
+        space,
+        start,
+        expire,
       });
-      log.info(`Created new snapshot proposal: ${msg.id}`);
+    }
+
+    const associatedCommunities = await models.CommunitySnapshotSpaces.findAll({
+      where: { snapshot_space_id: space },
+    });
+
+    for (const community of associatedCommunities) {
+      const communityId = community.chain_id;
+      const communityDiscordConfig = await models.DiscordBotConfig.findAll({
+        where: {
+          chain_id: communityId,
+        },
+      });
+
+      for (const config of communityDiscordConfig) {
+        if (config.snapshot_channel_id) {
+          // Pass data to Discord bot
+          try {
+            await axios.post(
+              `${process.env.DISCORD_BOT_URL}/send-snapshot-notification`,
+              {
+                snapshotNotificationData: {
+                  space,
+                  id,
+                  title,
+                  body,
+                  choices,
+                  start,
+                  expire,
+                },
+                guildId: config.guild_id,
+                channelId: config.snapshot_channel_id,
+                eventType,
+              },
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                  authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`,
+                },
+              }
+            );
+          } catch (e) {
+            console.log(
+              'Error sending snapshot notification to discord bot',
+              e
+            );
+          }
+        }
+      }
     }
   } catch (err) {
     log.error(`Error processing snapshot message: ${err}`);

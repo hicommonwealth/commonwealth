@@ -1,36 +1,35 @@
-import fetch from 'node-fetch';
+import fetch from "node-fetch";
 import dotenv from "dotenv";
 dotenv.config();
 
-export default async function fetchNewSnapshotProposal(
-  id: string,
-) {
+export default async function fetchNewSnapshotProposal(id: string) {
   try {
-    const environment = process.env.NODE_ENV || 'development';
+    const environment = process.env.NODE_ENV || "development";
 
-    if (environment === 'development') {
+    if (environment === "development") {
+      console.log("development");
       const dummyProposal = {
         data: {
           proposal: {
-            id: "proposal/0x123",
+            id: "proposal/0x1234",
             title: "Dummy Proposal",
             body: "This is a dummy proposal",
             choices: ["Yes", "No"],
-            space: "dummy-space",
-            start: "2021-01-01T00:00:00.000Z",
+            space: "dummy-space.eth",
+            start: "2021-01-01T00:00:00.000Z", // TODO: is this the format we get back?
             end: "2021-01-01T00:00:00.000Z",
-          }
-        }
-      }
+          },
+        },
+      };
 
       return dummyProposal;
     }
-    
-    const response = await fetch('https://hub.snapshot.org/graphql', {
-      method: 'POST',
+
+    const response = await fetch("https://hub.snapshot.org/graphql", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
+        "Content-Type": "application/json",
+        Accept: "application/json",
       },
       body: JSON.stringify({
         query: `
@@ -52,7 +51,7 @@ export default async function fetchNewSnapshotProposal(
     });
 
     const proposal = await response.json();
-    proposal.expire = proposal.end
+    proposal.expire = proposal.end;
 
     return proposal;
   } catch (err) {
