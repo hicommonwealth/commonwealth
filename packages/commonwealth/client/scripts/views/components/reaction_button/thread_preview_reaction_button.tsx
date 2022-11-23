@@ -29,7 +29,7 @@ export class ThreadPreviewReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<ThreadPreviewReactionButtonAttrs, this>) {
+  view(vnode: m.Vnode<ThreadPreviewReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};
