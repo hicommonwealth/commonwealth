@@ -25,7 +25,7 @@ import {
 } from './sputnik/types';
 import { NearAccounts, NearAccount } from './account';
 
-export interface IDaoInfo {
+export type IDaoInfo = {
   contractId: string;
   amount: string;
   name: string;

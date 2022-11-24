@@ -114,9 +114,9 @@ CONTACT US
 If you have any questions about this Privacy Statement, please contact us at: hello@commonwealth.im.
 `;
 
-const PrivacyPage: m.Component<{}> = {
-  oncreate: (vnode) => {},
-  view: (vnode) => {
+class PrivacyPage extends ClassComponent<{}> {
+  public oncreate(vnode) {}
+  public view(vnode) {
     return m('.PrivacyPage', [
       m(HeaderLandingPage, {
         scrollHeader: false,

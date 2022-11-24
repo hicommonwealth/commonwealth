@@ -5,7 +5,7 @@ function getLocalStorageKey(prefix: string, chain: string, name: string, id: str
   return `${prefix}_${chain}_${name}_${id}`;
 }
 
-interface IStorageItem<T> {
+type IStorageItem<T> = {
   data: T;
   timestamp: number;
 }

@@ -237,14 +237,14 @@ class HomepageCommunityCards extends ClassComponent {
   }
 }
 
-const CommunityCardPage: m.Component = {
-  view: () => {
+class CommunityCardPage extends ClassComponent {
+  public view() {
     return (
       <Sublayout>
         <HomepageCommunityCards />
       </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default CommunityCardPage;

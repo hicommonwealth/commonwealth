@@ -7,8 +7,8 @@ import HeaderLandingPage from '../landing/landing_page_header';
 import LandingPageButton from '../landing/landing_page_button';
 import { Footer } from '../../footer';
 
-const WhyCommonWealthView: m.Component<{}, {}> = {
-  view: (vnode) => {
+class WhyCommonWealthView extends ClassComponent<{}, {}> {
+  public view(vnode) {
     return m('.WhyCommonWealth', [
       m(
         'div',

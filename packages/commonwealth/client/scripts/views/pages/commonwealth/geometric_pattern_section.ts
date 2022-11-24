@@ -1,8 +1,8 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-const GeometricPatternSection: m.Component<{}, {}> = {
-  view: (vnode) => {
+class GeometricPatternSection extends ClassComponent<{}, {}> {
+  public view(vnode) {
     return m(
       'section',
       {

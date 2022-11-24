@@ -118,7 +118,7 @@ export const PROPOSAL_VOTES_QUERY = gql`
   }
 `;
 
-export interface SnapshotSpace {
+export type SnapshotSpace = {
   id: string;
   name: string;
   about: string;
@@ -137,7 +137,7 @@ export interface SnapshotSpace {
   members: string[];
 }
 
-export interface SnapshotProposal {
+export type SnapshotProposal = {
   id: string;
   ipfs: string;
   author: string;

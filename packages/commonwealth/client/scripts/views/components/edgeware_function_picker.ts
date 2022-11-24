@@ -7,9 +7,10 @@ import app from 'state';
 import { DropdownFormField } from 'views/components/forms';
 import Substrate from 'controllers/chain/substrate/adapter';
 
-const EdgewareFunctionPicker = {
-  form: { module: '', function: '', args: [] },
-  getMethod() {
+class EdgewareFunctionPicker extends ClassComponent {
+  private form: { module?: string, function?: string, args?: any[] } = { module: '', function: '', args: [] };
+
+  private getMethod() {
     const mod = this.form.module;
     const func = this.form.function;
     const args = this.form.args;
@@ -19,24 +20,25 @@ const EdgewareFunctionPicker = {
       // eslint-disable-next-line
       return;
     }
-  },
-  view: (vnode) => {
-    vnode.state.form = vnode.state.form || {};
-    vnode.state.form.module =
-      vnode.state.form.module ||
+  }
+
+  public view(vnode) {
+    this.form = this.form || {};
+    this.form.module =
+      this.form.module ||
       (app.chain as Substrate).chain.listApiModules()[0];
-    vnode.state.form.function =
-      vnode.state.form.function ||
+    this.form.function =
+      this.form.function ||
       (app.chain as Substrate).chain.listModuleFunctions(
-        vnode.state.form.module
+        this.form.module
       )[0];
-    vnode.state.form.args = vnode.state.form.args || [];
+    this.form.args = this.form.args || [];
 
     let argumentInputs;
     try {
       argumentInputs = (app.chain as Substrate).chain.generateArgumentInputs(
-        vnode.state.form.module,
-        vnode.state.form.function
+        this.form.module,
+        this.form.function
       );
     } catch (e) {
       return m('.FunctionPicker', 'Invalid function!');
@@ -57,14 +59,14 @@ const EdgewareFunctionPicker = {
               .map((mod) => {
                 return { label: mod, value: mod };
               }),
-            value: vnode.state.form.module,
+            value: this.form.module,
             defaultValue: (app.chain as Substrate).chain.listApiModules()[0],
             callback: (result) => {
-              vnode.state.form.module = result;
-              vnode.state.form.function = (
+              this.form.module = result;
+              this.form.function = (
                 app.chain as Substrate
               ).chain.listModuleFunctions(result)[0];
-              vnode.state.form.args = [];
+              this.form.args = [];
               m.redraw();
               setTimeout(() => {
                 m.redraw();
@@ -75,17 +77,17 @@ const EdgewareFunctionPicker = {
             title: 'Function',
             name: 'function',
             choices: (app.chain as Substrate).chain
-              .listModuleFunctions(vnode.state.form.module)
+              .listModuleFunctions(this.form.module)
               .map((func) => {
                 return { label: func, value: func };
               }),
             defaultValue: (app.chain as Substrate).chain.listModuleFunctions(
-              vnode.state.form.module
+              this.form.module
             )[0],
-            value: vnode.state.form.function,
+            value: this.form.function,
             callback: (result) => {
-              vnode.state.form.function = result;
-              vnode.state.form.args = [];
+              this.form.function = result;
+              this.form.args = [];
               setTimeout(() => {
                 m.redraw();
               }, 0);
@@ -102,7 +104,7 @@ const EdgewareFunctionPicker = {
                   placeholder: `${name} (${app.chain.currency})`,
                   oninput: (e) => {
                     const result = (e.target as any).value;
-                    vnode.state.form.args[index] = app.chain.chain.coins(
+                    this.form.args[index] = app.chain.chain.coins(
                       parseFloat(result),
                       true
                     );
@@ -119,7 +121,7 @@ const EdgewareFunctionPicker = {
                   placeholder: `${name} (${type})`,
                   oninput: (e) => {
                     const result = (e.target as any).value;
-                    vnode.state.form.args[index] = result
+                    this.form.args[index] = result
                       .split(',')
                       .map((str) => str.trim());
                     m.redraw(); // TODO: why is this needed?
@@ -134,7 +136,7 @@ const EdgewareFunctionPicker = {
                 placeholder: `${name} (${type})`,
                 oninput: (e) => {
                   const result = (e.target as any).value;
-                  vnode.state.form.args[index] = result;
+                  this.form.args[index] = result;
                   m.redraw(); // TODO: why is this needed?
                 },
               }),
@@ -146,8 +148,8 @@ const EdgewareFunctionPicker = {
           m(FormLabel, 'Proposal Hash'),
           m(Input, {
             disabled: true,
-            value: EdgewareFunctionPicker.getMethod()
-              ? blake2AsHex(EdgewareFunctionPicker.getMethod().toHex())
+            value: this.getMethod()
+              ? blake2AsHex(this.getMethod().toHex())
               : '',
           }),
         ]),

@@ -17,8 +17,8 @@ import { ProposalModule } from 'models';
 import NewProposalForm from 'views/pages/new_proposal/new_proposal_form';
 import { PageNotFound } from '../404';
 
-const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
-  view: (vnode) => {
+class NewProposalPage extends ClassComponent<{ type }, { typeEnum; titlePre }> {
+  public view(vnode) {
     vnode.state.typeEnum = vnode.attrs.type;
     vnode.state.titlePre = 'New';
 

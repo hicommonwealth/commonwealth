@@ -607,7 +607,7 @@ export class CreateInviteModal
 
 // Gabe 7/28/22 - Invite link generation doesn't work right now
 
-// const CreateInviteLink: m.Component<
+// class CreateInviteLink extends ClassComponent<
 //   {
 //     chain?: ChainInfo;
 //     onChangeHandler?: Function;
@@ -617,13 +617,13 @@ export class CreateInviteModal
 //     inviteUses: string;
 //     inviteTime: string;
 //   }
-// > = {
-//   oninit: (vnode) => {
+// > {
+//   public oninit(vnode) {
 //     this.link = '';
 //     this.inviteUses = 'none';
 //     this.inviteTime = 'none';
 //   },
-//   view: (vnode) => {
+//   public view(vnode) {
 //     const { chain, onChangeHandler } = vnode.attrs;
 //     const chainOrCommunityObj = { chain: chain.id };
 //     return m(Form, { class: 'CreateInviteLink' }, [

@@ -302,26 +302,24 @@ const getBatchNotificationFields = (
   };
 };
 
-const NotificationRow: m.Component<
+class NotificationRow extends ClassComponent<
   {
     notifications: Notification[];
     onListPage?: boolean;
-  },
-  {
-    scrollOrStop: boolean;
-    markingRead: boolean;
   }
-> = {
-  oncreate: (vnode) => {
+> {
+  private scrollOrStop: boolean;
+  private markingRead: boolean;
+  public oncreate(vnode) {
     if (
       m.route.param('id') &&
       vnode.attrs.onListPage &&
       m.route.param('id') === vnode.attrs.notifications[0].id.toString()
     ) {
-      vnode.state.scrollOrStop = true;
+      this.scrollOrStop = true;
     }
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     const { notifications } = vnode.attrs;
     const notification = notifications[0];
     const { category } = notifications[0].subscription;
@@ -342,12 +340,12 @@ const NotificationRow: m.Component<
       if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
       const label = ChainEventLabel(chainId, chainEvent);
 
-      if (vnode.state.scrollOrStop) {
+      if (this.scrollOrStop) {
         setTimeout(() => {
           const el = document.getElementById(m.route.param('id'));
           if (el) el.scrollIntoView();
         }, 1);
-        vnode.state.scrollOrStop = false;
+        this.scrollOrStop = false;
       }
 
       if (!label) {
@@ -374,7 +372,7 @@ const NotificationRow: m.Component<
                   onclick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    vnode.state.scrollOrStop = true;
+                    this.scrollOrStop = true;
                     app.user.notifications.delete([notification]).then(() => {
                       m.redraw();
                     });
@@ -395,8 +393,8 @@ const NotificationRow: m.Component<
         },
         null,
         () => {
-          if (vnode.state.scrollOrStop) {
-            vnode.state.scrollOrStop = false;
+          if (this.scrollOrStop) {
+            this.scrollOrStop = false;
             return;
           }
           app.user.notifications
@@ -449,21 +447,21 @@ const NotificationRow: m.Component<
                     onclick: (e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      vnode.state.markingRead = true;
+                      this.markingRead = true;
                       app.user.notifications
                         .markAsRead(notifications)
                         ?.then(() => {
-                          vnode.state.markingRead = false;
+                          this.markingRead = false;
                           m.redraw();
                         })
                         .catch(() => {
-                          vnode.state.markingRead = false;
+                          this.markingRead = false;
                           m.redraw();
                         });
                     },
                   },
                   [
-                    vnode.state.markingRead
+                    this.markingRead
                       ? m(CWSpinner, { size: 'small' })
                       : 'Mark as read',
                   ]
@@ -545,21 +543,21 @@ const NotificationRow: m.Component<
                     onclick: (e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      vnode.state.markingRead = true;
+                      this.markingRead = true;
                       app.user.notifications
                         .markAsRead(notifications)
                         ?.then(() => {
-                          vnode.state.markingRead = false;
+                          this.markingRead = false;
                           m.redraw();
                         })
                         .catch(() => {
-                          vnode.state.markingRead = false;
+                          this.markingRead = false;
                           m.redraw();
                         });
                     },
                   },
                   [
-                    vnode.state.markingRead
+                    this.markingRead
                       ? m(CWSpinner, { size: 'small' })
                       : 'Mark as read',
                   ]
@@ -584,7 +582,7 @@ const NotificationRow: m.Component<
         pageJump ? () => setTimeout(() => pageJump(), 1) : null
       );
     }
-  },
-};
+  }
+}
 
 export default NotificationRow;

@@ -13,7 +13,7 @@ export enum SearchSort {
     "Newest" = "Newest",
     "Oldest" = "Oldest"
 }
-export interface SearchParams {
+export type SearchParams = {
     communityScope?: string;
     chainScope?: string;
     isSearchPreview?: boolean;

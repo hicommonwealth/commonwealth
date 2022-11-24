@@ -4,15 +4,15 @@ export enum UpdateType {
   Update,
 }
 
-export interface ISerializable<T> {
+export type ISerializable<T> = {
   serialize: () => T;
   deserialize: (data: T) => void;
 }
 
-export interface IHasId {
+export type IHasId = {
   id: string | number;
 }
 
-export interface IHasAddress {
+export type IHasAddress = {
   address: string;
 }

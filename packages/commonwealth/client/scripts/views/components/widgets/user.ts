@@ -18,13 +18,13 @@ import { BanUserModal } from '../../modals/ban_user_modal';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
-export interface IAddressDisplayOptions {
+export type IAddressDisplayOptions = {
   showFullAddress?: boolean;
   autoTruncate?: boolean;
   maxCharLength?: number;
 }
 
-const User: m.Component<
+class User extends ClassComponent<
   {
     user: Account | AddressInfo | Profile;
     avatarSize?: number;
@@ -37,12 +37,11 @@ const User: m.Component<
     onclick?: any;
     popover?: boolean;
     showRole?: boolean;
-  },
-  {
-    identityWidgetLoading: boolean;
   }
-> = {
-  view: (vnode) => {
+> {
+  private identityWidgetLoading: boolean;
+
+  public view(vnode) {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
       avatarOnly,
@@ -87,17 +86,17 @@ const User: m.Component<
 
     if (
       app.chain?.base === ChainBase.Substrate &&
-      !vnode.state.identityWidgetLoading &&
+      !this.identityWidgetLoading &&
       !app.cachedIdentityWidget
     ) {
-      vnode.state.identityWidgetLoading = true;
+      this.identityWidgetLoading = true;
       import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "substrate-identity-widget" */
         './substrate_identity'
       ).then((mod) => {
         app.cachedIdentityWidget = mod.default;
-        vnode.state.identityWidgetLoading = false;
+        this.identityWidgetLoading = false;
         m.redraw();
       });
     }
@@ -366,10 +365,10 @@ const User: m.Component<
           key: profile?.address || '-',
         })
       : userFinal;
-  },
+  }
 };
 
-export const UserBlock: m.Component<{
+export class UserBlock extends ClassComponent<{
   user: Account | AddressInfo | Profile;
   hideIdentityIcon?: boolean;
   popover?: boolean;
@@ -383,8 +382,8 @@ export const UserBlock: m.Component<{
   compact?: boolean;
   linkify?: boolean;
   avatarSize?: number;
-}> = {
-  view: (vnode) => {
+}> {
+  public view(vnode) {
     const {
       user,
       hideIdentityIcon,
@@ -499,20 +498,19 @@ export const UserBlock: m.Component<{
           },
           children
         );
-  },
+  }
 };
 
-export const AnonymousUser: m.Component<
+export class AnonymousUser extends ClassComponent<
   {
     avatarSize?: number;
     avatarOnly?: boolean;
     hideAvatar?: boolean;
     showAsDeleted?: boolean;
     distinguishingKey: string; // To distinguish user from other anonymous users
-  },
-  {}
-> = {
-  view: (vnode) => {
+  }
+> {
+  public view(vnode) {
     const {
       avatarOnly,
       avatarSize,
@@ -531,10 +529,10 @@ export const AnonymousUser: m.Component<
       profileAvatar = m('svg.Jdenticon', {
         style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         'data-address': pseudoAddress,
-        oncreate: (vnode_) => {
+        public oncreate(vnode_) {
           jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
         },
-        onupdate: (vnode_) => {
+        public onupdate(vnode_) {
           jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
         },
       });

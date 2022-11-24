@@ -8,11 +8,6 @@ import { initAppState } from 'app';
 import { updateActiveAddresses } from 'controllers/app/login';
 import ErrorPage from './error';
 
-interface IState {
-  validating: boolean;
-  error: string;
-}
-
 // creates address, initializes account, and redirects to main page
 const validate = async (
   token: string,
@@ -43,23 +38,26 @@ const validate = async (
   }
 };
 
-const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
-  oninit: (vnode) => {
+class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
+  private validating: boolean;
+  private error: string;
+
+  public oninit(vnode) {
     // grab token
     // TODO: how to use state id?
     const token = m.route.param('token');
     const stateId = m.route.param('stateId');
     validate(token, stateId, 'axie-infinity').then((res) => {
       if (typeof res === 'string') {
-        vnode.state.error = res;
+        this.error = res;
         m.redraw();
       }
     });
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     console.log('finish axie login');
-    if (vnode.state.error) {
-      return m(ErrorPage, { title: 'Login Error', message: vnode.state.error });
+    if (this.error) {
+      return m(ErrorPage, { title: 'Login Error', message: this.error });
     } else {
       return m(PageLoading);
     }

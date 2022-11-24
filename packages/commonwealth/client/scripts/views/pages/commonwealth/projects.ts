@@ -12,7 +12,7 @@ import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 
-interface CWProjectStub {
+type CWProjectStub = {
   title: string;
   description: string;
   beneficiary_address: string;
@@ -45,8 +45,8 @@ const PROJECTS: CWProjectStub[] = [
   },
 ];
 
-const ProjectsPage: m.Component<{}> = {
-  view: (vnode) => {
+class ProjectsPage extends ClassComponent<{}> {
+  public view(vnode) {
     if (!app.chain || !app.chain.loaded) {
       return m(PageLoading, {
         message: 'Connecting to chain',

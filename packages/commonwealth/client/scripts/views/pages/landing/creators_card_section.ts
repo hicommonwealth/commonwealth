@@ -7,8 +7,8 @@ import { ICardListItem } from 'models/interfaces';
 import LandingPageButton from './landing_page_button';
 import ItemListsMapper from './list_mapper_with_item';
 
-const TokensCreatorComponent: m.Component<{ creators: ICardListItem[] }, {}> = {
-  view: (vnode) => {
+class TokensCreatorComponent extends ClassComponent<{ creators: ICardListItem[] }, {}> {
+  public view(vnode) {
     const { creators } = vnode.attrs;
 
     return m('section.TokensCreatorComponent', { class: 'container mx-auto pt-10' }, [

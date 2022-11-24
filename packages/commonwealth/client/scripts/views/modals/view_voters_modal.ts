@@ -14,12 +14,12 @@ import ClassComponent from 'class_component';
 // import User from 'views/components/widgets/user';
 // import { formatAddressShort } from '../../../../shared/utils';
 
-// interface IVoterRowAttrs {
+// type IVoterRowAttrs = {
 //   vote: PhragmenElectionVote;
 // }
 
-// const VoterRow: m.Component<IVoterRowAttrs> = {
-//   view: (vnode: m.VnodeDOM<IVoterRowAttrs>) => {
+// class VoterRow extends ClassComponent<IVoterRowAttrs> {
+//   public view(vnode: m.VnodeDOM<IVoterRowAttrs>) {
 //     const { account, stake } = vnode.attrs.vote;
 
 //     return m(
@@ -82,13 +82,13 @@ import ClassComponent from 'class_component';
 //   },
 // };
 
-// interface IViewVotersModalAttrs {
+// type IViewVotersModalAttrs = {
 //   account: SubstrateAccount;
 //   votes: PhragmenElectionVote[];
 // }
 
-// const ViewVotersModal: m.Component<IViewVotersModalAttrs> = {
-//   view: (vnode) => {
+// class ViewVotersModal extends ClassComponent<IViewVotersModalAttrs> {
+//   public view(vnode) {
 //     const { address, chain } = vnode.attrs.account;
 
 //     return m('.ViewVotersModal', [

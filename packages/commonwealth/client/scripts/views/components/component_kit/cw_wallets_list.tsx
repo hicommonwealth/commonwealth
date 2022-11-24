@@ -26,17 +26,17 @@ import { CWSpinner } from './cw_spinner';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
-const LinkAccountItem: m.Component<
+class LinkAccountItem extends ClassComponent<
   {
     account: { address: string; meta?: { name: string } };
     walletNetwork: ChainNetwork;
     walletChain: ChainBase;
     onSelect: (idx: number) => void;
     idx: number;
-  },
-  { linking: boolean }
-> = {
-  view: (vnode) => {
+  }
+> {
+  private linking: boolean;
+  public view(vnode) {
     const { account, walletNetwork, walletChain, onSelect, idx } = vnode.attrs;
 
     const address = app.chain
@@ -95,11 +95,11 @@ const LinkAccountItem: m.Component<
               })
             ),
           ]),
-          vnode.state.linking &&
+          this.linking &&
             m('p.small-text', 'Check your wallet for a confirmation prompt.'),
         ]),
         m('.account-item-right', [
-          vnode.state.linking &&
+          this.linking &&
             m('.account-waiting', [
               // TODO: show a (?) icon with a tooltip explaining to check your wallet
               m(CWSpinner, { size: 'small' }),

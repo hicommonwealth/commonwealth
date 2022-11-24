@@ -92,11 +92,11 @@ export enum UserContent {
   Comments = 'comments',
 }
 
-interface IProfilePageAttrs {
+type IProfilePageAttrs = {
   address: string;
   setIdentity?: boolean;
 }
-interface IProfilePageState {
+type IProfilePageState = {
   account;
   threads: Thread[];
   comments: Comment<any>[];
@@ -280,8 +280,8 @@ const postsRemaining = (contentLength, count) => {
   return contentLength > 10 && count < contentLength;
 };
 
-const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
-  oninit: (vnode) => {
+class ProfilePage extends ClassComponent<IProfilePageAttrs, IProfilePageState> {
+  public oninit(vnode) {
     vnode.state.account = null;
     vnode.state.tabSelected = 0;
     vnode.state.initialized = false;
@@ -328,8 +328,8 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       }
     }
   },
-  oncreate: async (vnode) => {},
-  view: (vnode) => {
+  oncreate: async (vnode) => {}
+  public view(vnode) {
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;
     if (!loading && !loaded) {

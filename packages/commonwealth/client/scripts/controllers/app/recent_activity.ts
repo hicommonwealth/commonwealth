@@ -4,7 +4,7 @@ import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 
-export interface IAbridgedThreadFromServer {
+export type IAbridgedThreadFromServer = {
   id: number;
   Address: any;
   title: string;

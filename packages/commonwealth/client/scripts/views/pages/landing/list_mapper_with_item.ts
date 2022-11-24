@@ -7,7 +7,7 @@ import { ICardListItem } from 'models/interfaces';
 import ListedCardWithImage from './listed_card_with_image';
 import ListContainer from './list_container';
 
-const ItemListsMapper: m.Component<
+class ItemListsMapper extends ClassComponent<
   {
     cardItems: ICardListItem[];
     textType?: string;
@@ -17,13 +17,13 @@ const ItemListsMapper: m.Component<
     variant?: string;
   },
   { buttonHoverActiveById: string; cardImageActiveById: string }
-> = {
-  oninit: (vnode) => {
+> {
+  public oninit(vnode) {
     const { cardItems } = vnode.attrs;
     vnode.state.buttonHoverActiveById = cardItems[0].button.id;
     vnode.state.cardImageActiveById = cardItems[0].card.id;
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     const { cardItems, tabHoverColorClick, textType, bgColor, margin, variant } = vnode.attrs;
     const { buttonHoverActiveById, cardImageActiveById } = vnode.state;
 

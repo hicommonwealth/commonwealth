@@ -37,7 +37,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 // TODO Graham 7-20-22: Reconcile against NewThreadForm
-interface IThreadForm {
+type IThreadForm = {
   name: string;
   body: string;
   choices: string[];
@@ -151,21 +151,20 @@ const newLink = async (
   return errors;
 };
 
-const NewProposalForm: m.Component<
-  { snapshotId: string },
-  {
-    form: IThreadForm;
-    quillEditorState: QuillEditor;
-    saving: boolean;
-    space: SnapshotSpace;
-    members: string[];
-    userScore: number;
-    isFromExistingProposal: boolean;
-    initialized: boolean;
-    snapshotScoresFetched: boolean;
-  }
-> = {
-  view: (vnode) => {
+class NewProposalForm extends ClassComponent<
+  { snapshotId: string }
+> {
+  private form: IThreadForm;
+  private quillEditorState: QuillEditor;
+  private saving: boolean;
+  private space: SnapshotSpace;
+  private members: string[];
+  private userScore: number;
+  private isFromExistingProposal: boolean;
+  private initialized: boolean;
+  private snapshotScoresFetched: boolean;
+
+  public view(vnode) {
     const getLoadingPage = () =>
       m('.topic-loading-spinner-wrap', [m(CWSpinner, { size: 'large' })]);
     if (!app.chain) return getLoadingPage();
@@ -176,11 +175,11 @@ const NewProposalForm: m.Component<
       app.snapshot.init(vnode.attrs.snapshotId).then(() => m.redraw());
       return getLoadingPage();
     }
-    if (!vnode.state.initialized) {
-      vnode.state.initialized = true;
-      vnode.state.members = [];
-      vnode.state.userScore = null;
-      vnode.state.form = {
+    if (!this.initialized) {
+      this.initialized = true;
+      this.members = [];
+      this.userScore = null;
+      this.form = {
         name: '',
         body: '',
         choices: ['Yes', 'No'],
@@ -199,12 +198,12 @@ const NewProposalForm: m.Component<
             : pathVars.params.fromProposalId.toString();
         const fromProposalType = pathVars.params.fromProposalType.toString();
         const fromProposal = idToProposal(fromProposalType, fromProposalId);
-        vnode.state.form.name = fromProposal.title;
-        vnode.state.isFromExistingProposal = true;
+        this.form.name = fromProposal.title;
+        this.isFromExistingProposal = true;
         if (fromProposal.body) {
           try {
             const parsedBody = JSON.parse(fromProposal.body);
-            vnode.state.form.body = parsedBody.ops[0].insert;
+            this.form.body = parsedBody.ops[0].insert;
           } catch (e) {
             console.error(e);
           }
@@ -221,25 +220,25 @@ const NewProposalForm: m.Component<
             )
           )
           .reduce((a, b) => (a as number) + (b as number), 0);
-        vnode.state.userScore = scores as number;
-        vnode.state.space = space;
-        vnode.state.members = space.members;
-        vnode.state.snapshotScoresFetched = true;
+        this.userScore = scores as number;
+        this.space = space;
+        this.members = space.members;
+        this.snapshotScoresFetched = true;
         m.redraw();
       });
     }
-    if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
+    if (!this.snapshotScoresFetched) return getLoadingPage();
     const author = app.user.activeAccount;
 
     const saveToLocalStorage = () => {
       localStorage.setItem(
         `${app.activeChainId()}-new-snapshot-proposal-name`,
-        vnode.state.form.name
+        this.form.name
       );
     };
 
     const populateFromLocalStorage = () => {
-      vnode.state.form.name = localStorage.getItem(
+      this.form.name = localStorage.getItem(
         `${app.activeChainId()}-new-snapshot-proposal-name`
       );
     };
@@ -253,26 +252,26 @@ const NewProposalForm: m.Component<
     const isMember =
       author &&
       author.address &&
-      !!vnode.state.members.find(
+      !!this.members.find(
         (member) => member.toLowerCase() === author.address.toLowerCase()
       );
 
     const hasMinScore =
-      vnode.state.userScore >= vnode.state.space.filters?.minScore;
+      this.userScore > this.space.filters?.minScore;
 
     const showScoreWarning =
-      vnode.state.space.filters?.minScore > 0 &&
+      this.space.filters?.minScore > 0 &&
       !hasMinScore &&
       !isMember &&
-      vnode.state.userScore !== null;
+      this.userScore !== null;
 
     const isValid =
-      vnode.state.space !== undefined &&
-      (!vnode.state.space.filters?.onlyMembers ||
-        (vnode.state.space.filters?.onlyMembers && isMember)) &&
-      (vnode.state.space.filters?.minScore === 0 ||
-        (vnode.state.space.filters?.minScore > 0 &&
-          vnode.state.userScore > vnode.state.space.filters?.minScore) ||
+      this.space !== undefined &&
+      (!this.space.filters?.onlyMembers ||
+        (this.space.filters?.onlyMembers && isMember)) &&
+      (this.space.filters?.minScore === 0 ||
+        (this.space.filters?.minScore > 0 &&
+          this.userScore > this.space.filters?.minScore) ||
         isMember);
 
     const today = new Date();
@@ -290,7 +289,7 @@ const NewProposalForm: m.Component<
       },
       [
         m('.new-thread-form-body', [
-          vnode.state.space.filters?.onlyMembers &&
+          this.space.filters?.onlyMembers &&
             !isMember &&
             m(Callout, {
               class: 'no-profile-callout',
@@ -304,7 +303,7 @@ const NewProposalForm: m.Component<
                 class: 'no-profile-callout',
                 intent: 'primary',
                 content: [
-                  `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`,
+                  `You need to have a minimum of ${this.space.filters.minScore} ${this.space.symbol} in order to submit a proposal`,
                 ],
               })
             : m(CWSpinner),
@@ -317,18 +316,18 @@ const NewProposalForm: m.Component<
                   oninput: (e) => {
                     e.redraw = false; // do not redraw on input
                     const { value } = e.target as any;
-                    vnode.state.form.name = value;
+                    this.form.name = value;
                     localStorage.setItem(
                       `${app.activeChainId()}-new-snapshot-proposal-name`,
-                      vnode.state.form.name
+                      this.form.name
                     );
                   },
-                  defaultValue: vnode.state.form.name,
+                  defaultValue: this.form.name,
                 }),
               ]),
               m(
                 FormGroup,
-                vnode.state.form.choices.map((choice, idx) => {
+                this.form.choices.map((choice, idx) => {
                   const placeholder =
                     idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`;
                   return m(FormGroup, [
@@ -338,17 +337,17 @@ const NewProposalForm: m.Component<
                       placeholder,
                       oninput: (e) => {
                         const result = (e.target as any).value;
-                        vnode.state.form.choices[idx] = result;
+                        this.form.choices[idx] = result;
                         m.redraw();
                       },
                       contentRight:
                         idx > 1 &&
-                        idx === vnode.state.form.choices.length - 1 &&
+                        idx === this.form.choices.length - 1 &&
                         m(CWIconButton, {
                           iconName: 'trash',
                           iconSize: 'large',
                           onclick: () => {
-                            vnode.state.form.choices.pop();
+                            this.form.choices.pop();
                             m.redraw();
                           },
                         }),
@@ -361,8 +360,8 @@ const NewProposalForm: m.Component<
                 {
                   style: 'cursor: pointer;',
                   onclick: () => {
-                    const choiceLength = vnode.state.form.choices.length;
-                    vnode.state.form.choices.push(`Option ${choiceLength + 1}`);
+                    const choiceLength = this.form.choices.length;
+                    this.form.choices.push(`Option ${choiceLength + 1}`);
                     m.redraw();
                   },
                 },
@@ -379,13 +378,13 @@ const NewProposalForm: m.Component<
                 m(RadioGroup, {
                   name: 'period',
                   options: [{ value: '4d', label: '4-day' }],
-                  value: vnode.state.form.range,
+                  value: this.form.range,
                   onchange: (e: Event) => {
-                    vnode.state.form.range = (e.target as any).value;
-                    vnode.state.form.start = new Date().getTime();
-                    switch (vnode.state.form.range) {
+                    this.form.range = (e.target as any).value;
+                    this.form.start = new Date().getTime();
+                    switch (this.form.range) {
                       case '4d':
-                        vnode.state.form.end = moment()
+                        this.form.end = moment()
                           .add(4, 'days')
                           .toDate()
                           .getTime();
@@ -398,9 +397,9 @@ const NewProposalForm: m.Component<
               ]),
               m(FormGroup, {}, [
                 m(QuillEditorComponent, {
-                  contentsDoc: vnode.state.form.body || ' ',
+                  contentsDoc: this.form.body || ' ',
                   oncreateBind: (state: QuillEditor) => {
-                    vnode.state.quillEditorState = state;
+                    this.quillEditorState = state;
                   },
                   placeholder: 'What is your proposal?',
                   editorNamespace: 'new-proposal',
@@ -411,24 +410,24 @@ const NewProposalForm: m.Component<
                   intent: 'primary',
                   label: 'Publish',
                   name: 'submit',
-                  disabled: !author || vnode.state.saving || !isValid,
+                  disabled: !author || this.saving || !isValid,
                   rounded: true,
                   onclick: async (e) => {
-                    vnode.state.saving = true;
+                    this.saving = true;
                     try {
                       await newLink(
-                        vnode.state.form,
-                        vnode.state.quillEditorState,
+                        this.form,
+                        this.quillEditorState,
                         author,
-                        vnode.state.space,
+                        this.space,
                         vnode.attrs.snapshotId
                       );
-                      vnode.state.saving = false;
+                      this.saving = false;
                       clearLocalStorage();
                       notifySuccess('Snapshot Created!');
-                      navigateToSubpage(`/snapshot/${vnode.state.space.id}`);
+                      navigateToSubpage(`/snapshot/${this.space.id}`);
                     } catch (err) {
-                      vnode.state.saving = false;
+                      this.saving = false;
                       notifyError(capitalize(err.message));
                     }
                   },

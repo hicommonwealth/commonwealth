@@ -15,7 +15,7 @@ import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
 
 const ETHEREUM_BLOCK_TIME = 13;
-export interface IEthereumTXData extends ITXData {
+export type IEthereumTXData extends ITXData = {
   chainId: string;
   accountNumber: number;
   sequence: number;

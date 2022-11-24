@@ -13,12 +13,12 @@ import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
 const Delta = Quill.import('delta');
 
-interface IVersionHistoryAttrs {
+type IVersionHistoryAttrs = {
   item: Thread | Comment<any>;
 }
 
-const VersionHistoryModal: m.Component<IVersionHistoryAttrs, {}> = {
-  view: (vnode) => {
+class VersionHistoryModal extends ClassComponent<IVersionHistoryAttrs, {}> {
+  public view(vnode) {
     const { item } = vnode.attrs;
     if (!item) return;
 

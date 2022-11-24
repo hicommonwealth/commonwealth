@@ -81,8 +81,8 @@ function previousPage() {
   if (flag) m.redraw();
 }
 
-const NotificationsPage: m.Component<{}> = {
-  view: (vnode) => {
+class NotificationsPage extends ClassComponent<{}> {
+  public view(vnode) {
     if (!app.isLoggedIn())
       return m(PageError, {
         title: [

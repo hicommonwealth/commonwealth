@@ -13,7 +13,7 @@ import User, { AnonymousUser } from './user';
 // The list of passed users must be unique to begin with, if one
 // wishes to prevent redundant rendering of avatars.
 
-const UserGallery: m.Component<
+class UserGallery extends ClassComponent<
   {
     users: Account[] | AddressInfo[];
     addressesCount?: number;
@@ -23,8 +23,8 @@ const UserGallery: m.Component<
     maxUsers?: number;
   },
   {}
-> = {
-  view: (vnode) => {
+> {
+  public view(vnode) {
     const { users, avatarSize, popover, addressesCount } = vnode.attrs;
     const userCount = users.length;
     const maxUsers = vnode.attrs.maxUsers || 10;

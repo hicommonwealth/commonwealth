@@ -32,7 +32,7 @@ type ConfirmSnapshotVoteModalAttrs = {
 };
 
 export class ConfirmSnapshotVoteModal
-  implements m.Component<ConfirmSnapshotVoteModalAttrs>
+  extends ClassComponent<ConfirmSnapshotVoteModalAttrs>
 {
   private saving: boolean;
 

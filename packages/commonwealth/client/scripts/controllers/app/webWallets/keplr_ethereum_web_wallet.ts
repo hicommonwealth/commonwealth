@@ -13,7 +13,7 @@ import {
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
-  interface Window extends KeplrWindow {}
+  type Window extends KeplrWindow = {}
 }
 
 class EVMKeplrWebWalletController implements IWebWallet<AccountData> {

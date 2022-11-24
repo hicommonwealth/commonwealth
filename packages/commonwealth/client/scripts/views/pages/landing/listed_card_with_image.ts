@@ -1,7 +1,7 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-interface IAttrs {
+type IAttrs = {
   handleClick: (creator) => void;
   isTabHoverActive: boolean;
   buttonId: string;
@@ -17,8 +17,8 @@ interface IAttrs {
   variant?: string
 }
 
-const ListedCardWithImage: m.Component<IAttrs, {}> = {
-  view: (vnode) => {
+class ListedCardWithImage extends ClassComponent<IAttrs, {}> {
+  public view(vnode) {
     return m(
       'li',
       { class: 'lg:flex-grow' },

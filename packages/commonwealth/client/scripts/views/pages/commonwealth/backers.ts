@@ -7,8 +7,8 @@ import ClassComponent from 'class_component';
 // import Sublayout from 'views/sublayout';
 // import { PageLoading } from 'views/pages/loading';
 
-// const BackersPage: m.Component<{}> = {
-//   view: (vnode) => {
+// class BackersPage extends ClassComponent<{}> {
+//   public view(vnode) {
 //     if (!app.chain || !app.chain.loaded) {
 //       return m(PageLoading, {
 //         message: 'Connecting to chain',

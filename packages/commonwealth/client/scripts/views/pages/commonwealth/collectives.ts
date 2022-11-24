@@ -12,7 +12,7 @@ import User from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 
-interface CWCollectiveStub {
+type CWCollectiveStub = {
   name: string;
   description: string;
   numMembers: number;
@@ -36,8 +36,8 @@ const COLLECTIVES: CWCollectiveStub[] = [
   },
 ];
 
-const CollectivesPage: m.Component<{}> = {
-  view: (vnode) => {
+class CollectivesPage extends ClassComponent<{}> {
+  public view(vnode) {
     if (!app.chain || !app.chain.loaded) {
       return m(PageLoading, {
         message: 'Connecting to chain',

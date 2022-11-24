@@ -9,12 +9,12 @@ import NearChain from './chain';
 
 // NOTE: this is the actual type of validators in the NodeStatus struct,
 //    the library is wrong, it's not just a string.
-interface INearValidator {
+type INearValidator = {
   account_id: string;
   is_slashed: boolean;
 }
 
-export interface INearValidators {
+export type INearValidators = {
   [accountId: string]: {
     account: NearAccount;
     isSlashed: boolean;

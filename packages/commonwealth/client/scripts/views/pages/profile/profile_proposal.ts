@@ -8,11 +8,11 @@ import { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 
-const ProfileProposal: m.Component<
+class ProfileProposal extends ClassComponent<
   { proposal: Thread },
   { revealThread: boolean }
-> = {
-  view: (vnode) => {
+> {
+  public view(vnode) {
     const proposal = vnode.attrs.proposal;
     const { slug, identifier } = proposal;
     const { attachments, author, body, title, createdAt, chain } = proposal;

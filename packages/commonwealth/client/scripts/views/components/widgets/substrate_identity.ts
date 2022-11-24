@@ -16,7 +16,7 @@ import SubstrateIdentity, {
 } from 'controllers/chain/substrate/identity';
 import { formatAddressShort } from '../../../../../shared/utils';
 
-export interface ISubstrateIdentityAttrs {
+export type ISubstrateIdentityAttrs = {
   account: Account;
   linkify: boolean;
   profile: Profile;
@@ -25,17 +25,14 @@ export interface ISubstrateIdentityAttrs {
   addrShort: string;
 }
 
-export interface ISubstrateIdentityState {
-  identity: SubstrateIdentity | null;
-}
+class SubstrateOnlineIdentityWidget extends ClassComponent<
+  ISubstrateIdentityAttrs
+> {
+  private identity: SubstrateIdentity | null;
 
-const SubstrateOnlineIdentityWidget: m.Component<
-  ISubstrateIdentityAttrs,
-  ISubstrateIdentityState
-> = {
-  oninit: (vnode) => {
+  public oninit(vnode) {
     app.runWhenReady(async () => {
-      vnode.state.identity =
+      this.identity =
         vnode.attrs.account instanceof SubstrateAccount &&
         !vnode.attrs.profile.isOnchain &&
         (app.chain as Substrate).identities
@@ -43,8 +40,8 @@ const SubstrateOnlineIdentityWidget: m.Component<
           : null;
       m.redraw();
     });
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     const {
       profile,
       linkify,
@@ -54,7 +51,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
       showAddressWithDisplayName,
     } = vnode.attrs;
     // if invalidated by change, load the new identity immediately
-    vnode.state.identity =
+    this.identity =
       (!profile.isOnchain || profile.isNameInvalid) &&
       (app.chain as Substrate).identities
         ? (app.chain as Substrate).identities.get(account.address)
@@ -72,15 +69,15 @@ const SubstrateOnlineIdentityWidget: m.Component<
           ]
         : profile.displayName;
       quality = getIdentityQuality(Object.values(profile.judgements));
-    } else if (vnode.state.identity?.exists) {
+    } else if (this.identity?.exists) {
       // then attempt to use identity fetched from chain
       displayName = showAddressWithDisplayName
         ? [
-            vnode.state.identity.username,
+            this.identity.username,
             m('.id-short', formatAddressShort(profile.address, profile.chain)),
           ]
-        : vnode.state.identity.username;
-      quality = vnode.state.identity.quality;
+        : this.identity.username;
+      quality = this.identity.quality;
     }
 
     if (displayName && quality) {
@@ -159,14 +156,15 @@ const SubstrateOnlineIdentityWidget: m.Component<
                 ),
               ],
         ]);
-  },
-};
+  }
+}
 
-const SubstrateOfflineIdentityWidget: m.Component<
-  ISubstrateIdentityAttrs,
-  ISubstrateIdentityState
-> = {
-  view: (vnode) => {
+class SubstrateOfflineIdentityWidget extends ClassComponent<
+  ISubstrateIdentityAttrs
+> {
+  private identity: SubstrateIdentity | null;
+
+  public view(vnode) {
     const {
       profile,
       linkify,
@@ -264,14 +262,13 @@ const SubstrateOfflineIdentityWidget: m.Component<
                 ),
               ],
         ]);
-  },
-};
+  }
+}
 
-const SubstrateIdentityWidget: m.Component<
-  ISubstrateIdentityAttrs,
-  ISubstrateIdentityState
-> = {
-  view: (vnode) => {
+class SubstrateIdentityWidget extends ClassComponent<
+  ISubstrateIdentityAttrs
+> {
+  public view(vnode) {
     if (
       app.chain?.loaded &&
       vnode.attrs.account &&
@@ -281,7 +278,7 @@ const SubstrateIdentityWidget: m.Component<
     } else {
       return m(SubstrateOfflineIdentityWidget, vnode.attrs);
     }
-  },
-};
+  }
+}
 
 export default SubstrateIdentityWidget;

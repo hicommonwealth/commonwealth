@@ -11,7 +11,7 @@ import { attachSigner } from '../contractApi';
 import AaveApi from './api';
 import EthereumAccounts from '../accounts';
 
-export interface AaveProposalArgs {
+export type AaveProposalArgs = {
   executor: Executor | string,
   targets: string[],
   values: string[],

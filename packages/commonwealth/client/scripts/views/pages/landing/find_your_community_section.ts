@@ -2,7 +2,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import 'pages/landing/find_your_community_section.scss';
 
-interface IState {
+type IState = {
   holders: {
     img: string;
     alt: string;
@@ -11,11 +11,11 @@ interface IState {
   }[];
 }
 
-const TokenHoldersComponent: m.Component<IState, IState> = {
-  oninit: (vnode) => {
+class TokenHoldersComponent extends ClassComponent<IState, IState> {
+  public oninit(vnode) {
     vnode.state.holders = vnode.attrs.holders;
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     return m(
       'section.LandingPageTokenHolders',
       { class: 'container mx-auto pt-20' },

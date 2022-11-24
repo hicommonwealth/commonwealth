@@ -76,11 +76,11 @@ enum SupportedCosmosProposalTypes {
 
 // this should be titled the Substrate/Edgeware new proposal form
 const NewProposalForm = {
-  form: {},
-  oncreate: (vnode) => {
+  form: {}
+  public oncreate(vnode) {
     vnode.state.toggleValue = 'proposal';
-  },
-  oninit: (vnode) => {
+  }
+  public oninit(vnode) {
     vnode.state.aaveTabCount = 1;
     vnode.state.activeAaveTabIndex = 0;
     vnode.state.aaveProposalState = [
@@ -95,8 +95,8 @@ const NewProposalForm = {
     vnode.state.cosmosProposalType = SupportedCosmosProposalTypes.Text;
     vnode.state.sputnikProposalType =
       SupportedSputnikProposalTypes.AddMemberToRole;
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     const callback = vnode.attrs.callback;
     const author = app.user.activeAccount;
     const proposalTypeEnum = vnode.attrs.typeEnum;

@@ -30,14 +30,14 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
   }
 }
 
-const LoginWithWalletDropdown: m.Component<{
+class LoginWithWalletDropdown extends ClassComponent<{
   label;
   loggingInWithAddress;
   joiningChain;
   onSuccess?;
   prepopulateAddress?;
-}> = {
-  view: (vnode) => {
+}> {
+  public view(vnode) {
     const {
       label,
       loggingInWithAddress,

@@ -8,14 +8,14 @@ import { Thread, Comment, Account } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 
-interface IProfileCommentGroupAttrs {
+type IProfileCommentGroupAttrs = {
   proposal: Thread | any;
   comments: Array<Comment<any>>;
   account: Account;
 }
 
-const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
-  view: (vnode) => {
+class ProfileCommentGroup extends ClassComponent<IProfileCommentGroupAttrs> {
+  public view(vnode) {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
 

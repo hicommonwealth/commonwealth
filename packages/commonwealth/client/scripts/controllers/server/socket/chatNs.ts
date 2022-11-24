@@ -10,7 +10,7 @@ export enum ChatErrors {
     NOT_LOGGED_IN='User must be logged in to load chat'
 }
 
-export interface IChannel {
+export type IChannel = {
     id: number,
     name: string,
     category: string,

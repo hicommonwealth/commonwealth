@@ -9,8 +9,8 @@ import { setActiveAccount } from 'controllers/app/login';
 import { Account, AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
-const ProfileBanner: m.Component<{ account: Account, addressInfo: AddressInfo }, { loading: boolean }> = {
-  view: (vnode) => {
+class ProfileBanner extends ClassComponent<{ account: Account, addressInfo: AddressInfo }, { loading: boolean }> {
+  public view(vnode) {
     const { account, addressInfo } = vnode.attrs;
     const addrShort = formatAddressShort(addressInfo.address, addressInfo.chain.id);
 

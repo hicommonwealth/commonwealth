@@ -14,7 +14,7 @@ const postsRemaining = (contentLength, count) => {
   return contentLength > 10 && count < contentLength;
 };
 
-const ProfileContent: m.Component<
+class ProfileContent extends ClassComponent<
   {
     account: Account;
     type: UserContent;
@@ -26,9 +26,9 @@ const ProfileContent: m.Component<
     previousContent: any;
     onscroll;
   }
-> = {
+> {
   // TODO: Add typeguards to ProposalComments so we can avoid the dirty indexing here
-  oncreate: (vnode) => {
+  public oncreate(vnode) {
     if (window.location.hash) {
       const matches = window.location.hash.match(/#([0-9]+)/);
       if (!matches || isNaN(+matches[1])) return;
@@ -42,8 +42,8 @@ const ProfileContent: m.Component<
         }
       }, 10);
     }
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     const { account, type, content } = vnode.attrs;
 
     return m('.ProfileContent', [

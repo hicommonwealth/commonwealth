@@ -5,12 +5,12 @@ import app from 'state';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
 
-interface IAttrs {
+type IAttrs = {
   navs: { text: string; redirectTo: string }[];
   scrollHeader: boolean;
 }
 
-interface IState {
+type IState = {
   headerMinimized: boolean;
   hideHeader?: boolean;
 }
@@ -48,18 +48,18 @@ const scrollingHeader = () => {
   }
 };
 
-const HeaderLandingPage: m.Component<IAttrs, IState> = {
-  oninit: (vnode) => {
+class HeaderLandingPage extends ClassComponent<IAttrs, IState> {
+  public oninit(vnode) {
     if (vnode.attrs.scrollHeader) {
       window.addEventListener('scroll', scrollingHeader);
     }
-  },
-  onremove: (vnode) => {
+  }
+  public onremove(vnode) {
     if (vnode.attrs.scrollHeader) {
       window.removeEventListener('scroll', scrollingHeader);
     }
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     const redirectClick = (route) => {
       m.route.set(route);
     };

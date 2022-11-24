@@ -29,7 +29,7 @@ export class CosmosToken extends Coin {
 export type CosmosProposalType = 'text' | 'upgrade' | 'parameter';
 export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
 export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected' | 'Failed';
-export interface ICosmosProposalTally {
+export type ICosmosProposalTally = {
   yes: BN;
   abstain: BN;
   no: BN;
@@ -37,7 +37,7 @@ export interface ICosmosProposalTally {
 }
 
 // TODO: note that these vote number values are in terms of _stake_
-export interface ICosmosProposalState extends ICompletable {
+export type ICosmosProposalState extends ICompletable = {
   status: CosmosProposalState;
   depositors: Array<[ string, BN ]>;
   totalDeposit: BN;
@@ -45,7 +45,7 @@ export interface ICosmosProposalState extends ICompletable {
   tally: ICosmosProposalTally;
 }
 
-export interface ICosmosProposal extends IIdentifiable {
+export type ICosmosProposal extends IIdentifiable = {
   type: CosmosProposalType;
   title: string;
   description: string;

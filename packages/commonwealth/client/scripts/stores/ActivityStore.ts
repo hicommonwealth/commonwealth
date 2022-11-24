@@ -2,20 +2,20 @@ import app from 'state';
 import { AddressInfo, AbridgedThread } from 'models';
 import { byAscendingCreationDate } from '../helpers';
 
-export interface IAddressCountAndInfo {
+export type IAddressCountAndInfo = {
   postCount: number;
   addressInfo: AddressInfo;
 }
 
-export interface IIdScopedAddressCountAndInfo {
+export type IIdScopedAddressCountAndInfo = {
   [addressId: string]: IAddressCountAndInfo;
 }
 
-interface ICommunityAddresses {
+type ICommunityAddresses = {
   [parentEntity: string]: IIdScopedAddressCountAndInfo;
 }
 
-interface ICommunityThreads {
+type ICommunityThreads = {
   [parentEntity: string]: Array<AbridgedThread>;
 }
 

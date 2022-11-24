@@ -7,7 +7,7 @@ import { TransactionStatus } from './types';
 import Account from './Account';
 import StorageModule from './StorageModule';
 
-export interface IBlockInfo {
+export type IBlockInfo = {
   height: number;
   duration: number;
   lastTime: moment.Moment;
@@ -16,7 +16,7 @@ export interface IBlockInfo {
 
 // Implemented by a chain's top-level module. Responsible for high-level
 // metadata, API, and event-handling functionality.
-export interface IChainModule<C extends Coin, A extends Account> {
+export type IChainModule<C extends Coin, A extends Account> = {
   coins(n: number | BN, inDollars?: boolean): C;
   denom: string;
 
@@ -31,18 +31,18 @@ export interface IChainModule<C extends Coin, A extends Account> {
 }
 
 // Implemented by a chain's account module. Store for account objects.
-export interface IAccountsModule<C extends Coin, A extends Account> extends StorageModule {
+export type IAccountsModule<C extends Coin, A extends Account> extends StorageModule = {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
   get(address: string, keytype?: string): A;
 }
 
 // Offchain stores and management for discussion features.
-export interface IOffchainAccountsModule<C extends Coin, A extends Account> extends StorageModule {
+export type IOffchainAccountsModule<C extends Coin, A extends Account> extends StorageModule = {
   get(address: string, chain?: string): A;
 }
 
-export interface ITransactionResult {
+export type ITransactionResult = {
   status: TransactionStatus;
   hash?: string;
   err?: string;
@@ -51,12 +51,12 @@ export interface ITransactionResult {
 }
 
 // TODO: abstract this for edgeware? Maybe replace with "command string"?
-export interface ITXData {
+export type ITXData = {
   call: string;
 }
 
 // TODO: figure out how to abstract this to make the tx_signing_modal work with cosmos
-export interface ITXModalData {
+export type ITXModalData = {
   author: Account;
   txType: string;
   txData: {
@@ -76,42 +76,42 @@ export interface ITXModalData {
 
 export type IBalanceAccount<C extends Coin> = Account & { balance: Promise<C> };
 
-export interface IVote<C extends Coin> {
+export type IVote<C extends Coin> = {
   account: IBalanceAccount<C>;
 }
 
-export interface IUniqueId extends IIdentifiable {
+export type IUniqueId extends IIdentifiable = {
   readonly uniqueIdentifier: string;
   readonly slug: string;
 }
 
-export interface IFixedEndTime {
+export type IFixedEndTime = {
   kind: 'fixed';
   time: moment.Moment;
 }
-export interface IFixedBlockEndTime {
+export type IFixedBlockEndTime = {
   kind: 'fixed_block';
   blocknum: number;
 }
-export interface IDynamicEndTime {
+export type IDynamicEndTime = {
   kind: 'dynamic';
   getBlocknum(): number;
 }
-export interface IThresholdEndTime {
+export type IThresholdEndTime = {
   kind: 'threshold';
   threshold: number;
 }
-export interface INotStartedEndTime {
+export type INotStartedEndTime = {
   kind: 'not_started';
 }
-export interface IUnavailableEndTime {
+export type IUnavailableEndTime = {
   kind: 'unavailable';
 }
-export interface IQueuedEndTime {
+export type IQueuedEndTime = {
   kind: 'queued';
 }
 
-export interface ICardListItem {
+export type ICardListItem = {
   button: {
     id: string;
   };

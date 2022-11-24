@@ -34,7 +34,7 @@ type MarkdownFormattedTextAttrs = {
 };
 
 export class MarkdownFormattedText
-  implements m.Component<MarkdownFormattedTextAttrs>
+  extends ClassComponent<MarkdownFormattedTextAttrs>
 {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;

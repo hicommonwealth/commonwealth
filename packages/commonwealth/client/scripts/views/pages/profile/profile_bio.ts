@@ -68,7 +68,7 @@ const editIdentityAction = (
     })
   );
 };
-export interface IProfileHeaderAttrs {
+export type IProfileHeaderAttrs = {
   account: Account;
   setIdentity: boolean;
   refreshCallback: Function;
@@ -76,18 +76,18 @@ export interface IProfileHeaderAttrs {
   onOwnProfile: boolean;
 }
 
-export interface IProfileHeaderState {
+export type IProfileHeaderState = {
   identity: SubstrateIdentity | null;
   copied: boolean;
   loading: boolean;
   showProfileRight: boolean;
 }
 
-const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
-  oninit: (vnode) => {
+class ProfileBio extends ClassComponent<IProfileHeaderAttrs, IProfileHeaderState> {
+  public oninit(vnode) {
     vnode.state.showProfileRight = false;
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } =
       vnode.attrs;
     const showJoinCommunityButton = vnode.attrs.setIdentity && !onOwnProfile;

@@ -4,7 +4,7 @@ import { IVote } from 'models';
 import { NearAccount } from 'controllers/chain/near/account';
 import { NearToken } from 'adapters/chain/near/types';
 
-export interface NearSputnikConfig {
+export type NearSputnikConfig = {
   metadata: string;
   name: string;
   purpose: string;

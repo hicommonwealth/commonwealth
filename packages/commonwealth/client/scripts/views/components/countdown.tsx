@@ -52,7 +52,7 @@ type CountdownUntilBlockAttrs = {
 };
 
 export class CountdownUntilBlock
-  implements m.Component<CountdownUntilBlockAttrs>
+  extends ClassComponent<CountdownUntilBlockAttrs>
 {
   view(vnode: m.Vnode<CountdownUntilBlockAttrs>) {
     let { includeSeconds } = vnode.attrs;

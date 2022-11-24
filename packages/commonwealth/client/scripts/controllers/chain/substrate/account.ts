@@ -19,7 +19,7 @@ import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
 import SubstrateChain from './shared';
 
-export interface IValidators {
+export type IValidators = {
   [address: string]: {
     exposure: Exposure,
     controller: string,

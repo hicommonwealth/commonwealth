@@ -13,7 +13,7 @@ import { EmptyListingPlaceholder } from '../../components/empty_topic_placeholde
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
-interface RecentListingAttrs {
+type RecentListingAttrs = {
   stageName: string;
   topicName: string;
 }

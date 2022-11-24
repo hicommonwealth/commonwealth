@@ -2,7 +2,7 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import Account from './Account';
 import BlockInfo from './BlockInfo';
 
-interface IWebWallet<AccountT extends { address: string } | string> {
+type IWebWallet<AccountT extends { address: string } | string> = {
   name: WalletId;
   label: string;
   available: boolean;

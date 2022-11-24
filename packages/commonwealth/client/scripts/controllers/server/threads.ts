@@ -190,7 +190,7 @@ would break the listingStore's careful chronology.
 
 */
 
-export interface VersionHistory {
+export type VersionHistory = {
   author?: Profile;
   timestamp: moment.Moment;
   body: string;

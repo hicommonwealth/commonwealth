@@ -10,7 +10,7 @@ import {
 } from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
-export interface AaveExecutor {
+export type AaveExecutor = {
   contract: Executor;
   address: string;
   gracePeriod: number;

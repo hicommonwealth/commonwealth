@@ -72,7 +72,7 @@ function sumVotes(vs: AaveProposalVote[]): BN {
   }, new BN(0));
 }
 
-interface AipIpfsObject {
+type AipIpfsObject = {
   aip: number;
   title: string;
   status: string;

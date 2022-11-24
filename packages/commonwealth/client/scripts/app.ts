@@ -555,7 +555,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       },
     });
 
-    interface RouteAttrs {
+    type RouteAttrs = {
       scoped: string | boolean;
       hideSidebar?: boolean;
       deferChain?: boolean;

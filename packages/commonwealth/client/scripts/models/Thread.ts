@@ -15,18 +15,18 @@ import { ChainEntity } from '.';
 import Poll from './Poll';
 
 // field names copied from snapshot
-interface IOffchainVotingOptions {
+type IOffchainVotingOptions = {
   name: string;
   choices: string[];
 }
 
-export interface LinkedThreadRelation {
+export type LinkedThreadRelation = {
   id: string;
   linkedThread: string;
   linkingThread: string;
 }
 
-interface IThreadCollaborator {
+type IThreadCollaborator = {
   address: string;
   chain: string;
 }

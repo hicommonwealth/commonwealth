@@ -57,12 +57,9 @@ export type ThreadPrefetch = {
   };
 };
 
-class ViewThreadPage
-  implements
-    m.ClassComponent<{
-      identifier: string;
-    }>
-{
+class ViewThreadPage extends ClassComponent<{
+  identifier: string;
+}> {
   private comments: Array<Comment<Thread>>;
   private isEditingBody: boolean;
   private isGloballyEditing: boolean;

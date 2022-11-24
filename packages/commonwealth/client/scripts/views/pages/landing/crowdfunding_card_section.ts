@@ -7,8 +7,8 @@ import { ICardListItem } from 'models/interfaces';
 import LandingPageButton from './landing_page_button';
 import ItemListsMapper from './list_mapper_with_item';
 
-const ChainsCrowdfundingComponent: m.Component<{ chains: ICardListItem[] }, {}> = {
-  view: (vnode) => {
+class ChainsCrowdfundingComponent extends ClassComponent<{ chains: ICardListItem[] }, {}> {
+  public view(vnode) {
     const { chains } = vnode.attrs;
 
     return m(

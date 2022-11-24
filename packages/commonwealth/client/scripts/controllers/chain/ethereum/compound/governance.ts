@@ -12,7 +12,7 @@ import CompoundChain from './chain';
 import { attachSigner } from '../contractApi';
 import EthereumAccounts from '../accounts';
 
-export interface CompoundProposalArgs {
+export type CompoundProposalArgs = {
   targets: string[],
   values: string[],
   signatures?: string[],

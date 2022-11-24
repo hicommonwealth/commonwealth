@@ -215,7 +215,7 @@ type SearchPageAttrs = {
   results: any[];
 };
 
-class SearchPage implements m.Component<SearchPageAttrs> {
+class SearchPage extends ClassComponent<SearchPageAttrs> {
   private activeTab: SearchScope;
   private errorText: string;
   private pageCount: number;

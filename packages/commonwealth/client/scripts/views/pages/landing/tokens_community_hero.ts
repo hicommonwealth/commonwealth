@@ -15,7 +15,7 @@ export const placeholderChain = {
   placeholder: true,
 }
 
-interface IState {
+type IState = {
   chainsAndTokens: (Chain | Token | typeof placeholderChain)[];
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
@@ -23,7 +23,7 @@ interface IState {
   refilterResults: boolean;
 }
 
-interface IAttrs {
+type IAttrs = {
   chains: Chain[];
 }
 
@@ -42,14 +42,14 @@ const initiateFullSearch = (searchTerm) => {
   m.route.set(`/search?${params}`);
 };
 
-const TokensCommunityComponent: m.Component<IAttrs, IState> = {
-  oninit: (vnode) => {
+class TokensCommunityComponent extends ClassComponent<IAttrs, IState> {
+  public oninit(vnode) {
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';
     vnode.state.refilterResults = true;
     vnode.state.chainsAndTokens = [];
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     vnode.state.chainsAndTokens = [
       placeholderChain,
       ...vnode.attrs.chains,

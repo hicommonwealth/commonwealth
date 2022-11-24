@@ -4,18 +4,18 @@ import InputTokenOptionComponent from './input_token_option';
 import { Chain, Token } from './index';
 import { placeholderChain } from './tokens_community_hero';
 
-interface IAttrs {
+type IAttrs = {
   optionList: (Token | Chain | typeof placeholderChain)[];
   maxOptions: number;
   inputValue: string;
   refilterResults: boolean;
 }
 
-const InputTokenList: m.Component<
+class InputTokenList extends ClassComponent<
   IAttrs,
   { options: any[]; oldValue: string }
-> = {
-  view: (vnode) => {
+> {
+  public view(vnode) {
     const { optionList, refilterResults, inputValue } = vnode.attrs;
     if (inputValue.length < 3) return;
     const { oldValue } = vnode.state;

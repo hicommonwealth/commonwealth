@@ -24,27 +24,24 @@ import { IdentityInfoProps } from 'controllers/chain/substrate/identities';
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 
-interface IAttrs {
+type IAttrs = {
   account: SubstrateAccount;
   currentIdentity?: SubstrateIdentity;
 }
 
-interface IState {
-  identity: SubstrateIdentity | null;
-  saving: boolean;
-}
-
-const EditIdentityModal: m.Component<IAttrs, IState> = {
-  oninit: (vnode) => {
+class EditIdentityModal extends ClassComponent<IAttrs> {
+  private identity: SubstrateIdentity | null;
+  private saving: boolean;
+  public oninit(vnode) {
     app.runWhenReady(async () => {
-      vnode.state.identity = await (app.chain as Substrate).identities.load(
+      this.identity = await (app.chain as Substrate).identities.load(
         vnode.attrs.account
       );
       m.redraw();
     });
-  },
-  oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
-    if (vnode.state.identity?.info) {
+  }
+  public oncreate(vnode: m.VnodeDOM<IAttrs>) {
+    if (this.identity?.info) {
       const {
         additional,
         display,
@@ -55,7 +52,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         // pgpFingerprint,
         image,
         twitter,
-      } = vnode.state.identity?.info;
+      } = this.identity?.info;
 
       // do not display SHA values, only raw strings
       const d2s = (d: Data) =>
@@ -70,8 +67,8 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
       // }
       $(vnode.dom).find('input[name=twitter]').val(d2s(twitter));
     }
-  },
-  view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+  }
+  public view(vnode: m.VnodeDOM<IAttrs, IState>) {
     const updateIdentity = async () => {
       const data = {
         display: `${$(vnode.dom).find('input[name=display]').val()}`.trim(),
@@ -84,7 +81,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         image: null,
       };
 
-      vnode.state.saving = true;
+      this.saving = true;
       const idData: IdentityInfoProps = {
         display: {
           [data.display ? 'raw' : 'none']: data.display ? data.display : null,
@@ -139,7 +136,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
       if (profile) {
         profile.invalidateName();
       }
-      vnode.state.saving = false;
+      this.saving = false;
       m.redraw();
     };
 
@@ -201,7 +198,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
           m('.buttons', [
             m(Button, {
               intent: 'primary',
-              disabled: vnode.state.saving || !app.chain?.loaded,
+              disabled: this.saving || !app.chain?.loaded,
               rounded: true,
               onclick: (e) => {
                 e.preventDefault();
@@ -222,7 +219,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         ]),
       ]),
     ]);
-  },
+  }
 };
 
 export default EditIdentityModal;

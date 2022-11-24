@@ -158,7 +158,7 @@ export class LoginSelectorMenuLeft
 type LoginSelectorMenuRightAttrs = { mobile?: boolean };
 
 export class LoginSelectorMenuRight
-  implements m.Component<LoginSelectorMenuRightAttrs>
+  extends ClassComponent<LoginSelectorMenuRightAttrs>
 {
   view(vnode: m.Vnode<LoginSelectorMenuRightAttrs>) {
     const { mobile } = vnode.attrs;

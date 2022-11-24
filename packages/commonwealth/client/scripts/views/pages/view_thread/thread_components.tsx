@@ -30,7 +30,7 @@ type ThreadComponentAttrs = {
   thread: Thread;
 };
 
-export class ThreadAuthor implements m.Component<ThreadComponentAttrs> {
+export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
   view(vnode: m.Vnode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 

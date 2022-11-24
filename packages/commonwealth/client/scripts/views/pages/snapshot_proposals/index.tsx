@@ -33,7 +33,7 @@ type SnapshotProposalStagesBarAttrs = {
 };
 
 class SnapshotProposalStagesBar
-  implements m.Component<SnapshotProposalStagesBarAttrs>
+  extends ClassComponent<SnapshotProposalStagesBarAttrs>
 {
   view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
     return (

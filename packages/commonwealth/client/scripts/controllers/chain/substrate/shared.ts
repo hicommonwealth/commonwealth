@@ -42,7 +42,7 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateAccount } from './account';
 import { chainToEventNetwork } from '../../server/chain_entities';
 
-export interface ISubstrateTXData extends ITXData {
+export type ISubstrateTXData extends ITXData = {
   nonce: string;
   blockHash: string;
   isEd25519: boolean;

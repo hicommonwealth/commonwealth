@@ -26,7 +26,7 @@ type CommentAuthorAttrs = {
   comment: CommentType<any>;
 };
 
-class CommentAuthor implements m.Component<CommentAuthorAttrs> {
+class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
   view(vnode: m.Vnode<CommentAuthorAttrs>) {
     const { comment } = vnode.attrs;
 

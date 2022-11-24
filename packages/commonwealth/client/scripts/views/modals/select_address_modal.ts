@@ -17,18 +17,20 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
-const SelectAddressModal: m.Component<
-  {},
-  { selectedIndex: number; loading: boolean }
-> = {
-  view: (vnode) => {
-    const activeAccountsByRole: Array<[Account, RoleInfo]> =
+class SelectAddressModal extends ClassComponent<
+  {}
+> {
+  private selectedIndex: number;
+  private loading: boolean;
+
+  public view(vnode) {
+    const activeAccountsByRole: Array<[Account, RoleInfo]>
       app.roles.getActiveAccountsByRole();
     const activeEntityInfo = app.chain?.meta;
     const createRole = (e) => {
-      vnode.state.loading = true;
+      this.loading = true;
 
-      const [account, role] = activeAccountsByRole[vnode.state.selectedIndex];
+      const [account, role] = activeAccountsByRole[this.selectedIndex];
       const addressInfo = app.user.addresses.find(
         (a) => a.address === account.address && a.chain.id === account.chain.id
       );
@@ -38,9 +40,9 @@ const SelectAddressModal: m.Component<
           chain: app.activeChainId(),
         })
         .then(() => {
-          vnode.state.loading = false;
+          this.loading = false;
           m.redraw();
-          vnode.state.selectedIndex = null;
+          this.selectedIndex = null;
           // select the address, and close the form
           notifySuccess(
             `Joined with ${formatAddressShort(
@@ -55,14 +57,14 @@ const SelectAddressModal: m.Component<
           });
         })
         .catch((err: any) => {
-          vnode.state.loading = false;
+          this.loading = false;
           m.redraw();
           notifyError(err.responseJSON.error);
         });
     };
 
     const deleteRole = async (index, e) => {
-      vnode.state.loading = true;
+      this.loading = true;
       const [account, role] = activeAccountsByRole[index];
       const addressInfo = app.user.addresses.find(
         (a) => a.address === account.address && a.chain.id === account.chain.id
@@ -73,7 +75,7 @@ const SelectAddressModal: m.Component<
         'Remove this address from the community?'
       )();
       if (!confirmed) {
-        vnode.state.loading = false;
+        this.loading = false;
         m.redraw();
         return;
       }
@@ -84,16 +86,16 @@ const SelectAddressModal: m.Component<
           chain: app.activeChainId(),
         })
         .then(() => {
-          vnode.state.loading = false;
+          this.loading = false;
           m.redraw();
-          vnode.state.selectedIndex = null;
+          this.selectedIndex = null;
           // unset activeAccount, or set it to the next activeAccount
           if (isSameAccount(app.user.activeAccount, account)) {
             app.user.ephemerallySetActiveAccount(null);
           }
         })
         .catch((err: any) => {
-          vnode.state.loading = false;
+          this.loading = false;
           m.redraw();
           notifyError(err.responseJSON.error);
         });
@@ -158,10 +160,10 @@ const SelectAddressModal: m.Component<
                     '.select-address-option',
                     {
                       class:
-                        vnode.state.selectedIndex === index ? 'selected' : '',
+                        this.selectedIndex === index ? 'selected' : '',
                       onclick: async (e) => {
                         e.preventDefault();
-                        vnode.state.selectedIndex = index;
+                        this.selectedIndex = index;
                       },
                     },
                     [
@@ -169,7 +171,7 @@ const SelectAddressModal: m.Component<
                         m(UserBlock, {
                           user: account,
                           showRole: true,
-                          selected: vnode.state.selectedIndex === index,
+                          selected: this.selectedIndex === index,
                         }),
                         app.user.addresses.find(
                           (a) =>
@@ -217,8 +219,8 @@ const SelectAddressModal: m.Component<
             fluid: true,
             rounded: true,
             disabled:
-              typeof vnode.state.selectedIndex !== 'number' ||
-              vnode.state.loading,
+              typeof this.selectedIndex !== 'number' ||
+              this.loading,
             onclick: createRole.bind(this),
           }),
         // m(LoginWithWalletDropdown, {

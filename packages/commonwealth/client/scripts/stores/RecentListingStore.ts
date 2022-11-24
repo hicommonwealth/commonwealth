@@ -3,13 +3,13 @@ import IdStore from './IdStore';
 import { Thread } from '../models';
 import { orderDiscussionsbyLastComment } from '../views/pages/discussions/helpers';
 
-interface IListingParams {
+type IListingParams = {
   topicName?: string;
   stageName?: string;
   pinned?: boolean;
 }
 
-interface IListingFetchState {
+type IListingFetchState = {
   allThreadsInitialized: boolean;
   topicInitialized: { [topicName: string]: boolean };
   stageInitialized: { [stageName: string]: boolean };

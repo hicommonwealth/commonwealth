@@ -24,7 +24,7 @@ import { handleEmailInvites } from '../../menus/invites_menu';
 import UserDashboard from '../user_dashboard';
 import { Footer } from '../../footer';
 
-export interface Chain {
+export type Chain = {
   img: string;
   id: string;
   name: string;
@@ -32,7 +32,7 @@ export interface Chain {
   chainInfo: ChainInfo;
 }
 
-export interface Token {
+export type Token = {
   address: string;
   chainId: number;
   decimals: number;
@@ -41,14 +41,14 @@ export interface Token {
   symbol: string;
 }
 
-interface IState {
+type IState = {
   chains: Chain[];
   hiddenInputTokenList: boolean;
   inputTokenValue: string;
   modalAutoTriggered: boolean;
 }
 
-const LandingPage: m.Component<{}, IState> = {
+class LandingPage extends ClassComponent<{}, IState> {
   oncreate: () => {
     if (!app.isLoggedIn()) {
       mixpanelBrowserTrack({
@@ -56,8 +56,8 @@ const LandingPage: m.Component<{}, IState> = {
         isCustomDomain: app.isCustomDomain(),
       });
     }
-  },
-  oninit: (vnode) => {
+  }
+  public oninit(vnode) {
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';
     vnode.state.chains = [];
@@ -89,8 +89,8 @@ const LandingPage: m.Component<{}, IState> = {
       ...sortedChainsAndCommunities,
       ...betaChainsAndCommunities,
     ];
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }

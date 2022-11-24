@@ -1,14 +1,14 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-interface IAttrs {
+type IAttrs = {
   onclick?: () => {};
   href: any;
   text: string;
 }
 
-const LandingPageButton: m.Component<IAttrs, {}> = {
-  view: (vnode) => {
+class LandingPageButton extends ClassComponent<IAttrs, {}> {
+  public view(vnode) {
     return m(
       'a',
       {

@@ -1,13 +1,13 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-interface IAttrs {
+type IAttrs = {
   onchangeValue: (event: any) => void;
   onkeyupValue: (event: any) => void;
 }
 
-const FindYourTokenInputComponent: m.Component<IAttrs, {}> = {
-  view: (vnode) => {
+class FindYourTokenInputComponent extends ClassComponent<IAttrs, {}> {
+  public view(vnode) {
     return m('input', {
       autocomplete: 'off',
       class:

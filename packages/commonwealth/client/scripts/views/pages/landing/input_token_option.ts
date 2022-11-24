@@ -3,14 +3,14 @@ import ClassComponent from 'class_component';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 
-interface IAttrs {
+type IAttrs = {
   iconImg: string;
   text: string;
   route: string;
 }
 
-const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
-  view: (vnode) => {
+class InputTokenOptionComponent extends ClassComponent<IAttrs, {}> {
+  public view(vnode) {
     const { iconImg } = vnode.attrs;
     let tokenImage;
     if (!iconImg || !iconImg.length || iconImg.slice(0, 4) === 'ipfs') {

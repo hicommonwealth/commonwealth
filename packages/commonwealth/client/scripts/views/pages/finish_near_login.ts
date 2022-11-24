@@ -25,7 +25,7 @@ import { PageNotFound } from 'views/pages/404';
 import { NewLoginModal } from '../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 
-interface IState {
+type IState = {
   validating: boolean;
   validationCompleted: boolean;
   validatedAccount: NearAccount | null;
@@ -160,8 +160,8 @@ const validate = async (
   }
 };
 
-const FinishNearLogin: m.Component<Record<string, never>, IState> = {
-  view: (vnode) => {
+class FinishNearLogin extends ClassComponent<Record<string, never>, IState> {
+  public view(vnode) {
     if (!app.chain || !app.chain.loaded || vnode.state.validating) {
       return m(PageLoading);
     }

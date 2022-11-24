@@ -17,7 +17,7 @@ import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateIdentities, { SuperCodec } from './identities';
 
-export interface IIdentitySubs {
+export type IIdentitySubs = {
   subs: SubstrateAccount[];
   deposit: SubstrateCoin;
 }
@@ -30,7 +30,7 @@ export enum IdentityQuality {
   Unknown = 'unknown',
 }
 
-export interface ISubstrateIdentity extends IHasId {
+export type ISubstrateIdentity extends IHasId = {
   address: string;
   username: string;
   quality: IdentityQuality;

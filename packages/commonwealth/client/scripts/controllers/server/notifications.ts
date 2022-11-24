@@ -35,7 +35,7 @@ const get = (route, args, callback) => {
     .catch((e) => console.error(e));
 }
 
-interface NotifOptions {
+type NotifOptions = {
   chain_filter: string,
   maxId: number
 }

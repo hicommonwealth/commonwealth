@@ -4,19 +4,19 @@ import ClassComponent from 'class_component';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';
 
-interface IState {
+type IState = {
   chains: Chain[];
   oncreateSlider: Function;
 }
 
-const TokensChainsComponent: m.Component<IState, IState> = {
-  oninit: (vnode) => {
+class TokensChainsComponent extends ClassComponent<IState, IState> {
+  public oninit(vnode) {
     vnode.state.oncreateSlider = vnode.attrs.oncreateSlider;
-  },
-  oncreate: (vnode) => {
+  }
+  public oncreate(vnode) {
     vnode.state.oncreateSlider();
-  },
-  view: (vnode) => {
+  }
+  public view(vnode) {
     return m(
       'section.TokensChainsComponent',
       {

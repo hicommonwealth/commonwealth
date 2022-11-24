@@ -27,7 +27,7 @@ import CosmosAccount from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
 
-export interface ICosmosTXData extends ITXData {
+export type ICosmosTXData extends ITXData = {
   chainId: string;
   accountNumber: number;
   sequence: number;

@@ -1,8 +1,8 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-const JoinCommonWealthSection: m.Component<{}, {}> = {
-  view: (vnode) => {
+class JoinCommonWealthSection extends ClassComponent<{}, {}> {
+  public view(vnode) {
     return m(
       'section.JoinCommonWealthSection',
       { class: 'h-80 bg-gray-900 flex items-center mt-20 h-56' },
