@@ -28,7 +28,6 @@ import {
 } from '../components/proposals/proposals_explainers';
 import { getStatusText } from '../components/proposal_card/helpers';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
-import cosmosFetch from '../../helpers/cosmos_fetch';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -51,15 +50,6 @@ function getModules(): ProposalModule<any, any, any>[] {
     throw new Error('invalid chain');
   }
 }
-
-async function getCosmosProposals(){
- const activeCosmosProposals = await cosmosFetch(
-      'https://lcd.osmosis.zone/cosmos/gov/v1beta1/proposals'
-    );
-    console.log({ activeCosmosProposals });
-}
-
-await getCosmosProposals(),
 
 const ProposalsPage: m.Component<{}> = {
   oncreate: () => {
@@ -129,17 +119,13 @@ const ProposalsPage: m.Component<{}> = {
         .getAll()
         .filter((p) => !p.completed);
 
-   
-
-    console.log({ activeCosmosProposals });
-
-    // const activeCosmosProposals =
-    //   app.chain &&
-    //   app.chain.base === ChainBase.CosmosSDK &&
-    //   (app.chain as Cosmos).governance.store
-    //     .getAll()
-    //     .filter((p) => !p.completed)
-    //     .sort((a, b) => +b.identifier - +a.identifier);
+    const activeCosmosProposals =
+      app.chain &&
+      app.chain.base === ChainBase.CosmosSDK &&
+      (app.chain as Cosmos).governance.store
+        .getAll()
+        .filter((p) => !p.completed)
+        .sort((a, b) => +b.identifier - +a.identifier);
 
     const activeMolochProposals =
       onMoloch &&

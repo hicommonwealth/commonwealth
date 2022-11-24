@@ -131,6 +131,12 @@ class CosmosGovernance extends ProposalModule<
     this._initialized = true;
   }
 
+  public async restFetchProposals(): Promise<ICosmosProposal[]> {
+    return fetch('https://lcd.osmosis.zone/cosmos/gov/v1beta1/proposals').then(
+      (res) => res.json() as Promise<ICosmosProposal[]>
+    );
+  }
+
   private async _initProposals(proposalId?: number): Promise<void> {
     const msgToIProposal = (p: Proposal): ICosmosProposal | null => {
       const content = p.content;
@@ -173,12 +179,11 @@ class CosmosGovernance extends ProposalModule<
         paginationParam
       );
 
-      console.log({ pagination })
+      console.log({ pagination });
 
       // fetch all proposals
       // TODO: only fetch next page of proposals on scroll
       //let nextKey = pagination.nextKey;
-     
 
       cosmosProposals = proposals
         .map((p) => msgToIProposal(p))
@@ -266,14 +271,10 @@ class CosmosGovernance extends ProposalModule<
     return id;
   }
 
-  public async getScrollableItems(
-    toRender: number,
-    lastItem?: CosmosProposal
-  ) {
+  public async getScrollableItems(toRender: number, lastItem?: CosmosProposal) {
     this.toRender = toRender;
     console.log('getScrollableItems', toRender, lastItem);
   }
-
 }
 
 export default CosmosGovernance;
