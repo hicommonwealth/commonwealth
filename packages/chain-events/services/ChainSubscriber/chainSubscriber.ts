@@ -77,16 +77,30 @@ async function mainProcess(
   } else {
     try {
       const url = new URL(`${CW_SERVER_URL}/api/getChainEventServiceData`);
-      url.searchParams.append('secret', CHAIN_EVENT_SERVICE_SECRET);
-      url.searchParams.append('num_chain_subscribers', String(NUM_CHAIN_SUBSCRIBERS));
-      url.searchParams.append('chain_subscriber_index', String(CHAIN_SUBSCRIBER_INDEX));
       log.info(`Fetching CE data from CW at ${url}`);
-      const result = await fetch(url);
+      const data = {
+        secret: CHAIN_EVENT_SERVICE_SECRET,
+        num_chain_subscribers: NUM_CHAIN_SUBSCRIBERS,
+        chain_subscriber_index: CHAIN_SUBSCRIBER_INDEX
+      }
+      const result = await fetch(
+        url,
+        {
+          method: 'POST',
+          body: JSON.stringify(data),
+          headers: { 'Content-Type': 'application/json' }
+        },
+      );
       const jsonRes = await result.json();
+      log.info(`Fetched chain-event service data: ${JSON.stringify(jsonRes)}`);
+      if (jsonRes?.status >= 400) {
+        throw new Error(jsonRes.error)
+      }
       allChainsAndTokens = jsonRes.result;
     } catch (e) {
-      log.error(`Could not fetch chain-event service date`, e);
-      rollbar?.critical(`Could not fetch chain-event service date`, e);
+      log.error('Could not fetch chain-event service data', e);
+      rollbar?.critical('Could not fetch chain-event service data', e);
+      log.info(`Retrying in ${REPEAT_TIME} minute(s)`);
       return;
     }
   }

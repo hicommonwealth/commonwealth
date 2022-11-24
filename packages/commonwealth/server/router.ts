@@ -802,7 +802,7 @@ function setupRouter(
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
 
-  router.get(
+  router.post(
     '/getChainEventServiceData',
     getChainEventServiceData.bind(this, models)
   );

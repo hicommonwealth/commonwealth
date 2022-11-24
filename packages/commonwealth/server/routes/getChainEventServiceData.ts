@@ -12,24 +12,25 @@ export const Errors = {
 }
 
 export const getChainEventServiceData = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  if (!req.query.secret) {
+  console.log(`${JSON.stringify(req.body)}`);
+  if (!req.body.secret) {
     return next(new AppError(Errors.NeedSecret));
   }
 
-  if (req.query.secret !== CHAIN_EVENT_SERVICE_SECRET) {
+  if (req.body.secret !== CHAIN_EVENT_SERVICE_SECRET) {
     return next(new AppError(Errors.InvalidSecret));
   }
 
-  if (!req.query.num_chain_subscribers) {
+  if (isNaN(req.body.num_chain_subscribers)) {
     return next(new AppError(Errors.NoNumChainSubscribers));
   }
 
-  if (!req.query.chain_subscriber_index) {
+  if (isNaN(req.body.chain_subscriber_index)) {
     return next(new AppError(Errors.NoChainSubscriberIndex));
   }
 
-  const numChainSubs = req.query.num_chain_subscribers;
-  const chainSubIndex = req.query.chain_subscriber_index
+  const numChainSubs = req.body.num_chain_subscribers;
+  const chainSubIndex = req.body.chain_subscriber_index
 
   const query = `
       WITH allChains AS (SELECT "Chains".id,
