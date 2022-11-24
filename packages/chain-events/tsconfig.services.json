@@ -2,9 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./build",
-    "baseUrl": "./services",
   },
   "include": [
-    "./services"
+    "services"
   ]
 }
