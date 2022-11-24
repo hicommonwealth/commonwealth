@@ -20,6 +20,7 @@ import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
+
 import { CardsCollection } from '../components/cards_collection';
 import {
   CompoundProposalStats,
@@ -27,6 +28,7 @@ import {
 } from '../components/proposals/proposals_explainers';
 import { getStatusText } from '../components/proposal_card/helpers';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import cosmosFetch from '../../helpers/cosmos_fetch';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
@@ -50,7 +52,14 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
 }
 
+async function getCosmosProposals(){
+ const activeCosmosProposals = await cosmosFetch(
+      'https://lcd.osmosis.zone/cosmos/gov/v1beta1/proposals'
+    );
+    console.log({ activeCosmosProposals });
+}
 
+await getCosmosProposals(),
 
 const ProposalsPage: m.Component<{}> = {
   oncreate: () => {
@@ -67,14 +76,6 @@ const ProposalsPage: m.Component<{}> = {
         );
       }, 100);
     }
-  },
-
-  // eslint-disable-next-line no-restricted-globals
-  oninit() {
-    addEventListener('scroll', () => {
-      console.log('scrolling');
-      localStorage[`${app.activeChainId()}-proposals-scrollY`] = window.scrollY;
-    });
   },
 
   view() {
@@ -128,13 +129,17 @@ const ProposalsPage: m.Component<{}> = {
         .getAll()
         .filter((p) => !p.completed);
 
-    const activeCosmosProposals =
-      app.chain &&
-      app.chain.base === ChainBase.CosmosSDK &&
-      (app.chain as Cosmos).governance.store
-        .getAll()
-        .filter((p) => !p.completed)
-        .sort((a, b) => +b.identifier - +a.identifier);
+   
+
+    console.log({ activeCosmosProposals });
+
+    // const activeCosmosProposals =
+    //   app.chain &&
+    //   app.chain.base === ChainBase.CosmosSDK &&
+    //   (app.chain as Cosmos).governance.store
+    //     .getAll()
+    //     .filter((p) => !p.completed)
+    //     .sort((a, b) => +b.identifier - +a.identifier);
 
     const activeMolochProposals =
       onMoloch &&

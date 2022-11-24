@@ -74,6 +74,8 @@ class CosmosGovernance extends ProposalModule<
   private _vetoThreshold: number;
   private _maxDepositPeriodS: number;
   private _minDeposit: CosmosToken;
+  private _toRender: number;
+
   public get votingPeriodNs() {
     return this._votingPeriodS;
   }
@@ -163,22 +165,20 @@ class CosmosGovernance extends ProposalModule<
 
     let cosmosProposals: CosmosProposal[];
     if (!proposalId) {
+      const paginationParam = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 20]);
       const { proposals, pagination } = await this._Chain.api.gov.proposals(
         0,
         '',
-        ''
+        '',
+        paginationParam
       );
+
+      console.log({ pagination })
 
       // fetch all proposals
       // TODO: only fetch next page of proposals on scroll
-      let nextKey = pagination.nextKey;
-      while (nextKey.length > 0) {
-        console.log(nextKey);
-        const { proposals: addlProposals, pagination: nextPage } =
-          await this._Chain.api.gov.proposals(0, '', '', nextKey);
-        proposals.push(...addlProposals);
-        nextKey = nextPage.nextKey;
-      }
+      //let nextKey = pagination.nextKey;
+     
 
       cosmosProposals = proposals
         .map((p) => msgToIProposal(p))
@@ -186,7 +186,7 @@ class CosmosGovernance extends ProposalModule<
         .sort((p1, p2) => +p2.identifier - +p1.identifier)
         .map((p) => new CosmosProposal(this._Chain, this._Accounts, this, p));
     } else {
-      const { proposal } = await this._Chain.api.gov.proposal(proposalId);
+      const { proposal } = await this._Chain.api.gov.proposal(1);
       cosmosProposals = [
         new CosmosProposal(
           this._Chain,
@@ -265,6 +265,15 @@ class CosmosGovernance extends ProposalModule<
     await this._initProposals(id);
     return id;
   }
+
+  public async getScrollableItems(
+    toRender: number,
+    lastItem?: CosmosProposal
+  ) {
+    this.toRender = toRender;
+    console.log('getScrollableItems', toRender, lastItem);
+  }
+
 }
 
 export default CosmosGovernance;
