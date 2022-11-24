@@ -37,11 +37,11 @@ export const RABBITMQ_API_URI = (() => {
 export const ROLLBAR_SERVER_TOKEN = process.env.ROLLBAR_SERVER_TOKEN;
 
 // ----------------- ChainSubscriber specific var ------------------------
-export const WORKER_NUMBER = process.env.WORKER_NUMBER
-  ? Number(process.env.WORKER_NUMBER)
+export const CHAIN_SUBSCRIBER_INDEX = process.env.CHAIN_SUBSCRIBER_INDEX
+  ? Number(process.env.CHAIN_SUBSCRIBER_INDEX)
   : 0;
-export const NUM_WORKERS = process.env.NUM_WORKERS
-  ? Number(process.env.NUM_WORKERS)
+export const NUM_CHAIN_SUBSCRIBERS = process.env.NUM_CHAIN_SUBSCRIBERS
+  ? Number(process.env.NUM_CHAIN_SUBSCRIBERS)
   : 1;
 
 // The number of minutes to wait between each run -- rounded to the nearest whole number

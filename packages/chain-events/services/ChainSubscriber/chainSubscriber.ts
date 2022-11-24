@@ -11,11 +11,11 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import {
   CHAIN_EVENT_SERVICE_SECRET,
   CW_DATABASE_URI, CW_SERVER_URL,
-  NUM_WORKERS,
+  NUM_CHAIN_SUBSCRIBERS,
   RABBITMQ_URI,
   REPEAT_TIME,
   ROLLBAR_SERVER_TOKEN,
-  WORKER_NUMBER,
+  CHAIN_SUBSCRIBER_INDEX,
 } from '../config';
 import {
   getListenerNames,
@@ -76,9 +76,12 @@ async function mainProcess(
     allChainsAndTokens = (await pool.query<ChainAttributes>(query)).rows;
   } else {
     try {
-      const result = await fetch(
-        `${CW_SERVER_URL}/api/getChainEventServiceData?secret=${CHAIN_EVENT_SERVICE_SECRET}`
-      );
+      const url = new URL(`${CW_SERVER_URL}/api/getChainEventServiceData`);
+      url.searchParams.append('secret', CHAIN_EVENT_SERVICE_SECRET);
+      url.searchParams.append('num_chain_subscribers', String(NUM_CHAIN_SUBSCRIBERS));
+      url.searchParams.append('chain_subscriber_index', String(CHAIN_SUBSCRIBER_INDEX));
+      log.info(`Fetching CE data from CW at ${url}`);
+      const result = await fetch(url);
       const jsonRes = await result.json();
       allChainsAndTokens = jsonRes.result;
     } catch (e) {
@@ -182,7 +185,7 @@ export async function chainEventsSubscriberInitializer(): Promise<{ rollbar: any
   }
 
   log.info(
-    `Worker Number: ${WORKER_NUMBER}, Number of Workers: ${NUM_WORKERS}`
+    `Worker Number: ${CHAIN_SUBSCRIBER_INDEX}, Number of Workers: ${NUM_CHAIN_SUBSCRIBERS}`
   );
 
   const producer = new RabbitMqHandler(

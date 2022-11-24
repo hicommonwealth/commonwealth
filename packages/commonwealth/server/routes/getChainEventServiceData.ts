@@ -2,12 +2,13 @@ import {DB} from '../models';
 import {AppError} from "common-common/src/errors";
 import { Response, NextFunction, Request } from 'express';
 import {CHAIN_EVENT_SERVICE_SECRET} from "../config";
-import {NUM_WORKERS, WORKER_NUMBER} from "chain-events/services/config";
 import {QueryTypes} from "sequelize";
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',
-  InvalidSecret: 'Must provide a valid secret to use this route'
+  InvalidSecret: 'Must provide a valid secret to use this route',
+  NoNumChainSubscribers: 'Must provide the number of chain-event subscribers',
+  NoChainSubscriberIndex: 'Must provide the index of the chain-event subscriber'
 }
 
 export const getChainEventServiceData = async (models: DB, req: Request, res: Response, next: NextFunction) => {
@@ -18,6 +19,17 @@ export const getChainEventServiceData = async (models: DB, req: Request, res: Re
   if (req.query.secret !== CHAIN_EVENT_SERVICE_SECRET) {
     return next(new AppError(Errors.InvalidSecret));
   }
+
+  if (!req.query.num_chain_subscribers) {
+    return next(new AppError(Errors.NoNumChainSubscribers));
+  }
+
+  if (!req.query.chain_subscriber_index) {
+    return next(new AppError(Errors.NoChainSubscriberIndex));
+  }
+
+  const numChainSubs = req.query.num_chain_subscribers;
+  const chainSubIndex = req.query.chain_subscriber_index
 
   const query = `
       WITH allChains AS (SELECT "Chains".id,
@@ -48,7 +60,7 @@ export const getChainEventServiceData = async (models: DB, req: Request, res: Re
              JSON_BUILD_OBJECT('id', allChains.chain_node_id, 'url',
                                COALESCE(allChains.private_url, allChains.url)) as "ChainNode"
       FROM allChains
-      WHERE MOD(allChains.index, ${NUM_WORKERS}) = ${WORKER_NUMBER};
+      WHERE MOD(allChains.index, ${numChainSubs}) = ${chainSubIndex};
   `;
 
   const result = await models.sequelize.query(
