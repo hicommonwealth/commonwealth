@@ -21,9 +21,6 @@ import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq';
 import ViewCountCache from './server/util/viewCountCache';
-import IdentityFetchCache, {
-  IdentityFetchCacheNew,
-} from './server/util/identityFetchCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
 import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
@@ -67,15 +64,6 @@ async function main() {
   // CLI parameters used to configure specific tasks
   const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
-  const USE_NEW_IDENTITY_CACHE = process.env.USE_NEW_IDENTITY_CACHE === 'true';
-
-  // if running in old mode then use old identityCache but if running with dbNode.ts use the new db identityCache
-  let identityFetchCache: IdentityFetchCacheNew | IdentityFetchCache;
-  if (!USE_NEW_IDENTITY_CACHE) {
-    identityFetchCache = new IdentityFetchCache(10 * 60);
-  } else {
-    identityFetchCache = new IdentityFetchCacheNew();
-  }
 
   const tokenBalanceCache = new TokenBalanceCache();
   const ruleCache = new RuleCache();
@@ -270,7 +258,6 @@ async function main() {
     app,
     models,
     viewCountCache,
-    <any>identityFetchCache,
     tokenBalanceCache,
     ruleCache,
     banCache,

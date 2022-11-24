@@ -24,7 +24,7 @@ export const Errors = {
 };
 
 const updateProfile = async (
-  models: DB, identityFetchCache: IdentityFetchCache, req: Request, res: Response, next: NextFunction
+  models: DB, req: Request, res: Response, next: NextFunction
 ) => {
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new AppError(Errors.MissingParams));
@@ -93,12 +93,6 @@ const updateProfile = async (
         id: address.id,
       }
     });
-  }
-
-  // new profiles on substrate chains get added to the identity cache
-  // to be fetched by chain-event nodes or on a timer job
-  if (!req.body.skipChainFetch && chain.base === ChainBase.Substrate) {
-    await identityFetchCache.add(req.body.chain, req.body.address);
   }
 
   return res.json({ status: 'Success', result: { profile, updatedProfileAddress: address } });

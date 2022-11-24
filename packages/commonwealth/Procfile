@@ -1,3 +1,3 @@
-web: cd packages/commonwealth && USE_NEW_IDENTITY_CACHE=true ts-node -P tsconfig.node.json -T server.ts
+web: cd packages/commonwealth && ts-node -P tsconfig.server.json -T server.ts
 consumer: cd packages/commonwealth && yarn start-consumer
 release: cd packages/commonwealth && npx sequelize-cli db:migrate --config server/sequelize.json

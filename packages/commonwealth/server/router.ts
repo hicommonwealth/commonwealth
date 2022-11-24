@@ -165,7 +165,6 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
   banCache: BanCache,
@@ -527,7 +526,7 @@ function setupRouter(
   router.post(
     '/updateProfile',
     passport.authenticate('jwt', { session: false }),
-    updateProfile.bind(this, models, identityFetchCache)
+    updateProfile.bind(this, models)
   );
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
