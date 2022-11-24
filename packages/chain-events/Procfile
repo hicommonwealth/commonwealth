@@ -1,4 +1,4 @@
 web: node packages/chain-events/build/chain-events/services/app/Server.js
-subscriber: node packages/chain-events/build/chain-events/services/ChainSubscriber/chainSubscriber.js
-consumer: node packages/chain-events/build/chain-events/services/ChainEventsConsumer/chainEventsConsumer.js
+subscriber: node packages/chain-events/build/chain-events/services/ChainSubscriber/chainSubscriber.js run-as-script
+consumer: node packages/chain-events/build/chain-events/services/ChainEventsConsumer/chainEventsConsumer.js run-as-script
 release: cd packages/chain-events && npx sequelize-cli db:migrate --config services/database/sequelize.json
