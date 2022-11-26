@@ -359,29 +359,35 @@ async function discoverReconnectRange(this: DB, chain: string) {
         where: { chain },
       })
     ).map((x) => x.id);
+
     if (eventTypes.length === 0) {
       log.info(
-        `[${chain}]: No events in database to get last block number from`
+        `[${chain}]: No event types exist in the database`
       );
       return { startBlock: null };
     }
+
     latestBlock = await this.ChainEvent.max('block_number', {
       where: {
         chain_event_type_id: eventTypes,
       },
     });
+
+    if (latestBlock) {
+      log.info(
+        `[${chain}]: Discovered chain event in db at block ${latestBlock}.`
+      );
+      return { startBlock: latestBlock + 1 };
+    } else {
+      log.info(`[${chain}]: No chain-events found in the database`);
+      return { startBlock: null };
+    }
   } catch (error) {
     log.warn(
       `[${chain}]: An error occurred while discovering offline time range`,
       error
     );
   }
-  if (latestBlock) {
-    log.info(
-      `[${chain}]: Discovered chain event in db at block ${latestBlock}.`
-    );
-    return { startBlock: latestBlock + 1 };
-  } else {
-    return { startBlock: null };
-  }
+
+  return { startBlock: null };
 }

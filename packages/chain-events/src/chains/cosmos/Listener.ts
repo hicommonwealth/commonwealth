@@ -127,8 +127,8 @@ export class Listener extends BaseListener<
 
   protected async processBlock(event: RawEvent): Promise<void> {
     const { height } = event;
-    if (!this._lastBlockNumber || height > this._lastBlockNumber) {
-      this._lastBlockNumber = height;
+    if (!this._lastCachedBlockNumber || height > this._lastCachedBlockNumber) {
+      this._lastCachedBlockNumber = height;
     }
 
     const cwEvents: CWEvent[] = await this._processor.process(event);
@@ -139,54 +139,16 @@ export class Listener extends BaseListener<
   }
 
   private async processMissedBlocks(): Promise<IDisconnectedRange | null> {
-    this.log.info(`Detected offline time, polling missed blocks...`);
-
-    if (!this.discoverReconnectRange) {
-      this.log.info(
-        `Unable to determine offline range - No discoverReconnectRange function given`
-      );
-      return null;
-    }
-
-    // TODO: what to do about this offline range code for Cosmos?
-    let offlineRange: IDisconnectedRange;
-    try {
-      // fetch the block of the last server event from database
-      offlineRange = await this.discoverReconnectRange(this._chain);
-      if (!offlineRange) {
-        this.log.warn('No offline range found, skipping event catchup.');
-        return null;
-      }
-    } catch (error) {
-      this.log.error(
-        `Could not discover offline range: ${error.message}. Skipping event catchup.`
-      );
-      return null;
-    }
-
-    // compare with default range algorithm: take last cached block in processor
-    // if it exists, and is more recent than the provided algorithm
-    // (note that on first run, we wont have a cached block/this wont do anything)
-    if (
-      this._lastBlockNumber &&
-      (!offlineRange ||
-        !offlineRange.startBlock ||
-        offlineRange.startBlock < this._lastBlockNumber)
-    ) {
-      offlineRange = { startBlock: this._lastBlockNumber };
-    }
-
-    // if we can't figure out when the last block we saw was,
-    // do nothing
-    // (i.e. don't try and fetch all events from block 0 onward)
-    if (!offlineRange || !offlineRange.startBlock) {
-      this.log.warn(`Unable to determine offline time range.`);
-      return null;
-    }
+    const offlineRange = await this.processOfflineRange(this.log);
+    if (!offlineRange) return;
     return offlineRange;
   }
 
   public get options(): CosmosListenerOptions {
     return this._options;
+  }
+
+  public async getLatestBlockNumber(): Promise<number> {
+    return (await this._api.tm.block()).block.header.height;
   }
 }

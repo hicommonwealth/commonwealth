@@ -15,6 +15,7 @@
     "check-services-types": "tsc --noEmit --project tsconfig.services.json",
     "check-src-types": "tsc --noEmit --project tsconfig.src.json",
     "check-types": "tsc --noEmit --project tsconfig.json",
+    "test-query": "ts-node ./scripts/testSequelizeQuery.ts",
     "unit-test": "ts-mocha --config ./.mocharc.json ./test/unit/**/*.spec.ts",
     "integration-test": "cd eth && hardhat test ../test/integration/*.spec.ts",
     "test-services": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/*.test.ts --timeout 20000",

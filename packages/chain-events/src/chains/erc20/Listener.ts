@@ -131,4 +131,8 @@ export class Listener extends BaseListener<
   public get options(): Erc20ListenerOptions {
     return this._options;
   }
+
+  public async getLatestBlockNumber(): Promise<number> {
+    return this._api.provider.getBlockNumber();
+  }
 }

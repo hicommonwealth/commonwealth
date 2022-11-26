@@ -126,8 +126,8 @@ export class Listener extends BaseListener<
 
   protected async processBlock(event: RawEvent): Promise<void> {
     const { blockNumber } = event;
-    if (!this._lastBlockNumber || blockNumber > this._lastBlockNumber) {
-      this._lastBlockNumber = blockNumber;
+    if (!this._lastCachedBlockNumber || blockNumber > this._lastCachedBlockNumber) {
+      this._lastCachedBlockNumber = blockNumber;
     }
 
     const cwEvents: CWEvent[] = await this._processor.process(event);
@@ -138,61 +138,42 @@ export class Listener extends BaseListener<
   }
 
   private async processMissedBlocks(): Promise<void> {
-    this.log.info(`Detected offline time, polling missed blocks...`);
+    const offlineRange = await this.processOfflineRange(this.log);
+    if (!offlineRange) return;
 
-    if (!this.discoverReconnectRange) {
-      this.log.info(
-        `Unable to determine offline range - No discoverReconnectRange function given`
-      );
-      return;
-    }
-
-    let offlineRange: IDisconnectedRange;
+    this.log.info(`Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
     try {
-      // fetch the block of the last server event from database
-      offlineRange = await this.discoverReconnectRange(this._chain);
-      if (!offlineRange) {
-        this.log.warn('No offline range found, skipping event catchup.');
-        return;
+      const maxBlocksPerPoll = 250;
+      let startBlock = offlineRange.startBlock;
+      let endBlock;
+
+      if (startBlock + maxBlocksPerPoll < offlineRange.endBlock) endBlock = startBlock + maxBlocksPerPoll;
+      else endBlock = offlineRange.endBlock;
+
+      while (endBlock <= offlineRange.endBlock) {
+        const cwEvents = await this.storageFetcher.fetch({startBlock, endBlock});
+        for (const event of cwEvents) {
+          await this.handleEvent(event);
+        }
+
+        // stop loop when we have fetched all blocks
+        if (endBlock === offlineRange.endBlock) break;
+
+        startBlock = endBlock + 1;
+        if (endBlock + maxBlocksPerPoll <= offlineRange.endBlock) endBlock += maxBlocksPerPoll;
+        else endBlock = offlineRange.endBlock;
       }
     } catch (error) {
-      this.log.error(
-        `Could not discover offline range: ${error.message}. Skipping event catchup.`
-      );
-      return;
+      this.log.error(`Unable to fetch events from storage`, error);
     }
-
-    // compare with default range algorithm: take last cached block in processor
-    // if it exists, and is more recent than the provided algorithm
-    // (note that on first run, we wont have a cached block/this wont do anything)
-    if (
-      this._lastBlockNumber &&
-      (!offlineRange ||
-        !offlineRange.startBlock ||
-        offlineRange.startBlock < this._lastBlockNumber)
-    ) {
-      offlineRange = { startBlock: this._lastBlockNumber };
-    }
-
-    // if we can't figure out when the last block we saw was,
-    // do nothing
-    // (i.e. don't try and fetch all events from block 0 onward)
-    if (!offlineRange || !offlineRange.startBlock) {
-      this.log.warn(`Unable to determine offline time range.`);
-      return;
-    }
-
-    try {
-      const cwEvents = await this.storageFetcher.fetch(offlineRange);
-      for (const event of cwEvents) {
-        await this.handleEvent(event as CWEvent<IEventData>);
-      }
-    } catch (error) {
-      this.log.error(`Unable to fetch events from storage: ${error.message}`);
-    }
+    this.log.info(`Successfully processed block ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
   }
 
   public get options(): CompoundListenerOptions {
     return this._options;
+  }
+
+  public async getLatestBlockNumber(): Promise<number> {
+    return +(await this._api.provider.getBlockNumber());
   }
 }
