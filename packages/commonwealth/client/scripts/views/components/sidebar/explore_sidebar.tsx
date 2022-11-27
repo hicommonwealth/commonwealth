@@ -75,9 +75,13 @@ export class ExploreCommunitiesSidebar implements m.ClassComponent {
         className="ExploreCommunitiesSidebar"
         menuHeader={{
           label: 'Explore',
-          onclick: () => {
-            app.sidebarMenu = 'default';
-            m.redraw();
+          onclick: async () => {
+            const sidebar = document.getElementsByClassName('ExploreCommunitiesSidebar');
+            sidebar[0].classList.add('onremove')
+            setTimeout(() => {
+              app.sidebarMenu = 'default';
+              m.redraw();
+            }, 400);
           },
         }}
         menuItems={communityList}

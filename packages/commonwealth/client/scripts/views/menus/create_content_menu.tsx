@@ -210,15 +210,19 @@ const getCreateContentMenuItems = (): MenuItem[] => {
 };
 
 export class CreateContentSidebar implements m.ClassComponent {
-  view() {
+  view(vnode: m.Vnode) {
     return (
       <CWSidebarMenu
         className="CreateContentSidebar"
         menuHeader={{
           label: 'Create',
-          onclick: () => {
-            app.sidebarMenu = 'default';
-            m.redraw();
+          onclick: async () => {
+            const sidebar = document.getElementsByClassName('CreateContentSidebar');
+            sidebar[0].classList.add('onremove')
+            setTimeout(() => {
+              app.sidebarMenu = 'default';
+              m.redraw();
+            }, 400);
           },
         }}
         menuItems={getCreateContentMenuItems()}

@@ -4,7 +4,6 @@
   display: flex;
   flex-direction: column;
   transform: none !important; // override any scrolling effects
-  left: $quick-switcher-width !important;
 
   @include smallInclusive {
     overflow-y: scroll;

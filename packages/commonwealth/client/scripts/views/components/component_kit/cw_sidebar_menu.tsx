@@ -144,22 +144,31 @@ export class CWSidebarMenu implements m.ClassComponent<SidebarMenuAttrs> {
               type: 'default',
               label: 'Explore communities',
               iconLeft: 'compass',
-              onclick: () => m.route.set('/communities'),
+              onclick: () => {
+                app.sidebarMenu = 'default';
+                m.route.set('/communities');
+              },
             },
             {
               type: 'default',
               label: 'Notification settings',
               iconLeft: 'person',
-              onclick: () => m.route.set('/notification-settings'),
+              onclick: () => {
+                app.sidebarMenu = 'default';
+                m.route.set('/notification-settings');
+              },
             },
             {
               type: 'default',
               label: 'Account settings',
               iconLeft: 'bell',
-              onclick: () =>
-                app.activeChainId()
-                  ? navigateToSubpage('/settings')
-                  : m.route.set('/settings'),
+              onclick: () => {
+                  if (app.activeChainId()) { navigateToSubpage('/settings'); }
+                  else {
+                    app.sidebarMenu = 'default';
+                    m.route.set('/settings');
+                  }
+                },
             } as MenuItem,
           ].map((item: MenuItem) => {
             return (

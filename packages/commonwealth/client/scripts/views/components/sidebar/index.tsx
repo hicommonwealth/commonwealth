@@ -48,7 +48,7 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
       );
 
     const showSidebar = app.sidebarToggled || !onMobile;
-    const showDefaultSidebar = showSidebar && app.sidebarMenu === 'default';
+    const showDefaultSidebar = showSidebar;
     const showCommunityMenu = showDefaultSidebar && app.chain;
     const showCreateSidebar =
       showSidebar && app.sidebarMenu === 'create-content';
