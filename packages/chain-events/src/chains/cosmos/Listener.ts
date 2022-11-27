@@ -151,4 +151,12 @@ export class Listener extends BaseListener<
   public async getLatestBlockNumber(): Promise<number> {
     return (await this._api.tm.block()).block.header.height;
   }
+
+  public async isConnected(): Promise<boolean> {
+    // cosmos querying is polling/HTTP based so there is no
+    // long-running WebSocket connection we can check the status for
+    // this function will be deprecated when we switch all listeners
+    // to HTTP polling
+    return true;
+  }
 }

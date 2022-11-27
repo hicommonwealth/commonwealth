@@ -153,7 +153,7 @@ export class Listener extends BaseListener<ApiPromise,
         error
       );
     }
-    this.log.info(`Successfully processed block ${offlineRange.startBlock} to ${offlineRange.startBlock}`);
+    this.log.info(`Successfully processed block ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
   }
 
   public async getBlocks(
@@ -202,5 +202,9 @@ export class Listener extends BaseListener<ApiPromise,
   public async getLatestBlockNumber(): Promise<number> {
     const header = await this._api.rpc.chain.getHeader();
     return +header.number;
+  }
+
+  public async isConnected(): Promise<boolean> {
+    return this._api.isConnected;
   }
 }

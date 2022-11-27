@@ -166,4 +166,6 @@ export abstract class Listener<
 
     return <{startBlock: number, endBlock: number}>offlineRange;
   }
+
+  public abstract isConnected(): Promise<boolean>;
 }

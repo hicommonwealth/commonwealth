@@ -7,12 +7,12 @@ import {
   SubstrateTypes,
   SupportedNetwork,
 } from '../../src';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ChainAttributes, IListenerInstances } from './types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
+import {ChainBase, ChainNetwork} from 'common-common/src/types';
+import {ChainAttributes, IListenerInstances} from './types';
+import {factory, formatFilename} from 'common-common/src/logging';
+import {RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers';
 import Rollbar from 'rollbar';
-import models, { DB } from '../database/database';
+import models, {DB} from '../database/database';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -216,6 +216,8 @@ async function setupNewListeners(
     let network: SupportedNetwork;
     if (chain.base === ChainBase.Substrate)
       network = SupportedNetwork.Substrate;
+    else if (chain.base === ChainBase.CosmosSDK)
+      network = SupportedNetwork.Cosmos;
     else if (chain.network === ChainNetwork.Compound)
       network = SupportedNetwork.Compound;
     else if (chain.network === ChainNetwork.Aave)
