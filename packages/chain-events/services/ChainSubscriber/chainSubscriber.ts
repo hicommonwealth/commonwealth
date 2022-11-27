@@ -151,6 +151,11 @@ async function mainProcess(
   await manageRegularListeners(chains, listenerInstances, producer, rollbar);
 
   for (const c of Object.keys(listenerInstances)) {
+    if (await listenerInstances[c].isConnected())
+      StatsDController.get().increment('ce.connection-active', { chain: c });
+    else
+      StatsDController.get().increment('ce.connection-inactive', { chain: c });
+
     StatsDController.get().increment('ce.listeners-active', { chain: c });
   }
 
