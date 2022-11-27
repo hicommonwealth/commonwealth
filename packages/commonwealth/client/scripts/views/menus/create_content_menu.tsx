@@ -174,6 +174,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           isCustomDomain: app.isCustomDomain(),
           communityType: null,
         });
+        app.sidebarMenu = 'default';
         m.route.set('/createCommunity');
       },
     },

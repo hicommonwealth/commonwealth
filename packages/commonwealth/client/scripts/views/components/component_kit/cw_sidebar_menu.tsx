@@ -66,7 +66,7 @@ const renderCommunity = (item: ChainInfo) => {
 };
 
 class CWSidebarMenuItem implements m.ClassComponent<MenuItem> {
-  view(vnode: m.VnodeDOM<MenuItem, this>) {
+  view(vnode: m.Vnode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
       const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
         vnode.attrs;
@@ -111,7 +111,7 @@ type SidebarMenuAttrs = {
 };
 
 export class CWSidebarMenu implements m.ClassComponent<SidebarMenuAttrs> {
-  view(vnode: m.VnodeDOM<SidebarMenuAttrs, this>) {
+  view(vnode: m.Vnode<SidebarMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
 
     return (
