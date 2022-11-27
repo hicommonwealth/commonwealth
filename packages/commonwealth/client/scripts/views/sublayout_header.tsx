@@ -23,7 +23,7 @@ type SublayoutHeaderAttrs = {
 };
 
 export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<SublayoutHeaderAttrs>) {
     const { hideSearch, onMobile, isSidebarToggled } = vnode.attrs;
 
     return (

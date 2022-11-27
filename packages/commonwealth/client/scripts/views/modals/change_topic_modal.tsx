@@ -21,12 +21,12 @@ export class ChangeTopicModal
 {
   private activeTopic: Topic;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ChangeTopicModalAttrs>) {
     if (!vnode.attrs.thread.topic) return;
     this.activeTopic = vnode.attrs.thread.topic;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ChangeTopicModalAttrs>) {
     const { thread } = vnode.attrs;
 
     return (

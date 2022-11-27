@@ -4,15 +4,17 @@ import m from 'mithril';
 
 import 'components/sidebar/index.scss';
 
+import { Action } from 'common-common/src/permissions';
+
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
+import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
-import { CommunityHeader } from './community_header';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 
@@ -26,15 +28,28 @@ export type SidebarMenuName =
   | 'explore-communities';
 
 export class Sidebar implements m.ClassComponent<SidebarAttrs> {
-  view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
+  view(vnode: m.Vnode<SidebarAttrs>) {
     const { onMobile } = vnode.attrs;
     if (!app.sidebarMenu) app.sidebarMenu = 'default';
+
+    const activeAddressRoles = app.roles.getAllRolesInCommunity({
+      chain: app.activeChainId(),
+    });
+
+    const currentChainInfo = app.chain?.meta;
+
+    const hideChat =
+      !currentChainInfo ||
+      !activeAddressRoles ||
+      !isActiveAddressPermitted(
+        activeAddressRoles,
+        currentChainInfo,
+        Action.VIEW_CHAT_CHANNELS
+      );
 
     const showSidebar = app.sidebarToggled || !onMobile;
     const showDefaultSidebar = showSidebar && app.sidebarMenu === 'default';
     const showCommunityMenu = showDefaultSidebar && app.chain;
-    const showCommunityHeader =
-      showCommunityMenu && onMobile && app.sidebarToggled;
     const showCreateSidebar =
       showSidebar && app.sidebarMenu === 'create-content';
     const showExploreSidebar =
@@ -42,7 +57,6 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
 
     return (
       <div class="Sidebar">
-        {showCommunityHeader && <CommunityHeader meta={app.chain.meta} />}
         {showDefaultSidebar && (
           <div class="sidebar-default-menu">
             <SidebarQuickSwitcher />
@@ -51,9 +65,7 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
                 <AdminSection />
                 <DiscussionSection />
                 <GovernanceSection />
-                {app.socket && !!app.chain?.meta?.chatEnabled && (
-                  <ChatSection />
-                )}
+                {app.socket && !hideChat && <ChatSection />}
                 <ExternalLinksModule />
                 <div class="buttons-container">
                   {app.isLoggedIn() && app.chain && (

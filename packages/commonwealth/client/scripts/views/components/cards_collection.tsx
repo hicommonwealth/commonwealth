@@ -7,12 +7,12 @@ import 'components/cards_collection.scss';
 import { CWText } from './component_kit/cw_text';
 
 type CardsCollectionAttrs = {
-  content: any[];
-  header?: any;
+  content: Array<m.Vnode> | m.Vnode;
+  header?: string;
 };
 
 export class CardsCollection implements m.ClassComponent<CardsCollectionAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<CardsCollectionAttrs>) {
     const { content, header } = vnode.attrs;
     return (
       <div class="CardsCollection">
