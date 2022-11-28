@@ -17,8 +17,8 @@ type AdminPanelTabsAttrs = {
     oldRole: RoleInstanceWithPermissionAttributes,
     newRole: RoleInstanceWithPermissionAttributes
   ) => void;
-  roleData: RoleInstanceWithPermissionAttributes[];
-  webhooks: Webhook[];
+  roleData: Array<RoleInstanceWithPermissionAttributes>;
+  webhooks: Array<Webhook>;
 };
 
 export class AdminPanelTabs extends ClassComponent<AdminPanelTabsAttrs> {

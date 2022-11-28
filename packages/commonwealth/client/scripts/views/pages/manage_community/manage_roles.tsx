@@ -7,6 +7,7 @@ import $ from 'jquery';
 import 'pages/manage_community/manage_roles.scss';
 
 import app from 'state';
+import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
@@ -16,13 +17,17 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ManageRoleRowAttrs = {
   label: string;
-  onRoleUpdate: (oldRole: string, newRole: string) => void;
-  roledata?: any;
+  onRoleUpdate: (
+    oldRole: RoleInstanceWithPermissionAttributes,
+    newRole: RoleInstanceWithPermissionAttributes
+  ) => void;
+  roledata?: Array<RoleInstanceWithPermissionAttributes>;
 };
 
 export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
   view(vnode: m.Vnode<ManageRoleRowAttrs>) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
+
     const chainOrCommObj = { chain: app.activeChainId() };
     const communityMeta = app.chain.meta;
 
@@ -63,12 +68,14 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                     const adminsAndMods = await communityMeta.getMembers(
                       app.activeChainId()
                     );
+
                     const userAdminsAndMods = adminsAndMods.filter((role_) => {
                       const belongsToUser = !!app.user.addresses.filter(
                         (addr_) => addr_.id === role_.address_id
                       ).length;
                       return belongsToUser;
                     });
+
                     // if (role.permission === 'admin') {
                     //   const admins = (adminsAndMods || []).filter((r) => r.permission === 'admin');
                     //   if (admins.length < 2) {
@@ -76,13 +83,16 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                     //     return;
                     //   }
                     // }
+
                     const onlyModsRemaining = () => {
                       const modCount = userAdminsAndMods.filter(
                         (r) => r.permission === 'moderator'
                       ).length;
+
                       const remainingRoleCount = userAdminsAndMods.length - 1;
                       return modCount === remainingRoleCount;
                     };
+
                     const isLosingAdminPermissions =
                       (userAdminsAndMods.length === 1 && isSelf) ||
                       (roleBelongsToUser &&
@@ -106,6 +116,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                       )();
                       if (!confirmed) return;
                     }
+
                     try {
                       const res = await $.post(
                         `${app.serverUrl()}/upgradeMember`,
@@ -116,11 +127,13 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                           jwt: app.user.jwt,
                         }
                       );
+
                       if (res.status !== 'Success') {
                         throw new Error(
                           `Got unsuccessful status: ${res.status}`
                         );
                       }
+
                       const newRole = res.result;
                       vnode.attrs.onRoleUpdate(role, newRole);
 
