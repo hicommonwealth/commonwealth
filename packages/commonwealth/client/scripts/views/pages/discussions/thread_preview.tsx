@@ -69,6 +69,23 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
       getCommentSubscription(thread)?.isActive &&
       getReactionSubscription(thread)?.isActive;
 
+    const hasAdminPermissions =
+      app.user.activeAccount &&
+      (app.roles.isRoleOfCommunity({
+        role: 'admin',
+        chain: app.activeChainId(),
+      }) ||
+        app.roles.isRoleOfCommunity({
+          role: 'moderator',
+          chain: app.activeChainId(),
+        }));
+
+    const isAuthor =
+      app.user.activeAccount &&
+      thread.author === app.user.activeAccount.address;
+
+    const canSeeMenu = hasAdminPermissions || isAuthor;
+
     return (
       <div
         class={getClasses<{ isPinned?: boolean }>(
@@ -210,7 +227,9 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                   }
                 />
               </div>
-              {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}
+              {app.isLoggedIn() && canSeeMenu && (
+                <ThreadPreviewMenu thread={thread} />
+              )}
             </div>
           </div>
         </div>

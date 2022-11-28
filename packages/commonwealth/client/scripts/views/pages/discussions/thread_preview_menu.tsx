@@ -60,6 +60,7 @@ export class ThreadPreviewMenu
                         .then(() => m.redraw());
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
+                    iconLeft: 'pin',
                   },
                 ]
               : []),
@@ -77,6 +78,7 @@ export class ThreadPreviewMenu
                         .then(() => m.redraw());
                     },
                     label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
+                    iconLeft: 'lock',
                   },
                 ]
               : []),
@@ -97,6 +99,7 @@ export class ThreadPreviewMenu
                       });
                     },
                     label: 'Change topic',
+                    iconLeft: 'filter',
                   },
                 ]
               : []),
@@ -117,10 +120,11 @@ export class ThreadPreviewMenu
                       });
                     },
                     label: 'Update status',
+                    iconLeft: 'democraticProposal',
                   },
                 ]
               : []),
-            ...(isAuthor || hasAdminPermissions || app.user.isSiteAdmin
+            ...(isAuthor || hasAdminPermissions
               ? [
                   {
                     onclick: async (e) => {
@@ -137,6 +141,7 @@ export class ThreadPreviewMenu
                       }
                     },
                     label: 'Delete',
+                    iconLeft: 'trash',
                   },
                 ]
               : []),
