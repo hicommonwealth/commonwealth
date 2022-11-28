@@ -24,7 +24,7 @@ import { CWValidationText } from '../component_kit/cw_validation_text';
 
 type CreateCommmentAttrs = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
-  parentCommentId: number;
+  parentCommentId?: number;
   rootProposal: AnyProposal | Thread;
   updatedCommentsCallback: () => void;
 };

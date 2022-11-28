@@ -18,14 +18,14 @@ import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type Topic = {
-  defaultOffchainTemplate: string;
+  defaultOffchainTemplate?: string;
   description: string;
-  featured_order: number;
-  featuredInNewPost: boolean;
-  featuredInSidebar: boolean;
+  featured_order?: number;
+  featuredInNewPost?: boolean;
+  featuredInSidebar?: boolean;
   id: number;
   name: string;
-  telegram: string;
+  telegram?: string;
 };
 
 type TopicsMenuAttrs = {

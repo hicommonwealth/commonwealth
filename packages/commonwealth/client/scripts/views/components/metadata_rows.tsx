@@ -11,7 +11,7 @@ import { CWToggle } from './component_kit/cw_toggle';
 import { CWText } from './component_kit/cw_text';
 
 type InputRowAttrs = {
-  value: string;
+  value: string | number;
   disabled?: boolean;
   maxlength?: number;
   onChangeHandler: (e) => void;

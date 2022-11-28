@@ -148,19 +148,19 @@ export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
 }
 
 type WalletsListAttrs = {
-  connectAnotherWayOnclick: () => void;
+  connectAnotherWayOnclick?: () => void;
   darkMode?: boolean;
   showResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
-  setBodyType: (bodyType: string) => void;
-  accountVerifiedCallback: (
+  setBodyType?: (bodyType: string) => void;
+  accountVerifiedCallback?: (
     account: Account,
     newlyCreated: boolean,
     linked: boolean
   ) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
-  linking: boolean;
+  linking?: boolean;
 };
 
 export class CWWalletsList extends ClassComponent<WalletsListAttrs> {

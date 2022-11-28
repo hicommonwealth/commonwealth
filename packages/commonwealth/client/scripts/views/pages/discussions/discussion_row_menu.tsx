@@ -104,7 +104,7 @@ export class DiscussionRowMenu extends ClassComponent<DiscussionRowMenuAttrs> {
         <CWPopoverMenu
           menuItems={[
             getThreadSubScriptionMenuItem(proposal),
-            ...(hasAdminPermissions ? [{ type: 'divider' }] : []),
+            ...(hasAdminPermissions ? [{ type: 'divider' as const }] : []),
             ...(hasAdminPermissions
               ? [
                   {

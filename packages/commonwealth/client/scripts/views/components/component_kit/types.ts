@@ -51,7 +51,7 @@ export type StyleAttrs = {
 
 type DividerMenuItem = { type: 'divider' };
 
-type HeaderMenuItem = { type: 'header'; label: string };
+type HeaderMenuItem = { type?: 'header'; label: string };
 
 export type DefaultMenuItem = {
   disabled?: boolean;
@@ -59,7 +59,7 @@ export type DefaultMenuItem = {
   iconRight?: IconName;
   isSecondary?: boolean;
   label: string;
-  onclick?: () => void;
+  onclick?: (e?: Event) => void;
   type?: 'default';
 };
 
@@ -68,8 +68,8 @@ type NotificationMenuItem = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string;
-  onclick?: () => void;
-  type: 'notification';
+  onclick?: (e?: MouseEvent) => void;
+  type?: 'notification';
 };
 
 export type MenuItem =

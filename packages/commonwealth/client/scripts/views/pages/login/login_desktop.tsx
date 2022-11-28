@@ -182,10 +182,6 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 </CWText>
               </div>
               <CWWalletsList
-                connectAnotherWayOnclick={() => {
-                  // sidebarType = 'ethWallet';
-                  // bodyType = 'connectWithEmail';
-                }}
                 setSelectedWallet={setSelectedWallet}
                 hasNoWalletsLink={false}
                 wallets={wallets}

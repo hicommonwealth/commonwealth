@@ -18,7 +18,7 @@ import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
 
 type SnapshotInfoRowAttrs = {
   label: string;
-  value: string;
+  value: string | m.Vnode;
 };
 
 class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {

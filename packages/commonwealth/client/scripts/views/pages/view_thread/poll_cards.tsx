@@ -62,7 +62,7 @@ export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={
           app.user.activeAccount &&
-          poll.getUserVote(
+          !!poll.getUserVote(
             app.user.activeAccount?.chain?.id,
             app.user.activeAccount?.address
           )

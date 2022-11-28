@@ -16,7 +16,7 @@ type SnapshotVoteType = {
   choice: number;
   created: number;
   id: string;
-  scores: Array<number>;
+  scores?: Array<number>;
   voter: string;
 };
 

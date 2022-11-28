@@ -45,7 +45,7 @@ type TextStyleAttrs = {
 };
 
 type TextAttrs = {
-  onclick?: () => void;
+  onclick?: (e?: MouseEvent) => void;
   title?: string | number;
 } & TextStyleAttrs;
 

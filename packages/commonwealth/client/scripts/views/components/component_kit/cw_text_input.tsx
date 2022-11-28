@@ -12,6 +12,7 @@ import { ValidationStatus } from './cw_validation_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
+import { IconName } from './cw_icons/cw_icon_lookup';
 
 type TextInputSize = 'small' | 'large';
 
@@ -20,8 +21,8 @@ export type BaseTextInputAttrs = {
   autofocus?: boolean;
   containerClassName?: string;
   defaultValue?: string;
-  value?: string;
-  iconRight?: string;
+  value?: string | number;
+  iconRight?: IconName;
   iconRightonclick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;

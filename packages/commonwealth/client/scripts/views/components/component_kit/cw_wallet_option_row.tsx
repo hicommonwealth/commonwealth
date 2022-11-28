@@ -19,7 +19,7 @@ type WalletOptionRowStyleAttrs = {
 type WalletOptionRowAttrs = {
   onclick?: () => void;
   walletName: CustomIconName;
-  walletLabel: string;
+  walletLabel?: string;
 } & WalletOptionRowStyleAttrs;
 
 export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {

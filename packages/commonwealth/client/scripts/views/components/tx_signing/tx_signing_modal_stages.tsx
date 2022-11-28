@@ -15,10 +15,10 @@ import { TXSigningTransactionBox } from './tx_signing_transaction_box';
 import { CWText } from '../component_kit/cw_text';
 import { CWSpinner } from '../component_kit/cw_spinner';
 
-type TxSigningModalIntroStageAttrs = ITXModalData & {
-  next: NextFn;
-  polkaWallet: IWebWallet<any>;
-};
+type TxSigningModalIntroStageAttrs = ITXModalData &
+  NextFn & {
+    polkaWallet: IWebWallet<any>;
+  };
 
 export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntroStageAttrs> {
   private introTab: 'webWallet' | 'commandLine';
@@ -70,14 +70,12 @@ export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntro
   }
 }
 
-type TxSigningModalWaitingStageAttrs = { next: NextFn };
-
-export class TxSigningModalWaitingStage extends ClassComponent<TxSigningModalWaitingStageAttrs> {
+export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
   private timeoutHandle?: NodeJS.Timeout;
   private timer?: number;
   private timerHandle?: NodeJS.Timeout;
 
-  oncreate(vnode: m.Vnode<TxSigningModalWaitingStageAttrs>) {
+  oncreate(vnode: m.Vnode<NextFn>) {
     const $parent = $('.TXSigningModal');
 
     this.timer = 0;
@@ -147,10 +145,10 @@ export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
   }
 }
 
-export class TxSigningModalRejectedStage extends ClassComponent<
-  TxDataState & NextFn
-> {
-  view(vnode) {
+type TxSigningModalRejectedStageAttrs = TxDataState & NextFn;
+
+export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRejectedStageAttrs> {
+  view(vnode: m.VnodeDOM<TxSigningModalRejectedStageAttrs>) {
     const { blocknum, error, hash, timestamp, next } = vnode.attrs;
 
     return (

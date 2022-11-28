@@ -10,7 +10,7 @@ import { CWText } from '../component_kit/cw_text';
 
 type TXSigningTransactionBoxAttrs = {
   blockHash: string;
-  blockNum: string;
+  blockNum: string | number;
   status: string;
   success: boolean;
   timestamp: string;

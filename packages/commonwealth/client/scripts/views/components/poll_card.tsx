@@ -31,8 +31,8 @@ export function buildVoteDirectionString(voteOption: string) {
 export type PollOptionAttrs = {
   multiSelect: boolean;
   voteInformation: Array<VoteInformation>;
-  selectedOptions: Array<string>;
-  disableVoteOptions: boolean;
+  selectedOptions?: Array<string>;
+  disableVoteOptions?: boolean;
 };
 
 export class PollOptions extends ClassComponent<PollOptionAttrs> {
@@ -84,8 +84,8 @@ export type CastVoteAttrs = {
   timeRemaining: string;
   tooltipErrorMessage: string;
   onVoteCast: (
-    selectedOption: string,
-    handleVoteCast: () => void,
+    selectedOption?: string,
+    handleVoteCast?: () => void,
     isSelected?: boolean
   ) => void;
 };
@@ -112,7 +112,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
                 label="Vote"
                 buttonType="mini"
                 disabled={disableVoteButton}
-                onclick={onVoteCast}
+                onclick={() => onVoteCast()}
               />
             }
           />
@@ -121,7 +121,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
             label="Vote"
             buttonType="mini"
             disabled={disableVoteButton}
-            onclick={onVoteCast}
+            onclick={() => onVoteCast()}
           />
         )}
         <CWText className="time-remaining-text" type="caption">
@@ -135,7 +135,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
 export type VoteDisplayAttrs = {
   timeRemaining: string;
   voteDirectionString: string;
-  pollEnded: string;
+  pollEnded: boolean;
   voteInformation: Array<VoteInformation>;
 };
 
@@ -185,9 +185,9 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
 }
 
 export type ResultsSectionAttrs = {
-  resultString: string;
+  resultString?: string;
   onResultsClick: (e: Event) => any;
-  tokenSymbol: string;
+  tokenSymbol?: string;
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;
   pollEnded: boolean;

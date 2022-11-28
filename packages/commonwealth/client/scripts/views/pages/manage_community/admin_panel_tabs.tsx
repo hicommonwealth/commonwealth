@@ -12,7 +12,7 @@ import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 
 type AdminPanelTabsAttrs = {
   defaultTab: number;
-  onRoleUpgrade: (oldRole: string, newRole: string) => void;
+  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];
   webhooks: Webhook[];
 };

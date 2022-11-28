@@ -19,7 +19,7 @@ import { threadStageToLabel } from 'helpers';
 
 type StagesMenuAttrs = {
   disabled: boolean;
-  selectedStage: ThreadStage;
+  selectedStage?: ThreadStage;
   stage: string;
   stages: ThreadStage[];
 };

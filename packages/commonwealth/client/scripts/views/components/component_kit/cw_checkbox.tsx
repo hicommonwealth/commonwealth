@@ -9,16 +9,16 @@ import { ComponentType, StyleAttrs } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-type Checkbox = { label?: string; value: string };
+type Checkbox = { label?: string; value?: string };
 
 type CheckboxStyleAttrs = {
-  checked: boolean;
+  checked?: boolean;
   indeterminate?: boolean;
 } & StyleAttrs;
 
 type CheckboxAttrs = {
   groupName?: string;
-  onchange: (e?: any) => void;
+  onchange?: (e?: any) => void;
 } & Checkbox &
   CheckboxStyleAttrs;
 

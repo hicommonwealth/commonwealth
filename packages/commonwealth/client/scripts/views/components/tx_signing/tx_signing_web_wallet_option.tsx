@@ -14,9 +14,9 @@ import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
 
 type TXSigningWebWalletOptionAttrs = {
-  next: NextFn;
   wallet?: IWebWallet<any>;
-} & ITXModalData;
+} & ITXModalData &
+  NextFn;
 
 export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletOptionAttrs> {
   oncreate(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {

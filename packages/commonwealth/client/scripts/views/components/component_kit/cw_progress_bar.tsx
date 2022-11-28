@@ -11,7 +11,7 @@ import { CWText } from './cw_text';
 import { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
 
-type ProgressBarStatus = 'failed' | 'neutral' | 'ongoing' | 'passed';
+type ProgressBarStatus = 'selected' | 'neutral' | 'ongoing' | 'passed';
 
 type ProgressBarAttrs = {
   label: string;

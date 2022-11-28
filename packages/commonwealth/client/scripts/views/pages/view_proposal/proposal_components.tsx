@@ -23,8 +23,8 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { cancelProposal } from '../../components/proposals/helpers';
 
 type BaseCancelButtonAttrs = {
-  onModalClose: () => void;
-  toggleVotingModal: (newModalState: boolean) => void;
+  onModalClose?: () => void;
+  toggleVotingModal?: (newModalState: boolean) => void;
   votingModalOpen?: boolean;
 };
 
@@ -103,9 +103,14 @@ export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAtt
   }
 }
 
+export type SubheaderProposalType =
+  | AaveProposal
+  | CompoundProposal
+  | MolochProposal;
+
 type ProposalSubheaderAttrs = {
-  proposal: AaveProposal | CompoundProposal | MolochProposal;
-  molochMember: MolochMember;
+  proposal: SubheaderProposalType;
+  molochMember?: MolochMember;
 } & BaseCancelButtonAttrs;
 
 export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {

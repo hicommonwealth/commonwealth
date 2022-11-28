@@ -39,10 +39,12 @@ export class InvitesMenu extends ClassComponent {
             app.mobileMenu = 'MainMenu';
           },
         }}
-        menuItems={{
-          label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
-          onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
-        }}
+        menuItems={[
+          {
+            label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
+            onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+          },
+        ]}
       />
     );
   }

@@ -9,7 +9,7 @@ import { ComponentType, StyleAttrs } from './types';
 import { getClasses } from './helpers';
 
 type ToggleStyleAttrs = {
-  checked: boolean;
+  checked?: boolean;
 } & StyleAttrs;
 
 type ToggleAttrs = {

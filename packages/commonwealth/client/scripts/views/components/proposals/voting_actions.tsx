@@ -490,7 +490,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             <MolochCancelButton
               molochMember={user}
               onModalClose={onModalClose}
-              proposal={proposal}
+              proposal={proposal as MolochProposal}
               votingModalOpen={votingModalOpen}
             />
           </div>
@@ -503,7 +503,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           {yesButton}
           <CompoundCancelButton
             onModalClose={onModalClose}
-            proposal={proposal}
+            proposal={proposal as CompoundProposal}
             votingModalOpen={votingModalOpen}
           />
         </div>
@@ -516,7 +516,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           {abstainButton}
           <CompoundCancelButton
             onModalClose={onModalClose}
-            proposal={proposal}
+            proposal={proposal as CompoundProposal}
             votingModalOpen={votingModalOpen}
           />
         </div>

@@ -24,13 +24,22 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import User from '../../components/widgets/user';
-import { ProposalSubheader } from './proposal_components';
+import {
+  ProposalSubheader,
+  SubheaderProposalType,
+} from './proposal_components';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { AaveViewProposalDetail } from './aave_summary';
-import { LinkedProposalsEmbed } from './linked_proposals_embed';
+import {
+  LinkedProposalsEmbed,
+  LinkedSubstrateProposal,
+} from './linked_proposals_embed';
 import { CommentsTree } from '../../components/comments/comments_tree';
-import { CollapsibleBodyText } from '../../components/collapsible_body_text';
+import {
+  CollapsibleProposalBody,
+  CollapsibleThreadBody,
+} from '../../components/collapsible_body_text';
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -240,6 +249,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     if (this.proposal instanceof SubstrateTreasuryTip) {
       return (
         <TipDetail
+          tipAmount={this.tipAmount}
           proposal={this.proposal}
           headerTitle={headerTitle}
           setTipAmount={(tip) => {
@@ -277,19 +287,21 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           createdAt={this.proposal.createdAt}
           subHeader={
             <ProposalSubheader
-              proposal={this.proposal}
+              proposal={this.proposal as SubheaderProposalType}
               toggleVotingModal={toggleVotingModal}
               votingModalOpen={this.votingModalOpen}
             />
           }
           body={
             !!this.proposal.description && (
-              <CollapsibleBodyText item={this.proposal} />
+              <CollapsibleProposalBody proposal={this.proposal} />
             )
           }
           subBody={
             <>
-              <LinkedProposalsEmbed proposal={this.proposal} />
+              <LinkedProposalsEmbed
+                proposal={this.proposal as LinkedSubstrateProposal}
+              />
               {this.proposal instanceof AaveProposal && (
                 <AaveViewProposalDetail proposal={this.proposal} />
               )}

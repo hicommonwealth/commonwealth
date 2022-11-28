@@ -13,12 +13,12 @@ export type RadioButton = { label?: string; value: string; disabled?: boolean };
 
 type RadioButtonStyleAttrs = {
   disabled?: boolean;
-  checked: boolean;
+  checked?: boolean;
 };
 
 type RadioButtonAttrs = {
-  groupName: string;
-  onchange: (e?: any) => void;
+  groupName?: string;
+  onchange?: (e?: any) => void;
 } & RadioButton &
   RadioButtonStyleAttrs;
 

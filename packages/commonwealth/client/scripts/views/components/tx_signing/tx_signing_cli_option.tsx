@@ -15,7 +15,7 @@ import { setupEventListeners } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { CWTextArea } from '../component_kit/cw_text_area';
 
-type TXSigningCLIOptionAttrs = ITXModalData & { next: NextFn };
+type TXSigningCLIOptionAttrs = ITXModalData & NextFn;
 
 export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> {
   private calldata?: ISubstrateTXData;

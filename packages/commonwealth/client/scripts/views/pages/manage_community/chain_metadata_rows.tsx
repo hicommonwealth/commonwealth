@@ -231,7 +231,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
-            value={this.snapshot}
+            value={this.snapshot.join('')}
             placeholder={this.network}
             onChangeHandler={(v) => {
               const snapshots = v

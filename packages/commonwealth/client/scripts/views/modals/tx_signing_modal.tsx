@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'modals/tx_signing_modal.scss';
 
 import app from 'state';
-import { ITXModalData } from 'models';
+import { ITXModalData } from 'models/interfaces';
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import {
