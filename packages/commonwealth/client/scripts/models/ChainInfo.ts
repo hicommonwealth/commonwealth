@@ -254,6 +254,8 @@ class ChainInfo {
           r.Address.chain,
           r.chain_id,
           r.permission,
+          r.allow,
+          r.deny,
           r.is_user_default
         )
       );
