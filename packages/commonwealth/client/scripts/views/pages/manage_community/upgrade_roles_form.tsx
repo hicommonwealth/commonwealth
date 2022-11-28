@@ -7,6 +7,7 @@ import $ from 'jquery';
 import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
+import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { formatAddressShort } from 'helpers';
 import { RoleInfo, RolePermission } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
@@ -14,8 +15,11 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 
 type UpgradeRolesFormAttrs = {
-  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
-  roleData: RoleInfo[];
+  onRoleUpgrade: (
+    oldRole: RoleInstanceWithPermissionAttributes,
+    newRole: RoleInstanceWithPermissionAttributes
+  ) => void;
+  roleData: RoleInstanceWithPermissionAttributes[];
 };
 
 export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
@@ -25,12 +29,14 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
   view(vnode: m.Vnode<UpgradeRolesFormAttrs>) {
     const { roleData, onRoleUpgrade } = vnode.attrs;
 
-    const nonAdmins: RoleInfo[] = roleData.filter((role) => {
-      return (
-        role.permission === RolePermission.member ||
-        role.permission === RolePermission.moderator
-      );
-    });
+    const nonAdmins: RoleInstanceWithPermissionAttributes[] = roleData.filter(
+      (role) => {
+        return (
+          role.permission === RolePermission.member ||
+          role.permission === RolePermission.moderator
+        );
+      }
+    );
 
     const nonAdminNames: string[] = nonAdmins.map((role) => {
       // Graham 9.19.23: Temporary patch while Addresses are unreliable.
@@ -39,6 +45,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
         role.chain_id || typeof role.Address.chain === 'string'
           ? role.Address.chain
           : role.Address.chain?.id;
+
       const displayName = app.profiles.getProfile(
         chainId as string,
         role.Address.address

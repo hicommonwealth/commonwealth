@@ -5,15 +5,19 @@ import ClassComponent from 'class_component';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 
-import { RoleInfo, Webhook } from 'models';
+import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
+import { Webhook } from 'models';
 import { WebhooksForm } from './webhooks_form';
 import { UpgradeRolesForm } from './upgrade_roles_form';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
 
 type AdminPanelTabsAttrs = {
   defaultTab: number;
-  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
-  roleData: RoleInfo[];
+  onRoleUpgrade: (
+    oldRole: RoleInstanceWithPermissionAttributes,
+    newRole: RoleInstanceWithPermissionAttributes
+  ) => void;
+  roleData: RoleInstanceWithPermissionAttributes[];
   webhooks: Webhook[];
 };
 
