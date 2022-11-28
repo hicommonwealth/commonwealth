@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'pages/snapshot/index.scss';
+// import 'pages/snapshot/index.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';

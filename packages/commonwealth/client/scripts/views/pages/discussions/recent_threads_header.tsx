@@ -16,14 +16,14 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 
-type DiscussionFilterBarAttrs = {
+type RecentThreadsHeaderAttrs = {
   stage: string;
   topic: string;
   totalThreadCount: number;
 };
 
 export class RecentThreadsHeader
-  implements m.ClassComponent<DiscussionFilterBarAttrs>
+  implements m.ClassComponent<RecentThreadsHeaderAttrs>
 {
   private isWindowExtraSmall: boolean;
 
@@ -46,7 +46,7 @@ export class RecentThreadsHeader
     });
   }
 
-  view(vnode: m.Vnode<DiscussionFilterBarAttrs>) {
+  view(vnode: m.Vnode<RecentThreadsHeaderAttrs>) {
     const { topic, stage, totalThreadCount } = vnode.attrs;
 
     const { stagesEnabled, customStages } = app.chain?.meta;
