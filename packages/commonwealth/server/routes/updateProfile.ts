@@ -1,16 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import Sequelize from 'sequelize';
-import { ChainBase } from 'common-common/src/types';
 import {
   PROFILE_BIO_MAX_CHARS,
   PROFILE_HEADLINE_MAX_CHARS,
   PROFILE_NAME_MAX_CHARS,
   PROFILE_NAME_MIN_CHARS,
 } from '../../shared/types';
-import IdentityFetchCache from '../util/identityFetchCache';
 import { DB } from '../models';
 import validateChain from '../util/validateChain';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',
