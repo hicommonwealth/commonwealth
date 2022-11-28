@@ -23,34 +23,8 @@ $size: 48px;
     padding: 0 24px 24px;
   }
 
-  .NoThreadsPlaceholder {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-
-    .no-threads-text.Text {
-      color: $neutral-500;
-    }
-
-    .icon-circle {
-      align-items: center;
-      background: $primary-200;
-      border-radius: $size / 2;
-      color: $white;
-      display: flex;
-      height: $size;
-      justify-content: center;
-      width: $size;
-    }
-
-    .welcome-text-container {
-      display: flex;
-      flex-direction: column;
-
-      .no-threads-text.Text {
-        color: $neutral-500;
-      }
-    }
+  .no-threads-text.Text {
+    color: $neutral-500;
   }
 
   .RecentThreads {

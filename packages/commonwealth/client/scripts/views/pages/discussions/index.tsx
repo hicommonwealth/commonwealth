@@ -11,9 +11,7 @@ import { isNotUndefined } from 'helpers/typeGuards';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { RecentThreadsHeader } from './recent_threads_header';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CreateContentPopover } from '../../menus/create_content_menu';
 import { ThreadPreview } from './thread_preview';
 
 type DiscussionPageAttrs = { topic?: string };
@@ -139,26 +137,11 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
               )}
             </div>
           ) : (
-            <div class="NoThreadsPlaceholder">
-              {isNotUndefined(topicName) ? (
-                <CWText className="no-threads-text">
-                  There are no threads matching your filter.
-                </CWText>
-              ) : (
-                <>
-                  <div class="icon-circle">
-                    <CWIcon iconName="hash" iconSize="large" />
-                  </div>
-                  <div class="welcome-text-container">
-                    <CWText type="h3">Welcome to the community!</CWText>
-                    <CWText className="no-threads-text">
-                      There are no threads here yet.
-                    </CWText>
-                  </div>
-                  <CreateContentPopover />
-                </>
-              )}
-            </div>
+            <CWText className="no-threads-text">
+              {isNotUndefined(topicName)
+                ? 'There are no threads matching your filter.'
+                : 'There are no threads here yet.'}
+            </CWText>
           )}
         </div>
       </Sublayout>
