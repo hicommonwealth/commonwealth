@@ -39,12 +39,8 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
     );
 
     const nonAdminNames: string[] = nonAdmins.map((role) => {
-      // Graham 9.19.23: Temporary patch while Addresses are unreliable.
       // @TODO: @Profiles upgrade, clean this up
-      const chainId =
-        role.chain_id || typeof role.Address.chain === 'string'
-          ? role.Address.chain
-          : role.Address.chain?.id;
+      const chainId = role.chain_id ? role.chain_id : role.Address.chain;
 
       const displayName = app.profiles.getProfile(
         chainId as string,
