@@ -31,6 +31,26 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const listenerInstances: IListenerInstances = {};
 
+// object used to keep track of listener error counts
+let listenerErrorCounts: {[chain: string]: number} = {};
+// an array of chain_ids that we will no longer create listeners for on every run
+let bannedListeners: string[] = [];
+// resets the error counts and banned listeners every 12 hours
+setInterval(() => {
+  listenerErrorCounts = {}
+  bannedListeners = []
+}, 43200000);
+
+export function handleFatalListenerError(chain_id: string,  error: Error, rollbar?: Rollbar) {
+  log.error(`Listener for ${chain_id} threw an error`, error);
+  rollbar?.critical(`Listener for ${chain_id} threw an error`, error);
+
+  if (listenerErrorCounts[chain_id]) listenerErrorCounts[chain_id] += 1;
+  else listenerErrorCounts[chain_id] = 1;
+
+  if (listenerErrorCounts[chain_id] > 5) bannedListeners.push(chain_id);
+}
+
 /**
  * This function manages all the chain listeners. It queries the database to get the most recent list of chains to
  * listen to and then creates, updates, or deletes the listeners.
@@ -111,10 +131,13 @@ async function mainProcess(
   const erc721Tokens = [];
   const chains = []; // any listener that is not an erc20 or erc721 token and require independent listenerInstances
   for (const chain of allChainsAndTokens) {
+    if (bannedListeners.includes(chain.id)) continue;
+
     StatsDController.get().increment(
-      'ce.listeners',
+      'ce.should-exist-listeners',
       { chain: chain.id, network: chain.network, base: chain.base }
     );
+
     if (
       chain.network === ChainNetwork.ERC20 &&
       chain.base === ChainBase.Ethereum
@@ -158,7 +181,11 @@ async function mainProcess(
     else
       StatsDController.get().increment('ce.connection-inactive', { chain: c });
 
-    StatsDController.get().increment('ce.listeners-active', { chain: c });
+    StatsDController.get().increment('ce.existing-listeners', { chain: c });
+  }
+
+  for (const chain_id of bannedListeners) {
+    StatsDController.get().increment('ce.banned-listeners', { chain: chain_id });
   }
 
   log.info('Finished scheduled process.');

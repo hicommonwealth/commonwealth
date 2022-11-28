@@ -13,6 +13,7 @@ import {factory, formatFilename} from 'common-common/src/logging';
 import {RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers';
 import Rollbar from 'rollbar';
 import models, {DB} from '../database/database';
+import {handleFatalListenerError} from "./chainSubscriber";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -244,6 +245,7 @@ async function setupNewListeners(
         `Unable to create a listener instance for ${chain.id}`,
         error
       );
+      handleFatalListenerError(chain.id, error, rollbar);
       continue;
     }
 
@@ -271,9 +273,15 @@ async function setupNewListeners(
       };
     }
 
-    // subscribe the listener to its chain/RPC if it isn't yet subscribed
-    log.info(`Subscribing listener: ${chain.id}`);
-    await listenerInstances[chain.id].subscribe();
+    try {
+      // subscribe the listener to its chain/RPC if it isn't yet subscribed
+      log.info(`Subscribing listener: ${chain.id}`);
+      await listenerInstances[chain.id].subscribe();
+    } catch (e) {
+      delete listenerInstances[chain.id];
+      log.error(`Failed to subscribe listener: ${chain.id}`, e);
+      handleFatalListenerError(chain.id, e, rollbar);
+    }
   }
 }
 

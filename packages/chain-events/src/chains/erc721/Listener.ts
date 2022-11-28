@@ -85,6 +85,7 @@ export class Listener extends BaseListener<
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
+      throw error;
     }
   }
 
