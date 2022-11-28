@@ -30,6 +30,7 @@ import StatsDController from "common-common/src/statsd";
 const log = factory.getLogger(formatFilename(__filename));
 
 const listenerInstances: IListenerInstances = {};
+let allChainsAndTokens;
 
 // object used to keep track of listener error counts
 let listenerErrorCounts: {[chain: string]: number} = {};
@@ -72,7 +73,6 @@ async function mainProcess(
     log.info('No active listeners');
   }
 
-  let allChainsAndTokens;
   if (process.env.CHAIN) {
     const selectedChain = process.env.CHAIN;
     // gets the data needed to start a single listener for the chain specified by the CHAIN environment variable
@@ -122,8 +122,7 @@ async function mainProcess(
     } catch (e) {
       log.error('Could not fetch chain-event service data', e);
       rollbar?.critical('Could not fetch chain-event service data', e);
-      log.info(`Retrying in ${REPEAT_TIME} minute(s)`);
-      return;
+      log.info(`Using cached chains: ${allChainsAndTokens}`);
     }
   }
 
