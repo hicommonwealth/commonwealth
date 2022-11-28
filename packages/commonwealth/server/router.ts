@@ -123,11 +123,9 @@ import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
-import IdentityFetchCache from './util/identityFetchCache';
 import updateChainCategory from './routes/updateChainCategory';
 import updateChainCustomDomain from './routes/updateChainCustomDomain';
 import updateChainPriority from './routes/updateChainPriority';
-import migrateEvent from './routes/migrateEvent';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
@@ -158,6 +156,10 @@ import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 import StatsDController from 'common-common/src/statsd';
 import {getChainEventServiceData} from "./routes/getChainEventServiceData";
+import {getChain} from "./routes/getChain";
+import {getChainNode} from "./routes/getChainNode";
+import {getChainContracts} from "./routes/getChainContracts";
+import {getSubscribedChains} from "./routes/getSubscribedChains";
 
 
 
@@ -723,7 +725,6 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
-  router.post('/migrateEvent', migrateEvent.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
@@ -801,9 +802,27 @@ function setupRouter(
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
 
+  // These routes behave like get (fetch data) but use POST because a secret
+  // is passed in the request body -> passing the secret via query parameters is not safe
   router.post(
     '/getChainEventServiceData',
     getChainEventServiceData.bind(this, models)
+  );
+  router.post(
+    '/getChain',
+    getChain.bind(this, models)
+  );
+  router.post(
+    '/getChainNode',
+    getChainNode.bind(this, models)
+  );
+  router.post(
+    '/getChainContracts',
+    getChainContracts.bind(this, models)
+  );
+  router.post(
+    '/getSubscribedChains',
+    getSubscribedChains.bind(this, models)
   );
 
   // new API
