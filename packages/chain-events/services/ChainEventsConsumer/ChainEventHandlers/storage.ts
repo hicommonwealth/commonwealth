@@ -19,6 +19,7 @@ import hash from 'object-hash';
 
 import { DB } from '../../database/database';
 import { ChainEventInstance } from '../../database/models/chain_event';
+import StatsDController from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -152,6 +153,7 @@ export default class extends IEventHandler {
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
       // return nothing so following handlers ignore this event
+      StatsDController.get().increment('ce.hit-event-cache', {chain, block_number: String(event.blockNumber)})
     }
   }
 }

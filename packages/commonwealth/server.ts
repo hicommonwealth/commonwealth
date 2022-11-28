@@ -33,7 +33,6 @@ import {sendBatchedNotificationEmails} from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupPassport from './server/passport';
-import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import StatsDController from 'common-common/src/statsd';
@@ -62,7 +61,6 @@ async function main() {
     SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
   // CLI parameters used to configure specific tasks
-  const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
   const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
 
   const tokenBalanceCache = new TokenBalanceCache();
@@ -70,16 +68,6 @@ async function main() {
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
-  } else if (IDENTITY_MIGRATION) {
-    log.info('Started migrating chain identities into the DB');
-    try {
-      await migrateIdentities(models);
-      log.info('Finished migrating chain identities into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error('Failed migrating chain identities into the DB: ', e.message);
-      rc = 1;
-    }
   } else if (FLAG_MIGRATION) {
     log.info('Started migrating councillor and validator flags into the DB');
     try {

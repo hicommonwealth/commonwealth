@@ -15,7 +15,7 @@ import {
   ChainType,
   BalanceType,
 } from 'common-common/src/types';
-import { TokenBalanceCache, BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
