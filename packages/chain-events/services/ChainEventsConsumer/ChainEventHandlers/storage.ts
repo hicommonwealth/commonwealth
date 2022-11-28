@@ -156,8 +156,8 @@ export default class extends IEventHandler {
     }
 
     const cacheStats = this.eventCache.getStats()
-    StatsDController.get().set('ce.num-events-cached', cacheStats.keys);
-    StatsDController.get().set('ce.event-cache-hits', cacheStats.hits);
-    StatsDController.get().set('ce.event-cache-misses', cacheStats.misses)
+    StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
+    StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
+    StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses)
   }
 }
