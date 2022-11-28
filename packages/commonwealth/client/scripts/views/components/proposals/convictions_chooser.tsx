@@ -11,10 +11,12 @@ import {
   convictions,
 } from 'controllers/chain/substrate/democracy_referendum';
 
+type ConvictionsChooserAttrs = { callback: (number) => void };
+
 export class ConvictionsChooser
-  implements m.ClassComponent<{ callback: (number) => void }>
+  implements m.ClassComponent<ConvictionsChooserAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<ConvictionsChooserAttrs>) {
     return m(Select, {
       class: 'ConvictionsChooser',
       name: 'convictions',

@@ -119,7 +119,7 @@ export class QuillEditorComponent
 
   // LIFECYCLE HELPERS
 
-  oncreate(vnode) {
+  oncreate(vnode: m.Vnode<QuillEditorComponentAttrs>) {
     // Only bind the alert if we are actually trying to persist the user's changes
     if (!vnode.attrs.contentsDoc) {
       this._beforeunloadHandler = () => {
@@ -131,13 +131,13 @@ export class QuillEditorComponent
     }
   }
 
-  onremove(vnode) {
+  onremove(vnode: m.Vnode<QuillEditorComponentAttrs>) {
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', this._beforeunloadHandler);
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<QuillEditorComponentAttrs>) {
     const {
       className,
       contentsDoc,

@@ -30,7 +30,7 @@ export class SnapshotVotesTable
 {
   isVotersListExpanded: boolean;
 
-  view(vnode: m.VnodeDOM<SnapshotVotesTableAttrs, this>) {
+  view(vnode: m.Vnode<SnapshotVotesTableAttrs>) {
     const { choices, symbol, voters } = vnode.attrs;
 
     const toggleExpandedVoterList = () => {

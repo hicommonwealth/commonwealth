@@ -27,7 +27,7 @@ type TopicSummaryRowAttrs = {
 };
 
 export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
-  view(vnode: m.VnodeDOM<TopicSummaryRowAttrs, this>) {
+  view(vnode: m.Vnode<TopicSummaryRowAttrs>) {
     const { monthlyThreads, topic } = vnode.attrs;
 
     const topFiveSortedThreads = monthlyThreads

@@ -14,12 +14,13 @@ import { slugify } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 
+type LinkedThreadsCardAttrs = {
+  allowLinking: boolean;
+  threadlId: number;
+};
+
 export class LinkedThreadsCard
-  implements
-    m.ClassComponent<{
-      threadlId: number;
-      allowLinking: boolean;
-    }>
+  implements m.ClassComponent<LinkedThreadsCardAttrs>
 {
   private fetchLinkedThreads: boolean;
   private linkedThreads: Thread[];
@@ -29,7 +30,7 @@ export class LinkedThreadsCard
     this.fetchLinkedThreads = true;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<LinkedThreadsCardAttrs>) {
     const { allowLinking, threadlId } = vnode.attrs;
 
     const thread = app.threads.getById(threadlId);

@@ -6,26 +6,16 @@ import $ from 'jquery';
 import 'pages/create_community.scss';
 
 import app from 'state';
-import {
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-  ContractType,
-} from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ContractType } from 'common-common/src/types';
 import { AbiItem, isAddress } from 'web3-utils';
-
 import { notifyError } from 'controllers/app/notifications';
-import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
-
+import { InputRow, SelectRow } from 'views/components/metadata_rows';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
-
 import {
   initChainForm,
-  defaultChainRows,
   ethChainRows,
 } from '../create_community/chain_input_rows';
-
 import {
   ChainFormFields,
   ChainFormState,
@@ -34,8 +24,8 @@ import {
 } from '../create_community/types';
 
 type ContractFormFields = {
-  chain_node_id: number;
   abi: AbiItem[];
+  chain_node_id: number;
   contractType: ContractType;
   decimals: number;
   token_name: string;
@@ -68,11 +58,11 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
 
     return (
@@ -130,8 +120,13 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
             this.state.loading
           }
           onclick={async () => {
-            const { altWalletUrl, chainString, chain_node_id, nodeUrl, symbol } =
-              this.state.form;
+            const {
+              altWalletUrl,
+              chainString,
+              chain_node_id,
+              nodeUrl,
+              symbol,
+            } = this.state.form;
             this.state.saving = true;
             try {
               const res = await $.post(`${app.serverUrl()}/createContract`, {
