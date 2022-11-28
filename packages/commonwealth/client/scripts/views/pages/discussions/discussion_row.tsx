@@ -34,7 +34,7 @@ type DiscussionRowAttrs = {
 };
 
 export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
-  view(vnode: m.VnodeDOM<DiscussionRowAttrs, this>) {
+  view(vnode: m.Vnode<DiscussionRowAttrs>) {
     const { proposal } = vnode.attrs;
 
     const discussionLink = getProposalUrlPath(

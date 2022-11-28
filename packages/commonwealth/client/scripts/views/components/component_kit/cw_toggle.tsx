@@ -16,21 +16,14 @@ type ToggleAttrs = {
 } & ToggleStyleAttrs;
 
 export class CWToggle implements m.ClassComponent<ToggleAttrs> {
-  view(vnode) {
-    const {
-      className,
-      disabled = false,
-      onchange,
-      checked,
-      value,
-    } = vnode.attrs;
+  view(vnode: m.Vnode<ToggleAttrs>) {
+    const { className, disabled = false, onchange, checked } = vnode.attrs;
 
     const params = {
       disabled,
       onchange,
       checked,
       type: 'checkbox',
-      value,
     };
 
     return (

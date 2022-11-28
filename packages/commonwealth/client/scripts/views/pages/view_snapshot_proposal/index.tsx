@@ -47,7 +47,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private validatedAgainstStrategies: boolean;
   private votes: Array<SnapshotProposalVote>;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ViewProposalPageAttrs>) {
     this.fetchedPower = false;
     this.proposal = null;
     this.scores = [];
@@ -115,7 +115,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     return !this.votes || !this.totals || !this.proposal ? (

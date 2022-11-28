@@ -27,11 +27,11 @@ export class CommentsTree implements m.ClassComponent<CommentsTreeAttrs> {
   private isReplying: boolean;
   private parentCommentId: number;
 
-  oncreate(vvnode) {
-    this.dom = vvnode.dom;
+  oncreate(vnode: m.VnodeDOM<CommentsTreeAttrs, this>) {
+    this.dom = vnode.dom;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<CommentsTreeAttrs>) {
     const {
       comments,
       proposal,
@@ -118,7 +118,7 @@ export class CommentsTree implements m.ClassComponent<CommentsTreeAttrs> {
                 comment={comment}
                 handleIsReplying={handleIsReplying}
                 isLast={threadLevel === 2}
-                isLocked={proposal.readOnly}
+                isLocked={proposal instanceof Thread && proposal.readOnly}
                 setIsGloballyEditing={setIsGloballyEditing}
                 threadLevel={threadLevel}
                 updatedCommentsCallback={updatedCommentsCallback}
@@ -144,7 +144,7 @@ export class CommentsTree implements m.ClassComponent<CommentsTreeAttrs> {
 
     return (
       <div class="ProposalComments">
-        {recursivelyGatherComments(comments, proposal, 0)}
+        {recursivelyGatherComments(comments, comments[0], 0)}
         {this.commentError && (
           <CWValidationText message={this.commentError} status="failure" />
         )}

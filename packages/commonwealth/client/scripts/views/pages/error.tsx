@@ -8,7 +8,7 @@ import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 type ErrorPageAttrs = { title?: any; message?: string };
 
 class ErrorPage implements m.ClassComponent<ErrorPageAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ErrorPageAttrs>) {
     const { message } = vnode.attrs;
 
     return (
