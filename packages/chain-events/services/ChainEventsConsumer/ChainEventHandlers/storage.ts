@@ -80,6 +80,7 @@ export default class extends IEventHandler {
     const log = factory.getLogger(
       addPrefix(__filename, [event.network, event.chain])
     );
+    log.info(`STORAGE HANDLER EXECUTING`);
     const chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
@@ -117,6 +118,8 @@ export default class extends IEventHandler {
           model: this._models.ChainEventType,
         }
       );
+
+      log.info(`STORAGE HANDLER MESSAGE PUBLISHED`);
     }
 
     if (!dbEventType) {
@@ -129,6 +132,8 @@ export default class extends IEventHandler {
         log.trace(`found chain event type: ${dbEventType.id}`);
       }
     }
+
+    log.info(`STORAGE HANDLER ENTERING FINAL STAGES`);
     const eventData = {
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
@@ -156,10 +161,13 @@ export default class extends IEventHandler {
     }
 
     const cacheStats = this.eventCache.getStats();
+    console.log("CacheStats without log.info", cacheStats);
     log.info(`>>>>>>>>>>>>>>>>>>>>>>> (BEFORE) CacheStats: ${JSON.stringify(cacheStats)}`);
     await StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
     await StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
     await StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
     log.info(`>>>>>>>>>>>>>>>>>>>>>>> (AFTER) CacheStats: ${JSON.stringify(cacheStats)}`);
+
+    log.info(`STORAGE HANDLER Finished`);
   }
 }
