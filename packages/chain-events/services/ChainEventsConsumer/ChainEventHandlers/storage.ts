@@ -80,7 +80,6 @@ export default class extends IEventHandler {
     const log = factory.getLogger(
       addPrefix(__filename, [event.network, event.chain])
     );
-    log.info(`STORAGE HANDLER EXECUTING`);
     const chain = event.chain || this._chain;
 
     event = this.truncateEvent(event);
@@ -133,7 +132,6 @@ export default class extends IEventHandler {
       }
     }
 
-    log.info(`STORAGE HANDLER ENTERING FINAL STAGES`);
     const eventData = {
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
@@ -153,21 +151,23 @@ export default class extends IEventHandler {
       // no need to save the entire event data since the key is the hash of the data
       this.eventCache.set(eventKey, true);
 
+      const cacheStats = this.eventCache.getStats();
+      StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
+      StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
+      StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
+
       return dbEvent;
     } else {
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
+
+      const cacheStats = this.eventCache.getStats();
+      StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
+      StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
+      StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
+
       // return nothing so following handlers ignore this event
+      return;
     }
-
-    const cacheStats = this.eventCache.getStats();
-    console.log("CacheStats without log.info", cacheStats);
-    log.info(`>>>>>>>>>>>>>>>>>>>>>>> (BEFORE) CacheStats: ${JSON.stringify(cacheStats)}`);
-    await StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
-    await StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
-    await StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
-    log.info(`>>>>>>>>>>>>>>>>>>>>>>> (AFTER) CacheStats: ${JSON.stringify(cacheStats)}`);
-
-    log.info(`STORAGE HANDLER Finished`);
   }
 }
