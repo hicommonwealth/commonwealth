@@ -25,36 +25,36 @@ type BaseVotingResultAttrs = {
 };
 
 type VotingResultAttrs = {
-  getAbstainVotes?: () => void;
-  getNoVotes: () => void;
-  getYesVotes: () => void;
+  abstainVotes?: Array<IVote<any>>;
+  noVotes: Array<IVote<any>>;
+  yesVotes: Array<IVote<any>>;
   proposal: AnyProposal;
 };
 
 export class VotingResult extends ClassComponent<VotingResultAttrs> {
   view(vnode: m.Vnode<VotingResultAttrs>) {
-    const { getAbstainVotes, getNoVotes, getYesVotes, proposal } = vnode.attrs;
+    const { abstainVotes, noVotes, yesVotes, proposal } = vnode.attrs;
 
     return (
       <div class="VotingResult">
         <div class="results-column-yes">
           <CWText type="h4" fontWeight="medium" className="results-header">
-            {`Yes (${getYesVotes.length})`}
+            {`Yes (${yesVotes.length})`}
           </CWText>
-          <VoteListing proposal={proposal} votes={getYesVotes} />
+          <VoteListing proposal={proposal} votes={yesVotes} />
         </div>
         <div class="results-column-no">
           <CWText type="h4" fontWeight="medium" className="results-header">
-            {`No (${getNoVotes.length})`}
+            {`No (${noVotes.length})`}
           </CWText>
-          <VoteListing proposal={proposal} votes={getNoVotes} />
+          <VoteListing proposal={proposal} votes={noVotes} />
         </div>
-        {getAbstainVotes && (
+        {abstainVotes && (
           <div class="results-column-no">
             <CWText type="h4" fontWeight="medium" className="results-header">
-              {`Abstain (${getAbstainVotes.length})`}
+              {`Abstain (${abstainVotes.length})`}
             </CWText>
-            <VoteListing proposal={proposal} votes={getAbstainVotes} />
+            <VoteListing proposal={proposal} votes={abstainVotes} />
           </div>
         )}
       </div>

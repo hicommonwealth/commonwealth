@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
-import { TransactionResult } from 'models';
+import { ITransactionResult } from 'models';
 
-export type TxDataState = Partial<TransactionResult> & {
+export type TxDataState = Partial<ITransactionResult> & {
   error?: Error;
   events?: EventEmitter;
 };

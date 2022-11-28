@@ -71,7 +71,7 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
         {...ethChainRows(vnode.attrs, this.state.form)}
         <InputRow
           title="Abi"
-          value={this.state.form.abi}
+          value={this.state.form.abi.toString()}
           placeholder="Optional: Paste ABI here"
           onChangeHandler={(value) => {
             this.state.form.abi = value;
