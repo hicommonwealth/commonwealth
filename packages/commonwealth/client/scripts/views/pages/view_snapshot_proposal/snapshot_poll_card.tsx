@@ -40,7 +40,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
     this.localVoteInformation = vnode.attrs.voteInformation;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotPollCardAttrs>) {
     const {
       disableVoteButton = false,
       incrementalVoteCast,

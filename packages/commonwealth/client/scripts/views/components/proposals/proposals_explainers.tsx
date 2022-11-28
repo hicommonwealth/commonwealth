@@ -48,11 +48,13 @@ export class SubstrateProposalStats extends ClassComponent<SubstrateProposalStat
   }
 }
 
-export class CompoundProposalStats extends ClassComponent<{ chain: Compound }> {
-  view(vnode) {
+type CompoundProposalStatsAttrs = { chain: Compound };
+
+export class CompoundProposalStats extends ClassComponent<CompoundProposalStatsAttrs> {
+  view(vnode: m.Vnode<CompoundProposalStatsAttrs>) {
     const { chain } = vnode.attrs;
 
-    const symbol = chain.meta.symbol;
+    const symbol = chain.meta.default_symbol;
 
     return (
       <GovExplainer

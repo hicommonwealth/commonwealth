@@ -61,7 +61,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
       .map(([candidate]) => candidate.address);
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<CouncilVotingModalAttrs>) {
     const { candidates } = vnode.attrs;
 
     const submitVote = (e) => {

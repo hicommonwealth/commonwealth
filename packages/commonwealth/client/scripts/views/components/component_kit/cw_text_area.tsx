@@ -15,13 +15,15 @@ type TextAreaStyleAttrs = {
   validationStatus?: ValidationStatus;
 };
 
-export class CWTextArea extends ClassComponent<BaseTextInputAttrs> {
+type TextAreaAttrs = BaseTextInputAttrs & TextAreaStyleAttrs;
+
+export class CWTextArea extends ClassComponent<TextAreaAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode) {
+  view(vnode: m.Vnode<TextAreaAttrs>) {
     const {
       autocomplete,
       autofocus,

@@ -11,7 +11,7 @@ import NewProposalForm from './new_proposal_form';
 type NewProposalSnapshotPageAttrs = { snapshotId: string };
 
 class NewSnapshotProposalPage extends ClassComponent<NewProposalSnapshotPageAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<NewProposalSnapshotPageAttrs>) {
     return (
       <Sublayout
       // title="New Snapshot Proposal"

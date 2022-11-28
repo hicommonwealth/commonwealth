@@ -29,7 +29,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
     const transact = (...args) => {
       setupEventListeners(vnode);
       vnode.attrs.txData.transact(...args);

@@ -60,9 +60,11 @@ export type ThreadPrefetch = {
   };
 };
 
-class ViewThreadPage extends ClassComponent<{
+type ViewThreadPageAttrs = {
   identifier: string;
-}> {
+};
+
+class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
   private comments: Array<Comment<Thread>>;
   private isEditingBody: boolean;
   private isGloballyEditing: boolean;
@@ -96,7 +98,7 @@ class ViewThreadPage extends ClassComponent<{
     });
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ViewThreadPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
