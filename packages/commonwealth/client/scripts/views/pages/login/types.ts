@@ -20,7 +20,7 @@ export type LoginBodyType =
 export type LoginAttrs = {
   address: string;
   currentlyInCommunityPage: boolean;
-  bodyType: string;
+  bodyType: LoginBodyType;
   profiles: Array<ProfileRowAttrs>;
   sidebarType: string;
   username: string;
@@ -28,8 +28,9 @@ export type LoginAttrs = {
   magicLoading: boolean;
   setAddress: (address: string) => void;
   setBodyType: (bodyType: string) => void;
-  handleSetAvatar: () => void;
-  handleSetUsername: () => void;
+  handleEmailLoginCallback: () => void;
+  handleSetAvatar: (url: string) => void;
+  handleSetUsername: (username: string) => void;
   handleSetEmail: () => void;
   setProfiles: (profiles: Array<ProfileRowAttrs>) => void;
   setSidebarType: (sidebarType: string) => void;

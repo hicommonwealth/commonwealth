@@ -26,7 +26,7 @@ export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
   private success: boolean;
   private webhookUrl: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<WebhooksFormAttrs>) {
     const { webhooks } = vnode.attrs;
     const chainOrCommObj = { chain: app.activeChainId() };
 

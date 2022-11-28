@@ -9,7 +9,6 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from '../loading';
-import ErrorPage from '../error';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';

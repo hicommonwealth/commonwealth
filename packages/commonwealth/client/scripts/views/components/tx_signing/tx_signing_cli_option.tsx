@@ -22,7 +22,7 @@ export class TXSigningCLIOption
   private calldata?: ISubstrateTXData;
   private signedTx: string;
 
-  async oncreate(vnode) {
+  async oncreate(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
     if (this.calldata === undefined) {
       this.calldata =
         (await vnode.attrs.txData.unsignedData()) as ISubstrateTXData;

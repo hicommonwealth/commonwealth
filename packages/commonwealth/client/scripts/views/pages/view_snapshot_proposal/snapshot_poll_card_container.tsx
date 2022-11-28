@@ -46,7 +46,7 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
 export class SnapshotPollCardContainer
   implements m.ClassComponent<SnapshotProposalCardsAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotProposalCardsAttrs>) {
     const {
       identifier,
       proposal,
@@ -135,7 +135,7 @@ export class SnapshotPollCardContainer
         tokenSymbol={space.symbol}
         totalVoteCount={totals.sumOfResultsBalance}
         voteInformation={buildVoteInformation(proposal?.choices, votes)}
-        onVoteCast={(choice: string, callback: () => any) => {
+        onVoteCast={(choice, callback) => {
           castSnapshotVote(choice, callback);
           m.redraw();
         }}

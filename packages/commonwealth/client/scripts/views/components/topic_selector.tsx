@@ -17,7 +17,7 @@ type TopicSelectorAttrs = {
 };
 
 export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<TopicSelectorAttrs>) {
     const { defaultTopic, tabindex, topics, updateFormData } = vnode.attrs;
 
     let selectedTopic;

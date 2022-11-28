@@ -11,8 +11,8 @@ import { ChainEntity, Thread } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
 
 type ChainEntitiesSelectorAttrs = {
-  chainEntitiesToSet: ChainEntity[];
-  onSelect: () => void;
+  chainEntitiesToSet: Array<ChainEntity>;
+  onSelect: (ce: ChainEntity) => void;
   thread: Thread;
 };
 
@@ -22,7 +22,7 @@ export class ChainEntitiesSelector
   private chainEntitiesLoaded: boolean;
   private initialized: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<ChainEntitiesSelectorAttrs>) {
     const { thread, onSelect } = vnode.attrs;
 
     if (!app.chain || !app.activeChainId()) return;

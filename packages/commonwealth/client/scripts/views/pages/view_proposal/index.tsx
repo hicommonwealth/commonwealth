@@ -49,8 +49,9 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private prefetch: ProposalPrefetch;
   private proposal: AnyProposal;
   private tipAmount: number;
+  private votingModalOpen: boolean;
 
-  view(vnode: m.VnodeDOM<ViewProposalPageAttrs, this>) {
+  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
@@ -247,6 +248,16 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       );
     }
 
+    const toggleVotingModal = (newModalState: boolean) => {
+      this.votingModalOpen = newModalState;
+      m.redraw();
+    };
+
+    const onModalClose = () => {
+      this.votingModalOpen = false;
+      m.redraw();
+    };
+
     return (
       <Sublayout
       //  title={headerTitle}
@@ -263,7 +274,13 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
             })
           }
           createdAt={this.proposal.createdAt}
-          subHeader={<ProposalSubheader proposal={this.proposal} />}
+          subHeader={
+            <ProposalSubheader
+              proposal={this.proposal}
+              toggleVotingModal={toggleVotingModal}
+              votingModalOpen={this.votingModalOpen}
+            />
+          }
           body={
             !!this.proposal.description && (
               <CollapsibleBodyText item={this.proposal} />
@@ -276,7 +293,12 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
                 <AaveViewProposalDetail proposal={this.proposal} />
               )}
               <VotingResults proposal={this.proposal} />
-              <VotingActions proposal={this.proposal} />
+              <VotingActions
+                onModalClose={onModalClose}
+                proposal={this.proposal}
+                toggleVotingModal={toggleVotingModal}
+                votingModalOpen={this.votingModalOpen}
+              />
             </>
           }
           comments={
