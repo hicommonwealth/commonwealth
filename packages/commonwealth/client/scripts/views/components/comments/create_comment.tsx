@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -28,7 +29,7 @@ type CreateCommmentAttrs = {
   updatedCommentsCallback: () => void;
 };
 
-export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
+export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
   private error;
   private quillEditorState: QuillEditor;
   private saving: boolean;

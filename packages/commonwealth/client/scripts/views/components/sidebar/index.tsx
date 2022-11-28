@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
 
@@ -24,7 +25,7 @@ type SidebarAttrs = {
   isSidebarToggled?: boolean;
 };
 
-export class Sidebar implements m.ClassComponent<SidebarAttrs> {
+export class Sidebar extends ClassComponent<SidebarAttrs> {
   view(vnode: m.Vnode<SidebarAttrs>) {
     const { isSidebarToggleable, isSidebarToggled } = vnode.attrs;
 
@@ -51,7 +52,7 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
           <div class="CommunityHeader">
             <div class="inner-container">
               <CWCommunityAvatar size="large" community={app.chain.meta} />
-              <CWText type="h5" fontStyle="medium">
+              <CWText type="h5" fontWeight="medium">
                 {app.chain.meta.name}
               </CWText>
             </div>

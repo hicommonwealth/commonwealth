@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import BN from 'bn.js';
 import moment from 'moment';
 
@@ -21,7 +22,7 @@ type SputnikDaoRowAttrs = {
   dao: IDaoInfo;
 };
 
-class SputnikDaoRow implements m.ClassComponent<SputnikDaoRowAttrs> {
+class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
   view(vnode: m.Vnode<SputnikDaoRowAttrs>) {
     const { dao, clickable } = vnode.attrs;
 
@@ -68,7 +69,7 @@ class SputnikDaoRow implements m.ClassComponent<SputnikDaoRowAttrs> {
   }
 }
 
-class SputnikDAOsPage implements m.ClassComponent {
+class SputnikDAOsPage extends ClassComponent {
   private daosList: IDaoInfo[];
   private daosRequested: boolean;
 

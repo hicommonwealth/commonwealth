@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
@@ -25,9 +26,7 @@ type SnapshotVotesTableAttrs = {
   voters: Array<SnapshotVoteType>;
 };
 
-export class SnapshotVotesTable
-  implements m.ClassComponent<SnapshotVotesTableAttrs>
-{
+export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> {
   isVotersListExpanded: boolean;
 
   view(vnode: m.Vnode<SnapshotVotesTableAttrs>) {

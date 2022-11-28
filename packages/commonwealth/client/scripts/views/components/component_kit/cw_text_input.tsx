@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text_input.scss';
 
@@ -25,7 +26,7 @@ export type BaseTextInputAttrs = {
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   maxlength?: number;
-  name: string;
+  name?: string;
   oninput?: (e) => void;
   onenterkey?: (e) => void;
   onclick?: (e) => void;
@@ -37,14 +38,14 @@ type InputStyleAttrs = {
   inputClassName?: string;
   darkMode?: boolean;
   disabled?: boolean;
-  size: TextInputSize;
+  size?: TextInputSize;
   validationStatus?: ValidationStatus;
   displayOnly?: boolean;
 };
 
 type InputInternalStyleAttrs = {
   hasRightIcon?: boolean;
-  isTyping: boolean;
+  isTyping?: boolean;
 };
 
 type MessageRowAttrs = {
@@ -58,7 +59,7 @@ type TextInputAttrs = BaseTextInputAttrs &
   InputStyleAttrs &
   InputInternalStyleAttrs;
 
-export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
+export class MessageRow extends ClassComponent<MessageRowAttrs> {
   view(vnode: m.Vnode<MessageRowAttrs>) {
     const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
 
@@ -86,7 +87,7 @@ export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
   }
 }
 
-export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
+export class CWTextInput extends ClassComponent<TextInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';

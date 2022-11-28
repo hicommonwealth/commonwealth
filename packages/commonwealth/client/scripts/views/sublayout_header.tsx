@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'sublayout_header.scss';
 
@@ -23,7 +24,7 @@ type SublayoutHeaderAttrs = {
   toggleSidebar: () => void;
 };
 
-export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
+export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
   view(vnode: m.Vnode<SublayoutHeaderAttrs>) {
     const { hideSearch, isSidebarToggleable, isSidebarToggled, toggleSidebar } =
       vnode.attrs;

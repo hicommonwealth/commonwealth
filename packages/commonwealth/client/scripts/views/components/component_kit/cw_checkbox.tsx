@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_checkbox.scss';
 
@@ -16,13 +17,13 @@ type CheckboxStyleAttrs = {
 } & StyleAttrs;
 
 type CheckboxAttrs = {
-  groupName: string;
+  groupName?: string;
   onchange: (e?: any) => void;
 } & Checkbox &
   CheckboxStyleAttrs;
 
-export class CWCheckbox implements m.ClassComponent<CheckboxAttrs> {
-  view(vnode) {
+export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
+  view(vnode: m.Vnode<CheckboxAttrs>) {
     const {
       className,
       disabled = false,

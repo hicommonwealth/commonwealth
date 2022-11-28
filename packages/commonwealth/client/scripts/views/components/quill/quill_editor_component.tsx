@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
@@ -41,9 +42,7 @@ type QuillEditorComponentAttrs = {
 // - Audit and fix image, video, & Twitter blots as necessary
 // - Convert generic HTML tags to CWText components in QuillFormattedText
 
-export class QuillEditorComponent
-  implements m.ClassComponent<QuillEditorComponentAttrs>
-{
+export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAttrs> {
   unsavedChanges;
   $editor: JQuery<HTMLElement>;
   editor: QuillEditor;
@@ -201,7 +200,7 @@ export class QuillEditorComponent
             fontWeight="semiBold"
             className="mode-switcher"
             title="Switch to Markdown mode"
-            onclick={async (e) => {
+            onclick={async () => {
               // Confirm before removing formatting and switching to Markdown mode.
               const confirmed = await this._confirmRemoveFormatting();
               if (!confirmed) return;

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -44,7 +45,7 @@ type ViewProposalPageAttrs = {
   type?: string;
 };
 
-class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
+class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private comments: Comment<AnyProposal>[];
   private prefetch: ProposalPrefetch;
   private proposal: AnyProposal;

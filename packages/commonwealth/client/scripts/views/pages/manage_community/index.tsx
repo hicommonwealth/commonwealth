@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/manage_community/index.scss';
@@ -14,7 +15,7 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 import { sortAdminsAndModsFirst } from './helpers';
 
-class ManageCommunityPage implements m.ClassComponent {
+class ManageCommunityPage extends ClassComponent {
   private loadingFinished: boolean;
   private loadingStarted: boolean;
   private roleData: RoleInfo[];

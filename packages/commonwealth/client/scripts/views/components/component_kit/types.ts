@@ -64,7 +64,7 @@ export type DefaultMenuItem = {
 };
 
 type NotificationMenuItem = {
-  hasUnreads: boolean;
+  hasUnreads?: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string;

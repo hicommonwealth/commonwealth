@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import {
   Button,
   Icons,
@@ -35,7 +36,7 @@ type TopicsMenuAttrs = {
   topic: string;
 };
 
-export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
+export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
   view(vnode: m.Vnode<TopicsMenuAttrs>) {
     const { disabled, featuredTopics, otherTopics, selectedTopic, topic } =
       vnode.attrs;

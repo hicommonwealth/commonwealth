@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/proposals.scss';
 
@@ -50,7 +51,7 @@ function getModules(): ProposalModule<any, any, any>[] {
   }
 }
 
-class ProposalsPage implements m.ClassComponent {
+class ProposalsPage extends ClassComponent {
   oncreate() {
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');

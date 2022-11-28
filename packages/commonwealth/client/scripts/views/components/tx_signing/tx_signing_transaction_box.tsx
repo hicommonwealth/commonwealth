@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/tx_signing/tx_signing_transaction_box.scss';
 
@@ -15,9 +16,7 @@ type TXSigningTransactionBoxAttrs = {
   timestamp: string;
 };
 
-export class TXSigningTransactionBox
-  implements m.ClassComponent<TXSigningTransactionBoxAttrs>
-{
+export class TXSigningTransactionBox extends ClassComponent<TXSigningTransactionBoxAttrs> {
   view(vnode: m.Vnode<TXSigningTransactionBoxAttrs>) {
     const { blockHash, blockNum, status, success, timestamp } = vnode.attrs;
 

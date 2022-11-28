@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -19,9 +20,7 @@ type TxSigningModalIntroStageAttrs = ITXModalData & {
   polkaWallet: IWebWallet<any>;
 };
 
-export class TxSigningModalIntroStage
-  implements m.ClassComponent<TxSigningModalIntroStageAttrs>
-{
+export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntroStageAttrs> {
   private introTab: 'webWallet' | 'commandLine';
 
   oninit() {
@@ -73,9 +72,7 @@ export class TxSigningModalIntroStage
 
 type TxSigningModalWaitingStageAttrs = { next: NextFn };
 
-export class TxSigningModalWaitingStage
-  implements m.ClassComponent<TxSigningModalWaitingStageAttrs>
-{
+export class TxSigningModalWaitingStage extends ClassComponent<TxSigningModalWaitingStageAttrs> {
   private timeoutHandle?: NodeJS.Timeout;
   private timer?: number;
   private timerHandle?: NodeJS.Timeout;
@@ -125,9 +122,7 @@ export class TxSigningModalWaitingStage
   }
 }
 
-export class TxSigningModalSuccessStage
-  implements m.ClassComponent<TxDataState>
-{
+export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
   view(vnode: m.VnodeDOM<TxDataState, this>) {
     const { blocknum, hash, timestamp } = vnode.attrs;
 
@@ -152,9 +147,9 @@ export class TxSigningModalSuccessStage
   }
 }
 
-export class TxSigningModalRejectedStage
-  implements m.ClassComponent<TxDataState & NextFn>
-{
+export class TxSigningModalRejectedStage extends ClassComponent<
+  TxDataState & NextFn
+> {
   view(vnode) {
     const { blocknum, error, hash, timestamp, next } = vnode.attrs;
 

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -168,7 +169,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
   ];
 };
 
-export class CreateContentMenu implements m.ClassComponent {
+export class CreateContentMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
@@ -184,7 +185,7 @@ export class CreateContentMenu implements m.ClassComponent {
   }
 }
 
-export class CreateContentPopover implements m.ClassComponent {
+export class CreateContentPopover extends ClassComponent {
   view() {
     if (!app.isLoggedIn() || !app.chain || !app.activeChainId()) return;
 

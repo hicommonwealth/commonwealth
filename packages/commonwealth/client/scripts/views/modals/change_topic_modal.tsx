@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/change_topic_modal.scss';
@@ -16,9 +17,7 @@ type ChangeTopicModalAttrs = {
   thread: Thread;
 };
 
-export class ChangeTopicModal
-  implements m.ClassComponent<ChangeTopicModalAttrs>
-{
+export class ChangeTopicModal extends ClassComponent<ChangeTopicModalAttrs> {
   private activeTopic: Topic;
 
   oninit(vnode: m.Vnode<ChangeTopicModalAttrs>) {

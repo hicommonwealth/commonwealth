@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
@@ -47,7 +48,7 @@ type ContentPageAttrs = {
   viewCount?: number;
 };
 
-export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
+export class CWContentPage extends ClassComponent<ContentPageAttrs> {
   private viewType: 'sidebarView' | 'tabsView';
   private tabSelected: number;
 

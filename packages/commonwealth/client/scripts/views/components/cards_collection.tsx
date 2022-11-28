@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/cards_collection.scss';
 
@@ -11,7 +12,7 @@ type CardsCollectionAttrs = {
   header?: string;
 };
 
-export class CardsCollection implements m.ClassComponent<CardsCollectionAttrs> {
+export class CardsCollection extends ClassComponent<CardsCollectionAttrs> {
   view(vnode: m.Vnode<CardsCollectionAttrs>) {
     const { content, header } = vnode.attrs;
     return (

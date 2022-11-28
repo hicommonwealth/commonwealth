@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/login/login_desktop.scss';
 
@@ -21,7 +22,7 @@ import { LoginDesktopSidebar } from './login_desktop_sidebar';
 import { LoginAttrs } from './types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
-export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
+export class LoginDesktop extends ClassComponent<LoginAttrs> {
   view(vnode: m.Vnode<LoginAttrs>) {
     const {
       address,

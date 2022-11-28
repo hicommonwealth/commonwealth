@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import smartTruncate from 'smart-truncate';
 
@@ -20,7 +21,7 @@ type WebhooksFormAttrs = {
   webhooks: Array<Webhook>;
 };
 
-export class WebhooksForm implements m.ClassComponent<WebhooksFormAttrs> {
+export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
   private disabled: boolean;
   private failure: boolean;
   private success: boolean;

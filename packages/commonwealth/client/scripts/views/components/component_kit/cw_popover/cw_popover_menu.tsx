@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
@@ -10,7 +11,7 @@ import { getClasses } from '../helpers';
 import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 
-export class CWPopoverMenuItem implements m.ClassComponent<MenuItem> {
+export class CWPopoverMenuItem extends ClassComponent<MenuItem> {
   view(vnode: m.Vnode<MenuItem>) {
     if (vnode.attrs.type === 'header') {
       return (
@@ -50,7 +51,7 @@ type PopoverMenuAttrs = {
   menuItems: Array<MenuItem>;
 } & SharedPopoverAttrs;
 
-export class CWPopoverMenu implements m.ClassComponent<PopoverMenuAttrs> {
+export class CWPopoverMenu extends ClassComponent<PopoverMenuAttrs> {
   view(vnode: m.Vnode<PopoverMenuAttrs>) {
     const { menuItems, trigger } = vnode.attrs;
 

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { Account, Thread } from 'models';
@@ -16,9 +17,7 @@ type CollapsibleBodyTextAttrs = {
   item: Thread;
 };
 
-export class CollapsibleBodyText
-  implements m.ClassComponent<CollapsibleBodyTextAttrs>
-{
+export class CollapsibleBodyText extends ClassComponent<CollapsibleBodyTextAttrs> {
   private body: any;
   private collapsed: boolean;
 

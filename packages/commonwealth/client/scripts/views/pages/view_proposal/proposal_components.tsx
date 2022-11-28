@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_proposal/proposal_components.scss';
 
@@ -24,7 +25,7 @@ import { cancelProposal } from '../../components/proposals/helpers';
 type BaseCancelButtonAttrs = {
   onModalClose: () => void;
   toggleVotingModal: (newModalState: boolean) => void;
-  votingModalOpen: boolean;
+  votingModalOpen?: boolean;
 };
 
 type MolochCancelButtonAttrs = {
@@ -32,9 +33,7 @@ type MolochCancelButtonAttrs = {
   molochMember: MolochMember;
 } & BaseCancelButtonAttrs;
 
-export class MolochCancelButton
-  implements m.ClassComponent<MolochCancelButtonAttrs>
-{
+export class MolochCancelButton extends ClassComponent<MolochCancelButtonAttrs> {
   view(vnode: m.Vnode<MolochCancelButtonAttrs>) {
     const {
       proposal,
@@ -64,9 +63,7 @@ type AaveCancelButtonAttrs = {
   proposal: AaveProposal;
 } & BaseCancelButtonAttrs;
 
-export class AaveCancelButton
-  implements m.ClassComponent<AaveCancelButtonAttrs>
-{
+export class AaveCancelButton extends ClassComponent<AaveCancelButtonAttrs> {
   view(vnode: m.Vnode<AaveCancelButtonAttrs>) {
     const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
       vnode.attrs;
@@ -88,9 +85,7 @@ type CompoundCancelButtonAttrs = {
   proposal: CompoundProposal;
 } & BaseCancelButtonAttrs;
 
-export class CompoundCancelButton
-  implements m.ClassComponent<CompoundCancelButtonAttrs>
-{
+export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAttrs> {
   view(vnode: m.Vnode<CompoundCancelButtonAttrs>) {
     const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
       vnode.attrs;
@@ -113,9 +108,7 @@ type ProposalSubheaderAttrs = {
   molochMember: MolochMember;
 } & BaseCancelButtonAttrs;
 
-export class ProposalSubheader
-  implements m.ClassComponent<ProposalSubheaderAttrs>
-{
+export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
   view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
     const {
       molochMember,
@@ -216,8 +209,8 @@ export class ProposalSubheader
 }
 // // needs refactoring
 // export class ProposalBodyLastEdited
-//   implements
-//     m.ClassComponent<{
+//   extends
+//     ClassComponent<{
 //       item: Thread | Comment<any>;
 //     }>
 // {
