@@ -153,7 +153,11 @@ export default class extends IEventHandler {
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
       // return nothing so following handlers ignore this event
-      StatsDController.get().increment('ce.hit-event-cache', {chain, block_number: String(event.blockNumber)})
     }
+
+    const cacheStats = this.eventCache.getStats()
+    StatsDController.get().set('ce.num-events-cached', cacheStats.keys);
+    StatsDController.get().set('ce.event-cache-hits', cacheStats.hits);
+    StatsDController.get().set('ce.event-cache-misses', cacheStats.misses)
   }
 }
