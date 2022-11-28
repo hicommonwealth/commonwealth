@@ -70,7 +70,7 @@ export function isPermitted(permission: Permissions, action: number): boolean {
   return hasAction;
 }
 
-function computeImplicitPermissions(permission: Permissions): Permissions {
+export function computeImplicitPermissions(permission: Permissions): Permissions {
   let result = BigInt(permission);
   // Find the highest hierachy action that is permitted
   for (const [action, implicitActions] of IMPLICIT_PERMISSIONS_BY_ACTION) {
