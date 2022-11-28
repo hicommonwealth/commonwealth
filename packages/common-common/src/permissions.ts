@@ -70,24 +70,19 @@ export function isPermitted(permission: Permissions, action: number): boolean {
   return hasAction;
 }
 
-function isThereImplicitAction(action: number): boolean {
-  return IMPLICIT_PERMISSIONS_BY_ACTION[action] != undefined;
-}
-
 function computeImplicitPermissions(permission: Permissions): Permissions {
   let result = BigInt(permission);
-  for (const [action, implicitActions] of IMPLICIT_PERMISSIONS_BY_ACTION.keys) {
+  // Find the highest hierachy action that is permitted
+  for (const [action, implicitActions] of IMPLICIT_PERMISSIONS_BY_ACTION) {
     if (isPermitted(permission, Number(action))) {
-      //if the action is permitted, add all the implicit actions recursively
-      while (isThereImplicitAction(action)) {
-        const implicitAction = implicitActions.pop();
-        if (implicitAction) {
-          result = addPermission(result, implicitAction);
-        }
+      // add all the implicit actions and then return the result
+      for (const implicitAction of implicitActions) {
+        result = addPermission(result, implicitAction);
       }
+      return result;
     }
   }
-  return BigInt(0);
+  return result;
 }
 
 export function computePermissions(
@@ -99,6 +94,7 @@ export function computePermissions(
     permission &= ~BigInt(assignment.deny);
     permission |= BigInt(assignment.allow);
   }
-
+  // Finally, compute implicit permissions
+  permission = computeImplicitPermissions(permission);
   return permission;
 }
