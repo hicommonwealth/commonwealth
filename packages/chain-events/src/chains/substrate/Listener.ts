@@ -136,7 +136,9 @@ export class Listener extends BaseListener<ApiPromise,
 
       while (endBlock <= offlineRange.endBlock) {
         const blocks = await this.getBlocks(startBlock, endBlock + 1);
-        await Promise.all(blocks.map(this.processBlock, this));
+        for (const block of blocks) {
+          await this.processBlock(block);
+        }
 
         // stop loop when we have fetched all blocks
         if (endBlock === offlineRange.endBlock) break;
