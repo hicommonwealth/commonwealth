@@ -127,7 +127,7 @@ export class Listener extends BaseListener<ApiPromise,
 
     this.log.info(`Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
     try {
-      const maxBlocksPerPoll = 250;
+      const maxBlocksPerPoll = 100;
       let startBlock = offlineRange.startBlock;
       let endBlock;
 
