@@ -83,7 +83,7 @@ async function mainProcess(
         num_chain_subscribers: NUM_CHAIN_SUBSCRIBERS,
         chain_subscriber_index: CHAIN_SUBSCRIBER_INDEX
       }
-      const result = await fetch(
+      const res = await fetch(
         url,
         {
           method: 'POST',
@@ -91,7 +91,9 @@ async function mainProcess(
           headers: { 'Content-Type': 'application/json' }
         },
       );
-      const jsonRes = await result.json();
+      if (!res.ok) throw new Error(`HTTP Error Response: ${res.status} ${res.statusText}`);
+
+      const jsonRes = await res.json();
       log.info(`Fetched chain-event service data: ${JSON.stringify(jsonRes)}`);
       if (jsonRes?.status >= 400) {
         throw new Error(jsonRes.error)
