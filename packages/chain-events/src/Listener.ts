@@ -139,6 +139,7 @@ export abstract class Listener<
       !offlineRange.startBlock ||
       offlineRange.startBlock < this._lastCachedBlockNumber)
     ) {
+      log.info(`Using cached block number ${this._lastCachedBlockNumber}`);
       offlineRange = {startBlock: this._lastCachedBlockNumber}
     }
 

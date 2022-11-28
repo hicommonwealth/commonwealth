@@ -104,6 +104,12 @@ export class Listener extends BaseListener<ApiPromise,
       return;
     }
 
+    // processed blocks missed blocks in the background while the subscription is active
+    if (!this.options.skipCatchup) {
+      await this.processMissedBlocks();
+    }
+    else this.log.info(`Skipping event catchup on startup!`);
+
     try {
       this.log.info(
         `Subscribing to ${this._chain} on url ${this._options.url}`
@@ -113,14 +119,6 @@ export class Listener extends BaseListener<ApiPromise,
     } catch (error) {
       this.log.error(`Subscription error`, error.message);
     }
-
-    // TODO: save the first block processed by the subscription
-
-    // processed blocks missed blocks in the background while the subscription is active
-    if (!this.options.skipCatchup) {
-      await this.processMissedBlocks();
-    }
-    else this.log.info(`Skipping event catchup on startup!`);
   }
 
   private async processMissedBlocks(): Promise<void> {
