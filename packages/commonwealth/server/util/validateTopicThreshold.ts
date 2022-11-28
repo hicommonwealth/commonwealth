@@ -51,8 +51,9 @@ const validateTopicThreshold = async (
         topic.chain.network,
         topic.chain.ChainNode.id,
         userAddress,
-        communityContracts.Contract?.address
+        communityContracts?.Contract?.address
       );
+
       return (new BN(balance)).gte(threshold);
     } catch (e) {
       if (e.message === FetchTokenBalanceErrors.NoBalanceProvider) {
