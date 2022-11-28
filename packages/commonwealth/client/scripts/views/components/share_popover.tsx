@@ -6,8 +6,10 @@ import { int } from 'aws-sdk/clients/datapipeline';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
+type SharePopoverAttrs = { commentId?: int };
+
 export class SharePopover implements m.ClassComponent<{ commentId?: int }> {
-  view(vnode) {
+  view(vnode: m.Vnode<SharePopoverAttrs>) {
     const domain = document.location.origin;
 
     return (

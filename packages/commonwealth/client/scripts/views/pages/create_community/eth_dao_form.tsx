@@ -41,7 +41,6 @@ import {
   EthFormFields,
 } from 'views/pages/create_community/types';
 
-
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
   tokenName: string;
@@ -72,11 +71,11 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 

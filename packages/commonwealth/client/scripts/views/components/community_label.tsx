@@ -14,7 +14,7 @@ type CommunityLabelAttrs = {
 };
 
 export class CommunityLabel implements m.ClassComponent<CommunityLabelAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<CommunityLabelAttrs>) {
     const { community, size = 'small' } = vnode.attrs;
 
     return (

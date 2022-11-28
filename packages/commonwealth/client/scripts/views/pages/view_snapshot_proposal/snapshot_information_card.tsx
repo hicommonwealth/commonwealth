@@ -21,7 +21,7 @@ type SnapshotInfoRowAttrs = {
 };
 
 class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotInfoRowAttrs>) {
     const { label, value } = vnode.attrs;
 
     return (
@@ -35,10 +35,12 @@ class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
   }
 }
 
+type SnapshotInfoLinkRowAttrs = SnapshotInfoRowAttrs & { url: string };
+
 class SnapshotInfoLinkRow
-  implements m.ClassComponent<SnapshotInfoRowAttrs & { url: string }>
+  implements m.ClassComponent<SnapshotInfoLinkRowAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotInfoLinkRowAttrs>) {
     const { label, url, value } = vnode.attrs;
 
     return (
@@ -65,7 +67,7 @@ type SnapshotInformationCardAttrs = {
 export class SnapshotInformationCard
   implements m.ClassComponent<SnapshotInformationCardAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;
 
     const votingSystem = capitalize(

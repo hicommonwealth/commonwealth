@@ -8,10 +8,14 @@ import { modalRedirectClick } from 'helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 
+type LoginBoilerplateAttrs = {
+  darkMode?: boolean;
+};
+
 export class LoginBoilerplate
-  implements m.ClassComponent<{ darkMode?: boolean }>
+  implements m.ClassComponent<LoginBoilerplateAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<LoginBoilerplateAttrs>) {
     const { darkMode } = vnode.attrs;
 
     return (

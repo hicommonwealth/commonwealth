@@ -42,26 +42,40 @@ import { NearAccount } from 'controllers/chain/near/account';
 
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ProposalExtensions } from './proposal_extensions';
-import { CannotVote, CancelButton } from './voting_actions_components';
 import { getCanVote, getVotingResults } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';
+import {
+  CompoundCancelButton,
+  MolochCancelButton,
+} from '../../pages/view_proposal/proposal_components';
 
-export class VotingActions
-  implements m.ClassComponent<{ proposal: AnyProposal }>
-{
+type CannotVoteAttrs = { label: string };
+
+class CannotVote implements m.ClassComponent<CannotVoteAttrs> {
+  view(vnode: m.Vnode<CannotVoteAttrs>) {
+    return (
+      <div class="CannotVote">
+        <CWButton disabled label={vnode.attrs.label} />
+      </div>
+    );
+  }
+}
+
+type VotingActionsAttrs = {
+  onModalClose: () => void;
+  proposal: AnyProposal;
+  toggleVotingModal: (newModalState: boolean) => void;
+  votingModalOpen: boolean;
+};
+
+export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
   private amount: number;
   private conviction: number;
-  private votingModalOpen: boolean;
 
-  view(vnode) {
-    const { proposal } = vnode.attrs;
-    const { votingModalOpen } = this;
-
-    const onModalClose = () => {
-      this.votingModalOpen = false;
-      m.redraw();
-    };
+  view(vnode: m.Vnode<VotingActionsAttrs>) {
+    const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
+      vnode.attrs;
 
     if (proposal instanceof SubstrateTreasuryProposal) {
       return;
@@ -98,7 +112,7 @@ export class VotingActions
 
     const voteYes = async (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof SubstrateDemocracyProposal) {
         createTXModal(
@@ -109,13 +123,15 @@ export class VotingActions
         );
       } else if (proposal instanceof SubstrateDemocracyReferendum) {
         if (this.conviction === undefined) {
-          this.votingModalOpen = false;
+          toggleVotingModal(false);
           return notifyError('Must select a conviction');
         }
+
         if (this.amount === 0) {
-          this.votingModalOpen = false;
+          toggleVotingModal(false);
           return notifyError('Must select a valid amount');
         }
+
         createTXModal(
           proposal.submitVoteTx(
             new BinaryVote(
@@ -170,29 +186,31 @@ export class VotingActions
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError(
           'Unimplemented proposal type - use election voting modal'
         );
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const voteNo = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof SubstrateDemocracyReferendum) {
         if (this.conviction === undefined) {
-          this.votingModalOpen = false;
+          toggleVotingModal(false);
           return notifyError('Must select a conviction');
         }
+
         if (this.amount === 0) {
-          this.votingModalOpen = false;
+          toggleVotingModal(false);
           return notifyError('Must select a valid amount');
         }
+
         createTXModal(
           proposal.submitVoteTx(
             new BinaryVote(
@@ -235,14 +253,14 @@ export class VotingActions
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const processProposal = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof MolochProposal) {
         proposal
@@ -256,14 +274,14 @@ export class VotingActions
             notifyError(err.toString());
           });
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const voteAbstain = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof CosmosProposal) {
         proposal
@@ -279,14 +297,14 @@ export class VotingActions
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const voteVeto = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof CosmosProposal) {
         proposal
@@ -294,14 +312,14 @@ export class VotingActions
           .then(() => m.redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
 
     const voteRemove = (e) => {
       e.preventDefault();
-      this.votingModalOpen = true;
+      toggleVotingModal(true);
 
       if (proposal instanceof NearSputnikProposal) {
         proposal
@@ -317,7 +335,7 @@ export class VotingActions
             notifyError(err.toString());
           });
       } else {
-        this.votingModalOpen = false;
+        toggleVotingModal(false);
         return notifyError('Invalid proposal type');
       }
     };
@@ -468,10 +486,10 @@ export class VotingActions
             {yesButton}
             {noButton}
             {processButton}
-            <CancelButton
+            <MolochCancelButton
+              molochMember={user}
               onModalClose={onModalClose}
               proposal={proposal}
-              user={user}
               votingModalOpen={votingModalOpen}
             />
           </div>
@@ -482,10 +500,9 @@ export class VotingActions
       votingActionObj = (
         <div class="button-row">
           {yesButton}
-          <CancelButton
+          <CompoundCancelButton
             onModalClose={onModalClose}
             proposal={proposal}
-            user={user}
             votingModalOpen={votingModalOpen}
           />
         </div>
@@ -496,10 +513,9 @@ export class VotingActions
           {yesButton}
           {noButton}
           {abstainButton}
-          <CancelButton
+          <CompoundCancelButton
             onModalClose={onModalClose}
             proposal={proposal}
-            user={user}
             votingModalOpen={votingModalOpen}
           />
         </div>

@@ -84,7 +84,7 @@ export class ChainMetadataRows
   selectedSnapshotChannel: { id: string; name: string } | null;
   snapshotNotificationsEnabled: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
     this.name = chain.name;
     this.description = chain.description;
@@ -118,7 +118,7 @@ export class ChainMetadataRows
     this.snapshotNotificationsEnabled = false;
   }
 
-  view(vnode) {
+  view(vnode: m.VnodeDOM<ChainMetadataRowsAttrs, this>) {
     const chain: ChainInfo = vnode.attrs.chain;
 
     const getChannels = async () => {
