@@ -15,6 +15,13 @@ import { RoleAssignmentAttributes } from '../models/role_assignment';
 import { AddressInstance } from '../models/address';
 import { AppError } from './errors';
 
+export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
+  chain_id: string;
+  permission: Permission;
+  allow: bigint;
+  deny: bigint;
+}
+
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
   chain_id: string;
@@ -36,12 +43,7 @@ export class RoleInstanceWithPermission {
     this.deny = deny;
   }
 
-  public toJSON(): RoleAssignmentAttributes & {
-    chain_id: string;
-    permission: Permission;
-    allow: bigint;
-    deny: bigint;
-  } {
+  public toJSON(): RoleInstanceWithPermissionAttributes {
     return {
       ...this._roleAssignmentAttributes,
       chain_id: this.chain_id,
