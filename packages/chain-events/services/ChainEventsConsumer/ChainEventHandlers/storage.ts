@@ -156,14 +156,10 @@ export default class extends IEventHandler {
     }
 
     const cacheStats = this.eventCache.getStats();
-    StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys, () => {
-      log.info(`Num-events-cached!!!!!!!!!!!!!!!! ${cacheStats.keys}`);
-    });
-    StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits, ()=> {
-      log.info(`Num cache hits -------------------------- ${cacheStats.hits}`);
-    });
-    StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses, () => {
-      log.info(`Num cache misses ???????????????????????????????? ${cacheStats.misses}`);
-    });
+    log.info(`>>>>>>>>>>>>>>>>>>>>>>> (BEFORE) CacheStats: ${JSON.stringify(cacheStats)}`);
+    await StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
+    await StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
+    await StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
+    log.info(`>>>>>>>>>>>>>>>>>>>>>>> (AFTER) CacheStats: ${JSON.stringify(cacheStats)}`);
   }
 }
