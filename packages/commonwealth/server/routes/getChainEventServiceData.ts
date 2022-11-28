@@ -51,8 +51,8 @@ export const getChainEventServiceData = async (models: DB, req: Request, res: Re
                                             ON "Contracts".id = cc.contract_id
                          WHERE "Chains"."has_chain_events_listener" = true
                            AND ("Contracts".type IN ('marlin-testnet', 'aave', 'compound') OR
-                                ("Chains".base = 'substrate' AND "Chains".type = 'chain')) OR
-                                ("Chains".base = 'cosmos' AND ("Chains".type='token' OR "Chains".type='chain')))
+                                ("Chains".base = 'substrate' AND "Chains".type = 'chain') OR
+                                ("Chains".base = 'cosmos' AND ("Chains".type='token' OR "Chains".type='chain'))))
       SELECT allChains.id,
              allChains.substrate_spec,
              allChains.address                                                 as contract_address,
