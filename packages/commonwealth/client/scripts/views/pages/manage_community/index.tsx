@@ -8,11 +8,9 @@ import 'pages/manage_community/index.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { RoleInfo, RolePermission, Webhook } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { ChainMetadataRows } from './chain_metadata_rows';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { PageLoading } from '../loading';
 import { sortAdminsAndModsFirst } from './helpers';
 

@@ -15,14 +15,15 @@ import { PollCard } from '../../components/poll_card';
 import { getPollTimestamp, handlePollVote } from './helpers';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
 
+type ThreadPollEditorCardAttrs = {
+  thread: Thread;
+  threadAlreadyHasPolling: boolean;
+};
+
 export class ThreadPollEditorCard
-  implements
-    m.ClassComponent<{
-      thread: Thread;
-      threadAlreadyHasPolling: boolean;
-    }>
+  implements m.ClassComponent<ThreadPollEditorCardAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<ThreadPollEditorCardAttrs>) {
     const { thread, threadAlreadyHasPolling } = vnode.attrs;
 
     return (
@@ -32,8 +33,7 @@ export class ThreadPollEditorCard
           thread?
         </CWText>
         <CWButton
-          disabled={!!thread.offchainVotingEndsAt}
-          label={thread.votingEndTime ? 'Polling enabled' : 'Create poll'}
+          label="Create poll"
           onclick={(e) => {
             e.preventDefault();
             app.modals.create({
@@ -49,8 +49,12 @@ export class ThreadPollEditorCard
   }
 }
 
-export class ThreadPollCard implements m.ClassComponent<{ poll: Poll }> {
-  view(vnode: m.VnodeDOM<{ poll: Poll }, this>) {
+type ThreadPollCardAttrs = {
+  poll: Poll;
+};
+
+export class ThreadPollCard implements m.ClassComponent<ThreadPollCardAttrs> {
+  view(vnode: m.Vnode<ThreadPollCardAttrs>) {
     const { poll } = vnode.attrs;
 
     return (
@@ -91,7 +95,7 @@ export class ThreadPollCard implements m.ClassComponent<{ poll: Poll }> {
             ? null
             : 'You must join this community to vote.'
         }
-        onVoteCast={(option, isSelected, callback) =>
+        onVoteCast={(option, callback, isSelected) =>
           handlePollVote(poll, option, isSelected, callback)
         }
         onResultsClick={(e) => {

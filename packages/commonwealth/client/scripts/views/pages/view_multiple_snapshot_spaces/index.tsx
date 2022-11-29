@@ -56,12 +56,13 @@ function redirectHandler(
   };
 }
 
+type MultipleSnapshotsPageAttrs = {
+  action?: string;
+  proposal?: Thread;
+};
+
 class MultipleSnapshotsPage
-  implements
-    m.ClassComponent<{
-      action?: string;
-      proposal?: Thread;
-    }>
+  implements m.ClassComponent<MultipleSnapshotsPageAttrs>
 {
   private snapshot_spaces: string[];
   private spaces_metadata: Array<{
@@ -69,7 +70,7 @@ class MultipleSnapshotsPage
     proposals: SnapshotProposal[];
   }>;
 
-  view(vnode) {
+  view(vnode: m.Vnode<MultipleSnapshotsPageAttrs>) {
     const { action, proposal } = vnode.attrs;
     const redirect_options = redirectHandler(action, proposal);
 

@@ -20,14 +20,20 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 
-export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
+type CouncilVotingModalAttrs = {
+  candidates: Array<[SubstrateAccount, number]>;
+};
+
+export class CouncilVotingModal
+  implements m.ClassComponent<CouncilVotingModalAttrs>
+{
   private currentApprovals: Array<string>;
   private currentStake: number;
   private error: string;
   private phragmenStakeAmount: SubstrateCoin;
   private votes: Array<string>;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<CouncilVotingModalAttrs>) {
     const candidates = vnode.attrs.candidates || [];
     // get currently set approvals
     const currentVote = (

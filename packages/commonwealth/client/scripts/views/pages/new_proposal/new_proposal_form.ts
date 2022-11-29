@@ -22,7 +22,13 @@ import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ITXModalData, ProposalModule, ThreadStage, ThreadKind } from 'models';
+import {
+  ITXModalData,
+  ProposalModule,
+  ThreadStage,
+  ThreadKind,
+  Topic,
+} from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { formatCoin } from 'adapters/currency';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
@@ -706,9 +712,9 @@ const NewProposalForm = {
           hasTopics &&
             m(TopicSelector, {
               topics: app.topics.getByCommunity(app.chain.id),
-              updateFormData: (topicName: string, topicId?: number) => {
-                vnode.state.form.topicName = topicName;
-                vnode.state.form.topicId = topicId;
+              updateFormData: (topic: Topic) => {
+                vnode.state.form.topicName = topic.name;
+                vnode.state.form.topicId = topic.id;
               },
               tabindex: 3,
             }),

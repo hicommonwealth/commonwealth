@@ -18,7 +18,7 @@ type EmptyListingPlaceholderAttrs = {
 export class EmptyListingPlaceholder
   implements m.ClassComponent<EmptyListingPlaceholderAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<EmptyListingPlaceholderAttrs>) {
     const { stageName, topicName, communityName } = vnode.attrs;
 
     if (isNotUndefined(stageName)) {
