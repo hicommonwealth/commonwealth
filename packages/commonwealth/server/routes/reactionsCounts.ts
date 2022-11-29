@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action } from 'common-common/src/permissions';
 import { DB } from '../models';
 import { ReactionInstance } from '../models/reaction';
 import { AppError, ServerError } from '../util/errors';
+import { checkReadPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -23,6 +25,12 @@ const reactionsCounts = async (
   res: Response,
   next: NextFunction
 ) => {
+  await checkReadPermitted(
+    models,
+    req.query.chain_id,
+    Action.VIEW_REACTIONS,
+    req.user?.id
+  );
   const { active_address, thread_ids, comment_ids, proposal_ids } = req.body;
   try {
     if (thread_ids || comment_ids || proposal_ids) {

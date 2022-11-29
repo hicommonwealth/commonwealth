@@ -18,11 +18,15 @@ import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
+import {
+  Action,
+  PermissionError,
+} from '../../../common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -50,6 +54,18 @@ const createReaction = async (
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
+
+  // Gatekeeper: check if user is permitted to react
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.CREATE_REACTION
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
+
   const { reaction, comment_id, proposal_id, thread_id } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
