@@ -97,7 +97,7 @@ export class UpdateProposalStatusModal
               snapshotProposalsToSet={this.snapshotProposalsToSet}
             />
           )}
-          {app.chain.chainEntities && (
+          {app.chainEntities && (
             <ChainEntitiesSelector
               thread={vnode.attrs.thread}
               onSelect={() => {
