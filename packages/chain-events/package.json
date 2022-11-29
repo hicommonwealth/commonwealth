@@ -39,8 +39,8 @@
     "create-migration": "npx sequelize migration:generate --name",
     "reset-db": "psql -d postgres -U commonwealth -c 'DROP DATABASE commonwealth_chain_events WITH (FORCE);' && npx sequelize db:create",
     "load-db": "psql -d commonwealth_chain_events -U commonwealth -W -f latest.dump",
-    "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a chain-events-staging) --verbose --no-privileges --no-owner -f latest.dump",
-    "migrate-events": "ts-node --project tsconfig.json scripts/migrateChainEntities.ts run-as-script"
+    "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a chain-events) --verbose --no-privileges --no-owner -f latest.dump",
+    "migrate-events": "NODE_OPTIONS='--max-old-space-size=460' ts-node --project tsconfig.json scripts/migrateChainEntities.ts run-as-script"
   },
   "engines": {
     "node": ">=14"
