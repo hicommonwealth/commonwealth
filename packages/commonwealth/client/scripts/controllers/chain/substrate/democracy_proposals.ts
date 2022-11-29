@@ -7,6 +7,7 @@ import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
+import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateDemocracyProposals extends ProposalModule<
   ApiPromise,
@@ -56,7 +57,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyProposal);
+    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyProposal);
     entities.forEach((e) => this._entityConstructor(e));
 
     // save parameters
@@ -65,18 +66,32 @@ class SubstrateDemocracyProposals extends ProposalModule<
     this._cooloffPeriod = +(ChainInfo.api.consts.democracy.cooloffPeriod as BlockNumber);
 
     // register new chain-event handlers
-    this.app.chainEntities.registerEntityHandler(
+    this.app.chain.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.DemocracyProposal, (entity, event) => {
         this.updateProposal(entity, event);
       }
     );
-    this.app.chainEntities.registerEntityHandler(
+    this.app.chain.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
         if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
           const proposal = this.getByHash(entity.typeId);
           if (proposal) proposal.update(event);
         }
       }
+    );
+
+    // fetch proposals from chain
+    const events = await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta),
+      () => this._Chain.fetcher.fetchDemocracyProposals(this.app.chain.block.height)
+    );
+
+    const hashes = events.map((e) => e.data.proposalHash);
+    await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta),
+      () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
     );
 
     const lastTabledWasExternal = await ChainInfo.api.query.democracy.lastTabledWasExternal();

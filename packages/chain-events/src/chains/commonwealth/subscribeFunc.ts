@@ -33,7 +33,7 @@ export async function createApi(
   const log = factory.getLogger(
     addPrefix(__filename, [SupportedNetwork.Commonwealth, chain])
   );
-  const api: Api = { factory: null, projects: [], provider: null };
+  const api: Api = { factory: null, projects: [] };
   for (let i = 0; i < 3; ++i) {
     try {
       const provider = await createProvider(
@@ -41,7 +41,6 @@ export async function createApi(
         SupportedNetwork.Commonwealth,
         chain
       );
-      api.provider = provider;
 
       api.factory = IProjectBaseFactoryFactory.connect(
         factoryAddress,

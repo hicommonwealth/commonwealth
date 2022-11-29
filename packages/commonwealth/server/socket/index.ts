@@ -1,29 +1,21 @@
 // Use https://admin.socket.io/#/ to monitor
 
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
-import { Server, Socket } from 'socket.io';
-import * as jwt from 'jsonwebtoken';
-import { ExtendedError } from 'socket.io/dist/namespace';
-import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
-import {
-  ConnectionTimeoutError,
-  createClient,
-  ReconnectStrategyError, SocketClosedUnexpectedlyError
-} from "redis";
-import Rollbar from 'rollbar';
-import { RabbitMQController, RascalSubscriptions } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { getRabbitMQConfig, RabbitMQController, RascalSubscriptions } from 'common-common/src/rabbitmq';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
-import { createCeNamespace, publishToCERoom } from './chainEventsNs';
-import {
-  JWT_SECRET,
-  REDIS_URL,
-  VULTR_IP
-} from '../config';
-import { createChatNamespace } from './chatNs';
+import * as http from 'http';
+import * as jwt from 'jsonwebtoken';
+import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
+import Rollbar from 'rollbar';
+import { Server, Socket } from 'socket.io';
+import { ExtendedError } from 'socket.io/dist/namespace';
+import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
 import { DB } from '../models';
-import StatsDController from "common-common/src/statsd";
+import StatsDController from '../util/statsd';
+import { createCeNamespace, publishToCERoom } from './chainEventsNs';
+import { createChatNamespace } from './chatNs';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -52,8 +44,7 @@ export const authenticate = (
 export async function setupWebSocketServer(
   httpServer: http.Server,
   rollbar: Rollbar,
-  models: DB,
-  rabbitMQController: RabbitMQController
+  models: DB
 ) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
@@ -202,7 +193,12 @@ export async function setupWebSocketServer(
   const chatNamespace = createChatNamespace(io, models, redisCache);
 
   try {
-    await rabbitMQController.startSubscription(
+    const rabbitController = new RabbitMQController(
+      getRabbitMQConfig(RABBITMQ_URI)
+    );
+
+    await rabbitController.init();
+    await rabbitController.startSubscription(
       publishToCERoom,
       RascalSubscriptions.ChainEventNotifications,
       {server: ceNamespace}

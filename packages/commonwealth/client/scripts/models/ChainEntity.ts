@@ -4,21 +4,16 @@ import { IChainEntityKind } from 'chain-events/src';
 import ChainEvent from './ChainEvent';
 
 class ChainEntity {
+  public readonly id?: number;
   public readonly chain: string;
   public readonly type: IChainEntityKind;
   public readonly typeId: string;
+  public readonly title?: string;
   public readonly author: string;
 
+  public readonly threadId?: number;
   public readonly threadTitle?: string;
   public readonly createdAt?: moment.Moment;
-
-  // This id is the chain-events service chain-entity id -> equivalent to ce_id in ChainEntityMeta in main service
-  // This id is only available when the chain-entity is loaded from the server and NOT from the chain
-  public readonly id?: number;
-
-  // these values cannot be readonly because they are updated when the chain-entity metadata is added to the instance
-  public title?: string;
-  public threadId?: number;
 
   private _updatedAt?: moment.Moment;
   public get updatedAt() { return this._updatedAt; }

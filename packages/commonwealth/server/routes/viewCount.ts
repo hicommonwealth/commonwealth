@@ -3,7 +3,7 @@ import ViewCountCache from '../util/viewCountCache';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 import { sequelize } from '../database';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

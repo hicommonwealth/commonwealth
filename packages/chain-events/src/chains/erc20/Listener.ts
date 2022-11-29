@@ -88,7 +88,6 @@ export class Listener extends BaseListener<
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
-      throw error;
     }
   }
 
@@ -131,22 +130,5 @@ export class Listener extends BaseListener<
 
   public get options(): Erc20ListenerOptions {
     return this._options;
-  }
-
-  public async getLatestBlockNumber(): Promise<number> {
-    return this._api.provider.getBlockNumber();
-  }
-
-  public async isConnected(): Promise<boolean> {
-    // force type to any because the Ethers Provider interface does not include the original
-    // Web3 provider, yet it exists under provider.provider
-    const provider = <any>this._api.provider;
-
-    // WebSocket ReadyState - more info: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
-    const readyState = provider.provider.connection._readyState === 1;
-    const socketConnected = provider.provider.connected;
-    const polling = provider.polling;
-
-    return readyState && socketConnected && polling;
   }
 }

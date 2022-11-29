@@ -2,7 +2,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import { DB } from '../models';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
 
 const log = factory.getLogger(formatFilename(__filename));

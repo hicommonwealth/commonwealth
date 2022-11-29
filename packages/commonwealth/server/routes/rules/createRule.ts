@@ -1,6 +1,6 @@
 import validateChain from '../../util/validateChain';
 import { DB } from '../../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../../types';
 import { RuleAttributes } from '../../models/rule';
 

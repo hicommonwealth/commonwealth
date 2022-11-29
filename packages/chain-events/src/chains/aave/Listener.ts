@@ -98,7 +98,6 @@ export class Listener extends BaseListener<
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error: ${error.message}`);
-      throw error;
     }
   }
 
@@ -107,41 +106,47 @@ export class Listener extends BaseListener<
   }
 
   private async processMissedBlocks(): Promise<void> {
-    const offlineRange = await this.processOfflineRange(this.log);
-    if (!offlineRange) return;
+    this.log.info(`Detected offline time, polling missed blocks...`);
 
-    this.log.info(`Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
+    if (!this.discoverReconnectRange) {
+      this.log.info(
+        `Unable to determine offline range - No discoverReconnectRange function given`
+      );
+    }
+
+    let offlineRange: IDisconnectedRange;
     try {
-      const maxBlocksPerPoll = 250;
-      let startBlock = offlineRange.startBlock;
-      let endBlock;
-
-      if (startBlock + maxBlocksPerPoll < offlineRange.endBlock) endBlock = startBlock + maxBlocksPerPoll;
-      else endBlock = offlineRange.endBlock;
-
-      while (endBlock <= offlineRange.endBlock) {
-        const cwEvents = await this.storageFetcher.fetch({startBlock, endBlock});
-        for (const event of cwEvents) {
-          await this.handleEvent(event);
-        }
-
-        // stop loop when we have fetched all blocks
-        if (endBlock === offlineRange.endBlock) break;
-
-        startBlock = endBlock + 1;
-        if (endBlock + maxBlocksPerPoll <= offlineRange.endBlock) endBlock += maxBlocksPerPoll;
-        else endBlock = offlineRange.endBlock;
+      offlineRange = await this.discoverReconnectRange(this._chain);
+      if (!offlineRange) {
+        this.log.warn(`No offline range found, skipping event catchup.`);
+        return;
       }
     } catch (error) {
-      this.log.error(`Unable to fetch events from storage`, error);
+      this.log.error(
+        `Could not discover offline range: ${error.message}. Skipping event catchup.`
+      );
+      return;
     }
-    this.log.info(`Successfully processed block ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
+
+    if (!offlineRange || !offlineRange.startBlock) {
+      this.log.warn(`Unable to determine offline time range.`);
+      return;
+    }
+
+    try {
+      const cwEvents = await this.storageFetcher.fetch(offlineRange);
+      for (const event of cwEvents) {
+        await this.handleEvent(event);
+      }
+    } catch (error) {
+      this.log.error(`Unable to fetch events from storage: ${error.message}`);
+    }
   }
 
   protected async processBlock(event: RawEvent): Promise<void> {
     const { blockNumber } = event;
-    if (!this._lastCachedBlockNumber || blockNumber > this._lastCachedBlockNumber) {
-      this._lastCachedBlockNumber = blockNumber;
+    if (!this._lastBlockNumber || blockNumber > this._lastBlockNumber) {
+      this._lastBlockNumber = blockNumber;
     }
 
     const cwEvents: CWEvent[] = await this._processor.process(event);
@@ -153,22 +158,5 @@ export class Listener extends BaseListener<
 
   public get options(): AaveListenerOptions {
     return this._options;
-  }
-
-  public async getLatestBlockNumber(): Promise<number> {
-    return this._api.governance.provider.getBlockNumber();
-  }
-
-  public async isConnected(): Promise<boolean> {
-    // force type to any because the Ethers Provider interface does not include the original
-    // Web3 provider, yet it exists under provider.provider
-    const provider = <any>this._api.governance.provider;
-
-    // WebSocket ReadyState - more info: https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/readyState
-    const readyState = provider.provider.connection._readyState === 1;
-    const socketConnected = provider.provider.connected;
-    const polling = provider.polling;
-
-    return readyState && socketConnected && polling;
   }
 }

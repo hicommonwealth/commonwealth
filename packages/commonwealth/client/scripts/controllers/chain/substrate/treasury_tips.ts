@@ -37,14 +37,21 @@ class SubstrateTreasuryTips extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chainEntities.store.getByType(SubstrateTypes.EntityKind.TipProposal);
+    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TipProposal);
     entities.forEach((e) => this._entityConstructor(e));
 
     // register new chain-event handlers
-    this.app.chainEntities.registerEntityHandler(
+    this.app.chain.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.TipProposal, (entity, event) => {
         this.updateProposal(entity, event);
       }
+    );
+
+    // fetch proposals from chain
+    await this.app.chain.chainEntities.fetchEntities(
+      this.app.chain.id,
+      chainToEventNetwork(this.app.chain.meta),
+      () => this._Chain.fetcher.fetchTips(this.app.chain.block.height)
     );
 
     // TODO: ensure council members === tippers for all chains

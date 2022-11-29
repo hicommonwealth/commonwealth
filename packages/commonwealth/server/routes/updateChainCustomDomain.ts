@@ -1,6 +1,6 @@
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import { validURL } from '../../shared/utils';
 
 enum UpdateCustomDomainErrors {

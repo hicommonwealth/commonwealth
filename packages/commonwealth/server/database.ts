@@ -1,4 +1,4 @@
-import { Sequelize, DataTypes } from 'sequelize';
+import { DataTypes, Sequelize } from 'sequelize';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DATABASE_URI } from './config';
@@ -10,7 +10,8 @@ import BanFactory from './models/ban';
 import ChainFactory from './models/chain';
 import ChainCategoryFactory from './models/chain_category';
 import ChainCategoryTypeFactory from './models/chain_category_type';
-import ChainEntityMetaFactory from './models/chain_entity_meta';
+import ChainEntityFactory from './models/chain_entity';
+import ChainEventFactory from './models/chain_event';
 import ChainEventTypeFactory from './models/chain_event_type';
 import ChainNodeFactory from './models/chain_node';
 import ChatChannelFactory from './models/chat_channel';
@@ -87,10 +88,11 @@ const models: Models = {
   Chain: ChainFactory(sequelize, DataTypes),
   ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
+  ChainEntity: ChainEntityFactory(sequelize, DataTypes),
+  ChainEvent: ChainEventFactory(sequelize, DataTypes),
+  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
-  ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),

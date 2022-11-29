@@ -10,16 +10,6 @@ import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CommonwealthTypes from './chains/commonwealth/types';
 import * as CosmosTypes from './chains/cosmos/types';
-import { ApiPromise as SubstrateApi } from '@polkadot/api';
-import { Api as MolochApi } from './chains/moloch/types';
-import { IErc721Contracts as ERC721Api } from "./chains/erc721/types";
-import { IErc20Contracts as ERC20Api } from "./chains/erc20/types";
-import { Api as CompoundApi } from './chains/compound/types';
-import { Api as CommonwealthApi } from './chains/commonwealth/types';
-import { Api as AaveApi } from './chains/aave/types';
-import { StorageFetcher } from "./chains/aave";
-import { Listener } from "./Listener";
-import {ChainEventInstance} from "../services/database/models/chain_event";
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -47,16 +37,6 @@ export type IChainEventKind =
   | Erc721Types.EventKind
   | CommonwealthTypes.EventKind
   | CosmosTypes.EventKind;
-export type IAPIs =
-  | SubstrateApi
-  | MolochApi
-  | ERC721Api
-  | ERC20Api
-  | CompoundApi
-  | CommonwealthApi
-  | AaveApi;
-export type IAnyListener = Listener<IAPIs, IStorageFetcher<IAPIs>, IEventProcessor<IAPIs, any>, IEventSubscriber<IAPIs, any>, IChainEventKind>
-
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
   ...MolochTypes.EventKinds,
@@ -100,9 +80,7 @@ export interface CWEvent<IEventData = IChainEventData> {
 }
 
 // handles individual events by sending them off to storage/notifying
-export abstract class IEventHandler<DBEventType = IChainEventData | ChainEventInstance> {
-  name?: any;
-
+export abstract class IEventHandler<DBEventType = IChainEventData> {
   // throws on error, returns a db event, or void
   public abstract handle(
     event: CWEvent,
@@ -204,15 +182,9 @@ export interface IEventTitle {
 
 export type TitlerFilter = (kind: IChainEventKind) => IEventTitle;
 
-/**
- * Returns the key of the value that is unique to the entities chain and type i.e. the key whose associated value
- * becomes the type_id of the chain-entity. The combination of chain, type, and type_id must/will always be unique.
- * @param network An instance of a network for which chain-events supports chain-events and chain-entities
- * @param entityKind The entity's creation event kind used to determine type_id for substrate network
- */
-export function getUniqueEntityKey(
+export function entityToFieldName(
   network: SupportedNetwork,
-  entityKind: IChainEntityKind
+  entity: IChainEntityKind
 ): string | null {
   if (network === SupportedNetwork.Compound) {
     return 'id';
@@ -229,7 +201,7 @@ export function getUniqueEntityKey(
   if (network === SupportedNetwork.Cosmos) {
     return 'id';
   }
-  switch (entityKind) {
+  switch (entity) {
     case SubstrateTypes.EntityKind.DemocracyProposal: {
       return 'proposalIndex';
     }
@@ -246,7 +218,7 @@ export function getUniqueEntityKey(
       return 'bountyIndex';
     }
     case SubstrateTypes.EntityKind.CollectiveProposal: {
-      return 'proposalIndex';
+      return 'proposalHash';
     }
     case SubstrateTypes.EntityKind.SignalingProposal: {
       return 'proposalHash';

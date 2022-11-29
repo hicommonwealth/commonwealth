@@ -9,7 +9,6 @@ import { ReactionCountsStore } from 'stores';
 import ReactionCount from 'models/ReactionCount';
 import { AnyProposal, Comment, Thread, Proposal } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 export const modelFromServer = (reactionCount) => {
   const { id, thread_id, comment_id, proposal_id, has_reacted, like } =
@@ -25,7 +24,7 @@ export const modelFromServer = (reactionCount) => {
   );
 };
 
-// TODO: Graham 4/24/22: File + class needs to be named ReactionCounts (plural) following convention
+// TODO Graham 4/24/22: File + class needs to be named ReactionCounts (plural) following convention
 class ReactionCountController {
   private _store: ReactionCountsStore = new ReactionCountsStore();
   public get store() {
@@ -51,8 +50,6 @@ class ReactionCountController {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
       }`;
-      const chainEntity = proposalIdToEntity(app, app.activeChainId(), options['proposal_id']);
-      options['chain_entity_id'] = chainEntity?.id
     } else if (post instanceof Comment) {
       options['comment_id'] = (post as Comment<any>).id;
     }
