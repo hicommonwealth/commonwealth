@@ -5,7 +5,7 @@ import {
   IEventHandler,
   CWEvent,
   eventToEntity,
-  entityToFieldName,
+  getUniqueEntityKey,
   IChainEventData,
   EntityEventKind,
 } from 'chain-events/src';
@@ -84,7 +84,7 @@ export default class extends IEventHandler<ChainEventInstance> {
     const entity = eventToEntity(event.network, event.data.kind);
     if (!entity) return null;
     const [entityKind, eventType] = entity;
-    const fieldName = entityToFieldName(event.network, entityKind);
+    const fieldName = getUniqueEntityKey(event.network, entityKind);
     if (!fieldName) return null;
     const fieldValue = event.data[fieldName];
     return createOrUpdateModel(fieldName, fieldValue, eventType);
