@@ -86,7 +86,8 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainInstance.base === ChainBase.Substrate) {
-      const nodeUrl = constructSubstrateUrl(node.url);
+      const nodeUrl = constructSubstrateUrl(node.private_url || node.url);
+      console.log(chainInstance.substrate_spec)
       const api = await SubstrateEvents.createApi(
         nodeUrl,
         chainInstance.substrate_spec
@@ -188,4 +189,3 @@ export async function runEntityMigrations(chainId?: string) {
 if (process.argv[2] === 'run-as-script') {
   runEntityMigrations(process.argv[3]);
 }
-

@@ -1,10 +1,10 @@
 /* eslint-disable no-restricted-syntax */
-import $ from "jquery";
+import $ from 'jquery';
 
-import {ChainEntityStore} from "stores";
-import {ChainBase, ChainNetwork} from "common-common/src/types";
-import {ChainEntity, ChainEvent, ChainEventType, ChainInfo} from "models";
-import app from "state";
+import {ChainEntityStore} from 'stores';
+import {ChainBase, ChainNetwork} from 'common-common/src/types';
+import {ChainEntity, ChainEvent, ChainEventType, ChainInfo} from 'models';
+import app from 'state';
 import {
   CWEvent,
   eventToEntity,
@@ -14,9 +14,9 @@ import {
   SupportedNetwork,
   getUniqueEntityKey,
   IChainEntityKind
-} from "chain-events/src";
-import {notifyError} from "../app/notifications";
-import {getBaseUrl, getFetch, ServiceUrls} from "helpers/getUrl";
+} from 'chain-events/src';
+import {notifyError} from '../app/notifications';
+import {getBaseUrl, getFetch, ServiceUrls} from 'helpers/getUrl';
 
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
