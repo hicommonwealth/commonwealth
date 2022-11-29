@@ -31,6 +31,7 @@ import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import CWCoverImageUploader from './cw_cover_image_uploader';
+import { CWContentPageCard } from './cw_content_page';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, v]) => {
@@ -68,6 +69,17 @@ export class ComponentShowcase implements m.ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <div class="basic-gallery">
+          <CWText type="h4">Content Page Card</CWText>
+          <CWContentPageCard
+            header="Information"
+            content={
+              <div style="padding: 8px;">
+                <CWText>Content page card content</CWText>
+              </div>
+            }
+          />
+        </div>
         <h1>Dropdown</h1>
         <div class="form-gallery">
           <CWDropdown

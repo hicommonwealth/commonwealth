@@ -69,6 +69,10 @@ export class LinkedThreadsCard
 
     if (allowLinking || thread.linkedThreads.length) {
       return (
+        //         <CWContentPageCard
+        //         header={headerText}
+        //         content={}
+        // />
         <div class="LinkedThreadsCard">
           <CWText type="h5">
             {thread.linkedThreads.length === 0

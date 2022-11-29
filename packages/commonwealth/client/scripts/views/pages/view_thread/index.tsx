@@ -645,10 +645,12 @@ class ViewThreadPage
                             ) => {
                               thread.stage = stage;
                               thread.chainEntities = chainEntities;
+
                               if (app.chain?.meta.snapshot.length) {
                                 thread.snapshotProposal =
                                   snapshotProposal[0]?.id;
                               }
+
                               app.threads.fetchThreadsFromId([
                                 thread.identifier,
                               ]);

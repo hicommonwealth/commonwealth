@@ -15,6 +15,7 @@ import { CWIconButton } from './cw_icon_button';
 import { isWindowMediumSmallInclusive } from './helpers';
 import { CWIcon } from './cw_icons/cw_icon';
 import { SharePopover } from '../share_popover';
+import { CWCard } from './cw_card';
 
 type SidebarItem = {
   label: string;
@@ -185,6 +186,30 @@ export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
           </div>
         )}
       </div>
+    );
+  }
+}
+
+type ContentPageCardAttrs = {
+  content: m.Vnode;
+  header: string;
+};
+
+export class CWContentPageCard
+  implements m.ClassComponent<ContentPageCardAttrs>
+{
+  view(vnode: m.Vnode<ContentPageCardAttrs>) {
+    const { content, header } = vnode.attrs;
+
+    return (
+      <CWCard className="ContentPageCard">
+        <div class="header-container">
+          <CWText type="h5" fontWeight="semiBold">
+            {header}
+          </CWText>
+        </div>
+        {content}
+      </CWCard>
     );
   }
 }
