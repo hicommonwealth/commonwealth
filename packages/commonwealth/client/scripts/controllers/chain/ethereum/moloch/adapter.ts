@@ -27,7 +27,7 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
     this.chain = new MolochChain(this.app);
     this.ethAccounts = new EthereumAccounts(this.app);
     this.accounts = new MolochMembers(this.app, this.chain, this.ethAccounts);
-    this.governance = new MolochGovernance(this.app);
+    this.governance = new MolochGovernance(this.app, !this.usingServerChainEntities);
   }
 
   public async initApi() {

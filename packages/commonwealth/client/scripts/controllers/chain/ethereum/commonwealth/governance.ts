@@ -1,7 +1,11 @@
-import { ProposalModule, ITXModalData } from 'models';
+import BN from 'bn.js';
+import EthDater from 'ethereum-block-by-date';
+
+import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models';
 
 import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 // import { ICommonwealthProposalResponse } from 'adapters/chain/moloch/types';
+import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 // import { CommonwealthEvents } from 'chain-events/src';
 
@@ -50,9 +54,10 @@ export default class CommonwealthGovernance extends ProposalModule<
   // }
 
   public get api() { return this._api; }
+  public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
   // INIT / DEINIT
-  constructor(app: IApp) {
+  constructor(app: IApp, private _usingServerChainEntities = false) {
     super(app, (e) => {
       return null;
       // return new CommonwealthProposal(this._Members, this, e);
@@ -76,7 +81,7 @@ export default class CommonwealthGovernance extends ProposalModule<
     // TODO: fetch all proposals
     // if (this._usingServerChainEntities) {
     //   console.log('Fetching moloch proposals from backend.');
-    //   await this.app.chain.chainEntities.refresh(this.app.chain.id);
+    //   await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
     //   const entities = this.app.chain.chainEntities.store.getByType(CommonwealthEvents.Types.EntityKind.Proposal);
     //   entities.map((p) => this._entityConstructor(p));
     // } else {

@@ -23,7 +23,7 @@ import { constructSubstrateUrl } from '../../shared/substrate';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const CHAIN_ID = process.env.CHAIN_ID;
+const ENTITY_MIGRATION = process.env.ENTITY_MIGRATION;
 
 export async function migrateChainEntity(chain: string): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
@@ -55,7 +55,6 @@ export async function migrateChainEntity(chain: string): Promise<void> {
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainInstance.base === ChainBase.Substrate) {
       const nodeUrl = constructSubstrateUrl(node.private_url || node.url);
-      console.log(chainInstance.substrate_spec)
       const api = await SubstrateEvents.createApi(
         nodeUrl,
         chainInstance.substrate_spec
@@ -129,8 +128,9 @@ export async function runMigrations() {
   // the specific chain to migrate
   log.info('Started migrating chain entities into the DB');
   try {
-    if (CHAIN_ID) await migrateChainEntity(CHAIN_ID)
-    else await migrateChainEntities()
+    await (ENTITY_MIGRATION === 'all'
+      ? migrateChainEntities()
+      : migrateChainEntity(ENTITY_MIGRATION));
     log.info('Finished migrating chain entities into the DB');
     process.exit(0);
   } catch (e) {
