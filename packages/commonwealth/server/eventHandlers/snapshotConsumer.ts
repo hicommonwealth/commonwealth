@@ -100,6 +100,7 @@ async function processSnapshotMessage(msg: SnapshotNotification) {
 
 function createSnapshotSubscription(): RabbitMQSubscription {
   return {
+    // @ts-ignore
     messageProcessor: processSnapshotMessage,
     subscriptionName: RascalSubscriptions.SnapshotListener,
   };

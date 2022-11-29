@@ -43,7 +43,7 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
 
   /**
    * This function combines the isValidMsgFormat and getInvalidFormatError functions. Essentially this function will
-   * check the given data format and throw the RmqMsgFormatError if the format is invalid.
+  * check the given data format and throw the RmqMsgFormatError if the format is invalid.
    * @param data The raw message from RabbitMQ
    */
   checkMsgFormat(data: any): void {

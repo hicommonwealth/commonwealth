@@ -33,14 +33,14 @@ export interface ChainEventNotification {
 }
 
 export interface SnapshotNotification {
-  id: string;
+  id?: string;
   title?: string;
   body?: string;
   choices?: string[];
   space?: string;
   event?: string;
   start?: string;
-  expire: string;
+  expire?: string;
 }
 
 export interface INotification {
