@@ -48,7 +48,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryBounty);
+    const entities = this.app.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryBounty);
     entities.forEach((e) => this._entityConstructor(e));
 
     // save parameters
@@ -62,7 +62,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     // const TREASURY_ACCOUNT = u8aToHex(stringToU8a('modlpy/trsry'.padEnd(32, '\0')));
 
     // register new chain-event handlers
-    this.app.chain.chainEntities.registerEntityHandler(
+    this.app.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.TreasuryBounty, (entity, event) => {
         this.updateProposal(entity, event);
       }

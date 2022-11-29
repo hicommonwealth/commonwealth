@@ -91,9 +91,11 @@ export const modelFromServer = (thread) => {
   let chainEntitiesProcessed: ChainEntity[] = [];
   if (chain_entity_meta) {
     for (const meta of chain_entity_meta) {
-      const full_entity = app.chain.chainEntities.store.getById(meta.ce_id);
+      const full_entity = app.chainEntities.store.getById(meta.ce_id);
       if (meta.title) full_entity.title = meta.title;
-      if (full_entity) chainEntitiesProcessed.push(full_entity);
+      if (full_entity) {
+        chainEntitiesProcessed.push(full_entity);
+      }
     }
   }
 
@@ -580,7 +582,7 @@ class ThreadsController {
     };
     const [response,] = await Promise.all([
       $.get(`${app.serverUrl()}/getThreads`, params),
-      app.chain.chainEntities.refreshRawEntities(app.activeChainId())
+      app.chainEntities.refreshRawEntities(app.activeChainId())
     ])
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
@@ -654,7 +656,7 @@ class ThreadsController {
     // fetch threads and refresh entities so we can join them together
     const [response,] = await Promise.all([
       $.get(`${app.serverUrl()}/bulkThreads`, params),
-      app.chain.chainEntities.refreshRawEntities(chain)
+      app.chainEntities.refreshRawEntities(chain)
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);

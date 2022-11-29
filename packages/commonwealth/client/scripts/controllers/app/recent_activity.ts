@@ -71,7 +71,7 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentTopicActivity(entityController: ChainEntityController, id?: string): Promise<Thread[]> {
+  public async getRecentTopicActivity(id?: string): Promise<Thread[]> {
     const params = {
       chain: id || app.activeChainId(),
       threads_per_topic: 3,
@@ -79,7 +79,7 @@ class RecentActivityController {
 
     const [response,] = await Promise.all([
       $.get(`${app.serverUrl()}/activeThreads`, params),
-      entityController.refreshRawEntities(params.chain)
+      app.chainEntities.refresh(params.chain)
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);

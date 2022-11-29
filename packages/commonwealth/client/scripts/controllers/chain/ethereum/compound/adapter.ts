@@ -19,7 +19,6 @@ export default class Compound extends IChainAdapter<EthereumCoin, EthereumAccoun
   public chain: CompoundChain;
   public accounts: EthereumAccounts;
   public governance: CompoundGovernance;
-  public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
