@@ -26,10 +26,10 @@
   flex-direction: column;
   gap: 16px;
   height: fit-content;
-  padding: 24px;
+  padding: 16px;
   width: 248px;
 
-  @include extraSmall {
+  @include mediumSmallInclusive {
     width: 100%;
   }
 

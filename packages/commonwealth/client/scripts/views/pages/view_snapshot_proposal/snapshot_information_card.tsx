@@ -13,7 +13,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWCard } from '../../components/component_kit/cw_card';
 import User from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
+import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
 
 type SnapshotInfoRowAttrs = {
   label: string;
@@ -21,7 +21,7 @@ type SnapshotInfoRowAttrs = {
 };
 
 class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotInfoRowAttrs>) {
     const { label, value } = vnode.attrs;
 
     return (
@@ -35,10 +35,12 @@ class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
   }
 }
 
+type SnapshotInfoLinkRowAttrs = SnapshotInfoRowAttrs & { url: string };
+
 class SnapshotInfoLinkRow
-  implements m.ClassComponent<SnapshotInfoRowAttrs & { url: string }>
+  implements m.ClassComponent<SnapshotInfoLinkRowAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotInfoLinkRowAttrs>) {
     const { label, url, value } = vnode.attrs;
 
     return (
@@ -65,7 +67,7 @@ type SnapshotInformationCardAttrs = {
 export class SnapshotInformationCard
   implements m.ClassComponent<SnapshotInformationCardAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;
 
     const votingSystem = capitalize(
@@ -127,7 +129,7 @@ export class SnapshotInformationCard
               Linked Discussions
             </CWText>
             {threads.map((thread) => (
-              <ProposalHeaderSnapshotThreadLink thread={thread} />
+              <SnapshotThreadLink thread={thread} />
             ))}
           </div>
         )}

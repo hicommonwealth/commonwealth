@@ -1,5 +1,5 @@
 import { Response, NextFunction, Request } from 'express';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {

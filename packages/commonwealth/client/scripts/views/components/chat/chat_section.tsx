@@ -2,11 +2,10 @@
 
 import m from 'mithril';
 import _ from 'lodash';
-import { Icon, Icons, Menu, MenuItem, Spinner, Overlay } from 'construct-ui';
+import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
 import 'components/sidebar/index.scss';
 
-import { navigateToSubpage } from 'app';
 import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
@@ -27,6 +26,7 @@ import {
   SidebarSectionAttrs,
 } from '../sidebar/types';
 import { verifyCachedToggleTree } from '../sidebar/helpers';
+import { CWSpinner } from '../component_kit/cw_spinner';
 
 enum Errors {
   None = '',
@@ -69,7 +69,7 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
   chain: string;
   activeChannel: number;
 
-  async oninit(vnode) {
+  async oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
     this.loaded = false;
     this.chain = app.activeChainId();
     this.activeChannel = null;
@@ -137,9 +137,12 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
     };
   }
 
-  onbeforeupdate(vnode, old) {
+  onbeforeupdate(
+    vnode: m.Vnode<SidebarSectionAttrs>,
+    old: m.VnodeDOM<SidebarSectionAttrs, this>
+  ) {
     if (
-      !_.isEqual(Object.values(app.socket.chatNs.channels), old.attrs.channels)
+      !_.isEqual(Object.values(app.socket.chatNs.channels), old.state.channels)
     ) {
       Object.values(app.socket.chatNs.channels).forEach((c) => {
         const { ChatMessages, ...metadata } = c;
@@ -147,6 +150,7 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
           ? this.channels[metadata.category].push(metadata)
           : (this.channels[metadata.category] = [metadata]);
       });
+
       this.menuToggleTree = {
         toggledState: false,
         children: this.categoryToToggleTree(Object.keys(this.channels), false),
@@ -163,9 +167,9 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
     }
   }
 
-  view(vnode) {
+  view() {
     if (!app.socket) return;
-    if (!this.loaded) return <Spinner />;
+    if (!this.loaded) return <CWSpinner />;
     this.activeChannel = m.route.param()['channel'];
     app.socket.chatNs.activeChannel = String(this.activeChannel);
 
@@ -193,21 +197,19 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
         chatDefaultToggleTree
       );
     }
-    const toggleTreeState = vnode.attrs.mobile
-      ? chatDefaultToggleTree
-      : JSON.parse(localStorage[`${app.activeChainId()}-chat-toggle-tree`]);
+    const toggleTreeState = JSON.parse(
+      localStorage[`${app.activeChainId()}-chat-toggle-tree`]
+    );
 
     // ---------- Build Section Props ---------- //
 
-    const sectionAdminButton: m.Vnode = (
-      <Icon
-        name={Icons.PLUS_CIRCLE}
-        onclick={(e) => {
-          e.stopPropagation();
-          this.adminModals['CreateCategory'] = true;
-        }}
-      />
-    );
+    const sectionAdminButton: m.Vnode = m(Icon, {
+      name: Icons.PLUS_CIRCLE,
+      onclick: (e) => {
+        e.stopPropagation();
+        this.adminModals['CreateCategory'] = true;
+      },
+    });
 
     const categoryAdminButton = (category: string): m.Vnode => {
       const handleMouseout = () => {
@@ -232,43 +234,45 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
         handleMouseout();
       };
 
-      const menuComponent = (
-        <Menu
-          class="admin-menu"
-          onmouseenter={handleMouseover}
-          onmouseleave={handleMouseout}
-        >
-          <MenuItem
-            iconLeft={Icons.PLUS_CIRCLE}
-            label="Add Channel"
-            onclick={(e) => {
+      const menuComponent = m(
+        Menu,
+        {
+          class: 'admin-menu',
+          onmouseenter: handleMouseover,
+          onmouseleave: handleMouseout,
+        },
+        [
+          m(MenuItem, {
+            iconLeft: Icons.PLUS_CIRCLE,
+            label: 'Add Channel',
+            onclick: (e) => {
               handleMenuClick(e, 'CreateChannel');
-            }}
-          />
-          <MenuItem
-            iconLeft={Icons.EDIT_2}
-            label="Rename Category"
-            onclick={(e) => {
+            },
+          }),
+          m(MenuItem, {
+            iconLeft: Icons.EDIT_2,
+            label: 'Rename Category',
+            onclick: (e) => {
               handleMenuClick(e, 'RenameCategory');
-            }}
-          />
-          <MenuItem
-            iconLeft={Icons.DELETE}
-            label="Delete Category"
-            onclick={(e) => {
+            },
+          }),
+          m(MenuItem, {
+            iconLeft: Icons.DELETE,
+            label: 'Delete Category',
+            onclick: (e) => {
               handleMenuClick(e, 'DeleteCategory');
-            }}
-          />
-        </Menu>
+            },
+          }),
+        ]
       );
 
       return (
         <>
-          <Icon
-            name={Icons.EDIT}
-            onmouseenter={handleMouseover}
-            onmouseleave={handleMouseout}
-          />
+          {m(Icon, {
+            name: Icons.EDIT,
+            onmouseenter: handleMouseover,
+            onmouseleave: handleMouseout,
+          })}
           {this.menuToggleTree['children'][category]['toggledState'] &&
             menuComponent}
         </>
@@ -310,27 +314,29 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
         handleMouseout();
       };
 
-      const menuComponent = (
-        <Menu
-          class="admin-menu"
-          onmouseenter={handleMouseover}
-          onmouseleave={handleMouseout}
-        >
-          <MenuItem
-            iconLeft={Icons.EDIT_2}
-            label="Rename Channel"
-            onclick={(e) => {
+      const menuComponent = m(
+        Menu,
+        {
+          class: 'admin-menu',
+          onmouseenter: handleMouseover,
+          onmouseleave: handleMouseout,
+        },
+        [
+          m(MenuItem, {
+            iconLeft: Icons.EDIT_2,
+            label: 'Rename Channel',
+            onclick: (e) => {
               handleMenuClick(e, 'RenameChannel');
-            }}
-          />
-          <MenuItem
-            iconLeft={Icons.DELETE}
-            label="Delete Channel"
-            onclick={(e) => {
+            },
+          }),
+          m(MenuItem, {
+            iconLeft: Icons.DELETE,
+            label: 'Delete Channel',
+            onclick: (e) => {
               handleMenuClick(e, 'DeleteChannel');
-            }}
-          />
-        </Menu>
+            },
+          }),
+        ]
       );
 
       return (
@@ -338,11 +344,11 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
           {channel.unread > 0 && (
             <div class="unread-icon">{channel.unread}</div>
           )}
-          <Icon
-            name={Icons.EDIT}
-            onmouseenter={handleMouseover}
-            onmouseleave={handleMouseout}
-          />
+          {m(Icon, {
+            name: Icons.EDIT,
+            onmouseenter: handleMouseover,
+            onmouseleave: handleMouseout,
+          })}
           {this.menuToggleTree['children'][channel.category]['children'][
             channel.name
           ]['toggledState'] && menuComponent}
@@ -433,15 +439,13 @@ export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
       displayData: channelData,
       isActive: false,
       rightIcon: isAdmin && sectionAdminButton,
-      extraComponents: (
-        <Overlay
-          class="chatAdminOverlay"
-          isOpen={Object.values(this.adminModals).some(Boolean)}
-          onClose={closeOverlay}
-          closeOnOutsideClick={true}
-          content={overlayContent}
-        />
-      ),
+      extraComponents: m(Overlay, {
+        class: 'chatAdminOverlay',
+        isOpen: Object.values(this.adminModals).some(Boolean),
+        onClose: closeOverlay,
+        closeOnOutsideClick: true,
+        content: overlayContent,
+      }),
     };
 
     return <SidebarSectionGroup {...sidebarSectionData} />;

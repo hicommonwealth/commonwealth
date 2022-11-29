@@ -19,7 +19,7 @@ type UserDashboardChainEventRowAttrs = {
 export class UserDashboardChainEventRow
   implements m.ClassComponent<UserDashboardChainEventRowAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<UserDashboardChainEventRowAttrs>) {
     const { blockNumber, chain, label } = vnode.attrs;
 
     return (

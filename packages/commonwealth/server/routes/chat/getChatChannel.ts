@@ -1,30 +1,51 @@
-import { NextFunction, Request, Response } from 'express';
-import { DB } from '../../database';
-import { AppError, ServerError } from '../../util/errors';
+import { Action } from 'common-common/src/permissions';
+import { checkReadPermitted } from '../../util/roles';
+import { DB } from '../../models';
+import { AppError } from '../../util/errors';
+import { success, TypedRequestQuery, TypedResponse } from '../../types';
+import { ChatChannelAttributes } from '../../models/chat_channel';
 
 export const Errors = {
-	NoChannelId: 'No channel id given'
+  NoChannelId: 'No channel id given',
+  NoChainId: 'No chain id given',
+  ChannelNF: 'No chat channel found',
 };
 
-/**
- * Gets all relevant messages of a community. A user must be logged in, and they must have a valid address in the
- * community whose chat messages they are trying to view.
- * @param models
- * @param req
- * @param res
- * @param next
- */
-export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
-	// check channel id
-	if (!req.query.channel_id) {
-		return next(new AppError(Errors.NoChannelId))
-	}
+type GetChatChannelReq = {
+  channel_id: number;
+  chain_id: string;
+};
+
+type GetChatChannelResp = ChatChannelAttributes;
+
+export default async (
+  models: DB,
+  req: TypedRequestQuery<GetChatChannelReq>,
+  res: TypedResponse<GetChatChannelResp>,
+) => {
+  if (!req.query.channel_id) {
+    throw new AppError(Errors.NoChannelId);
+  }
+  if (!req.query.chain_id) {
+    throw new AppError(Errors.NoChainId);
+  }
+
+  await checkReadPermitted(
+    models,
+    req.query.chain_id,
+    Action.VIEW_CHAT_CHANNELS,
+    req.user?.id,
+  );
 
   const channel = await models.ChatChannel.findOne({
     where: {
-      id: req.query.channel_id
-    }
-  })
+      id: req.query.channel_id,
+    },
+  });
 
-	return res.json({ status: '200', result: JSON.stringify(channel)});
-}
+  if (!channel) {
+    throw new AppError(Errors.ChannelNF);
+  }
+
+  return success(res, channel.toJSON());
+};

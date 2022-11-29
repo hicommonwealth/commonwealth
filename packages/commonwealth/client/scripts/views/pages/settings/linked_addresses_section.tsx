@@ -17,13 +17,15 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 
-class AccountRow
-  implements
-    m.ClassComponent<{ account: AddressInfo; onclick?: (e: Event) => any }>
-{
+type AccountRowAttrs = {
+  account: AddressInfo;
+  onclick?: (e: Event) => any;
+};
+
+class AccountRow implements m.ClassComponent<AccountRowAttrs> {
   private removing: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<AccountRowAttrs>) {
     const { account } = vnode.attrs;
     const isActiveAccount =
       app.user.activeAccount &&

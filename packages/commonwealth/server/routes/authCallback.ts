@@ -1,6 +1,6 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
-import { DB } from '../database';
+import { DB } from '../models';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';

@@ -1,5 +1,15 @@
 @import 'shared';
 
+.CannotVote {
+  align-items: center;
+  background-color: $neutral-100;
+  border-radius: $border-radius-corners;
+  display: flex;
+  justify-content: center;
+  padding: 8px;
+  width: 100%;
+}
+
 .VotingActions {
   background-color: $neutral-100;
   border-radius: $border-radius-corners;

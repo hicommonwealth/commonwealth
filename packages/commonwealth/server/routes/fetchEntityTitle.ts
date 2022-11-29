@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import proposalIdToEntity from '../util/proposalIdToEntity';
-import { DB } from '../database';
+import { DB } from '../models';
 
 export const Errors = {
   NoEntity: 'Cannot find entity',

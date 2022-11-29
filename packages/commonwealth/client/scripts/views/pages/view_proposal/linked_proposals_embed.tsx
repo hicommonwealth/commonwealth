@@ -12,12 +12,24 @@ import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democr
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 
-export class LinkedProposalsEmbed implements m.ClassComponent<{ proposal }> {
-  view(vnode) {
+export type LinkedSubstrateProposal =
+  | SubstrateDemocracyProposal
+  | SubstrateDemocracyReferendum
+  | SubstrateCollectiveProposal
+  | SubstrateTreasuryProposal;
+
+type LinkedProposalsEmbedAttrs = {
+  proposal: LinkedSubstrateProposal;
+};
+
+export class LinkedProposalsEmbed
+  implements m.ClassComponent<LinkedProposalsEmbedAttrs>
+{
+  view(vnode: m.Vnode<LinkedProposalsEmbedAttrs>) {
     const { proposal } = vnode.attrs;
 
     // show link to treasury proposal if this is a proposal that passes a treasury spend

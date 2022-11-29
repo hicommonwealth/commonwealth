@@ -16,11 +16,17 @@ import { CWButton } from '../../components/component_kit/cw_button';
 const getNewTag = (labelCount?: number) => {
   const label = !labelCount ? 'New' : `${labelCount} new`;
 
-  return <Tag label={label} size="xs" rounded intent="primary" />;
+  return m(Tag, { label, size: 'xs', rounded: true, intent: 'primary' });
 };
 
-class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
-  view(vnode) {
+type CommunityPreviewCardAttrs = {
+  chain: ChainInfo;
+};
+
+class CommunityPreviewCard
+  implements m.ClassComponent<CommunityPreviewCardAttrs>
+{
+  view(vnode: m.Vnode<CommunityPreviewCardAttrs>) {
     const { chain } = vnode.attrs;
     const { unseenPosts } = app.user;
     const visitedChain = !!unseenPosts[chain.id];

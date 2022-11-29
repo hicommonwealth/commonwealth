@@ -10,25 +10,26 @@ import { AnyProposal } from 'models';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import Cosmos from 'controllers/chain/cosmos/main';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 
 import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
 import { BalanceInfo } from 'views/components/proposals/balance_info';
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWText } from '../component_kit/cw_text';
 
+type ProposalExtensionsAttrs = {
+  proposal: AnyProposal;
+  setDemocracyVoteConviction?;
+  setDemocracyVoteAmount?;
+  setCosmosDepositAmount?;
+};
+
 export class ProposalExtensions
-  implements
-    m.ClassComponent<{
-      proposal: AnyProposal;
-      setDemocracyVoteConviction?;
-      setDemocracyVoteAmount?;
-      setCosmosDepositAmount?;
-    }>
+  implements m.ClassComponent<ProposalExtensionsAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<ProposalExtensionsAttrs>) {
     const {
       proposal,
       setCosmosDepositAmount,

@@ -70,10 +70,10 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentTopicActivity(): Promise<Thread[]> {
+  public async getRecentTopicActivity(id?: string): Promise<Thread[]> {
     const params = {
-      chain: app.activeChainId(),
-      threads_per_topic: 5,
+      chain: id || app.activeChainId(),
+      threads_per_topic: 3,
     };
 
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
@@ -87,9 +87,9 @@ class RecentActivityController {
       if (!thread.Address) {
         console.error('Thread missing address');
       }
-      if (!app.threads.summaryStore.getByIdentifier(thread.id)) {
+      if (!app.threads.overviewStore.getByIdentifier(thread.id)) {
         try {
-          app.threads.summaryStore.add(modeledThread);
+          app.threads.overviewStore.add(modeledThread);
         } catch (e) {
           console.error(e.message);
         }

@@ -1,7 +1,7 @@
 // Helper function to look up an (address, author_chain) pair of parameters,
 // and check that it's owned by the current user. Only for POST requests.
 
-import { DB } from '../database';
+import { DB } from '../models';
 import { AddressInstance } from '../models/address';
 import { UserInstance } from '../models/user';
 

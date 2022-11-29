@@ -3,16 +3,17 @@ import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import Web3 from 'web3';
 import { PublicKey } from '@solana/web3.js';
-import { addressSwapper } from '../../shared/utils';
-import { DB } from '../database';
-import { TypedRequestBody, TypedResponse, success } from '../types';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { addressSwapper } from '../../shared/utils';
+import { DB } from '../models';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
 import { AppError, ServerError } from '../util/errors';
+import { createRole, findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -29,6 +30,7 @@ type CreateAddressReq = {
   wallet_id: WalletId;
   community?: string;
   keytype?: string;
+  block_info?: string;
 };
 
 type CreateAddressResp = AddressAttributes & { newly_created: boolean };
@@ -128,6 +130,7 @@ const createAddress = async (
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
+    existingAddress.block_info = req.body.block_info;
 
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.body.wallet_id;
@@ -137,15 +140,13 @@ const createAddress = async (
     // even if this is the existing address, there is a case to login to community through this address's chain
     // if req.body.community is valid, then we should create a role between this community vs address
     if (req.body.community) {
-      const role = await models.Role.findOne({
-        where: { address_id: updatedObj.id, chain_id: req.body.community },
-      });
+      const role = await findOneRole(
+        models,
+        { where: { address_id: updatedObj.id } },
+        req.body.community
+      );
       if (!role) {
-        await models.Role.create({
-          address_id: updatedObj.id,
-          chain_id: req.body.community,
-          permission: 'member',
-        });
+        await createRole(models, updatedObj.id, req.body.community, 'member');
       }
     }
     const output = { ...updatedObj.toJSON(), newly_created: false };
@@ -176,6 +177,7 @@ const createAddress = async (
         address: encodedAddress,
         verification_token,
         verification_token_expires,
+        block_info: req.body.block_info,
         keytype: req.body.keytype,
         last_active,
         wallet_id: req.body.wallet_id,
@@ -184,11 +186,7 @@ const createAddress = async (
       // if req.user.id is undefined, the address is being used to create a new user,
       // and we should automatically give it a Role in its native chain (or community)
       if (!req.user) {
-        await models.Role.create({
-          address_id: newObj.id,
-          chain_id: req.body.chain,
-          permission: 'member',
-        });
+        await createRole(models, newObj.id, req.body.chain, 'member');
       }
 
       if (process.env.NODE_ENV !== 'test') {

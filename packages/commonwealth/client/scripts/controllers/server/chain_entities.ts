@@ -27,24 +27,30 @@ export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.network === ChainNetwork.Compound) return SupportedNetwork.Compound;
   if (c.network === ChainNetwork.Aave) return SupportedNetwork.Aave;
   if (c.network === ChainNetwork.Moloch) return SupportedNetwork.Moloch;
-  throw new Error(`Invalid event chain: ${c.id}, on network ${c.network}, base ${c.base}`);
+  throw new Error(
+    `Invalid event chain: ${c.id}, on network ${c.network}, base ${c.base}`
+  );
 }
 
 const get = (route, args, callback) => {
-  return $.get(app.serverUrl() + route, args).then((resp) => {
-    if (resp.status === 'Success') {
-      callback(resp.result);
-    } else {
-      console.error(resp);
-    }
-  }).catch((e) => console.error(e));
+  return $.get(app.serverUrl() + route, args)
+    .then((resp) => {
+      if (resp.status === 'Success') {
+        callback(resp.result);
+      } else {
+        console.error(resp);
+      }
+    })
+    .catch((e) => console.error(e));
 };
 
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
 class ChainEntityController {
   private _store: ChainEntityStore = new ChainEntityStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
   private _subscriber: IEventSubscriber<any, any>;
   private _handlers: { [t: string]: EntityHandler[] } = {};
 
@@ -53,16 +59,21 @@ class ChainEntityController {
   }
 
   public getPreimage(hash: string) {
-    const preimage = this.store.getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
+    const preimage = this.store
+      .getByType(SubstrateTypes.EntityKind.DemocracyPreimage)
       .find((preimageEntity) => {
-        return preimageEntity.typeId === hash && preimageEntity.chainEvents.length > 0;
+        return (
+          preimageEntity.typeId === hash &&
+          preimageEntity.chainEvents.length > 0
+        );
       });
     if (preimage) {
       const notedEvent = preimage.chainEvents.find(
         (event) => event.data.kind === SubstrateTypes.EventKind.PreimageNoted
       );
       if (notedEvent && notedEvent.data) {
-        const result = (notedEvent.data as SubstrateTypes.IPreimageNoted).preimage;
+        const result = (notedEvent.data as SubstrateTypes.IPreimageNoted)
+          .preimage;
         return result;
       } else {
         return null;
@@ -92,7 +103,7 @@ class ChainEntityController {
 
   public registerEntityHandler(type: IChainEntityKind, fn: EntityHandler) {
     if (!this._handlers[type]) {
-      this._handlers[type] = [ fn ];
+      this._handlers[type] = [fn];
     } else {
       this._handlers[type].push(fn);
     }
@@ -105,20 +116,25 @@ class ChainEntityController {
   public async _fetchTitle(chain: string, unique_id: string): Promise<any> {
     try {
       return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
-        unique_id, chain
+        unique_id,
+        chain,
       });
     } catch (e) {
       return { status: 'Failed' };
     }
   }
 
-  private _handleEvents(chain: string, network: SupportedNetwork, events: CWEvent[]) {
+  private _handleEvents(
+    chain: string,
+    network: SupportedNetwork,
+    events: CWEvent[]
+  ) {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
       const eventEntity = eventToEntity(network, cwEvent.data.kind);
       // eslint-disable-next-line no-continue
       if (!eventEntity) continue;
-      const [ entityKind ] = eventEntity;
+      const [entityKind] = eventEntity;
       // create event type
       const eventType = new ChainEventType(
         `${chain}-${cwEvent.data.kind.toString()}`,
@@ -128,7 +144,11 @@ class ChainEntityController {
       );
 
       // create event
-      const event = new ChainEvent(cwEvent.blockNumber, cwEvent.data, eventType);
+      const event = new ChainEvent(
+        cwEvent.blockNumber,
+        cwEvent.data,
+        eventType
+      );
 
       // create entity
       const fieldName = entityToFieldName(network, entityKind);
@@ -161,10 +181,10 @@ class ChainEntityController {
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
-        'jwt': app.user.jwt,
-        'unique_id': uniqueIdentifier,
-        'title': title,
-        'chain': app.activeChainId(),
+        jwt: app.user.jwt,
+        unique_id: uniqueIdentifier,
+        title: title,
+        chain: app.activeChainId(),
       },
       success: (response) => {
         const entity = ChainEntity.fromJSON(response.result);
@@ -183,7 +203,7 @@ class ChainEntityController {
     chain: string,
     network: SupportedNetwork,
     subscriber: IEventSubscriber<Api, RawEvent>,
-    processor: IEventProcessor<Api, RawEvent>,
+    processor: IEventProcessor<Api, RawEvent>
   ): Promise<void> {
     this._subscriber = subscriber;
 

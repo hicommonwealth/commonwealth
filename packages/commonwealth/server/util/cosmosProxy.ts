@@ -1,10 +1,11 @@
 import type { Express } from 'express';
 import axios from 'axios';
 import bodyParser from 'body-parser';
-
-import { DB } from '../database';
 import { factory, formatFilename } from 'common-common/src/logging';
+
+import { DB } from '../models';
 import { AppError, ServerError } from './errors';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 function setupCosmosProxy(app: Express, models: DB) {

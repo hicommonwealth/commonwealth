@@ -5,6 +5,7 @@ import m from 'mithril';
 import 'pages/snapshot/index.scss';
 
 import app from 'state';
+import { AddressInfo } from 'models';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
 import {
@@ -16,10 +17,17 @@ import {
 } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { SnapshotProposalContent } from './snapshot_proposal_content';
-import { isWindowMediumSmallInclusive } from '../../components/component_kit/helpers';
-import { SnapshotProposalCards } from './snapshot_proposal_cards';
-import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
+import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
+import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import { SnapshotInformationCard } from './snapshot_information_card';
+import { renderQuillTextBody } from '../../components/quill/helpers';
+import { SnapshotVotesTable } from './snapshot_votes_table';
+import {
+  ActiveProposalPill,
+  ClosedProposalPill,
+} from '../../components/proposal_pills';
+import { CWText } from '../../components/component_kit/cw_text';
+import User from '../../components/widgets/user';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -28,26 +36,24 @@ type ViewProposalPageAttrs = {
 };
 
 class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
-  private activeTab: 'proposals' | 'info-and-results';
+  private fetchedPower: boolean;
   private proposal: SnapshotProposal;
-  private scores: number[];
+  private scores: Array<number>;
   private space: SnapshotSpace;
   private symbol: string;
   private threads: Array<{ id: string; title: string }> | null;
   private totals: any;
-  private votes: SnapshotProposalVote[];
-  private fetchedPower: boolean;
-  private validatedAgainstStrategies: boolean;
   private totalScore: number;
+  private validatedAgainstStrategies: boolean;
+  private votes: Array<SnapshotProposalVote>;
 
-  oninit(vnode) {
-    this.activeTab = 'proposals';
-    this.votes = [];
-    this.scores = [];
-    this.proposal = null;
-    this.threads = null;
+  oninit(vnode: m.Vnode<ViewProposalPageAttrs>) {
     this.fetchedPower = false;
+    this.proposal = null;
+    this.scores = [];
+    this.threads = null;
     this.validatedAgainstStrategies = true;
+    this.votes = [];
 
     const loadVotes = async () => {
       this.proposal = app.snapshot.proposals.find(
@@ -107,19 +113,9 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       mixpanelTrack();
       loadVotes();
     }
-
-    window.onresize = () => {
-      if (
-        isWindowMediumSmallInclusive(window.innerWidth) &&
-        this.activeTab !== 'proposals'
-      ) {
-        this.activeTab = 'proposals';
-        m.redraw();
-      }
-    };
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     return !this.votes || !this.totals || !this.proposal ? (
@@ -128,70 +124,72 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       <Sublayout
       // title="Snapshot Proposal"
       >
-        <div class="SnapshotViewProposalPage">
-          <div class="proposal-body-with-tabs">
-            <CWTabBar>
-              <CWTab
-                label="Proposals"
-                isSelected={this.activeTab === 'proposals'}
-                onclick={() => {
-                  this.activeTab = 'proposals';
-                }}
-              />
-              <CWTab
-                label="Info & Results"
-                isSelected={this.activeTab === 'info-and-results'}
-                onclick={() => {
-                  this.activeTab = 'info-and-results';
-                }}
-              />
-            </CWTabBar>
-            {this.activeTab === 'proposals' && (
-              <SnapshotProposalContent
-                proposal={this.proposal}
-                votes={this.votes}
+        <CWContentPage
+          showSidebar
+          title={this.proposal.title}
+          author={
+            <CWText>
+              {m(User, {
+                user: new AddressInfo(
+                  null,
+                  this.proposal.author,
+                  app.activeChainId(),
+                  null
+                ),
+                showAddressWithDisplayName: true,
+                linkify: true,
+                popover: true,
+              })}
+            </CWText>
+          }
+          createdAt={this.proposal.created}
+          contentBodyLabel="Snapshot"
+          subHeader={
+            this.proposal.state === 'active' ? (
+              <ActiveProposalPill proposalEnd={this.proposal.end} />
+            ) : (
+              <ClosedProposalPill proposalState={this.proposal.state} />
+            )
+          }
+          body={renderQuillTextBody(this.proposal.body)}
+          subBody={
+            this.votes.length > 0 && (
+              <SnapshotVotesTable
+                choices={this.proposal.choices}
                 symbol={this.symbol}
+                voters={this.votes}
               />
-            )}
-            {this.activeTab === 'info-and-results' && (
-              <div class="proposal-cards-container">
-                <SnapshotProposalCards
+            )
+          }
+          sidebarComponents={[
+            {
+              label: 'Info',
+              item: (
+                <SnapshotInformationCard
+                  proposal={this.proposal}
+                  threads={this.threads}
+                />
+              ),
+            },
+            {
+              label: 'Poll',
+              item: (
+                <SnapshotPollCardContainer
+                  fetchedPower={this.fetchedPower}
                   identifier={identifier}
                   proposal={this.proposal}
                   scores={this.scores}
                   space={this.space}
                   symbol={this.symbol}
-                  threads={this.threads}
                   totals={this.totals}
-                  votes={this.votes}
-                  validatedAgainstStrategies={this.validatedAgainstStrategies}
-                  fetchedPower={this.fetchedPower}
                   totalScore={this.totalScore}
+                  validatedAgainstStrategies={this.validatedAgainstStrategies}
+                  votes={this.votes}
                 />
-              </div>
-            )}
-          </div>
-          <div class="proposal-body">
-            <SnapshotProposalContent
-              proposal={this.proposal}
-              votes={this.votes}
-              symbol={this.symbol}
-            />
-            <SnapshotProposalCards
-              identifier={identifier}
-              proposal={this.proposal}
-              scores={this.scores}
-              space={this.space}
-              symbol={this.symbol}
-              threads={this.threads}
-              totals={this.totals}
-              votes={this.votes}
-              validatedAgainstStrategies={this.validatedAgainstStrategies}
-              fetchedPower={this.fetchedPower}
-              totalScore={this.totalScore}
-            />
-          </div>
-        </div>
+              ),
+            },
+          ]}
+        />
       </Sublayout>
     );
   }

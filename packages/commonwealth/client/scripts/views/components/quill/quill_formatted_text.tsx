@@ -32,7 +32,7 @@ export class QuillFormattedText
   private isTruncated: boolean;
   private truncatedDoc;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<QuillFormattedTextAttrs>) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesQuill(vnode.attrs.doc.ops);
@@ -45,7 +45,8 @@ export class QuillFormattedText
       this.truncatedDoc = vnode.attrs.doc;
     }
   }
-  view(vnode) {
+
+  view(vnode: m.Vnode<QuillFormattedTextAttrs>) {
     const {
       doc,
       hideFormatting,
