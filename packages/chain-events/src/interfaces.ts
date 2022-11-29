@@ -182,15 +182,9 @@ export interface IEventTitle {
 
 export type TitlerFilter = (kind: IChainEventKind) => IEventTitle;
 
-/**
- * Returns the key of the value that is unique to the entities chain and type i.e. the key whose associated value
- * becomes the type_id of the chain-entity. The combination of chain, type, and type_id must/will always be unique.
- * @param network An instance of a network for which chain-events supports chain-events and chain-entities
- * @param entityKind The entity's creation event kind used to determine type_id for substrate network
- */
-export function getUniqueEntityKey(
+export function entityToFieldName(
   network: SupportedNetwork,
-  entityKind: IChainEntityKind
+  entity: IChainEntityKind
 ): string | null {
   if (network === SupportedNetwork.Compound) {
     return 'id';
@@ -207,7 +201,7 @@ export function getUniqueEntityKey(
   if (network === SupportedNetwork.Cosmos) {
     return 'id';
   }
-  switch (entityKind) {
+  switch (entity) {
     case SubstrateTypes.EntityKind.DemocracyProposal: {
       return 'proposalIndex';
     }
@@ -224,7 +218,7 @@ export function getUniqueEntityKey(
       return 'bountyIndex';
     }
     case SubstrateTypes.EntityKind.CollectiveProposal: {
-      return 'proposalIndex';
+      return 'proposalHash';
     }
     case SubstrateTypes.EntityKind.SignalingProposal: {
       return 'proposalHash';

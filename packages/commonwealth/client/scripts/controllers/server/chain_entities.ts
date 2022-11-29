@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
+import _ from 'lodash';
 
 import { ChainEntityStore } from 'stores';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -8,11 +9,12 @@ import app from 'state';
 import {
   CWEvent,
   eventToEntity,
+  entityToFieldName,
   IEventProcessor,
   IEventSubscriber,
   SubstrateTypes,
   IChainEntityKind,
-  SupportedNetwork, getUniqueEntityKey,
+  SupportedNetwork,
 } from 'chain-events/src';
 import { notifyError } from '../app/notifications';
 
@@ -160,7 +162,7 @@ class ChainEntityController {
       );
 
       // create entity
-      const fieldName = getUniqueEntityKey(network, entityKind);
+      const fieldName = entityToFieldName(network, entityKind);
       // eslint-disable-next-line no-continue
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
