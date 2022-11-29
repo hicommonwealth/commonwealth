@@ -8,10 +8,12 @@ import 'components/proposal_pills.scss';
 import { formatTimestamp } from 'helpers';
 import { CWText } from './component_kit/cw_text';
 
+type ActiveProposalPillAttrs = { proposalEnd: number };
+
 export class ActiveProposalPill
-  implements m.ClassComponent<{ proposalEnd: number }>
+  implements m.ClassComponent<ActiveProposalPillAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<ActiveProposalPillAttrs>) {
     const { proposalEnd } = vnode.attrs;
 
     return (
@@ -27,10 +29,12 @@ export class ActiveProposalPill
   }
 }
 
+type ClosedProposalPillAttrs = { proposalState: string };
+
 export class ClosedProposalPill
-  implements m.ClassComponent<{ proposalState: string }>
+  implements m.ClassComponent<ClosedProposalPillAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<ClosedProposalPillAttrs>) {
     const { proposalState } = vnode.attrs;
 
     return (

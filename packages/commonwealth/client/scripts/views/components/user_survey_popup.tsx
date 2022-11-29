@@ -22,7 +22,7 @@ type UserSurveyViewAttrs = {
 };
 
 class UserSurveyView implements m.ClassComponent<UserSurveyViewAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<UserSurveyViewAttrs>) {
     const { disabled, checked, onRedirectClick, onClose, onCheckboxClick } =
       vnode.attrs;
     return (
@@ -111,7 +111,7 @@ export class UserSurveyPopup implements m.ClassComponent<UserSurveyPopupAttrs> {
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<UserSurveyPopupAttrs>) {
     const { surveyReadyForDisplay } = vnode.attrs;
 
     const handleClose = () => {

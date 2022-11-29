@@ -15,12 +15,12 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ManageRoleRowAttrs = {
   label: string;
-  onRoleUpdate?: () => void;
+  onRoleUpdate: (oldRole: string, newRole: string) => void;
   roledata?: any;
 };
 
 export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<ManageRoleRowAttrs>) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
     const chainOrCommObj = { chain: app.activeChainId() };
     const communityMeta = app.chain.meta;
