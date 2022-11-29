@@ -74,6 +74,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     });
   }
 
+  private _fetcher: SubstrateEvents.StorageFetcher;
+  public get fetcher() { return this._fetcher; }
+
   private _tokenDecimals: number;
   private _tokenSymbol: string;
 
@@ -222,9 +225,10 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
   // load existing events and subscribe to future via client node connection
   public initChainEntities(): Promise<void> {
+    this._fetcher = new SubstrateEvents.StorageFetcher(this.api);
     const subscriber = new SubstrateEvents.Subscriber(this.api);
     const processor = new SubstrateEvents.Processor(this.api);
-    return this._app.chainEntities.subscribeEntities(
+    return this._app.chain.chainEntities.subscribeEntities(
       this._app.chain.id,
       chainToEventNetwork(this.app.chain.meta),
       subscriber,

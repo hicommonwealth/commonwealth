@@ -51,7 +51,6 @@ import {
 } from './chains/cosmos';
 import { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
-import { RegisteredTypes } from "@polkadot/types/types";
 
 export function Title(
   network: SupportedNetwork,
@@ -120,7 +119,7 @@ export async function createListener(
     skipCatchup?: boolean;
     startBlock?: number;
     archival?: boolean;
-    spec?: RegisteredTypes;
+    spec?: Record<string, unknown>;
     url?: string;
     enricherConfig?: any;
     pollTime?: number;

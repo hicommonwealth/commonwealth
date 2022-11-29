@@ -18,6 +18,7 @@ class Cosmos
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;
 
+  public readonly chainEntities = new ChainEntityController();
   public readonly base = ChainBase.CosmosSDK;
 
   constructor(meta: ChainInfo, app: IApp) {

@@ -1,25 +1,25 @@
-import {NextFunction} from 'express';
+import { NextFunction } from 'express';
 import Web3 from 'web3';
 import * as solw3 from '@solana/web3.js';
-import {Cluster} from '@solana/web3.js';
-import {Tendermint34Client} from '@cosmjs/tendermint-rpc';
+import { Cluster } from '@solana/web3.js';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
-import {Op} from 'sequelize';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {BalanceType,ChainBase, ChainType, NotificationCategories} from 'common-common/src/types';
-import {urlHasValidHTTPPrefix} from '../../shared/utils';
-import {ChainAttributes} from '../models/chain';
-import {ChainNodeAttributes} from '../models/chain_node';
+import { Op } from 'sequelize';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { BalanceType, ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
+import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import { ChainAttributes } from '../models/chain';
+import { ChainNodeAttributes } from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-import {DB} from '../models';
-import {success, TypedRequestBody, TypedResponse} from '../types';
+import { DB } from '../models';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 
-import {AddressInstance} from '../models/address';
-import {mixpanelTrack} from '../util/mixpanelUtil';
-import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
-import {RoleAttributes, RoleInstance} from '../models/role';
+import { AddressInstance } from '../models/address';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { RoleAttributes, RoleInstance } from '../models/role';
 
-import {AppError, ServerError} from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -110,7 +110,7 @@ const createChain = async (
   }
 
   const existingBaseChain = await models.Chain.findOne({
-    where: {base: req.body.base},
+    where: { base: req.body.base },
   });
   if (!existingBaseChain) {
     return next(new AppError(Errors.InvalidBase));
@@ -142,11 +142,9 @@ const createChain = async (
     }
 
     // override provided URL for eth chains (typically ERC20) with stored, unless none found
-    const node = await models.ChainNode.scope('withPrivateData').findOne({
-      where: {
-        eth_chain_id,
-      }
-    });
+    const node = await models.ChainNode.scope('withPrivateData').findOne({ where: {
+      eth_chain_id,
+    }});
     if (!node && !req.user.isAdmin) {
       // if creating a new ETH node, must be admin -- users cannot submit custom URLs
       return next(new AppError(Errors.NotAdmin));
@@ -184,7 +182,7 @@ const createChain = async (
       const clusterUrl = solw3.clusterApiUrl(url as Cluster);
       const connection = new solw3.Connection(clusterUrl);
       const supply = await connection.getTokenSupply(pubKey);
-      const {decimals, amount} = supply.value;
+      const { decimals, amount } = supply.value;
       if (new BN(amount, 10).isZero()) {
         throw new AppError('Invalid supply amount');
       }
@@ -201,7 +199,7 @@ const createChain = async (
     }
     try {
       const tmClient = await Tendermint34Client.connect(url);
-      const {block} = await tmClient.block();
+      const { block } = await tmClient.block();
     } catch (err) {
       return next(new ServerError(Errors.InvalidNode));
     }
@@ -258,7 +256,7 @@ const createChain = async (
   }
 
   const oldChain = await models.Chain.findOne({
-    where: {[Op.or]: [{name: req.body.name}, {id: req.body.id}]},
+    where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {
     return next(new AppError(Errors.ChainIDExists));
@@ -268,7 +266,7 @@ const createChain = async (
   }
 
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
-    where: {url},
+    where: { url },
     defaults: {
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
@@ -367,7 +365,7 @@ const createChain = async (
       },
       include: [{
         model: models.Chain,
-        where: {base: chain.base},
+        where: { base: chain.base },
         required: true,
       }]
     });
@@ -381,7 +379,7 @@ const createChain = async (
       },
       include: [{
         model: models.Chain,
-        where: {base: chain.base},
+        where: { base: chain.base },
         required: true,
       }]
     });
@@ -396,7 +394,7 @@ const createChain = async (
       },
       include: [{
         model: models.Chain,
-        where: {base: chain.base},
+        where: { base: chain.base },
         required: true,
       }]
     });
@@ -405,7 +403,7 @@ const createChain = async (
   if (addressToBeAdmin) {
     await createRole(models, addressToBeAdmin.id, chain.id, 'admin', true);
 
-    const [subscription] = await models.Subscription.findOrCreate({
+    const [ subscription ] = await models.Subscription.findOrCreate({
       where: {
         subscriber_id: req.user.id,
         category_id: NotificationCategories.NewThread,

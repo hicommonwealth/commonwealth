@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
 
@@ -35,8 +35,7 @@ const getThreads = async (
           as: 'topic',
         },
         {
-          model: models.ChainEntityMeta,
-          as: 'chain_entity_meta'
+          model: models.ChainEntity,
         },
         {
           model: models.Reaction,

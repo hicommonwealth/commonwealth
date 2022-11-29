@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import { Issuers } from './finishSsoLogin';
 import { DB } from '../models';
 import { AXIE_SHARED_SECRET } from '../config';

@@ -11,7 +11,7 @@ Discussions and governance for blockchain networks.
 ```bash
 brew install node yarn postgresql
 brew services start postgresql
-psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth SUPERUSER;"
+psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth CREATEDB;"
 psql postgres -h 127.0.0.1 -U commonwealth -c "CREATE DATABASE commonwealth;"
 ```
 

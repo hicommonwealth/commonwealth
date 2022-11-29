@@ -21,7 +21,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ThreadInstance } from '../models/thread';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,

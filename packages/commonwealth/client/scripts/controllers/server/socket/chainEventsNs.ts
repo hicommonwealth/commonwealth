@@ -29,7 +29,8 @@ export class ChainEventsNamespace {
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
       const eventTypes = subs
-        .filter((x) => !!x.chainEventTypeId)
+        .map((x) => x.ChainEventType?.id)
+        .filter((x) => !!x);
       const roomsToJoin = [];
       for (const eventType of eventTypes) {
         if (!this.subscriptionRoomsJoined.has(eventType)) {
@@ -49,7 +50,8 @@ export class ChainEventsNamespace {
   public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
       const eventTypes = subs
-        .filter((x) => !!x.chainEventTypeId)
+        .map((x) => x.ChainEventType?.id)
+        .filter((x) => !!x);
       const roomsToLeave = [];
       for (const eventType of eventTypes) {
         if (this.subscriptionRoomsJoined.has(eventType)) {
@@ -70,7 +72,7 @@ export class ChainEventsNamespace {
   private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
       (sub) =>
-        sub.chainEventTypeId === notification.ChainEvent.ChainEventType.id
+        sub.ChainEventType?.id === notification.ChainEvent.ChainEventType.id
     );
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally

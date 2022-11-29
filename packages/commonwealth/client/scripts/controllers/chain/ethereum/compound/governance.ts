@@ -3,7 +3,7 @@ import { ProposalModule, ITXModalData } from 'models';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import { CompoundEvents, CompoundTypes } from 'chain-events/src';
 import { IApp } from 'state';
-import { chainToEventNetwork } from 'controllers/server/chain_entities';
+import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
 import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
 import { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import CompoundAPI, { GovernorType } from './api';
@@ -42,6 +42,7 @@ export default class CompoundGovernance extends ProposalModule<
   public get votingPeriod() { return this._votingPeriod; }
 
   public get api() { return this._api; }
+  public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
   // capacities based on governor type
   private _supportsAbstain: boolean;
@@ -140,14 +141,14 @@ export default class CompoundGovernance extends ProposalModule<
 
     // load server proposals
     console.log('Fetching compound proposals from backend.');
-    await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
+    await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
+    const entities = this.app.chain.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
     console.log(`Found ${entities.length} proposals!`);
     entities.forEach((e) => this._entityConstructor(e));
     await Promise.all(this.store.getAll().map((p) => p.init()));
 
     // register new chain-event handlers
-    this.app.chainEntities.registerEntityHandler(
+    this.app.chain.chainEntities.registerEntityHandler(
       CompoundTypes.EntityKind.Proposal, (entity, event) => {
         this.updateProposal(entity, event);
         const proposal = this.store.getByIdentifier(entity.typeId);
@@ -160,7 +161,7 @@ export default class CompoundGovernance extends ProposalModule<
     // kick off listener
     const subscriber = new CompoundEvents.Subscriber(this._api.Contract as any, this.app.chain.id);
     const processor = new CompoundEvents.Processor(this._api.Contract as any);
-    await this.app.chainEntities.subscribeEntities(
+    await this.app.chain.chainEntities.subscribeEntities(
       this.app.chain.id,
       chainToEventNetwork(this.app.chain.meta),
       subscriber,
