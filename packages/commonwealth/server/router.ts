@@ -433,21 +433,9 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteReaction.bind(this, models, banCache)
   );
-  router.get(
-    '/viewReactions',
-    passport.authenticate('jwt', { session: false }),
-    viewReactions.bind(this, models)
-  );
-  router.get(
-    '/bulkReactions',
-    passport.authenticate('jwt', { session: false }),
-    bulkReactions.bind(this, models)
-  );
-  router.post(
-    '/reactionsCounts',
-    passport.authenticate('jwt', { session: false }),
-    reactionsCounts.bind(this, models)
-  );
+  router.get('/viewReactions', viewReactions.bind(this, models));
+  router.get('/bulkReactions', bulkReactions.bind(this, models));
+  router.post('/reactionsCounts', reactionsCounts.bind(this, models));
 
   // Threads UsersCounts
   router.post(

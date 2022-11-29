@@ -19,7 +19,7 @@ const viewReactions = async (models: DB, req: Request, res: Response, next: Next
 
   await checkReadPermitted(
     models,
-    req.query.chain_id,
+    chain.id,
     Action.VIEW_REACTIONS,
     req.user?.id,
   );

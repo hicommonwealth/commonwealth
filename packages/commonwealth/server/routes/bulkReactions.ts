@@ -9,13 +9,13 @@ import { checkReadPermitted } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 const bulkReactions = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+  const { thread_id, proposal_id, comment_id, chain_id } = req.query;
   await checkReadPermitted(
     models,
-    req.query.chain_id,
+    chain_id,
     Action.VIEW_REACTIONS,
     req.user?.id,
   );
-  const { thread_id, proposal_id, comment_id } = req.query;
   let reactions = [];
   try {
     if (thread_id || proposal_id || comment_id) {

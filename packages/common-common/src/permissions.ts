@@ -46,7 +46,8 @@ export function removePermission(
 export const BASE_PERMISSIONS: Permissions =
   addPermission(BigInt(0), Action.CREATE_THREAD) |
   addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
-  addPermission(BigInt(0), Action.VIEW_THREADS);
+  addPermission(BigInt(0), Action.VIEW_THREADS) | 
+  addPermission(BigInt(0), Action.VIEW_REACTIONS);
 
 const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<Action, Action[]>([
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],

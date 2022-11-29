@@ -25,13 +25,13 @@ const reactionsCounts = async (
   res: Response,
   next: NextFunction
 ) => {
+  const { active_address, thread_ids, comment_ids, proposal_ids, chain_id } = req.body;
   await checkReadPermitted(
     models,
-    req.query.chain_id,
+    chain_id,
     Action.VIEW_REACTIONS,
     req.user?.id
   );
-  const { active_address, thread_ids, comment_ids, proposal_ids } = req.body;
   try {
     if (thread_ids || comment_ids || proposal_ids) {
       let countField = 'thread_id';

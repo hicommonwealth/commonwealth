@@ -233,6 +233,8 @@ class ViewThreadPage
                 .getByProposal(thread)
                 .map((comment) => comment.id),
               active_address: app.user.activeAccount?.address,
+              chain_id: app.activeChainId(),
+              jwt: app.user.jwt,
             }),
           });
 
