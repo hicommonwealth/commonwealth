@@ -1,7 +1,7 @@
 import {
   ServiceConsumer,
   RabbitMQSubscription,
-} from 'common-common/src/serviceConsumer';
+} from 'common-common/src/ServiceConsumer';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import axios from 'axios';
 import {
