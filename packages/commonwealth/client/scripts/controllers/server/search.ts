@@ -141,6 +141,7 @@ class SearchContoller {
         search: searchTerm,
         results_size: resultSize,
         sort,
+        jwt: app.user.jwt,
       });
       if (response.status !== 'Success') {
         throw new Error(`Got unsuccessful status: ${response.status}`);

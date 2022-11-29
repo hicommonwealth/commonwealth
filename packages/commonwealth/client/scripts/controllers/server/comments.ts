@@ -241,6 +241,7 @@ class CommentsController {
         const response = await $.get(`${app.serverUrl()}/viewComments`, {
           chain: chainId,
           root_id: encodeURIComponent(proposal.uniqueIdentifier),
+          jwt: app.user.jwt,
         });
         if (response.status !== 'Success') {
           reject(new Error(`Unsuccessful status: ${response.status}`));
