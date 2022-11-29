@@ -1,7 +1,7 @@
 import { Action } from 'common-common/src/permissions';
 import { checkReadPermitted } from '../../util/roles';
 import { DB } from '../../models';
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '../../util/errors';
 import { success, TypedRequestQuery, TypedResponse } from '../../types';
 import { ChatChannelAttributes } from '../../models/chat_channel';
 

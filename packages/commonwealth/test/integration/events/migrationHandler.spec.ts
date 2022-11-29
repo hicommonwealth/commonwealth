@@ -11,20 +11,15 @@ import {
 } from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';
-import models from 'chain-events/services/database/database';
-import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
-import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
-import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
-import {BrokerConfig} from "rascal";
-import {getRabbitMQConfig} from "common-common/src/rabbitmq";
+import models from '../../../server/database';
+import StorageHandler from '../../../server/eventHandlers/storage';
+import MigrationHandler from '../../../server/eventHandlers/migration';
 
 chai.use(chaiHttp);
 const { assert } = chai;
 
-const rmqController = new MockRabbitMQController(<BrokerConfig>getRabbitMQConfig('localhost'));
-
 const setupDbEvent = async (event: CWEvent) => {
-  const storageHandler = new StorageHandler(models, rmqController, 'edgeware');
+  const storageHandler = new StorageHandler(models, 'edgeware');
   return storageHandler.handle(event);
 };
 
@@ -47,7 +42,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new MigrationHandler(models, rmqController, 'edgeware');
+    const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
     const dbEvent = await eventHandler.handle(event);
@@ -96,7 +91,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
     };
 
     const oldDbEvent = await setupDbEvent(legacyEvent);
-    const eventHandler = new MigrationHandler(models, rmqController, 'edgeware');
+    const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
     const dbEvent = await eventHandler.handle(currentEvent);
@@ -129,7 +124,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new MigrationHandler(models, rmqController, 'edgeware');
+    const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
     const dbEvent = await eventHandler.handle(event);
@@ -146,7 +141,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
       }
     };
 
-    const eventHandler = new MigrationHandler(models, rmqController, 'edgeware');
+    const eventHandler = new MigrationHandler(models, 'edgeware');
 
     // process event
     const dbEvent = await eventHandler.handle(event as unknown as CWEvent<SubstrateTypes.IEventData>);

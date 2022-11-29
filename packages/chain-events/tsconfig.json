@@ -1,13 +1,25 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "lib": ["es2019"],
-    "typeRoots": ["./node_modules/@types"],
-    "skipLibCheck": true
+    "lib": [
+      "es2019"
+    ],
+    "outDir": "./dist",
+    "baseUrl": "./src",
+    "declaration": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
   },
-  "paths": {
-    "common-common": ["../../packages/common-common"],
-    "common-common/*": ["../../packages/common-common/*"]
-  },
-  "exclude": ["./dist", "./node_modules", "./test", "./scripts", "./build"]
+  "include": [
+    "./src",
+  ],
+  "exclude": [
+    "./dist",
+    "./node_modules",
+    "./test",
+    "./scripts"
+  ]
 }

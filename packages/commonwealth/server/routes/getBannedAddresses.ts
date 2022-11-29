@@ -1,4 +1,4 @@
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '../util/errors';
 import { success, TypedRequestQuery, TypedResponse } from '../types';
 import { DB } from '../models';
 import validateChain from '../util/validateChain';

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));

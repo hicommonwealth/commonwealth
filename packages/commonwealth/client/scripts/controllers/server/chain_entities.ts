@@ -1,9 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 
-import {ChainEntityStore} from 'stores';
-import {ChainBase, ChainNetwork} from 'common-common/src/types';
-import {ChainEntity, ChainEvent, ChainEventType, ChainInfo} from 'models';
+import { ChainEntityStore } from 'stores';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from 'models';
 import app from 'state';
 import {
   CWEvent,
@@ -11,12 +11,10 @@ import {
   IEventProcessor,
   IEventSubscriber,
   SubstrateTypes,
-  SupportedNetwork,
-  getUniqueEntityKey,
-  IChainEntityKind
+  IChainEntityKind,
+  SupportedNetwork, getUniqueEntityKey,
 } from 'chain-events/src';
-import {notifyError} from '../app/notifications';
-import {getBaseUrl, getFetch, ServiceUrls} from 'helpers/getUrl';
+import { notifyError } from '../app/notifications';
 
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
@@ -43,7 +41,6 @@ const get = (route, args, callback) => {
     })
     .catch((e) => console.error(e));
 };
-
 
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
@@ -84,46 +81,13 @@ class ChainEntityController {
     }
   }
 
-  /**
-   * Refreshes the raw chain entities from chain-events + ChainEntityMeta from the main service
-   * to form full ChainEntities
-   * @param chain
-   */
-  public async refresh(chain: string) {
-    const options: any = {chain};
-
-    // load the chain-entity objects
-    const [entities, entityMetas] = await Promise.all([
-      getFetch(getBaseUrl(ServiceUrls.chainEvents) + '/entities', options),
-      getFetch(getBaseUrl() + '/getEntityMeta', options)
-    ]);
-
-    if (Array.isArray(entities)) {
-      // save the chain-entity objects in the store
-      for (const entityJSON of entities) {
+  public refresh(chain: string) {
+    return get('/bulkEntities', {chain}, (result) => {
+      for (const entityJSON of result) {
         const entity = ChainEntity.fromJSON(entityJSON);
         this._store.add(entity);
       }
-    }
-
-    // save chain-entity metadata to the appropriate chain-entity
-    for (const entityMetaJSON of entityMetas) {
-      const entity = this._store.getById(entityMetaJSON.ce_id);
-      if (entity) {
-        entity.title = entityMetaJSON.title;
-        entity.threadId = entityMetaJSON.thread_id;
-      }
-    }
-  }
-
-  public async refreshRawEntities(chain: string) {
-    const entities = await getFetch(getBaseUrl(ServiceUrls.chainEvents) + '/entities', {chain});
-    if (Array.isArray(entities)) {
-      for (const entityJSON of entities) {
-        const entity = ChainEntity.fromJSON(entityJSON);
-        this._store.add(entity);
-      }
-    }
+    });
   }
 
   public deinit() {
@@ -147,7 +111,22 @@ class ChainEntityController {
     this._handlers = {};
   }
 
-  private _handleEvents(chain: string, network: SupportedNetwork, events: CWEvent[]) {
+  public async _fetchTitle(chain: string, unique_id: string): Promise<any> {
+    try {
+      return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
+        unique_id,
+        chain,
+      });
+    } catch (e) {
+      return { status: 'Failed' };
+    }
+  }
+
+  private _handleEvents(
+    chain: string,
+    network: SupportedNetwork,
+    events: CWEvent[]
+  ) {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
       const eventEntity = eventToEntity(network, cwEvent.data.kind);
@@ -196,19 +175,20 @@ class ChainEntityController {
   }
 
   public async updateEntityTitle(uniqueIdentifier: string, title: string) {
-    const chainEntity = this.store.getByUniqueId(app.activeChainId(), uniqueIdentifier);
-    if (!chainEntity) console.error("Cannot update title for non-existent entity")
     return $.ajax({
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
         jwt: app.user.jwt,
-        chain_entity_id: chainEntity.id,
+        unique_id: uniqueIdentifier,
         title: title,
         chain: app.activeChainId(),
       },
       success: (response) => {
-        chainEntity.title = title;
+        const entity = ChainEntity.fromJSON(response.result);
+        this._store.remove(entity);
+        this._store.add(entity);
+        return entity;
       },
       error: (err) => {
         notifyError('Could not set entity title');

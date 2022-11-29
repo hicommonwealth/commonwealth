@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import StatsDController from 'common-common/src/statsd';
+import StatsDController from '../util/statsd';
 import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {

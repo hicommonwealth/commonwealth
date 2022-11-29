@@ -10,7 +10,7 @@ import { sequelize } from '../database';
 import { ProfileAttributes } from '../models/profile';
 import { DynamicTemplate } from '../../shared/types';
 
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import { UserAttributes } from '../models/user';
 import { AddressAttributes } from '../models/address';
 

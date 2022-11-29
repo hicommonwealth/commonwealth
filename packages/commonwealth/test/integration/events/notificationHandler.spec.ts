@@ -11,18 +11,13 @@ import {
 } from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';
-import models from 'chain-events/services/database/database';
+import models from '../../../server/database';
 import { NotificationCategories } from 'common-common/src/types';
-import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
+import StorageHandler from '../../../server/eventHandlers/storage';
 import NotificationHandler from '../../../server/eventHandlers/notifications';
-import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
-import {BrokerConfig} from "rascal";
-import {getRabbitMQConfig} from "common-common/src/rabbitmq";
 
 chai.use(chaiHttp);
 const { assert } = chai;
-
-const rmqController = new MockRabbitMQController(<BrokerConfig>getRabbitMQConfig('localhost'));
 
 const setupUserAndEventSubscriptions = async (email, address, chain) => {
   const user = await models['User'].create({
@@ -61,7 +56,7 @@ const setupUserAndEventSubscriptions = async (email, address, chain) => {
 };
 
 const setupDbEvent = async (event: CWEvent) => {
-  const storageHandler = new StorageHandler(models, rmqController, 'edgeware');
+  const storageHandler = new StorageHandler(models, 'edgeware');
   return storageHandler.handle(event);
 };
 
@@ -247,7 +242,7 @@ describe('Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new NotificationHandler(models, [ SubstrateTypes.EventKind.DemocracyStarted ]);
+    const eventHandler = new NotificationHandler(models, null, [ SubstrateTypes.EventKind.DemocracyStarted ]);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);

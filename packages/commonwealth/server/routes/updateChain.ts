@@ -7,7 +7,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../models';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 import { findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 

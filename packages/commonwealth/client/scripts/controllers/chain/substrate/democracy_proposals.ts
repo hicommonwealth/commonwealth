@@ -56,7 +56,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyProposal);
+    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyProposal);
     entities.forEach((e) => this._entityConstructor(e));
 
     // save parameters
@@ -65,12 +65,12 @@ class SubstrateDemocracyProposals extends ProposalModule<
     this._cooloffPeriod = +(ChainInfo.api.consts.democracy.cooloffPeriod as BlockNumber);
 
     // register new chain-event handlers
-    this.app.chainEntities.registerEntityHandler(
+    this.app.chain.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.DemocracyProposal, (entity, event) => {
         this.updateProposal(entity, event);
       }
     );
-    this.app.chainEntities.registerEntityHandler(
+    this.app.chain.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
         if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
           const proposal = this.getByHash(entity.typeId);

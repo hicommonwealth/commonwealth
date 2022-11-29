@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { DB } from '../models';
 import pinIpfsBlob from '../util/pinIpfsBlob';
-import { AppError } from 'common-common/src/errors';
+import { AppError } from '../util/errors';
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   InvalidAddress: 'Invalid address',

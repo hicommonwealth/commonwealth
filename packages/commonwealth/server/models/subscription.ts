@@ -21,12 +21,14 @@ import {
 import { ChainAttributes } from './chain';
 import { ThreadAttributes } from './thread';
 import { CommentAttributes } from './comment';
+import { ChainEventTypeAttributes } from './chain_event_type';
+import { ChainEntityAttributes } from './chain_entity';
 import {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
-import StatsDController from 'common-common/src/statsd';
+import StatsDController from '../util/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -53,6 +55,8 @@ export type SubscriptionAttributes = {
   Chain?: ChainAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
+  ChainEventType?: ChainEventTypeAttributes;
+  ChainEntity?: ChainEntityAttributes;
 }
 
 export interface SubscriptionInstance
@@ -66,6 +70,7 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emit
   object_id: string,
   notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
   webhook_data?: Partial<WebhookContent>,
+  wss?: WebSocket.Server,
   excludeAddresses?: string[],
   includeAddresses?: string[],
 ) => Promise<NotificationInstance> };
@@ -107,6 +112,7 @@ export default (
     object_id: string,
     notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
     webhook_data?: WebhookContent,
+    wss?: WebSocket.Server,
     excludeAddresses?: string[],
     includeAddresses?: string[],
   ): Promise<NotificationInstance> => {
@@ -183,10 +189,11 @@ export default (
     });
 
     // if the notification does not yet exist create it here
+    // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
     if (!notification) {
       if (isChainEventData) {
-        const event: any = (<IChainEventNotificationData>notification_data).chainEvent;
-        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType;
+        const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
+        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
 
         notification = await models.Notification.create({
           notification_data: JSON.stringify(event),
@@ -290,9 +297,9 @@ export default (
     models.Subscription.hasMany(models.NotificationsRead, { foreignKey: 'subscription_id', onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.Thread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.Comment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.ChainEntityMeta, { foreignKey: 'chain_entity_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.Comment, { foreignKey: 'offchain_comment_id', targetKey: 'id'});
+    models.Subscription.belongsTo(models.ChainEntity, { foreignKey: 'chain_entity_id', targetKey: 'id' });
   };
 
   return Subscription;

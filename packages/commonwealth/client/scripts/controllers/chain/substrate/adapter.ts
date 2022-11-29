@@ -26,6 +26,7 @@ class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public bounties: SubstrateBountyTreasury;
   public identities: SubstrateIdentities;
   public tips: SubstrateTreasuryTips;
+  public readonly chainEntities = new ChainEntityController();
 
   public readonly base = ChainBase.Substrate;
 

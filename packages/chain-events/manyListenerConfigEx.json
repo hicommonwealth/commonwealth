@@ -1,0 +1,13 @@
+[
+  {
+    "network": "kusama",
+    "url": "",
+    "archival": false,
+    "skipCatchup": true
+  },
+  {
+    "network": "polkadot",
+    "archival": false,
+    "skipCatchup": true
+  }
+]

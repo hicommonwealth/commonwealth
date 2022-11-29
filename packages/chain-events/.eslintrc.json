@@ -20,17 +20,14 @@
     }
   },
   "ignorePatterns": ["contractTypes", "eth", "dist"],
-  "rules": {
+  "rules": {  
     "@typescript-eslint/interface-name-prefix": "off",
     "import/prefer-default-export": 0,
     "import/extensions": 0,
     "import/no-cycle": 0,
-    "import/order": [
-      "error",
-      {
-        "newlines-between": "always"
-      }
-    ],
+    "import/order": ["error", {
+      "newlines-between": "always"
+    }],
     "max-classes-per-file": "off",
     "no-await-in-loop": "off",
     "no-import-cycles": "off",

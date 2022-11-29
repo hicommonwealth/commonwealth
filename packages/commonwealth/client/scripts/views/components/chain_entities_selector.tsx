@@ -29,10 +29,10 @@ export class ChainEntitiesSelector
 
     if (!this.initialized) {
       this.initialized = true;
-      app.chainEntities
+      app.chain.chainEntities
         ?.refresh(app.chain.id)
         .then(() => {
-          // refreshing loads the latest chain entities into app.chainEntities store
+          // refreshing loads the latest chain entities into app.chain.chainEntities store
           this.chainEntitiesLoaded = true;
           m.redraw();
         });
@@ -43,7 +43,7 @@ export class ChainEntitiesSelector
         {this.chainEntitiesLoaded ? (
           m(QueryList, {
             checkmark: true,
-            items: app.chainEntities.store.getAll().sort((a, b) => {
+            items: app.chain.chainEntities.store.getAll().sort((a, b) => {
               if (!a.threadId && b.threadId) return -1;
               if (a.threadId && !b.threadId) return 1;
               return 0;
