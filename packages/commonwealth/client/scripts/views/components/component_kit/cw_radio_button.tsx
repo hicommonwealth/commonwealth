@@ -22,7 +22,7 @@ type RadioButtonAttrs = {
   RadioButtonStyleAttrs;
 
 export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<RadioButtonAttrs>) {
     const {
       disabled = false,
       groupName,

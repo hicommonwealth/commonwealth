@@ -160,15 +160,15 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
 
     // derive proposal type from scope if possible
     let proposalType;
-    if (chain.base === ChainBase.CosmosSDK) {
+    if (chain?.base === ChainBase.CosmosSDK) {
       proposalType = ProposalType.CosmosProposal;
-    } else if (chain.network === ChainNetwork.Sputnik) {
+    } else if (chain?.network === ChainNetwork.Sputnik) {
       proposalType = ProposalType.SputnikProposal;
-    } else if (chain.network === ChainNetwork.Moloch) {
+    } else if (chain?.network === ChainNetwork.Moloch) {
       proposalType = ProposalType.MolochProposal;
-    } else if (chain.network === ChainNetwork.Compound) {
+    } else if (chain?.network === ChainNetwork.Compound) {
       proposalType = ProposalType.CompoundProposal;
-    } else if (chain.network === ChainNetwork.Aave) {
+    } else if (chain?.network === ChainNetwork.Aave) {
       proposalType = ProposalType.AaveProposal;
     } else {
       renderWithMetaTags(res, '', '', '', null);

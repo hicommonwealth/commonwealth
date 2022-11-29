@@ -22,7 +22,7 @@ type GovExplainerAttrs = {
 };
 
 export class GovExplainer implements m.ClassComponent<GovExplainerAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<GovExplainerAttrs>) {
     const { statHeaders, stats, statAction } = vnode.attrs;
 
     return (

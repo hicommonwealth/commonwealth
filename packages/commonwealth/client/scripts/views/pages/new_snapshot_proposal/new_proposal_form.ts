@@ -31,9 +31,9 @@ import {
   getVersion,
   createProposal,
 } from 'helpers/snapshot_utils';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 // TODO Graham 7-20-22: Reconcile against NewThreadForm
 interface IThreadForm {
@@ -343,10 +343,9 @@ const NewProposalForm: m.Component<
                       contentRight:
                         idx > 1 &&
                         idx === vnode.state.form.choices.length - 1 &&
-                        m(CWIcon, {
+                        m(CWIconButton, {
                           iconName: 'trash',
                           iconSize: 'large',
-                          style: 'cursor: pointer;',
                           onclick: () => {
                             vnode.state.form.choices.pop();
                             m.redraw();
@@ -404,7 +403,6 @@ const NewProposalForm: m.Component<
                   },
                   placeholder: 'What is your proposal?',
                   editorNamespace: 'new-proposal',
-                  tabindex: 2,
                 }),
               ]),
               m(FormGroup, { order: 5 }, [

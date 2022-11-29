@@ -28,7 +28,7 @@ export class EditProfileModal
   private name: string;
   private saving: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EditProfileModalAttrs>) {
     const { account } = vnode.attrs;
 
     this.avatarUrl = account.profile.avatarUrl;

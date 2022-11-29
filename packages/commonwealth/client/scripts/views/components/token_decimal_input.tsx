@@ -9,20 +9,21 @@ import { CWText } from './component_kit/cw_text';
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWToggle } from './component_kit/cw_toggle';
 
+type TokenDecimalInputAttrs = {
+  decimals: number;
+  defaultValueInWei: string;
+  onInputChange: (valueInWei: string) => void;
+};
+
 export class TokenDecimalInput
-  implements
-    m.ClassComponent<{
-      decimals: number;
-      defaultValueInWei: string;
-      onInputChange: (valueInWei: string) => void;
-    }>
+  implements m.ClassComponent<TokenDecimalInputAttrs>
 {
   private displayValue: string;
   private isInputInWei: boolean;
   private switchCaption: string;
   private valueInWei: string;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<TokenDecimalInputAttrs>) {
     const { defaultValueInWei } = vnode.attrs;
 
     this.valueInWei = defaultValueInWei || '0';
@@ -31,7 +32,7 @@ export class TokenDecimalInput
     this.switchCaption = 'Using base token value';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<TokenDecimalInputAttrs>) {
     const { onInputChange, decimals } = vnode.attrs;
 
     return (
@@ -69,7 +70,6 @@ export class TokenDecimalInput
         {decimals > 0 && (
           <div class="token-settings">
             <CWToggle
-              value={this.isInputInWei}
               checked={!this.isInputInWei}
               onchange={() => {
                 this.isInputInWei = !this.isInputInWei;

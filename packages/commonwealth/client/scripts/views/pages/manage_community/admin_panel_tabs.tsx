@@ -19,11 +19,11 @@ type AdminPanelTabsAttrs = {
 export class AdminPanelTabs implements m.ClassComponent<AdminPanelTabsAttrs> {
   private index: number;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<AdminPanelTabsAttrs>) {
     this.index = vnode.attrs.defaultTab;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<AdminPanelTabsAttrs>) {
     return (
       <div class="AdminPanelTabs">
         <CWTabBar>

@@ -4,16 +4,20 @@ import m from 'mithril';
 
 import 'components/sidebar/index.scss';
 
+import { Action } from 'common-common/src/permissions';
+
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
+import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
 import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
-import { CommunityHeader } from './community_header';
 import { getClasses } from '../component_kit/helpers';
+import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
+import { CWText } from '../component_kit/cw_text';
 
 type SidebarAttrs = {
   isSidebarToggleable?: boolean;
@@ -21,17 +25,37 @@ type SidebarAttrs = {
 };
 
 export class Sidebar implements m.ClassComponent<SidebarAttrs> {
-  view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
+  view(vnode: m.Vnode<SidebarAttrs>) {
     const { isSidebarToggleable, isSidebarToggled } = vnode.attrs;
 
-    const hideChat = !app.chain?.meta?.chatEnabled;
+    const activeAddressRoles = app.roles.getAllRolesInCommunity({
+      chain: app.activeChainId(),
+    });
+
+    const currentChainInfo = app.chain?.meta;
+
+    const hideChat =
+      !currentChainInfo ||
+      !activeAddressRoles ||
+      !isActiveAddressPermitted(
+        activeAddressRoles,
+        currentChainInfo,
+        Action.VIEW_CHAT_CHANNELS
+      );
 
     const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
 
     return (
       <div class="Sidebar">
         {app.chain && isSidebarToggleable && isSidebarToggled && (
-          <CommunityHeader meta={app.chain.meta} />
+          <div class="CommunityHeader">
+            <div class="inner-container">
+              <CWCommunityAvatar size="large" community={app.chain.meta} />
+              <CWText type="h5" fontStyle="medium">
+                {app.chain.meta.name}
+              </CWText>
+            </div>
+          </div>
         )}
         <div class="quickswitcher-and-sidebar-inner">
           {showQuickSwitcher && <SidebarQuickSwitcher />}

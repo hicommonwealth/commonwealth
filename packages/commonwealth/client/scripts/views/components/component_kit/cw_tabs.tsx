@@ -19,7 +19,7 @@ type TabAttrs = {
 } & TabStyleAttrs;
 
 export class CWTab implements m.ClassComponent<TabAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<TabAttrs>) {
     const { disabled, isSelected, label, onclick } = vnode.attrs;
 
     return (
@@ -43,7 +43,7 @@ export class CWTab implements m.ClassComponent<TabAttrs> {
 }
 
 export class CWTabBar implements m.ClassComponent {
-  view(vnode) {
+  view(vnode: m.Vnode) {
     return <div class={ComponentType.TabBar}>{vnode.children}</div>;
   }
 }

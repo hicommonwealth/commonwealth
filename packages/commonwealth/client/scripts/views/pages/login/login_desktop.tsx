@@ -22,7 +22,7 @@ import { LoginAttrs } from './types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<LoginAttrs>) {
     const {
       address,
       bodyType,

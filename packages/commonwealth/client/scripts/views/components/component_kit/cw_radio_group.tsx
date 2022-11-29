@@ -14,7 +14,7 @@ type RadioGroupAttrs = {
   toggledOption: string;
 };
 export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<RadioGroupAttrs>) {
     const { options, onchange, name, toggledOption } = vnode.attrs;
 
     return (

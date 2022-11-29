@@ -2,14 +2,10 @@ import { assert } from 'chai';
 import {
   createDefaultCommunityRoles,
   createRole,
-} from '../../../server/util/roles';
-import * as modelUtils from '../../util/modelUtils';
-import models from '../../../server/database';
-import {
-  ChainBase,
-  ChainNetwork,
-  ChainType,
-} from '../../../../common-common/src/types';
+} from 'commonwealth/server/util/roles';
+import * as modelUtils from 'commonwealth/test/util/modelUtils';
+import models from 'commonwealth/server/database';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 
 describe('createRole tests', () => {
   let loggedInAddr: string;
@@ -103,7 +99,8 @@ describe('createRole tests', () => {
       icon_url: 'https://commonwealth.im/static/media/eth.5b2b1b1f.svg',
       active: false,
       type: ChainType.Token,
-      chat_enabled: false,
+      default_allow_permissions: BigInt(0),
+      default_deny_permissions: BigInt(2048),
     });
 
     await createDefaultCommunityRoles(models, chainObj.id);

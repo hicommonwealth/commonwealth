@@ -16,7 +16,7 @@ type TooltipAttrs = {
 } & SharedPopoverAttrs;
 
 export class CWTooltip implements m.ClassComponent<TooltipAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<TooltipAttrs>) {
     const {
       hoverCloseDelay = 1500,
       hoverOpenDelay,

@@ -19,7 +19,7 @@ type LinkedThreadModalAttrs = {
 export class LinkedThreadModal
   implements m.ClassComponent<LinkedThreadModalAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<LinkedThreadModalAttrs>) {
     const { linkingThread, linkedThreads, onclose } = vnode.attrs;
 
     return (
