@@ -37,11 +37,11 @@ class SubstrateTreasuryTips extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TipProposal);
+    const entities = this.app.chainEntities.store.getByType(SubstrateTypes.EntityKind.TipProposal);
     entities.forEach((e) => this._entityConstructor(e));
 
     // register new chain-event handlers
-    this.app.chain.chainEntities.registerEntityHandler(
+    this.app.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.TipProposal, (entity, event) => {
         this.updateProposal(entity, event);
       }

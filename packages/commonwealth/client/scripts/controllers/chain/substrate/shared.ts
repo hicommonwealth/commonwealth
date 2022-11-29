@@ -224,7 +224,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   public initChainEntities(): Promise<void> {
     const subscriber = new SubstrateEvents.Subscriber(this.api);
     const processor = new SubstrateEvents.Processor(this.api);
-    return this._app.chain.chainEntities.subscribeEntities(
+    return this._app.chainEntities.subscribeEntities(
       this._app.chain.id,
       chainToEventNetwork(this.app.chain.meta),
       subscriber,

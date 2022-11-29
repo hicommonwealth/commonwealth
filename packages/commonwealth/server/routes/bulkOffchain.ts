@@ -16,7 +16,7 @@ import { RoleInstance } from '../models/role';
 import { RuleInstance } from '../models/rule';
 import { ThreadInstance } from '../models/thread';
 import { TopicInstance } from '../models/topic';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
 import validateChain from '../util/validateChain';
 
@@ -89,7 +89,8 @@ const bulkOffchain = async (
               as: 'topic',
             },
             {
-              model: models.ChainEntity,
+              model: models.ChainEntityMeta,
+                as: 'chain_entity_meta'
             },
             {
               model: models.LinkedThread,

@@ -4,8 +4,7 @@ import bodyParser from 'body-parser';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
-import { AppError, ServerError } from './errors';
-
+import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 function setupCosmosProxy(app: Express, models: DB) {

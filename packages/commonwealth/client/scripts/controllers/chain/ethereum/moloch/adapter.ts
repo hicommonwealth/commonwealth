@@ -20,7 +20,6 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
   public ethAccounts: EthereumAccounts;
   public accounts: MolochMembers;
   public governance: MolochGovernance;
-  public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);

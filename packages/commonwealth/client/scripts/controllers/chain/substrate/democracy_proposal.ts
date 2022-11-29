@@ -177,7 +177,7 @@ class SubstrateDemocracyProposal extends Proposal<
     this.threadTitle = entity.threadTitle;
 
     // see if preimage exists and populate data if it does
-    const preimage = this._Proposals.app.chain.chainEntities.getPreimage(
+    const preimage = this._Proposals.app.chainEntities.getPreimage(
       eventData.proposalHash
     );
     if (preimage) {
@@ -241,7 +241,7 @@ class SubstrateDemocracyProposal extends Proposal<
         break;
       }
       case SubstrateTypes.EventKind.PreimageNoted: {
-        const preimage = this._Proposals.app.chain.chainEntities.getPreimage(
+        const preimage = this._Proposals.app.chainEntities.getPreimage(
           this.hash
         );
         if (preimage) {

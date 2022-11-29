@@ -32,7 +32,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
 
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
-  public readonly chainEntities?: ChainEntityController;
   public readonly communityBanner?: string;
 
   public deferred: boolean;
@@ -46,24 +45,14 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     clearLocalStorage();
     console.log(`Starting ${this.meta.name}`);
     let response;
-    if (this.chainEntities) {
-      [, response] = await Promise.all([
-        this.chainEntities.refresh(this.meta.id),
-        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-          chain: this.id,
-          community: null,
-          jwt: this.app.user.jwt,
-        }),
-      ]);
-    } else {
-      [response, ] = await Promise.all([
-        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-          chain: this.id,
-          community: null,
-          jwt: this.app.user.jwt,
-        }),
-      ]);
-    }
+    [, response] = await Promise.all([
+      this.app.chainEntities.refresh(this.meta.id),
+      $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+        chain: this.id,
+        community: null,
+        jwt: this.app.user.jwt,
+      }),
+    ]);
 
     // If user is no longer on the initializing chain, abort initialization
     // and return false, so that the invoking selectChain fn can similarly
@@ -118,8 +107,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.threads.deinit();
     this.app.comments.deinit();
     this.app.reactions.deinit();
-    if (this.chainEntities) {
-      this.chainEntities.deinit();
+    if (this.app.chainEntities) {
+      this.app.chainEntities.deinit();
     }
     this.app.reactionCounts.deinit();
     this.app.threadUniqueAddressesCount.deinit();
