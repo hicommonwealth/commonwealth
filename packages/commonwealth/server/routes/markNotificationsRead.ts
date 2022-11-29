@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { DB } from '../models';
 import { sequelize } from '../database';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError, ServerError } from '../util/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

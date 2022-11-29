@@ -6,15 +6,14 @@ import Rollbar from 'rollbar';
 import { DEFAULT_PORT } from '../config';
 import { DB } from '../models';
 import { setupWebSocketServer } from '../socket';
-import {RabbitMQController} from "common-common/src/rabbitmq";
 
 const log = factory.getLogger(formatFilename(__filename));
 
-const setupServer = (app: Express, rollbar: Rollbar, models: DB, rabbitMQController: RabbitMQController) => {
+const setupServer = (app: Express, rollbar: Rollbar, models: DB) => {
   const port = process.env.PORT || DEFAULT_PORT;
   app.set('port', port);
   const server = http.createServer(app);
-  setupWebSocketServer(server, rollbar, models, rabbitMQController);
+  setupWebSocketServer(server, rollbar, models);
 
   const onError = (error) => {
     if (error.syscall !== 'listen') {

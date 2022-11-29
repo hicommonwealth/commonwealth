@@ -83,6 +83,7 @@ export const enum MixpanelCommunityCreationEvent {
   NEW_COMMUNITY_CREATION = 'New Community Creation',
   CREATE_COMMUNITY_ATTEMPTED = 'Create Community Attempted',
 }
+
 // END NEW COMMUNITY CREATION EVENT
 
 // CHAT EVENTS

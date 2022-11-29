@@ -131,8 +131,20 @@ export class SubstrateTreasuryProposal
 
     entity.chainEvents.forEach((e) => this.update(e));
 
-    this._initialized = true;
-    this._Treasury.store.add(this);
+    if (!this._completed) {
+      const slug = chainEntityTypeToProposalSlug(entity.type);
+      const uniqueId = `${slug}_${entity.typeId}`;
+      this._Chain.app.chain.chainEntities._fetchTitle(entity.chain, uniqueId).then((response) => {
+        if (response.status === 'Success' && response.result?.length) {
+          this.title = response.result;
+        }
+      });
+      this._initialized = true;
+      this._Treasury.store.add(this);
+    } else {
+      this._initialized = true;
+      this._Treasury.store.add(this);
+    }
   }
 
   protected complete() {

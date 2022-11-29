@@ -90,6 +90,7 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
+      ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       discord: { type: dataTypes.STRING, allowNull: true },
       element: { type: dataTypes.STRING, allowNull: true },
@@ -165,7 +166,6 @@ export default (
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
-    models.Chain.hasMany(models.ChainEntityMeta, { foreignKey: 'chain' })
   };
 
   return Chain;

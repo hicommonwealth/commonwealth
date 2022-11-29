@@ -2,20 +2,23 @@ import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
 import { NotificationsReadAttributes, NotificationsReadInstance } from './notifications_read';
+import { ChainEventAttributes, ChainEventInstance } from './chain_event';
 
 export type NotificationAttributes = {
-  id: number;
   notification_data: string;
   chain_id?: string;
   category_id: string;
+  id?: number;
   chain_event_id?: number;
   created_at?: Date;
   updated_at?: Date;
   NotificationsRead?: NotificationsReadAttributes[];
+  ChainEvent?: ChainEventAttributes;
 }
 
 export type NotificationInstance = ModelInstance<NotificationAttributes> & {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
+  getChainEvent: Sequelize.HasOneGetAssociationMixin<ChainEventInstance>;
 }
 
 export type NotificationModelStatic = ModelStatic<NotificationInstance>;
@@ -40,6 +43,7 @@ export default (
 
   Notification.associate = (models) => {
     models.Notification.hasMany(models.NotificationsRead, { foreignKey: 'notification_id', onDelete: 'cascade', hooks: true })
+    models.Notification.belongsTo(models.ChainEvent, { foreignKey: 'chain_event_id', targetKey: 'id' });
     models.Notification.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name'});
     models.Notification.belongsTo(models.Chain, {foreignKey: 'chain_id', targetKey: 'id'});
   };
