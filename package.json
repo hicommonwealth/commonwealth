@@ -9,7 +9,8 @@
     "reset-db": "yarn --cwd packages/commonwealth reset-db",
     "load-db": "yarn --cwd packages/commonwealth load-db",
     "migrate-db": "yarn --cwd packages/commonwealth migrate-db",
-    "start-all": "concurrently -p '{name}' -c red,green,yellow,blue,magenta -n cw-app,cw-consumer,ce-app,ce-consumer,ce-subscriber 'yarn --cwd packages/commonwealth start' 'yarn --cwd packages/commonwealth start-consumer' 'yarn --cwd packages/chain-events start-app' 'yarn --cwd packages/chain-events start-consumer' 'yarn --cwd packages/chain-events start-subscriber'"
+    "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
+    "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps"
   },
   "engines": {
     "node": "14.x"

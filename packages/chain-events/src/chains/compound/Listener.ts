@@ -188,7 +188,6 @@ export class Listener extends BaseListener<
     const socketConnected = provider.provider.connected;
     const polling = provider.polling;
 
-    this.log.info(`\n\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>${readyState}, ${socketConnected}, ${polling}`);
     return readyState && socketConnected && polling;
   }
 }
