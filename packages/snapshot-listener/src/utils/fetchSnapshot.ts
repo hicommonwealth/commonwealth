@@ -16,8 +16,8 @@ export default async function fetchNewSnapshotProposal(id: string) {
             body: "This is a dummy proposal",
             choices: ["Yes", "No"],
             space: "dummy-space.eth",
-            start: "2021-01-01T00:00:00.000Z", // TODO: is this the format we get back?
-            end: "2021-01-01T00:00:00.000Z",
+            start: 1660680000, // TODO: is this the format we get back?
+            end: 1670680000,
           },
         },
       };

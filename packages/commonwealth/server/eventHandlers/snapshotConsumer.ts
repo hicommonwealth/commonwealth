@@ -45,6 +45,11 @@ async function processSnapshotMessage(msg: SnapshotNotification) {
       });
     }
 
+    if (eventType === 'proposal/deleted') {
+      console.log('Deleting proposal');
+      await proposal.destroy();
+    }
+
     const associatedCommunities = await models.CommunitySnapshotSpaces.findAll({
       where: { snapshot_space_id: space },
     });
