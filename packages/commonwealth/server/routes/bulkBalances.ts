@@ -119,7 +119,6 @@ const bulkBalances = async (
         balances[nodeId] = balanceTotal.toString();
       } catch (e) {
         log.info(`Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`);
-        tokenBalanceCache.statsDSender.sendError(e)
       }
     } else {
       // this is for Ethereum / Solana Bases

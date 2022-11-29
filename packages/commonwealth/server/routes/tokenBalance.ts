@@ -63,7 +63,6 @@ const tokenBalance = async (
     bp = providersResult[0].bp;
   } catch (e) {
     log.info(e.message);
-    tokenBalanceCache.statsDSender.sendError(e);
     throw new AppError(`No token balance provider found for ${chain.id}`);
   }
 

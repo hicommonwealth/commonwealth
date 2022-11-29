@@ -13,7 +13,7 @@ export class TbcStatsDSender {
         nodeId: nodeId.toString(),
         contract: bp.opts['contract'],
         project: ProjectTag.TokenBalanceCache,
-      }
+      };
 
       this.statsD.increment(`tbc.provider_requests`, tags)
     });
@@ -23,7 +23,7 @@ export class TbcStatsDSender {
   sendCacheSizeInfo({ zero, nonZero }) {
     const tags = {
       project: ProjectTag.TokenBalanceCache,
-    }
+    };
 
     this.statsD.gauge('tbc.cache_size_zero', zero, tags);
     this.statsD.gauge('tbc.cache_size_nonzero', nonZero, tags);
@@ -35,7 +35,7 @@ export class TbcStatsDSender {
       name: name,
       node: nodeId.toString(),
       project: ProjectTag.TokenBalanceCache,
-    }
+    };
 
     this.statsD.timing('tbc.fetch_timings', stop - start, tags);
   }
@@ -46,7 +46,7 @@ export class TbcStatsDSender {
       cacheKey: cacheKey,
       date: Date.now().toString(),
       project: ProjectTag.TokenBalanceCache,
-    }
+    };
 
     this.statsD.increment('tbc.node_removed', tags);
   }
@@ -56,7 +56,7 @@ export class TbcStatsDSender {
     const tags = {
       reason: error.message,
       project: ProjectTag.TokenBalanceCache,
-    }
+    };
 
     this.statsD.increment('tbc.error', tags);
   }
