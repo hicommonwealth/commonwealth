@@ -95,6 +95,11 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       getBaseUrl(ServiceUrls.chainEvents) + '/events',
       {limit: 50, ordered: true}
     );
+
+    if (!Array.isArray(events)) {
+      return {status: 'Failure', result: []}
+    }
+
     let chains: any = new Set();
     for (const event of events) {
       chains.add(event.chain)
@@ -111,7 +116,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
     }
 
     for (const event of events) {
-      events.icon_url = chainIconUrls[event.chain];
+      (<any>events).icon_url = chainIconUrls[event.chain];
     }
 
     activity = {

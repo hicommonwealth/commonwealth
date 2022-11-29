@@ -26,7 +26,6 @@ import { modelFromServer as modelReactionFromServer } from 'controllers/server/r
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { LinkedThreadAttributes } from 'server/models/linked_thread';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
-import {getBaseUrl, getFetch, ServiceUrls} from "helpers/getUrl";
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
