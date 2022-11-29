@@ -3,7 +3,7 @@ import { IApp } from 'state';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { AaveEvents, AaveTypes } from 'chain-events/src';
 import { Executor } from 'common-common/src/eth/types';
-import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
+import { chainToEventNetwork } from 'controllers/server/chain_entities';
 
 import AaveProposal from './proposal';
 import AaveChain from './chain';
@@ -108,7 +108,7 @@ export default class AaveGovernance extends ProposalModule<
 
     // load server proposals
     console.log('Fetching aave proposals from backend.');
-    await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
+    await this.app.chain.chainEntities.refresh(this.app.chain.id);
     const entities = this.app.chain.chainEntities.store.getByType(AaveTypes.EntityKind.Proposal);
     entities.forEach((e) => this._entityConstructor(e));
     console.log(`Found ${entities.length} proposals!`);
