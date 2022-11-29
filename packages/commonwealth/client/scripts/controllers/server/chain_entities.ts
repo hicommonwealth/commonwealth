@@ -98,10 +98,12 @@ class ChainEntityController {
       getFetch(getBaseUrl() + '/getEntityMeta', options)
     ]);
 
-    // save the chain-entity objects in the store
-    for (const entityJSON of entities) {
-      const entity = ChainEntity.fromJSON(entityJSON);
-      this._store.add(entity);
+    if (Array.isArray(entities)) {
+      // save the chain-entity objects in the store
+      for (const entityJSON of entities) {
+        const entity = ChainEntity.fromJSON(entityJSON);
+        this._store.add(entity);
+      }
     }
 
     // save chain-entity metadata to the appropriate chain-entity
@@ -116,9 +118,11 @@ class ChainEntityController {
 
   public async refreshRawEntities(chain: string) {
     const entities = await getFetch(getBaseUrl(ServiceUrls.chainEvents) + '/entities', {chain});
-    for (const entityJSON of entities) {
-      const entity = ChainEntity.fromJSON(entityJSON);
-      this._store.add(entity);
+    if (Array.isArray(entities)) {
+      for (const entityJSON of entities) {
+        const entity = ChainEntity.fromJSON(entityJSON);
+        this._store.add(entity);
+      }
     }
   }
 

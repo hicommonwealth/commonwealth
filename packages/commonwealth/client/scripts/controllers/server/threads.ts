@@ -92,8 +92,8 @@ export const modelFromServer = (thread) => {
   if (chain_entity_meta) {
     for (const meta of chain_entity_meta) {
       const full_entity = app.chainEntities.store.getById(meta.ce_id);
-      if (meta.title) full_entity.title = meta.title;
       if (full_entity) {
+        if (meta.title) full_entity.title = meta.title;
         chainEntitiesProcessed.push(full_entity);
       }
     }
