@@ -44,6 +44,7 @@ export function removePermission(
 }
 
 export const BASE_PERMISSIONS: Permissions =
+  addPermission(BigInt(0), Action.CREATE_THREAD) |
   addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
   addPermission(BigInt(0), Action.VIEW_THREADS);
 
