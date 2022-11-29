@@ -3,7 +3,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
-import StatsDController from '../util/statsd';
+import StatsDController from 'common-common/src/statsd';
 
 const logout = async (models: DB, req: Request, res: Response) => {
   // Passport has a race condition where req.logout resolves too
