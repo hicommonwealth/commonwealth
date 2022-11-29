@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ListItem, QueryList, Spinner } from 'construct-ui';
+import { ListItem, QueryList } from 'construct-ui';
 
 import 'components/thread_selector.scss';
 
@@ -12,41 +12,43 @@ import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWText } from './component_kit/cw_text';
+import { CWSpinner } from './component_kit/cw_spinner';
 
-const renderThreadPreview = (state, thread: Thread, idx: number) => {
-  const selected = state.linkedThreads.find((lT) => +lT.id === +thread.id);
+const renderThreadPreview = (
+  linkedThreads: Array<Thread>,
+  thread: Thread,
+  idx: number
+) => {
+  const selected = linkedThreads.some((lt) => +lt.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
-  return (
-    <ListItem
-      label={
-        <div class="thread-preview-row">
-          <CWText fontWeight="medium" noWrap>
-            {thread.title}
-          </CWText>
-          <CWText type="caption">
-            {author.name
-              ? `${author.name} • ${formatAddressShort(thread.author)}`
-              : thread.author}
-          </CWText>
-        </div>
-      }
-      selected={selected}
-      key={idx}
-    />
-  );
+  return m(ListItem, {
+    label: (
+      <div class="thread-preview-row">
+        <CWText fontWeight="medium" noWrap>
+          {thread.title}
+        </CWText>
+        <CWText type="caption">
+          {author.name
+            ? `${author.name} • ${formatAddressShort(thread.author)}`
+            : thread.author}
+        </CWText>
+      </div>
+    ),
+    selected,
+    key: idx,
+  });
 };
 
 // The thread-to-thread relationship is comprised of linked and linking threads,
 // i.e. child and parent nodes.
 
-export class ThreadSelector
-  implements
-    m.ClassComponent<{
-      linkedThreads: Thread[];
-      linkingThread: Thread;
-    }>
-{
+type ThreadSelectorAttrs = {
+  linkedThreads: Array<Thread>;
+  linkingThread: Thread;
+};
+
+export class ThreadSelector implements m.ClassComponent<ThreadSelectorAttrs> {
   private inputTimeout;
   private linkedThreads: Thread[];
   private loading: boolean;
@@ -54,14 +56,14 @@ export class ThreadSelector
   private searchTerm: string;
   private showOnlyLinkedThreads: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ThreadSelectorAttrs>) {
     this.showOnlyLinkedThreads = true;
     this.searchResults = [];
     this.linkedThreads = vnode.attrs.linkedThreads;
     this.searchTerm = '';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ThreadSelectorAttrs>) {
     const { linkingThread } = vnode.attrs;
     const { searchResults } = this;
 
@@ -86,7 +88,7 @@ export class ThreadSelector
     return (
       <div class="ThreadSelector">
         {this.loading ? (
-          <Spinner active fill message="Loading threads..." />
+          <CWSpinner />
         ) : (
           <>
             <CWTextInput
@@ -139,22 +141,20 @@ export class ThreadSelector
                 }, 250);
               }}
             />
-            <QueryList
-              filterable={false}
-              checkmark
-              inputAttrs={{
+            {m(QueryList, {
+              filterable: false,
+              checkmark: true,
+              inputAttrs: {
                 placeholder: 'Search for thread to link...',
-              }}
-              emptyContent={getEmptyContentMessage()}
-              items={
+              },
+              emptyContent: getEmptyContentMessage(),
+              items:
                 this.showOnlyLinkedThreads && !queryLength
                   ? linkedThreads
-                  : searchResults
-              }
-              itemRender={(item: Thread, idx) =>
-                renderThreadPreview(this, item, idx)
-              }
-              onSelect={(thread: Thread) => {
+                  : searchResults,
+              itemRender: (item: Thread, idx) =>
+                renderThreadPreview(this.linkedThreads, item, idx),
+              onSelect: (thread: Thread) => {
                 const selectedThreadIdx = linkedThreads.findIndex(
                   (linkedThread) => linkedThread.id === thread.id
                 );
@@ -180,8 +180,8 @@ export class ThreadSelector
                       notifyError('Thread failed to link.');
                     });
                 }
-              }}
-            />
+              },
+            })}
           </>
         )}
       </div>

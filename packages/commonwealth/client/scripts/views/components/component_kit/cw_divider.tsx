@@ -12,7 +12,7 @@ type DividerAttrs = {
 };
 
 export class CWDivider implements m.ClassComponent<DividerAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<DividerAttrs>) {
     const { isVertical } = vnode.attrs;
 
     return (

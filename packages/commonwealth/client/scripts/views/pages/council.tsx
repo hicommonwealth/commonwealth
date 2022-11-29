@@ -8,7 +8,7 @@ import app, { ApiStatus } from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase } from 'common-common/src/types';
 import { pluralize } from 'helpers';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import Sublayout from 'views/sublayout';
@@ -25,8 +25,12 @@ import { GovExplainer } from '../components/gov_explainer';
 import { CWButton } from '../components/component_kit/cw_button';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
-class Councillor implements m.ClassComponent<{ account }> {
-  view(vnode) {
+type CouncillorAttrs = {
+  account: SubstrateAccount;
+};
+
+class Councillor implements m.ClassComponent<CouncillorAttrs> {
+  view(vnode: m.Vnode<CouncillorAttrs>) {
     if (!vnode.attrs.account) return;
 
     const { account } = vnode.attrs;

@@ -3,7 +3,7 @@ import Sequelize from 'sequelize';
 import validateChain from '../util/validateChain';
 const { Op } = Sequelize;
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));

@@ -8,7 +8,6 @@ import { isSameAccount } from 'helpers';
 
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
-import { PolkadotExtension } from '@magic-ext/polkadot';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import {
   ChainInfo,
@@ -16,10 +15,10 @@ import {
   Account,
   AddressInfo,
   ITokenAdapter,
+  BlockInfo,
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
-const MAGIC_PUBLISHABLE_KEY = 'pk_live_B0604AA1B8EEFDB4';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -121,7 +120,6 @@ export async function completeClientLogin(account: Account) {
 
     // set the address as active
     await setActiveAccount(account);
-
     if (
       app.user.activeAccounts.filter((a) => isSameAccount(a, account))
         .length === 0
@@ -247,13 +245,15 @@ export function updateActiveUser(data) {
 export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
-  chain: string
+  chain: string,
+  validationBlockInfo?: BlockInfo,
 ): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
+    block_info: JSON.stringify(validationBlockInfo)
   });
   const id = response.result.id;
   const chainInfo = app.config.chains.getById(chain);
@@ -263,6 +263,7 @@ export async function createUserWithAddress(
     chain: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
+    validationBlockInfo: response.result.block_info,
   });
   return { account, newlyCreated: response.result.newly_created };
 }
@@ -294,15 +295,7 @@ export async function unlinkLogin(account: AddressInfo) {
 }
 
 export async function loginWithMagicLink(email: string) {
-  const magic = new Magic(MAGIC_PUBLISHABLE_KEY, {
-    extensions: [
-      new PolkadotExtension({
-        // we don't need a real node URL because we're only generating an address,
-        // not doing anything requiring chain connection
-        rpcUrl: 'ws://localhost:9944',
-      }),
-    ],
-  });
+  const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
     url: `${app.serverUrl()}/auth/magic`,

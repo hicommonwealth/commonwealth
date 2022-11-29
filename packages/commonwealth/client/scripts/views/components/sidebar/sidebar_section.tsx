@@ -14,7 +14,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 
 class SubSection implements m.ClassComponent<SubSectionAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<SubSectionAttrs>) {
     const {
       isActive,
       isUpdated,
@@ -59,13 +59,13 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<SectionGroupAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SectionGroupAttrs>) {
     const {
       containsChildren,
       displayData,
@@ -76,7 +76,6 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       rightIcon,
       title,
     } = vnode.attrs;
-    const { toggled } = this;
 
     if (!isVisible) {
       return;
@@ -84,9 +83,11 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
 
     const clickHandler = (e) => {
       if (containsChildren) {
-        this.toggled = !toggled;
+        this.toggled = !this.toggled;
       }
+
       localStorage.setItem(`${app.activeChainId()}-sidebar-toggle`, 'false');
+
       onclick(e, this.toggled);
     };
 
@@ -111,7 +112,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
     }
 
     const mouseEnterHandler = (e) => {
-      if (toggled || this.hoverOn) {
+      if (this.toggled || this.hoverOn) {
         e.redraw = false;
         e.stopPropagation();
       }
@@ -149,7 +150,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
           </CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
         </div>
-        {containsChildren && toggled && (
+        {containsChildren && this.toggled && (
           <div class="subsections">
             {displayData.map((subsection) => (
               <SubSection {...subsection} />
@@ -167,14 +168,14 @@ export class SidebarSectionGroup
   private toggled: boolean;
   private hoverColor: string;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
     this.hoverColor = 'none';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SidebarSectionAttrs>) {
     const {
       displayData,
       extraComponents,
@@ -183,14 +184,14 @@ export class SidebarSectionGroup
       title,
       toggleDisabled,
     } = vnode.attrs;
-    const { toggled, hoverColor } = this;
 
     const clickHandler = (e, sectionName: string) => {
       if (toggleDisabled) {
         return;
       }
 
-      this.toggled = !toggled;
+      this.toggled = !this.toggled;
+
       localStorage.setItem(
         `${sectionName}-toggled`,
         (!!this.toggled).toString()
@@ -204,7 +205,7 @@ export class SidebarSectionGroup
     };
 
     const mouseEnterHandler = (e) => {
-      if (toggled || this.hoverColor) {
+      if (this.toggled || this.hoverColor) {
         e.redraw = false;
         e.stopPropagation();
       }
@@ -214,7 +215,7 @@ export class SidebarSectionGroup
       this.hoverColor = 'none';
     };
 
-    const carat = toggled ? (
+    const carat = this.toggled ? (
       <CWIcon iconName="chevronDown" iconSize="small" />
     ) : (
       <CWIcon iconName="chevronRight" iconSize="small" />

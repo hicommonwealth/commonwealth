@@ -11,6 +11,7 @@ import {
   loginWithMagicLink,
   updateActiveAddresses,
 } from 'controllers/app/login';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
 import { Account, IWebWallet } from 'models';
@@ -50,7 +51,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
   private magicLoading: boolean;
   private showMobile: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<LoginModalAttrs>) {
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
@@ -90,9 +91,9 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.primaryAccount = vnode.attrs.initialAccount;
       this.address = vnode.attrs.initialAccount.address;
     }
-    if (vnode.attrs.initialWebWallet) {
-      this.selectedWallet = vnode.attrs.initialWebWallet;
-    }
+    // if (vnode.attrs.initialWebWallet) {
+    //   this.selectedWallet = vnode.attrs.initialWebWallet;
+    // }
     if (vnode.attrs.initialWallets) {
       this.wallets = vnode.attrs.initialWallets;
     }
@@ -122,11 +123,14 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     );
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<LoginModalAttrs>) {
     const { onSuccess } = vnode.attrs;
     const wcEnabled = _.any(
       this.wallets,
-      (w) => w instanceof WalletConnectWebWalletController && w.enabled
+      (w) =>
+        (w instanceof WalletConnectWebWalletController ||
+          w instanceof TerraWalletConnectWebWalletController) &&
+        w.enabled
     );
 
     // Handles Magic Link Login

@@ -4,7 +4,7 @@ import passportDiscord from 'passport-discord';
 import { Request } from 'express';
 
 import '../types';
-import { DB } from '../database';
+import { DB } from '../models';
 import {
   GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK,
   DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OAUTH_CALLBACK, DISCORD_OAUTH_SCOPES

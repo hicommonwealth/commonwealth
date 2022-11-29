@@ -3,7 +3,7 @@
 import { Op } from 'sequelize';
 import JobRunner from 'common-common/src/cacheJobRunner';
 
-import { DB } from '../database';
+import { DB } from '../models';
 
 
 export const BanErrors = {

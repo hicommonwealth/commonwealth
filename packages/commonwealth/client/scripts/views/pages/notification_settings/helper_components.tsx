@@ -134,10 +134,14 @@ const getTextRows = (subscription: NotificationSubscription) => {
   }
 };
 
+type SubscriptionRowAttrs = {
+  subscription: NotificationSubscription;
+};
+
 export class SubscriptionRowTextContainer
-  implements m.ClassComponent<{ subscription: NotificationSubscription }>
+  implements m.ClassComponent<SubscriptionRowAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
 
     return (
@@ -157,9 +161,9 @@ export class SubscriptionRowTextContainer
 }
 
 export class SubscriptionRowMenu
-  implements m.ClassComponent<{ subscription: NotificationSubscription }>
+  implements m.ClassComponent<SubscriptionRowAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
     return (
       <CWPopoverMenu
@@ -167,7 +171,7 @@ export class SubscriptionRowMenu
         menuItems={[
           {
             label: 'Unsubscribe',
-            iconName: 'close',
+            iconLeft: 'close',
             isSecondary: true,
             onclick: () =>
               app.user.notifications

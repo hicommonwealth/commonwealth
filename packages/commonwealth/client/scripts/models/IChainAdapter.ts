@@ -65,19 +65,20 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         }),
       ]);
     } else {
-      response = await $.get(`${this.app.serverUrl()}/bulkOffchain`, {
-        chain: this.id,
-        community: null,
-        jwt: this.app.user.jwt,
-      });
+      [response, ] = await Promise.all([
+        $.get(`${this.app.serverUrl()}/bulkOffchain`, {
+          chain: this.id,
+          community: null,
+          jwt: this.app.user.jwt,
+        }),
+      ]);
     }
 
     // If user is no longer on the initializing chain, abort initialization
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
     if (
-      this.meta.id !==
-      (this.app.customDomainId() || m.route.param('scope'))
+      this.meta.id !== (this.app.customDomainId() || m.route.param('scope'))
     ) {
       return false;
     }
@@ -90,14 +91,21 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       numVotingThreads,
       chatChannels,
       rules, // TODO: store in rules controller
-      communityBanner
+      communityBanner,
+      contracts,
+      communityRoles,
     } = response.result;
     this.app.topics.initialize(topics, true);
     this.app.threads.initialize(pinnedThreads, numVotingThreads, true);
     this.meta.setAdmins(admins);
     this.app.recentActivity.setMostActiveUsers(activeUsers);
     this.meta.setBanner(communityBanner);
-    console.log('initializing banner', this.meta.communityBanner);
+    this.app.contracts.initialize(contracts, true);
+
+    // add community roles to the chain's roles
+    this.meta.communityRoles = communityRoles;
+
+    await this.app.recentActivity.getRecentTopicActivity(this.id);
 
     // parse/save the chat channels
     await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));

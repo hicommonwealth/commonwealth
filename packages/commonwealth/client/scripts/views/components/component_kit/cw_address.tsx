@@ -13,7 +13,7 @@ type AddressAttrs = {
 };
 
 export class CWAddress implements m.ClassComponent<AddressAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<AddressAttrs>) {
     const { address, darkMode } = vnode.attrs;
     return (
       <div class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'Address')}>

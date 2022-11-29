@@ -29,7 +29,7 @@ export class DiscussionRowReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<DiscussionRowReactionButtonAttrs, this>) {
+  view(vnode: m.Vnode<DiscussionRowReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};
@@ -91,9 +91,7 @@ export class DiscussionRowReactionButton
         onmouseenter={async () => {
           this.reactors = await fetchReactionsByPost(thread);
         }}
-        onclick={async (e) =>
-          onReactionClick(e, hasReacted, dislike, like, thread)
-        }
+        onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
         class={`DiscussionRowReactionButton${this.loading ? ' disabled' : ''}${
           hasReacted ? ' has-reacted' : ''
         }`}
@@ -106,22 +104,20 @@ export class DiscussionRowReactionButton
       </div>
     );
 
-    return likes > 0 ? (
-      <Popover
-        interactionType="hover"
-        content={
-          <div class="reaction-button-tooltip-contents">
-            {getDisplayedReactorsForPopup({
-              likes,
-              reactors: this.reactors,
-            })}
-          </div>
-        }
-        trigger={reactionButtonComponent}
-        hoverOpenDelay={100}
-      />
-    ) : (
-      reactionButtonComponent
-    );
+    return likes > 0
+      ? m(Popover, {
+          interactionType: 'hover',
+          content: (
+            <div class="reaction-button-tooltip-contents">
+              {getDisplayedReactorsForPopup({
+                likes,
+                reactors: this.reactors,
+              })}
+            </div>
+          ),
+          trigger: reactionButtonComponent,
+          hoverOpenDelay: 100,
+        })
+      : reactionButtonComponent;
   }
 }

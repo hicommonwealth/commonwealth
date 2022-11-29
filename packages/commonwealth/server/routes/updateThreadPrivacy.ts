@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -35,16 +36,14 @@ const updateThreadPrivacy = async (
       .map((addr) => addr.id);
     if (!userOwnedAddressIds.includes(thread.address_id)) {
       // is not author
-      const roles = await models.Role.findAll({
-        where: {
-          address_id: { [Op.in]: userOwnedAddressIds },
-          permission: { [Op.in]: ['admin', 'moderator'] },
-        },
-      });
+      const roles = await findAllRoles(
+        models,
+        { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+        thread.chain,
+        ['admin', 'moderator']
+      );
       const role = roles.find((r) => {
-        return (
-          r.chain_id === thread.chain
-        );
+        return r.chain_id === thread.chain;
       });
       if (!role) return next(new AppError(Errors.NotAdmin));
     }

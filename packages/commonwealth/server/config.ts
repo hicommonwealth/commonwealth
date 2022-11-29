@@ -73,13 +73,24 @@ export const RABBITMQ_URI = (() => {
   } else return process.env.CLOUDAMQP_URL;
 })();
 
-// if REDIS_URL exists use that (production or local redis instance) otherwise if
-// the Vultr server info is given then use that. Undefined otherwise.
-export const REDIS_URL = process.env.REDIS_URL
-  ? process.env.REDIS_URL
-  : process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT
-  ? `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`
-  : undefined;
+export const RABBITMQ_API_URI = (() => {
+  if (process.env.VULTR_RABBITMQ_CONTAINER_PORT && process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT)
+    return `http://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT}/api`
+  else return 'http://guest:guest@localhost:15672/api'
+})();
+
+
+// if a tls redis url is provided then that takes priority over everything else
+// then if a normal non-tls url is provided that is the second best option (local/staging)
+// finally, if no redis url is specified we use the Vultr redis instance (vultr)
+export const REDIS_URL = (() => {
+  if (process.env.REDIS_TLS_URL) return process.env.REDIS_TLS_URL; // staging + production
+  if (process.env.REDIS_URL) return process.env.REDIS_URL; // local + staging
+  if (process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT) // vultr
+    return `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`
+
+  return undefined;
+})();
 
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations
@@ -91,7 +102,7 @@ export const MIXPANEL_TOKEN = process.env.MIXPANEL_TOKEN;
 export const MAGIC_API_KEY = process.env.MAGIC_API_KEY;
 export const MAGIC_SUPPORTED_BASES = (process.env.MAGIC_SUPPORTED_BASES?.split(
   ','
-) as ChainBase[]) || [ChainBase.Ethereum, ChainBase.Substrate];
+) as ChainBase[]) || [ChainBase.Ethereum];
 export const MAGIC_DEFAULT_CHAIN =
   process.env.MAGIC_DEFAULT_CHAIN || 'ethereum';
 

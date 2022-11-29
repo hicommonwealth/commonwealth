@@ -6,6 +6,7 @@ import app from 'state';
 import 'pages/login/login_desktop_sidebar.scss';
 
 import { IWebWallet } from 'models';
+import { ChainNetwork } from 'common-common/src/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
 import { CWButton } from '../../components/component_kit/cw_button';
@@ -26,22 +27,27 @@ function generateText(wallets: Array<IWebWallet<any>>) {
   }
   const wallet = wallets[0];
   const startsWithVowel = wallet.chain === 'ethereum';
+  const walletType =
+    wallet.defaultNetwork === ChainNetwork.Terra
+      ? `Terra Station`
+      : wallet.chain.charAt(0).toUpperCase() + wallet.chain.slice(1);
 
-  return `This Community requires a${startsWithVowel ? 'n' : ''} ${
-    wallet.chain.charAt(0).toUpperCase() + wallet.chain.slice(1)
-  } Wallet`;
+  return `This Community requires a${
+    startsWithVowel ? 'n' : ''
+  } ${walletType} Wallet`;
 }
 
+type LoginDesktopSidebarAttrs = {
+  sidebarType: LoginSidebarType;
+  createNewAccountCallback: () => void;
+  linkExistingAccountCallback: () => void;
+  wallets: Array<IWebWallet<any>>;
+};
+
 export class LoginDesktopSidebar
-  implements
-    m.ClassComponent<{
-      sidebarType: LoginSidebarType;
-      createNewAccountCallback: () => void;
-      linkExistingAccountCallback: () => void;
-      wallets: Array<IWebWallet<any>>;
-    }>
+  implements m.ClassComponent<LoginDesktopSidebarAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<LoginDesktopSidebarAttrs>) {
     const {
       sidebarType,
       createNewAccountCallback,

@@ -9,7 +9,6 @@ import {
   FormGroup,
   Button,
   Callout,
-  Spinner,
   RadioGroup,
   Icon,
   Icons,
@@ -32,8 +31,9 @@ import {
   getVersion,
   createProposal,
 } from 'helpers/snapshot_utils';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { QuillEditor } from '../../components/quill/quill_editor';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 // TODO Graham 7-20-22: Reconcile against NewThreadForm
 interface IThreadForm {
@@ -166,9 +166,7 @@ const NewProposalForm: m.Component<
 > = {
   view: (vnode) => {
     const getLoadingPage = () =>
-      m('.topic-loading-spinner-wrap', [
-        m(Spinner, { active: true, size: 'lg' }),
-      ]);
+      m('.topic-loading-spinner-wrap', [m(CWSpinner, { size: 'large' })]);
     if (!app.chain) return getLoadingPage();
 
     const pathVars = m.parsePathname(window.location.href);
@@ -308,7 +306,7 @@ const NewProposalForm: m.Component<
                   `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`,
                 ],
               })
-            : m(Spinner, { active: false }),
+            : m(CWSpinner),
           m('.new-snapshot-proposal-form', [
             m(Form, { style: 'width:100%' }, [
               m(FormGroup, [
@@ -345,10 +343,9 @@ const NewProposalForm: m.Component<
                       contentRight:
                         idx > 1 &&
                         idx === vnode.state.form.choices.length - 1 &&
-                        m(CWIcon, {
+                        m(CWIconButton, {
                           iconName: 'trash',
                           iconSize: 'large',
-                          style: 'cursor: pointer;',
                           onclick: () => {
                             vnode.state.form.choices.pop();
                             m.redraw();
@@ -406,7 +403,6 @@ const NewProposalForm: m.Component<
                   },
                   placeholder: 'What is your proposal?',
                   editorNamespace: 'new-proposal',
-                  tabindex: 2,
                 }),
               ]),
               m(FormGroup, { order: 5 }, [

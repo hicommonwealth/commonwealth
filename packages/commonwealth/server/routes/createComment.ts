@@ -6,10 +6,10 @@ import {
   ProposalType,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../database';
+import { DB } from '../models';
 
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -29,6 +29,7 @@ import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -125,7 +126,12 @@ const createComment = async (
       attributes: ['rule_id'],
     });
     if (topic?.rule_id) {
-      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      const passesRules = await checkRule(
+        ruleCache,
+        models,
+        topic.rule_id,
+        author.address
+      );
       if (!passesRules) {
         return next(new AppError(Errors.RuleCheckFailed));
       }
@@ -134,13 +140,12 @@ const createComment = async (
 
   if (chain && chain.type === ChainType.Token) {
     // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
+    const isAdmin = await findAllRoles(
+      models,
+      { where: { address_id: author.id } },
+      chain.id,
+      ['admin']
+    );
     if (thread?.topic_id && !req.user.isAdmin && isAdmin.length === 0) {
       try {
         const canReact = await validateTopicThreshold(
@@ -345,7 +350,7 @@ const createComment = async (
               chain: mention[0] || null,
               address: mention[1],
             },
-            include: [models.User, models.Role],
+            include: [models.User, models.RoleAssignment],
           });
           return user;
         })
@@ -421,38 +426,38 @@ const createComment = async (
 
   // notify mentioned users if they have permission to view the originating forum
   if (mentionedAddresses?.length > 0) {
-      mentionedAddresses.map((mentionedAddress) => {
-        if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+    mentionedAddresses.map((mentionedAddress) => {
+      if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-        const shouldNotifyMentionedUser = true;
-        if (shouldNotifyMentionedUser)
-          models.Subscription.emitNotifications(
-            models,
-            NotificationCategories.NewMention,
-            `user-${mentionedAddress.User.id}`,
-            {
-              created_at: new Date(),
-              root_id: +id,
-              root_title,
-              root_type: prefix,
-              comment_id: +finalComment.id,
-              comment_text: finalComment.text,
-              chain_id: finalComment.chain,
-              author_address: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
-            },
-            {
-              user: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
-              url: cwUrl,
-              title: proposal.title || '',
-              chain: finalComment.chain,
-              body: finalComment.text,
-            }, // TODO: add webhook data for mentions
-            req.wss,
-            [finalComment.Address.address]
-          );
-      });
+      const shouldNotifyMentionedUser = true;
+      if (shouldNotifyMentionedUser)
+        models.Subscription.emitNotifications(
+          models,
+          NotificationCategories.NewMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            created_at: new Date(),
+            root_id: +id,
+            root_title,
+            root_type: prefix,
+            comment_id: +finalComment.id,
+            comment_text: finalComment.text,
+            chain_id: finalComment.chain,
+            author_address: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+          },
+          {
+            user: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+            url: cwUrl,
+            title: proposal.title || '',
+            chain: finalComment.chain,
+            body: finalComment.text,
+          }, // TODO: add webhook data for mentions
+          req.wss,
+          [finalComment.Address.address]
+        );
+    });
   }
 
   // update author.last_active (no await)

@@ -12,8 +12,8 @@ import { chainEntityTypeToProposalName } from 'identifiers';
 import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 type ChainEntitiesSelectorAttrs = {
-  chainEntitiesToSet: ChainEntity[];
-  onSelect: () => void;
+  chainEntitiesToSet: Array<ChainEntity>;
+  onSelect: (ce: ChainEntity) => void;
   thread: Thread;
 };
 
@@ -23,7 +23,7 @@ export class ChainEntitiesSelector
   private chainEntitiesLoaded: boolean;
   private initialized: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<ChainEntitiesSelectorAttrs>) {
     const { thread, onSelect } = vnode.attrs;
 
     if (!app.chain || !app.activeChainId()) return;
@@ -42,47 +42,45 @@ export class ChainEntitiesSelector
     return (
       <div class="ChainEntitiesSelector">
         {this.chainEntitiesLoaded ? (
-          <QueryList
-            checkmark={true}
-            items={app.chain.chainEntities.store.getAll().sort((a, b) => {
+          m(QueryList, {
+            checkmark: true,
+            items: app.chain.chainEntities.store.getAll().sort((a, b) => {
               if (!a.threadId && b.threadId) return -1;
               if (a.threadId && !b.threadId) return 1;
               return 0;
-            })}
-            inputAttrs={{
+            }),
+            inputAttrs: {
               placeholder: 'Search for an existing proposal...',
-            }}
-            itemRender={(ce: ChainEntity) => {
+            },
+            itemRender: (ce: ChainEntity) => {
               const selected =
                 vnode.attrs.chainEntitiesToSet
                   .map((ce_) => ce_.id)
                   .indexOf(ce.id) !== -1;
               // TODO: show additional info on the ListItem,
               // like any set proposal title, the creator, or other metadata
-              return (
-                <ListItem
-                  disabled={ce.threadId && ce.threadId !== thread.id}
-                  label={
-                    <div class="chain-entity">
-                      <div class="chain-entity-text">
-                        {chainEntityTypeToProposalName(ce.type) +
-                          (ce.typeId.startsWith('0x')
-                            ? ` ${ce.typeId.slice(0, 6)}...`
-                            : ` #${ce.typeId}`)}
-                      </div>
-                      <div class="chain-entity-subtext">
-                        {ce.threadTitle !== 'undefined'
-                          ? decodeURIComponent(ce.threadTitle)
-                          : 'No thread title'}
-                      </div>
+              return m(ListItem, {
+                disabled: ce.threadId && ce.threadId !== thread.id,
+                label: (
+                  <div class="chain-entity">
+                    <div class="chain-entity-text">
+                      {chainEntityTypeToProposalName(ce.type) +
+                        (ce.typeId.startsWith('0x')
+                          ? ` ${ce.typeId.slice(0, 6)}...`
+                          : ` #${ce.typeId}`)}
                     </div>
-                  }
-                  selected={selected}
-                  key={ce.id ? ce.id : uuidv4()}
-                />
-              );
-            }}
-            itemPredicate={(query, ce: ChainEntity) => {
+                    <div class="chain-entity-subtext">
+                      {ce.threadTitle !== 'undefined'
+                        ? decodeURIComponent(ce.threadTitle)
+                        : 'No thread title'}
+                    </div>
+                  </div>
+                ),
+                selected,
+                key: ce.id ? ce.id : uuidv4(),
+              });
+            },
+            itemPredicate: (query, ce: ChainEntity) => {
               if (ce.typeId.startsWith('0x')) {
                 return false;
               } else {
@@ -100,8 +98,8 @@ export class ChainEntitiesSelector
                     .includes(query.toLowerCase())
                 );
               }
-            }}
-            onSelect={(ce: ChainEntity) => {
+            },
+            onSelect: (ce: ChainEntity) => {
               if (
                 vnode.attrs.chainEntitiesToSet
                   .map((ce_) => ce_.id)
@@ -115,10 +113,10 @@ export class ChainEntitiesSelector
                 vnode.attrs.chainEntitiesToSet.push(ce);
               }
               onSelect(ce);
-            }}
-          />
+            },
+          })
         ) : (
-          <div class="laoding-container">
+          <div class="loading-container">
             <div class="loading-text">
               {this.chainEntitiesLoaded
                 ? 'Select "In Voting" to begin.'

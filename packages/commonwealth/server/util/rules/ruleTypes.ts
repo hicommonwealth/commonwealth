@@ -1,5 +1,5 @@
 import { Transaction } from 'sequelize/types';
-import { DB } from '../../database';
+import { DB } from '../../models';
 
 // acceptable types for rule arguments, verified in parser
 export type RuleArgumentType = 'balance' | 'balance[]' | 'address' | 'address[]' | 'rule[]';

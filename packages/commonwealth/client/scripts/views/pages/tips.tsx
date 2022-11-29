@@ -8,7 +8,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { formatCoin } from 'adapters/currency';
 import { ProposalType, ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
@@ -22,10 +22,12 @@ import { GovExplainer } from '../components/gov_explainer';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 
-class TipDetail
-  implements m.ClassComponent<{ proposal: SubstrateTreasuryTip }>
-{
-  view(vnode) {
+type TipAttrs = {
+  proposal: SubstrateTreasuryTip;
+};
+
+class Tip implements m.ClassComponent<TipAttrs> {
+  view(vnode: m.Vnode<TipAttrs>) {
     const { proposal } = vnode.attrs;
     const beneficiary = app.chain.accounts.get(proposal.data.who);
 
@@ -117,10 +119,7 @@ class TipsPage implements m.ClassComponent {
 
     const activeTipContent = activeTips.length ? (
       activeTips.map((tip) => (
-        <ProposalCard
-          proposal={tip}
-          injectedContent={<TipDetail proposal={tip} />}
-        />
+        <ProposalCard proposal={tip} injectedContent={<Tip proposal={tip} />} />
       ))
     ) : (
       <div class="no-proposals">None</div>
@@ -128,10 +127,7 @@ class TipsPage implements m.ClassComponent {
 
     const inactiveTipContent = inactiveTips.length ? (
       inactiveTips.map((tip) => (
-        <ProposalCard
-          proposal={tip}
-          injectedContent={<TipDetail proposal={tip} />}
-        />
+        <ProposalCard proposal={tip} injectedContent={<Tip proposal={tip} />} />
       ))
     ) : (
       <div class="no-proposals">None</div>

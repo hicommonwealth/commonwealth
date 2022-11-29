@@ -1,9 +1,10 @@
 import moment from 'moment';
 import { NextFunction } from 'express';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import { sequelize, DB } from '../database';
+import { DB } from '../models';
+import { sequelize } from '../database';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { TypedRequestBody, TypedResponse, success } from '../types';

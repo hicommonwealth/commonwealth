@@ -1,6 +1,7 @@
 export { default as AbridgedThread } from './AbridgedThread';
 export { default as Account } from './Account';
 export { default as AddressInfo } from './AddressInfo';
+export { default as BlockInfo } from './BlockInfo';
 export { default as ChainInfo } from './ChainInfo';
 export { default as ChatMessage } from './ChatMessage';
 export { default as DiscussionDraft } from './DiscussionDraft';
@@ -16,6 +17,7 @@ export { default as NotificationSubscription } from './NotificationSubscription'
 export { default as Attachment } from './Attachment';
 export { default as Comment } from './Comment';
 export { default as Reaction } from './Reaction';
+export { default as Contract } from './Contract'
 export { default as Topic } from './Topic';
 export { default as Thread } from './Thread';
 export { default as Poll } from './Poll';

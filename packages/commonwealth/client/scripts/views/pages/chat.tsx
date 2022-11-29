@@ -12,16 +12,16 @@ import Sublayout from 'views/sublayout';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
 
-const ChatPage: m.Component<never, never> = {
-  oncreate(vnode) {
+class ChatPage implements m.ClassComponent {
+  oncreate() {
     mixpanelBrowserTrack({
       event: MixpanelChatEvents.CHAT_PAGE_VISIT,
       community: app.activeChainId(),
       isCustomDomain: app.isCustomDomain(),
     });
-  },
+  }
 
-  view: () => {
+  view() {
     const activeEntity = app.chain;
     if (!activeEntity) return <PageLoading />;
 
@@ -32,11 +32,11 @@ const ChatPage: m.Component<never, never> = {
     return !app.socket.chatNs.hasChannels() ? (
       <PageLoading />
     ) : (
-      <Sublayout hideFooter={true}>
+      <Sublayout hideFooter>
         <ChatWindow channel_id={channel_id} />
       </Sublayout>
     );
-  },
-};
+  }
+}
 
 export default ChatPage;

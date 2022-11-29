@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 @mixin notificationsButton {
   .cui-button {
@@ -24,21 +24,19 @@
   }
 }
 
-.NotificationsMenuPopover {
-  .unread-notifications {
-    height: 25px;
-    width: 25px;
-    background-color: #bbb;
-    border-radius: 50%;
-    display: inline-block;
-  }
-  .NotificationsMenu {
-    width: 296px;
-  }
+.unreads-icon svg {
+  cursor: pointer;
 }
 
 .NotificationsMenu {
-  width: 100%;
+  background-color: $white;
+  width: 296px;
+
+  @include extraSmall {
+    height: calc(100% - 88px);
+    width: 100%;
+  }
+
   .NotificationsMenuHeader {
     @include notificationsButton;
 
@@ -48,8 +46,17 @@
 
   .notification-list {
     align-items: center;
+    border-left: 1px solid $neutral-300;
+    border-right: 1px solid $neutral-300;
+    display: flex;
     height: 480px;
     justify-content: center;
+
+    @include extraSmall {
+      border: none;
+      height: 100%;
+      width: 100%;
+    }
   }
 
   .NotificationsMenuFooter {

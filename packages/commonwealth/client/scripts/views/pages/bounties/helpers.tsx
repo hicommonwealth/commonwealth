@@ -8,7 +8,7 @@ import app from 'state';
 import { SubstrateBounty } from 'controllers/chain/substrate/bounty';
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInfo } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
