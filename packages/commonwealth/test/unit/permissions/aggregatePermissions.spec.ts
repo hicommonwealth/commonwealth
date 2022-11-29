@@ -33,7 +33,7 @@ describe('aggregatePermissions() unit tests', () => {
         allow: allowCreateThread,
         deny: base_permission,
         permission: admin_name,
-      }
+      },
     ];
 
     const permission = aggregatePermissions(roles, chain_permission);
@@ -95,11 +95,10 @@ describe('aggregatePermissions() unit tests', () => {
     chain_permission.deny = createThread;
 
     const permission = aggregatePermissions(roles, chain_permission);
-    // eslint-disable-next-line no-bitwise
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
-    // eslint-disable-next-line no-bitwise
-    assert.isFalse(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
-    // eslint-disable-next-line no-bitwise
+    // View chat should be allowed because it is allowed in the community through implicit allow
+    // of creating chat (does not make sense to deny view chat if you can create chat)
+    assert.isTrue(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
     assert.isTrue(isPermitted(permission, Action.CREATE_CHAT));
   });
 
