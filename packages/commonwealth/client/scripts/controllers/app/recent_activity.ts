@@ -3,6 +3,7 @@ import { Topic, AbridgedThread, Profile, Thread } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
+import ChainEntityController from "controllers/server/chain_entities";
 
 export interface IAbridgedThreadFromServer {
   id: number;
@@ -70,7 +71,7 @@ class RecentActivityController {
     return this._activeUsers;
   }
 
-  public async getRecentTopicActivity(id?: string): Promise<Thread[]> {
+  public async getRecentTopicActivity(entityController: ChainEntityController, id?: string): Promise<Thread[]> {
     const params = {
       chain: id || app.activeChainId(),
       threads_per_topic: 3,
@@ -78,7 +79,7 @@ class RecentActivityController {
 
     const [response,] = await Promise.all([
       $.get(`${app.serverUrl()}/activeThreads`, params),
-      app.chain.chainEntities.refreshRawEntities(app.activeChainId())
+      entityController.refreshRawEntities(params.chain)
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);

@@ -96,7 +96,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // add community roles to the chain's roles
     this.meta.communityRoles = communityRoles;
 
-    await this.app.recentActivity.getRecentTopicActivity(this.id);
+    await this.app.recentActivity.getRecentTopicActivity(this.chainEntities, this.id);
 
     // parse/save the chat channels
     await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));
