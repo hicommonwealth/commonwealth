@@ -10,7 +10,7 @@
   min-height: $global-header-height;
   padding: 0 8px;
 
-  .sidebar-left {
+  .header-left {
     align-items: center;
     display: flex;
     gap: 8px;
@@ -23,7 +23,7 @@
     }
   }
 
-  .sidebar-right {
+  .header-right {
     align-items: center;
     display: flex;
     gap: 8px;
