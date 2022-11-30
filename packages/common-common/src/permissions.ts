@@ -16,7 +16,7 @@ export enum Action {
   DELETE_THREAD = 14,
 }
 
-const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<Action, Action[]>([
+const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
   [Action.VIEW_REACTIONS, [Action.VIEW_COMMENTS, Action.VIEW_POLLS, Action.VIEW_THREADS]],
   [Action.CREATE_REACTION, [Action.VIEW_REACTIONS, Action.VIEW_COMMENTS, Action.VIEW_POLLS, Action.VIEW_THREADS]],
@@ -41,22 +41,25 @@ export enum PermissionError {
 
 export function addPermission(
   permission: Permissions,
-  action: Action
+  actionNumber: number
 ): Permissions {
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
-  result |= BigInt(1) << BigInt(Number(action));
-  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(action);
-  for (let i = 0; i < implicitActions.length; i++) {
-    // eslint-disable-next-line no-bitwise
-    result |= BigInt(1) << BigInt(implicitActions[i]);
+  result |= BigInt(1) << BigInt(actionNumber);
+  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
+  if (implicitActions) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      // eslint-disable-next-line no-bitwise
+      result |= BigInt(1) << BigInt(implicitActions[i]);
+    }
+    return result;
   }
   return result;
 }
 
 export function removePermission(
   permission: Permissions,
-  action: Action
+  actionNumber: number
 ): Permissions {
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
