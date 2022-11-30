@@ -117,7 +117,7 @@
     position: absolute;
     z-index: 1000;
 
-    animation: slidein .5s ease-in-out;
+    animation: slidein .2s ease-in-out;
   
     background-color: $neutral-25;
     border-right: 1px solid $neutral-200;
@@ -131,7 +131,7 @@
     }
 
     &.onremove {
-      animation: slideout 0.3s ease-in-out;
+      animation: slideout 0.2s ease-in-out;
       left: -100%;
     }
   }

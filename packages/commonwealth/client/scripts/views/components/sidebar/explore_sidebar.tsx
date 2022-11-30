@@ -81,7 +81,7 @@ export class ExploreCommunitiesSidebar implements m.ClassComponent {
             setTimeout(() => {
               app.sidebarMenu = 'default';
               m.redraw();
-            }, 400);
+            }, 200);
           },
         }}
         menuItems={communityList}
