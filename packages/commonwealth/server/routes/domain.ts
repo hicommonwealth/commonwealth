@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { DB } from '../database';
+import { DB } from '../models';
 
 const domain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const hostname = req.headers['x-forwarded-host'] || req.hostname;

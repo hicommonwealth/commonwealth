@@ -8,10 +8,14 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { AaveInfoRow } from '../../components/proposals/aave_proposal_card_detail';
 import { CWText } from '../../components/component_kit/cw_text';
 
+type AaveViewProposalDetailAttrs = {
+  proposal: AaveProposal;
+};
+
 export class AaveViewProposalDetail
-  implements m.ClassComponent<{ proposal: AaveProposal }>
+  implements m.ClassComponent<AaveViewProposalDetailAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<AaveViewProposalDetailAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (

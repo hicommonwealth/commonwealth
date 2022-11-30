@@ -3,7 +3,7 @@
 import m from 'mithril';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
-import { ListItem, Select, Spinner } from 'construct-ui';
+import { ListItem, Select } from 'construct-ui';
 
 import 'pages/search.scss';
 
@@ -14,7 +14,7 @@ import { SearchScope, SearchSort } from 'models/SearchQuery';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import { ContentType } from 'controllers/server/search';
+import { SearchContentType } from 'types';
 import { PageNotFound } from './404';
 import { search } from '../components/search_bar';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
@@ -24,6 +24,7 @@ import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 import ErrorPage from './error';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -38,33 +39,31 @@ const getMemberResult = (addr, searchTerm) => {
     addr.chain
   }`;
 
-  return (
-    <ListItem
-      allowOnContentClick={true}
-      contentLeft={<CWIcon iconSize="large" iconName="person" />}
-      label={
-        <a class="search-results-item">
-          {m(UserBlock, {
-            user: profile,
-            searchTerm,
-            avatarSize: 36,
-            addressDisplayOptions: { showFullAddress: true },
-            showChainName: !scope,
-          })}
-        </a>
-      }
-      onclick={() => {
-        m.route.set(userLink);
-      }}
-    />
-  );
+  return m(ListItem, {
+    allowOnContentClick: true,
+    contentLeft: <CWIcon iconSize="large" iconName="person" />,
+    label: (
+      <a class="search-results-item">
+        {m(UserBlock, {
+          user: profile,
+          searchTerm,
+          avatarSize: 36,
+          addressDisplayOptions: { showFullAddress: true },
+          showChainName: !scope,
+        })}
+      </a>
+    ),
+    onclick: () => {
+      m.route.set(userLink);
+    },
+  });
 };
 
 const getCommunityResult = (community) => {
   const params =
-    community.contentType === ContentType.Token
+    community.contentType === SearchContentType.Token
       ? { community }
-      : community.contentType === ContentType.Chain
+      : community.contentType === SearchContentType.Chain
       ? { community }
       : null;
 
@@ -80,21 +79,19 @@ const getCommunityResult = (community) => {
     }
   };
 
-  return (
-    <ListItem
-      label={
-        <a class="search-results-item.community-result">
-          <CommunityLabel {...params} />
-        </a>
+  return m(ListItem, {
+    label: (
+      <a class="search-results-item.community-result">
+        <CommunityLabel {...params} />
+      </a>
+    ),
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect();
       }
-      onclick={onSelect}
-      onkeyup={(e) => {
-        if (e.key === 'Enter') {
-          onSelect();
-        }
-      }}
-    />
-  );
+    },
+  });
 };
 
 const getDiscussionResult = (thread, searchTerm) => {
@@ -103,49 +100,41 @@ const getDiscussionResult = (thread, searchTerm) => {
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;
 
-  return (
-    <ListItem
-      allowOnContentClick={true}
-      contentLeft={<CWIcon iconName="feedback" />}
-      onclick={() => {
-        m.route.set(`/${chain}/proposal/discussion/${proposalId}`);
-      }}
-      label={
-        <a class="search-results-item">
-          <CWText
-            fontStyle="uppercase"
-            type="caption"
-            className="thread-header"
-          >
-            {`discussion - ${thread.chain}`}
+  return m(ListItem, {
+    allowOnContentClick: true,
+    contentLeft: <CWIcon iconName="feedback" />,
+    onclick: () => {
+      m.route.set(`/${chain}/proposal/discussion/${proposalId}`);
+    },
+    label: (
+      <a class="search-results-item">
+        <CWText fontStyle="uppercase" type="caption" className="thread-header">
+          {`discussion - ${thread.chain}`}
+        </CWText>
+        <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
+        <div class="search-results-thread-subtitle">
+          {m(User, {
+            user: new AddressInfo(
+              thread.address_id,
+              thread.address,
+              thread.address_chain,
+              null
+            ),
+          })}
+          <CWText className="created-at">
+            {moment(thread.created_at).fromNow()}
           </CWText>
-          <CWText fontWeight="medium">
-            {decodeURIComponent(thread.title)}
-          </CWText>
-          <div class="search-results-thread-subtitle">
-            {m(User, {
-              user: new AddressInfo(
-                thread.address_id,
-                thread.address,
-                thread.address_chain,
-                null
-              ),
-            })}
-            <CWText className="created-at">
-              {moment(thread.created_at).fromNow()}
-            </CWText>
-          </div>
-          <div class="search-results-thread-body">
-            {renderQuillTextBody(thread.body, {
-              hideFormatting: true,
-              collapse: true,
-              searchTerm,
-            })}
-          </div>
-        </a>
-      }
-    />
-  );
+        </div>
+        <div class="search-results-thread-body">
+          {renderQuillTextBody(thread.body, {
+            hideFormatting: true,
+            collapse: true,
+            searchTerm,
+          })}
+        </div>
+      </a>
+    ),
+  });
 };
 
 const getCommentResult = (comment, searchTerm) => {
@@ -154,49 +143,45 @@ const getCommentResult = (comment, searchTerm) => {
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;
 
-  return (
-    <ListItem
-      allowOnContentClick={true}
-      contentLeft={<CWIcon iconName="feedback" />}
-      onclick={() => {
-        m.route.set(
-          `/${chain}/proposal/${proposalId.split('_')[0]}/${
-            proposalId.split('_')[1]
-          }`
-        );
-      }}
-      label={
-        <a class="search-results-item">
-          <div class="search-results-thread-header">
-            {`comment - ${comment.chain || comment.community}`}
-          </div>
-          <div class="search-results-thread-title">
-            {decodeURIComponent(comment.title)}
-          </div>
-          <div class="search-results-thread-subtitle">
-            <span class="created-at">
-              {moment(comment.created_at).fromNow()}
-            </span>
-            {m(User, {
-              user: new AddressInfo(
-                comment.address_id,
-                comment.address,
-                comment.address_chain,
-                null
-              ),
-            })}
-          </div>
-          <div class="search-results-comment">
-            {renderQuillTextBody(comment.text, {
-              hideFormatting: true,
-              collapse: true,
-              searchTerm,
-            })}
-          </div>
-        </a>
-      }
-    />
-  );
+  return m(ListItem, {
+    allowOnContentClick: true,
+    contentLeft: <CWIcon iconName="feedback" />,
+    onclick: () => {
+      m.route.set(
+        `/${chain}/proposal/${proposalId.split('_')[0]}/${
+          proposalId.split('_')[1]
+        }`
+      );
+    },
+    label: (
+      <a class="search-results-item">
+        <div class="search-results-thread-header">
+          {`comment - ${comment.chain || comment.community}`}
+        </div>
+        <div class="search-results-thread-title">
+          {decodeURIComponent(comment.title)}
+        </div>
+        <div class="search-results-thread-subtitle">
+          <span class="created-at">{moment(comment.created_at).fromNow()}</span>
+          {m(User, {
+            user: new AddressInfo(
+              comment.address_id,
+              comment.address,
+              comment.address_chain,
+              null
+            ),
+          })}
+        </div>
+        <div class="search-results-comment">
+          {renderQuillTextBody(comment.text, {
+            hideFormatting: true,
+            collapse: true,
+            searchTerm,
+          })}
+        </div>
+      </a>
+    ),
+  });
 };
 
 const getListing = (
@@ -240,9 +225,7 @@ class SearchPage implements m.Component<SearchPageAttrs> {
   view() {
     const LoadingPage = (
       <PageLoading
-        narrow
-        showNewProposalButton
-        title={<BreadcrumbsTitleTag title="Search" />}
+      // title={<BreadcrumbsTitleTag title="Search" />}
       />
     );
 
@@ -338,15 +321,11 @@ class SearchPage implements m.Component<SearchPageAttrs> {
         title={<BreadcrumbsTitleTag title="Search" />}
       />
     ) : (
-      <Sublayout
-        title={['Search ', capitalize(scope) || 'Commonwealth']}
-        showNewProposalButton
-        alwaysShowTitle
-      >
+      <Sublayout>
         <div class="SearchPage">
           <>
             {!app.search.getByQuery(searchQuery)?.loaded ? (
-              <Spinner active fill size="xl" />
+              <CWSpinner size="xl" />
             ) : (
               <div class="search-results">
                 <CWTabBar>{tabs}</CWTabBar>
@@ -373,17 +352,17 @@ class SearchPage implements m.Component<SearchPageAttrs> {
                 {tabScopedListing.length > 0 && (
                   <div class="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
-                    <Select
-                      options={['Best', 'Newest', 'Oldest']}
-                      value={this.searchQuery.sort}
-                      onchange={(e) => {
+                    {m(Select, {
+                      options: ['Best', 'Newest', 'Oldest'],
+                      value: this.searchQuery.sort,
+                      onchange: (e) => {
                         searchQuery.sort = SearchSort[e.currentTarget['value']];
                         m.route.set(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);
-                      }}
-                    />
+                      },
+                    })}
                   </div>
                 )}
                 <div class="search-results-list">{tabScopedListing}</div>

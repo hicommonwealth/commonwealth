@@ -8,7 +8,6 @@ import { CWText } from './cw_text';
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
-import { renderQuillTextBody } from '../quill/helpers';
 
 type BannerAttrs = {
   bannerContent: string;
@@ -17,7 +16,7 @@ type BannerAttrs = {
 };
 
 export class CWBanner implements m.ClassComponent<BannerAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
@@ -35,7 +34,7 @@ export class CWBanner implements m.ClassComponent<BannerAttrs> {
 }
 
 export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (

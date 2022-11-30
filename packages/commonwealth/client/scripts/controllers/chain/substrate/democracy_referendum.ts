@@ -9,8 +9,15 @@ import {
 } from 'adapters/chain/substrate/types';
 import { ChainBase, ProposalType } from 'common-common/src/types';
 import {
-  Proposal, ProposalStatus, ProposalEndTime, BinaryVote, VotingType, VotingUnit,
-  Account, ChainEntity, ChainEvent
+  Proposal,
+  ProposalStatus,
+  ProposalEndTime,
+  BinaryVote,
+  VotingType,
+  VotingUnit,
+  Account,
+  ChainEntity,
+  ChainEvent,
 } from 'models';
 import { SubstrateTypes } from 'chain-events/src';
 import { Coin } from 'adapters/currency';
@@ -20,7 +27,7 @@ import SubstrateDemocracy from './democracy';
 import SubstrateDemocracyProposal from './democracy_proposal';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
 import { SubstrateCollectiveProposal } from './collective_proposal';
-import Substrate from './main';
+import Substrate from './adapter';
 
 export enum DemocracyConviction {
   None = 0,
@@ -32,7 +39,10 @@ export enum DemocracyConviction {
   Locked6x = 6,
 }
 
-export const convictionToSubstrate = (chain: SubstrateChain, c: DemocracyConviction): Conviction => {
+export const convictionToSubstrate = (
+  chain: SubstrateChain,
+  c: DemocracyConviction
+): Conviction => {
   return chain.createType('Conviction', c);
 };
 
@@ -48,40 +58,64 @@ export const convictions = (): DemocracyConviction[] => [
 
 export const convictionToWeight = (c: DemocracyConviction | number) => {
   switch (Number(c)) {
-    case DemocracyConviction.None: return 0.1;
-    case DemocracyConviction.Locked1x: return 1;
-    case DemocracyConviction.Locked2x: return 2;
-    case DemocracyConviction.Locked3x: return 3;
-    case DemocracyConviction.Locked4x: return 4;
-    case DemocracyConviction.Locked5x: return 5;
-    case DemocracyConviction.Locked6x: return 6;
-    default: throw new Error('Invalid conviction');
+    case DemocracyConviction.None:
+      return 0.1;
+    case DemocracyConviction.Locked1x:
+      return 1;
+    case DemocracyConviction.Locked2x:
+      return 2;
+    case DemocracyConviction.Locked3x:
+      return 3;
+    case DemocracyConviction.Locked4x:
+      return 4;
+    case DemocracyConviction.Locked5x:
+      return 5;
+    case DemocracyConviction.Locked6x:
+      return 6;
+    default:
+      throw new Error('Invalid conviction');
   }
 };
 
 export const convictionToLocktime = (c: DemocracyConviction) => {
   switch (c) {
-    case DemocracyConviction.None: return 0;
-    case DemocracyConviction.Locked1x: return 1;
-    case DemocracyConviction.Locked2x: return 2;
-    case DemocracyConviction.Locked3x: return 4;
-    case DemocracyConviction.Locked4x: return 8;
-    case DemocracyConviction.Locked5x: return 16;
-    case DemocracyConviction.Locked6x: return 32;
-    default: throw new Error('Invalid conviction');
+    case DemocracyConviction.None:
+      return 0;
+    case DemocracyConviction.Locked1x:
+      return 1;
+    case DemocracyConviction.Locked2x:
+      return 2;
+    case DemocracyConviction.Locked3x:
+      return 4;
+    case DemocracyConviction.Locked4x:
+      return 8;
+    case DemocracyConviction.Locked5x:
+      return 16;
+    case DemocracyConviction.Locked6x:
+      return 32;
+    default:
+      throw new Error('Invalid conviction');
   }
 };
 
 export const weightToConviction = (weight: number): DemocracyConviction => {
   switch (weight) {
-    case 0.1: return DemocracyConviction.None;
-    case 1: return DemocracyConviction.Locked1x;
-    case 2: return DemocracyConviction.Locked2x;
-    case 3: return DemocracyConviction.Locked3x;
-    case 4: return DemocracyConviction.Locked4x;
-    case 5: return DemocracyConviction.Locked5x;
-    case 6: return DemocracyConviction.Locked6x;
-    default: throw new Error('Invalid weight, could not convert to Conviction');
+    case 0.1:
+      return DemocracyConviction.None;
+    case 1:
+      return DemocracyConviction.Locked1x;
+    case 2:
+      return DemocracyConviction.Locked2x;
+    case 3:
+      return DemocracyConviction.Locked3x;
+    case 4:
+      return DemocracyConviction.Locked4x;
+    case 5:
+      return DemocracyConviction.Locked5x;
+    case 6:
+      return DemocracyConviction.Locked6x;
+    default:
+      throw new Error('Invalid weight, could not convert to Conviction');
   }
 };
 
@@ -108,7 +142,9 @@ export class SubstrateDemocracyVote extends BinaryVote<SubstrateCoin> {
   }
 }
 
-const backportEventToAdapter = (event: SubstrateTypes.IDemocracyStarted): ISubstrateDemocracyReferendum => {
+const backportEventToAdapter = (
+  event: SubstrateTypes.IDemocracyStarted
+): ISubstrateDemocracyReferendum => {
   const enc = new TextEncoder();
   return {
     identifier: event.referendumIndex.toString(),
@@ -119,16 +155,24 @@ const backportEventToAdapter = (event: SubstrateTypes.IDemocracyStarted): ISubst
   };
 };
 
-export class SubstrateDemocracyReferendum
-  extends Proposal<
-  ApiPromise, SubstrateCoin, ISubstrateDemocracyReferendum, SubstrateDemocracyVote
+export class SubstrateDemocracyReferendum extends Proposal<
+  ApiPromise,
+  SubstrateCoin,
+  ISubstrateDemocracyReferendum,
+  SubstrateDemocracyVote
 > {
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
-  public get description() { return null; }
-  public get author() { return null; }
-  public get preimage() { return this._preimage; }
+  public get description() {
+    return null;
+  }
+  public get author() {
+    return null;
+  }
+  public get preimage() {
+    return this._preimage;
+  }
 
   public get votingType() {
     return VotingType.ConvictionYesNoVoting;
@@ -145,13 +189,19 @@ export class SubstrateDemocracyReferendum
   public readonly hash: string;
 
   private _threshold;
-  public get threshold() { return this._threshold; }
+  public get threshold() {
+    return this._threshold;
+  }
 
   private _passed: boolean;
-  public get passed() { return this._passed; }
+  public get passed() {
+    return this._passed;
+  }
 
   private _executionBlock: number;
-  public get executionBlock() { return this._executionBlock; }
+  public get executionBlock() {
+    return this._executionBlock;
+  }
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
@@ -171,7 +221,8 @@ export class SubstrateDemocracyReferendum
   public get blockExplorerLinkLabel() {
     const chainInfo = this._Chain.app.chain?.meta;
     const blockExplorerIds = chainInfo?.blockExplorerIds;
-    if (blockExplorerIds && blockExplorerIds['subscan']) return 'View in Subscan';
+    if (blockExplorerIds && blockExplorerIds['subscan'])
+      return 'View in Subscan';
     return undefined;
   }
 
@@ -189,19 +240,20 @@ export class SubstrateDemocracyReferendum
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts,
     Democracy: SubstrateDemocracy,
-    entity: ChainEntity,
+    entity: ChainEntity
   ) {
-    super(ProposalType.SubstrateDemocracyReferendum, backportEventToAdapter(
-      entity.chainEvents
-        .find(
+    super(
+      ProposalType.SubstrateDemocracyReferendum,
+      backportEventToAdapter(
+        entity.chainEvents.find(
           (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyStarted
         ).data as SubstrateTypes.IDemocracyStarted
-    ));
+      )
+    );
 
-    const eventData = entity.chainEvents
-      .find(
-        (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyStarted
-      ).data as SubstrateTypes.IDemocracyStarted;
+    const eventData = entity.chainEvents.find(
+      (e) => e.data.kind === SubstrateTypes.EventKind.DemocracyStarted
+    ).data as SubstrateTypes.IDemocracyStarted;
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._Democracy = Democracy;
@@ -213,7 +265,9 @@ export class SubstrateDemocracyReferendum
     this.threadTitle = entity.threadTitle;
 
     // see if associated entity title exists, otherwise try to populate title with preimage
-    const preimage = this._Democracy.app.chain.chainEntities.getPreimage(eventData.proposalHash);
+    const preimage = this._Democracy.app.chain.chainEntities.getPreimage(
+      eventData.proposalHash
+    );
     const associatedProposalOrMotion = this.getProposalOrMotion(preimage);
     if (associatedProposalOrMotion) {
       this.title = associatedProposalOrMotion.title;
@@ -234,7 +288,11 @@ export class SubstrateDemocracyReferendum
     this._Democracy.store.add(this);
 
     // fetcher cannot generate "NotPassed" events
-    if (this._endBlock < this._Democracy.app.chain.block.height && !this.passed && !this.completed) {
+    if (
+      this._endBlock < this._Democracy.app.chain.block.height &&
+      !this.passed &&
+      !this.completed
+    ) {
       this.complete();
     }
   }
@@ -250,16 +308,23 @@ export class SubstrateDemocracyReferendum
   // TODO: This may cause issues if we have the same Call proposed twice, as this will only fetch the
   //   first one in storage. To fix this, we will need to use some timing heuristics to check that
   //   this referendum was created approximately when the found proposal concluded.
-  public getProposalOrMotion(preimage?): SubstrateDemocracyProposal | SubstrateCollectiveProposal
-    | SubstrateTreasuryProposal | undefined {
+  public getProposalOrMotion(
+    preimage?
+  ):
+    | SubstrateDemocracyProposal
+    | SubstrateCollectiveProposal
+    | SubstrateTreasuryProposal
+    | undefined {
     // ensure all modules have loaded
     if (!this._Chain.app.isModuleReady) return;
 
     // search for same preimage/proposal hash
-    const chain = (this._Chain.app.chain as Substrate);
-    const democracyProposal = chain.democracyProposals?.store.getAll().find((p) => {
-      return p.hash === this.hash;
-    });
+    const chain = this._Chain.app.chain as Substrate;
+    const democracyProposal = chain.democracyProposals?.store
+      .getAll()
+      .find((p) => {
+        return p.hash === this.hash;
+      });
     if (democracyProposal) return democracyProposal;
 
     const collectiveProposal = chain.council?.store.getAll().find((p) => {
@@ -268,14 +333,19 @@ export class SubstrateDemocracyReferendum
     if (collectiveProposal) return collectiveProposal;
 
     // search for treasury proposal for approveProposal only (not rejectProposal)
-    if (preimage?.section === 'treasury' && preimage?.method === 'approveProposal') {
+    if (
+      preimage?.section === 'treasury' &&
+      preimage?.method === 'approveProposal'
+    ) {
       return chain.treasury?.store.getByIdentifier(preimage.args[0]);
     }
 
-    console.log('could not find:',
+    console.log(
+      'could not find:',
       this.hash,
       chain.council?.store.getAll().map((c) => c.data.hash),
-      chain.democracyProposals?.store.getAll().map((c) => c.hash));
+      chain.democracyProposals?.store.getAll().map((c) => c.hash)
+    );
     return undefined;
   }
 
@@ -294,7 +364,7 @@ export class SubstrateDemocracyReferendum
           this._Accounts.fromAddress(who),
           isAye,
           this._Chain.coins(new BN(balance)),
-          convictionToWeight(conviction),
+          convictionToWeight(conviction)
         );
         this.addOrUpdateVote(vote);
         break;
@@ -326,7 +396,9 @@ export class SubstrateDemocracyReferendum
         break;
       }
       case SubstrateTypes.EventKind.PreimageNoted: {
-        const preimage = this._Democracy.app.chain.chainEntities.getPreimage(this.hash);
+        const preimage = this._Democracy.app.chain.chainEntities.getPreimage(
+          this.hash
+        );
         if (preimage) {
           this._preimage = preimage;
           if (!this.title) {
@@ -342,31 +414,47 @@ export class SubstrateDemocracyReferendum
   }
 
   public updateVoters = async () => {
-    const referenda = await this._Chain.api.derive.democracy.referendumsInfo([ new BN(this.data.index) ]);
+    const referenda = await this._Chain.api.derive.democracy.referendumsInfo([
+      new BN(this.data.index),
+    ]);
     if (referenda?.length) {
-      const votes = await this._Chain.api.derive.democracy._referendumVotes(referenda[0]);
+      const votes = await this._Chain.api.derive.democracy._referendumVotes(
+        referenda[0]
+      );
       for (const { accountId, balance, vote } of votes.votes) {
         const acct = this._Accounts.fromAddress(accountId.toString());
         if (!this.hasVoted(acct)) {
-          this.addOrUpdateVote(new SubstrateDemocracyVote(
-            this, acct, vote.isAye, this._Chain.coins(balance), convictionToWeight(vote.conviction.index)
-          ));
+          this.addOrUpdateVote(
+            new SubstrateDemocracyVote(
+              this,
+              acct,
+              vote.isAye,
+              this._Chain.coins(balance),
+              convictionToWeight(vote.conviction.index)
+            )
+          );
         }
       }
     }
-  }
+  };
 
   // GETTERS AND SETTERS
   public get support() {
     if (this.getVotes().some((v) => v.balance === undefined)) {
-      throw new Error('Balances haven\'t resolved');
+      throw new Error("Balances haven't resolved");
     }
     const yesVotes = this.getVotes().filter((vote) => vote.choice === true);
     const noVotes = this.getVotes().filter((vote) => vote.choice === false);
     if (yesVotes.length === 0 && noVotes.length === 0) return 0;
 
-    const yesSupport = yesVotes.reduce(((total, vote) => vote.balance.inDollars * vote.weight + total), 0);
-    const noSupport = noVotes.reduce(((total, vote) => vote.balance.inDollars * vote.weight + total), 0);
+    const yesSupport = yesVotes.reduce(
+      (total, vote) => vote.balance.inDollars * vote.weight + total,
+      0
+    );
+    const noSupport = noVotes.reduce(
+      (total, vote) => vote.balance.inDollars * vote.weight + total,
+      0
+    );
     return yesSupport / (yesSupport + noSupport);
   }
   public get turnout() {
@@ -375,26 +463,34 @@ export class SubstrateDemocracyReferendum
 
   private get edgVotedYes(): SubstrateCoin {
     if (this.getVotes().some((v) => v.balance === undefined)) {
-      throw new Error('Balances haven\'t resolved');
+      throw new Error("Balances haven't resolved");
     }
-    return this._Chain.coins(this.getVotes()
-      .filter((vote) => vote.choice === true)
-      .reduce((total, vote) => vote.coinWeight.add(total), new BN(0)));
+    return this._Chain.coins(
+      this.getVotes()
+        .filter((vote) => vote.choice === true)
+        .reduce((total, vote) => vote.coinWeight.add(total), new BN(0))
+    );
   }
   private get edgVotedNo(): SubstrateCoin {
     if (this.getVotes().some((v) => v.balance === undefined)) {
-      throw new Error('Balances haven\'t resolved');
+      throw new Error("Balances haven't resolved");
     }
-    return this._Chain.coins(this.getVotes()
-      .filter((vote) => vote.choice === false)
-      .reduce((total, vote) => vote.coinWeight.add(total), new BN(0)));
+    return this._Chain.coins(
+      this.getVotes()
+        .filter((vote) => vote.choice === false)
+        .reduce((total, vote) => vote.coinWeight.add(total), new BN(0))
+    );
   }
   private get edgVoted(): SubstrateCoin {
     if (this.getVotes().some((v) => v.balance === undefined)) {
-      throw new Error('Balances haven\'t resolved');
+      throw new Error("Balances haven't resolved");
     }
-    return this._Chain.coins(this.getVotes()
-      .reduce((total, vote) => vote.coinWeight.add(total), new BN(0)));
+    return this._Chain.coins(
+      this.getVotes().reduce(
+        (total, vote) => vote.coinWeight.add(total),
+        new BN(0)
+      )
+    );
   }
   public get accountsVotedYes() {
     return this.getVotes()
@@ -407,7 +503,7 @@ export class SubstrateDemocracyReferendum
       .map((vote) => vote.account);
   }
 
-  get endTime() : ProposalEndTime {
+  get endTime(): ProposalEndTime {
     return { kind: 'fixed_block', blocknum: this._endBlock };
   }
 
@@ -421,15 +517,17 @@ export class SubstrateDemocracyReferendum
     let passing;
     switch (this.data.threshold) {
       case DemocracyThreshold.Supermajorityapproval:
-        passing = this.edgVotedYes.sqr().div(this._Chain.totalbalance).gt(
-          this.edgVotedNo.sqr().div(this.edgVoted)
-        );
+        passing = this.edgVotedYes
+          .sqr()
+          .div(this._Chain.totalbalance)
+          .gt(this.edgVotedNo.sqr().div(this.edgVoted));
         break;
 
       case DemocracyThreshold.Supermajorityrejection:
-        passing = this.edgVotedYes.sqr().div(this.edgVoted).gt(
-          this.edgVotedNo.sqr().div(this._Chain.totalbalance)
-        );
+        passing = this.edgVotedYes
+          .sqr()
+          .div(this.edgVoted)
+          .gt(this.edgVotedNo.sqr().div(this._Chain.totalbalance));
         break;
 
       case DemocracyThreshold.Simplemajority:
@@ -444,7 +542,10 @@ export class SubstrateDemocracyReferendum
 
   // TRANSACTIONS
   public async submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
-    const conviction = convictionToSubstrate(this._Chain, weightToConviction(vote.weight)).index;
+    const conviction = convictionToSubstrate(
+      this._Chain,
+      weightToConviction(vote.weight)
+    ).index;
     const balance = this._Chain.coins(vote.amount, true);
 
     // "AccountVote" type, for kusama
@@ -456,7 +557,7 @@ export class SubstrateDemocracyReferendum
           conviction,
         },
         balance: balance.toString(),
-      }
+      },
     };
 
     srmlVote.Standard.balance = balance.toString();
@@ -479,9 +580,10 @@ export class SubstrateDemocracyReferendum
     }
     return this._Chain.createTXModalData(
       who,
-      (api: ApiPromise) => api.tx.democracy.removeOtherVote(target.address, this.data.index),
+      (api: ApiPromise) =>
+        api.tx.democracy.removeOtherVote(target.address, this.data.index),
       'unvote',
-      `${who.address} unvotes for ${target.address} on referendum ${this.data.index}`,
+      `${who.address} unvotes for ${target.address} on referendum ${this.data.index}`
     );
   }
 
@@ -503,21 +605,23 @@ export class SubstrateDemocracyReferendum
   // }
 
   public async notePreimage(author: SubstrateAccount, action: Call) {
-    const txFunc = (api: ApiPromise) => api.tx.democracy.notePreimage(action.toHex());
+    const txFunc = (api: ApiPromise) =>
+      api.tx.democracy.notePreimage(action.toHex());
     return this._Chain.createTXModalData(
       author,
       txFunc,
       'notePreimage',
-      this._Chain.methodToTitle(action),
+      this._Chain.methodToTitle(action)
     );
   }
 
   public noteImminentPreimage(author: SubstrateAccount, action: Call) {
     return this._Chain.createTXModalData(
       author,
-      (api: ApiPromise) => api.tx.democracy.noteImminentPreimage(action.toHex()),
+      (api: ApiPromise) =>
+        api.tx.democracy.noteImminentPreimage(action.toHex()),
       'noteImminentPreimage',
-      this._Chain.methodToTitle(action),
+      this._Chain.methodToTitle(action)
     );
   }
 }

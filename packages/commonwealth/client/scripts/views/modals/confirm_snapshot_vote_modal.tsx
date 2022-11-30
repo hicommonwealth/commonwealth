@@ -35,7 +35,7 @@ export class ConfirmSnapshotVoteModal
 {
   private saving: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<ConfirmSnapshotVoteModalAttrs>) {
     const author = app.user.activeAccount;
 
     const { proposal, space, id, selectedChoice, totalScore, successCallback } =

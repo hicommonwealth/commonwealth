@@ -16,7 +16,7 @@ export interface ListenerOptions {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type RawEvent = TypedEvent<any>;
 
-export enum ContractType {
+export enum CommonContractType {
   Factory,
   Project,
   cToken,

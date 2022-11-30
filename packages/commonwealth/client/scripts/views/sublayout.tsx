@@ -5,60 +5,50 @@ import m from 'mithril';
 import 'sublayout.scss';
 
 import app from 'state';
-import { handleEmailInvites } from 'views/components/header/invites_menu';
+import { handleEmailInvites } from 'views/menus/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
-import { MobileHeader } from 'views/mobile/mobile_header';
-import { SearchBar } from './components/search_bar';
-import { SublayoutHeaderLeft } from './sublayout_header_left';
-import { SublayoutHeaderRight } from './sublayout_header_right';
-import { SidebarQuickSwitcher } from './components/sidebar/sidebar_quick_switcher';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
-import { isWindowMediumSmallInclusive } from './components/component_kit/helpers';
+import { isWindowSmallInclusive } from './components/component_kit/helpers';
+import { AppMobileMenus } from './app_mobile_menus';
+import { SublayoutHeader } from './sublayout_header';
 
+// Graham TODO 22.10.6: Reinstate titles to Sublayout as body breadcrumbs
 type SublayoutAttrs = {
-  alwaysShowTitle?: boolean; // show page title even if app.chain and app.community are unavailable
   hideFooter?: boolean;
   hideSearch?: boolean;
-  onscroll: () => null; // lazy loading for page content
-  showNewProposalButton?: boolean;
-  title?: string; // displayed at the top of the layout
+  onscroll?: () => void; // lazy loading for page content
 };
 
-const footercontents = [
-  { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
-  {
-    text: 'Jobs',
-    externalLink: 'https://angel.co/company/commonwealth-labs/jobs',
-  },
-  { text: 'Terms', redirectTo: '/terms' },
-  { text: 'Privacy', redirectTo: '/privacy' },
-  { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
-  {
-    text: 'Discord',
-    externalLink: 'https://discord.gg/t9XscHdZrG',
-  },
-  {
-    text: 'Telegram',
-    externalLink: 'https://t.me/HiCommonwealth',
-  },
-  // { text:  'Use Cases' },
-  // { text:  'Crowdfunding' },
-  // { text:  'Developers' },
-  // { text:  'About us' },
-  // { text:  'Careers' }
-];
-
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
-  view(vnode) {
-    const {
-      alwaysShowTitle,
-      hideFooter = false,
-      hideSearch,
-      onscroll,
-      showNewProposalButton,
-      title,
-    } = vnode.attrs;
+  private isSidebarToggled: boolean;
+  private isWindowSmallInclusive: boolean;
+
+  onResize() {
+    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+    m.redraw();
+  }
+
+  oninit() {
+    if (localStorage.getItem('dark-mode-state') === 'on') {
+      document.getElementsByTagName('html')[0].classList.add('invert');
+    }
+
+    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+
+    window.addEventListener('resize', () => {
+      this.onResize();
+    });
+  }
+
+  onremove() {
+    window.removeEventListener('resize', () => {
+      this.onResize();
+    });
+  }
+
+  view(vnode: m.Vnode<SublayoutAttrs>) {
+    const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
@@ -70,28 +60,26 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
+    const isSidebarToggleable = app.chain && this.isWindowSmallInclusive;
+    this.isSidebarToggled =
+      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
+
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
-          <MobileHeader />
-          <div class="header-container">
-            <SublayoutHeaderLeft
-              alwaysShowTitle={alwaysShowTitle}
-              chain={chain}
-              title={title}
-            />
-            {!hideSearch && m(SearchBar)}
-            <SublayoutHeaderRight
-              chain={chain}
-              showNewProposalButton={showNewProposalButton}
-            />
-          </div>
+          <SublayoutHeader
+            hideSearch={hideSearch}
+            isSidebarToggleable={isSidebarToggleable}
+            isSidebarToggled={this.isSidebarToggled}
+            toggleSidebar={() => {
+              this.isSidebarToggled = !this.isSidebarToggled;
+            }}
+          />
           <div class="sidebar-and-body-container">
-            {!app.isCustomDomain() &&
-              !isWindowMediumSmallInclusive(window.innerWidth) && (
-                <SidebarQuickSwitcher />
-              )}
-            <Sidebar />
+            <Sidebar
+              isSidebarToggleable={isSidebarToggleable}
+              isSidebarToggled={this.isSidebarToggled}
+            />
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}
@@ -100,12 +88,15 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 tosStatus={tosStatus}
                 bannerStatus={bannerStatus}
               />
-              <div class="Body" onscroll={onscroll}>
-                {vnode.children}
-                {!app.isCustomDomain() && !hideFooter && (
-                  <Footer list={footercontents} />
-                )}
-              </div>
+
+              {this.isWindowSmallInclusive && app.mobileMenu ? (
+                <AppMobileMenus />
+              ) : (
+                <div class="Body" onscroll={onscroll}>
+                  {vnode.children}
+                  {!app.isCustomDomain() && !hideFooter && <Footer />}
+                </div>
+              )}
             </div>
           </div>
         </div>

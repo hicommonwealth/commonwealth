@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 
-import 'components/component_kit/cw_popover.scss';
+import 'components/component_kit/cw_popover/cw_popover.scss';
 
 import { CWPortal } from '../cw_portal';
 import {
@@ -13,7 +13,7 @@ import {
 } from './helpers';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
-import { TooltipType } from '../cw_tooltip';
+import { TooltipType } from './cw_tooltip';
 
 export type PopoverInteractionType = 'click' | 'hover';
 
@@ -42,7 +42,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
   private isRendered: boolean;
   private triggerRef: Element;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.VnodeDOM<PopoverAttrs>) {
     this.contentId = `popover-container-ref-${Math.random()}`; // has to be set first
     this.arrowId = `${this.contentId}-arrow`;
     this.isOpen = false;
@@ -50,7 +50,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     this.triggerRef = findRef(vnode.dom, 'trigger-wrapper-ref');
   }
 
-  onupdate(vnode) {
+  onupdate(vnode: m.Vnode<PopoverAttrs>) {
     if (this.isOpen && !this.isRendered) {
       try {
         this.applyPopoverPosition(vnode);
@@ -60,7 +60,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     }
   }
 
-  togglePopOver(onToggle) {
+  togglePopOver(onToggle: (isOpen: boolean) => void) {
     const newIsOpen = !this.isOpen;
     onToggle && onToggle(newIsOpen);
 
@@ -70,7 +70,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     m.redraw();
   }
 
-  applyPopoverPosition(vnode) {
+  applyPopoverPosition(vnode: m.Vnode<PopoverAttrs>) {
     // Apply styles in real time
     try {
       // TODO Gabe 6/1/22 - Figure out how to avoid these both being null at first
@@ -100,7 +100,11 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     m.redraw();
   }
 
-  handleHoverExit(e, onToggle, vnode) {
+  handleHoverExit(
+    e: MouseEvent,
+    onToggle: (isOpen: boolean) => void,
+    vnode: m.Vnode<PopoverAttrs>
+  ) {
     const { persistOnHover } = vnode.attrs;
 
     const hoverCloseDelay = vnode.attrs.hoverCloseDelay
@@ -126,7 +130,10 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     }
   }
 
-  handleHoverEnter(hoverOpenDelay, onToggle) {
+  handleHoverEnter(
+    hoverOpenDelay: number,
+    onToggle: (isOpen: boolean) => void
+  ) {
     if (hoverOpenDelay) {
       setTimeout(() => {
         this.togglePopOver(onToggle);
@@ -136,7 +143,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<PopoverAttrs>) {
     const {
       content,
       hoverOpenDelay,
@@ -180,7 +187,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
                   this.togglePopOver(onToggle);
                 }
               }}
-              onmousemove={(e) => {
+              onmousemove={(e: MouseEvent) => {
                 if (interactionType === 'hover') {
                   this.handleHoverExit(e, onToggle, vnode);
                 }
@@ -204,7 +211,7 @@ export class CWPopover implements m.ClassComponent<PopoverAttrs> {
               >
                 {content}
               </div>
-              {tooltipType && <div id={this.arrowId}></div>}
+              {tooltipType && <div id={this.arrowId} />}
             </div>
           </CWPortal>
         ) : null}

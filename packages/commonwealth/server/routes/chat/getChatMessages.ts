@@ -1,51 +1,48 @@
-import { NextFunction, Request, Response } from 'express';
-import { DB } from '../../database';
+import { Action } from 'common-common/src/permissions';
+import { DB } from '../../models';
+import { ChatChannelAttributes } from '../../models/chat_channel';
+import { success, TypedRequestQuery, TypedResponse } from '../../types';
+import { AppError } from '../../util/errors';
+import {
+  checkReadPermitted
+} from '../../util/roles';
 
 export const Errors = {
-	NotLoggedIn: 'Not logged in',
-	NoValidAddress: 'No valid address',
-	NoCommunityId: 'No community id given'
+  NoCommunityId: 'No community id given',
 };
 
-/**
- * Gets all relevant messages of a community. A user must be logged in, and they must have a valid address in the
- * community whose chat messages they are trying to view.
- * @param models
- * @param req
- * @param res
- * @param next
- */
-export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
-	if (!req.user) {
-		return next(new Error(Errors.NotLoggedIn));
-	}
-
-	// check address
-	const addressAccount = await models.Address.findOne({
-		where: {
-			address: req.query.address,
-			user_id: req.user.id
-		}
-	});
-	if (!addressAccount) {
-		return next(new Error(Errors.NoValidAddress))
-	}
-
-	// check community id
-	if (!req.query.chain_id) {
-		return next(new Error(Errors.NoCommunityId))
-	}
-
-	// get all messages
-	const messages = await models.ChatChannel.findAll({
-		where: {
-			chain_id: req.query.chain_id
-		},
-		include: {
-			model: models.ChatMessage,
-			required: false // should return channels with no chat messages
-		}
-	})
-
-	return res.json({ status: '200', result: JSON.stringify(messages) });
+type GetChatMessagesReq = {
+  chain_id: string;
 }
+
+type GetChatMessagesResp = ChatChannelAttributes[];
+
+export default async (
+  models: DB,
+  req: TypedRequestQuery<GetChatMessagesReq>,
+  res: TypedResponse<GetChatMessagesResp>,
+) => {
+  if (!req.query.chain_id) {
+    throw new AppError(Errors.NoCommunityId);
+  }
+
+  await checkReadPermitted(
+    models,
+    req.query.chain_id,
+    Action.VIEW_CHAT_CHANNELS,
+    req.user?.id,
+  );
+
+  // get all messages
+  const messages = await models.ChatChannel.findAll({
+    where: {
+      chain_id: req.query.chain_id,
+    },
+    include: {
+      model: models.ChatMessage,
+      required: false, // should return channels with no chat messages
+    },
+  });
+
+  return success(res, messages.map((m) => m.toJSON()));
+};

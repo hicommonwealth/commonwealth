@@ -2,7 +2,6 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { Spinner } from 'construct-ui';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -13,9 +12,15 @@ import { NextFn, TxDataState } from './types';
 import { CWButton } from '../component_kit/cw_button';
 import { TXSigningTransactionBox } from './tx_signing_transaction_box';
 import { CWText } from '../component_kit/cw_text';
+import { CWSpinner } from '../component_kit/cw_spinner';
+
+type TxSigningModalIntroStageAttrs = ITXModalData & {
+  next: NextFn;
+  polkaWallet: IWebWallet<any>;
+};
 
 export class TxSigningModalIntroStage
-  implements m.ClassComponent<ITXModalData & NextFn & IWebWallet<any>>
+  implements m.ClassComponent<TxSigningModalIntroStageAttrs>
 {
   private introTab: 'webWallet' | 'commandLine';
 
@@ -23,7 +28,7 @@ export class TxSigningModalIntroStage
     this.introTab = 'webWallet';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<TxSigningModalIntroStageAttrs>) {
     const { author, next, polkaWallet, txData, txType } = vnode.attrs;
 
     return (
@@ -66,12 +71,16 @@ export class TxSigningModalIntroStage
   }
 }
 
-export class TxSigningModalWaitingStage implements m.ClassComponent {
+type TxSigningModalWaitingStageAttrs = { next: NextFn };
+
+export class TxSigningModalWaitingStage
+  implements m.ClassComponent<TxSigningModalWaitingStageAttrs>
+{
   private timeoutHandle?: NodeJS.Timeout;
   private timer?: number;
   private timerHandle?: NodeJS.Timeout;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.Vnode<TxSigningModalWaitingStageAttrs>) {
     const $parent = $('.TXSigningModal');
 
     this.timer = 0;
@@ -109,7 +118,7 @@ export class TxSigningModalWaitingStage implements m.ClassComponent {
         <CWText>
           Waiting for your transaction to be confirmed by the network...
         </CWText>
-        <Spinner active />
+        <CWSpinner />
         <CWText>`Waiting ${this.timer || 0}s...</CWText>
       </>
     );
@@ -119,7 +128,7 @@ export class TxSigningModalWaitingStage implements m.ClassComponent {
 export class TxSigningModalSuccessStage
   implements m.ClassComponent<TxDataState>
 {
-  view(vnode) {
+  view(vnode: m.VnodeDOM<TxDataState, this>) {
     const { blocknum, hash, timestamp } = vnode.attrs;
 
     return (

@@ -12,29 +12,21 @@ import { TopicSelector } from '../components/topic_selector';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 
 type ChangeTopicModalAttrs = {
-  onChangeHandler: () => void;
+  onChangeHandler: (topic: Topic) => void;
   thread: Thread;
 };
 
 export class ChangeTopicModal
   implements m.ClassComponent<ChangeTopicModalAttrs>
 {
-  private activeTopic: Topic | string;
-  private topicId: number;
-  private topicName: string;
+  private activeTopic: Topic;
 
-  oncreate(vnode) {
+  oninit(vnode: m.Vnode<ChangeTopicModalAttrs>) {
     if (!vnode.attrs.thread.topic) return;
-
-    this.topicName = vnode.attrs.thread.topic.name;
-    this.topicId = vnode.attrs.thread.topic.id;
-  }
-
-  oninit(vnode) {
     this.activeTopic = vnode.attrs.thread.topic;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ChangeTopicModalAttrs>) {
     const { thread } = vnode.attrs;
 
     return (
@@ -47,9 +39,9 @@ export class ChangeTopicModal
           <TopicSelector
             defaultTopic={this.activeTopic}
             topics={app.topics.getByCommunity(app.activeChainId())}
-            updateFormData={(topicName, topicId?) => {
-              vnode.attrs.onChangeHandler(topicName, topicId);
-              this.activeTopic = topicName;
+            updateFormData={(topic: Topic) => {
+              vnode.attrs.onChangeHandler(topic);
+              this.activeTopic = topic;
             }}
           />
           <div class="buttons-row">
@@ -63,13 +55,12 @@ export class ChangeTopicModal
             <CWButton
               label="Save changes"
               onclick={async (e) => {
-                const { topicName, topicId } = this;
-
+                const { activeTopic } = this;
                 try {
                   const topic: Topic = await app.topics.update(
                     thread.id,
-                    topicName,
-                    topicId
+                    activeTopic.name,
+                    activeTopic.id
                   );
 
                   vnode.attrs.onChangeHandler(topic);

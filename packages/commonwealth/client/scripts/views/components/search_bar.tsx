@@ -10,7 +10,6 @@ import {
   Input,
   List,
   ListItem,
-  Spinner,
   Button,
   Size,
   Tag,
@@ -22,10 +21,11 @@ import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
-import { ContentType } from 'controllers/server/search';
+import { SearchContentType } from 'types';
 import User, { UserBlock } from './widgets/user';
 import { CommunityLabel } from './community_label';
 import { renderQuillTextBody } from './quill/helpers';
+import { CWSpinner } from './component_kit/cw_spinner';
 
 const getMemberPreview = (
   addr,
@@ -43,35 +43,33 @@ const getMemberPreview = (
     app.isCustomDomain() ? '' : `/${app.activeChainId() || addr.chain}`
   }/account/${addr.address}?base=${addr.chain}`;
 
-  return (
-    <ListItem
-      tabIndex={tabIndex}
-      label={
-        <a class="search-results-item">
-          {m(UserBlock, {
-            user: profile,
-            searchTerm,
-            avatarSize: 24,
-            showAddressWithDisplayName: true,
-            addressDisplayOptions: { showFullAddress: true },
-            showChainName,
-          })}
-        </a>
-      }
-      onclick={() => {
+  return m(ListItem, {
+    tabIndex,
+    label: (
+      <a class="search-results-item">
+        {m(UserBlock, {
+          user: profile,
+          searchTerm,
+          avatarSize: 24,
+          showAddressWithDisplayName: true,
+          addressDisplayOptions: { showFullAddress: true },
+          showChainName,
+        })}
+      </a>
+    ),
+    onclick: () => {
+      m.route.set(userLink);
+      closeResultsFn();
+    },
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
         m.route.set(userLink);
         closeResultsFn();
-      }}
-      onkeyup={(e) => {
-        if (e.key === 'Enter') {
-          m.route.set(userLink);
-          closeResultsFn();
-        }
-      }}
-      onmouseover={() => setUsingFilterMenuFn(true)}
-      onmouseout={() => setUsingFilterMenuFn(false)}
-    />
-  );
+      }
+    },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false),
+  });
 };
 
 const getCommunityPreview = (
@@ -81,9 +79,9 @@ const getCommunityPreview = (
   setUsingFilterMenuFn
 ) => {
   const params =
-    community.contentType === ContentType.Token
+    community.contentType === SearchContentType.Token
       ? { community }
-      : community.contentType === ContentType.Chain
+      : community.contentType === SearchContentType.Chain
       ? { community }
       : null;
 
@@ -102,24 +100,22 @@ const getCommunityPreview = (
     closeResultsFn();
   };
 
-  return (
-    <ListItem
-      tabIndex={tabIndex}
-      label={
-        <a class="search-results-item community-result">
-          <CommunityLabel {...params} />
-        </a>
+  return m(ListItem, {
+    tabIndex,
+    label: (
+      <a class="search-results-item community-result">
+        <CommunityLabel {...params} />
+      </a>
+    ),
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect();
       }
-      onclick={onSelect}
-      onkeyup={(e) => {
-        if (e.key === 'Enter') {
-          onSelect();
-        }
-      }}
-      onmouseover={() => setUsingFilterMenuFn(true)}
-      onmouseout={() => setUsingFilterMenuFn(false)}
-    />
-  );
+    },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false),
+  });
 };
 
 const getDiscussionPreview = (
@@ -142,46 +138,42 @@ const getDiscussionPreview = (
     closeResultsFn();
   };
 
-  return (
-    <ListItem
-      tabIndex={tabIndex}
-      onclick={onSelect}
-      onkeyup={(e) => {
-        if (e.key === 'Enter') {
-          onSelect();
-        }
-      }}
-      onmouseover={() => setUsingFilterMenuFn(true)}
-      onmouseout={() => setUsingFilterMenuFn(false)}
-      label={
-        <a class="search-results-item">
-          <div class="search-results-thread-title">
-            {decodeURIComponent(thread.title)}
-          </div>
-          <div class="search-results-thread-subtitle">
-            <span class="created-at">
-              {moment(thread.created_at).fromNow()}
-            </span>
-            {m(User, {
-              user: new AddressInfo(
-                thread.address_id,
-                thread.address,
-                thread.address_chain,
-                null
-              ),
-            })}
-          </div>
-          <div class="search-results-thread-body">
-            {renderQuillTextBody(thread.body, {
-              hideFormatting: true,
-              collapse: true,
-              searchTerm,
-            })}
-          </div>
-        </a>
+  return m(ListItem, {
+    tabIndex,
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect();
       }
-    />
-  );
+    },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false),
+    label: (
+      <a class="search-results-item">
+        <div class="search-results-thread-title">
+          {decodeURIComponent(thread.title)}
+        </div>
+        <div class="search-results-thread-subtitle">
+          <span class="created-at">{moment(thread.created_at).fromNow()}</span>
+          {m(User, {
+            user: new AddressInfo(
+              thread.address_id,
+              thread.address,
+              thread.address_chain,
+              null
+            ),
+          })}
+        </div>
+        <div class="search-results-thread-body">
+          {renderQuillTextBody(thread.body, {
+            hideFormatting: true,
+            collapse: true,
+            searchTerm,
+          })}
+        </div>
+      </a>
+    ),
+  });
 };
 
 const getCommentPreview = (
@@ -208,46 +200,42 @@ const getCommentPreview = (
     closeResultsFn();
   };
 
-  return (
-    <ListItem
-      tabIndex={tabIndex}
-      onclick={onSelect}
-      onkeyup={(e) => {
-        if (e.key === 'Enter') {
-          onSelect();
-        }
-      }}
-      onmouseover={() => setUsingFilterMenuFn(true)}
-      onmouseout={() => setUsingFilterMenuFn(false)}
-      label={
-        <a class="search-results-item">
-          <div class="search-results-thread-title">
-            {`Comment on ${decodeURIComponent(comment.title)}`}
-          </div>
-          <div class="search-results-thread-subtitle">
-            <span class="created-at">
-              {moment(comment.created_at).fromNow()}
-            </span>
-            {m(User, {
-              user: new AddressInfo(
-                comment.address_id,
-                comment.address,
-                comment.address_chain,
-                null
-              ),
-            })}
-          </div>
-          <div class="search-results-comment">
-            {renderQuillTextBody(comment.text, {
-              hideFormatting: true,
-              collapse: true,
-              searchTerm,
-            })}
-          </div>
-        </a>
+  return m(ListItem, {
+    tabIndex,
+    onclick: onSelect,
+    onkeyup: (e) => {
+      if (e.key === 'Enter') {
+        onSelect();
       }
-    />
-  );
+    },
+    onmouseover: () => setUsingFilterMenuFn(true),
+    onmouseout: () => setUsingFilterMenuFn(false),
+    label: (
+      <a class="search-results-item">
+        <div class="search-results-thread-title">
+          {`Comment on ${decodeURIComponent(comment.title)}`}
+        </div>
+        <div class="search-results-thread-subtitle">
+          <span class="created-at">{moment(comment.created_at).fromNow()}</span>
+          {m(User, {
+            user: new AddressInfo(
+              comment.address_id,
+              comment.address,
+              comment.address_chain,
+              null
+            ),
+          })}
+        </div>
+        <div class="search-results-comment">
+          {renderQuillTextBody(comment.text, {
+            hideFormatting: true,
+            collapse: true,
+            searchTerm,
+          })}
+        </div>
+      </a>
+    ),
+  });
 };
 
 const getBalancedContentListing = (
@@ -299,18 +287,14 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
 
     if (res?.length === 0) return;
 
-    const headerEle = (
-      <ListItem
-        label={type}
-        class={`disabled ${
-          organizedResults.length === 0 ? 'upper-border' : ''
-        }`}
-        onclick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      />
-    );
+    const headerEle = m(ListItem, {
+      label: type,
+      class: `disabled ${organizedResults.length === 0 ? 'upper-border' : ''}`,
+      onclick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      },
+    });
 
     organizedResults.push(headerEle);
 
@@ -366,16 +350,16 @@ const getSearchHistoryPreview = (
   const scopeTags =
     searchQuery.searchScope[0] === SearchScope.All
       ? []
-      : searchQuery.searchScope.map((scope) => (
-          <Tag label={SearchScope[scope].toLowerCase()} />
-        ));
+      : searchQuery.searchScope.map((scope) =>
+          m(Tag, { label: SearchScope[scope].toLowerCase() })
+        );
 
   if (searchQuery.chainScope && !app.isCustomDomain()) {
     scopeTags.unshift(
-      <Tag
-        label={searchQuery.chainScope.toLowerCase()}
-        class="search-history-primary-tag"
-      />
+      m(Tag, {
+        label: searchQuery.chainScope.toLowerCase(),
+        class: 'search-history-primary-tag',
+      })
     );
   }
 
@@ -384,38 +368,34 @@ const getSearchHistoryPreview = (
   }
 
   if (scopeTags.length >= 1) {
-    scopeTags.unshift(<Icon name={Icons.ARROW_RIGHT} />);
+    scopeTags.unshift(m(Icon, { name: Icons.ARROW_RIGHT }));
   }
 
-  return (
-    <ListItem
-      class="search-history-item"
-      onclick={() => {
+  return m(ListItem, {
+    class: 'search-history-item',
+    onclick: () => {
+      app.search.removeFromHistory(searchQuery);
+      executeSearch(searchQuery);
+    },
+    onmouseover: () => {
+      setFilterMenuActive(true);
+    },
+    onmouseout: () => {
+      setFilterMenuActive(false);
+    },
+    contentLeft: (
+      <>
+        <p class="search-history-query">{searchQuery.searchTerm}</p>
+        {scopeTags}
+      </>
+    ),
+    contentRight: m(Icon, {
+      name: Icons.X,
+      onclick: () => {
         app.search.removeFromHistory(searchQuery);
-        executeSearch(searchQuery);
-      }}
-      onmouseover={() => {
-        setFilterMenuActive(true);
-      }}
-      onmouseout={() => {
-        setFilterMenuActive(false);
-      }}
-      contentLeft={
-        <>
-          <p class="search-history-query">{searchQuery.searchTerm}</p>
-          {scopeTags}
-        </>
-      }
-      contentRight={
-        <Icon
-          name={Icons.X}
-          onclick={() => {
-            app.search.removeFromHistory(searchQuery);
-          }}
-        />
-      }
-    />
-  );
+      },
+    }),
+  });
 };
 
 export const search = async (searchQuery: SearchQuery, state) => {
@@ -506,35 +486,37 @@ export class SearchBar implements m.Component {
 
     if (historyList.length > 0) {
       historyList.push(
-        <ListItem
-          class="search-history-no-results upper-border"
+        m(ListItem, {
+          class: 'search-history-no-results upper-border',
           // eslint-disable-next-line max-len
-          label="Tip: You can use operators like \'single quotes\', and the keyword &quot;or&quot; to limit your search!"
-        />
+          label:
+            "Tip: You can use operators like 'single quotes', and the keyword &quot;or&quot; to limit your search!",
+        })
       );
     }
 
-    const scopeTitle = <ListItem class="disabled" label="Limit search to:" />;
+    const scopeTitle = m(ListItem, {
+      class: 'disabled',
+      label: 'Limit search to:',
+    });
 
     const scopeToButton = (scope, disabled) => {
-      return (
-        <Button
-          size={Size.SM}
-          class={disabled ? 'disabled' : ''}
-          active={this.searchQuery.searchScope.includes(scope)}
-          onclick={() => {
-            this.searchQuery.toggleScope(scope);
-            search(this.searchQuery, this);
-          }}
-          onmouseover={() => {
-            this.filterMenuActive = true;
-          }}
-          onmouseout={() => {
-            this.filterMenuActive = false;
-          }}
-          label={scope}
-        />
-      );
+      return m(Button, {
+        size: Size.SM,
+        class: disabled ? 'disabled' : '',
+        active: this.searchQuery.searchScope.includes(scope),
+        onclick: () => {
+          this.searchQuery.toggleScope(scope);
+          search(this.searchQuery, this);
+        },
+        onmouseover: () => {
+          this.filterMenuActive = true;
+        },
+        onmouseout: () => {
+          this.filterMenuActive = false;
+        },
+        label: scope,
+      });
     };
 
     const scopeButtons = [SearchScope.Threads, SearchScope.Replies]
@@ -546,153 +528,137 @@ export class SearchBar implements m.Component {
         ).map((s) => scopeToButton(s, false))
       );
 
-    const filterDropdown = (
-      <List class="search-results-list">
-        <ListItem class="disabled" label="I'm looking for: " />
-        <ListItem
-          class="disabled search-filter-button-bar"
-          label={scopeButtons}
-        />
-        {this.activeChain && !app.isCustomDomain() && (
-          <>
-            {scopeTitle}
-            <ListItem
-              class="disabled"
-              label={
-                <Button
-                  size={Size.SM}
-                  onclick={() => {
-                    this.searchQuery.chainScope =
-                      this.searchQuery.chainScope === this.activeChain
-                        ? undefined
-                        : this.activeChain;
-                    search(this.searchQuery, this);
-                  }}
-                  active={this.searchQuery.chainScope === this.activeChain}
-                  onmouseover={() => {
-                    this.filterMenuActive = true;
-                  }}
-                  onmouseout={() => {
-                    this.filterMenuActive = false;
-                  }}
-                  label={`Inside chain: ${this.activeChain}`}
-                />
-              }
-            />
-          </>
-        )}
-        {this.searchTerm.length < 1 ? (
-          historyList.length === 0 ? (
-            <ListItem
-              class="search-history-no-results upper-border"
-              label="Enter a term into the field and press Enter to start"
-            />
-          ) : (
-            <>
-              <ListItem class="disabled upper-border" label="Search History" />
-              {historyList}
-            </>
-          )
-        ) : !results || results?.length === 0 ? (
-          app.search.getByQuery(searchQuery)?.loaded ? (
-            <ListItem
-              class="search-history-no-results upper-border"
-              label="No Results Found"
-            />
-          ) : this.isTyping ? (
-            <ListItem
-              class="disabled upper-border"
-              label={<Spinner active={true} />}
-            />
-          ) : (
-            <ListItem
-              class="search-history-no-results upper-border"
-              label="Make your query longer than 3 characters to search"
-            />
-          )
-        ) : this.isTyping ? (
-          <ListItem
-            class="disabled upper-border"
-            label={<Spinner active={true} />}
-          />
-        ) : (
-          results
-        )}
-      </List>
-    );
-
-    const cancelInputIcon = this.searchTerm ? (
-      <Icon
-        name={Icons.X}
-        onclick={() => {
-          const input = $('.SearchBar').find('input[name=search');
-          input.val('');
-          this.searchTerm = '';
-        }}
-      />
-    ) : null;
-
-    const searchIcon = this.searchTerm ? (
-      <Icon
-        name={Icons.CORNER_DOWN_LEFT}
-        onclick={() => {
-          executeSearch(this.searchQuery);
-        }}
-      />
-    ) : null;
-
-    return (
-      <ControlGroup class="SearchBar">
-        <Input
-          name="search"
-          placeholder="Type to search..."
-          autofocus={false} // !isMobile,
-          fluid={true}
-          tabIndex={-10}
-          contentRight={
-            this.searchTerm && (
-              <ControlGroup>
-                {cancelInputIcon}
-                {searchIcon}
-              </ControlGroup>
-            )
-          }
-          defaultValue={m.route.param('q') || this.searchTerm}
-          value={this.searchTerm}
-          autocomplete="off"
-          onclick={async () => {
-            this.focused = true;
-          }}
-          onfocusout={() => {
-            if (!this.filterMenuActive) this.focused = false;
-          }}
-          oninput={(e) => {
-            e.stopPropagation();
-            this.isTyping = true;
-            this.focused = true;
-            this.searchTerm = e.target.value?.toLowerCase();
-            clearTimeout(this.inputTimeout);
-            const timeout = e.target.value?.length > 3 ? 250 : 1000;
-            this.inputTimeout = setTimeout(() => {
-              this.isTyping = false;
-              if (e.target.value?.length > 3) {
+    const filterDropdown = m(List, { class: 'search-results-list' }, [
+      m(ListItem, { class: 'disabled', label: "I'm looking for: " }),
+      m(ListItem, {
+        class: 'disabled search-filter-button-bar',
+        label: scopeButtons,
+      }),
+      this.activeChain &&
+        !app.isCustomDomain() && [
+          scopeTitle,
+          m(ListItem, {
+            class: 'disabled',
+            label: m(Button, {
+              size: Size.SM,
+              onclick: () => {
+                this.searchQuery.chainScope =
+                  this.searchQuery.chainScope === this.activeChain
+                    ? undefined
+                    : this.activeChain;
                 search(this.searchQuery, this);
-              } else {
-                this.searchQuery.searchTerm = e.target.value?.toLowerCase();
-                this.results = [];
-                m.redraw();
-              }
-            }, timeout);
-          }}
-          onkeyup={(e) => {
-            e.stopPropagation();
-            if (e.key === 'Enter') {
-              executeSearch(this.searchQuery);
+              },
+              active: this.searchQuery.chainScope === this.activeChain,
+              onmouseover: () => {
+                this.filterMenuActive = true;
+              },
+              onmouseout: () => {
+                this.filterMenuActive = false;
+              },
+              label: `Inside chain: ${this.activeChain}`,
+            }),
+          }),
+        ],
+      this.searchTerm.length < 1
+        ? historyList.length === 0
+          ? m(ListItem, {
+              class: 'search-history-no-results upper-border',
+              label: 'Enter a term into the field and press Enter to start',
+            })
+          : [
+              m(ListItem, {
+                class: 'disabled upper-border',
+                label: 'Search History',
+              }),
+              historyList,
+            ]
+        : !results || results?.length === 0
+        ? app.search.getByQuery(searchQuery)?.loaded
+          ? m(ListItem, {
+              class: 'search-history-no-results upper-border',
+              label: 'No Results Found',
+            })
+          : this.isTyping
+          ? m(ListItem, {
+              class: 'disabled upper-border',
+              label: <CWSpinner size="small" />,
+            })
+          : m(ListItem, {
+              class: 'search-history-no-results upper-border',
+              label: 'Make your query longer than 3 characters to search',
+            })
+        : this.isTyping
+        ? m(ListItem, {
+            class: 'disabled upper-border',
+            label: <CWSpinner size="small" />,
+          })
+        : results,
+    ]);
+
+    const cancelInputIcon = this.searchTerm
+      ? m(Icon, {
+          name: Icons.X,
+          onclick: () => {
+            const input = $('.SearchBar').find('input[name=search');
+            input.val('');
+            this.searchTerm = '';
+          },
+        })
+      : null;
+
+    const searchIcon = this.searchTerm
+      ? m(Icon, {
+          name: Icons.CORNER_DOWN_LEFT,
+          onclick: () => {
+            executeSearch(this.searchQuery);
+          },
+        })
+      : null;
+
+    return m(ControlGroup, { class: 'SearchBar' }, [
+      m(Input, {
+        name: 'search',
+        placeholder: 'Type to search...',
+        autofocus: false, // !isMobile,
+        fluid: true,
+        tabIndex: -10,
+        contentRight:
+          this.searchTerm && m(ControlGroup, [cancelInputIcon, searchIcon]),
+        defaultValue: m.route.param('q') || this.searchTerm,
+        value: this.searchTerm,
+        autocomplete: 'off',
+        onclick: async () => {
+          this.focused = true;
+        },
+        onfocusout: () => {
+          if (!this.filterMenuActive) this.focused = false;
+        },
+        oninput: (e) => {
+          e.stopPropagation();
+          this.isTyping = true;
+          this.focused = true;
+          this.searchTerm = e.target.value?.toLowerCase();
+          clearTimeout(this.inputTimeout);
+          const timeout = e.target.value?.length > 3 ? 250 : 1000;
+          this.inputTimeout = setTimeout(() => {
+            this.isTyping = false;
+            if (e.target.value?.length > 3) {
+              search(this.searchQuery, this);
+            } else {
+              this.searchQuery.searchTerm = e.target.value?.toLowerCase();
+              this.results = [];
+              m.redraw();
             }
-          }}
-        />
-        {this.focused && !this.hideResults && filterDropdown}
-      </ControlGroup>
-    );
+          }, timeout);
+        },
+        onkeyup: (e) => {
+          e.stopPropagation();
+          if (e.key === 'Enter') {
+            executeSearch(this.searchQuery);
+          }
+        },
+      }),
+      this.focused && !this.hideResults && filterDropdown,
+    ]);
   }
 }

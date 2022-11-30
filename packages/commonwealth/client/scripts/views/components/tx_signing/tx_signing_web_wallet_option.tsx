@@ -7,7 +7,7 @@ import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { NextFn } from './types';
 import { setupEventListeners } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
@@ -21,14 +21,14 @@ type TXSigningWebWalletOptionAttrs = {
 export class TXSigningWebWalletOption
   implements m.ClassComponent<TXSigningWebWalletOptionAttrs>
 {
-  oncreate(vnode) {
+  oncreate(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
     // try to enable web wallet
     if (vnode.attrs.wallet && !vnode.attrs.wallet.enabled) {
       vnode.attrs.wallet.enable().then(() => m.redraw());
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
     const { author, wallet } = vnode.attrs;
 
     const webWallet = wallet as PolkadotWebWalletController;

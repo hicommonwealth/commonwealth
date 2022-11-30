@@ -12,11 +12,12 @@
 @import 'mixins/icons';
 @import 'mixins/text';
 
-// layout parameters
+// layout & global nav parameters
 
 $sidebar-width: 232px;
 $quick-switcher-width: 56px;
-$header-height: 88px;
+$global-header-height: 56px;
+$sidebar-community-header-height: 56px;
 
 // base fonts
 
@@ -61,6 +62,22 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
       border-radius: $border-radius-corners;
       background-color: $neutral-500;
     }
+  }
+}
+
+@mixin contentPadding {
+  padding: 56px;
+
+  @include medium {
+    padding: 40px;
+  }
+
+  @include mediumSmall {
+    padding: 32px;
+  }
+
+  @include smallInclusive {
+    padding: 24px;
   }
 }
 

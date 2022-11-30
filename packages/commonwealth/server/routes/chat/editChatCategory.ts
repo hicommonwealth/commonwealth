@@ -1,5 +1,6 @@
-import {NextFunction, Request, Response} from "express";
-import {DB} from "../../database";
+import { NextFunction, Request, Response } from 'express';
+import { DB } from '../../models';
+import { AppError, ServerError } from '../../util/errors';
 
 export const Errors = {
     NotLoggedIn: 'Not logged in',
@@ -11,23 +12,23 @@ export const Errors = {
 
 export default async (models: DB, req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-        return next(new Error(Errors.NotLoggedIn));
+        return next(new AppError(Errors.NotLoggedIn));
     }
 
     if (!req.user.isAdmin) {
-        return next(new Error(Errors.NotAdmin))
+        return next(new AppError(Errors.NotAdmin))
     }
 
     if (!req.body.chain_id) {
-        return next(new Error(Errors.NoCommunityId))
+        return next(new AppError(Errors.NoCommunityId))
     }
 
     if (!req.body.category) {
-        return next(new Error(Errors.NoCategory))
+        return next(new AppError(Errors.NoCategory))
     }
 
     if (!req.body.new_category) {
-        return next(new Error(Errors.NoNewCategory))
+        return next(new AppError(Errors.NoNewCategory))
     }
 
     // finds all channels with category and renames category
@@ -41,7 +42,7 @@ export default async (models: DB, req: Request, res: Response, next: NextFunctio
     try {
         await Promise.all(channels.map(c => {c.category = req.body.new_category; return c.save()}))
     } catch (e) {
-        return next(new Error(e))
+        return next(new ServerError(e))
     }
 
     return res.json({ status: 'Success' });

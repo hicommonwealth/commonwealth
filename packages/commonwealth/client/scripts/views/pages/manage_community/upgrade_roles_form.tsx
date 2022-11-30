@@ -13,7 +13,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 
 type UpgradeRolesFormAttrs = {
-  onRoleUpgrade: (oldRole: string, newRole: string) => void;
+  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   roleData: RoleInfo[];
 };
 
@@ -23,7 +23,7 @@ export class UpgradeRolesForm
   private role: string;
   private user: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<UpgradeRolesFormAttrs>) {
     const { roleData, onRoleUpgrade } = vnode.attrs;
 
     const nonAdmins: RoleInfo[] = roleData.filter((role) => {
@@ -34,8 +34,14 @@ export class UpgradeRolesForm
     });
 
     const nonAdminNames: string[] = nonAdmins.map((role) => {
+      // Graham 9.19.23: Temporary patch while Addresses are unreliable.
+      // @TODO: @Profiles upgrade, clean this up
+      const chainId =
+        role.chain_id || typeof role.Address.chain === 'string'
+          ? role.Address.chain
+          : role.Address.chain?.id;
       const displayName = app.profiles.getProfile(
-        role.Address.chain.id,
+        chainId as string,
         role.Address.address
       ).displayName;
 

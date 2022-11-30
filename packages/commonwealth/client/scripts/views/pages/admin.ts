@@ -10,7 +10,7 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import { formatCoin } from 'adapters/currency';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';

@@ -1,13 +1,19 @@
 /* @jsx m */
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
 import $ from 'jquery';
+
+import { Profile } from 'models';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 
-export class BanUserModal implements m.ClassComponent {
-  view(vnode) {
+type BanUserModalAttrs = {
+  profile: Profile;
+};
+
+export class BanUserModal implements m.ClassComponent<BanUserModalAttrs> {
+  view(vnode: m.VnodeDOM<BanUserModalAttrs, this>) {
     const { address } = vnode.attrs.profile;
 
     const exitModal = () => {
@@ -31,7 +37,10 @@ export class BanUserModal implements m.ClassComponent {
               onclick={async () => {
                 try {
                   // ZAK TODO: Update Banned User Table with userProfile
-                  if (!address) { notifyError('CW Data error'); return; };
+                  if (!address) {
+                    notifyError('CW Data error');
+                    return;
+                  }
                   await $.post('/api/banAddress', {
                     jwt: app.user.jwt,
                     address,

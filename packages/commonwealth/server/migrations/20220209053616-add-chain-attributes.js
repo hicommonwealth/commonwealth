@@ -50,23 +50,12 @@ module.exports = {
       );
 
       const chainCategories = [];
-      const daos = ['dydx', 'osmosis', 'new-order-dao', 'spiritswap', 'notional', 
-        'element-finance', 'knoxedge', 'chihuahua', 'hashes', 'bitdao', 'hummingbot-foundation',
-        'terra', 'uniswap', 'aave', 'polygon', 'alpha-finance', 'tribe', 'frax',
-        'axie-infinity', 'lion', 'jenny-metaverse-dao', 'divine-dao', 'beanstalk', 'krause-house',
-        'redacted-cartel', 'phantom-dao', 'debt-dao', 'qnt-dao', 'yearn-finance', 
-        'sushi', 'derivadao', 'compound', 'maker', 'bancor-network-toke', 'convex-finance', 'aavegotchi',
-        '1inch', 'curve-dao-token', 'lido-dao', 'the-graph', 'friends-with-benefi', 'dxdao' ];
-      const defi = ['dydx', 'osmosis', 'notional', 'redacted-cartel', 'spookyswap', 'usemate', 'tribe',
-        'uniswap', 'aave', 'beanstalk', 'spiritswap', 'redacted-cartel', 'yearn-finance', 'debt-dao', 'sushi',
-        'synthetix-network-token', '0x', 'compound', 'bancor-network-toke', 'convex-finance', 'harvest-finance',
-        'maker', '1inch', 'curve-dao-token', 'gnosis', 'kyber-network-crystal', 'idle', 'celsius-network', 'serum', 'rarible'];
-      
+      const daos = ['agoric', 'clover', 'cosmos', 'edgeware', 'marlin', 'metacartel', 'phala', 'regen-network', 'stafi'];
+      const defi = ['clover', 'injective'];
+
       daos.forEach((c) => chainCategories.push({ chain_id: c, category_type_id: 2 }));
       defi.forEach((c) => chainCategories.push({ chain_id: c, category_type_id: 1 }));
-      await queryInterface.bulkInsert('ChainCategories', [...chainCategories], {
-        transaction: t,
-      });
+      return queryInterface.bulkInsert('ChainCategories', [...chainCategories], { transaction: t });
     });
   },
 

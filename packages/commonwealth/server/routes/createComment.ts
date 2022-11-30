@@ -6,10 +6,10 @@ import {
   ProposalType,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../database';
+import { DB } from '../models';
 
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -28,6 +28,8 @@ import { SENDGRID_API_KEY } from '../config';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
+import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -57,20 +59,20 @@ const createComment = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new Error(authorError));
+  if (authorError) return next(new AppError(authorError));
 
   const { parent_id, root_id, text } = req.body;
 
   if (!root_id || root_id.indexOf('_') === -1) {
-    return next(new Error(Errors.MissingRootId));
+    return next(new AppError(Errors.MissingRootId));
   }
   if (
     (!text || !text.trim()) &&
     (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
   ) {
-    return next(new Error(Errors.MissingTextOrAttachment));
+    return next(new AppError(Errors.MissingTextOrAttachment));
   }
 
   // check if banned
@@ -79,7 +81,7 @@ const createComment = async (
     address: author.address,
   });
   if (!canInteract) {
-    return next(new Error(banError));
+    return next(new AppError(banError));
   }
 
   let parentComment;
@@ -91,7 +93,7 @@ const createComment = async (
         chain: chain.id,
       },
     });
-    if (!parentComment) return next(new Error(Errors.InvalidParent));
+    if (!parentComment) return next(new AppError(Errors.InvalidParent));
 
     // Backend check to ensure comments are never nested more than three levels deep:
     // top-level, child, and grandchild
@@ -103,7 +105,7 @@ const createComment = async (
         },
       });
       if (grandparentComment?.parent_id) {
-        return next(new Error(Errors.NestingTooDeep));
+        return next(new AppError(Errors.NestingTooDeep));
       }
     }
   }
@@ -124,22 +126,26 @@ const createComment = async (
       attributes: ['rule_id'],
     });
     if (topic?.rule_id) {
-      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      const passesRules = await checkRule(
+        ruleCache,
+        models,
+        topic.rule_id,
+        author.address
+      );
       if (!passesRules) {
-        return next(new Error(Errors.RuleCheckFailed));
+        return next(new AppError(Errors.RuleCheckFailed));
       }
     }
   }
 
   if (chain && chain.type === ChainType.Token) {
     // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
+    const isAdmin = await findAllRoles(
+      models,
+      { where: { address_id: author.id } },
+      chain.id,
+      ['admin']
+    );
     if (thread?.topic_id && !req.user.isAdmin && isAdmin.length === 0) {
       try {
         const canReact = await validateTopicThreshold(
@@ -149,11 +155,11 @@ const createComment = async (
           req.body.address
         );
         if (!canReact) {
-          return next(new Error(Errors.BalanceCheckFailed));
+          return next(new AppError(Errors.BalanceCheckFailed));
         }
       } catch (e) {
         log.error(`hasToken failed: ${e.message}`);
-        return next(new Error(Errors.BalanceCheckFailed));
+        return next(new ServerError(Errors.BalanceCheckFailed));
       }
     }
   }
@@ -173,7 +179,7 @@ const createComment = async (
       quillDoc.ops[0].insert.trim() === '' &&
       (!req.body['attachments[]'] || req.body['attachments[]'].length === 0)
     ) {
-      return next(new Error(Errors.MissingTextOrAttachment));
+      return next(new AppError(Errors.MissingTextOrAttachment));
     }
   } catch (e) {
     // check always passes if the comment text isn't a Quill document
@@ -282,7 +288,7 @@ const createComment = async (
           );
         });
       // await finalComment.destroy();
-      // return next(new Error(Errors.ChainEntityNotFound));
+      // return next(new AppError(Errors.ChainEntityNotFound));
     }
     proposal = id;
   } else {
@@ -293,11 +299,11 @@ const createComment = async (
 
   if (!proposal) {
     await finalComment.destroy();
-    return next(new Error(Errors.ThreadNotFound));
+    return next(new AppError(Errors.ThreadNotFound));
   }
   if (typeof proposal !== 'string' && proposal.read_only) {
     await finalComment.destroy();
-    return next(new Error(Errors.CantCommentOnReadOnly));
+    return next(new AppError(Errors.CantCommentOnReadOnly));
   }
 
   // craft commonwealth url
@@ -344,7 +350,7 @@ const createComment = async (
               chain: mention[0] || null,
               address: mention[1],
             },
-            include: [models.User, models.Role],
+            include: [models.User, models.RoleAssignment],
           });
           return user;
         })
@@ -352,7 +358,7 @@ const createComment = async (
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
   } catch (e) {
-    return next(new Error('Failed to parse mentions'));
+    return next(new AppError('Failed to parse mentions'));
   }
 
   const excludedAddrs = (mentionedAddresses || []).map((addr) => addr.address);
@@ -420,38 +426,38 @@ const createComment = async (
 
   // notify mentioned users if they have permission to view the originating forum
   if (mentionedAddresses?.length > 0) {
-      mentionedAddresses.map((mentionedAddress) => {
-        if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+    mentionedAddresses.map((mentionedAddress) => {
+      if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-        const shouldNotifyMentionedUser = true;
-        if (shouldNotifyMentionedUser)
-          models.Subscription.emitNotifications(
-            models,
-            NotificationCategories.NewMention,
-            `user-${mentionedAddress.User.id}`,
-            {
-              created_at: new Date(),
-              root_id: +id,
-              root_title,
-              root_type: prefix,
-              comment_id: +finalComment.id,
-              comment_text: finalComment.text,
-              chain_id: finalComment.chain,
-              author_address: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
-            },
-            {
-              user: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
-              url: cwUrl,
-              title: proposal.title || '',
-              chain: finalComment.chain,
-              body: finalComment.text,
-            }, // TODO: add webhook data for mentions
-            req.wss,
-            [finalComment.Address.address]
-          );
-      });
+      const shouldNotifyMentionedUser = true;
+      if (shouldNotifyMentionedUser)
+        models.Subscription.emitNotifications(
+          models,
+          NotificationCategories.NewMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            created_at: new Date(),
+            root_id: +id,
+            root_title,
+            root_type: prefix,
+            comment_id: +finalComment.id,
+            comment_text: finalComment.text,
+            chain_id: finalComment.chain,
+            author_address: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+          },
+          {
+            user: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+            url: cwUrl,
+            title: proposal.title || '',
+            chain: finalComment.chain,
+            body: finalComment.text,
+          }, // TODO: add webhook data for mentions
+          req.wss,
+          [finalComment.Address.address]
+        );
+    });
   }
 
   // update author.last_active (no await)

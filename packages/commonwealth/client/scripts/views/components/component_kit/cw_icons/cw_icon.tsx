@@ -5,11 +5,11 @@ import m from 'mithril';
 import 'components/component_kit/cw_icon.scss';
 
 import { iconLookup } from './cw_icon_lookup';
-import { IconAttrs } from './types';
+import { IconComponentAttrs } from './types';
 import { ComponentType } from '../types';
 
-export class CWIcon implements m.ClassComponent<IconAttrs> {
-  view(vnode) {
+export class CWIcon implements m.ClassComponent<IconComponentAttrs> {
+  view(vnode: m.Vnode<IconComponentAttrs>) {
     const {
       className,
       componentType = ComponentType.Icon,
@@ -18,7 +18,7 @@ export class CWIcon implements m.ClassComponent<IconAttrs> {
       iconSize = 'medium',
       onclick,
       selected,
-      ...domAttrs
+      ...otherAttrs
     } = vnode.attrs;
 
     const Icon = iconLookup[iconName];
@@ -31,7 +31,7 @@ export class CWIcon implements m.ClassComponent<IconAttrs> {
         iconSize={iconSize}
         onclick={onclick}
         selected={selected}
-        {...domAttrs}
+        {...otherAttrs}
       />
     );
   }

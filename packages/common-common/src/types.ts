@@ -44,6 +44,18 @@ export enum ChainBase {
   Solana = 'solana',
 }
 
+export enum ContractType {
+  AAVE = 'aave',
+  COMPOUND = 'compound',
+  ERC20 = 'erc20',
+  ERC721 = 'erc721',
+  MARLINTESTNET = 'marlin-testnet',
+  SPL = 'spl',
+  MOLOCH1 = 'moloch1', // unused
+  MOLOCH2 = 'moloch2', // unused
+  COMMONPROTOCOL = 'common-protocol'
+}
+
 export enum ChainType {
   Chain = 'chain',
   DAO = 'dao',
@@ -56,9 +68,11 @@ export enum WalletId {
   Polkadot = 'polkadot',
   Metamask = 'metamask',
   WalletConnect = 'walletconnect',
+  KeplrEthereum = 'keplr-ethereum',
   Keplr = 'keplr',
   NearWallet = 'near',
   TerraStation = 'terrastation',
+  TerraWalletConnect = 'terra-walletconnect',
   CosmosEvmMetamask = 'cosm-metamask',
   Phantom = 'phantom',
   Ronin = 'ronin',
@@ -110,6 +124,7 @@ export enum ChainNetwork {
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
   Evmos = 'evmos',
+  Kava = 'kava',
 }
 
 export enum BalanceType {
@@ -118,4 +133,10 @@ export enum BalanceType {
   Ethereum = 'ethereum',
   Solana = 'solana',
   Cosmos = 'cosmos',
+  NEAR = 'near',
+  Substrate = 'substrate',
+}
+
+export enum RedisNamespaces {
+  Chat_Socket = 'chat_socket',
 }

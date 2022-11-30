@@ -22,11 +22,11 @@ export class CWThreadVoteButton
   private isHoveringDownvote: boolean;
   private initialVoteCount: number;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ThreadVoteButtonAttrs>) {
     this.initialVoteCount = vnode.attrs.voteCount;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ThreadVoteButtonAttrs>) {
     const { updateVoteCount, voteCount } = vnode.attrs;
 
     const handleVoteChange = (newCount: number) => {

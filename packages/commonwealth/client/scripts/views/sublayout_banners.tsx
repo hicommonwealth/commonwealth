@@ -22,7 +22,7 @@ type SublayoutBannersAttrs = {
 export class SublayoutBanners
   implements m.ClassComponent<SublayoutBannersAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SublayoutBannersAttrs>) {
     const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
 
     return (
@@ -39,7 +39,7 @@ export class SublayoutBanners
           ITokenAdapter.instanceOf(app.chain) &&
           !app.user.activeAccount && (
             <CWBanner
-              bannerContent={`Link an address that holds ${chain.symbol} to participate in governance.`}
+              bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}
             />
           )}
         {isNonEmptyString(terms) && tosStatus !== 'off' && (

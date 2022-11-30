@@ -4,8 +4,9 @@ import app from 'state';
 import Web3 from 'web3';
 import $ from 'jquery';
 import { provider } from 'web3-core';
-import { ChainBase, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import { hexToNumber } from 'web3-utils';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { Account, BlockInfo, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
@@ -19,6 +20,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public readonly name = WalletId.Metamask;
   public readonly label = 'Metamask';
+  public readonly defaultNetwork = ChainNetwork.Ethereum;
   public readonly chain = ChainBase.Ethereum;
 
   public get available() {
@@ -41,6 +43,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public async getRecentBlock(): Promise<BlockInfo> {
+    const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
+
+    return {
+      number: hexToNumber(block.number),
+      hash: block.hash,
+      timestamp: hexToNumber(block.timestamp),
+    }
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.sign(
       this._web3.utils.sha3(message),
@@ -49,10 +61,13 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(
-      app.chain.meta.node.ethChainId || 1,
-      message
+  public async signLoginToken(validationBlockInfo: string): Promise<string> {
+    const sessionPublicAddress = app.sessions.getOrCreateAddress(app.chain?.meta.node.ethChainId || 1);
+    const msgParams = await constructTypedMessage(
+      this.accounts[0],
+      app.chain?.meta.node.ethChainId || 1,
+      sessionPublicAddress,
+      validationBlockInfo,
     );
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
@@ -61,12 +76,13 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
-    // Sign with the method on eth_webwallet, because we don't have access to the private key
-    const webWalletSignature = await this.signLoginToken(
-      account.validationToken
-    );
-    return account.validate(webWalletSignature);
+  public async signWithAccount(account: Account): Promise<string> {
+    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
+    return webWalletSignature;
+  }
+
+  public async validateWithAccount(account: Account, walletSignature: string): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   // ACTIONS

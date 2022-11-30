@@ -31,14 +31,15 @@ import ProfileBio from './profile_bio';
 import ProfileBanner from './profile_banner';
 
 const getProfileStatus = (account) => {
-  const onOwnProfile = account.chain.id === app.user.activeAccount?.chain?.id &&
-        account.address === app.user.activeAccount?.address;
+  const onOwnProfile =
+    account.chain.id === app.user.activeAccount?.chain?.id &&
+    account.address === app.user.activeAccount?.address;
   const onLinkedProfile =
     !onOwnProfile &&
     app.user.activeAccounts.length > 0 &&
     app.user.activeAccounts
       .filter((account_) => {
-        return app.user.getRoleInCommunity({
+        return app.roles.getRoleInCommunity({
           account: account_,
           chain: app.activeChainId(),
         });
@@ -55,8 +56,8 @@ const getProfileStatus = (account) => {
   let currentAddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
     const communityOptions = { chain: app.activeChainId() };
-    const communityRoles = app.user.getAllRolesInCommunity(communityOptions);
-    const joinableAddresses = app.user.getJoinableAddresses(communityOptions);
+    const communityRoles = app.roles.getAllRolesInCommunity(communityOptions);
+    const joinableAddresses = app.roles.getJoinableAddresses(communityOptions);
     const unjoinedJoinableAddresses =
       joinableAddresses.length > communityRoles.length
         ? joinableAddresses.filter((addr) => {
@@ -337,11 +338,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       vnode.state.loaded = false;
       loadProfile(vnode.attrs, vnode.state);
     }
-    if (loading) return m(PageLoading, { showNewProposalButton: true });
+    if (loading) return m(PageLoading);
     if (!account && !vnode.state.initialized) {
       return m(PageNotFound, { message: 'Invalid address provided' });
     } else if (!account) {
-      return m(PageLoading, { showNewProposalButton: true });
+      return m(PageLoading);
     }
 
     if (!vnode.state.allContentCount) {
@@ -422,19 +423,18 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
 
     const allTabTitle =
       proposals && comments
-        ? ['All ', proposals.length + comments.length]
+        ? `All ${proposals.length + comments.length}`
         : 'All';
     const threadsTabTitle = proposals
-      ? ['Threads ', proposals.length]
+      ? `Threads ${proposals.length}`
       : 'Threads';
     const commentsTabTitle = comments
-      ? ['Comments ', comments.length]
+      ? `Comments ${comments.length}`
       : 'Comments';
 
     return m(
       Sublayout,
       {
-        showNewProposalButton: true,
         onscroll,
       },
       [

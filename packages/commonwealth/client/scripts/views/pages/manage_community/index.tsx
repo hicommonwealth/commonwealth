@@ -8,11 +8,9 @@ import 'pages/manage_community/index.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { RoleInfo, RolePermission, Webhook } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { ChainMetadataRows } from './chain_metadata_rows';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { PageLoading } from '../loading';
 import { sortAdminsAndModsFirst } from './helpers';
 
@@ -28,7 +26,7 @@ class ManageCommunityPage implements m.ClassComponent {
     }
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.user.isAdminOfEntity({
+      app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
 
@@ -90,8 +88,8 @@ class ManageCommunityPage implements m.ClassComponent {
         return r.id === oldRole.id;
       };
       this.roleData.splice(this.roleData.indexOf(oldRole), 1, newRole);
-      app.user.addRole(newRole);
-      app.user.removeRole(predicate);
+      app.roles.addRole(newRole);
+      app.roles.removeRole(predicate);
       const { adminsAndMods } = app.chain.meta;
       if (
         oldRole.permission === 'admin' ||
@@ -128,7 +126,9 @@ class ManageCommunityPage implements m.ClassComponent {
     return !this.loadingFinished ? (
       <PageLoading />
     ) : (
-      <Sublayout title="Manage Community" showNewProposalButton={true}>
+      <Sublayout
+      // title="Manage Community"
+      >
         <div class="ManageCommunityPage">
           <ChainMetadataRows
             admins={admins}
@@ -143,31 +143,6 @@ class ManageCommunityPage implements m.ClassComponent {
             roleData={this.roleData}
             webhooks={this.webhooks}
           />
-          {app.user.isSiteAdmin && (
-            <CWButton
-              label="Delete Chain"
-              onclick={async () => {
-                $.post(`${app.serverUrl()}/deleteChain`, {
-                  id: app.config.chains.getById(app.activeChainId()).id,
-                  auth: true,
-                  jwt: app.user.jwt,
-                }).then(
-                  (result) => {
-                    if (result.status !== 'Success') return;
-                    app.config.chains.remove(
-                      app.config.chains.getById(app.activeChainId())
-                    );
-                    notifySuccess('Deleted chain!');
-                    m.route.set('/');
-                    // redirect to /
-                  },
-                  () => {
-                    notifyError('Failed to delete chain!');
-                  }
-                );
-              }}
-            />
-          )}
         </div>
       </Sublayout>
     );

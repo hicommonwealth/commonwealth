@@ -1,3 +1,4 @@
+import { populateRange } from '../../util';
 import {
   CWEvent,
   IStorageFetcher,
@@ -73,26 +74,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
       return [];
     }
 
-    // populate range fully if not given
-    if (!range) {
-      range = { startBlock: 0 };
-    } else if (!range.startBlock) {
-      range.startBlock = 0;
-    } else if (range.startBlock >= this._currentBlock) {
-      this.log.error(
-        `Start block ${range.startBlock} greater than current block ${this._currentBlock}!`
-      );
-      return [];
-    }
-    if (!range.endBlock) {
-      range.endBlock = this._currentBlock;
-    }
-    if (range.startBlock >= range.endBlock) {
-      this.log.error(
-        `Invalid fetch range: ${range.startBlock}-${range.endBlock}.`
-      );
-      return [];
-    }
+    range = populateRange(range, this._currentBlock);
     this.log.info(
       `Fetching Commonwealth entities for range: ${range.startBlock}-${range.endBlock}.`
     );

@@ -1,6 +1,7 @@
 import { Transaction } from 'sequelize/types';
 import { RuleType } from '../util/rules/ruleTypes';
-import { DB } from '../database';
+import { findOneRole } from '../util/roles';
+import { DB } from '../models';
 
 type SchemaT = { AdminOnlyRule: [] };
 
@@ -10,26 +11,25 @@ export default class AdminOnlyRule extends RuleType<SchemaT> {
     name: 'Admin Only Rule',
     description: 'Only admins can perform the gated action',
     arguments: [],
-  }
+  };
 
   public async check(
     ruleSchema: SchemaT,
     address: string,
     chain: string,
     models: DB,
-    transaction?: Transaction,
+    transaction?: Transaction
   ): Promise<boolean> {
-    const role = await models.Role.findOne({
-      where: {
-        chain_id: chain,
-      },
-      include: {
-        model: models.Address,
-        where: { address },
-        required: true,
-      },
-      transaction,
+    const addressInstance = await models.Address.findOne({
+      where: { address, chain },
     });
+    const role = await findOneRole(
+      models,
+      {
+        where: { address_id: addressInstance.id },
+      },
+      chain
+    );
     return role?.permission === 'admin';
   }
 }

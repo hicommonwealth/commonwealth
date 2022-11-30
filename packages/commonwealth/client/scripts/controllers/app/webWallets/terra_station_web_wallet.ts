@@ -1,16 +1,21 @@
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
 
-class TerraStationWebWalletController implements IWebWallet<string> {
+type TerraAddress = {
+  address: string
+}
+
+class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
-  private _accounts: string[] = [];
-  private _enabling: boolean = false;
-  private _extension = new Extension()
+  private _accounts: TerraAddress[] = [];
+  private _enabling = false;
+  private _extension = new Extension();
 
   public readonly name = WalletId.TerraStation;
   public readonly label = 'Terra Station';
   public readonly chain = ChainBase.CosmosSDK;
+  public readonly defaultNetwork = ChainNetwork.Terra;
   public readonly specificChains = ['terra'];
 
   public get available() {
@@ -37,22 +42,23 @@ class TerraStationWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Terra Station');
     this._enabling = true;
 
-    try {
-      this._extension.once('onConnect', (accountAddr) => {
-        if (accountAddr && !this._accounts.includes(accountAddr)) {
-          this._accounts.push(accountAddr);
-        }
-        this._enabled = this._accounts.length !== 0;
-      });
+    // use a promise so that this function returns *after* the wallet has connected
+    const accountAddr = await new Promise<TerraAddress>((resolve) => {
+      this._extension.once('onConnect', resolve);
       this._extension.connect();
-      this._enabling = false;
-    } catch (error) {
+    }).catch((error) => {
       console.error(`Failed to enabled Terra Station ${error.message}`);
-      this._enabling = false;
+    });
+
+    if (accountAddr && !this._accounts.includes(accountAddr)) {
+      this._accounts.push(accountAddr);
     }
+
+    this._enabled = this._accounts.length !== 0;
+    this._enabling = false;
   }
 
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
@@ -61,23 +67,31 @@ class TerraStationWebWalletController implements IWebWallet<string> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(account.validationToken)
-        })
+          bytes: Buffer.from(account.validationToken),
+        });
       } catch (error) {
         console.error(error);
       }
     });
 
+    console.log(result);
     const signature = {
       signature: {
         pub_key: {
           type: 'tendermint/PubKeySecp256k1',
-          value: result.public_key
+          value: result.public_key,
         },
-        signature: result.signature
-      }
+        signature: result.signature,
+      },
     };
-    return account.validate(JSON.stringify(signature));
+    return JSON.stringify(signature);
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 }
 

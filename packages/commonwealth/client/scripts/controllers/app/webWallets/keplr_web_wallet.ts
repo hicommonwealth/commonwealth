@@ -3,10 +3,11 @@ import app from 'state';
 import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
+import { StdSignature } from '@cosmjs/amino';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -25,10 +26,11 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
 
   public readonly name = WalletId.Keplr;
   public readonly label = 'Keplr';
+  public readonly defaultNetwork = ChainNetwork.Osmosis;
   public readonly chain = ChainBase.CosmosSDK;
 
   public get available() {
-    return window.getOfflineSigner && !!window.keplr;
+    return !!window.keplr;
   }
   public get enabling() {
     return this._enabling;
@@ -39,42 +41,44 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public get accounts() {
     return this._accounts || [];
   }
-  public get api() { return window.keplr; }
-  public get offlineSigner() { return this._offlineSigner; }
+  public get api() {
+    return window.keplr;
+  }
+  public get offlineSigner() {
+    return this._offlineSigner;
+  }
 
-  public async validateWithAccount(account: Account): Promise<void> {
-    if (!this._chainId || !window.keplr?.signAmino)
-      throw new Error('Missing or misconfigured web wallet');
-
-    if (this._chain !== app.chain.id) {
-      // disable then re-enable on chain switch
-      await this.enable();
-    }
-
-    // Get the verification token & placeholder TX to send
-    const signDoc = validationTokenToSignDoc(
+  public async signLoginToken(
+    message: string,
+    address: string
+  ): Promise<StdSignature> {
+    const signature = await window.keplr.signArbitrary(
       this._chainId,
-      account.validationToken
+      address,
+      message
     );
+    return signature;
+  }
 
-    // save and restore default options after setting to no fee/memo for login
-    const defaultOptions = window.keplr.defaultOptions;
-    window.keplr.defaultOptions = {
-      sign: {
-        preferNoSetFee: true,
-        preferNoSetMemo: true,
-        disableBalanceCheck: true,
-      }
+  public async signWithAccount(account: Account): Promise<string> {
+    const webWalletSignature = await this.signLoginToken(
+      account.validationToken.trim(),
+      account.address
+    );
+    const signature = {
+      signature: {
+        pub_key: webWalletSignature.pub_key,
+        signature: webWalletSignature.signature,
+      },
     };
+    return JSON.stringify(signature);
+  }
 
-    const signature = await window.keplr.signAmino(
-      this._chainId,
-      account.address,
-      signDoc
-    );
-
-    window.keplr.defaultOptions = defaultOptions;
-    return account.validate(JSON.stringify(signature));
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   // ACTIONS
@@ -90,7 +94,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     this._enabling = true;
     try {
       // fetch chain id from URL using stargate client
-      const url = `${window.location.origin}/cosmosAPI/${app.chain.id}`;
+      const url = `${window.location.origin}/cosmosAPI/${
+        app.chain?.id || this.defaultNetwork
+      }`;
       const client = await StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;
@@ -99,7 +105,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       try {
         await window.keplr.enable(this._chainId);
       } catch (err) {
-        console.log(`Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`);
+        console.log(
+          `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
+        );
 
         const bech32Prefix = app.chain.meta.bech32Prefix;
         const info: ChainInfo = {
@@ -110,7 +118,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           // use the RPC url as hack, which will break some querying functionality but not signing.
           rest: app.chain.meta.node.altWalletUrl || url,
           bip44: {
-              coinType: 118,
+            coinType: 118,
           },
           bech32Config: {
             bech32PrefixAccAddr: `${bech32Prefix}`,
@@ -122,21 +130,21 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           },
           currencies: [
             {
-              coinDenom: app.chain.meta.symbol,
-              coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+              coinDenom: app.chain.meta.default_symbol,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
-              coinDenom: app.chain.meta.symbol,
-              coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+              coinDenom: app.chain.meta.default_symbol,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           stakeCurrency: {
-            coinDenom: app.chain.meta.symbol,
-            coinMinimalDenom: `u${app.chain.meta.symbol.toLowerCase()}`,
+            coinDenom: app.chain.meta.default_symbol,
+            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
             coinDecimals: app.chain.meta.decimals || 6,
           },
           gasPriceStep: { low: 0, average: 0.025, high: 0.03 },

@@ -12,11 +12,16 @@ class Account {
 
   // validation token sent by server
   private _validationToken?: string;
+  // block that the client is signing, in order to validate login to the server
+  private _validationBlockInfo?: string;
+
   private _addressId?: number;
   private _walletId?: WalletId;
 
   private _profile?: Profile;
-  public get profile() { return this._profile; }
+  public get profile() {
+    return this._profile;
+  }
 
   constructor({
     chain,
@@ -25,22 +30,24 @@ class Account {
     addressId,
     walletId,
     validationToken,
+    validationBlockInfo,
     profile,
     ignoreProfile,
   }: {
     // required args
-    chain: ChainInfo,
-    address: string,
+    chain: ChainInfo;
+    address: string;
 
     // optional args
-    addressId?: number,
-    walletId?: WalletId,
-    validationToken?: string,
-    profile?: Profile,
+    addressId?: number;
+    walletId?: WalletId;
+    validationToken?: string;
+    validationBlockInfo?: string;
+    profile?: Profile;
 
     // flags
-    ghostAddress?: boolean,
-    ignoreProfile?: boolean,
+    ghostAddress?: boolean;
+    ignoreProfile?: boolean;
   }) {
     // Check if the account is being initialized from a Community
     // Because there won't be any chain base or chain class
@@ -49,6 +56,7 @@ class Account {
     this._addressId = addressId;
     this._walletId = walletId;
     this._validationToken = validationToken;
+    this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
     if (profile) {
       this._profile = profile;
@@ -64,7 +72,9 @@ class Account {
     this._addressId = id;
   }
 
-  get walletId() { return this._walletId; }
+  get walletId() {
+    return this._walletId;
+  }
   public setWalletId(walletId: WalletId) {
     this._walletId = walletId;
   }
@@ -76,8 +86,15 @@ class Account {
     this._validationToken = token;
   }
 
+  get validationBlockInfo() {
+    return this._validationBlockInfo;
+  }
+  public setValidationBlockInfo(token: string) {
+    this._validationBlockInfo = token;
+  }
+
   public async validate(signature: string) {
-    if (!this._validationToken) {
+    if (!this._validationToken && !this._validationBlockInfo) {
       throw new Error('no validation token found');
     }
     if (!signature) {
@@ -91,21 +108,30 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
+      session_public_address: app.sessions.getAddress(this.chain.node.ethChainId || 1),
+      session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {
       // update ghost address for discourse users
-      const hasGhostAddress = app.user.addresses.some(({ address, ghostAddress, chain }) => (
-          ghostAddress && this.chain.id === chain.id &&
+      const hasGhostAddress = app.user.addresses.some(
+        ({ address, ghostAddress, chain }) =>
+          ghostAddress &&
+          this.chain.id === chain.id &&
           app.user.activeAccounts.some((account) => account.address === address)
-      ))
+      );
       if (hasGhostAddress) {
-        const { success, ghostAddressId } = await $.post(`${app.serverUrl()}/updateAddress`, params);
+        const { success, ghostAddressId } = await $.post(
+          `${app.serverUrl()}/updateAddress`,
+          params
+        );
         if (success && ghostAddressId) {
           // remove ghost address from addresses
-          app.user.setAddresses(app.user.addresses.filter(({ ghostAddress }) => {
-            return !ghostAddress
-          }));
+          app.user.setAddresses(
+            app.user.addresses.filter(({ ghostAddress }) => {
+              return !ghostAddress;
+            })
+          );
           app.user.setActiveAccounts([]);
         }
       }

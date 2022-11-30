@@ -6,42 +6,30 @@
   width: 100%;
 
   .BountyDetail {
-    p {
-      margin-top: 16px;
-    }
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 
-    p + p {
-      margin-top: 4px;
-    }
+    .bounty-info-container {
+      display: flex;
+      flex-direction: column;
 
-    .b-box {
-      border: 1px solid $neutral-50;
-      border-radius: 8px;
-      border-bottom: none;
-      margin-bottom: 18px;
-
-      .b-row {
-        padding: 0 10px;
-        padding-top: 5px;
-        border-bottom: 1px solid $neutral-50;
+      .bounty-info-row {
+        align-items: center;
         display: flex;
-
-        &.waiting {
-          color: $neutral-500;
-        }
-
-        &:last-child {
-          border-radius: 0 0 8px 8px;
-        }
-      }
-
-      .b-col {
-        min-width: 24px;
+        justify-content: space-between;
       }
     }
 
-    .cui-button + .cui-button {
-      margin-top: 6px;
+    .action {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .action-info-row {
+        display: flex;
+        gap: 4px;
+      }
     }
   }
 }

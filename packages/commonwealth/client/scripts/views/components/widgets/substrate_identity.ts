@@ -8,7 +8,7 @@ import { link } from 'helpers';
 import app from 'state';
 import { Account, Profile } from 'models';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import SubstrateIdentity, {
   IdentityQuality,
   getIdentityQuality,

@@ -4,9 +4,9 @@ export const getText = (bodyType: LoginBodyType) => {
   if (bodyType === 'walletList') {
     return {
       headerText: 'Connect Your Wallet',
-      bodyText: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed \
-        consectetur, leo vitae placerat convallis, risus libero rutrum dolor, vitae \
-        malesuada arcu turpis sed nibh. Maecenas.`,
+      bodyText: `Many communities require different wallets 
+      based on the chain they are built on and 
+      the types of tokens members hold.`,
     };
   } else if (bodyType === 'selectAccountType') {
     return {
@@ -40,9 +40,7 @@ export const getText = (bodyType: LoginBodyType) => {
   } else if (bodyType === 'connectWithEmail') {
     return {
       headerText: 'Connect with email?',
-      bodyText: `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed \
-        consectetur, leo vitae placerat convallis, risus libero rutrum dolor, vitae \
-        malesuada arcu turpis sed nibh. Maecenas.`,
+      bodyText: `Use Magic Link to connect with email and generate an address.`,
     };
   } else if (bodyType === 'ethWalletList') {
     return {

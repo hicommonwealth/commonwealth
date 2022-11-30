@@ -7,7 +7,7 @@ import 'pages/referenda.scss';
 import app from 'state';
 import { blockperiodToDuration } from 'helpers';
 import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/main';
+import Substrate from 'controllers/chain/substrate/adapter';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card';
@@ -72,7 +72,6 @@ class ReferendaPage implements m.ClassComponent {
         <PageLoading
           message="Connecting to chain"
           title={<BreadcrumbsTitleTag title="Referenda" />}
-          showNewProposalButton
         />
       );
     }
@@ -115,8 +114,7 @@ class ReferendaPage implements m.ClassComponent {
 
     return (
       <Sublayout
-        title={<BreadcrumbsTitleTag title="Referenda" />}
-        showNewProposalButton
+      // title={<BreadcrumbsTitleTag title="Referenda" />}
       >
         <div class="ReferendaPage">
           {onSubstrate && (

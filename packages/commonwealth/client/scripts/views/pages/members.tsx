@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import _ from 'lodash';
-import { Spinner } from 'construct-ui';
 import $ from 'jquery';
 
 import 'pages/members.scss';
@@ -15,6 +14,7 @@ import Sublayout from 'views/sublayout';
 import { Profile } from 'models';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -49,7 +49,6 @@ class MembersPage implements m.ClassComponent {
         <PageLoading
           message="Loading members"
           title={<BreadcrumbsTitleTag title="Members" />}
-          showNewProposalButton
         />
       );
 
@@ -97,7 +96,6 @@ class MembersPage implements m.ClassComponent {
         <PageLoading
           message="Loading members"
           title={<BreadcrumbsTitleTag title="Members" />}
-          showNewProposalButton
         />
       );
 
@@ -197,7 +195,6 @@ class MembersPage implements m.ClassComponent {
     return (
       <Sublayout
         title={<BreadcrumbsTitleTag title="Members" />}
-        showNewProposalButton
         onscroll={this.onscroll}
       >
         <div class="MembersPage">
@@ -238,7 +235,7 @@ class MembersPage implements m.ClassComponent {
                 Showing all {membersLoaded.length} community members
               </CWText>
             ) : (
-              <Spinner active size="lg" />
+              <CWSpinner size="large" />
             )}
           </div>
         </div>

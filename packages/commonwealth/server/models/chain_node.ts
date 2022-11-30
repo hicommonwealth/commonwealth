@@ -9,8 +9,8 @@ export type ChainNodeAttributes = {
   eth_chain_id?: number;
   alt_wallet_url?: string;
   private_url?: string;
-  balance_type?: BalanceType;
-  name?: string;
+  balance_type: BalanceType;
+  name: string;
   description?: string;
 }
 
@@ -32,13 +32,19 @@ export default (
       eth_chain_id: { type: dataTypes.INTEGER, allowNull: true },
       alt_wallet_url: { type: dataTypes.STRING, allowNull: true },
       private_url: { type: dataTypes.STRING, allowNull: true },
-      balance_type: { type: dataTypes.STRING, allowNull: true },
-      name: { type: dataTypes.STRING, allowNull: true },
+      balance_type: { type: dataTypes.STRING, allowNull: false },
+      name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.TEXT, allowNull: true },
+      ss58: { type: dataTypes.INTEGER, allowNull: true },
+      bech32: { type: dataTypes.STRING, allowNull: true },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'ChainNodes',
-      timestamps: false,
+      timestamps: true,
+      createdAt: 'created_at',
+      updatedAt: 'updated_at',
       underscored: true,
       defaultScope: {
         attributes: {

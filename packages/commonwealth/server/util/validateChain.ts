@@ -1,17 +1,22 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
 // If a community is found, also check that the user is allowed to see it.
 
-import { DB } from '../database';
+import { DB } from '../models';
 import { ChainInstance } from '../models/chain';
 
 export const ChainCommunityErrors = {
   ChainDNE: 'Chain does not exist',
 };
 
+export type ValidateChainParams = {
+  chain?: string;
+  chain_id?: string;
+};
+
 // sequelize 5.0 does not accept undefined key in where clause
 const validateChain = async (
   models: DB,
-  params: { chain?: string; chain_id?: string }
+  params: ValidateChainParams
 ): Promise<[ChainInstance, string]> => {
   const chain_id = params.chain || params.chain_id;
   if (!chain_id) return [null, ChainCommunityErrors.ChainDNE];
@@ -26,6 +31,10 @@ const validateChain = async (
         required: false,
         attributes: ['id', 'name', 'chain_id'],
       },
+      {
+        model: models.ChainNode,
+        required: true,
+      }
     ],
   });
   // searching for chain that doesn't exist

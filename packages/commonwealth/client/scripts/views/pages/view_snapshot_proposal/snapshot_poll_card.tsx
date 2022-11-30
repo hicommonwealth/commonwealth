@@ -30,7 +30,7 @@ export class SnapshotPollCard
   private voteDirectionString: string;
   private localVoteInformation: Array<VoteInformation>;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<SnapshotPollCardAttrs>) {
     // Initialize state which can change during the lifecycle of the component.
     this.hasVoted = vnode.attrs.hasVoted;
     this.voteDirectionString = vnode.attrs.votedFor
@@ -52,6 +52,7 @@ export class SnapshotPollCard
       tokenSymbol,
       votedFor,
       tooltipErrorMessage,
+      isPreview,
     } = vnode.attrs;
 
     const resultString = 'Results';
@@ -87,7 +88,7 @@ export class SnapshotPollCard
           {proposalTitle}
         </CWText>
         <div class="poll-voting-section">
-          {!this.hasVoted && !pollEnded && (
+          {!this.hasVoted && !pollEnded && !isPreview && (
             <>
               <PollOptions
                 multiSelect={false}
@@ -105,7 +106,7 @@ export class SnapshotPollCard
               />
             </>
           )}
-          {(this.hasVoted || pollEnded) && (
+          {((this.hasVoted && !isPreview) || pollEnded) && (
             <VoteDisplay
               timeRemaining={timeRemaining}
               voteDirectionString={this.voteDirectionString}
@@ -122,6 +123,7 @@ export class SnapshotPollCard
           pollEnded={pollEnded}
           totalVoteCount={this.totalVoteCount}
           votedFor={votedFor}
+          isPreview={isPreview}
         />
       </CWCard>
     );

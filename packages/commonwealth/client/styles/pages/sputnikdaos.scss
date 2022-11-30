@@ -1,20 +1,27 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .SputnikDAOsPage {
+  flex: 1;
   padding: 24px;
 
-  .title {
-    font-size: 32px;
-    padding-left: 12px;
-  }
+  .sputnik-row {
+    border-bottom: 1px solid $neutral-300;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    padding: 8px;
 
-  .nearBadge {
-    display: inline-block;
-    height: 20px;
-    font-size: 14px;
-  }
+    &.clickable {
+      cursor: pointer;
+    }
 
-  th {
-    border: 0px;
+    .clickable.Text {
+      color: $primary-500;
+      word-break: break-all;
+    }
+
+    .Text {
+      word-break: break-all;
+    }
   }
 }

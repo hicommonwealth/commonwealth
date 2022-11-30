@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
-
 import 'components/sidebar/sidebar_section.scss';
 
+import m from 'mithril';
+import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import {
   SubSectionAttrs,
@@ -11,9 +11,10 @@ import {
   SidebarSectionAttrs,
 } from './types';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWText } from '../component_kit/cw_text';
 
 class SubSection implements m.ClassComponent<SubSectionAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<SubSectionAttrs>) {
     const {
       isActive,
       isUpdated,
@@ -58,11 +59,13 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
-  oninit(vnode) {
-    this.toggled = vnode.attrs.hasDefaultToggle;
+  oninit(vnode: m.Vnode<SectionGroupAttrs>) {
+    const localStorageToggled =
+      localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
+    this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SectionGroupAttrs>) {
     const {
       containsChildren,
       displayData,
@@ -73,7 +76,6 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
       rightIcon,
       title,
     } = vnode.attrs;
-    const { toggled } = this;
 
     if (!isVisible) {
       return;
@@ -81,8 +83,11 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
 
     const clickHandler = (e) => {
       if (containsChildren) {
-        this.toggled = !toggled;
+        this.toggled = !this.toggled;
       }
+
+      localStorage.setItem(`${app.activeChainId()}-sidebar-toggle`, 'false');
+
       onclick(e, this.toggled);
     };
 
@@ -107,7 +112,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
     }
 
     const mouseEnterHandler = (e) => {
-      if (toggled || this.hoverOn) {
+      if (this.toggled || this.hoverOn) {
         e.redraw = false;
         e.stopPropagation();
       }
@@ -130,7 +135,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class={`SubSectionGroupTitle ${
+          class={`sub-section-group-title ${
             this.hoverOn ? 'background' : backgroundColorClass
           }`}
           onclick={(e) => clickHandler(e)}
@@ -140,12 +145,12 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
           ) : (
             <div class="no-carat" />
           )}
-          <div title={title} class={`title-text ${titleTextClass}`}>
+          <CWText type="b2" className={`title-text ${titleTextClass}`}>
             {title}
-          </div>
+          </CWText>
           {rightIcon && <div class="right-icon">{rightIcon}</div>}
         </div>
-        {containsChildren && toggled && (
+        {containsChildren && this.toggled && (
           <div class="subsections">
             {displayData.map((subsection) => (
               <SubSection {...subsection} />
@@ -163,12 +168,14 @@ export class SidebarSectionGroup
   private toggled: boolean;
   private hoverColor: string;
 
-  oninit(vnode) {
-    this.toggled = vnode.attrs.hasDefaultToggle;
+  oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
+    const localStorageToggled =
+      localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
+    this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
     this.hoverColor = 'none';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SidebarSectionAttrs>) {
     const {
       displayData,
       extraComponents,
@@ -177,14 +184,18 @@ export class SidebarSectionGroup
       title,
       toggleDisabled,
     } = vnode.attrs;
-    const { toggled, hoverColor } = this;
 
-    const clickHandler = (e) => {
+    const clickHandler = (e, sectionName: string) => {
       if (toggleDisabled) {
         return;
       }
 
-      this.toggled = !toggled;
+      this.toggled = !this.toggled;
+
+      localStorage.setItem(
+        `${sectionName}-toggled`,
+        (!!this.toggled).toString()
+      );
 
       if (this.toggled) {
         this.hoverColor = 'none';
@@ -194,12 +205,9 @@ export class SidebarSectionGroup
     };
 
     const mouseEnterHandler = (e) => {
-      if (toggled || this.hoverColor) {
+      if (this.toggled || this.hoverColor) {
         e.redraw = false;
         e.stopPropagation();
-      }
-      if (!toggled) {
-        this.hoverColor = '#EDE7FF';
       }
     };
 
@@ -207,7 +215,7 @@ export class SidebarSectionGroup
       this.hoverColor = 'none';
     };
 
-    const carat = toggled ? (
+    const carat = this.toggled ? (
       <CWIcon iconName="chevronDown" iconSize="small" />
     ) : (
       <CWIcon iconName="chevronRight" iconSize="small" />
@@ -218,15 +226,14 @@ export class SidebarSectionGroup
         class="SidebarSectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
-        style={`background-color: ${hoverColor}`}
       >
         <div
           class="section-group-title-container"
-          onclick={(e) => clickHandler(e)}
+          onclick={(e) => clickHandler(e, title)}
         >
-          <div class="title-text">{title}</div>
-          {rightIcon && <div class="right-icon">{rightIcon}</div>}
           {carat}
+          <CWText>{title}</CWText>
+          {rightIcon && <div class="right-icon">{rightIcon}</div>}
         </div>
         {this.toggled && (
           <div class="sections-container">

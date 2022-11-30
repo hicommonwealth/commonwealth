@@ -1,43 +1,22 @@
 @import 'shared';
 
 .SpecSettingsPage {
-  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 16px;
+  padding: 24px;
+  width: 768px;
 
-  @include extraSmall {
-    width: initial;
+  @include smallInclusive {
+    width: 100%;
   }
-}
 
-.SpecSettingsForm {
-  max-width: 85%;
-  margin-bottom: 20px;
+  .DropdownFormField .form-group {
+    margin: 0;
+  }
 
   .cui-overlay-inline {
     display: block;
-  }
-
-  h3 {
-    margin-top: 20px;
-    margin-bottom: 10px;
-  }
-
-  textarea {
-    min-height: 400px;
-  }
-
-  .cui-grid {
-    width: 100%;
-
-    .form-col {
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-
-      & > button {
-        margin-top: 10px;
-        padding: 0 10px;
-        display: block;
-      }
-    }
   }
 }

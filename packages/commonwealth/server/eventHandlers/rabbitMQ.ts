@@ -1,14 +1,16 @@
 import { CWEvent, IEventHandler } from 'chain-events/src';
 import Rascal from 'rascal';
-import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import { ServerError } from '../util/errors';
+import {RascalPublications} from "common-common/src/rabbitmq";
 
 export class RabbitMqHandler extends RabbitMQController implements IEventHandler {
 
-  protected publication: string
+  protected publication: RascalPublications
 
-  constructor(_rabbitMQConfig: Rascal.BrokerConfig, publication: string) {
+  constructor(_rabbitMQConfig: Rascal.BrokerConfig, publication: RascalPublications) {
     super(_rabbitMQConfig);
-    if (!this.publishers.includes(publication)) throw new Error('Given publication does not exist!');
+    if (!this.publishers.includes(publication)) throw new ServerError('Given publication does not exist!');
     this.publication = publication;
   }
 
@@ -16,7 +18,7 @@ export class RabbitMqHandler extends RabbitMQController implements IEventHandler
     try {
       await this.publish(event, this.publication);
     } catch (err) {
-      throw new Error(`Rascal config error: ${err.message}`);
+      throw new ServerError(`Rascal config error: ${err.message}`);
     }
   }
 }

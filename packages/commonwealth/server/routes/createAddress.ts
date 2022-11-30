@@ -3,15 +3,17 @@ import { bech32 } from 'bech32';
 import crypto from 'crypto';
 import Web3 from 'web3';
 import { PublicKey } from '@solana/web3.js';
-import { addressSwapper } from '../../shared/utils';
-import { DB } from '../database';
-import { TypedRequestBody, TypedResponse, success } from '../types';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { addressSwapper } from '../../shared/utils';
+import { DB } from '../models';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
+import { AppError, ServerError } from '../util/errors';
+import { createRole, findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -28,9 +30,10 @@ type CreateAddressReq = {
   wallet_id: WalletId;
   community?: string;
   keytype?: string;
+  block_info?: string;
 };
 
-type CreateAddressResp = AddressAttributes;
+type CreateAddressResp = AddressAttributes & { newly_created: boolean };
 
 const createAddress = async (
   models: DB,
@@ -42,16 +45,16 @@ const createAddress = async (
   // when logged in to link a new address for an existing user, or
   // when logged out to create a new user by showing proof of an address.
   if (!req.body.address) {
-    return next(new Error(Errors.NeedAddress));
+    return next(new AppError(Errors.NeedAddress));
   }
   if (!req.body.chain) {
-    return next(new Error(Errors.NeedChain));
+    return next(new AppError(Errors.NeedChain));
   }
   if (
     !req.body.wallet_id ||
     !Object.values(WalletId).includes(req.body.wallet_id)
   ) {
-    return next(new Error(Errors.NeedWallet));
+    return next(new AppError(Errors.NeedWallet));
   }
 
   const chain = await models.Chain.findOne({
@@ -59,7 +62,7 @@ const createAddress = async (
   });
 
   if (!chain || chain.network === ChainNetwork.AxieInfinity) {
-    return next(new Error(Errors.InvalidChain));
+    return next(new AppError(Errors.InvalidChain));
   }
 
   // test / convert address as needed
@@ -76,22 +79,22 @@ const createAddress = async (
       encodedAddress = bech32.encode(chain.bech32_prefix, words);
     } else if (chain.base === ChainBase.Ethereum) {
       if (!Web3.utils.isAddress(encodedAddress)) {
-        throw new Error('Eth address is not valid');
+        throw new AppError('Eth address is not valid');
       }
     } else if (chain.base === ChainBase.NEAR) {
       const nearRegex = /^[a-z0-9_\-.]*$/;
       if (!nearRegex.test(encodedAddress)) {
-        throw new Error('NEAR address is not valid');
+        throw new AppError('NEAR address is not valid');
       }
     } else if (chain.base === ChainBase.Solana) {
       const key = new PublicKey(encodedAddress);
       if (key.toBase58() !== encodedAddress) {
-        throw new Error(`Solana address is not valid: ${key.toBase58()}`);
+        throw new AppError(`Solana address is not valid: ${key.toBase58()}`);
       }
     }
   } catch (e) {
     log.info(`Invalid address passed: ${encodedAddress}: ${e.message}`);
-    return next(new Error(Errors.InvalidAddress));
+    return next(new AppError(Errors.InvalidAddress));
   }
 
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
@@ -127,6 +130,7 @@ const createAddress = async (
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
+    existingAddress.block_info = req.body.block_info;
 
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.body.wallet_id;
@@ -136,18 +140,17 @@ const createAddress = async (
     // even if this is the existing address, there is a case to login to community through this address's chain
     // if req.body.community is valid, then we should create a role between this community vs address
     if (req.body.community) {
-      const role = await models.Role.findOne({
-        where: { address_id: updatedObj.id, chain_id: req.body.community },
-      });
+      const role = await findOneRole(
+        models,
+        { where: { address_id: updatedObj.id } },
+        req.body.community
+      );
       if (!role) {
-        await models.Role.create({
-          address_id: updatedObj.id,
-          chain_id: req.body.community,
-          permission: 'member',
-        });
+        await createRole(models, updatedObj.id, req.body.community, 'member');
       }
     }
-    return success(res, updatedObj.toJSON());
+    const output = { ...updatedObj.toJSON(), newly_created: false };
+    return success(res, output);
   } else {
     // address doesn't exist, add it to the database
     try {
@@ -159,6 +162,7 @@ const createAddress = async (
       const last_active = new Date();
       let profile_id: number;
       const user_id = req.user ? req.user.id : null;
+
       if (user_id) {
         const profile = await models.Profile.findOne({
           attributes: ['id'],
@@ -173,6 +177,7 @@ const createAddress = async (
         address: encodedAddress,
         verification_token,
         verification_token_expires,
+        block_info: req.body.block_info,
         keytype: req.body.keytype,
         last_active,
         wallet_id: req.body.wallet_id,
@@ -181,11 +186,7 @@ const createAddress = async (
       // if req.user.id is undefined, the address is being used to create a new user,
       // and we should automatically give it a Role in its native chain (or community)
       if (!req.user) {
-        await models.Role.create({
-          address_id: newObj.id,
-          chain_id: req.body.chain,
-          permission: 'member',
-        });
+        await createRole(models, newObj.id, req.body.chain, 'member');
       }
 
       if (process.env.NODE_ENV !== 'test') {
@@ -195,8 +196,8 @@ const createAddress = async (
           isCustomDomain: null,
         });
       }
-
-      return success(res, newObj.toJSON());
+      const output = { ...newObj.toJSON(), newly_created: true };
+      return success(res, output);
     } catch (e) {
       return next(e);
     }

@@ -9,15 +9,12 @@ import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
-
-import { WebSocketController } from 'controllers/server/socket';
+import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
 
 import {
   notifyError,
@@ -28,15 +25,17 @@ import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
 import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
-import { LoginModal } from 'views/modals/login_modal';
+import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
+import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
 import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
+import(/* webpackPrefetch: true */ 'views/pages/view_thread');
 
 // eslint-disable-next-line max-len
 const APPLICATION_UPDATE_MESSAGE =
@@ -75,7 +74,7 @@ export async function initAppState(
               })
             );
           });
-        app.user.setRoles(data.roles);
+        app.roles.setRoles(data.roles);
         app.config.notificationCategories = data.notificationCategories.map(
           (json) => NotificationCategory.fromJSON(json)
         );
@@ -109,7 +108,6 @@ export async function initAppState(
         app.user.setStarredCommunities(
           data.user ? data.user.starredCommunities : []
         );
-
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
         if (updateSelectedChain && data.user && data.user.selectedChain) {
@@ -155,7 +153,15 @@ export async function handleInviteLinkRedirect() {
       m.route.param('message') === 'Must be logged in to accept invites'
     ) {
       notifyInfo('Log in to join a community with an invite link');
-      app.modals.create({ modal: LoginModal });
+      app.modals.create({
+        modal: NewLoginModal,
+        data: {
+          modalType: isWindowMediumSmallInclusive(window.innerWidth)
+            ? 'fullScreen'
+            : 'centered',
+          breakpointFn: isWindowMediumSmallInclusive,
+        },
+      });
     } else if (inviteMessage === 'failure') {
       const message = m.route.param('message');
       notifyError(message);
@@ -214,7 +220,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "substrate-main" */
-        './controllers/chain/substrate/main'
+        './controllers/chain/substrate/adapter'
       )
     ).default;
     newChain = new Substrate(chain, app);
@@ -223,7 +229,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "cosmos-main" */
-        './controllers/chain/cosmos/main'
+        './controllers/chain/cosmos/adapter'
       )
     ).default;
     newChain = new Cosmos(chain, app);
@@ -232,7 +238,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/main'
+        './controllers/chain/ethereum/adapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
@@ -244,7 +250,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "near-main" */
-        './controllers/chain/near/main'
+        './controllers/chain/near/adapter'
       )
     ).default;
     newChain = new Near(chain, app);
@@ -321,7 +327,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "solana-main" */
-        './controllers/chain/solana/main'
+        './controllers/chain/solana/adapter'
       )
     ).default;
     newChain = new Solana(chain, app);
@@ -342,7 +348,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/main'
+        './controllers/chain/ethereum/adapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
@@ -460,7 +466,7 @@ m.route.set = (...args) => {
 };
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
-  if (!app.isCustomDomain()) {
+  if (!app.isCustomDomain() && app.activeChainId()) {
     args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   m.route.set.apply(this, args);
@@ -592,21 +598,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             : // false => scope is null
               null;
 
-        if (scope) {
-          const scopeIsEthereumAddress =
-            scope.startsWith('0x') && scope.length === 42;
-          if (scopeIsEthereumAddress) {
-            const chains = app.config.chains.getAll();
-            const chain = chains.find((o) => o.address === scope);
-            if (chain) {
-              const pagePath = window.location.href.substr(
-                window.location.href.indexOf(scope) + scope.length
-              );
-              m.route.set(`/${chain.id}${pagePath}`);
-            }
-          }
-        }
-
         // Special case to defer chain loading specifically for viewing an offchain thread. We need
         // a special case because Threads and on-chain proposals are all viewed through the
         // same "/:scope/proposal/:type/:id" route.
@@ -645,10 +636,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             //
             // Custom domain routes
             //
-            '/': importRoute('views/pages/discussions', {
+            '/': importRoute('views/pages/discussions_redirect', {
               scoped: true,
-              deferChain: true,
             }),
+            '/web3login': redirectRoute(() => '/'),
             '/search': importRoute('views/pages/search', {
               scoped: false,
               deferChain: true,
@@ -682,8 +673,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
+            '/discussions': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
             '/discussions/:topic': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/overview': importRoute('views/pages/overview', {
               scoped: true,
               deferChain: true,
             }),
@@ -729,7 +727,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true }
             ),
             '/discussion/:identifier': importRoute(
-              'views/pages/view_proposal/index',
+              'views/pages/view_thread/index',
               { scoped: true }
             ),
             '/new/proposal/:type': importRoute(
@@ -748,10 +746,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             // Settings
             '/login': importRoute('views/pages/login', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/web3login': importRoute('views/pages/web3login', {
               scoped: true,
               deferChain: true,
             }),
@@ -793,13 +787,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/notification-settings': redirectRoute(
               () => '/notification-settings'
             ),
+            '/:scope/overview': redirectRoute(() => '/overview'),
             '/:scope/projects': redirectRoute(() => '/projects'),
             '/:scope/backers': redirectRoute(() => '/backers'),
             '/:scope/collectives': redirectRoute(() => '/collectives'),
             '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
             '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
             '/:scope/home': redirectRoute(() => '/'),
-            '/:scope/discussions': redirectRoute(() => '/'),
+            '/:scope/discussions': redirectRoute(() => '/discussions'),
             '/:scope': redirectRoute(() => '/'),
             '/:scope/discussions/:topic': redirectRoute(
               (attrs) => `/discussions/${attrs.topic}/`
@@ -839,7 +834,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/tips': redirectRoute(() => '/tips'),
             '/:scope/validators': redirectRoute(() => '/validators'),
             '/:scope/login': redirectRoute(() => '/login'),
-            '/:scope/web3login': redirectRoute(() => '/web3login'),
             '/:scope/settings': redirectRoute(() => '/settings'),
             '/:scope/admin': redirectRoute(() => '/admin'),
             '/:scope/manage': redirectRoute(() => '/manage'),
@@ -900,6 +894,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
+            '/web3login': importRoute('views/pages/web3login', {
+              scoped: false,
+              deferChain: true,
+            }),
             // Scoped routes
             //
 
@@ -909,12 +907,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true, deferChain: true }
             ),
             '/notifications': redirectRoute(() => '/edgeware/notifications'),
-            '/:scope/notification-settings': importRoute(
+            '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            '/notification-settings': redirectRoute(
-              () => '/edgeware/notification-settings'
             ),
             // CMN
             '/:scope/projects': importRoute(
@@ -946,8 +941,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
             '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope/discussions': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope': importRoute('views/pages/discussions', {
+            '/:scope': importRoute('views/pages/discussions_redirect', {
+              scoped: true,
+            }),
+            '/:scope/discussions': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/overview': importRoute('views/pages/overview', {
               scoped: true,
               deferChain: true,
             }),
@@ -1007,7 +1008,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true }
             ),
             '/:scope/discussion/:identifier': importRoute(
-              'views/pages/view_proposal/index',
+              'views/pages/view_thread/index',
               { scoped: true }
             ),
             '/:scope/new/proposal/:type': importRoute(
@@ -1033,10 +1034,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             // Settings
             '/login': importRoute('views/pages/login', { scoped: false }),
             '/:scope/login': importRoute('views/pages/login', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/web3login': importRoute('views/pages/web3login', {
               scoped: true,
               deferChain: true,
             }),
@@ -1103,9 +1100,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       )
     );
     document.body.insertBefore(script, document.body.firstChild);
-
-    // initialize construct-ui focus manager
-    FocusManager.showFocusOnlyOnTab();
 
     // initialize mixpanel, before adding an alias or tracking identity
     try {

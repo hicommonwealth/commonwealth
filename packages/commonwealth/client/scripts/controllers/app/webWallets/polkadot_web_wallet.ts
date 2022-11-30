@@ -8,7 +8,7 @@ import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
 import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
-import { ChainBase, WalletId } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
@@ -22,6 +22,7 @@ class PolkadotWebWalletController
 
   public readonly name = WalletId.Polkadot;
   public readonly label = 'polkadot.js';
+  public readonly defaultNetwork = ChainNetwork.Edgeware;
   public readonly chain = ChainBase.Substrate;
 
   public get available() {
@@ -52,7 +53,7 @@ class PolkadotWebWalletController
   }
 
   // ACTIONS
-  public async validateWithAccount(account: Account): Promise<void> {
+  public async signWithAccount(account: Account): Promise<string> {
     const signer = await this.getSigner(account.address);
     const token = account.validationToken;
     const payload: SignerPayloadRaw = {
@@ -61,7 +62,14 @@ class PolkadotWebWalletController
       type: 'bytes',
     };
     const signature = (await signer.signRaw(payload)).signature;
-    return account.validate(signature);
+    return signature;
+  }
+
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
+    return account.validate(walletSignature);
   }
 
   public async enable() {

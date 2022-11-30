@@ -1,12 +1,15 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
-import { DB } from '../database';
+import { Op } from 'sequelize';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 enum UpdateTopicErrors {
   NoUser = 'Not logged in',
   NoThread = 'Must provide thread_id',
   NoAddr = 'Must provide address',
-  NoTopic = 'Must provide topic_name',
+  NoTopic = 'Must provide topic_name or topic_id',
   InvalidAddr = 'Invalid address',
   NoPermission = `You do not have permission to edit post topic`,
 }
@@ -17,16 +20,18 @@ const updateTopic = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.user) return next(new Error(UpdateTopicErrors.NoUser));
-  if (!req.body.thread_id) return next(new Error(UpdateTopicErrors.NoThread));
-  if (!req.body.address) return next(new Error(UpdateTopicErrors.NoAddr));
-  if (!req.body.topic_name) return next(new Error(UpdateTopicErrors.NoTopic));
+  if (!req.user) return next(new AppError(UpdateTopicErrors.NoUser));
+  if (!req.body.thread_id)
+    return next(new AppError(UpdateTopicErrors.NoThread));
+  if (!req.body.address) return next(new AppError(UpdateTopicErrors.NoAddr));
+  if (!req.body.topic_name && !req.body.topic_id)
+    return next(new AppError(UpdateTopicErrors.NoTopic));
 
   const userAddresses = await req.user.getAddresses();
   const userAddress = userAddresses.find(
     (a) => !!a.verified && a.address === req.body.address
   );
-  if (!userAddress) return next(new Error(UpdateTopicErrors.InvalidAddr));
+  if (!userAddress) return next(new AppError(UpdateTopicErrors.InvalidAddr));
 
   const thread = await models.Thread.findOne({
     where: {
@@ -34,16 +39,25 @@ const updateTopic = async (
     },
   });
 
-  const roles: any[] = await models.Role.findAll({
-    where: {
-      permission: ['admin', 'moderator'],
-      address_id: userAddress.id,
-      chain_id: thread.chain,
-    },
-  });
+  const roles: any[] = await findAllRoles(
+    models,
+    { where: { address_id: userAddress.id } },
+    thread.chain,
+    ['admin', 'moderator']
+  );
   const isAdminOrMod = roles.length > 0;
+
   if (!isAdminOrMod) {
-    return next(new Error(UpdateTopicErrors.NoPermission));
+    const isAuthor = await models.Thread.findOne({
+      where: {
+        id: req.body.thread_id,
+        address_id: { [Op.in]: userAddresses.map((addr) => addr.id) },
+      },
+    });
+
+    if (!isAuthor) {
+      return next(new AppError(UpdateTopicErrors.NoPermission));
+    }
   }
 
   // remove deleted topics

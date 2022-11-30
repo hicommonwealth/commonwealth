@@ -1,24 +1,24 @@
 /* eslint-disable no-continue */
-import fetch from 'node-fetch';
-import { Pool } from 'pg';
-import _ from 'underscore';
-import format from 'pg-format';
 import {
   createListener,
-  SubstrateTypes,
-  SubstrateEvents,
-  IEventHandler,
   CWEvent,
+  IEventHandler,
   LoggingHandler,
-  SupportedNetwork,
+  SubstrateEvents,
+  SubstrateTypes,
+  SupportedNetwork
 } from 'chain-events/src';
+import fetch from 'node-fetch';
+import { Pool } from 'pg';
+import format from 'pg-format';
+import _ from 'underscore';
 
-import { BrokerConfig } from 'rascal';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { DATABASE_URI } from '../config';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
+import { getRabbitMQConfig, RascalPublications } from "common-common/src/rabbitmq";
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { DATABASE_URI, RABBITMQ_URI } from '../config';
+import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
+import StatsDController from '../util/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -125,20 +125,27 @@ async function mainProcess(
     );
 
   let query =`
-    SELECT
-      "Chains"."id",
-      "Chains"."substrate_spec",
-      "url",
-      "private_url",
-      "Chains"."address",
-      "Chains"."base",
-      "Chains"."type",
-      "Chains"."network",
-      "Chains"."ce_verbose"
-    FROM "Chains"
-    JOIN "ChainNodes"
-    ON "Chains".chain_node_id = "ChainNodes".id
-    WHERE "Chains"."has_chain_events_listener" = true;
+  SELECT
+    c."id",
+    c."substrate_spec",
+    cn."url",
+    cn."private_url",
+    con.address as "address",
+    c."base",
+    c."type",
+    c."network",
+    c."ce_verbose"
+  FROM "Chains" c 
+    JOIN "ChainNodes" cn
+      ON c.chain_node_id = cn.id
+    LEFT JOIN "CommunityContracts" cc
+      ON cc.chain_id = c.id
+    LEFT JOIN "Contracts" con
+      ON con.id = cc.contract_id
+  WHERE c."has_chain_events_listener" = true
+    AND (con.type IN ('marlin-testnet', 'aave', 'compound') OR
+         (c.base = 'substrate' AND c.type ='chain') OR
+         (c.base = 'cosmos' AND (c.type='token' OR c.type='chain')));
   `;
   const allChains = (await pool.query(query)).rows;
 
@@ -326,6 +333,8 @@ async function mainProcess(
 
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
+    StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network, base: chain.base });
+
     // start listeners that aren't already created or subscribed - this means for any duplicate chain nodes
     // it will start a listener for the first successful chain node url in the db
     if (!listeners[chain.id] || !listeners[chain.id].subscribed) {
@@ -336,6 +345,8 @@ async function mainProcess(
       let network: SupportedNetwork;
       if (chain.base === ChainBase.Substrate)
         network = SupportedNetwork.Substrate;
+      else if (chain.base === ChainBase.CosmosSDK)
+        network = SupportedNetwork.Cosmos;
       else if (chain.network === ChainNetwork.Compound)
         network = SupportedNetwork.Compound;
       else if (chain.network === ChainNetwork.Aave)
@@ -464,7 +475,7 @@ async function mainProcess(
 
     for (const event of identityEvents) {
       event.chain = chain.id; // augment event with chain
-      await producer.publish(event, 'SubstrateIdentityEventsPublication');
+      await producer.publish(event, RascalPublications.SubstrateIdentityEvents);
     }
 
     // clear the identity cache for this chain
@@ -483,6 +494,10 @@ async function mainProcess(
   }
 
   log.info('Finished scheduled process.');
+
+  for (const c of Object.keys(listeners)) {
+    StatsDController.get().increment('ce.listeners-active', { chain: c });
+  }
   if (process.env.TESTING) {
     const listenerOptions = {};
     for (const chain of Object.keys(listeners)) {
@@ -591,7 +606,7 @@ async function initializer(): Promise<void> {
 
   log.info(`Worker Number: ${workerNumber}\tNumber of Workers: ${numWorkers}`);
 
-  producer = new RabbitMqHandler(<BrokerConfig>RabbitMQConfig, 'ChainEventsHandlersPublication');
+  producer = new RabbitMqHandler(getRabbitMQConfig(RABBITMQ_URI), RascalPublications.ChainEvents);
   erc20Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   erc721Logger = new ErcLoggingHandler(ChainNetwork.ERC20, []);
   try {

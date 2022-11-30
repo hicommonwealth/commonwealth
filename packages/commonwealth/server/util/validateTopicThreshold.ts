@@ -1,10 +1,9 @@
-import { WhereOptions } from 'sequelize/types';
-import { ChainNetwork, ChainType } from 'common-common/src/types';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import BN from 'bn.js';
+import { ChainNetwork } from 'common-common/src/types';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
-import { DB } from '../database';
-import { ChainAttributes } from '../models/chain';
+import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -23,31 +22,50 @@ const validateTopicThreshold = async (
           model: models.Chain,
           required: true,
           as: 'chain',
-          where: {
-            // only support thresholds on token forums
-            // TODO: can we support for token-backed DAOs as well?
-            type: ChainType.Token,
-          } as WhereOptions<ChainAttributes>
+          include: [{
+            model: models.ChainNode,
+            required: true,
+          }]
         },
       ]
     });
-    if (!topic?.chain) {
-      // if associated with an offchain community, or if not token forum, always allow
+    if (!topic?.chain?.ChainNode?.id) {
+      // if we have no node, always approve
       return true;
     }
-    const threshold = topic.token_threshold;
-    if (threshold && threshold > 0) {
-      const tokenBalance = await tbc.getBalance(
+    let bp: string;
+    try {
+      const result = await tbc.getBalanceProviders(topic.chain.ChainNode.id);
+      bp = result[0].bp;
+    } catch (e) {
+      log.info(`No balance provider for chain node ${topic.chain.ChainNode.name}, skipping check.`);
+      return true;
+    }
+
+    const communityContracts = await models.CommunityContract.findOne({
+      where: { chain_id: topic.chain.id },
+      include: [{ model: models.Contract, required: true }],
+    });
+      // TODO: @JAKE in the future, we will have more than one contract,
+      // need to handle this through the TBC Rule, passing in associated Contract.id
+    const threshold = new BN(topic.token_threshold || '0');
+    if (!threshold.isZero()) {
+      const tokenBalances = await tbc.getBalancesForAddresses(
         topic.chain.chain_node_id,
-        userAddress,
-        topic.chain.address,
-        topic.chain.network === ChainNetwork.ERC20
+        [ userAddress ],
+        bp,
+        {
+          contractType: topic.chain.network === ChainNetwork.ERC20
           ? 'erc20' : topic.chain.network === ChainNetwork.ERC721
-            ? 'erc721' : topic.chain.network === ChainNetwork.SPL
-              ? 'spl-token' : undefined,
+            ? 'erc721' : undefined,
+          tokenAddress: communityContracts?.Contract?.address,
+        }
       );
-      log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
-      return tokenBalance.gten(threshold);
+      if (tokenBalances.errors[userAddress] || !tokenBalances.balances[userAddress]) {
+        throw new Error(tokenBalances.errors[userAddress] || `No token balance queried for ${userAddress}`);
+      }
+      const tokenBalance = new BN(tokenBalances.balances[userAddress]);
+      return tokenBalance.gte(threshold);
     } else {
       return true;
     }

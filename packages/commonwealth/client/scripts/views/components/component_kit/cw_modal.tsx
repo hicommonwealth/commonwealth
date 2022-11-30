@@ -7,19 +7,31 @@ import 'components/component_kit/cw_modal.scss';
 
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
-import { getClasses } from './helpers';
+import { breakpointFnValidator, getClasses } from './helpers';
 import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onclick: () => void;
-  oncreatemodal: () => void;
+  onclick: (
+    spec: any,
+    confirmExit: () => void,
+    exitCallback: () => void
+  ) => void;
+  oncreatemodal: (
+    spec: any,
+    confirmExit: () => void,
+    completeCallback: () => void,
+    exitCallback: () => void,
+    vnode: m.Vnode<ModalAttrs>
+  ) => void;
   modalType: 'centered' | 'fullScreen';
   spec: any; // TODO Gabe 2/2/22 - What is a spec?
+  breakpointFn?: (width: number) => boolean;
 };
 
 export class CWModal implements m.ClassComponent<ModalAttrs> {
-  oncreate(vnode) {
+  private modalTypeState: string;
+
+  oncreate(vnode: m.Vnode<ModalAttrs>) {
     const { spec, oncreatemodal } = vnode.attrs;
     const completeCallback = spec.completeCallback || (() => undefined);
     const exitCallback = spec.exitCallback || (() => undefined);
@@ -28,8 +40,42 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
     oncreatemodal(spec, confirmExit, completeCallback, exitCallback, vnode);
   }
 
-  view(vnode) {
-    const { onclick, modalType = 'centered', spec } = vnode.attrs;
+  oninit(vnode: m.Vnode<ModalAttrs>) {
+    const { modalType, breakpointFn } = vnode.attrs;
+    this.modalTypeState = modalType || 'centered';
+
+    if (breakpointFn) {
+      // eslint-disable-next-line no-restricted-globals
+      addEventListener('resize', () =>
+        breakpointFnValidator(
+          this.modalTypeState === 'fullScreen',
+          (state: boolean) => {
+            this.modalTypeState = state ? 'fullScreen' : 'centered';
+          },
+          breakpointFn
+        )
+      );
+    }
+  }
+
+  onremove(vnode: m.Vnode<ModalAttrs>) {
+    const { breakpointFn } = vnode.attrs;
+    if (breakpointFn) {
+      // eslint-disable-next-line no-restricted-globals
+      removeEventListener('resize', () =>
+        breakpointFnValidator(
+          this.modalTypeState === 'fullScreen',
+          (state: boolean) => {
+            this.modalTypeState = state ? 'fullScreen' : 'centered';
+          },
+          breakpointFn
+        )
+      );
+    }
+  }
+
+  view(vnode: m.Vnode<ModalAttrs>) {
+    const { onclick, spec } = vnode.attrs;
 
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
@@ -42,7 +88,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
         >
           <div
             class={getClasses<{ isFullScreen: boolean }>(
-              { isFullScreen: modalType === 'fullScreen' },
+              { isFullScreen: this.modalTypeState === 'fullScreen' },
               'modal-container'
             )}
             onclick={(e) => {
@@ -57,11 +103,13 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
   }
 }
 
-export class ModalExitButton
-  implements
-    m.ClassComponent<{ disabled?: boolean; iconButtonTheme: IconButtonTheme }>
-{
-  view(vnode) {
+type ModalExitButtonAttrs = {
+  disabled?: boolean;
+  iconButtonTheme: IconButtonTheme;
+};
+
+export class ModalExitButton implements m.ClassComponent<ModalExitButtonAttrs> {
+  view(vnode: m.Vnode<ModalExitButtonAttrs>) {
     const { disabled, iconButtonTheme } = vnode.attrs;
 
     return (

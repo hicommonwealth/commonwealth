@@ -26,44 +26,48 @@ enum SnapshotProposalFilter {
   Ended = 'Ended',
 }
 
+type SnapshotProposalStagesBarAttrs = {
+  selected: SnapshotProposalFilter;
+  onChangeFilter: (value: SnapshotProposalFilter) => void;
+};
+
 class SnapshotProposalStagesBar
-  implements
-    m.Component<{
-      selected: SnapshotProposalFilter;
-      onChangeFilter: (value: SnapshotProposalFilter) => void;
-    }>
+  implements m.Component<SnapshotProposalStagesBarAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
     return (
       <div class="DiscussionFilterBar">
         {Object.values(SnapshotProposalFilter).map(
-          (option: SnapshotProposalFilter) => (
-            <Button
-              rounded={true}
-              compact={true}
-              size="sm"
-              disabled={
+          (option: SnapshotProposalFilter) =>
+            m(Button, {
+              rounded: true,
+              compact: true,
+              size: 'sm',
+              disabled:
                 option === SnapshotProposalFilter.Core ||
-                option === SnapshotProposalFilter.Community
-              }
-              class={`discussions-stage ${
+                option === SnapshotProposalFilter.Community,
+              class: `discussions-stage ${
                 vnode.attrs.selected === option ? 'active' : ''
-              }`}
-              onclick={(e) => {
+              }`,
+              onclick: (e) => {
                 e.preventDefault();
                 vnode.attrs.onChangeFilter(option);
-              }}
-              label={option}
-            />
-          )
+              },
+              label: option,
+            })
         )}
       </div>
     );
   }
 }
 
+type SnapshotProposalsPageAttrs = {
+  topic?: string;
+  snapshotId: string;
+};
+
 class SnapshotProposalsPage
-  implements m.ClassComponent<{ topic?: string; snapshotId: string }>
+  implements m.ClassComponent<SnapshotProposalsPageAttrs>
 {
   private selectedFilter: SnapshotProposalFilter;
 
@@ -78,7 +82,7 @@ class SnapshotProposalsPage
     this.selectedFilter = SnapshotProposalFilter.Active;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotProposalsPageAttrs>) {
     const { selectedFilter } = this;
     const { snapshotId } = vnode.attrs;
 
@@ -118,7 +122,9 @@ class SnapshotProposalsPage
     };
 
     return (
-      <Sublayout title="Proposals" showNewProposalButton={true}>
+      <Sublayout
+      // title="Proposals"
+      >
         {app.chain && (
           <div class="SnapshotProposalsPage">
             <SnapshotProposalStagesBar

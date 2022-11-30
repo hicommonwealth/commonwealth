@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
 import { getLastEdited } from '../util/getLastEdited';
+import { AppError, ServerError } from '../util/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -17,10 +18,10 @@ const viewComments = async (
   next: NextFunction
 ) => {
   const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new Error(error));
+  if (error) return next(new AppError(error));
 
   if (!req.query.root_id) {
-    return next(new Error(Errors.NoRootId));
+    return next(new AppError(Errors.NoRootId));
   }
 
   const comments = await models.Comment.findAll({

@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../database';
+import { DB } from '../models';
+import { AppError, ServerError } from '../util/errors';
+import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -10,9 +12,14 @@ export const Errors = {
   NoThread: 'Cannot find thread',
 };
 
-const updateThreadPinned = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const updateThreadPinned = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { thread_id } = req.body;
-  if (!thread_id) return next(new Error(Errors.NoThread));
+  if (!thread_id) return next(new AppError(Errors.NoThread));
 
   try {
     const thread = await models.Thread.findOne({
@@ -20,45 +27,47 @@ const updateThreadPinned = async (models: DB, req: Request, res: Response, next:
         id: thread_id,
       },
     });
-    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
 
     // only community mods and admin can pin
-    const roles = await models.Role.findAll({
-      where: {
-        address_id: { [Op.in]: userOwnedAddressIds, },
-        permission: { [Op.in]: ['admin', 'moderator'] },
-      }
-    });
+    const roles = await findAllRoles(
+      models,
+      { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+      thread.chain,
+      ['admin', 'moderator']
+    );
     const role = roles.find((r) => {
       return r.chain_id === thread.chain;
     });
-    if (!role) return next(new Error(Errors.NotAdmin));
+    if (!role) return next(new AppError(Errors.NotAdmin));
 
     await thread.update({ pinned: !thread.pinned });
 
     const finalThread = await models.Thread.findOne({
-      where: { id: thread.id, },
+      where: { id: thread.id },
       include: [
         {
           model: models.Address,
-          as: 'Address'
+          as: 'Address',
         },
         {
           model: models.Address,
           // through: models.Collaboration,
-          as: 'collaborators'
+          as: 'collaborators',
         },
         models.Attachment,
         {
           model: models.Topic,
-          as: 'topic'
-        }
+          as: 'topic',
+        },
       ],
     });
 
     return res.json({ status: 'Success', result: finalThread.toJSON() });
   } catch (e) {
-    return next(new Error(e));
+    return next(new ServerError(e));
   }
 };
 

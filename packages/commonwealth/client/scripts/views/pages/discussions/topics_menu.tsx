@@ -29,131 +29,108 @@ type Topic = {
 
 type TopicsMenuAttrs = {
   disabled: boolean;
-  featuredTopics: string[];
+  featuredTopics: Topic[];
   otherTopics: Topic[];
-  parentState: any;
   selectedTopic: Topic;
   topic: string;
 };
 
 export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
-  view(vnode) {
-    const {
-      disabled,
-      featuredTopics,
-      otherTopics,
-      parentState,
-      selectedTopic,
-      topic,
-    } = vnode.attrs;
-    return (
-      <PopoverMenu
-        trigger={
-          <Button
-            rounded={true}
-            compact={true}
-            label={selectedTopic ? `Topic: ${topic}` : 'All Topics'}
-            iconRight={Icons.CHEVRON_DOWN}
-            size="sm"
-            disabled={disabled}
-          />
-        }
-        hasArrow={false}
-        transitionDuration={0}
-        closeOnContentClick={true}
-        content={
-          <div class="topic-items">
-            <MenuItem
-              active={m.route.get() === `/${app.activeChainId()}` || !topic}
-              iconLeft={
-                m.route.get() === `/${app.activeChainId()}` || !topic
-                  ? Icons.CHECK
-                  : null
-              }
-              label="All Topics"
-              onclick={() => {
-                localStorage.setItem('discussion-summary-toggle', 'false');
-                parentState.summaryView = false;
-                navigateToSubpage('/');
-              }}
-            />
-            <MenuDivider />
-            {featuredTopics
-              .concat(otherTopics)
-              .map(
-                ({
-                  id,
-                  name,
-                  description,
-                  telegram,
-                  featuredInSidebar,
-                  featuredInNewPost,
-                  defaultOffchainTemplate,
-                }) => {
-                  const active =
-                    m.route.get() ===
-                      `/${app.activeChainId()}/discussions/${encodeURI(
-                        name.toString().trim()
-                      )}` ||
-                    (topic && topic === name);
+  view(vnode: m.Vnode<TopicsMenuAttrs>) {
+    const { disabled, featuredTopics, otherTopics, selectedTopic, topic } =
+      vnode.attrs;
 
-                  return (
-                    <MenuItem
-                      key={name}
-                      active={active}
-                      onclick={(e) => {
-                        e.preventDefault();
-                        navigateToSubpage(`/discussions/${name}`);
-                        parentState.summaryView = false;
-                        localStorage.setItem(
-                          'discussion-summary-toggle',
-                          'false'
-                        );
-                      }}
-                      label={
-                        <div class="topic-item">
-                          <div class="icon-and-item-name-container">
-                            {active && (
-                              <CWIcon iconName="check" iconSize="small" />
-                            )}
-                            <div class="topic-item-name" title={name}>
-                              {name}
-                            </div>
-                          </div>
-                          {app.user?.isAdminOfEntity({
-                            chain: app.activeChainId(),
-                          }) && (
-                            <Button
-                              size="xs"
-                              label="Edit"
-                              class="edit-button"
-                              compact={true}
-                              onclick={(e) => {
-                                e.preventDefault();
-                                app.modals.create({
-                                  modal: EditTopicModal,
-                                  data: {
-                                    id,
-                                    name,
-                                    description,
-                                    telegram,
-                                    featuredInSidebar,
-                                    featuredInNewPost,
-                                    defaultOffchainTemplate,
-                                  },
-                                });
-                              }}
-                            />
-                          )}
+    return m(PopoverMenu, {
+      trigger: m(Button, {
+        rounded: true,
+        compact: true,
+        label: selectedTopic ? `Topic: ${topic}` : 'All Topics',
+        iconRight: Icons.CHEVRON_DOWN,
+        size: 'sm',
+        disabled,
+      }),
+      hasArrow: false,
+      transitionDuration: 0,
+      closeOnContentClick: true,
+      content: (
+        <div class="topic-items">
+          {m(MenuItem, {
+            active: m.route.get() === `/${app.activeChainId()}` || !topic,
+            iconLeft:
+              m.route.get() === `/${app.activeChainId()}` || !topic
+                ? Icons.CHECK
+                : null,
+            label: 'All Topics',
+            onclick: () => {
+              navigateToSubpage('/discussions');
+            },
+          })}
+          {m(MenuDivider)}
+          {featuredTopics
+            .concat(otherTopics)
+            .map(
+              ({
+                id,
+                name,
+                description,
+                telegram,
+                featuredInSidebar,
+                featuredInNewPost,
+                defaultOffchainTemplate,
+              }) => {
+                const active =
+                  m.route.get() ===
+                    `/${app.activeChainId()}/discussions/${encodeURI(
+                      name.toString().trim()
+                    )}` ||
+                  (topic && topic === name);
+
+                return m(MenuItem, {
+                  key: name,
+                  active,
+                  onclick: (e) => {
+                    e.preventDefault();
+                    navigateToSubpage(`/discussions/${name}`);
+                  },
+                  label: (
+                    <div class="topic-item">
+                      <div class="icon-and-item-name-container">
+                        {active && <CWIcon iconName="check" iconSize="small" />}
+                        <div class="topic-item-name" title={name}>
+                          {name}
                         </div>
-                      }
-                    />
-                  );
-                }
-              )}
-          </div>
-        }
-      />
-    );
+                      </div>
+                      {app.roles?.isAdminOfEntity({
+                        chain: app.activeChainId(),
+                      }) &&
+                        m(Button, {
+                          size: 'xs',
+                          label: 'Edit',
+                          class: 'edit-button',
+                          compact: true,
+                          onclick: (e) => {
+                            e.preventDefault();
+                            app.modals.create({
+                              modal: EditTopicModal,
+                              data: {
+                                id,
+                                name,
+                                description,
+                                telegram,
+                                featuredInSidebar,
+                                featuredInNewPost,
+                                defaultOffchainTemplate,
+                              },
+                            });
+                          },
+                        })}
+                    </div>
+                  ),
+                });
+              }
+            )}
+        </div>
+      ),
+    });
   }
 }

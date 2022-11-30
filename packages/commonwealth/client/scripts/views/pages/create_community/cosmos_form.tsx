@@ -101,6 +101,7 @@ export class CosmosForm implements m.ClassComponent {
               chainString,
               ethChainId,
               nodeUrl,
+              symbol,
             } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
@@ -120,6 +121,7 @@ export class CosmosForm implements m.ClassComponent {
                 network: this.state.form.id,
                 node_url: nodeUrl,
                 type: ChainType.Chain,
+                default_symbol: symbol,
                 ...this.state.form,
               });
               if (res.result.admin_address) {
