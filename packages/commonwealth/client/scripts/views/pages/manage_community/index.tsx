@@ -112,6 +112,8 @@ class ManageCommunityPage implements m.ClassComponent {
             newRole.Address.chain,
             newRole.chain_id,
             newRole.permission,
+            newRole.allow,
+            newRole.deny,
             newRole.is_user_default
           )
         );
