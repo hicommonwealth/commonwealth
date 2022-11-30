@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
+import { Action, PermissionError } from 'common-common/src/permissions';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from 'common-common/src/types';
@@ -10,6 +11,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
+import { isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -23,6 +25,16 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.EDIT_COMMENT
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));

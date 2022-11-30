@@ -7,6 +7,7 @@ import {
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { Action, PermissionError } from 'common-common/src/permissions';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
@@ -29,7 +30,7 @@ import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -62,6 +63,16 @@ const createComment = async (
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.CREATE_COMMENT
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { parent_id, root_id, text } = req.body;
 

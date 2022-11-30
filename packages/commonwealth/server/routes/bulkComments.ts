@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action } from 'common-common/src/permissions';
+import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
+import { checkReadPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,6 +16,13 @@ export const Errors = {
 const bulkComments = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new AppError(error));
+
+  await checkReadPermitted(
+    models,
+    chain.id,
+    Action.VIEW_COMMENTS,
+    req.user?.id,
+  );
 
   if (req.query.offchain_threads_only && req.query.proposals_only) {
     return next(new AppError(Errors.MutuallyExclusive));
