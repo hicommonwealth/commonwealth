@@ -1,6 +1,11 @@
 import { StatsD } from 'hot-shots';
 
-export default class StatsDController {
+export enum ProjectTag {
+  Commonwealth = "commonwealth",
+  TokenBalanceCache = "token-balance-cache",
+}
+
+export class StatsDController {
   private static instance: StatsDController = new StatsDController();
 
   private _client: StatsD;

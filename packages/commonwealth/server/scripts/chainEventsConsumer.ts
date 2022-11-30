@@ -17,7 +17,7 @@ import EventNotificationHandler from '../eventHandlers/notifications';
 import ProfileCreationHandler from '../eventHandlers/profileCreation';
 import EventStorageHandler from '../eventHandlers/storage';
 import UserFlagsHandler from '../eventHandlers/userFlags';
-import StatsDController from '../util/statsd';
+import { StatsDController, ProjectTag } from 'common-common/src/statsd';
 
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -92,6 +92,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
         network: event.network,
         blockNumber: `${event.blockNumber}`,
         kind: event.data.kind,
+        project: ProjectTag.Commonwealth,
       }
     );
     let prevResult = null;
