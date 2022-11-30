@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import Dropzone from 'dropzone';
 
 import 'components/avatar_upload.scss';
@@ -14,7 +15,7 @@ import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
 
 type AvatarUploadStyleAttrs = {
-  size: 'small' | 'large';
+  size?: 'small' | 'large';
 };
 
 type AvatarUploadAttrs = {
@@ -25,7 +26,7 @@ type AvatarUploadAttrs = {
   uploadStartedCallback?: CallableFunction;
 } & AvatarUploadStyleAttrs;
 
-export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
+export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
   private dropzone?: any;
   private uploaded: boolean;
 

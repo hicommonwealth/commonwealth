@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/comments/comments_tree.scss';
 
@@ -20,7 +21,7 @@ type CommentsTreeAttrs = {
   updatedCommentsCallback: () => void;
 };
 
-export class CommentsTree implements m.ClassComponent<CommentsTreeAttrs> {
+export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
   private commentError: any;
   private dom;
   private highlightedComment: boolean;

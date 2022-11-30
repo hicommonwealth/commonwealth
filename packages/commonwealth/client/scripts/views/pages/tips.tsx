@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/tips.scss';
 
@@ -26,7 +27,7 @@ type TipAttrs = {
   proposal: SubstrateTreasuryTip;
 };
 
-class Tip implements m.ClassComponent<TipAttrs> {
+class Tip extends ClassComponent<TipAttrs> {
   view(vnode: m.Vnode<TipAttrs>) {
     const { proposal } = vnode.attrs;
     const beneficiary = app.chain.accounts.get(proposal.data.who);
@@ -80,7 +81,7 @@ function getModules() {
   }
 }
 
-class TipsPage implements m.ClassComponent {
+class TipsPage extends ClassComponent {
   view() {
     const activeAccount = app.user.activeAccount;
 

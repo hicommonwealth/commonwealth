@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -116,7 +117,7 @@ type AccountSelectorAttrs = {
   walletNetwork: ChainNetwork;
 };
 
-export class AccountSelector implements m.ClassComponent<AccountSelectorAttrs> {
+export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
   view(vnode: m.Vnode<AccountSelectorAttrs>) {
     const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
 
@@ -147,22 +148,22 @@ export class AccountSelector implements m.ClassComponent<AccountSelectorAttrs> {
 }
 
 type WalletsListAttrs = {
-  connectAnotherWayOnclick: () => void;
+  connectAnotherWayOnclick?: () => void;
   darkMode?: boolean;
   showResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
-  setBodyType: (bodyType: string) => void;
-  accountVerifiedCallback: (
+  setBodyType?: (bodyType: string) => void;
+  accountVerifiedCallback?: (
     account: Account,
     newlyCreated: boolean,
     linked: boolean
   ) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
-  linking: boolean;
+  linking?: boolean;
 };
 
-export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
+export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
   view(vnode: m.Vnode<WalletsListAttrs>) {
     const {
       connectAnotherWayOnclick,

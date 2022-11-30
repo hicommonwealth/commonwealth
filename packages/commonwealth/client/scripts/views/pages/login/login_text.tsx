@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/login/login_text.scss';
 
@@ -14,10 +15,10 @@ type LoginTextAttrs = {
   bodyText: string;
   className?: string;
   headerText: string;
-  isMobile: boolean;
+  isMobile?: boolean;
 };
 
-export class LoginText implements m.ClassComponent<LoginTextAttrs> {
+export class LoginText extends ClassComponent<LoginTextAttrs> {
   view(vnode: m.Vnode<LoginTextAttrs>) {
     const { bodyText, className, headerText, isMobile = false } = vnode.attrs;
 
