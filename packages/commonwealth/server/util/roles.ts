@@ -6,7 +6,6 @@ import {
   PermissionError,
   BASE_PERMISSIONS,
 } from 'common-common/src/permissions';
-import { NextFunction, Request, Response } from 'express';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';

@@ -7,19 +7,15 @@ import $ from 'jquery';
 import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
-import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { formatAddressShort } from 'helpers';
-import { RolePermission } from 'models';
+import { RolePermission, RoleInfo } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 
 type UpgradeRolesFormAttrs = {
-  onRoleUpgrade: (
-    oldRole: RoleInstanceWithPermissionAttributes,
-    newRole: RoleInstanceWithPermissionAttributes
-  ) => void;
-  roleData: Array<RoleInstanceWithPermissionAttributes>;
+  onRoleUpgrade: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  roleData: RoleInfo[];
 };
 
 export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
@@ -29,18 +25,16 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
   view(vnode: m.Vnode<UpgradeRolesFormAttrs>) {
     const { roleData, onRoleUpgrade } = vnode.attrs;
 
-    const nonAdmins: RoleInstanceWithPermissionAttributes[] = roleData.filter(
-      (role) => {
-        return (
-          role.permission === RolePermission.member ||
-          role.permission === RolePermission.moderator
-        );
-      }
-    );
+    const nonAdmins: RoleInfo[] = roleData.filter((role) => {
+      return (
+        role.permission === RolePermission.member ||
+        role.permission === RolePermission.moderator
+      );
+    });
 
     const nonAdminNames: string[] = nonAdmins.map((role) => {
       // @TODO: @Profiles upgrade, clean this up
-      const chainId = role.chain_id ? role.chain_id : role.Address.chain;
+      const chainId = role.chain_id ? role.chain_id : role.Address?.chain?.id;
 
       const displayName = app.profiles.getProfile(
         chainId as string,

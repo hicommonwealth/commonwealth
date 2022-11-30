@@ -343,6 +343,8 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
                       result.address_chain,
                       result.chain_id,
                       result.permission,
+                      result.allow,
+                      result.deny,
                       result.is_user_default
                     )
                   );
