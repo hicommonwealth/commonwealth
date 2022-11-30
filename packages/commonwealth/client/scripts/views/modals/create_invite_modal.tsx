@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
@@ -254,7 +255,7 @@ const search = async (searchTerm: string, params: SearchParams, state) => {
   }
 };
 
-class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
+class InviteButton extends ClassComponent<InviteButtonAttrs> {
   private loading: boolean;
 
   oninit() {
@@ -342,6 +343,8 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
                       result.address_chain,
                       result.chain_id,
                       result.permission,
+                      result.allow,
+                      result.deny,
                       result.is_user_default
                     )
                   );
@@ -367,9 +370,7 @@ type CreateInviteModalAttrs = {
   chainInfo?: ChainInfo;
 };
 
-export class CreateInviteModal
-  implements m.ClassComponent<CreateInviteModalAttrs>
-{
+export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
   private closeResults: () => void;
   private disabled: boolean;
   private enterAddress: (address: string) => void;

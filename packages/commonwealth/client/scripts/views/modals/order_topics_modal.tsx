@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import dragula from 'dragula';
 import $ from 'jquery';
 
@@ -13,7 +14,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
-export class OrderTopicsModal implements m.ClassComponent {
+export class OrderTopicsModal extends ClassComponent {
   private topics: Array<Topic>;
 
   private _getTopicFromElement = (

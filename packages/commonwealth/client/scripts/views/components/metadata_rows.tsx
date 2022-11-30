@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Select } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
@@ -10,7 +11,7 @@ import { CWToggle } from './component_kit/cw_toggle';
 import { CWText } from './component_kit/cw_text';
 
 type InputRowAttrs = {
-  value: string;
+  value: string | number;
   disabled?: boolean;
   maxlength?: number;
   onChangeHandler: (e) => void;
@@ -19,7 +20,7 @@ type InputRowAttrs = {
   title: string;
 };
 
-export class InputRow implements m.ClassComponent<InputRowAttrs> {
+export class InputRow extends ClassComponent<InputRowAttrs> {
   view(vnode: m.Vnode<InputRowAttrs>) {
     const {
       value,
@@ -69,7 +70,7 @@ type ToggleRowAttrs = {
   title: string;
 };
 
-export class ToggleRow implements m.ClassComponent<ToggleRowAttrs> {
+export class ToggleRow extends ClassComponent<ToggleRowAttrs> {
   checked: boolean;
 
   oninit(vnode: m.Vnode<ToggleRowAttrs>) {
@@ -105,7 +106,7 @@ type SelectRowAttrs = {
   value: string;
 };
 
-export class SelectRow implements m.ClassComponent<SelectRowAttrs> {
+export class SelectRow extends ClassComponent<SelectRowAttrs> {
   view(vnode: m.Vnode<SelectRowAttrs>) {
     const { onchange, options, title, value } = vnode.attrs;
 
@@ -126,7 +127,7 @@ export class SelectRow implements m.ClassComponent<SelectRowAttrs> {
 
 type IdRowAttrs = { id: string };
 
-export class IdRow implements m.ClassComponent<IdRowAttrs> {
+export class IdRow extends ClassComponent<IdRowAttrs> {
   view(vnode: m.Vnode<IdRowAttrs>) {
     const { id } = vnode.attrs;
 

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_validation_text.scss';
 
@@ -14,7 +15,7 @@ export type ValidationTextAttrs = {
   status?: ValidationStatus;
 };
 
-export class CWValidationText implements m.ClassComponent<ValidationTextAttrs> {
+export class CWValidationText extends ClassComponent<ValidationTextAttrs> {
   view(vnode: m.Vnode<ValidationTextAttrs>) {
     const { message, status } = vnode.attrs;
     return (

@@ -1,5 +1,6 @@
 /* @jsx m */
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
@@ -9,10 +10,9 @@ import { CWRadioGroup } from './cw_radio_group';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput } from './cw_text_input';
-import { iconLookup } from './cw_icons/cw_icon_lookup';
+import { iconLookup, IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
-import { CWRadioButton, RadioButton } from './cw_radio_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
 import { CheckboxType, CWCheckbox } from './cw_checkbox';
@@ -32,19 +32,20 @@ import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import CWCoverImageUploader from './cw_cover_image_uploader';
+import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 
 const displayIcons = (icons) => {
-  return Object.entries(icons).map(([k, v]) => {
+  return Object.entries(icons).map(([k, _]) => {
     return (
       <div class="icon-container">
         <div class="icon-name">{k}</div>
-        <CWIcon iconName={k} />
+        <CWIcon iconName={k as IconName} />
       </div>
     );
   });
 };
 
-const radioGroupOptions: Array<RadioButton> = [
+const radioGroupOptions: Array<RadioButtonType> = [
   { label: 'This', value: 'This' },
   { label: 'Is', value: 'Is' },
   { label: 'A', value: 'A' },
@@ -74,8 +75,7 @@ const checkboxGroupOptions: Array<CheckboxType> = [
     value: 'failed',
   },
 ];
-
-export class ComponentShowcase implements m.ClassComponent {
+export class ComponentShowcase extends ClassComponent {
   private checkboxChecked: boolean;
   private checkboxGroupSelected: Array<string>;
   private radioButtonChecked: boolean;

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_card.scss';
 
@@ -23,7 +24,7 @@ type CardAttrs = {
   onmouseleave?: (e?: MouseEvent) => void;
 } & CardStyleAttrs;
 
-export class CWCard implements m.ClassComponent<CardAttrs> {
+export class CWCard extends ClassComponent<CardAttrs> {
   view(vnode: m.Vnode<CardAttrs>) {
     const {
       className,

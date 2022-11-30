@@ -52,33 +52,33 @@ export type StyleAttrs = {
   className?: string;
 };
 
-export type DividerMenuItem = { type: 'divider' };
+export type DividerMenuItem = { type?: 'divider' };
 
-export type HeaderMenuItem = { type: 'header'; label: string };
+type HeaderMenuItem = { type?: 'header'; label?: string };
 
 export type DefaultMenuItem = {
   disabled?: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
   isSecondary?: boolean;
-  label: string;
-  onclick?: (e?) => void;
+  label?: string;
+  onclick?: (e?: Event) => void;
   type?: 'default';
 };
 
-export type CommunityMenuItem = {
-  community: ChainInfo;
-  label?: string;
-  type: 'community';
-};
-
-export type NotificationMenuItem = {
-  hasUnreads: boolean;
+type NotificationMenuItem = {
+  hasUnreads?: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
-  label: string;
-  onclick: (e?) => void;
-  type: 'notification';
+  label?: string;
+  onclick?: (e?: MouseEvent) => void;
+  type?: 'notification';
+};
+
+export type CommunityMenuItem = {
+  community?: ChainInfo;
+  label?: string;
+  type?: 'community';
 };
 
 export type MenuItem =
