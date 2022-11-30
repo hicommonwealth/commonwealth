@@ -96,10 +96,9 @@ describe('aggregatePermissions() unit tests', () => {
 
     const permission = aggregatePermissions(roles, chain_permission);
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
-    // View chat should be allowed because it is allowed in the community through implicit allow
-    // of creating chat (does not make sense to deny view chat if you can create chat)
-    assert.isTrue(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
-    assert.isTrue(isPermitted(permission, Action.CREATE_CHAT));
+    // View chat should be denied because it is denied by admin
+    assert.isFalse(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
+    assert.isFalse(isPermitted(permission, Action.CREATE_CHAT));
   });
 
   it('should correctly aggregate permissions for a community with multiple role overwrites', () => {
