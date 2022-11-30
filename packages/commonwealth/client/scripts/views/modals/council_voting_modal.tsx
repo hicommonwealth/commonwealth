@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
@@ -24,9 +25,7 @@ type CouncilVotingModalAttrs = {
   candidates: Array<[SubstrateAccount, number]>;
 };
 
-export class CouncilVotingModal
-  implements m.ClassComponent<CouncilVotingModalAttrs>
-{
+export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> {
   private currentApprovals: Array<string>;
   private currentStake: number;
   private error: string;
@@ -62,7 +61,7 @@ export class CouncilVotingModal
       .map(([candidate]) => candidate.address);
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<CouncilVotingModalAttrs>) {
     const { candidates } = vnode.attrs;
 
     const submitVote = (e) => {
@@ -166,6 +165,7 @@ export class CouncilVotingModal
                         checked={this.votes.indexOf(address) !== -1}
                         onchange={onclick}
                         label=""
+                        value=""
                       />
                       {m(User, { user: candidate })}
                     </div>

@@ -1,12 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import BN from 'bn.js';
 import Web3 from 'web3';
 
 import app from 'state';
 import { formatNumberLong, Coin } from 'adapters/currency';
 import { VotingType, AnyProposal } from 'models';
+import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
@@ -24,7 +26,7 @@ import {
 
 type VotingResultsAttrs = { proposal: AnyProposal };
 
-export class VotingResults implements m.ClassComponent<VotingResultsAttrs> {
+export class VotingResults extends ClassComponent<VotingResultsAttrs> {
   view(vnode: m.Vnode<VotingResultsAttrs>) {
     const { proposal } = vnode.attrs;
     const votes = proposal.getVotes();
@@ -36,33 +38,33 @@ export class VotingResults implements m.ClassComponent<VotingResultsAttrs> {
     ) {
       return (
         <VotingResult
-          getYesVotes={votes.filter((v) => v.choice === true)}
-          getNoVotes={votes.filter((v) => v.choice === false)}
+          yesVotes={votes.filter((v) => v.choice === true)}
+          noVotes={votes.filter((v) => v.choice === false)}
           proposal={proposal}
         />
       );
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       return (
         <VotingResult
-          getYesVotes={votes.filter((v) => v.choice === MolochVote.YES)}
-          getNoVotes={votes.filter((v) => v.choice === MolochVote.NO)}
+          yesVotes={votes.filter((v) => v.choice === MolochVote.YES)}
+          noVotes={votes.filter((v) => v.choice === MolochVote.NO)}
           proposal={proposal}
         />
       );
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
       return (
         <VotingResult
-          getYesVotes={votes.filter((v) => v.choice === BravoVote.YES)}
-          getNoVotes={votes.filter((v) => v.choice === BravoVote.NO)}
+          yesVotes={votes.filter((v) => v.choice === BravoVote.YES)}
+          noVotes={votes.filter((v) => v.choice === BravoVote.NO)}
           proposal={proposal}
         />
       );
     } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
       return (
         <VotingResult
-          getAbstainVotes={votes.filter((v) => v.choice === BravoVote.ABSTAIN)}
-          getYesVotes={votes.filter((v) => v.choice === BravoVote.YES)}
-          getNoVotes={votes.filter((v) => v.choice === BravoVote.NO)}
+          abstainVotes={votes.filter((v) => v.choice === BravoVote.ABSTAIN)}
+          yesVotes={votes.filter((v) => v.choice === BravoVote.YES)}
+          noVotes={votes.filter((v) => v.choice === BravoVote.NO)}
           proposal={proposal}
         />
       );
@@ -156,11 +158,19 @@ export class VotingResults implements m.ClassComponent<VotingResultsAttrs> {
         );
       } else {
         return (
-          <YesNoAbstainVetoVotingResult proposal={proposal} votes={votes} />
+          <YesNoAbstainVetoVotingResult
+            proposal={proposal as CosmosProposal}
+            votes={votes}
+          />
         );
       }
     } else if (proposal.votingType === VotingType.YesNoReject) {
-      return <YesNoRejectVotingResult proposal={proposal} votes={votes} />;
+      return (
+        <YesNoRejectVotingResult
+          proposal={proposal as NearSputnikProposal}
+          votes={votes}
+        />
+      );
     } else if (proposal.votingType === VotingType.RankedChoiceVoting) {
       // to be implemented
       return null;

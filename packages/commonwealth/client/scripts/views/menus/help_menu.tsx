@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -22,7 +23,7 @@ const gethelpMenuItems = (): Array<MenuItem> => {
   ];
 };
 
-export class HelpMenu implements m.ClassComponent {
+export class HelpMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
@@ -39,7 +40,7 @@ export class HelpMenu implements m.ClassComponent {
   }
 }
 
-export class HelpMenuPopover implements m.ClassComponent {
+export class HelpMenuPopover extends ClassComponent {
   view() {
     return (
       <CWPopoverMenu

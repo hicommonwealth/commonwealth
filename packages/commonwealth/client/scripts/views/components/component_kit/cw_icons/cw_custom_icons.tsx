@@ -4,6 +4,7 @@
 /* eslint-disable max-len */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
 
@@ -19,7 +20,7 @@ import { CustomIconAttrs, CustomIconStyleAttrs } from './types';
 // (2) Extra attention must be paid to the JSX conversion output, since distortions
 //     of width, height, and coloration have been observed with some regularity
 
-export class CWCosmosEvmMetamask implements m.ClassComponent<CustomIconAttrs> {
+export class CWCosmosEvmMetamask extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -41,7 +42,7 @@ export class CWCosmosEvmMetamask implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWKeplr implements m.ClassComponent<CustomIconAttrs> {
+export class CWKeplr extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -72,7 +73,7 @@ export class CWKeplr implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWMagic implements m.ClassComponent<CustomIconAttrs> {
+export class CWMagic extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -94,7 +95,7 @@ export class CWMagic implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWMetaMask implements m.ClassComponent<CustomIconAttrs> {
+export class CWMetaMask extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -196,7 +197,7 @@ export class CWMetaMask implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWNearWallet implements m.ClassComponent<CustomIconAttrs> {
+export class CWNearWallet extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -218,7 +219,7 @@ export class CWNearWallet implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWPhantom implements m.ClassComponent<CustomIconAttrs> {
+export class CWPhantom extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, ...customIconStyleAttrs } = vnode.attrs;
     return (
@@ -279,7 +280,7 @@ export class CWPhantom implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWPolkadot implements m.ClassComponent<CustomIconAttrs> {
+export class CWPolkadot extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -305,7 +306,7 @@ export class CWPolkadot implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWRonin implements m.ClassComponent<CustomIconAttrs> {
+export class CWRonin extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -327,7 +328,7 @@ export class CWRonin implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWTerraStation implements m.ClassComponent<CustomIconAttrs> {
+export class CWTerraStation extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -382,7 +383,7 @@ export class CWTerraStation implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWTerraStation2 implements m.ClassComponent<CustomIconAttrs> {
+export class CWTerraStation2 extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -504,7 +505,7 @@ export class CWTerraStation2 implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWUnreads implements m.ClassComponent<CustomIconAttrs> {
+export class CWUnreads extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
@@ -529,7 +530,7 @@ export class CWUnreads implements m.ClassComponent<CustomIconAttrs> {
   }
 }
 
-export class CWWalletConnect implements m.ClassComponent<CustomIconAttrs> {
+export class CWWalletConnect extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (

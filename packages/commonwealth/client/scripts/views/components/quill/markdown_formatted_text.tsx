@@ -2,6 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
@@ -32,9 +33,7 @@ type MarkdownFormattedTextAttrs = {
   cutoffLines?: number;
 };
 
-export class MarkdownFormattedText
-  implements m.Component<MarkdownFormattedTextAttrs>
-{
+export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextAttrs> {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;
   truncatedDoc;
