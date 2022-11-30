@@ -1,12 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
+import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ListItem, Icon, Icons } from 'construct-ui';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
@@ -20,53 +21,48 @@ const renderCommunity = (item: ChainInfo) => {
   const roles: RoleInfo[] = [];
   roles.push(...app.roles.getAllRolesInCommunity({ chain: item.id }));
 
-  return (
-    <ListItem
-      class={app.communities.isStarred(item.id) ? 'starred' : ''}
-      label={<CommunityLabel community={item} />}
-      selected={app.activeChainId() === item.id}
-      onclick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        app.sidebarMenu = 'default';
-        m.route.set(item.id ? `/${item.id}` : '/');
-      }}
-      contentRight={
-        app.isLoggedIn() &&
-        roles.length > 0 && (
-          <div
-            class="community-star-toggle"
-            onclick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              await app.communities.setStarred(item.id);
-              m.redraw();
-            }}
-          >
-            {roles.map((role) => {
-              // TODO: sometimes address_chain is null here -- why??
-              return m(User, {
-                avatarSize: 18,
-                avatarOnly: true,
-                user: new AddressInfo(
-                  role.address_id,
-                  role.address,
-                  role.address_chain || role.chain_id,
-                  null
-                ),
-              });
-            })}
-            <div class="star-icon">
-              <Icon name={Icons.STAR} key={item.id} />
-            </div>
-          </div>
-        )
-      }
-    />
-  );
+  return m(ListItem, {
+    class: app.communities.isStarred(item.id) ? 'starred' : '',
+    label: <CommunityLabel community={item} />,
+    selected: app.activeChainId() === item.id,
+    onclick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      app.sidebarMenu = 'default';
+      m.route.set(item.id ? `/${item.id}` : '/');
+    },
+    contentRight: app.isLoggedIn() && roles.length > 0 && (
+      <div
+        class="community-star-toggle"
+        onclick={async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          await app.communities.setStarred(item.id);
+          m.redraw();
+        }}
+      >
+        {roles.map((role) => {
+          // TODO: sometimes address_chain is null here -- why??
+          return m(User, {
+            avatarSize: 18,
+            avatarOnly: true,
+            user: new AddressInfo(
+              role.address_id,
+              role.address,
+              role.address_chain || role.chain_id,
+              null
+            ),
+          });
+        })}
+        <div class="star-icon">
+          {m(Icon, { name: Icons.STAR, key: item.id })}
+        </div>
+      </div>
+    ),
+  });
 };
 
-class CWSidebarMenuItem implements m.ClassComponent<MenuItem> {
+class CWSidebarMenuItem extends ClassComponent<MenuItem> {
   view(vnode: m.Vnode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
       const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
@@ -111,7 +107,7 @@ type SidebarMenuAttrs = {
   menuItems: Array<MenuItem>;
 };
 
-export class CWSidebarMenu implements m.ClassComponent<SidebarMenuAttrs> {
+export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
   view(vnode: m.Vnode<SidebarMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
 
@@ -164,12 +160,13 @@ export class CWSidebarMenu implements m.ClassComponent<SidebarMenuAttrs> {
               label: 'Account settings',
               iconLeft: 'bell',
               onclick: () => {
-                  if (app.activeChainId()) { navigateToSubpage('/settings'); }
-                  else {
-                    app.sidebarMenu = 'default';
-                    m.route.set('/settings');
-                  }
-                },
+                if (app.activeChainId()) {
+                  navigateToSubpage('/settings');
+                } else {
+                  app.sidebarMenu = 'default';
+                  m.route.set('/settings');
+                }
+              },
             } as MenuItem,
           ].map((item: MenuItem) => {
             return (

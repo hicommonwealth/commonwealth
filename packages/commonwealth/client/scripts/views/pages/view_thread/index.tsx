@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/index.scss';
 
@@ -27,7 +28,10 @@ import { PageNotFound } from 'views/pages/404';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { activeQuillEditorHasText } from './helpers';
-import { CWContentPage } from '../../components/component_kit/cw_content_page';
+import {
+  CWContentPage,
+  SidebarComponents,
+} from '../../components/component_kit/cw_content_page';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { CommentsTree } from '../../components/comments/comments_tree';
@@ -36,7 +40,7 @@ import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
-import { CollapsibleBodyText } from '../../components/collapsible_body_text';
+import { CollapsibleThreadBody } from '../../components/collapsible_body_text';
 import { CreateComment } from '../../components/comments/create_comment';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -56,12 +60,11 @@ export type ThreadPrefetch = {
   };
 };
 
-class ViewThreadPage
-  implements
-    m.ClassComponent<{
-      identifier: string;
-    }>
-{
+type ViewThreadPageAttrs = {
+  identifier: string;
+};
+
+class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
   private comments: Array<Comment<Thread>>;
   private isEditingBody: boolean;
   private isGloballyEditing: boolean;
@@ -95,7 +98,7 @@ class ViewThreadPage
     });
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ViewThreadPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
@@ -423,7 +426,7 @@ class ViewThreadPage
           ? [
               {
                 label: 'Edit',
-                iconLeft: 'write',
+                iconLeft: 'write' as const,
                 onclick: async (e) => {
                   e.preventDefault();
                   this.savedEdits = localStorage.getItem(
@@ -448,7 +451,7 @@ class ViewThreadPage
           ? [
               {
                 label: 'Edit collaborators',
-                iconLeft: 'write',
+                iconLeft: 'write' as const,
                 onclick: async (e) => {
                   e.preventDefault();
                   app.modals.create({
@@ -465,7 +468,7 @@ class ViewThreadPage
           ? [
               {
                 label: 'Change topic',
-                iconLeft: 'write',
+                iconLeft: 'write' as const,
                 onclick: (e) => {
                   e.preventDefault();
                   app.modals.create({
@@ -486,7 +489,7 @@ class ViewThreadPage
           ? [
               {
                 label: 'Delete',
-                iconLeft: 'trash',
+                iconLeft: 'trash' as const,
                 onclick: async (e) => {
                   e.preventDefault();
 
@@ -507,7 +510,7 @@ class ViewThreadPage
           ? [
               {
                 label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
-                iconLeft: 'lock',
+                iconLeft: 'lock' as const,
                 onclick: (e) => {
                   e.preventDefault();
                   app.threads
@@ -527,7 +530,7 @@ class ViewThreadPage
           ? [
               {
                 label: 'Snapshot proposal from thread',
-                iconLeft: 'democraticProposal',
+                iconLeft: 'democraticProposal' as const,
                 onclick: () => {
                   const snapshotSpaces = app.chain.meta.snapshot;
 
@@ -543,7 +546,7 @@ class ViewThreadPage
               },
             ]
           : []),
-        { type: 'divider' },
+        { type: 'divider' as const },
         getThreadSubScriptionMenuItem(thread),
       ];
     };
@@ -602,7 +605,7 @@ class ViewThreadPage
                 </>
               ) : (
                 <>
-                  <CollapsibleBodyText item={thread} />
+                  <CollapsibleThreadBody thread={thread} />
                   {thread.readOnly ? (
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
@@ -631,73 +634,75 @@ class ViewThreadPage
               updatedCommentsCallback={updatedCommentsCallback}
             />
           }
-          sidebarComponents={[
-            ...(showLinkedSnapshotOptions || showLinkedThreadOptions
-              ? [
-                  {
-                    label: 'Links',
-                    item: (
-                      <div class="cards-column">
-                        {showLinkedSnapshotOptions && (
-                          <LinkedProposalsCard
-                            onChangeHandler={(
-                              stage: ThreadStageType,
-                              chainEntities: ChainEntity[],
-                              snapshotProposal: SnapshotProposal[]
-                            ) => {
-                              thread.stage = stage;
-                              thread.chainEntities = chainEntities;
-                              if (app.chain?.meta.snapshot.length) {
-                                thread.snapshotProposal =
-                                  snapshotProposal[0]?.id;
-                              }
-                              app.threads.fetchThreadsFromId([
-                                thread.identifier,
-                              ]);
-                              m.redraw();
-                            }}
-                            thread={thread}
-                            showAddProposalButton={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                        {showLinkedThreadOptions && (
-                          <LinkedThreadsCard
-                            threadlId={thread.id}
-                            allowLinking={isAuthor || isAdminOrMod}
-                          />
-                        )}
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
-            ...(this.polls?.length > 0 ||
-            (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
-              ? [
-                  {
-                    label: 'Polls',
-                    item: (
-                      <div class="cards-column">
-                        {[
-                          ...new Map(
-                            this.polls?.map((poll) => [poll.id, poll])
-                          ).values(),
-                        ].map((poll: Poll) => {
-                          return <ThreadPollCard poll={poll} />;
-                        })}
-                        {isAuthor &&
-                          (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
-                            <ThreadPollEditorCard
+          sidebarComponents={
+            [
+              ...(showLinkedSnapshotOptions || showLinkedThreadOptions
+                ? [
+                    {
+                      label: 'Links',
+                      item: (
+                        <div class="cards-column">
+                          {showLinkedSnapshotOptions && (
+                            <LinkedProposalsCard
+                              onChangeHandler={(
+                                stage: ThreadStageType,
+                                chainEntities: ChainEntity[],
+                                snapshotProposal: SnapshotProposal[]
+                              ) => {
+                                thread.stage = stage;
+                                thread.chainEntities = chainEntities;
+                                if (app.chain?.meta.snapshot.length) {
+                                  thread.snapshotProposal =
+                                    snapshotProposal[0]?.id;
+                                }
+                                app.threads.fetchThreadsFromId([
+                                  thread.identifier,
+                                ]);
+                                m.redraw();
+                              }}
                               thread={thread}
-                              threadAlreadyHasPolling={!this.polls?.length}
+                              showAddProposalButton={isAuthor || isAdminOrMod}
                             />
                           )}
-                      </div>
-                    ),
-                  },
-                ]
-              : []),
-          ]}
+                          {showLinkedThreadOptions && (
+                            <LinkedThreadsCard
+                              threadlId={thread.id}
+                              allowLinking={isAuthor || isAdminOrMod}
+                            />
+                          )}
+                        </div>
+                      ),
+                    },
+                  ]
+                : []),
+              ...(this.polls?.length > 0 ||
+              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+                ? [
+                    {
+                      label: 'Polls',
+                      item: (
+                        <div class="cards-column">
+                          {[
+                            ...new Map(
+                              this.polls?.map((poll) => [poll.id, poll])
+                            ).values(),
+                          ].map((poll: Poll) => {
+                            return <ThreadPollCard poll={poll} />;
+                          })}
+                          {isAuthor &&
+                            (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                              <ThreadPollEditorCard
+                                thread={thread}
+                                threadAlreadyHasPolling={!this.polls?.length}
+                              />
+                            )}
+                        </div>
+                      ),
+                    },
+                  ]
+                : []),
+            ] as SidebarComponents
+          }
         />
       </Sublayout>
     );

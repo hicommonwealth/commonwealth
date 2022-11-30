@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { ListItem, QueryList } from 'construct-ui';
 
 import 'components/thread_selector.scss';
@@ -48,7 +49,7 @@ type ThreadSelectorAttrs = {
   linkingThread: Thread;
 };
 
-export class ThreadSelector implements m.ClassComponent<ThreadSelectorAttrs> {
+export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
   private inputTimeout;
   private linkedThreads: Thread[];
   private loading: boolean;

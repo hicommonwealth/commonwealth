@@ -1,13 +1,18 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import numeral from 'numeral';
 
 import 'pages/landing/community_cards.scss';
 
 import app from 'state';
 import { ChainInfo } from 'models';
-import { ChainBase, ChainCategoryType, ChainNetwork } from 'common-common/src/types';
+import {
+  ChainBase,
+  ChainCategoryType,
+  ChainNetwork,
+} from 'common-common/src/types';
 import { CWButton } from '../components/component_kit/cw_button';
 import Sublayout from '../sublayout';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
@@ -45,7 +50,7 @@ export const buildChainToCategoriesMap = (
   return chainToCategoriesMap;
 };
 
-class HomepageCommunityCards implements m.ClassComponent {
+class HomepageCommunityCards extends ClassComponent {
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
   private chainBases: Array<string>;

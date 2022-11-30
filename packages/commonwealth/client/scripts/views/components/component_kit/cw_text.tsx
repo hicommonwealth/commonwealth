@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text.scss';
 
@@ -44,8 +45,8 @@ type TextStyleAttrs = {
 };
 
 type TextAttrs = {
-  onclick?: () => void;
-  title?: string;
+  onclick?: (e?: MouseEvent) => void;
+  title?: string | number;
 } & TextStyleAttrs;
 
 const getFontWeight = (type: FontType) => {
@@ -58,7 +59,7 @@ const getFontWeight = (type: FontType) => {
   }
 };
 
-export class CWText implements m.ClassComponent<TextAttrs> {
+export class CWText extends ClassComponent<TextAttrs> {
   view(vnode: m.Vnode<TextAttrs>) {
     const {
       className,

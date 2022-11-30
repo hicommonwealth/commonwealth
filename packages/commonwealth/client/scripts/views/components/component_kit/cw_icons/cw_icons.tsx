@@ -1,9 +1,10 @@
-/* eslint-disable max-classes-per-file */
 /* @jsx m */
 
+/* eslint-disable max-classes-per-file */
 /* eslint-disable max-len */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
@@ -28,7 +29,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 // If added properly, the icon should auto-display in the component kit.
 
 // ICON TEMPLATE
-// export class CWIconName implements m.ClassComponent<IconAttrs> {
+// export class CWIconName extends ClassComponent<IconAttrs> {
 //   view(vnode: m.Vnode<IconAttrs>){
 // const {
 //   className,
@@ -57,7 +58,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 //   }
 // }
 
-export class CWArrowLeft implements m.ClassComponent<IconAttrs> {
+export class CWArrowLeft extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -91,7 +92,7 @@ export class CWArrowLeft implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWArrowRight implements m.ClassComponent<IconAttrs> {
+export class CWArrowRight extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -125,7 +126,7 @@ export class CWArrowRight implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWBacker implements m.ClassComponent<IconAttrs> {
+export class CWBacker extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -166,7 +167,7 @@ export class CWBacker implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWBadge implements m.ClassComponent<IconAttrs> {
+export class CWBadge extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -197,7 +198,7 @@ export class CWBadge implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWBell implements m.ClassComponent<IconAttrs> {
+export class CWBell extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -232,7 +233,7 @@ export class CWBell implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCautionCircle implements m.ClassComponent<IconAttrs> {
+export class CWCautionCircle extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -268,7 +269,7 @@ export class CWCautionCircle implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCautionTriangle implements m.ClassComponent<IconAttrs> {
+export class CWCautionTriangle extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -304,7 +305,7 @@ export class CWCautionTriangle implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCheck implements m.ClassComponent<IconAttrs> {
+export class CWCheck extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -338,7 +339,7 @@ export class CWCheck implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWChevronDown implements m.ClassComponent<IconAttrs> {
+export class CWChevronDown extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -372,7 +373,7 @@ export class CWChevronDown implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWChevronLeft implements m.ClassComponent<IconAttrs> {
+export class CWChevronLeft extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -406,7 +407,7 @@ export class CWChevronLeft implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWChevronRight implements m.ClassComponent<IconAttrs> {
+export class CWChevronRight extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -440,7 +441,7 @@ export class CWChevronRight implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWChevronUp implements m.ClassComponent<IconAttrs> {
+export class CWChevronUp extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -474,7 +475,7 @@ export class CWChevronUp implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWClock implements m.ClassComponent<IconAttrs> {
+export class CWClock extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -508,7 +509,7 @@ export class CWClock implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWClose implements m.ClassComponent<IconAttrs> {
+export class CWClose extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -546,7 +547,7 @@ export class CWClose implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCloud implements m.ClassComponent<IconAttrs> {
+export class CWCloud extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -584,7 +585,7 @@ export class CWCloud implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCollapse implements m.ClassComponent<IconAttrs> {
+export class CWCollapse extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -618,7 +619,7 @@ export class CWCollapse implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCommonLogo implements m.ClassComponent<IconAttrs> {
+export class CWCommonLogo extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -648,7 +649,7 @@ export class CWCommonLogo implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCompass implements m.ClassComponent<IconAttrs> {
+export class CWCompass extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -683,7 +684,7 @@ export class CWCompass implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCopy implements m.ClassComponent<IconAttrs> {
+export class CWCopy extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -718,7 +719,7 @@ export class CWCopy implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCouncilProposal implements m.ClassComponent<IconAttrs> {
+export class CWCouncilProposal extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -748,7 +749,7 @@ export class CWCouncilProposal implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCow implements m.ClassComponent<IconAttrs> {
+export class CWCow extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -782,7 +783,7 @@ export class CWCow implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWCurator implements m.ClassComponent<IconAttrs> {
+export class CWCurator extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -818,7 +819,7 @@ export class CWCurator implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWDemocraticProposal implements m.ClassComponent<IconAttrs> {
+export class CWDemocraticProposal extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -852,7 +853,7 @@ export class CWDemocraticProposal implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWDiscord implements m.ClassComponent<IconAttrs> {
+export class CWDiscord extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -882,7 +883,7 @@ export class CWDiscord implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWDots implements m.ClassComponent<IconAttrs> {
+export class CWDots extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -912,7 +913,7 @@ export class CWDots implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWDotsVertical implements m.ClassComponent<IconAttrs> {
+export class CWDotsVertical extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -942,7 +943,7 @@ export class CWDotsVertical implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWDownvote implements m.ClassComponent<IconAttrs> {
+export class CWDownvote extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -972,7 +973,7 @@ export class CWDownvote implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWElement implements m.ClassComponent<IconAttrs> {
+export class CWElement extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1006,7 +1007,7 @@ export class CWElement implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWExpand implements m.ClassComponent<IconAttrs> {
+export class CWExpand extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1040,7 +1041,7 @@ export class CWExpand implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWExploreCommunities implements m.ClassComponent<IconAttrs> {
+export class CWExploreCommunities extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1075,7 +1076,7 @@ export class CWExploreCommunities implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWExternalLink implements m.ClassComponent<IconAttrs> {
+export class CWExternalLink extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1109,7 +1110,7 @@ export class CWExternalLink implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWFeedback implements m.ClassComponent<IconAttrs> {
+export class CWFeedback extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1143,7 +1144,7 @@ export class CWFeedback implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWFilter implements m.ClassComponent<IconAttrs> {
+export class CWFilter extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1177,7 +1178,7 @@ export class CWFilter implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWFlag implements m.ClassComponent<IconAttrs> {
+export class CWFlag extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1211,7 +1212,7 @@ export class CWFlag implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWFlame implements m.ClassComponent<IconAttrs> {
+export class CWFlame extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1241,7 +1242,7 @@ export class CWFlame implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWGear implements m.ClassComponent<IconAttrs> {
+export class CWGear extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1325,7 +1326,7 @@ export class CWGear implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWGithub implements m.ClassComponent<IconAttrs> {
+export class CWGithub extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1359,7 +1360,7 @@ export class CWGithub implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWHamburger implements m.ClassComponent<IconAttrs> {
+export class CWHamburger extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1388,7 +1389,7 @@ export class CWHamburger implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWHash implements m.ClassComponent<IconAttrs> {
+export class CWHash extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1422,7 +1423,7 @@ export class CWHash implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWHeartEmpty implements m.ClassComponent<IconAttrs> {
+export class CWHeartEmpty extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1456,7 +1457,7 @@ export class CWHeartEmpty implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWHeartFilled implements m.ClassComponent<IconAttrs> {
+export class CWHeartFilled extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1490,7 +1491,7 @@ export class CWHeartFilled implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWHelp implements m.ClassComponent<IconAttrs> {
+export class CWHelp extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1524,7 +1525,7 @@ export class CWHelp implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWHome implements m.ClassComponent<IconAttrs> {
+export class CWHome extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1558,7 +1559,7 @@ export class CWHome implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWInfoEmpty implements m.ClassComponent<IconAttrs> {
+export class CWInfoEmpty extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1593,7 +1594,7 @@ export class CWInfoEmpty implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWImageUpload implements m.ClassComponent<IconAttrs> {
+export class CWImageUpload extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1623,7 +1624,7 @@ export class CWImageUpload implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWInfoFilled implements m.ClassComponent<IconAttrs> {
+export class CWInfoFilled extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1657,7 +1658,7 @@ export class CWInfoFilled implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWJar implements m.ClassComponent<IconAttrs> {
+export class CWJar extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1692,7 +1693,7 @@ export class CWJar implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWLink implements m.ClassComponent<IconAttrs> {
+export class CWLink extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1726,7 +1727,7 @@ export class CWLink implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWLock implements m.ClassComponent<IconAttrs> {
+export class CWLock extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1760,7 +1761,7 @@ export class CWLock implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWLogout implements m.ClassComponent<IconAttrs> {
+export class CWLogout extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1799,7 +1800,7 @@ export class CWLogout implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWMail implements m.ClassComponent<IconAttrs> {
+export class CWMail extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1833,7 +1834,7 @@ export class CWMail implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWMute implements m.ClassComponent<IconAttrs> {
+export class CWMute extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1868,7 +1869,7 @@ export class CWMute implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWPeople implements m.ClassComponent<IconAttrs> {
+export class CWPeople extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1903,7 +1904,7 @@ export class CWPeople implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWPerson implements m.ClassComponent<IconAttrs> {
+export class CWPerson extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1937,7 +1938,7 @@ export class CWPerson implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWPin implements m.ClassComponent<IconAttrs> {
+export class CWPin extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -1969,7 +1970,7 @@ export class CWPin implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWPlus implements m.ClassComponent<IconAttrs> {
+export class CWPlus extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2000,7 +2001,7 @@ export class CWPlus implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWPlusCircle implements m.ClassComponent<IconAttrs> {
+export class CWPlusCircle extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2034,7 +2035,7 @@ export class CWPlusCircle implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWSearch implements m.ClassComponent<IconAttrs> {
+export class CWSearch extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2068,7 +2069,7 @@ export class CWSearch implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWSend implements m.ClassComponent<IconAttrs> {
+export class CWSend extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2102,7 +2103,7 @@ export class CWSend implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWShare implements m.ClassComponent<IconAttrs> {
+export class CWShare extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2136,7 +2137,7 @@ export class CWShare implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWShare2 implements m.ClassComponent<IconAttrs> {
+export class CWShare2 extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2170,7 +2171,7 @@ export class CWShare2 implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWSidebarCollapse implements m.ClassComponent<IconAttrs> {
+export class CWSidebarCollapse extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2204,7 +2205,7 @@ export class CWSidebarCollapse implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWSidebarExpand implements m.ClassComponent<IconAttrs> {
+export class CWSidebarExpand extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2238,7 +2239,7 @@ export class CWSidebarExpand implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWStar implements m.ClassComponent<IconAttrs> {
+export class CWStar extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2268,7 +2269,7 @@ export class CWStar implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWSun implements m.ClassComponent<IconAttrs> {
+export class CWSun extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2348,7 +2349,7 @@ export class CWSun implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWTelegram implements m.ClassComponent<IconAttrs> {
+export class CWTelegram extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2382,7 +2383,7 @@ export class CWTelegram implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWTrash implements m.ClassComponent<IconAttrs> {
+export class CWTrash extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2417,7 +2418,7 @@ export class CWTrash implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWTreasuryProposal implements m.ClassComponent<IconAttrs> {
+export class CWTreasuryProposal extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2451,7 +2452,7 @@ export class CWTreasuryProposal implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWTwitter implements m.ClassComponent<IconAttrs> {
+export class CWTwitter extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2481,7 +2482,7 @@ export class CWTwitter implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWUpvote implements m.ClassComponent<IconAttrs> {
+export class CWUpvote extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2511,7 +2512,7 @@ export class CWUpvote implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWViews implements m.ClassComponent<IconAttrs> {
+export class CWViews extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2546,7 +2547,7 @@ export class CWViews implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWWallet implements m.ClassComponent<IconAttrs> {
+export class CWWallet extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2586,7 +2587,7 @@ export class CWWallet implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWWebsite implements m.ClassComponent<IconAttrs> {
+export class CWWebsite extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,
@@ -2620,7 +2621,7 @@ export class CWWebsite implements m.ClassComponent<IconAttrs> {
   }
 }
 
-export class CWWrite implements m.ClassComponent<IconAttrs> {
+export class CWWrite extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
       className,

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/tip_detail.scss';
 
@@ -23,7 +24,7 @@ type TipDetailAttrs = {
   tipAmount: number;
 };
 
-export class TipDetail implements m.ClassComponent<TipDetailAttrs> {
+export class TipDetail extends ClassComponent<TipDetailAttrs> {
   view(vnode: m.Vnode<TipDetailAttrs>) {
     const { headerTitle, proposal, setTipAmount, tipAmount } = vnode.attrs;
 

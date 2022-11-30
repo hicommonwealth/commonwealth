@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
@@ -34,7 +35,7 @@ type PopoverAttrs = {
 
 const defaultHoverCloseDelay = 100;
 
-export class CWPopover implements m.ClassComponent<PopoverAttrs> {
+export class CWPopover extends ClassComponent<PopoverAttrs> {
   private arrowId: string;
   private contentId: string;
   private isOpen: boolean;
