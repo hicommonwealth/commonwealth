@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
 
@@ -14,12 +15,12 @@ import { getClasses } from '../helpers';
 type FilterMenuAttrs = {
   filterMenuItems: Array<CheckboxType>;
   header: string;
-  onchange: () => void;
+  onchange: (e?: any) => void;
   selectedItems: Array<string>;
 };
 
-export class CWFilterMenu implements m.ClassComponent<FilterMenuAttrs> {
-  view(vnode) {
+export class CWFilterMenu extends ClassComponent<FilterMenuAttrs> {
+  view(vnode: m.Vnode<FilterMenuAttrs>) {
     const { filterMenuItems, header, onchange, selectedItems } = vnode.attrs;
     // console.log({ selectedItems });
 
@@ -49,7 +50,7 @@ export class CWFilterMenu implements m.ClassComponent<FilterMenuAttrs> {
                   label={item.label}
                   checked={isChecked}
                   onchange={onchange}
-                  disabled={item.disabled}
+                  // disabled={item.disabled}
                 />
               );
             })}
