@@ -6,7 +6,6 @@ import {
   PermissionError,
   BASE_PERMISSIONS,
 } from 'common-common/src/permissions';
-import { NextFunction, Request, Response } from 'express';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
@@ -14,6 +13,13 @@ import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
 import { AddressInstance } from '../models/address';
 import { AppError } from './errors';
+
+export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
+  chain_id: string;
+  permission: Permission;
+  allow: bigint;
+  deny: bigint;
+}
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
@@ -36,12 +42,7 @@ export class RoleInstanceWithPermission {
     this.deny = deny;
   }
 
-  public toJSON(): RoleAssignmentAttributes & {
-    chain_id: string;
-    permission: Permission;
-    allow: bigint;
-    deny: bigint;
-  } {
+  public toJSON(): RoleInstanceWithPermissionAttributes {
     return {
       ...this._roleAssignmentAttributes,
       chain_id: this.chain_id,
