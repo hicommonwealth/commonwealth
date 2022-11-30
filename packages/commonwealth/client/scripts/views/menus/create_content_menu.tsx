@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -209,16 +210,18 @@ const getCreateContentMenuItems = (): MenuItem[] => {
   ];
 };
 
-export class CreateContentSidebar implements m.ClassComponent {
-  view(vnode: m.Vnode) {
+export class CreateContentSidebar extends ClassComponent {
+  view() {
     return (
       <CWSidebarMenu
         className="CreateContentSidebar"
         menuHeader={{
           label: 'Create',
           onclick: async () => {
-            const sidebar = document.getElementsByClassName('CreateContentSidebar');
-            sidebar[0].classList.add('onremove')
+            const sidebar = document.getElementsByClassName(
+              'CreateContentSidebar'
+            );
+            sidebar[0].classList.add('onremove');
             setTimeout(() => {
               app.sidebarMenu = 'default';
               m.redraw();
@@ -231,7 +234,7 @@ export class CreateContentSidebar implements m.ClassComponent {
   }
 }
 
-export class CreateContentMenu implements m.ClassComponent {
+export class CreateContentMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
@@ -248,7 +251,7 @@ export class CreateContentMenu implements m.ClassComponent {
   }
 }
 
-export class CreateContentPopover implements m.ClassComponent {
+export class CreateContentPopover extends ClassComponent {
   view() {
     if (
       !app.isLoggedIn() ||

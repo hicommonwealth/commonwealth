@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { debounce } from 'lodash';
 
 import 'pages/discussions/index.scss';
@@ -16,7 +17,8 @@ import { ThreadPreview } from './thread_preview';
 
 type DiscussionPageAttrs = { topic?: string };
 
-class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
+// Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
+class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   private fetchingThreads: boolean;
   private initializing: boolean;
   private stageName: string;

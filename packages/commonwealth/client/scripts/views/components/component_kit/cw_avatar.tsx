@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import jdenticon from 'jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';
@@ -13,7 +14,7 @@ type BaseAvatarAttrs = {
 
 type AvatarAttrs = BaseAvatarAttrs & { avatarUrl: string };
 
-export class CWAvatar implements m.ClassComponent<AvatarAttrs> {
+export class CWAvatar extends ClassComponent<AvatarAttrs> {
   view(vnode: m.Vnode<AvatarAttrs>) {
     const { avatarUrl, size } = vnode.attrs;
 
@@ -28,7 +29,7 @@ export class CWAvatar implements m.ClassComponent<AvatarAttrs> {
 
 type JdenticonAttrs = BaseAvatarAttrs & { address?: string };
 
-export class CWJdenticon implements m.ClassComponent<JdenticonAttrs> {
+export class CWJdenticon extends ClassComponent<JdenticonAttrs> {
   view(vnode: m.Vnode<JdenticonAttrs>) {
     const { address, size } = vnode.attrs;
     if (!address) return null;

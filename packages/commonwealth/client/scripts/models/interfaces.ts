@@ -14,6 +14,30 @@ export interface IBlockInfo {
   isIrregular: boolean;
 }
 
+// TODO: abstract this for edgeware? Maybe replace with "command string"?
+export interface ITXData {
+  call: string;
+}
+
+// TODO: figure out how to abstract this to make the tx_signing_modal work with cosmos
+export type ITXModalData = {
+  author: Account;
+  txType: string;
+  txData: {
+    // subscribe to transaction events
+    events: EventEmitter;
+
+    // get blob of tx data to sign
+    unsignedData: () => Promise<ITXData>;
+
+    // perform transaction
+    transact: (...args) => void;
+  };
+
+  // callback triggered upon exit
+  cb?: (success: boolean) => void;
+};
+
 // Implemented by a chain's top-level module. Responsible for high-level
 // metadata, API, and event-handling functionality.
 export interface IChainModule<C extends Coin, A extends Account> {
@@ -27,18 +51,21 @@ export interface IChainModule<C extends Coin, A extends Account> {
     txFunc,
     txName: string,
     objName: string,
-    cb?: (success: boolean) => void): ITXModalData;
+    cb?: (success: boolean) => void
+  ): ITXModalData;
 }
 
 // Implemented by a chain's account module. Store for account objects.
-export interface IAccountsModule<C extends Coin, A extends Account> extends StorageModule {
+export interface IAccountsModule<C extends Coin, A extends Account>
+  extends StorageModule {
   // Converts an address into an account module. Should check storage prior to
   // creating a new account object.
   get(address: string, keytype?: string): A;
 }
 
 // Offchain stores and management for discussion features.
-export interface IOffchainAccountsModule<C extends Coin, A extends Account> extends StorageModule {
+export interface IOffchainAccountsModule<C extends Coin, A extends Account>
+  extends StorageModule {
   get(address: string, chain?: string): A;
 }
 
@@ -48,30 +75,6 @@ export interface ITransactionResult {
   err?: string;
   blocknum?: number;
   timestamp?: moment.Moment;
-}
-
-// TODO: abstract this for edgeware? Maybe replace with "command string"?
-export interface ITXData {
-  call: string;
-}
-
-// TODO: figure out how to abstract this to make the tx_signing_modal work with cosmos
-export interface ITXModalData {
-  author: Account;
-  txType: string;
-  txData: {
-    // subscribe to transaction events
-    events: EventEmitter,
-
-    // get blob of tx data to sign
-    unsignedData: () => Promise<ITXData>,
-
-    // perform transaction
-    transact: (...args) => void,
-  };
-
-  // callback triggered upon exit
-  cb?: (success: boolean) => void;
 }
 
 export type IBalanceAccount<C extends Coin> = Account & { balance: Promise<C> };

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -27,7 +28,7 @@ type UserDashboardAttrs = {
   type: string;
 };
 
-class UserDashboard implements m.ClassComponent<UserDashboardAttrs> {
+class UserDashboard extends ClassComponent<UserDashboardAttrs> {
   private activePage: DashboardViews;
   private chainEventCount: number;
   private chainEvents: DashboardActivityNotification[];

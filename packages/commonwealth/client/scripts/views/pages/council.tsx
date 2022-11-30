@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/council.scss';
 
@@ -29,7 +30,7 @@ type CouncillorAttrs = {
   account: SubstrateAccount;
 };
 
-class Councillor implements m.ClassComponent<CouncillorAttrs> {
+class Councillor extends ClassComponent<CouncillorAttrs> {
   view(vnode: m.Vnode<CouncillorAttrs>) {
     if (!vnode.attrs.account) return;
 
@@ -118,7 +119,7 @@ function getModules() {
   }
 }
 
-class CouncilPage implements m.ClassComponent {
+class CouncilPage extends ClassComponent {
   view() {
     if (!app.chain || !app.chain.loaded) {
       if (

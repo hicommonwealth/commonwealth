@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/proposals/aave_proposal_card_detail.scss';
 
@@ -15,7 +16,7 @@ export const roundVote = (percentage) => {
 
 type AaveInfoRowAttrs = { aaveNum: number; aaveText: string };
 
-export class AaveInfoRow implements m.ClassComponent<AaveInfoRowAttrs> {
+export class AaveInfoRow extends ClassComponent<AaveInfoRowAttrs> {
   view(vnode: m.Vnode<AaveInfoRowAttrs>) {
     const { aaveNum, aaveText } = vnode.attrs;
 
@@ -35,9 +36,7 @@ type AaveProposalCardDetailAttrs = {
   statusText: any;
 };
 
-export class AaveProposalCardDetail
-  implements m.ClassComponent<AaveProposalCardDetailAttrs>
-{
+export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetailAttrs> {
   view(vnode: m.Vnode<AaveProposalCardDetailAttrs>) {
     const { proposal } = vnode.attrs;
 

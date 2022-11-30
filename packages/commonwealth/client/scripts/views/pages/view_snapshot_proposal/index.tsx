@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 // import 'pages/snapshot/index.scss';
 
@@ -35,7 +36,7 @@ type ViewProposalPageAttrs = {
   snapshotId: string;
 };
 
-class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
+class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private fetchedPower: boolean;
   private proposal: SnapshotProposal;
   private scores: Array<number>;

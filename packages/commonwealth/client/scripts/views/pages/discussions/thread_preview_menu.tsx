@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -15,9 +16,7 @@ type ThreadPreviewMenuAttrs = {
   thread: Thread;
 };
 
-export class ThreadPreviewMenu
-  implements m.ClassComponent<ThreadPreviewMenuAttrs>
-{
+export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
   view(vnode: m.Vnode<ThreadPreviewMenuAttrs>) {
     if (!app.isLoggedIn()) return;
 
@@ -60,7 +59,7 @@ export class ThreadPreviewMenu
                         .then(() => m.redraw());
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
-                    iconLeft: 'pin',
+                    iconLeft: 'pin' as const,
                   },
                 ]
               : []),
@@ -78,7 +77,7 @@ export class ThreadPreviewMenu
                         .then(() => m.redraw());
                     },
                     label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
-                    iconLeft: 'lock',
+                    iconLeft: 'lock' as const,
                   },
                 ]
               : []),
@@ -99,7 +98,7 @@ export class ThreadPreviewMenu
                       });
                     },
                     label: 'Change topic',
-                    iconLeft: 'filter',
+                    iconLeft: 'filter' as const,
                   },
                 ]
               : []),
@@ -120,7 +119,7 @@ export class ThreadPreviewMenu
                       });
                     },
                     label: 'Update status',
-                    iconLeft: 'democraticProposal',
+                    iconLeft: 'democraticProposal' as const,
                   },
                 ]
               : []),
@@ -141,7 +140,7 @@ export class ThreadPreviewMenu
                       }
                     },
                     label: 'Delete',
-                    iconLeft: 'trash',
+                    iconLeft: 'trash' as const,
                   },
                 ]
               : []),

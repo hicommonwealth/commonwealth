@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_dropdown.scss';
 
@@ -14,7 +15,7 @@ type DropdownAttrs = {
   initialValue?: string;
 };
 
-export class CWDropdown implements m.ClassComponent<DropdownAttrs> {
+export class CWDropdown extends ClassComponent<DropdownAttrs> {
   private showDropdown: boolean;
   private selectedValue: string;
 

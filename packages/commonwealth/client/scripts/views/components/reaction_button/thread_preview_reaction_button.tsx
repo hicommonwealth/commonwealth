@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
@@ -19,9 +20,7 @@ type ThreadPreviewReactionButtonAttrs = {
   thread: Thread;
 };
 
-export class ThreadPreviewReactionButton
-  implements m.ClassComponent<ThreadPreviewReactionButtonAttrs>
-{
+export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewReactionButtonAttrs> {
   private loading: boolean;
   private reactors: any;
 

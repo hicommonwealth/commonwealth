@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
@@ -20,9 +21,7 @@ type ThreadPollEditorCardAttrs = {
   threadAlreadyHasPolling: boolean;
 };
 
-export class ThreadPollEditorCard
-  implements m.ClassComponent<ThreadPollEditorCardAttrs>
-{
+export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAttrs> {
   view(vnode: m.Vnode<ThreadPollEditorCardAttrs>) {
     const { thread, threadAlreadyHasPolling } = vnode.attrs;
 
@@ -53,7 +52,7 @@ type ThreadPollCardAttrs = {
   poll: Poll;
 };
 
-export class ThreadPollCard implements m.ClassComponent<ThreadPollCardAttrs> {
+export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
   view(vnode: m.Vnode<ThreadPollCardAttrs>) {
     const { poll } = vnode.attrs;
 
@@ -63,7 +62,7 @@ export class ThreadPollCard implements m.ClassComponent<ThreadPollCardAttrs> {
         pollEnded={poll.endsAt && poll.endsAt?.isBefore(moment().utc())}
         hasVoted={
           app.user.activeAccount &&
-          poll.getUserVote(
+          !!poll.getUserVote(
             app.user.activeAccount?.chain?.id,
             app.user.activeAccount?.address
           )

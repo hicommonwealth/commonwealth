@@ -1,11 +1,11 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
 
-import { Comment } from 'models';
 import { pluralize } from 'helpers';
 import { ComponentType, MenuItem } from './types';
 import { CWTabBar, CWTab } from './cw_tabs';
@@ -16,16 +16,16 @@ import { isWindowMediumSmallInclusive } from './helpers';
 import { CWIcon } from './cw_icons/cw_icon';
 import { SharePopover } from '../share_popover';
 
-type SidebarItem = {
+export type ContentPageSidebarItem = {
   label: string;
   item: m.Vnode;
 };
 
 // tuple
-type SidebarComponents = [
-  item?: SidebarItem,
-  item?: SidebarItem,
-  item?: SidebarItem
+export type SidebarComponents = [
+  item?: ContentPageSidebarItem,
+  item?: ContentPageSidebarItem,
+  item?: ContentPageSidebarItem
 ];
 
 type ContentPageAttrs = {
@@ -36,7 +36,7 @@ type ContentPageAttrs = {
   author?: m.Vnode;
   actions?: Array<MenuItem>;
   body?: m.Vnode;
-  comments?: Array<Comment<any>>;
+  comments?: m.Vnode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
   headerComponents?: m.Vnode;
   readOnly?: boolean;
@@ -47,7 +47,7 @@ type ContentPageAttrs = {
   viewCount?: number;
 };
 
-export class CWContentPage implements m.ClassComponent<ContentPageAttrs> {
+export class CWContentPage extends ClassComponent<ContentPageAttrs> {
   private viewType: 'sidebarView' | 'tabsView';
   private tabSelected: number;
 

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import {
   Button,
   Icons,
@@ -17,14 +18,14 @@ import { EditTopicModal } from 'views/modals/edit_topic_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type Topic = {
-  defaultOffchainTemplate: string;
+  defaultOffchainTemplate?: string;
   description: string;
-  featured_order: number;
-  featuredInNewPost: boolean;
-  featuredInSidebar: boolean;
+  featured_order?: number;
+  featuredInNewPost?: boolean;
+  featuredInSidebar?: boolean;
   id: number;
   name: string;
-  telegram: string;
+  telegram?: string;
 };
 
 type TopicsMenuAttrs = {
@@ -34,7 +35,7 @@ type TopicsMenuAttrs = {
   topic: string;
 };
 
-export class TopicsMenu implements m.ClassComponent<TopicsMenuAttrs> {
+export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
   view(vnode: m.Vnode<TopicsMenuAttrs>) {
     const { featuredTopics, otherTopics, selectedTopic, topic } = vnode.attrs;
 

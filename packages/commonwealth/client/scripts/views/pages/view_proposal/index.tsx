@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -23,13 +24,22 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import User from '../../components/widgets/user';
-import { ProposalSubheader } from './proposal_components';
+import {
+  ProposalSubheader,
+  SubheaderProposalType,
+} from './proposal_components';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { AaveViewProposalDetail } from './aave_summary';
-import { LinkedProposalsEmbed } from './linked_proposals_embed';
+import {
+  LinkedProposalsEmbed,
+  LinkedSubstrateProposal,
+} from './linked_proposals_embed';
 import { CommentsTree } from '../../components/comments/comments_tree';
-import { CollapsibleBodyText } from '../../components/collapsible_body_text';
+import {
+  CollapsibleProposalBody,
+  CollapsibleThreadBody,
+} from '../../components/collapsible_body_text';
 
 type ProposalPrefetch = {
   [identifier: string]: {
@@ -44,7 +54,7 @@ type ViewProposalPageAttrs = {
   type?: string;
 };
 
-class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
+class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private comments: Comment<AnyProposal>[];
   private prefetch: ProposalPrefetch;
   private proposal: AnyProposal;
@@ -239,6 +249,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     if (this.proposal instanceof SubstrateTreasuryTip) {
       return (
         <TipDetail
+          tipAmount={this.tipAmount}
           proposal={this.proposal}
           headerTitle={headerTitle}
           setTipAmount={(tip) => {
@@ -276,19 +287,21 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
           createdAt={this.proposal.createdAt}
           subHeader={
             <ProposalSubheader
-              proposal={this.proposal}
+              proposal={this.proposal as SubheaderProposalType}
               toggleVotingModal={toggleVotingModal}
               votingModalOpen={this.votingModalOpen}
             />
           }
           body={
             !!this.proposal.description && (
-              <CollapsibleBodyText item={this.proposal} />
+              <CollapsibleProposalBody proposal={this.proposal} />
             )
           }
           subBody={
             <>
-              <LinkedProposalsEmbed proposal={this.proposal} />
+              <LinkedProposalsEmbed
+                proposal={this.proposal as LinkedSubstrateProposal}
+              />
               {this.proposal instanceof AaveProposal && (
                 <AaveViewProposalDetail proposal={this.proposal} />
               )}

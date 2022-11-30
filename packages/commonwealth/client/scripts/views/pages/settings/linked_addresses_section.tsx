@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 
 import 'pages/settings/linked_addresses_section.scss';
@@ -22,7 +23,7 @@ type AccountRowAttrs = {
   onclick?: (e: Event) => any;
 };
 
-class AccountRow implements m.ClassComponent<AccountRowAttrs> {
+class AccountRow extends ClassComponent<AccountRowAttrs> {
   private removing: boolean;
 
   view(vnode: m.Vnode<AccountRowAttrs>) {
@@ -111,7 +112,7 @@ class AccountRow implements m.ClassComponent<AccountRowAttrs> {
   }
 }
 
-export class LinkedAddressesSection implements m.ClassComponent {
+export class LinkedAddressesSection extends ClassComponent {
   view() {
     const addressGroups = Object.entries(
       _.groupBy(app.user.addresses, (account) => account.chain.id)

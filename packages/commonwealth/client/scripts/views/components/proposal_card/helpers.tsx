@@ -184,13 +184,10 @@ export const getStatusText = (proposal: AnyProposal) => {
   return '';
 };
 
-export const getPrimaryTagText = (proposal: AnyProposal) => [
-  chainEntityTypeToProposalShortName(
+export const getPrimaryTagText = (proposal: AnyProposal) => `
+  ${chainEntityTypeToProposalShortName(
     proposalSlugToChainEntityType(proposal.slug)
-  ),
-  ' ',
-  proposal.shortIdentifier,
-];
+  )} ${proposal.shortIdentifier}`;
 
 export const getSecondaryTagText = (proposal: AnyProposal) => {
   if (

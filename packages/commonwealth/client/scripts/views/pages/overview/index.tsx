@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/overview/index.scss';
 
@@ -16,7 +17,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 
-class OverviewPage implements m.ClassComponent {
+class OverviewPage extends ClassComponent {
   private isWindowExtraSmall: boolean;
 
   onResize() {

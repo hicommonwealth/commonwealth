@@ -1,5 +1,6 @@
 /* @jsx m */
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
@@ -9,7 +10,7 @@ import { CWRadioGroup } from './cw_radio_group';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput } from './cw_text_input';
-import { iconLookup } from './cw_icons/cw_icon_lookup';
+import { iconLookup, IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWRadioButton } from './cw_radio_button';
@@ -33,11 +34,11 @@ import { CWDropdown } from './cw_dropdown';
 import CWCoverImageUploader from './cw_cover_image_uploader';
 
 const displayIcons = (icons) => {
-  return Object.entries(icons).map(([k, v]) => {
+  return Object.entries(icons).map(([k, _]) => {
     return (
       <div class="icon-container">
         <div class="icon-name">{k}</div>
-        <CWIcon iconName={k} />
+        <CWIcon iconName={k as IconName} />
       </div>
     );
   });
@@ -50,7 +51,7 @@ const radioGroupOptions = [
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
 ];
-export class ComponentShowcase implements m.ClassComponent {
+export class ComponentShowcase extends ClassComponent {
   private checkboxChecked: boolean;
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;

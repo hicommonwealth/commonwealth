@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import {
   Button,
   Icons,
@@ -22,7 +23,7 @@ type StagesMenuAttrs = {
   stages: Array<ThreadStage>;
 };
 
-export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
+export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
   view(vnode: m.Vnode<StagesMenuAttrs>) {
     const { selectedStage, stage, stages } = vnode.attrs;
 
