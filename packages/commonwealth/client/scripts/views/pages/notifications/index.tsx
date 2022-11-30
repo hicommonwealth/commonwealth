@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
@@ -84,7 +85,7 @@ const previousPage = () => {
   if (flag) m.redraw();
 };
 
-class NotificationsPage implements m.ClassComponent {
+class NotificationsPage extends ClassComponent {
   view() {
     if (!app.isLoggedIn()) {
       return m(PageError, {

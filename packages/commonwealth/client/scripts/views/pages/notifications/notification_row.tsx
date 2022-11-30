@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Spinner } from 'construct-ui';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
@@ -21,7 +22,7 @@ type NotificationRowAttrs = {
   onListPage?: boolean;
 };
 
-export class NotificationRow implements m.ClassComponent<NotificationRowAttrs> {
+export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
   private markingRead: boolean;
   private scrollOrStop: boolean;
 
