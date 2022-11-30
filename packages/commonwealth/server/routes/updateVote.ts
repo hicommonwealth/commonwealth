@@ -2,6 +2,7 @@ import moment from 'moment';
 import { NextFunction } from 'express';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
+import { Action, PermissionError } from 'common-common/src/permissions';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';
 import { sequelize } from '../database';
@@ -15,6 +16,7 @@ import {
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import { AppError, ServerError } from '../util/errors';
+import { isAddressPermitted } from '../util/roles';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -51,6 +53,16 @@ const updateVote = async (
   if (authorError) return next(new AppError(authorError));
 
   const { poll_id, address, author_chain, option } = req.body;
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.VOTE_ON_POLLS
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const poll = await models.Poll.findOne({
     where: { id: poll_id, chain_id: chain.id },

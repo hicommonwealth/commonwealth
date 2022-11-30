@@ -52,6 +52,7 @@ class PollsController {
       data: {
         chain: chainId,
         thread_id: threadId,
+        jwt: app.user.jwt,
       },
       success: (response) => {
         for (const poll of response.result) {
