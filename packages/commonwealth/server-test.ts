@@ -310,7 +310,7 @@ const resetServer = (debug = false): Promise<void> => {
         is_active: true,
       });
       await models.SnapshotProposal.create({
-        id: 1,
+        id: '1',
         title: 'Test Snapshot Proposal',
         body: 'This is a test proposal',
         choices: ['Yes', 'No'],
