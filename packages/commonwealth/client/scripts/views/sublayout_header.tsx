@@ -19,19 +19,17 @@ import { NotificationsMenuPopover } from './menus/notifications_menu';
 
 type SublayoutHeaderAttrs = {
   hideSearch?: boolean;
-  isSidebarToggleable: boolean;
+  onMobile: boolean;
   isSidebarToggled: boolean;
-  toggleSidebar: () => void;
 };
 
 export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
   view(vnode: m.Vnode<SublayoutHeaderAttrs>) {
-    const { hideSearch, isSidebarToggleable, isSidebarToggled, toggleSidebar } =
-      vnode.attrs;
+    const { hideSearch, onMobile, isSidebarToggled } = vnode.attrs;
 
     return (
       <div class="SublayoutHeader">
-        <div class="sidebar-left">
+        <div class="header-left">
           <CWIconButton
             iconName="commonLogo"
             iconButtonTheme="black"
@@ -50,29 +48,27 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
           {!isSidebarToggled && app.activeChainId() && (
             <CWCommunityAvatar size="large" community={app.chain.meta} />
           )}
-          {isSidebarToggleable && (
+          {onMobile && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={isSidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
               onclick={() => {
-                toggleSidebar();
-                localStorage.setItem(
-                  `${app.activeChainId()}-sidebar-toggle`,
-                  (!isSidebarToggled).toString()
-                );
+                app.sidebarToggled = !app.sidebarToggled;
                 m.redraw();
               }}
             />
           )}
         </div>
         {!hideSearch && <SearchBar />}
-        <div class="sidebar-right">
+        <div class="header-right">
           <div class="MobileMenuContainer">
             <CWIconButton
               iconName="dotsVertical"
               iconButtonTheme="black"
               onclick={() => {
+                app.sidebarToggled = false;
                 app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
+                m.redraw();
               }}
             />
           </div>

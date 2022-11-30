@@ -1,3 +1,4 @@
+import { ChainInfo } from 'models';
 import { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
@@ -31,6 +32,7 @@ export enum ComponentType {
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  SidebarMenu = 'SidebarMenu',
   Spinner = 'Spinner',
   Tab = 'Tab',
   TabBar = 'TabBar',
@@ -49,7 +51,7 @@ export type StyleAttrs = {
   className?: string;
 };
 
-type DividerMenuItem = { type: 'divider' };
+export type DividerMenuItem = { type: 'divider' };
 
 type HeaderMenuItem = { type?: 'header'; label: string };
 
@@ -72,8 +74,15 @@ type NotificationMenuItem = {
   type?: 'notification';
 };
 
+export type CommunityMenuItem = {
+  community?: ChainInfo;
+  label?: string;
+  type?: 'community';
+};
+
 export type MenuItem =
   | DividerMenuItem
   | HeaderMenuItem
   | DefaultMenuItem
-  | NotificationMenuItem;
+  | NotificationMenuItem
+  | CommunityMenuItem;

@@ -27,6 +27,7 @@ export class HelpMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
+        className="HelpMenu"
         menuHeader={{
           label: 'Help',
           onclick: () => {

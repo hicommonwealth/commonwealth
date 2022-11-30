@@ -33,6 +33,7 @@ export class InvitesMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
+        className="InvitesMenu"
         menuHeader={{
           label: 'Invites',
           onclick: () => {

@@ -58,6 +58,6 @@ export const getMainMenuItems = (): Array<MenuItem> => {
 
 export class MainMenu extends ClassComponent {
   view() {
-    return <CWMobileMenu menuItems={getMainMenuItems()} />;
+    return <CWMobileMenu className="MainMenu" menuItems={getMainMenuItems()} />;
   }
 }

@@ -54,6 +54,20 @@ describe('TBC unit tests', () => {
     tbc.close();
   });
 
+  it('should throw error when no node exists for id', async () => {
+    const tbc = new TokenBalanceCache(0, 0, [new MockBalanceProvider()], mockNodesProvider);
+    await tbc.start();
+    try {
+      await tbc.getBalanceProviders(2);
+    } catch (e) {
+      // we expect error
+      return;
+    }
+
+    // if no error, fail test
+    assert.fail();
+  });
+
   it('should return token balances', async () => {
     const tbc = new TokenBalanceCache(0, 0, [new MockBalanceProvider()], mockNodesProvider);
     await tbc.start();
