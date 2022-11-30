@@ -702,9 +702,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
             // Profiles
-            '/account/:address': importRoute('views/pages/profile', {
-              scoped: true,
-              deferChain: true,
+            '/account/:address': importRoute('views/pages/new_profile', {
+              scoped: false,
+              deferChain: false,
             }),
             '/account': redirectRoute((a) =>
               activeAccount ? `/account/${activeAccount.address}` : '/'
