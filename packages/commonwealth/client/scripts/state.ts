@@ -26,6 +26,7 @@ import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import { MobileMenuName } from './views/app_mobile_menus';
 import ChainEntityController from "controllers/server/chain_entities";
+import { SidebarMenuName } from './views/components/sidebar';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -85,7 +86,11 @@ export interface IApp {
 
   toasts: ToastStore;
   modals: ModalStore;
+
   mobileMenu: MobileMenuName;
+  sidebarMenu: SidebarMenuName;
+  sidebarToggled: boolean;
+
   loginState: LoginState;
   // stored on server-side
   config: {
@@ -167,11 +172,16 @@ const app: IApp = {
   recentActivity: new RecentActivityController(),
   profiles: new ProfilesController(),
   sessions: new SessionsController(),
+  loginState: LoginState.NotLoaded,
+
+  // Global nav state
+  mobileMenu: null,
+  sidebarMenu: 'default',
+  sidebarToggled: true,
 
   toasts: getToastStore(),
   modals: getModalStore(),
-  mobileMenu: null,
-  loginState: LoginState.NotLoaded,
+
   config: {
     chains: new ChainStore(),
     nodes: new NodeStore(),

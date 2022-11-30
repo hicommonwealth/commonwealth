@@ -15,6 +15,14 @@ import Rollbar from 'rollbar';
 import { RabbitMQController, RascalSubscriptions } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import * as http from 'http';
+import * as jwt from 'jsonwebtoken';
+import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
+import Rollbar from 'rollbar';
+import { Server, Socket } from 'socket.io';
+import { ExtendedError } from 'socket.io/dist/namespace';
+import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
+import { DB } from '../models';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import {
   JWT_SECRET,
@@ -22,8 +30,7 @@ import {
   VULTR_IP
 } from '../config';
 import { createChatNamespace } from './chatNs';
-import { DB } from '../models';
-import StatsDController from "common-common/src/statsd";
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
