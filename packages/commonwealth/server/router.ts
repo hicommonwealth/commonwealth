@@ -158,7 +158,7 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import StatsDController from './util/statsd';
+import { StatsDController } from 'common-common/src/statsd';
 
 function setupRouter(
   app: Express,
