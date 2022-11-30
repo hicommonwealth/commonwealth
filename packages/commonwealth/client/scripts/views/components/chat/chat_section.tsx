@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
@@ -52,7 +53,7 @@ function setToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class ChatSection implements m.ClassComponent<SidebarSectionAttrs> {
+export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
   channels: {
     [category: string]: IChannel[];
   };

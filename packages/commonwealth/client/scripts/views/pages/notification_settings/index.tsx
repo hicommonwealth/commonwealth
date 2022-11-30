@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'pages/notification_settings/index.scss';
@@ -23,7 +24,7 @@ import {
 } from './helper_components';
 import { bundleSubs } from './helpers';
 
-class NotificationSettingsPage implements m.ClassComponent {
+class NotificationSettingsPage extends ClassComponent {
   view() {
     if (!app.loginStatusLoaded()) {
       return (

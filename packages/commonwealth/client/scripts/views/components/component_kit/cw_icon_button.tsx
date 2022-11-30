@@ -1,12 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import { CWIcon } from './cw_icons/cw_icon';
 import { IconComponentAttrs } from './cw_icons/types';
 import { ComponentType } from './types';
 
-export class CWIconButton implements m.ClassComponent<IconComponentAttrs> {
+export class CWIconButton extends ClassComponent<IconComponentAttrs> {
   view(vnode: m.Vnode<IconComponentAttrs>) {
     const {
       componentType = ComponentType.IconButton,

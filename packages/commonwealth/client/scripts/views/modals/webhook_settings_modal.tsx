@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/webhook_settings_modal.scss';
@@ -26,9 +27,7 @@ type WebhookSettingsModalAttrs = {
   webhook: Webhook;
 };
 
-export class WebhookSettingsModal
-  implements m.ClassComponent<WebhookSettingsModalAttrs>
-{
+export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAttrs> {
   private selectedCategories: string[];
 
   oninit(vnode: m.Vnode<WebhookSettingsModalAttrs>) {
@@ -67,6 +66,7 @@ export class WebhookSettingsModal
 
       return (
         <CWCheckbox
+          value=""
           checked={allValuesPresent}
           label={label}
           indeterminate={someValuesPresent && !allValuesPresent}

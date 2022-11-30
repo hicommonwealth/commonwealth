@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 
@@ -21,9 +22,7 @@ type UserDashboardRowAttrs = {
   notification: DashboardActivityNotification;
 };
 
-export class UserDashboardRow
-  implements m.ClassComponent<UserDashboardRowAttrs>
-{
+export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
   view(vnode: m.Vnode<UserDashboardRowAttrs>) {
     const {
       likeCount,

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_popover/cw_address_tooltip.scss';
 
@@ -15,7 +16,7 @@ type AddressTooltipAttrs = {
   trigger: m.Vnode;
 };
 
-export class CWAddressTooltip implements m.ClassComponent<AddressTooltipAttrs> {
+export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
   view(vnode: m.Vnode<AddressTooltipAttrs>) {
     const { address, trigger } = vnode.attrs;
 

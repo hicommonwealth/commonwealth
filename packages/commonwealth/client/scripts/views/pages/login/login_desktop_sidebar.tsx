@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 
 import 'pages/login/login_desktop_sidebar.scss';
@@ -44,9 +45,7 @@ type LoginDesktopSidebarAttrs = {
   wallets: Array<IWebWallet<any>>;
 };
 
-export class LoginDesktopSidebar
-  implements m.ClassComponent<LoginDesktopSidebarAttrs>
-{
+export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs> {
   view(vnode: m.Vnode<LoginDesktopSidebarAttrs>) {
     const {
       sidebarType,
