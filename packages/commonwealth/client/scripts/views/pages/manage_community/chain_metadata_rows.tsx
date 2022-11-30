@@ -11,9 +11,10 @@ import {
   ChainBase,
   ChainCategoryType,
   ChainNetwork,
+  ThreadsViewable,
 } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputRow, ToggleRow } from 'views/components/metadata_rows';
+import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo, RoleInfo } from 'models';
 import {
@@ -22,6 +23,7 @@ import {
   isPermitted,
   removePermission,
 } from 'common-common/src/permissions';
+import CommunityRole from 'models/CommunityRole';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
 import {
@@ -54,6 +56,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   stagesEnabled: boolean;
   customStages: string;
   chatEnabled: boolean;
+  ThreadsViewable: ThreadsViewable;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
   customDomain: string;
@@ -80,10 +83,17 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
+    // Note: Comparing using the Deny Permissions, so if Action is not permitted on Deny, then the Action is permitted
     this.chatEnabled = !isPermitted(
       chain.defaultDenyPermissions,
       Action.VIEW_CHAT_CHANNELS
     );
+    this.ThreadsViewable = !isPermitted(
+      chain.defaultDenyPermissions,
+      Action.VIEW_THREADS
+    )
+      ? ThreadsViewable.AllUsers
+      : ThreadsViewable.MembersOnly;
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -210,6 +220,14 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               ? "Don't enable chat feature for this community"
               : 'Enable chat feature for this community '
           }
+        />
+        <SelectRow
+          title="Threads Viewable Settings"
+          options={[ThreadsViewable.MembersOnly, ThreadsViewable.AllUsers]}
+          value={this.ThreadsViewable}
+          onchange={(value) => {
+            this.ThreadsViewable = value;
+          }}
         />
         <InputRow
           title="Custom Stages"
@@ -379,6 +397,37 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   Action.VIEW_CHAT_CHANNELS
                 );
               }
+
+              // if (this.ThreadsViewable === ThreadsViewable.MembersOnly) {
+              //   // Make sure Members can view threads
+              //   const membersRole = chain.communityRoles.find(
+              //     (r) => r.name === 'member'
+              //   );
+              //   if (!isPermitted(membersRole.allow, Action.VIEW_THREADS)) {
+              //     let newAllow = membersRole.allow;
+              //     newAllow = addPermission(
+              //       membersRole.allow,
+              //       Action.VIEW_THREADS
+              //     );
+              //     app.roles.updateRole({
+              //       chain_id: chain.id,
+              //       permission: 'member',
+              //       allow: newAllow,
+              //       deny: membersRole.deny,
+              //     });
+              //   }
+              //   // Deny non-members from viewing threads
+              //   this.default_deny_permissions = addPermission(
+              //     default_deny_permissions,
+              //     Action.VIEW_THREADS
+              //   );
+              // } else {
+              //   this.default_deny_permissions = removePermission(
+              //     default_deny_permissions,
+              //     Action.VIEW_THREADS
+              //   );
+              // }
+
               await chain.updateChainData({
                 name,
                 description,

@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import bs58 from 'bs58';
 import { Op } from 'sequelize';
+import { Action, PermissionError } from 'common-common/src/permissions';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -21,6 +22,17 @@ const updateThreadLinkedSnapshotProposal = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
+
+  const permission_error = await isAddressPermitted(
+    models,
+    req.user?.id,
+    chain.id,
+    Action.LINK_PROPOSAL_TO_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
+
   if (!chain?.snapshot) {
     return next(new AppError(Errors.MustBeSnapshotChain));
   }

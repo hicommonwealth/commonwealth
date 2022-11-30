@@ -4,6 +4,8 @@ import { groupBy } from 'lodash';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 import { sequelize } from '../database';
+import { checkReadPermitted } from '../util/roles';
+import { Action } from '../../../common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -55,6 +57,13 @@ const threadsUsersCountAndAvatar = async (
   const { chain, threads = [] } = req.body;
   try {
     if (chain && threads.length) {
+      await checkReadPermitted(
+        models,
+        chain,
+        Action.VIEW_POLLS,
+        req.user?.id,
+      );
+
       const root_ids = threads.map(({ root_id }) => root_id);
       const uniqueAddressesByRootIds = await fetchUniqueAddressesByRootIds(
         models,

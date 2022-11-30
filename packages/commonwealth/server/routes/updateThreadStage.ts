@@ -1,8 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { AppError, ServerError } from '../util/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { findAllRoles } from '../util/roles';
+import {
+  Action,
+  PermissionError,
+} from 'common-common/src/permissions';
+import { AppError, ServerError } from '../util/errors';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -22,10 +26,21 @@ const updateThreadStage = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { thread_id, stage } = req.body;
+  const { thread_id, stage, chain } = req.body;
   if (!thread_id) return next(new AppError(Errors.NoThreadId));
   if (!stage) return next(new AppError(Errors.NoStage));
   if (!req.user) return next(new AppError(Errors.NotAdminOrOwner));
+
+  const permission_error = await isAddressPermitted(
+    models,
+    req.user?.id,
+    chain,
+    Action.LINK_PROPOSAL_TO_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
+
 
   try {
     const thread = await models.Thread.findOne({

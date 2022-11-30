@@ -1,10 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { AppError, ServerError } from '../util/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from '../util/errors';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import validateRoles from '../util/validateRoles';
+import { isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,6 +29,16 @@ const deleteThread = async (
   }
   if (!thread_id) {
     throw new AppError(DeleteThreadErrors.NoThread);
+  }
+
+  const permission_error = await isAddressPermitted(
+    models,
+    req.user?.id,
+    chain_id,
+    Action.DELETE_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
   try {

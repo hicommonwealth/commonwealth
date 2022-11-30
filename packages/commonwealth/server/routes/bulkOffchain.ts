@@ -7,7 +7,7 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import { CommunityRoleInstance } from 'server/models/community_role';
+import { CommunityRoleInstance } from '../models/community_role';
 import { DB } from '../models';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { CommunityBannerInstance } from '../models/community_banner';

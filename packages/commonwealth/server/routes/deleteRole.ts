@@ -48,8 +48,7 @@ const deleteRole = async (
       models,
       {
         where: {
-          address_id: req.body.address_id,
-          id: { [Sequelize.Op.ne]: existingRole.toJSON().id },
+          address_id: { [Sequelize.Op.ne]: req.body.address_id },
         },
       },
       chain.id,

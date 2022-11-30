@@ -3,14 +3,19 @@ import { Op } from 'sequelize';
 import moment from 'moment';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action, PermissionError } from 'common-common/src/permissions';
 import { parseUserMentions } from '../util/parseUserMentions';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
+import {
+  getProposalUrl,
+  renderQuillDeltaToText,
+  validURL,
+} from '../../shared/utils';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
-import { findOneRole } from '../util/roles';
+import { findOneRole, isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -46,6 +51,16 @@ const editThread = async (
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.EDIT_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const attachFiles = async () => {
     if (

@@ -1,12 +1,14 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes, Op } from 'sequelize';
-import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action } from 'common-common/src/permissions';
+import validateChain from '../util/validateChain';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../models';
 import { ThreadInstance } from '../models/thread';
 import { AppError, ServerError } from '../util/errors';
+import { checkReadPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
@@ -18,6 +20,14 @@ const bulkThreads = async (
 ) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new AppError(error));
+
+  await checkReadPermitted(
+    models,
+    chain.id,
+    Action.VIEW_THREADS,
+    req.user?.id
+  );
+
   const { cutoff_date, topic_id, stage } = req.query;
 
   const bind = { chain: chain.id };
@@ -195,11 +205,13 @@ const bulkThreads = async (
      SELECT id, title, stage FROM "Threads"
      WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-  const threadsInVoting: ThreadInstance[] =
-    await models.sequelize.query(countsQuery, {
+  const threadsInVoting: ThreadInstance[] = await models.sequelize.query(
+    countsQuery,
+    {
       bind,
       type: QueryTypes.SELECT,
-    });
+    }
+  );
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
   ).length;
