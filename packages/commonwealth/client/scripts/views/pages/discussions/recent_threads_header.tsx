@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/discussions/recent_threads_header.scss';
 
@@ -10,11 +11,11 @@ import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import { ThreadStage } from 'models';
 import { TopicsMenu } from './topics_menu';
-import { StagesMenu } from './stages_menu';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { StagesMenu } from './stages_menu';
 
 type RecentThreadsHeaderAttrs = {
   stage: string;
@@ -22,9 +23,7 @@ type RecentThreadsHeaderAttrs = {
   totalThreadCount: number;
 };
 
-export class RecentThreadsHeader
-  implements m.ClassComponent<RecentThreadsHeaderAttrs>
-{
+export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs> {
   private isWindowExtraSmall: boolean;
 
   onResize() {
@@ -131,7 +130,7 @@ export class RecentThreadsHeader
             )}
             {stagesEnabled && (
               <StagesMenu
-                selectedState={selectedStage}
+                selectedStage={selectedStage}
                 stage={stage}
                 stages={stages}
               />

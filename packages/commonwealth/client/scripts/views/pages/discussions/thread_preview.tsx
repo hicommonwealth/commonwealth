@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
@@ -18,7 +19,6 @@ import User from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SharePopover } from '../../components/share_popover';
-import { ThreadPreviewMenu } from './thread_preview_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import {
@@ -33,12 +33,13 @@ import {
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { ThreadPreviewMenu } from './thread_preview_menu';
 
 type ThreadPreviewAttrs = {
   thread: Thread;
 };
 
-export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
+export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
   private isWindowSmallInclusive: boolean;
 
   onResize() {
@@ -164,7 +165,7 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
             {thread.snapshotProposal && (
               <CWTag
                 type="active"
-                label={['Snap ', `${thread.snapshotProposal.slice(0, 4)}…`]}
+                label={`Snap ${thread.snapshotProposal.slice(0, 4)}…`}
               />
             )}
           </div>
@@ -179,12 +180,12 @@ export class ThreadPreview implements m.ClassComponent<ThreadPreviewAttrs> {
                   return (
                     <CWTag
                       type="proposal"
-                      label={[
-                        chainEntityTypeToProposalShortName(ce.type),
-                        Number.isNaN(parseInt(ce.typeId, 10))
-                          ? ''
-                          : ` #${ce.typeId}`,
-                      ]}
+                      label={`${chainEntityTypeToProposalShortName(ce.type)} 
+                        ${
+                          Number.isNaN(parseInt(ce.typeId, 10))
+                            ? ''
+                            : ` #${ce.typeId}`
+                        }`}
                     />
                   );
                 })}
