@@ -5,7 +5,6 @@ import m from 'mithril';
 import 'pages/view_thread/linked_threads_card.scss';
 
 import app from 'state';
-import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 import { Thread } from 'models';
 import { LinkedThreadRelation } from 'models/Thread';
@@ -13,10 +12,11 @@ import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type LinkedThreadsCardAttrs = {
   allowLinking: boolean;
-  threadlId: number;
+  threadId: number;
 };
 
 export class LinkedThreadsCard
@@ -26,11 +26,11 @@ export class LinkedThreadsCard
   private linkedThreads: Thread[] = [];
 
   view(vnode: m.Vnode<LinkedThreadsCardAttrs>) {
-    const { allowLinking, threadlId } = vnode.attrs;
+    const { allowLinking, threadId } = vnode.attrs;
 
-    const thread = app.threads.getById(threadlId);
+    const thread = app.threads.getById(threadId);
 
-    if (!this.initialized) {
+    if (thread.linkedThreads.length > 0 && !this.initialized) {
       this.initialized = true;
 
       app.threads
@@ -58,7 +58,7 @@ export class LinkedThreadsCard
         }
         content={
           <div class="LinkedThreadsCard">
-            {thread.linkedThreads.length > 0 && (
+            {thread.linkedThreads.length > 0 ? (
               <div class="links-container">
                 {this.linkedThreads.map((t) => {
                   const discussionLink = getProposalUrlPath(
@@ -66,18 +66,18 @@ export class LinkedThreadsCard
                     `${t.identifier}-${slugify(t.title)}`
                   );
 
-                  return link('a', discussionLink, t.title);
+                  return <a href={discussionLink}>{t.title}</a>;
                 })}
               </div>
+            ) : (
+              <CWText type="b2" className="no-threads-text">
+                There are currently no linked threads.
+              </CWText>
             )}
             {allowLinking && (
               <CWButton
-                disabled={!this.initialized}
-                label={
-                  thread.linkedThreads?.length
-                    ? 'Link another thread'
-                    : 'Link threads'
-                }
+                buttonType="mini"
+                label="Link thread"
                 onclick={(e) => {
                   e.preventDefault();
                   app.modals.create({

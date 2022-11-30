@@ -662,7 +662,7 @@ class ViewThreadPage
                         )}
                         {showLinkedThreadOptions && (
                           <LinkedThreadsCard
-                            threadlId={thread.id}
+                            threadId={thread.id}
                             allowLinking={isAuthor || isAdminOrMod}
                           />
                         )}

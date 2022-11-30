@@ -20,6 +20,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type LinkedProposalAttrs = {
   chainEntity: ChainEntity;
@@ -67,14 +68,7 @@ export class LinkedProposalsCard
   view(vnode: m.Vnode<LinkedProposalsCardAttrs>) {
     const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
 
-    const headerText =
-      thread.chainEntities.length > 0 || thread.snapshotProposal?.length > 0
-        ? 'Proposals for Thread'
-        : app.chain
-        ? 'Connect an on-chain proposal?'
-        : 'Track the progress of this thread?';
-
-    if (!this.initialized && app.chain.meta.snapshot.length > 0) {
+    if (!this.initialized && thread.snapshotProposal?.length > 0) {
       this.initialized = true;
 
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
@@ -104,37 +98,47 @@ export class LinkedProposalsCard
       }/snapshot/${this.space.id}/${this.snapshot.id}`;
     }
 
+    const showSnapshot =
+      thread.snapshotProposal?.length > 0 && this.snapshotProposalsLoaded;
+
     return (
       <CWContentPageCard
-        header={headerText}
+        header="Linked Proposals"
         content={
-          app.chain.meta.snapshot.length > 0 &&
+          thread.snapshotProposal?.length > 0 &&
           !this.snapshotProposalsLoaded ? (
             <div class="spinner-container">
               <CWSpinner size="medium" />
             </div>
           ) : (
             <div class="LinkedProposalsCard">
-              <div class="links-container">
-                {thread.chainEntities.length > 0 && (
-                  <div class="linked-proposals">
-                    {thread.chainEntities.map((chainEntity) => {
-                      return (
-                        <LinkedProposal
-                          thread={thread}
-                          chainEntity={chainEntity}
-                        />
-                      );
-                    })}
-                  </div>
-                )}
-                {this.snapshotProposalsLoaded && (
-                  <a href={snapshotUrl}>Snapshot: {this.snapshot?.title}</a>
-                )}
-              </div>
+              {thread.chainEntities.length > 0 && showSnapshot ? (
+                <div class="links-container">
+                  {thread.chainEntities.length > 0 && (
+                    <div class="linked-proposals">
+                      {thread.chainEntities.map((chainEntity) => {
+                        return (
+                          <LinkedProposal
+                            thread={thread}
+                            chainEntity={chainEntity}
+                          />
+                        );
+                      })}
+                    </div>
+                  )}
+                  {showSnapshot && (
+                    <a href={snapshotUrl}>Snapshot: {this.snapshot?.title}</a>
+                  )}
+                </div>
+              ) : (
+                <CWText type="b2" className="no-proposals-text">
+                  There are currently no linked proposals.
+                </CWText>
+              )}
               {showAddProposalButton && (
                 <CWButton
-                  label="Connect a proposal"
+                  buttonType="mini"
+                  label="Link proposal"
                   onclick={(e) => {
                     e.preventDefault();
                     app.modals.create({

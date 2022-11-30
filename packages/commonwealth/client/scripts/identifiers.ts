@@ -214,10 +214,10 @@ export const chainEntityTypeToProposalName = (t: IChainEntityKind): string => {
       return 'Moloch Proposal';
     }
     if (app.chain.network === ChainNetwork.Compound) {
-      return 'Onchain Proposal';
+      return 'On-Chain Proposal';
     }
     if (app.chain.network === ChainNetwork.Aave) {
-      return 'Onchain Proposal';
+      return 'On-Chain Proposal';
     }
     if (app.chain.base === ChainBase.CosmosSDK) {
       return 'Proposal';
