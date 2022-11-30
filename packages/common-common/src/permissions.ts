@@ -18,6 +18,7 @@ export enum Action {
 
 const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
+  [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
   [Action.VIEW_REACTIONS, [Action.VIEW_COMMENTS, Action.VIEW_POLLS, Action.VIEW_THREADS]],
   [Action.CREATE_REACTION, [Action.VIEW_REACTIONS, Action.VIEW_COMMENTS, Action.VIEW_POLLS, Action.VIEW_THREADS]],
   [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS, Action.VIEW_POLLS, Action.VIEW_THREADS]],
