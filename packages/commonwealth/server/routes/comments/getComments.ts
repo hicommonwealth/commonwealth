@@ -1,8 +1,10 @@
+import { Action } from 'common-common/src/permissions';
 import { AppError, ServerError } from '../../util/errors';
 import validateChain from '../../util/validateChain';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { CommentAttributes } from '../../models/comment';
+import { checkReadPermitted } from '../../util/roles';
 
 type GetCommentsReq = {
   community_id: string;
@@ -23,6 +25,12 @@ const getComments = async (
   req: TypedRequestQuery<GetCommentsReq>,
   res: TypedResponse<GetThreadsResp>,
 ) => {
+  await checkReadPermitted(
+    models,
+    req.query.community_id,
+    Action.VIEW_COMMENTS,
+    req.user?.id,
+  );
   return success(res, []);
 };
 
