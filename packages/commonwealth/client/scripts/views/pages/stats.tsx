@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
@@ -14,7 +15,7 @@ import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 
-class StatsPage implements m.Component {
+class StatsPage extends ClassComponent {
   private data: any;
   private error: string;
   private requested: boolean;

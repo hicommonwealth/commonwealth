@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import moment from 'moment';
 import {
@@ -426,7 +427,7 @@ const executeSearch = (query: SearchQuery) => {
   m.route.set(`/search?${query.toUrlParams()}`);
 };
 
-export class SearchBar implements m.Component {
+export class SearchBar extends ClassComponent {
   private activeChain: string;
   private activeCommunity: string;
   private closeResults: () => void;

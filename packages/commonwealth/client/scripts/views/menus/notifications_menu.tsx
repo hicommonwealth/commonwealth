@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import Infinite from 'mithril-infinite';
 import { Button, PopoverMenu } from 'construct-ui';
 
@@ -14,7 +15,7 @@ import { NotificationRow } from '../pages/notifications/notification_row';
 
 const MAX_NOTIFS = 40;
 
-export class NotificationsMenu implements m.ClassComponent {
+export class NotificationsMenu extends ClassComponent {
   private init = false;
   private minChainEventsNotification = 0;
   private minDiscussionNotification = 0;
@@ -216,7 +217,7 @@ export class NotificationsMenu implements m.ClassComponent {
   }
 }
 
-export class NotificationsMenuPopover implements m.ClassComponent {
+export class NotificationsMenuPopover extends ClassComponent {
   view() {
     return m(PopoverMenu, {
       closeOnContentClick: true,

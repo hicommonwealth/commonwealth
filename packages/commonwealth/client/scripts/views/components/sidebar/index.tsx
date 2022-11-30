@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
 
@@ -15,8 +16,8 @@ import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
-import { CreateContentSidebar } from '../../menus/create_content_menu';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
+import { CreateContentSidebar } from '../../menus/create_content_menu';
 
 type SidebarAttrs = {
   onMobile: boolean;
@@ -27,7 +28,7 @@ export type SidebarMenuName =
   | 'create-content'
   | 'explore-communities';
 
-export class Sidebar implements m.ClassComponent<SidebarAttrs> {
+export class Sidebar extends ClassComponent<SidebarAttrs> {
   view(vnode: m.Vnode<SidebarAttrs>) {
     const { onMobile } = vnode.attrs;
     if (!app.sidebarMenu) app.sidebarMenu = 'default';

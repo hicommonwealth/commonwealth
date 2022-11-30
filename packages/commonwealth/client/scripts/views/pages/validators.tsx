@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/validators.scss';
 
@@ -35,7 +36,7 @@ type ValidatorAttrs = {
   info: ValidatorType;
 };
 
-class Validator implements m.ClassComponent<ValidatorAttrs> {
+class Validator extends ClassComponent<ValidatorAttrs> {
   view(vnode: m.Vnode<ValidatorAttrs>) {
     const { info } = vnode.attrs;
 
@@ -65,7 +66,7 @@ class Validator implements m.ClassComponent<ValidatorAttrs> {
   }
 }
 
-class ValidatorsPage implements m.ClassComponent {
+class ValidatorsPage extends ClassComponent {
   private validators;
   private totalStaked;
   private validatorsInitialized: boolean;

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 // import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
 // import { CodeResult } from 'near-api-js/lib/providers/provider';
@@ -27,7 +28,7 @@ type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 
 type CreateSputnikState = ChainFormState & { form: CreateSputnikForm };
 
-export class SputnikForm implements m.ClassComponent {
+export class SputnikForm extends ClassComponent {
   private state: CreateSputnikState = {
     saving: false,
     form: {

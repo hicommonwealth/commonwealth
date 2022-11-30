@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/edit_topic_modal.scss';
@@ -37,7 +38,7 @@ type EditTopicModalForm = {
   name: string;
 };
 
-export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
+export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
   private error: string;
   private form: EditTopicModalForm;
   private quillEditorState: QuillEditor;
@@ -171,6 +172,7 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
             onchange={() => {
               this.form.featuredInSidebar = !this.form.featuredInSidebar;
             }}
+            value=""
           />
           <CWCheckbox
             label="Featured in New Post"
@@ -178,6 +180,7 @@ export class EditTopicModal implements m.ClassComponent<EditTopicModalAttrs> {
             onchange={() => {
               this.form.featuredInNewPost = !this.form.featuredInNewPost;
             }}
+            value=""
           />
           {this.form.featuredInNewPost && (
             <QuillEditorComponent

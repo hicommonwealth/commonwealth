@@ -1,20 +1,16 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Icon, Icons, ListItem } from 'construct-ui';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/explore_sidebar.scss';
 
 import app from 'state';
-import { AddressInfo, ChainInfo, RoleInfo } from 'models';
-import User from '../widgets/user';
-import { CommunityLabel } from '../community_label';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWText } from '../component_kit/cw_text';
+import { ChainInfo } from 'models';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
 import { MenuItem } from '../component_kit/types';
 
-export class ExploreCommunitiesSidebar implements m.ClassComponent {
+export class ExploreCommunitiesSidebar extends ClassComponent {
   view() {
     const allCommunities = app.config.chains
       .getAll()
@@ -31,12 +27,15 @@ export class ExploreCommunitiesSidebar implements m.ClassComponent {
         return false;
       }
     };
+
     const starredCommunities = allCommunities.filter((c) => {
       return c instanceof ChainInfo && app.communities.isStarred(c.id);
     });
+
     const joinedCommunities = allCommunities.filter(
       (c) => isInCommunity(c) && !app.communities.isStarred(c.id)
     );
+
     const unjoinedCommunities = allCommunities.filter((c) => !isInCommunity(c));
 
     const communityList: MenuItem[] = [
@@ -76,8 +75,10 @@ export class ExploreCommunitiesSidebar implements m.ClassComponent {
         menuHeader={{
           label: 'Explore',
           onclick: async () => {
-            const sidebar = document.getElementsByClassName('ExploreCommunitiesSidebar');
-            sidebar[0].classList.add('onremove')
+            const sidebar = document.getElementsByClassName(
+              'ExploreCommunitiesSidebar'
+            );
+            sidebar[0].classList.add('onremove');
             setTimeout(() => {
               app.sidebarMenu = 'default';
               m.redraw();
