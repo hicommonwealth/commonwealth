@@ -8,6 +8,8 @@ import 'pages/overview/index.scss';
 import app from 'state';
 import { Thread, Topic } from 'models';
 import { navigateToSubpage } from 'app';
+import { Action } from 'common-common/src/permissions';
+import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { TopicSummaryRow } from './topic_summary_row';
@@ -18,7 +20,23 @@ import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 
 class OverviewPage extends ClassComponent {
+  private hideTopics: boolean;
   view() {
+    const activeAddressRoles = app.roles.getAllRolesInCommunity({
+      chain: app.activeChainId(),
+    });
+    const currentChainInfo = app.chain?.meta;
+    this.hideTopics =
+      !currentChainInfo ||
+      !activeAddressRoles ||
+      !isActiveAddressPermitted(
+        activeAddressRoles,
+        currentChainInfo,
+        Action.VIEW_TOPICS
+      );
+
+    if (this.hideTopics) return <PageLoading message="Topics Hidden" />;
+
     const allMonthlyThreads = app.threads.overviewStore.getAll();
 
     const topics = app.topics.getByCommunity(app.activeChainId());

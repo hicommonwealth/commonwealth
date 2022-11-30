@@ -171,6 +171,7 @@ class TopicsController {
       // TODO: Change to GET /topics
       const response = await $.get(`${app.serverUrl()}/bulkTopics`, {
         chain: chainId || app.activeChainId(),
+        jwt: app.user.jwt,
       });
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);

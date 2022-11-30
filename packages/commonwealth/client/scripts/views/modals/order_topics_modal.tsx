@@ -40,7 +40,7 @@ export class OrderTopicsModal extends ClassComponent {
     // If featured topics have not been re-ordered previously, they may lack
     // an order prop. We auto-generate a temporary order for these topics so
     // they may be properly shuffled.
-    if (!this.topics[0].order) {
+    if (!this.topics[0]?.order) {
       this.topics
         .sort((a, b) => a.name.localeCompare(b.name))
         .forEach((topic, idx) => {

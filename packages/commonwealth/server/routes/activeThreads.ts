@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { Action } from 'common-common/src/permissions';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
+import { checkReadPermitted } from '../util/roles';
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
@@ -15,6 +17,13 @@ const activeThreads = async (
 ): Promise<Response | void> => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new AppError(error));
+
+  await checkReadPermitted(
+    models,
+    chain.id,
+    Action.VIEW_THREADS,
+    req.user?.id
+  );
 
   let { threads_per_topic } = req.query;
   if (

@@ -1,8 +1,10 @@
+import { Action } from 'common-common/src/permissions';
 import { AppError, ServerError } from '../../util/errors';
 import validateChain from '../../util/validateChain';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { ThreadAttributes } from '../../models/thread';
+import { checkReadPermitted } from '../../util/roles';
 
 type GetThreadsReq = {
   community_id: string;
@@ -23,6 +25,13 @@ const getThreads = async (
   req: TypedRequestQuery<GetThreadsReq>,
   res: TypedResponse<GetThreadsResp>,
 ) => {
+  await checkReadPermitted(
+    models,
+    req.query.community_id,
+    Action.VIEW_THREADS,
+    req.user?.id
+  );
+
   return success(res, []);
 };
 

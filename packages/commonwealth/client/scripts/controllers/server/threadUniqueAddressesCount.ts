@@ -44,6 +44,7 @@ class ThreadUniqueAddressesCountController {
           })
         ),
         chain,
+        jwt: app.user.jwt,
       }),
     });
     for (const threadUniqueAddressesCnt of threadsUniqueAddressesCount) {

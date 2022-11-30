@@ -10,11 +10,13 @@ import {
 } from 'models';
 import {
   Action,
+  addPermission,
   BASE_PERMISSIONS,
   computePermissions,
   isPermitted,
   PermissionError,
   Permissions,
+  removePermission,
 } from 'common-common/src/permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { UserController } from './user';
@@ -78,6 +80,56 @@ export class RolesController {
       // handle state updates
       this.addRole(result.result.role);
     });
+  }
+
+  public async addPermissionToRole(options: {
+    chain: string;
+    permission: string;
+    action: Action;
+  }): Promise<void> {
+    const role = this.getCommunityRole(options);
+    if (!role) {
+      throw new Error('No role found for community');
+    }
+    let roleAllow = role.allow;
+    let roleDeny = role.deny;
+    if (!isPermitted(roleAllow, options.action)) {
+      roleAllow = addPermission(roleAllow, options.action);
+      roleDeny = removePermission(roleDeny, options.action);
+    }
+    await this.updateCommunityRole({
+      chain: options.chain,
+      permission: options.permission,
+      allow: roleAllow,
+      deny: roleDeny,
+    });
+  }
+
+  public async updateCommunityRole(options: {
+    chain: string;
+    permission: string;
+    allow: bigint;
+    deny: bigint;
+  }) {
+    try {
+      const result = await $.post('/api/updateCommunityRole', {
+        jwt: this.User.jwt,
+        chain_id: options.chain,
+        permission: options.permission,
+        allow: options.allow,
+        deny: options.deny,
+      });
+      if (result.status !== 'Success') {
+        throw new Error(result.message);
+      }
+      const chain_id = result.result.chain_id;
+      const name = result.result.name;
+      const allow = result.result.allow;
+      const deny = result.result.deny;
+      this._updateRole({chain: chain_id, permission: name, allow, deny});
+    } catch (err) {
+      throw new Error(`Failed to update community role: ${err}`);
+    }
   }
 
   public deleteRole(options: {
@@ -199,10 +251,26 @@ export class RolesController {
    * Filters all active roles by a specific chain/commnity
    * @param options A chain or a community ID
    */
-  public getAllRolesInCommunity(options: { chain?: string }) {
+  public getAllRolesInCommunity(options: { chain?: string }): RoleInfo[] {
     return this.roles.filter((r) => {
       return r.chain_id === options.chain;
     });
+  }
+
+  public getCommunityRole(options: { chain: string, permission: string }): RoleInfo {
+    return this.roles.find((r) => {
+      return r.chain_id === options.chain && r.permission === options.permission;
+    });
+  }
+
+  private _updateRole(options: { chain: string, permission: string, allow: bigint, deny: bigint }) {
+    const role = this.getCommunityRole(options);
+    this.removeRole((r) => r.id === role.id);
+    if (role) {
+      role.allow = options.allow;
+      role.deny = options.deny;
+    }
+    this.addRole(role);
   }
 
   /**

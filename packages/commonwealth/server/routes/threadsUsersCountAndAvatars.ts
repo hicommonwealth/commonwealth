@@ -4,6 +4,8 @@ import { groupBy } from 'lodash';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 import { sequelize } from '../database';
+import { checkReadPermitted } from '../util/roles';
+import { Action } from '../../../common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -53,6 +55,12 @@ const threadsUsersCountAndAvatar = async (
   res: Response
 ) => {
   const { chain, threads = [] } = req.body;
+  await checkReadPermitted(
+    models,
+    chain,
+    Action.VIEW_THREADS,
+    req.user?.id,
+  );
   try {
     if (chain && threads.length) {
       const root_ids = threads.map(({ root_id }) => root_id);

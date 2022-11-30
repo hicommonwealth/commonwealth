@@ -74,6 +74,7 @@ class RecentActivityController {
     const params = {
       chain: id || app.activeChainId(),
       threads_per_topic: 3,
+      jwt: app.user.jwt,
     };
 
     const response = await $.get(`${app.serverUrl()}/activeThreads`, params);

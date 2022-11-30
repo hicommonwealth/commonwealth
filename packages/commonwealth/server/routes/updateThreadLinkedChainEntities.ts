@@ -3,7 +3,8 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
+import { Action, PermissionError } from '../../../common-common/src/permissions';
 
 export const Errors = {
   NoThread: 'Cannot find thread',
@@ -19,6 +20,17 @@ const updateThreadLinkedChainEntities = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
+
+  const permission_error = await isAddressPermitted(
+    models,
+    req.user?.id,
+    chain.id,
+    Action.LINK_PROPOSAL_TO_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
+
   const { thread_id } = req.body;
 
   const thread = await models.Thread.findOne({

@@ -4,7 +4,8 @@ import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { AppError, ServerError } from '../util/errors';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
+import { Action, PermissionError } from '../../../common-common/src/permissions';
 
 export const Errors = {
   InsufficientPermissions:
@@ -33,6 +34,16 @@ const updateLinkedThreads = async (
 
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.LINK_THREAD_TO_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const userOwnedAddresses = await req.user.getAddresses();
   const userOwnedAddressIds = userOwnedAddresses

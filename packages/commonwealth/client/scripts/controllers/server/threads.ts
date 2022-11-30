@@ -576,6 +576,7 @@ class ThreadsController {
     const params = {
       chain: app.activeChainId(),
       ids,
+      jwt: app.user.jwt,
     };
     const response = await $.get(`${app.serverUrl()}/getThreads`, params);
     if (response.status !== 'Success') {
@@ -643,6 +644,7 @@ class ThreadsController {
       cutoff_date: this.listingStore.isInitialized(options)
         ? this.listingStore.getCutoffDate(options).toISOString()
         : moment().toISOString(),
+      jwt: app.user.jwt,
     };
     const topicId = app.topics.getByName(topicName, chain)?.id;
 

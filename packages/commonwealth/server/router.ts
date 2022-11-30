@@ -4,6 +4,7 @@ import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
+import { StatsDController } from 'common-common/src/statsd';
 import domain from './routes/domain';
 import status from './routes/status';
 import createAddress from './routes/createAddress';
@@ -63,6 +64,7 @@ import getProfileOld from './routes/getProfile';
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
 import setDefaultRole from './routes/setDefaultRole';
+import updateCommunityRole from './routes/updateCommunityRole';
 
 import getUploadSignature from './routes/getUploadSignature';
 import activeThreads from './routes/activeThreads';
@@ -156,7 +158,6 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import { StatsDController } from 'common-common/src/statsd';
 
 function setupRouter(
   app: Express,
@@ -520,6 +521,11 @@ function setupRouter(
     '/setDefaultRole',
     passport.authenticate('jwt', { session: false }),
     setDefaultRole.bind(this, models)
+  );
+  router.post(
+    '/updateCommunityRole',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityRole.bind(this, models)
   );
 
   // profiles

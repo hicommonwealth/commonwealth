@@ -7,6 +7,8 @@ import { debounce } from 'lodash';
 import 'pages/discussions/index.scss';
 
 import app from 'state';
+import { isActiveAddressPermitted } from 'controllers/server/roles';
+import { Action } from 'common-common/src/permissions';
 import { PageLoading } from '../loading';
 import { RecentListing } from './recent_listing';
 import Sublayout from '../../sublayout';
@@ -19,6 +21,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   private topicName: string;
   private stageName: string;
   private fetchingThreads: boolean;
+  private hideThreads: boolean;
 
   get scrollEle() {
     return document.getElementsByClassName('Body')[0];
@@ -67,10 +70,24 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   }
 
   view(vnode: m.Vnode<DiscussionPageAttrs>) {
+    const activeAddressRoles = app.roles.getAllRolesInCommunity({
+      chain: app.activeChainId(),
+    });
+    const currentChainInfo = app.chain?.meta;
+    this.hideThreads =
+      !currentChainInfo ||
+      !activeAddressRoles ||
+      !isActiveAddressPermitted(
+        activeAddressRoles,
+        currentChainInfo,
+        Action.VIEW_THREADS
+      );
+
     if (!app.chain || !app.chain.serverLoaded) {
       return <PageLoading />;
     }
-
+    if (this.hideThreads)
+      return <PageLoading message="Threads Available For Members Only" />;
     this.topicName = vnode.attrs.topic;
     this.stageName = m.route.param('stage');
 

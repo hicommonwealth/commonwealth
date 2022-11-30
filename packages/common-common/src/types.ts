@@ -63,6 +63,11 @@ export enum ChainType {
   Offchain = 'offchain',
 }
 
+export enum ThreadsViewable {
+  MembersOnly = 'members-only',
+  AllUsers = 'all-users',
+}
+
 export enum WalletId {
   Magic = 'magic',
   Polkadot = 'polkadot',

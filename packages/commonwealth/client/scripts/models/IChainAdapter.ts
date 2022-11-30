@@ -13,6 +13,8 @@ import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
 import { Account, NodeInfo, ProposalModule } from '.';
 import ChainInfo from './ChainInfo';
 import { WebSocketController } from '../controllers/server/socket';
+import { isActiveAddressPermitted } from '../controllers/server/roles';
+import { Action } from '../../../../common-common/src/permissions';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -65,7 +67,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         }),
       ]);
     } else {
-      [response, ] = await Promise.all([
+      [response] = await Promise.all([
         $.get(`${this.app.serverUrl()}/bulkOffchain`, {
           chain: this.id,
           community: null,
@@ -105,18 +107,26 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // add community roles to the chain's roles
     this.meta.communityRoles = communityRoles;
 
-    await this.app.recentActivity.getRecentTopicActivity(this.id);
+    if (
+      isActiveAddressPermitted(
+        this.app.roles.getAllRolesInCommunity({ chain: this.id }),
+        this.meta,
+        Action.VIEW_THREADS
+      )
+    ) {
+      await this.app.recentActivity.getRecentTopicActivity(this.id);
+
+      if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
+        this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
+          threads: this.app.threads.listingStore.getPinnedThreads(),
+          chain: this.meta.id,
+          pinned: true,
+        });
+      }
+    }
 
     // parse/save the chat channels
     await this.app.socket.chatNs.refreshChannels(JSON.parse(chatChannels));
-
-    if (!this.app.threadUniqueAddressesCount.getInitializedPinned()) {
-      this.app.threadUniqueAddressesCount.fetchThreadsUniqueAddresses({
-        threads: this.app.threads.listingStore.getPinnedThreads(),
-        chain: this.meta.id,
-        pinned: true,
-      });
-    }
 
     this._serverLoaded = true;
     return true;
