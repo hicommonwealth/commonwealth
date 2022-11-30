@@ -195,9 +195,7 @@ type ContentPageCardAttrs = {
   header: string;
 };
 
-export class CWContentPageCard
-  implements m.ClassComponent<ContentPageCardAttrs>
-{
+export class CWContentPageCard extends ClassComponent<ContentPageCardAttrs> {
   view(vnode: m.Vnode<ContentPageCardAttrs>) {
     const { content, header } = vnode.attrs;
 
