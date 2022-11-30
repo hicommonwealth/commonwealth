@@ -5,13 +5,13 @@ import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_radio_group.scss';
 
-import { CWRadioButton, RadioButton } from './cw_radio_button';
+import { CWRadioButton, RadioButtonType } from './cw_radio_button';
 import { ComponentType } from './types';
 
 type RadioGroupAttrs = {
   name: string;
   onchange: (e?: any) => void;
-  options: Array<RadioButton>;
+  options: Array<RadioButtonType>;
   toggledOption: string;
 };
 export class CWRadioGroup extends ClassComponent<RadioGroupAttrs> {
