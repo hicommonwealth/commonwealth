@@ -5,7 +5,7 @@ import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import fs from 'fs';
-
+import { StatsDController } from 'common-common/src/statsd';
 import Rollbar from 'rollbar';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
@@ -22,7 +22,6 @@ import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 const log = factory.getLogger(formatFilename(__filename));
-
 import ViewCountCache from './server/util/viewCountCache';
 import IdentityFetchCache, {
   IdentityFetchCacheNew,
@@ -43,7 +42,6 @@ import setupChainEventListeners from './server/scripts/setupChainEventListeners'
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import StatsDController from './server/util/statsd';
 import startSnapshotConsumer from './server/eventHandlers/snapshotConsumer';
 
 // set up express async error handling hack

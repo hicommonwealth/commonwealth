@@ -2,13 +2,13 @@ import {CWEvent, SubstrateTypes} from 'chain-events/src';
 import * as WebSocket from 'ws';
 import {SubscriberSessionAsPromised} from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { StatsDController, ProjectTag } from 'common-common/src/statsd';
 import {
   getRabbitMQConfig,
   RabbitMQController,
   RascalSubscriptions, RmqCWEvent
 } from 'common-common/src/rabbitmq';
 import { ChainBase } from 'common-common/src/types';
-import StatsDController from '../util/statsd';
 import { RABBITMQ_URI } from "../config";
 import models from '../database';
 import EntityArchivalHandler from '../eventHandlers/entityArchival';
@@ -90,6 +90,7 @@ const setupChainEventListeners = async (wss: WebSocket.Server):
         network: event.network,
         blockNumber: `${event.blockNumber}`,
         kind: event.data.kind,
+        project: ProjectTag.Commonwealth,
       }
     );
     let prevResult = null;

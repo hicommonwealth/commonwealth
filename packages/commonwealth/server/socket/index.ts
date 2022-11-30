@@ -5,15 +5,15 @@ import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
+import { createChatNamespace } from './createChatNamespace';
 import {
   ConnectionTimeoutError,
   createClient,
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
 } from 'redis';
-
+import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { createChatNamespace } from './createChatNamespace';
 import {
   getRabbitMQConfig,
   RabbitMQController,
@@ -28,7 +28,6 @@ import {
   publishToSnapshotRoom,
 } from './createNamespace';
 import { JWT_SECRET, REDIS_URL, VULTR_IP, RABBITMQ_URI } from '../config';
-import StatsDController from '../util/statsd';
 import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));

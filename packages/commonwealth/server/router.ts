@@ -3,6 +3,7 @@ import passport from 'passport';
 import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { StatsDController } from 'common-common/src/statsd';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -132,7 +133,6 @@ import updateChainCategory from './routes/updateChainCategory';
 import updateChainCustomDomain from './routes/updateChainCustomDomain';
 import updateChainPriority from './routes/updateChainPriority';
 import migrateEvent from './routes/migrateEvent';
-
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
 import bulkEntities from './routes/bulkEntities';
@@ -160,7 +160,6 @@ import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 import getSnapshotProposal from './routes/getSnapshotProposal';
-import StatsDController from './util/statsd';
 
 function setupRouter(
   app: Express,
