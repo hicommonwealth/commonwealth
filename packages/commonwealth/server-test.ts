@@ -18,7 +18,7 @@ import {
 } from 'common-common/src/types';
 import { TokenBalanceCache, BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 
-import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
+import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
 import models from './server/database';
@@ -309,6 +309,17 @@ const resetServer = (debug = false): Promise<void> => {
         object_id: `user-${drew.id}`,
         is_active: true,
       });
+      await models.SnapshotProposal.create({
+        id: 1,
+        title: 'Test Snapshot Proposal',
+        body: 'This is a test proposal',
+        choices: ['Yes', 'No'],
+        space: 'test space',
+        event: 'proposal/created',
+        start: new Date().toString(),
+        expire: new Date(new Date().getTime() + 100 * 24 * 60 * 60 * 1000).toString(),
+      })
+
 
       if (debug) console.log('Database reset!');
     } catch (error) {
