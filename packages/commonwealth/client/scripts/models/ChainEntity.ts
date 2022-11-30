@@ -49,6 +49,19 @@ class ChainEntity {
     title,
     author,
     completed,
+  }: {
+    chain: string,
+    type: IChainEntityKind,
+    typeId: string,
+    chainEvents: any[],
+    createdAt: moment.MomentInput,
+    updatedAt: moment.MomentInput,
+    threadId: number,
+    threadTitle: string,
+    author: string,
+    id?: number,
+    title?: string,
+    completed?: boolean,
   }) {
     this.id = id;
     this.chain = chain;
