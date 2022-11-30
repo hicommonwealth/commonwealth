@@ -74,21 +74,22 @@ export class LinkedProposalsCard
         ? 'Connect an on-chain proposal?'
         : 'Track the progress of this thread?';
 
-    if (!this.initialized) {
+    if (!this.initialized && app.chain.meta.snapshot.length > 0) {
       this.initialized = true;
 
       loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
         for (const { space, proposals } of data) {
-          const matching_snapshot = proposals.find(
+          const matchingSnapshot = proposals.find(
             (sn) => sn.id === thread.snapshotProposal
           );
 
-          if (matching_snapshot) {
-            this.snapshot = matching_snapshot;
+          if (matchingSnapshot) {
+            this.snapshot = matchingSnapshot;
             this.space = space;
             break;
           }
         }
+
         this.snapshotProposalsLoaded = true;
         this.initialized = false;
         m.redraw();
@@ -107,12 +108,13 @@ export class LinkedProposalsCard
       <CWContentPageCard
         header={headerText}
         content={
-          !(snapshotUrl && this.snapshot?.title) ? (
+          app.chain.meta.snapshot.length > 0 &&
+          !this.snapshotProposalsLoaded ? (
             <div class="spinner-container">
               <CWSpinner size="medium" />
             </div>
           ) : (
-            <div class="linked-proposals-card-content">
+            <div class="LinkedProposalsCard">
               <div class="links-container">
                 {thread.chainEntities.length > 0 && (
                   <div class="linked-proposals">
@@ -126,7 +128,9 @@ export class LinkedProposalsCard
                     })}
                   </div>
                 )}
-                <a href={snapshotUrl}>Snapshot: {this.snapshot?.title}</a>
+                {this.snapshotProposalsLoaded && (
+                  <a href={snapshotUrl}>Snapshot: {this.snapshot?.title}</a>
+                )}
               </div>
               {showAddProposalButton && (
                 <CWButton

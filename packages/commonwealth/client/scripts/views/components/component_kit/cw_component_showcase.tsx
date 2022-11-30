@@ -74,7 +74,7 @@ export class ComponentShowcase implements m.ClassComponent {
           <CWContentPageCard
             header="Information"
             content={
-              <div style="padding: 8px;">
+              <div style="padding: 16px;">
                 <CWText>Content page card content</CWText>
               </div>
             }

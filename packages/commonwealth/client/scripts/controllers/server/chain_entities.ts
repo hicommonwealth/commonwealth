@@ -209,7 +209,7 @@ class ChainEntityController {
       data: {
         jwt: app.user.jwt,
         unique_id: uniqueIdentifier,
-        title: title,
+        title,
         chain: app.activeChainId(),
       },
       success: (response) => {

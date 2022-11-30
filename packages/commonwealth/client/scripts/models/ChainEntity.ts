@@ -86,6 +86,7 @@ class ChainEntity {
       author,
       completed,
     } = json;
+
     return new ChainEntity({
       chain,
       type,
