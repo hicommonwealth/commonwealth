@@ -179,7 +179,6 @@ const ConfirmInviteModal: m.Component<
                                     $(e.target).trigger('modalexit');
                                   }
                                   const chainId = invites[location].chain_id;
-                                  console.log({ chainId });
                                   // if private community, re-init app
                                   m.route.set(`/${chainId}`);
                                   notifySuccess(
