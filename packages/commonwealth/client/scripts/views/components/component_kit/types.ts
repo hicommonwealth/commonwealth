@@ -1,3 +1,4 @@
+import { ChainInfo } from 'models';
 import { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
@@ -31,6 +32,7 @@ export enum ComponentType {
   ProgressBar = 'ProgressBar',
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
+  SidebarMenu = 'SidebarMenu',
   Spinner = 'Spinner',
   Tab = 'Tab',
   TabBar = 'TabBar',
@@ -49,9 +51,9 @@ export type StyleAttrs = {
   className?: string;
 };
 
-type DividerMenuItem = { type: 'divider' };
+export type DividerMenuItem = { type: 'divider' };
 
-type HeaderMenuItem = { type: 'header'; label: string };
+export type HeaderMenuItem = { type: 'header'; label: string };
 
 export type DefaultMenuItem = {
   disabled?: boolean;
@@ -59,16 +61,22 @@ export type DefaultMenuItem = {
   iconRight?: IconName;
   isSecondary?: boolean;
   label: string;
-  onclick?: () => void;
+  onclick?: (e?) => void;
   type?: 'default';
 };
 
-type NotificationMenuItem = {
+export type CommunityMenuItem = {
+  community: ChainInfo;
+  label?: string;
+  type: 'community';
+};
+
+export type NotificationMenuItem = {
   hasUnreads: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string;
-  onclick?: () => void;
+  onclick: (e?) => void;
   type: 'notification';
 };
 
@@ -76,4 +84,5 @@ export type MenuItem =
   | DividerMenuItem
   | HeaderMenuItem
   | DefaultMenuItem
-  | NotificationMenuItem;
+  | NotificationMenuItem
+  | CommunityMenuItem;

@@ -32,6 +32,7 @@ export class InvitesMenu implements m.ClassComponent {
   view() {
     return (
       <CWMobileMenu
+        className="InvitesMenu"
         menuHeader={{
           label: 'Invites',
           onclick: () => {
