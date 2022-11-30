@@ -28,6 +28,7 @@ const renderCommunity = (item: ChainInfo) => {
       onclick={(e) => {
         e.preventDefault();
         e.stopPropagation();
+        app.sidebarMenu = 'default';
         m.route.set(item.id ? `/${item.id}` : '/');
       }}
       contentRight={
