@@ -21,50 +21,45 @@ const renderCommunity = (item: ChainInfo) => {
   const roles: RoleInfo[] = [];
   roles.push(...app.roles.getAllRolesInCommunity({ chain: item.id }));
 
-  return (
-    <ListItem
-      class={app.communities.isStarred(item.id) ? 'starred' : ''}
-      label={<CommunityLabel community={item} />}
-      selected={app.activeChainId() === item.id}
-      onclick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        app.sidebarMenu = 'default';
-        m.route.set(item.id ? `/${item.id}` : '/');
-      }}
-      contentRight={
-        app.isLoggedIn() &&
-        roles.length > 0 && (
-          <div
-            class="community-star-toggle"
-            onclick={async (e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              await app.communities.setStarred(item.id);
-              m.redraw();
-            }}
-          >
-            {roles.map((role) => {
-              // TODO: sometimes address_chain is null here -- why??
-              return m(User, {
-                avatarSize: 18,
-                avatarOnly: true,
-                user: new AddressInfo(
-                  role.address_id,
-                  role.address,
-                  role.address_chain || role.chain_id,
-                  null
-                ),
-              });
-            })}
-            <div class="star-icon">
-              <Icon name={Icons.STAR} key={item.id} />
-            </div>
-          </div>
-        )
-      }
-    />
-  );
+  return m(ListItem, {
+    class: app.communities.isStarred(item.id) ? 'starred' : '',
+    label: <CommunityLabel community={item} />,
+    selected: app.activeChainId() === item.id,
+    onclick: (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      app.sidebarMenu = 'default';
+      m.route.set(item.id ? `/${item.id}` : '/');
+    },
+    contentRight: app.isLoggedIn() && roles.length > 0 && (
+      <div
+        class="community-star-toggle"
+        onclick={async (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          await app.communities.setStarred(item.id);
+          m.redraw();
+        }}
+      >
+        {roles.map((role) => {
+          // TODO: sometimes address_chain is null here -- why??
+          return m(User, {
+            avatarSize: 18,
+            avatarOnly: true,
+            user: new AddressInfo(
+              role.address_id,
+              role.address,
+              role.address_chain || role.chain_id,
+              null
+            ),
+          });
+        })}
+        <div class="star-icon">
+          {m(Icon, { name: Icons.STAR, key: item.id })}
+        </div>
+      </div>
+    ),
+  });
 };
 
 class CWSidebarMenuItem extends ClassComponent<MenuItem> {

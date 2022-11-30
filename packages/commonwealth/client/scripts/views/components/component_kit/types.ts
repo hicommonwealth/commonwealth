@@ -51,16 +51,16 @@ export type StyleAttrs = {
   className?: string;
 };
 
-export type DividerMenuItem = { type: 'divider' };
+export type DividerMenuItem = { type?: 'divider' };
 
-type HeaderMenuItem = { type?: 'header'; label: string };
+type HeaderMenuItem = { type?: 'header'; label?: string };
 
 export type DefaultMenuItem = {
   disabled?: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
   isSecondary?: boolean;
-  label: string;
+  label?: string;
   onclick?: (e?: Event) => void;
   type?: 'default';
 };
@@ -69,7 +69,7 @@ type NotificationMenuItem = {
   hasUnreads?: boolean;
   iconLeft?: IconName;
   iconRight?: IconName;
-  label: string;
+  label?: string;
   onclick?: (e?: MouseEvent) => void;
   type?: 'notification';
 };
