@@ -12,11 +12,10 @@ import {
   ChainCategoryType,
   ChainNetwork,
 } from 'common-common/src/types';
-import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo } from 'models';
+import { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
   addPermission,
@@ -33,13 +32,10 @@ import {
 import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ChainMetadataRowsAttrs = {
-  admins: Array<RoleInstanceWithPermissionAttributes>;
+  admins: Array<RoleInfo>;
   chain?: ChainInfo;
   mods: any;
-  onRoleUpdate: (
-    oldRole: RoleInstanceWithPermissionAttributes,
-    newRole: RoleInstanceWithPermissionAttributes
-  ) => void;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   onSave: () => void;
 };
 

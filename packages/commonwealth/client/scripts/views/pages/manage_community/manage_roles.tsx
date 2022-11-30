@@ -7,9 +7,8 @@ import $ from 'jquery';
 import 'pages/manage_community/manage_roles.scss';
 
 import app from 'state';
-import { RoleInstanceWithPermissionAttributes } from 'server/util/roles';
 import User from 'views/components/widgets/user';
-import { AddressInfo } from 'models';
+import { AddressInfo, RoleInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -17,11 +16,8 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ManageRoleRowAttrs = {
   label: string;
-  onRoleUpdate: (
-    oldRole: RoleInstanceWithPermissionAttributes,
-    newRole: RoleInstanceWithPermissionAttributes
-  ) => void;
-  roledata?: Array<RoleInstanceWithPermissionAttributes>;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  roledata?: Array<RoleInfo>;
 };
 
 export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
