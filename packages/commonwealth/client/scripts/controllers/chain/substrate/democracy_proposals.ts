@@ -7,7 +7,6 @@ import { IApp } from 'state';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateDemocracyProposal from './democracy_proposal';
-import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateDemocracyProposals extends ProposalModule<
   ApiPromise,
@@ -78,20 +77,6 @@ class SubstrateDemocracyProposals extends ProposalModule<
           if (proposal) proposal.update(event);
         }
       }
-    );
-
-    // fetch proposals from chain
-    const events = await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchDemocracyProposals(this.app.chain.block.height)
-    );
-
-    const hashes = events.map((e) => e.data.proposalHash);
-    await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
     );
 
     const lastTabledWasExternal = await ChainInfo.api.query.democracy.lastTabledWasExternal();
