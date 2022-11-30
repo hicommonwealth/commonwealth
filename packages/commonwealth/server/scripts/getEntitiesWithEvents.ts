@@ -5,6 +5,7 @@ import {ChainBase, ChainNetwork} from 'common-common/src/types';
 
 async function main() {
   await models.sequelize.transaction(async (t) => {
+    console.log("Transaction started");
     await models.sequelize.query(`
       CREATE TABLE IF NOT EXISTS entities_creation_events
       (
@@ -16,6 +17,7 @@ async function main() {
           event_data jsonb
       );
   `, { transaction: t });
+    console.log("Table created")
 
     // selects all chain-entities and the events that are in the first block associated with the entity
     let result = <any>(await models.sequelize.query(`
@@ -27,6 +29,8 @@ async function main() {
       WHERE CE.entity_id IS NOT NULL
         AND CE.block_number = (SELECT MIN(block_number) FROM "ChainEvents" CE2 WHERE CE2.entity_id = CE.entity_id);
   `, {type: QueryTypes.SELECT, raw: true, transaction: t}));
+
+    console.log("Num raw results", result.length);
 
     // remove the entity/event pairs where the event is not an 'entity creation' event
     result = result.filter((row) => {
@@ -58,6 +62,8 @@ async function main() {
       }
     }
 
+    console.log("Filtered result length:", final_result.length);
+
     let query = `INSERT INTO entities_creation_events (entity_id, chain, type, type_id, event_id) VALUES`
     let index = 0;
     for (const row of final_result) {
@@ -66,7 +72,9 @@ async function main() {
       if (index !== final_result.length) query += ',';
     }
     query += `;`
+
     await models.sequelize.query(query, { type: QueryTypes.INSERT, raw: true, transaction: t});
+    console.log("Inserted into entities_creation_events_table");
 
     await models.sequelize.query(`
       UPDATE entities_creation_events
@@ -74,6 +82,9 @@ async function main() {
       FROM "ChainEvents" CE
       WHERE event_id = CE.id;
     `, {transaction: t});
+
+    console.log("Updated event_data");
+    console.log("Transaction finished");
   });
 }
 
