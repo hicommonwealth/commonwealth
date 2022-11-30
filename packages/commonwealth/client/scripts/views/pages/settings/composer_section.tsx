@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/settings/composer_section.scss';
 
@@ -10,7 +11,7 @@ import SettingsController from 'controllers/app/settings';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 
-export class ComposerSection implements m.ClassComponent {
+export class ComposerSection extends ClassComponent {
   private selection: string;
 
   oninit() {

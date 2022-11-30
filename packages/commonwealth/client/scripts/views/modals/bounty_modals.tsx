@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/bounty_modals.scss';
 
@@ -20,7 +21,7 @@ type BountyModalAttrs = {
   bountyId: number;
 };
 
-export class ApproveBountyModal implements m.ClassComponent<BountyModalAttrs> {
+export class ApproveBountyModal extends ClassComponent<BountyModalAttrs> {
   private approvals: number;
 
   view(vnode: m.Vnode<BountyModalAttrs>) {
@@ -76,7 +77,7 @@ export class ApproveBountyModal implements m.ClassComponent<BountyModalAttrs> {
   }
 }
 
-export class ProposeCuratorModal implements m.ClassComponent<BountyModalAttrs> {
+export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
   private approvals: number;
   private curator: string;
   private fee: number;
@@ -156,7 +157,7 @@ export class ProposeCuratorModal implements m.ClassComponent<BountyModalAttrs> {
   }
 }
 
-export class AwardBountyModal implements m.ClassComponent<BountyModalAttrs> {
+export class AwardBountyModal extends ClassComponent<BountyModalAttrs> {
   private recipient: string;
 
   view(vnode: m.Vnode<BountyModalAttrs>) {
@@ -212,7 +213,7 @@ export class AwardBountyModal implements m.ClassComponent<BountyModalAttrs> {
   }
 }
 
-export class ExtendExpiryModal implements m.ClassComponent<BountyModalAttrs> {
+export class ExtendExpiryModal extends ClassComponent<BountyModalAttrs> {
   private remark: string;
 
   view(vnode: m.Vnode<BountyModalAttrs>) {

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/feedback_modal.scss';
@@ -13,7 +14,7 @@ import {
   ValidationStatus,
 } from '../components/component_kit/cw_validation_text';
 
-export class FeedbackModal implements m.ClassComponent {
+export class FeedbackModal extends ClassComponent {
   private feedbackText: string;
   private message: string;
   private sending: boolean;

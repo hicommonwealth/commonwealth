@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 
@@ -27,7 +28,7 @@ type LinkedProposalAttrs = {
   thread: Thread;
 };
 
-class LinkedProposal implements m.ClassComponent<LinkedProposalAttrs> {
+class LinkedProposal extends ClassComponent<LinkedProposalAttrs> {
   view(vnode: m.Vnode<LinkedProposalAttrs>) {
     const { thread, chainEntity } = vnode.attrs;
 
@@ -57,14 +58,11 @@ type LinkedProposalsCardAttrs = {
   thread: Thread;
 };
 
-export class LinkedProposalsCard
-  implements m.ClassComponent<LinkedProposalsCardAttrs>
-{
+export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs> {
   private initialized: boolean;
   private snapshot: SnapshotProposal;
   private snapshotProposalsLoaded: boolean;
   private space: SnapshotSpace;
-
   view(vnode: m.Vnode<LinkedProposalsCardAttrs>) {
     const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
 

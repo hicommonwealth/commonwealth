@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/snapshot/multiple_snapshots_page.scss';
 
@@ -61,9 +62,7 @@ type MultipleSnapshotsPageAttrs = {
   proposal?: Thread;
 };
 
-class MultipleSnapshotsPage
-  implements m.ClassComponent<MultipleSnapshotsPageAttrs>
-{
+class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
   private snapshot_spaces: string[];
   private spaces_metadata: Array<{
     space: SnapshotSpace;

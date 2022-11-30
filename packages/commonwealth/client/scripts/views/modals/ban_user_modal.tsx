@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import { Profile } from 'models';
@@ -12,7 +13,7 @@ type BanUserModalAttrs = {
   profile: Profile;
 };
 
-export class BanUserModal implements m.ClassComponent<BanUserModalAttrs> {
+export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
   view(vnode: m.VnodeDOM<BanUserModalAttrs, this>) {
     const { address } = vnode.attrs.profile;
 

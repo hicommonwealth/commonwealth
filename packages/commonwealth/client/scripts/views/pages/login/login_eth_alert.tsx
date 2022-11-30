@@ -1,12 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/login/login_eth_alert.scss';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
 
-export class LoginEthAlert implements m.ClassComponent {
+export class LoginEthAlert extends ClassComponent {
   view() {
     return (
       <div class="LoginEthAlert">
