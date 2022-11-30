@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { ChainNetwork } from 'common-common/src/types';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
