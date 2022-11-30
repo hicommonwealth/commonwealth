@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action } from 'common-common/src/permissions';
+import { AppError, ServerError } from '../util/errors';
 import { DB } from '../models';
 import { ReactionInstance } from '../models/reaction';
-import { AppError, ServerError } from '../util/errors';
+import { checkReadPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -23,7 +25,13 @@ const reactionsCounts = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { active_address, thread_ids, comment_ids, proposal_ids } = req.body;
+  const { active_address, thread_ids, comment_ids, proposal_ids, chain_id } = req.body;
+  await checkReadPermitted(
+    models,
+    chain_id,
+    Action.VIEW_REACTIONS,
+    req.user?.id
+  );
   try {
     if (thread_ids || comment_ids || proposal_ids) {
       let countField = 'thread_id';

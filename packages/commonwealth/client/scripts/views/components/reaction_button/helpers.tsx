@@ -65,6 +65,8 @@ export const fetchReactionsByPost = async (post: Post) => {
     thread_id,
     comment_id,
     proposal_id,
+    chain_id: app.activeChainId(),
+    jwt: app.user.jwt,
   });
 
   return result;

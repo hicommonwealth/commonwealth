@@ -158,8 +158,6 @@ import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 import StatsDController from './util/statsd';
 
-
-
 function setupRouter(
   app: Express,
   models: DB,
@@ -172,15 +170,15 @@ function setupRouter(
   const router = express.Router();
 
   router.use((req, res, next) => {
-    StatsDController.get().increment('cw.path.called', { path: req.path.slice(1) });
+    StatsDController.get().increment('cw.path.called', {
+      path: req.path.slice(1),
+    });
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
-      StatsDController.get().histogram(
-        `cw.path.latency`,
-        latency,
-        { path: req.path.slice(1) }
-      );
+      StatsDController.get().histogram(`cw.path.latency`, latency, {
+        path: req.path.slice(1),
+      });
     });
     next();
   });
@@ -438,6 +436,8 @@ function setupRouter(
   router.get('/viewReactions', viewReactions.bind(this, models));
   router.get('/bulkReactions', bulkReactions.bind(this, models));
   router.post('/reactionsCounts', reactionsCounts.bind(this, models));
+
+  // Threads UsersCounts
   router.post(
     '/threadsUsersCountAndAvatars',
     threadsUsersCountAndAvatars.bind(this, models)
@@ -809,7 +809,6 @@ function setupRouter(
   router.get('/communities', getCommunities.bind(this, models));
   router.get('/profile', getProfile.bind(this, models));
   router.get('/profiles', getProfiles.bind(this, models));
-
 
   app.use('/api', router);
 }

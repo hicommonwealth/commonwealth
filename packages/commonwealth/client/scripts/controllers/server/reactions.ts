@@ -77,7 +77,7 @@ class ReactionsController {
   }
 
   public async refresh(post: any, chainId: string) {
-    const options = { chain: chainId };
+    const options = { chain: chainId, jwt: app.user.jwt };
     // TODO: ensure identifier vs id use is correct; see also create method
     if (post instanceof Thread)
       options['thread_id'] = (post as Thread).id;

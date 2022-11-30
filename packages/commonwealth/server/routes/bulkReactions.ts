@@ -1,13 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import { uniqBy } from 'lodash';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
+import { Action } from 'common-common/src/permissions';
 import { AppError, ServerError } from '../util/errors';
+import { DB } from '../models';
+import { checkReadPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 const bulkReactions = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  const { thread_id, proposal_id, comment_id } = req.query;
+  const { thread_id, proposal_id, comment_id, chain_id } = req.query;
+  await checkReadPermitted(
+    models,
+    chain_id,
+    Action.VIEW_REACTIONS,
+    req.user?.id,
+  );
   let reactions = [];
   try {
     if (thread_id || proposal_id || comment_id) {

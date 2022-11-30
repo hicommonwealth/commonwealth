@@ -1,8 +1,9 @@
-import { AppError, ServerError } from '../../util/errors';
+import { Action } from 'common-common/src/permissions';
 import validateChain from '../../util/validateChain';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { ReactionAttributes } from '../../models/reaction';
+import { checkReadPermitted } from '../../util/roles';
 
 type GetReactionReq = {
   community_id: string;
@@ -24,6 +25,12 @@ const getReactions = async (
   req: TypedRequestQuery<GetReactionReq>,
   res: TypedResponse<GetReactionsResp>,
 ) => {
+  await checkReadPermitted(
+    models,
+    req.query.community_id,
+    Action.VIEW_REACTIONS,
+    req.user?.id,
+  );
   return success(res, []);
 };
 

@@ -1,7 +1,9 @@
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action } from 'common-common/src/permissions';
+import { checkReadPermitted } from '../util/roles';
+import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 
@@ -14,6 +16,13 @@ export const Errors = {
 const viewReactions = async (models: DB, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new AppError(error));
+
+  await checkReadPermitted(
+    models,
+    chain.id,
+    Action.VIEW_REACTIONS,
+    req.user?.id,
+  );
 
   if (!req.query.thread_id && !req.query.comment_id) {
     return next(new AppError(Errors.NoCommentOrThreadId));

@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from '../util/errors';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -30,6 +32,16 @@ const deleteReaction = async (models: DB, banCache: BanCache, req: Request, res:
       },
       include: [ models.Address ],
     });
+
+    const permission_error = await isAddressPermitted(
+      models,
+      reaction.Address.id,
+      reaction.chain,
+      Action.DELETE_REACTION,
+    );
+    if (permission_error === PermissionError.NOT_PERMITTED) {
+      return next(new AppError(PermissionError.NOT_PERMITTED));
+    }
 
     // check if author can delete react
     if (reaction) {

@@ -605,6 +605,8 @@ class ThreadsController {
       data: JSON.stringify({
         thread_ids: threads.map((thread) => thread.id),
         active_address: app.user.activeAccount?.address,
+        chain_id: app.activeChainId(),
+        jwt: app.user.jwt,
       }),
     });
     for (const rc of reactionCounts) {
