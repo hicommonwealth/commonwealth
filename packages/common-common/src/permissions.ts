@@ -17,39 +17,9 @@ export enum Action {
   DELETE_THREAD = 15,
 }
 
-export type Permissions = bigint;
-
-export enum PermissionError {
-  NOT_PERMITTED = 'Action not permitted',
-}
-
-export function addPermission(
-  permission: Permissions,
-  actionNumber: number
-): Permissions {
-  let result = BigInt(permission);
-  // eslint-disable-next-line no-bitwise
-  result |= BigInt(1) << BigInt(actionNumber);
-  return result;
-}
-
-export function removePermission(
-  permission: Permissions,
-  actionNumber: number
-): Permissions {
-  let result = BigInt(permission);
-  // eslint-disable-next-line no-bitwise
-  result &= ~(BigInt(1) << BigInt(actionNumber));
-  return result;
-}
-
-export const BASE_PERMISSIONS: Permissions =
-  addPermission(BigInt(0), Action.CREATE_THREAD) |
-  addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
-  addPermission(BigInt(0), Action.VIEW_THREADS);
-
-const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<Action, Action[]>([
+const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
+  [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
   [Action.VIEW_REACTIONS, [Action.VIEW_COMMENTS, Action.VIEW_POLLS, Action.VIEW_THREADS]],
   [Action.CREATE_REACTION, [Action.VIEW_REACTIONS, Action.DELETE_REACTION, Action.VIEW_COMMENTS, Action.VIEW_POLLS, Action.VIEW_THREADS]],
   [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS, Action.VIEW_POLLS, Action.VIEW_THREADS]],
@@ -65,6 +35,55 @@ const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<Action, Action[]>([
   [Action.DELETE_THREAD, [Action.CREATE_REACTION, Action.VIEW_REACTIONS, Action.DELETE_REACTION, Action.CREATE_COMMENT, Action.VIEW_COMMENTS, Action.EDIT_COMMENT, Action.DELETE_COMMENT, Action.CREATE_POLL, Action.VIEW_POLLS, Action.VOTE_ON_POLLS, Action.VIEW_THREADS, Action.CREATE_THREAD, Action.EDIT_THREAD]],
 ]);
 
+export type Permissions = bigint;
+
+export enum PermissionError {
+  NOT_PERMITTED = 'Action not permitted',
+}
+
+// Must be Used to Add Permissions
+export function addPermission(
+  permission: Permissions,
+  actionNumber: number
+): Permissions {
+  let result = BigInt(permission);
+  // eslint-disable-next-line no-bitwise
+  result |= BigInt(1) << BigInt(actionNumber);
+  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
+  if (implicitActions) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      // eslint-disable-next-line no-bitwise
+      result |= BigInt(1) << BigInt(Number(implicitActions[i]));
+    }
+    return result;
+  }
+  return result;
+}
+
+// Must be Used to Remove Permissions
+export function removePermission(
+  permission: Permissions,
+  actionNumber: number
+): Permissions {
+  let result = BigInt(permission);
+  // eslint-disable-next-line no-bitwise
+  result &= ~(BigInt(1) << BigInt(actionNumber));
+  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
+  if (implicitActions) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      result &= ~(BigInt(1) << BigInt(Number(implicitActions[i])));
+    }
+  }
+  return result;
+}
+
+// Default Permissions
+export const BASE_PERMISSIONS: Permissions =
+  addPermission(BigInt(0), Action.CREATE_THREAD) |
+  addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
+  addPermission(BigInt(0), Action.VIEW_THREADS);
+
+// Checks if a permission has a specific action
 export function isPermitted(permission: Permissions, action: number): boolean {
   const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
   const hasAction: boolean =
@@ -72,22 +91,34 @@ export function isPermitted(permission: Permissions, action: number): boolean {
   return hasAction;
 }
 
+// Adds the implicit permissions to a permission
 export function computeImplicitPermissions(
   permission: Permissions
 ): Permissions {
   let result = BigInt(permission);
   // Find the highest hierachy action that is permitted
   for (const [action, implicitActions] of IMPLICIT_PERMISSIONS_BY_ACTION) {
+    // If the action is permitted, add all the implicit actions
     if (isPermitted(permission, Number(action))) {
       // add all the implicit actions and then return the result
       for (const implicitAction of implicitActions) {
-        result = addPermission(result, implicitAction);
+        if (!isPermitted(result, Number(implicitAction))) {
+          result = addPermission(result, implicitAction);
+        }
+      }
+    } else {
+      // If the action is denied, deny all the implicit actions
+      for (const implicitAction of implicitActions) {
+        if (isPermitted(result, Number(implicitAction))) {
+          result = removePermission(result, implicitAction);
+        }
       }
     }
   }
   return result;
 }
 
+// Computes the permissions for a user
 export function computePermissions(
   base: Permissions,
   assignments: Array<{ allow: Permissions; deny: Permissions }>
@@ -97,7 +128,5 @@ export function computePermissions(
     permission &= ~BigInt(assignment.deny);
     permission |= BigInt(assignment.allow);
   }
-  // Finally, compute implicit permissions which will overwrite denials that overlap with implicit permissions
-  permission = computeImplicitPermissions(permission);
   return permission;
 }
