@@ -18,7 +18,7 @@ import { getRabbitMQConfig, RascalPublications } from "common-common/src/rabbitm
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { DATABASE_URI, RABBITMQ_URI } from '../config';
 import { RabbitMqHandler } from '../eventHandlers/rabbitMQ';
-import StatsDController from '../util/statsd';
+import { StatsDController, ProjectTag } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -333,7 +333,7 @@ async function mainProcess(
 
   // initialize listeners first (before dealing with identity)
   for (const chain of myChainData) {
-    StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network, base: chain.base });
+    StatsDController.get().increment('ce.listeners', { chain: chain.id, network: chain.network, base: chain.base, project: ProjectTag.Commonwealth });
 
     // start listeners that aren't already created or subscribed - this means for any duplicate chain nodes
     // it will start a listener for the first successful chain node url in the db
@@ -496,7 +496,7 @@ async function mainProcess(
   log.info('Finished scheduled process.');
 
   for (const c of Object.keys(listeners)) {
-    StatsDController.get().increment('ce.listeners-active', { chain: c });
+    StatsDController.get().increment('ce.listeners-active', { chain: c, project: ProjectTag.Commonwealth });
   }
   if (process.env.TESTING) {
     const listenerOptions = {};
