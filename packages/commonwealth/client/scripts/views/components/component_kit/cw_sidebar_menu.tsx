@@ -1,12 +1,13 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
+import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { ListItem, Icon, Icons } from 'construct-ui';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
@@ -66,7 +67,7 @@ const renderCommunity = (item: ChainInfo) => {
   );
 };
 
-class CWSidebarMenuItem implements m.ClassComponent<MenuItem> {
+class CWSidebarMenuItem extends ClassComponent<MenuItem> {
   view(vnode: m.Vnode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
       const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
@@ -111,7 +112,7 @@ type SidebarMenuAttrs = {
   menuItems: Array<MenuItem>;
 };
 
-export class CWSidebarMenu implements m.ClassComponent<SidebarMenuAttrs> {
+export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
   view(vnode: m.Vnode<SidebarMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
 
@@ -164,12 +165,13 @@ export class CWSidebarMenu implements m.ClassComponent<SidebarMenuAttrs> {
               label: 'Account settings',
               iconLeft: 'bell',
               onclick: () => {
-                  if (app.activeChainId()) { navigateToSubpage('/settings'); }
-                  else {
-                    app.sidebarMenu = 'default';
-                    m.route.set('/settings');
-                  }
-                },
+                if (app.activeChainId()) {
+                  navigateToSubpage('/settings');
+                } else {
+                  app.sidebarMenu = 'default';
+                  m.route.set('/settings');
+                }
+              },
             } as MenuItem,
           ].map((item: MenuItem) => {
             return (
