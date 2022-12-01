@@ -4,6 +4,8 @@ import 'pages/new_contract_page.scss';
 import app from 'state';
 import m from 'mithril';
 import $ from 'jquery';
+import ClassComponent from 'class_component';
+
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { BigNumber, ethers } from 'ethers';
@@ -20,7 +22,7 @@ import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
-class NewContractPage implements m.ClassComponent<any> {
+class NewContractPage extends ClassComponent {
   private state = {
     ethChainNames: {},
     ethChains: {},

@@ -4,6 +4,8 @@ import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'models';
 import m from 'mithril';
+import ClassComponent from 'class_component';
+
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -33,7 +35,7 @@ type CreateContractState = ChainFormState & {
   form: CreateContractForm;
 };
 class GeneralContractPage
-  implements m.ClassComponent<{ contractAddress?: string }>
+  extends ClassComponent<{ contractAddress?: string }>
 {
   generalContractsController: GeneralContractsController;
   private state: CreateContractState = {
