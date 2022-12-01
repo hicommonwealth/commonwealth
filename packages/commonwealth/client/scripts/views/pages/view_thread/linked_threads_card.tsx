@@ -66,7 +66,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
               </div>
             ) : (
               <CWText type="b2" className="no-threads-text">
-                There are currently no linked threads.
+                There are currently no linked discussions.
               </CWText>
             )}
             {allowLinking && (
