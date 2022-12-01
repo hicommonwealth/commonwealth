@@ -2,6 +2,7 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import app from 'state';
 
@@ -19,9 +20,7 @@ type CoverImageUploaderAttrs = {
 };
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
-export default class CWCoverImageUploader
-  implements m.ClassComponent<CoverImageUploaderAttrs>
-{
+export default class CWCoverImageUploader extends ClassComponent<CoverImageUploaderAttrs> {
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;

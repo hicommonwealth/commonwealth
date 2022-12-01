@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/delegate.scss';
 
@@ -22,7 +23,7 @@ type DelegateFormType = {
   amount: number;
 };
 
-class DelegateForm implements m.ClassComponent {
+class DelegateForm extends ClassComponent {
   private currentDelegate: string;
   private form: DelegateFormType;
   private loading: boolean;
@@ -133,7 +134,7 @@ class DelegateForm implements m.ClassComponent {
   }
 }
 
-class DelegatePage implements m.ClassComponent {
+class DelegatePage extends ClassComponent {
   view() {
     if (!app.chain || !app.chain.loaded) {
       // chain load failed
