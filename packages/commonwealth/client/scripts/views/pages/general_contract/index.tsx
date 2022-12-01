@@ -4,7 +4,6 @@ import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'models';
 import m from 'mithril';
-import { Spinner } from 'construct-ui';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -19,6 +18,7 @@ import {
   processAbiInputsToDataTypes,
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
+import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -189,7 +189,7 @@ class GeneralContractPage
                             <CWText>{output.name}</CWText>
                           </div>
                           <div>
-                            {this.state.loading && <Spinner active />}
+                            {this.state.loading && <CWSpinner />}
                             <CWText>
                               {fnOutputArray && fnOutputArray[i].toString()
                                 ? fnOutputArray[i].toString()
