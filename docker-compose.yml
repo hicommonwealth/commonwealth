@@ -1,0 +1,16 @@
+version: '3.7'
+services: 
+  cw-server:
+    image: node:14-alpine
+    volumes:
+      - './monorepo'
+    command: 
+      CI=true npm install -g yarn 
+    command: 
+      - CI=true yarn start || (\
+        echo '`yarn start` failed but the container is running...' && \
+        tail -f /dev/null\
+        )
+    ports:
+      - 8080:8080
+
