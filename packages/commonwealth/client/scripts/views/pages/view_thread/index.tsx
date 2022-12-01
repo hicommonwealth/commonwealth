@@ -68,7 +68,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
   private comments: Array<Comment<Thread>>;
   private isEditingBody: boolean;
   private isGloballyEditing: boolean;
-  private polls: Poll[];
+  private polls: Array<Poll>;
   private prefetch: ThreadPrefetch;
   private recentlyEdited: boolean;
   private savedEdits: string;

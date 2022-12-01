@@ -50,11 +50,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
 
     return (
       <CWContentPageCard
-        header={
-          thread.linkedThreads.length === 0
-            ? 'Link to an existing thread?'
-            : 'Linked Threads'
-        }
+        header="Linked Discussions"
         content={
           <div class="LinkedThreadsCard">
             {thread.linkedThreads.length > 0 ? (
@@ -76,7 +72,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
             {allowLinking && (
               <CWButton
                 buttonType="mini"
-                label="Link thread"
+                label="Link discussion"
                 onclick={(e) => {
                   e.preventDefault();
                   app.modals.create({

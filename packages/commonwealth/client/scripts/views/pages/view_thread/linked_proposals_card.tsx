@@ -63,6 +63,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
   private snapshot: SnapshotProposal;
   private snapshotProposalsLoaded: boolean;
   private space: SnapshotSpace;
+
   view(vnode: m.Vnode<LinkedProposalsCardAttrs>) {
     const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
 
