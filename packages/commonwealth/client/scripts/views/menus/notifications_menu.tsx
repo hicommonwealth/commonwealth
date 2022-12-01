@@ -133,7 +133,7 @@ export class NotificationsMenu extends ClassComponent {
                     'chain',
                   // TODO: add the length/num of total chain-events once
                   // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
+                  item: (data) => <NotificationRow notifications={[data]} />,
                 });
               } else if (
                 app.user.notifications.chainEventNotifications.length === 0
@@ -155,7 +155,7 @@ export class NotificationsMenu extends ClassComponent {
                     'discussion',
                   // TODO: add the length/num of total chain-events once
                   // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
+                  item: (data) => <NotificationRow notifications={[data]} />,
                 });
               } else if (
                 app.user.notifications.discussionNotifications.length === 0

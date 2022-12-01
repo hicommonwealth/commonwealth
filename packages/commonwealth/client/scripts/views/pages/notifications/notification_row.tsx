@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { Spinner } from 'construct-ui';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
@@ -16,6 +15,8 @@ import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { getBatchNotificationFields } from './helpers';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { getClasses } from '../../components/component_kit/helpers';
 
 type NotificationRowAttrs = {
   notifications: Array<Notification>;
@@ -72,14 +73,19 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       }
 
       if (!label) {
-        return m(
-          'li.NotificationRow',
-          {
-            class: notification.isRead ? '' : 'unread',
-            key: notification.id,
-            id: notification.id,
-          },
-          [m('.comment-body', [m('.comment-body-top', 'Loading...')])]
+        return (
+          <li
+            class={getClasses<{ isUnread?: boolean }>(
+              { isUnread: !notification.isRead },
+              'NotificationRow'
+            )}
+            key={notification.id}
+            id={notification.id}
+          >
+            <div class="comment-body">
+              <div class="comment-body-top">'Loading...</div>
+            </div>
+          </li>
         );
       }
 
@@ -87,28 +93,28 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
         'a.NotificationRow',
         `/notifications?id=${notification.id}`,
         [
-          m('.comment-body', [
-            m('.comment-body-top.chain-event-notification-top', [
-              `${label.heading} on ${chainName}`,
-              !vnode.attrs.onListPage &&
-                m(CWIconButton, {
-                  iconName: 'close',
-                  onclick: (e) => {
+          <div class="comment-body">
+            <div class="comment-body-top chain-event-notification-top">
+              {label.heading} on {chainName}
+              {!vnode.attrs.onListPage && (
+                <CWIconButton
+                  iconName="close"
+                  onclick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     this.scrollOrStop = true;
                     app.user.notifications.delete([notification]).then(() => {
                       m.redraw();
                     });
-                  },
-                }),
-            ]),
-            m(
-              '.comment-body-bottom',
-              `Block ${notification.chainEvent.blockNumber}`
-            ),
-            m('.comment-body-excerpt', label.label),
-          ]),
+                  }}
+                />
+              )}
+            </div>
+            <div class="comment-body-bottom">
+              Block {notification.chainEvent.blockNumber}
+            </div>
+            <div class="comment-body-excerpt">{label.label}</div>
+          </div>,
         ],
         {
           class: notification.isRead ? '' : 'unread',
@@ -148,53 +154,49 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       return link(
         'a.NotificationRow',
         route,
-        [
-          m(User, {
+        <div>
+          {m(User, {
             user: author,
             avatarOnly: true,
             avatarSize: 26,
-          }),
-          m('.comment-body', [
-            m(
-              '.comment-body-title',
-              m('span', [
-                authorName,
-                ' mentioned you in ',
-                m('span.commented-obj', chain_id),
-                ' chat ',
-              ])
-            ),
-            m('.comment-body-bottom-wrap', [
-              m('.comment-body-created', moment(created_at).fromNow()),
-              !notification.isRead &&
-                m(
-                  '.comment-body-mark-as-read',
-                  {
-                    onclick: (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.markingRead = true;
-                      app.user.notifications
-                        .markAsRead(notifications)
-                        ?.then(() => {
-                          this.markingRead = false;
-                          m.redraw();
-                        })
-                        .catch(() => {
-                          this.markingRead = false;
-                          m.redraw();
-                        });
-                    },
-                  },
-                  [
-                    this.markingRead
-                      ? m(Spinner, { size: 'xs', active: true })
-                      : 'Mark as read',
-                  ]
-                ),
-            ]),
-          ]),
-        ],
+          })}
+          <div class="comment-body">
+            <div class="comment-body-title">
+              {authorName} mentioned you in {chain_id} chat
+            </div>
+            <div class="comment-body-bottom-wrap">
+              <div class="comment-body-created">
+                {moment(created_at).fromNow()}
+              </div>
+              {!notification.isRead && (
+                <div
+                  class="comment-body-mark-as-read"
+                  onclick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.markingRead = true;
+                    app.user.notifications
+                      .markAsRead(notifications)
+                      ?.then(() => {
+                        this.markingRead = false;
+                        m.redraw();
+                      })
+                      .catch(() => {
+                        this.markingRead = false;
+                        m.redraw();
+                      });
+                  }}
+                >
+                  {this.markingRead ? (
+                    <CWSpinner size="small" />
+                  ) : (
+                    'Mark as read'
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
         {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
@@ -238,8 +240,8 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       return link(
         'a.NotificationRow',
         path.replace(/ /g, '%20'),
-        [
-          authorInfo.length === 1
+        <div>
+          {authorInfo.length === 1
             ? m(User, {
                 user: new AddressInfo(
                   null,
@@ -255,44 +257,47 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
                   (auth) => new AddressInfo(null, auth[1], auth[0], null)
                 ),
                 avatarSize: 26,
-              }),
-          m('.comment-body', [
-            m('.comment-body-title', notificationHeader),
-            notificationBody &&
+              })}
+          <div class="comment-body">
+            <div class="comment-body-title">{notificationHeader}</div>
+            {notificationBody &&
               category !== `${NotificationCategories.NewReaction}` &&
-              category !== `${NotificationCategories.NewThread}` &&
-              m('.comment-body-excerpt', notificationBody),
-            m('.comment-body-bottom-wrap', [
-              m('.comment-body-created', moment(createdAt).fromNow()),
-              !notification.isRead &&
-                m(
-                  '.comment-body-mark-as-read',
-                  {
-                    onclick: (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      this.markingRead = true;
-                      app.user.notifications
-                        .markAsRead(notifications)
-                        ?.then(() => {
-                          this.markingRead = false;
-                          m.redraw();
-                        })
-                        .catch(() => {
-                          this.markingRead = false;
-                          m.redraw();
-                        });
-                    },
-                  },
-                  [
-                    this.markingRead
-                      ? m(Spinner, { size: 'xs', active: true })
-                      : 'Mark as read',
-                  ]
-                ),
-            ]),
-          ]),
-        ],
+              category !== `${NotificationCategories.NewThread}` && (
+                <div class="comment-body-excerpt">{notificationBody}</div>
+              )}
+            <div class="comment-body-bottom-wrap">
+              <div class="comment-body-created">
+                {moment(createdAt).fromNow()}
+              </div>
+              {!notification.isRead && (
+                <div
+                  class="comment-body-mark-as-read"
+                  onclick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.markingRead = true;
+                    app.user.notifications
+                      .markAsRead(notifications)
+                      ?.then(() => {
+                        this.markingRead = false;
+                        m.redraw();
+                      })
+                      .catch(() => {
+                        this.markingRead = false;
+                        m.redraw();
+                      });
+                  }}
+                >
+                  {this.markingRead ? (
+                    <CWSpinner size="small" />
+                  ) : (
+                    'Mark as read'
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>,
         {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
