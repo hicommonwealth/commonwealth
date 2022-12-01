@@ -53,22 +53,20 @@ const jumpHighlightNotification = (
   }
 };
 
-const getCommentPreview = (comment_text) => {
-  let decoded_comment_text;
+const getCommentPreview = (commentText) => {
+  let decodedCommentText;
 
   try {
-    const doc = JSON.parse(decodeURIComponent(comment_text));
+    const doc = JSON.parse(decodeURIComponent(commentText));
 
     if (!doc.ops) throw new Error();
 
-    decoded_comment_text = m(QuillFormattedText, {
-      doc,
-      hideFormatting: true,
-      collapse: true,
-    });
+    decodedCommentText = (
+      <QuillFormattedText doc={doc} hideFormatting collapse />
+    );
   } catch (e) {
     // TODO Graham 22-6-5: What does this do? How can we simplify to use helper?
-    let doc = decodeURIComponent(comment_text);
+    let doc = decodeURIComponent(commentText);
 
     const regexp = RegExp('\\[(\\@.+?)\\]\\(.+?\\)', 'g');
 
@@ -78,14 +76,12 @@ const getCommentPreview = (comment_text) => {
       doc = doc.replace(match[0], match[1]);
     });
 
-    decoded_comment_text = m(MarkdownFormattedText, {
-      doc: doc.slice(0, 140),
-      hideFormatting: true,
-      collapse: true,
-    });
+    decodedCommentText = (
+      <MarkdownFormattedText doc={doc.slice(0, 140)} hideFormatting collapse />
+    );
   }
 
-  return decoded_comment_text;
+  return decodedCommentText;
 };
 
 const getNotificationFields = (category, data: IPostNotificationData) => {
@@ -102,12 +98,13 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     author_chain,
   } = data;
 
-  const community_name =
-    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
-
   let notificationHeader;
   let notificationBody;
-  const decoded_title = decodeURIComponent(root_title).trim();
+
+  const communityName =
+    app.config.chains.getById(chain_id)?.name || 'Unknown chain';
+
+  const decodedTitle = decodeURIComponent(root_title).trim();
 
   if (comment_text) {
     notificationBody = getCommentPreview(comment_text);
@@ -123,47 +120,43 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
-    notificationHeader = parent_comment_id
-      ? m('span', [
-          actorName,
-          ' commented on ',
-          m('span.commented-obj', decoded_title),
-        ])
-      : m('span', [
-          actorName,
-          ' responded in ',
-          m('span.commented-obj', decoded_title),
-        ]);
+    notificationHeader = parent_comment_id ? (
+      <div>
+        {actorName} commented on {decodedTitle}
+      </div>
+    ) : (
+      <div>
+        {actorName} responded in {decodedTitle}
+      </div>
+    );
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [
-      actorName,
-      ' created a new thread ',
-      m('span.commented-obj', decoded_title),
-    ]);
+    notificationHeader = (
+      <div>
+        {actorName} created a new thread {decodedTitle}
+      </div>
+    );
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = m('span', [
-      actorName,
-      ' mentioned you in ',
-      m('span.commented-obj', decoded_title),
-    ]);
+    notificationHeader = (
+      <div>
+        {actorName} mentioned you in {decodedTitle}
+      </div>
+    );
   } else if (category === `${NotificationCategories.NewCollaboration}`) {
-    notificationHeader = m('span', [
-      actorName,
-      ' added you as a collaborator on ',
-      m('span.commented-obj', decoded_title),
-    ]);
+    notificationHeader = (
+      <div>
+        {actorName} added you as a collaborator on {decodedTitle}
+      </div>
+    );
   } else if (category === `${NotificationCategories.NewReaction}`) {
-    notificationHeader = !comment_id
-      ? m('span', [
-          actorName,
-          ' liked the post ',
-          m('span.commented-obj', decoded_title),
-        ])
-      : m('span', [
-          actorName,
-          ' liked your comment in ',
-          m('span.commented-obj', decoded_title || community_name),
-        ]);
+    notificationHeader = !comment_id ? (
+      <div>
+        {actorName} liked the post {decodedTitle}
+      </div>
+    ) : (
+      <div>
+        {actorName} liked your comment in {decodedTitle || communityName}
+      </div>
+    );
   }
 
   const pseudoProposal = {
@@ -219,12 +212,12 @@ export const getBatchNotificationFields = (
 
   const length = authorInfo.length - 1;
 
-  const community_name =
+  const communityName =
     app.config.chains.getById(chain_id)?.name || 'Unknown chain';
 
   let notificationHeader;
   let notificationBody;
-  const decoded_title = decodeURIComponent(root_title).trim();
+  const decodedTitle = decodeURIComponent(root_title).trim();
 
   if (comment_text) {
     notificationBody = getCommentPreview(comment_text);
@@ -240,54 +233,55 @@ export const getBatchNotificationFields = (
 
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
-    notificationHeader = parent_comment_id
-      ? m('span', [
-          actorName,
-          length > 0 && ` and ${pluralize(length, 'other')}`,
-          ' commented on ',
-          m('span.commented-obj', decoded_title),
-        ])
-      : m('span', [
-          actorName,
-          length > 0 && ` and ${pluralize(length, 'other')}`,
-          ' responded in ',
-          m('span.commented-obj', decoded_title),
-        ]);
+    notificationHeader = parent_comment_id ? (
+      <div>
+        {actorName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} commented on
+        {decodedTitle}
+      </div>
+    ) : (
+      <div>
+        {actorName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} responded in
+        {decodedTitle}
+      </div>
+    );
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [
-      actorName,
-      length > 0 && ` and ${pluralize(length, 'other')}`,
-      ' created new threads in ',
-      m('span.commented-obj', community_name),
-    ]);
+    notificationHeader = (
+      <div>
+        {actorName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} created new threads
+        in {communityName}
+      </div>
+    );
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = !comment_id
-      ? m('span', [
-          actorName,
-          length > 0 && ` and ${pluralize(length, 'other')}`,
-          ' mentioned you in ',
-          m('span.commented-obj', community_name),
-        ])
-      : m('span', [
-          actorName,
-          length > 0 && ` and ${pluralize(length, 'other')}`,
-          ' mentioned you in ',
-          m('span.commented-obj', decoded_title || community_name),
-        ]);
+    notificationHeader = !comment_id ? (
+      <div>
+        {actorName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} mentioned you in{' '}
+        {communityName}
+      </div>
+    ) : (
+      <div>
+        {actorName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} mentioned you in{' '}
+        {decodedTitle || communityName}
+      </div>
+    );
   } else if (category === `${NotificationCategories.NewReaction}`) {
-    notificationHeader = !comment_id
-      ? m('span', [
-          actorName,
-          length > 0 && ` and ${pluralize(length, 'other')}`,
-          ' liked the post ',
-          m('span.commented-obj', decoded_title),
-        ])
-      : m('span', [
-          actorName,
-          length > 0 && ` and ${pluralize(length, 'other')}`,
-          ' liked your comment in ',
-          m('span.commented-obj', decoded_title || community_name),
-        ]);
+    notificationHeader = !comment_id ? (
+      <div>
+        {actorName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} liked the post{' '}
+        {communityName}
+      </div>
+    ) : (
+      <div>
+        {actorName}
+        {length > 0 && ` and ${pluralize(length, 'other')}`} liked your comment
+        in {decodedTitle || communityName}
+      </div>
+    );
   }
 
   const pseudoProposal = {
