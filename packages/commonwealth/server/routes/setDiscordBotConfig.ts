@@ -79,16 +79,16 @@ const setDiscordBotConfig = async (
   const existingCommunityWithGuildConnected =
     await models.DiscordBotConfig.findAll({ where: { guild_id } });
 
+  const chainInstance = await models.Chain.findOne({
+    where: { id: chain_id },
+  });
+
   if (
     existingCommunityWithGuildConnected &&
     existingCommunityWithGuildConnected.length > 0
   ) {
     // Handle discord already linked to another CW community
     try {
-      const chainInstance = await models.Chain.findOne({
-        where: { id: chain_id },
-      });
-
       chainInstance.discord_config_id = null;
       await chainInstance.save();
 
@@ -102,6 +102,13 @@ const setDiscordBotConfig = async (
     }
 
     throw new AppError(SetDiscordBotConfigErrors.CommonbotConnected);
+  } else {
+    try {
+      chainInstance.discord_config_id = configEntry.id;
+      await chainInstance.save();
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   try {
@@ -112,6 +119,7 @@ const setDiscordBotConfig = async (
         guild_id,
         verification_token: null,
         token_expiration: null,
+        verified: true,
       },
       {
         where: {

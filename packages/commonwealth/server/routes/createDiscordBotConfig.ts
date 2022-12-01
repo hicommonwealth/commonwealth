@@ -21,9 +21,7 @@ type CreateDiscordBotConfigReq = {
   verification_token: string;
 };
 
-type CreateDiscordBotConfigResp = {
-  message: string;
-};
+type CreateDiscordBotConfigResp = { message: string };
 
 const TOKEN_EXPIRATION_MINUTES = 5;
 
@@ -80,11 +78,6 @@ const createDiscordBotConfig = async (
         verification_token,
         token_expiration,
       });
-
-      await models.Chain.update(
-        { discord_config_id: newConfig.id },
-        { where: { id: chain_id } }
-      );
 
       return success(res, {
         message: 'created a new discord bot config',

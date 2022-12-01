@@ -479,7 +479,7 @@ export class ChainMetadataRows
                     window.open(
                       `https://discord.com/oauth2/authorize?client_id=${
                         process.env.DISCORD_CLIENT_ID
-                      }&redirect_uri=${encodeURI(
+                      }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
                         process.env.DISCORD_UI_URL
                       )}/callback&response_type=code&scope=bot&state=${encodeURI(
                         JSON.stringify({
@@ -587,7 +587,7 @@ export class ChainMetadataRows
                     window.open(
                       `https://discord.com/oauth2/authorize?client_id=${
                         process.env.DISCORD_CLIENT_ID
-                      }&redirect_uri=${encodeURI(
+                      }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
                         process.env.DISCORD_UI_URL
                       )}/callback&response_type=code&scope=bot&state=${encodeURI(
                         JSON.stringify({

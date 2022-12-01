@@ -10,6 +10,7 @@ export type DiscordBotConfigAttributes = {
   snapshot_channel_id: string;
   verification_token: string;
   token_expiration: Date;
+  verified: boolean;
 };
 
 export type DiscordBotConfigInstance =
@@ -39,6 +40,11 @@ export default (
       snapshot_channel_id: { type: Sequelize.STRING, allowNull: true },
       verification_token: { type: Sequelize.STRING, allowNull: true },
       token_expiration: { type: Sequelize.DATE, allowNull: true },
+      verified: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     },
