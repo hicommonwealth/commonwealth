@@ -19,7 +19,7 @@ interface RecentListingAttrs {
 export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
   private initializing: boolean;
 
-  view(vnode: m.VnodeDOM<RecentListingAttrs, this>) {
+  view(vnode: m.Vnode<RecentListingAttrs>) {
     const { topicName, stageName } = vnode.attrs;
 
     const { listingStore } = app.threads;

@@ -17,7 +17,7 @@ import { SublayoutHeader } from './sublayout_header';
 type SublayoutAttrs = {
   hideFooter?: boolean;
   hideSearch?: boolean;
-  onscroll: () => null; // lazy loading for page content
+  onscroll?: () => void; // lazy loading for page content
 };
 
 class Sublayout implements m.ClassComponent<SublayoutAttrs> {
@@ -47,7 +47,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     });
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SublayoutAttrs>) {
     const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;

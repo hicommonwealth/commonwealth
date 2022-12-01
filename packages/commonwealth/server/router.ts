@@ -4,6 +4,7 @@ import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
+import { StatsDController } from 'common-common/src/statsd';
 import domain from './routes/domain';
 import status from './routes/status';
 import createAddress from './routes/createAddress';
@@ -158,7 +159,6 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import StatsDController from './util/statsd';
 
 function setupRouter(
   app: Express,
@@ -243,6 +243,7 @@ function setupRouter(
 
   router.post(
     '/etherscanAPI/fetchEtherscanContract',
+    passport.authenticate('jwt', { session: false }),
     fetchEtherscanContract.bind(this, models)
   );
 

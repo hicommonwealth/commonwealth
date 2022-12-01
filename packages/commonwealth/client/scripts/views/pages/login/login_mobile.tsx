@@ -25,7 +25,7 @@ import { LoginText } from './login_text';
 import { LoginAttrs } from './types';
 
 export class LoginMobile implements m.ClassComponent<LoginAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<LoginAttrs>) {
     const {
       address,
       bodyType,

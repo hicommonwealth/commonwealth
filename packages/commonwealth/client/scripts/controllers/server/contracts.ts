@@ -56,6 +56,7 @@ class ContractsController {
         `${app.serverUrl()}/etherscanAPI/fetchEtherscanContract`,
         {
           address,
+          jwt: app.user.jwt,
         }
       );
       console.log(response);
@@ -126,8 +127,8 @@ class ContractsController {
     chain_node_id: number;
     node_url: string;
     address: string;
-    abi: string;
-    abiNickname: string;
+    abi?: string;
+    abiNickname?: string;
     contractType: ContractType;
     symbol: string;
     token_name: string;
@@ -160,7 +161,7 @@ class ContractsController {
         decimals,
         tokenName: token_name,
         symbol,
-        abi: JSON.parse(abi),
+        abi: (abi !== undefined ? JSON.parse(abi) : abi),
         isFactory: is_factory,
         nickname,
       });

@@ -72,7 +72,7 @@ export class ChainMetadataRows
   quillBanner: any;
   bannerStateUpdated: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
     this.name = chain.name;
     this.description = chain.description;
@@ -83,7 +83,10 @@ export class ChainMetadataRows
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !isPermitted(chain.defaultDenyPermissions, Action.VIEW_CHAT_CHANNELS);
+    this.chatEnabled = !isPermitted(
+      chain.defaultDenyPermissions,
+      Action.VIEW_CHAT_CHANNELS
+    );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -97,7 +100,7 @@ export class ChainMetadataRows
     this.communityBanner = chain.communityBanner;
   }
 
-  view(vnode) {
+  view(vnode: m.VnodeDOM<ChainMetadataRowsAttrs, this>) {
     const chain: ChainInfo = vnode.attrs.chain;
     return (
       <div class="ChainMetadataRows">

@@ -17,15 +17,17 @@ import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
-import { CommunityHeader } from './community_header';
 import { getClasses } from '../component_kit/helpers';
+import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
+import { CWText } from '../component_kit/cw_text';
+
 type SidebarAttrs = {
   isSidebarToggleable?: boolean;
   isSidebarToggled?: boolean;
 };
 
 export class Sidebar implements m.ClassComponent<SidebarAttrs> {
-  view(vnode: m.VnodeDOM<SidebarAttrs, this>) {
+  view(vnode: m.Vnode<SidebarAttrs>) {
     const { isSidebarToggleable, isSidebarToggled } = vnode.attrs;
     const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
     const contractsViewable = app.config.chains.getById(
@@ -38,7 +40,9 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
     });
+
     const currentChainInfo = app.chain?.meta;
+
     const hideChat =
       !currentChainInfo ||
       !activeAddressRoles ||
@@ -47,12 +51,20 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
         currentChainInfo,
         Action.VIEW_CHAT_CHANNELS
       );
+
     const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
 
     return (
       <div class="Sidebar">
         {app.chain && isSidebarToggleable && isSidebarToggled && (
-          <CommunityHeader meta={app.chain.meta} />
+          <div class="CommunityHeader">
+            <div class="inner-container">
+              <CWCommunityAvatar size="large" community={app.chain.meta} />
+              <CWText type="h5" fontStyle="medium">
+                {app.chain.meta.name}
+              </CWText>
+            </div>
+          </div>
         )}
         <div class="quickswitcher-and-sidebar-inner">
           {showQuickSwitcher && <SidebarQuickSwitcher />}

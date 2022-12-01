@@ -2,13 +2,13 @@ import passport from 'passport';
 import passportJWT from 'passport-jwt';
 
 import { factory, formatFilename } from 'common-common/src/logging';
+import { StatsDController } from 'common-common/src/statsd';
 import { DB } from '../models';
 import { JWT_SECRET } from '../config';
 import { useSocialAccountAuth } from './socialAccount';
 import { useMagicAuth } from './magic';
 import '../types';
 
-import StatsDController from '../util/statsd';
 const log = factory.getLogger(formatFilename(__filename));
 
 const JWTStrategy = passportJWT.Strategy;

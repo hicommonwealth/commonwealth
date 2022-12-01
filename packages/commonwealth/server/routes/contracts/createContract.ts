@@ -18,7 +18,7 @@ export const Errors = {
   InvalidAddress: 'Address is invalid',
   InvalidNodeUrl: 'Node url must begin with http://, https://, ws://, wss://',
   InvalidNode: 'Node url returned invalid response',
-  InvalidABI: 'Invalid ABI',
+  InvalidABI: 'Invalid ABI passed in',
   NoAbiNickname: 'Must provide ABI nickname',
   MustBeWs: 'Node must support websockets on ethereum',
   InvalidBalanceType: 'Must provide balance type',
@@ -39,8 +39,8 @@ export type CreateContractReq = ContractAttributes &
     community: string;
     node_url: string;
     address: string;
-    abi: string;
-    abiNickname: string;
+    abi?: string;
+    abiNickname?: string;
     contractType: ContractType;
   };
 
@@ -75,13 +75,14 @@ const createContract = async (
     return next(new Error(Errors.NotAdmin));
   }
 
-  if (abi !== '' && (Object.keys(abi) as Array<string>).length === 0) {
-    return next(new Error(Errors.InvalidABI));
-  }
   let abiAsRecord: Array<Record<string, unknown>>;
-  if (abi !== '') {
+  if (abi) {
     if (!abiNickname) {
       return next(new Error(Errors.NoAbiNickname));
+    }
+
+    if ((Object.keys(abi) as Array<string>).length === 0) {
+      return next(new Error(Errors.InvalidABI));
     }
 
     try {
@@ -152,7 +153,7 @@ const createContract = async (
   }
 
   let contract;
-  if (abi !== '') {
+  if (abi) {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {
       const contract_abi = await models.ContractAbi.create(

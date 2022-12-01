@@ -3,12 +3,7 @@ import m from 'mithril';
 import app from 'state';
 import { Contract, NodeInfo, IWebWallet } from 'models';
 import { initAppState } from 'app';
-import { Contract as Web3Contract } from 'web3-eth-contract';
-import {
-  RLPEncodedTransaction,
-  TransactionConfig,
-  TransactionReceipt,
-} from 'web3-core/types';
+import { TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import { parseAbiItemsFromABI, parseEventFromABI } from 'helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
@@ -18,6 +13,8 @@ import {
   EthFormFields,
 } from 'views/pages/create_community/types';
 import Web3 from 'web3';
+import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
+import { decodeCuratedFactoryTx } from 'helpers/web3_tx_helpers';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Ethereum;
@@ -29,20 +26,11 @@ type CreateFactoryEthDaoForm = ChainFormFields &
 
 export default class GeneralContractsController {
   public contract: Contract;
-  public web3Contract: Web3Contract;
   public isFactory: boolean;
 
-  constructor(web3: Web3, contract: Contract) {
+  constructor(contract: Contract) {
     this.isFactory = contract.isFactory;
     this.contract = contract;
-    try {
-      this.web3Contract = new web3.eth.Contract(
-        parseAbiItemsFromABI(this.contract.abi),
-        this.contract.address
-      );
-    } catch (error) {
-      console.error('Failed to create DaoFactory controller', error);
-    }
   }
 
   public async makeContractCall(
@@ -84,14 +72,37 @@ export default class GeneralContractsController {
 
   public async callContractFunction(
     fn: AbiItem,
-    processedArgs: any[],
-    wallet: IWebWallet<any>
+    formInputMap: Map<string, Map<number, string>>
   ): Promise<TransactionReceipt | string> {
+    // handle processing the forms inputs into their proper data types
+    const processedArgs = processAbiInputsToDataTypes(
+      fn.name,
+      fn.inputs,
+      formInputMap
+    );
+
+    const sender = app.user.activeAccount;
+    // get querying wallet
+    const signingWallet = await app.wallets.locateWallet(
+      sender,
+      ChainBase.Ethereum
+    );
+    const web3: Web3 = signingWallet.api;
+
     const methodSignature = `${fn.name}(${fn.inputs
       .map((input) => input.type)
       .join(',')})`;
 
-    const functionContract = this.web3Contract;
+    let functionContract;
+    try {
+      functionContract = new web3.eth.Contract(
+        parseAbiItemsFromABI(this.contract.abi),
+        this.contract.address
+      );
+    } catch (error) {
+      console.error('Failed to create DaoFactory controller', error);
+    }
+
     const contract = this.contract;
 
     const functionTx = functionContract.methods[methodSignature](
@@ -102,7 +113,7 @@ export default class GeneralContractsController {
       const txReceipt: TransactionReceipt = await this.makeContractTx(
         contract.address,
         functionTx.encodeABI(),
-        wallet
+        signingWallet
       );
       return txReceipt;
     } else {
@@ -110,38 +121,26 @@ export default class GeneralContractsController {
       const tx: string = await this.makeContractCall(
         contract.address,
         functionTx.encodeABI(),
-        wallet
+        signingWallet
       );
       return tx;
     }
   }
 
-  public decodeTransactionData(
-    fn: AbiItem,
-    tx: any,
-    wallet: IWebWallet<any>
-  ): any[] {
-    const web3: Web3 = wallet.api;
+  public async decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
+    const sender = app.user.activeAccount;
+    // get querying wallet
+    const signingWallet = await app.wallets.locateWallet(
+      sender,
+      ChainBase.Ethereum
+    );
+    const web3: Web3 = signingWallet.api;
     // simple return type
     let result;
     if (fn.outputs.length === 1) {
       let decodedTx;
-      if (
-        this.contract.nickname === 'curated-factory-goerli' &&
-        fn.name === 'createProject'
-      ) {
-        const eventAbiItem = parseEventFromABI(
-          this.contract.abi,
-          'ProjectCreated'
-        );
-        const decodedLog = web3.eth.abi.decodeLog(
-          eventAbiItem.inputs,
-          tx.logs[0].data,
-          tx.logs[0].topics
-        );
-        console.log('decodedLog', decodedLog);
-        decodedTx = decodedLog.projectAddress;
-      } else {
+      decodedTx = decodeCuratedFactoryTx(web3, fn, tx);
+      if (decodedTx == null) {
         decodedTx = web3.eth.abi.decodeParameter(fn.outputs[0].type, tx);
       }
       result = [];
@@ -157,25 +156,13 @@ export default class GeneralContractsController {
     return result;
   }
 
-  public async createFactoryDao(
-    fn: AbiItem,
-    processedArgs: any[],
+  public async createCuratedFactory(
+    contract: Contract,
+    web3: Web3,
+    functionTx: any,
     wallet: IWebWallet<any>,
     daoForm: CreateFactoryEthDaoForm
   ) {
-    const web3: Web3 = wallet.api;
-    const functionContract = this.web3Contract;
-
-    const methodSignature = `${fn.name}(${fn.inputs
-      .map((input) => input.type)
-      .join(',')})`;
-
-    const functionTx = functionContract.methods[methodSignature](
-      ...processedArgs
-    );
-
-    const contract = this.contract;
-
     if (contract.nickname === 'curated-factory-goerli') {
       const eventAbiItem = parseEventFromABI(contract.abi, 'ProjectCreated');
       // Sign Tx with PK if not view function
@@ -184,14 +171,11 @@ export default class GeneralContractsController {
         functionTx.encodeABI(),
         wallet
       );
-      console.log('txReceipt', txReceipt);
       const decodedLog = web3.eth.abi.decodeLog(
         eventAbiItem.inputs,
         txReceipt.logs[0].data,
         txReceipt.logs[0].topics
       );
-      console.log('decodedLog', decodedLog);
-      console.log('state.form.address', decodedLog.projectAddress);
       try {
         const res = await $.post(`${app.serverUrl()}/createChain`, {
           base: ChainBase.Ethereum,
@@ -218,5 +202,41 @@ export default class GeneralContractsController {
         throw new Error(err);
       }
     }
+  }
+
+  public async createFactoryDao(
+    fn: AbiItem,
+    processedArgs: any[],
+    wallet: IWebWallet<any>,
+    daoForm: CreateFactoryEthDaoForm
+  ) {
+    const web3: Web3 = wallet.api;
+    let functionContract;
+    try {
+      functionContract = new web3.eth.Contract(
+        parseAbiItemsFromABI(this.contract.abi),
+        this.contract.address
+      );
+    } catch (error) {
+      console.error('Failed to create DaoFactory controller', error);
+    }
+
+    const methodSignature = `${fn.name}(${fn.inputs
+      .map((input) => input.type)
+      .join(',')})`;
+
+    const functionTx = functionContract.methods[methodSignature](
+      ...processedArgs
+    );
+
+    const contract = this.contract;
+
+    await this.createCuratedFactory(
+      contract,
+      web3,
+      functionTx,
+      wallet,
+      daoForm
+    );
   }
 }

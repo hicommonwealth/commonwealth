@@ -64,11 +64,11 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     let validAbiNickname;
     if (this.state.form.abi.length > 0) {
@@ -169,13 +169,13 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
                 chain_node_id,
                 node_url: nodeUrl,
                 address,
-                abi,
+                abi: (abi !== '' ? abi : undefined),
                 contractType,
                 symbol,
                 token_name,
                 decimals,
                 nickname: contractNickname,
-                abiNickname,
+                abiNickname: (abiNickname !== '' ? abiNickname : undefined),
               });
               if (res) {
                 this.state.status = 'success';

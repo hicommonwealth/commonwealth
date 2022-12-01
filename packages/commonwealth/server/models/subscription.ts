@@ -2,6 +2,7 @@ import WebSocket from 'ws';
 import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { StatsDController } from 'common-common/src/statsd';
 import send, { WebhookContent } from '../webhookNotifier';
 import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
@@ -28,7 +29,6 @@ import {
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
-import StatsDController from '../util/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 

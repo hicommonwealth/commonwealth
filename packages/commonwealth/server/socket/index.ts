@@ -11,9 +11,9 @@ import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClo
 import Rollbar from 'rollbar';
 import { Server, Socket } from 'socket.io';
 import { ExtendedError } from 'socket.io/dist/namespace';
+import { StatsDController } from 'common-common/src/statsd';
 import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
 import { DB } from '../models';
-import StatsDController from '../util/statsd';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import { createChatNamespace } from './chatNs';
 

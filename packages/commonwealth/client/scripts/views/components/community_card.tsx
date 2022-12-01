@@ -15,7 +15,7 @@ import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 type CommunityCardAttrs = { chain: ChainInfo };
 
 export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
-  view(vnode) {
+  view(vnode: m.Vnode<CommunityCardAttrs>) {
     const { chain } = vnode.attrs as CommunityCardAttrs;
 
     const redirectFunction = (e) => {

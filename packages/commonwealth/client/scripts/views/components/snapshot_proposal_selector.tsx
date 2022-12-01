@@ -13,7 +13,7 @@ import {
 } from 'helpers/snapshot_utils';
 
 type SnapshotProposalSelectorAttrs = {
-  onSelect: () => void;
+  onSelect: (sn: SnapshotProposal) => void;
   snapshotProposalsToSet: SnapshotProposal[];
   thread: Thread;
 };
@@ -25,7 +25,7 @@ export class SnapshotProposalSelector
   private initialized: boolean;
   private snapshotProposalsLoaded: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotProposalSelectorAttrs>) {
     const { onSelect } = vnode.attrs;
 
     if (!app.chain || !app.activeChainId()) return;

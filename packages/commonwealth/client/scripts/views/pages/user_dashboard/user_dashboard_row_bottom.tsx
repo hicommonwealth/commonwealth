@@ -23,7 +23,7 @@ type UserDashboardRowBottomAttrs = {
 export class UserDashboardRowBottom
   implements m.ClassComponent<UserDashboardRowBottomAttrs>
 {
-  view(vnode) {
+  view(vnode: m.Vnode<UserDashboardRowBottomAttrs>) {
     const { path, threadId, viewCount, likeCount, commentCount } = vnode.attrs;
 
     const adjustedId = `discussion_${threadId}`;

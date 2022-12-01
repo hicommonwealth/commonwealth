@@ -43,7 +43,7 @@ import setupChainEventListeners from './server/scripts/setupChainEventListeners'
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import StatsDController from './server/util/statsd';
+import { StatsDController } from 'common-common/src/statsd';
 
 // set up express async error handling hack
 require('express-async-errors');

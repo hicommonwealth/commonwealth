@@ -65,36 +65,22 @@ class GeneralContractPage
       let tx: string | TransactionReceipt;
 
       try {
-        const sender = app.user.activeAccount;
-        // get querying wallet
-        const signingWallet = await app.wallets.locateWallet(
-          sender,
-          ChainBase.Ethereum
-        );
 
         // initialize daoFactory Controller
         this.generalContractsController = new GeneralContractsController(
-          signingWallet.api,
           contract
         );
 
         // handle processing the forms inputs into their proper data types
-        const processedArgs = processAbiInputsToDataTypes(
-          fn.name,
-          fn.inputs,
-          this.state.form.functionNameToFunctionInputArgs
-        );
         tx = await this.generalContractsController.callContractFunction(
           fn,
-          processedArgs,
-          signingWallet
+          this.state.form.functionNameToFunctionInputArgs
         );
         console.log('tx is ', tx);
 
-        const result = this.generalContractsController.decodeTransactionData(
+        const result = await this.generalContractsController.decodeTransactionData(
           fn,
-          tx,
-          signingWallet
+          tx
         );
 
         this.state.functionNameToFunctionOutput.set(fn.name, result);
