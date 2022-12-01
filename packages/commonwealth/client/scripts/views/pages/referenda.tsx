@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/referenda.scss';
 
@@ -36,7 +37,7 @@ function getModules() {
   }
 }
 
-class ReferendaPage implements m.ClassComponent {
+class ReferendaPage extends ClassComponent {
   oncreate() {
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);

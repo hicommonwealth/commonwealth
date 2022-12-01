@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { uuidv4 } from 'lib/util';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -17,9 +18,7 @@ type ChainEntitiesSelectorAttrs = {
   thread: Thread;
 };
 
-export class ChainEntitiesSelector
-  implements m.ClassComponent<ChainEntitiesSelectorAttrs>
-{
+export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorAttrs> {
   private chainEntitiesLoaded: boolean;
   private initialized: boolean;
 

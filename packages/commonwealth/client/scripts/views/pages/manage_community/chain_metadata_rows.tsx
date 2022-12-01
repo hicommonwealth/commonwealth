@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
@@ -16,7 +17,7 @@ import {
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo } from 'models';
+import { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
   addPermission,
@@ -38,16 +39,14 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
 
 type ChainMetadataRowsAttrs = {
-  admins: any;
+  admins: Array<RoleInfo>;
   chain?: ChainInfo;
   mods: any;
-  onRoleUpdate: (oldRole: string, newRole: string) => void;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   onSave: () => void;
 };
 
-export class ChainMetadataRows
-  implements m.ClassComponent<ChainMetadataRowsAttrs>
-{
+export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   name: string;
   description: string;
   website: string;

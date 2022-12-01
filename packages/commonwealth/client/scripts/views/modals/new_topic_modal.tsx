@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import $ from 'jquery';
 
@@ -28,7 +29,7 @@ type NewTopicModalForm = {
   tokenThreshold: string;
 };
 
-export class NewTopicModal implements m.ClassComponent {
+export class NewTopicModal extends ClassComponent {
   private error: string;
   private form: NewTopicModalForm = {
     description: '',
@@ -145,6 +146,7 @@ export class NewTopicModal implements m.ClassComponent {
               onchange={() => {
                 this.form.featuredInSidebar = !this.form.featuredInSidebar;
               }}
+              value=""
             />
             <CWCheckbox
               label="Featured in New Post"
@@ -152,6 +154,7 @@ export class NewTopicModal implements m.ClassComponent {
               onchange={() => {
                 this.form.featuredInNewPost = !this.form.featuredInNewPost;
               }}
+              value=""
             />
           </div>
           {this.form.featuredInNewPost && (
@@ -166,7 +169,7 @@ export class NewTopicModal implements m.ClassComponent {
           )}
           <CWButton
             label="Create topic"
-            disabled={this.saving || this.error || disabled}
+            disabled={this.saving || !!this.error || disabled}
             onclick={async (e: Event) => {
               e.preventDefault();
               const { form } = this;
