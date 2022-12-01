@@ -13,6 +13,7 @@ import { PageLoading } from 'views/pages/loading';
 import { NotificationRow } from './notification_row';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
+import { CWText } from '../../components/component_kit/cw_text';
 
 const MAX_NOTIFS = 40;
 
@@ -106,97 +107,99 @@ class NotificationsPage extends ClassComponent {
     return (
       <Sublayout>
         <div class="NotificationsPage">
-          <CWButton
-            label="Previous Page"
-            onclick={(e) => {
-              e.preventDefault();
-              pageKey -= 1;
-              // console.log(
-              //   'Before=\t',
-              //   `ChainEvents: ${minChainEventsNotification}-${
-              //     minChainEventsNotification + MAX_NOTIFS
-              //   }, Discussion: ${minDiscussionNotification}-${
-              //     minDiscussionNotification + MAX_NOTIFS
-              //   }`
-              // );
-              previousPage();
-              // console.log(
-              //   'After=\t',
-              //   `ChainEvents: ${minChainEventsNotification}-${
-              //     minChainEventsNotification + MAX_NOTIFS
-              //   }, Discussion: ${minDiscussionNotification}-${
-              //     minDiscussionNotification + MAX_NOTIFS
-              //   }`
-              // );
-            }}
-          />
-          <CWButton
-            label="Next Page"
-            onclick={(e) => {
-              e.preventDefault();
-              pageKey += 1;
+          <div class="notifications-buttons-row">
+            <CWButton
+              label="Previous Page"
+              onclick={(e) => {
+                e.preventDefault();
+                pageKey -= 1;
+                // console.log(
+                //   'Before=\t',
+                //   `ChainEvents: ${minChainEventsNotification}-${
+                //     minChainEventsNotification + MAX_NOTIFS
+                //   }, Discussion: ${minDiscussionNotification}-${
+                //     minDiscussionNotification + MAX_NOTIFS
+                //   }`
+                // );
+                previousPage();
+                // console.log(
+                //   'After=\t',
+                //   `ChainEvents: ${minChainEventsNotification}-${
+                //     minChainEventsNotification + MAX_NOTIFS
+                //   }, Discussion: ${minDiscussionNotification}-${
+                //     minDiscussionNotification + MAX_NOTIFS
+                //   }`
+                // );
+              }}
+            />
+            <CWButton
+              label="Next Page"
+              onclick={(e) => {
+                e.preventDefault();
+                pageKey += 1;
 
-              if (!init) {
-                init = true;
-                minDiscussionNotification =
-                  app.user.notifications.discussionNotifications.length;
-                minChainEventsNotification =
-                  app.user.notifications.chainEventNotifications.length;
-              }
-              // console.log(
-              //   'Before=\t',
-              //   `ChainEvents: ${minChainEventsNotification}-${
-              //     minChainEventsNotification + MAX_NOTIFS
-              //   }, Discussion: ${minDiscussionNotification}-${
-              //     minDiscussionNotification + MAX_NOTIFS
-              //   }`
-              // );
-              nextPage();
-              // console.log(
-              //   'After=\t',
-              //   `ChainEvents: ${minChainEventsNotification}-${
-              //     minChainEventsNotification + MAX_NOTIFS
-              //   }, Discussion: ${minDiscussionNotification}-${
-              //     minDiscussionNotification + MAX_NOTIFS
-              //   }`
-              // );
-            }}
-          />
-          <CWButton
-            label="Mark all as read"
-            onclick={(e) => {
-              e.preventDefault();
-              app.user.notifications
-                .markAsRead(
-                  discussionNotifications.concat(chainEventNotifications)
-                )
-                .then(() => m.redraw());
-            }}
-          />
-          <CWPopover
-            content={
-              <div>
-                <div style="margin-bottom: 10px">
-                  Clear all chain notifications?
+                if (!init) {
+                  init = true;
+                  minDiscussionNotification =
+                    app.user.notifications.discussionNotifications.length;
+                  minChainEventsNotification =
+                    app.user.notifications.chainEventNotifications.length;
+                }
+                // console.log(
+                //   'Before=\t',
+                //   `ChainEvents: ${minChainEventsNotification}-${
+                //     minChainEventsNotification + MAX_NOTIFS
+                //   }, Discussion: ${minDiscussionNotification}-${
+                //     minDiscussionNotification + MAX_NOTIFS
+                //   }`
+                // );
+                nextPage();
+                // console.log(
+                //   'After=\t',
+                //   `ChainEvents: ${minChainEventsNotification}-${
+                //     minChainEventsNotification + MAX_NOTIFS
+                //   }, Discussion: ${minDiscussionNotification}-${
+                //     minDiscussionNotification + MAX_NOTIFS
+                //   }`
+                // );
+              }}
+            />
+            <CWButton
+              label="Mark all as read"
+              onclick={(e) => {
+                e.preventDefault();
+                app.user.notifications
+                  .markAsRead(
+                    discussionNotifications.concat(chainEventNotifications)
+                  )
+                  .then(() => m.redraw());
+              }}
+            />
+            <CWPopover
+              content={
+                <div>
+                  <div style="margin-bottom: 10px">
+                    Clear all chain notifications?
+                  </div>
+                  <CWButton
+                    label="Confirm"
+                    onclick={async (e) => {
+                      e.preventDefault();
+                      if (
+                        app.user.notifications.chainEventNotifications
+                          .length === 0
+                      )
+                        return;
+                      app.user.notifications
+                        .delete(app.user.notifications.chainEventNotifications)
+                        .then(() => m.redraw());
+                    }}
+                  />
                 </div>
-                <CWButton
-                  label="Confirm"
-                  onclick={async (e) => {
-                    e.preventDefault();
-                    if (
-                      app.user.notifications.chainEventNotifications.length ===
-                      0
-                    )
-                      return;
-                    app.user.notifications
-                      .delete(app.user.notifications.chainEventNotifications)
-                      .then(() => m.redraw());
-                  }}
-                />
-              </div>
-            }
-            trigger={<CWButton label="Clear chain events" />}
-          />
+              }
+              trigger={<CWButton label="Clear chain events" />}
+            />
+          </div>
           <div class="NotificationsList">
             {(() => {
               const discussionNotif = discussionNotifications.slice(
@@ -229,7 +232,11 @@ class NotificationsPage extends ClassComponent {
                   ),
                 });
               } else
-                return <div class="no-notifications">No Notifications</div>;
+                return (
+                  <div class="no-notifications">
+                    <CWText>No Notifications</CWText>
+                  </div>
+                );
             })()}
           </div>
         </div>

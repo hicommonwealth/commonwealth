@@ -83,7 +83,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
             id={notification.id}
           >
             <div class="comment-body">
-              <div class="comment-body-top">'Loading...</div>
+              <div class="comment-body-top">Loading...</div>
             </div>
           </li>
         );
@@ -92,7 +92,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       return link(
         'a.NotificationRow',
         `/notifications?id=${notification.id}`,
-        [
+        <div>
           <div class="comment-body">
             <div class="comment-body-top chain-event-notification-top">
               {label.heading} on {chainName}
@@ -114,8 +114,8 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
               Block {notification.chainEvent.blockNumber}
             </div>
             <div class="comment-body-excerpt">{label.label}</div>
-          </div>,
-        ],
+          </div>
+        </div>,
         {
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
