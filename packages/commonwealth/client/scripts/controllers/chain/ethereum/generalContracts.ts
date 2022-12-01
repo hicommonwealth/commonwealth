@@ -104,8 +104,8 @@ export default class GeneralContractsController {
     const functionTx = functionContract.methods[methodSignature](
       ...processedArgs
     );
-    if (fn.stateMutability !== 'view' && fn.constant !== true) {
-      // Sign Tx with PK if not view function
+    if ((fn.stateMutability !== 'view' && fn.stateMutability !== 'pure') && fn.constant !== true) {
+      // Sign Tx with PK if this is write function
       const txReceipt: TransactionReceipt = await this.makeContractTx(
         contract.address,
         functionTx.encodeABI(),
@@ -113,7 +113,7 @@ export default class GeneralContractsController {
       );
       return this.decodeTransactionData(fn, txReceipt);
     } else {
-      // send transaction
+      // send call transaction
       const tx: string = await this.makeContractCall(
         contract.address,
         functionTx.encodeABI(),
