@@ -169,13 +169,13 @@ export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
                 chain_node_id,
                 node_url: nodeUrl,
                 address,
-                abi,
+                abi: (abi !== '' ? abi : undefined),
                 contractType,
                 symbol,
                 token_name,
                 decimals,
                 nickname: contractNickname,
-                abiNickname,
+                abiNickname: (abiNickname !== '' ? abiNickname : undefined),
               });
               if (res) {
                 this.state.status = 'success';

@@ -3,12 +3,7 @@ import m from 'mithril';
 import app from 'state';
 import { Contract, NodeInfo, IWebWallet } from 'models';
 import { initAppState } from 'app';
-import { Contract as Web3Contract } from 'web3-eth-contract';
-import {
-  RLPEncodedTransaction,
-  TransactionConfig,
-  TransactionReceipt,
-} from 'web3-core/types';
+import { TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import { parseAbiItemsFromABI, parseEventFromABI } from 'helpers/abi_utils';
 import { AbiItem } from 'web3-utils';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
@@ -19,6 +14,7 @@ import {
 } from 'views/pages/create_community/types';
 import Web3 from 'web3';
 import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
+import { decodeCuratedFactoryTx } from 'helpers/web3_tx_helpers';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Ethereum;
@@ -77,7 +73,7 @@ export default class GeneralContractsController {
 
   public async callContractFunction(
     fn: AbiItem,
-    formInputMap: Map<string, Map<number, string>>,
+    formInputMap: Map<string, Map<number, string>>
   ): Promise<TransactionReceipt | string> {
     // handle processing the forms inputs into their proper data types
     const processedArgs = processAbiInputsToDataTypes(
@@ -132,25 +128,6 @@ export default class GeneralContractsController {
     }
   }
 
-  public decodeCuratedFactoryTx(web3: Web3, fn: AbiItem, tx: any): any {
-    if (
-      this.contract.nickname === 'curated-factory-goerli' &&
-      fn.name === 'createProject'
-    ) {
-      const eventAbiItem = parseEventFromABI(
-        this.contract.abi,
-        'ProjectCreated'
-      );
-      const decodedLog = web3.eth.abi.decodeLog(
-        eventAbiItem.inputs,
-        tx.logs[0].data,
-        tx.logs[0].topics
-      );
-      return decodedLog.projectAddress;
-    }
-    return null;
-  }
-
   public async decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
     const sender = app.user.activeAccount;
     // get querying wallet
@@ -163,7 +140,7 @@ export default class GeneralContractsController {
     let result;
     if (fn.outputs.length === 1) {
       let decodedTx;
-      decodedTx = this.decodeCuratedFactoryTx(web3, fn, tx);
+      decodedTx = decodeCuratedFactoryTx(web3, fn, tx);
       if (decodedTx == null) {
         decodedTx = web3.eth.abi.decodeParameter(fn.outputs[0].type, tx);
       }

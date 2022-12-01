@@ -243,6 +243,7 @@ function setupRouter(
 
   router.post(
     '/etherscanAPI/fetchEtherscanContract',
+    passport.authenticate('jwt', { session: false }),
     fetchEtherscanContract.bind(this, models)
   );
 

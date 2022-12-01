@@ -50,25 +50,23 @@ const createContractAbi = async (
     return next(new Error(Errors.NoContractId));
   }
 
-  if (!abi) {
+  if (!abi || abi === '') {
     return next(new Error(Errors.NoAbi));
   }
 
   let abiAsRecord: Array<Record<string, unknown>>;
-  if (abi !== '') {
-    try {
-      // Parse ABI to validate it as a properly formatted ABI
-      abiAsRecord = JSON.parse(abi);
-      if (!abiAsRecord) {
-        return next(new Error(Errors.InvalidABI));
-      }
-      const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-      if (!abiItems) {
-        return next(new Error(Errors.InvalidABI));
-      }
-    } catch {
+  try {
+    // Parse ABI to validate it as a properly formatted ABI
+    abiAsRecord = JSON.parse(abi);
+    if (!abiAsRecord) {
       return next(new Error(Errors.InvalidABI));
     }
+    const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
+    if (!abiItems) {
+      return next(new Error(Errors.InvalidABI));
+    }
+  } catch {
+    return next(new Error(Errors.InvalidABI));
   }
 
   try {
