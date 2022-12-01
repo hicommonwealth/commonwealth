@@ -310,7 +310,7 @@ const ProposalsPage: m.Component<{}> = {
 
     return (
       <Sublayout
-      // title={<BreadcrumbsTitleTag title="Proposals" />}
+        onscroll={onscroll}
       >
         <div class="ProposalsPage">
           {onSubstrate && (
