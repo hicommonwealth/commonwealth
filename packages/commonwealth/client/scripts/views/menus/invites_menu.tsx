@@ -9,7 +9,7 @@ import 'components/header/invites_menu.scss';
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
-import ConfirmInviteModal from '../modals/confirm_invite_modal';
+import { ConfirmInviteModal } from '../modals/confirm_invite_modal';
 import { NewLoginModal } from '../modals/login_modal';
 
 export const handleEmailInvites = (state) => {

@@ -1,10 +1,12 @@
-import 'modals/confirm_invite_modal.scss';
+/* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'client/scripts/class_component';
 import $ from 'jquery';
-import app from 'state';
-import { Button } from 'construct-ui';
 
+import 'modals/confirm_invite_modal.scss';
+
+import app from 'state';
 import { orderAccountsByAddress } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { UserBlock } from 'views/components/widgets/user';
@@ -13,92 +15,99 @@ import { navigateToSubpage } from 'app';
 import { InviteCodeAttributes } from 'types';
 import { AddressInfo } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
-import { isWindowSmallInclusive } from '../components/component_kit/helpers';
+import {
+  getClasses,
+  isWindowSmallInclusive,
+} from '../components/component_kit/helpers';
+import { CWButton } from '../components/component_kit/cw_button';
 
-const SideMenu: m.Component<{ invites; onChangeHandler; location }, {}> = {
-  view: (vnode) => {
+type SideMenuAttrs = { invites; onChangeHandler; location: number };
+
+class SideMenu extends ClassComponent<SideMenuAttrs> {
+  view(vnode: m.Vnode<SideMenuAttrs>) {
     const { location } = vnode.attrs;
-    return m('.SideMenu', [
-      vnode.attrs.invites.map((invite, index) => {
-        return m(
-          '.inviteTitle',
-          {
-            class: location === index ? 'selected' : '',
-            onclick: () => {
-              vnode.attrs.onChangeHandler(index);
-            },
-          },
-          `${invite.community_name}`
-        );
-      }),
-    ]);
-  },
-};
 
-const ConfirmInviteModal: m.Component<
-  {},
-  {
-    invites: InviteCodeAttributes[];
-    location: number;
-    isComplete: boolean;
-    selectedAddress: string;
-    addresses: AddressInfo[];
-    accepted: number[];
-    rejected: number[];
+    return (
+      <div class="SideMenu">
+        {vnode.attrs.invites.map((invite, i) => {
+          return (
+            <div
+              class={getClasses<{ selected: boolean }>(
+                { selected: location === i },
+                'invite-title'
+              )}
+              onclick={() => {
+                vnode.attrs.onChangeHandler(i);
+              }}
+            >
+              {invite.community_name}
+            </div>
+          );
+        })}
+      </div>
+    );
   }
-> = {
-  oninit: (vnode) => {
-    vnode.state.invites = app.config.invites;
-    vnode.state.location = 0;
-    vnode.state.isComplete = false;
-    vnode.state.selectedAddress = null;
-    vnode.state.addresses = app.user.addresses;
-    vnode.state.accepted = [];
-    vnode.state.rejected = [];
-  },
-  oncreate: () => {},
-  view: (vnode) => {
-    const SelectAddress = (account) => {
+}
+
+export class ConfirmInviteModal extends ClassComponent {
+  private accepted: number[];
+  private addresses: Array<AddressInfo>;
+  private invites: Array<InviteCodeAttributes>;
+  private isComplete: boolean;
+  private location: number;
+  private rejected: Array<number>;
+  private selectedAddress: string;
+
+  oninit() {
+    this.invites = app.config.invites;
+    this.location = 0;
+    this.isComplete = false;
+    this.selectedAddress = null;
+    this.addresses = app.user.addresses;
+    this.accepted = [];
+    this.rejected = [];
+  }
+
+  view() {
+    const selectAddress = (account: AddressInfo) => {
       const isMobile = isWindowSmallInclusive(window.innerWidth);
-      return m(
-        '.SwitchAddress.account-menu-item',
-        {
-          key: `${account.chain.id}-${account.address}`,
-          class:
-            vnode.state.selectedAddress === account.address
-              ? isMobile
-                ? 'selected mobile'
-                : 'selected'
-              : isMobile
-              ? 'mobile'
-              : '',
-          onclick: (e) => {
+
+      return (
+        <div
+          class="SwitchAddress"
+          // class:
+          //   this.selectedAddress === account.address
+          //     ? isMobile
+          //       ? 'selected mobile'
+          //       : 'selected'
+          //     : isMobile
+          //     ? 'mobile'
+          //     : '',
+          key={`${account.chain.id}-${account.address}`}
+          onclick={(e) => {
             e.preventDefault();
-            vnode.state.selectedAddress = account.address;
-          },
-        },
-        [
-          m(UserBlock, {
+            this.selectedAddress = account.address;
+          }}
+        >
+          {m(UserBlock, {
             user: account,
             showChainName: true,
             addressDisplayOptions: { showFullAddress: !isMobile },
-          }),
-        ]
+          })}
+        </div>
       );
     };
 
-    const { invites, location } = vnode.state;
+    const { invites, location } = this;
+
     let addresses;
-    if (
-      vnode.state.accepted.length + vnode.state.rejected.length ===
-      invites.length
-    ) {
-      vnode.state.isComplete = true;
+
+    if (this.accepted.length + this.rejected.length === invites.length) {
+      this.isComplete = true;
     } else {
-      addresses = (vnode.state.addresses || [])
+      addresses = (this.addresses || [])
         .sort(orderAccountsByAddress)
-        .map((account) => SelectAddress(account));
+        .map((account) => selectAddress(account));
     }
 
     const activeInvite = app.config.chains.getById(invites[location].chain_id);
@@ -106,21 +115,22 @@ const ConfirmInviteModal: m.Component<
 
     return m('.ConfirmInviteModal', [
       m('.compact-modal-title', [
-        !vnode.state.isComplete
+        !this.isComplete
           ? m('h3', 'Manage Invites')
           : m('h3', 'No more invites'),
         m(ModalExitButton),
       ]),
-      !vnode.state.isComplete &&
-        m(SideMenu, {
-          invites,
-          location,
-          onChangeHandler: (result) => {
-            vnode.state.location = result;
-            vnode.state.selectedAddress = null;
-          },
-        }),
-      invites.length > 0 && !vnode.state.isComplete
+      !this.isComplete && (
+        <SideMenu
+          invites={invites}
+          location={location}
+          onChangeHandler={(result) => {
+            this.location = result;
+            this.selectedAddress = null;
+          }}
+        />
+      ),
+      invites.length > 0 && !this.isComplete
         ? m('.compact-modal-body', [
             m('p', [
               "You've been invited to the ",
@@ -140,29 +150,29 @@ const ConfirmInviteModal: m.Component<
                 ),
                 '.',
               ]),
-            vnode.state.accepted.includes(location)
+            this.accepted.includes(location)
               ? m('h4', "You've accepted this invite!")
-              : vnode.state.rejected.includes(location)
+              : this.rejected.includes(location)
               ? m('h4', "You've already deleted this invite!")
               : [
-                  m('.invite-addresses', [addresses]),
-                  addresses.length > 0 &&
-                    m('.invite-actions', [
-                      m(Button, {
-                        class: 'submit',
-                        intent: 'primary',
-                        rounded: true,
-                        disabled:
-                          vnode.state.accepted.includes(location) ||
-                          !vnode.state.selectedAddress,
-                        onclick: (e) => {
+                  <div class="invite-addresses">addresses</div>,
+                  addresses.length > 0 && (
+                    <div class="invite-actions">
+                      <CWButton
+                        disabled={
+                          this.accepted.includes(location) ||
+                          !this.selectedAddress
+                        }
+                        onclick={(e) => {
                           e.preventDefault();
+
                           const communityName =
                             invites[location].community_name;
-                          if (vnode.state.selectedAddress) {
+
+                          if (this.selectedAddress) {
                             app.roles
                               .acceptInvite({
-                                address: vnode.state.selectedAddress,
+                                address: this.selectedAddress,
                                 inviteCode: invites[location].id,
                               })
                               .then(
@@ -172,8 +182,8 @@ const ConfirmInviteModal: m.Component<
                                       (invite) =>
                                         invite.community_name !== communityName
                                     );
-                                  vnode.state.accepted.push(location);
-                                  vnode.state.selectedAddress = null;
+                                  this.accepted.push(location);
+                                  this.selectedAddress = null;
 
                                   if (app.config.invites.length === 0) {
                                     $(e.target).trigger('modalexit');
@@ -185,50 +195,51 @@ const ConfirmInviteModal: m.Component<
                                     `Successfully joined ${communityName}.`
                                   );
                                 },
-                                (err) => {
+                                () => {
                                   notifyError('Error accepting invite');
                                 }
                               );
                           }
-                        },
-                        label: 'Accept invite',
-                      }),
-                      m('.invite-actions-or', 'or'),
-                      m(Button, {
-                        class: 'reject',
-                        intent: 'negative',
-                        rounded: true,
-                        disabled: vnode.state.accepted.includes(location),
-                        onclick: async (e) => {
+                        }}
+                        label="Accept invite"
+                      />
+                      <div class="invite-actions-or">or</div>
+                      <CWButton
+                        disabled={this.accepted.includes(location)}
+                        onclick={async (e) => {
                           e.preventDefault();
+
                           const confirmed = await confirmationModalWithText(
                             'Reject this invite? You will need to be invited again.'
                           )();
+
                           if (!confirmed) return;
+
                           app.roles
                             .rejectInvite({ inviteCode: invites[location].id })
                             .then(
-                              (result) => {
+                              () => {
                                 app.config.invites = app.config.invites.filter(
                                   (invite) =>
                                     invite.community_name !==
                                     invites[location].community_name
                                 );
-                                vnode.state.rejected.push(location);
-                                vnode.state.selectedAddress = null;
+                                this.rejected.push(location);
+                                this.selectedAddress = null;
                                 m.redraw();
                               },
-                              (err) => {
+                              () => {
                                 notifyError('Error rejecting invite.');
                               }
                             );
-                        },
-                        label: 'Reject invite',
-                      }),
-                    ]),
+                        }}
+                        label="Reject invite"
+                      />
+                    </div>
+                  ),
                   addresses.length === 0 &&
                     m(
-                      'a.btn.add-account',
+                      'a.add-account',
                       {
                         href: '#',
                         onclick: (e) => {
@@ -238,7 +249,7 @@ const ConfirmInviteModal: m.Component<
                           // TODO: let the user select between different crypto wallets for linking an address
                           const defaultChainId = 'edgeware';
                           const joiningCommunity =
-                            invites[vnode.state.location].chain_id;
+                            invites[this.location].chain_id;
                           const targetCommunity = joiningCommunity;
                           const prev = m.route.get();
                           const next = `/${joiningCommunity}`;
@@ -270,18 +281,6 @@ const ConfirmInviteModal: m.Component<
                       },
                       'Connect a new address'
                     ),
-                  // addresses.length === 0 &&
-                  //   m(LoginWithWalletDropdown, {
-                  //     loggingInWithAddress: false,
-                  //     joiningChain: app.chain?.id || 'edgeware',
-                  //     label: 'Connect an address',
-                  //     onSuccess: (e) => {
-                  //       // $('.ConfirmInviteModal').trigger('modalexit');
-                  //       m.route.set(
-                  //         `/${invites[vnode.state.location].chain_id}`
-                  //       );
-                  //     },
-                  //   }),
                 ],
           ])
         : m('.compact-modal-body', [
@@ -291,7 +290,5 @@ const ConfirmInviteModal: m.Component<
             ]),
           ]),
     ]);
-  },
-};
-
-export default ConfirmInviteModal;
+  }
+}
