@@ -378,11 +378,13 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
         chain: app.activeChainId(),
       });
 
-    const showLinkedSnapshotOptions =
+    const showLinkedProposalOptions =
       thread.snapshotProposal?.length > 0 ||
       thread.chainEntities?.length > 0 ||
       isAuthor ||
       isAdminOrMod;
+
+    console.log(thread.chainEntities);
 
     const showLinkedThreadOptions =
       thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
@@ -556,7 +558,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
         <CWContentPage
           contentBodyLabel="Thread"
           showSidebar={
-            showLinkedSnapshotOptions ||
+            showLinkedProposalOptions ||
             showLinkedThreadOptions ||
             this.polls?.length > 0 ||
             isAuthor
@@ -634,13 +636,13 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           }
           sidebarComponents={
             [
-              ...(showLinkedSnapshotOptions || showLinkedThreadOptions
+              ...(showLinkedProposalOptions || showLinkedThreadOptions
                 ? [
                     {
                       label: 'Links',
                       item: (
                         <div class="cards-column">
-                          {showLinkedSnapshotOptions && (
+                          {showLinkedProposalOptions && (
                             <LinkedProposalsCard
                               onChangeHandler={(
                                 stage: ThreadStageType,

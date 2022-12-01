@@ -111,7 +111,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
             </div>
           ) : (
             <div class="LinkedProposalsCard">
-              {thread.chainEntities.length > 0 && showSnapshot ? (
+              {thread.chainEntities.length > 0 || showSnapshot ? (
                 <div class="links-container">
                   {thread.chainEntities.length > 0 && (
                     <div class="linked-proposals">
