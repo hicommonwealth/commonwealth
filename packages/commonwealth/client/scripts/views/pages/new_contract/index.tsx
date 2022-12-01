@@ -14,11 +14,11 @@ import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { ChainBase } from 'common-common/src/types';
+import { Spinner } from 'construct-ui';
 import { AddContractForm } from './add_contract_form';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
-import { Spinner } from 'construct-ui';
 
 class NewContractPage implements m.ClassComponent<any> {
   private state = {
@@ -71,7 +71,7 @@ class NewContractPage implements m.ClassComponent<any> {
       <Sublayout>
         <div class="NewContractPage">
           <CWText type="h4">Add New Contract</CWText>
-          {!this.state.loadingEthChains ? getActiveForm() : <Spinner/>}
+          {!this.state.loadingEthChains ? getActiveForm() : <Spinner />}
         </div>
       </Sublayout>
     );

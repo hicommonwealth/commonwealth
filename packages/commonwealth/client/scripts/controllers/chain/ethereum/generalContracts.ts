@@ -129,32 +129,36 @@ export default class GeneralContractsController {
   }
 
   public async decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
-    const sender = app.user.activeAccount;
-    // get querying wallet
-    const signingWallet = await app.wallets.locateWallet(
-      sender,
-      ChainBase.Ethereum
-    );
-    const web3: Web3 = signingWallet.api;
-    // simple return type
-    let result;
-    if (fn.outputs.length === 1) {
-      let decodedTx;
-      decodedTx = decodeCuratedFactoryTx(web3, fn, tx);
-      if (decodedTx == null) {
-        decodedTx = web3.eth.abi.decodeParameter(fn.outputs[0].type, tx);
-      }
-      result = [];
-      result.push(decodedTx);
-    } else if (fn.outputs.length > 1) {
-      const decodedTxMap = web3.eth.abi.decodeParameters(
-        fn.outputs.map((output) => output.type),
-        tx
+    try {
+      const sender = app.user.activeAccount;
+      // get querying wallet
+      const signingWallet = await app.wallets.locateWallet(
+        sender,
+        ChainBase.Ethereum
       );
-      // complex return type
-      result = Array.from(Object.values(decodedTxMap));
+      const web3: Web3 = signingWallet.api;
+      // simple return type
+      let result;
+      if (fn.outputs.length === 1) {
+        let decodedTx;
+        decodedTx = decodeCuratedFactoryTx(web3, fn, tx, this.contract);
+        if (decodedTx == null) {
+          decodedTx = web3.eth.abi.decodeParameter(fn.outputs[0].type, tx);
+        }
+        result = [];
+        result.push(decodedTx);
+      } else if (fn.outputs.length > 1) {
+        const decodedTxMap = web3.eth.abi.decodeParameters(
+          fn.outputs.map((output) => output.type),
+          tx
+        );
+        // complex return type
+        result = Array.from(Object.values(decodedTxMap));
+      }
+      return result;
+    } catch (error) {
+      console.error('Failed to decode transaction data', error);
     }
-    return result;
   }
 
   public async createCuratedFactory(

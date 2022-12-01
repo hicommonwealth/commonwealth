@@ -76,7 +76,6 @@ class GeneralContractPage
           fn,
           this.state.form.functionNameToFunctionInputArgs
         );
-        console.log('tx is ', tx);
 
         const result = await this.generalContractsController.decodeTransactionData(
           fn,
