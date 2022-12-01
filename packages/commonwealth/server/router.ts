@@ -3,6 +3,7 @@ import passport from 'passport';
 import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { StatsDController } from 'common-common/src/statsd';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -58,7 +59,8 @@ import acceptInvite from './routes/acceptInvite';
 import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
 import deleteSocialAccount from './routes/deleteSocialAccount';
-import getProfileOld from './routes/getProfile';
+import getProfile from './routes/getProfile';
+import getNewProfile from './routes/getNewProfile';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -96,6 +98,7 @@ import deleteChain from './routes/deleteChain';
 import updateChain from './routes/updateChain';
 import bulkProfiles from './routes/bulkProfiles';
 import updateProfile from './routes/updateProfile';
+import updateNewProfile from './routes/updateNewProfile';
 import writeUserSetting from './routes/writeUserSetting';
 import sendFeedback from './routes/sendFeedback';
 import logout from './routes/logout';
@@ -154,9 +157,7 @@ import getThreads from './routes/threads/getThreads';
 import getComments from './routes/comments/getComments';
 import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
-import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import { StatsDController } from 'common-common/src/statsd';
 
 
 
@@ -350,7 +351,8 @@ function setupRouter(
   router.get('/searchDiscussions', searchDiscussions.bind(this, models));
   router.get('/searchComments', searchComments.bind(this, models));
 
-  router.get('/profile', getProfileOld.bind(this, models));
+  router.get('/profile', getProfile.bind(this, models));
+  router.get('/profile/v2', getNewProfile.bind(this, models));
 
   // discussion drafts
   router.post(
@@ -529,6 +531,13 @@ function setupRouter(
     updateProfile.bind(this, models, identityFetchCache)
   );
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
+
+  // new profile
+  router.post(
+    '/updateProfile/v2',
+    passport.authenticate('jwt', { session: false }),
+    updateNewProfile.bind(this, models)
+  );
 
   // social accounts
   router.delete(
@@ -721,9 +730,6 @@ function setupRouter(
     '/updateChainCustomDomain',
     updateChainCustomDomain.bind(this, models)
   );
-
-  router.post('/updateChainPriority', updateChainPriority.bind(this, models));
-  router.post('/migrateEvent', migrateEvent.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
