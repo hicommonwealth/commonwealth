@@ -1,25 +1,25 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_growl.scss';
 
 import { CWCard } from './cw_card';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
-import { CWPortal } from './cw_portal';
 
 type GrowlPosition = 'bottom-left' | 'bottom-right';
 
 type GrowlAttrs = {
   className?: string;
   disabled: boolean;
-  onclose: () => void;
+  onclose?: () => void;
   position: GrowlPosition;
 };
 
-export class CWGrowl implements m.ClassComponent<GrowlAttrs> {
-  view(vnode) {
+export class CWGrowl extends ClassComponent<GrowlAttrs> {
+  view(vnode: m.Vnode<GrowlAttrs>) {
     const { className, position, disabled } = vnode.attrs;
     return (
       !disabled && (

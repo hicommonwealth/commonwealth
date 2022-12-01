@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/manage_community/index.scss';
@@ -8,24 +9,23 @@ import 'pages/manage_community/index.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { RoleInfo, RolePermission, Webhook } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { ChainMetadataRows } from './chain_metadata_rows';
 import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { PageLoading } from '../loading';
 import { sortAdminsAndModsFirst } from './helpers';
 
-class ManageCommunityPage implements m.ClassComponent {
+class ManageCommunityPage extends ClassComponent {
   private loadingFinished: boolean;
   private loadingStarted: boolean;
-  private roleData: RoleInfo[];
-  private webhooks: Webhook[];
+  private roleData: Array<RoleInfo>;
+  private webhooks: Array<Webhook>;
 
   view() {
     if (!app.activeChainId()) {
       return;
     }
+
     const isAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
@@ -45,16 +45,21 @@ class ManageCommunityPage implements m.ClassComponent {
           `${app.serverUrl()}/bulkMembers`,
           chainOrCommObj
         );
-        if (bulkMembers.status !== 'Success')
+
+        if (bulkMembers.status !== 'Success') {
           throw new Error('Could not fetch members');
+        }
         // TODO: Change to GET /webhooks
         const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`, {
           ...chainOrCommObj,
           auth: true,
           jwt: app.user.jwt,
         });
-        if (webhooks.status !== 'Success')
+
+        if (webhooks.status !== 'Success') {
           throw new Error('Could not fetch community webhooks');
+        }
+
         this.webhooks = webhooks.result;
         this.roleData = bulkMembers.result;
         this.loadingFinished = true;
@@ -73,12 +78,15 @@ class ManageCommunityPage implements m.ClassComponent {
     }
 
     const admins = [];
-
     const mods = [];
+
     if (this.roleData?.length > 0) {
       this.roleData.sort(sortAdminsAndModsFirst).forEach((role) => {
-        if (role.permission === RolePermission.admin) admins.push(role);
-        else if (role.permission === RolePermission.moderator) mods.push(role);
+        if (role.permission === RolePermission.admin) {
+          admins.push(role);
+        } else if (role.permission === RolePermission.moderator) {
+          mods.push(role);
+        }
       });
     }
 
@@ -86,22 +94,28 @@ class ManageCommunityPage implements m.ClassComponent {
       // newRole doesn't have the Address property that oldRole has,
       // Add the missing Address property to the newRole, then splice it into the array.
       newRole.Address = oldRole.Address;
+
       const predicate = (r) => {
         return r.id === oldRole.id;
       };
+
       this.roleData.splice(this.roleData.indexOf(oldRole), 1, newRole);
       app.roles.addRole(newRole);
       app.roles.removeRole(predicate);
+
       const { adminsAndMods } = app.chain.meta;
+
       if (
         oldRole.permission === 'admin' ||
         oldRole.permission === 'moderator'
       ) {
         const idx = adminsAndMods.findIndex(predicate);
+
         if (idx !== -1) {
           adminsAndMods.splice(idx, 1);
         }
       }
+
       if (
         newRole.permission === 'admin' ||
         newRole.permission === 'moderator'
@@ -114,10 +128,13 @@ class ManageCommunityPage implements m.ClassComponent {
             newRole.Address.chain,
             newRole.chain_id,
             newRole.permission,
+            newRole.allow,
+            newRole.deny,
             newRole.is_user_default
           )
         );
       }
+
       m.redraw();
     };
 

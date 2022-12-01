@@ -1,9 +1,9 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import $ from 'jquery';
-import { Spinner } from 'construct-ui';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
 import 'components/component_kit/cw_wallets_list.scss';
@@ -14,6 +14,7 @@ import { createUserWithAddress } from 'controllers/app/login';
 import Near from 'controllers/chain/near/adapter';
 import Substrate from 'controllers/chain/substrate/adapter';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
@@ -21,6 +22,7 @@ import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
+import { CWSpinner } from './cw_spinner';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
@@ -36,6 +38,7 @@ const LinkAccountItem: m.Component<
 > = {
   view: (vnode) => {
     const { account, walletNetwork, walletChain, onSelect, idx } = vnode.attrs;
+
     const address = app.chain
       ? addressSwapper({
           address: account.address,
@@ -45,13 +48,17 @@ const LinkAccountItem: m.Component<
           ),
         })
       : account.address;
+
     const baseName = app.chain?.meta.base || walletChain;
+
     const capitalizedBaseName = `${baseName
       .charAt(0)
       .toUpperCase()}${baseName.slice(1)}`;
+
     const name =
       account.meta?.name ||
       `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
+
     return m(
       '.account-item',
       {
@@ -95,7 +102,7 @@ const LinkAccountItem: m.Component<
           vnode.state.linking &&
             m('.account-waiting', [
               // TODO: show a (?) icon with a tooltip explaining to check your wallet
-              m(Spinner, { size: 'xs', active: true }),
+              m(CWSpinner, { size: 'small' }),
             ]),
         ]),
       ]
@@ -103,16 +110,15 @@ const LinkAccountItem: m.Component<
   },
 };
 
-export class AccountSelector
-  implements
-    m.ClassComponent<{
-      accounts: Array<{ address: string; meta?: { name: string } }>;
-      walletNetwork: ChainNetwork;
-      walletChain: ChainBase;
-      onSelect: (idx: number) => void;
-    }>
-{
-  view(vnode) {
+type AccountSelectorAttrs = {
+  accounts: Array<{ address: string; meta?: { name: string } }>;
+  onSelect: (idx: number) => void;
+  walletChain: ChainBase;
+  walletNetwork: ChainNetwork;
+};
+
+export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
+  view(vnode: m.Vnode<AccountSelectorAttrs>) {
     const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
 
     return (
@@ -142,19 +148,23 @@ export class AccountSelector
 }
 
 type WalletsListAttrs = {
-  connectAnotherWayOnclick: () => void;
+  connectAnotherWayOnclick?: () => void;
   darkMode?: boolean;
   showResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
-  setBodyType: (bodyType: string) => void;
-  accountVerifiedCallback: (account: Account) => void;
+  setBodyType?: (bodyType: string) => void;
+  accountVerifiedCallback?: (
+    account: Account,
+    newlyCreated: boolean,
+    linked: boolean
+  ) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
-  linking: boolean;
+  linking?: boolean;
 };
 
-export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
-  view(vnode) {
+export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
+  view(vnode: m.Vnode<WalletsListAttrs>) {
     const {
       connectAnotherWayOnclick,
       darkMode,
@@ -166,7 +176,10 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       linking,
     } = vnode.attrs;
 
-    async function handleNormalWalletLogin(wallet, address) {
+    async function handleNormalWalletLogin(
+      wallet: IWebWallet<any>,
+      address: string
+    ) {
       if (app.isLoggedIn()) {
         const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
           address:
@@ -194,11 +207,14 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       }
 
       try {
+        const validationBlockInfo =
+          wallet.getRecentBlock && (await wallet.getRecentBlock());
         const { account: signerAccount, newlyCreated } =
           await createUserWithAddress(
             address,
             wallet.name,
-            app.chain?.id || wallet.defaultNetwork
+            app.chain?.id || wallet.defaultNetwork,
+            validationBlockInfo
           );
         accountVerifiedCallback(signerAccount, newlyCreated, linking);
       } catch (err) {
@@ -206,16 +222,23 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       }
     }
 
-    const resetWalletConnectOnclick = async (webWallets) => {
+    const resetWalletConnectOnclick = async (
+      webWallets: Array<IWebWallet<any>>
+    ) => {
       const wallet = webWallets.find(
-        (w) => w instanceof WalletConnectWebWalletController
+        (w) =>
+          w instanceof WalletConnectWebWalletController ||
+          w instanceof TerraWalletConnectWebWalletController
       );
+
       await wallet.reset();
+
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         $('.LoginMobile').trigger('modalexit');
       } else {
         $('.LoginDesktop').trigger('modalexit');
       }
+
       m.redraw();
     };
 
@@ -302,7 +325,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                         // eslint-disable-next-line max-len
                         window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
                       } else {
-                        vnode.state.error(result.error || 'Could not login');
+                        console.log(result.error || 'Could not login');
                       }
                     } else {
                       // Normal Wallet Flow
@@ -312,14 +335,14 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                         wallet.chain === 'solana'
                       ) {
                         address = wallet.accounts[0];
+                      } else if (wallet.defaultNetwork === 'terra') {
+                        address = wallet.accounts[0].address;
                       } else if (wallet.chain === 'cosmos') {
                         if (wallet.defaultNetwork === 'injective') {
                           address = wallet.accounts[0];
                         } else {
                           address = wallet.accounts[0].address;
                         }
-                      } else if (wallet.defaultNetwork === 'terra') {
-                        address = wallet.accounts[0].address;
                       }
 
                       await handleNormalWalletLogin(wallet, address);

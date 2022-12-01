@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/bounty_modals.scss';
 
@@ -16,12 +17,14 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 
-export class ApproveBountyModal
-  implements m.ClassComponent<{ bountyId: number }>
-{
+type BountyModalAttrs = {
+  bountyId: number;
+};
+
+export class ApproveBountyModal extends ClassComponent<BountyModalAttrs> {
   private approvals: number;
 
-  view(vnode) {
+  view(vnode: m.Vnode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
 
     return (
@@ -74,14 +77,12 @@ export class ApproveBountyModal
   }
 }
 
-export class ProposeCuratorModal
-  implements m.ClassComponent<{ bountyId: number }>
-{
+export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
   private approvals: number;
   private curator: string;
   private fee: number;
 
-  view(vnode) {
+  view(vnode: m.Vnode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
     const { curator, fee, approvals } = this;
     const feeCoins = app.chain.chain.coins(fee, true);
@@ -156,12 +157,10 @@ export class ProposeCuratorModal
   }
 }
 
-export class AwardBountyModal
-  implements m.ClassComponent<{ bountyId: number }>
-{
+export class AwardBountyModal extends ClassComponent<BountyModalAttrs> {
   private recipient: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
     const { recipient } = this;
 
@@ -214,12 +213,10 @@ export class AwardBountyModal
   }
 }
 
-export class ExtendExpiryModal
-  implements m.ClassComponent<{ bountyId: number }>
-{
+export class ExtendExpiryModal extends ClassComponent<BountyModalAttrs> {
   private remark: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
     const { remark } = this;
 

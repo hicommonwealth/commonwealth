@@ -1,27 +1,21 @@
 // Use https://admin.socket.io/#/ to monitor
 
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
-import { Server, Socket } from 'socket.io';
-import { instrument } from '@socket.io/admin-ui';
-import { BrokerConfig } from 'rascal';
-import * as jwt from 'jsonwebtoken';
-import { ExtendedError } from 'socket.io/dist/namespace';
-import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
-import {
-  ConnectionTimeoutError,
-  createClient,
-  ReconnectStrategyError, SocketClosedUnexpectedlyError
-} from "redis";
-import Rollbar from 'rollbar';
-import { createCeNamespace, publishToCERoom } from './chainEventsNs';
-import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { createChatNamespace } from './chatNs';
+import { getRabbitMQConfig, RabbitMQController, RascalSubscriptions } from 'common-common/src/rabbitmq';
+import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import * as http from 'http';
+import * as jwt from 'jsonwebtoken';
+import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
+import Rollbar from 'rollbar';
+import { Server, Socket } from 'socket.io';
+import { ExtendedError } from 'socket.io/dist/namespace';
+import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
 import { DB } from '../models';
-import { RedisCache, redisRetryStrategy } from '../util/redisCache';
+import { createCeNamespace, publishToCERoom } from './chainEventsNs';
+import { createChatNamespace } from './chatNs';
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -65,12 +59,14 @@ export async function setupWebSocketServer(
   io.use(authenticate);
 
   io.on('connection', (socket) => {
+    StatsDController.get().increment('cw.socket.connections');
     log.trace(
       `Socket connected: socket_id = ${socket.id}, user_id = ${
         (<any>socket).user.id
       }`
     );
     socket.on('disconnect', () => {
+      StatsDController.get().decrement('cw.socket.connections');
       log.trace(
         `Socket disconnected: socket_id = ${socket.id}, user_id = ${
           (<any>socket).user.id
@@ -118,6 +114,7 @@ export async function setupWebSocketServer(
   const subClient = pubClient.duplicate();
 
   pubClient.on('error', (err) => {
+    StatsDController.get().increment('cw.socket.pub_errors', { name: err.name });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis pub-client connection to ${REDIS_URL} timed out!`
@@ -149,6 +146,7 @@ export async function setupWebSocketServer(
     log.info('Redis pub-client disconnected');
   })
   subClient.on('error', (err) => {
+    StatsDController.get().increment('cw.socket.sub_errors', { name: err.name });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis sub-client connection to ${REDIS_URL} timed out!`
@@ -187,7 +185,7 @@ export async function setupWebSocketServer(
 
   const redisCache = new RedisCache();
   console.log('Initializing Redis Cache for WebSockets...');
-  await redisCache.init();
+  await redisCache.init(REDIS_URL, VULTR_IP);
   console.log('Redis Cache initialized!');
 
   // create the chain-events namespace
@@ -196,13 +194,14 @@ export async function setupWebSocketServer(
 
   try {
     const rabbitController = new RabbitMQController(
-      <BrokerConfig>RabbitMQConfig
+      getRabbitMQConfig(RABBITMQ_URI)
     );
 
     await rabbitController.init();
     await rabbitController.startSubscription(
-      publishToCERoom.bind(ceNamespace),
-      'ChainEventsNotificationsSubscription'
+      publishToCERoom,
+      RascalSubscriptions.ChainEventNotifications,
+      {server: ceNamespace}
     );
   } catch (e) {
     log.error(

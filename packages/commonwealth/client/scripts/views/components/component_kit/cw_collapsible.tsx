@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_collapsible.scss';
 
@@ -12,10 +13,10 @@ type CollapsibleAttrs = {
   headerContent: m.Vnode;
 };
 
-export class CWCollapsible implements m.ClassComponent<CollapsibleAttrs> {
+export class CWCollapsible extends ClassComponent<CollapsibleAttrs> {
   private isExpanded: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<CollapsibleAttrs>) {
     const { collapsibleContent, headerContent } = vnode.attrs;
 
     return (

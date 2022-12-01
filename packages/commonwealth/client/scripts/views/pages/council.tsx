@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/council.scss';
 
@@ -25,8 +26,12 @@ import { GovExplainer } from '../components/gov_explainer';
 import { CWButton } from '../components/component_kit/cw_button';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
-class Councillor implements m.ClassComponent<{ account }> {
-  view(vnode) {
+type CouncillorAttrs = {
+  account: SubstrateAccount;
+};
+
+class Councillor extends ClassComponent<CouncillorAttrs> {
+  view(vnode: m.Vnode<CouncillorAttrs>) {
     if (!vnode.attrs.account) return;
 
     const { account } = vnode.attrs;
@@ -114,7 +119,7 @@ function getModules() {
   }
 }
 
-class CouncilPage implements m.ClassComponent {
+class CouncilPage extends ClassComponent {
   view() {
     if (!app.chain || !app.chain.loaded) {
       if (

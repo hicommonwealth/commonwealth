@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -13,15 +14,15 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWCard } from '../../components/component_kit/cw_card';
 import User from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { ProposalHeaderSnapshotThreadLink } from '../view_proposal/proposal_header_links';
+import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
 
 type SnapshotInfoRowAttrs = {
   label: string;
-  value: string;
+  value: string | m.Vnode;
 };
 
-class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
-  view(vnode) {
+class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
+  view(vnode: m.Vnode<SnapshotInfoRowAttrs>) {
     const { label, value } = vnode.attrs;
 
     return (
@@ -35,10 +36,10 @@ class SnapshotInfoRow implements m.ClassComponent<SnapshotInfoRowAttrs> {
   }
 }
 
-class SnapshotInfoLinkRow
-  implements m.ClassComponent<SnapshotInfoRowAttrs & { url: string }>
-{
-  view(vnode) {
+type SnapshotInfoLinkRowAttrs = SnapshotInfoRowAttrs & { url: string };
+
+class SnapshotInfoLinkRow extends ClassComponent<SnapshotInfoLinkRowAttrs> {
+  view(vnode: m.Vnode<SnapshotInfoLinkRowAttrs>) {
     const { label, url, value } = vnode.attrs;
 
     return (
@@ -62,10 +63,8 @@ type SnapshotInformationCardAttrs = {
   threads: Array<{ id: string; title: string }> | null;
 };
 
-export class SnapshotInformationCard
-  implements m.ClassComponent<SnapshotInformationCardAttrs>
-{
-  view(vnode) {
+export class SnapshotInformationCard extends ClassComponent<SnapshotInformationCardAttrs> {
+  view(vnode: m.Vnode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;
 
     const votingSystem = capitalize(
@@ -127,7 +126,7 @@ export class SnapshotInformationCard
               Linked Discussions
             </CWText>
             {threads.map((thread) => (
-              <ProposalHeaderSnapshotThreadLink thread={thread} />
+              <SnapshotThreadLink thread={thread} />
             ))}
           </div>
         )}

@@ -1,17 +1,21 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
 import { MenuItem } from '../components/component_kit/types';
+import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 
-const getCreateContentMenuItems = (): Array<MenuItem> => {
+const getCreateContentMenuItems = (): MenuItem[] => {
   const activeAccount = app.user.activeAccount;
 
   const showSnapshotOptions =
@@ -25,11 +29,12 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
     )
     .sort((a, b) => a.name.localeCompare(b.name));
 
-  const showSputnikProposalItem = app.chain.network === ChainNetwork.Sputnik;
+  const showSputnikProposalItem = app.chain?.network === ChainNetwork.Sputnik;
 
   const showOnChainProposalItem =
     (app.chain?.base === ChainBase.CosmosSDK &&
-      app.chain?.network !== ChainNetwork.Terra) ||
+      app.chain?.network !== ChainNetwork.Terra &&
+      app.chain?.network !== ChainNetwork.Kava) ||
     (app.chain?.base === ChainBase.Ethereum &&
       app.chain?.network === ChainNetwork.Aave) ||
     app.chain?.network === ChainNetwork.Compound;
@@ -38,7 +43,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
     app.chain?.base === ChainBase.Substrate &&
     app.chain?.network !== ChainNetwork.Plasm;
 
-  const getTopicThreads = (): Array<MenuItem> =>
+  const getTopicTemplateItems = (): MenuItem[] =>
     topics.map((t) => ({
       label: `New ${t.name} Thread`,
       iconLeft: 'write',
@@ -59,7 +64,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
       },
     }));
 
-  const getOnChainProposalItem = (): Array<MenuItem> =>
+  const getOnChainProposalItem = (): MenuItem[] =>
     showOnChainProposalItem
       ? [
           {
@@ -70,7 +75,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
         ]
       : [];
 
-  const getSputnikProposalItem = (): Array<MenuItem> =>
+  const getSputnikProposalItem = (): MenuItem[] =>
     showSputnikProposalItem
       ? [
           {
@@ -81,7 +86,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
         ]
       : [];
 
-  const getSubstrateProposalItems = (): Array<MenuItem> =>
+  const getSubstrateProposalItems = (): MenuItem[] =>
     showSubstrateProposalItems
       ? [
           {
@@ -111,7 +116,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
                   iconLeft: 'councilProposal',
                 },
               ]
-            : []) as Array<MenuItem>),
+            : []) as MenuItem[]),
           {
             label: 'New bounty proposal',
             onclick: () =>
@@ -131,7 +136,7 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
         ]
       : [];
 
-  const getSnapshotProposalItem = (): Array<MenuItem> =>
+  const getSnapshotProposalItem = (): MenuItem[] =>
     showSnapshotOptions
       ? [
           {
@@ -151,26 +156,89 @@ const getCreateContentMenuItems = (): Array<MenuItem> => {
         ]
       : [];
 
-  return [
+  const getUniversalCreateItems = (): MenuItem[] => [
+    // {
+    //   label: 'New Crowdfund',
+    //   iconLeft: 'wallet',
+    //   onclick: () => {
+
+    //   }
+    // },
     {
-      label: 'New Thread',
-      onclick: () => {
-        navigateToSubpage('/new/discussion');
+      label: 'New Community',
+      iconLeft: 'people',
+      onclick: (e) => {
+        e.preventDefault();
+        mixpanelBrowserTrack({
+          event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
+          chainBase: null,
+          isCustomDomain: app.isCustomDomain(),
+          communityType: null,
+        });
+        app.sidebarMenu = 'default';
+        m.route.set('/createCommunity');
       },
-      iconLeft: 'write',
     },
-    ...getTopicThreads(),
-    ...getOnChainProposalItem(),
-    ...getSputnikProposalItem(),
-    ...getSubstrateProposalItems(),
-    ...getSnapshotProposalItem(),
+  ];
+
+  return [
+    ...(app.activeChainId()
+      ? [
+          {
+            type: 'header',
+            label: 'Create Within Community',
+          } as MenuItem,
+          {
+            label: 'New Thread',
+            onclick: () => {
+              navigateToSubpage('/new/discussion');
+            },
+            iconLeft: 'write',
+          } as MenuItem,
+          ...getTopicTemplateItems(),
+          ...getOnChainProposalItem(),
+          ...getSputnikProposalItem(),
+          ...getSubstrateProposalItems(),
+          ...getSnapshotProposalItem(),
+        ]
+      : []),
+    {
+      type: 'header',
+      label: 'Universal Create',
+    },
+    ...getUniversalCreateItems(),
   ];
 };
 
-export class CreateContentMenu implements m.ClassComponent {
+export class CreateContentSidebar extends ClassComponent {
+  view() {
+    return (
+      <CWSidebarMenu
+        className="CreateContentSidebar"
+        menuHeader={{
+          label: 'Create',
+          onclick: async () => {
+            const sidebar = document.getElementsByClassName(
+              'CreateContentSidebar'
+            );
+            sidebar[0].classList.add('onremove');
+            setTimeout(() => {
+              app.sidebarMenu = 'default';
+              m.redraw();
+            }, 200);
+          },
+        }}
+        menuItems={getCreateContentMenuItems()}
+      />
+    );
+  }
+}
+
+export class CreateContentMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
+        className="CreateContentMenu"
         menuHeader={{
           label: 'Create',
           onclick: () => {
@@ -183,7 +251,7 @@ export class CreateContentMenu implements m.ClassComponent {
   }
 }
 
-export class CreateContentPopover implements m.ClassComponent {
+export class CreateContentPopover extends ClassComponent {
   view() {
     if (!app.isLoggedIn() || !app.chain || !app.activeChainId()) return;
 

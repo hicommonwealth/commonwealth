@@ -1,4 +1,4 @@
-import { IWebWallet } from 'client/scripts/models';
+import { Account, IWebWallet } from 'models';
 import { ProfileRowAttrs } from '../../components/component_kit/cw_profiles_list';
 
 export type LoginSidebarType =
@@ -20,25 +20,30 @@ export type LoginBodyType =
 export type LoginAttrs = {
   address: string;
   currentlyInCommunityPage: boolean;
-  bodyType: string;
+  bodyType: LoginBodyType;
   profiles: Array<ProfileRowAttrs>;
-  sidebarType: string;
+  sidebarType: LoginSidebarType;
   username: string;
   wallets: Array<IWebWallet<any>>;
   magicLoading: boolean;
   setAddress: (address: string) => void;
   setBodyType: (bodyType: string) => void;
-  handleSetAvatar: () => void;
-  handleSetUsername: () => void;
-  handleSetEmail: () => void;
+  handleEmailLoginCallback: () => void;
+  handleSetAvatar: (url: string) => void;
+  handleSetUsername: (username: string) => void;
+  handleSetEmail: (e: any) => void;
   setProfiles: (profiles: Array<ProfileRowAttrs>) => void;
   setSidebarType: (sidebarType: string) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
   setSelectedLinkingWallet: (wallet: IWebWallet<any>) => void;
   linkExistingAccountCallback: () => void;
   createNewAccountCallback: () => void;
-  accountVerifiedCallback: () => void;
-  logInWithAccountCallback: () => void;
+  accountVerifiedCallback: (
+    account: Account,
+    newlyCreated: boolean,
+    linking: boolean
+  ) => Promise<void>;
+  logInWithAccountCallback?: () => void;
   saveProfileInfoCallback: () => void;
   performLinkingCallback: () => void;
   showResetWalletConnect: boolean;

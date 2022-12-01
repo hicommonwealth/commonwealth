@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_tabs.scss';
 
@@ -18,8 +19,8 @@ type TabAttrs = {
   onclick: () => void;
 } & TabStyleAttrs;
 
-export class CWTab implements m.ClassComponent<TabAttrs> {
-  view(vnode) {
+export class CWTab extends ClassComponent<TabAttrs> {
+  view(vnode: m.Vnode<TabAttrs>) {
     const { disabled, isSelected, label, onclick } = vnode.attrs;
 
     return (
@@ -42,8 +43,8 @@ export class CWTab implements m.ClassComponent<TabAttrs> {
   }
 }
 
-export class CWTabBar implements m.ClassComponent {
-  view(vnode) {
+export class CWTabBar extends ClassComponent {
+  view(vnode: m.Vnode) {
     return <div class={ComponentType.TabBar}>{vnode.children}</div>;
   }
 }

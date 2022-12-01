@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/community_label.scss';
 
@@ -13,8 +14,8 @@ type CommunityLabelAttrs = {
   size?: IconSize;
 };
 
-export class CommunityLabel implements m.ClassComponent<CommunityLabelAttrs> {
-  view(vnode) {
+export class CommunityLabel extends ClassComponent<CommunityLabelAttrs> {
+  view(vnode: m.Vnode<CommunityLabelAttrs>) {
     const { community, size = 'small' } = vnode.attrs;
 
     return (

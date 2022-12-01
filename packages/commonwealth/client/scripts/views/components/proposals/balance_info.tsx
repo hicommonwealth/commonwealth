@@ -1,26 +1,31 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import { formatCoin } from 'adapters/currency';
 import app from 'state';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CWText } from '../component_kit/cw_text';
 
-export class BalanceInfo implements m.ClassComponent {
+type BalanceInfoAttrs = {
+  account: SubstrateAccount;
+};
+
+export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
   private balance: any;
   private freeBalance: any;
   private lockedBalance: any;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<BalanceInfoAttrs>) {
+    const { account } = vnode.attrs;
+
     app.runWhenReady(async () => {
-      this.freeBalance = await (vnode.attrs.account as SubstrateAccount)
-        .freeBalance;
+      this.freeBalance = await account.freeBalance;
 
-      this.lockedBalance = await (vnode.attrs.account as SubstrateAccount)
-        .lockedBalance;
+      this.lockedBalance = await account.lockedBalance;
 
-      this.balance = await (vnode.attrs.account as SubstrateAccount).balance;
+      this.balance = await account.balance;
 
       m.redraw();
     });

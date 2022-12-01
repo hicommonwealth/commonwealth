@@ -28,6 +28,7 @@ import {
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -116,6 +117,14 @@ export default (
     includeAddresses?: string[],
   ): Promise<NotificationInstance> => {
     // get subscribers to send notifications to
+    StatsDController.get().increment(
+      'cw.notifications.created',
+      {
+        category_id,
+        object_id,
+        chain: (notification_data as any).chain || (notification_data as any).chain_id,
+      }
+    );
     const findOptions: any = {
       [Op.and]: [
         { category_id },
@@ -223,6 +232,15 @@ export default (
     const replacements = [];
     for (const subscription of subscriptions) {
       if (subscription.subscriber_id) {
+        StatsDController.get().increment(
+          'cw.notifications.emitted',
+          {
+            category_id,
+            object_id,
+            chain: (notification_data as any).chain || (notification_data as any).chain_id,
+            subscriber: `${subscription.subscriber_id}`,
+          }
+        );
         query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `
         replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
       } else {

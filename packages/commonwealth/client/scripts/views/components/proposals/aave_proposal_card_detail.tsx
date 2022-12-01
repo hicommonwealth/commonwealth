@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/proposals/aave_proposal_card_detail.scss';
 
@@ -13,15 +14,10 @@ export const roundVote = (percentage) => {
   return percentage.toFixed(2).split('.0')[0].slice(0, 4);
 };
 
-type AaveProposalCardDetailAttrs = {
-  proposal: AaveProposal;
-  statusText: any;
-};
+type AaveInfoRowAttrs = { aaveNum: number; aaveText: string };
 
-export class AaveInfoRow
-  implements m.ClassComponent<{ aaveNum: number; aaveText: string }>
-{
-  view(vnode) {
+export class AaveInfoRow extends ClassComponent<AaveInfoRowAttrs> {
+  view(vnode: m.Vnode<AaveInfoRowAttrs>) {
     const { aaveNum, aaveText } = vnode.attrs;
 
     return (
@@ -35,10 +31,13 @@ export class AaveInfoRow
   }
 }
 
-export class AaveProposalCardDetail
-  implements m.ClassComponent<AaveProposalCardDetailAttrs>
-{
-  view(vnode) {
+type AaveProposalCardDetailAttrs = {
+  proposal: AaveProposal;
+  statusText: any;
+};
+
+export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetailAttrs> {
+  view(vnode: m.Vnode<AaveProposalCardDetailAttrs>) {
     const { proposal } = vnode.attrs;
 
     const statusText = Array.isArray(vnode.attrs.statusText)

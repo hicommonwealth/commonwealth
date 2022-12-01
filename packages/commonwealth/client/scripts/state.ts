@@ -19,11 +19,13 @@ import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddress
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
+import SessionsController from './controllers/server/sessions';
 import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import { MobileMenuName } from './views/app_mobile_menus';
+import { SidebarMenuName } from './views/components/sidebar';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -74,6 +76,7 @@ export interface IApp {
   roles: RolesController;
   recentActivity: RecentActivityController;
   profiles: ProfilesController;
+  sessions: SessionsController;
 
   // Web3
   wallets: WebWalletController;
@@ -81,7 +84,11 @@ export interface IApp {
 
   toasts: ToastStore;
   modals: ModalStore;
+
   mobileMenu: MobileMenuName;
+  sidebarMenu: SidebarMenuName;
+  sidebarToggled: boolean;
+
   loginState: LoginState;
   // stored on server-side
   config: {
@@ -161,11 +168,17 @@ const app: IApp = {
   roles,
   recentActivity: new RecentActivityController(),
   profiles: new ProfilesController(),
+  sessions: new SessionsController(),
+  loginState: LoginState.NotLoaded,
+
+  // Global nav state
+  mobileMenu: null,
+  sidebarMenu: 'default',
+  sidebarToggled: true,
 
   toasts: getToastStore(),
   modals: getModalStore(),
-  mobileMenu: null,
-  loginState: LoginState.NotLoaded,
+
   config: {
     chains: new ChainStore(),
     nodes: new NodeStore(),

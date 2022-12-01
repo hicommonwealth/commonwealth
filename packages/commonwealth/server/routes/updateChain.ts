@@ -2,11 +2,13 @@ import { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase } from 'common-common/src/types';
+import { Action } from 'common-common/src/permissions';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../models';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AppError, ServerError } from '../util/errors';
+import { findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -51,13 +53,12 @@ const updateChain = async (
     const userAddressIds = (await req.user.getAddresses())
       .filter((addr) => !!addr.verified)
       .map((addr) => addr.id);
-    const userMembership = await models.Role.findOne({
-      where: {
-        address_id: { [Op.in]: userAddressIds },
-        chain_id: chain.id || null,
-        permission: 'admin',
-      },
-    });
+    const userMembership = await findOneRole(
+      models,
+      { where: { address_id: { [Op.in]: userAddressIds } } },
+      chain.id,
+      ['admin']
+    );
     if (!req.user.isAdmin && !userMembership) {
       return next(new AppError(Errors.NotAdmin));
     }
@@ -78,7 +79,8 @@ const updateChain = async (
     stages_enabled,
     custom_stages,
     custom_domain,
-    chat_enabled,
+    default_allow_permissions,
+    default_deny_permissions,
     default_summary_view,
     terms,
   } = req.body;
@@ -133,8 +135,9 @@ const updateChain = async (
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
-  if (chat_enabled) chain.chat_enabled = chat_enabled;
-
+  // Set default allow/deny permissions
+  chain.default_allow_permissions = default_allow_permissions || BigInt(0);
+  chain.default_deny_permissions = default_deny_permissions || BigInt(0);
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?
   chain.default_summary_view = default_summary_view || false;
@@ -146,6 +149,12 @@ const updateChain = async (
   // chain.custom_domain = custom_domain;
 
   await chain.save();
+
+  // Suggested solution for serializing BigInts
+  // https://github.com/GoogleChromeLabs/jsbi/issues/30#issuecomment-1006086291
+  (BigInt.prototype as any).toJSON = function () {
+    return this.toString();
+  };
 
   return success(res, chain.toJSON());
 };

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/discussions/discussion_filter_bar.scss';
 
@@ -11,16 +12,14 @@ import { TopicsMenu } from './topics_menu';
 import { StagesMenu } from './stages_menu';
 
 type DiscussionFilterBarAttrs = {
-  disabled: boolean;
+  disabled?: boolean;
   parentState: any;
   stage: string;
   topic: string;
 };
 
-export class DiscussionFilterBar
-  implements m.ClassComponent<DiscussionFilterBarAttrs>
-{
-  view(vnode) {
+export class DiscussionFilterBar extends ClassComponent<DiscussionFilterBarAttrs> {
+  view(vnode: m.Vnode<DiscussionFilterBarAttrs>) {
     const { topic, stage, disabled, parentState } = vnode.attrs;
 
     const communityInfo = app.chain?.meta;

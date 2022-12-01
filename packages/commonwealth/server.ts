@@ -18,7 +18,7 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
 const log = factory.getLogger(formatFilename(__filename));
@@ -43,7 +43,7 @@ import setupChainEventListeners from './server/scripts/setupChainEventListeners'
 import migrateIdentities from './server/scripts/migrateIdentities';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import StatsDController from './server/util/statsd';
+import { StatsDController } from 'common-common/src/statsd';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -57,6 +57,8 @@ async function main() {
   const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
+  const NO_TOKEN_BALANCE_CACHE =
+    process.env.NO_TOKEN_BALANCE_CACHE === 'true';
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' ||
     SHOULD_SEND_EMAILS ||
@@ -156,11 +158,11 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV ? webpack(devWebpackConfig) : webpack(prodWebpackConfig);
+  const compiler = DEV ? webpack(devWebpackConfig as any) : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const devMiddleware =
     DEV && !NO_CLIENT_SERVER
-      ? webpackDevMiddleware(compiler, {
+      ? webpackDevMiddleware(compiler as any, {
           publicPath: '/build',
         })
       : null;
@@ -245,7 +247,7 @@ async function main() {
     // serve static files
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
-  
+
 
     // add other middlewares
     app.use(logger('dev'));
@@ -280,7 +282,7 @@ async function main() {
   setupMiddleware();
   setupPassport(models);
 
-  await tokenBalanceCache.start();
+  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   await ruleCache.start();
   const banCache = new BanCache(models);
   setupAPI(

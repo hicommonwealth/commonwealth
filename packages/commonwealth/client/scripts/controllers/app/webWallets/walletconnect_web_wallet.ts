@@ -1,7 +1,8 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, ChainInfo, IWebWallet } from 'models';
+import { Account, ChainInfo, IWebWallet, BlockInfo } from 'models';
 import app from 'state';
 import Web3 from 'web3';
+import { hexToNumber } from 'web3-utils';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
@@ -36,15 +37,28 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public async getRecentBlock(): Promise<BlockInfo> {
+    const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
+
+    return {
+      number: hexToNumber(block.number),
+      hash: block.hash,
+      timestamp: hexToNumber(block.timestamp),
+    }
+  }
+
   public async signMessage(message: string): Promise<string> {
     const signature = await this._web3.eth.sign(message, this.accounts[0]);
     return signature;
   }
 
-  public async signLoginToken(message: string): Promise<string> {
-    const msgParams = constructTypedMessage(
-      this._chainInfo.node.ethChainId,
-      message
+  public async signLoginToken(validationBlockInfo: string): Promise<string> {
+    const sessionPublicAddress = app.sessions.getOrCreateAddress(this._chainInfo.node.ethChainId);
+    const msgParams = await constructTypedMessage(
+      this.accounts[0],
+      this._chainInfo.node.ethChainId || 1,
+      sessionPublicAddress,
+      validationBlockInfo,
     );
     const signature = await this._provider.wc.signTypedData([
       this.accounts[0],
@@ -54,23 +68,20 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   }
 
   public async signWithAccount(account: Account): Promise<string> {
-    // TODO: test whether signTypedData works on WC
-    const webWalletSignature = await this.signLoginToken(
-      account.validationToken
-    );
+    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
     return webWalletSignature;
   }
 
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
+  public async validateWithAccount(account: Account, walletSignature: string): Promise<void> {
     return account.validate(walletSignature);
   }
 
   public async reset() {
     console.log('Attempting to reset WalletConnect');
-    const ks = await this._provider.wc.killSession();
+    if (!this._provider) {
+      return;
+    }
+    await this._provider.wc.killSession();
     this._provider.disconnect();
     this._enabled = false;
   }
@@ -78,7 +89,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   public async enable() {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
-    try {
+    // try {
       // Create WalletConnect Provider
       this._chainInfo =
         app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
@@ -89,7 +100,13 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
         [chainId]:
           this._chainInfo.node.altWalletUrl || this._chainInfo.node.url,
       };
+
       this._provider = new WalletConnectProvider({ rpc, chainId });
+
+      // destroy pre-existing session if exists
+      if (this._provider.wc?.connected) {
+        await this._provider.wc.killSession();
+      }
 
       //  Enable session (triggers QR Code modal)
       await this._provider.enable();
@@ -102,10 +119,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       await this.initAccountsChanged();
       this._enabled = true;
       this._enabling = false;
-    } catch (error) {
-      this._enabling = false;
-      throw new Error(`Failed to enable WalletConnect: ${error.message}`);
-    }
+    // } catch (error) {
+    //   this._enabling = false;
+    //   throw new Error(`Failed to enable WalletConnect: ${error.message}`);
+    // }
   }
 
   public async initAccountsChanged() {
