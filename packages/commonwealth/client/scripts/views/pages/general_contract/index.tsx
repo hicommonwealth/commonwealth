@@ -62,26 +62,17 @@ class GeneralContractPage
     };
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
-      const contract = app.contracts.getByAddress(contractAddress);
-      this.state.loading = true;
-      let tx: string | TransactionReceipt;
-
       try {
-
+        this.state.loading = true;
         // initialize daoFactory Controller
         this.generalContractsController = new GeneralContractsController(
-          contract
+          contractAddress
         );
 
         // handle processing the forms inputs into their proper data types
-        tx = await this.generalContractsController.callContractFunction(
+        const result: any[] = await this.generalContractsController.callContractFunction(
           fn,
           this.state.form.functionNameToFunctionInputArgs
-        );
-
-        const result = await this.generalContractsController.decodeTransactionData(
-          fn,
-          tx
         );
 
         this.state.functionNameToFunctionOutput.set(fn.name, result);
