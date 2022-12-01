@@ -2,6 +2,7 @@
 
 import m from 'mithril';
 import $ from 'jquery';
+import ClassComponent from 'class_component';
 
 import 'pages/create_community.scss';
 
@@ -40,7 +41,7 @@ type CreateContractForm = ChainFormIdFields &
 
 type CreateContractState = ChainFormState & { form: CreateContractForm };
 
-export class AddContractForm implements m.ClassComponent<EthChainAttrs> {
+export class AddContractForm extends ClassComponent<EthChainAttrs> {
   private state: CreateContractState = {
     message: '',
     loaded: false,
