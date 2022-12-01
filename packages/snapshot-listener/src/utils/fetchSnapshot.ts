@@ -7,7 +7,6 @@ export default async function fetchNewSnapshotProposal(id: string) {
     const environment = process.env.NODE_ENV || "development";
 
     if (environment === "development") {
-      console.log("development");
       const dummyProposal = {
         data: {
           proposal: {

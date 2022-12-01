@@ -56,10 +56,10 @@ type StatusResp = {
   chainCategories: ChainCategoryInstance[];
   chainCategoryTypes: ChainCategoryTypeInstance[];
   recentThreads: ThreadCountQueryData[];
-  roles: RoleInstanceWithPermission[];
-  invites: InviteCodeAttributes[];
-  loggedIn: boolean;
-  user: {
+  roles?: RoleInstanceWithPermission[];
+  invites?: InviteCodeAttributes[];
+  loggedIn?: boolean;
+  user?: {
     email: string;
     emailVerified: boolean;
     emailInterval: EmailNotificationInterval;
@@ -159,10 +159,6 @@ const status = async (
         chainCategories,
         chainCategoryTypes,
         recentThreads: threadCountQueryData,
-        roles: null,
-        invites: null,
-        loggedIn: false,
-        user: null,
       });
     }
 
