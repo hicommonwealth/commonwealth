@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/treasury.scss';
 
@@ -35,7 +36,7 @@ function getModules() {
   }
 }
 
-class TreasuryPage implements m.ClassComponent {
+class TreasuryPage extends ClassComponent {
   oncreate() {
     const returningFromThread =
       app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);

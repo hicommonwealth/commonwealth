@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 
@@ -15,9 +16,7 @@ type ProposalHeaderLinkAttrs = {
 };
 
 // "View in Subscan"
-export class BlockExplorerLink
-  implements m.ClassComponent<ProposalHeaderLinkAttrs>
-{
+export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
   view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
@@ -34,9 +33,7 @@ export class BlockExplorerLink
 }
 
 // "Vote on polkadot-js"
-export class VotingInterfaceLink
-  implements m.ClassComponent<ProposalHeaderLinkAttrs>
-{
+export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs> {
   view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
@@ -53,7 +50,7 @@ export class VotingInterfaceLink
 }
 
 // "Go to discussion"
-export class ThreadLink implements m.ClassComponent<ProposalHeaderLinkAttrs> {
+export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {
   view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
@@ -77,9 +74,7 @@ type SnapshotThreadLinkAttrs = {
   thread: { id: string; title: string };
 };
 
-export class SnapshotThreadLink
-  implements m.ClassComponent<SnapshotThreadLinkAttrs>
-{
+export class SnapshotThreadLink extends ClassComponent<SnapshotThreadLinkAttrs> {
   view(vnode: m.Vnode<SnapshotThreadLinkAttrs>) {
     const { id, title } = vnode.attrs.thread;
 

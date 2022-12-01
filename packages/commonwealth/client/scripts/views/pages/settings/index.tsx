@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 
 import 'pages/settings/index.scss';
@@ -11,7 +12,7 @@ import { EmailSection } from './email_section';
 import { LinkedAddressesSection } from './linked_addresses_section';
 import { ComposerSection } from './composer_section';
 
-class SettingsPage implements m.ClassComponent {
+class SettingsPage extends ClassComponent {
   view() {
     if (app.loginStatusLoaded() && !app.isLoggedIn()) {
       m.route.set('/', {}, { replace: true });

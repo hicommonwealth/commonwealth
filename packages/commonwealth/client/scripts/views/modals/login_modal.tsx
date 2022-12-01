@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
@@ -33,7 +34,7 @@ type LoginModalAttrs = {
   onSuccess?: () => void;
 };
 
-export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
+export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
   private bodyType: LoginBodyType;

@@ -1,13 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/external_links_module.scss';
 
 import app from 'state';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
-export class ExternalLinksModule implements m.ClassComponent {
+export class ExternalLinksModule extends ClassComponent {
   view() {
     if (!app.chain) return;
     const meta = app.chain.meta;

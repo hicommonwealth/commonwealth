@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { InputSelect, ListItem } from 'construct-ui';
 
@@ -23,9 +24,7 @@ type AddressInputTypeaheadAttrs = {
   options: { placeholder: string; fluid: boolean };
 };
 
-export class AddressInputTypeahead
-  implements m.ClassComponent<AddressInputTypeaheadAttrs>
-{
+export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadAttrs> {
   private initialized: boolean;
   private loading: boolean;
   private selectedItem: AddressInputTypeaheadItem;
