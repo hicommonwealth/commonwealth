@@ -1,10 +1,6 @@
 // Use https://admin.socket.io/#/ to monitor
 
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
-import { Server, Socket } from 'socket.io';
-import * as jwt from 'jsonwebtoken';
-import { ExtendedError } from 'socket.io/dist/namespace';
-import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
 import {
   ConnectionTimeoutError,
@@ -17,11 +13,8 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
 import * as http from 'http';
 import * as jwt from 'jsonwebtoken';
-import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
-import Rollbar from 'rollbar';
 import { Server, Socket } from 'socket.io';
 import { ExtendedError } from 'socket.io/dist/namespace';
-import { JWT_SECRET, RABBITMQ_URI, REDIS_URL, VULTR_IP } from '../config';
 import { DB } from '../models';
 import { createCeNamespace, publishToCERoom } from './chainEventsNs';
 import {
