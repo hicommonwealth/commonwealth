@@ -3,7 +3,7 @@ import { NotificationCategories } from 'common-common/src/types';
 import validateChain, { ValidateChainParams } from '../util/validateChain';
 import { DB } from '../models';
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { AppError } from '../util/errors';
+import { AppError } from 'common-common/src/errors';
 import { RoleAttributes } from '../models/role';
 import { SubscriptionAttributes } from '../models/subscription';
 import { createRole as _createRole } from '../util/roles';

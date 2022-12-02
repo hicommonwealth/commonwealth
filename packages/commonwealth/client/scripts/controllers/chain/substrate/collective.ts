@@ -37,7 +37,7 @@ class SubstrateCollective extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.CollectiveProposal);
+    const entities = this.app.chainEntities.store.getByType(SubstrateTypes.EntityKind.CollectiveProposal);
     entities.forEach((e) => {
       const event = e.chainEvents[0];
       if (event && (event.data as any).collectiveName === this.moduleName) {
@@ -46,7 +46,7 @@ class SubstrateCollective extends ProposalModule<
     });
 
     // register new chain-event handlers
-    this.app.chain.chainEntities.registerEntityHandler(
+    this.app.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.CollectiveProposal, (entity, event) => {
         if ((event.data as any).collectiveName === this.moduleName) {
           this.updateProposal(entity, event);
