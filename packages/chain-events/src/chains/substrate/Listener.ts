@@ -1,5 +1,5 @@
-import { ApiPromise } from '@polkadot/api';
-import { RegisteredTypes } from '@polkadot/types/types';
+import {ApiPromise} from '@polkadot/api';
+import {RegisteredTypes} from '@polkadot/types/types';
 
 import {
   CWEvent,
@@ -7,10 +7,10 @@ import {
   IEventPoller,
   SupportedNetwork,
 } from '../../interfaces';
-import { Listener as BaseListener } from '../../Listener';
-import { addPrefix, factory } from '../../logging';
+import {Listener as BaseListener} from '../../Listener';
+import {addPrefix, factory} from '../../logging';
 
-import { Block, EventKind, ISubstrateListenerOptions } from './types';
+import {Block, EventKind, ISubstrateListenerOptions} from './types';
 
 import {
   createApi,
@@ -22,13 +22,11 @@ import {
 } from './index';
 
 // TODO: archival support
-export class Listener extends BaseListener<
-  ApiPromise,
+export class Listener extends BaseListener<ApiPromise,
   StorageFetcher,
   Processor,
   Subscriber,
-  EventKind
-> {
+  EventKind> {
   private readonly _options: ISubstrateListenerOptions;
 
   private _poller: IEventPoller<ApiPromise, Block>;
@@ -106,8 +104,10 @@ export class Listener extends BaseListener<
       return;
     }
 
-    // processed blocks missed during downtime
-    if (!this.options.skipCatchup) await this.processMissedBlocks();
+    // processed blocks missed blocks in the background while the subscription is active
+    if (!this.options.skipCatchup) {
+      await this.processMissedBlocks();
+    }
     else this.log.info(`Skipping event catchup on startup!`);
 
     try {
@@ -118,73 +118,51 @@ export class Listener extends BaseListener<
       this._subscribed = true;
     } catch (error) {
       this.log.error(`Subscription error`, error.message);
+      throw error;
     }
   }
 
   private async processMissedBlocks(): Promise<void> {
-    this.log.info(`Detected offline time, polling missed blocks...`);
+    const offlineRange = await this.processOfflineRange(this.log);
+    if (!offlineRange) return;
 
-    if (!this.discoverReconnectRange) {
-      this.log.info(
-        `Unable to determine offline range - No discoverReconnectRange function given`
-      );
-      return;
-    }
-
-    let offlineRange: IDisconnectedRange;
+    this.log.info(`Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
     try {
-      // fetch the block of the last server event from database
-      offlineRange = await this.discoverReconnectRange(this._chain);
-      if (!offlineRange) {
-        this.log.warn(`No offline range found, skipping event catchup.`);
-        return;
+      const maxBlocksPerPoll = 100;
+      let startBlock = offlineRange.startBlock;
+      let endBlock;
+
+      if (startBlock + maxBlocksPerPoll < offlineRange.endBlock) endBlock = startBlock + maxBlocksPerPoll;
+      else endBlock = offlineRange.endBlock;
+
+      while (endBlock <= offlineRange.endBlock) {
+        const blocks = await this.getBlocks(startBlock, endBlock + 1);
+        for (const block of blocks) {
+          await this.processBlock(block);
+        }
+
+        // stop loop when we have fetched all blocks
+        if (endBlock === offlineRange.endBlock) break;
+
+        startBlock = endBlock + 1;
+        if (endBlock + maxBlocksPerPoll <= offlineRange.endBlock) endBlock += maxBlocksPerPoll;
+        else endBlock = offlineRange.endBlock;
       }
-    } catch (error) {
-      this.log.error(
-        `Could not discover offline range: ${error.message}. Skipping event catchup.`
-      );
-      return;
-    }
-
-    // compare with default range algorithm: take last cached block in processor
-    // if it exists, and is more recent than the provided algorithm
-    // (note that on first run, we wont have a cached block/this wont do anything)
-    if (
-      this._lastBlockNumber &&
-      (!offlineRange ||
-        !offlineRange.startBlock ||
-        offlineRange.startBlock < this._lastBlockNumber)
-    ) {
-      offlineRange = { startBlock: this._lastBlockNumber };
-    }
-
-    // if we can't figure out when the last block we saw was,
-    // do nothing
-    // (i.e. don't try and fetch all events from block 0 onward)
-    if (!offlineRange || !offlineRange.startBlock) {
-      this.log.warn(`Unable to determine offline time range.`);
-      return;
-    }
-
-    try {
-      const blocks = await this.getBlocks(
-        offlineRange.startBlock,
-        offlineRange.endBlock
-      );
-      await Promise.all(blocks.map(this.processBlock, this));
     } catch (error) {
       this.log.error(
         `Block polling failed after disconnect at block ${offlineRange.startBlock}`,
         error
       );
     }
+    this.log.info(`Successfully processed block ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
   }
 
   public async getBlocks(
     startBlock: number,
     endBlock?: number
   ): Promise<Block[]> {
-    return this._poller.poll({ startBlock, endBlock });
+    this.log.info(`Polling blocks ${startBlock} to ${endBlock}`);
+    return this._poller.poll({startBlock, endBlock});
   }
 
   public async updateSpec(spec: RegisteredTypes): Promise<void> {
@@ -207,8 +185,8 @@ export class Listener extends BaseListener<
   protected async processBlock(block: Block): Promise<void> {
     // cache block number if needed for disconnection purposes
     const blockNumber = +block.header.number;
-    if (!this._lastBlockNumber || blockNumber > this._lastBlockNumber) {
-      this._lastBlockNumber = blockNumber;
+    if (!this._lastCachedBlockNumber || blockNumber > this._lastCachedBlockNumber) {
+      this._lastCachedBlockNumber = blockNumber;
     }
 
     const events: CWEvent[] = await this._processor.process(block);
@@ -220,5 +198,14 @@ export class Listener extends BaseListener<
 
   public get options(): ISubstrateListenerOptions {
     return this._options;
+  }
+
+  public async getLatestBlockNumber(): Promise<number> {
+    const header = await this._api.rpc.chain.getHeader();
+    return +header.number;
+  }
+
+  public async isConnected(): Promise<boolean> {
+    return this._api.isConnected;
   }
 }
