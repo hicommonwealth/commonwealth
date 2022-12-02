@@ -1,3 +1,12 @@
+// Permissioning Library for Common
+// Modeled after the Discord Permissions Implementation
+
+export type Permissions = bigint;
+
+export enum PermissionError {
+  NOT_PERMITTED = 'Action not permitted',
+}
+
 export enum Action {
   CREATE_CHAT = 0,
   VIEW_CHAT_CHANNELS = 1,
@@ -322,10 +331,24 @@ const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   ],
 ]);
 
-export type Permissions = bigint;
-
-export enum PermissionError {
-  NOT_PERMITTED = 'Action not permitted',
+// Adds the implicit permissions to a permission
+export function computeImplicitPermissions(
+  permission: Permissions,
+  actionNumber: number,
+  isAdd: boolean
+): Permissions {
+  let result = BigInt(permission);
+  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
+  if (implicitActions && isAdd) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      result |= BigInt(1) << BigInt(implicitActions[i]);
+    }
+  } else if (implicitActions && !isAdd) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      result &= ~(BigInt(1) << BigInt(implicitActions[i]));
+    }
+  }
+  return result;
 }
 
 // Must be Used to Add Permissions
@@ -364,26 +387,6 @@ export function isPermitted(permission: Permissions, action: number): boolean {
   const hasAction: boolean =
     (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
   return hasAction;
-}
-
-// Adds the implicit permissions to a permission
-export function computeImplicitPermissions(
-  permission: Permissions,
-  actionNumber: number,
-  isAdd: boolean
-): Permissions {
-  let result = BigInt(permission);
-  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
-  if (implicitActions && isAdd) {
-    for (let i = 0; i < implicitActions.length; i++) {
-      result |= BigInt(1) << BigInt(implicitActions[i]);
-    }
-  } else if (implicitActions && !isAdd) {
-    for (let i = 0; i < implicitActions.length; i++) {
-      result &= ~(BigInt(1) << BigInt(implicitActions[i]));
-    }
-  }
-  return result;
 }
 
 // Computes the permissions for a user
