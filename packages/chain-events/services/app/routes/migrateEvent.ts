@@ -23,13 +23,13 @@ const migrateEvent = async (
 ) => {
   const { secret, migrateAll, chain_id } = req.body;
 
-  // if (
-  //   !process.env.AIRPLANE_SECRET ||
-  //   !secret ||
-  //   process.env.AIRPLANE_SECRET !== secret
-  // ) {
-  //   return next(new AppError(MigrateEventErrors.Failed));
-  // }
+  if (
+    !process.env.AIRPLANE_SECRET ||
+    !secret ||
+    process.env.AIRPLANE_SECRET !== secret
+  ) {
+    return next(new AppError(MigrateEventErrors.Failed));
+  }
 
   if (migrateAll && migrateAll === true) {
     try {
