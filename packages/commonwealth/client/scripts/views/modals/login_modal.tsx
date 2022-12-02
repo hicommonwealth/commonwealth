@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
@@ -49,8 +50,7 @@ async function signWithWallet<T extends { address: string }>(wallet: IWebWallet<
   return wallet.signCanvasMessage(account, canvasMessage);
 }
 
-
-export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
+export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
   private bodyType: LoginBodyType;
@@ -68,7 +68,7 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
   private magicLoading: boolean;
   private showMobile: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<LoginModalAttrs>) {
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
@@ -108,9 +108,9 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
       this.primaryAccount = vnode.attrs.initialAccount;
       this.address = vnode.attrs.initialAccount.address;
     }
-    if (vnode.attrs.initialWebWallet) {
-      this.selectedWallet = vnode.attrs.initialWebWallet;
-    }
+    // if (vnode.attrs.initialWebWallet) {
+    //   this.selectedWallet = vnode.attrs.initialWebWallet;
+    // }
     if (vnode.attrs.initialWallets) {
       this.wallets = vnode.attrs.initialWallets;
     }
@@ -140,11 +140,14 @@ export class NewLoginModal implements m.ClassComponent<LoginModalAttrs> {
     );
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<LoginModalAttrs>) {
     const { onSuccess } = vnode.attrs;
     const wcEnabled = _.any(
       this.wallets,
-      (w) => (w instanceof WalletConnectWebWalletController || w instanceof TerraWalletConnectWebWalletController) && w.enabled
+      (w) =>
+        (w instanceof WalletConnectWebWalletController ||
+          w instanceof TerraWalletConnectWebWalletController) &&
+        w.enabled
     );
 
     // Handles Magic Link Login

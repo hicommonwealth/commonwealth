@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -14,13 +15,12 @@ import { slugify } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 
-export class LinkedThreadsCard
-  implements
-    m.ClassComponent<{
-      threadlId: number;
-      allowLinking: boolean;
-    }>
-{
+type LinkedThreadsCardAttrs = {
+  allowLinking: boolean;
+  threadlId: number;
+};
+
+export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
   private fetchLinkedThreads: boolean;
   private linkedThreads: Thread[];
   private loading: boolean;
@@ -29,7 +29,7 @@ export class LinkedThreadsCard
     this.fetchLinkedThreads = true;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<LinkedThreadsCardAttrs>) {
     const { allowLinking, threadlId } = vnode.attrs;
 
     const thread = app.threads.getById(threadlId);

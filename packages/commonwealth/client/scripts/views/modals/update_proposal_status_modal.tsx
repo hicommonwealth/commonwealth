@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/update_proposal_status_modal.scss';
@@ -23,14 +24,12 @@ type UpdateProposalStatusModalAttrs = {
   thread: Thread;
 };
 
-export class UpdateProposalStatusModal
-  implements m.ClassComponent<UpdateProposalStatusModalAttrs>
-{
+export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStatusModalAttrs> {
   private chainEntitiesToSet: ChainEntity[];
   private snapshotProposalsToSet: SnapshotProposal[];
   private stage: ThreadStage;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
     this.stage = vnode.attrs.thread.stage;
 
     this.chainEntitiesToSet = [];
@@ -40,7 +39,7 @@ export class UpdateProposalStatusModal
     );
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
     if (!app.chain?.meta) return;
 
     const { customStages } = app.chain.meta;
@@ -67,7 +66,7 @@ export class UpdateProposalStatusModal
             <div class="stage-options">
               {stages.map((targetStage) => (
                 <CWButton
-                  iconName={this.stage === targetStage ? 'check' : ''}
+                  iconName={this.stage === targetStage ? 'check' : undefined}
                   label={threadStageToLabel(targetStage)}
                   onclick={() => {
                     this.stage = targetStage;

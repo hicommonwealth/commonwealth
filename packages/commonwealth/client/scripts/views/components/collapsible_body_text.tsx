@@ -1,9 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
-import { Account, Comment, Thread, AnyProposal } from 'models';
+import { AnyProposal, Thread } from 'models';
 import { countLinesQuill, countLinesMarkdown } from './quill/helpers';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
@@ -12,59 +13,46 @@ import User from './widgets/user';
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;
 
-export const formatBody = (vnode, updateCollapse) => {
-  const { item } = vnode.attrs;
-  if (!item) return;
-
-  const body =
-    item instanceof Comment
-      ? item.text
-      : item instanceof Thread
-      ? item.body
-      : item.description;
-  if (!body) return;
-
-  vnode.state.body = body;
-  if (updateCollapse) {
-    try {
-      const doc = JSON.parse(body);
-      if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
-        vnode.state.collapsed = true;
-      }
-    } catch (e) {
-      if (countLinesMarkdown(body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH) {
-        vnode.state.collapsed = true;
-      }
-    }
-  }
+type CollapsibleThreadBodyAttrs = {
+  thread: Thread;
 };
 
-export class CollapsibleBodyText
-  implements
-    m.ClassComponent<{
-      item: AnyProposal | Thread | Comment<any>;
-    }>
-{
+export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyAttrs> {
   private body: any;
   private collapsed: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<CollapsibleThreadBodyAttrs>) {
+    const { thread } = vnode.attrs;
+
     this.collapsed = false;
-    formatBody(vnode, true);
+    this.body = thread.body;
+
+    try {
+      const doc = JSON.parse(thread.body);
+      if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        this.collapsed = true;
+      }
+    } catch (e) {
+      if (
+        countLinesMarkdown(thread.body) > MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
+      ) {
+        this.collapsed = true;
+      }
+    }
   }
 
-  onupdate(vnode) {
-    formatBody(vnode, false);
+  onupdate(vnode: m.Vnode<CollapsibleThreadBodyAttrs>) {
+    const { thread } = vnode.attrs;
+
+    this.body = thread.body;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<CollapsibleThreadBodyAttrs>) {
     const { body } = this;
 
     const getPlaceholder = () => {
-      if (!(vnode.attrs.item instanceof Thread)) return;
-
-      const author: Account = app.chain
-        ? app.chain.accounts.get(vnode.attrs.item.author)
+      const author = app.chain
+        ? app.chain.accounts.get(vnode.attrs.thread.author)
         : null;
 
       return author ? (
@@ -108,6 +96,7 @@ export class CollapsibleBodyText
         if (body?.toString().trim() === '') {
           return getPlaceholder();
         }
+
         return (
           <MarkdownFormattedText
             doc={body}
@@ -117,6 +106,72 @@ export class CollapsibleBodyText
       }
     };
 
-    return <>{text()}</>;
+    return text();
+  }
+}
+
+type CollapsibleProposalBodyAttrs = {
+  proposal: AnyProposal;
+};
+
+export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalBodyAttrs> {
+  private body: any;
+  private collapsed: boolean;
+
+  oninit(vnode: m.Vnode<CollapsibleProposalBodyAttrs>) {
+    const { proposal } = vnode.attrs;
+
+    this.collapsed = false;
+    this.body = proposal.description;
+
+    try {
+      const doc = JSON.parse(proposal.description);
+      if (countLinesQuill(doc.ops) > QUILL_PROPOSAL_LINES_CUTOFF_LENGTH) {
+        this.collapsed = true;
+      }
+    } catch (e) {
+      if (
+        countLinesMarkdown(proposal.description) >
+        MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH
+      ) {
+        this.collapsed = true;
+      }
+    }
+  }
+
+  onupdate(vnode: m.Vnode<CollapsibleProposalBodyAttrs>) {
+    const { proposal } = vnode.attrs;
+
+    this.body = proposal.description;
+  }
+
+  view() {
+    const { body } = this;
+
+    const text = () => {
+      try {
+        const doc = JSON.parse(body);
+
+        if (!doc.ops) throw new Error();
+
+        return (
+          <QuillFormattedText
+            doc={doc}
+            cutoffLines={QUILL_PROPOSAL_LINES_CUTOFF_LENGTH}
+            collapse={false}
+            hideFormatting={false}
+          />
+        );
+      } catch (e) {
+        return (
+          <MarkdownFormattedText
+            doc={body}
+            cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
+          />
+        );
+      }
+    };
+
+    return text();
   }
 }

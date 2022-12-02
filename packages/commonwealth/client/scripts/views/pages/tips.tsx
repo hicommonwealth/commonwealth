@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/tips.scss';
 
@@ -22,10 +23,12 @@ import { GovExplainer } from '../components/gov_explainer';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 
-class TipDetail
-  implements m.ClassComponent<{ proposal: SubstrateTreasuryTip }>
-{
-  view(vnode) {
+type TipAttrs = {
+  proposal: SubstrateTreasuryTip;
+};
+
+class Tip extends ClassComponent<TipAttrs> {
+  view(vnode: m.Vnode<TipAttrs>) {
     const { proposal } = vnode.attrs;
     const beneficiary = app.chain.accounts.get(proposal.data.who);
 
@@ -78,7 +81,7 @@ function getModules() {
   }
 }
 
-class TipsPage implements m.ClassComponent {
+class TipsPage extends ClassComponent {
   view() {
     const activeAccount = app.user.activeAccount;
 
@@ -117,10 +120,7 @@ class TipsPage implements m.ClassComponent {
 
     const activeTipContent = activeTips.length ? (
       activeTips.map((tip) => (
-        <ProposalCard
-          proposal={tip}
-          injectedContent={<TipDetail proposal={tip} />}
-        />
+        <ProposalCard proposal={tip} injectedContent={<Tip proposal={tip} />} />
       ))
     ) : (
       <div class="no-proposals">None</div>
@@ -128,10 +128,7 @@ class TipsPage implements m.ClassComponent {
 
     const inactiveTipContent = inactiveTips.length ? (
       inactiveTips.map((tip) => (
-        <ProposalCard
-          proposal={tip}
-          injectedContent={<TipDetail proposal={tip} />}
-        />
+        <ProposalCard proposal={tip} injectedContent={<Tip proposal={tip} />} />
       ))
     ) : (
       <div class="no-proposals">None</div>

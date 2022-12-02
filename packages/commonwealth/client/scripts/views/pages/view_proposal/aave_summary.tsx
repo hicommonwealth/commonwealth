@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_proposal/aave_summary.scss';
 
@@ -8,10 +9,12 @@ import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { AaveInfoRow } from '../../components/proposals/aave_proposal_card_detail';
 import { CWText } from '../../components/component_kit/cw_text';
 
-export class AaveViewProposalDetail
-  implements m.ClassComponent<{ proposal: AaveProposal }>
-{
-  view(vnode) {
+type AaveViewProposalDetailAttrs = {
+  proposal: AaveProposal;
+};
+
+export class AaveViewProposalDetail extends ClassComponent<AaveViewProposalDetailAttrs> {
+  view(vnode: m.Vnode<AaveViewProposalDetailAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (

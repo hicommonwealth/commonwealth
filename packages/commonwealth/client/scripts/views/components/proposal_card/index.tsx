@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/proposal_card/index.scss';
 
@@ -30,8 +31,8 @@ type ProposalCardAttrs = {
   proposal: AnyProposal;
 };
 
-export class ProposalCard implements m.ClassComponent<ProposalCardAttrs> {
-  view(vnode) {
+export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
+  view(vnode: m.Vnode<ProposalCardAttrs>) {
     const { proposal, injectedContent } = vnode.attrs;
 
     const secondaryTagText = getSecondaryTagText(proposal);

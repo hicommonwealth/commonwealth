@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/proposals/vote_listing.scss';
 
@@ -30,11 +31,11 @@ type VoteListingAttrs = {
   votes: Array<IVote<any>>;
 };
 
-export class VoteListing implements m.ClassComponent<VoteListingAttrs> {
+export class VoteListing extends ClassComponent<VoteListingAttrs> {
   private balancesCache;
   private balancesCacheInitialized;
 
-  view(vnode) {
+  view(vnode: m.Vnode<VoteListingAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
     const balanceWeighted =

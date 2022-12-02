@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import moment from 'moment';
 import _ from 'underscore';
@@ -42,13 +43,13 @@ const getPollDurationCopy = (
   }
 };
 
-export class PollEditorModal implements m.ClassComponent<PollEditorAttrs> {
+export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
   private customDuration: string;
   private customDurationEnabled: boolean;
   private options: Array<string>;
   private prompt: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<PollEditorAttrs>) {
     const { thread } = vnode.attrs;
     const { customDurationEnabled, customDuration } = this;
 
@@ -115,24 +116,25 @@ export class PollEditorModal implements m.ClassComponent<PollEditorAttrs> {
                   this.customDurationEnabled = !this.customDurationEnabled;
                   this.customDuration = 'Infinite';
                 }}
+                value=""
               />
-              <SelectList
-                filterable={false}
-                items={['Infinite'].concat(
+              {m(SelectList, {
+                filterable: false,
+                items: ['Infinite'].concat(
                   _.range(1, 31).map((n) => pluralize(Number(n), 'day'))
-                )}
-                itemRender={(n) => <div class="duration-item">{n}</div>}
-                onSelect={(e) => {
+                ),
+                itemRender: (n) => <div class="duration-item">{n}</div>,
+                onSelect: (e) => {
                   this.customDuration = e as string;
-                }}
-                trigger={
+                },
+                trigger: (
                   <CWButton
                     disabled={!customDurationEnabled}
                     iconName="chevronDown"
                     label={this.customDuration || 'Infinite'}
                   />
-                }
-              />
+                ),
+              })}
             </div>
           </div>
           <div class="buttons-row">

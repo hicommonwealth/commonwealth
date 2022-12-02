@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_account_creation_button.scss';
 
@@ -10,14 +11,12 @@ import { CWCard } from './cw_card';
 import { CWText } from './cw_text';
 
 type AccountCreationButtonAttrs = {
-  creationType: 'newAccount' | 'linkAccount';
+  creationType?: 'newAccount' | 'linkAccount';
   onclick: () => void;
 };
 
-export class CWAccountCreationButton
-  implements m.ClassComponent<AccountCreationButtonAttrs>
-{
-  view(vnode) {
+export class CWAccountCreationButton extends ClassComponent<AccountCreationButtonAttrs> {
+  view(vnode: m.Vnode<AccountCreationButtonAttrs>) {
     const { creationType = 'newAccount', onclick } = vnode.attrs;
 
     return (

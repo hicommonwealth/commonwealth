@@ -2,6 +2,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -13,9 +14,13 @@ import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 
-export class CreateCategory
-  implements m.ClassComponent<{ handleClose: () => void }>
-{
+type ChannelAttrs = {
+  category?: string;
+  channel?: IChannel | Record<string, never>;
+  handleClose: () => void;
+};
+
+export class CreateCategory extends ClassComponent<ChannelAttrs> {
   category: string;
   channel: string;
 
@@ -24,7 +29,7 @@ export class CreateCategory
     this.channel = '';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.createChatChannel(
         this.channel,
@@ -83,20 +88,21 @@ export class CreateCategory
   }
 }
 
-export class CreateChannel
-  implements m.ClassComponent<{ handleClose: () => void; category: string }>
-{
-  channel: string;
+export class CreateChannel extends ClassComponent<ChannelAttrs> {
+  private channel: string;
+
   oninit() {
     this.channel = '';
   }
-  view(vnode) {
+
+  view(vnode: m.Vnode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.createChatChannel(
         this.channel,
         app.activeChainId(),
         vnode.attrs.category
       );
+
       vnode.attrs.handleClose();
     };
 
@@ -137,24 +143,24 @@ export class CreateChannel
   }
 }
 
-export class RenameChannel
-  implements m.ClassComponent<{ handleClose: () => void; channel: IChannel }>
-{
-  channel_name: string;
+export class RenameChannel extends ClassComponent<ChannelAttrs> {
+  private channelName: string;
+
   oninit() {
-    this.channel_name = '';
+    this.channelName = '';
   }
-  view(vnode) {
+
+  view(vnode: m.Vnode<ChannelAttrs>) {
     const handleSubmit = async () => {
       vnode.attrs.handleClose();
       await app.socket.chatNs.editChatChannel(
         vnode.attrs.channel.id,
-        this.channel_name
+        this.channelName
       );
     };
 
     const handleChange = (evt) => {
-      this.channel_name = evt.target.value;
+      this.channelName = evt.target.value;
     };
 
     return (
@@ -179,7 +185,7 @@ export class RenameChannel
           />
           <CWButton
             buttonType="primary-blue"
-            disabled={!this.channel_name.length}
+            disabled={!this.channelName.length}
             label="Submit"
             onclick={handleSubmit}
           />
@@ -189,24 +195,24 @@ export class RenameChannel
   }
 }
 
-export class RenameCategory
-  implements m.ClassComponent<{ handleClose: () => void; category: string }>
-{
-  new_category: string;
+export class RenameCategory extends ClassComponent<ChannelAttrs> {
+  newCategory: string;
+
   oninit() {
-    this.new_category = '';
+    this.newCategory = '';
   }
-  view(vnode) {
+
+  view(vnode: m.Vnode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.editChatCategory(
         vnode.attrs.category,
-        this.new_category
+        this.newCategory
       );
       vnode.attrs.handleClose();
     };
 
     const handleChange = (evt) => {
-      this.new_category = evt.target.value;
+      this.newCategory = evt.target.value;
     };
 
     return (
@@ -231,7 +237,7 @@ export class RenameCategory
           />
           <CWButton
             buttonType="primary-blue"
-            disabled={!this.new_category.length}
+            disabled={!this.newCategory.length}
             label="Submit"
             onclick={handleSubmit}
           />
@@ -241,10 +247,8 @@ export class RenameCategory
   }
 }
 
-export class DeleteChannel
-  implements m.ClassComponent<{ handleClose: () => void; channel: IChannel }>
-{
-  view(vnode) {
+export class DeleteChannel extends ClassComponent<ChannelAttrs> {
+  view(vnode: m.Vnode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.deleteChatChannel(vnode.attrs.channel.id);
       vnode.attrs.handleClose();
@@ -277,10 +281,8 @@ export class DeleteChannel
   }
 }
 
-export class DeleteCategory
-  implements m.ClassComponent<{ handleClose: () => void; category: string }>
-{
-  view(vnode) {
+export class DeleteCategory extends ClassComponent<ChannelAttrs> {
+  view(vnode: m.Vnode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.deleteChatCategory(vnode.attrs.category);
       vnode.attrs.handleClose();

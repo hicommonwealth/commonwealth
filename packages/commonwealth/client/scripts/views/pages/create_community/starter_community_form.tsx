@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -27,7 +28,7 @@ import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/
 type CreateStarterForm = ChainFormFields & { base: ChainBase };
 
 type CreateStarterState = ChainFormState & { form: CreateStarterForm };
-export class StarterCommunityForm implements m.ClassComponent {
+export class StarterCommunityForm extends ClassComponent {
   private state: CreateStarterState = {
     message: '',
     loaded: false,

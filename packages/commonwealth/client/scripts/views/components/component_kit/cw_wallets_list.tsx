@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -38,6 +39,7 @@ const LinkAccountItem: m.Component<
 > = {
   view: (vnode) => {
     const { account, walletNetwork, walletChain, onSelect, idx } = vnode.attrs;
+
     const address = app.chain
       ? addressSwapper({
           address: account.address,
@@ -47,13 +49,17 @@ const LinkAccountItem: m.Component<
           ),
         })
       : account.address;
+
     const baseName = app.chain?.meta.base || walletChain;
+
     const capitalizedBaseName = `${baseName
       .charAt(0)
       .toUpperCase()}${baseName.slice(1)}`;
+
     const name =
       account.meta?.name ||
       `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
+
     return m(
       '.account-item',
       {
@@ -105,16 +111,15 @@ const LinkAccountItem: m.Component<
   },
 };
 
-export class AccountSelector
-  implements
-    m.ClassComponent<{
-      accounts: Array<{ address: string; meta?: { name: string } }>;
-      walletNetwork: ChainNetwork;
-      walletChain: ChainBase;
-      onSelect: (idx: number) => void;
-    }>
-{
-  view(vnode) {
+type AccountSelectorAttrs = {
+  accounts: Array<{ address: string; meta?: { name: string } }>;
+  onSelect: (idx: number) => void;
+  walletChain: ChainBase;
+  walletNetwork: ChainNetwork;
+};
+
+export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
+  view(vnode: m.Vnode<AccountSelectorAttrs>) {
     const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
 
     return (
@@ -144,19 +149,23 @@ export class AccountSelector
 }
 
 type WalletsListAttrs = {
-  connectAnotherWayOnclick: () => void;
+  connectAnotherWayOnclick?: () => void;
   darkMode?: boolean;
   showResetWalletConnect: boolean;
   hasNoWalletsLink?: boolean;
   wallets: Array<IWebWallet<any>>;
-  setBodyType: (bodyType: string) => void;
-  accountVerifiedCallback: (account: Account) => void;
+  setBodyType?: (bodyType: string) => void;
+  accountVerifiedCallback?: (
+    account: Account,
+    newlyCreated: boolean,
+    linked: boolean
+  ) => void;
   setSelectedWallet: (wallet: IWebWallet<any>) => void;
-  linking: boolean;
+  linking?: boolean;
 };
 
-export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
-  view(vnode) {
+export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
+  view(vnode: m.Vnode<WalletsListAttrs>) {
     const {
       connectAnotherWayOnclick,
       darkMode,
@@ -168,7 +177,10 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       linking,
     } = vnode.attrs;
 
-    async function handleNormalWalletLogin(wallet: IWebWallet<any>, address) {
+    async function handleNormalWalletLogin(
+      wallet: IWebWallet<any>,
+      address: string
+    ) {
       if (app.isLoggedIn()) {
         const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
           address:
@@ -198,7 +210,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       try {
         const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, await wallet.getChainId());
         const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-        const validationBlockInfo = await wallet.getRecentBlock(chainIdentifier);
+        const validationBlockInfo = wallet.getRecentBlock && await wallet.getRecentBlock(chainIdentifier);
         const { account: signerAccount, newlyCreated } =
           await createUserWithAddress(
             address,
@@ -213,16 +225,23 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
       }
     }
 
-    const resetWalletConnectOnclick = async (webWallets) => {
+    const resetWalletConnectOnclick = async (
+      webWallets: Array<IWebWallet<any>>
+    ) => {
       const wallet = webWallets.find(
-        (w) => w instanceof WalletConnectWebWalletController || w instanceof TerraWalletConnectWebWalletController
+        (w) =>
+          w instanceof WalletConnectWebWalletController ||
+          w instanceof TerraWalletConnectWebWalletController
       );
+
       await wallet.reset();
+
       if (isWindowMediumSmallInclusive(window.innerWidth)) {
         $('.LoginMobile').trigger('modalexit');
       } else {
         $('.LoginDesktop').trigger('modalexit');
       }
+
       m.redraw();
     };
 
@@ -309,7 +328,7 @@ export class CWWalletsList implements m.ClassComponent<WalletsListAttrs> {
                         // eslint-disable-next-line max-len
                         window.location.href = `https://app.axieinfinity.com/login/?src=commonwealth&stateId=${stateId}`;
                       } else {
-                        vnode.state.error(result.error || 'Could not login');
+                        console.log(result.error || 'Could not login');
                       }
                     } else {
                       // Normal Wallet Flow

@@ -1,11 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/tx_signing_modal.scss';
 
 import app from 'state';
-import { ITXModalData } from 'models';
+import { ITXModalData } from 'models/interfaces';
 import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import {
@@ -20,7 +21,7 @@ import {
   TxSigningModalWaitingStage,
 } from '../components/tx_signing/tx_signing_modal_stages';
 
-class TXSigningModal implements m.ClassComponent<ITXModalData> {
+class TXSigningModal extends ClassComponent<ITXModalData> {
   private data: TxDataState;
   private stageName: StageName;
 
@@ -28,7 +29,7 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
     this.stageName = 'intro';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ITXModalData>) {
     const { author, txData, txType } = vnode.attrs;
 
     const txLabel = getTransactionLabel(txType);
@@ -59,7 +60,9 @@ class TXSigningModal implements m.ClassComponent<ITXModalData> {
               txType={txType}
             />
           )}
-          {this.stageName === 'waiting' && <TxSigningModalWaitingStage />}
+          {this.stageName === 'waiting' && (
+            <TxSigningModalWaitingStage next={next} />
+          )}
           {this.stageName === 'success' && (
             <TxSigningModalSuccessStage
               blocknum={this.data.blocknum}

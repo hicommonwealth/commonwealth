@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { capitalize } from 'lodash';
 import $ from 'jquery';
 
@@ -39,7 +40,7 @@ type NewThreadFormAttrs = {
   isModal: boolean;
 };
 
-export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
+export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
   activeTopic: Topic | string | boolean;
   autoTitleOverride: boolean;
   form: NewThreadFormType;
@@ -177,7 +178,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     this.form.topic = topic;
   }
 
-  oninit(vnode: m.VnodeDOM<NewThreadFormAttrs, this>) {
+  oninit(vnode: m.Vnode<NewThreadFormAttrs>) {
     const { isModal } = vnode.attrs;
     this.form = {
       topic: null,
@@ -255,7 +256,7 @@ export class NewThreadForm implements m.ClassComponent<NewThreadFormAttrs> {
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<NewThreadFormAttrs>) {
     if (!app.chain) return;
     const { isModal, hasTopics } = vnode.attrs;
     const { fromDraft, saving, form } = this;

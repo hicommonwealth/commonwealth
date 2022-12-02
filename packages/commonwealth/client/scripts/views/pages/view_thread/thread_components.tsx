@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/thread_components.scss';
 import 'pages/view_proposal/proposal_header_links.scss';
@@ -25,13 +26,12 @@ import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover'
 import { getClasses } from '../../components/component_kit/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
-export class ThreadAuthor
-  implements
-    m.Component<{
-      thread: Thread;
-    }>
-{
-  view(vnode) {
+type ThreadComponentAttrs = {
+  thread: Thread;
+};
+
+export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
+  view(vnode: m.Vnode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     const author: Account = app.chain.accounts.get(thread.author);
@@ -72,8 +72,8 @@ export class ThreadAuthor
   }
 }
 
-export class ThreadStage implements m.ClassComponent<{ thread: Thread }> {
-  view(vnode) {
+export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
+  view(vnode: m.Vnode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     return (
@@ -105,13 +105,8 @@ export class ThreadStage implements m.ClassComponent<{ thread: Thread }> {
   }
 }
 
-export class ExternalLink
-  implements
-    m.ClassComponent<{
-      thread: Thread;
-    }>
-{
-  view(vnode) {
+export class ExternalLink extends ClassComponent<ThreadComponentAttrs> {
+  view(vnode: m.Vnode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     return (

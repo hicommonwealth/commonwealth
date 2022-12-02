@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 
@@ -22,14 +23,13 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 
-class LinkedChainEntity
-  implements
-    m.ClassComponent<{
-      thread: Thread;
-      chainEntity;
-    }>
-{
-  view(vnode) {
+type LinkedChainEntityAttrs = {
+  chainEntity;
+  thread: Thread;
+};
+
+class LinkedChainEntity extends ClassComponent<LinkedChainEntityAttrs> {
+  view(vnode: m.Vnode<LinkedChainEntityAttrs>) {
     const { thread, chainEntity } = vnode.attrs;
 
     const slug = chainEntityTypeToProposalSlug(chainEntity.type);
@@ -48,18 +48,17 @@ class LinkedChainEntity
   }
 }
 
-class LinkedSnapshot
-  implements
-    m.ClassComponent<{
-      thread: Thread;
-    }>
-{
+type LinkedSnapshotAttrs = {
+  thread: Thread;
+};
+
+class LinkedSnapshot extends ClassComponent<LinkedSnapshotAttrs> {
   private initialized: boolean;
   private snapshot: SnapshotProposal;
   private snapshotProposalsLoaded: boolean;
   private space: SnapshotSpace;
 
-  view(vnode) {
+  view(vnode: m.Vnode<LinkedSnapshotAttrs>) {
     const { thread } = vnode.attrs;
     if (!thread.snapshotProposal) return;
     if (!app.chain?.meta?.snapshot?.length) return;
@@ -101,19 +100,18 @@ class LinkedSnapshot
   }
 }
 
-export class LinkedProposalsCard
-  implements
-    m.ClassComponent<{
-      onChangeHandler: (
-        stage: ThreadStage,
-        chainEntities?: ChainEntity[],
-        snapshotProposal?: SnapshotProposal[]
-      ) => void;
-      thread: Thread;
-      showAddProposalButton: boolean;
-    }>
-{
-  view(vnode) {
+type LinkedProposalsCardAttrs = {
+  onChangeHandler: (
+    stage: ThreadStage,
+    chainEntities?: ChainEntity[],
+    snapshotProposal?: SnapshotProposal[]
+  ) => void;
+  thread: Thread;
+  showAddProposalButton: boolean;
+};
+
+export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs> {
+  view(vnode: m.Vnode<LinkedProposalsCardAttrs>) {
     const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
     return (
       <CWCard className="LinkedProposalsCard">

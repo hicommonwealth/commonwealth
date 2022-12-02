@@ -120,7 +120,3 @@ export type TokenResponse = {
   decimals: number;
   logoURI?: string;
 };
-
-export enum RedisNamespaces {
-  Chat_Socket = 'chat_socket',
-}

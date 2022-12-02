@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_banner.scss';
 
@@ -10,13 +11,13 @@ import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
 
 type BannerAttrs = {
-  bannerContent: string;
+  bannerContent: string | m.Vnode;
   className?: string;
-  onClose: () => void;
+  onClose?: () => void;
 };
 
-export class CWBanner implements m.ClassComponent<BannerAttrs> {
-  view(vnode) {
+export class CWBanner extends ClassComponent<BannerAttrs> {
+  view(vnode: m.Vnode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
@@ -33,8 +34,8 @@ export class CWBanner implements m.ClassComponent<BannerAttrs> {
   }
 }
 
-export class CWMessageBanner implements m.ClassComponent<BannerAttrs> {
-  view(vnode) {
+export class CWMessageBanner extends ClassComponent<BannerAttrs> {
+  view(vnode: m.Vnode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (

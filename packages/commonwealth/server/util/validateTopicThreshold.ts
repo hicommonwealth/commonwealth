@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import { ChainNetwork } from 'common-common/src/types';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
@@ -46,7 +46,7 @@ const validateTopicThreshold = async (
       where: { chain_id: topic.chain.id },
       include: [{ model: models.Contract, required: true }],
     });
-    // TODO: @JAKE in the future, we will have more than one contract,
+      // TODO: @JAKE in the future, we will have more than one contract,
       // need to handle this through the TBC Rule, passing in associated Contract.id
     const threshold = new BN(topic.token_threshold || '0');
     if (!threshold.isZero()) {

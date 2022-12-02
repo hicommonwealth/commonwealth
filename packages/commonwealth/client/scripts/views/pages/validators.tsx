@@ -1,10 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/validators.scss';
 
 import app from 'state';
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import { pluralize, externalLink } from 'helpers';
 import { ChainBase } from 'common-common/src/types';
 import { AddressInfo } from 'models';
@@ -19,10 +21,23 @@ import { GovExplainer } from '../components/gov_explainer';
 import { CWText } from '../components/component_kit/cw_text';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
-class Validator implements m.ClassComponent<{ info }> {
-  view(vnode) {
-    if (!vnode.attrs.info) return;
+type ValidatorType = {
+  chain: string;
+  commission: any;
+  controller: string;
+  isElected: boolean;
+  nominators: number;
+  own: SubstrateCoin;
+  stash: string;
+  total: SubstrateCoin;
+};
 
+type ValidatorAttrs = {
+  info: ValidatorType;
+};
+
+class Validator extends ClassComponent<ValidatorAttrs> {
+  view(vnode: m.Vnode<ValidatorAttrs>) {
     const { info } = vnode.attrs;
 
     return (
@@ -51,7 +66,7 @@ class Validator implements m.ClassComponent<{ info }> {
   }
 }
 
-class ValidatorsPage implements m.ClassComponent {
+class ValidatorsPage extends ClassComponent {
   private validators;
   private totalStaked;
   private validatorsInitialized: boolean;

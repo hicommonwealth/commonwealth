@@ -6,7 +6,7 @@ import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
-import { BalanceType, ChainNetwork } from '../../../common-common/src/types';
+import { BalanceType, ChainNetwork } from 'common-common/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,7 +15,12 @@ export const Errors = {
   QueryFailed: 'Balance query failed',
 };
 
-type TokenBalanceReq = { address: string, author_chain: string, chain: string, contract_address: string };
+type TokenBalanceReq = {
+  address: string;
+  author_chain: string;
+  chain: string;
+  contract_address: string;
+};
 type TokenBalanceResp = string;
 
 const tokenBalance = async (
@@ -25,7 +30,7 @@ const tokenBalance = async (
   res: TypedResponse<TokenBalanceResp>
 ) => {
   if (!req.body.address) {
-    throw new AppError(Errors.InvalidAddress)
+    throw new AppError(Errors.InvalidAddress);
   }
 
   let chain: ChainInstance;

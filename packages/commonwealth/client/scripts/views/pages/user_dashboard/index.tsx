@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -23,7 +24,11 @@ export enum DashboardViews {
   Chain = 'Chain',
 }
 
-class UserDashboard implements m.ClassComponent<{ type: string }> {
+type UserDashboardAttrs = {
+  type: string;
+};
+
+class UserDashboard extends ClassComponent<UserDashboardAttrs> {
   private activePage: DashboardViews;
   private chainEventCount: number;
   private chainEvents: DashboardActivityNotification[];
@@ -80,7 +85,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
     this.chainEvents = [];
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<UserDashboardAttrs>) {
     const {
       activePage,
       fyNotifications,

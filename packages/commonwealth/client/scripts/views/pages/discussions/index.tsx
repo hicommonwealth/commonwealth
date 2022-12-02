@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { debounce } from 'lodash';
 
 import 'pages/discussions/index.scss';
@@ -14,7 +15,7 @@ import { DiscussionFilterBar } from './discussion_filter_bar';
 type DiscussionPageAttrs = { topic?: string };
 
 // Graham 4/18/22 Todo: Consider re-implementing LastVisited logic
-class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
+class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   private topicName: string;
   private stageName: string;
   private fetchingThreads: boolean;
@@ -65,7 +66,7 @@ class DiscussionsPage implements m.ClassComponent<DiscussionPageAttrs> {
     }
   }
 
-  view(vnode: m.VnodeDOM<DiscussionPageAttrs, this>) {
+  view(vnode: m.Vnode<DiscussionPageAttrs>) {
     if (!app.chain || !app.chain.serverLoaded) {
       return <PageLoading />;
     }

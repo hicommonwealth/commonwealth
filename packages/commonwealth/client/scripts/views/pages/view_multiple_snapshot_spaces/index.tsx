@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/snapshot/multiple_snapshots_page.scss';
 
@@ -56,20 +57,19 @@ function redirectHandler(
   };
 }
 
-class MultipleSnapshotsPage
-  implements
-    m.ClassComponent<{
-      action?: string;
-      proposal?: Thread;
-    }>
-{
+type MultipleSnapshotsPageAttrs = {
+  action?: string;
+  proposal?: Thread;
+};
+
+class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
   private snapshot_spaces: string[];
   private spaces_metadata: Array<{
     space: SnapshotSpace;
     proposals: SnapshotProposal[];
   }>;
 
-  view(vnode) {
+  view(vnode: m.Vnode<MultipleSnapshotsPageAttrs>) {
     const { action, proposal } = vnode.attrs;
     const redirect_options = redirectHandler(action, proposal);
 
