@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_radio_button.scss';
 
@@ -12,16 +13,16 @@ export type RadioButton = { label?: string; value: string; disabled?: boolean };
 
 type RadioButtonStyleAttrs = {
   disabled?: boolean;
-  checked: boolean;
+  checked?: boolean;
 };
 
 type RadioButtonAttrs = {
-  groupName: string;
-  onchange: (e?: any) => void;
+  groupName?: string;
+  onchange?: (e?: any) => void;
 } & RadioButton &
   RadioButtonStyleAttrs;
 
-export class CWRadioButton implements m.ClassComponent<RadioButtonAttrs> {
+export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
   view(vnode: m.Vnode<RadioButtonAttrs>) {
     const {
       disabled = false,

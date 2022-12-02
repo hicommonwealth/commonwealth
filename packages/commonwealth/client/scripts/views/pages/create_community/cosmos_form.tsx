@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -29,7 +30,7 @@ type CreateCosmosForm = ChainFormFields & EthFormFields & CosmosFormFields;
 
 type CreateCosmosState = ChainFormState & { form: CreateCosmosForm };
 
-export class CosmosForm implements m.ClassComponent {
+export class CosmosForm extends ClassComponent {
   private state: CreateCosmosState = {
     message: '',
     saving: false,

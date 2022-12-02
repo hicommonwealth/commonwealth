@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import Web3 from 'web3';
 
@@ -50,7 +51,7 @@ type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
 
 type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
 
-export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
+export class EthDaoForm extends ClassComponent<EthChainAttrs> {
   private state: CreateEthDaoState = {
     message: '',
     loaded: false,

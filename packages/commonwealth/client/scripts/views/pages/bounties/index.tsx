@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/bounties.scss';
 
@@ -26,7 +27,7 @@ type BountyDetailAttrs = {
   bounty: SubstrateBounty;
 };
 
-class BountyDetail implements m.ClassComponent<BountyDetailAttrs> {
+class BountyDetail extends ClassComponent<BountyDetailAttrs> {
   view(vnode: m.Vnode<BountyDetailAttrs>) {
     const { bounty } = vnode.attrs;
 
@@ -90,7 +91,7 @@ class BountyDetail implements m.ClassComponent<BountyDetailAttrs> {
   }
 }
 
-class BountiesPage implements m.ClassComponent {
+class BountiesPage extends ClassComponent {
   view() {
     if (!app.chain || !app.chain.loaded) {
       if (

@@ -2,6 +2,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -15,11 +16,11 @@ import { CWText } from '../component_kit/cw_text';
 
 type ChannelAttrs = {
   category?: string;
-  channel?: IChannel;
+  channel?: IChannel | Record<string, never>;
   handleClose: () => void;
 };
 
-export class CreateCategory implements m.ClassComponent<ChannelAttrs> {
+export class CreateCategory extends ClassComponent<ChannelAttrs> {
   category: string;
   channel: string;
 
@@ -87,7 +88,7 @@ export class CreateCategory implements m.ClassComponent<ChannelAttrs> {
   }
 }
 
-export class CreateChannel implements m.ClassComponent<ChannelAttrs> {
+export class CreateChannel extends ClassComponent<ChannelAttrs> {
   private channel: string;
 
   oninit() {
@@ -142,7 +143,7 @@ export class CreateChannel implements m.ClassComponent<ChannelAttrs> {
   }
 }
 
-export class RenameChannel implements m.ClassComponent<ChannelAttrs> {
+export class RenameChannel extends ClassComponent<ChannelAttrs> {
   private channelName: string;
 
   oninit() {
@@ -194,7 +195,7 @@ export class RenameChannel implements m.ClassComponent<ChannelAttrs> {
   }
 }
 
-export class RenameCategory implements m.ClassComponent<ChannelAttrs> {
+export class RenameCategory extends ClassComponent<ChannelAttrs> {
   newCategory: string;
 
   oninit() {
@@ -246,7 +247,7 @@ export class RenameCategory implements m.ClassComponent<ChannelAttrs> {
   }
 }
 
-export class DeleteChannel implements m.ClassComponent<ChannelAttrs> {
+export class DeleteChannel extends ClassComponent<ChannelAttrs> {
   view(vnode: m.Vnode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.deleteChatChannel(vnode.attrs.channel.id);
@@ -280,7 +281,7 @@ export class DeleteChannel implements m.ClassComponent<ChannelAttrs> {
   }
 }
 
-export class DeleteCategory implements m.ClassComponent<ChannelAttrs> {
+export class DeleteCategory extends ClassComponent<ChannelAttrs> {
   view(vnode: m.Vnode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.deleteChatCategory(vnode.attrs.category);

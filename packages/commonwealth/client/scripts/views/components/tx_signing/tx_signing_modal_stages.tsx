@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -14,14 +15,12 @@ import { TXSigningTransactionBox } from './tx_signing_transaction_box';
 import { CWText } from '../component_kit/cw_text';
 import { CWSpinner } from '../component_kit/cw_spinner';
 
-type TxSigningModalIntroStageAttrs = ITXModalData & {
-  next: NextFn;
-  polkaWallet: IWebWallet<any>;
-};
+type TxSigningModalIntroStageAttrs = ITXModalData &
+  NextFn & {
+    polkaWallet: IWebWallet<any>;
+  };
 
-export class TxSigningModalIntroStage
-  implements m.ClassComponent<TxSigningModalIntroStageAttrs>
-{
+export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntroStageAttrs> {
   private introTab: 'webWallet' | 'commandLine';
 
   oninit() {
@@ -71,16 +70,12 @@ export class TxSigningModalIntroStage
   }
 }
 
-type TxSigningModalWaitingStageAttrs = { next: NextFn };
-
-export class TxSigningModalWaitingStage
-  implements m.ClassComponent<TxSigningModalWaitingStageAttrs>
-{
+export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
   private timeoutHandle?: NodeJS.Timeout;
   private timer?: number;
   private timerHandle?: NodeJS.Timeout;
 
-  oncreate(vnode: m.Vnode<TxSigningModalWaitingStageAttrs>) {
+  oncreate(vnode: m.Vnode<NextFn>) {
     const $parent = $('.TXSigningModal');
 
     this.timer = 0;
@@ -125,9 +120,7 @@ export class TxSigningModalWaitingStage
   }
 }
 
-export class TxSigningModalSuccessStage
-  implements m.ClassComponent<TxDataState>
-{
+export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
   view(vnode: m.VnodeDOM<TxDataState, this>) {
     const { blocknum, hash, timestamp } = vnode.attrs;
 
@@ -152,10 +145,10 @@ export class TxSigningModalSuccessStage
   }
 }
 
-export class TxSigningModalRejectedStage
-  implements m.ClassComponent<TxDataState & NextFn>
-{
-  view(vnode) {
+type TxSigningModalRejectedStageAttrs = TxDataState & NextFn;
+
+export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRejectedStageAttrs> {
+  view(vnode: m.VnodeDOM<TxSigningModalRejectedStageAttrs>) {
     const { blocknum, error, hash, timestamp, next } = vnode.attrs;
 
     return (

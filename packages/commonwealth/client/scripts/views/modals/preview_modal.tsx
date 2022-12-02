@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/preview_modal.scss';
 
@@ -9,7 +10,7 @@ import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 
-class PreviewModalEmptyState implements m.ClassComponent {
+class PreviewModalEmptyState extends ClassComponent {
   view() {
     return (
       <div class="empty-state-container">
@@ -26,7 +27,7 @@ type PreviewModalAttrs = {
   title: string;
 };
 
-export class PreviewModal implements m.ClassComponent<PreviewModalAttrs> {
+export class PreviewModal extends ClassComponent<PreviewModalAttrs> {
   view(vnode: m.Vnode<PreviewModalAttrs>) {
     const { title } = vnode.attrs;
 
