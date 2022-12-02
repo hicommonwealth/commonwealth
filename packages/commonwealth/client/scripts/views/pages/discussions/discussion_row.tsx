@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { Button, Tag } from 'construct-ui';
 
@@ -33,7 +34,7 @@ type DiscussionRowAttrs = {
   proposal: Thread;
 };
 
-export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
+export class DiscussionRow extends ClassComponent<DiscussionRowAttrs> {
   view(vnode: m.Vnode<DiscussionRowAttrs>) {
     const { proposal } = vnode.attrs;
 

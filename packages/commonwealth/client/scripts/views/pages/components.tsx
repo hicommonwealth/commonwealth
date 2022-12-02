@@ -1,10 +1,11 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import Sublayout from 'views/sublayout';
 import { ComponentShowcase } from '../components/component_kit/cw_component_showcase';
 
-class ComponentsPage implements m.ClassComponent {
+class ComponentsPage extends ClassComponent {
   view() {
     return (
       <Sublayout

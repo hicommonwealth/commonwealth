@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
@@ -11,7 +12,7 @@ import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWDivider } from '../component_kit/cw_divider';
 
-export class SidebarQuickSwitcher implements m.ClassComponent {
+export class SidebarQuickSwitcher extends ClassComponent {
   view() {
     const allCommunities = app.config.chains
       .getAll()
