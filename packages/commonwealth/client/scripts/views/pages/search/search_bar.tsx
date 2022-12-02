@@ -16,17 +16,17 @@ import {
   Tag,
 } from 'construct-ui';
 
-import 'pages/search_bar.scss';
+import 'pages/search/search_bar.scss';
 
 import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile, AddressInfo, SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { SearchContentType } from 'types';
-import User, { UserBlock } from './widgets/user';
-import { CommunityLabel } from './community_label';
-import { renderQuillTextBody } from './quill/helpers';
-import { CWSpinner } from './component_kit/cw_spinner';
+import { CommunityLabel } from '../../components/community_label';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { renderQuillTextBody } from '../../components/quill/helpers';
+import User, { UserBlock } from '../../components/widgets/user';
 
 const getMemberPreview = (
   addr,
@@ -89,16 +89,16 @@ const getCommunityPreview = (
   params['size'] = 'large';
 
   const onSelect = () => {
-    if (params.community) {
-      m.route.set(
-        params.community.address
-          ? `/${params.community.address}`
-          : params.community.id
-          ? `/${params.community.id}`
-          : '/'
-      );
-    }
-    closeResultsFn();
+    // if (params.community) {
+    //   m.route.set(
+    //     params.community.address
+    //       ? `/${params.community.address}`
+    //       : params.community.id
+    //       ? `/${params.community.id}`
+    //       : '/'
+    //   );
+    // }
+    // closeResultsFn();
   };
 
   return m(ListItem, {

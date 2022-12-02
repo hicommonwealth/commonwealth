@@ -6,7 +6,7 @@ import _, { capitalize } from 'lodash';
 import moment from 'moment';
 import { ListItem, Select } from 'construct-ui';
 
-import 'pages/search.scss';
+import 'pages/search/index.scss';
 
 import { pluralize } from 'helpers';
 import app from 'state';
@@ -16,16 +16,15 @@ import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { SearchContentType } from 'types';
-import { PageNotFound } from './404';
-import { search } from '../components/search_bar';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { CommunityLabel } from '../components/community_label';
-import { renderQuillTextBody } from '../components/quill/helpers';
-import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
-import { CWText } from '../components/component_kit/cw_text';
-import ErrorPage from './error';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
+import { renderQuillTextBody } from '../../components/quill/helpers';
+import { PageNotFound } from '../404';
+import ErrorPage from '../error';
+import { search } from './search_bar';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -68,22 +67,23 @@ const getCommunityResult = (community) => {
       ? { community }
       : null;
 
-  params['size'] = 'large';
+  // params['size'] = 'large';
 
   const onSelect = () => {
-    if (params.community) {
-      m.route.set(
-        params.community.address ? `/${params.community.address}` : '/'
-      );
-    } else {
-      m.route.set(community.id ? `/${community.id}` : '/');
-    }
+    // if (params.community) {
+    //   m.route.set(
+    //     params.community.address ? `/${params.community.address}` : '/'
+    //   );
+    // } else {
+    //   m.route.set(community.id ? `/${community.id}` : '/');
+    // }
   };
 
   return m(ListItem, {
     label: (
       <a class="search-results-item.community-result">
-        <CommunityLabel {...params} />
+        poop
+        {/* <CommunityLabel {...params} /> */}
       </a>
     ),
     onclick: onSelect,
@@ -147,21 +147,21 @@ const getCommentResult = (comment, searchTerm) => {
   return m(ListItem, {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
-    onclick: () => {
-      m.route.set(
-        `/${chain}/proposal/${proposalId.split('_')[0]}/${
-          proposalId.split('_')[1]
-        }`
-      );
-    },
+    // onclick: () => {
+    //   m.route.set(
+    //     `/${chain}/proposal/${proposalId.split('_')[0]}/${
+    //       proposalId.split('_')[1]
+    //     }`
+    //   );
+    // },
     label: (
       <a class="search-results-item">
         <div class="search-results-thread-header">
           {`comment - ${comment.chain || comment.community}`}
         </div>
-        <div class="search-results-thread-title">
+        {/* <div class="search-results-thread-title">
           {decodeURIComponent(comment.title)}
-        </div>
+        </div> */}
         <div class="search-results-thread-subtitle">
           <span class="created-at">{moment(comment.created_at).fromNow()}</span>
           {m(User, {
