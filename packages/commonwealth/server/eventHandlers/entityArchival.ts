@@ -6,7 +6,7 @@ import {
   IEventHandler,
   CWEvent,
   eventToEntity,
-  entityToFieldName,
+  getUniqueEntityKey,
   EntityEventKind,
   IChainEntityKind,
   IChainEventData,
@@ -158,7 +158,7 @@ export default class extends IEventHandler {
       return dbEvent;
     }
     const [entityKind, updateType] = entity;
-    const fieldName = entityToFieldName(event.network, entityKind);
+    const fieldName = getUniqueEntityKey(event.network, entityKind);
     const fieldValue = event.data[fieldName].toString();
     const author = event.data['proposer'];
     switch (updateType) {
