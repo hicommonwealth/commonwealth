@@ -25,7 +25,7 @@ import {
 import { ChainAttributes, IListenerInstances } from './types';
 import Rollbar from 'rollbar';
 import fetch from "node-fetch";
-import StatsDController from "common-common/src/statsd";
+import {StatsDController} from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -122,7 +122,12 @@ async function mainProcess(
     } catch (e) {
       log.error('Could not fetch chain-event service data', e);
       rollbar?.critical('Could not fetch chain-event service data', e);
-      log.info(`Using cached chains: ${allChainsAndTokens}`);
+      if (Array.isArray(allChainsAndTokens) && allChainsAndTokens.length > 0) {
+        log.info(`Using cached chains: ${allChainsAndTokens}`);
+      } else {
+        log.info(`No cached chains. Retrying in ${REPEAT_TIME} minute(s)`);
+        return;
+      }
     }
   }
 

@@ -19,7 +19,7 @@ import hash from 'object-hash';
 
 import { DB } from '../../database/database';
 import { ChainEventInstance } from '../../database/models/chain_event';
-import StatsDController from "common-common/src/statsd";
+import {StatsDController} from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 
