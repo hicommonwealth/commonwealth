@@ -11,15 +11,12 @@ import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 
 import { Block, EventKind, ISubstrateListenerOptions } from './types';
-
-import {
-  createApi,
-  EnricherConfig,
-  Poller,
-  Processor,
-  StorageFetcher,
-  Subscriber,
-} from './index';
+import { StorageFetcher } from '../substrate/storageFetcher';
+import { Processor } from '../substrate/processor';
+import { Subscriber } from '../substrate/subscriber';
+import { EnricherConfig } from '../substrate/filters/enricher';
+import { createApi } from '../substrate/subscribeFunc';
+import { Poller } from '../substrate/poller';
 
 // TODO: archival support
 export class Listener extends BaseListener<

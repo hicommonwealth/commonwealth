@@ -12,6 +12,7 @@ import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMQController } from 'common-common/src/rabbitmq';
 import { ChainEventNotification } from '../../shared/types';
 import {RascalPublications} from "common-common/src/rabbitmq";
+import emitNotifications from 'server/models/subscription/subscriptionEmiter';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {
@@ -49,7 +50,7 @@ export default class extends IEventHandler {
       }
 
       // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
-      const dbNotification = await this._models.Subscription.emitNotifications(
+      const dbNotification = await emitNotifications(
         this._models,
         NotificationCategories.ChainEvent,
         dbEventType.id,
@@ -61,7 +62,8 @@ export default class extends IEventHandler {
       );
 
       // construct notification with all the necessary data from the DB (without having to re-query using joins)
-      const formattedEvent: ChainEventNotification = dbNotification.toJSON();
+      // cast to any to avoid id type mismatch
+      const formattedEvent: ChainEventNotification = (dbNotification as any).toJSON();
       formattedEvent.ChainEvent = dbEvent.toJSON()
       formattedEvent.ChainEvent.ChainEventType = dbEventType.toJSON()
 

@@ -76,7 +76,7 @@ import {
 } from './models/starred_community';
 import {
   SubscriptionModelStatic
-} from './models/subscription';
+} from 'server/models/subscription/subscription';
 import {
   TaggedThreadModelStatic
 } from './models/tagged_threads';

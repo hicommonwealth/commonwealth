@@ -10,6 +10,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
+import emitNotifications from 'server/models/subscription/subscriptionEmiter';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -116,7 +117,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
 
     // dispatch notifications to subscribers of the comment/thread
-    models.Subscription.emitNotifications(
+    emitNotifications(
       models,
       NotificationCategories.CommentEdit,
       '',
@@ -184,7 +185,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     if (mentionedAddresses?.length > 0) {
       mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
-        models.Subscription.emitNotifications(
+        emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,

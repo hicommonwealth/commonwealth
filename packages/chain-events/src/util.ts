@@ -9,11 +9,9 @@ import {
   IEventLabel,
   IChainEventKind,
 } from './interfaces';
-import {
-  Listener as SubstrateListener,
-  Title as SubstrateTitle,
-  Label as SubstrateLabel,
-} from './chains/substrate';
+import { Listener as SubstrateListener } from './chains/substrate/Listener';
+import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
+import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
 import {
   Listener as MolochListener,
   Title as MolochTitle,

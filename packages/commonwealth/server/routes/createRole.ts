@@ -5,7 +5,7 @@ import { DB } from '../models';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import { AppError } from '../util/errors';
 import { RoleAttributes } from '../models/role';
-import { SubscriptionAttributes } from '../models/subscription';
+import { SubscriptionAttributes } from 'server/models/subscription/subscription';
 import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {

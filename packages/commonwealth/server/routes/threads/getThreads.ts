@@ -64,7 +64,7 @@ const getThreads = async (
     attributes,
     ...pagination,
     ...order
-  })
+  });
 
   return success(res, {threads: threads.map((t) => t.toJSON()), count});
 };

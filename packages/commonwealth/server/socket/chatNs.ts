@@ -14,6 +14,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
 import { checkReadPermitted } from '../util/roles';
+import emitNotifications from 'server/models/subscription/subscriptionEmiter';
 
 
 const log = factory.getLogger(addPrefix(__filename));
@@ -48,7 +49,7 @@ const handleMentions = async (models: DB, socket: any, message: any, id: number,
           mentionedAddresses.map(async (mentionedAddress) => {
             // some Addresses may be missing users, e.g. if the user removed the address
             if (!mentionedAddress.User) return;
-            await models.Subscription.emitNotifications(
+            await emitNotifications(
                 models,
                 NotificationCategories.NewChatMention,
                 `user-${mentionedAddress.User.id}`,

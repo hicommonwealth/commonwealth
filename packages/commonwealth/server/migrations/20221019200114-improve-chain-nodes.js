@@ -357,15 +357,46 @@ module.exports = {
         { id: 'clandestina' },
         { transaction },
       );
+
+      // await queryInterface.findAll(
+      //   'Chains',
+      //   { chain_node_id: 20 },
+      // ).then((chain) => {
+      //   return queryInterface.bulkDelete(
+      //     'CommunityChains',
+      //     {chain_id: chain.chain_id}
+      //   );
+      // });
+      //
+      // await queryInterface.findAll(
+      //   'Chains',
+      //   { chain_node_id: 21 },
+      // ).then((chain) => {
+      //   return queryInterface.bulkDelete(
+      //     'CommunityChains',
+      //     {chain_id: chain.chain_id}
+      //   );
+      // });
+      //
+      // await queryInterface.bulkDelete(
+      //   'Chains',
+      //   {chain_node_id: 20}
+      // );
+      // await queryInterface.bulkDelete(
+      //   'Chains',
+      //   {chain_node_id: 21}
+      // );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 18 },
-        { transaction }
+        { cascade: true , transaction: transaction, truncate: true},
+        { primaryKeys:[], primaryKeyAttributes:[] }
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 21 },
-        { transaction }
+        { transaction: transaction, cascade: true, truncate: true },
+        { primaryKeys:[], primaryKeyAttributes:[] }
       );
       await queryInterface.changeColumn(
         'ChainNodes',

@@ -7,6 +7,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
+import emitNotifications from 'server/models/subscription/subscriptionEmiter';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -126,7 +127,7 @@ const addEditors = async (
     collaborators.map((collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-      models.Subscription.emitNotifications(
+      emitNotifications(
         models,
         NotificationCategories.NewCollaboration,
         `user-${collaborator.User.id}`,
