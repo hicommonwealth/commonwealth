@@ -336,14 +336,7 @@ export function addPermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result |= BigInt(1) << BigInt(actionNumber);
-  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
-  if (implicitActions) {
-    for (let i = 0; i < implicitActions.length; i++) {
-      // eslint-disable-next-line no-bitwise
-      result |= BigInt(1) << BigInt(Number(implicitActions[i]));
-    }
-    return result;
-  }
+  result = computeImplicitPermissions(result, actionNumber, true);
   return result;
 }
 
@@ -355,12 +348,7 @@ export function removePermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result &= ~(BigInt(1) << BigInt(actionNumber));
-  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
-  if (implicitActions) {
-    for (let i = 0; i < implicitActions.length; i++) {
-      result &= ~(BigInt(1) << BigInt(Number(implicitActions[i])));
-    }
-  }
+  result = computeImplicitPermissions(result, actionNumber, false);
   return result;
 }
 
@@ -380,26 +368,19 @@ export function isPermitted(permission: Permissions, action: number): boolean {
 
 // Adds the implicit permissions to a permission
 export function computeImplicitPermissions(
-  permission: Permissions
+  permission: Permissions,
+  actionNumber: number,
+  isAdd: boolean
 ): Permissions {
   let result = BigInt(permission);
-  // Find the highest hierachy action that is permitted
-  for (const [action, implicitActions] of IMPLICIT_PERMISSIONS_BY_ACTION) {
-    // If the action is permitted, add all the implicit actions
-    if (isPermitted(permission, Number(action))) {
-      // add all the implicit actions and then return the result
-      for (const implicitAction of implicitActions) {
-        if (!isPermitted(result, Number(implicitAction))) {
-          result = addPermission(result, implicitAction);
-        }
-      }
-    } else {
-      // If the action is denied, deny all the implicit actions
-      for (const implicitAction of implicitActions) {
-        if (isPermitted(result, Number(implicitAction))) {
-          result = removePermission(result, implicitAction);
-        }
-      }
+  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
+  if (implicitActions && isAdd) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      result |= BigInt(1) << BigInt(implicitActions[i]);
+    }
+  } else if (implicitActions && !isAdd) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      result &= ~(BigInt(1) << BigInt(implicitActions[i]));
     }
   }
   return result;
