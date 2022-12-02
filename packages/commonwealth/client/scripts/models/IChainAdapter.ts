@@ -6,13 +6,10 @@ import $ from 'jquery';
 import m from 'mithril';
 import { ChainBase } from 'common-common/src/types';
 
-import ChainEntityController, {
-  EntityRefreshOption,
-} from 'controllers/server/chain_entities';
+import ChainEntityController from 'controllers/server/chain_entities';
 import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
-import { Account, NodeInfo, ProposalModule } from '.';
+import { Account, ProposalModule } from '.';
 import ChainInfo from './ChainInfo';
-import { WebSocketController } from '../controllers/server/socket';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -36,7 +33,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public abstract chain: IChainModule<C, A>;
   public abstract accounts: IAccountsModule<C, A>;
   public readonly chainEntities?: ChainEntityController;
-  public readonly usingServerChainEntities = false;
   public readonly communityBanner?: string;
 
   public deferred: boolean;
@@ -51,13 +47,8 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     console.log(`Starting ${this.meta.name}`);
     let response;
     if (this.chainEntities) {
-      // if we're loading entities from chain, only pull completed
-      const refresh = this.usingServerChainEntities
-        ? EntityRefreshOption.AllEntities
-        : EntityRefreshOption.CompletedEntities;
-
       [, response] = await Promise.all([
-        this.chainEntities.refresh(this.meta.id, refresh),
+        this.chainEntities.refresh(this.meta.id),
         $.get(`${this.app.serverUrl()}/bulkOffchain`, {
           chain: this.id,
           community: null,

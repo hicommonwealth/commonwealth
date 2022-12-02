@@ -68,13 +68,6 @@ class SubstrateBountyTreasury extends ProposalModule<
       }
     );
 
-    // fetch proposals from chain
-    await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchBounties(this.app.chain.block.height),
-    );
-
     // fetch extra metadata
     // TODO: this should be picked up by the chain-events system
     const extra = await ChainInfo.api.derive.bounties.bounties();
