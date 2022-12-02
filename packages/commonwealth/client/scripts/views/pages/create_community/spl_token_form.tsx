@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import * as solw3 from '@solana/web3.js';
 
@@ -29,7 +30,7 @@ type CreateERC20Form = ChainFormFields & SplTokenFormFields;
 
 type CreateSplTokenState = ChainFormState & { form: CreateERC20Form };
 
-export class SplTokenForm implements m.ClassComponent {
+export class SplTokenForm extends ClassComponent {
   private state: CreateSplTokenState = {
     message: '',
     loaded: false,

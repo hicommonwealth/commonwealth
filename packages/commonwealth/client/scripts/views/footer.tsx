@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'footer.scss';
 
@@ -25,7 +26,7 @@ const footercontents = [
   },
 ];
 
-export class Footer implements m.ClassComponent {
+export class Footer extends ClassComponent {
   view() {
     const redirectClick = (route) => {
       m.route.set(route);

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import { formatCoin } from 'adapters/currency';
 import app from 'state';
@@ -11,7 +12,7 @@ type BalanceInfoAttrs = {
   account: SubstrateAccount;
 };
 
-export class BalanceInfo implements m.ClassComponent<BalanceInfoAttrs> {
+export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
   private balance: any;
   private freeBalance: any;
   private lockedBalance: any;

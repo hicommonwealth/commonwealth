@@ -1,13 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
 import { formatAddressShort } from 'helpers';
-import { RoleInfo, RolePermission } from 'models';
+import { RolePermission, RoleInfo } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
@@ -17,9 +18,7 @@ type UpgradeRolesFormAttrs = {
   roleData: RoleInfo[];
 };
 
-export class UpgradeRolesForm
-  implements m.ClassComponent<UpgradeRolesFormAttrs>
-{
+export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
   private role: string;
   private user: string;
 
@@ -34,12 +33,9 @@ export class UpgradeRolesForm
     });
 
     const nonAdminNames: string[] = nonAdmins.map((role) => {
-      // Graham 9.19.23: Temporary patch while Addresses are unreliable.
       // @TODO: @Profiles upgrade, clean this up
-      const chainId =
-        role.chain_id || typeof role.Address.chain === 'string'
-          ? role.Address.chain
-          : role.Address.chain?.id;
+      const chainId = role.chain_id ? role.chain_id : role.Address?.chain?.id;
+
       const displayName = app.profiles.getProfile(
         chainId as string,
         role.Address.address

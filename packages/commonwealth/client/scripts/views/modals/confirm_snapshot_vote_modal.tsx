@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/confirm_snapshot_vote_modal.scss';
@@ -30,9 +31,7 @@ type ConfirmSnapshotVoteModalAttrs = {
   successCallback: () => any;
 };
 
-export class ConfirmSnapshotVoteModal
-  implements m.Component<ConfirmSnapshotVoteModalAttrs>
-{
+export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVoteModalAttrs> {
   private saving: boolean;
 
   view(vnode: m.Vnode<ConfirmSnapshotVoteModalAttrs>) {

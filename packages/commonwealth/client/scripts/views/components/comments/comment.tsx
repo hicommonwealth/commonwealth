@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'components/comments/comment.scss';
@@ -25,7 +26,7 @@ type CommentAuthorAttrs = {
   comment: CommentType<any>;
 };
 
-class CommentAuthor implements m.Component<CommentAuthorAttrs> {
+class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
   view(vnode: m.Vnode<CommentAuthorAttrs>) {
     const { comment } = vnode.attrs;
 
@@ -60,7 +61,7 @@ class CommentAuthor implements m.Component<CommentAuthorAttrs> {
 type CommentAttrs = {
   comment: CommentType<any>;
   handleIsReplying: (isReplying: boolean, id?: number) => void;
-  isGloballyEditing: boolean;
+  isGloballyEditing?: boolean;
   isLast: boolean;
   isLocked: boolean;
   setIsGloballyEditing: (status: boolean) => void;
@@ -68,7 +69,7 @@ type CommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-export class Comment implements m.ClassComponent<CommentAttrs> {
+export class Comment extends ClassComponent<CommentAttrs> {
   private isEditingComment: boolean;
   private shouldRestoreEdits: boolean;
   private savedEdits: string;

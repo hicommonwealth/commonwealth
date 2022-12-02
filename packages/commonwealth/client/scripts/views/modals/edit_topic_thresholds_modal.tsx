@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 
@@ -17,9 +18,7 @@ type EditTopicThresholdsRowAttrs = {
   topic: Topic;
 };
 
-class EditTopicThresholdsRow
-  implements m.ClassComponent<EditTopicThresholdsRowAttrs>
-{
+class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs> {
   private newTokenThresholdInWei: string;
 
   view(vnode: m.Vnode<EditTopicThresholdsRowAttrs>) {
@@ -88,9 +87,7 @@ type EditTopicThresholdsModalAttrs = {
   tokenThreshold: number;
 };
 
-export class EditTopicThresholdsModal
-  implements m.ClassComponent<EditTopicThresholdsModalAttrs>
-{
+export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholdsModalAttrs> {
   private form: NewTopicModalForm;
 
   view(vnode: m.Vnode<EditTopicThresholdsModalAttrs>) {
