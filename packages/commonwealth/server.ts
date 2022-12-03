@@ -32,6 +32,7 @@ import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import {sendBatchedNotificationEmails} from './server/scripts/emails';
 import setupAPI from './server/router';
 import setupCosmosProxy from './server/util/cosmosProxy';
+import setupEntityProxy from './server/util/entitiesProxy';
 import setupPassport from './server/passport';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
@@ -251,6 +252,7 @@ async function main() {
     banCache,
   );
   setupCosmosProxy(app, models);
+  setupEntityProxy(app);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 
   setupErrorHandlers(app, rollbar);
