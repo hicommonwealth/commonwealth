@@ -16,5 +16,3 @@ WORKDIR /monorepo/packages/commonwealth
 ENV NODE_ENV=development
 EXPOSE 8080
 
-CMD ["yarn", "start"]
-

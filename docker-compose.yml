@@ -1,16 +1,38 @@
 version: '3.7'
 services: 
-  cw-server:
-    image: node:14-alpine
-    volumes:
-      - './monorepo'
-    command: 
-      CI=true npm install -g yarn 
-    command: 
-      - CI=true yarn start || (\
-        echo '`yarn start` failed but the container is running...' && \
-        tail -f /dev/null\
-        )
+  builder: 
+    image: builder
+    build: .
+  db:
+    env_file:
+      - ".env"
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: "${DOCKER_PG_PW}" 
+      POSTGRES_USER: "${DOCKER_PG_USER}" 
     ports:
-      - 8080:8080
+      - '5431:5432'
+    volumes:
+      - db:/var/lib/postgresql/data 
+  common-common:
+    build: packages/common-common
+  chain-events: 
+    build: packages/chain-events
+  commonwealth: 
+    build:
+      context: .
+      dockerfile: packages/commonwealth/Dockerfile
+    hostname: commonwealth-server
+    command: ./scripts/wait-for-it.sh db:5432 -- yarn start
+    depends_on:
+      - db
+    ports: 
+      - "8080:8080"
+    volumes:
+      - ./:/monorepo
+volumes:
+  db:
+    driver: local
+    
+
 

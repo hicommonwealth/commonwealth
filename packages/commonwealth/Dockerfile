@@ -1,18 +1,10 @@
-FROM node:14-alpine
+FROM builder
 
-WORKDIR /monorepo
+WORKDIR /packages/commonwealth
 
-COPY ./packages/commonwealth/package.json 
+COPY . .
 
-RUN npm i -g yarn
-RUN yarn install --dev
+RUN yarn --ignore-engines && yarn install && yarn build 
 
-COPY ./packages/commonwealth/build ./packages/server/build
-
-WORKDIR ./packages/server
-
-ENV NODE_ENV=development
-
+CMD ["yarn", "start"]
 EXPOSE 8080
-
-CMD ["node", "build/index.js"]
