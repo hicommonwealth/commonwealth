@@ -1,5 +1,4 @@
-import { DataTypes, QueryTypes } from 'sequelize';
-import * as Sequelize from 'sequelize';
+import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import send, { WebhookContent } from '../webhookNotifier';
