@@ -148,7 +148,6 @@ const addEditors = async (
           chain: thread.chain,
           body: thread.body,
         },
-        req.wss,
         [author.address]
       );
     });

@@ -1,5 +1,5 @@
-import WebSocket from 'ws';
-import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
+import { DataTypes, QueryTypes } from 'sequelize';
+import * as Sequelize from 'sequelize';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import send, { WebhookContent } from '../webhookNotifier';
@@ -7,7 +7,7 @@ import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { DB } from '../models';
 import { NotificationCategoryAttributes } from './notification_category';
-import { ModelStatic } from './types';
+import {ModelInstance, ModelStatic} from './types';
 import {
   IPostNotificationData,
   ICommunityNotificationData,
@@ -55,8 +55,7 @@ export type SubscriptionAttributes = {
   Comment?: CommentAttributes;
 }
 
-export interface SubscriptionInstance
-extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
+export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 }
 
