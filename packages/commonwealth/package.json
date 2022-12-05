@@ -33,12 +33,11 @@
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
-    "migrate-identities": "NO_CLIENT=true NO_PRERENDER=true IDENTITY_MIGRATION=true ts-node --project tsconfig.json server.ts",
     "migrate-flags": "NO_CLIENT=true NO_PRERENDER=true FLAG_MIGRATION=true ts-node --project tsconfig.json server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
     "profile": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.dev.js --json --profile > webpack-stats.json",
     "psql": "psql -h localhost commonwealth -U commonwealth",
-    "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"ChainEvents\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
+    "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump",
     "reset-db": "psql -d postgres -U commonwealth -c 'DROP DATABASE commonwealth WITH (FORCE);' && npx sequelize db:create",
     "load-db": "psql -d commonwealth -U commonwealth -W -f latest.dump",
     "load-db-local": "psql -d commonwealth -U commonwealth -W -f local_save.dump",
@@ -49,11 +48,7 @@
     "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
     "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh",
-    "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
-    "transfer-main-to-heroku": "pg_dump $(heroku config:get DATABASE_URL -a commonwealthapp) --no-privileges --no-owner -t \"public.\\\"ChainEvents\\\"\" -t \"public.\\\"ChainEntities\\\"\" -t \"public.\\\"ChainEventTypes\\\"\" | psql $(heroku config:get DATABASE_URL -a chain-events)",
-    "transfer-local-to-heroku": "pg_dump -U commonwealth --no-owner --no-privileges -t \"public.\\\"ChainEvents\\\"\" -t \"public.\\\"ChainEntities\\\"\" -t \"public.\\\"ChainEventTypes\\\" | psql $(heroku config:get DATABASE_URL -a chain-events)",
-    "transfer-local-to-local": "pg_dump -U commonwealth --verbose --no-owner --no-privileges -t \"public.\\\"ChainEvents\\\"\" -t \"public.\\\"ChainEntities\\\"\" -t \"public.\\\"ChainEventTypes\\\"\" -f chainEvents.dump && psql -d commonwealth_chain_events -U commonwealth -W -f chainEvents.dump",
-    "transfer-dump-to-local": "psql -d commonwealth_chain_events -U commonwealth -W -f chainEvents.dump"
+    "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump"
   },
   "engines": {
     "node": "14.x"
