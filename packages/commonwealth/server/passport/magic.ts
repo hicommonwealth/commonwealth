@@ -11,7 +11,7 @@ import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../util/validateChain';
 import { ProfileAttributes } from '../models/profile';
 
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 

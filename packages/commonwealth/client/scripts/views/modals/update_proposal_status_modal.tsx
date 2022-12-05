@@ -96,7 +96,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
               snapshotProposalsToSet={this.snapshotProposalsToSet}
             />
           )}
-          {app.chain.chainEntities && (
+          {app.chainEntities && (
             <ChainEntitiesSelector
               thread={vnode.attrs.thread}
               onSelect={() => {
