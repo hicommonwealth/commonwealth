@@ -5,8 +5,8 @@ import 'chai/register-should';
 import getReactions from 'server/routes/reactions/getReactions';
 import { req, res } from 'test/unit/unitHelpers';
 import { GetReactionsReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
-import './rootHooks.spec';
-import { testReactions } from 'test/unit/api/rootHooks.spec';
+import 'test/integration/api/external/dbEntityHooks.spec';
+import { testReactions } from 'test/integration/api/external/dbEntityHooks.spec';
 import { ReactionAttributes } from 'server/models/reaction';
 
 describe('getReactions Tests', () => {

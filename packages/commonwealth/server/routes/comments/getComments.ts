@@ -1,11 +1,9 @@
 import { AppError, ServerError } from '../../util/errors';
-import validateChain from '../../util/validateChain';
 import Sequelize from 'sequelize';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
-import { CommentAttributes } from '../../models/comment';
 import { GetCommentsResp, IPagination } from 'common-common/src/api/extApiTypes';
-import { formatPagination } from 'server/util/queries';
+import { formatPagination, requiredArgsMessage } from 'server/util/queries';
 
 const { Op } = Sequelize;
 
@@ -23,23 +21,31 @@ const getComments = async (
   const { community_id, addresses, count_only } = req.query;
 
   const where = { chain: community_id };
+  if(requiredArgsMessage(where)) throw new AppError(requiredArgsMessage(where));
 
   const include = [];
   if (addresses) include.push({
     model: models.Address,
-    where: { address: { [Op.in]: addresses }},
+    where: { address: { [Op.in]: addresses } },
     required: true
   });
 
-  // if (count_only) //TODO: finish;
+  let comments, count;
+  if (!count_only) {
+    ({ rows: comments, count } = await models.Comment.findAndCountAll({
+      where: where,
+      include: include,
+      ...formatPagination(req.query)
+    }));
+  } else{
+    count = <any>await models.Comment.count({
+      where: where,
+      include: include,
+      ...formatPagination(req.query)
+    });
+  }
 
-  const { rows: comments, count } = await models.Comment.findAndCountAll({
-    where: where,
-    include: include,
-    ...formatPagination(req.query)
-  });
-
-  return success(res, { comments: comments.map((c) => c.toJSON()), count });
+  return success(res, { comments: comments, count });
 };
 
 export default getComments;

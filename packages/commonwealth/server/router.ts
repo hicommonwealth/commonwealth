@@ -160,6 +160,7 @@ import getProfiles from './routes/profiles/getProfiles';
 import { StatsDController } from 'common-common/src/statsd';
 import { getChainNodes } from 'server/routes/getChainNodes';
 import { getBalanceProviders } from 'server/routes/getBalanceProviders';
+import { getTokenBalance } from 'server/routes/getTokenBalance';
 
 function setupRouter(
   app: Express,
@@ -810,10 +811,10 @@ function setupRouter(
   router.get('/communities', getCommunities.bind(this, models));
   router.get('/profile', getProfile.bind(this, models));
   router.get('/profiles', getProfiles.bind(this, models));
-  router.get('/chainNodes', getChainNodes.bind(this, models));
 
+  router.get('/chainNodes', getChainNodes.bind(this, models));
   router.get('/balanceProviders ', getBalanceProviders.bind(this, tokenBalanceCache, models));
-  router.get('/tokenBalance ', getBalanceProviders.bind(this, tokenBalanceCache, models));
+  router.get('/tokenBalance ', getTokenBalance.bind(this, tokenBalanceCache, models));
 
 
   app.use('/api', router);

@@ -2,40 +2,30 @@ import Sequelize from 'sequelize';
 import { DB } from 'server/models';
 import { success, TypedRequestQuery, TypedResponse } from 'server/types';
 import {
-  GetChainNodesReq,
-  GetChainNodesResp,
+  GetChainNodesReq, GetChainNodesResp
 } from 'common-common/src/api/extApiTypes';
 import { AppError } from 'server/util/errors';
-import { formatPagination } from 'server/util/queries';
-
-const { Op } = Sequelize;
+import { ChainNodeResp, TokenBalanceCache } from 'token-balance-cache/src';
 
 export const Errors = {
-  NoArgs: "Must provide balance_type or name",
+  NoArgs: "Must provide chain_node_ids or names",
   BothArgs: "Must not provide both args"
 };
 
 export const getChainNodes = async (
   models: DB,
+  tbc: TokenBalanceCache,
   req: TypedRequestQuery<GetChainNodesReq>,
   res: TypedResponse<GetChainNodesResp>,
 ) => {
+  const { chain_node_ids, names } = req.query;
 
-  if (!req.query) throw new AppError(Errors.NoArgs);
-  // This route is for fetching all profiles + addresses by community
-  const { balance_types, names } = req.query;
+  if (!chain_node_ids && !names) throw new AppError(Errors.NoArgs);
+  if (chain_node_ids && names) throw new AppError(Errors.BothArgs);
 
-  if (!balance_types && !names) throw new AppError(Errors.NoArgs);
-  if (balance_types && names) throw new AppError(Errors.BothArgs);
+  let chainNodes: ChainNodeResp[] = await tbc.getChainNodes();
+  if (chain_node_ids) chainNodes = chainNodes.filter(c => chain_node_ids.includes(c.id));
+  if (names) chainNodes = chainNodes.filter(c => names.includes(c.name));
 
-  const where = balance_types ? { balance_type: { [Op.in]: balance_types } } : { name: { [Op.in]: names } };
-
-  const pagination = formatPagination(req.query);
-
-  const { rows: chainNodes, count } = await models.ChainNode.findAndCountAll({
-    where,
-    ...pagination,
-  });
-
-  return success(res, { chain_nodes: chainNodes.map((t) => t.toJSON()), count });
+  return success(res, { chain_nodes: chainNodes, count: chainNodes.length });
 };

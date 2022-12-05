@@ -4,8 +4,8 @@ import chai from 'chai';
 import 'chai/register-should';
 import { req, res } from 'test/unit/unitHelpers';
 import { GetThreadsReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
-import './rootHooks.spec';
-import { testThreads } from 'test/unit/api/rootHooks.spec';
+import 'test/integration/api/external/dbEntityHooks.spec';
+import { testThreads } from 'test/integration/api/external/dbEntityHooks.spec';
 import { ThreadAttributes } from 'server/models/thread';
 import getThreads from 'server/routes/threads/getThreads';
 

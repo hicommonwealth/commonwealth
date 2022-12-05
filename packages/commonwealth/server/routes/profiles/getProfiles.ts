@@ -19,14 +19,12 @@ const getProfiles = async (
 ) => {
   if (!req.query) throw new AppError(Errors.NoArgs);
   // This route is for fetching all profiles + addresses by community
-  const { addresses, profile_ids } = req.query;
+  const { addresses, profile_ids, count_only } = req.query;
 
   if (!addresses && !profile_ids) throw new AppError(Errors.NoArgs);
   if (addresses && profile_ids) throw new AppError(Errors.BothArgs);
 
   const pagination = formatPagination(req.query);
-
-  let profiles;
 
   const include = [];
   if (addresses) include.push({
@@ -35,13 +33,22 @@ const getProfiles = async (
     required: true
   });
 
-  profiles = await models.Profile.findAll({
-    where: { id: { [Op.in]: profile_ids, } },
-    attributes: { exclude: ['user_id'] },
-    ...pagination,
-  });
+  let profiles, count;
+  if(!count_only) {
+    ({rows: profiles, count} = await models.Profile.findAndCountAll({
+      where: { id: { [Op.in]: profile_ids, } },
+      attributes: { exclude: ['user_id'] },
+      ...pagination,
+    }));
+  } else {
+    count = await models.Profile.count({
+      where: { id: { [Op.in]: profile_ids, } },
+      attributes: { exclude: ['user_id'] },
+      ...pagination,
+    });
+  }
 
-  return success(res, profiles);
+  return success(res, { profiles: profiles, count });
 };
 
 

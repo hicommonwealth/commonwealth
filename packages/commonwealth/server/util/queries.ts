@@ -1,5 +1,3 @@
-import { Sequelize} from 'sequelize';
-import { Models } from '../models';
 import { IPagination, OrderByOptions } from 'common-common/src/api/extApiTypes';
 
 /*
@@ -39,4 +37,23 @@ export const formatPagination = (query: IPagination) => {
   if (query.sort == OrderByOptions.UPDATED) pagination.order = [[OrderByOptions.UPDATED, 'DESC']];
 
   return pagination;
+};
+
+export const formatPaginationNoSort = (query: { limit?: number, page?: number}) => {
+  const { limit, page } = query;
+  let pagination: any = {};
+  if (limit && page) pagination = paginate(limit, page);
+  else if (limit) pagination = limitBy(limit);
+
+  return pagination;
+};
+
+export const requiredArgsMessage = (args: Object): string | null => {
+  let error = 'Must provide';
+  Object.keys(args).forEach(a => {
+    if(!a) error += ` ${a},`;
+  });
+
+  if(error != 'Must provide') return error.slice(0, -1);
+  return null
 };

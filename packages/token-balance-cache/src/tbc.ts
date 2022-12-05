@@ -13,7 +13,6 @@ import {
   ITokenBalanceCache,
   TokenBalanceResp,
 } from './types';
-import { default as BalanceProviders } from './providers';
 import { TbcStatsDSender } from './tbcStatsDSender';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -50,9 +49,11 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
   constructor(
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 1 * 60 * 60,
-    providers: BalanceProvider[] = BalanceProviders,
+    providers: BalanceProvider[] = null,
     private readonly _nodesProvider: (lastQueryUnixTime: number) => Promise<IChainNode[]> = queryChainNodesFromDB,
   ) {
+    // lazy load import to improve test speed
+    if(providers == null) import('./providers').then((p) => providers = p.default);
     super({}, noBalancePruneTimeS);
     for (const provider of providers) {
       this._providers[provider.name] = provider;

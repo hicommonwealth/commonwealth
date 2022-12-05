@@ -5,8 +5,7 @@ import { CommentAttributes } from 'commonwealth/server/models/comment';
 import { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import { ChainAttributes } from 'commonwealth/server/models/chain';
 import { ProfileAttributes } from 'commonwealth/server/models/profile';
-import { ChainNodeAttributes } from 'commonwealth/server/models/chain_node';
-import { BalanceProvider, BalanceProviderResp } from 'token-balance-cache/src';
+import { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -25,7 +24,7 @@ export type GetCommentsReq = {
   count_only?: boolean;
 } & IPagination;
 
-export type GetCommentsResp = { comments: CommentAttributes[], count: number };
+export type GetCommentsResp = { comments?: CommentAttributes[], count: number };
 
 export type GetThreadsReq = {
   community_id: string;
@@ -34,9 +33,10 @@ export type GetThreadsReq = {
   addresses?: string[];
   no_body?: boolean;
   include_comments?: boolean;
+  count_only?: boolean;
 } & IPagination;
 
-export type GetThreadsResp = { threads: ThreadAttributes[], count: number };
+export type GetThreadsResp = { threads?: ThreadAttributes[], count: number };
 
 export type GetReactionsReq = {
   community_id: string;
@@ -46,34 +46,38 @@ export type GetReactionsReq = {
   count_only?: boolean;
 } & IPagination;
 
-export type GetReactionsResp = { reactions: ReactionAttributes[], count: number };
+export type GetReactionsResp = { reactions?: ReactionAttributes[], count: number };
 
 export type GetCommunitiesReq = {
   community_id?: string;
-  count_only?: boolean; // Desired?
-} & IPagination;
+  network?: string;
+  count_only?: boolean;
+  limit?: number;
+  page?: number;
+};
 
-export type GetCommunitiesResp = ChainAttributes[];
+export type GetCommunitiesResp = { communities?: ChainAttributes[], count: number };
 
 export type GetProfilesReq = {
   addresses?: string[];
   profile_ids?: number[];
+  count_only?: boolean;
 } & IPagination;
 
-export type GetProfilesResp = ProfileAttributes[];
+export type GetProfilesResp = { profiles?: ProfileAttributes[], count: number };;
 
 export type GetChainNodesReq = {
-  balance_types?: string[];
+  chain_node_ids?: number[],
   names?: string[];
 } & IPagination;
 
-export type GetChainNodesResp = { chain_nodes: ChainNodeAttributes[], count: number };
+export type GetChainNodesResp = { chain_nodes: ChainNodeResp[], count: number };
 
 export type GetBalanceProvidersReq = {
   chain_node_ids: number[]
 };
 
-export type GetBalanceProvidersResp = { balance_providers: [BalanceProviderResp[]], count: number };
+export type GetBalanceProvidersResp = { balance_providers: BalanceProviderResp[], count: number };
 
 export type GetTokenBalanceReq = {
   chain_node_id: number,
