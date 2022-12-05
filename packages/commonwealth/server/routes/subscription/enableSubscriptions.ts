@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
 import { sequelize } from '../../database';
-import { AppError, ServerError } from '../../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const Op = Sequelize.Op;

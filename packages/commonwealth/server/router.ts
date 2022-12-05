@@ -3,7 +3,6 @@ import passport from 'passport';
 import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { StatsDController } from 'common-common/src/statsd';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -47,7 +46,6 @@ import viewNotifications, {
   NotificationCategories,
 } from './routes/viewNotifications';
 import viewUserActivity from './routes/viewUserActivity';
-import viewChainActivity from './routes/viewChainActivity';
 import viewGlobalActivity from './routes/viewGlobalActivity';
 import markNotificationsRead from './routes/markNotificationsRead';
 import clearReadNotifications from './routes/clearReadNotifications';
@@ -127,15 +125,13 @@ import updateWebhook from './routes/webhooks/updateWebhook';
 import deleteWebhook from './routes/webhooks/deleteWebhook';
 import getWebhooks from './routes/webhooks/getWebhooks';
 import ViewCountCache from './util/viewCountCache';
-import IdentityFetchCache from './util/identityFetchCache';
 import updateChainCategory from './routes/updateChainCategory';
 import updateChainCustomDomain from './routes/updateChainCustomDomain';
 import updateChainPriority from './routes/updateChainPriority';
-import migrateEvent from './routes/migrateEvent';
 
 import startSsoLogin from './routes/startSsoLogin';
 import finishSsoLogin from './routes/finishSsoLogin';
-import bulkEntities from './routes/bulkEntities';
+import getEntityMeta from './routes/getEntityMeta';
 import { getTokensFromLists } from './routes/getTokensFromLists';
 import getTokenForum from './routes/getTokenForum';
 import tokenBalance from './routes/tokenBalance';
@@ -152,12 +148,19 @@ import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import authCallback from './routes/authCallback';
+import viewChainIcons from "./routes/viewChainIcons";
 
 import getThreads from './routes/threads/getThreads';
 import getComments from './routes/comments/getComments';
 import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfiles from './routes/profiles/getProfiles';
+import { StatsDController } from 'common-common/src/statsd';
+import {getChainEventServiceData} from "./routes/getChainEventServiceData";
+import {getChain} from "./routes/getChain";
+import {getChainNode} from "./routes/getChainNode";
+import {getChainContracts} from "./routes/getChainContracts";
+import {getSubscribedChains} from "./routes/getSubscribedChains";
 
 
 
@@ -165,10 +168,9 @@ function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
-  banCache: BanCache // TODO: where is this needed?
+  banCache: BanCache,
 ) {
   const router = express.Router();
 
@@ -528,7 +530,7 @@ function setupRouter(
   router.post(
     '/updateProfile',
     passport.authenticate('jwt', { session: false }),
-    updateProfile.bind(this, models, identityFetchCache)
+    updateProfile.bind(this, models)
   );
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
@@ -606,7 +608,7 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models)
   );
-  router.post('/viewChainActivity', viewChainActivity.bind(this, models));
+  router.post('/viewChainIcons', viewChainIcons.bind(this, models));
   router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models));
   router.post(
     '/markNotificationsRead',
@@ -731,6 +733,8 @@ function setupRouter(
     updateChainCustomDomain.bind(this, models)
   );
 
+  router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -802,11 +806,33 @@ function setupRouter(
   // logout
   router.get('/logout', logout.bind(this, models));
 
-  // TODO: Change to GET /entities
-  router.get('/bulkEntities', bulkEntities.bind(this, models));
+  router.get('/getEntityMeta', getEntityMeta.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
+
+  // These routes behave like get (fetch data) but use POST because a secret
+  // is passed in the request body -> passing the secret via query parameters is not safe
+  router.post(
+    '/getChainEventServiceData',
+    getChainEventServiceData.bind(this, models)
+  );
+  router.post(
+    '/getChain',
+    getChain.bind(this, models)
+  );
+  router.post(
+    '/getChainNode',
+    getChainNode.bind(this, models)
+  );
+  router.post(
+    '/getChainContracts',
+    getChainContracts.bind(this, models)
+  );
+  router.post(
+    '/getSubscribedChains',
+    getSubscribedChains.bind(this, models)
+  );
 
   // new API
   router.get('/threads', getThreads.bind(this, models));
