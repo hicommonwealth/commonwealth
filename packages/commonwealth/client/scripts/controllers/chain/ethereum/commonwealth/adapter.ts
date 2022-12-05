@@ -17,13 +17,12 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
   public chain: CommonwealthChain;
   public accounts: EthereumAccounts;
   public governance: CommonwealthGovernance;
-  public readonly chainEntities = new ChainEntityController();
 
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new CommonwealthChain(this.app);
     this.accounts = new EthereumAccounts(this.app);
-    this.governance = new CommonwealthGovernance(this.app, !this.usingServerChainEntities);
+    this.governance = new CommonwealthGovernance(this.app);
   }
 
   public async initApi() {

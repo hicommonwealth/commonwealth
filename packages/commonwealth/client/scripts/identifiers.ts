@@ -234,4 +234,5 @@ export const chainEntityTypeToProposalShortName = (
   else if (t === SubstrateTypes.EntityKind.CollectiveProposal) return 'Mot';
   else if (t === SubstrateTypes.EntityKind.TipProposal) return 'Tip';
   else if (t === SubstrateTypes.EntityKind.TreasuryBounty) return 'Bounty';
+  else return 'Prop';
 };
