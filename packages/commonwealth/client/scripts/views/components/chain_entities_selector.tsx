@@ -10,7 +10,6 @@ import 'components/chain_entities_selector.scss';
 import app from 'state';
 import { ChainEntity, Thread } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 type ChainEntitiesSelectorAttrs = {
   chainEntitiesToSet: Array<ChainEntity>;
@@ -29,10 +28,10 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
 
     if (!this.initialized) {
       this.initialized = true;
-      app.chain.chainEntities
-        ?.refresh(app.chain.id, EntityRefreshOption.AllEntities)
+      app.chainEntities
+        ?.refresh(app.chain.id)
         .then(() => {
-          // refreshing loads the latest chain entities into app.chain.chainEntities store
+          // refreshing loads the latest chain entities into app.chainEntities store
           this.chainEntitiesLoaded = true;
           m.redraw();
         });
@@ -43,7 +42,7 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
         {this.chainEntitiesLoaded ? (
           m(QueryList, {
             checkmark: true,
-            items: app.chain.chainEntities.store.getAll().sort((a, b) => {
+            items: app.chainEntities.store.getAll().sort((a, b) => {
               if (!a.threadId && b.threadId) return -1;
               if (a.threadId && !b.threadId) return 1;
               return 0;
