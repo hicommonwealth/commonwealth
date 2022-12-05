@@ -4,7 +4,6 @@
 .ProfilePage {
   position: relative;
   width: 100%;
-  max-width: 1000px;
   margin: 0 auto;
 
   .heavy {
@@ -14,84 +13,49 @@
 
   .ProfilePageContainer {
     display: flex;
+    margin: 80px 86px;
   
     .ProfileHeader {
-      margin: 30px 10px;
+      margin-right: 26px;
+      border: 1px solid $neutral-200;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 400px;
   
-      .profile-info {
-        min-height: 215px;
-        &.expand {
-          height: auto;
+      .profile-image {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        img {
+          height: 160px;
         }
-        padding: 0;
-        display: grid;
-        grid-template-areas:
-          'image info'
-          'social social';
-        grid-template-columns: 15% 85%;
-        grid-template-rows: auto 55px;
-        border: 1px solid #cccccc;
-        box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-        // row-gap: 20px;
-  
-        .profile-image {
-          position: relative;
-          grid-area: image;
-          height: 100%;
-          border-right: 1px solid #cccccc;
-          img {
-            position: absolute;
-            left: 50%;
-            top: 30px;
-            transform: translateX(-50%);
-            height: 90px;
-            width: 90px;
-            border-radius: 50%;
-            object-fit: cover;
+      }
+
+      .profile-name-and-bio {
+        .name {
+          margin-bottom: 20px;
+          justify-content: center;
+        }
+        .buttons {
+          display: flex;
+          justify-content: center;
+          margin-bottom: 20px;
+
+          > :first-child {
+            margin-right: 8px;
           }
         }
-  
-        .profile-name-and-bio {
-          grid-area: info;
-          padding: 20px;
-          .name,
-          .bio {
-            margin-bottom: 8px;
-          }
-          .bio {
-            line-height: 21px;
-          }
-          .read-more {
-            margin-bottom: 15px;
-            color: #338fff;
-            &:hover {
-              cursor: pointer;
-            }
-          }
+        .bio {
+          margin-top: 16px;
         }
-  
-        .social-accounts-and-edit {
-          position: relative;
-          grid-area: social;
-          width: 100%;
-          height: 100%;
-          border-top: 1px solid #cccccc;
-  
-          .social-account-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-          }
-  
-          .edit-button {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            button {
-              height: 35px;
-            }
+
+        .read-more {
+          margin-top: 8px;
+          margin-bottom: 10px;
+          color: $primary-500;
+          &:hover {
+            cursor: pointer;
           }
         }
       }

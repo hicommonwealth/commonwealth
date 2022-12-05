@@ -39,7 +39,7 @@ type NewProfileState = {
   socialAccounts: Array<SocialAccount>;
   loading: boolean;
   error: ProfileError;
-  content: m.Vnode<NewProfileAttrs, NewProfileState>;
+  content: m.Vnode;
 };
 
 const NoAddressFoundError = 'No address found';
@@ -100,34 +100,33 @@ const NewProfile: m.Component<NewProfileAttrs, NewProfileState> = {
 
     if (loading)
       vnode.state.content = (
-        m('.ProfilePage', [
-          m('.loading-spinner', [
-            m(Spinner, {
-              active: true,
-              size: 'lg',
-            }),
-          ]),
-        ])
+        <div class="ProfilePage">
+          <div class="loading-spinner">
+            <Spinner active size="lg" />
+          </div>
+        </div>
       )
 
     if (error === ProfileError.NoAddressFound)
       vnode.state.content = (
-        m('.ProfilePage', [
-          m('.ErrorPage', [
-            m('h3', 'Not on Commonwealth'),
-            m('p', 'If this is your address, sign in using your wallet to set up a profile.'),
-          ]),
-        ])
+        <div class="ProfilePage">
+          <div class="ErrorPage">
+            <h3>Not on Commonwealth</h3>
+            <p>
+              If this is your address, sign in using your wallet to set up a profile.
+            </p>
+          </div>
+        </div>
       );
 
     if (error === ProfileError.NoProfileFound)
       vnode.state.content = (
-        m('.ProfilePage', [
-          m('.ErrorPage', [
-            m('h3', 'No profile found'),
-            m('p', 'This address is not registered to Commonwealth.'),
-          ]),
-        ])
+        <div class="ProfilePage">
+          <div class="ErrorPage">
+            <h3>No profile found</h3>
+            <p>This address is not registered to Commonwealth.</p>
+          </div>
+        </div>
       );
 
     if (error === ProfileError.None)
