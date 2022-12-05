@@ -167,7 +167,6 @@ const dispatchHooks = async (
       chain: finalThread.chain,
       body: finalThread.body,
     },
-    req.wss,
     excludedAddrs
   );
 
@@ -199,7 +198,6 @@ const dispatchHooks = async (
           chain: finalThread.chain,
           body: finalThread.body,
         },
-        req.wss,
         [finalThread.Address.address]
       );
     });

@@ -24,8 +24,8 @@
     "./shared",
     "./test",
     "./globals.d.ts",
-    "server/*",
-    "server.ts"
+    "./server",
+    "./server.ts"
   ],
   "exclude": ["./node_modules"]
 }
