@@ -14,10 +14,12 @@ import 'pages/new_profile.scss';
 type ProfileHeaderAttrs = {
   profile: Profile;
   socialAccounts: Array<SocialAccount>;
+  address: string;
 };
 
 type ProfileHeaderState = {
   isBioExpanded: boolean;
+  defaultAvatar: string;
 };
 
 const DefaultProfileName = 'Anonymous';
@@ -26,6 +28,7 @@ const DefaultProfileBio = 'Happy to be on Commonwealth!';
 const maxBioCharCount = 190;
 // TODO: Adjust value for responsiveness
 
+// NOTE: https://mithril.js.org/components.html#define-components-statically,-call-them-dynamically
 const renderSocialAccounts = (socialAccounts: Array<SocialAccount>) => {
   return socialAccounts?.map((account) => (
     <div className="social-account-icon">
@@ -77,9 +80,9 @@ class NewProfileHeader
         <CWCard
           interactive={true}
           fullWidth={true}
-          className={
-            vnode.state.isBioExpanded ? 'profile-info expand' : 'profile-info'
-          }
+          // className={
+          //   vnode.state.isBioExpanded ? 'profile-info expand' : 'profile-info'
+          // }
         >
           <div className="profile-image">
             {profile?.avatarUrl ? (

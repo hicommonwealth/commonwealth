@@ -11,6 +11,7 @@ import { IUniqueId } from 'client/scripts/models/interfaces';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 import 'pages/new_profile.scss';
+import { CWCard } from '../../components/component_kit/cw_card';
 
 type ProfileActivityAttrs = {
   threads: Array<Thread>;
@@ -200,6 +201,10 @@ class NewProfileActivity
   view(vnode) {
     return (
       <div className="ProfileActivity">
+        <CWCard
+          interactive={true}
+          fullWidth={true}
+        >
         <div className="activity-nav">
           <div
             className={
@@ -339,6 +344,7 @@ class NewProfileActivity
             vnode.state
           )}
         </div>
+        </CWCard>
       </div>
     );
   }
