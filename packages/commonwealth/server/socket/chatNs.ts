@@ -14,7 +14,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
 import { checkReadPermitted } from '../util/roles';
-import emitNotifications from 'server/models/subscription/subscriptionEmiter';
+import emitNotifications from 'server/util/emitNotifications';
 
 
 const log = factory.getLogger(addPrefix(__filename));

@@ -11,7 +11,7 @@ import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from '../util/errors';
 import { findOneRole } from '../util/roles';
-import emitNotifications from 'server/models/subscription/subscriptionEmiter';
+import emitNotifications from 'server/util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 

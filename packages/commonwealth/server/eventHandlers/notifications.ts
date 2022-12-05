@@ -12,7 +12,7 @@ import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import { RabbitMQController } from 'common-common/src/rabbitmq';
 import { ChainEventNotification } from '../../shared/types';
 import {RascalPublications} from "common-common/src/rabbitmq";
-import emitNotifications from 'server/models/subscription/subscriptionEmiter';
+import emitNotifications from 'server/util/emitNotifications';
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {

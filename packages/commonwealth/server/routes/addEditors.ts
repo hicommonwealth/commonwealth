@@ -7,7 +7,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
 import { AppError, ServerError } from '../util/errors';
-import emitNotifications from 'server/models/subscription/subscriptionEmiter';
+import emitNotifications from 'server/util/emitNotifications';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',

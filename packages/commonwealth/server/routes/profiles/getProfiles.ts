@@ -1,23 +1,16 @@
 import Sequelize from 'sequelize';
-import { AppError, ServerError } from '../../util/errors';
+import { AppError } from '../../util/errors';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
-import { ProfileAttributes } from '../../models/profile';
-import { formatPagination, orderBy, IPagination } from '../../util/queries';
+import { formatPagination } from '../../util/queries';
+import { GetProfilesReq, GetProfilesResp } from 'common-common/src/api/extApiTypes';
 
 const { Op } = Sequelize;
-
-type GetProfilesReq = {
-  addresses?: string[];
-  profile_ids?: number[];
-} & IPagination;
 
 export const Errors = {
   NoArgs: "Must provide addresses or profile_ids",
   BothArgs: "Must not provide both args"
 };
-
-type GetProfilesResp = ProfileAttributes[];
 
 const getProfiles = async (
   models: DB,
@@ -32,28 +25,24 @@ const getProfiles = async (
   if (addresses && profile_ids) throw new AppError(Errors.BothArgs);
 
   const pagination = formatPagination(req.query);
-  const order = req.query.sort ? orderBy('createdAt', req.query.sort) : {};
 
   let profiles;
 
-  // by addresses
-  if (addresses) {
-    profiles = await models.Profile.findAll({
-      include: [{ model: models.Address, where: { address: { [Op.in]: addresses, }} }],
-      attributes: { exclude: ['user_id'] },
-      ...pagination,
-      ...order,
-    });
-  } else if (profile_ids) {
-    profiles = await models.Profile.findAll({
-      where: { id: { [Op.in]: profile_ids, }},
-      attributes: { exclude: ['user_id'] },
-      ...pagination,
-      ...order,
-    });
-  }
+  const include = [];
+  if (addresses) include.push({
+    model: models.Address,
+    where: { address: { [Op.in]: addresses } },
+    required: true
+  });
+
+  profiles = await models.Profile.findAll({
+    where: { id: { [Op.in]: profile_ids, } },
+    attributes: { exclude: ['user_id'] },
+    ...pagination,
+  });
 
   return success(res, profiles);
 };
+
 
 export default getProfiles;

@@ -148,7 +148,8 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
       balances: {},
       errors: {},
     };
-    for (const address of addresses) {
+
+    await Promise.all(addresses.map(async (address) => {
       try {
         const start = Date.now();
         const balance = await getBalance(address);
@@ -158,7 +159,8 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
       } catch (e) {
         results.errors[address] = e.message;
       }
-    }
+    }));
+
     return results;
   }
 

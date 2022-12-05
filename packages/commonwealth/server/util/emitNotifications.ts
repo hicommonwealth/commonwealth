@@ -1,20 +1,20 @@
 import { ChainBase, ChainType } from 'common-common/src/types';
 import WebSocket from 'ws';
-import { SERVER_URL } from '../../config';
+import { SERVER_URL } from 'commonwealth/server/config';
 import {
   createImmediateNotificationEmailObject,
   sendImmediateNotificationEmail,
-} from '../../scripts/emails';
+} from 'commonwealth/server/scripts/emails';
 import { StatsDController } from 'common-common/src/statsd';
 import {
   IChainEventNotificationData,
   IChatNotification,
   ICommunityNotificationData,
   IPostNotificationData
-} from '../../../shared/types';
-import { DB } from '../../models';
-import send, { WebhookContent } from '../../webhookNotifier';
-import { NotificationInstance } from '../../models/notification';
+} from 'commonwealth/shared/types';
+import { DB } from 'commonwealth/server/models';
+import send, { WebhookContent } from 'commonwealth/server/webhookNotifier';
+import { NotificationInstance } from 'commonwealth/server/models/notification';
 import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 

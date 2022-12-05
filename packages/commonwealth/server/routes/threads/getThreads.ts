@@ -1,30 +1,17 @@
-import Sequelize, {  } from 'sequelize';
+import Sequelize, {} from 'sequelize';
 import { AppError, ServerError } from '../../util/errors';
-import validateChain from '../../util/validateChain';
+import { GetThreadsReq, GetThreadsResp, OrderByOptions } from 'common-common/src/api/extApiTypes';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
-import { ThreadAttributes } from '../../models/thread';
-import { formatPagination, IPagination, orderBy } from '../../util/queries';
+import { formatPagination } from '../../util/queries';
+
 const { Op } = Sequelize;
-
-
-type GetThreadsReq = {
-  community_id: string;
-  topic_id?: number;
-  address_ids?: string[];
-  addresses?: string[];
-  no_body?: boolean;
-  include_comments?: boolean;
-} & IPagination;
 
 export const Errors = {
   NoArgs: "Must provide arguments",
   NoCommunityId: "Must provide a Community_id",
   AddressesOrAddressIds: "Cannot provide both addresses and address_ids",
 };
-
-
-type GetThreadsResp = { threads: ThreadAttributes[], count: number };
 
 const getThreads = async (
   models: DB,
@@ -35,38 +22,37 @@ const getThreads = async (
 
   const { community_id, topic_id, address_ids, no_body, include_comments, addresses } = req.query;
   if (!community_id) throw new AppError(Errors.NoCommunityId);
-  if (addresses && address_ids) throw new AppError(Errors.AddressesOrAddressIds)
+  if (addresses && address_ids) throw new AppError(Errors.AddressesOrAddressIds);
 
   const pagination = formatPagination(req.query);
-  const order = req.query.sort ? orderBy('createdAt', req.query.sort) : {};
 
   const where = { chain: community_id };
-  const include: any[] = [];
+
+  const include = [];
+  if (addresses) {
+    include.push({
+      model: models.Address,
+      where: { address: { [Op.in]: addresses }},
+      as: 'Address'
+    });
+  }
+
   let attributes;
 
-  if (no_body) attributes = { exclude: ['body', 'plaintext', 'version_history']}
+  if (no_body) attributes = { exclude: ['body', 'plaintext', 'version_history'] };
   if (topic_id) where['topic_id'] = topic_id;
   if (address_ids) where['address_id'] = { [Op.in]: address_ids, };
   if (include_comments) include.push({ model: models.Comment, required: false, });
 
-  if (addresses) {
-    const addressInstances = await models.Address.findAll({
-      where: {
-        address: { [Op.in]: addresses }
-      }
-    });
-    where['address_id'] = { [Op.in]: addressInstances.map((a) => a.id) }
-  }
-
   const { rows: threads, count } = await models.Thread.findAndCountAll({
+    logging: console.log,
     where,
     include,
     attributes,
-    ...pagination,
-    ...order
+    ...pagination
   });
 
-  return success(res, {threads: threads.map((t) => t.toJSON()), count});
+  return success(res, { threads: threads.map((t) => t.toJSON()), count });
 };
 
 export default getThreads;

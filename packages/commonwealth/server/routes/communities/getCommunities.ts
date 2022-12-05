@@ -1,16 +1,7 @@
-import { AppError, ServerError } from '../../util/errors';
-import validateChain from '../../util/validateChain';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
-import { ChainAttributes } from '../../models/chain';
-import { IPagination } from '../../util/queries';
-
-type GetCommunitiesReq = {
-  community_id?: string;
-  count_only?: boolean; // Desired?
-} & IPagination;
-
-type GetCommunitiesResp = ChainAttributes[];
+import { GetCommunitiesReq, GetCommunitiesResp } from 'common-common/src/api/extApiTypes';
+import { formatPagination } from 'server/util/queries';
 
 const getCommunities = async (
   models: DB,
