@@ -1,28 +1,23 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import _ from 'lodash';
 
-import { ChainEntityStore } from 'stores';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from 'models';
+import {ChainEntityStore} from 'stores';
+import {ChainBase, ChainNetwork} from 'common-common/src/types';
+import {ChainEntity, ChainEvent, ChainEventType, ChainInfo} from 'models';
 import app from 'state';
 import {
   CWEvent,
   eventToEntity,
-  entityToFieldName,
   IEventProcessor,
   IEventSubscriber,
   SubstrateTypes,
-  IChainEntityKind,
   SupportedNetwork,
+  getUniqueEntityKey,
+  IChainEntityKind
 } from 'chain-events/src';
-import { notifyError } from '../app/notifications';
+import {notifyError} from '../app/notifications';
+import {getBaseUrl, getFetch, ServiceUrls} from 'helpers/getUrl';
 
-export enum EntityRefreshOption {
-  AllEntities = 'all-entities',
-  CompletedEntities = 'completed-entities',
-  Nothing = 'nothing',
-}
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
@@ -48,6 +43,7 @@ const get = (route, args, callback) => {
     })
     .catch((e) => console.error(e));
 };
+
 
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
@@ -88,19 +84,46 @@ class ChainEntityController {
     }
   }
 
-  public refresh(chain: string, refreshOption: EntityRefreshOption) {
-    if (refreshOption === EntityRefreshOption.Nothing) return;
-    const options: any = { chain };
-    if (refreshOption === EntityRefreshOption.CompletedEntities) {
-      options.completed = true;
-    }
-    // TODO: Change to GET /entities
-    return get('/bulkEntities', options, (result) => {
-      for (const entityJSON of result) {
+  /**
+   * Refreshes the raw chain entities from chain-events + ChainEntityMeta from the main service
+   * to form full ChainEntities
+   * @param chain
+   */
+  public async refresh(chain: string) {
+    const options: any = {chain};
+
+    // load the chain-entity objects
+    const [entities, entityMetas] = await Promise.all([
+      getFetch(getBaseUrl() + '/entities', options),
+      getFetch(getBaseUrl() + '/getEntityMeta', options)
+    ]);
+
+    if (Array.isArray(entities)) {
+      // save the chain-entity objects in the store
+      for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);
         this._store.add(entity);
       }
-    });
+    }
+
+    // save chain-entity metadata to the appropriate chain-entity
+    for (const entityMetaJSON of entityMetas) {
+      const entity = this._store.getById(entityMetaJSON.ce_id);
+      if (entity) {
+        entity.title = entityMetaJSON.title;
+        entity.threadId = entityMetaJSON.thread_id;
+      }
+    }
+  }
+
+  public async refreshRawEntities(chain: string) {
+    const entities = await getFetch(getBaseUrl() + '/entities', {chain});
+    if (Array.isArray(entities)) {
+      for (const entityJSON of entities) {
+        const entity = ChainEntity.fromJSON(entityJSON);
+        this._store.add(entity);
+      }
+    }
   }
 
   public deinit() {
@@ -124,22 +147,7 @@ class ChainEntityController {
     this._handlers = {};
   }
 
-  public async _fetchTitle(chain: string, unique_id: string): Promise<any> {
-    try {
-      return $.get(`${app.serverUrl()}/fetchEntityTitle`, {
-        unique_id,
-        chain,
-      });
-    } catch (e) {
-      return { status: 'Failed' };
-    }
-  }
-
-  private _handleEvents(
-    chain: string,
-    network: SupportedNetwork,
-    events: CWEvent[]
-  ) {
+  private _handleEvents(chain: string, network: SupportedNetwork, events: CWEvent[]) {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
       const eventEntity = eventToEntity(network, cwEvent.data.kind);
@@ -162,32 +170,17 @@ class ChainEntityController {
       );
 
       // create entity
-      const fieldName = entityToFieldName(network, entityKind);
+      const fieldName = getUniqueEntityKey(network, entityKind);
       // eslint-disable-next-line no-continue
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
-      const author = event.data['proposer'];
-      let entity = new ChainEntity({
-        chain,
-        type: entityKind,
-        typeId: fieldValue.toString(),
-        chainEvents: [],
-        createdAt: null,
-        updatedAt: null,
-        id: null,
-        threadId: null,
-        threadTitle: null,
-        title: null,
-        author,
-      });
 
-      // update entity against store
-      const existingEntity = this.store.get(entity);
-      if (!existingEntity) {
-        this._store.add(entity);
-      } else {
-        entity = existingEntity;
+      const entity = this.store.getByUniqueData(chain, entityKind, fieldValue.toString());
+      if (!entity) {
+        console.log("Client creation of entities not supported. Please refresh to fetch new entities from the server.");
+        return;
       }
+
       entity.addEvent(event);
 
       // emit update to handlers
@@ -203,45 +196,25 @@ class ChainEntityController {
   }
 
   public async updateEntityTitle(uniqueIdentifier: string, title: string) {
+    const chainEntity = this.store.getByUniqueId(app.activeChainId(), uniqueIdentifier);
+    if (!chainEntity) console.error("Cannot update title for non-existent entity")
     return $.ajax({
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
         jwt: app.user.jwt,
-        unique_id: uniqueIdentifier,
+        chain_entity_id: chainEntity.id,
         title: title,
         chain: app.activeChainId(),
       },
       success: (response) => {
-        const entity = ChainEntity.fromJSON(response.result);
-        this._store.remove(entity);
-        this._store.add(entity);
-        return entity;
+        chainEntity.title = title;
       },
       error: (err) => {
         notifyError('Could not set entity title');
         console.error(err);
       },
     });
-  }
-
-  public async fetchEntities<T extends CWEvent>(
-    chain: string,
-    network: SupportedNetwork,
-    fetch: () => Promise<T[]>,
-    eventSortFn?: (a: CWEvent, b: CWEvent) => number
-  ): Promise<T[]> {
-    // get existing events
-    let existingEvents: T[];
-    try {
-      existingEvents = await fetch();
-    } catch (e) {
-      console.error(`Chain entity fetch failed: ${e.message}`);
-      return;
-    }
-    if (eventSortFn) existingEvents.sort(eventSortFn);
-    this._handleEvents(chain, network, existingEvents);
-    return existingEvents;
   }
 
   public async subscribeEntities<Api, RawEvent>(
