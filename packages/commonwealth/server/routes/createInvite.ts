@@ -6,7 +6,7 @@ import validateChain from '../util/validateChain';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { createRole, findAllRoles, findOneRole } from '../util/roles';
 import { DB } from '../models';
 

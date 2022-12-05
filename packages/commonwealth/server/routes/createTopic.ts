@@ -2,7 +2,7 @@ import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {

@@ -45,7 +45,7 @@ class SubstrateDemocracy extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server referenda
-    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyReferendum);
+    const entities = this.app.chainEntities.store.getByType(SubstrateTypes.EntityKind.DemocracyReferendum);
     entities.forEach((e) => this._entityConstructor(e));
 
     // save parameters
@@ -56,31 +56,18 @@ class SubstrateDemocracy extends ProposalModule<
     this._preimageByteDeposit = this._Chain.coins(ChainInfo.api.consts.democracy.preimageByteDeposit);
 
     // register chain-event handlers
-    this.app.chain.chainEntities.registerEntityHandler(
+    this.app.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.DemocracyReferendum, (entity, event) => {
         this.updateProposal(entity, event);
       }
     );
-    this.app.chain.chainEntities.registerEntityHandler(
+    this.app.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.DemocracyPreimage, (entity, event) => {
         if (event.data.kind === SubstrateTypes.EventKind.PreimageNoted) {
           const referendum = this.getByHash(entity.typeId);
           if (referendum) referendum.update(event);
         }
       }
-    );
-
-    // fetch referenda from chain
-    const events = await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchDemocracyReferenda(this.app.chain.block.height)
-    );
-    const hashes = events.filter((e) => (e.data as any).proposalHash).map((e) => (e.data as any).proposalHash);
-    await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchDemocracyPreimages(hashes)
     );
 
     this._initialized = true;
