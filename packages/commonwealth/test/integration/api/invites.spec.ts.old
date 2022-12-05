@@ -330,9 +330,9 @@ describe('Invite Tests', () => {
       expect(res.body.result.updatedCode.invited_email).to.be.equal(userEmail);
       expect(res.body.result.updatedCode.used).to.be.true;
       expect(res.body.result.role).to.not.be.null;
-      expect(res.body.result.subscription).to.not.be.null;
-      expect(res.body.result.subscription.object_id).to.be.equal(community);
-      expect(res.body.result.subscription.category_id).to.be.equal(NotificationCategories.NewThread);
+      expect(res.body.result.RabbitMQSubscription).to.not.be.null;
+      expect(res.body.result.RabbitMQSubscription.object_id).to.be.equal(community);
+      expect(res.body.result.RabbitMQSubscription.category_id).to.be.equal(NotificationCategories.NewThread);
     });
 
     it('should fail to accept an invite created by an admin as a user who does not own the address', async () => {

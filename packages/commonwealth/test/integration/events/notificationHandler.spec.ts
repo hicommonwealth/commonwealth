@@ -13,11 +13,16 @@ import {
 import { resetDatabase } from '../../../server-test';
 import models from '../../../server/database';
 import NotificationHandler from '../../../server/eventHandlers/notifications';
+import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
+import {BrokerConfig} from "rascal";
+import {getRabbitMQConfig} from "common-common/src/rabbitmq";
 
 import { setupSubscriptions, setupDbEvent } from './util';
 
 chai.use(chaiHttp);
 const { assert } = chai;
+
+const rmqController = new MockRabbitMQController(<BrokerConfig>getRabbitMQConfig('localhost'));
 
 describe('Event Handler Tests', () => {
   let aliceId, bobId;
@@ -201,7 +206,7 @@ describe('Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new NotificationHandler(models, null, [ SubstrateTypes.EventKind.DemocracyStarted ]);
+    const eventHandler = new NotificationHandler(models, [ SubstrateTypes.EventKind.DemocracyStarted ]);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);

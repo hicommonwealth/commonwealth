@@ -28,7 +28,7 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
    * @param data The raw message from RabbitMQ
    */
   isValidMsgFormat(data: any): data is ChainEventNotification {
-    return (
+    return !!(
       data.id && typeof data.id === 'string'
       && data.notification_data && typeof data.notification_data === 'string'
       && data.chain_event_id && typeof data.chain_event_id === 'string'
@@ -48,7 +48,10 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
    */
   checkMsgFormat(data: any): void {
     const valid = this.isValidMsgFormat(data);
-    if (!valid) throw this.getInvalidFormatError(data);
+    if (!valid) {
+      console.log(`The following notification is improperly formatted: ${JSON.stringify(data)}`);
+      throw this.getInvalidFormatError(data);
+    }
   }
 }
 

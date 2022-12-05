@@ -27,7 +27,7 @@ import {
   publishToChainEventsRoom,
   publishToSnapshotRoom,
 } from './createNamespace';
-import { JWT_SECRET, REDIS_URL, VULTR_IP, RABBITMQ_URI } from '../config';
+import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -57,7 +57,8 @@ export const authenticate = (
 export async function setupWebSocketServer(
   httpServer: http.Server,
   rollbar: Rollbar,
-  models: DB
+  models: DB,
+  rabbitMQController: RabbitMQController
 ) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
@@ -189,6 +190,7 @@ export async function setupWebSocketServer(
 
   await Promise.all([pubClient.connect(), subClient.connect()]);
 
+  // provide the redis connection instances to the socket.io adapters
   await io.adapter(<any>createAdapter(pubClient, subClient));
 
   const redisCache = new RedisCache();
@@ -208,21 +210,17 @@ export async function setupWebSocketServer(
   const chatNamespace = createChatNamespace(io, models, redisCache);
 
   try {
-    const rabbitController = new RabbitMQController(
-      getRabbitMQConfig(RABBITMQ_URI)
-    );
-
-    await rabbitController.init();
-    await rabbitController.startSubscription(
-      publishToChainEventsRoom.bind(chainEventsNamespace),
+    await rabbitMQController.startSubscription(
+      publishToChainEventsRoom,
       RascalSubscriptions.ChainEventNotifications,
       {server: chainEventsNamespace}
     );
 
-    await rabbitController.startSubscription(
-      publishToSnapshotRoom.bind(snapshotProposalNamespace),
-      RascalSubscriptions.SnapshotProposalNotifications
-    )
+    await rabbitMQController.startSubscription(
+      publishToSnapshotRoom,
+      RascalSubscriptions.SnapshotProposalNotifications,
+      {server: snapshotProposalNamespace}
+    );
   } catch (e) {
     log.error(
       `Failure connecting to ${process.env.NODE_ENV || 'local'}` +

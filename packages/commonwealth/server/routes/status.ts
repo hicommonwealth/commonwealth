@@ -36,7 +36,7 @@ import { TypedResponse, success } from '../types';
 import { JWT_SECRET } from '../config';
 import { DB } from '../models';
 import { sequelize } from '../database';
-import { ServerError } from '../util/errors';
+import { ServerError } from 'common-common/src/errors';
 import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));

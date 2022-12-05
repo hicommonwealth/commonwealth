@@ -60,172 +60,193 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
     }
   }
 
+  const exchangeConfig = {
+    'assert': true,
+    'options': {
+      'durable': true
+    }
+  }
+
   const config = {
     'vhosts': {
       [vhost]: {
         'connection': rabbitmq_uri,
         'exchanges': {
           [RascalExchanges.ChainEvents]: {
-            'assert': true,
-            'type': 'topic',
-            'options': {
-              'durable': true,
-            },
-          },
-          [RascalExchanges.Notifications]: {
-            'assert': true,
             'type': 'fanout',
-            'options': {
-              'durable': true,
-            },
+            ...exchangeConfig
           },
-          [RascalExchanges.SnapshotListener]:{
-            'assert': true, 
+          [RascalExchanges.SnapshotListener]: {
             'type': 'fanout',
-            'options': {
-              'durable': true,
-            },
+            ...exchangeConfig
           },
           [RascalExchanges.DeadLetter]: {
-            'assert': true,
-            'options': {
-              'durable': true
-            }
+            ...exchangeConfig
+          },
+          [RascalExchanges.CUD]: {
+            'type': 'topic',
+            ...exchangeConfig
+          },
+          [RascalExchanges.Notifications]: {
+            'type': 'topic',
+            ...exchangeConfig
           }
         },
         'queues': {
           [RascalQueues.ChainEvents]: {
             ...queueConfig,
-            'options': {
-              'arguments': {
-                ...queueOptions
-              }
-            }
+            'options': queueOptions
           },
-          [RascalQueues.SubstrateIdentityEvents]: {
+          [RascalQueues.ChainEntityCUDMain]: {
             ...queueConfig,
-            'options': {
-              'arguments': {
-                ...queueOptions
-              }
-            }
+            'options': queueOptions
+          },
+          [RascalQueues.ChainEventNotificationsCUDMain]: {
+            ...queueConfig,
+            'options': queueOptions
           },
           [RascalQueues.ChainEventNotifications]: {
             ...queueConfig,
             'options': {
-              "arguments": {
-                ...queueOptions,
-                "x-message-ttl": 600000
-              }
+              ...queueOptions,
+              "x-message-ttl": 600000
             }
+          },
+          [RascalQueues.ChainEventTypeCUDMain]: {
+            ...queueConfig,
+            'options': queueOptions
           },
           [RascalQueues.SnapshotProposalNotifications]: {
             ...queueConfig,
             'options': {
-              "arguments": {
-                ...queueOptions,
-                "x-message-ttl": 600000
-              }
+              ...queueOptions,
+              "x-message-ttl": 600000
             }
           },
           [RascalQueues.SnapshotListener]: {
             ...queueConfig,
-            'options': {
-              "arguments": {
-                ...queueOptions,
-              }
-            }
-          },
-          [RascalQueues.DeadLetter]: {
-            ...queueConfig
+            'options': queueOptions,
           }
         },
-        'bindings': {
-          [RascalBindings.ChainEvents]: {
-            'source': RascalExchanges.ChainEvents,
-            'destination': RascalQueues.ChainEvents,
-            'destinationType': 'queue',
-            'bindingKey': RascalRoutingKeys.ChainEvents
-          },
-          [RascalBindings.SubstrateIdentityEvents]: {
-            'source': RascalExchanges.ChainEvents,
-            'destination': RascalQueues.SubstrateIdentityEvents,
-            'destinationType': 'queue',
-            'bindingKey': RascalRoutingKeys.SubstrateIdentityEvents
-          },
-          [RascalBindings.ChainEventNotifications]: {
-            'source': RascalExchanges.Notifications,
-            'destination': RascalQueues.ChainEventNotifications,
-            'destinationType': 'queue',
-            'bindingKey': RascalRoutingKeys.ChainEventNotifications
-          },
-          [RascalBindings.SnapshotProposalNotifications]: {
-            'source': RascalExchanges.Notifications,
-            'destination': RascalQueues.SnapshotProposalNotifications,
-            'destinationType': 'queue',
-            'bindingKey': RascalRoutingKeys.SnapshotProposalNotifications
-          },
-          [RascalBindings.SnapshotListener]: {
-            'source': RascalExchanges.SnapshotListener,
-            'destination': RascalQueues.SnapshotListener,
-            'destinationType': 'queue',
-            'bindingKey': RascalRoutingKeys.SnapshotListener
-          },
-          [RascalBindings.DeadLetter]: {
-            'source': RascalExchanges.DeadLetter,
-            'destination': RascalQueues.DeadLetter,
-            'destinationType': 'queue',
-            'bindingKey': RascalRoutingKeys.DeadLetter
-          }
+        [RascalQueues.DeadLetter]: {
+          ...queueConfig
+        }
+      },
+      'bindings': {
+        [RascalBindings.ChainEvents]: {
+          'source': RascalExchanges.ChainEvents,
+          'destination': RascalQueues.ChainEvents,
+          'destinationType': 'queue',
+          'bindingKey': RascalRoutingKeys.ChainEvents
         },
-        'publications': {
-          [RascalPublications.ChainEvents]: {
-            'exchange': RascalExchanges.ChainEvents,
-            'routingKey': RascalRoutingKeys.ChainEvents,
-            ...publicationConfig
-          },
-          [RascalPublications.SubstrateIdentityEvents]: {
-            'exchange': RascalExchanges.ChainEvents,
-            'routingKey': RascalRoutingKeys.SubstrateIdentityEvents,
-            ...publicationConfig
-          },
-          [RascalPublications.ChainEventNotifications]: {
-            'exchange': RascalExchanges.Notifications,
-            'routingKey': RascalRoutingKeys.ChainEventNotifications,
-            ...publicationConfig
-          },
-          [RascalPublications.SnapshotProposalNotifications]: {
-            'exchange': RascalExchanges.Notifications,
-            'routingKey': RascalRoutingKeys.SnapshotProposalNotifications,
-            ...publicationConfig
-          },
-          [RascalPublications.SnapshotListener]: {
-            'exchange': RascalExchanges.SnapshotListener,
-            'routingKey': RascalRoutingKeys.SnapshotListener,
-            ...publicationConfig
-          }
+        [RascalBindings.ChainEntityCUDMain]: {
+          'source': RascalExchanges.CUD,
+          'destination': RascalQueues.ChainEntityCUDMain,
+          'destinationType': 'queue',
+          'bindingKey': RascalRoutingKeys.ChainEntityCUD
         },
-        'subscriptions': {
-          [RascalSubscriptions.ChainEvents]: {
-            'queue': RascalQueues.ChainEvents,
-            ...subscriptionConfig
-          },
-          [RascalSubscriptions.SubstrateIdentityEvents]: {
-            'queue': RascalQueues.SubstrateIdentityEvents,
-            ...subscriptionConfig
-          },
-          [RascalSubscriptions.ChainEventNotifications]: {
-            'queue': RascalQueues.ChainEventNotifications,
-            ...subscriptionConfig
-          },
-          [RascalSubscriptions.SnapshotProposalNotifications]: {
-            'queue': RascalQueues.SnapshotProposalNotifications,
-            ...subscriptionConfig
-          },
-          [RascalSubscriptions.SnapshotListener]: {
-            'queue': RascalQueues.SnapshotListener,
-            ...subscriptionConfig
-          }
+        [RascalBindings.ChainEventNotificationsCUD]: {
+          'source': RascalExchanges.CUD,
+          'destination': RascalQueues.ChainEventNotificationsCUDMain,
+          'destinationType': 'queue',
+          'bindingKey': RascalRoutingKeys.ChainEventNotificationsCUD
+        },
+        [RascalBindings.ChainEventNotifications]: {
+          'source': RascalExchanges.Notifications,
+          'destination': RascalQueues.ChainEventNotifications,
+          'destinationType': 'queue',
+          'bindingKey': RascalBindings.ChainEventNotifications
+        },
+        [RascalBindings.ChainEventType]: {
+          'source': RascalExchanges.CUD,
+          'destination': RascalQueues.ChainEventTypeCUDMain,
+          'destinationType': 'queue',
+          'bindingKey': RascalRoutingKeys.ChainEventTypeCUD
+        },
+        [RascalBindings.SnapshotProposalNotifications]: {
+          'source': RascalExchanges.Notifications,
+          'destination': RascalQueues.SnapshotProposalNotifications,
+          'destinationType': 'queue',
+          'bindingKey': RascalRoutingKeys.SnapshotProposalNotifications
+        },
+        [RascalBindings.SnapshotListener]: {
+          'source': RascalExchanges.SnapshotListener,
+          'destination': RascalQueues.SnapshotListener,
+          'destinationType': 'queue',
+          'bindingKey': RascalRoutingKeys.SnapshotListener
+        },
+        [RascalBindings.DeadLetter]: {
+          'source': RascalExchanges.DeadLetter,
+          'destination': RascalQueues.DeadLetter,
+          'destinationType': 'queue',
+          'bindingKey': RascalRoutingKeys.DeadLetter
+        }
+      },
+      'publications': {
+        [RascalPublications.ChainEvents]: {
+          'exchange': RascalExchanges.ChainEvents,
+          'routingKey': RascalRoutingKeys.ChainEvents,
+          ...publicationConfig
+        },
+        [RascalPublications.ChainEntityCUDMain]: {
+          'exchange': RascalExchanges.CUD,
+          'routingKey': RascalRoutingKeys.ChainEntityCUD,
+          ...publicationConfig
+        },
+        [RascalPublications.ChainEventNotificationsCUDMain]: {
+          'exchange': RascalExchanges.CUD,
+          'routingKey': RascalRoutingKeys.ChainEventNotificationsCUD,
+          ...publicationConfig
+        },
+        [RascalPublications.ChainEventNotifications]: {
+          'exchange': RascalExchanges.Notifications,
+          'routingKey': RascalRoutingKeys.ChainEventNotifications,
+          ...publicationConfig
+        },
+        [RascalPublications.ChainEventTypeCUDMain]: {
+          'exchange': RascalExchanges.CUD,
+          'routingKey': RascalRoutingKeys.ChainEventTypeCUD,
+          ...publicationConfig
+        },
+        [RascalPublications.SnapshotProposalNotifications]: {
+          'exchange': RascalExchanges.Notifications,
+          'routingKey': RascalRoutingKeys.SnapshotProposalNotifications,
+          ...publicationConfig
+        },
+        [RascalPublications.SnapshotListener]: {
+          'exchange': RascalExchanges.SnapshotListener,
+          'routingKey': RascalRoutingKeys.SnapshotListener,
+          ...publicationConfig
+        }
+      },
+      'subscriptions': {
+        [RascalSubscriptions.ChainEvents]: {
+          'queue': RascalQueues.ChainEvents,
+          ...subscriptionConfig
+        },
+        [RascalSubscriptions.ChainEntityCUDMain]: {
+          'queue': RascalQueues.ChainEntityCUDMain,
+          ...subscriptionConfig
+        },
+        [RascalSubscriptions.ChainEventNotificationsCUDMain]: {
+          'queue': RascalQueues.ChainEventNotificationsCUDMain,
+          ...subscriptionConfig
+        },
+        [RascalSubscriptions.ChainEventNotifications]: {
+          'queue': RascalQueues.ChainEventNotifications,
+          ...subscriptionConfig
+        },
+        [RascalSubscriptions.ChainEventTypeCUDMain]: {
+          'queue': RascalQueues.ChainEventTypeCUDMain,
+          ...subscriptionConfig
+        },
+        [RascalSubscriptions.SnapshotProposalNotifications]: {
+          'queue': RascalQueues.SnapshotProposalNotifications,
+          ...subscriptionConfig
+        },
+        [RascalSubscriptions.SnapshotListener]: {
+          'queue': RascalQueues.SnapshotListener,
+          ...subscriptionConfig
         }
       }
     }
