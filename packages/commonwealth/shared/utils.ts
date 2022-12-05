@@ -11,7 +11,7 @@ import {
 } from 'common-common/src/permissions';
 
 import { ProposalType } from 'common-common/src/types';
-import { Permission } from 'server/models/role';
+import { Permission } from '../server/models/role';
 
 export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,

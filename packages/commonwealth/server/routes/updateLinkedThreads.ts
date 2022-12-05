@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {
@@ -109,7 +109,8 @@ const updateLinkedThreads = async (
           as: 'topic',
         },
         {
-          model: models.ChainEntity,
+          model: models.ChainEntityMeta,
+          as: 'chain_entity_meta'
         },
         {
           model: models.Reaction,
