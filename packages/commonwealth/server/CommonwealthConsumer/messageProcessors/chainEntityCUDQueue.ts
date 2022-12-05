@@ -1,11 +1,9 @@
-import { Logger } from "typescript-logging";
 import {RmqEntityCUD} from "common-common/src/rabbitmq/types/chainEntityCUD";
 import { DB } from "../../models";
 
 
 export type Ithis = {
   models: DB;
-  log: Logger;
 }
 
 export async function processChainEntityCUD(

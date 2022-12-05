@@ -157,7 +157,6 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import { StatsDController } from 'common-common/src/statsd';
 import {getChainEventServiceData} from './routes/getChainEventServiceData';
 import {getChain} from './routes/getChain';
 import {getChainNode} from './routes/getChainNode';

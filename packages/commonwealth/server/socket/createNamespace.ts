@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import { addPrefix, factory } from 'common-common/src/logging';
 import {
-  SnapshotProposalNotfication,
+  SnapshotProposalNotification,
   ChainEventNotification,
   WebsocketEngineEvents,
   WebsocketMessageNames,
@@ -81,21 +81,21 @@ export function createNamespace(io: Server, namespace: WebsocketNamespaces) {
  * received from the queue to the appropriate room. The context (this) should be the chain-events namespace
  * @param notification A Notification model instance
  */
-export function publishToChainEventsRoom(
-  this: Server,
+export async function publishToChainEventsRoom(
+  this: { server: Server },
   notification: ChainEventNotification
 ) {
-  this.to(notification.ChainEvent.ChainEventType.id).emit(
+  this.server.to(notification.ChainEvent.ChainEventType.id).emit(
     WebsocketMessageNames.ChainEventNotification,
     notification
   );
 }
 
-export function publishToSnapshotRoom(
-  this: Server,
-  notification: SnapshotProposalNotfication
+export async function publishToSnapshotRoom(
+  this: { server: Server },
+  notification: SnapshotProposalNotification
 ) {
-  this.to(notification.SnapshotProposal.id).emit(
+  this.server.to(notification.SnapshotProposal.id).emit(
     WebsocketMessageNames.SnapshotProposalNotification,
     notification
   );

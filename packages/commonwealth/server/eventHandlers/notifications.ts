@@ -8,8 +8,8 @@ import {
 } from 'chain-events/src';
 import { NotificationCategories } from 'common-common/src/types';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import { RabbitMQController, RascalPublications } from 'common-common/src/rabbitmq';
 import { ChainEventNotification } from '../../shared/types';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler {

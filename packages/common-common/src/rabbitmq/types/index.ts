@@ -8,11 +8,12 @@ export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD'
 export * from './chainEventTypeCUD'
 
-export * from "./ChainEvents"
-export * from "./ChainEventNotification"
-import { RmqCWEvent } from "common-common/src/rabbitmq/types/ChainEvents";
-import { RmqSnapshotEvent } from "common-common/src/rabbitmq/types/SnapshotListener";
-import { RmqCENotification } from "common-common/src/rabbitmq/types/ChainEventNotification";
+export * from "./chainEvents"
+export * from "./chainEventNotification"
+import { RmqCWEvent } from "common-common/src/rabbitmq/types/chainEvents";
+import { RmqSnapshotEvent } from "common-common/src/rabbitmq/types/snapshotListener";
+import { RmqCENotification } from "common-common/src/rabbitmq/types/chainEventNotification";
+import {RmqSnapshotNotification} from "common-common/src/rabbitmq/types/snapshotNotification";
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -34,6 +35,7 @@ export type TRmqMessages = RmqEntityCUD.RmqMsgType
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
+  | RmqSnapshotNotification.RmqMsgType;
 
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError,

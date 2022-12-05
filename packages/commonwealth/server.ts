@@ -37,7 +37,6 @@ import setupIpfsProxy from './server/util/ipfsProxy';
 import setupPassport from './server/passport';
 import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import startSnapshotConsumer from './server/eventHandlers/snapshotConsumer';
 import {BrokerConfig} from "rascal";
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -259,7 +258,6 @@ async function main() {
 
   setupErrorHandlers(app, rollbar);
 
-  startSnapshotConsumer();
   setupServer(app, rollbar, models, rabbitMQController);
 }
 

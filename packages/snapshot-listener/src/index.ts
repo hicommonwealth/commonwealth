@@ -1,6 +1,5 @@
-import express, { Express, Request, Response } from "express";
+import express, { Request, Response } from "express";
 import { SnapshotEvent } from "./types";
-import { RabbitMqHandler } from "./rabbitMQ/eventHandler";
 import {
   RascalPublications,
   RabbitMQController,

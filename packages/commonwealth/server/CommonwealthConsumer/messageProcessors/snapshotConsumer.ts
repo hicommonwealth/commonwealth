@@ -1,30 +1,21 @@
-import {
-  ServiceConsumer,
-  RabbitMQSubscription,
-} from 'common-common/src/serviceConsumer';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import axios from 'axios';
-import {
-  getRabbitMQConfig,
-  RascalSubscriptions,
-} from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { SnapshotNotification } from '../../shared/types';
-import models from '../database';
-import { RABBITMQ_URI } from '../config';
+import { SnapshotNotification } from '../../../shared/types';
+import {DB} from "../../models";
 
-async function processSnapshotMessage(msg: SnapshotNotification) {
+
+export async function processSnapshotMessage(this: {models: DB}, data: SnapshotNotification) {
   const log = factory.getLogger(formatFilename(__filename));
   try {
-    console.log('Processing snapshot message', msg);
-    const { space, id, title, body, choices, start, expire } = msg;
+    console.log('Processing snapshot message', data);
+    const { space, id, title, body, choices, start, expire } = data;
 
-    const eventType = msg.event;
-    let proposal = await models.SnapshotProposal.findOne({
-      where: { id: msg.id },
+    const eventType = data.event;
+    let proposal = await this.models.SnapshotProposal.findOne({
+      where: { id: data.id },
     });
 
-    await models.SnapshotSpace.findOrCreate({
+    await this.models.SnapshotSpace.findOrCreate({
       where: { snapshot_space: space },
     });
 
@@ -34,7 +25,7 @@ async function processSnapshotMessage(msg: SnapshotNotification) {
     }
 
     if (!proposal) {
-      proposal = await models.SnapshotProposal.create({
+      proposal = await this.models.SnapshotProposal.create({
         id,
         title,
         body,
@@ -50,13 +41,13 @@ async function processSnapshotMessage(msg: SnapshotNotification) {
       await proposal.destroy();
     }
 
-    const associatedCommunities = await models.CommunitySnapshotSpaces.findAll({
+    const associatedCommunities = await this.models.CommunitySnapshotSpaces.findAll({
       where: { snapshot_space_id: space },
     });
 
     for (const community of associatedCommunities) {
       const communityId = community.chain_id;
-      const communityDiscordConfig = await models.DiscordBotConfig.findAll({
+      const communityDiscordConfig = await this.models.DiscordBotConfig.findAll({
         where: {
           chain_id: communityId,
         },
@@ -102,30 +93,3 @@ async function processSnapshotMessage(msg: SnapshotNotification) {
     log.error(`Error processing snapshot message: ${err}`);
   }
 }
-
-function createSnapshotSubscription(): RabbitMQSubscription {
-  return {
-    // @ts-ignore
-    messageProcessor: processSnapshotMessage,
-    subscriptionName: RascalSubscriptions.SnapshotListener,
-  };
-}
-
-async function startSnapshotConsumer() {
-  try {
-    const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
-    const subscriptions = [createSnapshotSubscription()];
-
-    const consumer = new ServiceConsumer(
-      RascalSubscriptions.SnapshotListener,
-      controller,
-      subscriptions
-    );
-
-    await consumer.init();
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-export default startSnapshotConsumer;

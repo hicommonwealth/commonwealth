@@ -13,7 +13,7 @@ export enum WebsocketMessageNames {
   LeaveChatChannel = 'leave-chat-channel',
   Error = 'exception',
 }
-export type SnapshotProposalNotfication = {
+export type SnapshotProposalNotification = {
   id: string;
   category_id: 'snapshot-proposal';
   chain_id: string;
