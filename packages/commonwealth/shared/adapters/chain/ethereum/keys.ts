@@ -6,7 +6,7 @@ export const constructTypedCanvasMessage = (message) => {
   // construct the signature data from scratch, since canvas' implementation doesn't
   // include an EIP712Domain
   const domain: TypedDataDomain = {
-    name: "Canvas",
+    name: "Commonwealth",
   };
 
   const types: Record<string, TypedDataField[]> = {
