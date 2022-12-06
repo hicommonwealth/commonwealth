@@ -136,6 +136,8 @@ export default class extends IEventHandler {
       chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
       event_data: event.data,
+      network: event.network,
+      chain
     };
 
     // duplicate event check
