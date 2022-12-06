@@ -710,8 +710,8 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           this.error && <div class="error">{this.error.message}</div>,
           hasCouncilMotionChooser && (
             <>
-              <CWLabel label="Motion" />
               <CWDropdown
+                label="Motion"
                 options={motions.map((m_) => ({
                   name: 'councilMotionType',
                   value: m_.name,
@@ -783,9 +783,9 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
               title="Beneficiary"
               placeholder="Beneficiary of proposal"
               defaultValue={author.address}
-              // oncreate={() => {
-              //   this.form.beneficiary = author.address;
-              // }}
+              oncreate={() => {
+                this.form.beneficiary = author.address;
+              }}
               oninput={(e) => {
                 const result = (e.target as any).value;
                 this.form.beneficiary = result;
@@ -856,266 +856,229 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
               ]}
             />
           ),
-          hasBountyValue && [
-            m(FormGroup, [
-              m(FormLabel, `Value (${app.chain.chain.denom})`),
-              m(Input, {
-                name: 'value',
-                placeholder: 'Amount allocated to bounty',
-                autocomplete: 'off',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  this.form.value = app.chain.chain.coins(
-                    parseFloat(result),
-                    true
-                  );
-                  m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasDepositChooser && [
-            m(FormGroup, [
-              m(
-                FormLabel,
-                `Deposit (${
-                  app.chain.base === ChainBase.Substrate
-                    ? app.chain.currency
-                    : (app.chain as Cosmos).governance.minDeposit.denom
-                })`
-              ),
-              m(Input, {
-                name: 'deposit',
-                placeholder: `Min: ${
+          hasBountyValue && (
+            <CWTextInput
+              label={`Value (${app.chain.chain.denom})`}
+              placeholder="Amount allocated to bounty"
+              oninput={(e) => {
+                const result = (e.target as any).value;
+                this.form.value = app.chain.chain.coins(
+                  parseFloat(result),
+                  true
+                );
+                m.redraw();
+              }}
+            />
+          ),
+          hasDepositChooser && (
+            <CWTextInput
+              label={`Deposit (${
+                app.chain.base === ChainBase.Substrate
+                  ? app.chain.currency
+                  : (app.chain as Cosmos).governance.minDeposit.denom
+              })`}
+              placeholder={`Min: ${
+                app.chain.base === ChainBase.Substrate
+                  ? (app.chain as Substrate).democracyProposals.minimumDeposit
+                      .inDollars
+                  : +(app.chain as Cosmos).governance.minDeposit
+              }`}
+              oncreate={(vvnode) =>
+                $(vvnode.dom).val(
                   app.chain.base === ChainBase.Substrate
                     ? (app.chain as Substrate).democracyProposals.minimumDeposit
                         .inDollars
                     : +(app.chain as Cosmos).governance.minDeposit
-                }`,
-                oncreate: (vvnode) =>
-                  $(vvnode.dom).val(
-                    app.chain.base === ChainBase.Substrate
-                      ? (app.chain as Substrate).democracyProposals
-                          .minimumDeposit.inDollars
-                      : +(app.chain as Cosmos).governance.minDeposit
-                  ),
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  this.deposit = parseFloat(result);
-                  m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasVotingPeriodAndDelaySelector && [
-            m(FormGroup, [
-              m(FormLabel, 'Voting Period'),
-              m(Input, {
-                name: 'voting_period',
-                placeholder: 'Blocks (minimum enforced)',
-                oninput: (e) => {
+                )
+              }
+              oninput={(e) => {
+                const result = (e.target as any).value;
+                this.deposit = parseFloat(result);
+                m.redraw();
+              }}
+            />
+          ),
+          hasVotingPeriodAndDelaySelector && (
+            <>
+              <CWTextInput
+                label="Voting Period"
+                placeholder="Blocks (minimum enforced)"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.votingPeriod = +result;
                   m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Enactment Delay'),
-              m(Input, {
-                name: 'enactment_delay',
-                placeholder: 'Blocks (minimum enforced)',
-                oninput: (e) => {
+                }}
+              />
+              <CWTextInput
+                label="Enactment Delay"
+                placeholder="Blocks (minimum enforced)"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.enactmentDelay = +result;
                   m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasReferendumSelector &&
-            m(DropdownFormField, {
-              title: 'Referendum',
-              choices: (app.chain as Substrate).democracy.store
+                }}
+              />
+            </>
+          ),
+          hasReferendumSelector && (
+            <CWDropdown
+              label="Referendum"
+              options={(app.chain as Substrate).democracy.store
                 .getAll()
                 .map((r) => ({
                   name: 'referendum',
                   value: r.identifier,
                   label: `${r.shortIdentifier}: ${r.title}`,
-                })),
-              callback: (result) => {
+                }))}
+              onSelect={(result) => {
                 this.referendumId = result;
                 m.redraw();
-              },
-            }),
-          hasExternalProposalSelector &&
-            m(DropdownFormField, {
-              title: 'Proposal',
-              choices: (app.chain as Substrate).democracyProposals.nextExternal
-                ? [
-                    {
-                      name: 'external_proposal',
-                      value: (
-                        app.chain as Substrate
-                      ).democracyProposals.nextExternal[0].hash.toString(),
-                      label: `${(
-                        app.chain as Substrate
-                      ).democracyProposals.nextExternal[0].hash
-                        .toString()
-                        .slice(0, 8)}...`,
-                    },
-                  ]
-                : [],
-              callback: (result) => {
+              }}
+            />
+          ),
+          hasExternalProposalSelector && (
+            <CWDropdown
+              label="Proposal"
+              options={[]}
+              // options={(app.chain as Substrate).democracyProposals.nextExternal
+              //   ? [
+              //       {
+              //         value: (
+              //           app.chain as Substrate
+              //         ).democracyProposals.nextExternal[0].hash.toString(),
+              //         label: `${(
+              //           app.chain as Substrate
+              //         ).democracyProposals.nextExternal[0].hash
+              //           .toString()
+              //           .slice(0, 8)}...`,
+              //       },
+              //     ]
+              //   : []}
+              onSelect={(result) => {
                 this.nextExternalProposalHash = result;
                 m.redraw();
-              },
-            }),
-          hasTreasuryProposalSelector &&
-            m(DropdownFormField, {
-              title: 'Treasury Proposal',
-              choices: (app.chain as Substrate).treasury.store
-                .getAll()
-                .map((r) => ({
-                  name: 'external_proposal',
-                  value: r.identifier,
-                  label: r.shortIdentifier,
-                })),
-              callback: (result) => {
+              }}
+            />
+          ),
+          hasTreasuryProposalSelector && (
+            <CWDropdown
+              label="Treasury Proposal"
+              options={[]}
+              // options={(app.chain as Substrate).treasury.store
+              //   .getAll()
+              //   .map((r) => ({
+              //     name: 'external_proposal',
+              //     value: r.identifier,
+              //     label: r.shortIdentifier,
+              //   }))}
+              onSelect={(result) => {
                 this.treasuryProposalIndex = result;
                 m.redraw();
-              },
-            }),
-          hasThreshold && [
-            m(FormGroup, [
-              m(FormLabel, 'Threshold'),
-              m(Input, {
-                name: 'threshold',
-                placeholder: 'How many members must vote yes to execute?',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  this.threshold = +result;
-                  m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasMolochFields && [
-            m(FormGroup, [
-              m(FormLabel, 'Applicant Address (will receive Moloch shares)'),
-              m(Input, {
-                name: 'applicant_address',
-                placeholder: 'Applicant Address',
-                oninput: (e) => {
+              }}
+            />
+          ),
+          hasThreshold && (
+            <CWTextInput
+              label="Threshold"
+              placeholder="How many members must vote yes to execute?"
+              oninput={(e) => {
+                const result = (e.target as any).value;
+                this.threshold = +result;
+                m.redraw();
+              }}
+            />
+          ),
+          hasMolochFields && (
+            <>
+              <CWTextInput
+                label="Applicant Address (will receive Moloch shares)"
+                placeholder="Applicant Address"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.applicantAddress = result;
                   m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(
-                FormLabel,
-                'Token Tribute (offered to Moloch, must be pre-approved for transfer)'
-              ),
-              m(Input, {
-                name: 'token_tribute',
-                placeholder: 'Tribute in tokens',
-                oninput: (e) => {
+                }}
+              />
+              <CWTextInput
+                label="Token Tribute (offered to Moloch, must be pre-approved for transfer)"
+                placeholder="Tribute in tokens"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.tokenTribute = +result;
                   m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Shares Requested'),
-              m(Input, {
-                name: 'shares_requested',
-                placeholder: 'Moloch shares requested',
-                oninput: (e) => {
+                }}
+              />
+              <CWTextInput
+                label="Shares Requested"
+                placeholder="Moloch shares requested"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.sharesRequested = +result;
                   m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Title'),
-              m(Input, {
-                name: 'title',
-                placeholder: 'Proposal Title',
-                oninput: (e) => {
+                }}
+              />
+              <CWTextInput
+                label="Proposal Title"
+                placeholder="Proposal Title"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.title = result;
                   m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Description'),
-              m(Input, {
-                name: 'description',
-                placeholder: 'Proposal Description',
-                oninput: (e) => {
+                }}
+              />
+              <CWTextInput
+                label="Proposal Description"
+                placeholder="Proposal Description"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.description = result;
                   m.redraw();
-                },
-              }),
-            ]),
-          ],
-
+                }}
+              />
+            </>
+          ),
           hasCompoundFields &&
             m('.AaveGovernance', [
-              m(FormGroup, [
-                m(FormLabel, 'Proposer (you)'),
-                m('', [
-                  m(User, {
-                    user: author,
-                    linkify: true,
-                    popover: true,
-                    showAddressWithDisplayName: true,
-                  }),
-                ]),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'Proposal Title (leave blank for no title)'),
-                m(Input, {
-                  name: 'title',
-                  placeholder: 'Proposal Title',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    this.title = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'Proposal Description'),
-                m(TextArea, {
-                  name: 'description',
-                  placeholder: 'Proposal Description',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    this.description = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
-              m('.tab-selector', [
-                m(CWTabBar, [
-                  aaveProposalState.map((_, index) =>
-                    m(CWTab, {
-                      label: `Call ${index + 1}`,
-                      isSelected: activeAaveTabIndex === index,
-                      onclick: () => {
+              <div>
+                <CWLabel label="Proposer (you)" />
+                {m(User, {
+                  user: author,
+                  linkify: true,
+                  popover: true,
+                  showAddressWithDisplayName: true,
+                })}
+              </div>,
+              <CWTextInput
+                label="Proposal Title (leave blank for no title)"
+                placeholder="Proposal Title"
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.title = result;
+                  m.redraw();
+                }}
+              />,
+              <CWTextArea
+                label="Proposal Description"
+                placeholder="Proposal Description"
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.description = result;
+                  m.redraw();
+                }}
+              />,
+              <div class="tab-selector">
+                <CWTabBar>
+                  {aaveProposalState.map((_, index) => (
+                    <CWTab
+                      label={`Call ${index + 1}`}
+                      isSelected={activeAaveTabIndex === index}
+                      onclick={() => {
                         this.activeAaveTabIndex = index;
-                      },
-                    })
-                  ),
-                ]),
-                m(PopoverMenu, {
+                      }}
+                    />
+                  ))}
+                </CWTabBar>
+                {m(PopoverMenu, {
                   closeOnContentClick: true,
                   content: [
                     m(MenuItem, {
@@ -1148,48 +1111,38 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                     iconLeft: Icons.MORE_HORIZONTAL,
                     basic: true,
                   }),
-                }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'Target Address'),
-                m(Input, {
-                  name: 'targets',
-                  placeholder: 'Add Target',
-                  value: aaveProposalState[activeAaveTabIndex].target,
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    this.aaveProposalState[activeAaveTabIndex].target = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'Value'),
-                m(Input, {
-                  name: 'values',
-                  placeholder: 'Enter amount in wei',
-                  value: aaveProposalState[activeAaveTabIndex].value,
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    this.aaveProposalState[activeAaveTabIndex].value = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
-              m(FormGroup, [
-                m(FormLabel, 'Calldata'),
-                m(Input, {
-                  name: 'calldatas',
-                  placeholder: 'Add Calldata',
-                  value: aaveProposalState[activeAaveTabIndex].calldata,
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    this.aaveProposalState[activeAaveTabIndex].calldata =
-                      result;
-                    m.redraw();
-                  },
-                }),
-              ]),
+                })}
+              </div>,
+              <CWTextInput
+                label="Target Address"
+                placeholder="Add Target"
+                value={aaveProposalState[activeAaveTabIndex].target}
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.aaveProposalState[activeAaveTabIndex].target = result;
+                  m.redraw();
+                }}
+              />,
+              <CWTextInput
+                label="Value"
+                placeholder="Enter amount in wei"
+                value={aaveProposalState[activeAaveTabIndex].value}
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.aaveProposalState[activeAaveTabIndex].value = result;
+                  m.redraw();
+                }}
+              />,
+              <CWTextInput
+                label="Calldata"
+                placeholder="Add Calldata"
+                value={aaveProposalState[activeAaveTabIndex].calldata}
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.aaveProposalState[activeAaveTabIndex].calldata = result;
+                  m.redraw();
+                }}
+              />,
               m(FormGroup, [
                 m('.flex-label', [
                   m(FormLabel, 'Function Signature'),

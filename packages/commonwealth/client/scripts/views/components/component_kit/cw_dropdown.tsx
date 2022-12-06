@@ -10,9 +10,10 @@ import { CWPopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { DefaultMenuItem } from './types';
 
 type DropdownAttrs = {
-  options: Array<DefaultMenuItem>;
-  onSelect?: (label: string, index: number) => void;
   initialValue?: string;
+  label: string;
+  onSelect?: (label: string, index: number) => void;
+  options: Array<DefaultMenuItem>;
 };
 
 export class CWDropdown extends ClassComponent<DropdownAttrs> {
@@ -26,7 +27,7 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
   }
 
   view(vnode: m.Vnode<DropdownAttrs>) {
-    const { options, onSelect } = vnode.attrs;
+    const { label, options, onSelect } = vnode.attrs;
 
     return (
       <div class="dropdown-wrapper">
@@ -37,6 +38,7 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
           iconRightonclick={() => {
             // Only here because it makes TextInput display correctly
           }}
+          label={label}
           onclick={() => {
             this.showDropdown = !this.showDropdown;
           }}

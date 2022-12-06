@@ -72,6 +72,7 @@ export class ComponentShowcase extends ClassComponent {
         <h1>Dropdown</h1>
         <div class="form-gallery">
           <CWDropdown
+            label="Dropdown"
             options={[
               { label: 'Dropdown Option 1' },
               { label: 'Dropdown Option 2' },
