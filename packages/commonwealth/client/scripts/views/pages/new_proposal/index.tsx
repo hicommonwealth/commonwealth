@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'client/scripts/class_component';
+import ClassComponent from 'class_component';
 
 import 'pages/new_proposal_page.scss';
 
@@ -16,16 +16,16 @@ import {
   chainToProposalSlug,
 } from 'identifiers';
 import { ProposalModule } from 'models';
-import NewProposalForm from 'views/pages/new_proposal/new_proposal_form';
+import { NewProposalForm } from 'views/pages/new_proposal/new_proposal_form';
 import { PageNotFound } from '../404';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type NewProposalPageAttrs = {
-  type;
+  type: string;
 };
 
 class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
-  private titlePre;
+  private titlePre: string;
   private typeEnum;
 
   view(vnode: m.Vnode<NewProposalPageAttrs>) {
@@ -79,14 +79,14 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
           <CWText>
             {this.titlePre} {proposalSlugToFriendlyName.get(this.typeEnum)}
           </CWText>
-          {/* {m(NewProposalForm, {
-            typeEnum: this.typeEnum,
-            onChangeSlugEnum: (value) => {
+          <NewProposalForm
+            typeEnum={this.typeEnum}
+            onChangeSlugEnum={(value) => {
               this.titlePre = value !== 'proposal' ? 'Note' : 'New';
               this.typeEnum = `democracy${value}`;
               m.redraw();
-            },
-          })} */}
+            }}
+          />
         </div>
       </Sublayout>
     );
