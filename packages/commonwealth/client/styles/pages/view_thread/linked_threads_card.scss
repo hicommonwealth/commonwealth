@@ -7,28 +7,16 @@
   flex-direction: column;
   gap: 16px;
   padding: 16px;
-  width: 248px;
-
-  @include extraSmall {
-    width: 100%;
-  }
-
-  h4 {
-    margin-bottom: 16px;
-    text-align: center;
-  }
+  width: 100%;
 
   .links-container {
     display: flex;
     flex-direction: column;
     gap: 4px;
     width: 100%;
+  }
 
-    a {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-      width: 100%;
-    }
+  .no-threads-text.Text {
+    color: $neutral-500;
   }
 }
