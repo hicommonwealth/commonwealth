@@ -63,7 +63,7 @@ class SubstrateTreasury extends ProposalModule<
     this._Accounts = Accounts;
 
     // load server proposals
-    const entities = this.app.chain.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
+    const entities = this.app.chainEntities.store.getByType(SubstrateTypes.EntityKind.TreasuryProposal);
     entities.forEach((e) => this._entityConstructor(e));
 
     // save parameters
@@ -77,17 +77,10 @@ class SubstrateTreasury extends ProposalModule<
     this._pot = this._Chain.coins(pot.freeBalance);
 
     // register new chain-event handlers
-    this.app.chain.chainEntities.registerEntityHandler(
+    this.app.chainEntities.registerEntityHandler(
       SubstrateTypes.EntityKind.TreasuryProposal, (entity, event) => {
         this.updateProposal(entity, event);
       }
-    );
-
-    // fetch proposals from chain
-    await this.app.chain.chainEntities.fetchEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
-      () => this._Chain.fetcher.fetchTreasuryProposals(this.app.chain.block.height),
     );
 
     this._initialized = true;
