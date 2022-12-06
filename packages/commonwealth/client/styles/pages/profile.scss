@@ -108,7 +108,7 @@
         display: inline;
         background-color: $neutral-100;
         padding: 1px 8px 3px;
-        border-radius: 9999px;
+        border-radius: $border-radius-round;
         font-size: 14px;
         font-weight: 600;
       }
@@ -201,7 +201,7 @@
 
   button.cui-button.cui-fluid {
     width: fit-content;
-    border-radius: 6px;
+    border-radius: $border-radius-corners;
     background-color: $purple-300;
 
     &:hover {
@@ -231,7 +231,7 @@
 
     .cui-button {
       margin: 6px 16px 6px 0;
-      border-radius: 8px;
+      border-radius: $border-radius-corners;
       padding: 5px 15px 5px 15px;
       background: $white;
       border: 1px solid $purple-400;
@@ -317,7 +317,7 @@
       a.btn,
       .cui-button {
         margin-right: 16px;
-        border-radius: 8px;
+        border-radius: $border-radius-corners;
         padding: 5px 15px 5px 15px;
         background: $white;
         border: 1px solid $purple-400;
@@ -367,7 +367,7 @@
       background: $primary-500;
       width: 16px;
       height: 16px;
-      border-radius: 8px;
+      border-radius: $border-radius-corners;
       margin-right: 6px;
       svg {
         position: relative;
@@ -410,7 +410,7 @@
       }
       button.cui-button.cui-fluid {
         width: fit-content;
-        border-radius: 6px;
+        border-radius: $border-radius-corners;
         background-color: $purple-300;
 
         &:hover {
@@ -448,7 +448,7 @@
     border: 1px solid $primary-500 !important;
     background-image: none !important;
     color: $primary-500;
-    border-radius: 4px;
+    border-radius: $border-radius-corners;
   }
   .infinite-scroll {
     overflow-y: hidden;
