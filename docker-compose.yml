@@ -6,14 +6,13 @@ services:
   db:
     env_file:
       - ".env"
-    image: postgres
     environment:
       POSTGRES_PASSWORD: "${DOCKER_PG_PW}" 
       POSTGRES_USER: "${DOCKER_PG_USER}" 
     ports:
-      - '5431:5432'
-    volumes:
-      - db:/var/lib/postgresql/data 
+      - '5432:5432'
+    build: 
+      context: .
   common-common:
     build: packages/common-common
   chain-events: 
