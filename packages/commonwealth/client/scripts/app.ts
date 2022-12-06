@@ -469,6 +469,7 @@ export const navigateToSubpage = (...args) => {
   if (!app.isCustomDomain() && app.activeChainId()) {
     args[0] = `/${app.activeChainId()}${args[0]}`;
   }
+  app.sidebarMenu = 'default';
   m.route.set.apply(this, args);
 };
 

@@ -22,7 +22,7 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ThreadInstance } from '../models/thread';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
@@ -168,7 +168,6 @@ const dispatchHooks = async (
       chain: finalThread.chain,
       body: finalThread.body,
     },
-    req.wss,
     excludedAddrs
   );
 
@@ -200,7 +199,6 @@ const dispatchHooks = async (
           chain: finalThread.chain,
           body: finalThread.body,
         },
-        req.wss,
         [finalThread.Address.address]
       );
     });

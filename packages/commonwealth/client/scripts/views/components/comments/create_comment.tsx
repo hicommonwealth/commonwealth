@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -23,12 +24,12 @@ import { CWValidationText } from '../component_kit/cw_validation_text';
 
 type CreateCommmentAttrs = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
-  parentCommentId: number;
+  parentCommentId?: number;
   rootProposal: AnyProposal | Thread;
   updatedCommentsCallback: () => void;
 };
 
-export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
+export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
   private error;
   private quillEditorState: QuillEditor;
   private saving: boolean;

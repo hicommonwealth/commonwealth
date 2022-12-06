@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { PopoverMenu, Button, Icons, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 
@@ -28,26 +29,29 @@ export const handleEmailInvites = (state) => {
   }
 };
 
-export class InvitesMenu implements m.ClassComponent {
+export class InvitesMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
+        className="InvitesMenu"
         menuHeader={{
           label: 'Invites',
           onclick: () => {
             app.mobileMenu = 'MainMenu';
           },
         }}
-        menuItems={{
-          label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
-          onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
-        }}
+        menuItems={[
+          {
+            label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
+            onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+          },
+        ]}
       />
     );
   }
 }
 
-export class InvitesMenuPopover implements m.ClassComponent {
+export class InvitesMenuPopover extends ClassComponent {
   view() {
     return m(PopoverMenu, {
       hasArrow: false,

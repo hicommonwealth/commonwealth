@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_proposal/linked_proposals_embed.scss';
 
@@ -26,9 +27,7 @@ type LinkedProposalsEmbedAttrs = {
   proposal: LinkedSubstrateProposal;
 };
 
-export class LinkedProposalsEmbed
-  implements m.ClassComponent<LinkedProposalsEmbedAttrs>
-{
+export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAttrs> {
   view(vnode: m.Vnode<LinkedProposalsEmbedAttrs>) {
     const { proposal } = vnode.attrs;
 

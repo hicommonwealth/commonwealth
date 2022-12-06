@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/code_block.scss';
 
@@ -11,7 +12,7 @@ type CodeBlockAttrs = {
   clickToSelect: boolean;
 };
 
-export class CodeBlock implements m.ClassComponent<CodeBlockAttrs> {
+export class CodeBlock extends ClassComponent<CodeBlockAttrs> {
   view(vnode: m.VnodeDOM<CodeBlockAttrs, this>) {
     const { clickToSelect } = vnode.attrs;
 

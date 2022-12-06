@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
 
@@ -16,7 +17,7 @@ type BreadcrumbsAttrs = {
   breadcrumbs: Array<BreadcrumbsType>;
 };
 
-export class CWBreadcrumbs implements m.ClassComponent<BreadcrumbsAttrs> {
+export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
   view(vnode: m.Vnode<BreadcrumbsAttrs>) {
     const { breadcrumbs } = vnode.attrs;
 
