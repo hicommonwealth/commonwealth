@@ -74,7 +74,8 @@ export async function enforceDataConsistency(
 if (process.argv[2] == 'run-as-script') {
   enforceDataConsistency(process.argv[3])
     .then(() => {
-      console.log("Successfully synced the databases")
+      console.log("Successfully synced the databases");
+      process.exit(0);
     })
     .catch((e) => {
       console.error(e);
