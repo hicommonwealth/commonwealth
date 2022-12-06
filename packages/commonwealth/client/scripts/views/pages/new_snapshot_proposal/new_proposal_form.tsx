@@ -1,22 +1,16 @@
 import m from 'mithril';
 import ClassComponent from 'client/scripts/class_component';
 import moment from 'moment';
+import { capitalize } from 'lodash';
 
 import 'pages/new_proposal_page.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { idToProposal } from 'identifiers';
-import { capitalize } from 'lodash';
-import {
-  SnapshotSpace,
-  getScore,
-  getSpaceBlockNumber,
-  createProposal,
-} from 'helpers/snapshot_utils';
+import { SnapshotSpace, getScore } from 'helpers/snapshot_utils';
 import { QuillEditor } from '../../components/quill/quill_editor';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -25,113 +19,8 @@ import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
-
-// TODO Graham 7-20-22: Reconcile against NewThreadForm
-type ThreadForm = {
-  body: string;
-  choices: Array<string>;
-  end: number;
-  metadata: {
-    network?: string;
-    strategies?: Array<{
-      name: string;
-      params: any;
-    }>;
-  };
-  name: string;
-  range: string;
-  snapshot: number;
-  start: number;
-  type: string;
-};
-
-enum NewThreadErrors {
-  NoBody = 'Proposal body cannot be blank!',
-  NoTitle = 'Title cannot be blank!',
-  NoChoices = 'Choices cannot be blank!',
-  NoStartDate = 'Start Date cannot be blank!',
-  NoEndDate = 'End Date cannot be blank!',
-  SomethingWentWrong = 'Something went wrong!',
-}
-
-// Don't call it a new thread if it ain't a new thread.
-const newThread = async (
-  form: ThreadForm,
-  quillEditorState: QuillEditor,
-  author: Account,
-  space: SnapshotSpace
-) => {
-  if (!form.name) {
-    throw new Error(NewThreadErrors.NoTitle);
-  }
-
-  if (!form.start) {
-    throw new Error(NewThreadErrors.NoStartDate);
-  }
-
-  if (!form.end) {
-    throw new Error(NewThreadErrors.NoEndDate);
-  }
-
-  if (!form.choices[0] || !form.choices[1]) {
-    throw new Error(NewThreadErrors.NoChoices);
-  }
-
-  if (quillEditorState.isBlank()) {
-    throw new Error(NewThreadErrors.NoBody);
-  }
-
-  quillEditorState.disable();
-
-  const bodyText = quillEditorState.textContentsAsString;
-
-  form.body = bodyText;
-
-  form.snapshot = await getSpaceBlockNumber(space.network);
-  form.metadata.network = space.network;
-  form.metadata.strategies = space.strategies;
-
-  // Format form for proper validation
-  delete form.range;
-  form.start = Math.floor(form.start / 1000);
-  form.end = Math.floor(form.end / 1000);
-
-  const proposalPayload = {
-    space: space.id,
-    type: 'single-choice',
-    title: form.name,
-    body: form.body,
-    choices: form.choices,
-    start: form.start,
-    end: form.end,
-    snapshot: form.snapshot,
-    network: '1', // TODO: unclear if this is always 1
-    timestamp: Math.floor(Date.now() / 1e3),
-    strategies: JSON.stringify({}),
-    plugins: JSON.stringify({}),
-    metadata: JSON.stringify({}),
-  };
-
-  try {
-    await createProposal(author.address, proposalPayload);
-    await app.user.notifications.refresh();
-    await app.snapshot.refreshProposals();
-  } catch (e) {
-    console.log(e);
-    throw new Error(e.error);
-  }
-};
-
-const newLink = async (
-  form: ThreadForm,
-  quillEditorState: QuillEditor,
-  author: Account,
-  space: SnapshotSpace
-) => {
-  const errors = await newThread(form, quillEditorState, author, space);
-  console.log('the rro', errors);
-  return errors;
-};
+import { ThreadForm } from './types';
+import { newLink } from './helpers';
 
 type NewProposalFormAttrs = {
   snapshotId: string;
@@ -141,7 +30,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
   private form: ThreadForm;
   private initialized: boolean;
   private isFromExistingProposal: boolean;
-  private members: string[];
+  private members: Array<string>;
   private quillEditorState: QuillEditor;
   private saving: boolean;
   private snapshotScoresFetched: boolean;
@@ -168,6 +57,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
       this.initialized = true;
       this.members = [];
       this.userScore = null;
+
       this.form = {
         name: '',
         body: '',
@@ -185,10 +75,15 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           typeof pathVars.params.fromProposalId === 'number'
             ? pathVars.params.fromProposalId
             : pathVars.params.fromProposalId.toString();
+
         const fromProposalType = pathVars.params.fromProposalType.toString();
+
         const fromProposal = idToProposal(fromProposalType, fromProposalId);
+
         this.form.name = fromProposal.title;
+
         this.isFromExistingProposal = true;
+
         if (fromProposal.body) {
           try {
             const parsedBody = JSON.parse(fromProposal.body);
@@ -210,9 +105,13 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             )
           )
           .reduce((a, b) => (a as number) + (b as number), 0);
+
         this.userScore = scores as number;
+
         this.space = space;
+
         this.members = space.members;
+
         this.snapshotScoresFetched = true;
         m.redraw();
       });
