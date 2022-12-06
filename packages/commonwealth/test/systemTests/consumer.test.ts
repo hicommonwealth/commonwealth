@@ -1,5 +1,5 @@
 import chai from 'chai';
-import {ServiceConsumer} from "common-common/src/ServiceConsumer";
+import {ServiceConsumer} from "common-common/src/serviceConsumer";
 import {getQueueStats, publishRmqMsg} from "common-common/src/rabbitmq/util";
 import {
   RascalExchanges,

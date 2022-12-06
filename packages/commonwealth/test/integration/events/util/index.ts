@@ -1,7 +1,10 @@
 import { NotificationCategories } from 'common-common/src/types';
 import { CWEvent } from 'chain-events/src';
 import models from '../../../../server/database';
-import StorageHandler from '../../../../server/eventHandlers/storage';
+import ceModels from 'chain-events/services/database/database';
+import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
+import {getRabbitMQConfig, RabbitMQController} from "common-common/src/rabbitmq";
+import {RABBITMQ_URI} from "../../../../server/config";
 
 interface ISetupSubscriptionsFunction {
   (email: string, address: string, chain: string): Promise<number>;
@@ -49,7 +52,8 @@ const setupSubscriptions: ISetupSubscriptionsFunction = async (
 };
 
 const setupDbEvent = async (event: CWEvent) => {
-  const storageHandler = new StorageHandler(models, 'edgeware');
+  const controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
+  const storageHandler = new StorageHandler(ceModels, controller, 'edgeware');
   return storageHandler.handle(event);
 };
 

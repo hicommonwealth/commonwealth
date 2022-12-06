@@ -1,6 +1,5 @@
 import { Response } from 'express';
 import { DB } from '../models';
-import { AppError } from '../util/errors';
 import { success, TypedRequestQuery } from '../types';
 import fetchNewSnapshotProposal from '../util/fetchSnapshot'
 
