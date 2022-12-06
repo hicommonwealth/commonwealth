@@ -11,21 +11,24 @@ import { IUniqueId } from 'client/scripts/models/interfaces';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 import 'pages/new_profile.scss';
-import { CWCard } from '../../components/component_kit/cw_card';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
 
-type ProfileActivityAttrs = {
+enum ProfileActivity {
+  Comments,
+  Threads,
+  Communities,
+  Addresses,
+}
+
+type NewProfileActivityAttrs = {
   threads: Array<Thread>;
   comments: Array<Comment<IUniqueId>>;
   chains: Array<ChainInfo>;
   addresses: Array<AddressInfo>;
 };
 
-enum ProfileActivity {
-  Comments,
-  Threads,
-}
-
-type ProfileActivityState = {
+type NewProfileActivityState = {
   selectedActivity: ProfileActivity;
   isCommunitiesOpen: boolean;
   isAddressesOpen: boolean;
@@ -35,22 +38,11 @@ type ProfileActivityState = {
   threadCharLimit: number;
 };
 
-const handleActivityClick = (
+type NewProfileActivityContentAttrs = {
   option: ProfileActivity,
-  state: ProfileActivityState
-) => {
-  state.selectedActivity = option;
-};
-
-const handleCommunityFilterClick = (evt, vnode) => {
-  evt.stopPropagation();
-  vnode.state.isCommunitiesOpen = !vnode.state.isCommunitiesOpen;
-};
-
-const handleAddressFilterClick = (evt, vnode) => {
-  evt.stopPropagation();
-  vnode.state.isAddressesOpen = !vnode.state.isAddressesOpen;
-};
+  attrs: NewProfileActivityAttrs,
+  state: NewProfileActivityState,
+}
 
 const transformTimestamp = (timestamp) => {
   const fromNow = moment(timestamp).fromNow();
@@ -59,113 +51,94 @@ const transformTimestamp = (timestamp) => {
     : fromNow;
 };
 
-const renderActivity = (
-  option: ProfileActivity,
-  attrs: ProfileActivityAttrs,
-  state: ProfileActivityState
-) => {
-  const shouldFilterCommunities =
-    Object.keys(state.communityFilters).length > 0;
-  const shouldFilterAddresses = Object.keys(state.addressFilters).length > 0;
+const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
+  view: (vnode) => {
+    const { option, attrs, state } = vnode.attrs;
+    const shouldFilterCommunities = Object.keys(state.communityFilters).length > 0;
+    const shouldFilterAddresses = Object.keys(state.addressFilters).length > 0;
 
-  if (option === ProfileActivity.Comments) {
-    return attrs.comments
-      ?.filter(
-        (comment) =>
-          // Filter communities
-          (!shouldFilterCommunities ||
-            comment.chain in state.communityFilters) &&
-          // Filter addresses
-          (!shouldFilterAddresses ||
-            comment.addressInfo.address in state.addressFilters)
-      )
-      .map((comment) => (
-        <div className="activity">
-          <div className="comment-icon">
-            <CWIcon iconName="feedback" iconSize="small" />
+    // force redraw or on initial load comments don't render
+    m.redraw();
+
+    if (option === ProfileActivity.Comments) {
+      return attrs.comments
+        ?.filter(
+          (comment) =>
+            // Filter communities
+            (!shouldFilterCommunities ||
+              comment.chain in state.communityFilters) &&
+            // Filter addresses
+            (!shouldFilterAddresses ||
+              comment.addressInfo.address in state.addressFilters)
+        )
+        .map((comment) => (
+          <div className="activity">
+            <div className="comment-icon">
+              <CWIcon iconName="feedback" iconSize="small" />
+            </div>
+            <div className="comment-chain">
+              <CWText>
+                Commented in <CWText fontWeight="semiBold">&nbsp;{comment.chain}</CWText>
+              </CWText>
+            </div>
+            <div className="comment-date">
+              <CWText>
+                {transformTimestamp(comment.createdAt)}
+              </CWText>
+            </div>
+            <div className="comment-text">
+              <CWText>
+                {comment.plaintext.length > state.commentCharLimit
+                  ? `${comment.plaintext.slice(0, state.commentCharLimit)}...`
+                  : comment.plaintext}
+              </CWText>
+            </div>
           </div>
-          <div className="comment-chain">
-            <p>
-              {' '}
-              Commented in <span className="heavy"> {comment.chain} </span>{' '}
-            </p>
-          </div>
-          <div className="comment-date">
-            <p> {transformTimestamp(comment.createdAt)} </p>
-          </div>
-          <div className="comment-text">
-            <p>
-              {comment.plaintext.length > state.commentCharLimit
-                ? `${comment.plaintext.slice(0, state.commentCharLimit)}...`
-                : comment.plaintext}
-            </p>
-          </div>
-        </div>
-      ));
+        ));
+      }
+
+      if (option === ProfileActivity.Threads) {
+        return attrs.threads
+          ?.filter(
+            (thread) =>
+              // Filter communities
+              (!shouldFilterAddresses ||
+                thread.addressInfo.address in state.addressFilters) &&
+              // Filter addresses
+              (!shouldFilterCommunities || thread.chain in state.communityFilters)
+          )
+          .map((thread) => (
+            <div className="activity">
+              <div className="comment-icon">
+                <CWIcon iconName="feedback" iconSize="small" />
+              </div>
+              <div className="thread-chain">
+                <CWText>
+                  Thread in <CWText fontWeight="semiBold">&nbsp;{thread.chain} </CWText>
+                </CWText>
+              </div>
+              <div className="thread-date">
+                <CWText>{transformTimestamp(thread.createdAt)}</CWText>
+              </div>
+              <div className="thread-title">
+                <CWText> {(thread.title).replace(/%20/g, " ")} </CWText>
+              </div>
+              <div className="thread-body">
+                <CWText>
+                  {thread.plaintext.length > state.threadCharLimit
+                    ? `${thread.plaintext.slice(0, state.threadCharLimit)}...`
+                    : thread.plaintext}
+                </CWText>
+              </div>
+            </div>
+          ));
+      }
   }
+}
 
-  if (option === ProfileActivity.Threads) {
-    return attrs.threads
-      ?.filter(
-        (thread) =>
-          // Filter communities
-          (!shouldFilterAddresses ||
-            thread.addressInfo.address in state.addressFilters) &&
-          // Filter addresses
-          (!shouldFilterCommunities || thread.chain in state.communityFilters)
-      )
-      .map((thread) => (
-        <div className="activity">
-          <div className="comment-icon">
-            <CWIcon iconName="feedback" iconSize="small" />
-          </div>
-          <div className="thread-chain">
-            <p>
-              {' '}
-              Thread in <span className="heavy"> {thread.chain} </span>{' '}
-            </p>
-          </div>
-          <div className="thread-date">
-            <p> {transformTimestamp(thread.createdAt)} </p>
-          </div>
-          <div className="thread-title">
-            <p> {thread.title} </p>
-          </div>
-          <div className="thread-body">
-            <p>
-              {thread.plaintext.length > state.threadCharLimit
-                ? `${thread.plaintext.slice(0, state.threadCharLimit)}...`
-                : thread.plaintext}
-            </p>
-          </div>
-        </div>
-      ));
-  }
-};
-
-const handleCommunityFilter = (chain: string, state: ProfileActivityState) => {
-  if (chain in state.communityFilters) {
-    delete state.communityFilters[chain];
-  } else {
-    state.communityFilters[chain] = true;
-  }
-};
-
-const handleAddressFilter = (address: string, state: ProfileActivityState) => {
-  if (address in state.addressFilters) {
-    delete state.addressFilters[address];
-  } else {
-    state.addressFilters[address] = true;
-  }
-};
-
-class NewProfileActivity
-  implements m.Component<ProfileActivityAttrs, ProfileActivityState>
-{
-  oninit(vnode) {
+const NewProfileActivity: m.Component<NewProfileActivityAttrs, NewProfileActivityState> = {
+  oninit(vnode: m.Vnode<NewProfileActivityAttrs, NewProfileActivityState>) {
     vnode.state.selectedActivity = ProfileActivity.Comments;
-    vnode.state.isCommunitiesOpen = false;
-    vnode.state.isAddressesOpen = false;
     vnode.state.communityFilters = {};
     vnode.state.addressFilters = {};
     vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 140;
@@ -176,175 +149,53 @@ class NewProfileActivity
       vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 140;
       vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
     });
+  },
 
-    // Close dropdown
-    window.addEventListener('click', (evt) => {
-      // If option clicked do nothing
-      if (
-        (evt.target as HTMLDivElement).classList.contains('option') ||
-        (evt.target as HTMLDivElement).classList.contains('option-name')
-      ) {
-        return;
-      }
-
-      if (vnode.state.isCommunitiesOpen) {
-        vnode.state.isCommunitiesOpen = false;
-        m.redraw();
-      }
-      if (vnode.state.isAddressesOpen) {
-        vnode.state.isAddressesOpen = false;
-        m.redraw();
-      }
-    });
-  }
-
-  view(vnode) {
+  view(vnode: m.Vnode<NewProfileActivityAttrs, NewProfileActivityState>) {
     return (
       <div className="ProfileActivity">
-        <CWCard
-          interactive={true}
-          fullWidth={true}
-        >
         <div className="activity-nav">
-          <div
-            className={
-              vnode.state.selectedActivity === ProfileActivity.Comments
-                ? 'activity-nav-option selected'
-                : 'activity-nav-option'
-            }
-            onclick={() => {
-              handleActivityClick(ProfileActivity.Comments, vnode.state);
-            }}
+          <CWTabBar
+            className="tab-bar"
           >
-            <h4> Comments </h4>
-            <div className="activity-count">
-              {' '}
-              <p> {vnode.attrs.comments?.length} </p>{' '}
-            </div>
-          </div>
-          <div
-            className={
-              vnode.state.selectedActivity === ProfileActivity.Threads
-                ? 'activity-nav-option selected'
-                : 'activity-nav-option'
-            }
-            onclick={() => {
-              handleActivityClick(ProfileActivity.Threads, vnode.state);
-            }}
-          >
-            <h4> Threads </h4>
-            <div className="activity-count">
-              {' '}
-              <p> {vnode.attrs.threads?.length} </p>{' '}
-            </div>
-          </div>
-          <div className="divider"></div>
-          <div className="activity-nav-option">
-            <h4
-              onclick={(evt) => {
-                handleCommunityFilterClick(evt, vnode);
+            <CWTab
+              label="All Activity"
+              onclick={() => {
+                vnode.state.selectedActivity = ProfileActivity.Comments
               }}
-            >
-              All Communities
-            </h4>
-            <CWIcon
-              iconName={
-                vnode.state.isCommunitiesOpen ? 'chevronUp' : 'chevronDown'
-              }
-              className="chevron"
-              iconSize="medium"
-              onclick={(evt) => {
-                handleCommunityFilterClick(evt, vnode);
-              }}
+              isSelected={vnode.state.selectedActivity === ProfileActivity.Comments}
             />
-            {vnode.state.isCommunitiesOpen ? (
-              <div className="drop-down">
-                {vnode.attrs.chains.map((chain) => (
-                  <div
-                    className="option"
-                    onclick={() => {
-                      handleCommunityFilter(
-                        chain.name.toLowerCase(),
-                        vnode.state
-                      );
-                    }}
-                  >
-                    <p className="option-name"> {chain.name} </p>
-                    {chain.name.toLowerCase() in
-                    vnode.state.communityFilters ? (
-                      <CWIcon
-                        iconName="check"
-                        iconSize="medium"
-                        className="check"
-                      />
-                    ) : (
-                      <div />
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div />
-            )}
-          </div>
-          <div className="activity-nav-option">
-            <h4
-              onclick={(evt) => {
-                handleAddressFilterClick(evt, vnode);
+            <CWTab
+              label="Threads"
+              onclick={() => {
+                vnode.state.selectedActivity = ProfileActivity.Threads
               }}
-            >
-              All Addresses
-            </h4>
-            <CWIcon
-              iconName={
-                vnode.state.isAddressesOpen ? 'chevronUp' : 'chevronDown'
-              }
-              className="chevron"
-              iconSize="medium"
-              onclick={(evt) => {
-                handleAddressFilterClick(evt, vnode);
-              }}
+              isSelected={vnode.state.selectedActivity === ProfileActivity.Threads}
             />
-            {vnode.state.isAddressesOpen ? (
-              <div className="drop-down wide">
-                {vnode.attrs.addresses.map((address) => (
-                  <div
-                    className="option"
-                    onclick={() => {
-                      handleAddressFilter(address.address, vnode.state);
-                    }}
-                  >
-                    <p className="option-name">
-                      {`${address.address.slice(
-                        0,
-                        6
-                      )}...${address.address.slice(-6)}`}
-                    </p>
-                    {address.address in vnode.state.addressFilters ? (
-                      <CWIcon
-                        iconName="check"
-                        iconSize="medium"
-                        className="check"
-                      />
-                    ) : (
-                      <div />
-                    )}
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div />
-            )}
-          </div>
+            <div className="divider" />
+            <CWTab
+              label="Communities"
+              onclick={() => {
+                vnode.state.selectedActivity = ProfileActivity.Communities
+              }}
+              isSelected={vnode.state.selectedActivity === ProfileActivity.Communities}
+            />
+            <CWTab
+              label="Addresses"
+              onclick={() => {
+                vnode.state.selectedActivity = ProfileActivity.Addresses
+              }}
+              isSelected={vnode.state.selectedActivity === ProfileActivity.Addresses}
+            />
+          </CWTabBar>
         </div>
         <div className="activity-section">
-          {renderActivity(
-            vnode.state.selectedActivity,
-            vnode.attrs,
-            vnode.state
-          )}
+          {m(ActivityContent, {
+            option: vnode.state.selectedActivity,
+            attrs: vnode.attrs,
+            state: vnode.state,
+          })}
         </div>
-        </CWCard>
       </div>
     );
   }
