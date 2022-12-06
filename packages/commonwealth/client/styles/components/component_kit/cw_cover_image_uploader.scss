@@ -20,7 +20,7 @@
 
     background-color: $neutral-25;
     border: 1px solid $neutral-200;
-    border-radius: 5px;
+    border-radius: $border-radius-corners;
 
     background-size: contain;
     background-repeat: no-repeat;
