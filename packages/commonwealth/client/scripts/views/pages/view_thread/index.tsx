@@ -384,8 +384,6 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       isAuthor ||
       isAdminOrMod;
 
-    console.log(thread.chainEntities);
-
     const showLinkedThreadOptions =
       thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
 
