@@ -12,7 +12,7 @@ type RadioGroupAttrs = {
   name: string;
   onchange: (e?: any) => void;
   options: Array<RadioButton>;
-  toggledOption: string;
+  toggledOption?: string;
 };
 export class CWRadioGroup extends ClassComponent<RadioGroupAttrs> {
   view(vnode: m.Vnode<RadioGroupAttrs>) {
