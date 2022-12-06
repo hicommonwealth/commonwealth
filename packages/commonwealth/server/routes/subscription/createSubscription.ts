@@ -81,13 +81,14 @@ export default async (
         },
       });
       if (!chain) return next(new AppError(Errors.InvalidChain));
-      const chainEventType = await models.ChainEventType.findOne({
+      const chainEntity = await models.ChainEntityMeta.findOne({
         where: {
-          id: req.body.object_id,
+          id: p_id,
         },
       });
-      if (!chainEventType) return next(new AppError(Errors.InvalidChainEventId));
-      obj = { chain_id: p_entity, chain_event_type_id: req.body.object_id };
+      if (!chainEntity) return next(new AppError(Errors.NoChainEntity));
+      // object_id = [chain]-[entity_id] e.g. edgeware-10
+      obj = { chain_id: p_entity, entity_id: p_id };
       break;
     }
     default:

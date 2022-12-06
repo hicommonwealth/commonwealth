@@ -26,6 +26,7 @@ import {
 } from './notifications_read';
 import { NotificationInstance } from './notification';
 import { StatsDController } from 'common-common/src/statsd';
+import {SupportedNetwork} from "chain-events/src";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -43,7 +44,6 @@ export type SubscriptionAttributes = {
   chain_id?: string;
   offchain_thread_id?: number;
   offchain_comment_id?: number;
-  chain_event_type_id?: string;
   chain_entity_id?: number;
 
   User?: UserAttributes;
@@ -126,7 +126,19 @@ export default (
     };
 
     // typeguard function to differentiate between chain event notifications as needed
-    const isChainEventData = (<IChainEventNotificationData>notification_data).chainEvent !== undefined
+    let chainEvent: IChainEventNotificationData;
+    const isChainEventData = !!(
+      typeof (<any>notification_data).id === 'number'
+      && typeof (<any>notification_data).block_number === 'number'
+      && (<any>notification_data).event_data
+      && Object.values(SupportedNetwork).includes((<any>notification_data).network)
+      && (<any>notification_data).chain && typeof (<any>notification_data).chain === 'string'
+      && typeof (<any>notification_data).entity_id === 'number'
+    );
+
+    if (isChainEventData) {
+      chainEvent = <IChainEventNotificationData>notification_data;
+    }
 
     // retrieve distinct user ids given a set of addresses
     const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
@@ -172,7 +184,7 @@ export default (
     let notification: NotificationInstance;
     notification = await models.Notification.findOne(isChainEventData ? {
       where: {
-        chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id
+        chain_event_id: chainEvent.id
       }
     } : {
       where: {
@@ -183,15 +195,13 @@ export default (
     // if the notification does not yet exist create it here
     if (!notification) {
       if (isChainEventData) {
-        const event: any = (<IChainEventNotificationData>notification_data).chainEvent;
-        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType;
-
         notification = await models.Notification.create({
-          notification_data: JSON.stringify(event),
-          chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
+          notification_data: JSON.stringify(chainEvent),
+          chain_event_id: chainEvent.id,
           category_id: 'chain-event',
-          chain_id: (<IChainEventNotificationData>notification_data).chain_id
-        })
+          chain_id: chainEvent.chain,
+          entity_id: chainEvent.entity_id
+        });
       } else {
         notification = await models.Notification.create({
           notification_data: JSON.stringify(notification_data),
@@ -210,14 +220,6 @@ export default (
       console.log('Error generating immediate notification email!');
       console.trace(e);
     }
-
-    // create NotificationsRead instances
-    // await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
-    //   subscription_id: subscription.id,
-    //   notification_id: notification.id,
-    //   is_read: false,
-    //   user_id: subscription.subscriber_id
-    // })));
 
     let query = `INSERT INTO "NotificationsRead" VALUES `;
     const replacements = [];
@@ -246,11 +248,11 @@ export default (
 
     // send emails
     for (const subscription of subscriptions) {
-      if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
+      if (msg && isChainEventData && chainEvent.chain) {
         msg.dynamic_template_data.notification.path = `${
           SERVER_URL
         }/${
-          (<IChainEventNotificationData>notification_data).chainEventType.chain
+          chainEvent.chain
         }/notifications?id=${
           notification.id
         }`;

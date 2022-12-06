@@ -7,6 +7,7 @@ import {NotificationSubscription, Notification} from 'models';
 import {modelFromServer} from 'models/NotificationSubscription';
 
 import app from 'state';
+import {NotificationCategories} from "../../../../server/routes/viewNotifications";
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;

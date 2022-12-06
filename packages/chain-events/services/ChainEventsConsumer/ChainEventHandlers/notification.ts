@@ -8,8 +8,8 @@ import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQControlle
 import {RascalPublications, RmqCENotificationCUD} from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
-import { ChainEventAttributes } from '../../database/models/chain_event';
-import { DB } from '../../database/database';
+import { ChainEventInstance } from '../../database/models/chain_event';
+import {DB} from '../../database/database';
 
 export default class extends IEventHandler {
   public readonly name = 'Notification Producer';
@@ -22,7 +22,7 @@ export default class extends IEventHandler {
     super();
   }
 
-  public async handle(event: CWEvent<IChainEventData>, dbEvent) {
+  public async handle(event: CWEvent<IChainEventData>, dbEvent: ChainEventInstance) {
     const log = factory.getLogger(
       addPrefix(__filename, [event.network, event.chain])
     );
@@ -37,25 +37,13 @@ export default class extends IEventHandler {
       return dbEvent;
     }
 
-    let dbEventType;
-    try {
-      dbEventType = await dbEvent.getChainEventType();
-      if (!dbEventType) {
-        log.error(`Failed to fetch event type! Ignoring.`);
-        return;
-      }
-    } catch (e) {
-      log.error(
-        `Failed to get chain-event type for event: ${JSON.stringify(event)}`
-      );
+    if (!dbEvent.entity_id) {
+      log.trace(`No related entity, skipping!`);
       return dbEvent;
     }
 
-    const formattedEvent: ChainEventAttributes = dbEvent.toJSON();
-    formattedEvent.ChainEventType = dbEventType.toJSON();
-
     const publishData: RmqCENotificationCUD.RmqMsgType = {
-      ChainEvent: formattedEvent,
+      ChainEvent: dbEvent.toJSON(),
       event,
       cud: 'create',
     };

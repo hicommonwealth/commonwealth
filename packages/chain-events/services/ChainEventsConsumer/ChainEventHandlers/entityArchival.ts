@@ -1,6 +1,7 @@
 /**
  * Determines which chain entities each event affects and updates state accordingly.
  */
+import { ChainEventInstance } from 'chain-events/services/database/models/chain_event';
 import {
   CWEvent,
   EntityEventKind,
@@ -12,12 +13,12 @@ import {
   SubstrateTypes,
 } from 'chain-events/src';
 
-import { addPrefix, factory } from 'common-common/src/logging';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import {addPrefix, factory} from 'common-common/src/logging';
+import {RabbitMQController} from 'common-common/src/rabbitmq/rabbitMQController';
 import {
   RascalPublications, RmqEntityCUD,
 } from 'common-common/src/rabbitmq/types';
-import { DB } from '../../database/database';
+import {DB} from '../../database/database';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';
@@ -36,7 +37,7 @@ export default class extends IEventHandler {
    *
    * `dbEvent` is the database entry corresponding to the `event`.
    */
-  public async handle(event: CWEvent<IChainEventData>, dbEvent) {
+  public async handle(event: CWEvent<IChainEventData>, dbEvent: ChainEventInstance) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const log = factory.getLogger(
       addPrefix(__filename, [event.network, event.chain])
@@ -167,5 +168,7 @@ export default class extends IEventHandler {
         break;
       }
     }
+
+    return dbEvent;
   }
 }

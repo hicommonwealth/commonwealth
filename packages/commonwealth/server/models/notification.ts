@@ -9,6 +9,7 @@ export type NotificationAttributes = {
   chain_id?: string;
   category_id: string;
   chain_event_id?: number;
+  entity_id: number;
   created_at?: Date;
   updated_at?: Date;
   NotificationsRead?: NotificationsReadAttributes[];
@@ -28,6 +29,7 @@ export default (
     id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     notification_data: { type: dataTypes.TEXT, allowNull: false },
     chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
+    entity_id: { type: dataTypes.INTEGER, allowNull: true },
     chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
     category_id: { type: dataTypes.STRING, allowNull: false}
   }, {

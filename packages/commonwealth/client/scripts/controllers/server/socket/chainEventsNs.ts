@@ -28,13 +28,13 @@ export class ChainEventsNamespace {
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs
-        .filter((x) => !!x.chainEventTypeId)
+      const filteredSubs = subs
+        .filter((x) => !!x.chainEntityId)
       const roomsToJoin = [];
-      for (const eventType of eventTypes) {
-        if (!this.subscriptionRoomsJoined.has(eventType)) {
-          roomsToJoin.push(eventType);
-          this.subscriptionRoomsJoined.add(eventType);
+      for (const sub of filteredSubs) {
+        if (!this.subscriptionRoomsJoined.has(sub.chainEntityId)) {
+          roomsToJoin.push(sub.chainEntityId);
+          this.subscriptionRoomsJoined.add(sub.chainEntityId);
         }
       }
       if (roomsToJoin.length > 0) {
@@ -48,13 +48,13 @@ export class ChainEventsNamespace {
 
   public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs
-        .filter((x) => !!x.chainEventTypeId)
+      const filteredSubs = subs
+        .filter((x) => !!x.chainEntityId)
       const roomsToLeave = [];
-      for (const eventType of eventTypes) {
-        if (this.subscriptionRoomsJoined.has(eventType)) {
-          roomsToLeave.push(eventType);
-          this.subscriptionRoomsJoined.delete(eventType);
+      for (const sub of filteredSubs) {
+        if (this.subscriptionRoomsJoined.has(sub.chainEntityId)) {
+          roomsToLeave.push(sub.chainEntityId);
+          this.subscriptionRoomsJoined.delete(sub.chainEntityId);
         }
       }
 
@@ -70,7 +70,7 @@ export class ChainEventsNamespace {
   private onChainEvent(notification: ChainEventNotification) {
     const subscription = app.user.notifications.subscriptions.find(
       (sub) =>
-        sub.chainEventTypeId === notification.ChainEvent.ChainEventType.id
+        sub.chainEntityId === notification.ChainEvent.entity_id
     );
     if (!subscription) {
       // will theoretically never happen as subscriptions are added/removed on Socket.io as they happen locally
