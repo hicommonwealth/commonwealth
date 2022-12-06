@@ -1,11 +1,4 @@
 import { IChainEventData, SupportedNetwork } from 'chain-events/src';
-import {
-  NodeInfo,
-  Notification,
-  ChainEvent,
-  NotificationSubscription,
-  ChainEventType,
-} from 'models';
 import moment from 'moment';
 
 class DashboardActivityNotification {
@@ -24,7 +17,6 @@ class DashboardActivityNotification {
   }
 
   // Chain Event Notifications
-  public readonly typeId?: ChainEventType;
   public readonly blockNumber?: number;
   public readonly eventData?: IChainEventData;
   public readonly chainEventId?: number;
@@ -42,7 +34,6 @@ class DashboardActivityNotification {
     likeCount,
     commentCount,
     isRead,
-    typeId,
     blockNumber,
     eventData,
     id,
@@ -59,7 +50,6 @@ class DashboardActivityNotification {
     likeCount?: number;
     commentCount?: number;
     isRead?: boolean;
-    typeId?: ChainEventType;
     blockNumber?: number;
     eventData?: IChainEventData;
     id?: number;
@@ -76,7 +66,6 @@ class DashboardActivityNotification {
     this.likeCount = likeCount;
     this.commentCount = commentCount;
     this._isRead = isRead;
-    this.typeId = typeId;
     this.blockNumber = blockNumber;
     this.eventData = eventData;
     this.chainEventId = id;
@@ -96,7 +85,6 @@ class DashboardActivityNotification {
       likeCount: json.like_count,
       commentCount: json.comment_count,
       isRead: json.is_read,
-      typeId: json.chain_event_type_id,
       blockNumber: json.block_number,
       eventData: json.event_data,
       id: json.id,

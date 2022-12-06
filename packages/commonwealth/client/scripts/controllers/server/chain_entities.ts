@@ -3,7 +3,7 @@ import $ from 'jquery';
 
 import {ChainEntityStore} from 'stores';
 import {ChainBase, ChainNetwork} from 'common-common/src/types';
-import {ChainEntity, ChainEvent, ChainEventType, ChainInfo} from 'models';
+import {ChainEntity, ChainEvent, ChainInfo} from 'models';
 import app from 'state';
 import {
   CWEvent,
@@ -154,19 +154,12 @@ class ChainEntityController {
       // eslint-disable-next-line no-continue
       if (!eventEntity) continue;
       const [entityKind] = eventEntity;
-      // create event type
-      const eventType = new ChainEventType(
-        `${chain}-${cwEvent.data.kind.toString()}`,
-        chain,
-        network,
-        cwEvent.data.kind.toString()
-      );
+
 
       // create event
       const event = new ChainEvent(
         cwEvent.blockNumber,
         cwEvent.data,
-        eventType
       );
 
       // create entity

@@ -3,7 +3,7 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import {NotificationStore} from 'stores';
-import {NotificationSubscription, Notification, ChainEventType} from 'models';
+import {NotificationSubscription, Notification} from 'models';
 import {modelFromServer} from 'models/NotificationSubscription';
 
 import app from 'state';
@@ -335,14 +335,6 @@ class NotificationsController {
     for (const subscriptionJSON of subscriptions) {
       const subscription = NotificationSubscription.fromJSON(subscriptionJSON);
 
-      // save the chainEventType for the subscription if the subscription type is chain-event
-      let chainEventType = null;
-      if (subscriptionJSON.ChainEventType) {
-        chainEventType = ChainEventType.fromJSON(
-          subscriptionJSON.ChainEventType
-        );
-      }
-
       // save the notification read + notification instances if any
       for (const notificationsReadJSON of subscriptionJSON.NotificationsReads) {
         const data = {
@@ -352,7 +344,6 @@ class NotificationsController {
         const notification = Notification.fromJSON(
           data,
           subscription,
-          chainEventType
         );
 
         if (subscription.category === 'chain-event') {
