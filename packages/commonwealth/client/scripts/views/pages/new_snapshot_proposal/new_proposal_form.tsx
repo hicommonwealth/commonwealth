@@ -1,6 +1,5 @@
 import m from 'mithril';
 import ClassComponent from 'client/scripts/class_component';
-import { Callout } from 'construct-ui';
 import moment from 'moment';
 
 import 'pages/new_proposal_page.scss';
@@ -25,6 +24,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
 
 // TODO Graham 7-20-22: Reconcile against NewThreadForm
 type ThreadForm = {
@@ -255,28 +255,20 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     return (
       <div class="NewThreadForm">
         <div class="new-thread-form-body">
-          {
-            (this.space.filters?.onlyMembers &&
-              !isMember &&
-              m(Callout, {
-                class: 'no-profile-callout',
-                intent: 'primary',
-                content: [
-                  'You need to be a member of the space in order to submit a proposal.',
-                ],
-              }),
-            showScoreWarning ? (
-              m(Callout, {
-                class: 'no-profile-callout',
-                intent: 'primary',
-                content: [
-                  `You need to have a minimum of ${this.space.filters.minScore} ${this.space.symbol} in order to submit a proposal`,
-                ],
-              })
-            ) : (
-              <CWSpinner />
-            ))
-          }
+          {this.space.filters?.onlyMembers && !isMember && (
+            <CWText>
+              You need to be a member of the space in order to submit a
+              proposal.
+            </CWText>
+          )}
+          {showScoreWarning ? (
+            <CWText>
+              You need to have a minimum of {this.space.filters.minScore}{' '}
+              {this.space.symbol} in order to submit a proposal.
+            </CWText>
+          ) : (
+            <CWSpinner />
+          )}
           <div class="new-snapshot-proposal-form">
             <CWTextInput
               label="Question/Proposal"
