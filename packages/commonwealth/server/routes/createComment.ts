@@ -358,7 +358,6 @@ const createComment = async (
       chain: finalComment.chain,
       body: finalComment.text,
     },
-    req.wss,
     excludedAddrs
   );
 
@@ -389,7 +388,6 @@ const createComment = async (
         chain: finalComment.chain,
         body: finalComment.text,
       },
-      req.wss,
       excludedAddrs
     );
   }
@@ -424,7 +422,6 @@ const createComment = async (
             chain: finalComment.chain,
             body: finalComment.text,
           }, // TODO: add webhook data for mentions
-          req.wss,
           [finalComment.Address.address]
         );
     });

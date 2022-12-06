@@ -138,7 +138,6 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
         title: proposal.title || '',
         chain: finalComment.chain,
       },
-      req.wss,
       [ finalComment.Address.address ],
     );
 
@@ -207,7 +206,6 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
             chain: finalComment.chain,
             body: finalComment.text,
           },
-          req.wss,
           [ finalComment.Address.address ],
         );
       });
