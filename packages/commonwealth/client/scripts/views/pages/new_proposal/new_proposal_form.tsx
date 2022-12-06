@@ -45,10 +45,7 @@ import Cosmos from 'controllers/chain/cosmos/adapter';
 import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
-import {
-  DropdownFormField,
-  RadioSelectorFormField,
-} from 'views/components/forms';
+import { DropdownFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
@@ -62,6 +59,11 @@ import { TopicSelector } from 'views/components/topic_selector';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWTextArea } from '../../components/component_kit/cw_text_area';
+import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 
 enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
@@ -148,7 +150,9 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     const proposalTypeEnum = vnode.attrs.typeEnum;
 
     if (!author) return <CWText>Must be logged in</CWText>;
-    if (!callback) return <CWText>Must have callback</CWText>;
+
+    // if (!callback) return <CWText>Must have callback</CWText>;
+
     if (app.chain?.network === ChainNetwork.Plasm)
       return <CWText>Unsupported network</CWText>;
 
@@ -703,170 +707,155 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     return m(Form, { class: 'NewProposalForm' }, [
       m(Grid, [
         m(Col, [
-          this.error && m('.error', this.error.message),
-          hasCouncilMotionChooser && [
-            m(DropdownFormField, {
-              title: 'Motion',
-              choices: motions.map((m_) => ({
-                name: 'councilMotionType',
-                value: m_.name,
-                label: m_.label,
-              })),
-              callback: (result) => {
-                this.councilMotionType = result;
-                this.councilMotionDescription = motions.find(
-                  (m_) => m_.name === result
-                ).description;
-                m.redraw();
-              },
-            }),
-            this.councilMotionDescription &&
-              m('.council-motion-description', this.councilMotionDescription),
-          ],
+          this.error && <div class="error">{this.error.message}</div>,
+          hasCouncilMotionChooser && (
+            <>
+              <CWLabel label="Motion" />
+              <CWDropdown
+                options={motions.map((m_) => ({
+                  name: 'councilMotionType',
+                  value: m_.name,
+                  label: m_.label,
+                }))}
+                onSelect={(result) => {
+                  this.councilMotionType = result;
+                  this.councilMotionDescription = motions.find(
+                    (m_) => m_.name === result
+                  ).description;
+                  m.redraw();
+                }}
+              />
+              {this.councilMotionDescription && (
+                <div class="council-motion-description">
+                  {this.councilMotionDescription}
+                </div>
+              )}
+            </>
+          ),
           // actions
           hasAction && m(EdgewareFunctionPicker),
-          hasTopics &&
-            m(TopicSelector, {
-              topics: app.topics.getByCommunity(app.chain.id),
-              updateFormData: (topic: Topic) => {
+          hasTopics && (
+            <TopicSelector
+              topics={app.topics.getByCommunity(app.chain.id)}
+              updateFormData={(topic: Topic) => {
                 this.form.topicName = topic.name;
                 this.form.topicId = topic.id;
-              },
-              tabindex: 3,
-            }),
-          hasBountyTitle && [
-            m(FormGroup, [
-              m(FormLabel, 'Title'),
-              m(Input, {
-                placeholder: 'Bounty title (stored on chain)',
-                name: 'title',
-                autofocus: true,
-                autocomplete: 'off',
-                oninput: (e) => {
+              }}
+              tabindex={3}
+            />
+          ),
+          hasBountyTitle && (
+            <CWTextInput
+              placeholder="Bounty title (stored on chain)"
+              label="Title"
+              oninput={(e) => {
+                const result = (e.target as any).value;
+                this.form.title = result;
+                m.redraw();
+              }}
+            />
+          ),
+          hasTitleAndDescription && (
+            <>
+              <CWTextInput
+                placeholder="Enter a title"
+                label="Title"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.form.title = result;
                   m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasTitleAndDescription && [
-            m(FormGroup, [
-              m(FormLabel, 'Title'),
-              m(Input, {
-                placeholder: 'Enter a title',
-                name: 'title',
-                autofocus: true,
-                autocomplete: 'off',
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  this.form.title = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-            m(FormGroup, [
-              m(FormLabel, 'Description'),
-              m(TextArea, {
-                name: 'description',
-                placeholder: 'Enter a description',
-                oninput: (e) => {
+                }}
+              />
+              <CWTextArea
+                label="Description"
+                placeholder="Enter a description"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   if (this.form.description === result) return;
                   this.form.description = result;
                   m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasBeneficiary && [
-            m(FormGroup, [
-              m(FormLabel, 'Beneficiary'),
-              m(Input, {
-                name: 'beneficiary',
-                placeholder: 'Beneficiary of proposal',
-                defaultValue: author.address,
-                oncreate: () => {
-                  this.form.beneficiary = author.address;
-                },
-                oninput: (e) => {
-                  const result = (e.target as any).value;
-                  this.form.beneficiary = result;
-                  m.redraw();
-                },
-              }),
-            ]),
-          ],
-          hasAmount && [
-            m(FormGroup, [
-              m(FormLabel, `Amount (${app.chain.chain.denom})`),
-              m(Input, {
-                name: 'amount',
-                autofocus: true,
-                placeholder: 'Amount of proposal',
-                autocomplete: 'off',
-                oninput: (e) => {
+                }}
+              />
+            </>
+          ),
+          hasBeneficiary && (
+            <CWTextInput
+              title="Beneficiary"
+              placeholder="Beneficiary of proposal"
+              defaultValue={author.address}
+              // oncreate={() => {
+              //   this.form.beneficiary = author.address;
+              // }}
+              oninput={(e) => {
+                const result = (e.target as any).value;
+                this.form.beneficiary = result;
+                m.redraw();
+              }}
+            />
+          ),
+          hasAmount && (
+            <>
+              <CWTextInput
+                label={`Amount (${app.chain.chain.denom})`}
+                placeholder="Amount of proposal"
+                oninput={(e) => {
                   const result = (e.target as any).value;
                   this.form.amount = app.chain.chain.coins(
                     parseFloat(result),
                     true
                   );
                   m.redraw();
-                },
-              }),
-            ]),
-            m('p', [
-              'Bond: ',
-              app.chain.chain
-                .coins(
-                  Math.max(
-                    (this.form.amount?.inDollars || 0) *
-                      (app.chain as Substrate).treasury.bondPct,
-                    (app.chain as Substrate).treasury.bondMinimum.inDollars
-                  ),
-                  true
-                )
-                .format(),
-              ` (${
-                (app.chain as Substrate).treasury.bondPct * 100
-              }% of requested amount, `,
-              `minimum ${(
-                app.chain as Substrate
-              ).treasury.bondMinimum.format()})`,
-            ]),
-          ],
-          hasPhragmenInfo &&
-            m('.council-slot-info', [
-              m('p', [
-                'Becoming a candidate requires a deposit of ',
-                formatCoin(
-                  (app.chain as Substrate).phragmenElections.candidacyBond
-                ),
-                '. It will be returned if you are elected, or carried over to the next election if you are in the top ',
-                `${
-                  (app.chain as Substrate).phragmenElections.desiredRunnersUp
-                } runners-up.`,
-              ]),
-            ]),
-          hasToggle && [
-            m(RadioSelectorFormField, {
-              callback: async (value) => {
+                }}
+              />
+              <CWText>
+                Bond:{' '}
+                {app.chain.chain
+                  .coins(
+                    Math.max(
+                      (this.form.amount?.inDollars || 0) *
+                        (app.chain as Substrate).treasury.bondPct,
+                      (app.chain as Substrate).treasury.bondMinimum.inDollars
+                    ),
+                    true
+                  )
+                  .format()}
+                {(app.chain as Substrate).treasury.bondPct * 100}% of requested
+                amount minimum{' '}
+                {(app.chain as Substrate).treasury.bondMinimum.format()}
+              </CWText>
+            </>
+          ),
+          hasPhragmenInfo && (
+            <div class="council-slot-info">
+              Becoming a candidate requires a deposit of
+              {formatCoin(
+                (app.chain as Substrate).phragmenElections.candidacyBond
+              )}
+              . It will be returned if you are elected, or carried over to the
+              next election if you are in the top{' '}
+              {(app.chain as Substrate).phragmenElections.desiredRunnersUp}{' '}
+              runners-up.
+            </div>
+          ),
+          hasToggle && (
+            <CWRadioGroup
+              name="democracy-tx-switcher"
+              onchange={async (value) => {
                 this.toggleValue = value;
                 vnode.attrs.onChangeSlugEnum(value);
                 m.redraw();
-              },
-              choices: [
-                { label: 'Create Proposal', value: 'proposal', checked: true },
-                { label: 'Upload Preimage', value: 'preimage', checked: false },
+              }}
+              toggledOption="proposal"
+              options={[
+                { label: 'Create Proposal', value: 'proposal' },
+                { label: 'Upload Preimage', value: 'preimage' },
                 {
                   label: 'Upload Imminent Preimage',
                   value: 'imminent',
-                  checked: false,
                 },
-              ],
-              name: 'democracy-tx-switcher',
-            }),
-          ],
+              ]}
+            />
+          ),
           hasBountyValue && [
             m(FormGroup, [
               m(FormLabel, `Value (${app.chain.chain.denom})`),

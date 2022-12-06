@@ -10,8 +10,8 @@ import { CWPopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { DefaultMenuItem } from './types';
 
 type DropdownAttrs = {
-  inputOptions: Array<DefaultMenuItem>;
-  onSelect?: (optionLabel: string, index?: number) => void;
+  options: Array<DefaultMenuItem>;
+  onSelect?: (label: string, index: number) => void;
   initialValue?: string;
 };
 
@@ -22,11 +22,11 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
   oninit(vnode: m.Vnode<DropdownAttrs>) {
     this.showDropdown = false;
     this.selectedValue =
-      vnode.attrs.initialValue ?? vnode.attrs.inputOptions[0].label;
+      vnode.attrs.initialValue ?? vnode.attrs.options[0].label;
   }
 
   view(vnode: m.Vnode<DropdownAttrs>) {
-    const { inputOptions, onSelect } = vnode.attrs;
+    const { options, onSelect } = vnode.attrs;
 
     return (
       <div class="dropdown-wrapper">
@@ -43,7 +43,7 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
         />
         {this.showDropdown && (
           <div class="dropdown-options-display">
-            {inputOptions.map((item, idx) => {
+            {options.map((item, idx) => {
               return (
                 <CWPopoverMenuItem
                   {...item}
