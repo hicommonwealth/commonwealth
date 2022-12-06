@@ -6,18 +6,16 @@ import ClassComponent from 'class_component';
 import 'pages/new_proposal_page.scss';
 
 import Sublayout from 'views/sublayout';
-import { NewProposalForm } from './new_proposal_form';
+import { NewSnapshotProposalForm } from './new_snapshot_proposal_form';
 
 type NewProposalSnapshotPageAttrs = { snapshotId: string };
 
 class NewSnapshotProposalPage extends ClassComponent<NewProposalSnapshotPageAttrs> {
   view(vnode: m.Vnode<NewProposalSnapshotPageAttrs>) {
     return (
-      <Sublayout
-      // title="New Snapshot Proposal"
-      >
+      <Sublayout>
         <div class="NewProposalPage">
-          <NewProposalForm snapshotId={vnode.attrs.snapshotId} />
+          <NewSnapshotProposalForm snapshotId={vnode.attrs.snapshotId} />
         </div>
       </Sublayout>
     );

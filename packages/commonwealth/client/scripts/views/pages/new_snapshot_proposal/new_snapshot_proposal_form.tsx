@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import m from 'mithril';
 import ClassComponent from 'client/scripts/class_component';
 import moment from 'moment';
@@ -22,11 +24,11 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { ThreadForm } from './types';
 import { newLink } from './helpers';
 
-type NewProposalFormAttrs = {
+type NewSnapshotProposalFormAttrs = {
   snapshotId: string;
 };
 
-export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
+export class NewSnapshotProposalForm extends ClassComponent<NewSnapshotProposalFormAttrs> {
   private form: ThreadForm;
   private initialized: boolean;
   private isFromExistingProposal: boolean;
@@ -37,7 +39,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
   private space: SnapshotSpace;
   private userScore: number;
 
-  view(vnode: m.Vnode<NewProposalFormAttrs>) {
+  view(vnode: m.Vnode<NewSnapshotProposalFormAttrs>) {
     const getLoadingPage = () => (
       <div class="topic-loading-spinner-wrap">
         <CWSpinner size="large" />
@@ -224,6 +226,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             onchange={(e: Event) => {
               this.form.range = (e.target as any).value;
               this.form.start = new Date().getTime();
+
               switch (this.form.range) {
                 case '4d':
                   this.form.end = moment().add(4, 'days').toDate().getTime();
