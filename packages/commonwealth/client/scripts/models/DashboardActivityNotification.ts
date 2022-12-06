@@ -89,7 +89,7 @@ class DashboardActivityNotification {
       eventData: json.event_data,
       id: json.id,
       updatedAt: json.updated_at,
-      eventNetwork: json.event_network,
+      eventNetwork: json.network,
       chain: json.chain,
       iconUrl: json.icon_url,
     });

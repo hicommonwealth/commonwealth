@@ -7,6 +7,7 @@ import {
   ChainEventTypeInstance,
 } from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
+import {SupportedNetwork} from "../../../src";
 
 export type ChainEventAttributes = {
   id: number;
@@ -15,6 +16,8 @@ export type ChainEventAttributes = {
   event_data: any;
   queued: number;
   entity_id?: number;
+  network: SupportedNetwork;
+  chain: string;
   created_at?: Date;
   updated_at?: Date;
 
@@ -45,6 +48,8 @@ export default (
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
       queued: { type: dataTypes.SMALLINT, allowNull: false, defaultValue: 0 },
+      chain: { type: dataTypes.STRING, allowNull: false },
+      network: { type: dataTypes.STRING, allowNull: false }
     },
     {
       tableName: 'ChainEvents',

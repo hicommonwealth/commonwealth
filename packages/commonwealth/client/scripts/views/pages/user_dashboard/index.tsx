@@ -65,6 +65,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     } else if (tab === DashboardViews.Chain) {
       if (this.chainEvents.length === 0) this.loadingData = true;
       fetchActivity(tab).then((activity) => {
+        console.log(">>>>>>>>>>>>>>>>>>>", activity);
         this.chainEvents = activity.result.map((notification) =>
           DashboardActivityNotification.fromJSON(notification)
         );
