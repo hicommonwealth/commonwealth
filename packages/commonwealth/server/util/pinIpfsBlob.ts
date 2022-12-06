@@ -4,7 +4,7 @@ import FormData from 'form-data';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import models from '../database';
-import { ServerError } from './errors';
+import { ServerError } from 'common-common/src/errors';
 
 
 const log = factory.getLogger(formatFilename(__filename));

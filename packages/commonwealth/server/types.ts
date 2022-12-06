@@ -46,10 +46,9 @@ declare global {
     interface Request {
       user?: User;
 
-      // TODO: remove these once websocket PR merged!
+      // TODO: session is used in logout.ts -> remove?
       session: any;
       sessionID: any;
-      wss: any;
     }
   }
 }

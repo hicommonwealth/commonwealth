@@ -57,7 +57,49 @@ configuration.
 
 All the major Rascal configuration component names are defined as enums [here](./types/index.ts).
 
-More Coming Soon...
+We define 4 exchanges:
+- ChainEvents
+  - A fanout exchange. Any queue that binds to this exchange will receive all chain-events produced by the chain-events service
+- DeadLetter
+  - A direct exchange which routes dead-letter messages to the dead letter queue
+- CUD
+  - A topic exchange which routes all create, update, or delete (CUD) messages e.g. chain created, chain-entity created, etc
+- Notifications
+  - A topic exchange which routes notifications between the main service consumer and the socket.io servers
 
+We define 6 queues:
+- ChainEvents
+  - Carries messages from the ChainEventsSubscriber server to the ChainEventsConsumer for processing
+  - [Message producer](../../../chain-events/services/ChainEventsConsumer/ChainEventHandlers/rabbitMQ.ts)
+  - [Messages processor](../../../chain-events/services/ChainEventsConsumer/MessageProcessors/ChainEventsQueue.ts)
+- ChainCUDChainEvents
+  - Carries chain create, update, delete (CUD) messages from the main service to the chain-events service
+  - Message producers:
+    - [createChain](../../../commonwealth/server/routes/createChain.ts)
+    - [deleteChain](../../../commonwealth/server/routes/deleteChain.ts)
+    - [updateChainNode](../../../commonwealth/server/routes/updateChainNode.ts)
+  - [Message processor](../../../chain-events/services/ChainEventsConsumer/MessageProcessors/ChainCUDChainEventsQueue.ts)
+- ChainEntityCUDMain
+  - Carries chain-entity creation messages from the chain-events service to the main service
+  - [Message producer](../../../chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival.ts)
+  - [Message processor](../../../commonwealth/server/CommonwealthConsumer/messageProcessors/chainEntityCUDQueue.ts)
+- ChainEventNotificationsCUDMain
+  - Carries chain-event creation messages from the chain-events service to the main service consumer
+  - [Message producer](../../../chain-events/services/ChainEventsConsumer/ChainEventHandlers/notification.ts)
+  - [Message processor](../../../commonwealth/server/CommonwealthConsumer/messageProcessors/chainEventNotificationsCUDQueue.ts)
+- ChainEventNotifications
+  - Carries chain event notifications from the main service consumer to the main service socket.io servers
+  - [Message producer](../../../commonwealth/server/CommonwealthConsumer/messageProcessors/chainEventNotificationsCUDQueue.ts)
+  - [Message processor](../../../commonwealth/server/socket/index.ts)
+- ChainEventTypeCUDMain
+  - Carries chain-event-type creation messages from the chain-events service to the main service
+  - [Message producer](../../../chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage.ts)
+  - [Message processor](../../../commonwealth/server/CommonwealthConsumer/messageProcessors/chainEventTypeCUDQueue.ts)
+- DeadLetter
+  - Dead-letter messages are faulty messages that are rerouted from other queues after repeated processing failure.
+
+# Queue Naming Conventions
+- Queues that are bound to the **CreateDelete Exchange** are formatted like so:
+    - [object being created or deleted]CUD[Destination service]Queue
 
 

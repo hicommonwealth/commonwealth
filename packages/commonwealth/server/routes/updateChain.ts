@@ -8,7 +8,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../models';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 import { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 const log = factory.getLogger(formatFilename(__filename));

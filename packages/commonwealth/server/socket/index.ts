@@ -57,7 +57,8 @@ export const authenticate = (
 export async function setupWebSocketServer(
   httpServer: http.Server,
   rollbar: Rollbar,
-  models: DB
+  models: DB,
+  rabbitMQController: RabbitMQController
 ) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues

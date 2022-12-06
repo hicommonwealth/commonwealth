@@ -11,14 +11,63 @@ import {
 } from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';
-import models from '../../../server/database';
+import models from 'chain-events/services/database/database';
+import { NotificationCategories } from 'common-common/src/types';
+import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
 import NotificationHandler from '../../../server/eventHandlers/notifications';
+import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
+import {BrokerConfig} from "rascal";
+import {getRabbitMQConfig} from "common-common/src/rabbitmq";
 
 import { setupSubscriptions, setupDbEvent } from './util';
 
 chai.use(chaiHttp);
 const { assert } = chai;
 
+const rmqController = new MockRabbitMQController(<BrokerConfig>getRabbitMQConfig('localhost'));
+
+const setupUserAndEventSubscriptions = async (email, address, chain) => {
+  const user = await models['User'].create({
+    email,
+    emailVerified: true,
+    isAdmin: false,
+    lastVisited: '{}',
+  });
+
+  await models['Address'].create({
+    user_id: user.id,
+    address,
+    chain,
+    // selected: true,
+    verification_token: 'PLACEHOLDER',
+    verification_token_expires: null,
+    verified: new Date(),
+    created_at: new Date(),
+    updated_at: new Date(),
+  });
+
+  await models['Subscription'].create({
+    subscriber_id: user.id,
+    category_id: NotificationCategories.ChainEvent,
+    object_id: 'edgeware-democracy-started',
+    is_active: true,
+  });
+
+  await models['Subscription'].create({
+    subscriber_id: user.id,
+    category_id: NotificationCategories.ChainEvent,
+    object_id: 'edgeware-slash',
+    is_active: true,
+  });
+  return user.id;
+};
+
+const setupDbEvent = async (event: CWEvent) => {
+  const storageHandler = new StorageHandler(models, rmqController, 'edgeware');
+  return storageHandler.handle(event);
+};
+
+>>>>>>> master
 describe('Event Handler Tests', () => {
   let aliceId, bobId;
   before('reset database', async () => {
@@ -201,7 +250,7 @@ describe('Event Handler Tests', () => {
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new NotificationHandler(models, null, [ SubstrateTypes.EventKind.DemocracyStarted ]);
+    const eventHandler = new NotificationHandler(models, [ SubstrateTypes.EventKind.DemocracyStarted ]);
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
