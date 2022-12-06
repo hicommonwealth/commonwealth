@@ -153,127 +153,122 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
 
     return (
       <div class="NewThreadForm">
-        <div class="new-thread-form-body">
-          {this.space.filters?.onlyMembers && !isMember && (
-            <CWText>
-              You need to be a member of the space in order to submit a
-              proposal.
-            </CWText>
-          )}
-          {showScoreWarning ? (
-            <CWText>
-              You need to have a minimum of {this.space.filters.minScore}{' '}
-              {this.space.symbol} in order to submit a proposal.
-            </CWText>
-          ) : (
-            <CWSpinner />
-          )}
-          <div class="new-snapshot-proposal-form">
-            <CWTextInput
-              label="Question/Proposal"
-              placeholder="Should 0xMaki be our new Mayor?"
-              oninput={(e) => {
-                e.redraw = false; // do not redraw on input
+        {this.space.filters?.onlyMembers && !isMember && (
+          <CWText>
+            You need to be a member of the space in order to submit a proposal.
+          </CWText>
+        )}
+        {showScoreWarning ? (
+          <CWText>
+            You need to have a minimum of {this.space.filters.minScore}{' '}
+            {this.space.symbol} in order to submit a proposal.
+          </CWText>
+        ) : (
+          <CWSpinner />
+        )}
+        <div class="new-snapshot-proposal-form">
+          <CWTextInput
+            label="Question/Proposal"
+            placeholder="Should 0xMaki be our new Mayor?"
+            oninput={(e) => {
+              e.redraw = false; // do not redraw on input
 
-                this.form.name = e.target as any;
+              this.form.name = e.target as any;
 
-                localStorage.setItem(
-                  `${app.activeChainId()}-new-snapshot-proposal-name`,
-                  this.form.name
-                );
-              }}
-              defaultValue={this.form.name}
-            />
-            {this.form.choices.map((_, idx) => {
-              return (
-                <CWTextInput
-                  label={`Choice ${idx + 1}`}
-                  placeholder={
-                    idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
-                  }
-                  oninput={(e) => {
-                    this.form.choices[idx] = (e.target as any).value;
-                    m.redraw();
-                  }}
-                  iconRight={
-                    idx > 1 && idx === this.form.choices.length - 1
-                      ? 'trash'
-                      : undefined
-                  }
-                  iconRightonclick={() => {
-                    this.form.choices.pop();
-                    m.redraw();
-                  }}
-                />
+              localStorage.setItem(
+                `${app.activeChainId()}-new-snapshot-proposal-name`,
+                this.form.name
               );
-            })}
-            <div
-              class="add-vote-choice"
-              style="cursor: pointer;"
-              onclick={() => {
-                this.form.choices.push(
-                  `Option ${this.form.choices.length + 1}`
-                );
-                m.redraw();
-              }}
-            >
-              <span>Add voting choice</span>
-              <CWIcon iconName="plus" size="xl" />
-            </div>
-            <CWLabel label="Date Range:" />
-            <CWRadioGroup
-              name="period"
-              options={[{ value: '4d', label: '4-day' }]}
-              value={this.form.range}
-              onchange={(e: Event) => {
-                this.form.range = (e.target as any).value;
-                this.form.start = new Date().getTime();
-                switch (this.form.range) {
-                  case '4d':
-                    this.form.end = moment().add(4, 'days').toDate().getTime();
-                    break;
-                  default:
-                    break;
+            }}
+            defaultValue={this.form.name}
+          />
+          {this.form.choices.map((_, idx) => {
+            return (
+              <CWTextInput
+                label={`Choice ${idx + 1}`}
+                placeholder={
+                  idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`
                 }
-              }}
-            />
-            <QuillEditorComponent
-              contentsDoc={this.form.body || ' '}
-              oncreateBind={(state: QuillEditor) => {
-                this.quillEditorState = state;
-              }}
-              placeholder="What is your proposal?"
-              editorNamespace="new-proposal"
-            />
-            <CWButton
-              label="Publish"
-              disabled={!author || this.saving || !isValid}
-              onclick={async () => {
-                this.saving = true;
-
-                try {
-                  await newLink(
-                    this.form,
-                    this.quillEditorState,
-                    author,
-                    this.space
-                  );
-
-                  this.saving = false;
-
-                  clearLocalStorage();
-
-                  notifySuccess('Snapshot Created!');
-
-                  navigateToSubpage(`/snapshot/${this.space.id}`);
-                } catch (err) {
-                  this.saving = false;
-
-                  notifyError(capitalize(err.message));
+                oninput={(e) => {
+                  this.form.choices[idx] = (e.target as any).value;
+                  m.redraw();
+                }}
+                iconRight={
+                  idx > 1 && idx === this.form.choices.length - 1
+                    ? 'trash'
+                    : undefined
                 }
-              }}
-            />
+                iconRightonclick={() => {
+                  this.form.choices.pop();
+                  m.redraw();
+                }}
+              />
+            );
+          })}
+          <div
+            class="add-vote-choice"
+            style="cursor: pointer;"
+            onclick={() => {
+              this.form.choices.push(`Option ${this.form.choices.length + 1}`);
+              m.redraw();
+            }}
+          >
+            <span>Add voting choice</span>
+            <CWIcon iconName="plus" size="xl" />
           </div>
+          <CWLabel label="Date Range" />
+          <CWRadioGroup
+            name="period"
+            options={[{ value: '4d', label: '4-day' }]}
+            value={this.form.range}
+            onchange={(e: Event) => {
+              this.form.range = (e.target as any).value;
+              this.form.start = new Date().getTime();
+              switch (this.form.range) {
+                case '4d':
+                  this.form.end = moment().add(4, 'days').toDate().getTime();
+                  break;
+                default:
+                  break;
+              }
+            }}
+          />
+          <QuillEditorComponent
+            contentsDoc={this.form.body || ' '}
+            oncreateBind={(state: QuillEditor) => {
+              this.quillEditorState = state;
+            }}
+            placeholder="What is your proposal?"
+            editorNamespace="new-proposal"
+          />
+          <CWButton
+            label="Publish"
+            disabled={!author || this.saving || !isValid}
+            onclick={async () => {
+              this.saving = true;
+
+              try {
+                await newLink(
+                  this.form,
+                  this.quillEditorState,
+                  author,
+                  this.space
+                );
+
+                this.saving = false;
+
+                clearLocalStorage();
+
+                notifySuccess('Snapshot Created!');
+
+                navigateToSubpage(`/snapshot/${this.space.id}`);
+              } catch (err) {
+                this.saving = false;
+
+                notifyError(capitalize(err.message));
+              }
+            }}
+          />
         </div>
       </div>
     );
