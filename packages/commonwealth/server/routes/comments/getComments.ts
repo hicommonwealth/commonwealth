@@ -1,9 +1,9 @@
-import { AppError, ServerError } from '../../util/errors';
+import { AppError } from '../../util/errors';
 import Sequelize from 'sequelize';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { GetCommentsResp, IPagination } from 'common-common/src/api/extApiTypes';
-import { formatPagination, requiredArgsMessage } from 'server/util/queries';
+import { formatPagination } from 'server/util/queries';
 
 const { Op } = Sequelize;
 
@@ -21,7 +21,8 @@ const getComments = async (
   const { community_id, addresses, count_only } = req.query;
 
   const where = { chain: community_id };
-  if(requiredArgsMessage(where)) throw new AppError(requiredArgsMessage(where));
+
+  if(!community_id) throw new AppError('Must provide community_id');
 
   const include = [];
   if (addresses) include.push({

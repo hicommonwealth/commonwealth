@@ -47,13 +47,3 @@ export const formatPaginationNoSort = (query: { limit?: number, page?: number}) 
 
   return pagination;
 };
-
-export const requiredArgsMessage = (args: Object): string | null => {
-  let error = 'Must provide';
-  Object.keys(args).forEach(a => {
-    if(!a) error += ` ${a},`;
-  });
-
-  if(error != 'Must provide') return error.slice(0, -1);
-  return null
-};

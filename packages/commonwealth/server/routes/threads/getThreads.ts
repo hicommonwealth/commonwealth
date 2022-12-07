@@ -3,7 +3,7 @@ import { AppError } from '../../util/errors';
 import { GetThreadsReq, GetThreadsResp } from 'common-common/src/api/extApiTypes';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
-import { formatPagination, requiredArgsMessage } from '../../util/queries';
+import { formatPagination } from 'server/util/queries';
 
 const { Op } = Sequelize;
 
@@ -21,12 +21,13 @@ const getThreads = async (
   if (!req.query) throw new AppError(Errors.NoArgs);
 
   const { community_id, topic_id, address_ids, no_body, include_comments, addresses, count_only } = req.query;
+
+  if(!community_id) throw new AppError('Must provide community_id');
   if (addresses && address_ids) throw new AppError(Errors.AddressesOrAddressIds);
 
   const pagination = formatPagination(req.query);
 
   const where = { chain: community_id };
-  if(requiredArgsMessage(where)) throw new AppError(requiredArgsMessage(where));
 
   const include = [];
   if (addresses) {
