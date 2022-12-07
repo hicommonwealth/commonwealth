@@ -196,10 +196,11 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
               {this.isWindowSmallInclusive && (
                 <ThreadReactionButton thread={thread} />
               )}
-              <CWIcon iconName="feedback" iconSize="small" />
+              {/* TODO Gabe 12/7/22 - Comment count isn't available before the comments store is initialized */}
+              {/* <CWIcon iconName="feedback" iconSize="small" />
               <CWText type="caption">
                 {commentsCount} {!this.isWindowSmallInclusive && `comments`}
-              </CWText>
+              </CWText> */}
             </div>
             <div class="row-bottom-menu">
               <div
