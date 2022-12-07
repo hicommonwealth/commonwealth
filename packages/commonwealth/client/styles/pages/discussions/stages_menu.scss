@@ -31,7 +31,7 @@
 
       .discussions-stage-count {
         background: $primary-500;
-        border-radius: 50%;
+        border-radius: $border-radius-round;
         color: $white;
         font-size: 15px;
         font-weight: 500;

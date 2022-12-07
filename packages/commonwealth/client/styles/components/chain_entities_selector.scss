@@ -1,7 +1,7 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .ChainEntitiesSelector {
-  border-radius: 5px;
+  border-radius: $border-radius-corners;
   border: 1px solid $neutral-100;
   height: 208px;
   overflow-y: hidden;
@@ -21,7 +21,7 @@
   }
 
   .cui-list {
-    border-radius: 5px;
+    border-radius: $border-radius-corners;
     height: 168px;
 
     .cui-list-item {
