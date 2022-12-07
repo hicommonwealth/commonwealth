@@ -8,6 +8,7 @@ import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 import 'pages/notifications/notification_row.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { NotificationCategories } from 'common-common/src/types';
 import { Notification, AddressInfo } from 'models';
 import { link } from 'helpers';
@@ -89,10 +90,14 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
         );
       }
 
-      return link(
-        'a.NotificationRow',
-        `/notifications?id=${notification.id}`,
-        <div>
+      // link(
+      //   'a.NotificationRow',
+      //   `/notifications?id=${notification.id}`,
+
+      return (
+        <div
+          onclick={navigateToSubpage(`/notifications?id=${notification.id}`)}
+        >
           <div class="comment-body">
             <div class="comment-body-top chain-event-notification-top">
               {label.heading} on {chainName}
@@ -113,26 +118,27 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
             <div class="comment-body-bottom">
               Block {notification.chainEvent.blockNumber}
             </div>
-            <div class="comment-body-excerpt">{label.label}</div>
+            {/* <div class="comment-body-excerpt">{label.label}</div> */}
           </div>
-        </div>,
-        {
-          class: notification.isRead ? '' : 'unread',
-          key: notification.id,
-          id: notification.id,
-        },
-        null,
-        () => {
-          if (this.scrollOrStop) {
-            this.scrollOrStop = false;
-            return;
-          }
-          app.user.notifications
-            .markAsRead([notification])
-            .then(() => m.redraw());
-        },
-        () => m.redraw.sync()
+        </div>
       );
+      // {
+      //   class: notification.isRead ? '' : 'unread',
+      //   key: notification.id,
+      //   id: notification.id,
+      // },
+      // null,
+      // () => {
+      //   if (this.scrollOrStop) {
+      //     this.scrollOrStop = false;
+      //     return;
+      //   }
+      //   app.user.notifications
+      //     .markAsRead([notification])
+      //     .then(() => m.redraw());
+      // },
+      // () => m.redraw.sync()
+      // );
     } else if (category === NotificationCategories.NewChatMention) {
       const { chain_id, author_address, created_at, message_id, channel_id } =
         JSON.parse(notification.data);
@@ -151,10 +157,12 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
         hideIdentityIcon: true,
       });
 
-      return link(
-        'a.NotificationRow',
-        route,
-        <div>
+      // link(
+      //   'a.NotificationRow',
+      //   route,
+
+      return (
+        <div onclick={navigateToSubpage(route)}>
           {m(User, {
             user: author,
             avatarOnly: true,
@@ -196,20 +204,21 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
               )}
             </div>
           </div>
-        </div>,
-        {
-          class: notification.isRead ? '' : 'unread',
-          key: notification.id,
-          id: notification.id,
-        },
-        null,
-        () => app.user.notifications.markAsRead(notifications),
-        () =>
-          setTimeout(() => {
-            const el = document.getElementById('highlighted');
-            if (el) el.scrollIntoView({ behavior: 'smooth' });
-          }, 200)
+        </div>
       );
+      //   {
+      //     class: notification.isRead ? '' : 'unread',
+      //     key: notification.id,
+      //     id: notification.id,
+      //   },
+      //   null,
+      //   () => app.user.notifications.markAsRead(notifications),
+      //   () =>
+      //     setTimeout(() => {
+      //       const el = document.getElementById('highlighted');
+      //       if (el) el.scrollIntoView({ behavior: 'smooth' });
+      //     }, 200)
+      // );
     } else {
       const notificationData = notifications.map((notif) =>
         typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
@@ -237,10 +246,12 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
           .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
       }
 
-      return link(
-        'a.NotificationRow',
-        path.replace(/ /g, '%20'),
-        <div>
+      // link(
+      //   'a.NotificationRow',
+      //   path.replace(/ /g, '%20'),
+
+      return (
+        <div onclick={navigateToSubpage(path.replace(/ /g, '%20'))}>
           {authorInfo.length === 1
             ? m(User, {
                 user: new AddressInfo(
@@ -297,23 +308,24 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
               )}
             </div>
           </div>
-        </div>,
-        {
-          class: notification.isRead ? '' : 'unread',
-          key: notification.id,
-          id: notification.id,
-          onclick: () => {
-            // Graham TODO 22.10.05: Temporary fix while we wait for full
-            // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
-            // array
-            delete app.mobileMenu;
-            m.redraw();
-          },
-        },
-        null,
-        () => app.user.notifications.markAsRead(notifications),
-        pageJump ? () => setTimeout(() => pageJump(), 1) : null
+        </div>
       );
+      //   {
+      //     class: notification.isRead ? '' : 'unread',
+      //     key: notification.id,
+      //     id: notification.id,
+      //     onclick: () => {
+      //       // Graham TODO 22.10.05: Temporary fix while we wait for full
+      //       // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
+      //       // array
+      //       delete app.mobileMenu;
+      //       m.redraw();
+      //     },
+      //   },
+      //   null,
+      //   () => app.user.notifications.markAsRead(notifications),
+      //   pageJump ? () => setTimeout(() => pageJump(), 1) : null
+      // );
     }
   }
 }

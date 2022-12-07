@@ -1,17 +1,14 @@
 @import 'shared';
 
 .NotificationRow {
-  border-bottom: 1px solid $neutral-50;
-  color: $black !important;
+  border-bottom: 1px solid $neutral-100;
   cursor: pointer;
   display: flex;
   flex-direction: column;
-  margin: 0;
-  padding: 17px 22px;
-  text-decoration: none !important;
+  padding: 16px;
 
   &:hover {
-    background: $primary-400;
+    background: $neutral-50;
   }
 
   &.isUnread {
@@ -42,10 +39,6 @@
     .chain-event-notification-top {
       display: flex;
       justify-content: space-between;
-
-      .cui-icon-action svg:hover {
-        color: $rorange-500;
-      }
     }
   }
 
@@ -92,7 +85,7 @@
 }
 
 .NotificationRowMarkAsRead {
-  .cui-popover-content {
-    padding: 15px 20px 10px;
-  }
+  // .cui-popover-content {
+  //   padding: 15px 20px 10px;
+  // }
 }

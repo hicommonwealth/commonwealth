@@ -3,7 +3,6 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import Infinite from 'mithril-infinite';
-import { Button, PopoverMenu } from 'construct-ui';
 
 import 'components/header/notifications_menu.scss';
 
@@ -12,6 +11,8 @@ import { navigateToSubpage } from 'app';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { NotificationRow } from '../pages/notifications/notification_row';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
 
 const MAX_NOTIFS = 40;
 
@@ -73,7 +74,7 @@ export class NotificationsMenu extends ClassComponent {
     m.redraw();
   }
 
-  view() {
+  oninit() {
     this.showingDiscussionNotifications =
       app.user.notifications.discussionNotifications.slice(
         this.minDiscussionNotification,
@@ -85,97 +86,90 @@ export class NotificationsMenu extends ClassComponent {
         this.minChainEventsNotification,
         this.minChainEventsNotification + MAX_NOTIFS
       );
+  }
+
+  view() {
+    const getContents = () => {
+      if (this.selectedChainEvents) {
+        if (this.showingChainEventNotifications.length > 0) {
+          return m(Infinite, {
+            maxPages: 1, // prevents rollover/repeat
+            pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
+            pageKey: () =>
+              `${this.minChainEventsNotification} - ${
+                this.minChainEventsNotification + MAX_NOTIFS
+              }`,
+            key:
+              // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+              // sortedFilteredNotifications.length
+              'chain',
+            // TODO: add the length/num of total chain-events once
+            // notifications and notifications read table are split
+            item: (data) => <NotificationRow notifications={[data]} />,
+          });
+        } else if (app.user.notifications.chainEventNotifications.length === 0)
+          return 'No chain notifications';
+        else return 'No more chain notifications';
+      } else {
+        if (this.showingDiscussionNotifications.length > 0) {
+          return m(Infinite, {
+            maxPages: 1, // prevents rollover/repeat
+            pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
+            pageKey: () =>
+              `${this.minDiscussionNotification} - ${
+                this.minDiscussionNotification + MAX_NOTIFS
+              }`,
+            key:
+              // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+              // sortedFilteredNotifications.length
+              'discussion',
+            // TODO: add the length/num of total chain-events once
+            // notifications and notifications read table are split
+            item: (data) => <NotificationRow notifications={[data]} />,
+          });
+        } else if (app.user.notifications.discussionNotifications.length === 0)
+          return 'No discussion notifications';
+        else return 'No more discussion notifications';
+      }
+    };
 
     return (
       <div class="NotificationsMenu">
         <div class="NotificationsMenuHeader">
-          {m(Button, {
-            label:
-              // discussionNotificationsCount
-              //   ? `Discussions (${discussionNotificationsCount})`
-              //   : 'Discussions'
-              'Discussions',
-            active: !this.selectedChainEvents,
-            onclick: (e) => {
+          <CWButton
+            label="Discussions"
+            buttonType="tertiary-blue"
+            onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = false;
-            },
-          })}
-          {m(Button, {
-            label:
-              // chainNotificationsCount
-              //   ? `Chain events (${chainNotificationsCount})`
-              //   : 'Chain events'
-              'Chain events',
-            active: !!this.selectedChainEvents,
-            onclick: (e) => {
+            }}
+          />
+          <CWButton
+            label="Chain events"
+            buttonType="tertiary-blue"
+            onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = true;
-            },
-          })}
+            }}
+          />
         </div>
-        <div class="notification-list">
-          {(() => {
-            if (this.selectedChainEvents) {
-              if (this.showingChainEventNotifications.length > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
-                  pageKey: () =>
-                    `${this.minChainEventsNotification} - ${
-                      this.minChainEventsNotification + MAX_NOTIFS
-                    }`,
-                  key:
-                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                    // sortedFilteredNotifications.length
-                    'chain',
-                  // TODO: add the length/num of total chain-events once
-                  // notifications and notifications read table are split
-                  item: (data) => <NotificationRow notifications={[data]} />,
-                });
-              } else if (
-                app.user.notifications.chainEventNotifications.length === 0
-              )
-                return 'No chain notifications';
-              else return 'No more chain notifications';
-            } else {
-              if (this.showingDiscussionNotifications.length > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
-                  pageKey: () =>
-                    `${this.minDiscussionNotification} - ${
-                      this.minDiscussionNotification + MAX_NOTIFS
-                    }`,
-                  key:
-                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                    // sortedFilteredNotifications.length
-                    'discussion',
-                  // TODO: add the length/num of total chain-events once
-                  // notifications and notifications read table are split
-                  item: (data) => <NotificationRow notifications={[data]} />,
-                });
-              } else if (
-                app.user.notifications.discussionNotifications.length === 0
-              )
-                return 'No discussion notifications';
-              else return 'No more discussion notifications';
-            }
-          })()}
-        </div>
+        <div class="notification-list">{getContents()}</div>
         <div class="NotificationsMenuFooter">
-          {m(Button, {
-            label: 'See all',
-            onclick: () =>
+          <CWButton
+            label="See all"
+            buttonType="tertiary-blue"
+            onclick={() => {
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
-                : m.route.set('/notifications'),
-          })}
-          {m(Button, {
-            label: 'Mark all read',
-            onclick: (e) => {
+                : m.route.set('/notifications');
+            }}
+          />
+          <CWButton
+            label="Mark all read"
+            buttonType="tertiary-blue"
+            onclick={(e) => {
               e.preventDefault();
               // e.stopPropagation();
               const typeNotif = this.selectedChainEvents
@@ -185,19 +179,21 @@ export class NotificationsMenu extends ClassComponent {
               app.user.notifications
                 .markAsRead(typeNotif)
                 ?.then(() => m.redraw());
-            },
-          })}
-          {m(Button, {
-            label: '<',
-            onclick: (e) => {
+            }}
+          />
+          <CWButton
+            label="<"
+            buttonType="tertiary-blue"
+            onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this._previousPage(this.selectedChainEvents);
-            },
-          })}
-          {m(Button, {
-            label: '>',
-            onclick: (e) => {
+            }}
+          />
+          <CWButton
+            label=">"
+            buttonType="tertiary-blue"
+            onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               // necessary since page refresh loads the first set of notifications for both but the min may not be set
@@ -209,8 +205,8 @@ export class NotificationsMenu extends ClassComponent {
                   app.user.notifications.chainEventNotifications.length;
               }
               this._nextPage(this.selectedChainEvents);
-            },
-          })}
+            }}
+          />
         </div>
       </div>
     );
@@ -219,22 +215,20 @@ export class NotificationsMenu extends ClassComponent {
 
 export class NotificationsMenuPopover extends ClassComponent {
   view() {
-    return m(PopoverMenu, {
-      closeOnContentClick: true,
-      closeOnOutsideClick: true,
-      hasArrow: false,
-      hoverCloseDelay: 0,
-      position: 'bottom-end',
-      transitionDuration: 0,
-      trigger:
-        app.user.notifications.numUnread > 0 ? (
-          <div class="unreads-icon">
-            <CWCustomIcon iconName="unreads" />
-          </div>
-        ) : (
-          <CWIconButton iconButtonTheme="black" iconName="bell" />
-        ),
-      content: <NotificationsMenu />,
-    });
+    return (
+      <CWPopover
+        content={<NotificationsMenu />}
+        interactionType="click"
+        trigger={
+          app.user.notifications.numUnread > 0 ? (
+            <div class="unreads-icon">
+              <CWCustomIcon iconName="unreads" />
+            </div>
+          ) : (
+            <CWIconButton iconButtonTheme="black" iconName="bell" />
+          )
+        }
+      />
+    );
   }
 }

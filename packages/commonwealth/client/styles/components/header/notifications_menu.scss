@@ -1,29 +1,5 @@
 @import 'shared';
 
-@mixin notificationsButton {
-  .cui-button {
-    border-radius: 0;
-    border-right: 1px solid $neutral-300;
-    box-shadow: none;
-    height: 40px;
-    padding: 0 8px;
-    width: 100%;
-
-    .cui-button-label {
-      color: $neutral-900;
-      text-align: center;
-    }
-
-    &:hover {
-      background: $neutral-100;
-    }
-
-    &:active {
-      background: $neutral-200;
-    }
-  }
-}
-
 .unreads-icon svg {
   cursor: pointer;
 }
@@ -38,8 +14,6 @@
   }
 
   .NotificationsMenuHeader {
-    @include notificationsButton;
-
     border-bottom: 1px solid $neutral-300;
     display: flex;
   }
@@ -60,8 +34,6 @@
   }
 
   .NotificationsMenuFooter {
-    @include notificationsButton;
-
     border-top: 1px solid $neutral-300;
     display: flex;
   }
