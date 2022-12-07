@@ -66,6 +66,7 @@
       border: 1px solid $neutral-200;
       border-radius: 16px;
       width: 65%;
+      height: fit-content;
   
       .activity-nav {
         display: flex;
@@ -117,24 +118,14 @@
 
         .activity {
           position: relative;
-          max-height: 170px;
+          min-height: 170px;
           border-bottom: 1px solid #dddddd;
           padding: 24px 0;
-  
-          .comment-chain,
-          .thread-chain {
-            margin-bottom: 10px;
-          }
-  
-          .thread-title {
-            margin-bottom: 10px;
-          }
-  
-          .thread-body {
-            width: 85%;
-            color: #bbbbbb;
-          }
 
+          .title {
+            margin-bottom: 10px;
+          }
+  
           .gray-text {
             color: $neutral-600;
           }
@@ -143,6 +134,32 @@
             display: flex;
             align-items: center;
             margin-bottom: 10px;
+
+            .dot {
+              width: 20px;
+              color: $neutral-500;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 600;
+              padding-bottom: 6px;
+            }
+
+            .date {
+              .Text {
+                color: $neutral-500;
+              }
+            }
+          }
+
+          .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+
+            .trigger-wrapper {
+              margin-right: 20px;
+            }
           }
         }
 
