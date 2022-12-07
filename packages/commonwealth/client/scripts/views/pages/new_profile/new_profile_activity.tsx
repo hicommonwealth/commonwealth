@@ -32,8 +32,6 @@ type NewProfileActivityState = {
   selectedActivity: ProfileActivity;
   isCommunitiesOpen: boolean;
   isAddressesOpen: boolean;
-  communityFilters: any;
-  addressFilters: any;
   commentCharLimit: number;
   threadCharLimit: number;
 };
@@ -44,33 +42,15 @@ type NewProfileActivityContentAttrs = {
   state: NewProfileActivityState,
 }
 
-const transformTimestamp = (timestamp) => {
-  const fromNow = moment(timestamp).fromNow();
-  return fromNow === 'a day ago'
-    ? `${moment(Date.now()).diff(timestamp, 'hours')} hours ago`
-    : fromNow;
-};
-
 const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
   view: (vnode) => {
     const { option, attrs, state } = vnode.attrs;
-    const shouldFilterCommunities = Object.keys(state.communityFilters).length > 0;
-    const shouldFilterAddresses = Object.keys(state.addressFilters).length > 0;
 
     // force redraw or on initial load comments don't render
-    m.redraw();
+    // m.redraw();
 
     if (option === ProfileActivity.Comments) {
       return attrs.comments
-        ?.filter(
-          (comment) =>
-            // Filter communities
-            (!shouldFilterCommunities ||
-              comment.chain in state.communityFilters) &&
-            // Filter addresses
-            (!shouldFilterAddresses ||
-              comment.addressInfo.address in state.addressFilters)
-        )
         .map((comment) => (
           <div className="activity">
             <div className="comment-chain">
@@ -80,7 +60,7 @@ const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
             </div>
             <div className="comment-date">
               <CWText>
-                {transformTimestamp(comment.createdAt)}
+                {moment(comment.createdAt).format('MM/DD/YYYY')}
               </CWText>
             </div>
             <CWText type="b2" className="gray-text">
@@ -94,24 +74,22 @@ const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
 
       if (option === ProfileActivity.Threads) {
         return attrs.threads
-          ?.filter(
-            (thread) =>
-              // Filter communities
-              (!shouldFilterAddresses ||
-                thread.addressInfo.address in state.addressFilters) &&
-              // Filter addresses
-              (!shouldFilterCommunities || thread.chain in state.communityFilters)
-          )
           .map((thread) => (
             <div className="activity">
-              <div className="thread-chain">
+              <div className="chain-info">
+                <CWText fontWeight="semiBold">
+                  {thread.chain}
+                </CWText>
                 <CWText>
-                  Commented on the thread
-                  <CWText fontWeight="semiBold">&nbsp;{(thread.title).replace(/%20/g, " ")} </CWText>
+                  {thread.author.slice(0, 5)}
                 </CWText>
               </div>
+              <CWText>
+                Created a thread
+                <CWText fontWeight="semiBold">&nbsp;{thread.title} </CWText>
+              </CWText>
               <div className="thread-date">
-                <CWText>{transformTimestamp(thread.createdAt)}</CWText>
+                <CWText>{moment(thread.createdAt).format('MM/DD/YYYY')}</CWText>
               </div>
               <CWText type="b2" className="gray-text">
                 {thread.plaintext.length > state.threadCharLimit
@@ -127,9 +105,7 @@ const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
 const NewProfileActivity: m.Component<NewProfileActivityAttrs, NewProfileActivityState> = {
   oninit(vnode: m.Vnode<NewProfileActivityAttrs, NewProfileActivityState>) {
     vnode.state.selectedActivity = ProfileActivity.Comments;
-    vnode.state.communityFilters = {};
-    vnode.state.addressFilters = {};
-    vnode.state.commentCharLimit = window.innerWidth > 1024 ? 250 : 140;
+    vnode.state.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
     vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
 
     // Handle text character limit

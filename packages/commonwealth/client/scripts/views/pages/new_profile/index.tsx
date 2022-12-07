@@ -13,6 +13,8 @@ import {
   NewProfile as Profile,
   Comment,
 } from 'models';
+import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
+import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import NewProfileActivity from "./new_profile_activity";
 import NewProfileHeader from "./new_profile_header";
@@ -67,8 +69,8 @@ const getProfileData = async (state: NewProfileState) => {
   if (state.error !== ProfileError.None) return;
 
   state.profile = new Profile(response.profile);
-  state.threads = response.threads.map((t) => new Thread(t));
-  state.comments = response.comments.map((c) => new Comment(c));
+  state.threads = response.threads.map((t) => modelThreadFromServer(t));
+  state.comments = response.comments.map((c) => modelCommentFromServer(c));
   state.chains = response.chains.map((c) => new ChainInfo(c));
   state.addresses = response.addresses.map(
     (a) =>
@@ -91,6 +93,8 @@ const NewProfile: m.Component<NewProfileAttrs, NewProfileState> = {
     vnode.state.address = m.route.param('address');
     vnode.state.loading = true;
     vnode.state.error = ProfileError.None;
+    vnode.state.comments = [];
+    vnode.state.threads = [];
     getProfileData(vnode.state);
     vnode.state.loading = false;
     m.redraw();

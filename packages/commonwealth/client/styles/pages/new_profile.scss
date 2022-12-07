@@ -138,6 +138,12 @@
           .gray-text {
             color: $neutral-600;
           }
+
+          .chain-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+          }
         }
 
         >:last-child {
