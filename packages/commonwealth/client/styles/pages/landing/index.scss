@@ -22,7 +22,7 @@
     .hero-image {
     }
     .hero-image-inner {
-      border-radius: 9999px;
+      border-radius: $border-radius-round;
       height: 160px;
       width: 160px;
       background: $neutral-50;

@@ -80,24 +80,3 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
     padding: 24px;
   }
 }
-
-@mixin header {
-  font-family: $fonts;
-  font-style: normal;
-  font-weight: 500;
-}
-
-h1 {
-  @include header;
-  font-size: 48px;
-}
-
-h2 {
-  @include header;
-  font-size: 32px;
-}
-
-h3 {
-  @include header;
-  font-size: 24px;
-}

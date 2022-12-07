@@ -6,7 +6,7 @@
   max-width: 200px;
   align-items: center;
   background: $neutral-100;
-  border-radius: 99px;
+  border-radius: $border-radius-rounded-corners;
   color: $neutral-500;
   font-weight: 600;
   overflow: hidden;
