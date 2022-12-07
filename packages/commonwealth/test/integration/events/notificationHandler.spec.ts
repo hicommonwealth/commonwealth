@@ -67,7 +67,6 @@ const setupDbEvent = async (event: CWEvent) => {
   return storageHandler.handle(event);
 };
 
->>>>>>> master
 describe('Event Handler Tests', () => {
   let aliceId, bobId;
   before('reset database', async () => {
