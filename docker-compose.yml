@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.9'
 services: 
   builder: 
     image: builder
@@ -10,9 +10,20 @@ services:
       POSTGRES_PASSWORD: "${DOCKER_PG_PW}" 
       POSTGRES_USER: "${DOCKER_PG_USER}" 
     ports:
-      - '5432:5432'
+      - "5432:5432"
     build: 
       context: .
+  rabbitmq: 
+    image: rabbitmq:3-management-alpine
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    volumes:
+      - ~/.docker-conf/rabbitmq/data/:/var/lib/rabbitmq/
+      - ~/.docker-conf/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+        - rabbitmq_go_net
   common-common:
     build: packages/common-common
   chain-events: 
@@ -24,6 +35,7 @@ services:
     hostname: commonwealth-server
     depends_on:
       - db
+      - rabbitmq
     ports: 
       - "8080:8080"
     volumes:
@@ -31,6 +43,10 @@ services:
 volumes:
   db:
     driver: local
+networks: 
+  rabbitmq_go_net:
+    driver: bridge
+
     
 
 
