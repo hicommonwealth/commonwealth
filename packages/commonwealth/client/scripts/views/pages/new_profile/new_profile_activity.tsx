@@ -59,8 +59,7 @@ const ActivityRow: m.Component<NewProfileActivityRowAttrs> = {
     const { charLimit, activity, address } = vnode.attrs;
     const { chain, createdAt, plaintext, author, title } = activity;
 
-    console.log('address', address);
-    console.log('app address', app.user.addresses)
+    m.redraw();
 
     return (
       <div className="activity">

@@ -192,6 +192,22 @@
   }
 }
 
+@media only screen and (max-width: $breakpoint-medium-max-px) {
+  .ProfilePage {
+    .ProfilePageContainer {
+      margin: 80px 72px;
+    }
+  }
+}
+
+@media only screen and (max-width: $breakpoint-medium-small-max-px) {
+  .ProfilePage {
+    .ProfilePageContainer {
+      margin: 40px 42px;
+    }
+  }
+}
+
 @media only screen and (max-width: $breakpoint-small-max-px) {
   .ProfilePage {
     .ProfilePageContainer {
