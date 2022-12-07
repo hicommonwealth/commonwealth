@@ -32,6 +32,7 @@ import { CWTag } from './cw_tag';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import CWCoverImageUploader from './cw_cover_image_uploader';
+import { CWContentPageCard } from './cw_content_page';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, _]) => {
@@ -69,6 +70,17 @@ export class ComponentShowcase extends ClassComponent {
   view() {
     return (
       <div class="ComponentShowcase">
+        <div class="basic-gallery">
+          <CWText type="h4">Content Page Card</CWText>
+          <CWContentPageCard
+            header="Information"
+            content={
+              <div style="padding: 16px;">
+                <CWText>Content page card content</CWText>
+              </div>
+            }
+          />
+        </div>
         <h1>Dropdown</h1>
         <div class="form-gallery">
           <CWDropdown
@@ -82,12 +94,12 @@ export class ComponentShowcase extends ClassComponent {
             }
           />
         </div>
-        <h1>Spinner</h1>
         <div class="basic-gallery">
+          <CWText type="h3">Spinner</CWText>
           <CWSpinner />
         </div>
-        <h1>Breadcrumbs</h1>
         <div class="basic-gallery">
+          <CWText type="h3">Breadcrumbs</CWText>
           <CWBreadcrumbs
             breadcrumbs={[
               { label: 'Page', path: '' },
@@ -97,18 +109,19 @@ export class ComponentShowcase extends ClassComponent {
             ]}
           />
         </div>
-        <h1>Tag</h1>
         <div class="basic-gallery">
-          <CWTag label="Passed" type="passed" />
-          <CWTag label="Failed" type="failed" />
-          <CWTag label="Active" type="active" />
+          <CWText type="h3">Tag</CWText>
+          <CWTag label="Ref #90" />
+          <CWTag label="Passed" status="passed" />
+          <CWTag label="Failed" status="failed" />
+          <CWTag label="Active" status="active" />
           <CWTag label="Poll" type="poll" />
           <CWTag label="Prop #52" type="proposal" />
           <CWTag label="Ref #90" type="referendum" />
           <CWTag label="12 days" iconName="clock" />
         </div>
-        <h1>Popover Menu</h1>
         <div class="basic-gallery">
+          <CWText type="h3">Popover Menu</CWText>
           <CWPopoverMenu
             trigger={<CWIconButton iconName="dotsVertical" />}
             menuItems={[
@@ -131,8 +144,8 @@ export class ComponentShowcase extends ClassComponent {
             ]}
           />
         </div>
-        <h1>Tooltip</h1>
         <div class="tooltip-gallery">
+          <CWText type="h3">Tooltip</CWText>
           <div class="tooltip-row">
             <CWText>Hover</CWText>
             <CWTooltip
@@ -231,14 +244,14 @@ export class ComponentShowcase extends ClassComponent {
           </div>
         </div>
         <div class="basic-gallery">
-          <h1>Collapsible</h1>
+          <CWText type="h3">Collapsible</CWText>
           <CWCollapsible
             headerContent={<CWText>Header content</CWText>}
             collapsibleContent={<CWText>Body content</CWText>}
           />
         </div>
         <div class="basic-gallery">
-          <h1>Toggle</h1>
+          <CWText type="h3">Toggle</CWText>
           <CWToggle
             checked={this.toggleToggled}
             onchange={() => {
@@ -260,7 +273,7 @@ export class ComponentShowcase extends ClassComponent {
           />
         </div>
         <div class="basic-gallery">
-          <h1>Vote Button</h1>
+          <CWText type="h3">Vote Button</CWText>
           <CWThreadVoteButton
             updateVoteCount={(newCount: number) => {
               // TODO Gabe 7/27/22 - Add real db update
@@ -270,7 +283,7 @@ export class ComponentShowcase extends ClassComponent {
           />
         </div>
         <div class="basic-gallery">
-          <h1>Tabs</h1>
+          <CWText type="h3">Tabs</CWText>
           <CWTabBar>
             <CWTab
               label="A tab"
@@ -296,7 +309,7 @@ export class ComponentShowcase extends ClassComponent {
           </CWTabBar>
         </div>
         <div class="progress-gallery">
-          <h1>Progress Bars</h1>
+          <CWText type="h3">Progress Bars</CWText>
           <CWProgressBar
             progress={75}
             label="Progress Bar (Success)"
@@ -332,13 +345,13 @@ export class ComponentShowcase extends ClassComponent {
           />
         </div>
         <div class="card-gallery">
-          <h1>Account Creation Button</h1>
+          <CWText type="h3">Account Creation Button</CWText>
           <CWAccountCreationButton
             onclick={() => notifySuccess('Account creation button clicked!')}
           />
         </div>
         <div class="basic-gallery">
-          <h1>Wallet Row Card</h1>
+          <CWText type="h3">Wallet Row Card</CWText>
           <CWWalletOptionRow
             walletName="metamask"
             onclick={() => notifySuccess('MetaMask clicked!')}
@@ -349,8 +362,8 @@ export class ComponentShowcase extends ClassComponent {
             onclick={() => notifySuccess('MetaMask clicked!')}
           />
         </div>
-        <h1>Form fields</h1>
         <div class="form-gallery">
+          <CWText type="h3">Form fields</CWText>
           <CWTextInput
             name="Text field"
             label="Large"
@@ -403,165 +416,167 @@ export class ComponentShowcase extends ClassComponent {
             }}
           />
         </div>
-        <h1>Buttons</h1>
         <div class="button-gallery">
-          <CWButton
-            iconName="person"
-            buttonType="primary-red"
-            label="Primary red with icon"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            buttonType="primary-blue"
-            label="Primary blue"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            buttonType="primary-black"
-            label="Primary black"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Primary disabled"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
+          <CWText type="h3">Buttons</CWText>
+          <div class="button-row">
+            <CWButton
+              iconName="person"
+              buttonType="primary-red"
+              label="Primary red with icon"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              buttonType="primary-blue"
+              label="Primary blue"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              buttonType="primary-black"
+              label="Primary black"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Primary disabled"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
+          <div class="button-row">
+            <CWButton
+              iconName="person"
+              label="Secondary red with icon"
+              buttonType="secondary-red"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Secondary blue"
+              buttonType="secondary-blue"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Secondary black"
+              buttonType="secondary-black"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Secondary disabled"
+              buttonType="secondary-blue"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
+          <div class="button-row">
+            <CWButton
+              iconName="person"
+              label="Tertiary blue with icon"
+              buttonType="tertiary-blue"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Tertiary black"
+              buttonType="tertiary-black"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Tertiary disabled"
+              buttonType="tertiary-black"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
+          <div class="button-row">
+            <CWButton
+              iconName="person"
+              label="Large primary red with icon"
+              buttonType="lg-primary-red"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Large primary blue"
+              buttonType="lg-primary-blue"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Large primary blue"
+              buttonType="lg-primary-blue"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
+          <div class="button-row">
+            <CWButton
+              iconName="person"
+              label="Large secondary red with icon"
+              buttonType="lg-secondary-red"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Large secondary blue"
+              buttonType="lg-secondary-blue"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Large secondary disabled"
+              buttonType="lg-secondary-blue"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
+          <div class="button-row">
+            <CWButton
+              iconName="person"
+              label="Large tertiary red with icon"
+              buttonType="lg-tertiary-red"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Large tertiary blue"
+              buttonType="lg-tertiary-blue"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Large tertiary disabled"
+              buttonType="lg-tertiary-blue"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
+          <div class="button-row">
+            <CWButton
+              label="Primary blue dark disabled"
+              buttonType="primary-blue-dark"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Secondary blue dark disabled"
+              buttonType="secondary-blue-dark"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
+          <div class="button-row">
+            <CWButton
+              iconName="person"
+              buttonType="mini"
+              label="Mini with icon"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Mini"
+              buttonType="mini"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Mini Disabled"
+              buttonType="mini"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
         </div>
-        <div class="button-gallery">
-          <CWButton
-            iconName="person"
-            label="Secondary red with icon"
-            buttonType="secondary-red"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary blue"
-            buttonType="secondary-blue"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary black"
-            buttonType="secondary-black"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary disabled"
-            buttonType="secondary-blue"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div class="button-gallery">
-          <CWButton
-            iconName="person"
-            label="Tertiary blue with icon"
-            buttonType="tertiary-blue"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Tertiary black"
-            buttonType="tertiary-black"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Tertiary disabled"
-            buttonType="tertiary-black"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div class="button-gallery">
-          <CWButton
-            iconName="person"
-            label="Large primary red with icon"
-            buttonType="lg-primary-red"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Large primary blue"
-            buttonType="lg-primary-blue"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Large primary blue"
-            buttonType="lg-primary-blue"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div class="button-gallery">
-          <CWButton
-            iconName="person"
-            label="Large secondary red with icon"
-            buttonType="lg-secondary-red"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Large secondary blue"
-            buttonType="lg-secondary-blue"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Large secondary disabled"
-            buttonType="lg-secondary-blue"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div class="button-gallery">
-          <CWButton
-            iconName="person"
-            label="Large tertiary red with icon"
-            buttonType="lg-tertiary-red"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Large tertiary blue"
-            buttonType="lg-tertiary-blue"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Large tertiary disabled"
-            buttonType="lg-tertiary-blue"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div class="button-gallery">
-          <CWButton
-            label="Primary blue dark disabled"
-            buttonType="primary-blue-dark"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Secondary blue dark disabled"
-            buttonType="secondary-blue-dark"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <div class="button-gallery">
-          <CWButton
-            iconName="person"
-            buttonType="mini"
-            label="Mini with icon"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Mini"
-            buttonType="mini"
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-          <CWButton
-            label="Mini Disabled"
-            buttonType="mini"
-            disabled
-            onclick={() => notifySuccess('Button clicked!')}
-          />
-        </div>
-        <h1>Text</h1>
         <div class="text-gallery">
+          <CWText type="h3">Text</CWText>
           <CWText fontWeight="semiBold" type="d1">
             Display1 semi bold
           </CWText>
@@ -664,8 +679,8 @@ export class ComponentShowcase extends ClassComponent {
             </div>
           </div>
         </div>
-        <h1>Icons</h1>
         <div class="icon-gallery">
+          <CWText type="h3">Icons</CWText>
           <div class="all-icons-container">{displayIcons(iconLookup)}</div>
           <div class="icon-row">
             Small
@@ -684,9 +699,9 @@ export class ComponentShowcase extends ClassComponent {
             <CWIcon iconName="views" iconSize="large" disabled={true} />
           </div>
         </div>
-        <h1>Icon Buttons</h1>
         <div class="icon-button-gallery">
-          <div class="icon-button-subheader">Click to see selected state</div>
+          <CWText type="h3">Icon Buttons</CWText>
+          <CWText>Click to see selected state</CWText>
           <div class="icon-button-row">
             <CWIconButton
               iconName="views"
@@ -730,8 +745,8 @@ export class ComponentShowcase extends ClassComponent {
             )}
           </div>
         </div>
-        <h1>Radio Button</h1>
         <div class="choice-gallery">
+          <CWText type="h3">Radio Button</CWText>
           <CWRadioButton
             value="Radio Button"
             label="Radio Button"
@@ -752,8 +767,8 @@ export class ComponentShowcase extends ClassComponent {
             checked
           />
         </div>
-        <h1>Radio Group</h1>
         <div class="button-gallery">
+          <CWText type="h3">Radio Group</CWText>
           <CWRadioGroup
             options={radioGroupOptions}
             name="RadioGroup"
@@ -764,8 +779,8 @@ export class ComponentShowcase extends ClassComponent {
             }}
           />
         </div>
-        <h1>Checkbox</h1>
         <div class="choice-gallery">
+          <CWText type="h3">Checkbox</CWText>
           <CWCheckbox
             checked={this.checkboxChecked}
             label="Click me"
@@ -782,32 +797,32 @@ export class ComponentShowcase extends ClassComponent {
             indeterminate
           />
         </div>
-        <h1>Cards</h1>
         <div class="card-gallery">
+          <CWText type="h3">Cards</CWText>
           <div class="top-card-row">
             <CWCard
               elevation="elevation-1"
               interactive={true}
               onclick={() => notifySuccess('Card clicked!')}
             >
-              <h4>Card title</h4>
-              <div>Elevation: 1</div>
+              <CWText fontWeight="semiBold">Card title</CWText>
+              <CWText>Elevation: 1</CWText>
             </CWCard>
             <CWCard
               elevation="elevation-2"
               interactive={true}
               onclick={() => notifySuccess('Card clicked!')}
             >
-              <h4>Card title</h4>
-              <div>Elevation: 2</div>
+              <CWText fontWeight="semiBold">Card title</CWText>
+              <CWText>Elevation: 2</CWText>
             </CWCard>
             <CWCard
               elevation="elevation-3"
               interactive={true}
               onclick={() => notifySuccess('Card clicked!')}
             >
-              <h4>Card title</h4>
-              <div>Elevation: 3</div>
+              <CWText fontWeight="semiBold">Card title</CWText>
+              <CWText>Elevation: 3</CWText>
             </CWCard>
           </div>
           <CWCard
@@ -816,8 +831,8 @@ export class ComponentShowcase extends ClassComponent {
             fullWidth={true}
             onclick={() => notifySuccess('Card clicked!')}
           >
-            <h4>Card title</h4>
-            <div>Full width</div>
+            <CWText fontWeight="semiBold">Card title</CWText>
+            <CWText>Full width</CWText>
           </CWCard>
         </div>
       </div>

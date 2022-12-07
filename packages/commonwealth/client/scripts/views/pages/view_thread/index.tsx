@@ -68,7 +68,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
   private comments: Array<Comment<Thread>>;
   private isEditingBody: boolean;
   private isGloballyEditing: boolean;
-  private polls: Poll[];
+  private polls: Array<Poll>;
   private prefetch: ThreadPrefetch;
   private recentlyEdited: boolean;
   private savedEdits: string;
@@ -378,7 +378,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
         chain: app.activeChainId(),
       });
 
-    const showLinkedSnapshotOptions =
+    const showLinkedProposalOptions =
       thread.snapshotProposal?.length > 0 ||
       thread.chainEntities?.length > 0 ||
       isAuthor ||
@@ -556,7 +556,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
         <CWContentPage
           contentBodyLabel="Thread"
           showSidebar={
-            showLinkedSnapshotOptions ||
+            showLinkedProposalOptions ||
             showLinkedThreadOptions ||
             this.polls?.length > 0 ||
             isAuthor
@@ -634,13 +634,13 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           }
           sidebarComponents={
             [
-              ...(showLinkedSnapshotOptions || showLinkedThreadOptions
+              ...(showLinkedProposalOptions || showLinkedThreadOptions
                 ? [
                     {
                       label: 'Links',
                       item: (
                         <div class="cards-column">
-                          {showLinkedSnapshotOptions && (
+                          {showLinkedProposalOptions && (
                             <LinkedProposalsCard
                               onChangeHandler={(
                                 stage: ThreadStageType,
@@ -664,7 +664,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                           )}
                           {showLinkedThreadOptions && (
                             <LinkedThreadsCard
-                              threadlId={thread.id}
+                              threadId={thread.id}
                               allowLinking={isAuthor || isAdminOrMod}
                             />
                           )}
