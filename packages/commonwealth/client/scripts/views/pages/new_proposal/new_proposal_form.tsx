@@ -1143,50 +1143,38 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                   m.redraw();
                 }}
               />,
-              m(FormGroup, [
-                m('.flex-label', [
-                  m(FormLabel, 'Function Signature'),
-                  m('.helper-text', 'Optional'),
-                ]),
-                m(Input, {
-                  name: 'signatures',
-                  placeholder: 'Add a signature',
-                  value: aaveProposalState[activeAaveTabIndex].signature,
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    this.aaveProposalState[activeAaveTabIndex].signature =
-                      result;
-                    m.redraw();
-                  },
-                }),
-              ]),
+              <CWTextInput
+                label="Function Signature (Optional)"
+                placeholder="Add a signature"
+                value={aaveProposalState[activeAaveTabIndex].signature}
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.aaveProposalState[activeAaveTabIndex].signature = result;
+                  m.redraw();
+                }}
+              />,
             ]),
           hasAaveFields &&
             m('.AaveGovernance', [
-              m(FormGroup, [
-                m(FormLabel, 'Proposer (you)'),
-                m('', [
-                  m(User, {
-                    user: author,
-                    linkify: true,
-                    popover: true,
-                    showAddressWithDisplayName: true,
-                  }),
-                ]),
-              ]),
+              <div>
+                <CWLabel label="Proposer (you)" />
+                {m(User, {
+                  user: author,
+                  linkify: true,
+                  popover: true,
+                  showAddressWithDisplayName: true,
+                })}
+              </div>,
               // TODO: validate this is the correct length, or else hash it ourselves
-              m(FormGroup, [
-                m(FormLabel, 'IPFS Hash'),
-                m(Input, {
-                  name: 'ipfsHash',
-                  placeholder: 'Proposal IPFS Hash',
-                  oninput: (e) => {
-                    const result = (e.target as any).value;
-                    this.ipfsHash = result;
-                    m.redraw();
-                  },
-                }),
-              ]),
+              <CWTextInput
+                label="IPFS Hash"
+                placeholder="Proposal IPFS Hash"
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.ipfsHash = result;
+                  m.redraw();
+                }}
+              />,
               m(FormGroup, [
                 m(FormLabel, 'Executor'),
                 (app.chain as Aave).governance.api.Executors.map((r) =>
