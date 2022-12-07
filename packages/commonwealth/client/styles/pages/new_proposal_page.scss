@@ -56,7 +56,7 @@
   .executor {
     background-color: $neutral-50;
     padding: 16px 16px 10px;
-    border-radius: 8px;
+    border-radius: $border-radius-corners;
     border: 1px solid $neutral-100;
     min-width: 100%;
     margin-bottom: 20px;
@@ -97,7 +97,7 @@
   }
 
   .button {
-    border-radius: 8px;
+    border-radius: $border-radius-corners;
     font-weight: 500;
     color: $neutral-500;
   }

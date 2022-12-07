@@ -1,5 +1,3 @@
-import * as net from 'net';
-
 import {
   IEventHandler,
   IChainEventKind,
@@ -12,6 +10,7 @@ import {
   SupportedNetwork,
 } from './interfaces';
 import { addPrefix, factory } from './logging';
+import {Logger} from "typescript-logging";
 
 let log;
 
@@ -46,7 +45,7 @@ export abstract class Listener<
 
   protected _subscribed: boolean;
 
-  protected _lastBlockNumber: number;
+  protected _lastCachedBlockNumber: number;
 
   protected readonly _chain: string;
 
@@ -118,7 +117,56 @@ export abstract class Listener<
 
   public abstract get options(): any;
 
-  public get lastBlockNumber(): number {
-    return this._lastBlockNumber;
+  public get lastCachedBlockNumber(): number {
+    return this._lastCachedBlockNumber;
   }
+
+  public abstract getLatestBlockNumber(): Promise<number>;
+
+  public async processOfflineRange(log: Logger): Promise<{startBlock: number, endBlock: number} | undefined> {
+    log.info(`Detected offline time, polling missed blocks...`);
+
+    if (!this.discoverReconnectRange) {
+      log.info(
+        `Unable to determine offline range - No discoverReconnectRange function given`
+      );
+    }
+
+    // fetch the block number of the last event from database
+    let offlineRange = await this.discoverReconnectRange(this._chain);
+
+    if (this._lastCachedBlockNumber && (
+      !offlineRange.startBlock ||
+      offlineRange.startBlock < this._lastCachedBlockNumber)
+    ) {
+      log.info(`Using cached block number ${this._lastCachedBlockNumber}`);
+      offlineRange = {startBlock: this._lastCachedBlockNumber}
+    }
+
+    // do nothing if we don't have an existing event in the database/cache
+    // (i.e. don't try and fetch all events from block 0 onward)
+    if (!offlineRange.startBlock) {
+      log.warn(`Unable to determine offline time range.`);
+      return;
+    }
+
+    if (!offlineRange.endBlock) {
+      offlineRange.endBlock = await this.getLatestBlockNumber();
+      log.info(`Current endBlock: ${offlineRange.endBlock}`);
+    }
+
+    // limit max number of blocks to 500
+    if (offlineRange.endBlock - offlineRange.startBlock > 500) {
+      log.info(
+        `Attempting to poll ${
+          offlineRange.endBlock - offlineRange.startBlock
+        } blocks, reducing query size to ${500}.`
+      );
+      offlineRange.startBlock = offlineRange.endBlock - 500;
+    }
+
+    return <{startBlock: number, endBlock: number}>offlineRange;
+  }
+
+  public abstract isConnected(): Promise<boolean>;
 }

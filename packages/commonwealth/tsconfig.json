@@ -12,16 +12,20 @@
       "token-balance-cache": ["../../packages/token-balance-cache"],
       "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
-    }
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": false
   },
   "include": [
     "./client",
     "./client/scripts",
-    "./shared/adapters",
+    "./shared",
     "./test",
     "./globals.d.ts",
-    "server/*",
-    "server.ts"
+    "./server",
+    "./server.ts"
   ],
   "exclude": ["./node_modules"]
 }
