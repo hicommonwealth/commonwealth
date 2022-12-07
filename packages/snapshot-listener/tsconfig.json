@@ -1,25 +1,17 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "allowJs": true,
-    "target": "esnext",
-    "moduleResolution": "node",
-    "module": "commonjs",
-    "allowSyntheticDefaultImports": true,
-    "outDir": "./build",
-    "baseUrl": ".",
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "traceResolution": false,
+    "lib": ["es2019"],
+    "typeRoots": ["./node_modules/@types"],
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "paths": {
+    "outDir": "./build",
+  },
+  "paths": {
       "common-common": ["../../packages/common-common"],
       "common-common/*": ["../../packages/common-common/*"],
       "chain-events": ["../../packages/chain-events"],
       "chain-events/*": ["../../packages/chain-events/*"]
-    }
-  },
+    },
   "include": [
     "src",
   ],

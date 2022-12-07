@@ -38,7 +38,7 @@ describe.skip('RabbitMQ producer integration tests', () => {
       id: 'proposal/0x42',
       space: 'test.eth',
       event: 'test/created',
-      expire: 0
+      expire: '0'
     });
   });
 
@@ -58,14 +58,14 @@ describe.skip('RabbitMQ producer integration tests', () => {
       id: 'proposal/0x42',
       space: 'test.eth',
       event: 'test/created',
-      expire: 0
+      expire: '0'
     });
 
     controller.handle({
       id: 'proposal/0x424242',
       space: 'test.eth',
       event: 'test/created',
-      expire: 0
+      expire: '0'
     });
   });
 });
