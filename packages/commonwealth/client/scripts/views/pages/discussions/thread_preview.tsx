@@ -33,7 +33,7 @@ import {
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { ThreadPreviewMenu } from './thread_preview_menu';
+// import { ThreadPreviewMenu } from './thread_preview_menu';
 
 type ThreadPreviewAttrs = {
   thread: Thread;
@@ -64,28 +64,28 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
   view(vnode: m.Vnode<ThreadPreviewAttrs>) {
     const { thread } = vnode.attrs;
 
-    const commentsCount = app.comments.nComments(thread);
+    // const commentsCount = app.comments.nComments(thread);
 
     const isSubscribed =
       getCommentSubscription(thread)?.isActive &&
       getReactionSubscription(thread)?.isActive;
 
-    const hasAdminPermissions =
-      app.user.activeAccount &&
-      (app.roles.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-      }) ||
-        app.roles.isRoleOfCommunity({
-          role: 'moderator',
-          chain: app.activeChainId(),
-        }));
+    // const hasAdminPermissions =
+    //   app.user.activeAccount &&
+    //   (app.roles.isRoleOfCommunity({
+    //     role: 'admin',
+    //     chain: app.activeChainId(),
+    //   }) ||
+    //     app.roles.isRoleOfCommunity({
+    //       role: 'moderator',
+    //       chain: app.activeChainId(),
+    //     }));
 
-    const isAuthor =
-      app.user.activeAccount &&
-      thread.author === app.user.activeAccount.address;
+    // const isAuthor =
+    //   app.user.activeAccount &&
+    //   thread.author === app.user.activeAccount.address;
 
-    const canSeeMenu = hasAdminPermissions || isAuthor;
+    // const canSeeMenu = hasAdminPermissions || isAuthor;
 
     return (
       <div
@@ -229,9 +229,10 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                   }
                 />
               </div>
-              {app.isLoggedIn() && canSeeMenu && (
+              {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
+              {/* {app.isLoggedIn() && canSeeMenu && (
                 <ThreadPreviewMenu thread={thread} />
-              )}
+              )} */}
             </div>
           </div>
         </div>

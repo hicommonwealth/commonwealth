@@ -56,7 +56,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
 
                       app.threads
                         .pin({ proposal: thread })
-                        .then(() => m.redraw());
+                        .then(() => navigateToSubpage('/discussions'));
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
                     iconLeft: 'pin' as const,
@@ -133,11 +133,11 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                         'Delete this entire thread?'
                       )();
 
-                      if (confirmed) {
-                        app.threads.delete(thread).then(() => {
-                          navigateToSubpage('/discussions');
-                        });
-                      }
+                      if (!confirmed) return;
+
+                      app.threads.delete(thread).then(() => {
+                        navigateToSubpage('/discussions');
+                      });
                     },
                     label: 'Delete',
                     iconLeft: 'trash' as const,

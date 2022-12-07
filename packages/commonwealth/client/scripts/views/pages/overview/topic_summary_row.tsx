@@ -7,7 +7,7 @@ import moment from 'moment';
 import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+// import { navigateToSubpage } from 'app';
 import { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
@@ -15,11 +15,11 @@ import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+// import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
 import { SharePopover } from '../../components/share_popover';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
+// import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+// import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { getClasses } from '../../components/component_kit/helpers';
 
 type TopicSummaryRowAttrs = {
@@ -39,18 +39,18 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
       })
       .slice(0, 5);
 
-    const isAdmin =
-      app.roles.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-      }) || app.user.isSiteAdmin;
+    // const isAdmin =
+    //   app.roles.isRoleOfCommunity({
+    //     role: 'admin',
+    //     chain: app.activeChainId(),
+    //   }) || app.user.isSiteAdmin;
 
-    const isAdminOrMod =
-      isAdmin ||
-      app.roles.isRoleOfCommunity({
-        role: 'moderator',
-        chain: app.activeChainId(),
-      });
+    // const isAdminOrMod =
+    //   isAdmin ||
+    //   app.roles.isRoleOfCommunity({
+    //     role: 'moderator',
+    //     chain: app.activeChainId(),
+    //   });
 
     return (
       <div class="TopicSummaryRow">
@@ -153,7 +153,8 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                       >
                         <SharePopover />
                       </div>
-                      {isAdminOrMod && (
+                      {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
+                      {/* {isAdminOrMod && (
                         <div
                           onclick={(e) => {
                             // prevent clicks from propagating to discussion row
@@ -207,7 +208,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                             }
                           />
                         </div>
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>
