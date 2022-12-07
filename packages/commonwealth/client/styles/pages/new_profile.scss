@@ -20,8 +20,8 @@
       border: 1px solid $neutral-200;
       border-radius: 16px;
       padding: 24px;
-      max-width: 400px;
       height: fit-content;
+      width: 35%;
   
       .profile-image {
         display: flex;
@@ -65,7 +65,7 @@
     .ProfileActivity {
       border: 1px solid $neutral-200;
       border-radius: 16px;
-      width: 100%;
+      width: 65%;
   
       .activity-nav {
         display: flex;
@@ -190,6 +190,8 @@
       }
 
       .ProfileActivity {
+        width: 100%;
+
         .activity-nav {
           padding: 24px 24px 0 24px;
         }
@@ -201,4 +203,3 @@
     }
   }
 }
-
