@@ -10,8 +10,7 @@ module.exports = {
                              AND tablename = 'entities_creation_events'
                        );
         `, {raw: true}));
-    if (!temp[0].exists) throw new Error("The 'entities_creation_events' table is not defined. Cannot run migration! " +
-      "Please run `cd server/scripts && ts-node getEntitiesWithEvents.ts && cd ../..` first.");
+    if (!temp[0].exists) return;
 
     return await queryInterface.sequelize.transaction(async (t) => {
       // updates comment root_id's for the collective-proposal entities

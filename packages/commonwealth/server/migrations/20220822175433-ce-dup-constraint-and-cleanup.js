@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.sequelize.query(`
-                DROP TABLE entities_creation_events;
+                DROP TABLE IF EXISTS entities_creation_events;
             `, {transaction: t, logging: console.log});
 
       await queryInterface.addConstraint('ChainEntities', {

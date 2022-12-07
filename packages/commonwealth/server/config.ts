@@ -17,6 +17,12 @@ export const SERVER_URL =
     ? 'https://commonwealth.im'
     : 'http://localhost:8080');
 
+export const ENTITIES_URL =
+  process.env.ENTITIES_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://chain-events.herokuapp.com/api'
+    : 'http://localhost:8081/api')
+
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
