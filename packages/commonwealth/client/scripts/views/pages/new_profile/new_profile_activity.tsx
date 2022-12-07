@@ -73,9 +73,6 @@ const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
         )
         .map((comment) => (
           <div className="activity">
-            <div className="comment-icon">
-              <CWIcon iconName="feedback" iconSize="small" />
-            </div>
             <div className="comment-chain">
               <CWText>
                 Commented in <CWText fontWeight="semiBold">&nbsp;{comment.chain}</CWText>
@@ -86,13 +83,11 @@ const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
                 {transformTimestamp(comment.createdAt)}
               </CWText>
             </div>
-            <div className="comment-text">
-              <CWText>
-                {comment.plaintext.length > state.commentCharLimit
-                  ? `${comment.plaintext.slice(0, state.commentCharLimit)}...`
-                  : comment.plaintext}
-              </CWText>
-            </div>
+            <CWText type="b2" className="gray-text">
+              {comment.plaintext.length > state.commentCharLimit
+                ? `${comment.plaintext.slice(0, state.commentCharLimit)}...`
+                : comment.plaintext}
+            </CWText>
           </div>
         ));
       }
@@ -109,27 +104,20 @@ const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
           )
           .map((thread) => (
             <div className="activity">
-              <div className="comment-icon">
-                <CWIcon iconName="feedback" iconSize="small" />
-              </div>
               <div className="thread-chain">
                 <CWText>
-                  Thread in <CWText fontWeight="semiBold">&nbsp;{thread.chain} </CWText>
+                  Commented on the thread
+                  <CWText fontWeight="semiBold">&nbsp;{(thread.title).replace(/%20/g, " ")} </CWText>
                 </CWText>
               </div>
               <div className="thread-date">
                 <CWText>{transformTimestamp(thread.createdAt)}</CWText>
               </div>
-              <div className="thread-title">
-                <CWText> {(thread.title).replace(/%20/g, " ")} </CWText>
-              </div>
-              <div className="thread-body">
-                <CWText>
-                  {thread.plaintext.length > state.threadCharLimit
-                    ? `${thread.plaintext.slice(0, state.threadCharLimit)}...`
-                    : thread.plaintext}
-                </CWText>
-              </div>
+              <CWText type="b2" className="gray-text">
+                {thread.plaintext.length > state.threadCharLimit
+                  ? `${thread.plaintext.slice(0, state.threadCharLimit)}...`
+                  : thread.plaintext}
+              </CWText>
             </div>
           ));
       }
@@ -141,7 +129,7 @@ const NewProfileActivity: m.Component<NewProfileActivityAttrs, NewProfileActivit
     vnode.state.selectedActivity = ProfileActivity.Comments;
     vnode.state.communityFilters = {};
     vnode.state.addressFilters = {};
-    vnode.state.commentCharLimit = window.innerWidth > 1024 ? 300 : 140;
+    vnode.state.commentCharLimit = window.innerWidth > 1024 ? 250 : 140;
     vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
 
     // Handle text character limit

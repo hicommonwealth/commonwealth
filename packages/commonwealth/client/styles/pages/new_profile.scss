@@ -2,7 +2,6 @@
 @import 'construct-ui/src/_shared/_colors';
 
 .ProfilePage {
-  position: relative;
   width: 100%;
   margin: 0 auto;
 
@@ -13,6 +12,7 @@
 
   .ProfilePageContainer {
     display: flex;
+    flex-direction: row;
     margin: 80px 86px;
   
     .ProfileHeader {
@@ -21,6 +21,7 @@
       border-radius: 16px;
       padding: 24px;
       max-width: 400px;
+      height: fit-content;
   
       .profile-image {
         display: flex;
@@ -64,11 +65,11 @@
     .ProfileActivity {
       border: 1px solid $neutral-200;
       border-radius: 16px;
-      padding: 24px;
       width: 100%;
   
       .activity-nav {
         display: flex;
+        padding: 26px;
 
         .TabBar {
           align-items: center;
@@ -112,36 +113,17 @@
       }
   
       .activity-section {
-        margin: 40px 0;
-  
+        padding: 0 60px 30px 60px;
+
         .activity {
           position: relative;
-          height: 130px;
-          padding: 10px 25px;
+          max-height: 170px;
           border-bottom: 1px solid #dddddd;
-  
-          .comment-icon {
-            position: absolute;
-            top: 14px;
-            left: 0px;
-          }
+          padding: 24px 0;
   
           .comment-chain,
           .thread-chain {
             margin-bottom: 10px;
-          }
-  
-          .comment-date,
-          .thread-date {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-          }
-  
-          .comment-text {
-            width: 85%;
-            max-height: 90px;
-            font-size: 16px;
           }
   
           .thread-title {
@@ -152,6 +134,14 @@
             width: 85%;
             color: #bbbbbb;
           }
+
+          .gray-text {
+            color: $neutral-600;
+          }
+        }
+
+        >:last-child {
+          border-bottom: none;
         }
       }
     }
@@ -179,85 +169,36 @@
   }
 }
 
-@media only screen and (max-width: 1024px) {
+@media only screen and (max-width: $breakpoint-small-max-px) {
   .ProfilePage {
-    width: 90%;
+    .ProfilePageContainer {
+      flex-direction: column;
+      margin: 40px 32px;
+      
+      .ProfileHeader {
+        width: 100%;
+        max-width: none;
+        margin-bottom: 16px;
 
-    .ProfileHeader {
-      .profile-info {
-        min-height: 260px;
-        grid-template-columns: 20% 80%;
-        grid-template-rows: 80% 20%;
-
-        .profile-image {
-          img {
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            max-width: none;
+        .profile-name-and-bio { 
+          .buttons {
+            .Button {
+              width: 100%;
+            }
           }
         }
       }
 
-      .social-accounts-and-edit {
-        padding: 15px 15px;
-      }
-    }
+      .ProfileActivity {
+        .activity-nav {
+          padding: 24px 24px 0 24px;
+        }
 
-    .ProfileActivity {
-      .activity-section {
-        .activity {
-          .comment-text {
-            width: 100%;
-          }
+        .activity-section {
+          padding: 0 24px 24px 24px;
         }
       }
     }
   }
 }
 
-@media only screen and (max-width: 1024px) {
-  .ProfilePage {
-    .ProfileActivity {
-      .activity-nav {
-        .activity-nav-option {
-          .drop-down.wide {
-            width: 130%;
-          }
-        }
-      }
-    }
-  }
-}
-
-@media only screen and (max-width: 768px) {
-  .ProfilePage {
-    .ProfileHeader {
-      .profile-info {
-        height: 300px;
-        grid-template-columns: 30% 70%;
-        grid-template-rows: 85% 15%;
-      }
-    }
-  }
-}
-
-@media only screen and (max-width: 530px) {
-  .ProfilePage {
-    .ProfileActivity {
-      .activity-nav {
-        display: block;
-
-        .activity-nav-option {
-          .drop-down.wide {
-            width: 100%;
-          }
-        }
-
-        .divider {
-          display: none;
-        }
-      }
-    }
-  }
-}
