@@ -87,7 +87,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             );
 
             const user = app.chain.accounts.get(thread.author);
-            const commentsCount = app.comments.nComments(thread);
+            // const commentsCount = app.comments.nComments(thread);
 
             return (
               <>
@@ -131,10 +131,11 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                   </CWText>
                   <div class="row-bottom">
                     <div class="comments-and-users">
-                      <div class="comments-count">
+                      {/* TODO Gabe 12/7/22 - Comment count isn't available before the comments store is initialized */}
+                      {/* <div class="comments-count">
                         <CWIcon iconName="feedback" iconSize="small" />
                         <CWText type="caption">{commentsCount} comments</CWText>
-                      </div>
+                      </div> */}
                       {/* TODO Gabe 10/3/22 - user gallery blocked by changes to user model */}
                       {/* <div class="user-gallery">
                         <div class="avatars-row">
