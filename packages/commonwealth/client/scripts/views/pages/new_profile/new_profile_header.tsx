@@ -3,6 +3,7 @@
 import m from 'mithril';
 import app from 'state';
 import jdenticon from 'jdenticon';
+import ClassComponent from 'class_component';
 
 import { NewProfile as Profile, SocialAccount } from 'client/scripts/models';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -15,11 +16,6 @@ type NewProfileHeaderAttrs = {
   profile: Profile;
   socialAccounts: Array<SocialAccount>;
   address: string;
-};
-
-type NewProfileHeaderState = {
-  isBioExpanded: boolean;
-  defaultAvatar: string;
 };
 
 type NewProfileBioAttrs = {
@@ -76,14 +72,17 @@ const Bio: m.Component<NewProfileBioAttrs> = {
   }
 }
 
-const NewProfileHeader: m.Component<NewProfileHeaderAttrs, NewProfileHeaderState> = {
-  oninit(vnode: m.Vnode<NewProfileHeaderAttrs, NewProfileHeaderState>) {
-    vnode.state.isBioExpanded = false;
-    vnode.state.defaultAvatar = jdenticon.toSvg(vnode.attrs.address, 90);
-  },
-  view(vnode: m.Vnode<NewProfileHeaderAttrs, NewProfileHeaderState>) {
+export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
+  private isBioExpanded: boolean;
+  private defaultAvatar: string;
+
+  oninit(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+    this.isBioExpanded = false;
+    this.defaultAvatar = jdenticon.toSvg(vnode.attrs.address, 90);
+  }
+
+  view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
     const { profile, address } = vnode.attrs;
-    const { isBioExpanded, defaultAvatar } = vnode.state;
     const bio = profile?.bio || DefaultProfileBio;
 
     return (
@@ -94,7 +93,7 @@ const NewProfileHeader: m.Component<NewProfileHeaderAttrs, NewProfileHeaderState
           ) : (
             <img
               src={`data:image/svg+xml;utf8,${encodeURIComponent(
-                defaultAvatar
+                this.defaultAvatar
               )}`}
             />
           )}
@@ -128,16 +127,16 @@ const NewProfileHeader: m.Component<NewProfileHeaderAttrs, NewProfileHeaderState
           <CWText
             className="bio"
           >
-            {m(Bio, { bio, isBioExpanded })}
+            {m(Bio, { bio, isBioExpanded: this.isBioExpanded })}
           </CWText>
           {(bio.length > maxBioCharCount) && (
             <div
               class="read-more"
               onclick={() => {
-                vnode.state.isBioExpanded = !isBioExpanded;
+                this.isBioExpanded = !this.isBioExpanded;
               }}
             >
-              <p>{!isBioExpanded ? 'Show More' : 'Show Less'}</p>
+              <p>{!this.isBioExpanded ? 'Show More' : 'Show Less'}</p>
             </div>
           )}
         </div>

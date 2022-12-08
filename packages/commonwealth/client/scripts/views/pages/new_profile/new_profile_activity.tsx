@@ -3,6 +3,7 @@
 import m from 'mithril';
 import moment from 'moment';
 import app from 'state';
+import ClassComponent from 'class_component';
 
 import Thread from 'client/scripts/models/Thread';
 import ChainInfo from 'client/scripts/models/ChainInfo';
@@ -33,19 +34,12 @@ type NewProfileActivityAttrs = {
   addresses: Array<AddressInfo>;
 };
 
-type NewProfileActivityState = {
-  address: string;
-  selectedActivity: ProfileActivity;
-  isCommunitiesOpen: boolean;
-  isAddressesOpen: boolean;
+type NewProfileActivityContentAttrs = {
+  option: ProfileActivity;
+  attrs: NewProfileActivityAttrs;
   commentCharLimit: number;
   threadCharLimit: number;
-};
-
-type NewProfileActivityContentAttrs = {
-  option: ProfileActivity,
-  attrs: NewProfileActivityAttrs,
-  state: NewProfileActivityState,
+  address: string;
 }
 
 type NewProfileActivityRowAttrs = {
@@ -59,6 +53,7 @@ const ActivityRow: m.Component<NewProfileActivityRowAttrs> = {
     const { charLimit, activity, address } = vnode.attrs;
     const { chain, createdAt, plaintext, author, title } = activity;
 
+    // force redraw or on initial load comments don't render
     m.redraw();
 
     return (
@@ -120,42 +115,45 @@ const ActivityRow: m.Component<NewProfileActivityRowAttrs> = {
 
 const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
   view: (vnode) => {
-    const { option, attrs, state } = vnode.attrs;
-
-    // force redraw or on initial load comments don't render
-    // m.redraw();
+    const { option, attrs, commentCharLimit, threadCharLimit, address } = vnode.attrs;
 
     if (option === ProfileActivity.Comments) {
       return attrs.comments
         .map((comment) => (
-          m(ActivityRow, { activity: comment, charLimit: state.commentCharLimit, address: state.address })
+          m(ActivityRow, { activity: comment, charLimit: commentCharLimit, address })
         ));
       }
 
       if (option === ProfileActivity.Threads) {
         return attrs.threads
           .map((thread) => (
-            m(ActivityRow, { activity: thread, charLimit: state.threadCharLimit, address: state.address })
+            m(ActivityRow, { activity: thread, charLimit: threadCharLimit, address })
           ));
       }
   }
 }
 
-const NewProfileActivity: m.Component<NewProfileActivityAttrs, NewProfileActivityState> = {
-  oninit(vnode: m.Vnode<NewProfileActivityAttrs, NewProfileActivityState>) {
-    vnode.state.address = m.route.param('address');
-    vnode.state.selectedActivity = ProfileActivity.Comments;
-    vnode.state.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
-    vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
+
+export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
+  private address: string;
+  private selectedActivity: ProfileActivity;
+  private commentCharLimit: number;
+  private threadCharLimit: number;
+
+  oninit(vnode: m.Vnode<NewProfileActivityAttrs>) {
+    this.address = m.route.param('address');
+    this.selectedActivity = ProfileActivity.Comments;
+    this.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
+    this.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
 
     // Handle text character limit
     window.addEventListener('resize', () => {
-      vnode.state.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
-      vnode.state.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
+      this.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
+      this.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
     });
-  },
+  }
 
-  view(vnode: m.Vnode<NewProfileActivityAttrs, NewProfileActivityState>) {
+  view(vnode: m.Vnode<NewProfileActivityAttrs>) {
     return (
       <div className="ProfileActivity">
         <div className="activity-nav">
@@ -165,39 +163,41 @@ const NewProfileActivity: m.Component<NewProfileActivityAttrs, NewProfileActivit
             <CWTab
               label="All Activity"
               onclick={() => {
-                vnode.state.selectedActivity = ProfileActivity.Comments
+                this.selectedActivity = ProfileActivity.Comments
               }}
-              isSelected={vnode.state.selectedActivity === ProfileActivity.Comments}
+              isSelected={this.selectedActivity === ProfileActivity.Comments}
             />
             <CWTab
               label="Threads"
               onclick={() => {
-                vnode.state.selectedActivity = ProfileActivity.Threads
+                this.selectedActivity = ProfileActivity.Threads
               }}
-              isSelected={vnode.state.selectedActivity === ProfileActivity.Threads}
+              isSelected={this.selectedActivity === ProfileActivity.Threads}
             />
             <div className="divider" />
             <CWTab
               label="Communities"
               onclick={() => {
-                vnode.state.selectedActivity = ProfileActivity.Communities
+                this.selectedActivity = ProfileActivity.Communities
               }}
-              isSelected={vnode.state.selectedActivity === ProfileActivity.Communities}
+              isSelected={this.selectedActivity === ProfileActivity.Communities}
             />
             <CWTab
               label="Addresses"
               onclick={() => {
-                vnode.state.selectedActivity = ProfileActivity.Addresses
+                this.selectedActivity = ProfileActivity.Addresses
               }}
-              isSelected={vnode.state.selectedActivity === ProfileActivity.Addresses}
+              isSelected={this.selectedActivity === ProfileActivity.Addresses}
             />
           </CWTabBar>
         </div>
         <div className="activity-section">
           {m(ActivityContent, {
-            option: vnode.state.selectedActivity,
+            option: this.selectedActivity,
             attrs: vnode.attrs,
-            state: vnode.state,
+            commentCharLimit: this.commentCharLimit,
+            threadCharLimit: this.threadCharLimit,
+            address: this.address,
           })}
         </div>
       </div>

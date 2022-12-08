@@ -2,8 +2,10 @@ import m from 'mithril';
 import app from 'state';
 import $ from 'jquery';
 import { Spinner } from 'construct-ui';
+import ClassComponent from 'class_component';
 
 import 'pages/new_profile.scss';
+
 import {
   Thread,
   IUniqueId,
@@ -31,79 +33,77 @@ type NewProfileAttrs = {
   placeholder?: string;
 };
 
-type NewProfileState = {
-  address: string;
-  profile: Profile;
-  threads: Array<Thread>;
-  comments: Array<Comment<IUniqueId>>;
-  chains: Array<ChainInfo>;
-  addresses: Array<AddressInfo>;
-  socialAccounts: Array<SocialAccount>;
-  loading: boolean;
-  error: ProfileError;
-  content: m.Vnode;
-};
-
 const NoAddressFoundError = 'No address found';
 const NoProfileFoundError = 'No profile found';
 
-const getProfileData = async (state: NewProfileState) => {
-  const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
-    address: state.address,
-    jwt: app.user.jwt,
-  }).catch((err) => {
-    if (
-      err.status === 500 &&
-      err.responseJSON.error === NoAddressFoundError
-    ) {
-      state.error = ProfileError.NoAddressFound;
+export class NewProfile extends ClassComponent<NewProfileAttrs> {
+  private address: string;
+  private profile: Profile;
+  private threads: Array<Thread>;
+  private comments: Array<Comment<IUniqueId>>;
+  private chains: Array<ChainInfo>;
+  private addresses: Array<AddressInfo>;
+  private socialAccounts: Array<SocialAccount>;
+  private loading: boolean;
+  private error: ProfileError;
+  private content: m.Vnode;
+
+  private _getProfileData = async (
+    address: string,
+  ) => {
+    try {
+      const response = await $.get(`${app.serverUrl()}/profile/v2`, {
+        address,
+        jwt: app.user.jwt,
+      });
+
+      this.profile = new Profile(response.profile);
+      this.threads = response.threads.map((t) => modelThreadFromServer(t));
+      this.comments = response.comments.map((c) => modelCommentFromServer(c));
+      this.chains = response.chains.map((c) => new ChainInfo(c));
+      this.addresses = response.addresses.map(
+        (a) =>
+          new AddressInfo(
+            a.id,
+            a.address,
+            a.chain,
+            a.keytype,
+            a.wallet_id,
+            a.ghost_address
+          )
+      );
+      this.socialAccounts = response.socialAccounts.map(
+        (a) => new SocialAccount(a.provider, a.provider_username)
+      );
+    } catch (err) {
+      if (
+        err.status === 500 &&
+        err.responseJSON.error === NoAddressFoundError
+      ) {
+        this.error = ProfileError.NoAddressFound;
+      }
+      if (
+        err.status === 500 &&
+        err.responseJSON.error === NoProfileFoundError
+      ) {
+        this.error = ProfileError.NoProfileFound;
+      }
     }
-    if (
-      err.status === 500 &&
-      err.responseJSON.error === NoProfileFoundError
-    ) {
-      state.error = ProfileError.NoProfileFound;
-    }
-    state.loading = false;
-  });
-  if (state.error !== ProfileError.None) return;
+  }
 
-  state.profile = new Profile(response.profile);
-  state.threads = response.threads.map((t) => modelThreadFromServer(t));
-  state.comments = response.comments.map((c) => modelCommentFromServer(c));
-  state.chains = response.chains.map((c) => new ChainInfo(c));
-  state.addresses = response.addresses.map(
-    (a) =>
-      new AddressInfo(
-        a.id,
-        a.address,
-        a.chain,
-        a.keytype,
-        a.wallet_id,
-        a.ghost_address
-      )
-  );
-  state.socialAccounts = response.socialAccounts.map(
-    (a) => new SocialAccount(a.provider, a.provider_username)
-  );
-};
+  oninit (vnode: m.Vnode<NewProfileAttrs>) {
+    this.address = m.route.param('address');
+    this.loading = true;
+    this.error = ProfileError.None;
+    this.comments = [];
+    this.threads = [];
+    this._getProfileData(this.address);
+    this.loading = false;
+  }
 
-const NewProfile: m.Component<NewProfileAttrs, NewProfileState> = {
-  oninit(vnode: m.Vnode<NewProfileAttrs, NewProfileState>) {
-    vnode.state.address = m.route.param('address');
-    vnode.state.loading = true;
-    vnode.state.error = ProfileError.None;
-    vnode.state.comments = [];
-    vnode.state.threads = [];
-    getProfileData(vnode.state);
-    vnode.state.loading = false;
-    m.redraw();
-  },
-  view: (vnode: m.Vnode<NewProfileAttrs, NewProfileState>) => {
-    const { loading, error } = vnode.state;
-
-    if (loading)
-      vnode.state.content = (
+  view(vnode: m.Vnode<NewProfileAttrs>) {
+    if (this.loading)
+      this.content = (
         <div class="ProfilePage">
           <div class="loading-spinner">
             <Spinner active size="lg" />
@@ -111,8 +111,8 @@ const NewProfile: m.Component<NewProfileAttrs, NewProfileState> = {
         </div>
       )
 
-    if (error === ProfileError.NoAddressFound)
-      vnode.state.content = (
+    if (this.error === ProfileError.NoAddressFound)
+      this.content = (
         <div class="ProfilePage">
           <div class="ErrorPage">
             <h3>Not on Commonwealth</h3>
@@ -123,8 +123,8 @@ const NewProfile: m.Component<NewProfileAttrs, NewProfileState> = {
         </div>
       );
 
-    if (error === ProfileError.NoProfileFound)
-      vnode.state.content = (
+    if (this.error === ProfileError.NoProfileFound)
+      this.content = (
         <div class="ProfilePage">
           <div class="ErrorPage">
             <h3>No profile found</h3>
@@ -133,29 +133,29 @@ const NewProfile: m.Component<NewProfileAttrs, NewProfileState> = {
         </div>
       );
 
-    if (error === ProfileError.None)
-      vnode.state.content = (
+    if (this.error === ProfileError.None)
+      this.content = (
         m('.ProfilePage', [
           m('.ProfilePageContainer', [
             m(NewProfileHeader, {
-              profile: vnode.state.profile,
-              address: vnode.state.address,
-              socialAccounts: vnode.state.socialAccounts,
+              profile: this.profile,
+              address: this.address,
+              socialAccounts: this.socialAccounts,
               }),
             m(NewProfileActivity, {
-              threads: vnode.state.threads,
-              comments: vnode.state.comments,
-              chains: vnode.state.chains,
-              addresses: vnode.state.addresses,
+              threads: this.threads,
+              comments: this.comments,
+              chains: this.chains,
+              addresses: this.addresses,
             })
           ]),
         ])
       );
 
     return m(Sublayout, [
-      vnode.state.content,
+      this.content,
     ]);
-  },
-};
+  }
+}
 
 export default NewProfile;
