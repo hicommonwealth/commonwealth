@@ -4,7 +4,6 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { utils } from 'ethers';
-import { Form, Button, PopoverMenu, Icons, MenuItem } from 'construct-ui';
 import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
@@ -52,6 +51,8 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 enum SupportedSputnikProposalTypes {
   AddMemberToRole = 'Add Member',
@@ -1060,11 +1061,10 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                   />
                 ))}
               </CWTabBar>
-              {m(PopoverMenu, {
-                closeOnContentClick: true,
-                content: [
-                  m(MenuItem, {
-                    iconLeft: Icons.EDIT_2,
+              <CWPopoverMenu
+                menuItems={[
+                  {
+                    iconLeft: 'write',
                     label: 'Add',
                     onclick: () => {
                       this.aaveTabCount++;
@@ -1077,23 +1077,19 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                         withDelegateCall: false,
                       });
                     },
-                  }),
-                  m(MenuItem, {
-                    iconLeft: Icons.TRASH_2,
+                  },
+                  {
+                    iconLeft: 'trash',
                     label: 'Delete',
-                    disabled: this.activeAaveTabIndex === 0,
                     onclick: () => {
                       this.aaveTabCount--;
                       this.activeAaveTabIndex = this.aaveTabCount - 1;
                       this.aaveProposalState.pop();
                     },
-                  }),
-                ],
-                trigger: m(Button, {
-                  iconLeft: Icons.MORE_HORIZONTAL,
-                  basic: true,
-                }),
-              })}
+                  },
+                ]}
+                trigger={<CWIconButton iconName="plus" />}
+              />
             </div>
             <CWTextInput
               label="Target Address"
@@ -1184,11 +1180,10 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                   />
                 ))}
               </CWTabBar>
-              {m(PopoverMenu, {
-                closeOnContentClick: true,
-                content: [
-                  m(MenuItem, {
-                    iconLeft: Icons.EDIT_2,
+              <CWPopoverMenu
+                menuItems={[
+                  {
+                    iconLeft: 'write',
                     label: 'Add',
                     onclick: () => {
                       this.aaveTabCount++;
@@ -1201,9 +1196,9 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                         withDelegateCall: false,
                       });
                     },
-                  }),
-                  m(MenuItem, {
-                    iconLeft: Icons.TRASH_2,
+                  },
+                  {
+                    iconLeft: 'trash',
                     label: 'Delete',
                     disabled: this.activeAaveTabIndex === 0,
                     onclick: () => {
@@ -1211,13 +1206,10 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                       this.activeAaveTabIndex = this.aaveTabCount - 1;
                       this.aaveProposalState.pop();
                     },
-                  }),
-                ],
-                trigger: m(Button, {
-                  iconLeft: Icons.MORE_HORIZONTAL,
-                  basic: true,
-                }),
-              })}
+                  },
+                ]}
+                trigger={<CWIconButton iconName="plus" />}
+              />
             </div>
             <CWTextInput
               label="Target Address"
