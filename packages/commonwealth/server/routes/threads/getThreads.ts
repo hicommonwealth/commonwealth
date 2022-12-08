@@ -1,9 +1,10 @@
 import Sequelize, {} from 'sequelize';
 import { AppError } from '../../util/errors';
 import { GetThreadsReq, GetThreadsResp } from 'common-common/src/api/extApiTypes';
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from 'server/util/queries';
+import { check, query, validationResult } from 'express-validator';
 
 const { Op } = Sequelize;
 
@@ -13,17 +14,28 @@ export const Errors = {
   AddressesOrAddressIds: "Cannot provide both addresses and address_ids",
 };
 
-const getThreads = async (
+export const getThreadsValidation = [
+  query('community_id').isString().trim(),
+  query('topic_id').optional().isNumeric(),
+  query('count_only').optional().isBoolean().toBoolean(),
+  query('address_ids').optional().toArray().if(query('addresses').notEmpty()).optional().toArray(),
+  query('addresses').optional().toArray(),
+  query('no_body').optional().isBoolean().toBoolean(),
+  query('include_comments').optional().isBoolean().toBoolean(),
+  query('count_only').optional().isBoolean().toBoolean(),
+];
+
+export const getThreads = async (
   models: DB,
   req: TypedRequestQuery<GetThreadsReq>,
   res: TypedResponse<GetThreadsResp>,
 ) => {
-  if (!req.query) throw new AppError(Errors.NoArgs);
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return failure(res.status(400), errors);
+  }
 
   const { community_id, topic_id, address_ids, no_body, include_comments, addresses, count_only } = req.query;
-
-  if(!community_id) throw new AppError('Must provide community_id');
-  if (addresses && address_ids) throw new AppError(Errors.AddressesOrAddressIds);
 
   const pagination = formatPagination(req.query);
 
@@ -66,5 +78,3 @@ const getThreads = async (
 
   return success(res, { threads: threads, count });
 };
-
-export default getThreads;

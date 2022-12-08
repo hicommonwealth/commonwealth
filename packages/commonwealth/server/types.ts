@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ValidationError } from 'express-validator';
 import { UserInstance } from './models/user';
 
 export type TypedRequestQuery<
@@ -24,11 +25,18 @@ export type TypedRequest<
   query?: Q;
 }
 
-export type TypedResponse<T> = Response<{ result: T } & { status: 'Success' | 'Failure' | number }>;
+export type TypedResponse<T> = Response<{ result: T | ValidationError[] } & { status: 'Success' | 'Failure' | number }>;
 
 export function success<T>(res: TypedResponse<T>, result: T) {
   return res.json({
     status: 'Success',
+    result,
+  });
+}
+
+export function failure<T>(res: TypedResponse<any>, result: T) {
+  return res.json({
+    status: 'Failure',
     result,
   });
 }

@@ -19,7 +19,7 @@ import {
 import { TokenBalanceCache, BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 
 import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
-import setupAPI from './server/router'; // performance note: this takes 15 seconds
+import setupAPI from 'server/routing/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
 import models from './server/database';
 import ViewCountCache from './server/util/viewCountCache';
