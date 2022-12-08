@@ -190,7 +190,6 @@ const editThread = async (
       },
       // don't send webhook notifications for edits
       null,
-      req.wss,
       [userOwnedAddresses[0].address]
     );
 
@@ -264,7 +263,6 @@ const editThread = async (
             chain: finalThread.chain,
             body: finalThread.body,
           },
-          req.wss,
           [finalThread.Address.address]
         );
       });
