@@ -255,6 +255,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
         callback(result);
         return result;
       };
+
       let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (
         a
       ) => {
@@ -266,7 +267,9 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           >
         ).createTx(...a);
       };
+
       let args = [];
+
       if (proposalTypeEnum === ProposalType.Thread) {
         app.threads
           .create(
@@ -299,12 +302,14 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           const proposalHash = blake2AsHex(
             EdgewareFunctionPicker.getMethod().toHex()
           );
+
           args = [
             author,
             EdgewareFunctionPicker.getMethod(),
             proposalHash,
             deposit,
           ];
+
           createFunc = ([au, mt, pr, dep]) =>
             (app.chain as Substrate).democracyProposals.createTx(
               au,
@@ -314,8 +319,11 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             );
         } else if (this.toggleValue === 'preimage') {
           vnode.attrs.onChangeSlugEnum('democracypreimage');
+
           const encodedProposal = EdgewareFunctionPicker.getMethod().toHex();
+
           args = [author, EdgewareFunctionPicker.getMethod(), encodedProposal];
+
           createFunc = ([au, mt, pr]) =>
             (app.chain as Substrate).democracyProposals.notePreimage(
               au,
@@ -324,8 +332,11 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             );
         } else if (this.toggleValue === 'imminent') {
           vnode.attrs.onChangeSlugEnum('democracyimminent');
+
           const encodedProposal = EdgewareFunctionPicker.getMethod().toHex();
+
           args = [author, EdgewareFunctionPicker.getMethod(), encodedProposal];
+
           createFunc = ([au, mt, pr]) =>
             (app.chain as Substrate).democracyProposals.noteImminentPreimage(
               au,
@@ -340,13 +351,16 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
         this.councilMotionType === 'vetoNextExternal'
       ) {
         args = [author, this.nextExternalProposalHash];
+
         createFunc = ([a, h]) =>
           (app.chain as Substrate).council.vetoNextExternal(a, h);
       } else if (
         proposalTypeEnum === ProposalType.SubstrateCollectiveProposal
       ) {
         if (!this.threshold) throw new Error('Invalid threshold');
+
         const threshold = this.threshold;
+
         if (this.councilMotionType === 'createExternalProposal') {
           args = [
             author,
@@ -354,6 +368,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength,
           ];
+
           createFunc = ([a, t, mt, l]) =>
             (app.chain as Substrate).council.createExternalProposal(
               a,
@@ -370,6 +385,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength,
           ];
+
           createFunc = ([a, t, mt, l]) =>
             (app.chain as Substrate).council.createExternalProposalMajority(
               a,
@@ -384,6 +400,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             EdgewareFunctionPicker.getMethod(),
             EdgewareFunctionPicker.getMethod().encodedLength,
           ];
+
           createFunc = ([a, t, mt, l]) =>
             (app.chain as Substrate).council.createExternalProposalDefault(
               a,
@@ -399,10 +416,12 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             this.votingPeriod,
             this.enactmentDelay,
           ];
+
           createFunc = ([a, b, c, d, e]) =>
             (app.chain as Substrate).council.createFastTrack(a, b, c, d, e);
         } else if (this.councilMotionType === 'createEmergencyCancellation') {
           args = [author, threshold, this.referendumId];
+
           createFunc = ([a, t, h]) =>
             (app.chain as Substrate).council.createEmergencyCancellation(
               a,
@@ -411,6 +430,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             );
         } else if (this.councilMotionType === 'createTreasuryApprovalMotion') {
           args = [author, threshold, this.treasuryProposalIndex];
+
           createFunc = ([a, t, i]) =>
             (app.chain as Substrate).council.createTreasuryApprovalMotion(
               a,
@@ -419,6 +439,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             );
         } else if (this.councilMotionType === 'createTreasuryRejectionMotion') {
           args = [author, threshold, this.treasuryProposalIndex];
+
           createFunc = ([a, t, i]) =>
             (app.chain as Substrate).council.createTreasuryRejectionMotion(
               a,
@@ -431,32 +452,51 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
 
         return createTXModal(createFunc(args)).then(done);
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryProposal) {
-        if (!this.form.beneficiary)
+        if (!this.form.beneficiary) {
           throw new Error('Invalid beneficiary address');
+        }
+
         const beneficiary = app.chain.accounts.get(this.form.beneficiary);
+
         args = [author, this.form.amount, beneficiary];
       } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
-        if (!this.form.title) throw new Error('Invalid title');
-        if (!this.form.value) throw new Error('Invalid value');
+        if (!this.form.title) {
+          throw new Error('Invalid title');
+        }
+
+        if (!this.form.value) {
+          throw new Error('Invalid value');
+        }
+
         args = [author, this.form.value, this.form.title];
+
         createFunc = ([a, v, t]) =>
           (app.chain as Substrate).bounties.createTx(a, v, t);
         return createTXModal(createFunc(args)).then(done);
       } else if (proposalTypeEnum === ProposalType.SubstrateBountyProposal) {
-        if (!this.form.reason) throw new Error('Invalid reason');
-        if (!this.form.beneficiary)
+        if (!this.form.reason) {
+          throw new Error('Invalid reason');
+        }
+
+        if (!this.form.beneficiary) {
           throw new Error('Invalid beneficiary address');
+        }
+
         const beneficiary = app.chain.accounts.get(this.form.beneficiary);
+
         args = [this.form.reason, beneficiary];
       } else if (proposalTypeEnum === ProposalType.PhragmenCandidacy) {
         args = [author];
+
         createFunc = ([a]) =>
           (
             app.chain as Substrate
           ).phragmenElections.activeElection.submitCandidacyTx(a);
       } else if (proposalTypeEnum === ProposalType.CosmosProposal) {
         let prop: ProtobufAny;
+
         const { title, description } = this.form;
+
         const deposit = this.deposit
           ? new CosmosToken(
               (app.chain as Cosmos).governance.minDeposit.denom,
@@ -493,17 +533,27 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
         return;
       } else if (proposalTypeEnum === ProposalType.MolochProposal) {
         // TODO: check that applicant is valid ETH address in hex
-        if (!this.applicantAddress)
+        if (!this.applicantAddress) {
           throw new Error('Invalid applicant address');
-        if (typeof this.tokenTribute !== 'number')
+        }
+
+        if (typeof this.tokenTribute !== 'number') {
           throw new Error('Invalid token tribute');
-        if (typeof this.sharesRequested !== 'number')
+        }
+
+        if (typeof this.sharesRequested !== 'number') {
           throw new Error('Invalid shares requested');
-        if (!this.title) throw new Error('Invalid title');
+        }
+
+        if (!this.title) {
+          throw new Error('Invalid title');
+        }
+
         const details = JSON.stringify({
           title: this.title,
           description: this.description || '',
         });
+
         (app.chain as Moloch).governance
           .createPropWebTx(
             author as MolochMember,
@@ -519,8 +569,14 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
         return;
       } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
         this.proposer = app.user?.activeAccount?.address;
-        if (!this.proposer) throw new Error('Invalid address / not logged in');
-        if (!this.description) throw new Error('Invalid description');
+
+        if (!this.proposer) {
+          throw new Error('Invalid address / not logged in');
+        }
+
+        if (!this.description) {
+          throw new Error('Invalid description');
+        }
 
         const targets = [];
         const values = [];
@@ -543,12 +599,14 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
         // if they passed a title, use the JSON format for description.
         // otherwise, keep description raw
         let description = this.description;
+
         if (this.title) {
           description = JSON.stringify({
             description: this.description,
             title: this.title,
           });
         }
+
         const details: CompoundProposalArgs = {
           description,
           targets,
@@ -556,6 +614,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           calldatas,
           signatures,
         };
+
         (app.chain as Compound).governance
           .propose(details)
           .then((result: string) => {
@@ -567,12 +626,22 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             m.redraw();
           })
           .catch((err) => notifyError(err.data?.message || err.message));
+
         return;
       } else if (proposalTypeEnum === ProposalType.AaveProposal) {
         this.proposer = app.user?.activeAccount?.address;
-        if (!this.proposer) throw new Error('Invalid address / not logged in');
-        if (!this.executor) throw new Error('Invalid executor');
-        if (!this.ipfsHash) throw new Error('No ipfs hash');
+
+        if (!this.proposer) {
+          throw new Error('Invalid address / not logged in');
+        }
+
+        if (!this.executor) {
+          throw new Error('Invalid executor');
+        }
+
+        if (!this.ipfsHash) {
+          throw new Error('No ipfs hash');
+        }
 
         const targets = [];
         const values = [];
@@ -582,6 +651,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
 
         for (let i = 0; i < this.aaveTabCount; i++) {
           const aaveProposal = this.aaveProposalState[i];
+
           if (aaveProposal.target) {
             targets.push(aaveProposal.target);
           } else {
@@ -593,8 +663,10 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           withDelegateCalls.push(aaveProposal.withDelegateCall || false);
           signatures.push(aaveProposal.signature || '');
         }
+
         // TODO: preload this ipfs value to ensure it's correct
         const ipfsHash = utils.formatBytes32String(this.ipfsHash);
+
         const details: AaveProposalArgs = {
           executor: this.executor as string,
           targets,
@@ -604,18 +676,23 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           withDelegateCalls,
           ipfsHash,
         };
+
         (app.chain as Aave).governance
           .propose(details)
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.data?.message || err.message));
+
         return;
         // @TODO: Create Proposal via WebTx
       } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
         // TODO: make type of proposal switchable
         const member = this.member;
+
         const description = this.description;
+
         let propArgs: NearSputnikProposalKind;
+
         if (
           this.sputnikProposalType ===
           SupportedSputnikProposalTypes.AddMemberToRole
@@ -635,6 +712,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
         ) {
           // TODO: validate amount / token id
           const token_id = this.tokenId || '';
+
           let amount: string;
           // treat NEAR as in dollars but tokens as whole #s
           if (!token_id) {
@@ -657,11 +735,15 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           .then((result) => done(result))
           .then(() => m.redraw())
           .catch((err) => notifyError(err.message));
+
         return;
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
-        if (!this.form.beneficiary)
+        if (!this.form.beneficiary) {
           throw new Error('Invalid beneficiary address');
+        }
+
         const beneficiary = app.chain.accounts.get(this.form.beneficiary);
+
         args = [author, this.form.description, beneficiary];
       } else {
         throw new Error('Invalid proposal type');
