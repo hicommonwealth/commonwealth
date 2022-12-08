@@ -3,44 +3,21 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import { utils } from 'ethers';
-import BN from 'bn.js';
-import { blake2AsHex } from '@polkadot/util-crypto';
-import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import 'pages/new_proposal_page.scss';
 
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
-import {
-  ITXModalData,
-  ProposalModule,
-  ThreadStage,
-  ThreadKind,
-  Topic,
-} from 'models';
-import { proposalSlugToClass } from 'identifiers';
+import { Topic } from 'models';
 import { formatCoin } from 'adapters/currency';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
-import CosmosAccount from 'controllers/chain/cosmos/account';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import Substrate from 'controllers/chain/substrate/adapter';
 import Cosmos from 'controllers/chain/cosmos/adapter';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
-import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
-import { createTXModal } from 'views/modals/tx_signing_modal';
 import ErrorPage from 'views/pages/error';
-import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
-import NearSputnik from 'controllers/chain/near/sputnik/adapter';
-import { navigateToSubpage } from 'app';
-import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { TopicSelector } from 'views/components/topic_selector';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
@@ -53,18 +30,11 @@ import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-
-enum SupportedSputnikProposalTypes {
-  AddMemberToRole = 'Add Member',
-  RemoveMemberFromRole = 'Remove Member',
-  Transfer = 'Payout',
-  Vote = 'Poll',
-}
-
-enum SupportedCosmosProposalTypes {
-  Text = 'Text Proposal',
-  CommunitySpend = 'Community Spend',
-}
+import { createNewProposal } from './helpers';
+import {
+  SupportedCosmosProposalTypes,
+  SupportedSputnikProposalTypes,
+} from './types';
 
 type NewProposalFormAttrs = {
   callback?;
@@ -150,99 +120,53 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
       return <CWText>Unsupported network</CWText>;
     }
 
-    let hasCouncilMotionChooser: boolean;
     let hasAction: boolean;
-    let hasToggle: boolean;
-    let hasTitleAndDescription: boolean;
-    let hasBountyTitle: boolean;
-    let hasTopics: boolean;
-    let hasBeneficiary: boolean;
-    let hasAmount: boolean;
-    let hasPhragmenInfo: boolean;
     let hasDepositChooser: boolean;
-    // bounty proposal
-    let hasBountyValue: boolean;
-    // tip
-    let hasTipsFields: boolean;
     // council motion
-    let hasVotingPeriodAndDelaySelector: boolean;
-    let hasReferendumSelector: boolean;
     let hasExternalProposalSelector: boolean;
-    let hasTreasuryProposalSelector: boolean;
-    let hasThreshold: boolean;
-    // moloch proposal
-    let hasMolochFields: boolean;
-    // compound proposal
-    let hasCompoundFields: boolean;
-    // aave proposal
-    let hasAaveFields: boolean;
-    // sputnik proposal
-    let hasSputnikFields: boolean;
-    let hasCosmosFields: boolean;
     // data loaded
     let dataLoaded = true;
 
     if (typeEnum === ProposalType.SubstrateDemocracyProposal) {
       hasAction = true;
-      hasToggle = true;
       hasDepositChooser = this.toggleValue === 'proposal';
+
       if (hasDepositChooser) {
         dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
       }
     } else if (typeEnum === ProposalType.SubstrateCollectiveProposal) {
-      hasCouncilMotionChooser = true;
       hasAction =
         this.councilMotionType === 'createExternalProposal' ||
         this.councilMotionType === 'createExternalProposalMajority';
-      hasVotingPeriodAndDelaySelector =
-        this.councilMotionType === 'createFastTrack' ||
-        this.councilMotionType === 'createExternalProposalDefault';
-      hasReferendumSelector =
-        this.councilMotionType === 'createEmergencyCancellation';
+
       hasExternalProposalSelector =
         this.councilMotionType === 'vetoNextExternal' ||
         this.councilMotionType === 'createFastTrack' ||
         this.councilMotionType === 'createExternalProposalDefault';
-      hasTreasuryProposalSelector =
-        this.councilMotionType === 'createTreasuryApprovalMotion' ||
-        this.councilMotionType === 'createTreasuryRejectionMotion';
-      hasThreshold = this.councilMotionType !== 'vetoNextExternal';
-      if (hasExternalProposalSelector)
+
+      if (hasExternalProposalSelector) {
         dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
-    } else if (typeEnum === ProposalType.Thread) {
-      hasTitleAndDescription = true;
-      hasTopics = true;
+      }
     } else if (typeEnum === ProposalType.SubstrateTreasuryProposal) {
-      hasBeneficiary = true;
-      hasAmount = true;
       const treasury = (app.chain as Substrate).treasury;
+
       dataLoaded = !!treasury.initialized;
     } else if (typeEnum === ProposalType.SubstrateBountyProposal) {
-      hasBountyTitle = true;
-      hasBountyValue = true;
       const bountyTreasury = (app.chain as Substrate).bounties;
+
       dataLoaded = !!bountyTreasury.initialized;
     } else if (typeEnum === ProposalType.SubstrateTreasuryTip) {
-      hasTipsFields = true;
       // TODO: this is only true if the proposer is doing reportAwesome()
       //   we need special code for newTip().
       const tips = (app.chain as Substrate).tips;
+
       dataLoaded = !!tips.initialized;
     } else if (typeEnum === ProposalType.PhragmenCandidacy) {
-      hasPhragmenInfo = true;
       const elections = (app.chain as Substrate).phragmenElections;
+
       dataLoaded = !!elections.initialized;
     } else if (typeEnum === ProposalType.CosmosProposal) {
-      hasCosmosFields = true;
       dataLoaded = !!(app.chain as Cosmos).governance.initialized;
-    } else if (typeEnum === ProposalType.MolochProposal) {
-      hasMolochFields = true;
-    } else if (typeEnum === ProposalType.CompoundProposal) {
-      hasCompoundFields = true;
-    } else if (typeEnum === ProposalType.AaveProposal) {
-      hasAaveFields = true;
-    } else if (typeEnum === ProposalType.SputnikProposal) {
-      hasSputnikFields = true;
     } else {
       return <div class="NewProposalForm">Invalid proposal type</div>;
     }
@@ -253,505 +177,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     ) {
       dataLoaded = false;
     }
-
-    const createNewProposal = () => {
-      const done = (result) => {
-        this.error = '';
-        callback(result);
-        return result;
-      };
-
-      let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (
-        a
-      ) => {
-        return (
-          proposalSlugToClass().get(typeEnum) as ProposalModule<any, any, any>
-        ).createTx(...a);
-      };
-
-      let args = [];
-
-      if (typeEnum === ProposalType.Thread) {
-        app.threads
-          .create(
-            author.address,
-            ThreadKind.Discussion,
-            ThreadStage.Discussion,
-            app.activeChainId(),
-            this.form.title,
-            this.form.topicName,
-            this.form.topicId,
-            this.form.description
-          )
-          .then(done)
-          .then(() => {
-            m.redraw();
-          })
-          .catch((err) => {
-            console.error(err);
-          });
-        return;
-      } else if (typeEnum === ProposalType.SubstrateDemocracyProposal) {
-        const deposit = this.deposit
-          ? app.chain.chain.coins(this.deposit, true)
-          : (app.chain as Substrate).democracyProposals.minimumDeposit;
-
-        if (!EdgewareFunctionPicker.getMethod()) {
-          notifyError('Missing arguments');
-          return;
-        } else if (this.toggleValue === 'proposal') {
-          const proposalHash = blake2AsHex(
-            EdgewareFunctionPicker.getMethod().toHex()
-          );
-
-          args = [
-            author,
-            EdgewareFunctionPicker.getMethod(),
-            proposalHash,
-            deposit,
-          ];
-
-          createFunc = ([au, mt, pr, dep]) =>
-            (app.chain as Substrate).democracyProposals.createTx(
-              au,
-              mt,
-              pr,
-              dep
-            );
-        } else if (this.toggleValue === 'preimage') {
-          onChangeSlugEnum('democracypreimage');
-
-          const encodedProposal = EdgewareFunctionPicker.getMethod().toHex();
-
-          args = [author, EdgewareFunctionPicker.getMethod(), encodedProposal];
-
-          createFunc = ([au, mt, pr]) =>
-            (app.chain as Substrate).democracyProposals.notePreimage(
-              au,
-              mt,
-              pr
-            );
-        } else if (this.toggleValue === 'imminent') {
-          onChangeSlugEnum('democracyimminent');
-
-          const encodedProposal = EdgewareFunctionPicker.getMethod().toHex();
-
-          args = [author, EdgewareFunctionPicker.getMethod(), encodedProposal];
-
-          createFunc = ([au, mt, pr]) =>
-            (app.chain as Substrate).democracyProposals.noteImminentPreimage(
-              au,
-              mt,
-              pr
-            );
-        } else {
-          throw new Error('Invalid toggle state');
-        }
-      } else if (
-        typeEnum === ProposalType.SubstrateCollectiveProposal &&
-        this.councilMotionType === 'vetoNextExternal'
-      ) {
-        args = [author, this.nextExternalProposalHash];
-
-        createFunc = ([a, h]) =>
-          (app.chain as Substrate).council.vetoNextExternal(a, h);
-      } else if (typeEnum === ProposalType.SubstrateCollectiveProposal) {
-        if (!this.threshold) throw new Error('Invalid threshold');
-
-        const threshold = this.threshold;
-
-        if (this.councilMotionType === 'createExternalProposal') {
-          args = [
-            author,
-            threshold,
-            EdgewareFunctionPicker.getMethod(),
-            EdgewareFunctionPicker.getMethod().encodedLength,
-          ];
-
-          createFunc = ([a, t, mt, l]) =>
-            (app.chain as Substrate).council.createExternalProposal(
-              a,
-              t,
-              mt,
-              l
-            );
-        } else if (
-          this.councilMotionType === 'createExternalProposalMajority'
-        ) {
-          args = [
-            author,
-            threshold,
-            EdgewareFunctionPicker.getMethod(),
-            EdgewareFunctionPicker.getMethod().encodedLength,
-          ];
-
-          createFunc = ([a, t, mt, l]) =>
-            (app.chain as Substrate).council.createExternalProposalMajority(
-              a,
-              t,
-              mt,
-              l
-            );
-        } else if (this.councilMotionType === 'createExternalProposalDefault') {
-          args = [
-            author,
-            threshold,
-            EdgewareFunctionPicker.getMethod(),
-            EdgewareFunctionPicker.getMethod().encodedLength,
-          ];
-
-          createFunc = ([a, t, mt, l]) =>
-            (app.chain as Substrate).council.createExternalProposalDefault(
-              a,
-              t,
-              mt,
-              l
-            );
-        } else if (this.councilMotionType === 'createFastTrack') {
-          args = [
-            author,
-            threshold,
-            this.nextExternalProposalHash,
-            this.votingPeriod,
-            this.enactmentDelay,
-          ];
-
-          createFunc = ([a, b, c, d, e]) =>
-            (app.chain as Substrate).council.createFastTrack(a, b, c, d, e);
-        } else if (this.councilMotionType === 'createEmergencyCancellation') {
-          args = [author, threshold, this.referendumId];
-
-          createFunc = ([a, t, h]) =>
-            (app.chain as Substrate).council.createEmergencyCancellation(
-              a,
-              t,
-              h
-            );
-        } else if (this.councilMotionType === 'createTreasuryApprovalMotion') {
-          args = [author, threshold, this.treasuryProposalIndex];
-
-          createFunc = ([a, t, i]) =>
-            (app.chain as Substrate).council.createTreasuryApprovalMotion(
-              a,
-              t,
-              i
-            );
-        } else if (this.councilMotionType === 'createTreasuryRejectionMotion') {
-          args = [author, threshold, this.treasuryProposalIndex];
-
-          createFunc = ([a, t, i]) =>
-            (app.chain as Substrate).council.createTreasuryRejectionMotion(
-              a,
-              t,
-              i
-            );
-        } else {
-          throw new Error('Invalid council motion type');
-        }
-
-        return createTXModal(createFunc(args)).then(done);
-      } else if (typeEnum === ProposalType.SubstrateTreasuryProposal) {
-        if (!this.form.beneficiary) {
-          throw new Error('Invalid beneficiary address');
-        }
-
-        const beneficiary = app.chain.accounts.get(this.form.beneficiary);
-
-        args = [author, this.form.amount, beneficiary];
-      } else if (typeEnum === ProposalType.SubstrateBountyProposal) {
-        if (!this.form.title) {
-          throw new Error('Invalid title');
-        }
-
-        if (!this.form.value) {
-          throw new Error('Invalid value');
-        }
-
-        args = [author, this.form.value, this.form.title];
-
-        createFunc = ([a, v, t]) =>
-          (app.chain as Substrate).bounties.createTx(a, v, t);
-        return createTXModal(createFunc(args)).then(done);
-      } else if (typeEnum === ProposalType.SubstrateBountyProposal) {
-        if (!this.form.reason) {
-          throw new Error('Invalid reason');
-        }
-
-        if (!this.form.beneficiary) {
-          throw new Error('Invalid beneficiary address');
-        }
-
-        const beneficiary = app.chain.accounts.get(this.form.beneficiary);
-
-        args = [this.form.reason, beneficiary];
-      } else if (typeEnum === ProposalType.PhragmenCandidacy) {
-        args = [author];
-
-        createFunc = ([a]) =>
-          (
-            app.chain as Substrate
-          ).phragmenElections.activeElection.submitCandidacyTx(a);
-      } else if (typeEnum === ProposalType.CosmosProposal) {
-        let prop: ProtobufAny;
-
-        const { title, description } = this.form;
-
-        const deposit = this.deposit
-          ? new CosmosToken(
-              (app.chain as Cosmos).governance.minDeposit.denom,
-              this.deposit,
-              false
-            )
-          : (app.chain as Cosmos).governance.minDeposit;
-        if (this.cosmosProposalType === SupportedCosmosProposalTypes.Text) {
-          prop = (app.chain as Cosmos).governance.encodeTextProposal(
-            title,
-            description
-          );
-        } else if (
-          this.cosmosProposalType ===
-          SupportedCosmosProposalTypes.CommunitySpend
-        ) {
-          prop = (app.chain as Cosmos).governance.encodeCommunitySpend(
-            title,
-            description,
-            this.recipient,
-            this.payoutAmount
-          );
-        } else {
-          throw new Error('Unknown Cosmos proposal type.');
-        }
-        // TODO: add disabled / loading
-        (app.chain as Cosmos).governance
-          .submitProposalTx(author as CosmosAccount, deposit, prop)
-          .then((result) => {
-            done(result);
-            navigateToSubpage(`/proposal/${result}`);
-          })
-          .catch((err) => notifyError(err.message));
-        return;
-      } else if (typeEnum === ProposalType.MolochProposal) {
-        // TODO: check that applicant is valid ETH address in hex
-        if (!this.applicantAddress) {
-          throw new Error('Invalid applicant address');
-        }
-
-        if (typeof this.tokenTribute !== 'number') {
-          throw new Error('Invalid token tribute');
-        }
-
-        if (typeof this.sharesRequested !== 'number') {
-          throw new Error('Invalid shares requested');
-        }
-
-        if (!this.title) {
-          throw new Error('Invalid title');
-        }
-
-        const details = JSON.stringify({
-          title: this.title,
-          description: this.description || '',
-        });
-
-        (app.chain as Moloch).governance
-          .createPropWebTx(
-            author as MolochMember,
-            this.applicantAddress,
-            new BN(this.tokenTribute),
-            new BN(this.sharesRequested),
-            details
-          )
-          // TODO: handling errors?
-          .then((result) => done(result))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.data?.message || err.message));
-        return;
-      } else if (typeEnum === ProposalType.CompoundProposal) {
-        this.proposer = app.user?.activeAccount?.address;
-
-        if (!this.proposer) {
-          throw new Error('Invalid address / not logged in');
-        }
-
-        if (!this.description) {
-          throw new Error('Invalid description');
-        }
-
-        const targets = [];
-        const values = [];
-        const calldatas = [];
-        const signatures = [];
-
-        for (let i = 0; i < this.aaveTabCount; i++) {
-          const aaveProposal = this.aaveProposalState[i];
-          if (aaveProposal.target) {
-            targets.push(aaveProposal.target);
-          } else {
-            throw new Error(`No target for Call ${i + 1}`);
-          }
-
-          values.push(aaveProposal.value || '0');
-          calldatas.push(aaveProposal.calldata || '');
-          signatures.push(aaveProposal.signature || '');
-        }
-
-        // if they passed a title, use the JSON format for description.
-        // otherwise, keep description raw
-        let description = this.description;
-
-        if (this.title) {
-          description = JSON.stringify({
-            description: this.description,
-            title: this.title,
-          });
-        }
-
-        const details: CompoundProposalArgs = {
-          description,
-          targets,
-          values,
-          calldatas,
-          signatures,
-        };
-
-        (app.chain as Compound).governance
-          .propose(details)
-          .then((result: string) => {
-            done(result);
-            return result;
-          })
-          .then((result: string) => {
-            notifySuccess(`Proposal ${result} created successfully!`);
-            m.redraw();
-          })
-          .catch((err) => notifyError(err.data?.message || err.message));
-
-        return;
-      } else if (typeEnum === ProposalType.AaveProposal) {
-        this.proposer = app.user?.activeAccount?.address;
-
-        if (!this.proposer) {
-          throw new Error('Invalid address / not logged in');
-        }
-
-        if (!this.executor) {
-          throw new Error('Invalid executor');
-        }
-
-        if (!this.ipfsHash) {
-          throw new Error('No ipfs hash');
-        }
-
-        const targets = [];
-        const values = [];
-        const calldatas = [];
-        const signatures = [];
-        const withDelegateCalls = [];
-
-        for (let i = 0; i < this.aaveTabCount; i++) {
-          const aaveProposal = this.aaveProposalState[i];
-
-          if (aaveProposal.target) {
-            targets.push(aaveProposal.target);
-          } else {
-            throw new Error(`No target for Call ${i + 1}`);
-          }
-
-          values.push(aaveProposal.value || '0');
-          calldatas.push(aaveProposal.calldata || '');
-          withDelegateCalls.push(aaveProposal.withDelegateCall || false);
-          signatures.push(aaveProposal.signature || '');
-        }
-
-        // TODO: preload this ipfs value to ensure it's correct
-        const ipfsHash = utils.formatBytes32String(this.ipfsHash);
-
-        const details: AaveProposalArgs = {
-          executor: this.executor as string,
-          targets,
-          values,
-          calldatas,
-          signatures,
-          withDelegateCalls,
-          ipfsHash,
-        };
-
-        (app.chain as Aave).governance
-          .propose(details)
-          .then((result) => done(result))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.data?.message || err.message));
-
-        return;
-        // @TODO: Create Proposal via WebTx
-      } else if (typeEnum === ProposalType.SputnikProposal) {
-        // TODO: make type of proposal switchable
-        const member = this.member;
-
-        const description = this.description;
-
-        let propArgs: NearSputnikProposalKind;
-
-        if (
-          this.sputnikProposalType ===
-          SupportedSputnikProposalTypes.AddMemberToRole
-        ) {
-          propArgs = {
-            AddMemberToRole: { role: 'council', member_id: member },
-          };
-        } else if (
-          this.sputnikProposalType ===
-          SupportedSputnikProposalTypes.RemoveMemberFromRole
-        ) {
-          propArgs = {
-            RemoveMemberFromRole: { role: 'council', member_id: member },
-          };
-        } else if (
-          this.sputnikProposalType === SupportedSputnikProposalTypes.Transfer
-        ) {
-          // TODO: validate amount / token id
-          const token_id = this.tokenId || '';
-
-          let amount: string;
-          // treat NEAR as in dollars but tokens as whole #s
-          if (!token_id) {
-            amount = app.chain.chain
-              .coins(+this.payoutAmount, true)
-              .asBN.toString();
-          } else {
-            amount = `${+this.payoutAmount}`;
-          }
-
-          propArgs = { Transfer: { receiver_id: member, token_id, amount } };
-        } else if (
-          this.sputnikProposalType === SupportedSputnikProposalTypes.Vote
-        ) {
-          propArgs = 'Vote';
-        } else {
-          throw new Error('unsupported sputnik proposal type');
-        }
-        (app.chain as NearSputnik).dao
-          .proposeTx(description, propArgs)
-          .then((result) => done(result))
-          .then(() => m.redraw())
-          .catch((err) => notifyError(err.message));
-
-        return;
-      } else if (typeEnum === ProposalType.SubstrateTreasuryTip) {
-        if (!this.form.beneficiary) {
-          throw new Error('Invalid beneficiary address');
-        }
-
-        const beneficiary = app.chain.accounts.get(this.form.beneficiary);
-
-        args = [author, this.form.description, beneficiary];
-      } else {
-        throw new Error('Invalid proposal type');
-      }
-      Promise.resolve(createFunc(args))
-        .then((modalData) => createTXModal(modalData))
-        .then(done);
-    };
 
     // default state options
     const motions = SubstrateCollectiveProposal.motions;
@@ -778,7 +203,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     return (
       <div class="NewProposalForm">
         {this.error && <div class="error">{this.error.message}</div>}
-        {hasCouncilMotionChooser && (
+        {typeEnum === ProposalType.SubstrateCollectiveProposal && (
           <>
             <CWDropdown
               label="Motion"
@@ -803,7 +228,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           </>
         )}
         {hasAction && m(EdgewareFunctionPicker)}
-        {hasTopics && (
+        {typeEnum === ProposalType.Thread && (
           <TopicSelector
             topics={app.topics.getByCommunity(app.chain.id)}
             updateFormData={(topic: Topic) => {
@@ -812,7 +237,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             }}
           />
         )}
-        {hasBountyTitle && (
+        {typeEnum === ProposalType.SubstrateBountyProposal && (
           <CWTextInput
             placeholder="Bounty title (stored on chain)"
             label="Title"
@@ -823,7 +248,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             }}
           />
         )}
-        {hasTitleAndDescription && (
+        {typeEnum === ProposalType.Thread && (
           <>
             <CWTextInput
               placeholder="Enter a title"
@@ -846,7 +271,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             />
           </>
         )}
-        {hasBeneficiary && (
+        {typeEnum === ProposalType.SubstrateTreasuryProposal && (
           <CWTextInput
             title="Beneficiary"
             placeholder="Beneficiary of proposal"
@@ -861,7 +286,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             }}
           />
         )}
-        {hasAmount && (
+        {typeEnum === ProposalType.SubstrateTreasuryProposal && (
           <>
             <CWTextInput
               label={`Amount (${app.chain.chain.denom})`}
@@ -893,7 +318,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             </CWText>
           </>
         )}
-        {hasPhragmenInfo && (
+        {typeEnum === ProposalType.PhragmenCandidacy && (
           <div class="council-slot-info">
             Becoming a candidate requires a deposit of
             {formatCoin(
@@ -905,7 +330,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             runners-up.
           </div>
         )}
-        {hasToggle && (
+        {typeEnum === ProposalType.SubstrateDemocracyProposal && (
           <CWRadioGroup
             name="democracy-tx-switcher"
             onchange={async (value) => {
@@ -924,7 +349,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             ]}
           />
         )}
-        {hasBountyValue && (
+        {typeEnum === ProposalType.SubstrateBountyProposal && (
           <CWTextInput
             label={`Value (${app.chain.chain.denom})`}
             placeholder="Amount allocated to bounty"
@@ -963,29 +388,30 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             }}
           />
         )}
-        {hasVotingPeriodAndDelaySelector && (
-          <>
-            <CWTextInput
-              label="Voting Period"
-              placeholder="Blocks (minimum enforced)"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.votingPeriod = +result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Enactment Delay"
-              placeholder="Blocks (minimum enforced)"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.enactmentDelay = +result;
-                m.redraw();
-              }}
-            />
-          </>
-        )}
-        {hasReferendumSelector && (
+        {this.councilMotionType === 'createFastTrack' ||
+          (this.councilMotionType === 'createExternalProposalDefault' && (
+            <>
+              <CWTextInput
+                label="Voting Period"
+                placeholder="Blocks (minimum enforced)"
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.votingPeriod = +result;
+                  m.redraw();
+                }}
+              />
+              <CWTextInput
+                label="Enactment Delay"
+                placeholder="Blocks (minimum enforced)"
+                oninput={(e) => {
+                  const result = (e.target as any).value;
+                  this.enactmentDelay = +result;
+                  m.redraw();
+                }}
+              />
+            </>
+          ))}
+        {this.councilMotionType === 'createEmergencyCancellation' && (
           <CWDropdown
             label="Referendum"
             options={(app.chain as Substrate).democracy.store
@@ -1021,23 +447,24 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
               }}
             />
           )} */}
-        {hasTreasuryProposalSelector && (
-          <CWDropdown
-            label="Treasury Proposal"
-            options={(app.chain as Substrate).treasury.store
-              .getAll()
-              .map((r) => ({
-                name: 'external_proposal',
-                value: r.identifier,
-                label: r.shortIdentifier,
-              }))}
-            onSelect={(result) => {
-              this.treasuryProposalIndex = result;
-              m.redraw();
-            }}
-          />
-        )}
-        {hasThreshold && (
+        {this.councilMotionType === 'createTreasuryApprovalMotion' ||
+          (this.councilMotionType === 'createTreasuryRejectionMotion' && (
+            <CWDropdown
+              label="Treasury Proposal"
+              options={(app.chain as Substrate).treasury.store
+                .getAll()
+                .map((r) => ({
+                  name: 'external_proposal',
+                  value: r.identifier,
+                  label: r.shortIdentifier,
+                }))}
+              onSelect={(result) => {
+                this.treasuryProposalIndex = result;
+                m.redraw();
+              }}
+            />
+          ))}
+        {this.councilMotionType !== 'vetoNextExternal' && (
           <CWTextInput
             label="Threshold"
             placeholder="How many members must vote yes to execute?"
@@ -1048,7 +475,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             }}
           />
         )}
-        {hasMolochFields && (
+        {typeEnum === ProposalType.MolochProposal && (
           <>
             <CWTextInput
               label="Applicant Address (will receive Moloch shares)"
@@ -1097,7 +524,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             />
           </>
         )}
-        {hasCompoundFields && (
+        {typeEnum === ProposalType.CompoundProposal && (
           <div class="AaveGovernance">
             <div>
               <CWLabel label="Proposer (you)" />
@@ -1210,7 +637,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             />
           </div>
         )}
-        {hasAaveFields && (
+        {typeEnum === ProposalType.AaveProposal && (
           <div class="AaveGovernance">
             <div>
               <CWLabel label="Proposer (you)" />
@@ -1355,7 +782,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             </div>
           </div>
         )}
-        {hasSputnikFields && (
+        {typeEnum === ProposalType.SputnikProposal && (
           <>
             <CWDropdown
               label="Proposal Type"
@@ -1431,7 +858,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             )}
           </>
         )}
-        {hasCosmosFields && (
+        {typeEnum === ProposalType.CosmosProposal && (
           <>
             <CWDropdown
               label="Proposal Type"
@@ -1515,7 +942,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             )}
           </>
         )}
-        {hasTipsFields && (
+        {typeEnum === ProposalType.SubstrateTreasuryTip && (
           <>
             <CWLabel label="Finder" />,
             {m(User, {
@@ -1557,7 +984,13 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           }
           onclick={(e) => {
             e.preventDefault();
-            createNewProposal();
+            createNewProposal(
+              this,
+              callback,
+              typeEnum,
+              author,
+              onChangeSlugEnum
+            );
           }}
         />
       </div>
