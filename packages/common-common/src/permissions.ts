@@ -3,6 +3,8 @@
 
 export type Permissions = bigint;
 
+export type Permission = 'admin' | 'moderator' | 'member';
+
 export enum PermissionError {
   NOT_PERMITTED = 'Action not permitted',
 }
@@ -411,7 +413,7 @@ export function isImplicitlyPermitted(
       }
       return false;
     }
-  };
+  }
   return false;
 }
 
@@ -433,5 +435,39 @@ export function computePermissions(
     permission &= ~BigInt(assignment.deny);
     permission |= BigInt(assignment.allow);
   }
+  return permission;
+}
+
+type RoleObject = {
+  permission: Permission;
+  allow: Permissions;
+  deny: Permissions;
+};
+
+export function aggregatePermissions(
+  roles: RoleObject[],
+  chain_permissions: { allow: Permissions; deny: Permissions }
+) {
+  // sort roles by roles with highest permissions last
+  const ORDER: Permission[] = ['member', 'moderator', 'admin'];
+
+  function compare(o1: RoleObject, o2: RoleObject) {
+    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
+  }
+  roles = roles.sort(compare);
+
+  const permissionsAllowDeny: Array<{
+    allow: Permissions;
+    deny: Permissions;
+  }> = roles;
+
+  // add chain default permissions to beginning of permissions array
+  permissionsAllowDeny.unshift(chain_permissions);
+
+  // compute permissions
+  const permission: bigint = computePermissions(
+    BASE_PERMISSIONS,
+    permissionsAllowDeny
+  );
   return permission;
 }
