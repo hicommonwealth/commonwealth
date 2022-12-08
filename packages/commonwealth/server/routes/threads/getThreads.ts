@@ -4,6 +4,7 @@ import { GetThreadsReq, GetThreadsResp } from 'common-common/src/api/extApiTypes
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from 'server/util/queries';
+import { oneOf, query } from 'express-validator';
 
 const { Op } = Sequelize;
 
@@ -18,12 +19,14 @@ const getThreads = async (
   req: TypedRequestQuery<GetThreadsReq>,
   res: TypedResponse<GetThreadsResp>,
 ) => {
-  if (!req.query) throw new AppError(Errors.NoArgs);
+  query('community_id').isString().trim();
+  query('addresses').not();
+  query(['addresses', 'address_ids']).not();
+  query('no_body').optional().toBoolean();
+  query('include_comments').optional().toBoolean();
+  query('count_only').optional().toBoolean();
 
   const { community_id, topic_id, address_ids, no_body, include_comments, addresses, count_only } = req.query;
-
-  if(!community_id) throw new AppError('Must provide community_id');
-  if (addresses && address_ids) throw new AppError(Errors.AddressesOrAddressIds);
 
   const pagination = formatPagination(req.query);
 

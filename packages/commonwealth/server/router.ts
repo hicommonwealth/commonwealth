@@ -807,6 +807,7 @@ function setupRouter(
   // new API
   router.get('/threads', getThreads.bind(this, models));
   router.get('/comments', getComments.bind(this, models));
+  router.put('/comments', getComments.bind(this, models));
   router.get('/reactions', getReactions.bind(this, models));
   router.get('/communities', getCommunities.bind(this, models));
   router.get('/profile', getProfile.bind(this, models));

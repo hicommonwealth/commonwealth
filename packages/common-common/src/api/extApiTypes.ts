@@ -26,6 +26,10 @@ export type GetCommentsReq = {
 
 export type GetCommentsResp = { comments?: CommentAttributes[], count: number };
 
+export type PutCommentsReq = { comments: Omit<{ community_id: string; } & CommentAttributes, "chain">[] };
+
+export type PutCommentsResp = { error?: String };
+
 export type GetThreadsReq = {
   community_id: string;
   topic_id?: number;

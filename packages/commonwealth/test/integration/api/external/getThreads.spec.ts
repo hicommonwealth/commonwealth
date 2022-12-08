@@ -8,6 +8,11 @@ import 'test/integration/api/external/dbEntityHooks.spec';
 import { testThreads } from 'test/integration/api/external/dbEntityHooks.spec';
 import { ThreadAttributes } from 'server/models/thread';
 import getThreads from 'server/routes/threads/getThreads';
+import chaiHttp from 'chai-http';
+
+import app, { resetDatabase } from '../../../../server-test';
+import { JWT_SECRET } from 'server/config';
+chai.use(chaiHttp);
 
 describe('getThreads Tests', () => {
   it('should return threads with specified community_id correctly', async () => {
@@ -39,6 +44,22 @@ describe('getThreads Tests', () => {
     resp = await getThreads(models, req(r), res()) as any;
 
     chai.assert.lengthOf(resp.result.threads, 3);
+  });
+
+  it('should fail if both addresses and address_ids specified', async () => {
+    const r: GetThreadsReq = { community_id: testThreads[0].chain, addresses: ['testAddress-1'], address_ids: ['1'] };
+    const res = await chai
+      .request(app)
+      .get('/api/threads')
+      .query({})
+      .set('Accept', 'application/json');
+      // .send({
+      //   jwt: jwt.sign({ id: user.user_id, email: user.email }, JWT_SECRET),
+      //   chain,
+      //   address_id: user.address_id,
+      // });
+
+    chai.assert.lengthOf(resp.result.threads, 0);
   });
 
   it('should return threads with specified topic_id correctly', async () => {

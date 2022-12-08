@@ -2,27 +2,24 @@ import { AppError } from '../../util/errors';
 import Sequelize from 'sequelize';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
-import { GetCommentsResp, IPagination } from 'common-common/src/api/extApiTypes';
+import { GetCommentsReq, GetCommentsResp } from 'common-common/src/api/extApiTypes';
 import { formatPagination } from 'server/util/queries';
+import { check, query, validationResult } from 'express-validator';
 
 const { Op } = Sequelize;
-
-type GetCommentsReq = {
-  community_id: string;
-  addresses?: string[];
-  count_only?: boolean;
-} & IPagination;
 
 const getComments = async (
   models: DB,
   req: TypedRequestQuery<GetCommentsReq>,
   res: TypedResponse<GetCommentsResp>,
 ) => {
+  query('community_id').isString().trim();
+  query('address').optional().isString();
+  query('count_only').optional().toBoolean();
+
   const { community_id, addresses, count_only } = req.query;
 
   const where = { chain: community_id };
-
-  if(!community_id) throw new AppError('Must provide community_id');
 
   const include = [];
   if (addresses) include.push({
