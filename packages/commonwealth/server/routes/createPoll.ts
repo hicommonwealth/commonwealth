@@ -7,7 +7,7 @@ import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getNextPollEndingTime } from '../../shared/utils';
 import { DB } from '../models';
-import { findOneRole } from '../util/roles';
+import { findOneRole, isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
