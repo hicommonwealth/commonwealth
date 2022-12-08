@@ -3,6 +3,8 @@
 
 export type Permissions = bigint;
 
+export type Permission = 'admin' | 'moderator' | 'member';
+
 export enum PermissionError {
   NOT_PERMITTED = 'Action not permitted',
 }
@@ -396,7 +398,22 @@ export const BASE_PERMISSIONS: Permissions =
   addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
   addPermission(BigInt(0), Action.VIEW_THREADS);
 
-// Checks if a permission has a specific action
+// Checks implicitly if a permission has a specific action
+export function isImplicitlyPermitted(
+  permission: Permissions,
+  actionNumber: number
+): boolean {
+  // Check implicit permissions map by while looping through the map and checking each entry whose values include the action number
+  // Check whether the key (which is an action) is permitted
+  for (let [key, value] of IMPLICIT_PERMISSIONS_BY_ACTION) {
+    if (value.includes(actionNumber)) {
+      return isPermitted(permission, key);
+    }
+  }
+  return false;
+}
+
+// Checks if a permission explicitly has a specific action
 export function isPermitted(permission: Permissions, action: number): boolean {
   const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
   const hasAction: boolean =
@@ -414,5 +431,39 @@ export function computePermissions(
     permission &= ~BigInt(assignment.deny);
     permission |= BigInt(assignment.allow);
   }
+  return permission;
+}
+
+type RoleObject = {
+  permission: Permission;
+  allow: Permissions;
+  deny: Permissions;
+};
+
+export function aggregatePermissions(
+  roles: RoleObject[],
+  chain_permissions: { allow: Permissions; deny: Permissions }
+) {
+  // sort roles by roles with highest permissions last
+  const ORDER: Permission[] = ['member', 'moderator', 'admin'];
+
+  function compare(o1: RoleObject, o2: RoleObject) {
+    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
+  }
+  roles = roles.sort(compare);
+
+  const permissionsAllowDeny: Array<{
+    allow: Permissions;
+    deny: Permissions;
+  }> = roles;
+
+  // add chain default permissions to beginning of permissions array
+  permissionsAllowDeny.unshift(chain_permissions);
+
+  // compute permissions
+  const permission: bigint = computePermissions(
+    BASE_PERMISSIONS,
+    permissionsAllowDeny
+  );
   return permission;
 }

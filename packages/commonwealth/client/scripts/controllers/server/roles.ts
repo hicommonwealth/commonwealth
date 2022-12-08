@@ -10,13 +10,13 @@ import {
 } from 'models';
 import {
   Action,
+  aggregatePermissions,
   BASE_PERMISSIONS,
   computePermissions,
   isPermitted,
   PermissionError,
   Permissions,
 } from 'common-common/src/permissions';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { UserController } from './user';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {
@@ -343,10 +343,7 @@ export function isActiveAddressPermitted(
       allow: chain_info.defaultAllowPermissions,
       deny: chain_info.defaultDenyPermissions,
     });
-    if (!isPermitted(permission, action)) {
-      return false;
-    }
-    return true;
+    return isPermitted(permission, action);
   }
   // If no roles are given for the chain, compute permissions with chain default permissions
   else {
@@ -357,9 +354,6 @@ export function isActiveAddressPermitted(
         deny: chain_info.defaultDenyPermissions,
       },
     ]);
-    if (!isPermitted(permission, action)) {
-      return false;
-    }
-    return true;
+    return !isPermitted(permission, action);
   }
 }
