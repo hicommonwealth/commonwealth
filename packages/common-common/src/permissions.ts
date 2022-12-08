@@ -396,7 +396,26 @@ export const BASE_PERMISSIONS: Permissions =
   addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
   addPermission(BigInt(0), Action.VIEW_THREADS);
 
-// Checks if a permission has a specific action
+// Checks implicitly if a permission has a specific action
+export function isImplicitlyPermitted(
+  permission: Permissions,
+  actionNumber: number
+): boolean {
+  // Check implicit permissions map by while looping through the map and checking each entry whose values include the action number
+  // Check whether the key (which is an action) is permitted
+  for (let [key, value] of IMPLICIT_PERMISSIONS_BY_ACTION) {
+    if (value.includes(actionNumber)) {
+      console.log("key", key);
+      if (isPermitted(permission, key)) {
+        return true;
+      }
+      return false;
+    }
+  };
+  return false;
+}
+
+// Checks if a permission explicitly has a specific action
 export function isPermitted(permission: Permissions, action: number): boolean {
   const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
   const hasAction: boolean =
