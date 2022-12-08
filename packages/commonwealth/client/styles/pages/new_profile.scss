@@ -34,10 +34,10 @@
       }
 
       .profile-name-and-bio {
-        .name {
-          margin-bottom: 20px;
-          justify-content: center;
+        .bio {
+          margin-top: 16px;
         }
+
         .buttons {
           display: flex;
           justify-content: center;
@@ -47,8 +47,10 @@
             margin-right: 8px;
           }
         }
-        .bio {
-          margin-top: 16px;
+
+        .name {
+          margin-bottom: 20px;
+          justify-content: center;
         }
 
         .read-more {
@@ -122,18 +124,26 @@
           border-bottom: 1px solid #dddddd;
           padding: 24px 0;
 
-          .title {
-            margin-bottom: 10px;
-          }
-  
-          .gray-text {
-            color: $neutral-600;
+          .actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+
+            .trigger-wrapper {
+              margin-right: 20px;
+            }
           }
 
           .chain-info {
             display: flex;
             align-items: center;
             margin-bottom: 10px;
+
+            .date {
+              .Text {
+                color: $neutral-500;
+              }
+            }
 
             .dot {
               width: 20px;
@@ -144,22 +154,14 @@
               font-weight: 600;
               padding-bottom: 6px;
             }
-
-            .date {
-              .Text {
-                color: $neutral-500;
-              }
-            }
           }
 
-          .actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 16px;
+          .gray-text {
+            color: $neutral-600;
+          }
 
-            .trigger-wrapper {
-              margin-right: 20px;
-            }
+          .title {
+            margin-bottom: 10px;
           }
         }
 

@@ -13,9 +13,9 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type NewProfileHeaderAttrs = {
+  address: string;
   profile: Profile;
   socialAccounts: Array<SocialAccount>;
-  address: string;
 };
 
 type NewProfileBioAttrs = {

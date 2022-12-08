@@ -23,10 +23,10 @@ import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 enum ProfileError {
+  InsufficientProfileData, // when does this get used?
   None,
   NoAddressFound,
   NoProfileFound,
-  InsufficientProfileData, // when does this get used?
 }
 
 type NewProfileAttrs = {
@@ -38,15 +38,15 @@ const NoProfileFoundError = 'No profile found';
 
 export class NewProfile extends ClassComponent<NewProfileAttrs> {
   private address: string;
+  private addresses: Array<AddressInfo>;
+  private chains: Array<ChainInfo>;
+  private content: m.Vnode;
+  private comments: Array<Comment<IUniqueId>>;
+  private error: ProfileError;
+  private loading: boolean;
   private profile: Profile;
   private threads: Array<Thread>;
-  private comments: Array<Comment<IUniqueId>>;
-  private chains: Array<ChainInfo>;
-  private addresses: Array<AddressInfo>;
   private socialAccounts: Array<SocialAccount>;
-  private loading: boolean;
-  private error: ProfileError;
-  private content: m.Vnode;
 
   private _getProfileData = async (address: string) => {
     try {

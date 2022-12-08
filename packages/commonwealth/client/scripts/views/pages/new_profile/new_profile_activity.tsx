@@ -20,36 +20,35 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 enum ProfileActivity {
-  Comments,
-  Threads,
-  Communities,
   Addresses,
+  Comments,
+  Communities,
+  Threads,
 }
 
 type NewProfileActivityAttrs = {
-  threads: Array<Thread>;
+  addresses: Array<AddressInfo>;
   comments: Array<Comment<IUniqueId>>;
   chains: Array<ChainInfo>;
-  addresses: Array<AddressInfo>;
+  threads: Array<Thread>;
 };
 
 type NewProfileActivityContentAttrs = {
-  option: ProfileActivity;
+  address: string;
   attrs: NewProfileActivityAttrs;
   commentCharLimit: number;
+  option: ProfileActivity;
   threadCharLimit: number;
-  address: string;
 };
 
 type NewProfileActivityRowAttrs = {
   activity: Comment<IUniqueId> | Thread;
-  charLimit: number;
   address: string;
 };
 
 class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
-    const { charLimit, activity, address } = vnode.attrs;
+    const { activity, address } = vnode.attrs;
     const { chain, createdAt, plaintext, author, title } = activity;
 
     // force redraw or on initial load comments don't render
@@ -130,14 +129,14 @@ class ActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
 
 export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
   private address: string;
-  private selectedActivity: ProfileActivity;
   private commentCharLimit: number;
+  private selectedActivity: ProfileActivity;
   private threadCharLimit: number;
 
   oninit() {
     this.address = m.route.param('address');
-    this.selectedActivity = ProfileActivity.Comments;
     this.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
+    this.selectedActivity = ProfileActivity.Comments;
     this.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
 
     // Handle text character limit
