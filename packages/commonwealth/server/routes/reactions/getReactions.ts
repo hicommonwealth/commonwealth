@@ -1,5 +1,4 @@
 import { Action } from 'common-common/src/permissions';
-import validateChain from '../../util/validateChain';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { ReactionAttributes } from '../../models/reaction';

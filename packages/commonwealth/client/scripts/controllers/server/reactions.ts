@@ -15,6 +15,8 @@ import {
   AbridgedThread,
 } from 'models';
 import { notifyError } from 'controllers/app/notifications';
+import { ProposalType } from "common-common/src/types";
+import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 export const modelFromServer = (reaction) => {
   return new Reaction(
@@ -60,11 +62,16 @@ class ReactionsController {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
       }`;
+      // attempt to find the chain-entity associated with this proposal
+      // TODO: is the below assumptions valid?
+      // this only works if we assume that all chain-entities for the specific
+      // chain are loaded when the reaction is created
+      const chainEntity = proposalIdToEntity(app, app.activeChainId(), options['proposal_id']);
+      options['chain_entity_id'] = chainEntity?.id
     } else if (post instanceof Comment) {
       options['comment_id'] = (post as Comment<any>).id;
     }
     try {
-      // TODO: Change to POST /reaction
       const response = await $.post(
         `${app.serverUrl()}/createReaction`,
         options

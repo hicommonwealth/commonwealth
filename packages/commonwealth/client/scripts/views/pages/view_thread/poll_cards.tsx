@@ -8,13 +8,12 @@ import 'pages/view_thread/poll_cards.scss';
 
 import app from 'state';
 import { Poll, Thread } from 'models';
-import { CWCard } from '../../components/component_kit/cw_card';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWText } from '../../components/component_kit/cw_text';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 import { PollCard } from '../../components/poll_card';
 import { getPollTimestamp, handlePollVote } from './helpers';
 import { OffchainVotingModal } from '../../modals/offchain_voting_modal';
+import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
 
 type ThreadPollEditorCardAttrs = {
   thread: Thread;
@@ -26,24 +25,29 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
     const { thread, threadAlreadyHasPolling } = vnode.attrs;
 
     return (
-      <CWCard className="PollEditorCard">
-        <CWText type="h5">
-          Add {threadAlreadyHasPolling ? 'an' : 'another'} offchain poll to this
-          thread?
-        </CWText>
-        <CWButton
-          label="Create poll"
-          onclick={(e) => {
-            e.preventDefault();
-            app.modals.create({
-              modal: PollEditorModal,
-              data: {
-                thread,
-              },
-            });
-          }}
-        />
-      </CWCard>
+      <CWContentPageCard
+        header={`Add ${
+          threadAlreadyHasPolling ? 'an' : 'another'
+        } offchain poll to this
+        thread?`}
+        content={
+          <div className="PollEditorCard">
+            <CWButton
+              buttonType="mini"
+              label="Create poll"
+              onclick={(e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: PollEditorModal,
+                  data: {
+                    thread,
+                  },
+                });
+              }}
+            />
+          </div>
+        }
+      />
     );
   }
 }

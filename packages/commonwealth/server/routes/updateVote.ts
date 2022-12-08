@@ -3,6 +3,7 @@ import { NextFunction } from 'express';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from 'common-common/src/errors';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';
 import { sequelize } from '../database';
@@ -15,7 +16,6 @@ import {
 } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
-import { AppError, ServerError } from '../util/errors';
 import { isAddressPermitted } from '../util/roles';
 
 export const Errors = {

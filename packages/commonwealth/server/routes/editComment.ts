@@ -2,15 +2,15 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { NotificationCategories } from 'common-common/src/types';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { NotificationCategories } from 'common-common/src/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
 import { isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -150,7 +150,6 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
         title: proposal.title || '',
         chain: finalComment.chain,
       },
-      req.wss,
       [ finalComment.Address.address ],
     );
 
@@ -219,7 +218,6 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
             chain: finalComment.chain,
             body: finalComment.text,
           },
-          req.wss,
           [ finalComment.Address.address ],
         );
       });
