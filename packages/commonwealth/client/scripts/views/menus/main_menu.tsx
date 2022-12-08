@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
@@ -55,7 +56,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
   ];
 };
 
-export class MainMenu implements m.ClassComponent {
+export class MainMenu extends ClassComponent {
   view() {
     return <CWMobileMenu className="MainMenu" menuItems={getMainMenuItems()} />;
   }

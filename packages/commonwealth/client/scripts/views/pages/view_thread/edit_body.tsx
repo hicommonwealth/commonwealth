@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/edit_body.scss';
 
@@ -23,7 +24,7 @@ type EditBodyAttrs = {
   title: string;
 };
 
-export class EditBody implements m.ClassComponent<EditBodyAttrs> {
+export class EditBody extends ClassComponent<EditBodyAttrs> {
   private quillEditorState: QuillEditor;
   private saving: boolean;
 

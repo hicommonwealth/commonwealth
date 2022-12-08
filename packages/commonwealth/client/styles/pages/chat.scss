@@ -118,7 +118,7 @@
 
       .ql-toolbar.ql-snow + .ql-container.ql-snow {
         border: 1px solid $neutral-100 !important;
-        border-radius: 5px;
+        border-radius: $border-radius-corners;
       }
 
       .ql-container > .ql-editor {

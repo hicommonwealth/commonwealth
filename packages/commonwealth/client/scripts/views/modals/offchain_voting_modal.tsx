@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/offchain_voting_modal.scss';
 
@@ -12,9 +13,7 @@ type OffchainVotingModalAttrs = {
   votes: Array<Vote>;
 };
 
-export class OffchainVotingModal
-  implements m.ClassComponent<OffchainVotingModalAttrs>
-{
+export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs> {
   view(vnode: m.Vnode<OffchainVotingModalAttrs>) {
     const { votes } = vnode.attrs;
 
@@ -36,7 +35,7 @@ export class OffchainVotingModal
               onclick={(e) => {
                 e.preventDefault();
                 const csvContent = `data:text/csv;charset=utf-8,${csvRows
-                  .map((e) => e.join(','))
+                  .map((r) => r.join(','))
                   .join('\n')}`;
                 const encodedUri = encodeURI(csvContent);
                 window.open(encodedUri);

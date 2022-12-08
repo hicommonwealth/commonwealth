@@ -5,14 +5,14 @@ import {
   isPermitted,
   PermissionError,
   BASE_PERMISSIONS,
+  aggregatePermissions,
 } from 'common-common/src/permissions';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
 import { AddressInstance } from '../models/address';
-import { AppError } from './errors';
 
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   chain_id: string;

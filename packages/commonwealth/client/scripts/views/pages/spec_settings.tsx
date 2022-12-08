@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
@@ -21,7 +22,7 @@ import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 
-class SpecSettingsPage implements m.ClassComponent {
+class SpecSettingsPage extends ClassComponent {
   private chain: string;
   private chains: string[];
   private error: string;
