@@ -1,0 +1,123 @@
+@import 'client/styles/shared';
+@import 'construct-ui/src/_shared/_colors';
+
+.ProfileActivity {
+  border: 1px solid $neutral-200;
+  border-radius: 16px;
+  width: 65%;
+  height: fit-content;
+
+  .activity-nav {
+    display: flex;
+    padding: 24px;
+
+    .TabBar {
+      align-items: center;
+
+      .divider {
+        height: 32px;
+        width: 1px;
+        background: $neutral-100;
+        margin: 0;
+      }
+    }
+
+    .activity-nav-option {
+      position: relative;
+      display: flex;
+      min-width: 48px;
+      padding: 8px 0;
+      margin-right: 24px;
+
+
+      .activity-count {
+        position: relative;
+        width: 48px;
+        height: 24px;
+        background-color: white;
+        border-radius: 16px;
+        margin-left: 16px;
+        transition: background-color 0.2s ease-in;
+
+        p {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -60%);
+          font-size: small;
+          font-weight: 600;
+        }
+      }
+    }
+
+  }
+
+  .activity-section {
+    padding: 0 60px 30px 60px;
+
+    .activity {
+      position: relative;
+      min-height: 168px;
+      border-bottom: 1px solid #dddddd;
+      padding: 24px 0;
+
+      .actions {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 16px;
+
+        .trigger-wrapper {
+          margin-right: 24px;
+        }
+      }
+
+      .chain-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+
+        .date {
+          .Text {
+            color: $neutral-500;
+          }
+        }
+
+        .dot {
+          width: 24px;
+          color: $neutral-500;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+          padding-bottom: 8px;
+        }
+      }
+
+      .gray-text {
+        color: $neutral-600;
+      }
+
+      .title {
+        margin-bottom: 8px;
+      }
+    }
+
+    >:last-child {
+      border-bottom: none;
+    }
+  }
+}
+
+@media only screen and (max-width: $breakpoint-small-max-px) {
+  .ProfileActivity {
+    width: 100%;
+
+    .activity-nav {
+      padding: 24px 24px 0 24px;
+    }
+
+    .activity-section {
+      padding: 0 24px 24px 24px;
+    }
+  }
+}

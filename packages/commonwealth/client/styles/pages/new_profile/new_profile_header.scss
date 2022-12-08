@@ -1,0 +1,67 @@
+@import 'client/styles/shared';
+@import 'construct-ui/src/_shared/_colors';
+
+.ProfileHeader {
+  margin-right: 24px;
+  border: 1px solid $neutral-200;
+  border-radius: 16px;
+  padding: 24px;
+  height: fit-content;
+  width: 35%;
+
+  .profile-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      height: 160px;
+    }
+  }
+
+  .profile-name-and-bio {
+    .bio {
+      margin-top: 16px;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 24px;
+
+      > :first-child {
+        margin-right: 8px;
+      }
+    }
+
+    .name {
+      margin-bottom: 24px;
+      justify-content: center;
+    }
+
+    .read-more {
+      margin: 8px 0;
+      color: $primary-500;
+      &:hover {
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: $breakpoint-small-max-px) {
+  .ProfileHeader {
+    width: 100%;
+    max-width: none;
+    margin-bottom: 16px;
+    margin-right: 0;
+
+    .profile-name-and-bio { 
+      .buttons {
+        .Button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}

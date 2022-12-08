@@ -1,8 +1,10 @@
+/* @jsx m */
+
 import m from 'mithril';
 import $ from 'jquery';
 import ClassComponent from 'class_component';
 
-import 'pages/new_profile.scss';
+import 'pages/new_profile/index.scss';
 
 import app from 'state';
 import {
@@ -36,7 +38,7 @@ type NewProfileAttrs = {
 const NoAddressFoundError = 'No address found';
 const NoProfileFoundError = 'No profile found';
 
-export class NewProfile extends ClassComponent<NewProfileAttrs> {
+export default class NewProfile extends ClassComponent<NewProfileAttrs> {
   private address: string;
   private addresses: Array<AddressInfo>;
   private chains: Array<ChainInfo>;

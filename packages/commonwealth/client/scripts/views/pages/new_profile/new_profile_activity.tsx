@@ -4,7 +4,7 @@ import m from 'mithril';
 import moment from 'moment';
 import ClassComponent from 'class_component';
 
-import 'pages/new_profile.scss';
+import 'pages/new_profile/new_profile_activity.scss';
 
 import app from 'state';
 import Thread from 'client/scripts/models/Thread';

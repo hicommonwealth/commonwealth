@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import jdenticon from 'jdenticon';
 
-import 'pages/new_profile.scss';
+import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
 import { NewProfile as Profile, SocialAccount } from 'client/scripts/models';
