@@ -17,10 +17,10 @@ import {
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
-import { NewProfileActivity } from './new_profile_activity';
 import { NewProfileHeader } from './new_profile_header';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { NewProfileActivity } from './new_profile_activity';
 
 enum ProfileError {
   InsufficientProfileData, // when does this get used?
@@ -154,5 +154,3 @@ export class NewProfile extends ClassComponent<NewProfileAttrs> {
     return <Sublayout>{this.content}</Sublayout>;
   }
 }
-
-export default NewProfile;

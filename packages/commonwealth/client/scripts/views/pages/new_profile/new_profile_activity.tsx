@@ -44,11 +44,12 @@ type NewProfileActivityContentAttrs = {
 type NewProfileActivityRowAttrs = {
   activity: Comment<IUniqueId> | Thread;
   address: string;
+  charLimit: number;
 };
 
 class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
-    const { activity, address } = vnode.attrs;
+    const { activity, address, charLimit } = vnode.attrs;
     const { chain, createdAt, plaintext, author, title } = activity;
 
     // force redraw or on initial load comments don't render
