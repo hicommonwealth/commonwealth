@@ -407,11 +407,7 @@ export function isImplicitlyPermitted(
   // Check whether the key (which is an action) is permitted
   for (let [key, value] of IMPLICIT_PERMISSIONS_BY_ACTION) {
     if (value.includes(actionNumber)) {
-      console.log("key", key);
-      if (isPermitted(permission, key)) {
-        return true;
-      }
-      return false;
+      return isPermitted(permission, key);
     }
   }
   return false;
