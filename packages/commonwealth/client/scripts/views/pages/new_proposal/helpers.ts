@@ -33,17 +33,10 @@ import {
 
 export const createNewProposal = (
   state,
-  callback,
-  typeEnum,
+  typeEnum: ProposalType,
   author,
   onChangeSlugEnum
 ) => {
-  const done = (result) => {
-    state.error = '';
-    callback(result);
-    return result;
-  };
-
   let createFunc: (...args) => ITXModalData | Promise<ITXModalData> = (a) => {
     return (
       proposalSlugToClass().get(typeEnum) as ProposalModule<any, any, any>
@@ -64,7 +57,6 @@ export const createNewProposal = (
         state.form.topicId,
         state.form.description
       )
-      .then(done)
       .then(() => {
         m.redraw();
       })
@@ -202,7 +194,7 @@ export const createNewProposal = (
       throw new Error('Invalid council motion type');
     }
 
-    return createTXModal(createFunc(args)).then(done);
+    return createTXModal(createFunc(args));
   } else if (typeEnum === ProposalType.SubstrateTreasuryProposal) {
     if (!state.form.beneficiary) {
       throw new Error('Invalid beneficiary address');
@@ -220,12 +212,6 @@ export const createNewProposal = (
       throw new Error('Invalid value');
     }
 
-    args = [author, state.form.value, state.form.title];
-
-    createFunc = ([a, v, t]) =>
-      (app.chain as Substrate).bounties.createTx(a, v, t);
-    return createTXModal(createFunc(args)).then(done);
-  } else if (typeEnum === ProposalType.SubstrateBountyProposal) {
     if (!state.form.reason) {
       throw new Error('Invalid reason');
     }
@@ -236,7 +222,17 @@ export const createNewProposal = (
 
     const beneficiary = app.chain.accounts.get(state.form.beneficiary);
 
-    args = [state.form.reason, beneficiary];
+    args = [
+      state.form.reason,
+      beneficiary,
+      author,
+      state.form.value,
+      state.form.title,
+    ];
+
+    createFunc = ([a, v, t]) =>
+      (app.chain as Substrate).bounties.createTx(a, v, t);
+    return createTXModal(createFunc(args));
   } else if (typeEnum === ProposalType.PhragmenCandidacy) {
     args = [author];
 
@@ -277,7 +273,6 @@ export const createNewProposal = (
     (app.chain as Cosmos).governance
       .submitProposalTx(author as CosmosAccount, deposit, prop)
       .then((result) => {
-        done(result);
         navigateToSubpage(`/proposal/${result}`);
       })
       .catch((err) => notifyError(err.message));
@@ -314,7 +309,6 @@ export const createNewProposal = (
         details
       )
       // TODO: handling errors?
-      .then((result) => done(result))
       .then(() => m.redraw())
       .catch((err) => notifyError(err.data?.message || err.message));
     return;
@@ -368,10 +362,6 @@ export const createNewProposal = (
 
     (app.chain as Compound).governance
       .propose(details)
-      .then((result: string) => {
-        done(result);
-        return result;
-      })
       .then((result: string) => {
         notifySuccess(`Proposal ${result} created successfully!`);
         m.redraw();
@@ -430,7 +420,6 @@ export const createNewProposal = (
 
     (app.chain as Aave).governance
       .propose(details)
-      .then((result) => done(result))
       .then(() => m.redraw())
       .catch((err) => notifyError(err.data?.message || err.message));
 
@@ -484,7 +473,6 @@ export const createNewProposal = (
     }
     (app.chain as NearSputnik).dao
       .proposeTx(description, propArgs)
-      .then((result) => done(result))
       .then(() => m.redraw())
       .catch((err) => notifyError(err.message));
 
@@ -500,7 +488,7 @@ export const createNewProposal = (
   } else {
     throw new Error('Invalid proposal type');
   }
-  Promise.resolve(createFunc(args))
-    .then((modalData) => createTXModal(modalData))
-    .then(done);
+  Promise.resolve(createFunc(args)).then((modalData) =>
+    createTXModal(modalData)
+  );
 };

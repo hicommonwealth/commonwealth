@@ -37,9 +37,8 @@ import {
 } from './types';
 
 type NewProposalFormAttrs = {
-  callback?;
-  typeEnum;
-  onChangeSlugEnum;
+  onChangeSlugEnum: (slug: any) => void;
+  typeEnum: ProposalType;
 };
 
 // this should be titled the Substrate/Edgeware new proposal form
@@ -54,7 +53,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
   private deposit;
   private description;
   private enactmentDelay;
-  private error;
   private executor;
   private form: {
     amount;
@@ -104,13 +102,9 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
   }
 
   view(vnode: m.Vnode<NewProposalFormAttrs>) {
-    const { callback, onChangeSlugEnum, typeEnum } = vnode.attrs;
+    const { onChangeSlugEnum, typeEnum } = vnode.attrs;
 
     const author = app.user.activeAccount;
-
-    // if (!callback) {
-    //   return <CWText>Must have callback</CWText>;
-    // }
 
     if (!author) {
       return <CWText>Must be logged in</CWText>;
@@ -119,6 +113,25 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     if (app.chain?.network === ChainNetwork.Plasm) {
       return <CWText>Unsupported network</CWText>;
     }
+
+    // check typeEnum against supported types (use Omit on ProposalType?)
+
+    // SubstrateDemocracyProposal = 'democracyproposal',
+    // SubstrateBountyProposal = 'bountyproposal',
+    // SubstrateTreasuryTip = 'treasurytip',
+    // SubstrateCollectiveProposal = 'councilmotion',
+    // PhragmenCandidacy = 'phragmenelection',
+    // SubstrateTreasuryProposal = 'treasuryproposal',
+    // Thread = 'discussion',
+    // CosmosProposal = 'cosmosproposal',
+    // MolochProposal = 'molochproposal',
+    // CompoundProposal = 'compoundproposal',
+    // AaveProposal = 'onchainproposal',
+    // SputnikProposal = 'sputnikproposal',
+
+    // else {
+    //   return <div class="NewProposalForm">Invalid proposal type</div>;
+    // }
 
     let hasAction: boolean;
     let hasDepositChooser: boolean;
@@ -167,8 +180,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
       dataLoaded = !!elections.initialized;
     } else if (typeEnum === ProposalType.CosmosProposal) {
       dataLoaded = !!(app.chain as Cosmos).governance.initialized;
-    } else {
-      return <div class="NewProposalForm">Invalid proposal type</div>;
     }
 
     if (
@@ -191,18 +202,16 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut
       ) {
-        return (
-          <ErrorPage message="Could not connect to chain" title="Proposals" />
-        );
+        return <ErrorPage message="Could not connect to chain" />;
+      } else {
+        return <CWSpinner />;
       }
-      return <CWSpinner />;
     }
 
     const { activeAaveTabIndex, aaveProposalState } = this;
 
     return (
       <div class="NewProposalForm">
-        {this.error && <div class="error">{this.error.message}</div>}
         {typeEnum === ProposalType.SubstrateCollectiveProposal && (
           <>
             <CWDropdown
@@ -264,8 +273,9 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
               placeholder="Enter a description"
               oninput={(e) => {
                 const result = (e.target as any).value;
-                if (this.form.description === result) return;
-                this.form.description = result;
+                if (this.form.description !== result) {
+                  this.form.description = result;
+                }
                 m.redraw();
               }}
             />
@@ -755,30 +765,34 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                 m.redraw();
               }}
             />
-            <CWLabel label="Delegate Call" />
-            <div>
-              <CWButton
-                label="TRUE"
-                // class: `button ${
-                //   aaveProposalState[activeAaveTabIndex].withDelegateCall ===
-                //     true && 'active'
-                // }`,
-                onclick={() => {
-                  this.aaveProposalState[activeAaveTabIndex].withDelegateCall =
-                    true;
-                }}
-              />
-              <CWButton
-                label="FALSE"
-                // class: `ml-12 button ${
-                //   aaveProposalState[activeAaveTabIndex].withDelegateCall ===
-                //     false && 'active'
-                // }`,
-                onclick={() => {
-                  this.aaveProposalState[activeAaveTabIndex].withDelegateCall =
-                    false;
-                }}
-              />
+            <div class="delegate-call-container">
+              <CWLabel label="Delegate Call" />
+              <div class="buttons-row">
+                <CWButton
+                  label="TRUE"
+                  // class: `button ${
+                  //   aaveProposalState[activeAaveTabIndex].withDelegateCall ===
+                  //     true && 'active'
+                  // }`,
+                  onclick={() => {
+                    this.aaveProposalState[
+                      activeAaveTabIndex
+                    ].withDelegateCall = true;
+                  }}
+                />
+                <CWButton
+                  label="FALSE"
+                  // class: `ml-12 button ${
+                  //   aaveProposalState[activeAaveTabIndex].withDelegateCall ===
+                  //     false && 'active'
+                  // }`,
+                  onclick={() => {
+                    this.aaveProposalState[
+                      activeAaveTabIndex
+                    ].withDelegateCall = false;
+                  }}
+                />
+              </div>
             </div>
           </div>
         )}
@@ -887,8 +901,9 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
               placeholder="Enter a description"
               oninput={(e) => {
                 const result = (e.target as any).value;
-                if (this.form.description === result) return;
-                this.form.description = result;
+                if (this.form.description !== result) {
+                  this.form.description = result;
+                }
                 m.redraw();
               }}
             />
@@ -965,8 +980,9 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
               placeholder="What’s the reason you want to tip the beneficiary?"
               oninput={(e) => {
                 const result = (e.target as any).value;
-                if (this.form.description === result) return;
-                this.form.description = result;
+                if (this.form.description !== result) {
+                  this.form.description = result;
+                }
                 m.redraw();
               }}
             />
@@ -984,13 +1000,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           }
           onclick={(e) => {
             e.preventDefault();
-            createNewProposal(
-              this,
-              callback,
-              typeEnum,
-              author,
-              onChangeSlugEnum
-            );
+            createNewProposal(this, typeEnum, author, onChangeSlugEnum);
           }}
         />
       </div>

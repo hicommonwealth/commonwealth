@@ -76,7 +76,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
     return (
       <Sublayout>
         <div class="NewProposalPage">
-          <CWText>
+          <CWText type="h3" fontWeight="medium">
             {this.titlePre} {proposalSlugToFriendlyName.get(this.typeEnum)}
           </CWText>
           <NewProposalForm
