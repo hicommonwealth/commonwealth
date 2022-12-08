@@ -1,15 +1,15 @@
 /* @jsx m */
 
 import m from 'mithril';
-import app from 'state';
-import jdenticon from 'jdenticon';
 import ClassComponent from 'class_component';
+import jdenticon from 'jdenticon';
 
+import 'pages/new_profile.scss';
+
+import app from 'state';
 import { NewProfile as Profile, SocialAccount } from 'client/scripts/models';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../../components/component_kit/cw_button';
-
-import 'pages/new_profile.scss';
 import { CWText } from '../../components/component_kit/cw_text';
 
 type NewProfileHeaderAttrs = {
@@ -21,7 +21,7 @@ type NewProfileHeaderAttrs = {
 type NewProfileBioAttrs = {
   bio: string;
   isBioExpanded: boolean;
-}
+};
 
 const DefaultProfileName = 'Anonymous';
 const DefaultProfileBio = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sollicitudin vitae faucibus eros
@@ -31,8 +31,8 @@ Cursus et nulla erat pellentesque vitae, amet leo est aliquet. Ornare gravida vi
 const maxBioCharCount = 190;
 // TODO: Adjust value for responsiveness
 
-const SocialAccounts: m.Component<NewProfileHeaderAttrs> = {
-  view: (vnode) => {
+class SocialAccounts extends ClassComponent<NewProfileHeaderAttrs> {
+  view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
     const { socialAccounts } = vnode.attrs;
 
     return socialAccounts?.map((account) => (
@@ -58,10 +58,10 @@ const SocialAccounts: m.Component<NewProfileHeaderAttrs> = {
       </div>
     ));
   }
-};
+}
 
-const Bio: m.Component<NewProfileBioAttrs> = {
-  view: (vnode) => {
+class Bio extends ClassComponent<NewProfileBioAttrs> {
+  view(vnode: m.Vnode<NewProfileBioAttrs>) {
     const { bio, isBioExpanded } = vnode.attrs;
 
     if (bio?.length > maxBioCharCount && !isBioExpanded) {
@@ -100,36 +100,19 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
         </div>
 
         <div class="profile-name-and-bio">
-          <CWText
-            type="h3"
-            className="name"
-          >
+          <CWText type="h3" className="name">
             {profile?.name ? profile.name : DefaultProfileName}
           </CWText>
           <div class="buttons">
-            <CWButton
-              label="Delegate"
-              buttonType="mini"
-              onClick={() => {}}
-            />
-            <CWButton
-              label="Follow"
-              buttonType="mini"
-              onClick={() => {}}
-            />
+            <CWButton label="Delegate" buttonType="mini" onClick={() => {}} />
+            <CWButton label="Follow" buttonType="mini" onClick={() => {}} />
           </div>
           {m(SocialAccounts, vnode.attrs)}
-          <CWText
-            type="h4"
-          >
-            Bio
-          </CWText>
-          <CWText
-            className="bio"
-          >
+          <CWText type="h4">Bio</CWText>
+          <CWText className="bio">
             {m(Bio, { bio, isBioExpanded: this.isBioExpanded })}
           </CWText>
-          {(bio.length > maxBioCharCount) && (
+          {bio.length > maxBioCharCount && (
             <div
               class="read-more"
               onclick={() => {
@@ -143,23 +126,21 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
 
         <div class="edit">
           {app.isLoggedIn() &&
-          app.user.addresses
-            .map((addressInfo) => addressInfo.address)
-            .includes(address) && (
-            <div class="edit-button">
-              <CWButton
-                label="Edit"
-                buttonType="primary-blue"
-                onclick={() =>
-                  m.route.set(`/profile/${m.route.param('address')}/edit`)
-                }
-              />
-            </div>
-          )}
+            app.user.addresses
+              .map((addressInfo) => addressInfo.address)
+              .includes(address) && (
+              <div class="edit-button">
+                <CWButton
+                  label="Edit"
+                  buttonType="primary-blue"
+                  onclick={() =>
+                    m.route.set(`/profile/${m.route.param('address')}/edit`)
+                  }
+                />
+              </div>
+            )}
         </div>
       </div>
     );
   }
 }
-
-export default NewProfileHeader;

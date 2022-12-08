@@ -1,11 +1,10 @@
 import m from 'mithril';
-import app from 'state';
 import $ from 'jquery';
-import { Spinner } from 'construct-ui';
 import ClassComponent from 'class_component';
 
 import 'pages/new_profile.scss';
 
+import app from 'state';
 import {
   Thread,
   IUniqueId,
@@ -18,9 +17,10 @@ import {
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
-import NewProfileActivity from "./new_profile_activity";
-import NewProfileHeader from "./new_profile_header";
+import { NewProfileActivity } from './new_profile_activity';
+import { NewProfileHeader } from './new_profile_header';
 import Sublayout from '../../sublayout';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 enum ProfileError {
   None,
@@ -48,9 +48,7 @@ export class NewProfile extends ClassComponent<NewProfileAttrs> {
   private error: ProfileError;
   private content: m.Vnode;
 
-  private _getProfileData = async (
-    address: string,
-  ) => {
+  private _getProfileData = async (address: string) => {
     try {
       const response = await $.get(`${app.serverUrl()}/profile/v2`, {
         address,
@@ -89,9 +87,9 @@ export class NewProfile extends ClassComponent<NewProfileAttrs> {
         this.error = ProfileError.NoProfileFound;
       }
     }
-  }
+  };
 
-  oninit (vnode: m.Vnode<NewProfileAttrs>) {
+  oninit() {
     this.address = m.route.param('address');
     this.loading = true;
     this.error = ProfileError.None;
@@ -101,15 +99,15 @@ export class NewProfile extends ClassComponent<NewProfileAttrs> {
     this.loading = false;
   }
 
-  view(vnode: m.Vnode<NewProfileAttrs>) {
+  view() {
     if (this.loading)
       this.content = (
         <div class="ProfilePage">
           <div class="loading-spinner">
-            <Spinner active size="lg" />
+            <CWSpinner />
           </div>
         </div>
-      )
+      );
 
     if (this.error === ProfileError.NoAddressFound)
       this.content = (
@@ -117,7 +115,8 @@ export class NewProfile extends ClassComponent<NewProfileAttrs> {
           <div class="ErrorPage">
             <h3>Not on Commonwealth</h3>
             <p>
-              If this is your address, sign in using your wallet to set up a profile.
+              If this is your address, sign in using your wallet to set up a
+              profile.
             </p>
           </div>
         </div>
@@ -135,26 +134,24 @@ export class NewProfile extends ClassComponent<NewProfileAttrs> {
 
     if (this.error === ProfileError.None)
       this.content = (
-        m('.ProfilePage', [
-          m('.ProfilePageContainer', [
-            m(NewProfileHeader, {
-              profile: this.profile,
-              address: this.address,
-              socialAccounts: this.socialAccounts,
-              }),
-            m(NewProfileActivity, {
-              threads: this.threads,
-              comments: this.comments,
-              chains: this.chains,
-              addresses: this.addresses,
-            })
-          ]),
-        ])
+        <div class="ProfilePage">
+          <div class="ProfilePageContainer">
+            <NewProfileHeader
+              profile={this.profile}
+              address={this.address}
+              socialAccounts={this.socialAccounts}
+            />
+            <NewProfileActivity
+              threads={this.threads}
+              comments={this.comments}
+              chains={this.chains}
+              addresses={this.addresses}
+            />
+          </div>
+        </div>
       );
 
-    return m(Sublayout, [
-      this.content,
-    ]);
+    return <Sublayout>{this.content}</Sublayout>;
   }
 }
 

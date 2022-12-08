@@ -2,17 +2,16 @@
 
 import m from 'mithril';
 import moment from 'moment';
-import app from 'state';
 import ClassComponent from 'class_component';
 
+import 'pages/new_profile.scss';
+
+import app from 'state';
 import Thread from 'client/scripts/models/Thread';
 import ChainInfo from 'client/scripts/models/ChainInfo';
 import Comment from 'client/scripts/models/Comment';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import { IUniqueId } from 'client/scripts/models/interfaces';
-
-import 'pages/new_profile.scss';
-
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTag } from '../../components/component_kit/cw_tag';
@@ -40,16 +39,16 @@ type NewProfileActivityContentAttrs = {
   commentCharLimit: number;
   threadCharLimit: number;
   address: string;
-}
+};
 
 type NewProfileActivityRowAttrs = {
   activity: Comment<IUniqueId> | Thread;
   charLimit: number;
   address: string;
-}
+};
 
-const ActivityRow: m.Component<NewProfileActivityRowAttrs> = {
-  view: (vnode) => {
+class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
+  view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
     const { charLimit, activity, address } = vnode.attrs;
     const { chain, createdAt, plaintext, author, title } = activity;
 
@@ -59,27 +58,20 @@ const ActivityRow: m.Component<NewProfileActivityRowAttrs> = {
     return (
       <div className="activity">
         <div className="chain-info">
-          <CWText fontWeight="semiBold">
-            {chain}
-          </CWText>
-          <div className="dot">
-            .
-          </div>
-          <CWTag
-            label={author.slice(0, 5)}
-          />
-          <div className="dot">
-            .
-          </div>
+          <CWText fontWeight="semiBold">{chain}</CWText>
+          <div className="dot">.</div>
+          <CWTag label={author.slice(0, 5)} />
+          <div className="dot">.</div>
           <div className="date">
-            <CWText
-              type="caption"
-              fontWeight="medium"
-            >{moment(createdAt).format('MM/DD/YYYY')}</CWText>
+            <CWText type="caption" fontWeight="medium">
+              {moment(createdAt).format('MM/DD/YYYY')}
+            </CWText>
           </div>
         </div>
         <CWText className="title">
-          {(activity as Thread).kind ? 'Created a thread' : 'Commented on the thread'}
+          {(activity as Thread).kind
+            ? 'Created a thread'
+            : 'Commented on the thread'}
           <CWText fontWeight="semiBold">&nbsp;{title}</CWText>
         </CWText>
         <CWText type="b2" className="gray-text">
@@ -90,49 +82,51 @@ const ActivityRow: m.Component<NewProfileActivityRowAttrs> = {
         <div className="actions">
           <SharePopover />
 
-      {app.user.addresses
-        .map((addressInfo) => addressInfo.address)
-        .includes(address)
-        && (
-          <CWPopoverMenu
-            trigger={
-              <CWIconButton
-                iconName="dotsVertical"
-                iconSize="small"
-              />
-            }
-            menuItems={[
-              { label: 'Edit', iconLeft: 'write' },
-              { label: 'Delete', iconLeft: 'trash' },
-            ]}
-          />
-        )}
+          {app.user.addresses
+            .map((addressInfo) => addressInfo.address)
+            .includes(address) && (
+            <CWPopoverMenu
+              trigger={
+                <CWIconButton iconName="dotsVertical" iconSize="small" />
+              }
+              menuItems={[
+                { label: 'Edit', iconLeft: 'write' },
+                { label: 'Delete', iconLeft: 'trash' },
+              ]}
+            />
+          )}
         </div>
       </div>
-    )
+    );
   }
 }
 
-const ActivityContent: m.Component<NewProfileActivityContentAttrs> = {
-  view: (vnode) => {
-    const { option, attrs, commentCharLimit, threadCharLimit, address } = vnode.attrs;
+class ActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
+  view(vnode: m.Vnode<NewProfileActivityContentAttrs>) {
+    const { option, attrs, commentCharLimit, threadCharLimit, address } =
+      vnode.attrs;
 
     if (option === ProfileActivity.Comments) {
-      return attrs.comments
-        .map((comment) => (
-          m(ActivityRow, { activity: comment, charLimit: commentCharLimit, address })
-        ));
-      }
+      return attrs.comments.map((comment) => (
+        <ActivityRow
+          activity={comment}
+          charLimit={commentCharLimit}
+          address={address}
+        />
+      ));
+    }
 
-      if (option === ProfileActivity.Threads) {
-        return attrs.threads
-          .map((thread) => (
-            m(ActivityRow, { activity: thread, charLimit: threadCharLimit, address })
-          ));
-      }
+    if (option === ProfileActivity.Threads) {
+      return attrs.threads.map((thread) => (
+        <ActivityRow
+          activity={thread}
+          charLimit={threadCharLimit}
+          address={address}
+        />
+      ));
+    }
   }
 }
-
 
 export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
   private address: string;
@@ -140,7 +134,7 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
   private commentCharLimit: number;
   private threadCharLimit: number;
 
-  oninit(vnode: m.Vnode<NewProfileActivityAttrs>) {
+  oninit() {
     this.address = m.route.param('address');
     this.selectedActivity = ProfileActivity.Comments;
     this.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
@@ -157,20 +151,18 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
     return (
       <div className="ProfileActivity">
         <div className="activity-nav">
-          <CWTabBar
-            className="tab-bar"
-          >
+          <CWTabBar className="tab-bar">
             <CWTab
               label="All Activity"
               onclick={() => {
-                this.selectedActivity = ProfileActivity.Comments
+                this.selectedActivity = ProfileActivity.Comments;
               }}
               isSelected={this.selectedActivity === ProfileActivity.Comments}
             />
             <CWTab
               label="Threads"
               onclick={() => {
-                this.selectedActivity = ProfileActivity.Threads
+                this.selectedActivity = ProfileActivity.Threads;
               }}
               isSelected={this.selectedActivity === ProfileActivity.Threads}
             />
@@ -178,31 +170,29 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
             <CWTab
               label="Communities"
               onclick={() => {
-                this.selectedActivity = ProfileActivity.Communities
+                this.selectedActivity = ProfileActivity.Communities;
               }}
               isSelected={this.selectedActivity === ProfileActivity.Communities}
             />
             <CWTab
               label="Addresses"
               onclick={() => {
-                this.selectedActivity = ProfileActivity.Addresses
+                this.selectedActivity = ProfileActivity.Addresses;
               }}
               isSelected={this.selectedActivity === ProfileActivity.Addresses}
             />
           </CWTabBar>
         </div>
         <div className="activity-section">
-          {m(ActivityContent, {
-            option: this.selectedActivity,
-            attrs: vnode.attrs,
-            commentCharLimit: this.commentCharLimit,
-            threadCharLimit: this.threadCharLimit,
-            address: this.address,
-          })}
+          <ActivityContent
+            option={this.selectedActivity}
+            attrs={vnode.attrs}
+            commentCharLimit={this.commentCharLimit}
+            threadCharLimit={this.threadCharLimit}
+            address={this.address}
+          />
         </div>
       </div>
     );
   }
 }
-
-export default NewProfileActivity;
