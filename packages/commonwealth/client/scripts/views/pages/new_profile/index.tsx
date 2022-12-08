@@ -18,15 +18,15 @@ import {
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
-import NewProfileActivity from "./new_profile_activity";
-import NewProfileHeader from "./new_profile_header";
+import NewProfileActivity from './new_profile_activity';
+import NewProfileHeader from './new_profile_header';
 import Sublayout from '../../sublayout';
 
 enum ProfileError {
+  InsufficientProfileData, // when does this get used?
   None,
   NoAddressFound,
   NoProfileFound,
-  InsufficientProfileData, // when does this get used?
 }
 
 type NewProfileAttrs = {
@@ -38,15 +38,15 @@ const NoProfileFoundError = 'No profile found';
 
 export class NewProfile extends ClassComponent<NewProfileAttrs> {
   private address: string;
+  private addresses: Array<AddressInfo>;
+  private chains: Array<ChainInfo>;
+  private content: m.Vnode;
+  private comments: Array<Comment<IUniqueId>>;
+  private error: ProfileError;
+  private loading: boolean;
   private profile: Profile;
   private threads: Array<Thread>;
-  private comments: Array<Comment<IUniqueId>>;
-  private chains: Array<ChainInfo>;
-  private addresses: Array<AddressInfo>;
   private socialAccounts: Array<SocialAccount>;
-  private loading: boolean;
-  private error: ProfileError;
-  private content: m.Vnode;
 
   private _getProfileData = async (
     address: string,
