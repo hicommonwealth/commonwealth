@@ -5,8 +5,8 @@ import {
   isPermitted,
   PermissionError,
   BASE_PERMISSIONS,
+  aggregatePermissions,
 } from 'common-common/src/permissions';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';

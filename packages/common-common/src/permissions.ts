@@ -9,19 +9,20 @@ export enum PermissionError {
   NOT_PERMITTED = 'Action not permitted',
 }
 
+// Note all new actions MUST be added to the end of this list (some migrations are tied to this ordering)
 export enum Action {
   CREATE_CHAT = 0,
-  VIEW_CHAT_CHANNELS = 1,
-  CREATE_REACTION = 2,
-  VIEW_REACTIONS = 3,
-  DELETE_REACTION = 4,
-  CREATE_COMMENT = 5,
-  VIEW_COMMENTS = 6,
-  EDIT_COMMENT = 7,
-  DELETE_COMMENT = 8,
-  CREATE_POLL = 9,
-  VIEW_POLLS = 10,
-  VOTE_ON_POLLS = 11,
+  CREATE_REACTION = 1,
+  VIEW_REACTIONS = 2,
+  DELETE_REACTION = 3,
+  CREATE_COMMENT = 4,
+  VIEW_COMMENTS = 5,
+  EDIT_COMMENT = 6,
+  DELETE_COMMENT = 7,
+  CREATE_POLL = 8,
+  VIEW_POLLS = 9,
+  VOTE_ON_POLLS = 10,
+  VIEW_CHAT_CHANNELS = 11,
   CREATE_THREAD = 12,
   VIEW_THREADS = 13,
   EDIT_THREAD = 14,
@@ -379,22 +380,22 @@ export function removePermission(
 
 // Default Permissions
 export const BASE_PERMISSIONS: Permissions =
-  addPermission(BigInt(0), Action.VIEW_REACTIONS) |
-  addPermission(BigInt(0), Action.CREATE_REACTION) |
-  addPermission(BigInt(0), Action.DELETE_REACTION) |
-  addPermission(BigInt(0), Action.VIEW_COMMENTS) |
-  addPermission(BigInt(0), Action.CREATE_COMMENT) |
-  addPermission(BigInt(0), Action.EDIT_COMMENT) |
-  addPermission(BigInt(0), Action.DELETE_COMMENT) |
-  addPermission(BigInt(0), Action.VIEW_POLLS) |
-  addPermission(BigInt(0), Action.CREATE_POLL) |
-  addPermission(BigInt(0), Action.VOTE_ON_POLLS) |
-  addPermission(BigInt(0), Action.VIEW_TOPICS) |
+  // addPermission(BigInt(0), Action.VIEW_REACTIONS) |
+  // addPermission(BigInt(0), Action.CREATE_REACTION) |
+  // addPermission(BigInt(0), Action.DELETE_REACTION) |
+  // addPermission(BigInt(0), Action.VIEW_COMMENTS) |
+  // addPermission(BigInt(0), Action.CREATE_COMMENT) |
+  // addPermission(BigInt(0), Action.EDIT_COMMENT) |
+  // addPermission(BigInt(0), Action.DELETE_COMMENT) |
+  // addPermission(BigInt(0), Action.VIEW_POLLS) |
+  // addPermission(BigInt(0), Action.CREATE_POLL) |
+  // addPermission(BigInt(0), Action.VOTE_ON_POLLS) |
+  // addPermission(BigInt(0), Action.VIEW_TOPICS) |
   addPermission(BigInt(0), Action.CREATE_THREAD) |
-  addPermission(BigInt(0), Action.EDIT_THREAD) |
-  addPermission(BigInt(0), Action.DELETE_THREAD) |
-  addPermission(BigInt(0), Action.LINK_THREAD_TO_THREAD) |
-  addPermission(BigInt(0), Action.LINK_PROPOSAL_TO_THREAD) |
+  // addPermission(BigInt(0), Action.EDIT_THREAD) |
+  // addPermission(BigInt(0), Action.DELETE_THREAD) |
+  // addPermission(BigInt(0), Action.LINK_THREAD_TO_THREAD) |
+  // addPermission(BigInt(0), Action.LINK_PROPOSAL_TO_THREAD) |
   addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
   addPermission(BigInt(0), Action.VIEW_THREADS);
 
