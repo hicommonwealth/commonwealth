@@ -3,8 +3,20 @@ import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from 'server/util/queries';
 import { GetReactionsReq, GetReactionsResp, IPagination } from 'common-common/src/api/extApiTypes';
+import { query } from 'express-validator';
 
 const { Op } = Sequelize;
+
+export const getThreadsValidation = [
+  query('community_id').isString().trim(),
+  query('topic_id').optional().isNumeric(),
+  query('count_only').optional().isBoolean().toBoolean(),
+  query('address_ids').optional().toArray(),
+  query('addresses').optional().toArray(),
+  query('no_body').optional().isBoolean().toBoolean(),
+  query('include_comments').optional().isBoolean().toBoolean(),
+  query('count_only').optional().isBoolean().toBoolean(),
+];
 
 const getReactions = async (
   models: DB,
