@@ -58,8 +58,8 @@ export const getNotificationTypeText = (category: string) => {
 };
 
 // export class BatchedSubscriptionRow
-//   implements
-//     m.ClassComponent<{
+//   extends
+//     ClassComponent<{
 //       subscriptions: NotificationSubscription[];
 //       label?: string;
 //     }>
@@ -283,8 +283,8 @@ export const getNotificationTypeText = (category: string) => {
 // }
 
 // export class NewThreadRow
-//   implements
-//     m.ClassComponent<{
+//   extends
+//     ClassComponent<{
 //       subscriptions: NotificationSubscription[];
 //       community: ChainInfo;
 //     }>
@@ -309,8 +309,8 @@ export const getNotificationTypeText = (category: string) => {
 // }
 
 // export class ChainEventSubscriptionRow
-//   implements
-//     m.ClassComponent<{
+//   extends
+//     ClassComponent<{
 //       title: string;
 //       notificationTypeArray: string[];
 //       recommended?: boolean;
@@ -460,8 +460,8 @@ export const getNotificationTypeText = (category: string) => {
 // }
 
 // export class IndividualCommunityNotifications
-//   implements
-//     m.ClassComponent<{
+//   extends
+//     ClassComponent<{
 //       community: ChainInfo;
 //       subscriptions: NotificationSubscription[];
 //     }>
@@ -528,8 +528,8 @@ export const getNotificationTypeText = (category: string) => {
 // }
 
 // export class AllCommunitiesNotifications
-//   implements
-//     m.ClassComponent<{
+//   extends
+//     ClassComponent<{
 //       subscriptions: NotificationSubscription[];
 //       communities: string[];
 //     }>
@@ -608,7 +608,7 @@ export const getNotificationTypeText = (category: string) => {
 //   }
 // }
 
-// export class EdgewareChainEventNotifications implements m.ClassComponent {
+// export class EdgewareChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -638,7 +638,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-//   export class KusamaChainEventNotifications implements m.ClassComponent {
+//   export class KusamaChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -668,7 +668,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-//   export class PolkadotChainEventNotifications implements m.ClassComponent {
+//   export class PolkadotChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -698,7 +698,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-//   export class KulupuChainEventNotifications implements m.ClassComponent {
+//   export class KulupuChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -728,7 +728,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-//   export class DydxChainEventNotifications implements m.ClassComponent {
+//   export class DydxChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
 //         m(ChainEventSubscriptionRow, {
@@ -745,7 +745,7 @@ export const getNotificationTypeText = (category: string) => {
 //     }
 //   }
 
-// export class EmailIntervalConfiguration implements m.ClassComponent {
+// export class EmailIntervalConfiguration extends ClassComponent {
 //     private interval: string;
 //     private saving: boolean;
 

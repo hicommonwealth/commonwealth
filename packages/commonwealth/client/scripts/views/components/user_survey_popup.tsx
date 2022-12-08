@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 
 import 'components/user_survey_popup.scss';
@@ -21,7 +22,7 @@ type UserSurveyViewAttrs = {
   onCheckboxClick: () => void;
 };
 
-class UserSurveyView implements m.ClassComponent<UserSurveyViewAttrs> {
+class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
   view(vnode: m.Vnode<UserSurveyViewAttrs>) {
     const { disabled, checked, onRedirectClick, onClose, onCheckboxClick } =
       vnode.attrs;
@@ -50,6 +51,7 @@ class UserSurveyView implements m.ClassComponent<UserSurveyViewAttrs> {
             />
           </div>
           <CWCheckbox
+            value=""
             checked={checked}
             label="Please don't show this again"
             onchange={onCheckboxClick}
@@ -95,7 +97,7 @@ type UserSurveyPopupAttrs = {
   surveyReadyForDisplay: boolean;
 };
 
-export class UserSurveyPopup implements m.ClassComponent<UserSurveyPopupAttrs> {
+export class UserSurveyPopup extends ClassComponent<UserSurveyPopupAttrs> {
   private surveyLocked: boolean;
   private hideForeverChecked: boolean; // radio button indicating whether the user wants to hide the survey forever
 

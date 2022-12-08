@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/comments/edit_comment.scss';
 
@@ -21,7 +22,7 @@ type EditCommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-export class EditComment implements m.ClassComponent<EditCommentAttrs> {
+export class EditComment extends ClassComponent<EditCommentAttrs> {
   private quillEditorState: QuillEditor;
   private saving: boolean;
 

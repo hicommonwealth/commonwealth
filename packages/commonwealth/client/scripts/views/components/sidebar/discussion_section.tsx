@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
 
@@ -28,9 +29,7 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class DiscussionSection
-  implements m.ClassComponent<SidebarSectionAttrs>
-{
+export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
   view() {
     // Conditional Render Details +
     const onAllDiscussionPage = (p) => {
@@ -45,7 +44,8 @@ export class DiscussionSection
       }
 
       return (
-        p === `/${app.activeChainId()}/discussions` || p === `/${app.activeChainId()}/discussions/`
+        p === `/${app.activeChainId()}/discussions` ||
+        p === `/${app.activeChainId()}/discussions/`
       );
     };
 

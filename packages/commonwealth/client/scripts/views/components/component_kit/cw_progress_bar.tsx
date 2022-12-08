@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_progress_bar.scss';
 
@@ -10,7 +11,7 @@ import { CWText } from './cw_text';
 import { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
 
-type ProgressBarStatus = 'failed' | 'neutral' | 'ongoing' | 'passed';
+type ProgressBarStatus = 'selected' | 'neutral' | 'ongoing' | 'passed';
 
 type ProgressBarAttrs = {
   label: string;
@@ -20,7 +21,7 @@ type ProgressBarAttrs = {
   iconName?: IconName;
 };
 
-export class CWProgressBar implements m.ClassComponent<ProgressBarAttrs> {
+export class CWProgressBar extends ClassComponent<ProgressBarAttrs> {
   view(vnode: m.Vnode<ProgressBarAttrs>) {
     const { label, progress, progressStatus, subtext, iconName } = vnode.attrs;
 

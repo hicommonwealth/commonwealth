@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
@@ -24,9 +25,7 @@ type QuillFormattedTextAttrs = {
   doc;
 } & QuillTextParams;
 
-export class QuillFormattedText
-  implements m.ClassComponent<QuillFormattedTextAttrs>
-{
+export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;
   private isTruncated: boolean;

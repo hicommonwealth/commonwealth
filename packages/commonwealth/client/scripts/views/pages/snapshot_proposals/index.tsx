@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 import { Button } from 'construct-ui';
 
@@ -31,9 +32,7 @@ type SnapshotProposalStagesBarAttrs = {
   onChangeFilter: (value: SnapshotProposalFilter) => void;
 };
 
-class SnapshotProposalStagesBar
-  implements m.Component<SnapshotProposalStagesBarAttrs>
-{
+class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
   view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
     return (
       <div class="DiscussionFilterBar">
@@ -66,9 +65,7 @@ type SnapshotProposalsPageAttrs = {
   snapshotId: string;
 };
 
-class SnapshotProposalsPage
-  implements m.ClassComponent<SnapshotProposalsPageAttrs>
-{
+class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
   private selectedFilter: SnapshotProposalFilter;
 
   oncreate() {

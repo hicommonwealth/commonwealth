@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -9,7 +10,7 @@ import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { NewThreadForm } from '../components/new_thread_form/new_thread_form';
 
-class NewThreadPage implements m.ClassComponent {
+class NewThreadPage extends ClassComponent {
   view() {
     if (!app.isLoggedIn()) {
       notifyInfo('You need to log in first');

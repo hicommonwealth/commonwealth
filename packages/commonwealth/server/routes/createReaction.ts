@@ -8,7 +8,7 @@ import {
   Action,
   PermissionError,
 } from 'common-common/src/permissions';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -16,7 +16,6 @@ import {
   getProposalUrl,
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
-import proposalIdToEntity from '../util/proposalIdToEntity';
 import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -66,7 +65,7 @@ const createReaction = async (
     return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
-  const { reaction, comment_id, proposal_id, thread_id } = req.body;
+  const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new AppError(Errors.NoPostId));
@@ -161,8 +160,7 @@ const createReaction = async (
 
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {
-    const chainEntity = await proposalIdToEntity(models, chain.id, proposal_id);
-    if (!chainEntity) return next(new AppError(Errors.NoProposalMatch));
+    if (!chain_entity_id) return next(new AppError(Errors.NoProposalMatch));
     const [prefix, id] = proposal_id.split('_');
     proposal = { id };
     root_type = proposal_id.split('_')[0];
@@ -258,7 +256,6 @@ const createReaction = async (
       chain: finalReaction.chain,
       body: comment_id ? comment.text : '',
     },
-    req.wss,
     [finalReaction.Address.address]
   );
 

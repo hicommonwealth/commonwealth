@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Tag } from 'construct-ui';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
@@ -23,9 +24,7 @@ type CommunityPreviewCardAttrs = {
   chain: ChainInfo;
 };
 
-class CommunityPreviewCard
-  implements m.ClassComponent<CommunityPreviewCardAttrs>
-{
+class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
   view(vnode: m.Vnode<CommunityPreviewCardAttrs>) {
     const { chain } = vnode.attrs;
     const { unseenPosts } = app.user;
@@ -75,7 +74,7 @@ class CommunityPreviewCard
   }
 }
 
-export class DashboardCommunitiesPreview implements m.ClassComponent {
+export class DashboardCommunitiesPreview extends ClassComponent {
   view() {
     const sortedChains = app.config.chains
       .getAll()

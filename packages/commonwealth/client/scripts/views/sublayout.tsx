@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'sublayout.scss';
 
@@ -20,7 +21,7 @@ type SublayoutAttrs = {
   onscroll?: () => void; // lazy loading for page content
 };
 
-class Sublayout implements m.ClassComponent<SublayoutAttrs> {
+class Sublayout extends ClassComponent<SublayoutAttrs> {
   private isWindowSmallInclusive: boolean;
 
   onResize() {

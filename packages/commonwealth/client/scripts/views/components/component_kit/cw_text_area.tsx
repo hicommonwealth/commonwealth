@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text_area.scss';
 
@@ -14,13 +15,15 @@ type TextAreaStyleAttrs = {
   validationStatus?: ValidationStatus;
 };
 
-export class CWTextArea implements m.ClassComponent<BaseTextInputAttrs> {
+type TextAreaAttrs = BaseTextInputAttrs & TextAreaStyleAttrs;
+
+export class CWTextArea extends ClassComponent<TextAreaAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode) {
+  view(vnode: m.Vnode<TextAreaAttrs>) {
     const {
       autocomplete,
       autofocus,
