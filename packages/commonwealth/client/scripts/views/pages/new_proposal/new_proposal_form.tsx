@@ -919,41 +919,35 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             }}
           />
         )}
-        {hasExternalProposalSelector && (
-          <CWDropdown
-            label="Proposal"
-            options={[]}
-            // options={(app.chain as Substrate).democracyProposals.nextExternal
-            //   ? [
-            //       {
-            //         value: (
-            //           app.chain as Substrate
-            //         ).democracyProposals.nextExternal[0].hash.toString(),
-            //         label: `${(
-            //           app.chain as Substrate
-            //         ).democracyProposals.nextExternal[0].hash
-            //           .toString()
-            //           .slice(0, 8)}...`,
-            //       },
-            //     ]
-            //   : []}
-            onSelect={(result) => {
-              this.nextExternalProposalHash = result;
-              m.redraw();
-            }}
-          />
-        )}
+        {hasExternalProposalSelector &&
+          (app.chain as Substrate).democracyProposals.nextExternal && (
+            <CWDropdown
+              label="Proposal"
+              options={{
+                value:
+                  app.chain.democracyProposals.nextExternal[0].hash.toString(),
+                label: `${(
+                  app.chain as Substrate
+                ).democracyProposals.nextExternal[0].hash
+                  .toString()
+                  .slice(0, 8)}...`,
+              }}
+              onSelect={(result) => {
+                this.nextExternalProposalHash = result;
+                m.redraw();
+              }}
+            />
+          )}
         {hasTreasuryProposalSelector && (
           <CWDropdown
             label="Treasury Proposal"
-            options={[]}
-            // options={(app.chain as Substrate).treasury.store
-            //   .getAll()
-            //   .map((r) => ({
-            //     name: 'external_proposal',
-            //     value: r.identifier,
-            //     label: r.shortIdentifier,
-            //   }))}
+            options={(app.chain as Substrate).treasury.store
+              .getAll()
+              .map((r) => ({
+                name: 'external_proposal',
+                value: r.identifier,
+                label: r.shortIdentifier,
+              }))}
             onSelect={(result) => {
               this.treasuryProposalIndex = result;
               m.redraw();
@@ -1163,7 +1157,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                   this.executor = r.address;
                 }}
               >
-                <div class="label">Address</div>,<div>{r.address}</div>
+                <div class="label">Address</div> <div>{r.address}</div>
                 <div class="label mt-16">Time Delay</div>
                 <div>{r.delay / (60 * 60 * 24)} Day(s)</div>
               </div>
@@ -1251,7 +1245,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
                 m.redraw();
               }}
             />
-            <CWLabel label="Delegate Call" />,
+            <CWLabel label="Delegate Call" />
             <div>
               <CWButton
                 label="TRUE"

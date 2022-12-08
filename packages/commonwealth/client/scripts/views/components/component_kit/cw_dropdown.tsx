@@ -6,14 +6,13 @@ import ClassComponent from 'class_component';
 import 'components/component_kit/cw_dropdown.scss';
 
 import { CWTextInput } from './cw_text_input';
-import { CWPopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { DefaultMenuItem } from './types';
+import { CWText } from './cw_text';
 
 type DropdownAttrs = {
   initialValue?: string;
   label: string;
   onSelect?: (label: string, index: number) => void;
-  options: Array<DefaultMenuItem>;
+  options: Array<{ label: string }>;
 };
 
 export class CWDropdown extends ClassComponent<DropdownAttrs> {
@@ -47,15 +46,16 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
           <div class="dropdown-options-display">
             {options.map((item, idx) => {
               return (
-                <CWPopoverMenuItem
-                  {...item}
-                  type="default"
+                <div
+                  class="dropdown-item"
                   onclick={() => {
                     this.showDropdown = false;
                     this.selectedValue = item.label;
                     if (onSelect) onSelect(item.label, idx);
                   }}
-                />
+                >
+                  <CWText className="dropdown-item-text">{item.label}</CWText>
+                </div>
               );
             })}
           </div>
