@@ -19,7 +19,7 @@ export default class WhyCommonwealthPage extends ClassComponent {
           </CWText>
           <div>
             <CWButton
-              label="See docs"
+              label="Read The Docs"
               onclick={(e) => {
                 e.preventDefault();
                 window.location.href =
@@ -35,13 +35,22 @@ export default class WhyCommonwealthPage extends ClassComponent {
             into featured tags, or lock threads to a select group of community
             members.
           </CWText>
+          <div>
+            <CWButton
+              label="Explore Our Communities"
+              onclick={(e) => {
+                e.preventDefault();
+                m.route.set('/communities');
+              }}
+            />
+          </div>
           <CWText>
             Commonwealth helps break down silos between chat apps like Discord,
             Telegram, and Riot by providing integrations for webhooks and
             bridges. Your community will be able to receive Commonwealth
             notifications wherever they are most comfortable.
           </CWText>
-          <CWText type="h3">Your tech should match your values.</CWText>
+          <CWText type="h2">Your tech should match your values.</CWText>
           <CWText type="h3">
             Crypto-native integrations for the most popular protocols.
           </CWText>

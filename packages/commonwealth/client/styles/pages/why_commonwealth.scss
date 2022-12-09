@@ -10,6 +10,15 @@
     text-align: center;
     padding: 16px;
   }
+  .b1 {
+    margin: 0 12vw;
+  }
+  .h2 {
+    background: -webkit-linear-gradient($purple-600, $primary-300);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
   img {
     max-width: 80%;
     height: auto;
