@@ -46,5 +46,6 @@ export default async function queryGlobalActivity(models: DB): Promise<GlobalAct
     type: 'SELECT',
     raw: true,
   });
-  return notifications;
+  // TODO: verify output type
+  return notifications as GlobalActivity;
 }
