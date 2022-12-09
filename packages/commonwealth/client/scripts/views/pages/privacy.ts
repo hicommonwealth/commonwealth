@@ -113,7 +113,7 @@ CONTACT US
 If you have any questions about this Privacy Statement, please contact us at: hello@commonwealth.im.
 `;
 
-const PrivacyPage: m.Component<{}> = {
+const PrivacyPage: m.Component = {
   view: () => {
     return m(Sublayout, [
       m('.PrivacyPage', [
