@@ -318,7 +318,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       //       // Graham TODO 22.10.05: Temporary fix while we wait for full
       //       // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
       //       // array
-      //       delete app.mobileMenu;
+      //       app.mobileMenu = null;
       //       m.redraw();
       //     },
       //   },
