@@ -39,6 +39,7 @@ import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorV
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import { StatsDController } from 'common-common/src/statsd';
 import {BrokerConfig} from "rascal";
+import GlobalActivityCache from './server/util/globalActivityCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -244,6 +245,9 @@ async function main() {
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   await ruleCache.start();
   const banCache = new BanCache(models);
+  const globalActivityCache = new GlobalActivityCache(models);
+  // TODO: should we await this? it will block server startup -- but not a big deal locally
+  await globalActivityCache.start();
   setupAPI(
     app,
     models,
@@ -251,6 +255,7 @@ async function main() {
     tokenBalanceCache,
     ruleCache,
     banCache,
+    globalActivityCache,
   );
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
