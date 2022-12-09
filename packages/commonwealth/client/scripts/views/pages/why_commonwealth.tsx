@@ -13,7 +13,7 @@ export default class WhyCommonwealthPage extends ClassComponent {
   view() {
     return (
       <Sublayout>
-        <div class="WhyCommonwealth">
+        <div class="WhyCommonwealthPage">
           <CWText type="h2">
             Crypto-native communities deserve crypto-native software.
           </CWText>

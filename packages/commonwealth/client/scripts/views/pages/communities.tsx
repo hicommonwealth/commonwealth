@@ -1,12 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import numeral from 'numeral';
-
 import 'pages/communities.scss';
 
+import m from 'mithril';
+
 import app from 'state';
+
+import ClassComponent from 'class_component';
+import numeral from 'numeral';
 import { ChainInfo } from 'models';
 import {
   ChainBase,
