@@ -9,7 +9,11 @@ import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-export type RadioButton = { label?: string; value: string; disabled?: boolean };
+export type RadioButtonType = {
+  label?: string;
+  value: string;
+  disabled?: boolean;
+};
 
 type RadioButtonStyleAttrs = {
   disabled?: boolean;
@@ -19,7 +23,7 @@ type RadioButtonStyleAttrs = {
 type RadioButtonAttrs = {
   groupName?: string;
   onchange?: (e?: any) => void;
-} & RadioButton &
+} & Omit<RadioButtonType, 'disabled'> &
   RadioButtonStyleAttrs;
 
 export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {

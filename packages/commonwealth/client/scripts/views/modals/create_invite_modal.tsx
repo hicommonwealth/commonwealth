@@ -482,7 +482,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
                 },
                 trigger: (
                   <CWButton
-                    iconName="chevronDown"
+                    iconLeft="chevronDown"
                     buttonType="lg-secondary-blue"
                     label={selectedChainId}
                   />

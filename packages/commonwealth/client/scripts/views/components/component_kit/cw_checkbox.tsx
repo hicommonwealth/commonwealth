@@ -9,7 +9,7 @@ import { ComponentType, StyleAttrs } from './types';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 
-type Checkbox = { label?: string; value?: string };
+export type CheckboxType = { label?: string; value?: string };
 
 type CheckboxStyleAttrs = {
   checked?: boolean;
@@ -19,7 +19,7 @@ type CheckboxStyleAttrs = {
 type CheckboxAttrs = {
   groupName?: string;
   onchange?: (e?: any) => void;
-} & Checkbox &
+} & CheckboxType &
   CheckboxStyleAttrs;
 
 export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
@@ -27,7 +27,6 @@ export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
     const {
       className,
       disabled = false,
-      groupName,
       indeterminate = false,
       label,
       onchange,
@@ -37,7 +36,6 @@ export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
 
     const params = {
       disabled,
-      name: groupName,
       onchange,
       checked,
       type: 'checkbox',
