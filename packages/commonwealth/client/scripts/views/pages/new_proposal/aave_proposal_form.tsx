@@ -13,10 +13,10 @@ import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 
 type AaveProposalFormAttrs = {
   author: Account;
@@ -184,31 +184,15 @@ export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
             m.redraw();
           }}
         />
-        <div class="delegate-call-container">
-          <CWLabel label="Delegate Call" />
-          <div class="buttons-row">
-            <CWButton
-              label="TRUE"
-              // class: `button ${
-              //   aaveProposalState[activeAaveTabIndex].withDelegateCall ===
-              //     true && 'active'
-              // }`,
-              onclick={() => {
-                this.aaveProposalState[activeTabIndex].withDelegateCall = true;
-              }}
-            />
-            <CWButton
-              label="FALSE"
-              // class: `ml-12 button ${
-              //   aaveProposalState[activeAaveTabIndex].withDelegateCall ===
-              //     false && 'active'
-              // }`,
-              onclick={() => {
-                this.aaveProposalState[activeTabIndex].withDelegateCall = false;
-              }}
-            />
-          </div>
-        </div>
+        <CWCheckbox
+          checked={this.aaveProposalState[activeTabIndex].withDelegateCall}
+          onchange={() => {
+            this.aaveProposalState[activeTabIndex].withDelegateCall =
+              !this.aaveProposalState[activeTabIndex].withDelegateCall;
+          }}
+          label="Delegate Call"
+          value=""
+        />
       </div>
     );
   }
