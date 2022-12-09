@@ -116,18 +116,25 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
 
     // check typeEnum against supported types (use Omit on ProposalType?)
 
-    // SubstrateDemocracyProposal = 'democracyproposal',
-    // SubstrateBountyProposal = 'bountyproposal',
-    // SubstrateTreasuryTip = 'treasurytip',
-    // SubstrateCollectiveProposal = 'councilmotion',
-    // PhragmenCandidacy = 'phragmenelection',
-    // SubstrateTreasuryProposal = 'treasuryproposal',
+    // unsupported?
+    // SubstrateDemocracyReferendum = 'referendum',
+    // SubstrateImminentPreimage = 'democracyimminent',
+    // SubstratePreimage = 'democracypreimage',
+    // SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
     // Thread = 'discussion',
+
+    // supported?
+    // AaveProposal = 'onchainproposal',
+    // CompoundProposal = 'compoundproposal',
     // CosmosProposal = 'cosmosproposal',
     // MolochProposal = 'molochproposal',
-    // CompoundProposal = 'compoundproposal',
-    // AaveProposal = 'onchainproposal',
+    // PhragmenCandidacy = 'phragmenelection',
     // SputnikProposal = 'sputnikproposal',
+    // SubstrateBountyProposal = 'bountyproposal',
+    // SubstrateCollectiveProposal = 'councilmotion',
+    // SubstrateDemocracyProposal = 'democracyproposal',
+    // SubstrateTreasuryProposal = 'treasuryproposal',
+    // SubstrateTreasuryTip = 'treasurytip',
 
     // else {
     //   return <div class="NewProposalForm">Invalid proposal type</div>;

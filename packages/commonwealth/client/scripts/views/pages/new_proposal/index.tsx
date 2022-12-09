@@ -68,6 +68,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
       any,
       any
     >;
+
     if (!c.ready) {
       app.chain.loadModules([c]);
       return <PageLoading />;
