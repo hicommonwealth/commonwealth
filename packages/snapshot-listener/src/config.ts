@@ -1,3 +1,6 @@
+/* eslint-disable indent,prefer-template,operator-linebreak */
+require('dotenv').config();
+
 export const RABBITMQ_URI = (() => {
   if (!process.env.CLOUDAMQP_URL || process.env.NODE_ENV === "development") {
     if (
@@ -8,3 +11,5 @@ export const RABBITMQ_URI = (() => {
     } else return "amqp://localhost";
   } else return process.env.CLOUDAMQP_URL;
 })();
+
+export const DEFAULT_PORT = '8001';

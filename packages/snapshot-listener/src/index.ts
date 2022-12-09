@@ -1,18 +1,18 @@
-import express, { Request, Response } from "express";
-import { SnapshotEvent } from "./types";
+import express, {Request, Response} from "express";
+import {SnapshotEvent} from "./types";
 import {
   RascalPublications,
   RabbitMQController,
   getRabbitMQConfig,
 } from "common-common/src/rabbitmq";
-import { factory, formatFilename } from "common-common/src/logging";
-import { RABBITMQ_URI } from "./config";
+import {factory, formatFilename} from "common-common/src/logging";
+import {RABBITMQ_URI} from "./config";
 import fetchNewSnapshotProposal from "./utils/fetchSnapshot";
-import dotenv from "dotenv";
-dotenv.config();
+import {DEFAULT_PORT} from "./config"
+
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT || DEFAULT_PORT;
 app.use(express.json());
 
 let controller: RabbitMQController;
@@ -40,7 +40,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     event.expire = response.data.proposal.end;
 
     await controller.publish(event, RascalPublications.SnapshotListener);
-    res.status(200).send({ message: "Snapshot event received", event });
+    res.status(200).send({message: "Snapshot event received", event});
   } catch (err) {
     console.log(err);
     res.status(500).send("error: " + err);
@@ -53,7 +53,7 @@ app.listen(port, async () => {
 
   try {
     controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
-    controller.init();
+    await controller.init();
     console.log(`Server listening on port ${port}`);
   } catch (err) {
     log.error(`Error starting server: ${err}`);

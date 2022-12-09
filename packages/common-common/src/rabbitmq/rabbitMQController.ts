@@ -120,6 +120,7 @@ export class RabbitMQController {
       subscription = await this.broker.subscribe(subscriptionName);
 
       subscription.on("message", (message, content, ackOrNack) => {
+        console.log("RabbitMQ Message:", content);
         messageProcessor
           .call({ rmqController: this, ...msgProcessorContext }, content)
           .then(() => {
