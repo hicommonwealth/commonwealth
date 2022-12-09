@@ -362,7 +362,6 @@ export function addPermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result |= BigInt(1) << BigInt(actionNumber);
-  result = computeImplicitPermissions(result, actionNumber, true);
   return result;
 }
 
@@ -374,15 +373,14 @@ export function removePermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result &= ~(BigInt(1) << BigInt(actionNumber));
-  result = computeImplicitPermissions(result, actionNumber, false);
   return result;
 }
 
 // Default Permissions
 export const BASE_PERMISSIONS: Permissions =
-  // addPermission(BigInt(0), Action.VIEW_REACTIONS) |
-  // addPermission(BigInt(0), Action.CREATE_REACTION) |
-  // addPermission(BigInt(0), Action.DELETE_REACTION) |
+  addPermission(BigInt(0), Action.VIEW_REACTIONS) |
+  addPermission(BigInt(0), Action.CREATE_REACTION) |
+  addPermission(BigInt(0), Action.DELETE_REACTION) |
   // addPermission(BigInt(0), Action.VIEW_COMMENTS) |
   // addPermission(BigInt(0), Action.CREATE_COMMENT) |
   // addPermission(BigInt(0), Action.EDIT_COMMENT) |
