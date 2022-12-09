@@ -17,7 +17,6 @@ import Cosmos from 'controllers/chain/cosmos/adapter';
 import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import ErrorPage from 'views/pages/error';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { TopicSelector } from 'views/components/topic_selector';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
@@ -35,6 +34,7 @@ import {
   SupportedCosmosProposalTypes,
   SupportedSputnikProposalTypes,
 } from './types';
+import { AaveProposalForm } from './aave_proposal_form';
 
 type NewProposalFormAttrs = {
   onChangeSlugEnum: (slug: any) => void;
@@ -53,7 +53,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
   private deposit;
   private description;
   private enactmentDelay;
-  private executor;
   private form: {
     amount;
     beneficiary;
@@ -64,7 +63,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     topicName;
     value;
   };
-  private ipfsHash;
   private member;
   private nextExternalProposalHash;
   private payoutAmount;
@@ -492,55 +490,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             }}
           />
         )}
-        {typeEnum === ProposalType.MolochProposal && (
-          <>
-            <CWTextInput
-              label="Applicant Address (will receive Moloch shares)"
-              placeholder="Applicant Address"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.applicantAddress = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Token Tribute (offered to Moloch, must be pre-approved for transfer)"
-              placeholder="Tribute in tokens"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.tokenTribute = +result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Shares Requested"
-              placeholder="Moloch shares requested"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.sharesRequested = +result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Proposal Title"
-              placeholder="Proposal Title"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.title = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Proposal Description"
-              placeholder="Proposal Description"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.description = result;
-                m.redraw();
-              }}
-            />
-          </>
-        )}
         {typeEnum === ProposalType.CompoundProposal && (
           <div class="AaveGovernance">
             <div>
@@ -655,153 +604,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
           </div>
         )}
         {typeEnum === ProposalType.AaveProposal && (
-          <div class="AaveGovernance">
-            <div>
-              <CWLabel label="Proposer (you)" />
-              {m(User, {
-                user: author,
-                linkify: true,
-                popover: true,
-                showAddressWithDisplayName: true,
-              })}
-            </div>
-            <CWTextInput
-              label="IPFS Hash"
-              placeholder="Proposal IPFS Hash"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.ipfsHash = result;
-                m.redraw();
-              }}
-            />
-            <CWLabel label="Executor" />
-            {(app.chain as Aave).governance.api.Executors.map((r) => (
-              <div
-                class={`executor ${
-                  this.executor === r.address && '.selected-executor'
-                }`}
-                onclick={() => {
-                  this.executor = r.address;
-                }}
-              >
-                <div class="label">Address</div> <div>{r.address}</div>
-                <div class="label mt-16">Time Delay</div>
-                <div>{r.delay / (60 * 60 * 24)} Day(s)</div>
-              </div>
-            ))}
-            <div class="tab-selector">
-              <CWTabBar>
-                {aaveProposalState.map((_, index) => (
-                  <CWTab
-                    label={`Call ${index + 1}`}
-                    isSelected={activeAaveTabIndex === index}
-                    onclick={() => {
-                      this.activeAaveTabIndex = index;
-                    }}
-                  />
-                ))}
-              </CWTabBar>
-              <CWPopoverMenu
-                menuItems={[
-                  {
-                    iconLeft: 'write',
-                    label: 'Add',
-                    onclick: () => {
-                      this.aaveTabCount++;
-                      this.activeAaveTabIndex = this.aaveTabCount - 1;
-                      this.aaveProposalState.push({
-                        target: null,
-                        value: null,
-                        calldata: null,
-                        signature: null,
-                        withDelegateCall: false,
-                      });
-                    },
-                  },
-                  {
-                    iconLeft: 'trash',
-                    label: 'Delete',
-                    disabled: this.activeAaveTabIndex === 0,
-                    onclick: () => {
-                      this.aaveTabCount--;
-                      this.activeAaveTabIndex = this.aaveTabCount - 1;
-                      this.aaveProposalState.pop();
-                    },
-                  },
-                ]}
-                trigger={<CWIconButton iconName="plus" />}
-              />
-            </div>
-            <CWTextInput
-              label="Target Address"
-              placeholder="Add Target"
-              value={aaveProposalState[activeAaveTabIndex].target}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.aaveProposalState[activeAaveTabIndex].target = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Value"
-              placeholder="Enter amount in wei"
-              value={aaveProposalState[activeAaveTabIndex].value}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.aaveProposalState[activeAaveTabIndex].value = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Calldata"
-              placeholder="Add Calldata"
-              value={aaveProposalState[activeAaveTabIndex].calldata}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.aaveProposalState[activeAaveTabIndex].calldata = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Function Signature (Optional)"
-              placeholder="Add a signature"
-              value={aaveProposalState[activeAaveTabIndex].signature}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.aaveProposalState[activeAaveTabIndex].signature = result;
-                m.redraw();
-              }}
-            />
-            <div class="delegate-call-container">
-              <CWLabel label="Delegate Call" />
-              <div class="buttons-row">
-                <CWButton
-                  label="TRUE"
-                  // class: `button ${
-                  //   aaveProposalState[activeAaveTabIndex].withDelegateCall ===
-                  //     true && 'active'
-                  // }`,
-                  onclick={() => {
-                    this.aaveProposalState[
-                      activeAaveTabIndex
-                    ].withDelegateCall = true;
-                  }}
-                />
-                <CWButton
-                  label="FALSE"
-                  // class: `ml-12 button ${
-                  //   aaveProposalState[activeAaveTabIndex].withDelegateCall ===
-                  //     false && 'active'
-                  // }`,
-                  onclick={() => {
-                    this.aaveProposalState[
-                      activeAaveTabIndex
-                    ].withDelegateCall = false;
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+          <AaveProposalForm author={author} />
         )}
         {typeEnum === ProposalType.SputnikProposal && (
           <>
