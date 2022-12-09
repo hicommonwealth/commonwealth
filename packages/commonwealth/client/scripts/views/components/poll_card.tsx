@@ -110,7 +110,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
             trigger={
               <CWButton
                 label="Vote"
-                buttonType="mini"
+                buttonType="mini-black"
                 disabled={disableVoteButton}
                 onclick={() => onVoteCast()}
               />
@@ -119,7 +119,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
         ) : (
           <CWButton
             label="Vote"
-            buttonType="mini"
+            buttonType="mini-black"
             disabled={disableVoteButton}
             onclick={() => onVoteCast()}
           />
