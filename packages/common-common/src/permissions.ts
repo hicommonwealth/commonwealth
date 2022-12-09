@@ -362,7 +362,6 @@ export function addPermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result |= BigInt(1) << BigInt(actionNumber);
-  result = computeImplicitPermissions(result, actionNumber, true);
   return result;
 }
 
@@ -374,7 +373,6 @@ export function removePermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result &= ~(BigInt(1) << BigInt(actionNumber));
-  result = computeImplicitPermissions(result, actionNumber, false);
   return result;
 }
 
