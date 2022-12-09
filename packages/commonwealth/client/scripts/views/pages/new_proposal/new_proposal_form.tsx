@@ -117,6 +117,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     // check typeEnum against supported types (use Omit on ProposalType?)
 
     // unsupported?
+    // MolochProposal = 'molochproposal',
     // SubstrateDemocracyReferendum = 'referendum',
     // SubstrateImminentPreimage = 'democracyimminent',
     // SubstratePreimage = 'democracypreimage',
@@ -127,7 +128,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     // AaveProposal = 'onchainproposal',
     // CompoundProposal = 'compoundproposal',
     // CosmosProposal = 'cosmosproposal',
-    // MolochProposal = 'molochproposal',
     // PhragmenCandidacy = 'phragmenelection',
     // SputnikProposal = 'sputnikproposal',
     // SubstrateBountyProposal = 'bountyproposal',
