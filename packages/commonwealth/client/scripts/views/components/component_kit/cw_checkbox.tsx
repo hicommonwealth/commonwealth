@@ -42,8 +42,6 @@ export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
       value,
     };
 
-    console.log('inside checkbox', value, checked);
-
     return (
       <label
         class={getClasses<CheckboxStyleAttrs>(
