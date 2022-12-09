@@ -654,17 +654,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            // CMN
-            '/projects': importRoute('views/pages/commonwealth/projects', {
-              scoped: true,
-            }),
-            '/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
-            '/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
-              { scoped: true }
-            ),
             // NEAR
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {
               scoped: true,
@@ -900,18 +889,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            // CMN
-            '/:scope/projects': importRoute(
-              'views/pages/commonwealth/projects',
-              { scoped: true }
-            ),
-            '/:scope/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
-            '/:scope/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
-              { scoped: true }
             ),
             // NEAR
             '/:scope/finishNearLogin': importRoute(
