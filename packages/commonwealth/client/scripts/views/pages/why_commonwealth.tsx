@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import './commonwealth.scss';
+import 'pages/why_commonwealth.scss';
 
 import m from 'mithril';
 
 import ClassComponent from 'class_component';
-import { CWText } from '../../components/component_kit/cw_text';
-import Sublayout from '../../sublayout';
-import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from '../sublayout';
+import { CWButton } from '../components/component_kit/cw_button';
 
 export default class WhyCommonwealthPage extends ClassComponent {
   view() {
@@ -19,7 +19,8 @@ export default class WhyCommonwealthPage extends ClassComponent {
         <CWButton
           label="See docs"
           onclick={(e) => {
-            m.route.set('https://docs.commonwealth.im/commonwealth/');
+            e.preventDefault();
+            window.location.href = 'https://docs.commonwealth.im/commonwealth/';
           }}
         />
         <CWText type="h2">The medium is the message.</CWText>
@@ -38,11 +39,11 @@ export default class WhyCommonwealthPage extends ClassComponent {
         </CWText>
         <CWText type="h2">Your tech should match your values.</CWText>
         <CWText type="h2">
-          Crypto-native integrations for the most popular protocols.{' '}
+          Crypto-native integrations for the most popular protocols.
         </CWText>
         <CWText>
           No matter what protocol you build on, give easy access to your
-          project’s most important on-chain actions like staking and voting.
+          project's most important on-chain actions like staking and voting.
           Commonwealth has a growing list of integrations--including Ethereum,
           NEAR, Cosmos, Substrate, and popular DAO frameworks like Moloch or
           Aragon.
@@ -50,7 +51,7 @@ export default class WhyCommonwealthPage extends ClassComponent {
         <CWText>
           Fork, develop, alter, share - Commonwealth is explicitly designed for
           open-source ecosystems. Existing solutions like chat and email lock
-          your data, users, and brand into platforms you don’t control. Default
+          your data, users, and brand into platforms you don't control. Default
           openness allows new members to discover you through SEO.
         </CWText>
         <CWText>

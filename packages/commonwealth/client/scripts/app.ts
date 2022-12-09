@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
 import '../styles/normalize.css'; // reset
-import '../styles/tailwind_reset.css'; // for the landing page
 import '../styles/shared.scss';
 import 'construct.scss';
 import 'lity/dist/lity.min.css';
@@ -32,7 +31,9 @@ import { isWindowMediumSmallInclusive } from './views/components/component_kit/h
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/user_dashboard');
-import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
+import(
+  /* webpackPrefetch: true */ 'client/scripts/views/pages/why_commonwealth'
+);
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 import(/* webpackPrefetch: true */ 'views/pages/view_thread');
@@ -620,7 +621,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
-      '/about': importRoute('views/pages/commonwealth', {
+      '/about': importRoute('views/pages/why_commonwealth', {
         scoped: false,
       }),
       '/terms': importRoute('views/pages/terms', { scoped: false }),
@@ -861,7 +862,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            '/whyCommonwealth': importRoute('views/pages/commonwealth', {
+            '/whyCommonwealth': importRoute('views/pages/why_commonwealth', {
               scoped: false,
               hideSidebar: true,
             }),

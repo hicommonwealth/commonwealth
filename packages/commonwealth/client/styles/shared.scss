@@ -1,15 +1,16 @@
 @import 'mixins/animation';
-@import 'mixins/buttons';
-@import 'mixins/popovers';
-@import 'mixins/media_queries';
 @import 'mixins/breakpoints';
+@import 'mixins/border_radius';
+@import 'mixins/buttons';
+@import 'mixins/choice';
+@import 'mixins/colors';
 @import 'mixins/dragula';
 @import 'mixins/elevation';
-@import 'mixins/colors';
-@import 'mixins/border_radius';
-@import 'mixins/choice';
-@import 'mixins/inputs';
 @import 'mixins/icons';
+@import 'mixins/inputs';
+@import 'mixins/media_queries';
+@import 'mixins/pages';
+@import 'mixins/popovers';
 @import 'mixins/text';
 
 // layout & global nav parameters

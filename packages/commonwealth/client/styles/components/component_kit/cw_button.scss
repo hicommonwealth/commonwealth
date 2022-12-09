@@ -4,12 +4,18 @@
   align-items: center;
   border: 2px solid transparent;
   border-radius: $border-radius-corners;
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   height: 36px;
   justify-content: center;
   padding: 6px 20px;
   width: fit-content;
+
+  &.disabled {
+    cursor: default;
+    pointer-events: none;
+  }
 
   &.primary-red {
     @include primaryRed;
