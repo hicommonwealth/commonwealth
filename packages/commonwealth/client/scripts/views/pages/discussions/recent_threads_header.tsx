@@ -101,7 +101,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
                   />
                 ) : (
                   <CWButton
-                    buttonType="mini"
+                    buttonType="mini-black"
                     label="Create Thread"
                     iconName="plus"
                     onclick={() => {
