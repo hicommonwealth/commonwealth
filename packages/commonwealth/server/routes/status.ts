@@ -29,7 +29,7 @@ import { JWT_SECRET } from '../config';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ServerError } from 'common-common/src/errors';
-import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
+import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 

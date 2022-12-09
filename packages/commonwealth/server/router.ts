@@ -157,12 +157,14 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import {getChainEventServiceData} from './routes/getChainEventServiceData';
-import {getChain} from './routes/getChain';
-import {getChainNode} from './routes/getChainNode';
-import {getChainContracts} from './routes/getChainContracts';
-import {getSubscribedChains} from './routes/getSubscribedChains';
 import getSnapshotProposal from './routes/getSnapshotProposal';
+import { getChainEventServiceData } from "./routes/getChainEventServiceData";
+import { getChain } from "./routes/getChain";
+import { getChainNode } from "./routes/getChainNode";
+import { getChainContracts } from "./routes/getChainContracts";
+import { getSubscribedChains } from "./routes/getSubscribedChains";
+
+
 
 function setupRouter(
   app: Express,

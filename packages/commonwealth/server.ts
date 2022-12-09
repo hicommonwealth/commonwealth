@@ -23,7 +23,7 @@ import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq'
 import ViewCountCache from './server/util/viewCountCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
-import { RABBITMQ_URI,ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
+import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
@@ -54,7 +54,8 @@ async function main() {
   const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
-  const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+  const NO_TOKEN_BALANCE_CACHE =
+    process.env.NO_TOKEN_BALANCE_CACHE === 'true';
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' ||
     SHOULD_SEND_EMAILS ||
@@ -249,7 +250,7 @@ async function main() {
     viewCountCache,
     tokenBalanceCache,
     ruleCache,
-    banCache
+    banCache,
   );
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
