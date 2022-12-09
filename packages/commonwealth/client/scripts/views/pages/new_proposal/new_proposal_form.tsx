@@ -16,7 +16,6 @@ import User from 'views/components/widgets/user';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import ErrorPage from 'views/pages/error';
 import { TopicSelector } from 'views/components/topic_selector';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWLabel } from '../../components/component_kit/cw_label';
@@ -25,14 +24,11 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { createNewProposal } from './helpers';
-import {
-  SupportedCosmosProposalTypes,
-  SupportedSputnikProposalTypes,
-} from './types';
+import { SupportedSputnikProposalTypes } from './types';
 import { AaveProposalForm } from './aave_proposal_form';
+import { CompoundProposalForm } from './compound_proposal_form';
+import { CosmosProposalForm } from './cosmos_proposal_form';
 
 type NewProposalFormAttrs = {
   onChangeSlugEnum: (slug: any) => void;
@@ -41,11 +37,7 @@ type NewProposalFormAttrs = {
 
 // this should be titled the Substrate/Edgeware new proposal form
 export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
-  private aaveProposalState;
-  private aaveTabCount;
-  private activeAaveTabIndex;
   private applicantAddress;
-  private cosmosProposalType;
   private councilMotionDescription;
   private councilMotionType;
   private deposit;
@@ -65,7 +57,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
   private nextExternalProposalHash;
   private payoutAmount;
   private proposer;
-  private recipient;
   private referendumId;
   private sharesRequested;
   private sputnikProposalType;
@@ -82,18 +73,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
   }
 
   oninit() {
-    this.aaveTabCount = 1;
-    this.activeAaveTabIndex = 0;
-    this.aaveProposalState = [
-      {
-        target: null,
-        value: null,
-        calldata: null,
-        signature: null,
-        withDelegateCall: false,
-      },
-    ];
-    this.cosmosProposalType = SupportedCosmosProposalTypes.Text;
     this.sputnikProposalType = SupportedSputnikProposalTypes.AddMemberToRole;
   }
 
@@ -211,10 +190,15 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
       }
     }
 
-    const { activeAaveTabIndex, aaveProposalState } = this;
-
     return (
       <>
+        {typeEnum === ProposalType.AaveProposal && (
+          <AaveProposalForm author={author} />
+        )}
+        {typeEnum === ProposalType.CompoundProposal && (
+          <CompoundProposalForm author={author} />
+        )}
+        {typeEnum === ProposalType.CosmosProposal && <CosmosProposalForm />}
         {typeEnum === ProposalType.SubstrateCollectiveProposal && (
           <>
             <CWDropdown
@@ -488,122 +472,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             }}
           />
         )}
-        {typeEnum === ProposalType.CompoundProposal && (
-          <div class="AaveGovernance">
-            <div>
-              <CWLabel label="Proposer (you)" />
-              {m(User, {
-                user: author,
-                linkify: true,
-                popover: true,
-                showAddressWithDisplayName: true,
-              })}
-            </div>
-            <CWTextInput
-              label="Proposal Title (leave blank for no title)"
-              placeholder="Proposal Title"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.title = result;
-                m.redraw();
-              }}
-            />
-            <CWTextArea
-              label="Proposal Description"
-              placeholder="Proposal Description"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.description = result;
-                m.redraw();
-              }}
-            />
-            <div class="tab-selector">
-              <CWTabBar>
-                {aaveProposalState.map((_, index) => (
-                  <CWTab
-                    label={`Call ${index + 1}`}
-                    isSelected={activeAaveTabIndex === index}
-                    onclick={() => {
-                      this.activeAaveTabIndex = index;
-                    }}
-                  />
-                ))}
-              </CWTabBar>
-              <CWPopoverMenu
-                menuItems={[
-                  {
-                    iconLeft: 'write',
-                    label: 'Add',
-                    onclick: () => {
-                      this.aaveTabCount++;
-                      this.activeAaveTabIndex = this.aaveTabCount - 1;
-                      this.aaveProposalState.push({
-                        target: null,
-                        value: null,
-                        calldata: null,
-                        signature: null,
-                        withDelegateCall: false,
-                      });
-                    },
-                  },
-                  {
-                    iconLeft: 'trash',
-                    label: 'Delete',
-                    onclick: () => {
-                      this.aaveTabCount--;
-                      this.activeAaveTabIndex = this.aaveTabCount - 1;
-                      this.aaveProposalState.pop();
-                    },
-                  },
-                ]}
-                trigger={<CWIconButton iconName="plus" />}
-              />
-            </div>
-            <CWTextInput
-              label="Target Address"
-              placeholder="Add Target"
-              value={aaveProposalState[activeAaveTabIndex].target}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.aaveProposalState[activeAaveTabIndex].target = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Value"
-              placeholder="Enter amount in wei"
-              value={aaveProposalState[activeAaveTabIndex].value}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.aaveProposalState[activeAaveTabIndex].value = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Calldata"
-              placeholder="Add Calldata"
-              value={aaveProposalState[activeAaveTabIndex].calldata}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.aaveProposalState[activeAaveTabIndex].calldata = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label="Function Signature (Optional)"
-              placeholder="Add a signature"
-              value={aaveProposalState[activeAaveTabIndex].signature}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.aaveProposalState[activeAaveTabIndex].signature = result;
-                m.redraw();
-              }}
-            />
-          </div>
-        )}
-        {typeEnum === ProposalType.AaveProposal && (
-          <AaveProposalForm author={author} />
-        )}
         {typeEnum === ProposalType.SputnikProposal && (
           <>
             <CWDropdown
@@ -667,91 +535,6 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
               SupportedSputnikProposalTypes.Transfer && (
               <CWTextInput
                 label="Amount"
-                // defaultValue: '',
-                // oncreate: () => {
-                //   this.payoutAmount = '';
-                // },
-                oninput={(e) => {
-                  const result = (e.target as any).value;
-                  this.payoutAmount = result;
-                  m.redraw();
-                }}
-              />
-            )}
-          </>
-        )}
-        {typeEnum === ProposalType.CosmosProposal && (
-          <>
-            <CWDropdown
-              label="Proposal Type"
-              initialValue={SupportedCosmosProposalTypes.Text}
-              options={Object.values(SupportedCosmosProposalTypes).map((v) => ({
-                name: 'proposalType',
-                label: v,
-                value: v,
-              }))}
-              onSelect={(result) => {
-                this.cosmosProposalType = result;
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              placeholder="Enter a title"
-              label="Title"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.form.title = result;
-                m.redraw();
-              }}
-            />
-            <CWTextArea
-              label="Description"
-              placeholder="Enter a description"
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                if (this.form.description !== result) {
-                  this.form.description = result;
-                }
-                m.redraw();
-              }}
-            />
-            <CWTextInput
-              label={`Deposit (${
-                (app.chain as Cosmos).governance.minDeposit.denom
-              })`}
-              placeholder={`Min: ${+(app.chain as Cosmos).governance
-                .minDeposit}`}
-              // oncreate={(vvnode) =>
-              //   $(vvnode.dom).val(
-              //     +(app.chain as Cosmos).governance.minDeposit
-              //   )}
-              oninput={(e) => {
-                const result = (e.target as any).value;
-                this.deposit = +result;
-                m.redraw();
-              }}
-            />
-            {this.cosmosProposalType !== SupportedCosmosProposalTypes.Text && (
-              <CWTextInput
-                label="Recipient"
-                placeholder={app.user.activeAccount.address}
-                // defaultValue: '',
-                // oncreate: () => {
-                //   this.recipient = '';
-                // },
-                oninput={(e) => {
-                  const result = (e.target as any).value;
-                  this.recipient = result;
-                  m.redraw();
-                }}
-              />
-            )}
-            {this.cosmosProposalType !== SupportedCosmosProposalTypes.Text && (
-              <CWTextInput
-                label={`Amount (${
-                  (app.chain as Cosmos).governance.minDeposit.denom
-                })`}
-                placeholder="12345"
                 // defaultValue: '',
                 // oncreate: () => {
                 //   this.payoutAmount = '';
