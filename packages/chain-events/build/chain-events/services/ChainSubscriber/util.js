@@ -1,0 +1,306 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getListenerNames = exports.manageRegularListeners = exports.manageErcListeners = void 0;
+const underscore_1 = __importDefault(require("underscore"));
+const src_1 = require("../../src");
+const types_1 = require("../../../common-common/src/types");
+const logging_1 = require("../../../common-common/src/logging");
+const database_1 = __importDefault(require("../database/database"));
+const chainSubscriber_1 = require("./chainSubscriber");
+const log = logging_1.factory.getLogger((0, logging_1.formatFilename)(__filename));
+const generalLogger = new src_1.LoggingHandler();
+async function manageErcListeners(network, groupedTokens, listenerInstances, producer, rollbar) {
+    // delete any listeners that have no more tokens to listen to
+    const currentChainUrls = Object.keys(groupedTokens);
+    for (const listenerName of Object.keys(listenerInstances)) {
+        if ((listenerName.startsWith(types_1.ChainNetwork.ERC20) &&
+            network === types_1.ChainNetwork.ERC20) ||
+            (listenerName.startsWith(types_1.ChainNetwork.ERC721) &&
+                network === types_1.ChainNetwork.ERC721)) {
+            const url = listenerName.slice(listenerName.indexOf('_') + 1);
+            if (!currentChainUrls.includes(url)) {
+                log.info(`Deleting listener: ${listenerName}`);
+                await listenerInstances[listenerName].unsubscribe();
+                delete listenerInstances[listenerName];
+            }
+        }
+    }
+    // create/update erc listeners
+    for (const [url, tokens] of Object.entries(groupedTokens)) {
+        const listenerName = `${network}_${url}`;
+        const listener = listenerInstances[listenerName];
+        const tokenAddresses = tokens.map((chain) => chain.contract_address);
+        const tokenNames = tokens.map((chain) => chain.id);
+        // if there is an existing listener for the given url and the tokens assigned
+        // to it are different from the tokens given then delete the listener so that
+        // we can create a new one with the updated token list
+        if (listener &&
+            !underscore_1.default.isEqual(tokenAddresses, listener.options.tokenAddresses)) {
+            log.info(`Deleting listener: ${listenerName}`);
+            await listener.unsubscribe();
+            delete listenerInstances[listenerName];
+        }
+        // if the listener does not exist then create a new one
+        if (!listenerInstances[listenerName]) {
+            let supportedNetwork;
+            switch (network) {
+                case types_1.ChainNetwork.ERC20:
+                    supportedNetwork = src_1.SupportedNetwork.ERC20;
+                    break;
+                case types_1.ChainNetwork.ERC721:
+                    supportedNetwork = src_1.SupportedNetwork.ERC721;
+                    break;
+                default:
+                    break;
+            }
+            try {
+                listenerInstances[listenerName] = await (0, src_1.createListener)(network, supportedNetwork, {
+                    url,
+                    tokenAddresses: tokenAddresses,
+                    tokenNames: tokenNames,
+                    verbose: false,
+                });
+            }
+            catch (e) {
+                log.error(`An error occurred while starting a listener for ${JSON.stringify(tokenNames)} connecting to ${url}`, e);
+                rollbar?.critical(`An error occurred while starting a listener for ${JSON.stringify(tokenNames)} connecting to ${url}`, e);
+            }
+        }
+        // get all the tokens who have verbose_logging set to true
+        const tokenLog = tokens
+            .filter((token) => token.verbose_logging)
+            .map((token) => token.id);
+        let logger = listenerInstances[listenerName].eventHandlers['logger'];
+        // create the logger if this is a brand-new listener
+        if (!logger && tokenLog.length > 0) {
+            log.info(`Create a logger for listener: ${listenerName}`);
+            if (network === types_1.ChainNetwork.ERC20)
+                logger = new src_1.ErcLoggingHandler(types_1.ChainNetwork.ERC20, []);
+            else if (network === types_1.ChainNetwork.ERC721)
+                logger = new src_1.ErcLoggingHandler(types_1.ChainNetwork.ERC20, []);
+            listenerInstances[listenerName].eventHandlers['logger'] = {
+                handler: logger,
+                excludedEvents: [],
+            };
+        }
+        else if (logger && tokenLog.length === 0) {
+            log.info(`Deleting logger on listener: ${listenerName}`);
+            delete listenerInstances[listenerName].eventHandlers['logger'];
+        }
+        else if (logger && tokenLog.length > 0) {
+            // update the tokens to log events for
+            logger.tokenNames = tokenLog;
+        }
+        if (!listenerInstances[listenerName].eventHandlers['rabbitmq']) {
+            log.info(`Adding RabbitMQ event handler to listener: ${listenerName}`);
+            listenerInstances[listenerName].eventHandlers['rabbitmq'] = {
+                handler: producer,
+                excludedEvents: [],
+            };
+        }
+        // subscribe the listener to its chain/RPC if it isn't yet subscribed
+        if (!listenerInstances[listenerName].subscribed) {
+            log.info(`Subscribing listener: ${listenerName}`);
+            await listenerInstances[listenerName].subscribe();
+        }
+    }
+}
+exports.manageErcListeners = manageErcListeners;
+/**
+ * This function creates, updates, and deletes all listeners except ERC20 and
+ * ERC721 listeners.
+ * @param chains A list of new chains to create listener instances for
+ * @param listenerInstances An object containing all the currently active listener instances
+ * @param producer An instance of RabbitMqHandler which is one of the event handlers
+ * @param rollbar An instance of rollbar for error reporting
+ */
+async function manageRegularListeners(chains, listenerInstances, producer, rollbar) {
+    // for ease of use create a new object containing all listener instances that are not ERC20 or ERC721
+    const regListenerInstances = {};
+    const activeListenerNames = [];
+    for (const [name, instance] of Object.entries(listenerInstances)) {
+        if (!name.startsWith(types_1.ChainNetwork.ERC20) &&
+            !name.startsWith(types_1.ChainNetwork.ERC721))
+            regListenerInstances[name] = instance;
+        activeListenerNames.push(name);
+    }
+    // delete any listeners that should no longer be active on this ChainSubscriber instance
+    const updatedChainIds = chains.map((chain) => chain.id);
+    Object.keys(regListenerInstances).forEach((name) => {
+        if (!updatedChainIds.includes(name)) {
+            log.info(`[${name}]: Deleting chain listener...`);
+            listenerInstances[name].unsubscribe();
+            delete listenerInstances[name];
+        }
+    });
+    const newChains = chains.filter((chain) => {
+        return !activeListenerNames.includes(chain.id);
+    });
+    // create listeners for all the new chains -- this does not update any existing chains!
+    await setupNewListeners(newChains, listenerInstances, producer, rollbar);
+    // update existing listeners whose verbose_logging or substrate_spec has changed
+    await updateExistingListeners(chains, listenerInstances, rollbar);
+    // fetch and publish on-chain substrate identities
+    // await fetchSubstrateIdentities(chains, listenerInstances, pool, producer, rollbar);
+}
+exports.manageRegularListeners = manageRegularListeners;
+/**
+ * Provided a list of the new chains that do not have existing listener instances,
+ * this function will create a listener instance and setup all the relevant
+ * event handlers.
+ * @param newChains A list of new chains to create listener instances for
+ * @param listenerInstances An object containing all the currently active listener instances
+ * @param producer An instance of RabbitMqHandler which is one of the event handlers
+ * @param rollbar An instance of rollbar for error reporting
+ */
+async function setupNewListeners(newChains, listenerInstances, producer, rollbar) {
+    for (const chain of newChains) {
+        let network;
+        if (chain.base === types_1.ChainBase.Substrate)
+            network = src_1.SupportedNetwork.Substrate;
+        else if (chain.base === types_1.ChainBase.CosmosSDK)
+            network = src_1.SupportedNetwork.Cosmos;
+        else if (chain.network === types_1.ChainNetwork.Compound)
+            network = src_1.SupportedNetwork.Compound;
+        else if (chain.network === types_1.ChainNetwork.Aave)
+            network = src_1.SupportedNetwork.Aave;
+        else if (chain.network === types_1.ChainNetwork.Moloch)
+            network = src_1.SupportedNetwork.Moloch;
+        try {
+            log.info(`Starting listener for: ${chain.id}`);
+            listenerInstances[chain.id] = await (0, src_1.createListener)(chain.id, network, {
+                address: chain.contract_address,
+                archival: false,
+                url: chain.ChainNode.url,
+                spec: chain.substrate_spec,
+                skipCatchup: false,
+                verbose: false,
+                enricherConfig: { balanceTransferThresholdPermill: 10_000 },
+                discoverReconnectRange: discoverReconnectRange.bind(database_1.default),
+            });
+        }
+        catch (error) {
+            delete listenerInstances[chain.id];
+            log.error(`Unable to create a listener instance for ${chain.id}`, error);
+            rollbar?.critical(`Unable to create a listener instance for ${chain.id}`, error);
+            (0, chainSubscriber_1.handleFatalListenerError)(chain.id, error, rollbar);
+            continue;
+        }
+        // if a substrate chain then ignore some events
+        let excludedEvents = [];
+        if (network === src_1.SupportedNetwork.Substrate)
+            excludedEvents = [
+                src_1.SubstrateTypes.EventKind.Reward,
+                src_1.SubstrateTypes.EventKind.TreasuryRewardMinting,
+                src_1.SubstrateTypes.EventKind.TreasuryRewardMintingV2,
+                src_1.SubstrateTypes.EventKind.HeartbeatReceived,
+            ];
+        // add the rabbitmq handler and the events it should ignore
+        listenerInstances[chain.id].eventHandlers['rabbitmq'] = {
+            handler: producer,
+            excludedEvents,
+        };
+        // add the logger and the events it should ignore if required
+        if (chain.verbose_logging) {
+            listenerInstances[chain.id].eventHandlers['logger'] = {
+                handler: generalLogger,
+                excludedEvents,
+            };
+        }
+        try {
+            // subscribe the listener to its chain/RPC if it isn't yet subscribed
+            log.info(`Subscribing listener: ${chain.id}`);
+            await listenerInstances[chain.id].subscribe();
+        }
+        catch (e) {
+            delete listenerInstances[chain.id];
+            log.error(`Failed to subscribe listener: ${chain.id}`, e);
+            (0, chainSubscriber_1.handleFatalListenerError)(chain.id, e, rollbar);
+        }
+    }
+}
+/**
+ * Provided a list of all the chains, this function determines if any listeners
+ * need to be updated. Values that could have changed in a chain instance
+ * include verbose_logging and substrate_spec.
+ * @param allChains An array containing all the chains pulled from the database
+ * @param listenerInstances An object containing all the currently active listener instances
+ * @param rollbar An instance of rollbar for error reporting
+ */
+async function updateExistingListeners(allChains, listenerInstances, rollbar) {
+    for (const chain of allChains) {
+        // skip a chain if the listener is inactive due to an error occurring for that specific listener i.e. connection error
+        if (!listenerInstances[chain.id])
+            continue;
+        // if the chain is a substrate chain and its spec has changed since the last
+        // check then update the active listener with the new spec
+        if (chain.base === types_1.ChainBase.Substrate &&
+            !underscore_1.default.isEqual(chain.substrate_spec, listenerInstances[chain.id].options.spec)) {
+            log.info(`Spec for ${chain.id} changed... restarting listener`);
+            try {
+                await (listenerInstances[chain.id]).updateSpec(chain.substrate_spec);
+            }
+            catch (error) {
+                log.error(`Unable to update substrate spec for ${chain.id}!`, error);
+                rollbar?.critical(`Unable to update substrate spec for ${chain.id}!`, error);
+            }
+        }
+        if (listenerInstances[chain.id].eventHandlers['logger'] &&
+            !chain.verbose_logging) {
+            delete listenerInstances[chain.id].eventHandlers['logger'];
+        }
+    }
+}
+function getListenerNames(listenerInstances) {
+    const activeListenerInstances = [];
+    for (const listenerName of Object.keys(listenerInstances)) {
+        if (!listenerName.startsWith(types_1.ChainNetwork.ERC20) &&
+            !listenerName.startsWith(types_1.ChainNetwork.ERC721))
+            activeListenerInstances.push(listenerName);
+        else {
+            activeListenerInstances.push(listenerInstances[listenerName].options.tokenNames);
+        }
+    }
+    return activeListenerInstances;
+}
+exports.getListenerNames = getListenerNames;
+/**
+ * This function queries the chain-events database for the most recent
+ * chain-event and attempts to retrieve all on-chain events since that
+ * chain-event.
+ * WARNING: This function requires to be binded with a PG pool instance
+ * e.g. discoverReconnectRange.bind({ pool })
+ * @param chain
+ */
+async function discoverReconnectRange(chain) {
+    let latestBlock;
+    try {
+        const eventTypes = (await this.ChainEventType.findAll({
+            where: { chain },
+        })).map((x) => x.id);
+        if (eventTypes.length === 0) {
+            log.info(`[${chain}]: No event types exist in the database`);
+            return { startBlock: null };
+        }
+        latestBlock = await this.ChainEvent.max('block_number', {
+            where: {
+                chain_event_type_id: eventTypes,
+            },
+        });
+        if (latestBlock) {
+            log.info(`[${chain}]: Discovered chain event in db at block ${latestBlock}.`);
+            return { startBlock: latestBlock + 1 };
+        }
+        else {
+            log.info(`[${chain}]: No chain-events found in the database`);
+            return { startBlock: null };
+        }
+    }
+    catch (error) {
+        log.warn(`[${chain}]: An error occurred while discovering offline time range`, error);
+    }
+    return { startBlock: null };
+}

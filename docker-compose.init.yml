@@ -1,0 +1,7 @@
+version: "3.7"
+services:
+  builder:
+    image: builder
+    build:
+      context: .
+      dockerfile: Dockerfile.init

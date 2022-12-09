@@ -11,6 +11,7 @@ RUN apk add --update --no-cache python3 build-base gcc && ln -sf \
 RUN npm i -g yarn --force && apk add git && yarn --ignore-engines
 
 COPY . . 
+COPY --from=builder /packages/commonwealth/build /packages/commonwealth/build
 
 WORKDIR /monorepo/packages/commonwealth
 ENV NODE_ENV=development

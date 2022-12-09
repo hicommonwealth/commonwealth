@@ -1,0 +1,25 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = (sequelize, dataTypes) => {
+    const StarredCommunity = sequelize.define('StarredCommunity', {
+        id: { type: dataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+        user_id: { type: dataTypes.INTEGER, allowNull: false },
+        chain: { type: dataTypes.STRING, allowNull: false },
+        created_at: { type: dataTypes.DATE, allowNull: false },
+        updated_at: { type: dataTypes.DATE, allowNull: false },
+    }, {
+        tableName: 'StarredCommunities',
+        underscored: true,
+        createdAt: 'created_at',
+        updatedAt: 'updated_at',
+        indexes: [
+            { fields: ['user_id'] },
+            { fields: ['chain'] },
+        ],
+    });
+    StarredCommunity.associate = (models) => {
+        models.StarredCommunity.belongsTo(models.User);
+        models.StarredCommunity.belongsTo(models.Chain, { foreignKey: 'chain', targetKey: 'id' });
+    };
+    return StarredCommunity;
+};

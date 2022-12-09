@@ -3,17 +3,6 @@ services:
   builder: 
     image: builder
     build: .
-  db:
-    env_file:
-      - ".env"
-    image: postgres
-    environment:
-      POSTGRES_PASSWORD: "${DOCKER_PG_PW}" 
-      POSTGRES_USER: "${DOCKER_PG_USER}" 
-    ports:
-      - '5431:5432'
-    volumes:
-      - db:/var/lib/postgresql/data 
   common-common:
     build: packages/common-common
   chain-events: 
@@ -22,17 +11,16 @@ services:
     build:
       context: .
       dockerfile: packages/commonwealth/Dockerfile
-    hostname: commonwealth-server
-    command: ./scripts/wait-for-it.sh db:5432 -- yarn start
-    depends_on:
-      - db
+    hostname: commonwealth
+    env_file:
+      .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports: 
       - "8080:8080"
     volumes:
       - ./:/monorepo
-volumes:
-  db:
-    driver: local
+
     
 
 

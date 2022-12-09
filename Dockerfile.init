@@ -1,0 +1,3 @@
+FROM node:14-alpine
+RUN npm i -g yarn --force && apk add git
+COPY /packages/commonwealth/build /packages/commonwealth/build 
