@@ -7,6 +7,7 @@
   cursor: pointer;
   display: flex;
   flex-direction: row;
+  gap: 8px;
   height: 36px;
   justify-content: center;
   padding: 6px 20px;
@@ -99,9 +100,15 @@
     @include secondaryBlueDark;
   }
 
-  &.mini {
+  &.mini-black {
     height: 24px;
 
-    @include mini;
+    @include miniBlack;
+  }
+
+  &.mini-white {
+    height: 24px;
+
+    @include miniWhite;
   }
 }

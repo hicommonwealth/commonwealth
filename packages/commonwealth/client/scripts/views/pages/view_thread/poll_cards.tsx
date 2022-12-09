@@ -33,7 +33,7 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
         content={
           <div className="PollEditorCard">
             <CWButton
-              buttonType="mini"
+              buttonType="mini-black"
               label="Create poll"
               onclick={(e) => {
                 e.preventDefault();
