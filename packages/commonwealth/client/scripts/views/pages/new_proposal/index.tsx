@@ -3,7 +3,7 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-import 'pages/new_proposal_page.scss';
+import 'pages/new_proposal/index.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';

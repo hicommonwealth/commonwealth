@@ -15,29 +15,28 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWText } from '../../components/component_kit/cw_text';
 
 type AaveProposalFormAttrs = {
   author: Account;
 };
 
 type AaveProposalState = {
-  target;
-  value;
   calldata;
   signature;
+  target;
+  value;
   withDelegateCall: boolean;
 };
 
 export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
-  private tabCount: number;
-  private activeTabIndex: number;
   private aaveProposalState: Array<AaveProposalState>;
+  private activeTabIndex: number;
   private executor;
   private ipfsHash;
+  private tabCount: number;
 
   oninit() {
-    this.tabCount = 1;
-    this.activeTabIndex = 0;
     this.aaveProposalState = [
       {
         target: null,
@@ -47,6 +46,8 @@ export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
         withDelegateCall: false,
       },
     ];
+    this.activeTabIndex = 0;
+    this.tabCount = 1;
   }
 
   view(vnode: m.Vnode<AaveProposalFormAttrs>) {
@@ -55,7 +56,7 @@ export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
 
     return (
       <div class="AaveProposalForm">
-        <div>
+        <div class="row-with-label">
           <CWLabel label="Proposer (you)" />
           {m(User, {
             user: author,
@@ -73,21 +74,32 @@ export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
             m.redraw();
           }}
         />
-        <CWLabel label="Executor" />
-        {(app.chain as Aave).governance.api.Executors.map((r) => (
-          <div
-            class={`executor ${
-              this.executor === r.address && '.selected-executor'
-            }`}
-            onclick={() => {
-              this.executor = r.address;
-            }}
-          >
-            <div class="label">Address</div> <div>{r.address}</div>
-            <div class="label mt-16">Time Delay</div>
-            <div>{r.delay / (60 * 60 * 24)} Day(s)</div>
+        <div class="row-with-label">
+          <CWLabel label="Executor" />
+          <div class="executors-container">
+            {(app.chain as Aave).governance.api.Executors.map((r) => (
+              <div
+                class={`executor ${
+                  this.executor === r.address && 'selected-executor'
+                }`}
+                onclick={() => {
+                  this.executor = r.address;
+                }}
+              >
+                <div class="executor-row">
+                  <CWText fontWeight="medium">Address</CWText>
+                  <CWText type="caption">{r.address}</CWText>
+                </div>
+                <div class="executor-row">
+                  <CWText fontWeight="medium">Time Delay</CWText>
+                  <CWText type="caption">
+                    {r.delay / (60 * 60 * 24)} Day(s)
+                  </CWText>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
         <div class="tab-selector">
           <CWTabBar>
             {aaveProposalState.map((_, index) => (

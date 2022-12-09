@@ -5,45 +5,43 @@
   flex-direction: column;
   gap: 16px;
 
-  .executor {
-    background-color: $neutral-50;
-    padding: 16px;
-    border-radius: $border-radius-corners;
-    border: 1px solid $neutral-100;
-    min-width: 100%;
+  .row-with-label {
+    display: flex;
+    flex-direction: column;
+  }
 
-    .label {
-      font-size: 14px;
-      color: $neutral-600;
+  .executors-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .executor {
+      background-color: $neutral-50;
+      border-radius: $border-radius-corners;
+      border: 1px solid $neutral-100;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 16px;
+      width: 100%;
+
+      &.selected-executor {
+        background-color: $green-50;
+        border: 1px solid $green-300;
+      }
+
+      .executor-row {
+        display: flex;
+        flex-direction: column;
+      }
     }
-
-    .mt-16 {
-      margin-top: 16px;
-    }
   }
 
-  .selected-executor {
-    background-color: $green-50;
-    border: 1px solid $green-300;
-  }
-
-  .tabs {
-    margin-left: -15px;
-  }
-
-  .ml-12 {
-    margin-left: 12px;
-  }
-
-  .flex-label {
+  .tab-selector {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
-
-    .helper-text {
-      font-size: 14px;
-      color: $neutral-500;
-    }
+    align-items: center;
   }
 
   .delegate-call-container {
@@ -55,22 +53,5 @@
       display: flex;
       gap: 16px;
     }
-  }
-
-  .button {
-    border-radius: $border-radius-corners;
-    font-weight: 500;
-    color: $neutral-500;
-  }
-
-  .active {
-    border-color: $purple-300;
-    color: $purple-300;
-  }
-
-  .tab-selector {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
   }
 }

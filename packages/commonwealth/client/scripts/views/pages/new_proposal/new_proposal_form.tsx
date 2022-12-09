@@ -4,8 +4,6 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 
-import 'pages/new_proposal_page.scss';
-
 import app from 'state';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { Topic } from 'models';
@@ -216,7 +214,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
     const { activeAaveTabIndex, aaveProposalState } = this;
 
     return (
-      <div class="NewProposalForm">
+      <>
         {typeEnum === ProposalType.SubstrateCollectiveProposal && (
           <>
             <CWDropdown
@@ -813,7 +811,7 @@ export class NewProposalForm extends ClassComponent<NewProposalFormAttrs> {
             createNewProposal(this, typeEnum, author, onChangeSlugEnum);
           }}
         />
-      </div>
+      </>
     );
   }
 }
