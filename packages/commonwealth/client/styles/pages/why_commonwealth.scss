@@ -2,4 +2,16 @@
 
 .WhyCommonwealthPage {
   @include SinglePage();
+  padding: 40px 0;
+  > * {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 16px;
+  }
+  img {
+    max-width: 80%;
+    height: auto;
+  }
 }
