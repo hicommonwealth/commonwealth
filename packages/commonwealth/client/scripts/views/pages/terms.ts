@@ -4,7 +4,6 @@ import 'pages/privacy_and_terms.scss';
 
 import m from 'mithril';
 import { renderMultilineText } from 'helpers';
-import HeaderLandingPage from './landing_page_header';
 
 const TermsOfService = `
 PLEASE READ THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT VERY CAREFULLY. THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT IS A LEGALLY BINDING CONTRACT BETWEEN YOU AND COMMONWEALTH LABS THAT SETS FORTH AND DETERMINES, AMONG OTHER THINGS:
@@ -120,13 +119,9 @@ Section 6.10 No Waiver. No failure on the part of any Person to exercise any pow
 `;
 
 const TermsPage: m.Component<{}> = {
-  oncreate: (vnode) => {},
-  view: (vnode) => {
+  oncreate: () => {},
+  view: () => {
     return m('.TermsPage', [
-      m(HeaderLandingPage, {
-        scrollHeader: false,
-        navs: [{ text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' }],
-      }),
       m('.forum-container', [
         m('h1.page-title', 'Terms of Service'),
         renderMultilineText(TermsOfService),

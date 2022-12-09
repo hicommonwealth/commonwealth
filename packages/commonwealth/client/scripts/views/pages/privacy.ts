@@ -4,7 +4,6 @@ import 'pages/privacy_and_terms.scss';
 
 import m from 'mithril';
 import { renderMultilineText } from 'helpers';
-import HeaderLandingPage from './landing_page_header';
 
 const PrivacyPolicy = `
 Last updated: January 14, 2019
@@ -114,13 +113,8 @@ If you have any questions about this Privacy Statement, please contact us at: he
 `;
 
 const PrivacyPage: m.Component<{}> = {
-  oncreate: (vnode) => {},
-  view: (vnode) => {
+  view: () => {
     return m('.PrivacyPage', [
-      m(HeaderLandingPage, {
-        scrollHeader: false,
-        navs: [{ text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' }],
-      }),
       m('.forum-container', [
         m('h1.page-title', 'Privacy Policy'),
         renderMultilineText(PrivacyPolicy),

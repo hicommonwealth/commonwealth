@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import numeral from 'numeral';
 
-import 'pages/landing/community_cards.scss';
+import 'pages/communities.scss';
 
 import app from 'state';
 import { ChainInfo } from 'models';
@@ -14,9 +14,9 @@ import {
   ChainNetwork,
 } from 'common-common/src/types';
 import { CWButton } from '../components/component_kit/cw_button';
-import Sublayout from '../sublayout';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
 import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from '../sublayout';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;
@@ -50,7 +50,7 @@ export const buildChainToCategoriesMap = (
   return chainToCategoriesMap;
 };
 
-class HomepageCommunityCards extends ClassComponent {
+class CommunitiesPage extends ClassComponent {
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
   private chainBases: Array<string>;
@@ -183,7 +183,7 @@ class HomepageCommunityCards extends ClassComponent {
     const totalCommunitiesString = buildCommunityString(sortedChains.length);
 
     return (
-      <div class="HomepageCommunityCards">
+      <Sublayout class="CommunitiesPage">
         <div class="header-section">
           <CWText type="h3" fontWeight="semiBold" className="communities-count">
             {totalCommunitiesString}
@@ -236,19 +236,9 @@ class HomepageCommunityCards extends ClassComponent {
           {sortedChains}
           <NewCommunityCard />
         </div>
-      </div>
+      </Sublayout>
     );
   }
 }
 
-const CommunityCardPage: m.Component = {
-  view: () => {
-    return (
-      <Sublayout>
-        <HomepageCommunityCards />
-      </Sublayout>
-    );
-  },
-};
-
-export default CommunityCardPage;
+export default CommunitiesPage;
