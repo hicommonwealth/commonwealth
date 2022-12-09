@@ -7,10 +7,10 @@
   width: 100%;
 
   &.isPinned {
-    background: $neutral-100;
+    background: $neutral-50;
 
     &:hover {
-      background: $neutral-200;
+      background: $neutral-100;
     }
   }
 
@@ -74,11 +74,16 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
+      padding-right: 72px; // hack to be removed on completion of discussion listings
     }
 
     .row-bottom {
       display: flex;
       justify-content: space-between;
+
+      @include mediumAndUp { // hack to be removed on completion of discussion listings
+        margin-top: -28px;
+      }
 
       .comments-count {
         align-items: center;
