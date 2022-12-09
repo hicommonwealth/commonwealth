@@ -7,6 +7,7 @@ import 'pages/new_proposal/aave_proposal_form.scss';
 
 import app from 'state';
 import { Account } from 'models';
+import { Executor } from 'common-common/src/eth/types';
 import User from 'views/components/widgets/user';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
@@ -22,27 +23,27 @@ type AaveProposalFormAttrs = {
 };
 
 type AaveProposalState = {
-  calldata;
-  signature;
-  target;
-  value;
+  calldata?: string;
+  signature?: string;
+  target?: string;
+  value?: string;
   withDelegateCall: boolean;
 };
 
 export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
   private aaveProposalState: Array<AaveProposalState>;
   private activeTabIndex: number;
-  private executor;
-  private ipfsHash;
+  private executor: Executor | string;
+  private ipfsHash: string;
   private tabCount: number;
 
   oninit() {
     this.aaveProposalState = [
       {
-        target: null,
-        value: null,
-        calldata: null,
-        signature: null,
+        target: undefined,
+        value: undefined,
+        calldata: undefined,
+        signature: undefined,
         withDelegateCall: false,
       },
     ];
