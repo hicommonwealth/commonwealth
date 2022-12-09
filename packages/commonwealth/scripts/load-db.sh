@@ -7,7 +7,7 @@ echo "Grepping: $ENV_FILE_PATH"
 if [[ $OSTYPE == 'darwin'* ]]; then
   export $(grep -v '^#' "$ENV_FILE_PATH" | xargs)
   else
-    export $(grep -v '^#' $ENV_FILE_PATH | xargs -d '\n' -e)
+    export $(grep -v '^#' "$ENV_FILE_PATH" | xargs -d '\n' -e)
 fi
 
 psql -d commonwealth -U commonwealth -W -f latest.dump
