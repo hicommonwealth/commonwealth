@@ -7,7 +7,6 @@ echo "Grepping: $ENV_FILE_PATH"
 if [[ $OSTYPE == 'darwin'* ]]; then
   export $(grep -v '^#' "$ENV_FILE_PATH" | xargs)
   else
-    # shellcheck disable=SC2086
     export $(grep -v '^#' $ENV_FILE_PATH | xargs -d '\n' -e)
 fi
 
