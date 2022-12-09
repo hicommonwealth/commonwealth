@@ -4,6 +4,7 @@ import 'pages/privacy_and_terms.scss';
 
 import m from 'mithril';
 import { renderMultilineText } from 'helpers';
+import Sublayout from '../sublayout';
 
 const PrivacyPolicy = `
 Last updated: January 14, 2019
@@ -114,10 +115,12 @@ If you have any questions about this Privacy Statement, please contact us at: he
 
 const PrivacyPage: m.Component<{}> = {
   view: () => {
-    return m('.PrivacyPage', [
-      m('.forum-container', [
-        m('h1.page-title', 'Privacy Policy'),
-        renderMultilineText(PrivacyPolicy),
+    return m(Sublayout, [
+      m('.PrivacyPage', [
+        m('.forum-container', [
+          m('h1.page-title', 'Privacy Policy'),
+          renderMultilineText(PrivacyPolicy),
+        ]),
       ]),
     ]);
   },
