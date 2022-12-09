@@ -142,9 +142,6 @@ export default (
       tableName: 'Chains',
       timestamps: false,
       underscored: false,
-      indexes: [
-        { fields: ['snapshot'] },
-      ],
     }
   );
 
