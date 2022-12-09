@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -20,18 +21,17 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 
-export class EditCollaboratorsModal
-  implements
-    m.ClassComponent<{
-      thread: Thread;
-    }>
-{
+type EditCollaboratorsModalAttrs = {
+  thread: Thread;
+};
+
+export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModalAttrs> {
   private addedEditors: any;
   private items: any[];
   private membersFetched: boolean;
   private removedEditors: any;
 
-  view(vnode) {
+  view(vnode: m.Vnode<EditCollaboratorsModalAttrs>) {
     const { thread } = vnode.attrs;
 
     // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state

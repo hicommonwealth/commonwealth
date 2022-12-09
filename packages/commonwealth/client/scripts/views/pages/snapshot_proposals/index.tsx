@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 import { Button } from 'construct-ui';
 
@@ -26,14 +27,13 @@ enum SnapshotProposalFilter {
   Ended = 'Ended',
 }
 
-class SnapshotProposalStagesBar
-  implements
-    m.Component<{
-      selected: SnapshotProposalFilter;
-      onChangeFilter: (value: SnapshotProposalFilter) => void;
-    }>
-{
-  view(vnode) {
+type SnapshotProposalStagesBarAttrs = {
+  selected: SnapshotProposalFilter;
+  onChangeFilter: (value: SnapshotProposalFilter) => void;
+};
+
+class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
+  view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
     return (
       <div class="DiscussionFilterBar">
         {Object.values(SnapshotProposalFilter).map(
@@ -60,9 +60,12 @@ class SnapshotProposalStagesBar
   }
 }
 
-class SnapshotProposalsPage
-  implements m.ClassComponent<{ topic?: string; snapshotId: string }>
-{
+type SnapshotProposalsPageAttrs = {
+  topic?: string;
+  snapshotId: string;
+};
+
+class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
   private selectedFilter: SnapshotProposalFilter;
 
   oncreate() {
@@ -76,7 +79,7 @@ class SnapshotProposalsPage
     this.selectedFilter = SnapshotProposalFilter.Active;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotProposalsPageAttrs>) {
     const { selectedFilter } = this;
     const { snapshotId } = vnode.attrs;
 

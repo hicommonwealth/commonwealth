@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { InputSelect, ListItem } from 'construct-ui';
 
@@ -18,15 +19,18 @@ type AddressInputTypeaheadItem = {
   permission: string;
 };
 
-export class AddressInputTypeahead
-  implements m.ClassComponent<{ options: any; oninput }>
-{
+type AddressInputTypeaheadAttrs = {
+  oninput: (item: AddressInputTypeaheadItem) => void;
+  options: { placeholder: string; fluid: boolean };
+};
+
+export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadAttrs> {
   private initialized: boolean;
   private loading: boolean;
   private selectedItem: AddressInputTypeaheadItem;
   private typeaheadAddresses: Array<AddressInputTypeaheadItem>;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.VnodeDOM<AddressInputTypeaheadAttrs>) {
     if (vnode.attrs.options.placeholder) {
       $(vnode.dom)
         .find('input')
@@ -35,7 +39,7 @@ export class AddressInputTypeahead
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<AddressInputTypeaheadAttrs>) {
     const { options, oninput } = vnode.attrs;
 
     if (!this.initialized) {

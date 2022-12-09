@@ -1,30 +1,31 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_dropdown.scss';
 
 import { CWTextInput } from './cw_text_input';
 import { CWPopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { MenuItem } from './types';
+import { DefaultMenuItem } from './types';
 
-export type DropdownInputAttrs = {
-  inputOptions: Array<MenuItem>;
+type DropdownAttrs = {
+  inputOptions: Array<DefaultMenuItem>;
   onSelect?: (optionLabel: string, index?: number) => void;
   initialValue?: string;
 };
 
-export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
+export class CWDropdown extends ClassComponent<DropdownAttrs> {
   private showDropdown: boolean;
   private selectedValue: string;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<DropdownAttrs>) {
     this.showDropdown = false;
     this.selectedValue =
       vnode.attrs.initialValue ?? vnode.attrs.inputOptions[0].label;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<DropdownAttrs>) {
     const { inputOptions, onSelect } = vnode.attrs;
 
     return (

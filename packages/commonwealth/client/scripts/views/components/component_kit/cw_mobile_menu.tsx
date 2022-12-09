@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_mobile_menu.scss';
 
@@ -11,7 +12,7 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
 import { ComponentType, MenuItem } from './types';
 
-class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
+class CWMobileMenuItem extends ClassComponent<MenuItem> {
   view(vnode: m.Vnode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
       const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
@@ -23,10 +24,10 @@ class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
             { disabled, isSecondary },
             'MobileMenuItem'
           )}
-          onclick={() => {
+          onclick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
-            onclick();
+            onclick(e);
           }}
         >
           <div class="mobile-menu-item-left">
@@ -36,16 +37,22 @@ class CWMobileMenuItem implements m.ClassComponent<MenuItem> {
           {iconRight && <CWIcon iconName={iconRight} iconSize="small" />}
         </div>
       );
+    } else if (vnode.attrs.type === 'header') {
+      return (
+        <div class="MobileMenuItem">
+          <CWText type="caption">{vnode.attrs.label}</CWText>
+        </div>
+      );
     } else if (vnode.attrs.type === 'notification') {
       const { hasUnreads, iconLeft, iconRight, label, onclick } = vnode.attrs;
 
       return (
         <div
           class="MobileMenuItem"
-          onclick={() => {
+          onclick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
-            onclick();
+            onclick(e);
           }}
         >
           <div class="mobile-menu-item-left">
@@ -70,9 +77,10 @@ type MobileMenuAttrs = {
   menuItems: Array<MenuItem>;
 };
 
-export class CWMobileMenu implements m.ClassComponent<MobileMenuAttrs> {
+export class CWMobileMenu extends ClassComponent<MobileMenuAttrs> {
   view(vnode: m.Vnode<MobileMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
+
     return (
       <div
         class={getClasses<{ className: string }>(

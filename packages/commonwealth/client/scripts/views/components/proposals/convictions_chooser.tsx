@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Select } from 'construct-ui';
 
 import 'components/proposals/convictions_chooser.scss';
@@ -11,10 +12,10 @@ import {
   convictions,
 } from 'controllers/chain/substrate/democracy_referendum';
 
-export class ConvictionsChooser
-  implements m.ClassComponent<{ callback: (number) => void }>
-{
-  view(vnode) {
+type ConvictionsChooserAttrs = { callback: (number) => void };
+
+export class ConvictionsChooser extends ClassComponent<ConvictionsChooserAttrs> {
+  view(vnode: m.Vnode<ConvictionsChooserAttrs>) {
     return m(Select, {
       class: 'ConvictionsChooser',
       name: 'convictions',

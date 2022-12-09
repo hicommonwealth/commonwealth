@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_label.scss';
 
@@ -11,7 +12,7 @@ type LabelAttrs = {
   label: string;
 };
 
-export class CWLabel implements m.ClassComponent<LabelAttrs> {
+export class CWLabel extends ClassComponent<LabelAttrs> {
   view(vnode: m.Vnode<LabelAttrs>) {
     const { label } = vnode.attrs;
     return (

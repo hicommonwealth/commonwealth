@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/tip_detail.scss';
 
@@ -16,16 +17,15 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { createTXModal } from '../modals/tx_signing_modal';
 
-export class TipDetail
-  implements
-    m.ClassComponent<{
-      headerTitle: string;
-      proposal: SubstrateTreasuryTip;
-      setTipAmount: () => void;
-      tipAmount: number;
-    }>
-{
-  view(vnode) {
+type TipDetailAttrs = {
+  headerTitle: string;
+  proposal: SubstrateTreasuryTip;
+  setTipAmount: (tip?: number) => void;
+  tipAmount: number;
+};
+
+export class TipDetail extends ClassComponent<TipDetailAttrs> {
+  view(vnode: m.Vnode<TipDetailAttrs>) {
     const { headerTitle, proposal, setTipAmount, tipAmount } = vnode.attrs;
 
     const {

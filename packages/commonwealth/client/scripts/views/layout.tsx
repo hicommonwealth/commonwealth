@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
@@ -20,7 +21,7 @@ import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
 
-class LoadingLayout implements m.ClassComponent {
+class LoadingLayout extends ClassComponent {
   view() {
     return (
       <div class="Layout">
@@ -40,13 +41,13 @@ type LayoutAttrs = {
   scope: string;
 };
 
-export class Layout implements m.ClassComponent<LayoutAttrs> {
+export class Layout extends ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
 
-  view(vnode) {
+  view(vnode: m.Vnode<LayoutAttrs>) {
     const { scope, deferChain } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;

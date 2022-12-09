@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/discussions/recent_listing.scss';
 
@@ -12,14 +13,14 @@ import { EmptyListingPlaceholder } from '../../components/empty_topic_placeholde
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
-interface RecentListingAttrs {
+type RecentListingAttrs = {
   stageName: string;
   topicName: string;
-}
-export class RecentListing implements m.ClassComponent<RecentListingAttrs> {
+};
+export class RecentListing extends ClassComponent<RecentListingAttrs> {
   private initializing: boolean;
 
-  view(vnode: m.VnodeDOM<RecentListingAttrs, this>) {
+  view(vnode: m.Vnode<RecentListingAttrs>) {
     const { topicName, stageName } = vnode.attrs;
 
     const { listingStore } = app.threads;

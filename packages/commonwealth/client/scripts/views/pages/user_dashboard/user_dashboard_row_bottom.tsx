@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Icons, MenuItem, PopoverMenu } from 'construct-ui';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
@@ -20,10 +21,8 @@ type UserDashboardRowBottomAttrs = {
   viewCount: number;
 };
 
-export class UserDashboardRowBottom
-  implements m.ClassComponent<UserDashboardRowBottomAttrs>
-{
-  view(vnode) {
+export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBottomAttrs> {
+  view(vnode: m.Vnode<UserDashboardRowBottomAttrs>) {
     const { path, threadId, viewCount, likeCount, commentCount } = vnode.attrs;
 
     const adjustedId = `discussion_${threadId}`;

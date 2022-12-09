@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { SelectList, ListItem, Callout, Icons } from 'construct-ui';
 
 import 'components/topic_selector.scss';
@@ -16,8 +17,8 @@ type TopicSelectorAttrs = {
   updateFormData: (topic: Topic) => void;
 };
 
-export class TopicSelector implements m.ClassComponent<TopicSelectorAttrs> {
-  view(vnode) {
+export class TopicSelector extends ClassComponent<TopicSelectorAttrs> {
+  view(vnode: m.Vnode<TopicSelectorAttrs>) {
     const { defaultTopic, tabindex, topics, updateFormData } = vnode.attrs;
 
     let selectedTopic;

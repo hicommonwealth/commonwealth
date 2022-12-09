@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import { formatDuration, blocknumToTime } from 'helpers';
@@ -11,11 +12,11 @@ type CountdownAttrs = {
   time?: moment.Moment;
 };
 
-export class Countdown implements m.ClassComponent<CountdownAttrs> {
+export class Countdown extends ClassComponent<CountdownAttrs> {
   private timer;
   private timerHandle;
 
-  view(vnode: m.VnodeDOM<CountdownAttrs, this>) {
+  view(vnode: m.Vnode<CountdownAttrs>) {
     const { time, duration, includeSeconds } = vnode.attrs;
     if (!time && !duration) return;
 
@@ -50,10 +51,8 @@ type CountdownUntilBlockAttrs = {
   includeSeconds?: boolean;
 };
 
-export class CountdownUntilBlock
-  implements m.Component<CountdownUntilBlockAttrs>
-{
-  view(vnode: m.VnodeDOM<CountdownUntilBlockAttrs, this>) {
+export class CountdownUntilBlock extends ClassComponent<CountdownUntilBlockAttrs> {
+  view(vnode: m.Vnode<CountdownUntilBlockAttrs>) {
     let { includeSeconds } = vnode.attrs;
     if (!vnode.attrs.block) return;
     if (includeSeconds === undefined) includeSeconds = true;

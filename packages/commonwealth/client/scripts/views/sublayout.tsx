@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'sublayout.scss';
 
@@ -17,11 +18,10 @@ import { SublayoutHeader } from './sublayout_header';
 type SublayoutAttrs = {
   hideFooter?: boolean;
   hideSearch?: boolean;
-  onscroll: () => null; // lazy loading for page content
+  onscroll?: () => void; // lazy loading for page content
 };
 
-class Sublayout implements m.ClassComponent<SublayoutAttrs> {
-  private isSidebarToggled: boolean;
+class Sublayout extends ClassComponent<SublayoutAttrs> {
   private isWindowSmallInclusive: boolean;
 
   onResize() {
@@ -47,7 +47,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     });
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SublayoutAttrs>) {
     const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
@@ -59,27 +59,15 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
-
-    const isSidebarToggleable = app.chain && this.isWindowSmallInclusive;
-    this.isSidebarToggled =
-      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
-
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
           <SublayoutHeader
             hideSearch={hideSearch}
-            isSidebarToggleable={isSidebarToggleable}
-            isSidebarToggled={this.isSidebarToggled}
-            toggleSidebar={() => {
-              this.isSidebarToggled = !this.isSidebarToggled;
-            }}
+            onMobile={this.isWindowSmallInclusive}
           />
           <div class="sidebar-and-body-container">
-            <Sidebar
-              isSidebarToggleable={isSidebarToggleable}
-              isSidebarToggled={this.isSidebarToggled}
-            />
+            <Sidebar onMobile={this.isWindowSmallInclusive} />
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}

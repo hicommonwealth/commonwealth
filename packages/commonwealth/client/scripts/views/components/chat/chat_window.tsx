@@ -1,7 +1,8 @@
 /* @jsx m */
 
 import $ from 'jquery';
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -25,7 +26,7 @@ import { QuillEditor } from '../quill/quill_editor';
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
 
-const formatTimestampForChat = (timestamp) => {
+const formatTimestampForChat = (timestamp: moment.Moment) => {
   timestamp = moment(timestamp);
   if (timestamp.isBefore(moment().subtract(365, 'days')))
     return timestamp.format('MMM D YYYY');
@@ -40,7 +41,7 @@ type ChatWindowAttrs = {
   channel_id: string;
 };
 
-export class ChatWindow implements m.Component<ChatWindowAttrs> {
+export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
   private onIncomingMessage: (any: any) => void;
   private scrollToBottom: () => void;
   private shouldScroll: boolean;
@@ -80,7 +81,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     );
   };
 
-  oninit(vnode: VnodeDOM<ChatWindowAttrs, this>) {
+  oninit(vnode: m.VnodeDOM<ChatWindowAttrs, this>) {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
     });
@@ -97,6 +98,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
 
     this.shouldScroll = true;
     this.shouldScrollToHighlight = Boolean(m.route.param('message'));
+
     this.scrollToBottom = () => {
       const scroller = $(vnode.dom).find('.chat-messages')[0];
       scroller.scrollTop = scroller.scrollHeight - scroller.clientHeight + 20;
@@ -122,7 +124,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
     );
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ChatWindowAttrs>) {
     if (this.hideChat) return;
 
     const { channel_id } = vnode.attrs;
@@ -229,7 +231,7 @@ export class ChatWindow implements m.Component<ChatWindowAttrs> {
               // TODO Graham 7/20/22: I hate this usage of contentsDoc—can it be improved?
               contentsDoc=""
               oncreateBind={(state: QuillEditor) => {
-                vnode.state.quillEditorState = state;
+                this.quillEditorState = state;
               }}
               editorNamespace={`${document.location.pathname}-chatting`}
               onkeyboardSubmit={() => {

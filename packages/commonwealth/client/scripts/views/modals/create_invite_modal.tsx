@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
@@ -31,12 +32,12 @@ type SearchParams = {
 type InviteButtonAttrs = {
   chain?: ChainInfo;
   disabled?: boolean;
-  failureCallback: () => void;
+  failureCallback: (isFailure: boolean, err?: string) => void;
   invitedAddress?: string;
   invitedAddressChain?: string;
   invitedEmail?: string;
   selection: string;
-  successCallback: () => void;
+  successCallback: (isSuccessful: boolean) => void;
 };
 
 type CommunityOption = {
@@ -254,14 +255,14 @@ const search = async (searchTerm: string, params: SearchParams, state) => {
   }
 };
 
-class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
+class InviteButton extends ClassComponent<InviteButtonAttrs> {
   private loading: boolean;
 
   oninit() {
     this.loading = false;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<InviteButtonAttrs>) {
     const {
       selection,
       successCallback,
@@ -342,6 +343,8 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
                       result.address_chain,
                       result.chain_id,
                       result.permission,
+                      result.allow,
+                      result.deny,
                       result.is_user_default
                     )
                   );
@@ -363,12 +366,11 @@ class InviteButton implements m.ClassComponent<InviteButtonAttrs> {
   }
 }
 
-export class CreateInviteModal
-  implements
-    m.ClassComponent<{
-      chainInfo?: ChainInfo;
-    }>
-{
+type CreateInviteModalAttrs = {
+  chainInfo?: ChainInfo;
+};
+
+export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
   private closeResults: () => void;
   private disabled: boolean;
   private enterAddress: (address: string) => void;
@@ -386,7 +388,7 @@ export class CreateInviteModal
   private searchAddressTerm: string;
   private success: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<CreateInviteModalAttrs>) {
     const { chainInfo } = vnode.attrs;
 
     const chainOrCommunityObj = chainInfo ? { chain: chainInfo } : null;

@@ -1,20 +1,18 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
 import app from 'state';
 import { link } from 'helpers';
 import { ChainInfo } from 'models';
-import { CommunitySelector } from 'views/components/sidebar/community_selector';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWDivider } from '../component_kit/cw_divider';
 
-export class SidebarQuickSwitcher implements m.ClassComponent {
+export class SidebarQuickSwitcher extends ClassComponent {
   view() {
     const allCommunities = app.config.chains
       .getAll()
@@ -39,17 +37,18 @@ export class SidebarQuickSwitcher implements m.ClassComponent {
               iconButtonTheme="black"
               onclick={(e) => {
                 e.preventDefault();
-                mixpanelBrowserTrack({
-                  event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
-                  chainBase: null,
-                  isCustomDomain: app.isCustomDomain(),
-                  communityType: null,
-                });
-                m.route.set('/createCommunity');
+                app.sidebarMenu = 'create-content';
               }}
             />
           )}
-          <CommunitySelector />
+          <CWIconButton
+            iconName="compass"
+            iconButtonTheme="black"
+            onclick={(e) => {
+              e.preventDefault();
+              app.sidebarMenu = 'explore-communities';
+            }}
+          />
         </div>
         <CWDivider />
         <div class="scrollable-community-bar">

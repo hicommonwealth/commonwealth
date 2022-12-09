@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/snapshot_proposal_selector.scss';
@@ -13,19 +14,17 @@ import {
 } from 'helpers/snapshot_utils';
 
 type SnapshotProposalSelectorAttrs = {
-  onSelect: () => void;
+  onSelect: (sn: SnapshotProposal) => void;
   snapshotProposalsToSet: SnapshotProposal[];
   thread: Thread;
 };
 
-export class SnapshotProposalSelector
-  implements m.ClassComponent<SnapshotProposalSelectorAttrs>
-{
+export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSelectorAttrs> {
   private allProposals: SnapshotProposal[];
   private initialized: boolean;
   private snapshotProposalsLoaded: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotProposalSelectorAttrs>) {
     const { onSelect } = vnode.attrs;
 
     if (!app.chain || !app.activeChainId()) return;

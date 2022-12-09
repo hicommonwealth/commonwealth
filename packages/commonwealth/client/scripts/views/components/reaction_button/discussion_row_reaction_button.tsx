@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/discussion_row_reaction_button.scss';
@@ -19,9 +20,7 @@ type DiscussionRowReactionButtonAttrs = {
   thread: Thread;
 };
 
-export class DiscussionRowReactionButton
-  implements m.ClassComponent<DiscussionRowReactionButtonAttrs>
-{
+export class DiscussionRowReactionButton extends ClassComponent<DiscussionRowReactionButtonAttrs> {
   private loading: boolean;
   private reactors: any;
 
@@ -29,7 +28,7 @@ export class DiscussionRowReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<DiscussionRowReactionButtonAttrs, this>) {
+  view(vnode: m.Vnode<DiscussionRowReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};

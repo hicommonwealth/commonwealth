@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import {
   Button,
   Icons,
@@ -18,13 +19,13 @@ import { threadStageToLabel } from 'helpers';
 
 type StagesMenuAttrs = {
   disabled: boolean;
-  selectedStage: ThreadStage;
+  selectedStage?: ThreadStage;
   stage: string;
   stages: ThreadStage[];
 };
 
-export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
-  view(vnode) {
+export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
+  view(vnode: m.Vnode<StagesMenuAttrs>) {
     const { disabled, selectedStage, stage, stages } = vnode.attrs;
 
     return m(PopoverMenu, {

@@ -130,7 +130,7 @@ li.LandingPageMenuButton.ml-10.pt-2 {
 }
 
 header {
-  border-radius: 50px;
+  border-radius: $border-radius-rounded-corners;
   transition: border-radius 0.15s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
@@ -140,7 +140,6 @@ header {
   }
 
   @include small {
-    border-radius: 33px;
     &.fixed-header {
       width: calc(100% - 2rem);
     }

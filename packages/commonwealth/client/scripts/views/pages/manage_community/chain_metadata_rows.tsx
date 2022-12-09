@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
@@ -14,7 +15,7 @@ import {
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo } from 'models';
+import { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
   addPermission,
@@ -31,16 +32,14 @@ import {
 import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ChainMetadataRowsAttrs = {
-  admins: any;
+  admins: Array<RoleInfo>;
   chain?: ChainInfo;
   mods: any;
-  onRoleUpdate: (oldRole: string, newRole: string) => void;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   onSave: () => void;
 };
 
-export class ChainMetadataRows
-  implements m.ClassComponent<ChainMetadataRowsAttrs>
-{
+export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   name: string;
   description: string;
   website: string;
@@ -70,7 +69,7 @@ export class ChainMetadataRows
   quillBanner: any;
   bannerStateUpdated: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
     this.name = chain.name;
     this.description = chain.description;
@@ -81,7 +80,10 @@ export class ChainMetadataRows
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !isPermitted(chain.defaultDenyPermissions, Action.VIEW_CHAT_CHANNELS);
+    this.chatEnabled = !isPermitted(
+      chain.defaultDenyPermissions,
+      Action.VIEW_CHAT_CHANNELS
+    );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -95,7 +97,7 @@ export class ChainMetadataRows
     this.communityBanner = chain.communityBanner;
   }
 
-  view(vnode) {
+  view(vnode: m.VnodeDOM<ChainMetadataRowsAttrs, this>) {
     const chain: ChainInfo = vnode.attrs.chain;
     return (
       <div class="ChainMetadataRows">
@@ -229,7 +231,7 @@ export class ChainMetadataRows
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
-            value={this.snapshot}
+            value={this.snapshot.join('')}
             placeholder={this.network}
             onChangeHandler={(v) => {
               const snapshots = v

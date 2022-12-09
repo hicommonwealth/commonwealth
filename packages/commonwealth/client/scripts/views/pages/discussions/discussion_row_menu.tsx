@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/discussions/discussion_row_menu.scss';
 
@@ -66,10 +67,12 @@ export const getThreadSubScriptionMenuItem = (proposal: Thread) => {
   };
 };
 
-export class DiscussionRowMenu
-  implements m.ClassComponent<{ proposal: Thread }>
-{
-  view(vnode) {
+type DiscussionRowMenuAttrs = {
+  proposal: Thread;
+};
+
+export class DiscussionRowMenu extends ClassComponent<DiscussionRowMenuAttrs> {
+  view(vnode: m.Vnode<DiscussionRowMenuAttrs>) {
     if (!app.isLoggedIn()) return;
 
     const { proposal } = vnode.attrs;
@@ -101,7 +104,7 @@ export class DiscussionRowMenu
         <CWPopoverMenu
           menuItems={[
             getThreadSubScriptionMenuItem(proposal),
-            ...(hasAdminPermissions ? [{ type: 'divider' }] : []),
+            ...(hasAdminPermissions ? [{ type: 'divider' as const }] : []),
             ...(hasAdminPermissions
               ? [
                   {
