@@ -37,7 +37,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
               iconButtonTheme="black"
               onclick={(e) => {
                 e.preventDefault();
-                app.sidebarMenu = 'create-content';
+                app.sidebarMenu = 'createContent';
               }}
             />
           )}
@@ -46,7 +46,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
             iconButtonTheme="black"
             onclick={(e) => {
               e.preventDefault();
-              app.sidebarMenu = 'explore-communities';
+              app.sidebarMenu = 'exploreCommunities';
             }}
           />
         </div>

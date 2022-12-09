@@ -80,6 +80,7 @@ export class ExploreCommunitiesSidebar extends ClassComponent {
             );
             sidebar[0].classList.add('onremove');
             setTimeout(() => {
+              app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               m.redraw();
             }, 200);
