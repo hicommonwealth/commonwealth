@@ -175,6 +175,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           isCustomDomain: app.isCustomDomain(),
           communityType: null,
         });
+        app.sidebarToggled = false;
         app.sidebarMenu = 'default';
         m.route.set('/createCommunity');
       },
@@ -223,6 +224,7 @@ export class CreateContentSidebar extends ClassComponent {
             );
             sidebar[0].classList.add('onremove');
             setTimeout(() => {
+              app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               m.redraw();
             }, 200);
