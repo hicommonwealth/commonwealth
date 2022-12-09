@@ -97,7 +97,7 @@ export class ComponentShowcase extends ClassComponent {
     // console.log(this.checkboxGroupSelected);
     return (
       <div class="ComponentShowcase">
-        <div class="basic-gallery">
+        {/* <div class="basic-gallery">
           <CWText type="h4">Filter Menu</CWText>
           <CWFilterMenu
             header="Stages"
@@ -117,7 +117,7 @@ export class ComponentShowcase extends ClassComponent {
               }
             }}
           />
-        </div>
+        </div> */}
         <div class="basic-gallery">
           <CWText type="h4">Content Page Card</CWText>
           <CWContentPageCard

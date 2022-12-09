@@ -19,6 +19,8 @@ type FilterMenuAttrs = {
   selectedItems: Array<string>;
 };
 
+// DO NOT USE! DOESN'T WORK YET
+
 export class CWFilterMenu extends ClassComponent<FilterMenuAttrs> {
   view(vnode: m.Vnode<FilterMenuAttrs>) {
     const { filterMenuItems, header, onchange, selectedItems } = vnode.attrs;
