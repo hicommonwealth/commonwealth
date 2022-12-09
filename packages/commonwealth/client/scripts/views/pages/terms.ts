@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 
-import 'pages/landing/privacyAndTerms.scss';
+import 'pages/privacy_and_terms.scss';
 
 import m from 'mithril';
 import { renderMultilineText } from 'helpers';

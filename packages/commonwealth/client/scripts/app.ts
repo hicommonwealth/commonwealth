@@ -623,8 +623,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       '/about': importRoute('views/pages/commonwealth', {
         scoped: false,
       }),
-      '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
-      '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
+      '/terms': importRoute('views/pages/terms', { scoped: false }),
+      '/privacy': importRoute('views/pages/privacy', { scoped: false }),
       '/components': importRoute('views/pages/components', {
         scoped: false,
         hideSidebar: true,
