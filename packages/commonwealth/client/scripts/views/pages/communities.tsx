@@ -183,58 +183,65 @@ class CommunitiesPage extends ClassComponent {
     const totalCommunitiesString = buildCommunityString(sortedChains.length);
 
     return (
-      <Sublayout class="CommunitiesPage">
-        <div class="header-section">
-          <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {totalCommunitiesString}
-          </CWText>
-          <div class="filter-buttons">
-            {this.chainCategories.map((cat) => {
-              return (
-                <CWButton
-                  label={cat}
-                  buttonType={
-                    this.filterMap[cat] ? 'primary-black' : 'secondary-black'
-                  }
-                  onclick={() => {
-                    this.filterMap[cat] = !this.filterMap[cat];
-                  }}
-                />
-              );
-            })}
-            {this.chainNetworks.map((network) => {
-              return (
-                <CWButton
-                  label={network}
-                  buttonType={
-                    this.filterMap[network]
-                      ? 'primary-black'
-                      : 'secondary-black'
-                  }
-                  onclick={() => {
-                    this.filterMap[network] = !this.filterMap[network];
-                  }}
-                />
-              );
-            })}
-            {this.chainBases.map((base) => {
-              return (
-                <CWButton
-                  label={base}
-                  buttonType={
-                    this.filterMap[base] ? 'primary-black' : 'secondary-black'
-                  }
-                  onclick={() => {
-                    this.filterMap[base] = !this.filterMap[base];
-                  }}
-                />
-              );
-            })}
+      <Sublayout>
+        <div class="CommunitiesPage">
+          {' '}
+          <div class="header-section">
+            <CWText
+              type="h3"
+              fontWeight="semiBold"
+              className="communities-count"
+            >
+              {totalCommunitiesString}
+            </CWText>
+            <div class="filter-buttons">
+              {this.chainCategories.map((cat) => {
+                return (
+                  <CWButton
+                    label={cat}
+                    buttonType={
+                      this.filterMap[cat] ? 'primary-black' : 'secondary-black'
+                    }
+                    onclick={() => {
+                      this.filterMap[cat] = !this.filterMap[cat];
+                    }}
+                  />
+                );
+              })}
+              {this.chainNetworks.map((network) => {
+                return (
+                  <CWButton
+                    label={network}
+                    buttonType={
+                      this.filterMap[network]
+                        ? 'primary-black'
+                        : 'secondary-black'
+                    }
+                    onclick={() => {
+                      this.filterMap[network] = !this.filterMap[network];
+                    }}
+                  />
+                );
+              })}
+              {this.chainBases.map((base) => {
+                return (
+                  <CWButton
+                    label={base}
+                    buttonType={
+                      this.filterMap[base] ? 'primary-black' : 'secondary-black'
+                    }
+                    onclick={() => {
+                      this.filterMap[base] = !this.filterMap[base];
+                    }}
+                  />
+                );
+              })}
+            </div>
           </div>
-        </div>
-        <div class="communities-list">
-          {sortedChains}
-          <NewCommunityCard />
+          <div class="communities-list">
+            {sortedChains}
+            <NewCommunityCard />
+          </div>
         </div>
       </Sublayout>
     );

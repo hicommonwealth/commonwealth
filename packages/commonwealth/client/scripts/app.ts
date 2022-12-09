@@ -31,9 +31,7 @@ import { isWindowMediumSmallInclusive } from './views/components/component_kit/h
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/user_dashboard');
-import(
-  /* webpackPrefetch: true */ 'client/scripts/views/pages/why_commonwealth'
-);
+import(/* webpackPrefetch: true */ 'views/pages/why_commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 import(/* webpackPrefetch: true */ 'views/pages/view_thread');
@@ -854,7 +852,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
-            '/communities': importRoute('views/pages/community_cards', {
+            '/communities': importRoute('views/pages/communities', {
               scoped: false,
               hideSidebar: false,
             }),
