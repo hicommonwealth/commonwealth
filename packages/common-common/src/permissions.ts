@@ -381,10 +381,10 @@ export const BASE_PERMISSIONS: Permissions =
   addPermission(BigInt(0), Action.VIEW_REACTIONS) |
   addPermission(BigInt(0), Action.CREATE_REACTION) |
   addPermission(BigInt(0), Action.DELETE_REACTION) |
-  // addPermission(BigInt(0), Action.VIEW_COMMENTS) |
-  // addPermission(BigInt(0), Action.CREATE_COMMENT) |
-  // addPermission(BigInt(0), Action.EDIT_COMMENT) |
-  // addPermission(BigInt(0), Action.DELETE_COMMENT) |
+  addPermission(BigInt(0), Action.VIEW_COMMENTS) |
+  addPermission(BigInt(0), Action.CREATE_COMMENT) |
+  addPermission(BigInt(0), Action.EDIT_COMMENT) |
+  addPermission(BigInt(0), Action.DELETE_COMMENT) |
   // addPermission(BigInt(0), Action.VIEW_POLLS) |
   // addPermission(BigInt(0), Action.CREATE_POLL) |
   // addPermission(BigInt(0), Action.VOTE_ON_POLLS) |
