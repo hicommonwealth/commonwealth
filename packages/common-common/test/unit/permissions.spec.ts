@@ -26,7 +26,7 @@ describe('addPermission() unit tests', () => {
     assert.isTrue(isPermitted(base, Action.CREATE_THREAD));
     // eslint-disable-next-line no-bitwise
     assert.isTrue(isPermitted(base, Action.VIEW_CHAT_CHANNELS));
-    assert.isTrue(isPermitted(base, Action.VIEW_COMMENTS));
+    assert.isFalse(isPermitted(base, Action.VIEW_COMMENTS));
   });
 });
 

@@ -93,20 +93,7 @@ describe('computePermissions() unit tests', () => {
     assert.isFalse(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
   });
 
-  it('should correctly implicit permissions for an addPermission', () => {
-    const actionPermission = addPermission(
-      base_permission,
-      Action.VIEW_THREADS
-    );
-    assert.isTrue(isPermitted(actionPermission, Action.VIEW_COMMENTS));
-    assert.isTrue(isPermitted(actionPermission, Action.VIEW_COMMENTS));
-    assert.isTrue(isPermitted(actionPermission, Action.VIEW_THREADS));
-    assert.isTrue(isPermitted(actionPermission, Action.VIEW_REACTIONS));
-    assert.isTrue(isPermitted(actionPermission, Action.VIEW_POLLS));
-    assert.isFalse(isPermitted(actionPermission, Action.CREATE_THREAD));
-  });
-
-  it('should correctly computePermissions for an action and its implicit permissions', () => {
+  it('should correctly computePermissions for an action(No implicit permissions)', () => {
     // eslint-disable-next-line no-bitwise
     overwrite_admin.allow = addPermission(BigInt(0), Action.CREATE_THREAD);
 
@@ -119,18 +106,9 @@ describe('computePermissions() unit tests', () => {
     ]);
 
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
-    assert.isTrue(isPermitted(permission, Action.CREATE_COMMENT));
-    assert.isTrue(isPermitted(permission, Action.CREATE_POLL));
-    assert.isTrue(isPermitted(permission, Action.CREATE_REACTION));
-    assert.isTrue(isPermitted(permission, Action.VIEW_COMMENTS));
-    assert.isTrue(isPermitted(permission, Action.VIEW_THREADS));
-    assert.isTrue(isPermitted(permission, Action.VIEW_REACTIONS));
-    assert.isTrue(isPermitted(permission, Action.VIEW_POLLS));
-    assert.isTrue(isPermitted(permission, Action.DELETE_THREAD));
-    assert.isFalse(isPermitted(permission, Action.CREATE_CHAT));
   });
 
-  it('should correctly computePermissions for an action and its implicit permissions with one denial that is overwritten by admin', () => {
+  it('should correctly computePermissions for two actions on different roles(no implicit permissions)', () => {
     // If moderator allows viewing comments, but admin denies threads. Then view threads should be allowed because viewing comments implies viewing threads.
 
     // eslint-disable-next-line no-bitwise
@@ -145,7 +123,7 @@ describe('computePermissions() unit tests', () => {
     ]);
 
     assert.isFalse(isPermitted(permission, Action.VIEW_THREADS));
-    assert.isFalse(isPermitted(permission, Action.VIEW_COMMENTS));
+    assert.isTrue(isPermitted(permission, Action.VIEW_COMMENTS));
   });
 
   it('should correctly computePermissions for an action and its implicit permissions with one denial', () => {
