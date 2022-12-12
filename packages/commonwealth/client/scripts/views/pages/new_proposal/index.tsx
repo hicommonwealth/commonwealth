@@ -111,9 +111,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
     //   return <div class="NewProposalForm">Invalid proposal type</div>;
     // }
 
-    const author = app.user.activeAccount;
-
-    if (!author) {
+    if (!app.user.activeAccount) {
       return <CWText>Must be logged in</CWText>;
     }
 
@@ -127,11 +125,9 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
           <CWText type="h3" fontWeight="medium">
             {this.titlePre} {proposalSlugToFriendlyName.get(this.typeEnum)}
           </CWText>
-          {this.typeEnum === ProposalType.AaveProposal && (
-            <AaveProposalForm author={author} />
-          )}
+          {this.typeEnum === ProposalType.AaveProposal && <AaveProposalForm />}
           {this.typeEnum === ProposalType.CompoundProposal && (
-            <CompoundProposalForm author={author} />
+            <CompoundProposalForm />
           )}
           {this.typeEnum === ProposalType.CosmosProposal && (
             <CosmosProposalForm />
@@ -146,7 +142,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
             <SubstrateBountyProposalForm />
           )}
           {this.typeEnum === ProposalType.SubstrateCollectiveProposal && (
-            <SubstrateCollectiveProposalForm author={author} />
+            <SubstrateCollectiveProposalForm />
           )}
           {this.typeEnum === ProposalType.SubstrateDemocracyProposal && (
             <SubstrateDemocracyProposalForm
@@ -158,10 +154,10 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
             />
           )}
           {this.typeEnum === ProposalType.SubstrateTreasuryProposal && (
-            <SubstrateTreasuryProposalForm author={author} />
+            <SubstrateTreasuryProposalForm />
           )}
           {this.typeEnum === ProposalType.SubstrateTreasuryTip && (
-            <SubstrateTreasuryTipForm author={author} />
+            <SubstrateTreasuryTipForm />
           )}
         </div>
       </Sublayout>

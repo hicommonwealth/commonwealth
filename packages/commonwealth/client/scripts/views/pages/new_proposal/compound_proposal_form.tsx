@@ -5,7 +5,12 @@ import ClassComponent from 'class_component';
 
 import 'pages/new_proposal/compound_proposal_form.scss';
 
-import { Account } from 'models';
+import app from 'state';
+import { ITXModalData, ProposalModule } from 'models';
+import { proposalSlugToClass } from 'identifiers';
+import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
+import { notifySuccess, notifyError } from 'controllers/app/notifications';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
 import User from 'views/components/widgets/user';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWLabel } from '../../components/component_kit/cw_label';
@@ -15,15 +20,14 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { AaveProposalState, defaultStateItem } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { ProposalType } from '../../../../../../common-common/src/types';
+import { createTXModal } from '../../modals/tx_signing_modal';
 
-type CompoundProposalFormAttrs = {
-  author: Account;
-};
-
-export class CompoundProposalForm extends ClassComponent<CompoundProposalFormAttrs> {
+export class CompoundProposalForm extends ClassComponent {
   private aaveProposalState: Array<AaveProposalState>;
   private activeTabIndex: number;
   private description: string;
+  private proposer;
   private tabCount: number;
   private title: string;
 
@@ -33,8 +37,8 @@ export class CompoundProposalForm extends ClassComponent<CompoundProposalFormAtt
     this.tabCount = 1;
   }
 
-  view(vnode: m.Vnode<CompoundProposalFormAttrs>) {
-    const { author } = vnode.attrs;
+  view() {
+    const author = app.user.activeAccount;
     const { activeTabIndex, aaveProposalState } = this;
 
     return (
@@ -146,7 +150,77 @@ export class CompoundProposalForm extends ClassComponent<CompoundProposalFormAtt
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-            // createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+
+            const createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.AaveProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
+
+            const args = [];
+
+            this.proposer = app.user?.activeAccount?.address;
+
+            if (!this.proposer) {
+              throw new Error('Invalid address / not logged in');
+            }
+
+            if (!this.description) {
+              throw new Error('Invalid description');
+            }
+
+            const targets = [];
+            const values = [];
+            const calldatas = [];
+            const signatures = [];
+
+            for (let i = 0; i < this.tabCount; i++) {
+              const aaveProposal = this.aaveProposalState[i];
+              if (aaveProposal.target) {
+                targets.push(aaveProposal.target);
+              } else {
+                throw new Error(`No target for Call ${i + 1}`);
+              }
+
+              values.push(aaveProposal.value || '0');
+              calldatas.push(aaveProposal.calldata || '');
+              signatures.push(aaveProposal.signature || '');
+            }
+
+            // if they passed a title, use the JSON format for description.
+            // otherwise, keep description raw
+            let description = this.description;
+
+            if (this.title) {
+              description = JSON.stringify({
+                description: this.description,
+                title: this.title,
+              });
+            }
+
+            const details: CompoundProposalArgs = {
+              description,
+              targets,
+              values,
+              calldatas,
+              signatures,
+            };
+
+            (app.chain as Compound).governance
+              .propose(details)
+              .then((result: string) => {
+                notifySuccess(`Proposal ${result} created successfully!`);
+                m.redraw();
+              })
+              .catch((err) => notifyError(err.data?.message || err.message));
+
+            Promise.resolve(createFunc(args)).then((modalData) =>
+              createTXModal(modalData)
+            );
           }}
         />
       </div>

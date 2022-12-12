@@ -7,7 +7,7 @@ import { utils } from 'ethers';
 import 'pages/new_proposal/aave_proposal_form.scss';
 
 import app from 'state';
-import { Account, ITXModalData, ProposalModule } from 'models';
+import { ITXModalData, ProposalModule } from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { Executor } from 'common-common/src/eth/types';
 import User from 'views/components/widgets/user';
@@ -26,11 +26,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { ProposalType } from '../../../../../../common-common/src/types';
 import { createTXModal } from '../../modals/tx_signing_modal';
 
-type AaveProposalFormAttrs = {
-  author: Account;
-};
-
-export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
+export class AaveProposalForm extends ClassComponent {
   private aaveProposalState: Array<AaveProposalState>;
   private activeTabIndex: number;
   private executor: Executor | string;
@@ -44,8 +40,8 @@ export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
     this.tabCount = 1;
   }
 
-  view(vnode: m.Vnode<AaveProposalFormAttrs>) {
-    const { author } = vnode.attrs;
+  view() {
+    const author = app.user.activeAccount;
     const { activeTabIndex, aaveProposalState } = this;
 
     return (

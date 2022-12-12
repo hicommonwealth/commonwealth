@@ -2,16 +2,23 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-
-// import 'pages/new_proposal/compound_proposal_form.scss';
+import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
+import { proposalSlugToClass } from 'identifiers';
+import { ITXModalData, ProposalModule } from 'models';
+import CosmosAccount from 'controllers/chain/cosmos/account';
+import { notifyError } from 'controllers/app/notifications';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { SupportedCosmosProposalTypes } from './types';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { ProposalType } from '../../../../../../common-common/src/types';
+import { createTXModal } from '../../modals/tx_signing_modal';
 
 export class CosmosProposalForm extends ClassComponent {
   private cosmosProposalType;
@@ -34,6 +41,7 @@ export class CosmosProposalForm extends ClassComponent {
   }
 
   view() {
+    const author = app.user.activeAccount;
     let dataLoaded = true;
     dataLoaded = !!(app.chain as Cosmos).governance.initialized;
 
@@ -124,7 +132,59 @@ export class CosmosProposalForm extends ClassComponent {
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-            // createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+
+            const createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.AaveProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
+
+            const args = [];
+
+            let prop: ProtobufAny;
+
+            const { title, description } = this.form;
+
+            const deposit = this.deposit
+              ? new CosmosToken(
+                  (app.chain as Cosmos).governance.minDeposit.denom,
+                  this.deposit,
+                  false
+                )
+              : (app.chain as Cosmos).governance.minDeposit;
+            if (this.cosmosProposalType === SupportedCosmosProposalTypes.Text) {
+              prop = (app.chain as Cosmos).governance.encodeTextProposal(
+                title,
+                description
+              );
+            } else if (
+              this.cosmosProposalType ===
+              SupportedCosmosProposalTypes.CommunitySpend
+            ) {
+              prop = (app.chain as Cosmos).governance.encodeCommunitySpend(
+                title,
+                description,
+                this.recipient,
+                this.payoutAmount
+              );
+            } else {
+              throw new Error('Unknown Cosmos proposal type.');
+            }
+            // TODO: add disabled / loading
+            (app.chain as Cosmos).governance
+              .submitProposalTx(author as CosmosAccount, deposit, prop)
+              .then((result) => {
+                navigateToSubpage(`/proposal/${result}`);
+              })
+              .catch((err) => notifyError(err.message));
+
+            Promise.resolve(createFunc(args)).then((modalData) =>
+              createTXModal(modalData)
+            );
           }}
         />
       </>

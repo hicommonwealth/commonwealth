@@ -4,33 +4,35 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { Account } from 'models';
+import { proposalSlugToClass } from 'identifiers';
+import { ITXModalData, ProposalModule } from 'models';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { ChainBase } from '../../../../../../common-common/src/types';
+import {
+  ChainBase,
+  ProposalType,
+} from '../../../../../../common-common/src/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { createTXModal } from '../../modals/tx_signing_modal';
 
-type SubstrateCollectiveProposalFormAttrs = {
-  author: Account;
-};
-
-export class SubstrateCollectiveProposalForm extends ClassComponent<SubstrateCollectiveProposalFormAttrs> {
+export class SubstrateCollectiveProposalForm extends ClassComponent {
   private councilMotionDescription;
   private councilMotionType;
   private enactmentDelay;
+  private nextExternalProposalHash;
   private referendumId;
   private threshold;
   private treasuryProposalIndex;
   private votingPeriod;
 
-  view(vnode: m.Vnode<SubstrateCollectiveProposalFormAttrs>) {
-    const { author } = vnode.attrs;
+  view() {
+    const author = app.user.activeAccount;
     const motions = SubstrateCollectiveProposal.motions;
 
     // if (
@@ -186,7 +188,129 @@ export class SubstrateCollectiveProposalForm extends ClassComponent<SubstrateCol
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-            // createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+
+            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
+              (a) => {
+                return (
+                  proposalSlugToClass().get(
+                    ProposalType.AaveProposal
+                  ) as ProposalModule<any, any, any>
+                ).createTx(...a);
+              };
+
+            let args = [];
+
+            if (!this.threshold) throw new Error('Invalid threshold');
+
+            const threshold = this.threshold;
+
+            if (this.councilMotionType === 'createExternalProposal') {
+              args = [
+                author,
+                threshold,
+                EdgewareFunctionPicker.getMethod(),
+                EdgewareFunctionPicker.getMethod().encodedLength,
+              ];
+
+              createFunc = ([a, t, mt, l]) =>
+                (app.chain as Substrate).council.createExternalProposal(
+                  a,
+                  t,
+                  mt,
+                  l
+                );
+            } else if (
+              this.councilMotionType === 'createExternalProposalMajority'
+            ) {
+              args = [
+                author,
+                threshold,
+                EdgewareFunctionPicker.getMethod(),
+                EdgewareFunctionPicker.getMethod().encodedLength,
+              ];
+
+              createFunc = ([a, t, mt, l]) =>
+                (app.chain as Substrate).council.createExternalProposalMajority(
+                  a,
+                  t,
+                  mt,
+                  l
+                );
+            } else if (
+              this.councilMotionType === 'createExternalProposalDefault'
+            ) {
+              args = [
+                author,
+                threshold,
+                EdgewareFunctionPicker.getMethod(),
+                EdgewareFunctionPicker.getMethod().encodedLength,
+              ];
+
+              createFunc = ([a, t, mt, l]) =>
+                (app.chain as Substrate).council.createExternalProposalDefault(
+                  a,
+                  t,
+                  mt,
+                  l
+                );
+            } else if (this.councilMotionType === 'createFastTrack') {
+              args = [
+                author,
+                threshold,
+                this.nextExternalProposalHash,
+                this.votingPeriod,
+                this.enactmentDelay,
+              ];
+
+              createFunc = ([a, b, c, d, e]) =>
+                (app.chain as Substrate).council.createFastTrack(a, b, c, d, e);
+            } else if (
+              this.councilMotionType === 'createEmergencyCancellation'
+            ) {
+              args = [author, threshold, this.referendumId];
+
+              createFunc = ([a, t, h]) =>
+                (app.chain as Substrate).council.createEmergencyCancellation(
+                  a,
+                  t,
+                  h
+                );
+            } else if (
+              this.councilMotionType === 'createTreasuryApprovalMotion'
+            ) {
+              args = [author, threshold, this.treasuryProposalIndex];
+
+              createFunc = ([a, t, i]) =>
+                (app.chain as Substrate).council.createTreasuryApprovalMotion(
+                  a,
+                  t,
+                  i
+                );
+            } else if (
+              this.councilMotionType === 'createTreasuryRejectionMotion'
+            ) {
+              args = [author, threshold, this.treasuryProposalIndex];
+
+              createFunc = ([a, t, i]) =>
+                (app.chain as Substrate).council.createTreasuryRejectionMotion(
+                  a,
+                  t,
+                  i
+                );
+            } else if (this.councilMotionType === 'vetoNextExternal') {
+              args = [author, this.nextExternalProposalHash];
+
+              createFunc = ([a, h]) =>
+                (app.chain as Substrate).council.vetoNextExternal(a, h);
+            } else {
+              throw new Error('Invalid council motion type');
+            }
+
+            return createTXModal(createFunc(args));
+
+            // Promise.resolve(createFunc(args)).then((modalData) =>
+            //   createTXModal(modalData)
+            // );
           }}
         />
       </>

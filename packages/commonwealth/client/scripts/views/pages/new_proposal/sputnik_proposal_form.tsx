@@ -3,10 +3,18 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
+import app from 'state';
+import { proposalSlugToClass } from 'identifiers';
+import { ITXModalData, ProposalModule } from 'models';
+import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
+import { notifyError } from 'controllers/app/notifications';
+import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { SupportedSputnikProposalTypes } from './types';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { ProposalType } from '../../../../../../common-common/src/types';
+import { createTXModal } from '../../modals/tx_signing_modal';
 
 export class SputnikProposalForm extends ClassComponent {
   private description;
@@ -95,7 +103,75 @@ export class SputnikProposalForm extends ClassComponent {
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-            // createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+
+            const createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.AaveProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
+
+            const args = [];
+
+            // TODO: make type of proposal switchable
+            const member = this.member;
+
+            const description = this.description;
+
+            let propArgs: NearSputnikProposalKind;
+
+            if (
+              this.sputnikProposalType ===
+              SupportedSputnikProposalTypes.AddMemberToRole
+            ) {
+              propArgs = {
+                AddMemberToRole: { role: 'council', member_id: member },
+              };
+            } else if (
+              this.sputnikProposalType ===
+              SupportedSputnikProposalTypes.RemoveMemberFromRole
+            ) {
+              propArgs = {
+                RemoveMemberFromRole: { role: 'council', member_id: member },
+              };
+            } else if (
+              this.sputnikProposalType ===
+              SupportedSputnikProposalTypes.Transfer
+            ) {
+              // TODO: validate amount / token id
+              const token_id = this.tokenId || '';
+
+              let amount: string;
+              // treat NEAR as in dollars but tokens as whole #s
+              if (!token_id) {
+                amount = app.chain.chain
+                  .coins(+this.payoutAmount, true)
+                  .asBN.toString();
+              } else {
+                amount = `${+this.payoutAmount}`;
+              }
+
+              propArgs = {
+                Transfer: { receiver_id: member, token_id, amount },
+              };
+            } else if (
+              this.sputnikProposalType === SupportedSputnikProposalTypes.Vote
+            ) {
+              propArgs = 'Vote';
+            } else {
+              throw new Error('unsupported sputnik proposal type');
+            }
+            (app.chain as NearSputnik).dao
+              .proposeTx(description, propArgs)
+              .then(() => m.redraw())
+              .catch((err) => notifyError(err.message));
+
+            Promise.resolve(createFunc(args)).then((modalData) =>
+              createTXModal(modalData)
+            );
           }}
         />
       </>

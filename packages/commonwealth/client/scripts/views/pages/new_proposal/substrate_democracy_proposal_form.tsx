@@ -2,18 +2,26 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
+import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
+import { proposalSlugToClass } from 'identifiers';
+import { ITXModalData, ProposalModule } from 'models';
+import { notifyError } from 'controllers/app/notifications';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { ChainBase } from '../../../../../../common-common/src/types';
+import {
+  ChainBase,
+  ProposalType,
+} from '../../../../../../common-common/src/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { createTXModal } from '../../modals/tx_signing_modal';
 
 type SubstrateDemocracyProposalFormAttrs = {
   onChangeSlugEnum: (slug: any) => void;
@@ -29,6 +37,8 @@ export class SubstrateDemocracyProposalForm extends ClassComponent<SubstrateDemo
 
   view(vnode: m.Vnode<SubstrateDemocracyProposalFormAttrs>) {
     const { onChangeSlugEnum } = vnode.attrs;
+
+    const author = app.user.activeAccount;
 
     let dataLoaded;
 
@@ -103,7 +113,84 @@ export class SubstrateDemocracyProposalForm extends ClassComponent<SubstrateDemo
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-            // createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+
+            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
+              (a) => {
+                return (
+                  proposalSlugToClass().get(
+                    ProposalType.AaveProposal
+                  ) as ProposalModule<any, any, any>
+                ).createTx(...a);
+              };
+
+            let args = [];
+
+            const deposit = this.deposit
+              ? app.chain.chain.coins(this.deposit, true)
+              : (app.chain as Substrate).democracyProposals.minimumDeposit;
+
+            if (!EdgewareFunctionPicker.getMethod()) {
+              notifyError('Missing arguments');
+            } else if (this.toggleValue === 'proposal') {
+              const proposalHash = blake2AsHex(
+                EdgewareFunctionPicker.getMethod().toHex()
+              );
+
+              args = [
+                author,
+                EdgewareFunctionPicker.getMethod(),
+                proposalHash,
+                deposit,
+              ];
+
+              createFunc = ([au, mt, pr, dep]) =>
+                (app.chain as Substrate).democracyProposals.createTx(
+                  au,
+                  mt,
+                  pr,
+                  dep
+                );
+            } else if (this.toggleValue === 'preimage') {
+              onChangeSlugEnum('democracypreimage');
+
+              const encodedProposal =
+                EdgewareFunctionPicker.getMethod().toHex();
+
+              args = [
+                author,
+                EdgewareFunctionPicker.getMethod(),
+                encodedProposal,
+              ];
+
+              createFunc = ([au, mt, pr]) =>
+                (app.chain as Substrate).democracyProposals.notePreimage(
+                  au,
+                  mt,
+                  pr
+                );
+            } else if (this.toggleValue === 'imminent') {
+              onChangeSlugEnum('democracyimminent');
+
+              const encodedProposal =
+                EdgewareFunctionPicker.getMethod().toHex();
+
+              args = [
+                author,
+                EdgewareFunctionPicker.getMethod(),
+                encodedProposal,
+              ];
+
+              createFunc = ([au, mt, pr]) =>
+                (
+                  app.chain as Substrate
+                ).democracyProposals.noteImminentPreimage(au, mt, pr);
+            } else {
+              throw new Error('Invalid toggle state');
+            }
+
+            Promise.resolve(createFunc(args)).then((modalData) =>
+              createTXModal(modalData)
+            );
           }}
         />
       </>

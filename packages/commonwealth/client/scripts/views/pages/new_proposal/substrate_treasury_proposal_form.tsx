@@ -4,20 +4,21 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { Account } from 'models';
+import { proposalSlugToClass } from 'identifiers';
+import { ITXModalData, ProposalModule } from 'models';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { ChainBase } from '../../../../../../common-common/src/types';
+import {
+  ChainBase,
+  ProposalType,
+} from '../../../../../../common-common/src/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { createTXModal } from '../../modals/tx_signing_modal';
 
-type SubstrateTreasuryProposalFormAttrs = {
-  author: Account;
-};
-
-export class SubstrateTreasuryProposalForm extends ClassComponent<SubstrateTreasuryProposalFormAttrs> {
+export class SubstrateTreasuryProposalForm extends ClassComponent {
   private form: {
     amount;
     beneficiary;
@@ -29,8 +30,8 @@ export class SubstrateTreasuryProposalForm extends ClassComponent<SubstrateTreas
     // value;
   };
 
-  view(vnode: m.Vnode<SubstrateTreasuryProposalFormAttrs>) {
-    const { author } = vnode.attrs;
+  view() {
+    const author = app.user.activeAccount;
 
     let dataLoaded;
     const treasury = (app.chain as Substrate).treasury;
@@ -90,7 +91,30 @@ export class SubstrateTreasuryProposalForm extends ClassComponent<SubstrateTreas
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-            // createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+
+            const createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.AaveProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
+
+            let args = [];
+
+            if (!this.form.beneficiary) {
+              throw new Error('Invalid beneficiary address');
+            }
+
+            const beneficiary = app.chain.accounts.get(this.form.beneficiary);
+
+            args = [author, this.form.amount, beneficiary];
+
+            Promise.resolve(createFunc(args)).then((modalData) =>
+              createTXModal(modalData)
+            );
           }}
         />
       </>
