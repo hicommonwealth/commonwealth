@@ -334,8 +334,8 @@ const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   ],
 ]);
 
-// Adds the implicit permissions to a permission
-export function computeImplicitPermissions(
+// Adds or Removes the implicit permissions of a permission
+export function addRemoveImplicitPermissions(
   permission: Permissions,
   actionNumber: number,
   isAdd: boolean
@@ -362,6 +362,7 @@ export function addPermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result |= BigInt(1) << BigInt(actionNumber);
+  result = addRemoveImplicitPermissions(result, actionNumber, true);
   return result;
 }
 
@@ -373,6 +374,7 @@ export function removePermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result &= ~(BigInt(1) << BigInt(actionNumber));
+  result = addRemoveImplicitPermissions(result, actionNumber, true);
   return result;
 }
 
