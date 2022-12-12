@@ -1,6 +1,5 @@
 import BN from 'bn.js';
-import { ChainNetwork } from 'common-common/src/types';
-import { TokenBalanceCache } from 'token-balance-cache/src';
+import { TokenBalanceCache, FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
@@ -33,41 +32,35 @@ const validateTopicThreshold = async (
       // if we have no node, always approve
       return true;
     }
-    let bp: string;
-    try {
-      const result = await tbc.getBalanceProviders(topic.chain.ChainNode.id);
-      bp = result[0].bp;
-    } catch (e) {
-      log.info(`No balance provider for chain node ${topic.chain.ChainNode.name}, skipping check.`);
+
+    // skip query if no threshold
+    const threshold = new BN(topic.token_threshold || '0');
+    if (threshold.isZero()) {
       return true;
     }
 
+    // TODO: @JAKE in the future, we will have more than one contract,
+    // need to handle this through the TBC Rule, passing in associated Contract.id
     const communityContracts = await models.CommunityContract.findOne({
       where: { chain_id: topic.chain.id },
       include: [{ model: models.Contract, required: true }],
     });
-      // TODO: @JAKE in the future, we will have more than one contract,
-      // need to handle this through the TBC Rule, passing in associated Contract.id
-    const threshold = new BN(topic.token_threshold || '0');
-    if (!threshold.isZero()) {
-      const tokenBalances = await tbc.getBalancesForAddresses(
-        topic.chain.chain_node_id,
-        [ userAddress ],
-        bp,
-        {
-          contractType: topic.chain.network === ChainNetwork.ERC20
-          ? 'erc20' : topic.chain.network === ChainNetwork.ERC721
-            ? 'erc721' : undefined,
-          tokenAddress: communityContracts?.Contract?.address,
-        }
+
+    try {
+      const balance = await tbc.fetchUserBalance(
+        topic.chain.network,
+        topic.chain.ChainNode.id,
+        userAddress,
+        communityContracts?.Contract?.address
       );
-      if (tokenBalances.errors[userAddress] || !tokenBalances.balances[userAddress]) {
-        throw new Error(tokenBalances.errors[userAddress] || `No token balance queried for ${userAddress}`);
+
+      return (new BN(balance)).gte(threshold);
+    } catch (e) {
+      if (e.message === FetchTokenBalanceErrors.NoBalanceProvider) {
+        return true;
+      } else {
+        throw e;
       }
-      const tokenBalance = new BN(tokenBalances.balances[userAddress]);
-      return tokenBalance.gte(threshold);
-    } else {
-      return true;
     }
   } catch (err) {
     log.warn(`Could not validate topic threshold for ${topicId}: ${err.message}`);

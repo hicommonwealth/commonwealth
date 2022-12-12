@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import { ChainType, NotificationCategories } from 'common-common/src/types';
+import { ChainNetwork, ChainType, NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
@@ -107,7 +107,7 @@ const createReaction = async (
     }
   }
 
-  if (chain && chain.type === ChainType.Token) {
+  if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
     // skip check for admins
     const isAdmin = await findAllRoles(
       models,
