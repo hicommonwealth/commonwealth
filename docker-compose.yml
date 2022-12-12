@@ -3,6 +3,18 @@ services:
   builder: 
     image: builder
     build: .
+  db:
+    env_file:
+      - ".env"
+    image: postgres 
+    environment:
+      POSTGRES_PASSWORD: "${DOCKER_PG_PW}"
+      POSTGRES_USER: "${DOCKER_PG_USER}"
+      POSTGRES_DB: commonwealth
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports: 
+      - '5432:5432'
   common-common:
     build: packages/common-common
   chain-events: 
@@ -12,14 +24,18 @@ services:
       context: .
       dockerfile: packages/commonwealth/Dockerfile
     hostname: commonwealth
-    env_file: 
-      - packages/commonwealth/.env
+    environment: 
+      DATABASE_URL: postgresql://commonwealth:edgeware@localhost/commonwealth
     ports: 
       - "8080:8080"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     volumes:
       - ./:/monorepo
+    depends_on:
+      - db
+volumes:
+  db:
+    driver: local
+
 
     
 
