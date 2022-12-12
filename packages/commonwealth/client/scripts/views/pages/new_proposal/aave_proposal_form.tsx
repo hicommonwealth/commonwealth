@@ -18,6 +18,7 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { AaveProposalState, defaultStateItem } from './types';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 type AaveProposalFormAttrs = {
   author: Account;
@@ -172,6 +173,13 @@ export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
           label="Delegate Call"
           value=""
         />
+        {/* <CWButton
+          label="Send transaction"
+          onclick={(e) => {
+            e.preventDefault();
+            createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+          }}
+        /> */}
       </div>
     );
   }

@@ -11,6 +11,7 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { SupportedCosmosProposalTypes } from './types';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 export class CosmosProposalForm extends ClassComponent {
   private cosmosProposalType;
@@ -33,6 +34,9 @@ export class CosmosProposalForm extends ClassComponent {
   }
 
   view() {
+    let dataLoaded = true;
+    dataLoaded = !!(app.chain as Cosmos).governance.initialized;
+
     return (
       <>
         <CWDropdown
@@ -116,6 +120,13 @@ export class CosmosProposalForm extends ClassComponent {
             }}
           />
         )}
+        <CWButton
+          label="Send transaction"
+          onclick={(e) => {
+            e.preventDefault();
+            // createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+          }}
+        />
       </>
     );
   }

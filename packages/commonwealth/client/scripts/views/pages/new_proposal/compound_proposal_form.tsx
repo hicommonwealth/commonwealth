@@ -14,6 +14,7 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { AaveProposalState, defaultStateItem } from './types';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 type CompoundProposalFormAttrs = {
   author: Account;
@@ -139,6 +140,13 @@ export class CompoundProposalForm extends ClassComponent<CompoundProposalFormAtt
             const result = (e.target as any).value;
             this.aaveProposalState[activeTabIndex].signature = result;
             m.redraw();
+          }}
+        />
+        <CWButton
+          label="Send transaction"
+          onclick={(e) => {
+            e.preventDefault();
+            // createNewProposal(this, typeEnum, author, onChangeSlugEnum);
           }}
         />
       </div>
