@@ -29,23 +29,24 @@ import { SubstrateTreasuryProposalForm } from './substrate_treasury_proposal_for
 import { SubstrateTreasuryTipForm } from './substrate_treasury_tip_form';
 
 type NewProposalPageAttrs = {
-  type: string;
+  type: ProposalType;
 };
 
 class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
-  private typeEnum;
+  private typeEnum: ProposalType;
 
   view(vnode: m.Vnode<NewProposalPageAttrs>) {
     this.typeEnum = vnode.attrs.type;
 
     // wait for chain
-    if (app.chain?.failed)
+    if (app.chain?.failed) {
       return (
         <PageNotFound
           title="Wrong Ethereum Provider Network!"
           message="Change Metamask to point to Ethereum Mainnet"
         />
       );
+    }
 
     if (!app.chain || !app.chain.loaded || !app.chain.meta) {
       return <PageLoading />;
@@ -85,27 +86,27 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
       return <CWText>Unsupported network</CWText>;
     }
 
-    const getForm = () => {
-      switch (this.typeEnum) {
-        case this.typeEnum === ProposalType.AaveProposal:
+    const getForm = (typeEnum) => {
+      switch (typeEnum) {
+        case ProposalType.AaveProposal:
           return <AaveProposalForm />;
-        case this.typeEnum === ProposalType.CompoundProposal:
+        case ProposalType.CompoundProposal:
           return <CompoundProposalForm />;
-        case this.typeEnum === ProposalType.CosmosProposal:
+        case ProposalType.CosmosProposal:
           return <CosmosProposalForm />;
-        case this.typeEnum === ProposalType.PhragmenCandidacy:
+        case ProposalType.PhragmenCandidacy:
           return <PhragmenCandidacyForm />;
-        case this.typeEnum === ProposalType.SputnikProposal:
+        case ProposalType.SputnikProposal:
           return <SputnikProposalForm />;
-        case this.typeEnum === ProposalType.SubstrateBountyProposal:
+        case ProposalType.SubstrateBountyProposal:
           return <SubstrateBountyProposalForm />;
-        case this.typeEnum === ProposalType.SubstrateCollectiveProposal:
+        case ProposalType.SubstrateCollectiveProposal:
           return <SubstrateCollectiveProposalForm />;
-        case this.typeEnum === ProposalType.SubstrateDemocracyProposal:
+        case ProposalType.SubstrateDemocracyProposal:
           return <SubstrateDemocracyProposalForm />;
-        case this.typeEnum === ProposalType.SubstrateTreasuryProposal:
+        case ProposalType.SubstrateTreasuryProposal:
           return <SubstrateTreasuryProposalForm />;
-        case this.typeEnum === ProposalType.SubstrateTreasuryTip:
+        case ProposalType.SubstrateTreasuryTip:
           return <SubstrateTreasuryTipForm />;
         default:
           return <CWText>Invalid proposal type</CWText>;
@@ -118,7 +119,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
           <CWText type="h3" fontWeight="medium">
             New {proposalSlugToFriendlyName.get(this.typeEnum)}
           </CWText>
-          {getForm()}
+          {getForm(this.typeEnum)}
         </div>
       </Sublayout>
     );
