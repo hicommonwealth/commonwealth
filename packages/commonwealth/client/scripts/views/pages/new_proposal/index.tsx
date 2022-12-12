@@ -6,7 +6,6 @@ import ClassComponent from 'class_component';
 import 'pages/new_proposal/index.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ChainNetwork, ProposalType } from 'common-common/src/types';
@@ -34,17 +33,10 @@ type NewProposalPageAttrs = {
 };
 
 class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
-  private titlePre: string;
   private typeEnum;
 
   view(vnode: m.Vnode<NewProposalPageAttrs>) {
     this.typeEnum = vnode.attrs.type;
-    this.titlePre = 'New';
-
-    // auto-redirect to the new thread page if sent here accidentally
-    if (this.typeEnum === ProposalType.Thread) {
-      navigateToSubpage('/new/discussion');
-    }
 
     // wait for chain
     if (app.chain?.failed)
@@ -85,32 +77,6 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
       return <PageLoading />;
     }
 
-    // check typeEnum against supported types (use Omit on ProposalType?)
-
-    // unsupported
-    // MolochProposal = 'molochproposal',
-    // SubstrateDemocracyReferendum = 'referendum',
-    // SubstrateImminentPreimage = 'democracyimminent',
-    // SubstratePreimage = 'democracypreimage',
-    // SubstrateTechnicalCommitteeMotion = 'technicalcommitteemotion',
-    // Thread = 'discussion',
-
-    // supported
-    // AaveProposal = 'onchainproposal',
-    // CompoundProposal = 'compoundproposal',
-    // CosmosProposal = 'cosmosproposal',
-    // PhragmenCandidacy = 'phragmenelection',
-    // SputnikProposal = 'sputnikproposal',
-    // SubstrateBountyProposal = 'bountyproposal',
-    // SubstrateCollectiveProposal = 'councilmotion',
-    // SubstrateDemocracyProposal = 'democracyproposal',
-    // SubstrateTreasuryProposal = 'treasuryproposal',
-    // SubstrateTreasuryTip = 'treasurytip',
-
-    // else {
-    //   return <div class="NewProposalForm">Invalid proposal type</div>;
-    // }
-
     if (!app.user.activeAccount) {
       return <CWText>Must be logged in</CWText>;
     }
@@ -119,46 +85,40 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
       return <CWText>Unsupported network</CWText>;
     }
 
+    const getForm = () => {
+      switch (this.typeEnum) {
+        case this.typeEnum === ProposalType.AaveProposal:
+          return <AaveProposalForm />;
+        case this.typeEnum === ProposalType.CompoundProposal:
+          return <CompoundProposalForm />;
+        case this.typeEnum === ProposalType.CosmosProposal:
+          return <CosmosProposalForm />;
+        case this.typeEnum === ProposalType.PhragmenCandidacy:
+          return <PhragmenCandidacyForm />;
+        case this.typeEnum === ProposalType.SputnikProposal:
+          return <SputnikProposalForm />;
+        case this.typeEnum === ProposalType.SubstrateBountyProposal:
+          return <SubstrateBountyProposalForm />;
+        case this.typeEnum === ProposalType.SubstrateCollectiveProposal:
+          return <SubstrateCollectiveProposalForm />;
+        case this.typeEnum === ProposalType.SubstrateDemocracyProposal:
+          return <SubstrateDemocracyProposalForm />;
+        case this.typeEnum === ProposalType.SubstrateTreasuryProposal:
+          return <SubstrateTreasuryProposalForm />;
+        case this.typeEnum === ProposalType.SubstrateTreasuryTip:
+          return <SubstrateTreasuryTipForm />;
+        default:
+          return <CWText>Invalid proposal type</CWText>;
+      }
+    };
+
     return (
       <Sublayout>
         <div class="NewProposalPage">
           <CWText type="h3" fontWeight="medium">
-            {this.titlePre} {proposalSlugToFriendlyName.get(this.typeEnum)}
+            New {proposalSlugToFriendlyName.get(this.typeEnum)}
           </CWText>
-          {this.typeEnum === ProposalType.AaveProposal && <AaveProposalForm />}
-          {this.typeEnum === ProposalType.CompoundProposal && (
-            <CompoundProposalForm />
-          )}
-          {this.typeEnum === ProposalType.CosmosProposal && (
-            <CosmosProposalForm />
-          )}
-          {this.typeEnum === ProposalType.PhragmenCandidacy && (
-            <PhragmenCandidacyForm />
-          )}
-          {this.typeEnum === ProposalType.SputnikProposal && (
-            <SputnikProposalForm />
-          )}
-          {this.typeEnum === ProposalType.SubstrateBountyProposal && (
-            <SubstrateBountyProposalForm />
-          )}
-          {this.typeEnum === ProposalType.SubstrateCollectiveProposal && (
-            <SubstrateCollectiveProposalForm />
-          )}
-          {this.typeEnum === ProposalType.SubstrateDemocracyProposal && (
-            <SubstrateDemocracyProposalForm
-              onChangeSlugEnum={(value) => {
-                this.titlePre = value !== 'proposal' ? 'Note' : 'New';
-                this.typeEnum = `democracy${value}`;
-                m.redraw();
-              }}
-            />
-          )}
-          {this.typeEnum === ProposalType.SubstrateTreasuryProposal && (
-            <SubstrateTreasuryProposalForm />
-          )}
-          {this.typeEnum === ProposalType.SubstrateTreasuryTip && (
-            <SubstrateTreasuryTipForm />
-          )}
+          {getForm()}
         </div>
       </Sublayout>
     );

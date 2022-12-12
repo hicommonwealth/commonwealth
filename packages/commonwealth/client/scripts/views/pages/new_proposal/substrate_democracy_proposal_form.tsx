@@ -23,11 +23,7 @@ import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { createTXModal } from '../../modals/tx_signing_modal';
 
-type SubstrateDemocracyProposalFormAttrs = {
-  onChangeSlugEnum: (slug: any) => void;
-};
-
-export class SubstrateDemocracyProposalForm extends ClassComponent<SubstrateDemocracyProposalFormAttrs> {
+export class SubstrateDemocracyProposalForm extends ClassComponent {
   private deposit;
   private toggleValue;
 
@@ -35,9 +31,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent<SubstrateDemo
     this.toggleValue = 'proposal';
   }
 
-  view(vnode: m.Vnode<SubstrateDemocracyProposalFormAttrs>) {
-    const { onChangeSlugEnum } = vnode.attrs;
-
+  view() {
     const author = app.user.activeAccount;
 
     let dataLoaded;
@@ -67,7 +61,6 @@ export class SubstrateDemocracyProposalForm extends ClassComponent<SubstrateDemo
           name="democracy-tx-switcher"
           onchange={async (value) => {
             this.toggleValue = value;
-            onChangeSlugEnum(value);
             m.redraw();
           }}
           toggledOption="proposal"
@@ -151,8 +144,6 @@ export class SubstrateDemocracyProposalForm extends ClassComponent<SubstrateDemo
                   dep
                 );
             } else if (this.toggleValue === 'preimage') {
-              onChangeSlugEnum('democracypreimage');
-
               const encodedProposal =
                 EdgewareFunctionPicker.getMethod().toHex();
 
@@ -169,8 +160,6 @@ export class SubstrateDemocracyProposalForm extends ClassComponent<SubstrateDemo
                   pr
                 );
             } else if (this.toggleValue === 'imminent') {
-              onChangeSlugEnum('democracyimminent');
-
               const encodedProposal =
                 EdgewareFunctionPicker.getMethod().toHex();
 
