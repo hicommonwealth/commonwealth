@@ -1,28 +1,22 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { utils } from 'ethers';
-import BN from 'bn.js';
 import { blake2AsHex } from '@polkadot/util-crypto';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
 import { ProposalType } from 'common-common/src/types';
-import { ITXModalData, ProposalModule, ThreadStage, ThreadKind } from 'models';
+import { ITXModalData, ProposalModule } from 'models';
 import { proposalSlugToClass } from 'identifiers';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import Substrate from 'controllers/chain/substrate/adapter';
 import Cosmos from 'controllers/chain/cosmos/adapter';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { navigateToSubpage } from 'app';
 import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
@@ -45,26 +39,7 @@ export const createNewProposal = (
 
   let args = [];
 
-  if (typeEnum === ProposalType.Thread) {
-    app.threads
-      .create(
-        author.address,
-        ThreadKind.Discussion,
-        ThreadStage.Discussion,
-        app.activeChainId(),
-        state.form.title,
-        state.form.topicName,
-        state.form.topicId,
-        state.form.description
-      )
-      .then(() => {
-        m.redraw();
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-    return;
-  } else if (typeEnum === ProposalType.SubstrateDemocracyProposal) {
+  if (typeEnum === ProposalType.SubstrateDemocracyProposal) {
     const deposit = state.deposit
       ? app.chain.chain.coins(state.deposit, true)
       : (app.chain as Substrate).democracyProposals.minimumDeposit;
@@ -277,41 +252,6 @@ export const createNewProposal = (
       })
       .catch((err) => notifyError(err.message));
     return;
-  } else if (typeEnum === ProposalType.MolochProposal) {
-    // TODO: check that applicant is valid ETH address in hex
-    if (!state.applicantAddress) {
-      throw new Error('Invalid applicant address');
-    }
-
-    if (typeof state.tokenTribute !== 'number') {
-      throw new Error('Invalid token tribute');
-    }
-
-    if (typeof state.sharesRequested !== 'number') {
-      throw new Error('Invalid shares requested');
-    }
-
-    if (!state.title) {
-      throw new Error('Invalid title');
-    }
-
-    const details = JSON.stringify({
-      title: state.title,
-      description: state.description || '',
-    });
-
-    (app.chain as Moloch).governance
-      .createPropWebTx(
-        author as MolochMember,
-        state.applicantAddress,
-        new BN(state.tokenTribute),
-        new BN(state.sharesRequested),
-        details
-      )
-      // TODO: handling errors?
-      .then(() => m.redraw())
-      .catch((err) => notifyError(err.data?.message || err.message));
-    return;
   } else if (typeEnum === ProposalType.CompoundProposal) {
     state.proposer = app.user?.activeAccount?.address;
 
@@ -369,62 +309,6 @@ export const createNewProposal = (
       .catch((err) => notifyError(err.data?.message || err.message));
 
     return;
-  } else if (typeEnum === ProposalType.AaveProposal) {
-    state.proposer = app.user?.activeAccount?.address;
-
-    if (!state.proposer) {
-      throw new Error('Invalid address / not logged in');
-    }
-
-    if (!state.executor) {
-      throw new Error('Invalid executor');
-    }
-
-    if (!state.ipfsHash) {
-      throw new Error('No ipfs hash');
-    }
-
-    const targets = [];
-    const values = [];
-    const calldatas = [];
-    const signatures = [];
-    const withDelegateCalls = [];
-
-    for (let i = 0; i < state.aaveTabCount; i++) {
-      const aaveProposal = state.aaveProposalState[i];
-
-      if (aaveProposal.target) {
-        targets.push(aaveProposal.target);
-      } else {
-        throw new Error(`No target for Call ${i + 1}`);
-      }
-
-      values.push(aaveProposal.value || '0');
-      calldatas.push(aaveProposal.calldata || '');
-      withDelegateCalls.push(aaveProposal.withDelegateCall || false);
-      signatures.push(aaveProposal.signature || '');
-    }
-
-    // TODO: preload this ipfs value to ensure it's correct
-    const ipfsHash = utils.formatBytes32String(state.ipfsHash);
-
-    const details: AaveProposalArgs = {
-      executor: state.executor as string,
-      targets,
-      values,
-      calldatas,
-      signatures,
-      withDelegateCalls,
-      ipfsHash,
-    };
-
-    (app.chain as Aave).governance
-      .propose(details)
-      .then(() => m.redraw())
-      .catch((err) => notifyError(err.data?.message || err.message));
-
-    return;
-    // @TODO: Create Proposal via WebTx
   } else if (typeEnum === ProposalType.SputnikProposal) {
     // TODO: make type of proposal switchable
     const member = state.member;

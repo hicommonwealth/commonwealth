@@ -54,8 +54,10 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
           message="Change Metamask to point to Ethereum Mainnet"
         />
       );
-    if (!app.chain || !app.chain.loaded || !app.chain.meta)
+
+    if (!app.chain || !app.chain.loaded || !app.chain.meta) {
       return <PageLoading />;
+    }
 
     // infer proposal type if possible
     if (!this.typeEnum) {
@@ -97,8 +99,6 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
     // AaveProposal = 'onchainproposal',
     // CompoundProposal = 'compoundproposal',
     // CosmosProposal = 'cosmosproposal',
-
-    // substrate (also supported)
     // PhragmenCandidacy = 'phragmenelection',
     // SputnikProposal = 'sputnikproposal',
     // SubstrateBountyProposal = 'bountyproposal',

@@ -2,13 +2,17 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
+import { utils } from 'ethers';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
 
 import app from 'state';
-import { Account } from 'models';
+import { Account, ITXModalData, ProposalModule } from 'models';
+import { proposalSlugToClass } from 'identifiers';
 import { Executor } from 'common-common/src/eth/types';
 import User from 'views/components/widgets/user';
+import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
+import { notifyError } from 'controllers/app/notifications';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWLabel } from '../../components/component_kit/cw_label';
@@ -19,6 +23,8 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { AaveProposalState, defaultStateItem } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { ProposalType } from '../../../../../../common-common/src/types';
+import { createTXModal } from '../../modals/tx_signing_modal';
 
 type AaveProposalFormAttrs = {
   author: Account;
@@ -29,6 +35,7 @@ export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
   private activeTabIndex: number;
   private executor: Executor | string;
   private ipfsHash: string;
+  private proposer;
   private tabCount: number;
 
   oninit() {
@@ -173,13 +180,81 @@ export class AaveProposalForm extends ClassComponent<AaveProposalFormAttrs> {
           label="Delegate Call"
           value=""
         />
-        {/* <CWButton
+        <CWButton
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-            createNewProposal(this, typeEnum, author, onChangeSlugEnum);
+
+            const createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.AaveProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
+
+            const args = [];
+
+            this.proposer = app.user?.activeAccount?.address;
+
+            if (!this.proposer) {
+              throw new Error('Invalid address / not logged in');
+            }
+
+            if (!this.executor) {
+              throw new Error('Invalid executor');
+            }
+
+            if (!this.ipfsHash) {
+              throw new Error('No ipfs hash');
+            }
+
+            const targets = [];
+            const values = [];
+            const calldatas = [];
+            const signatures = [];
+            const withDelegateCalls = [];
+
+            for (let i = 0; i < this.tabCount; i++) {
+              const aaveProposal = this.aaveProposalState[i];
+
+              if (aaveProposal.target) {
+                targets.push(aaveProposal.target);
+              } else {
+                throw new Error(`No target for Call ${i + 1}`);
+              }
+
+              values.push(aaveProposal.value || '0');
+              calldatas.push(aaveProposal.calldata || '');
+              withDelegateCalls.push(aaveProposal.withDelegateCall || false);
+              signatures.push(aaveProposal.signature || '');
+            }
+
+            // TODO: preload this ipfs value to ensure it's correct
+            const ipfsHash = utils.formatBytes32String(this.ipfsHash);
+
+            const details: AaveProposalArgs = {
+              executor: this.executor as string,
+              targets,
+              values,
+              calldatas,
+              signatures,
+              withDelegateCalls,
+              ipfsHash,
+            };
+
+            (app.chain as Aave).governance
+              .propose(details)
+              .then(() => m.redraw())
+              .catch((err) => notifyError(err.data?.message || err.message));
+
+            Promise.resolve(createFunc(args)).then((modalData) =>
+              createTXModal(modalData)
+            );
           }}
-        /> */}
+        />
       </div>
     );
   }
