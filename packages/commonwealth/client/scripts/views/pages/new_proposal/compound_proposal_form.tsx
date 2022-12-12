@@ -6,8 +6,6 @@ import ClassComponent from 'class_component';
 import 'pages/new_proposal/compound_proposal_form.scss';
 
 import app from 'state';
-import { ITXModalData, ProposalModule } from 'models';
-import { proposalSlugToClass } from 'identifiers';
 import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
@@ -20,14 +18,12 @@ import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
 import { AaveProposalState, defaultStateItem } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ProposalType } from '../../../../../../common-common/src/types';
-import { createTXModal } from '../../modals/tx_signing_modal';
 
 export class CompoundProposalForm extends ClassComponent {
   private aaveProposalState: Array<AaveProposalState>;
   private activeTabIndex: number;
   private description: string;
-  private proposer;
+  private proposer: string;
   private tabCount: number;
   private title: string;
 
@@ -56,18 +52,14 @@ export class CompoundProposalForm extends ClassComponent {
           label="Proposal Title (leave blank for no title)"
           placeholder="Proposal Title"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.title = result;
-            m.redraw();
+            this.title = e.target.value;
           }}
         />
         <CWTextArea
           label="Proposal Description"
           placeholder="Proposal Description"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.description = result;
-            m.redraw();
+            this.description = e.target.value;
           }}
         />
         <div class="tab-selector">
@@ -111,9 +103,7 @@ export class CompoundProposalForm extends ClassComponent {
           placeholder="Add Target"
           value={aaveProposalState[activeTabIndex].target}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.aaveProposalState[activeTabIndex].target = result;
-            m.redraw();
+            this.aaveProposalState[activeTabIndex].target = e.target.value;
           }}
         />
         <CWTextInput
@@ -121,9 +111,7 @@ export class CompoundProposalForm extends ClassComponent {
           placeholder="Enter amount in wei"
           value={aaveProposalState[activeTabIndex].value}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.aaveProposalState[activeTabIndex].value = result;
-            m.redraw();
+            this.aaveProposalState[activeTabIndex].value = e.target.value;
           }}
         />
         <CWTextInput
@@ -131,9 +119,7 @@ export class CompoundProposalForm extends ClassComponent {
           placeholder="Add Calldata"
           value={aaveProposalState[activeTabIndex].calldata}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.aaveProposalState[activeTabIndex].calldata = result;
-            m.redraw();
+            this.aaveProposalState[activeTabIndex].calldata = e.target.value;
           }}
         />
         <CWTextInput
@@ -141,27 +127,13 @@ export class CompoundProposalForm extends ClassComponent {
           placeholder="Add a signature"
           value={aaveProposalState[activeTabIndex].signature}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.aaveProposalState[activeTabIndex].signature = result;
-            m.redraw();
+            this.aaveProposalState[activeTabIndex].signature = e.target.value;
           }}
         />
         <CWButton
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-
-            const createFunc: (
-              ...args
-            ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (
-                proposalSlugToClass().get(
-                  ProposalType.AaveProposal
-                ) as ProposalModule<any, any, any>
-              ).createTx(...a);
-            };
-
-            const args = [];
 
             this.proposer = app.user?.activeAccount?.address;
 
@@ -217,10 +189,6 @@ export class CompoundProposalForm extends ClassComponent {
                 m.redraw();
               })
               .catch((err) => notifyError(err.data?.message || err.message));
-
-            Promise.resolve(createFunc(args)).then((modalData) =>
-              createTXModal(modalData)
-            );
           }}
         />
       </div>

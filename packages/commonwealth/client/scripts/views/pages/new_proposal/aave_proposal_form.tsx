@@ -7,8 +7,6 @@ import { utils } from 'ethers';
 import 'pages/new_proposal/aave_proposal_form.scss';
 
 import app from 'state';
-import { ITXModalData, ProposalModule } from 'models';
-import { proposalSlugToClass } from 'identifiers';
 import { Executor } from 'common-common/src/eth/types';
 import User from 'views/components/widgets/user';
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
@@ -23,15 +21,13 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { AaveProposalState, defaultStateItem } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ProposalType } from '../../../../../../common-common/src/types';
-import { createTXModal } from '../../modals/tx_signing_modal';
 
 export class AaveProposalForm extends ClassComponent {
   private aaveProposalState: Array<AaveProposalState>;
   private activeTabIndex: number;
   private executor: Executor | string;
   private ipfsHash: string;
-  private proposer;
+  private proposer: string;
   private tabCount: number;
 
   oninit() {
@@ -42,6 +38,7 @@ export class AaveProposalForm extends ClassComponent {
 
   view() {
     const author = app.user.activeAccount;
+    const aave = app.chain as Aave;
     const { activeTabIndex, aaveProposalState } = this;
 
     return (
@@ -59,15 +56,13 @@ export class AaveProposalForm extends ClassComponent {
           label="IPFS Hash"
           placeholder="Proposal IPFS Hash"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.ipfsHash = result;
-            m.redraw();
+            this.ipfsHash = e.target.value;
           }}
         />
         <div class="row-with-label">
           <CWLabel label="Executor" />
           <div class="executors-container">
-            {(app.chain as Aave).governance.api.Executors.map((r) => (
+            {aave.governance.api.Executors.map((r) => (
               <div
                 class={`executor ${
                   this.executor === r.address && 'selected-executor'
@@ -132,9 +127,7 @@ export class AaveProposalForm extends ClassComponent {
           placeholder="Add Target"
           value={aaveProposalState[activeTabIndex].target}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.aaveProposalState[activeTabIndex].target = result;
-            m.redraw();
+            this.aaveProposalState[activeTabIndex].target = e.target.value;
           }}
         />
         <CWTextInput
@@ -142,9 +135,7 @@ export class AaveProposalForm extends ClassComponent {
           placeholder="Enter amount in wei"
           value={aaveProposalState[activeTabIndex].value}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.aaveProposalState[activeTabIndex].value = result;
-            m.redraw();
+            this.aaveProposalState[activeTabIndex].value = e.target.value;
           }}
         />
         <CWTextInput
@@ -152,9 +143,7 @@ export class AaveProposalForm extends ClassComponent {
           placeholder="Add Calldata"
           value={aaveProposalState[activeTabIndex].calldata}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.aaveProposalState[activeTabIndex].calldata = result;
-            m.redraw();
+            this.aaveProposalState[activeTabIndex].calldata = e.target.value;
           }}
         />
         <CWTextInput
@@ -162,9 +151,7 @@ export class AaveProposalForm extends ClassComponent {
           placeholder="Add a signature"
           value={aaveProposalState[activeTabIndex].signature}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.aaveProposalState[activeTabIndex].signature = result;
-            m.redraw();
+            this.aaveProposalState[activeTabIndex].signature = e.target.value;
           }}
         />
         <CWCheckbox
@@ -180,18 +167,6 @@ export class AaveProposalForm extends ClassComponent {
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-
-            const createFunc: (
-              ...args
-            ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (
-                proposalSlugToClass().get(
-                  ProposalType.AaveProposal
-                ) as ProposalModule<any, any, any>
-              ).createTx(...a);
-            };
-
-            const args = [];
 
             this.proposer = app.user?.activeAccount?.address;
 
@@ -241,14 +216,10 @@ export class AaveProposalForm extends ClassComponent {
               ipfsHash,
             };
 
-            (app.chain as Aave).governance
+            aave.governance
               .propose(details)
               .then(() => m.redraw())
               .catch((err) => notifyError(err.data?.message || err.message));
-
-            Promise.resolve(createFunc(args)).then((modalData) =>
-              createTXModal(modalData)
-            );
           }}
         />
       </div>

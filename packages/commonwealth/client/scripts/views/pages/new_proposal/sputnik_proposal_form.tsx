@@ -4,24 +4,26 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
 import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { notifyError } from 'controllers/app/notifications';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { SupportedSputnikProposalTypes } from './types';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ProposalType } from '../../../../../../common-common/src/types';
-import { createTXModal } from '../../modals/tx_signing_modal';
+
+enum SupportedSputnikProposalTypes {
+  AddMemberToRole = 'Add Member',
+  RemoveMemberFromRole = 'Remove Member',
+  Transfer = 'Payout',
+  Vote = 'Poll',
+}
 
 export class SputnikProposalForm extends ClassComponent {
-  private description;
-  private member;
-  private payoutAmount;
-  private sputnikProposalType;
-  private tokenId;
+  private description: string;
+  private member: string;
+  private payoutAmount: string;
+  private sputnikProposalType: SupportedSputnikProposalTypes;
+  private tokenId: string;
 
   oninit() {
     this.sputnikProposalType = SupportedSputnikProposalTypes.AddMemberToRole;
@@ -34,53 +36,35 @@ export class SputnikProposalForm extends ClassComponent {
           label="Proposal Type"
           defaultValue={SupportedSputnikProposalTypes.AddMemberToRole}
           options={Object.values(SupportedSputnikProposalTypes).map((v) => ({
-            name: 'proposalType',
             label: v,
-            value: v,
           }))}
-          onSelect={(result) => {
+          onSelect={(result: SupportedSputnikProposalTypes) => {
             this.sputnikProposalType = result;
-            m.redraw();
           }}
         />
         {this.sputnikProposalType !== SupportedSputnikProposalTypes.Vote && (
           <CWTextInput
             label="Member"
             defaultValue="tokenfactory.testnet"
-            // oncreate={() => {
-            //   this.member = 'tokenfactory.testnet';
-            // }}
             oninput={(e) => {
-              const result = (e.target as any).value;
-              this.member = result;
-              m.redraw();
+              this.member = e.target.value;
             }}
           />
         )}
         <CWTextInput
           label="Description"
-          // defaultValue=''
-          // oncreate={() => {
-          //   this.description = '';
-          // }}
+          defaultValue=""
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.description = result;
-            m.redraw();
+            this.description = e.target.value;
           }}
         />
         {this.sputnikProposalType ===
           SupportedSputnikProposalTypes.Transfer && (
           <CWTextInput
             label="Token ID (leave blank for Ⓝ)"
-            // defaultValue: '',
-            // oncreate: () => {
-            //   this.tokenId = '';
-            // },
+            defaultValue=""
             oninput={(e) => {
-              const result = (e.target as any).value;
-              this.tokenId = result;
-              m.redraw();
+              this.tokenId = e.target.value;
             }}
           />
         )}
@@ -88,14 +72,9 @@ export class SputnikProposalForm extends ClassComponent {
           SupportedSputnikProposalTypes.Transfer && (
           <CWTextInput
             label="Amount"
-            // defaultValue: '',
-            // oncreate: () => {
-            //   this.payoutAmount = '';
-            // },
+            defaultValue=""
             oninput={(e) => {
-              const result = (e.target as any).value;
-              this.payoutAmount = result;
-              m.redraw();
+              this.payoutAmount = e.target.value;
             }}
           />
         )}
@@ -103,18 +82,6 @@ export class SputnikProposalForm extends ClassComponent {
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
-
-            const createFunc: (
-              ...args
-            ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (
-                proposalSlugToClass().get(
-                  ProposalType.AaveProposal
-                ) as ProposalModule<any, any, any>
-              ).createTx(...a);
-            };
-
-            const args = [];
 
             // TODO: make type of proposal switchable
             const member = this.member;
@@ -142,11 +109,11 @@ export class SputnikProposalForm extends ClassComponent {
               SupportedSputnikProposalTypes.Transfer
             ) {
               // TODO: validate amount / token id
-              const token_id = this.tokenId || '';
+              const tokenId = this.tokenId || '';
 
               let amount: string;
               // treat NEAR as in dollars but tokens as whole #s
-              if (!token_id) {
+              if (!tokenId) {
                 amount = app.chain.chain
                   .coins(+this.payoutAmount, true)
                   .asBN.toString();
@@ -155,7 +122,7 @@ export class SputnikProposalForm extends ClassComponent {
               }
 
               propArgs = {
-                Transfer: { receiver_id: member, token_id, amount },
+                Transfer: { receiver_id: member, token_id: tokenId, amount },
               };
             } else if (
               this.sputnikProposalType === SupportedSputnikProposalTypes.Vote
@@ -164,14 +131,11 @@ export class SputnikProposalForm extends ClassComponent {
             } else {
               throw new Error('unsupported sputnik proposal type');
             }
+
             (app.chain as NearSputnik).dao
               .proposeTx(description, propArgs)
               .then(() => m.redraw())
               .catch((err) => notifyError(err.message));
-
-            Promise.resolve(createFunc(args)).then((modalData) =>
-              createTXModal(modalData)
-            );
           }}
         />
       </>

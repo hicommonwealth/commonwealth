@@ -6,125 +6,88 @@ import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 import Cosmos from 'controllers/chain/cosmos/adapter';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
-import { SupportedCosmosProposalTypes } from './types';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ProposalType } from '../../../../../../common-common/src/types';
-import { createTXModal } from '../../modals/tx_signing_modal';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
+import { CWLabel } from '../../components/component_kit/cw_label';
 
 export class CosmosProposalForm extends ClassComponent {
-  private cosmosProposalType;
-  private deposit;
-  private form: {
-    amount;
-    beneficiary;
-    description;
-    reason;
-    title;
-    topicId;
-    topicName;
-    value;
-  };
-  private payoutAmount;
-  private recipient;
+  private cosmosProposalType: 'textProposal' | 'communitySpend';
+  private deposit: number;
+  private description: string;
+  private payoutAmount: string;
+  private recipient: string;
+  private title: string;
 
   oninit() {
-    this.cosmosProposalType = SupportedCosmosProposalTypes.Text;
+    this.cosmosProposalType = 'textProposal';
   }
 
   view() {
-    const author = app.user.activeAccount;
-    let dataLoaded = true;
-    dataLoaded = !!(app.chain as Cosmos).governance.initialized;
+    const author = app.user.activeAccount as CosmosAccount;
+    const cosmos = app.chain as Cosmos;
 
-    return (
+    return !cosmos.governance.initialized ? (
+      <CWSpinner />
+    ) : (
       <>
-        <CWDropdown
-          label="Proposal Type"
-          initialValue={SupportedCosmosProposalTypes.Text}
-          options={[]}
-          //   options={Object.values(SupportedCosmosProposalTypes).map((v) => ({
-          //     name: 'proposalType',
-          //     label: v,
-          //     value: v,
-          //   }))}
-          onSelect={(result) => {
-            this.cosmosProposalType = result;
-            m.redraw();
+        <CWLabel label="Proposal Type" />
+        <CWRadioGroup
+          name="cosmos-proposal-type"
+          onchange={(value) => {
+            this.cosmosProposalType = value;
           }}
+          toggledOption="textProposal"
+          options={[
+            { label: 'Text Proposal', value: 'textProposal' },
+            { label: 'Community Spend', value: 'communitySpend' },
+          ]}
         />
         <CWTextInput
           placeholder="Enter a title"
           label="Title"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.form.title = result;
-            m.redraw();
+            this.title = e.target.value;
           }}
         />
         <CWTextArea
           label="Description"
           placeholder="Enter a description"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            if (this.form.description !== result) {
-              this.form.description = result;
-            }
-            m.redraw();
+            this.description = e.target.value;
           }}
         />
         <CWTextInput
-          label={`Deposit (${
-            (app.chain as Cosmos).governance.minDeposit.denom
-          })`}
-          placeholder={`Min: ${+(app.chain as Cosmos).governance.minDeposit}`}
-          // oncreate={(vvnode) =>
-          //   $(vvnode.dom).val(
-          //     +(app.chain as Cosmos).governance.minDeposit
-          //   )}
+          label={`Deposit (${cosmos.governance.minDeposit.denom})`}
+          placeholder={`Min: ${+cosmos.governance.minDeposit}`}
+          defaultValue={+cosmos.governance.minDeposit}
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.deposit = +result;
-            m.redraw();
+            this.deposit = +e.target.value;
           }}
         />
-        {this.cosmosProposalType !== SupportedCosmosProposalTypes.Text && (
+        {this.cosmosProposalType !== 'textProposal' && (
           <CWTextInput
             label="Recipient"
             placeholder={app.user.activeAccount.address}
-            // defaultValue: '',
-            // oncreate: () => {
-            //   this.recipient = '';
-            // },
+            defaultValue=""
             oninput={(e) => {
-              const result = (e.target as any).value;
-              this.recipient = result;
-              m.redraw();
+              this.recipient = e.target.value;
             }}
           />
         )}
-        {this.cosmosProposalType !== SupportedCosmosProposalTypes.Text && (
+        {this.cosmosProposalType !== 'textProposal' && (
           <CWTextInput
-            label={`Amount (${
-              (app.chain as Cosmos).governance.minDeposit.denom
-            })`}
+            label={`Amount (${cosmos.governance.minDeposit.denom})`}
             placeholder="12345"
-            // defaultValue: '',
-            // oncreate: () => {
-            //   this.payoutAmount = '';
-            // },
+            defaultValue=""
             oninput={(e) => {
-              const result = (e.target as any).value;
-              this.payoutAmount = result;
-              m.redraw();
+              this.payoutAmount = e.target.value;
             }}
           />
         )}
@@ -133,39 +96,21 @@ export class CosmosProposalForm extends ClassComponent {
           onclick={(e) => {
             e.preventDefault();
 
-            const createFunc: (
-              ...args
-            ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (
-                proposalSlugToClass().get(
-                  ProposalType.AaveProposal
-                ) as ProposalModule<any, any, any>
-              ).createTx(...a);
-            };
-
-            const args = [];
-
             let prop: ProtobufAny;
 
-            const { title, description } = this.form;
+            const { title, description } = this;
 
             const deposit = this.deposit
               ? new CosmosToken(
-                  (app.chain as Cosmos).governance.minDeposit.denom,
+                  cosmos.governance.minDeposit.denom,
                   this.deposit,
                   false
                 )
-              : (app.chain as Cosmos).governance.minDeposit;
-            if (this.cosmosProposalType === SupportedCosmosProposalTypes.Text) {
-              prop = (app.chain as Cosmos).governance.encodeTextProposal(
-                title,
-                description
-              );
-            } else if (
-              this.cosmosProposalType ===
-              SupportedCosmosProposalTypes.CommunitySpend
-            ) {
-              prop = (app.chain as Cosmos).governance.encodeCommunitySpend(
+              : cosmos.governance.minDeposit;
+            if (this.cosmosProposalType === 'textProposal') {
+              prop = cosmos.governance.encodeTextProposal(title, description);
+            } else if (this.cosmosProposalType === 'communitySpend') {
+              prop = cosmos.governance.encodeCommunitySpend(
                 title,
                 description,
                 this.recipient,
@@ -175,16 +120,12 @@ export class CosmosProposalForm extends ClassComponent {
               throw new Error('Unknown Cosmos proposal type.');
             }
             // TODO: add disabled / loading
-            (app.chain as Cosmos).governance
-              .submitProposalTx(author as CosmosAccount, deposit, prop)
+            cosmos.governance
+              .submitProposalTx(author, deposit, prop)
               .then((result) => {
                 navigateToSubpage(`/proposal/${result}`);
               })
               .catch((err) => notifyError(err.message));
-
-            Promise.resolve(createFunc(args)).then((modalData) =>
-              createTXModal(modalData)
-            );
           }}
         />
       </>
