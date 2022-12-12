@@ -463,7 +463,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               </div>
               <CWButton
                 label="reconnect"
-                buttonType="mini"
+                buttonType="mini-black"
                 className="connect-button"
                 onclick={async () => {
                   try {
