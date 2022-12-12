@@ -6,7 +6,7 @@ services:
   db:
     env_file:
       - ".env"
-    image: postgres 
+    image: postgres:14.1-alpine
     environment:
       POSTGRES_PASSWORD: "${DOCKER_PG_PW}"
       POSTGRES_USER: "${DOCKER_PG_USER}"
@@ -16,6 +16,8 @@ services:
       - ./docker/pg_init.sql:/docker-entrypoint-initdb.d/pg_init.sql
     ports: 
       - '5432:5432'
+    expose:
+      - 5432
   common-common:
     build: packages/common-common
   chain-events: 
@@ -26,6 +28,7 @@ services:
       dockerfile: packages/commonwealth/Dockerfile
     hostname: commonwealth
     environment: 
+      WAIT_HOSTS: db:5432
       DATABASE_URL: postgresql://commonwealth:edgeware@db/commonwealth
     ports: 
       - "8080:8080"
@@ -33,6 +36,7 @@ services:
       - ./:/monorepo
     depends_on:
       - db
+    command: sh -c "wait && yarn start"
 volumes:
   db:
     driver: local
