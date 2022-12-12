@@ -6,7 +6,6 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
@@ -47,8 +46,9 @@ const createReaction = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+
+  const author = req.address;
+
   const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {

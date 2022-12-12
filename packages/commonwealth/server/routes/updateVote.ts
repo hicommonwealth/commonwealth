@@ -6,7 +6,6 @@ import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import {
   VoteAttributes,
@@ -46,9 +45,8 @@ const updateVote = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (!author) return next(new AppError(Errors.InvalidUser));
-  if (authorError) return next(new AppError(authorError));
+
+  const author = req.address;
 
   const { poll_id, address, author_chain, option } = req.body;
 

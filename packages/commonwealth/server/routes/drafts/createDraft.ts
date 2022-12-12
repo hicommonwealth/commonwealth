@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
 import validateChain from '../../util/validateChain';
-import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
@@ -18,9 +17,9 @@ const createDraft = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
   const { title, body, topic } = req.body;
+
+  const author = req.address;
 
   if (!title && !body && !req.body['attachments[]']?.length) {
     return next(new AppError(Errors.InsufficientData));

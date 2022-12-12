@@ -1,7 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateChain from '../../util/validateChain';
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -17,8 +16,7 @@ export const Errors = {
 const editDraft = async (models, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));
   }

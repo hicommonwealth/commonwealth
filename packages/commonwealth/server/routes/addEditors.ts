@@ -3,7 +3,6 @@ import { Op } from 'sequelize';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { findOneRole } from '../util/roles';
 import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -33,8 +32,7 @@ const addEditors = async (
   }
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+  const author = req.address;
 
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)

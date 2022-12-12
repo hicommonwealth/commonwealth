@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from 'common-common/src/types';
 import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -21,12 +20,12 @@ export const Errors = {
 const editComment = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
 
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));
   }
+
+  const author = req.address;
 
   // check if banned
   const [canInteract, banError] = await banCache.checkBan({

@@ -16,7 +16,6 @@ import {
 } from 'commonwealth/server/util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
@@ -216,8 +215,8 @@ const createThread = async (
   const [chain, error] = await validateChain(models, req.body);
 
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+
+  const author = req.address;
 
   const permission_error = await isAddressPermitted(
     models,
