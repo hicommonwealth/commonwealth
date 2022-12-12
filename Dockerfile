@@ -15,5 +15,5 @@ COPY --from=builder /packages/commonwealth/build /packages/commonwealth/build
 
 WORKDIR /monorepo/packages/commonwealth
 ENV NODE_ENV=development
-EXPOSE 8080
+CMD ["true"]
 

@@ -12,10 +12,10 @@ services:
       context: .
       dockerfile: packages/commonwealth/Dockerfile
     hostname: commonwealth
+    env_file: 
+      - packages/commonwealth/.env
     ports: 
       - "8080:8080"
-    env_file:
-      .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
