@@ -158,6 +158,7 @@ export default class extends IEventHandler {
 
       return dbEvent;
     } else {
+      log.info(`[Storage.ts Event-Cache Hit] Event: ${JSON.stringify(event)}`);
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
 
