@@ -149,7 +149,7 @@ import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import authCallback from './routes/authCallback';
-import viewChainIcons from "./routes/viewChainIcons";
+import viewChainIcons from './routes/viewChainIcons';
 
 import getThreads from './routes/threads/getThreads';
 import getComments from './routes/comments/getComments';
@@ -158,13 +158,12 @@ import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
 import getSnapshotProposal from './routes/getSnapshotProposal';
-import { getChainEventServiceData } from "./routes/getChainEventServiceData";
-import { getChain } from "./routes/getChain";
-import { getChainNode } from "./routes/getChainNode";
-import { getChainContracts } from "./routes/getChainContracts";
-import { getSubscribedChains } from "./routes/getSubscribedChains";
-
-
+import { getChainEventServiceData } from './routes/getChainEventServiceData';
+import { getChain } from './routes/getChain';
+import { getChainNode } from './routes/getChainNode';
+import { getChainContracts } from './routes/getChainContracts';
+import { getSubscribedChains } from './routes/getSubscribedChains';
+import GlobalActivityCache from './util/globalActivityCache';
 
 function setupRouter(
   app: Express,
@@ -173,6 +172,7 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
   banCache: BanCache,
+  globalActivityCache: GlobalActivityCache
 ) {
   const router = express.Router();
 
@@ -603,7 +603,10 @@ function setupRouter(
     viewUserActivity.bind(this, models)
   );
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
-  router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models));
+  router.post(
+    '/viewGlobalActivity',
+    viewGlobalActivity.bind(this, models, globalActivityCache)
+  );
   router.post(
     '/markNotificationsRead',
     passport.authenticate('jwt', { session: false }),
@@ -827,22 +830,10 @@ function setupRouter(
     '/getChainEventServiceData',
     getChainEventServiceData.bind(this, models)
   );
-  router.post(
-    '/getChain',
-    getChain.bind(this, models)
-  );
-  router.post(
-    '/getChainNode',
-    getChainNode.bind(this, models)
-  );
-  router.post(
-    '/getChainContracts',
-    getChainContracts.bind(this, models)
-  );
-  router.post(
-    '/getSubscribedChains',
-    getSubscribedChains.bind(this, models)
-  );
+  router.post('/getChain', getChain.bind(this, models));
+  router.post('/getChainNode', getChainNode.bind(this, models));
+  router.post('/getChainContracts', getChainContracts.bind(this, models));
+  router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
 
   // new API
   router.get('/threads', getThreads.bind(this, models));

@@ -136,7 +136,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
               )}
               {showAddProposalButton && (
                 <CWButton
-                  buttonType="mini"
+                  buttonType="mini-black"
                   label="Link proposal"
                   onclick={(e) => {
                     e.preventDefault();
