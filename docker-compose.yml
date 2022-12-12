@@ -12,12 +12,12 @@ services:
       context: .
       dockerfile: packages/commonwealth/Dockerfile
     hostname: commonwealth
+    ports: 
+      - "8080:8080"
     env_file:
       .env
     extra_hosts:
       - "host.docker.internal:host-gateway"
-    ports: 
-      - "8080:8080"
     volumes:
       - ./:/monorepo
 
