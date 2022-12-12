@@ -1,9 +1,9 @@
 import Sequelize, {} from 'sequelize';
+import { query } from 'express-validator';
+import { GetReactionsReq, GetReactionsResp } from 'common-common/src/api/extApiTypes';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
-import { formatPagination } from 'server/util/queries';
-import { GetReactionsReq, GetReactionsResp, IPagination } from 'common-common/src/api/extApiTypes';
-import { query } from 'express-validator';
+import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
@@ -37,7 +37,7 @@ const getReactions = async (
   const pagination = formatPagination(req.query);
 
   const { rows: reactions, count } = await models.Reaction.findAndCountAll({
-      where: where,
+      where,
       include,
       ...pagination
     }

@@ -150,15 +150,8 @@ import getBannedAddresses from 'commonwealth/server/routes/getBannedAddresses';
 import BanCache from 'commonwealth/server/util/banCheckCache';
 import authCallback from 'commonwealth/server/routes/authCallback';
 
-import getThreads from 'commonwealth/server/routes/threads/getThreads';
-import getComments from 'commonwealth/server/routes/comments/getComments';
-import getReactions from 'commonwealth/server/routes/reactions/getReactions';
-import getCommunities from 'commonwealth/server/routes/communities/getCommunities';
-import getProfile from 'commonwealth/server/routes/profiles/getProfile';
-import getProfiles from 'commonwealth/server/routes/profiles/getProfiles';
-
 import { StatsDController } from 'common-common/src/statsd';
-import { addExternalRoutes } from 'server/routing/external';
+import { addExternalRoutes } from './external';
 
 function setupRouter(
   app: Express,

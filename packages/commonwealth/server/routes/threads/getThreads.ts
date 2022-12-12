@@ -1,10 +1,9 @@
 import Sequelize, {} from 'sequelize';
-import { AppError } from '../../util/errors';
 import { GetThreadsReq, GetThreadsResp } from 'common-common/src/api/extApiTypes';
+import { query, validationResult } from 'express-validator';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
-import { formatPagination } from 'server/util/queries';
-import { check, query, validationResult } from 'express-validator';
+import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
@@ -76,5 +75,5 @@ export const getThreads = async (
     });
   }
 
-  return success(res, { threads: threads, count });
+  return success(res, { threads, count });
 };

@@ -1,8 +1,8 @@
+import { GetCommunitiesReq, GetCommunitiesResp } from 'common-common/src/api/extApiTypes';
+import { formatPaginationNoSort } from '../../util/queries';
+import { AppError } from '../../util/errors';
 import { TypedRequestQuery, TypedResponse, success } from '../../types';
 import { DB } from '../../models';
-import { GetCommunitiesReq, GetCommunitiesResp } from 'common-common/src/api/extApiTypes';
-import { formatPaginationNoSort } from 'server/util/queries';
-import { AppError } from 'server/util/errors';
 
 export const Errors = {
   NoArgs: "Must provide community_id or network",
@@ -21,22 +21,22 @@ const getCommunities = async (
 
   let where;
   if(community_id) where = { id: community_id };
-  if(network) where = { network: network };
+  if(network) where = { network };
 
   let communities, count;
   if (!count_only) {
     ({ rows: communities, count } = await models.Chain.findAndCountAll({
-      where: where,
+      where,
       ...formatPaginationNoSort(req.query)
     }));
   } else {
     count = await models.Chain.count({
-      where: where,
+      where,
       ...formatPaginationNoSort(req.query)
     });
   }
 
-  return success(res, { communities: communities, count });
+  return success(res, { communities, count });
 };
 
 export default getCommunities;

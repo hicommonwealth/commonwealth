@@ -3,7 +3,7 @@ import Sequelize from 'sequelize';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 import { GetCommentsResp, IPagination } from 'common-common/src/api/extApiTypes';
-import { formatPagination } from 'server/util/queries';
+import { formatPagination } from '../../util/queries';
 import { check, query, validationResult } from 'express-validator';
 
 const { Op } = Sequelize;

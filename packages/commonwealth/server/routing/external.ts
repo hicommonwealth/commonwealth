@@ -7,9 +7,9 @@ import getCommunities from 'commonwealth/server/routes/communities/getCommunitie
 import getProfile from 'commonwealth/server/routes/profiles/getProfile';
 import getProfiles from 'commonwealth/server/routes/profiles/getProfiles';
 import { DB } from 'commonwealth/server/models';
-import { getChainNodes } from 'server/routes/getChainNodes';
-import { getBalanceProviders } from 'server/routes/getBalanceProviders';
-import { getTokenBalance } from 'server/routes/getTokenBalance';
+import { getChainNodes } from '../routes/getChainNodes';
+import { getBalanceProviders } from '../routes/getBalanceProviders';
+import { getTokenBalance } from '../routes/getTokenBalance';
 import { TokenBalanceCache } from 'token-balance-cache/src';
 
 // contains external routes

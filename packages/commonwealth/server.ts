@@ -36,7 +36,7 @@ import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from './server/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
-import setupAPI from 'server/routing/router';
+import setupAPI from './server/routing/router';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupPassport from './server/passport';
 import setupChainEventListeners from './server/scripts/setupChainEventListeners';
@@ -81,6 +81,7 @@ async function main() {
   }
 
   const tokenBalanceCache = new TokenBalanceCache();
+  await tokenBalanceCache.initBalanceProviders();
   const ruleCache = new RuleCache();
   const listenChainEvents = async () => {
     try {

@@ -23,18 +23,14 @@ export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 
 before(async () => {
-  try {
-    await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Collaboration.destroy({ where: { thread_id: { [Op.lt]: 0 } }, force: true });
-    await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Chain.destroy({ where: { chain_node_id: { [Op.lt]: 0 } }, force: true });
-    await models.ChainNode.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  } catch (e) {
-  }
+  await models.Topic.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Reaction.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Collaboration.destroy({where: {thread_id: {[Op.lt]: 0}}, force: true});
+  await models.User.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Thread.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Comment.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Address.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Chain.destroy({where: {chain_node_id: {[Op.lt]: 0}}, force: true});
 
   testUsers = await Promise.all([...Array(2).keys()].map(
     async (i) => (await models.User.findOrCreate({
@@ -51,7 +47,7 @@ before(async () => {
     (await models.ChainNode.findOrCreate({
       where: {
         id: -1,
-        url: '',
+        url: 'test1',
         balance_type: 'cmntest',
         name: 'TestName1'
       }
@@ -59,7 +55,7 @@ before(async () => {
     (await models.ChainNode.findOrCreate({
       where: {
         id: -2,
-        url: '',
+        url: 'test2',
         balance_type: 'cmntest',
         name: 'TestName2'
       }
@@ -197,16 +193,13 @@ before(async () => {
 });
 
 after(async () => {
-  try {
-    await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Reaction.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Collaboration.destroy({ where: { thread_id: { [Op.lt]: 0 } }, force: true });
-    await models.User.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-    await models.Chain.destroy({ where: { chain_node_id: { [Op.lt]: 0 } }, force: true });
-    await models.ChainNode.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  } catch (e) {
-  }
+  await models.Topic.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Reaction.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Collaboration.destroy({where: {thread_id: {[Op.lt]: 0}}, force: true});
+  await models.User.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Thread.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Comment.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Address.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Chain.destroy({where: {chain_node_id: {[Op.lt]: 0}}, force: true});
+  await models.ChainNode.destroy({where: {id: {[Op.lt]: 0}}, force: true});
 });

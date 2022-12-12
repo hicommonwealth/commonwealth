@@ -1,11 +1,10 @@
-import Sequelize from 'sequelize';
 import { DB } from 'server/models';
-import { success, TypedRequestQuery, TypedResponse } from 'server/types';
 import {
   GetChainNodesReq, GetChainNodesResp
 } from 'common-common/src/api/extApiTypes';
-import { AppError } from 'server/util/errors';
 import { ChainNodeResp, TokenBalanceCache } from 'token-balance-cache/src';
+import { AppError } from '../util/errors';
+import { success, TypedRequestQuery, TypedResponse } from '../types';
 
 export const Errors = {
   NoArgs: "Must provide chain_node_ids or names",

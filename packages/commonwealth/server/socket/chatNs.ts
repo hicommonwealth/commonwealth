@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import { Action } from 'common-common/src/permissions';
 import { addPrefix, factory } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
+import emitNotifications from '../util/emitNotifications';
 import { NotificationCategories, RedisNamespaces } from 'common-common/src/types';
 import {
     WebsocketEngineEvents,
@@ -14,7 +15,6 @@ import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
 import { checkReadPermitted } from '../util/roles';
-import emitNotifications from 'server/util/emitNotifications';
 
 
 const log = factory.getLogger(addPrefix(__filename));
