@@ -1,10 +1,11 @@
-/* eslint-disable @typescript-eslint/ban-types */
-/* eslint-disable no-restricted-globals */
-import 'pages/admin.scss';
+/* @jsx m */
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { ISubmittableResult } from '@polkadot/types/types';
+
+import 'pages/admin.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -12,21 +13,21 @@ import { blockperiodToDuration, formatDuration } from 'helpers';
 import { formatCoin } from 'adapters/currency';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { DropdownFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import { PageLoading } from 'views/pages/loading';
+import { PageNotFound } from './404';
 
-interface ISudoFormState {
-  txProcessing: boolean;
-  resultText: string;
-}
+class SudoForm extends ClassComponent {
+  private resultText: string;
+  private txProcessing: boolean;
 
-const SudoForm: m.Component<{}, ISudoFormState> = {
-  view: (vnode) => {
+  view() {
     const author = app.user.activeAccount as SubstrateAccount;
-    if (!(app.chain as Substrate).chain.sudoKey) {
+    const substrate = app.chain as Substrate;
+
+    if (!substrate.chain.sudoKey) {
       return m(
         '.SudoForm',
         {
@@ -37,7 +38,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
       );
     }
 
-    if (author && author.address !== (app.chain as Substrate).chain.sudoKey) {
+    if (author && author.address !== substrate.chain.sudoKey) {
       return m(
         '.SudoForm',
         {
@@ -47,15 +48,14 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
         [
           'Must be logged into admin account to use Sudo: ',
           m(User, {
-            user: app.chain.accounts.get(
-              (app.chain as Substrate).chain.sudoKey
-            ),
+            user: app.chain.accounts.get(substrate.chain.sudoKey),
           }),
         ]
       );
     }
 
     let keyring;
+
     try {
       // keyring = author.getKeyringPair();
       // TODO: FIXME: we do not support unlocking with seed/mnemonic, so we will need to use
@@ -88,22 +88,22 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
           'button',
           {
             type: 'submit',
-            disabled: vnode.state.txProcessing,
+            disabled: this.txProcessing,
             onclick: (e) => {
               e.preventDefault();
               const call = EdgewareFunctionPicker.getMethod();
-              vnode.state.txProcessing = true;
-              vnode.state.resultText = 'Waiting...';
+              this.txProcessing = true;
+              this.resultText = 'Waiting...';
               m.redraw();
-              (app.chain as Substrate).chain.api.tx.sudo
+              substrate.chain.api.tx.sudo
                 .sudo(call)
                 .signAndSend(keyring, (result: ISubmittableResult) => {
                   if (result.isCompleted) {
-                    vnode.state.txProcessing = false;
+                    this.txProcessing = false;
                     if (result.isFinalized) {
-                      vnode.state.resultText = 'Action completed successfully.';
+                      this.resultText = 'Action completed successfully.';
                     } else {
-                      vnode.state.resultText = 'Action was unsuccessful.';
+                      this.resultText = 'Action was unsuccessful.';
                     }
                     m.redraw();
                   }
@@ -112,15 +112,17 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
           },
           'Submit Action'
         ),
-        m('h4.header', { style: 'margin: 15px 0;' }, vnode.state.resultText),
+        m('h4.header', { style: 'margin: 15px 0;' }, this.resultText),
         m('br'),
       ]
     );
-  },
-};
+  }
+}
 
-const ChainStats: m.Component<{}> = {
-  view: () => {
+class ChainStats extends ClassComponent {
+  view() {
+    const substrate = app.chain as Substrate;
+
     const header = (label) =>
       m('h4.header', { style: 'margin: 15px 0;' }, label);
     const stat = (label, content) =>
@@ -155,108 +157,68 @@ const ChainStats: m.Component<{}> = {
         ),
         stat('Target block time', `${app.chain.block?.duration} sec`),
         header('Balances'),
-        stat(
-          'Total EDG',
-          formatCoin((app.chain as Substrate).chain.totalbalance)
-        ),
+        stat('Total EDG', formatCoin(substrate.chain.totalbalance)),
         stat(
           'Existential deposit',
-          formatCoin((app.chain as Substrate).chain.existentialdeposit)
+          formatCoin(substrate.chain.existentialdeposit)
         ),
-        // stat('Transfer fee',        formatCoin((app.chain as Substrate).chain.transferfee)),
+        // stat('Transfer fee',        formatCoin(substrate.chain.transferfee)),
         header('Democracy Proposals'),
         stat(
           'Launch period',
-          formatBlocks((app.chain as Substrate).democracyProposals.launchPeriod)
+          formatBlocks(substrate.democracyProposals.launchPeriod)
         ),
         stat(
           'Minimum deposit',
-          formatCoin((app.chain as Substrate).democracyProposals.minimumDeposit)
+          formatCoin(substrate.democracyProposals.minimumDeposit)
         ),
         header('Phragmen Elections'),
         stat(
           'Term length',
-          formatBlocks((app.chain as Substrate).phragmenElections.termDuration)
+          formatBlocks(substrate.phragmenElections.termDuration)
         ),
-        stat(
-          'Voting bond',
-          formatCoin((app.chain as Substrate).phragmenElections.votingBond)
-        ),
+        stat('Voting bond', formatCoin(substrate.phragmenElections.votingBond)),
         stat(
           'Candidacy bond',
-          formatCoin((app.chain as Substrate).phragmenElections.candidacyBond)
+          formatCoin(substrate.phragmenElections.candidacyBond)
         ),
         m('br'),
       ]
     );
-  },
-};
-
-/*
-const ProposalCreationRow = {
-  view: (vnode) => {
-    return m('span', [
-      m('p', `Create ${vnode.attrs.name} proposal`),
-      m('button', {
-        class: vnode.state.inprogress ? 'disabled' : '',
-        onclick: (e) => {
-          e.preventDefault();
-          vnode.state.inprogress = true;
-          vnode.attrs.func().subscribe(
-            (e: SubmittableResult) => {
-              if (e.status.isReady) {
-                vnode.state.inprogress = true;
-              } else if (e.status.isFinalized) {
-                vnode.state.inprogress = false;
-              } else {
-                console.log(e);
-                vnode.state.inprogress = false;
-                throw new Error(e.status.type.toString());
-              }
-            },
-            (e: Error) => {
-              console.log(`${vnode.attrs.name} proposal err`, e);
-            }
-          );
-        }
-      }, vnode.state.inprogress ? 'Creating proposal' : 'Create proposal')
-    ]);
   }
-};
-*/
-
-interface IAdminActionsState {
-  inprogress: boolean;
-  disabled: boolean;
-  success: boolean;
-  failure: boolean;
-  error: string;
-  profiles: object;
-  selected_profile: string;
-  role: string;
 }
 
-const AdminActions: m.Component<{}, IAdminActionsState> = {
-  oninit: (vnode: m.VnodeDOM<{}, IAdminActionsState>) => {
+class AdminActions extends ClassComponent {
+  private disabled: boolean;
+  private error: string;
+  private failure: boolean;
+  private inprogress: boolean;
+  private profiles: any;
+  private role: string;
+  private selectedProfile: string;
+  private success: boolean;
+
+  oninit() {
     const profiles = app.profiles.store.getAll();
-    vnode.state.profiles = {};
+    this.profiles = {};
 
     for (const profile in profiles) {
       if (profile) {
-        vnode.state.profiles[profile] = {
+        this.profiles[profile] = {
           address: profiles[profile].address,
           name: profiles[profile].name,
         };
       }
     }
-  },
-  view: (vnode: m.VnodeDOM<{}, IAdminActionsState>) => {
+  }
+
+  view() {
     let adminChoices;
-    if (vnode.state.profiles) {
-      adminChoices = Object.keys(vnode.state.profiles).map((key) => {
-        return vnode.state.profiles[key].address;
+    if (this.profiles) {
+      adminChoices = Object.keys(this.profiles).map((key) => {
+        return this.profiles[key].address;
       });
-      vnode.state.selected_profile = adminChoices[0];
+      this.selectedProfile = adminChoices[0];
     }
 
     return m('.AdminActions', [
@@ -265,13 +227,13 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
       m('p', 'Run individual test suites (suite 1 required before 2 and 3)'),
       m('p', 'Create identities'),
       // m('button', {
-      //   class: vnode.state.inprogress ? 'disabled' : '',
+      //   class: this.inprogress ? 'disabled' : '',
       //   onclick: (e) => {
       //     e.preventDefault();
       //     console.log('registering and attesting identities for initial council set');
-      //     vnode.state.inprogress = true;
+      //     this.inprogress = true;
       //   }
-      // }, vnode.state.inprogress ? 'Creating identities' : 'Create identities'),
+      // }, this.inprogress ? 'Creating identities' : 'Create identities'),
       // m('br'),
       m('br'),
       m('h4', 'Site admin panel (unimplemented)'),
@@ -288,7 +250,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
             options: { style: 'padding: 5px' },
             choices: adminChoices,
             callback: (result) => {
-              vnode.state.selected_profile = result;
+              this.selectedProfile = result;
             },
           }),
         ]),
@@ -317,70 +279,73 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
               },
             ],
             callback: (result) => {
-              vnode.state.role = result;
+              this.role = result;
             },
           }),
         ]),
         m(
           'button',
           {
-            class: vnode.state.inprogress ? 'disabled' : '',
+            class: this.inprogress ? 'disabled' : '',
             onclick: (e) => {
               e.preventDefault();
-              vnode.state.inprogress = true;
+              this.inprogress = true;
               // TODO: Change to PUT /adminStatus
               $.post(`${app.serverUrl()}/updateAdminStatus`, {
                 admin: app.user.activeAccount.address,
-                address: vnode.state.selected_profile, // the address to be changed
-                role: vnode.state.role,
+                address: this.selectedProfile, // the address to be changed
+                role: this.role,
                 jwt: app.user.jwt,
               }).then(
                 (response) => {
                   if (response.status === 'Success') {
-                    if (!app.isLoggedIn()) {
-                    }
                     m.redraw();
                   } else {
                     // error tracking
                   }
-                  vnode.state.inprogress = false;
+                  this.inprogress = false;
                 },
                 (err) => {
-                  vnode.state.failure = true;
-                  vnode.state.disabled = false;
-                  if (err.responseJSON)
-                    vnode.state.error = err.responseJSON.error;
+                  this.failure = true;
+                  this.disabled = false;
+                  if (err.responseJSON) this.error = err.responseJSON.error;
                   m.redraw();
                 }
               );
             },
           },
-          vnode.state.inprogress
-            ? `Adding ${vnode.state.selected_profile}`
-            : 'Add admin'
+          this.inprogress ? `Adding ${this.selectedProfile}` : 'Add admin'
         ),
       ]),
       m('br'),
       m('br'),
     ]);
-  },
-};
+  }
+}
 
-const AdminPage: m.Component<{}> = {
-  oncreate: () => {},
-  view: () => {
-    if (!app.user.isSiteAdmin) {
+class AdminPage extends ClassComponent {
+  view() {
+    if (!app.chain) {
       m.route.set('/', {}, { replace: true });
-      return m(PageLoading);
+      return <PageLoading />;
+    } else if (app.chain && app.user.isSiteAdmin) {
+      return (
+        <Sublayout>
+          <div class="AdminPage">
+            {app.chain ? (
+              <>
+                <AdminActions />
+                <SudoForm />
+                <ChainStats />
+              </>
+            ) : null}
+          </div>
+        </Sublayout>
+      );
+    } else {
+      return <PageNotFound />;
     }
-
-    return m(
-      Sublayout,
-      m('.AdminPage', [
-        app.chain ? [m(AdminActions), m(SudoForm), m(ChainStats)] : [],
-      ])
-    );
-  },
-};
+  }
+}
 
 export default AdminPage;
