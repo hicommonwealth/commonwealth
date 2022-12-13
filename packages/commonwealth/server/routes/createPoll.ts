@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { getNextPollEndingTime } from '../../shared/utils';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';

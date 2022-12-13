@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 
-import validateChain from '../../util/validateChain';
+import validateChain from '../../middleware/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
@@ -26,12 +26,12 @@ const createDraft = async (
   }
 
   const draftContent = {
-        chain: chain.id,
-        address_id: author.id,
-        title,
-        body,
-        topic,
-      };
+    chain: chain.id,
+    address_id: author.id,
+    title,
+    body,
+    topic,
+  };
 
   const draft = await models.DiscussionDraft.create(draftContent);
 

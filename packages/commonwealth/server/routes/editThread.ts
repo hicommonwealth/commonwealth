@@ -4,8 +4,12 @@ import moment from 'moment';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
-import validateChain from '../util/validateChain';
-import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
+import validateChain from '../middleware/validateChain';
+import {
+  getProposalUrl,
+  renderQuillDeltaToText,
+  validURL,
+} from '../../shared/utils';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from 'common-common/src/errors';

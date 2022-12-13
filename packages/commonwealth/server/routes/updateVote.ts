@@ -5,12 +5,9 @@ import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';
 import { sequelize } from '../database';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import {
-  VoteAttributes,
-  VoteInstance,
-} from '../models/vote';
+import { VoteAttributes, VoteInstance } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -89,7 +86,12 @@ const updateVote = async (
     attributes: ['rule_id'],
   });
   if (topic?.rule_id) {
-    const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+    const passesRules = await checkRule(
+      ruleCache,
+      models,
+      topic.rule_id,
+      author.address
+    );
     if (!passesRules) {
       return next(new AppError(Errors.RuleCheckFailed));
     }

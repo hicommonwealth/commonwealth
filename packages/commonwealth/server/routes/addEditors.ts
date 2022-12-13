@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { findOneRole } from '../util/roles';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';

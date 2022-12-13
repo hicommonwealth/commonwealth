@@ -1,5 +1,7 @@
 import Sequelize from 'sequelize';
-import validateChain, { ValidateChainParams } from '../util/validateChain';
+import validateChain, {
+  ValidateChainParams,
+} from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
@@ -13,7 +15,7 @@ export const Errors = {
 };
 
 type DeleteRoleReq = {
-  address_id: number,
+  address_id: number;
 } & ValidateChainParams;
 
 type DeleteRoleResp = Record<string, never>;
@@ -62,8 +64,8 @@ const deleteRole = async (
   await models.RoleAssignment.destroy({
     where: {
       community_role_id: existingRole.toJSON().community_role_id,
-      address_id: req.body.address_id
-    }
+      address_id: req.body.address_id,
+    },
   });
 
   return success(res, {});
