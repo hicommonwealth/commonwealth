@@ -8,47 +8,39 @@ import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
 import { ITXModalData, ProposalModule } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import Cosmos from 'controllers/chain/cosmos/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import {
-  ChainBase,
-  ProposalType,
-} from '../../../../../../common-common/src/types';
+import { ProposalType } from '../../../../../../common-common/src/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { createTXModal } from '../../modals/tx_signing_modal';
 
 export class SubstrateDemocracyProposalForm extends ClassComponent {
-  private deposit;
-  private toggleValue;
+  private deposit: number;
+  private toggleValue: string;
 
-  oncreate() {
+  oninit() {
     this.toggleValue = 'proposal';
   }
 
   view() {
-    const author = app.user.activeAccount;
+    const author = app.user.activeAccount as SubstrateAccount;
+    const substrate = app.chain as Substrate;
 
     let dataLoaded;
 
-    if (!(app.user.activeAccount as SubstrateAccount).isCouncillor) {
+    if (!author.isCouncillor) {
       dataLoaded = false;
-    }
-
-    if (this.toggleValue === 'proposal') {
-      dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
+    } else {
+      dataLoaded = !!substrate.democracyProposals?.initialized;
     }
 
     if (!dataLoaded) {
-      if (
-        app.chain?.base === ChainBase.Substrate &&
-        (app.chain as Substrate).chain?.timedOut
-      ) {
+      if (substrate.chain?.timedOut) {
         return <ErrorPage message="Could not connect to chain" />;
       } else {
         return <CWSpinner />;
@@ -59,9 +51,8 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
       <>
         <CWRadioGroup
           name="democracy-tx-switcher"
-          onchange={async (value) => {
+          onchange={(value) => {
             this.toggleValue = value;
-            m.redraw();
           }}
           toggledOption="proposal"
           options={[
@@ -76,29 +67,11 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
         {m(EdgewareFunctionPicker)}
         {this.toggleValue === 'proposal' && (
           <CWTextInput
-            label={`Deposit (${
-              app.chain.base === ChainBase.Substrate
-                ? app.chain.currency
-                : (app.chain as Cosmos).governance.minDeposit.denom
-            })`}
-            placeholder={`Min: ${
-              app.chain.base === ChainBase.Substrate
-                ? (app.chain as Substrate).democracyProposals.minimumDeposit
-                    .inDollars
-                : +(app.chain as Cosmos).governance.minDeposit
-            }`}
-            oncreate={(vvnode) =>
-              $(vvnode.dom).val(
-                app.chain.base === ChainBase.Substrate
-                  ? (app.chain as Substrate).democracyProposals.minimumDeposit
-                      .inDollars
-                  : +(app.chain as Cosmos).governance.minDeposit
-              )
-            }
+            label={`Deposit (${app.chain.currency})`}
+            placeholder={`Min: ${substrate.democracyProposals.minimumDeposit.inDollars}`}
+            defaultValue={substrate.democracyProposals.minimumDeposit.inDollars}
             oninput={(e) => {
-              const result = (e.target as any).value;
-              this.deposit = parseFloat(result);
-              m.redraw();
+              this.deposit = parseFloat(e.target.value);
             }}
           />
         )}
@@ -120,7 +93,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
 
             const deposit = this.deposit
               ? app.chain.chain.coins(this.deposit, true)
-              : (app.chain as Substrate).democracyProposals.minimumDeposit;
+              : substrate.democracyProposals.minimumDeposit;
 
             if (!EdgewareFunctionPicker.getMethod()) {
               notifyError('Missing arguments');
@@ -137,12 +110,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
               ];
 
               createFunc = ([au, mt, pr, dep]) =>
-                (app.chain as Substrate).democracyProposals.createTx(
-                  au,
-                  mt,
-                  pr,
-                  dep
-                );
+                substrate.democracyProposals.createTx(au, mt, pr, dep);
             } else if (this.toggleValue === 'preimage') {
               const encodedProposal =
                 EdgewareFunctionPicker.getMethod().toHex();
@@ -154,11 +122,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
               ];
 
               createFunc = ([au, mt, pr]) =>
-                (app.chain as Substrate).democracyProposals.notePreimage(
-                  au,
-                  mt,
-                  pr
-                );
+                substrate.democracyProposals.notePreimage(au, mt, pr);
             } else if (this.toggleValue === 'imminent') {
               const encodedProposal =
                 EdgewareFunctionPicker.getMethod().toHex();
@@ -170,9 +134,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
               ];
 
               createFunc = ([au, mt, pr]) =>
-                (
-                  app.chain as Substrate
-                ).democracyProposals.noteImminentPreimage(au, mt, pr);
+                substrate.democracyProposals.noteImminentPreimage(au, mt, pr);
             } else {
               throw new Error('Invalid toggle state');
             }

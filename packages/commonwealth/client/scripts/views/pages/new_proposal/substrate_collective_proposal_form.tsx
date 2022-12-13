@@ -12,57 +12,47 @@ import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collect
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import {
-  ChainBase,
-  ProposalType,
-} from '../../../../../../common-common/src/types';
+import { ProposalType } from '../../../../../../common-common/src/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { createTXModal } from '../../modals/tx_signing_modal';
 
 export class SubstrateCollectiveProposalForm extends ClassComponent {
-  private councilMotionDescription;
-  private councilMotionType;
-  private enactmentDelay;
-  private nextExternalProposalHash;
-  private referendumId;
-  private threshold;
-  private treasuryProposalIndex;
-  private votingPeriod;
+  private councilMotionDescription: string;
+  private councilMotionType: string;
+  private enactmentDelay: number;
+  private nextExternalProposalHash: string;
+  private referendumId: string;
+  private threshold: number;
+  private treasuryProposalIndex: string;
+  private votingPeriod: number;
 
   view() {
-    const author = app.user.activeAccount;
+    const author = app.user.activeAccount as SubstrateAccount;
+    const substrate = app.chain as Substrate;
     const motions = SubstrateCollectiveProposal.motions;
-
-    // if (
-    //   !(app.user.activeAccount as SubstrateAccount).isCouncillor
-    // ) {
-    //   dataLoaded = false;
-    // }
-
-    let hasExternalProposalSelector;
-    let dataLoaded;
-
-    hasExternalProposalSelector =
-      this.councilMotionType === 'vetoNextExternal' ||
-      this.councilMotionType === 'createFastTrack' ||
-      this.councilMotionType === 'createExternalProposalDefault';
-
-    if (hasExternalProposalSelector) {
-      dataLoaded = !!(app.chain as Substrate).democracyProposals?.initialized;
-    }
 
     if (!this.councilMotionType) {
       this.councilMotionType = motions[0].name;
       this.councilMotionDescription = motions[0].description;
     }
 
+    const hasExternalProposalSelector =
+      this.councilMotionType === 'vetoNextExternal' ||
+      this.councilMotionType === 'createFastTrack' ||
+      this.councilMotionType === 'createExternalProposalDefault';
+
+    let dataLoaded;
+
+    if (!author.isCouncillor) {
+      dataLoaded = false;
+    } else if (hasExternalProposalSelector) {
+      dataLoaded = !!substrate.democracyProposals?.initialized;
+    }
+
     if (!dataLoaded) {
-      if (
-        app.chain?.base === ChainBase.Substrate &&
-        (app.chain as Substrate).chain?.timedOut
-      ) {
+      if (substrate.chain?.timedOut) {
         return <ErrorPage message="Could not connect to chain" />;
       } else {
         return <CWSpinner />;
@@ -74,16 +64,14 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
         <CWDropdown
           label="Motion"
           options={motions.map((m_) => ({
-            name: 'councilMotionType',
-            value: m_.name,
             label: m_.label,
+            value: m_.name,
           }))}
           onSelect={(result) => {
-            this.councilMotionType = result;
+            this.councilMotionType = result.value;
             this.councilMotionDescription = motions.find(
-              (m_) => m_.name === result
+              (m_) => m_.name === result.value
             ).description;
-            m.redraw();
           }}
         />
         {this.councilMotionDescription && (
@@ -94,26 +82,24 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
         {this.councilMotionType === 'createExternalProposal' ||
           (this.councilMotionType === 'createExternalProposalMajority' &&
             m(EdgewareFunctionPicker))}
-        {/* {hasExternalProposalSelector &&
-          (app.chain as Substrate).democracyProposals.nextExternal && (
+        {hasExternalProposalSelector &&
+          substrate.democracyProposals.nextExternal && (
             <CWDropdown
               label="Proposal"
-              options={{
-                value: (
-                  app.chain as Substrate
-                ).democracyProposals.nextExternal[0].hash.toString(),
-                label: `${(
-                  app.chain as Substrate
-                ).democracyProposals.nextExternal[0].hash
-                  .toString()
-                  .slice(0, 8)}...`,
-              }}
+              options={[
+                {
+                  value:
+                    substrate.democracyProposals.nextExternal[0].hash.toString(),
+                  label: `${substrate.democracyProposals.nextExternal[0].hash
+                    .toString()
+                    .slice(0, 8)}...`,
+                },
+              ]}
               onSelect={(result) => {
-                this.nextExternalProposalHash = result;
-                m.redraw();
+                this.nextExternalProposalHash = result.value;
               }}
             />
-          )} */}
+          )}
         {this.councilMotionType === 'createFastTrack' ||
           (this.councilMotionType === 'createExternalProposalDefault' && (
             <>
@@ -121,18 +107,14 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
                 label="Voting Period"
                 placeholder="Blocks (minimum enforced)"
                 oninput={(e) => {
-                  const result = (e.target as any).value;
-                  this.votingPeriod = +result;
-                  m.redraw();
+                  this.votingPeriod = +e.target.value;
                 }}
               />
               <CWTextInput
                 label="Enactment Delay"
                 placeholder="Blocks (minimum enforced)"
                 oninput={(e) => {
-                  const result = (e.target as any).value;
-                  this.enactmentDelay = +result;
-                  m.redraw();
+                  this.enactmentDelay = +e.target.value;
                 }}
               />
             </>
@@ -141,16 +123,12 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
         {this.councilMotionType === 'createEmergencyCancellation' && (
           <CWDropdown
             label="Referendum"
-            options={(app.chain as Substrate).democracy.store
-              .getAll()
-              .map((r) => ({
-                name: 'referendum',
-                value: r.identifier,
-                label: `${r.shortIdentifier}: ${r.title}`,
-              }))}
+            options={substrate.democracy.store.getAll().map((r) => ({
+              value: r.identifier,
+              label: `${r.shortIdentifier}: ${r.title}`,
+            }))}
             onSelect={(result) => {
-              this.referendumId = result;
-              m.redraw();
+              this.referendumId = result.value;
             }}
           />
         )}
@@ -158,16 +136,12 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
           (this.councilMotionType === 'createTreasuryRejectionMotion' && (
             <CWDropdown
               label="Treasury Proposal"
-              options={(app.chain as Substrate).treasury.store
-                .getAll()
-                .map((r) => ({
-                  name: 'external_proposal',
-                  value: r.identifier,
-                  label: r.shortIdentifier,
-                }))}
+              options={substrate.treasury.store.getAll().map((r) => ({
+                value: r.identifier,
+                label: r.shortIdentifier,
+              }))}
               onSelect={(result) => {
-                this.treasuryProposalIndex = result;
-                m.redraw();
+                this.treasuryProposalIndex = result.value;
               }}
             />
           ))}
@@ -177,17 +151,19 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
             label="Threshold"
             placeholder="How many members must vote yes to execute?"
             oninput={(e) => {
-              const result = (e.target as any).value;
-              this.threshold = +result;
-              m.redraw();
+              this.threshold = +e.target.value;
             }}
           />
         )}
         <CWButton
-          disabled={!(author as SubstrateAccount).isCouncillor}
+          disabled={!author.isCouncillor}
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
+
+            if (!this.threshold) {
+              throw new Error('Invalid threshold');
+            }
 
             let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
               (a) => {
@@ -200,8 +176,6 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
 
             let args = [];
 
-            if (!this.threshold) throw new Error('Invalid threshold');
-
             const threshold = this.threshold;
 
             if (this.councilMotionType === 'createExternalProposal') {
@@ -213,12 +187,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               ];
 
               createFunc = ([a, t, mt, l]) =>
-                (app.chain as Substrate).council.createExternalProposal(
-                  a,
-                  t,
-                  mt,
-                  l
-                );
+                substrate.council.createExternalProposal(a, t, mt, l);
             } else if (
               this.councilMotionType === 'createExternalProposalMajority'
             ) {
@@ -230,12 +199,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               ];
 
               createFunc = ([a, t, mt, l]) =>
-                (app.chain as Substrate).council.createExternalProposalMajority(
-                  a,
-                  t,
-                  mt,
-                  l
-                );
+                substrate.council.createExternalProposalMajority(a, t, mt, l);
             } else if (
               this.councilMotionType === 'createExternalProposalDefault'
             ) {
@@ -247,12 +211,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               ];
 
               createFunc = ([a, t, mt, l]) =>
-                (app.chain as Substrate).council.createExternalProposalDefault(
-                  a,
-                  t,
-                  mt,
-                  l
-                );
+                substrate.council.createExternalProposalDefault(a, t, mt, l);
             } else if (this.councilMotionType === 'createFastTrack') {
               args = [
                 author,
@@ -262,8 +221,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
                 this.enactmentDelay,
               ];
 
-              createFunc = ([a, b, c, d, e]) =>
-                (app.chain as Substrate).council.createFastTrack(a, b, c, d, e);
+              createFunc = ([a, b, c, d, _e]) =>
+                substrate.council.createFastTrack(a, b, c, d, _e);
             } else if (
               this.councilMotionType === 'createEmergencyCancellation'
             ) {
@@ -281,36 +240,23 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               args = [author, threshold, this.treasuryProposalIndex];
 
               createFunc = ([a, t, i]) =>
-                (app.chain as Substrate).council.createTreasuryApprovalMotion(
-                  a,
-                  t,
-                  i
-                );
+                substrate.council.createTreasuryApprovalMotion(a, t, i);
             } else if (
               this.councilMotionType === 'createTreasuryRejectionMotion'
             ) {
               args = [author, threshold, this.treasuryProposalIndex];
 
               createFunc = ([a, t, i]) =>
-                (app.chain as Substrate).council.createTreasuryRejectionMotion(
-                  a,
-                  t,
-                  i
-                );
+                substrate.council.createTreasuryRejectionMotion(a, t, i);
             } else if (this.councilMotionType === 'vetoNextExternal') {
               args = [author, this.nextExternalProposalHash];
 
-              createFunc = ([a, h]) =>
-                (app.chain as Substrate).council.vetoNextExternal(a, h);
+              createFunc = ([a, h]) => substrate.council.vetoNextExternal(a, h);
             } else {
               throw new Error('Invalid council motion type');
             }
 
             return createTXModal(createFunc(args));
-
-            // Promise.resolve(createFunc(args)).then((modalData) =>
-            //   createTXModal(modalData)
-            // );
           }}
         />
       </>

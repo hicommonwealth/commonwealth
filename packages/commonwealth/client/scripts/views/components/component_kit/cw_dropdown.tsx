@@ -8,21 +8,25 @@ import 'components/component_kit/cw_dropdown.scss';
 import { CWTextInput } from './cw_text_input';
 import { CWText } from './cw_text';
 
-type DropdownAttrs = {
-  initialValue?: string;
+type DropdownItemType = {
   label: string;
-  onSelect?: (label: string, index: number) => void;
-  options: Array<{ label: string }>;
+  value: string;
+};
+
+type DropdownAttrs = {
+  initialValue?: DropdownItemType;
+  label: string;
+  onSelect?: (item: DropdownItemType) => void;
+  options: Array<DropdownItemType>;
 };
 
 export class CWDropdown extends ClassComponent<DropdownAttrs> {
   private showDropdown: boolean;
-  private selectedValue: string;
+  private selectedValue: DropdownItemType;
 
   oninit(vnode: m.Vnode<DropdownAttrs>) {
     this.showDropdown = false;
-    this.selectedValue =
-      vnode.attrs.initialValue ?? vnode.attrs.options[0].label;
+    this.selectedValue = vnode.attrs.initialValue ?? vnode.attrs.options[0];
   }
 
   view(vnode: m.Vnode<DropdownAttrs>) {
@@ -32,7 +36,7 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
       <div class="dropdown-wrapper">
         <CWTextInput
           iconRight="chevronDown"
-          placeholder={this.selectedValue}
+          placeholder={this.selectedValue.label}
           displayOnly
           iconRightonclick={() => {
             // Only here because it makes TextInput display correctly
@@ -44,14 +48,16 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
         />
         {this.showDropdown && (
           <div class="dropdown-options-display">
-            {options.map((item, idx) => {
+            {options.map((item) => {
               return (
                 <div
                   class="dropdown-item"
                   onclick={() => {
                     this.showDropdown = false;
-                    this.selectedValue = item.label;
-                    if (onSelect) onSelect(item.label, idx);
+                    this.selectedValue = item;
+                    if (onSelect) {
+                      onSelect(item);
+                    }
                   }}
                 >
                   <CWText className="dropdown-item-text">{item.label}</CWText>

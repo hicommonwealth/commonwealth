@@ -11,41 +11,24 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 import User from '../../components/widgets/user';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
-import {
-  ChainBase,
-  ProposalType,
-} from '../../../../../../common-common/src/types';
+import { ProposalType } from '../../../../../../common-common/src/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { createTXModal } from '../../modals/tx_signing_modal';
 
 export class SubstrateTreasuryTipForm extends ClassComponent {
-  private form: {
-    // amount;
-    beneficiary;
-    description;
-    // reason;
-    // title;
-    // topicId;
-    // topicName;
-    // value;
-  };
+  private beneficiary: string;
+  private description: string;
 
   view() {
     const author = app.user.activeAccount;
+    const substrate = app.chain as Substrate;
 
-    let dataLoaded = true;
     // TODO: this is only true if the proposer is doing reportAwesome()
     //   we need special code for newTip().
-    const tips = (app.chain as Substrate).tips;
-    dataLoaded = !!tips.initialized;
-
-    if (!dataLoaded) {
-      if (
-        app.chain?.base === ChainBase.Substrate &&
-        (app.chain as Substrate).chain?.timedOut
-      ) {
+    if (!substrate.tips.initialized) {
+      if (substrate.chain?.timedOut) {
         return <ErrorPage message="Could not connect to chain" />;
       } else {
         return <CWSpinner />;
@@ -65,26 +48,24 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
           label="Beneficiary"
           placeholder="Beneficiary of treasury proposal"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.form.beneficiary = result;
-            m.redraw();
+            this.beneficiary = e.target.value;
           }}
         />
         <CWTextArea
           label="Reason"
           placeholder="What’s the reason you want to tip the beneficiary?"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            if (this.form.description !== result) {
-              this.form.description = result;
-            }
-            m.redraw();
+            this.description = e.target.value;
           }}
         />
         <CWButton
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
+
+            if (!this.beneficiary) {
+              throw new Error('Invalid beneficiary address');
+            }
 
             const createFunc: (
               ...args
@@ -96,15 +77,9 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
               ).createTx(...a);
             };
 
-            let args = [];
+            const beneficiary = app.chain.accounts.get(this.beneficiary);
 
-            if (!this.form.beneficiary) {
-              throw new Error('Invalid beneficiary address');
-            }
-
-            const beneficiary = app.chain.accounts.get(this.form.beneficiary);
-
-            args = [author, this.form.description, beneficiary];
+            const args = [author, this.description, beneficiary];
 
             Promise.resolve(createFunc(args)).then((modalData) =>
               createTXModal(modalData)

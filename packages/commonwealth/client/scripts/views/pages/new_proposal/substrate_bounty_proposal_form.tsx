@@ -8,39 +8,22 @@ import { proposalSlugToClass } from 'identifiers';
 import { ITXModalData, ProposalModule } from 'models';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import {
-  ChainBase,
-  ProposalType,
-} from '../../../../../../common-common/src/types';
+import { ProposalType } from '../../../../../../common-common/src/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { createTXModal } from '../../modals/tx_signing_modal';
 
 export class SubstrateBountyProposalForm extends ClassComponent {
-  private form: {
-    // amount;
-    beneficiary;
-    // description;
-    reason;
-    title;
-    // topicId;
-    // topicName;
-    value;
-  };
+  private title: string;
+  private value: string;
 
   view() {
     const author = app.user.activeAccount;
+    const substrate = app.chain as Substrate;
 
-    let dataLoaded;
-    const bountyTreasury = (app.chain as Substrate).bounties;
-    dataLoaded = !!bountyTreasury.initialized;
-
-    if (!dataLoaded) {
-      if (
-        app.chain?.base === ChainBase.Substrate &&
-        (app.chain as Substrate).chain?.timedOut
-      ) {
+    if (!substrate.bounties.initialized) {
+      if (substrate.chain?.timedOut) {
         return <ErrorPage message="Could not connect to chain" />;
       } else {
         return <CWSpinner />;
@@ -53,24 +36,31 @@ export class SubstrateBountyProposalForm extends ClassComponent {
           placeholder="Bounty title (stored on chain)"
           label="Title"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.form.title = result;
-            m.redraw();
+            this.title = e.target.value;
           }}
         />
         <CWTextInput
           label={`Value (${app.chain.chain.denom})`}
           placeholder="Amount allocated to bounty"
           oninput={(e) => {
-            const result = (e.target as any).value;
-            this.form.value = app.chain.chain.coins(parseFloat(result), true);
-            m.redraw();
+            this.value = app.chain.chain.coins(
+              parseFloat(e.target.value),
+              true
+            );
           }}
         />
         <CWButton
           label="Send transaction"
           onclick={(e) => {
             e.preventDefault();
+
+            if (!this.title) {
+              throw new Error('Invalid title');
+            }
+
+            if (!this.value) {
+              throw new Error('Invalid value');
+            }
 
             let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
               (a) => {
@@ -81,41 +71,11 @@ export class SubstrateBountyProposalForm extends ClassComponent {
                 ).createTx(...a);
               };
 
-            let args = [];
+            const args = [author, this.value, this.title];
 
-            if (!this.form.title) {
-              throw new Error('Invalid title');
-            }
+            createFunc = ([a, v, t]) => substrate.bounties.createTx(a, v, t);
 
-            if (!this.form.value) {
-              throw new Error('Invalid value');
-            }
-
-            if (!this.form.reason) {
-              throw new Error('Invalid reason');
-            }
-
-            if (!this.form.beneficiary) {
-              throw new Error('Invalid beneficiary address');
-            }
-
-            const beneficiary = app.chain.accounts.get(this.form.beneficiary);
-
-            args = [
-              this.form.reason,
-              beneficiary,
-              author,
-              this.form.value,
-              this.form.title,
-            ];
-
-            // createFunc = ([a, v, t]) =>
-            //   (app.chain as Substrate).bounties.createTx(a, v, t);
-            // return createTXModal(createFunc(args));
-
-            // Promise.resolve(createFunc(args)).then((modalData) =>
-            //   createTXModal(modalData)
-            // );
+            return createTXModal(createFunc(args));
           }}
         />
       </>

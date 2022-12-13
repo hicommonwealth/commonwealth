@@ -11,22 +11,34 @@ import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/cw_button';
 
-enum SupportedSputnikProposalTypes {
-  AddMemberToRole = 'Add Member',
-  RemoveMemberFromRole = 'Remove Member',
-  Transfer = 'Payout',
-  Vote = 'Poll',
-}
+const sputnikProposalOptions = [
+  {
+    label: 'Add Member',
+    value: 'addMember',
+  },
+  {
+    label: 'Remove Member',
+    value: 'removeMember',
+  },
+  {
+    label: 'Payout',
+    value: 'payout',
+  },
+  {
+    label: 'Poll',
+    value: 'poll',
+  },
+];
 
 export class SputnikProposalForm extends ClassComponent {
   private description: string;
   private member: string;
   private payoutAmount: string;
-  private sputnikProposalType: SupportedSputnikProposalTypes;
+  private sputnikProposalType: string;
   private tokenId: string;
 
   oninit() {
-    this.sputnikProposalType = SupportedSputnikProposalTypes.AddMemberToRole;
+    this.sputnikProposalType = sputnikProposalOptions[0].value;
   }
 
   view() {
@@ -34,15 +46,13 @@ export class SputnikProposalForm extends ClassComponent {
       <>
         <CWDropdown
           label="Proposal Type"
-          defaultValue={SupportedSputnikProposalTypes.AddMemberToRole}
-          options={Object.values(SupportedSputnikProposalTypes).map((v) => ({
-            label: v,
-          }))}
-          onSelect={(result: SupportedSputnikProposalTypes) => {
-            this.sputnikProposalType = result;
+          defaultValue={sputnikProposalOptions[0]}
+          options={sputnikProposalOptions}
+          onSelect={(item) => {
+            this.sputnikProposalType = item.value;
           }}
         />
-        {this.sputnikProposalType !== SupportedSputnikProposalTypes.Vote && (
+        {this.sputnikProposalType !== 'vote' && (
           <CWTextInput
             label="Member"
             defaultValue="tokenfactory.testnet"
@@ -58,8 +68,7 @@ export class SputnikProposalForm extends ClassComponent {
             this.description = e.target.value;
           }}
         />
-        {this.sputnikProposalType ===
-          SupportedSputnikProposalTypes.Transfer && (
+        {this.sputnikProposalType === 'payout' && (
           <CWTextInput
             label="Token ID (leave blank for Ⓝ)"
             defaultValue=""
@@ -68,8 +77,7 @@ export class SputnikProposalForm extends ClassComponent {
             }}
           />
         )}
-        {this.sputnikProposalType ===
-          SupportedSputnikProposalTypes.Transfer && (
+        {this.sputnikProposalType === 'payout' && (
           <CWTextInput
             label="Amount"
             defaultValue=""
@@ -90,24 +98,15 @@ export class SputnikProposalForm extends ClassComponent {
 
             let propArgs: NearSputnikProposalKind;
 
-            if (
-              this.sputnikProposalType ===
-              SupportedSputnikProposalTypes.AddMemberToRole
-            ) {
+            if (this.sputnikProposalType === 'addMember') {
               propArgs = {
                 AddMemberToRole: { role: 'council', member_id: member },
               };
-            } else if (
-              this.sputnikProposalType ===
-              SupportedSputnikProposalTypes.RemoveMemberFromRole
-            ) {
+            } else if (this.sputnikProposalType === 'removeMember') {
               propArgs = {
                 RemoveMemberFromRole: { role: 'council', member_id: member },
               };
-            } else if (
-              this.sputnikProposalType ===
-              SupportedSputnikProposalTypes.Transfer
-            ) {
+            } else if (this.sputnikProposalType === 'payout') {
               // TODO: validate amount / token id
               const tokenId = this.tokenId || '';
 
@@ -124,9 +123,7 @@ export class SputnikProposalForm extends ClassComponent {
               propArgs = {
                 Transfer: { receiver_id: member, token_id: tokenId, amount },
               };
-            } else if (
-              this.sputnikProposalType === SupportedSputnikProposalTypes.Vote
-            ) {
+            } else if (this.sputnikProposalType === 'vote') {
               propArgs = 'Vote';
             } else {
               throw new Error('unsupported sputnik proposal type');
