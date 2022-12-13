@@ -25,6 +25,7 @@ export default class extends IEventHandler {
       addPrefix(__filename, [event.network, event.chain])
     );
 
+    // XXX TODO: REWORK THIS
     if (event.data.kind === CommonwealthTypes.EventKind.ProjectCreated) {
       // handle creation event by checking against projects table
       const entityId = dbEvent?.entity_id;
@@ -33,7 +34,6 @@ export default class extends IEventHandler {
         return; // oops, should not happen
       }
       const index = event.data.index;
-      const ipfsHash = event.data.ipfsHash;
 
       const projectRow = await this._models.Project.findOne({
         where: { id: +index },
@@ -43,52 +43,11 @@ export default class extends IEventHandler {
         return;
       }
 
-      const ipfsHashId = await this._models.IpfsPins.findOne({
-        where: { ipfs_hash: ipfsHash },
-      });
-      const ipfsParams = ipfsHashId ? { ipfs_hash_id: ipfsHashId.id } : {};
-
       // create new project (this should be the only place Projects are created)
       await this._models.Project.create({
         id: +index,
         entity_id: entityId,
-        ...ipfsParams,
-        creator: event.data.creator,
-        beneficiary: event.data.beneficiary,
-        token: event.data.acceptedToken,
-        curator_fee: event.data.curatorFee,
-        threshold: event.data.threshold,
-        deadline: event.data.deadline,
-        funding_amount: event.data.fundingAmount,
-        // TODO: where is this data coming from?
-        // title: event.data.title,
-        // chain_id: event.data.chainId,
-        // short_description: event.data.shortDescription,
-        // description: event.data.description,
-        // cover_image: event.data.coverImage,
       });
-    } else if (
-      event.data.kind === CommonwealthTypes.EventKind.ProjectBacked ||
-      event.data.kind === CommonwealthTypes.EventKind.ProjectCurated
-    ) {
-      // update funding amount in project
-      const entityId = dbEvent?.entity_id;
-      if (!entityId) {
-        log.error(`Entity not found on dbEvent: ${dbEvent.toString()}`);
-        return;
-      }
-      const amount = new BN(event.data.amount);
-      const projectRow = await this._models.Project.findOne({
-        where: { entity_id: entityId },
-      });
-      if (!projectRow) {
-        log.error(`Entity not found for id: ${entityId}`);
-        return;
-      }
-      const existingAmount = new BN(projectRow.funding_amount);
-      const newAmount = existingAmount.add(amount);
-      projectRow.funding_amount = newAmount.toString();
-      await projectRow.save();
     }
 
     return dbEvent;

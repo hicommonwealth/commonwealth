@@ -11,6 +11,7 @@ import { BigNumberish, ContractReceipt } from 'ethers';
 import { formatBytes32String } from 'ethers/lib/utils';
 import { attachSigner } from './contractApi';
 
+// TODO: this file needs to be reworked + Projects model as well
 export type IProjectCreationData = {
   title: string; // TODO length limits for contract side
   shortDescription: string;

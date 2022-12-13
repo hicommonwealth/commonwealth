@@ -3,6 +3,9 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
+      await queryInterface.dropTable('IpfsPins', { transaction: t });
+
+      // create Projects table
       await queryInterface.createTable(
         'Projects',
         {
@@ -11,34 +14,16 @@ module.exports = {
             primaryKey: true,
             type: Sequelize.INTEGER,
           },
+          entity_id: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            references: { model: 'ChainEntityMeta', key: 'id' },
+          },
           chain_id: {
             type: Sequelize.STRING,
             allowNull: true,
             references: { model: 'Chains', key: 'id' },
           },
-          entity_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: { model: 'ChainEntities', key: 'id' },
-          },
-          creator: { type: Sequelize.STRING, allowNull: false },
-          ipfs_hash_id: {
-            type: Sequelize.INTEGER,
-            allowNull: true,
-            references: { model: 'IpfsPins', key: 'id' },
-          },
-
-          beneficiary: { type: Sequelize.STRING, allowNull: false },
-          token: { type: Sequelize.STRING, allowNull: false },
-          curator_fee: { type: Sequelize.STRING, allowNull: false },
-          threshold: { type: Sequelize.STRING, allowNull: false },
-          deadline: { type: Sequelize.INTEGER, allowNull: false },
-          funding_amount: { type: Sequelize.STRING, allowNull: false },
-
-          title: { type: Sequelize.STRING(64), allowNull: true },
-          short_description: { type: Sequelize.STRING(224), allowNull: true },
-          description: { type: Sequelize.TEXT, allowNull: true },
-          cover_image: { type: Sequelize.TEXT, allowNull: true },
 
           created_at: { type: Sequelize.DATE, allowNull: false },
           updated_at: { type: Sequelize.DATE, allowNull: false },
@@ -46,6 +31,7 @@ module.exports = {
         { transaction: t }
       );
 
+      // Add required commonwealth nodes / chains
       const ethChainNode = await queryInterface.bulkInsert(
         'ChainNodes',
         [
@@ -117,14 +103,36 @@ module.exports = {
         },
         { transaction: t }
       );
+
+      await queryInterface.addColumn('Chains', 'hide_projects', {
+        type: Sequelize.BOOLEAN,
+        allowNull: true,
+      }, { transaction: t });
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn('IpfsPins', 'user_id', {
-        transaction: t,
-      });
+      await queryInterface.createTable('IpfsPins', {
+        id: {
+          allowNull: false,
+          autoIncrement: true,
+          primaryKey: true,
+          type: Sequelize.INTEGER,
+        },
+        address_id: {
+          type: Sequelize.INTEGER,
+          allowNull: false,
+          references: { model: 'Addresses', key: 'id' }
+        },
+        ipfs_hash: {
+          type: Sequelize.STRING,
+          allowNull: false,
+        },
+        created_at: { type: Sequelize.DATE, allowNull: false },
+        updated_at: { type: Sequelize.DATE, allowNull: false },
+      }, { transaction: t });
+
       await queryInterface.bulkDelete(
         'CommunityContracts',
         { chain_id: 'common-protocol' },
@@ -146,6 +154,7 @@ module.exports = {
         { transaction: t }
       );
       await queryInterface.dropTable('Projects', { transaction: t });
+      await queryInterface.removeColumn('Chains', 'hide_projects', { transaction: t });
     });
-  },
+  }
 };

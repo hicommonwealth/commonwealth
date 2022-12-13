@@ -27,17 +27,23 @@ const setProjectChain = async (
 
   const project = await models.Project.findOne({
     where: { id: project_id },
+    include: {
+      model: models.ChainEntityMeta,
+      required: true,
+    }
   });
   if (!project) {
     throw new AppError(Errors.InvalidProjectId);
   }
 
+  // TODO: ChainEntityMeta.author is never set???
   const author = await models.Address.findOne({
     where: {
-      address: project.creator,
+      address: project.ChainEntityMeta.author,
       user_id: req.user.id,
     },
   });
+
   // site admin can set chain always
   if (!author && !req.user.isAdmin) {
     throw new AppError(Errors.OnlyAuthorCanSetChain);

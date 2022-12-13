@@ -1,7 +1,8 @@
 import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError } from 'common-common/src/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
+import axios from 'axios';
+import FormData from 'form-data';
 import { DB } from '../models';
-import pinIpfsBlob from '../util/pinIpfsBlob';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 
@@ -13,6 +14,7 @@ export const Errors = {
   NoBlobPresent: 'No JSON blob was input',
   InvalidJson: 'Input is not a valid JSON string',
   PinFailed: 'Failed to pin IPFS blob',
+  KeysError: 'Pinata Keys do not exist',
 };
 
 const isValidJSON = (input: string) => {
@@ -39,11 +41,31 @@ const ipfsPin = async (
   if (error || !address) throw new AppError(Errors.InvalidAddress);
 
   try {
-    const ipfsHash = await pinIpfsBlob(req.user.id, address.id, req.body.blob);
-    return success(res, ipfsHash);
+    const data = new FormData();
+    const jsonfile = req.body.blob;
+    data.append('file', JSON.stringify(jsonfile), 'user_idblob');
+    if (process.env.PINATA_API_KEY && process.env.PINATA_SECRET_API_KEY) {
+      const headers = {
+        pinata_api_key: process.env.PINATA_API_KEY,
+        'Content-Type': `multipart/form-data; boundary= ${data.getBoundary()}`,
+        pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
+      };
+      const pinataResponse = await axios.post(
+        'https://api.pinata.cloud/pinning/pinFileToIPFS',
+        data,
+        { headers }
+      );
+      return success(res, pinataResponse.data.IpfsHash);
+    } else {
+      throw new ServerError(Errors.KeysError);
+    }
   } catch (e) {
     log.error(`Failed to pin IPFS blob: ${e.message}`);
-    throw new AppError(Errors.PinFailed);
+    if (e instanceof ServerError || e instanceof AppError) {
+      throw e;
+    } else {
+      throw new AppError(Errors.PinFailed)
+    }
   }
 };
 

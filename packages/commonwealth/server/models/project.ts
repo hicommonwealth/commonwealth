@@ -2,9 +2,8 @@ import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
 import { ChainEntityMetaAttributes } from './chain_entity_meta';
+import { IpfsPinAttributes } from './ipfs_pin';
 import { ModelStatic, ModelInstance } from './types';
-
-export type Permission = 'admin' | 'moderator' | 'member';
 
 // TODO, updating with data necessary to populate client-side model,
 // e.g. incl description, title, coverImage, etc
@@ -12,28 +11,11 @@ export type Permission = 'admin' | 'moderator' | 'member';
 export type ProjectAttributes = {
   // populated immediately
   id: number;
-  chain_id?: string; // Chains fk, null if created by event
+  entity_id: number;
+  chain_id?: string;
+
   created_at?: Date;
   updated_at?: Date;
-
-  // populated by creation event
-  entity_id: number; // ChainEntities fk
-  creator: string;
-  ipfs_hash_id?: number;
-
-  // TODO: This organizational schema no longer up to date
-  // populated from contract queries
-  beneficiary: string;
-  token: string;
-  curator_fee: string;
-  threshold: string;
-  deadline: number;
-  funding_amount: string;
-
-  title: string;
-  short_description: string;
-  description: string;
-  cover_image: string;
 
   Chain?: ChainAttributes;
   ChainEntityMeta?: ChainEntityMetaAttributes;
@@ -53,21 +35,6 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, allowNull: false },
       entity_id: { type: dataTypes.INTEGER, allowNull: false },
       chain_id: { type: dataTypes.STRING, allowNull: true },
-      ipfs_hash_id: { type: dataTypes.INTEGER, allowNull: true },
-
-      creator: { type: dataTypes.STRING, allowNull: false },
-      beneficiary: { type: dataTypes.STRING, allowNull: false },
-      token: { type: dataTypes.STRING, allowNull: false },
-
-      curator_fee: { type: dataTypes.STRING, allowNull: false },
-      threshold: { type: dataTypes.STRING, allowNull: false },
-      deadline: { type: dataTypes.INTEGER, allowNull: false },
-      funding_amount: { type: dataTypes.STRING, allowNull: false },
-
-      title: { type: dataTypes.STRING(64), allowNull: true },
-      short_description: { type: dataTypes.STRING(224), allowNull: true },
-      description: { type: dataTypes.TEXT, allowNull: true },
-      cover_image: { type: dataTypes.TEXT, allowNull: true },
 
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
@@ -89,10 +56,6 @@ export default (
     });
     models.Project.belongsTo(models.ChainEntityMeta, {
       foreignKey: 'entity_id',
-      targetKey: 'id',
-    });
-    models.Project.belongsTo(models.IpfsPins, {
-      foreignKey: 'ipfs_hash_id',
       targetKey: 'id',
     });
   };

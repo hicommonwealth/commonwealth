@@ -1,5 +1,4 @@
 import { WhereOptions } from 'sequelize/types';
-import Web3 from 'web3';
 
 import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../util/validateChain';
@@ -12,7 +11,6 @@ export const Errors = {
 };
 
 type GetProjectsReq = {
-  creator_address?: string;
   chain_id?: string;
   project_id?: number;
 };
@@ -23,7 +21,7 @@ const getProjects = async (
   req: TypedRequestQuery<GetProjectsReq>,
   res: TypedResponse<GetProjectsResp>
 ) => {
-  const { creator_address, chain_id, project_id } = req.query as GetProjectsReq;
+  const { chain_id, project_id } = req.query as GetProjectsReq;
   const params: WhereOptions<ProjectAttributes> = {};
   if (chain_id) {
     try {
@@ -34,12 +32,6 @@ const getProjects = async (
     }
     params.chain_id = chain_id;
   }
-  if (creator_address) {
-    if (!Web3.utils.isAddress(creator_address)) {
-      throw new AppError(Errors.InvalidAddress);
-    }
-    params.creator = creator_address;
-  }
   if (project_id) {
     params.id = project_id;
   }
@@ -49,13 +41,7 @@ const getProjects = async (
       where: params,
       include: {
         model: models.ChainEntityMeta,
-        include: [
-          {
-            model: models.ChainEventType,
-            order: [[models.ChainEventType, 'id', 'asc']],
-            include: [models.ChainEventType],
-          },
-        ],
+        required: true,
       },
     });
 
