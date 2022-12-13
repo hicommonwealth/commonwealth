@@ -237,7 +237,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/adapter'
+        './controllers/chain/ethereum/tokenAdapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
