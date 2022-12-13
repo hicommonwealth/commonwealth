@@ -122,9 +122,11 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       TopicGateCheck.getTopicThreshold(activeTopicName);
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
+    const userFailsThreshold =
+      tokenPostingThreshold?.gtn(0) && userBalance?.gtn(0) && userBalance.lt(tokenPostingThreshold);
 
     const disabled =
-      this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress;
+      this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress || userFailsThreshold;
 
     const decimals = app.chain?.meta?.decimals
       ? app.chain.meta.decimals

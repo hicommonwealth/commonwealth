@@ -71,7 +71,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
             )}
             {allowLinking && (
               <CWButton
-                buttonType="mini"
+                buttonType="mini-black"
                 label="Link discussion"
                 onclick={(e) => {
                   e.preventDefault();

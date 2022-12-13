@@ -56,7 +56,7 @@ class OverviewPage extends ClassComponent {
               </CWText>
               <CWButton
                 className="latest-button"
-                buttonType="mini"
+                buttonType="mini-black"
                 label="Latest Threads"
                 iconName="home"
                 onclick={() => {
@@ -74,7 +74,7 @@ class OverviewPage extends ClassComponent {
               />
             ) : (
               <CWButton
-                buttonType="mini"
+                buttonType="mini-black"
                 label="Create Thread"
                 iconName="plus"
                 onclick={() => {
