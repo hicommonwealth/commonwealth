@@ -80,6 +80,15 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   },
 });
 
+console.log('Connecting to database...', DATABASE_URI);
+
+sequelize.authenticate().then(() => {
+  log.info('Database connected');
+}).catch((err) => {
+  log.error('Unable to connect to the database:', err);
+});
+
+
 export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),

@@ -6,7 +6,7 @@ services:
   db:
     env_file:
       - ".env"
-    image: postgres:14.1-alpine
+    image: postgres 
     environment:
       POSTGRES_PASSWORD: "${DOCKER_PG_PW}"
       POSTGRES_USER: "${DOCKER_PG_USER}"
@@ -16,8 +16,6 @@ services:
       - ./docker/pg_init.sql:/docker-entrypoint-initdb.d/pg_init.sql
     ports: 
       - '5432:5432'
-    expose:
-      - 5432
   common-common:
     build: packages/common-common
   chain-events: 
@@ -36,7 +34,10 @@ services:
       - ./:/monorepo
     depends_on:
       - db
+    links:
+      - db
     command: sh -c "wait && yarn start"
+    env_file: ./.env
 volumes:
   db:
     driver: local
