@@ -24,7 +24,7 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { PageNotFound } from '../404';
 import ErrorPage from '../error';
-import { search } from './search_bar';
+import { search } from './helpers';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -224,12 +224,6 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
-    const LoadingPage = (
-      <PageLoading
-      // title={<BreadcrumbsTitleTag title="Search" />}
-      />
-    );
-
     const searchQuery = SearchQuery.fromUrlParams(m.route.param());
 
     const { chainScope, searchTerm } = searchQuery;
@@ -253,11 +247,11 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
       this.refreshResults = false;
       this.results = {};
       search(searchQuery, this);
-      return LoadingPage;
+      return <PageLoading />;
     }
 
     if (!app.search.getByQuery(searchQuery)?.loaded) {
-      return LoadingPage;
+      return <PageLoading />;
     }
 
     if (!this.activeTab) {

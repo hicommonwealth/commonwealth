@@ -1,0 +1,57 @@
+@import 'shared';
+
+.SearchBar {
+  width: 608px;
+
+  .search-and-icon-container {
+    position: relative;
+
+    input {
+      @include b1;
+
+      border: 1px solid $neutral-300;
+      border-radius: $border-radius-rounded-corners;
+      color: $neutral-800;
+      height: 40px;
+      padding: 8px 48px 8px 16px;
+      width: 100%;
+
+      &::placeholder {
+        color: $neutral-500;
+      }
+
+      &:focus {
+        outline: none;
+      }
+
+      &:focus-within {
+        border-color: $primary-500;
+      }
+    }
+
+    .searchbar-icon {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .search-results-dropdown {
+      background-color: $white;
+      border-radius: 0 0 $border-radius-corners $border-radius-corners;
+      box-shadow: $elevation-3;
+      margin-top: 8px;
+      overflow: hidden;
+      padding: 16px;
+      position: absolute;
+      user-select: none;
+      width: 100%;
+      z-index: 1001;
+
+      .looking-buttons-row {
+        display: flex;
+        gap: 8px;
+      }
+    }
+  }
+}
