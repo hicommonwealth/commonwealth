@@ -160,6 +160,7 @@ import {getChain} from "./routes/getChain";
 import {getChainNode} from "./routes/getChainNode";
 import {getChainContracts} from "./routes/getChainContracts";
 import {getSubscribedChains} from "./routes/getSubscribedChains";
+import GlobalActivityCache from './util/globalActivityCache';
 
 
 
@@ -170,6 +171,7 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
   banCache: BanCache,
+  globalActivityCache: GlobalActivityCache,
 ) {
   const router = express.Router();
 
@@ -600,7 +602,7 @@ function setupRouter(
     viewUserActivity.bind(this, models)
   );
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
-  router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models));
+  router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models, globalActivityCache));
   router.post(
     '/markNotificationsRead',
     passport.authenticate('jwt', { session: false }),
