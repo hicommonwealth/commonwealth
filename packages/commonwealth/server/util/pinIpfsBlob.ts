@@ -3,8 +3,9 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { factory, formatFilename } from 'common-common/src/logging';
 
+import { ServerError } from 'common-common/src/errors';
 import models from '../database';
-import { ServerError } from './errors';
+
 
 const log = factory.getLogger(formatFilename(__filename));
 require('dotenv').config();

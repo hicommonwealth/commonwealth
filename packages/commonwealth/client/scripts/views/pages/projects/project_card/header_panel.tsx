@@ -52,7 +52,7 @@ export class HeaderPanel implements m.ClassComponent<HeaderPanelAttrs> {
             class="chain-wrap"
             style={isSupporter ? 'top: 104px' : 'top: 8px'}
           >
-            <CWAvatar iconUrl={iconUrl} size={32} />
+            <CWAvatar avatarUrl={iconUrl} size={32} />
           </div>
         )}
       </div>

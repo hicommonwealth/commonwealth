@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
 
@@ -20,7 +21,9 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
     localStorage[`${app.activeChainId()}-governance-toggle-tree`]
   );
+
   const split = path.split('.');
+
   for (const field of split.slice(0, split.length - 1)) {
     if (Object.prototype.hasOwnProperty.call(currentTree, field)) {
       currentTree = currentTree[field];
@@ -28,16 +31,17 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
       return;
     }
   }
+
   currentTree[split[split.length - 1]] = toggle;
+
   const newTree = currentTree;
+
   localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
     JSON.stringify(newTree);
 }
 
-export class GovernanceSection
-  implements m.ClassComponent<SidebarSectionAttrs>
-{
-  view(vnode) {
+export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
+  view() {
     // Conditional Render Details
     const hasProposals =
       app.chain &&
@@ -53,32 +57,21 @@ export class GovernanceSection
 
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
-    const showMolochMenuOptions =
-      isNotOffchain &&
-      app.user.activeAccount &&
-      app.chain?.network === ChainNetwork.Moloch;
-    const showMolochMemberOptions =
-      isNotOffchain &&
-      showMolochMenuOptions &&
-      (app.user.activeAccount as any)?.shares?.gtn(0);
-    const showCommonProtocolMenuOptions =
-      isNotOffchain && app.chain?.network === ChainNetwork.CommonProtocol;
     const showCompoundOptions =
       isNotOffchain &&
       app.user.activeAccount &&
       app.chain?.network === ChainNetwork.Compound;
-    const showAaveOptions =
-      isNotOffchain &&
-      app.user.activeAccount &&
-      app.chain?.network === ChainNetwork.Aave;
+
     const showSnapshotOptions =
       app.chain?.base === ChainBase.Ethereum &&
       !!app.chain?.meta.snapshot?.length;
+
     const showReferenda =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Darwinia &&
       app.chain.network !== ChainNetwork.HydraDX;
+
     const showProposals =
       (isNotOffchain &&
         app.chain?.base === ChainBase.Substrate &&
@@ -89,21 +82,26 @@ export class GovernanceSection
       app.chain?.network === ChainNetwork.Moloch ||
       app.chain?.network === ChainNetwork.Compound ||
       app.chain?.network === ChainNetwork.Aave;
+
     const showCouncillors =
       isNotOffchain && app.chain?.base === ChainBase.Substrate;
+
     const showTreasury =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge;
+
     const showBounties =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge &&
       app.chain.network !== ChainNetwork.HydraDX;
+
     const showTips =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
       app.chain.network !== ChainNetwork.Centrifuge;
+
     const showValidators =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
@@ -193,17 +191,14 @@ export class GovernanceSection
       localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
         JSON.stringify(governanceDefaultToggleTree);
     }
-    let toggleTreeState = JSON.parse(
+
+    const toggleTreeState = JSON.parse(
       localStorage[`${app.activeChainId()}-governance-toggle-tree`]
     );
-    if (vnode.attrs.mobile) {
-      toggleTreeState = governanceDefaultToggleTree;
-    }
 
     const onSnapshotProposal = (p) =>
       p.startsWith(`/${app.activeChainId()}/snapshot`);
-    const onSnapshotProposalCreation = (p) =>
-      p.startsWith(`/${app.activeChainId()}/new/snapshot/`);
+
     const onProposalPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/proposals`) ||
       p.startsWith(
@@ -211,6 +206,7 @@ export class GovernanceSection
           ProposalType.SubstrateDemocracyProposal
         }`
       );
+
     const onReferendaPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/referenda`) ||
       p.startsWith(
@@ -218,6 +214,7 @@ export class GovernanceSection
           ProposalType.SubstrateDemocracyReferendum
         }`
       );
+
     const onTreasuryPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/treasury`) ||
       p.startsWith(
@@ -225,27 +222,27 @@ export class GovernanceSection
           ProposalType.SubstrateTreasuryProposal
         }`
       );
+
     const onBountiesPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/bounties`);
+
     const onTipsPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/tips`) ||
       p.startsWith(
         `/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`
       );
+
     const onCouncilPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/council`);
-    const onMotionPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/motions`) ||
-      p.startsWith(
-        `/${app.activeChainId()}/proposal/${
-          ProposalType.SubstrateCollectiveProposal
-        }`
-      );
+
     const onValidatorsPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/validators`);
+
     const onProjectsPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/projects`);
-    const onNotificationsPage = (p) => p.startsWith('/notifications');
+
+      const onNotificationsPage = (p) => p.startsWith('/notifications');
+
     const onMembersPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/members`) ||
       p.startsWith(`/${app.activeChainId()}/account/`);
@@ -514,7 +511,7 @@ export class GovernanceSection
       },
       displayData: governanceGroupData,
       isActive: false,
-      toggleDisabled: vnode.attrs.mobile,
+      toggleDisabled: false,
     };
 
     return <SidebarSectionGroup {...sidebarSectionData} />;

@@ -1,6 +1,6 @@
+import { AppError } from 'common-common/src/errors';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { AppError } from '../util/errors';
 import { ProjectAttributes } from '../models/project';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 

@@ -4,11 +4,18 @@ import { AddressModelStatic } from './models/address';
 import { AttachmentModelStatic } from './models/attachment';
 import { BanModelStatic } from './models/ban';
 import { ChainModelStatic } from './models/chain';
-import { ChainCategoryModelStatic } from './models/chain_category';
-import { ChainCategoryTypeModelStatic } from './models/chain_category_type';
-import { ChainEntityModelStatic } from './models/chain_entity';
-import { ChainEventModelStatic } from './models/chain_event';
-import { ChainEventTypeModelStatic } from './models/chain_event_type';
+import {
+  ChainCategoryModelStatic
+} from './models/chain_category';
+import {
+  ChainCategoryTypeModelStatic
+} from './models/chain_category_type';
+import {
+  ChainEntityMetaModelStatic
+} from './models/chain_entity_meta';
+import {
+  ChainEventTypeModelStatic
+} from './models/chain_event_type';
 import { ChainNodeModelStatic } from './models/chain_node';
 import { ChatChannelModelStatic } from './models/chat_channel';
 import { ChatMessageModelStatic } from './models/chat_message';
@@ -56,8 +63,7 @@ export type Models = {
   Chain: ChainModelStatic;
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
-  ChainEntity: ChainEntityModelStatic;
-  ChainEvent: ChainEventModelStatic;
+  ChainEntityMeta: ChainEntityMetaModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
   ChatChannel: ChatChannelModelStatic;

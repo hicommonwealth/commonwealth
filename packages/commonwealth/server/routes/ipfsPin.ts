@@ -1,7 +1,7 @@
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
 import pinIpfsBlob from '../util/pinIpfsBlob';
-import { AppError } from '../util/errors';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 

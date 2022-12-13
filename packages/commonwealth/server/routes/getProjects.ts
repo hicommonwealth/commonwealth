@@ -1,9 +1,9 @@
 import { WhereOptions } from 'sequelize/types';
 import Web3 from 'web3';
 
+import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
 import { ProjectAttributes } from '../models/project';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 
@@ -48,11 +48,11 @@ const getProjects = async (
     const projects = await models.Project.findAll({
       where: params,
       include: {
-        model: models.ChainEntity,
+        model: models.ChainEntityMeta,
         include: [
           {
-            model: models.ChainEvent,
-            order: [[models.ChainEvent, 'id', 'asc']],
+            model: models.ChainEventType,
+            order: [[models.ChainEventType, 'id', 'asc']],
             include: [models.ChainEventType],
           },
         ],

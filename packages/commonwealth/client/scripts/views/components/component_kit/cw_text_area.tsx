@@ -1,26 +1,29 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text_area.scss';
 
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { ValidationStatus } from './cw_validation_text';
-import { MessageRow, TextInputAttrs } from './cw_text_input';
+import { MessageRow, BaseTextInputAttrs } from './cw_text_input';
 
 type TextAreaStyleAttrs = {
   disabled?: boolean;
   validationStatus?: ValidationStatus;
 };
 
-export class CWTextArea implements m.ClassComponent<TextInputAttrs> {
+type TextAreaAttrs = BaseTextInputAttrs & TextAreaStyleAttrs;
+
+export class CWTextArea extends ClassComponent<TextAreaAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode) {
+  view(vnode: m.Vnode<TextAreaAttrs>) {
     const {
       autocomplete,
       autofocus,

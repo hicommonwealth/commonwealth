@@ -3,7 +3,7 @@ import { IApp } from 'state';
 import { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { AaveEvents, AaveTypes } from 'chain-events/src';
 import { Executor } from 'common-common/src/eth/types';
-import { chainToEventNetwork, EntityRefreshOption } from 'controllers/server/chain_entities';
+import { chainToEventNetwork } from 'controllers/server/chain_entities';
 
 import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import AaveProposal from './proposal';
@@ -126,22 +126,16 @@ export default class AaveGovernance extends ProposalModule<
 
     // load server proposals
     console.log('Fetching aave proposals from backend.');
-    await this.app.chain.chainEntities.refresh(
-      this.app.chain.id,
-      EntityRefreshOption.AllEntities
-    );
-    const entities = this.app.chain.chainEntities.store.getByType(
-      AaveTypes.EntityKind.Proposal
-    );
+    await this.app.chainEntities.refresh(this.app.chain.id);
+    const entities = this.app.chainEntities.store.getByType(AaveTypes.EntityKind.Proposal);
     entities.forEach((e) => this._entityConstructor(e));
     console.log(`Found ${entities.length} proposals!`);
 
     await Promise.all(this.store.getAll().map((p) => p.init()));
 
     // register new chain-event handlers
-    this.app.chain.chainEntities.registerEntityHandler(
-      AaveTypes.EntityKind.Proposal,
-      (entity, event) => {
+    this.app.chainEntities.registerEntityHandler(
+      AaveTypes.EntityKind.Proposal, (entity, event) => {
         this.updateProposal(entity, event);
       }
     );
@@ -155,7 +149,7 @@ export default class AaveGovernance extends ProposalModule<
       this.app.chain.id
     );
     const processor = new AaveEvents.Processor(chainEventsContracts);
-    await this.app.chain.chainEntities.subscribeEntities(
+    await this.app.chainEntities.subscribeEntities(
       this.app.chain.id,
       chainToEventNetwork(this.app.chain.meta),
       subscriber,
@@ -166,7 +160,7 @@ export default class AaveGovernance extends ProposalModule<
   }
 
   public deinit() {
-    this.app.chain.chainEntities.deinit();
+    this.app.chainEntities.deinit();
     this.store.clear();
   }
 

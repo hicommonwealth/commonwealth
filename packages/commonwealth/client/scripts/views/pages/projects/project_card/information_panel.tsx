@@ -66,7 +66,7 @@ export class InformationPanel
           </div>
         </div>
         <div class="description">
-          <CWText type="h5" fontStyle="semiBold">
+          <CWText type="h5" fontWeight={"semiBold"}>
             {project.title}
           </CWText>
           <CWText type="caption">

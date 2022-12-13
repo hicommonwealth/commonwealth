@@ -283,9 +283,7 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.post(
-      `https://cloudflare-ipfs.com/ipfs/${this._ipfsAddress}#x-ipfs-companion-no-redirect`
-    )
+    $.get(`${this._Gov.app.serverUrl()}/ipfsProxy/${this._ipfsAddress}`)
       .then((ipfsData) => {
         if (typeof ipfsData === 'string') {
           this._ipfsData = JSON.parse(ipfsData);

@@ -80,7 +80,7 @@ export class InformationSlide
           uniqueId="chain-selector"
         />
         <CWDropdown
-          menuItems={
+          inputOptions={
             chainAccounts.map((acc: Account) => {
               return { label: acc.address };
             }) as DefaultMenuItem[]

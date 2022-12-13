@@ -54,7 +54,7 @@ export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
       <div class="SupportCard">
         <div class="card-header">
           <CWIcon iconName={supportType} iconSize="large" />
-          <CWText type="h3" weight="semibold">
+          <CWText type="h3" weight="semiBold">
             {headerText}
           </CWText>
         </div>

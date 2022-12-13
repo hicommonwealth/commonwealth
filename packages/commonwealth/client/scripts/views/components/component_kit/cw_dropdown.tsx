@@ -1,28 +1,29 @@
 /* @jsx m */
 
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_dropdown.scss';
 
-import { CWTextInput, TextInputAttrs } from './cw_text_input';
+import { CWTextInput, BaseTextInputAttrs } from './cw_text_input';
 import { CWPopoverMenuItem } from './cw_popover/cw_popover_menu';
 import { DefaultMenuItem } from './types';
 
-export type DropdownInputAttrs = {
-  defaultActiveIndex?: number;
-  menuItems: DefaultMenuItem[];
+type DropdownAttrs = {
+  inputOptions: Array<DefaultMenuItem>;
+  onSelect?: (optionLabel: string, index?: number) => void;
   label: string;
   placeholder?: string;
-  onSelect?: (optionLabel: string, index?: number) => void;
-  textInputAttrs?: TextInputAttrs;
+  defaultActiveIndex?: number;
+  textInputAttrs?: BaseTextInputAttrs;
   uniqueId: string; // Allows for identification of the dropdown in a form
 };
 
-export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
+export class CWDropdown extends ClassComponent<DropdownAttrs> {
   private showDropdown: boolean;
   private value: string;
 
-  oninit(vnode: VnodeDOM<DropdownInputAttrs, this>) {
+  oninit(vnode: m.Vnode<DropdownAttrs>) {
     this.showDropdown = false;
 
     document.body.addEventListener('click', (event) => {
@@ -35,14 +36,14 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
     });
   }
 
-  view(vnode: VnodeDOM<DropdownInputAttrs, this>) {
-    const { defaultActiveIndex, menuItems, label, onSelect, placeholder } =
+  view(vnode: m.Vnode<DropdownAttrs>) {
+    const { defaultActiveIndex, inputOptions, label, onSelect, placeholder } =
       vnode.attrs;
 
-    if (!this.value) {
-      this.value = menuItems[defaultActiveIndex ?? 0].label;
-    }
-    const { showDropdown, value } = this;
+      if (!this.value) {
+        this.value = inputOptions[defaultActiveIndex ?? 0].label;
+      }
+      const { showDropdown, value } = this;
 
     return (
       <div id={vnode.attrs.uniqueId} class="dropdown-wrapper">
@@ -62,7 +63,7 @@ export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
         />
         {showDropdown && (
           <div class="dropdown-options-display">
-            {menuItems.map((item, idx) => {
+            {inputOptions.map((item, idx) => {
               return (
                 <CWPopoverMenuItem
                   {...item}

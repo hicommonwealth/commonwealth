@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
 import { ChainAttributes } from './chain';
-import { ChainEntityAttributes } from './chain_entity';
+import { ChainEntityMetaAttributes } from './chain_entity_meta';
 import { ModelStatic, ModelInstance } from './types';
 
 export type Permission = 'admin' | 'moderator' | 'member';
@@ -36,7 +36,7 @@ export type ProjectAttributes = {
   cover_image: string;
 
   Chain?: ChainAttributes;
-  ChainEntity?: ChainEntityAttributes;
+  ChainEntityMeta?: ChainEntityMetaAttributes;
 };
 
 export type ProjectInstance = ModelInstance<ProjectAttributes>;
@@ -87,7 +87,7 @@ export default (
       foreignKey: 'chain_id',
       targetKey: 'id',
     });
-    models.Project.belongsTo(models.ChainEntity, {
+    models.Project.belongsTo(models.ChainEntityMeta, {
       foreignKey: 'entity_id',
       targetKey: 'id',
     });

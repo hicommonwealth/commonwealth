@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import app from 'state';
 
@@ -15,7 +16,7 @@ import { PageLoading } from './loading';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { NewLoginModal } from '../modals/login_modal';
 
-class Web3LoginPage implements m.ClassComponent {
+class Web3LoginPage extends ClassComponent {
   private error?: string;
   private loading?: boolean;
 

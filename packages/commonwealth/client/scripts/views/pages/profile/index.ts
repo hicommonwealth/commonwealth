@@ -423,13 +423,13 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
 
     const allTabTitle =
       proposals && comments
-        ? ['All ', proposals.length + comments.length]
+        ? `All ${proposals.length + comments.length}`
         : 'All';
     const threadsTabTitle = proposals
-      ? ['Threads ', proposals.length]
+      ? `Threads ${proposals.length}`
       : 'Threads';
     const commentsTabTitle = comments
-      ? ['Comments ', comments.length]
+      ? `Comments ${comments.length}`
       : 'Comments';
 
     return m(

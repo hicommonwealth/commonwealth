@@ -4,10 +4,10 @@
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import { contracts } from '@polkadot/types/interfaces/definitions';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
+import { CommunityRoleInstance } from 'server/models/community_role';
 import { DB } from '../models';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { CommunityBannerInstance } from '../models/community_banner';
@@ -16,7 +16,7 @@ import { RoleInstance } from '../models/role';
 import { RuleInstance } from '../models/rule';
 import { ThreadInstance } from '../models/thread';
 import { TopicInstance } from '../models/topic';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
 import validateChain from '../util/validateChain';
 
@@ -48,6 +48,7 @@ const bulkOffchain = async (
     rules,
     communityBanner,
     contracts,
+    communityRoles,
   ] = await (<
     Promise<
       [
@@ -59,7 +60,8 @@ const bulkOffchain = async (
         ChatChannelInstance[],
         RuleInstance[],
         CommunityBannerInstance,
-        ContractInstance[]
+        ContractInstance[],
+        CommunityRoleInstance[]
       ]
     >
   >Promise.all([
@@ -87,7 +89,8 @@ const bulkOffchain = async (
               as: 'topic',
             },
             {
-              model: models.ChainEntity,
+              model: models.ChainEntityMeta,
+                as: 'chain_entity_meta'
             },
             {
               model: models.LinkedThread,
@@ -213,6 +216,7 @@ const bulkOffchain = async (
         reject(new ServerError('Could not fetch contracts'));
       }
     }),
+    models.CommunityRole.findAll({ where: { chain_id: chain.id } }),
   ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -231,6 +235,7 @@ const bulkOffchain = async (
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contracts: contracts.map((c) => c.toJSON()),
+      communityRoles: communityRoles.map((r) => r.toJSON()),
     },
   });
 };

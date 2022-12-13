@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import Infinite from 'mithril-infinite';
 import { Button, PopoverMenu } from 'construct-ui';
 
@@ -14,7 +15,7 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 
 const MAX_NOTIFS = 40;
 
-export class NotificationsMenu implements m.ClassComponent {
+export class NotificationsMenu extends ClassComponent {
   private init = false;
   private minChainEventsNotification = 0;
   private minDiscussionNotification = 0;
@@ -88,60 +89,52 @@ export class NotificationsMenu implements m.ClassComponent {
     return (
       <div class="NotificationsMenu">
         <div class="NotificationsMenuHeader">
-          <Button
-            label={
+          {m(Button, {
+            label:
               // discussionNotificationsCount
               //   ? `Discussions (${discussionNotificationsCount})`
               //   : 'Discussions'
-              'Discussions'
-            }
-            active={!this.selectedChainEvents}
-            onclick={(e) => {
+              'Discussions',
+            active: !this.selectedChainEvents,
+            onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = false;
-            }}
-          />
-          <Button
-            label={
+            },
+          })}
+          {m(Button, {
+            label:
               // chainNotificationsCount
               //   ? `Chain events (${chainNotificationsCount})`
               //   : 'Chain events'
-              'Chain events'
-            }
-            active={!!this.selectedChainEvents}
-            onclick={(e) => {
+              'Chain events',
+            active: !!this.selectedChainEvents,
+            onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = true;
-            }}
-          />
+            },
+          })}
         </div>
         <div class="notification-list">
           {(() => {
             if (this.selectedChainEvents) {
               if (this.showingChainEventNotifications.length > 0) {
-                return (
-                  <Infinite
-                    maxPages={1} // prevents rollover/repeat
-                    pageData={() => this.showingChainEventNotifications} // limit the number of rows shown here
-                    pageKey={() =>
-                      `${this.minChainEventsNotification} - ${
-                        this.minChainEventsNotification + MAX_NOTIFS
-                      }`
-                    }
-                    key={
-                      // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                      // sortedFilteredNotifications.length
-                      'chain'
-                      // TODO: add the length/num of total chain-events once
-                      // notifications and notifications read table are split
-                    }
-                    item={(data) => {
-                      return m(NotificationRow, { notifications: [data] });
-                    }}
-                  />
-                );
+                return m(Infinite, {
+                  maxPages: 1, // prevents rollover/repeat
+                  pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
+                  pageKey: () =>
+                    `${this.minChainEventsNotification} - ${
+                      this.minChainEventsNotification + MAX_NOTIFS
+                    }`,
+                  key:
+                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+                    // sortedFilteredNotifications.length
+                    'chain',
+                  // TODO: add the length/num of total chain-events once
+                  // notifications and notifications read table are split
+                  item: (data) => m(NotificationRow, { notifications: [data] }),
+                });
               } else if (
                 app.user.notifications.chainEventNotifications.length === 0
               )
@@ -149,27 +142,21 @@ export class NotificationsMenu implements m.ClassComponent {
               else return 'No more chain notifications';
             } else {
               if (this.showingDiscussionNotifications.length > 0) {
-                return (
-                  <Infinite
-                    maxPages={1} // prevents rollover/repeat
-                    pageData={() => this.showingDiscussionNotifications} // limit the number of rows shown here
-                    pageKey={() =>
-                      `${this.minDiscussionNotification} - ${
-                        this.minDiscussionNotification + MAX_NOTIFS
-                      }`
-                    }
-                    key={
-                      // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                      // sortedFilteredNotifications.length
-                      'discussion'
-                      // TODO: add the length/num of total chain-events once
-                      // notifications and notifications read table are split
-                    }
-                    item={(data) => {
-                      return m(NotificationRow, { notifications: [data] });
-                    }}
-                  />
-                );
+                return m(Infinite, {
+                  maxPages: 1, // prevents rollover/repeat
+                  pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
+                  pageKey: () =>
+                    `${this.minDiscussionNotification} - ${
+                      this.minDiscussionNotification + MAX_NOTIFS
+                    }`,
+                  key:
+                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+                    // sortedFilteredNotifications.length
+                    'discussion',
+                  // TODO: add the length/num of total chain-events once
+                  // notifications and notifications read table are split
+                  item: (data) => m(NotificationRow, { notifications: [data] }),
+                });
               } else if (
                 app.user.notifications.discussionNotifications.length === 0
               )
@@ -179,17 +166,16 @@ export class NotificationsMenu implements m.ClassComponent {
           })()}
         </div>
         <div class="NotificationsMenuFooter">
-          <Button
-            label="See all"
-            onclick={() =>
+          {m(Button, {
+            label: 'See all',
+            onclick: () =>
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
-                : m.route.set('/notifications')
-            }
-          />
-          <Button
-            label="Mark all read"
-            onclick={(e) => {
+                : m.route.set('/notifications'),
+          })}
+          {m(Button, {
+            label: 'Mark all read',
+            onclick: (e) => {
               e.preventDefault();
               // e.stopPropagation();
               const typeNotif = this.selectedChainEvents
@@ -199,19 +185,19 @@ export class NotificationsMenu implements m.ClassComponent {
               app.user.notifications
                 .markAsRead(typeNotif)
                 ?.then(() => m.redraw());
-            }}
-          />
-          <Button
-            label="<"
-            onclick={(e) => {
+            },
+          })}
+          {m(Button, {
+            label: '<',
+            onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               this._previousPage(this.selectedChainEvents);
-            }}
-          />
-          <Button
-            label=">"
-            onclick={(e) => {
+            },
+          })}
+          {m(Button, {
+            label: '>',
+            onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               // necessary since page refresh loads the first set of notifications for both but the min may not be set
@@ -223,35 +209,32 @@ export class NotificationsMenu implements m.ClassComponent {
                   app.user.notifications.chainEventNotifications.length;
               }
               this._nextPage(this.selectedChainEvents);
-            }}
-          />
+            },
+          })}
         </div>
       </div>
     );
   }
 }
 
-export class NotificationsMenuPopover implements m.ClassComponent {
+export class NotificationsMenuPopover extends ClassComponent {
   view() {
-    return (
-      <PopoverMenu
-        closeOnContentClick={true}
-        closeOnOutsideClick={true}
-        hasArrow={false}
-        hoverCloseDelay={0}
-        position="bottom-end"
-        transitionDuration={0}
-        trigger={
-          app.user.notifications.numUnread > 0 ? (
-            <div class="unreads-icon">
-              <CWCustomIcon iconName="unreads" />
-            </div>
-          ) : (
-            <CWIconButton iconButtonTheme="black" iconName="bell" />
-          )
-        }
-        content={<NotificationsMenu />}
-      />
-    );
+    return m(PopoverMenu, {
+      closeOnContentClick: true,
+      closeOnOutsideClick: true,
+      hasArrow: false,
+      hoverCloseDelay: 0,
+      position: 'bottom-end',
+      transitionDuration: 0,
+      trigger:
+        app.user.notifications.numUnread > 0 ? (
+          <div class="unreads-icon">
+            <CWCustomIcon iconName="unreads" />
+          </div>
+        ) : (
+          <CWIconButton iconButtonTheme="black" iconName="bell" />
+        ),
+      content: <NotificationsMenu />,
+    });
   }
 }

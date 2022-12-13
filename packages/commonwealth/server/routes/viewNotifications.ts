@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
-import { AppError } from '../util/errors';
 
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;
@@ -157,8 +157,8 @@ export default async (
       };
       // If the Notification is a chain-event notification then save the chain event type
       if (nr.Notification.chain_event_id) {
-        subscriptionsObj[nr.subscription_id].ChainEventType =
-          chainEvent.ChainEventType;
+        subscriptionsObj[nr.subscription_id].chain_event_type_id =
+          chainEvent.ChainEventType.id;
       }
     }
 

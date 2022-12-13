@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import Dropzone from 'dropzone';
 
 import 'components/avatar_upload.scss';
@@ -14,7 +15,7 @@ import { getClasses } from './component_kit/helpers';
 import { ComponentType } from './component_kit/types';
 
 type AvatarUploadStyleAttrs = {
-  size: 'small' | 'large';
+  size?: 'small' | 'large';
 };
 
 type AvatarUploadAttrs = {
@@ -25,11 +26,11 @@ type AvatarUploadAttrs = {
   uploadStartedCallback?: CallableFunction;
 } & AvatarUploadStyleAttrs;
 
-export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
+export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
   private dropzone?: any;
   private uploaded: boolean;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.VnodeDOM<AvatarUploadAttrs>) {
     $(vnode.dom).on('cleardropzone', () => {
       this.dropzone.files.map((file) => this.dropzone.removeFile(file));
     });
@@ -96,7 +97,7 @@ export class AvatarUpload implements m.ClassComponent<AvatarUploadAttrs> {
     });
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<AvatarUploadAttrs>) {
     const { account, darkMode, scope, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import app from 'state';
@@ -43,10 +44,8 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
   return timeRemainingString;
 }
 
-export class SnapshotPollCardContainer
-  implements m.ClassComponent<SnapshotProposalCardsAttrs>
-{
-  view(vnode) {
+export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCardsAttrs> {
+  view(vnode: m.Vnode<SnapshotProposalCardsAttrs>) {
     const {
       identifier,
       proposal,
@@ -135,7 +134,7 @@ export class SnapshotPollCardContainer
         tokenSymbol={space.symbol}
         totalVoteCount={totals.sumOfResultsBalance}
         voteInformation={buildVoteInformation(proposal?.choices, votes)}
-        onVoteCast={(choice: string, callback: () => any) => {
+        onVoteCast={(choice, callback) => {
           castSnapshotVote(choice, callback);
           m.redraw();
         }}

@@ -1,7 +1,7 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import { ChainType, NotificationCategories } from 'common-common/src/types';
+import { ChainNetwork, ChainType, NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
@@ -11,7 +11,6 @@ import {
   getProposalUrl,
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
-import proposalIdToEntity from '../util/proposalIdToEntity';
 import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -22,7 +21,7 @@ import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -50,7 +49,7 @@ const createReaction = async (
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
-  const { reaction, comment_id, proposal_id, thread_id } = req.body;
+  const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new AppError(Errors.NoPostId));
@@ -108,7 +107,7 @@ const createReaction = async (
     }
   }
 
-  if (chain && chain.type === ChainType.Token) {
+  if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
     // skip check for admins
     const isAdmin = await findAllRoles(
       models,
@@ -145,8 +144,7 @@ const createReaction = async (
 
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {
-    const chainEntity = await proposalIdToEntity(models, chain.id, proposal_id);
-    if (!chainEntity) return next(new AppError(Errors.NoProposalMatch));
+    if (!chain_entity_id) return next(new AppError(Errors.NoProposalMatch));
     const [prefix, id] = proposal_id.split('_');
     proposal = { id };
     root_type = proposal_id.split('_')[0];
@@ -242,7 +240,6 @@ const createReaction = async (
       chain: finalReaction.chain,
       body: comment_id ? comment.text : '',
     },
-    req.wss,
     [finalReaction.Address.address]
   );
 

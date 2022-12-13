@@ -22,7 +22,7 @@ export class FundraisingSlide
           what address the funds will be going.
         </CWText>
         <CWDropdown
-          menuItems={[
+          inputOptions={[
             {
               label: 'WETH',
             },
@@ -44,7 +44,7 @@ export class FundraisingSlide
           value={vnode.attrs.form.threshold}
         />
         <CWDropdown
-          menuItems={['1 week', '2 weeks', '3 weeks', '4 weeks'].map(
+          inputOptions={['1 week', '2 weeks', '3 weeks', '4 weeks'].map(
             (length) => {
               return { label: length };
             }

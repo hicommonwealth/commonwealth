@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -20,18 +21,17 @@ import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
 
-export class EditCollaboratorsModal
-  implements
-    m.ClassComponent<{
-      thread: Thread;
-    }>
-{
+type EditCollaboratorsModalAttrs = {
+  thread: Thread;
+};
+
+export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModalAttrs> {
   private addedEditors: any;
   private items: any[];
   private membersFetched: boolean;
   private removedEditors: any;
 
-  view(vnode) {
+  view(vnode: m.Vnode<EditCollaboratorsModalAttrs>) {
     const { thread } = vnode.attrs;
 
     // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state
@@ -81,13 +81,13 @@ export class EditCollaboratorsModal
         <div class="compact-modal-body">
           <div class="user-list-container">
             <CWLabel label="Users" />
-            <QueryList
-              checkmark
-              items={items}
-              inputAttrs={{
+            {m(QueryList, {
+              checkmark: true,
+              items,
+              inputAttrs: {
                 placeholder: 'Enter username or address...',
-              }}
-              itemRender={(role: any) => {
+              },
+              itemRender: (role: any) => {
                 const user: Profile = app.profiles.getProfile(
                   role.Address.chain,
                   role.Address.address
@@ -97,22 +97,20 @@ export class EditCollaboratorsModal
                   this.addedEditors[role.Address.address]
                 );
 
-                return (
-                  <ListItem
-                    label={m(User, { user })}
-                    selected={recentlyAdded}
-                    key={role.Address.address}
-                  />
-                );
-              }}
-              itemPredicate={(query, item) => {
+                return m(ListItem, {
+                  label: m(User, { user }),
+                  selected: recentlyAdded,
+                  key: role.Address.address,
+                });
+              },
+              itemPredicate: (query, item) => {
                 const address = (item as any).Address;
 
                 return address.name
                   ? address.name.toLowerCase().includes(query.toLowerCase())
                   : address.address.toLowerCase().includes(query.toLowerCase());
-              }}
-              onSelect={(item) => {
+              },
+              onSelect: (item) => {
                 const addrItem = (item as any).Address;
 
                 // If already scheduled for removal, un-schedule
@@ -136,8 +134,8 @@ export class EditCollaboratorsModal
                 } else {
                   notifyInfo('Already an editor');
                 }
-              }}
-            />
+              },
+            })}
           </div>
           {allCollaborators.length > 0 ? (
             <div class="selected-collaborators-section">

@@ -1,7 +1,8 @@
 /* @jsx m */
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
-import m, { VnodeDOM } from 'mithril';
+import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import app from 'state';
 
@@ -20,9 +21,7 @@ type ICWCoverImageUploaderAttrs = {
 };
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
-export default class CWCoverImageUploader
-  implements m.ClassComponent<ICWCoverImageUploaderAttrs>
-{
+export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUploaderAttrs> {
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;
@@ -55,7 +54,7 @@ export default class CWCoverImageUploader
     }
   }
 
-  oncreate(vnode: VnodeDOM<ICWCoverImageUploaderAttrs, this>) {
+  oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
@@ -131,7 +130,7 @@ export default class CWCoverImageUploader
     }
   }
 
-  view(vnode: VnodeDOM<ICWCoverImageUploaderAttrs, this>) {
+  view(vnode: m.Vnode<ICWCoverImageUploaderAttrs>) {
     const { imageURL, isUploading, uploadStatus } = this;
     const { headerText, subheaderText } = vnode.attrs;
 

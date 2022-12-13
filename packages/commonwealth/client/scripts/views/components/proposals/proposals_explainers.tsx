@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import BN from 'bn.js';
 
 import { navigateToSubpage } from 'app';
@@ -9,10 +10,10 @@ import { CountdownUntilBlock } from 'views/components/countdown';
 import { GovExplainer } from '../gov_explainer';
 import { CWButton } from '../component_kit/cw_button';
 
-export class SubstrateProposalStats
-  implements m.ClassComponent<{ nextLaunchBlock: number }>
-{
-  view(vnode) {
+type SubstrateProposalStatsAttrs = { nextLaunchBlock: number };
+
+export class SubstrateProposalStats extends ClassComponent<SubstrateProposalStatsAttrs> {
+  view(vnode: m.Vnode<SubstrateProposalStatsAttrs>) {
     const { nextLaunchBlock } = vnode.attrs;
 
     return (
@@ -47,10 +48,10 @@ export class SubstrateProposalStats
   }
 }
 
-export class CompoundProposalStats
-  implements m.ClassComponent<{ chain: Compound }>
-{
-  view(vnode) {
+type CompoundProposalStatsAttrs = { chain: Compound };
+
+export class CompoundProposalStats extends ClassComponent<CompoundProposalStatsAttrs> {
+  view(vnode: m.Vnode<CompoundProposalStatsAttrs>) {
     const { chain } = vnode.attrs;
 
     const symbol = chain.meta.defaultSymbol;

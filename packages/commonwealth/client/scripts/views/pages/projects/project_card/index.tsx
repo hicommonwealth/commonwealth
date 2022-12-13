@@ -2,7 +2,7 @@
 
 import 'pages/projects/project_card.scss';
 
-import m from 'mithril';
+import m, { ClassComponent } from 'mithril';
 import { slugify } from 'utils';
 
 import { Project } from 'models';

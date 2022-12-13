@@ -95,11 +95,7 @@ export default class ProjectListing implements m.ClassComponent {
             <CWText type="h1">Crowdfunding</CWText>
             <CWTabBar align="left" bordered={false} fluid={true}>
               <CWTab
-                label={[
-                  <CWText type="h5" fontWeight="semibold">
-                    Explore
-                  </CWText>,
-                ]}
+                label={'Explore'}
                 isSelected={onExplorePage}
                 onclick={() => {
                   if (onExplorePage) return;
@@ -109,7 +105,7 @@ export default class ProjectListing implements m.ClassComponent {
               />
               <CWTab
                 label={[
-                  <CWText type="h5" fontWeight="semibold">
+                  <CWText type="h5" fontWeight={"semiBold"}>
                     Your Projects
                   </CWText>,
                 ]}

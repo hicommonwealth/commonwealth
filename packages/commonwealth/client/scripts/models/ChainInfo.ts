@@ -10,6 +10,7 @@ import {
   CWAvatar,
   CWJdenticon,
 } from '../views/components/component_kit/cw_avatar';
+import CommunityRole from './CommunityRole';
 
 class ChainInfo {
   public readonly id: string;
@@ -38,7 +39,8 @@ class ChainInfo {
   public adminsAndMods: RoleInfo[];
   public members: RoleInfo[];
   public type: string;
-  public chatEnabled: boolean;
+  public defaultAllowPermissions: bigint;
+  public defaultDenyPermissions: bigint;
   public readonly ss58Prefix: string;
   public readonly bech32Prefix: string;
   public decimals: number;
@@ -46,6 +48,7 @@ class ChainInfo {
   public hideProjects: boolean;
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
+  public communityRoles: CommunityRole[];
 
   public get node() {
     return this.ChainNode;
@@ -76,13 +79,15 @@ class ChainInfo {
     ss58Prefix,
     bech32Prefix,
     type,
-    chatEnabled,
+    defaultAllowPermissions,
+    defaultDenyPermissions,
     decimals,
     substrateSpec,
     hideProjects,
     ChainNode,
     tokenName,
     adminOnlyPolling,
+    communityRoles
   }) {
     this.id = id;
     this.network = network;
@@ -107,9 +112,10 @@ class ChainInfo {
     this.defaultOverview = defaultOverview;
     this.adminsAndMods = adminsAndMods || [];
     this.type = type;
+    this.defaultAllowPermissions = defaultAllowPermissions;
+    this.defaultDenyPermissions = defaultDenyPermissions;
     this.ss58Prefix = ss58Prefix;
     this.bech32Prefix = bech32Prefix;
-    this.chatEnabled = chatEnabled;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
     this.hideProjects = hideProjects;
@@ -117,6 +123,7 @@ class ChainInfo {
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
+    this.communityRoles = communityRoles;
   }
 
   public static fromJSON({
@@ -144,7 +151,8 @@ class ChainInfo {
     ss58_prefix,
     bech32_prefix,
     type,
-    chat_enabled,
+    default_allow_permissions,
+    default_deny_permissions,
     substrate_spec,
     hide_projects,
     token_name,
@@ -152,6 +160,7 @@ class ChainInfo {
     address,
     ChainNode,
     admin_only_polling,
+    community_roles
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -190,13 +199,15 @@ class ChainInfo {
       ss58Prefix: ss58_prefix,
       bech32Prefix: bech32_prefix,
       type,
-      chatEnabled: chat_enabled,
+      defaultAllowPermissions: default_allow_permissions,
+      defaultDenyPermissions: default_deny_permissions,
       decimals: parseInt(decimals, 10),
       substrateSpec: substrate_spec,
       hideProjects: hide_projects,
       tokenName: token_name,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
+      communityRoles: community_roles
     });
   }
 
@@ -229,6 +240,8 @@ class ChainInfo {
           r.Address.chain,
           r.chain_id,
           r.permission,
+          r.allow,
+          r.deny,
           r.is_user_default
         )
       );
@@ -246,6 +259,8 @@ class ChainInfo {
           r.Address.chain,
           r.chain_id,
           r.permission,
+          r.allow,
+          r.deny,
           r.is_user_default
         )
       );
@@ -273,7 +288,8 @@ class ChainInfo {
     iconUrl,
     hideProjects,
     defaultOverview,
-    chatEnabled,
+    default_allow_permissions,
+    default_deny_permissions,
   }) {
     // TODO: Change to PUT /chain
     const r = await $.post(`${app.serverUrl()}/updateChain`, {
@@ -288,7 +304,8 @@ class ChainInfo {
       stages_enabled: stagesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
-      chat_enabled: chatEnabled,
+      default_allow_permissions,
+      default_deny_permissions,
       snapshot,
       terms,
       icon_url: iconUrl,
@@ -312,7 +329,8 @@ class ChainInfo {
     this.terms = updatedChain.terms;
     this.iconUrl = updatedChain.icon_url;
     this.defaultOverview = updatedChain.default_summary_view;
-    this.chatEnabled = updatedChain.chat_enabled;
+    this.defaultAllowPermissions = updatedChain.default_allow_permissions;
+    this.defaultDenyPermissions = updatedChain.default_deny_permissions;
   }
 
   public getAvatar(size: number) {

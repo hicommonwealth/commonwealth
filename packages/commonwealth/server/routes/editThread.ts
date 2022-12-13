@@ -9,7 +9,7 @@ import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -190,7 +190,6 @@ const editThread = async (
       },
       // don't send webhook notifications for edits
       null,
-      req.wss,
       [userOwnedAddresses[0].address]
     );
 
@@ -264,7 +263,6 @@ const editThread = async (
             chain: finalThread.chain,
             body: finalThread.body,
           },
-          req.wss,
           [finalThread.Address.address]
         );
       });

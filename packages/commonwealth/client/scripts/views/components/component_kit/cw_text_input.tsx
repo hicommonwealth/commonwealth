@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m, { VnodeDOM } from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text_input.scss';
 
@@ -12,41 +13,42 @@ import { ValidationStatus } from './cw_validation_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
+import { IconName } from './cw_icons/cw_icon_lookup';
 
 type TextInputSize = 'small' | 'large';
 
-export type InputStyleAttrs = {
-  inputClassName?: string;
-  darkMode?: boolean;
-  disabled?: boolean;
-  size: TextInputSize;
-  validationStatus?: ValidationStatus;
-  displayOnly?: boolean;
-};
-
-export type TextInputAttrs = {
+export type BaseTextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   containerClassName?: string;
   defaultValue?: string;
-  iconRight?: string;
-  iconRightonclick?: () => void;
+  value?: string | number;
+  iconRight?: IconName;
+  iconRightonclick?: (e: MouseEvent) => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   maxlength?: number;
-  name: string;
+  name?: string;
   oninput?: (e) => void;
   onenterkey?: (e) => void;
   onclick?: (e) => void;
   placeholder?: string;
   required?: boolean;
   tabindex?: number;
-  value?: string;
 } & InputStyleAttrs;
+
+export type InputStyleAttrs = {
+  inputClassName?: string;
+  darkMode?: boolean;
+  disabled?: boolean;
+  size?: TextInputSize;
+  validationStatus?: ValidationStatus;
+  displayOnly?: boolean;
+};
 
 export type InputInternalStyleAttrs = {
   hasRightIcon?: boolean;
-  isTyping: boolean;
+  isTyping?: boolean;
 };
 
 export type MessageRowAttrs = {
@@ -56,10 +58,13 @@ export type MessageRowAttrs = {
   validationStatus?: ValidationStatus;
 };
 
-export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
-  view(vnode) {
-    const { hasFeedback, label, statusMessage, validationStatus, displayOnly } =
-      vnode.attrs;
+type TextInputAttrs = BaseTextInputAttrs &
+  InputStyleAttrs &
+  InputInternalStyleAttrs;
+
+export class MessageRow extends ClassComponent<MessageRowAttrs> {
+  view(vnode: m.Vnode<MessageRowAttrs>) {
+    const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
 
     return (
       <div
@@ -85,13 +90,13 @@ export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
   }
 }
 
-export class CWTextInput implements m.ClassComponent<TextInputAttrs> {
+export class CWTextInput extends ClassComponent<TextInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode: VnodeDOM<TextInputAttrs, this>) {
+  view(vnode: m.Vnode<TextInputAttrs>) {
     const {
       autocomplete = 'off',
       autofocus,

@@ -124,6 +124,7 @@ export enum ChainNetwork {
   AxieInfinity = 'axie-infinity',
   CommonProtocol = 'common-protocol', // dummy chain used for event handling
   Evmos = 'evmos',
+  Kava = 'kava',
 }
 
 export enum BalanceType {
@@ -134,4 +135,8 @@ export enum BalanceType {
   Cosmos = 'cosmos',
   NEAR = 'near',
   Substrate = 'substrate',
+}
+
+export enum RedisNamespaces {
+  Chat_Socket = 'chat_socket',
 }

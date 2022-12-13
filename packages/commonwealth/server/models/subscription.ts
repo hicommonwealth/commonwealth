@@ -1,4 +1,3 @@
-import WebSocket from 'ws';
 import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -7,7 +6,7 @@ import { SERVER_URL } from '../config';
 import { UserAttributes } from './user';
 import { DB } from '../models';
 import { NotificationCategoryAttributes } from './notification_category';
-import { ModelStatic } from './types';
+import {ModelInstance, ModelStatic} from './types';
 import {
   IPostNotificationData,
   ICommunityNotificationData,
@@ -21,13 +20,12 @@ import {
 import { ChainAttributes } from './chain';
 import { ThreadAttributes } from './thread';
 import { CommentAttributes } from './comment';
-import { ChainEventTypeAttributes } from './chain_event_type';
-import { ChainEntityAttributes } from './chain_entity';
 import {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
 import { NotificationInstance } from './notification';
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -54,12 +52,9 @@ export type SubscriptionAttributes = {
   Chain?: ChainAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
-  ChainEventType?: ChainEventTypeAttributes;
-  ChainEntity?: ChainEntityAttributes;
 }
 
-export interface SubscriptionInstance
-extends Sequelize.Model<SubscriptionAttributes>, SubscriptionAttributes {
+export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 }
 
@@ -69,7 +64,6 @@ export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emit
   object_id: string,
   notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
   webhook_data?: Partial<WebhookContent>,
-  wss?: WebSocket.Server,
   excludeAddresses?: string[],
   includeAddresses?: string[],
 ) => Promise<NotificationInstance> };
@@ -111,11 +105,18 @@ export default (
     object_id: string,
     notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
     webhook_data?: WebhookContent,
-    wss?: WebSocket.Server,
     excludeAddresses?: string[],
     includeAddresses?: string[],
   ): Promise<NotificationInstance> => {
     // get subscribers to send notifications to
+    StatsDController.get().increment(
+      'cw.notifications.created',
+      {
+        category_id,
+        object_id,
+        chain: (notification_data as any).chain || (notification_data as any).chain_id,
+      }
+    );
     const findOptions: any = {
       [Op.and]: [
         { category_id },
@@ -180,11 +181,10 @@ export default (
     });
 
     // if the notification does not yet exist create it here
-    // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
     if (!notification) {
       if (isChainEventData) {
-        const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
-        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
+        const event: any = (<IChainEventNotificationData>notification_data).chainEvent;
+        event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType;
 
         notification = await models.Notification.create({
           notification_data: JSON.stringify(event),
@@ -223,6 +223,15 @@ export default (
     const replacements = [];
     for (const subscription of subscriptions) {
       if (subscription.subscriber_id) {
+        StatsDController.get().increment(
+          'cw.notifications.emitted',
+          {
+            category_id,
+            object_id,
+            chain: (notification_data as any).chain || (notification_data as any).chain_id,
+            subscriber: `${subscription.subscriber_id}`,
+          }
+        );
         query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `
         replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
       } else {
@@ -279,9 +288,9 @@ export default (
     models.Subscription.hasMany(models.NotificationsRead, { foreignKey: 'subscription_id', onDelete: 'cascade' });
     models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.Thread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.Comment, { foreignKey: 'offchain_comment_id', targetKey: 'id' });
     models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.ChainEntity, { foreignKey: 'chain_entity_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.ChainEntityMeta, { foreignKey: 'chain_entity_id', targetKey: 'id' });
+    models.Subscription.belongsTo(models.Comment, { foreignKey: 'offchain_comment_id', targetKey: 'id'});
   };
 
   return Subscription;

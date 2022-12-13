@@ -5,6 +5,7 @@ import {
   IERC20,
 } from '../../contractTypes';
 import { TypedEvent } from '../../contractTypes/commons';
+import {Web3Provider} from "@ethersproject/providers";
 
 // options for the listener class
 export interface ListenerOptions {
@@ -45,6 +46,7 @@ export type ProjectApi = {
 export type Api = {
   factory: IProjectBaseFactory;
   projects: ProjectApi[];
+  provider: Web3Provider;
 };
 
 // eslint-disable-next-line no-shadow

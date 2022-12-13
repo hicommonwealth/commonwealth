@@ -5,17 +5,27 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
+      "common-common": ["../../packages/common-common"],
+      "common-common/*": ["../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"],
+      "token-balance-cache": ["../../packages/token-balance-cache"],
+      "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
-    }
+    },
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": false
   },
   "include": [
     "./client",
     "./client/scripts",
-    "./shared/adapters",
+    "./shared",
     "./test",
     "./globals.d.ts",
-    "server/*",
-    "server.ts"
+    "./server",
+    "./server.ts"
   ],
   "exclude": ["./node_modules"]
 }

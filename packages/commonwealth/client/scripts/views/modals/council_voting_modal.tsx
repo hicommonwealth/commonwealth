@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
@@ -20,14 +21,18 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 
-export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
+type CouncilVotingModalAttrs = {
+  candidates: Array<[SubstrateAccount, number]>;
+};
+
+export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> {
   private currentApprovals: Array<string>;
   private currentStake: number;
   private error: string;
   private phragmenStakeAmount: SubstrateCoin;
   private votes: Array<string>;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<CouncilVotingModalAttrs>) {
     const candidates = vnode.attrs.candidates || [];
     // get currently set approvals
     const currentVote = (
@@ -56,7 +61,7 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
       .map(([candidate]) => candidate.address);
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<CouncilVotingModalAttrs>) {
     const { candidates } = vnode.attrs;
 
     const submitVote = (e) => {
@@ -160,6 +165,7 @@ export class CouncilVotingModal implements m.ClassComponent<{ candidates }> {
                         checked={this.votes.indexOf(address) !== -1}
                         onchange={onclick}
                         label=""
+                        value=""
                       />
                       {m(User, { user: candidate })}
                     </div>
