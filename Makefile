@@ -45,5 +45,5 @@ dump-db:
 	docker exec -it commonwealth-commonwealth-1 sh -c "pg_dump -h db $(heroku config:get HEROKU_DB_URI -a commonwealthapp) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump"
 
 # Test Commands
-api-test:
+test-api:
 	docker exec -it commonwealth-commonwealth-1 sh -c "yarn test-api"
