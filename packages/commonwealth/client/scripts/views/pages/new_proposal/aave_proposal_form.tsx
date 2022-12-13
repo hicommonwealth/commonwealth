@@ -73,7 +73,9 @@ export class AaveProposalForm extends ClassComponent {
               >
                 <div class="executor-row">
                   <CWText fontWeight="medium">Address</CWText>
-                  <CWText type="caption">{r.address}</CWText>
+                  <CWText type="caption" noWrap>
+                    {r.address}
+                  </CWText>
                 </div>
                 <div class="executor-row">
                   <CWText fontWeight="medium">Time Delay</CWText>
