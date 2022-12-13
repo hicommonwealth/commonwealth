@@ -3,11 +3,13 @@
 import 'pages/projects/project_completion_bar.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
+
 import { ProjectStatus } from './types';
 
 export default class ProjectCompletionBar
-  implements
-    m.ClassComponent<{
+  extends
+    ClassComponent<{
       completionPercent: number;
       projectStatus?: ProjectStatus;
     }>

@@ -3,22 +3,23 @@
 import m from 'mithril';
 import app from 'state';
 import _ from 'lodash';
+import ClassComponent from 'class_component';
 
 import { ChainInfo, Project } from 'models';
 import { weiToTokens } from 'helpers';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { CWText } from 'views/components/component_kit/cw_text';
 import User, { AnonymousUser } from 'views/components/widgets/user';
-import { Tag } from 'construct-ui';
+import { CWTag } from 'views/components/component_kit/cw_tag';
 import { ProjectStatus } from '../types';
 
-interface InformationPanelAttrs {
+type InformationPanelAttrs = {
   project: Project;
   projectStatus: ProjectStatus;
 }
 
 export class InformationPanel
-  implements m.ClassComponent<InformationPanelAttrs>
+  extends ClassComponent<InformationPanelAttrs>
 {
   getProjectShortDescription(p: Project) {
     if (p.shortDescription) return p.shortDescription;
@@ -38,21 +39,14 @@ export class InformationPanel
     return (
       <div class="InformationPanel">
         <div class="funding-data">
-          <Tag
+          <CWTag
             intent="none"
             class={projectStatus}
             label={
               projectStatus ? (
-                <CWText type="caption" fontWeight="medium">
-                  {_.capitalize(projectStatus)}
-                </CWText>
+                  projectStatus.toString()
               ) : (
-                <>
-                  <CWIcon iconName="clock" iconSize="small" />
-                  <CWText type="caption" fontWeight="medium">
-                    <div class="project-deadline">{`${project.deadline} blocks`}</div>
-                  </CWText>
-                </>
+                `${project.deadline} blocks`
               )
             }
           />
@@ -84,12 +78,8 @@ export class InformationPanel
               <CWText type="caption">{project.curatorFee}% Curator Fee</CWText>
             )}
             {project.chainId && (
-              <Tag
-                label={
-                  <CWText type="caption" fontWeight="medium">
-                    {projectChain.name}
-                  </CWText>
-                }
+              <CWTag
+                label={projectChain.name}
               />
             )}
           </div>

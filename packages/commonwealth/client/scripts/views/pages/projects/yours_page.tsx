@@ -3,15 +3,16 @@ import 'pages/projects/index.scss';
 
 import m from 'mithril';
 import app from 'state';
+import ClassComponent from 'class_component';
 
 import { Project } from 'models';
-import ProjectCard from './project_card/index';
+import { ProjectCard } from './project_card/index';
 import { ProjectCardSize } from './types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export default class YoursPage
-  implements
-    m.ClassComponent<{ currentBlockNum: number; userProjects: Project[] }>
+  extends
+    ClassComponent<{ currentBlockNum: number; userProjects: Project[] }>
 {
   // TODO v2: These counts will be used for pagination or scroll
   private totalActiveProjects = 0;
@@ -51,7 +52,7 @@ export default class YoursPage
     }
 
     const userProjects = vnode.attrs.userProjects.map((project) => (
-      <ProjectCard project={project} size={ProjectCardSize.Large} />
+      <ProjectCard project={project} size={ProjectCardSize.Large} currentBlockNum={vnode.attrs.currentBlockNum} />
     ));
 
     return (

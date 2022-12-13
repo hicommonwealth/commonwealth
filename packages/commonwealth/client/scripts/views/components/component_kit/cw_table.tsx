@@ -1,6 +1,8 @@
 /* @jsx m */
 
 import m, { Vnode } from 'mithril';
+import ClassComponent from 'class_component';
+
 import 'components/quill/component_kit/cw_table.scss';
 import { CWText } from 'views/components/component_kit/cw_text';
 
@@ -12,7 +14,7 @@ export type ButtonAttrs = {
 
 // TODO Graham 5-16-22: Only styled for simple two-column table; needs extending
 // Eventually should have filtering/sorting functionality added
-export class CWTable implements m.ClassComponent<ButtonAttrs> {
+export class CWTable extends ClassComponent<ButtonAttrs> {
   view(vnode) {
     const { className, headers, entries } = vnode.attrs;
     return (
@@ -33,7 +35,7 @@ export class CWTable implements m.ClassComponent<ButtonAttrs> {
                 {row.map((cellText: string) => {
                   return (
                     <td>
-                      <CWText type="body1">{cellText}</CWText>
+                      <CWText fontWeight={'regular'}>{cellText}</CWText>
                     </td>
                   );
                 })}

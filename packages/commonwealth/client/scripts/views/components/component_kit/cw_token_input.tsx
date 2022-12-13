@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_token_input.scss';
 
@@ -20,7 +21,7 @@ export type TokenInputAttrs = {
   autofocus?: boolean;
   containerClassName?: string;
   value?: string;
-  inputValidationFn?: (value: number) => [ValidationStatus, string];
+  inputValidationFn?: (value: number | string) => [ValidationStatus, string];
   label?: string;
   oninput?: (e) => void;
   placeholder?: string;
@@ -30,7 +31,7 @@ export type TokenInputAttrs = {
   tokenIconUrl?: string;
 };
 
-export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
+export class MessageRow extends ClassComponent<MessageRowAttrs> {
   view(vnode) {
     const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
 
@@ -58,7 +59,7 @@ export class MessageRow implements m.ClassComponent<MessageRowAttrs> {
   }
 }
 
-export class CWTokenInput implements m.ClassComponent<TokenInputAttrs> {
+export class CWTokenInput extends ClassComponent<TokenInputAttrs> {
   private inputTimeout: NodeJS.Timeout;
   private isTyping: boolean;
   private statusMessage?: string = '';

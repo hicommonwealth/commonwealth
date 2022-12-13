@@ -5,7 +5,6 @@ import m from 'mithril';
 import app from 'state';
 
 import { CWText } from 'views/components/component_kit/cw_text';
-import { ButtonGroup, Button } from 'construct-ui';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { notifyError } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
@@ -170,44 +169,42 @@ export default class CreateProjectForm implements m.ClassComponent {
             </CWText>
             <FormSlide form={this.form} />
           </div>
-          <ButtonGroup class="NavigationButtons" outlined={true}>
-            <Button
-              disabled={this.slideNumber === 1}
+          <CWButton
+            disabled={this.slideNumber === 1}
+            label={
+              <>
+                <CWIcon iconName="arrowLeft" />
+                <span>Previous Page</span>
+              </>
+            }
+            onclick={(e) => {
+              this.slideNumber -= 1;
+            }}
+          />
+          {this.slideNumber !== 3 ? (
+            <CWButton
               label={
                 <>
-                  <CWIcon iconName="arrowLeft" />
-                  <span>Previous Page</span>
+                  <span>Next Page</span>
+                  <CWIcon iconName="arrowRight" />
                 </>
               }
               onclick={(e) => {
-                this.slideNumber -= 1;
+                const requiredInputsFilled = this.$form?.reportValidity();
+                if (requiredInputsFilled) {
+                  this.slideNumber += 1;
+                }
               }}
             />
-            {this.slideNumber !== 3 ? (
-              <Button
-                label={
-                  <>
-                    <span>Next Page</span>
-                    <CWIcon iconName="arrowRight" />
-                  </>
-                }
-                onclick={(e) => {
-                  const requiredInputsFilled = this.$form?.reportValidity();
-                  if (requiredInputsFilled) {
-                    this.slideNumber += 1;
-                  }
-                }}
-              />
-            ) : (
-              <Button
-                label="Submit"
-                onclick={async (e) => {
-                  console.log(this.form);
-                  this.submitForm();
-                }}
-              />
-            )}
-          </ButtonGroup>
+          ) : (
+            <CWButton
+              label="Submit"
+              onclick={async (e) => {
+                console.log(this.form);
+                this.submitForm();
+              }}
+            />
+          )}
         </div>
       </Sublayout>
     );

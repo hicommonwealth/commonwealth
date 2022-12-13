@@ -41,7 +41,7 @@ export class FundraisingSlide
           }}
           required
           tokenIconUrl={WethUrl}
-          value={vnode.attrs.form.threshold}
+          value={vnode.attrs.form.threshold.toString()}
         />
         <CWDropdown
           inputOptions={['1 week', '2 weeks', '3 weeks', '4 weeks'].map(

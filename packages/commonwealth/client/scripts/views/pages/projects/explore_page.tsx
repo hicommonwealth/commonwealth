@@ -2,11 +2,13 @@
 
 import m from 'mithril';
 import app from 'state';
+import ClassComponent from 'class_component';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import ProjectCard from './project_card/index';
+import { ProjectCard } from './project_card/index';
+
 
 export default class ExplorePage
-  implements m.ClassComponent<{ currentBlockNum: number }>
+  extends ClassComponent<{ currentBlockNum: number }>
 {
   view(vnode) {
     const { currentBlockNum } = vnode.attrs;

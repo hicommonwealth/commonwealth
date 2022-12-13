@@ -2,7 +2,8 @@
 
 import 'pages/projects/project_card.scss';
 
-import m, { ClassComponent } from 'mithril';
+import m from 'mithril';
+import ClassComponent from 'class_component';
 import { slugify } from 'utils';
 
 import { Project } from 'models';
@@ -11,12 +12,12 @@ import CompletionBar from '../project_completion_bar';
 import { HeaderPanel } from './header_panel';
 import { InformationPanel } from './information_panel';
 
-interface ProjectCardAttrs {
+type ProjectCardAttrs = {
   project: Project;
   currentBlockNum: number;
 }
 
-export default class ProjectCard implements m.ClassComponent<ProjectCardAttrs> {
+export class ProjectCard extends ClassComponent<ProjectCardAttrs> {
   view(vnode: m.Vnode<ProjectCardAttrs>) {
     const { project } = vnode.attrs;
 

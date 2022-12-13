@@ -104,11 +104,7 @@ export default class ProjectListing implements m.ClassComponent {
                 }}
               />
               <CWTab
-                label={[
-                  <CWText type="h5" fontWeight={"semiBold"}>
-                    Your Projects
-                  </CWText>,
-                ]}
+                label={'Your Projects'}
                 disabled={
                   !app.isLoggedIn() || this.getUserProjects().length === 0
                 }

@@ -3,12 +3,16 @@
 import 'pages/projects/support_card.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
+
+
 import _ from 'lodash';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import app from 'state';
+import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { ProjectRole } from './types';
 import { CWAvatar } from '../../components/component_kit/cw_avatar';
 import { CWTokenInput } from '../../components/component_kit/cw_token_input';
@@ -24,10 +28,10 @@ type SupportCardAttrs = {
 
 const validateSupportAmount = (value: string) => {
   if (Number.isNaN(+value)) return ['failure', 'Invalid number'];
-  return ['success', 'Valid amount'];
+  return [ValidationStatus, 'Valid amount'];
 };
 
-export default class SupportCard implements m.ClassComponent<SupportCardAttrs> {
+export default class SupportCard extends ClassComponent<SupportCardAttrs> {
   private amount: string;
 
   view(vnode: m.Vnode<SupportCardAttrs>) {

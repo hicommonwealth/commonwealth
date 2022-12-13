@@ -83,7 +83,7 @@ export default class SupportProjectModal
               oninput={(e) => this.amount === e.target.value.length}
             />
             <div class="buttons-row">
-              <CWButton label="Nevermind" buttonType="secondary" />
+              <CWButton label="Nevermind" buttonType={'secondary-blue'} />
               <CWButton
                 label={copyText.body.buttonText}
                 onclick={(e) => this._onSubmit(project.id, supportType, e)}

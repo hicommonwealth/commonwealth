@@ -54,7 +54,7 @@ export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUp
     }
   }
 
-  oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  oncreate(vnode: m.Vnode<ICWCoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;

@@ -3,6 +3,7 @@
 import m, { VnodeDOM } from 'mithril';
 import _ from 'lodash';
 import app from 'state';
+import ClassComponent from 'class_component';
 
 import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
@@ -14,7 +15,7 @@ import { getUserRoles } from '../helpers';
 
 type HeaderPanelAttrs = { project: Project };
 
-export class HeaderPanel implements m.ClassComponent<HeaderPanelAttrs> {
+export class HeaderPanel extends ClassComponent<HeaderPanelAttrs> {
   view(vnode: VnodeDOM<HeaderPanelAttrs, this>) {
     const { project } = vnode.attrs;
     const [userRole, supportAmount] = getUserRoles(project, app.user.addresses);

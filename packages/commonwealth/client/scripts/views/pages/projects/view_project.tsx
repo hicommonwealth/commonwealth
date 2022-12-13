@@ -22,6 +22,7 @@ import { CommunityLabel } from '../../components/community_label';
 import { ChainNetwork } from '../../../../../../common-common/src/types';
 import { PageLoading } from '../loading';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWTag } from '../../components/component_kit/cw_tag';
 
 interface ProjectPageAttrs {
   identifier: string;
@@ -88,19 +89,12 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
               })}
             </div>
             <div class="metadata-right">
-              <Tag
-                label={
-                  <>
-                    <CWIcon iconName="clock" />
-                    <CWText type="h5">
-                      {project.createdAt.format('MMMM D, YYYY')}
-                    </CWText>
-                  </>
-                }
+              <CWTag
+                label={project.createdAt.format('MMMM D, YYYY').toString()}
               />
-              <Tag
+              <CWTag
                 label={
-                  <CWText type="h5">Ends at {project.deadline} Blocks</CWText>
+                  `Ends at ${project.deadline} Blocks`
                 }
               />
             </div>

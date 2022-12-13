@@ -61,7 +61,7 @@ export class InformationSlide
           required
         />
         <CWDropdown
-          menuItems={
+          inputOptions={
             allEthChains.map((chain: ChainInfo) => {
               const disabled = !userEthChains.includes(chain);
               return { label: chain.name, disabled };
