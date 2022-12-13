@@ -1,12 +1,11 @@
 /* @jsx m */
 
+import m from 'mithril';
+import ClassComponent from 'class_component';
+
 import 'pages/communities.scss';
 
-import m from 'mithril';
-
 import app from 'state';
-
-import ClassComponent from 'class_component';
 import numeral from 'numeral';
 import { ChainInfo } from 'models';
 import {
@@ -20,12 +19,13 @@ import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
 
 const buildCommunityString = (numCommunities: number) => {
-  let numberString = numCommunities;
   if (numCommunities >= 1000) {
-    numberString = numeral(numCommunities).format('0.0a');
+    return `${numeral(numCommunities).format('0.0a')} Communities`;
+  } else {
+    return `${numCommunities} Communities`;
   }
-  return `${numberString} Communities`;
 };
+
 export const buildChainToCategoriesMap = (
   categoryTypes,
   chainsAndCategories
@@ -173,7 +173,7 @@ class CommunitiesPage extends ClassComponent {
           return threadCountB - threadCountA;
         })
         .map((chain: ChainInfo) => {
-          return m(CommunityCard, { chain });
+          return <CommunityCard chain={chain} />;
         });
 
       return res;
@@ -186,7 +186,6 @@ class CommunitiesPage extends ClassComponent {
     return (
       <Sublayout>
         <div class="CommunitiesPage">
-          {' '}
           <div class="header-section">
             <CWText
               type="h3"

@@ -1,26 +1,22 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .PrivacyPage,
 .TermsPage {
-  @include SinglePage();
-
   align-items: center;
   display: flex;
+  flex: 1;
   flex-direction: column;
+  padding: 24px;
 
   .forum-container {
     align-items: center;
     display: flex;
     flex-direction: column;
-    padding: 24px;
+    gap: 16px;
     width: 736px;
 
-    @include small {
-      width: unset;
+    @include smallInclusive {
+      width: 100%;
     }
-  }
-
-  p {
-    margin: 8px 0;
   }
 }

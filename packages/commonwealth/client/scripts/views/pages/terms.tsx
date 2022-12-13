@@ -1,10 +1,14 @@
+/* @jsx m */
 /* eslint-disable max-len */
+
+import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/privacy_and_terms.scss';
 
-import m from 'mithril';
 import { renderMultilineText } from 'helpers';
 import Sublayout from '../sublayout';
+import { CWText } from '../components/component_kit/cw_text';
 
 const TermsOfService = `
 PLEASE READ THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT VERY CAREFULLY. THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT IS A LEGALLY BINDING CONTRACT BETWEEN YOU AND COMMONWEALTH LABS THAT SETS FORTH AND DETERMINES, AMONG OTHER THINGS:
@@ -119,17 +123,19 @@ Section 6.9 Amendments. This Agreement may only be amended, modified, altered or
 Section 6.10 No Waiver. No failure on the part of any Person to exercise any power, right, privilege or remedy under this Agreement, and no delay on the part of any Person in exercising any power, right, privilege or remedy under this Agreement, shall operate as a waiver of such power, right, privilege or remedy; and no single or partial exercise of any such power, right, privilege or remedy shall preclude any other or further exercise thereof or of any other power, right, privilege or remedy. No Person shall be deemed to have waived any claim arising out of this Agreement, or any power, right, privilege or remedy under this Agreement, unless the waiver of such claim, power, right, privilege or remedy is expressly set forth in a written instrument duly executed and delivered on behalf of such Person; and any such waiver shall not be applicable or have any effect except in the specific instance in which it is given.
 `;
 
-const TermsPage: m.Component = {
-  view: () => {
-    return m(Sublayout, [
-      m('.TermsPage', [
-        m('.forum-container', [
-          m('h1.page-title', 'Terms of Service'),
-          renderMultilineText(TermsOfService),
-        ]),
-      ]),
-    ]);
-  },
-};
+class TermsPage extends ClassComponent {
+  view() {
+    return (
+      <Sublayout>
+        <div class="TermsPage">
+          <div class="forum-container">
+            <CWText type="h3">Terms of Service</CWText>
+            {renderMultilineText(TermsOfService)}
+          </div>
+        </div>
+      </Sublayout>
+    );
+  }
+}
 
 export default TermsPage;

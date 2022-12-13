@@ -1,26 +1,31 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .WhyCommonwealthPage {
-  @include SinglePage();
-  padding: 40px 0;
-  > * {
-    display: flex;
-    justify-content: center;
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 24px;
+
+  .inner-container {
     align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     text-align: center;
-    padding: 16px;
-  }
-  .b1 {
-    margin: 0 12vw;
-  }
-  .h2 {
-    background: -webkit-linear-gradient($purple-600, $primary-300);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  img {
-    max-width: 80%;
-    height: auto;
+    width: 736px;
+
+    img {
+      max-width: 480px;
+      height: auto;
+
+      @include smallInclusive {
+        width: 100%;
+      }
+    }
+
+    @include smallInclusive {
+      width: 100%;
+    }
   }
 }

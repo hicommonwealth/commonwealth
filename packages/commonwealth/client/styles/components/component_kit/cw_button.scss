@@ -13,11 +13,6 @@
   padding: 6px 20px;
   width: fit-content;
 
-  &.disabled {
-    cursor: default;
-    pointer-events: none;
-  }
-
   &.primary-red {
     @include primaryRed;
   }

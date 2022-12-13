@@ -7,6 +7,7 @@ import { ICardListItem } from 'models/interfaces';
 import app from 'state';
 import { ThreadStage } from 'models';
 import { navigateToSubpage } from '../app';
+import { CWText } from '../views/components/component_kit/cw_text';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -289,7 +290,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p) => m('p', p));
+  return paragraphs.map((p) => m(CWText, p));
 }
 
 /*
