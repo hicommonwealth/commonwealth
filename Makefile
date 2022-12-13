@@ -26,7 +26,6 @@ into-db:
 	docker exec -it commonwealth-db-1 sh
 
 # DB Commands
-
 # N.B. If your DB is ever broken, run these commands in order to reconstruct:
 # 1. make reset-db
 # 2. make load-db
