@@ -84,7 +84,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
               (a) => {
                 return (
                   proposalSlugToClass().get(
-                    ProposalType.AaveProposal
+                    ProposalType.SubstrateDemocracyProposal
                   ) as ProposalModule<any, any, any>
                 ).createTx(...a);
               };

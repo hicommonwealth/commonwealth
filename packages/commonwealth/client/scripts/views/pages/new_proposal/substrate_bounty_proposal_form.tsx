@@ -66,7 +66,7 @@ export class SubstrateBountyProposalForm extends ClassComponent {
               (a) => {
                 return (
                   proposalSlugToClass().get(
-                    ProposalType.AaveProposal
+                    ProposalType.SubstrateBountyProposal
                   ) as ProposalModule<any, any, any>
                 ).createTx(...a);
               };

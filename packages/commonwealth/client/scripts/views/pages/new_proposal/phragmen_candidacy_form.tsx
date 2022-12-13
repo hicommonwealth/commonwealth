@@ -46,7 +46,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
               (a) => {
                 return (
                   proposalSlugToClass().get(
-                    ProposalType.AaveProposal
+                    ProposalType.PhragmenCandidacy
                   ) as ProposalModule<any, any, any>
                 ).createTx(...a);
               };

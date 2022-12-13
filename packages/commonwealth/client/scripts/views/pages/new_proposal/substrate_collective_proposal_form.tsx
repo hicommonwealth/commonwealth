@@ -169,7 +169,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               (a) => {
                 return (
                   proposalSlugToClass().get(
-                    ProposalType.AaveProposal
+                    ProposalType.SubstrateCollectiveProposal
                   ) as ProposalModule<any, any, any>
                 ).createTx(...a);
               };

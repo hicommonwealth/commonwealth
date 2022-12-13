@@ -72,7 +72,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
             ) => ITXModalData | Promise<ITXModalData> = (a) => {
               return (
                 proposalSlugToClass().get(
-                  ProposalType.AaveProposal
+                  ProposalType.SubstrateTreasuryTip
                 ) as ProposalModule<any, any, any>
               ).createTx(...a);
             };
