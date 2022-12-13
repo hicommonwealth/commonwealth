@@ -87,7 +87,7 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
         this.toggled = !this.toggled;
       }
 
-      localStorage.setItem(`${app.activeChainId()}-sidebar-toggle`, 'false');
+      app.sidebarToggled = false;
 
       onclick(e, this.toggled);
     };
