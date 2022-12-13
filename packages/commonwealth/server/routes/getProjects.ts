@@ -3,8 +3,9 @@ import { WhereOptions } from 'sequelize/types';
 import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { ProjectAttributes } from '../models/project';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
+import { ChainEntityMetaAttributes } from '../models/chain_entity_meta';
+import { ChainNetwork } from '../../../common-common/src/types';
 
 export const Errors = {
   InvalidAddress: 'Invalid address',
@@ -14,7 +15,7 @@ type GetProjectsReq = {
   chain_id?: string;
   project_id?: number;
 };
-type GetProjectsResp = ProjectAttributes[];
+type GetProjectsResp = ChainEntityMetaAttributes[];
 
 const getProjects = async (
   models: DB,
@@ -22,7 +23,9 @@ const getProjects = async (
   res: TypedResponse<GetProjectsResp>
 ) => {
   const { chain_id, project_id } = req.query as GetProjectsReq;
-  const params: WhereOptions<ProjectAttributes> = {};
+  const params: WhereOptions<ChainEntityMetaAttributes> = {
+    chain: ChainNetwork.CommonProtocol,
+  };
   if (chain_id) {
     try {
       const [, error] = await validateChain(models, { chain: chain_id });
@@ -30,19 +33,18 @@ const getProjects = async (
     } catch (err) {
       throw new AppError(err);
     }
-    params.chain_id = chain_id;
+    params.project_chain = chain_id;
   }
   if (project_id) {
-    params.id = project_id;
+    params.type_id = project_id;
   }
 
+  // TODO: if we're getting projects from multiple chains, this provides no
+  //   way of distinguishing -- we need to ensure we only listen for projects on
+  //   one chain ever to avoid overlapping projects meta objects.
   try {
-    const projects = await models.Project.findAll({
+    const projects = await models.ChainEntityMeta.findAll({
       where: params,
-      include: {
-        model: models.ChainEntityMeta,
-        required: true,
-      },
     });
 
     return success(

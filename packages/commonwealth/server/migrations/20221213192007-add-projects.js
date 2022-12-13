@@ -5,28 +5,23 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.dropTable('IpfsPins', { transaction: t });
 
-      // create Projects table
-      await queryInterface.createTable(
-        'Projects',
+      // add projects columns
+      await queryInterface.addColumn(
+        'ChainEntityMeta',
+        'type_id',
         {
-          id: {
-            allowNull: false,
-            primaryKey: true,
-            type: Sequelize.INTEGER,
-          },
-          entity_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false,
-            references: { model: 'ChainEntityMeta', key: 'id' },
-          },
-          chain_id: {
-            type: Sequelize.STRING,
-            allowNull: true,
-            references: { model: 'Chains', key: 'id' },
-          },
-
-          created_at: { type: Sequelize.DATE, allowNull: false },
-          updated_at: { type: Sequelize.DATE, allowNull: false },
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
+      await queryInterface.addColumn(
+        'ChainEntityMeta',
+        'project_chain',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+          references: { model: 'Chain', key: 'id', }
         },
         { transaction: t }
       );
@@ -93,17 +88,6 @@ module.exports = {
         { transaction: t }
       );
 
-      await queryInterface.addColumn(
-        'IpfsPins',
-        'user_id',
-        {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          references: { model: 'Users', key: 'id' },
-        },
-        { transaction: t }
-      );
-
       await queryInterface.addColumn('Chains', 'hide_projects', {
         type: Sequelize.BOOLEAN,
         allowNull: true,
@@ -153,7 +137,8 @@ module.exports = {
         { eth_chain_id: 5 },
         { transaction: t }
       );
-      await queryInterface.dropTable('Projects', { transaction: t });
+      await queryInterface.removeColumn('ChainEntityMeta', 'type_id', { transaction: t });
+      await queryInterface.removeColumn('ChainEntityMeta', 'project_chain', { transaction: t });
       await queryInterface.removeColumn('Chains', 'hide_projects', { transaction: t });
     });
   }

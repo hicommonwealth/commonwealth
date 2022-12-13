@@ -1,8 +1,9 @@
 import { AppError } from 'common-common/src/errors';
 import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { ProjectAttributes } from '../models/project';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
+import { ChainEntityMetaAttributes } from '../models/chain_entity_meta';
+import { ChainNetwork } from '../../../common-common/src/types';
 
 export const Errors = {
   OnlyAuthorCanSetChain: 'Creator of project not owned by caller',
@@ -10,7 +11,7 @@ export const Errors = {
 };
 
 type SetProjectChainReq = { chain_id: string; project_id: number };
-type SetProjectChainResp = ProjectAttributes;
+type SetProjectChainResp = ChainEntityMetaAttributes;
 
 const setProjectChain = async (
   models: DB,
@@ -25,21 +26,22 @@ const setProjectChain = async (
     throw new AppError(err);
   }
 
-  const project = await models.Project.findOne({
-    where: { id: project_id },
-    include: {
-      model: models.ChainEntityMeta,
-      required: true,
-    }
+  // TODO: if we're getting projects from multiple chains, this provides no
+  //   way of distinguishing -- we need to ensure we only listen for projects on
+  //   one chain ever to avoid overlapping projects meta objects.
+  const project = await models.ChainEntityMeta.findOne({
+    where: {
+      chain: ChainNetwork.CommonProtocol,
+      type_id: project_id,
+    },
   });
   if (!project) {
     throw new AppError(Errors.InvalidProjectId);
   }
 
-  // TODO: ChainEntityMeta.author is never set???
   const author = await models.Address.findOne({
     where: {
-      address: project.ChainEntityMeta.author,
+      address: project.author,
       user_id: req.user.id,
     },
   });
@@ -48,7 +50,7 @@ const setProjectChain = async (
   if (!author && !req.user.isAdmin) {
     throw new AppError(Errors.OnlyAuthorCanSetChain);
   }
-  project.chain_id = chain_id;
+  project.project_chain = chain_id;
   await project.save();
   return success(res, project.toJSON());
 };

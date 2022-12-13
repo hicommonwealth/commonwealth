@@ -33,7 +33,6 @@ import NotificationCategoryFactory from './models/notification_category';
 import OffchainProfileFactory from './models/offchain_profile';
 import PollFactory from './models/poll';
 import ProfileFactory from './models/profile';
-import ProjectFactory from './models/project';
 import ReactionFactory from './models/reaction';
 import RoleAssignmentFactory from './models/role_assignment';
 import RoleFactory from './models/role';
@@ -116,7 +115,6 @@ const models: Models = {
   ViewCount: ViewCountFactory(sequelize, DataTypes),
   Vote: VoteFactory(sequelize, DataTypes),
   Profile: ProfileFactory(sequelize, DataTypes),
-  Project: ProjectFactory(sequelize, DataTypes),
   Role: RoleFactory(sequelize, DataTypes),
   RoleAssignment: RoleAssignmentFactory(sequelize, DataTypes),
   Rule: RuleFactory(sequelize, DataTypes),

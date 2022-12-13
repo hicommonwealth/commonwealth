@@ -37,7 +37,6 @@ import { NotificationCategoryModelStatic } from './models/notification_category'
 import { OffchainProfileModelStatic } from './models/offchain_profile';
 import { PollModelStatic } from './models/poll';
 import { ProfileModelStatic } from './models/profile';
-import { ProjectModelStatic } from './models/project';
 import { ReactionModelStatic } from './models/reaction';
 import { RoleModelStatic } from './models/role';
 import { RoleAssignmentModelStatic } from './models/role_assignment';
@@ -84,7 +83,6 @@ export type Models = {
   Attachment: AttachmentModelStatic;
   Comment: CommentModelStatic;
   Poll: PollModelStatic;
-  Project: ProjectModelStatic;
   OffchainProfile: OffchainProfileModelStatic;
   Reaction: ReactionModelStatic;
   Thread: ThreadModelStatic;
