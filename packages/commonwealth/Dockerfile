@@ -11,7 +11,7 @@ ADD https://github.com/ufoscout/docker-compose-wait/releases/download/$WAIT_VERS
 
 RUN chmod +x /wait
 
-RUN yarn --ignore-engines && apk add git && yarn build \
+RUN yarn --ignore-engines && apk add git && yarn build
 
 EXPOSE 8080
 
