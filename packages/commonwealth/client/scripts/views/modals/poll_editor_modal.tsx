@@ -130,7 +130,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                 trigger: (
                   <CWButton
                     disabled={!customDurationEnabled}
-                    iconName="chevronDown"
+                    iconLeft="chevronDown"
                     label={this.customDuration || 'Infinite'}
                   />
                 ),

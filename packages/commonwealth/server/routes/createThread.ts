@@ -4,6 +4,7 @@ import {
   NotificationCategories,
   ProposalType,
   ChainType,
+  ChainNetwork,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
@@ -329,7 +330,7 @@ const createThread = async (
       }
     }
 
-    if (chain && chain.type === ChainType.Token) {
+    if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
       // skip check for admins
       const isAdmin = await findAllRoles(
         models,
