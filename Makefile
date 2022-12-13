@@ -1,13 +1,20 @@
 # Essential Commands
 
+# When first running this project, the builder image must be ran first.
 builder:
 	docker compose --file=docker-compose.init.yml build
 
-cw-build:
-	docker compose up --build 
+build-dev:
+	docker compose -f docker-compose.yml up --build 
 
-cw:
-	docker compose up
+dev:
+	docker compose -f docker-compose.yml up
+
+build-prod:
+	docker compose -f docker-compose.prod.yml up --build
+
+prod:
+	docker compose -f docker-compose.prod.yml up
 
 into-commonwealth:
 	docker exec -it commonwealth-commonwealth-1 sh 
@@ -34,7 +41,9 @@ load-db:
 migrate-db:
 	docker exec -it commonwealth-commonwealth-1 sh -c "yarn migrate-db"
 
-# Test Commands
+dump-db:
+	docker exec -it commonwealth-commonwealth-1 sh -c "pg_dump -h db $(heroku config:get HEROKU_DB_URI -a commonwealthapp) --verbose --exclude-table-data=\"public.\\\"Subscriptions\\\"\" --exclude-table-data=\"public.\\\"Sessions\\\"\" --exclude-table-data=\"public.\\\"DiscussionDrafts\\\"\" --exclude-table-data=\"public.\\\"LoginTokens\\\"\" --exclude-table-data=\"public.\\\"Notifications\\\"\" --exclude-table-data=\"public.\\\"SocialAccounts\\\"\" --exclude-table-data=\"public.\\\"Webhooks\\\"\" --exclude-table-data=\"public.\\\"NotificationsRead\\\"\" --no-privileges --no-owner -f latest.dump"
 
+# Test Commands
 api-test:
 	docker exec -it commonwealth-commonwealth-1 sh -c "yarn test-api"

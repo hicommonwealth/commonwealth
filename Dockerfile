@@ -1,6 +1,6 @@
 FROM node:14-alpine
 
-WORKDIR /monorepo
+WORKDIR /app
 
 COPY ./package.json .
 COPY ./packages/commonwealth/package.json  ./packages/commonwealth/
