@@ -110,11 +110,5 @@ describe('getThreads Tests', () => {
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
     chai.assert.equal(resp.result[0].param, 'count_only');
-
-    resp = await get('/api/threads', {community_id: testComments[0].chain, address_ids: ["1"]}, true);
-
-    chai.assert.lengthOf(resp.result, 1);
-    chai.assert.equal(resp.result[0].msg, 'Invalid value');
-    chai.assert.equal(resp.result[0].param, 'count_only');
   });
 });

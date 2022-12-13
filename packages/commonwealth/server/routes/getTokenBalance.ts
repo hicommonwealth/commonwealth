@@ -3,6 +3,14 @@ import { TokenBalanceCache, TokenBalanceResp } from 'token-balance-cache/src';
 import { DB } from 'commonwealth/server/models';
 import { success, TypedRequestQuery, TypedResponse } from 'commonwealth/server/types';
 import { AppError } from 'commonwealth/server/util/errors';
+import { query } from "express-validator";
+
+export const getTokenBalanceValidation = [
+  query('chain_node_id').isString().trim(),
+  query('addresses').toArray(),
+  query('balance_provider').isString(),
+  query('opts').isString(),
+];
 
 export const getTokenBalance = async (
   models: DB,

@@ -6,7 +6,8 @@ import getCommunities from 'server/routes/communities/getCommunities';
 import { req, res } from 'test/unit/unitHelpers';
 import { GetCommunitiesReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
 import 'test/integration/api/external/dbEntityHooks.spec';
-import { testChains } from 'test/integration/api/external/dbEntityHooks.spec';
+import { testChains, testComments } from 'test/integration/api/external/dbEntityHooks.spec';
+import { get } from "./appHook.spec";
 
 describe('getCommunities Tests', () => {
   it('should return communities with specified community_id correctly', async () => {
@@ -29,5 +30,19 @@ describe('getCommunities Tests', () => {
 
     chai.assert.equal(resp.result.count, 2);
     chai.assert.isUndefined(resp.result.communities);
+  });
+
+  it('should handle errors correctly', async () => {
+    let resp = await get('/api/communities', {}, true);
+
+    chai.assert.lengthOf(resp.result, 1);
+    chai.assert.equal(resp.result[0].msg, 'Invalid value');
+    chai.assert.equal(resp.result[0].param, 'community_id');
+
+    resp = await get('/api/communities', {community_id: testComments[0].chain, count_only: 3}, true);
+
+    chai.assert.lengthOf(resp.result, 1);
+    chai.assert.equal(resp.result[0].msg, 'Invalid value');
+    chai.assert.equal(resp.result[0].param, 'count_only');
   });
 });

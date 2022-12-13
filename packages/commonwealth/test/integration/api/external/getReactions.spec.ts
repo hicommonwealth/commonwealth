@@ -6,8 +6,9 @@ import getReactions from 'server/routes/reactions/getReactions';
 import { req, res } from 'test/unit/unitHelpers';
 import { GetReactionsReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
 import 'test/integration/api/external/dbEntityHooks.spec';
-import { testReactions } from 'test/integration/api/external/dbEntityHooks.spec';
+import { testComments, testReactions } from 'test/integration/api/external/dbEntityHooks.spec';
 import { ReactionAttributes } from 'server/models/reaction';
+import { get } from "./appHook.spec";
 
 describe('getReactions Tests', () => {
   it('should return reactions with specified community_id correctly', async () => {
@@ -73,5 +74,19 @@ describe('getReactions Tests', () => {
         (a, b) => b.updated_at.getTime() - a.updated_at.getTime()
       )
     );
+  });
+
+  it('should handle errors correctly', async () => {
+    let resp = await get('/api/reactions', {}, true);
+
+    chai.assert.lengthOf(resp.result, 1);
+    chai.assert.equal(resp.result[0].msg, 'Invalid value');
+    chai.assert.equal(resp.result[0].param, 'community_id');
+
+    resp = await get('/api/reactions', {community_id: testComments[0].chain, count_only: 3}, true);
+
+    chai.assert.lengthOf(resp.result, 1);
+    chai.assert.equal(resp.result[0].msg, 'Invalid value');
+    chai.assert.equal(resp.result[0].param, 'count_only');
   });
 });

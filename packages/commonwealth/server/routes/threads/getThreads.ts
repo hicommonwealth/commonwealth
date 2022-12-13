@@ -7,17 +7,11 @@ import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
-export const Errors = {
-  NoArgs: "Must provide arguments",
-  NoCommunityId: "Must provide a Community_id",
-  AddressesOrAddressIds: "Cannot provide both addresses and address_ids",
-};
-
 export const getThreadsValidation = [
   query('community_id').isString().trim(),
   query('topic_id').optional().isNumeric(),
   query('count_only').optional().isBoolean().toBoolean(),
-  query('address_ids').optional().toArray().if(query('addresses').notEmpty()).optional().toArray(),
+  query('address_ids').optional().toArray(),
   query('addresses').optional().toArray(),
   query('no_body').optional().isBoolean().toBoolean(),
   query('include_comments').optional().isBoolean().toBoolean(),

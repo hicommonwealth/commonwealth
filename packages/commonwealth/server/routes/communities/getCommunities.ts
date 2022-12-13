@@ -1,23 +1,28 @@
 import { GetCommunitiesReq, GetCommunitiesResp } from 'common-common/src/api/extApiTypes';
+import { query, validationResult } from "express-validator";
 import { formatPaginationNoSort } from '../../util/queries';
-import { AppError } from '../../util/errors';
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 
-export const Errors = {
-  NoArgs: "Must provide community_id or network",
-  BothArgs: "Must not provide both args"
-};
+export const getCommunitiesValidation = [
+  query('community_id').isString().trim(),
+  query('network').optional().isString(),
+  query('comment_id').optional().toInt(),
+  query('address_ids').optional().toArray(),
+  query('addresses').optional().toArray(),
+  query('count_only').optional().isBoolean().toBoolean(),
+];
 
 const getCommunities = async (
   models: DB,
   req: TypedRequestQuery<GetCommunitiesReq>,
   res: TypedResponse<GetCommunitiesResp>,
 ) => {
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return failure(res.status(400), errors);
+  }
   const { community_id, network, count_only } = req.query;
-
-  if (!community_id && !network) throw new AppError(Errors.NoArgs);
-  if (community_id && network) throw new AppError(Errors.BothArgs);
 
   let where;
   if(community_id) where = { id: community_id };
