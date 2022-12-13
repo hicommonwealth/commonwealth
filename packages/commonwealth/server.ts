@@ -246,8 +246,7 @@ async function main() {
   await ruleCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
-  // TODO: should we await this? it will block server startup -- but not a big deal locally
-  await globalActivityCache.start();
+  globalActivityCache.start();
   setupAPI(
     app,
     models,
