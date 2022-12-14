@@ -53,7 +53,7 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
     const { chain, createdAt, plaintext, author, title } = activity;
 
     // force redraw or on initial load comments don't render
-    m.redraw();
+    // m.redraw();
 
     return (
       <div className="activity">

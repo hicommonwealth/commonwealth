@@ -4,6 +4,24 @@
 .EditProfilePage {
   padding: 50px;
 
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    
+    .h3 {
+      margin-bottom: 16px;
+    }
+
+    .buttons {
+      display: flex;
+
+      > :first-child {
+        margin-right: 16px;
+      }
+    }
+  }
+
   .edit-pane {
     position: relative;
     width: 100%;
@@ -45,125 +63,220 @@
     }
 
     .general-info {
-      flex: 1;
-      margin-right: 50px;
+      width: 100%;
 
-      .title {
-        margin-bottom: 24px;
-      }
+      .columns {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        margin-top: 24px;
 
-      input[name='bio-form-field'] {
-        height: 150px;
-      }
-
-      .bio-container {
-        label {
-          font-size: 14px;
-          color: #656167;
+        .left-side {
+          width: 40%;
+          margin-right: 36px;
         }
-
-        .bio-textarea {
-          width: 100%;
-          height: 150px;
-          padding: 10px;
-          background-color: #f7f6f7;
-          border: 2px solid white;
-          border-radius: 4px;
-          margin: 4px 0 24px 0;
-          &:hover,
-          &:focus {
-            border: 2px solid #bd99ff;
-          }
+  
+        .right-side {
+          width: 60%;
         }
-      }
-
-      .profile-image-section {
+  
         .title {
           margin-bottom: 24px;
         }
+  
+        .bio-container {
+          margin-bottom: 36px;
 
-        .flex {
-          position: relative;
-          display: flex;
-          width: 100%;
-          align-items: center;
-
-          .profile-image {
-            width: 90px;
-            height: 90px;
-            min-width: 90px;
-            min-height: 90px;
-            img {
-              width: 100%;
-              height: 100%;
-              border-radius: 50%;
-              object-fit: cover;
-            }
-            &.hide {
-              img {
-                display: none;
-              }
-            }
+          .caption {
+            color: $neutral-500;
+            margin-bottom: 4px;
           }
-
-          .AvatarUpload {
-            position: absolute;
-            left: 45px;
-            top: 45px;
-            transform: translate(-50%, -50%);
-            opacity: 0.45;
-            transition: opacity 0.3s ease;
-            &:hover {
-              opacity: 1;
-            }
-
-            .dz-image {
+        }
+  
+        .profile-image-section {
+          .description {
+            margin-top: 8px;
+            color: $neutral-500;
+          }
+  
+          .image-upload {
+            position: relative;
+            display: flex;
+            width: 100%;
+            align-items: center;
+            margin: 8px 0;
+  
+            .profile-image {
               width: 90px;
               height: 90px;
+              img {
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+                object-fit: cover;
+              }
+              &.hide {
+                img {
+                  display: none;
+                }
+              }
+            }
+  
+            .AvatarUpload {
+              position: absolute;
+              left: 45px;
+              top: 45px;
+              transform: translate(-50%, -50%);
+              opacity: 0.45;
+              transition: opacity 0.3s ease;
+              &:hover {
+                opacity: 1;
+              }
+  
+              .dz-image {
+                width: 90px;
+                height: 90px;
+              }
+            }
+  
+            .TextInput {
+              width: 75%;
+            }
+  
+            p {
+              margin: 0 20px;
+              color: #999999;
             }
           }
+        }
 
+        .info-section {
           .TextInput {
-            width: 75%;
+            margin-bottom: 16px;
+          }
+        }
+      }
+  
+      .social-links {
+        margin-top: 24px;
+  
+        .b1 {
+          color: $neutral-600;
+        }
+
+        .caption {
+          color: $neutral-500;
+          margin: 4px 0 16px 0;
+        }
+
+        .input-row {
+          display: flex;
+          align-items: center;
+          margin-bottom: 8px;
+        }
+
+        .add-social-link {
+          display: flex;
+          align-items: center;
+          color: $neutral-500;
+
+          &:hover {
+            color: $neutral-700;
+            cursor: pointer;
           }
 
-          p {
-            margin: 0 20px;
-            color: #999999;
+          .b1 {
+            color: $neutral-500;
+            margin-left: 8px;
+
+            &:hover {
+              color: $neutral-700;
+              cursor: pointer;
+            }
           }
         }
       }
     }
+  }
 
-    .social-links {
-      flex: 1;
+  .linked-addresses {
+    margin-top: 24px;
 
-      .title {
-        margin-bottom: 24px;
+    .edit-section {
+      display: flex;
+      margin-top: 24px;
+
+      .description {
+        width: 40%;
+        margin-right: 36px;
+      }
+
+      .addresses-container {
+        width: 60%;
+
+        .addresses {
+          display: flex;
+          justify-content: space-between;
+          margin: 0 80px;
+
+          .Tag {
+            margin-right: 8px;
+          }
+  
+          .address {
+            display: flex;
+            align-items: center;
+          }
+        }
+
+        .Button {
+          background-color: $neutral-100;
+          margin-top: 24px;
+          width: 100%;
+
+          &:hover {
+            background-color: $neutral-200;
+          }
+
+          svg, .Text {
+            color: $neutral-600;
+          }
+        }
       }
     }
   }
 }
 
-@media only screen and (max-width: 768px) {
+@media only screen and (max-width: $breakpoint-small-max-px) {
   .EditProfilePage {
     .edit-pane {
-      display: block;
-
       .general-info {
-        margin-right: 0;
-
-        .profile-image-section {
-          .flex {
-            .TextInput {
-              width: 50%;
+        .columns {
+          flex-direction: column;
+          width: 100%;
+  
+          .left-side, .right-side {
+            width: 100%;
+            
+            .profile-image-section { 
+              margin-top: 36px;
             }
           }
         }
       }
+    }
 
-      .social-links {
-        margin-top: 30px;
+    .linked-addresses {
+      .edit-section {
+        flex-direction: column;
+
+        .description, .addresses-container {
+          width: 100%;
+        }
+
+        .addresses-container {
+          margin-top: 36px;
+        }
       }
     }
   }
