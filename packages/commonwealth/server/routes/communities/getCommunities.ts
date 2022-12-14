@@ -1,15 +1,17 @@
-import { GetCommunitiesReq, GetCommunitiesResp } from 'common-common/src/api/extApiTypes';
-import { query, validationResult } from "express-validator";
+import { GetCommunitiesReq, GetCommunitiesResp, needParamErrMsg } from 'common-common/src/api/extApiTypes';
+import { oneOf, query, validationResult } from "express-validator";
 import { formatPaginationNoSort } from '../../util/queries';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 
 export const getCommunitiesValidation = [
-  query('community_id').isString().trim(),
-  query('network').optional().isString(),
-  query('comment_id').optional().toInt(),
-  query('address_ids').optional().toArray(),
-  query('addresses').optional().toArray(),
+  oneOf([
+    query('community_id').exists().isString().trim(),
+    query('network').exists().isString().trim(),
+    query('comment_id').exists().toInt(),
+    query('address_ids').exists().toArray(),
+    query('addresses').exists().toArray(),
+  ], `${needParamErrMsg} (community_id, network, comment_id, address_ids, addresses)`),
   query('count_only').optional().isBoolean().toBoolean(),
 ];
 

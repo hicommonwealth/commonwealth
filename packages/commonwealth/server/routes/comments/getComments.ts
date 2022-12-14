@@ -1,18 +1,11 @@
-  import { AppError } from '../../util/errors';
 import Sequelize from 'sequelize';
+import { GetCommentsReq, GetCommentsResp } from 'common-common/src/api/extApiTypes';
+import { query, validationResult } from 'express-validator';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
-import { GetCommentsResp, IPagination } from 'common-common/src/api/extApiTypes';
 import { formatPagination } from '../../util/queries';
-import { check, query, validationResult } from 'express-validator';
 
 const { Op } = Sequelize;
-
-type GetCommentsReq = {
-  community_id: string;
-  addresses?: string[];
-  count_only?: boolean;
-} & IPagination;
 
 export const getCommentsValidation = [
   query('community_id').isString().trim(),
@@ -44,17 +37,17 @@ export const getComments = async (
   let comments, count;
   if (!count_only) {
     ({ rows: comments, count } = await models.Comment.findAndCountAll({
-      where: where,
-      include: include,
+      where,
+      include,
       ...formatPagination(req.query)
     }));
   } else {
     count = <any>await models.Comment.count({
-      where: where,
-      include: include,
+      where,
+      include,
       ...formatPagination(req.query)
     });
   }
 
-  return success(res, { comments: comments, count });
+  return success(res, { comments, count });
 };

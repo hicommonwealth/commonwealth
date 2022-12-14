@@ -1,6 +1,5 @@
 import express from "express";
 import cookieParser from 'cookie-parser';
-import favicon from 'serve-favicon';
 import bodyParser from 'body-parser';
 import passport from 'passport';
 import session from 'express-session';
@@ -46,7 +45,7 @@ before(async () => {
   app.use('/api', router);
 });
 
-export async function get(path: string, val: object = null, expectError: boolean = false) {
+export async function get(path: string, val: Record<string, unknown> = null, expectError = false) {
   const res = <any>await chai
     .request(app)
     .get(path)
@@ -55,5 +54,6 @@ export async function get(path: string, val: object = null, expectError: boolean
 
   if (!expectError) assert.equal(res.statusCode, 200);
 
+  if (res.statusCode === 404) throw Error(`Cannot find api for ${path}`)
   return JSON.parse(res.text);
 }

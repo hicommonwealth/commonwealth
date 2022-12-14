@@ -9,6 +9,7 @@ import { CollaborationAttributes } from 'server/models/collaboration';
 import { ReactionAttributes } from 'server/models/reaction';
 import { ChainNodeAttributes } from 'server/models/chain_node';
 import { TopicAttributes } from 'server/models/topic';
+import { ProfileAttributes } from "../../../../server/models/profile";
 
 const Op = Sequelize.Op;
 
@@ -21,6 +22,7 @@ export let testCollaborations: CollaborationAttributes[];
 export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
+export let testProfiles: ProfileAttributes[];
 
 before(async () => {
   await models.Topic.destroy({where: {id: {[Op.lt]: 0}}, force: true});
@@ -31,6 +33,7 @@ before(async () => {
   await models.Comment.destroy({where: {id: {[Op.lt]: 0}}, force: true});
   await models.Address.destroy({where: {id: {[Op.lt]: 0}}, force: true});
   await models.Chain.destroy({where: {chain_node_id: {[Op.lt]: 0}}, force: true});
+  await models.Profile.destroy({where: {id: {[Op.lt]: 0}}, force: true});
 
   testUsers = await Promise.all([...Array(2).keys()].map(
     async (i) => (await models.User.findOrCreate({
@@ -40,6 +43,15 @@ before(async () => {
         emailVerified: true,
         isAdmin: true,
         lastVisited: '{}',
+      }
+    }))[0]));
+
+  testProfiles = await Promise.all([...Array(2).keys()].map(
+    async (i) => (await models.Profile.findOrCreate({
+      where: {
+        id: -i - 1,
+        email: `test${i - 1}@gmail.com`,
+        user_id: -i - 1,
       }
     }))[0]));
 
@@ -107,6 +119,7 @@ before(async () => {
         address: `testAddress${-i - 1}`,
         chain: 'cmntest',
         verification_token: '',
+        profile_id: -i - 1,
       }
     }))[0]));
 
@@ -168,7 +181,6 @@ before(async () => {
       }
     }))[0])));
 
-
   testReactions = await Promise.all([...Array(2).keys()].map(
     async (i) => (await models.Reaction.findOrCreate({
       where: {
@@ -202,4 +214,5 @@ after(async () => {
   await models.Address.destroy({where: {id: {[Op.lt]: 0}}, force: true});
   await models.Chain.destroy({where: {chain_node_id: {[Op.lt]: 0}}, force: true});
   await models.ChainNode.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Profile.destroy({where: {id: {[Op.lt]: 0}}, force: true});
 });

@@ -64,7 +64,7 @@ export type GetProfilesReq = {
   count_only?: boolean;
 } & IPagination;
 
-export type GetProfilesResp = { profiles?: ProfileAttributes[], count: number };;
+export type GetProfilesResp = { profiles?: ProfileAttributes[], count: number };
 
 export type GetChainNodesReq = {
   chain_node_ids?: number[],
@@ -85,3 +85,5 @@ export type GetTokenBalanceReq = {
   balance_provider: string,
   opts: Record<string, string | undefined>
 };
+
+export const needParamErrMsg = 'Please provide a parameter to query by';
