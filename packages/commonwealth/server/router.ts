@@ -170,7 +170,8 @@ function setupRouter(
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
   banCache: BanCache,
-  globalActivityCache: GlobalActivityCache
+  globalActivityCache: GlobalActivityCache,
+  databaseValidationService: DatabaseValidationService
 ) {
   const router = express.Router();
 
@@ -270,26 +271,17 @@ function setupRouter(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
     [
-      DatabaseValidationService.validateAuthor.bind(
-        DatabaseValidationService,
-        models
-      ),
+      databaseValidationService.validateAuthor.bind(databaseValidationService),
       createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache),
     ]
   );
   router.put('/editThread', passport.authenticate('jwt', { session: false }), [
-    DatabaseValidationService.validateAuthor.bind(
-      DatabaseValidationService,
-      models
-    ),
+    databaseValidationService.validateAuthor.bind(databaseValidationService),
     editThread.bind(this, models, banCache),
   ]);
 
   router.post('/createPoll', passport.authenticate('jwt', { session: false }), [
-    DatabaseValidationService.validateAuthor.bind(
-      DatabaseValidationService,
-      models
-    ),
+    databaseValidationService.validateAuthor.bind(databaseValidationService),
     createPoll.bind(this, models),
   ]);
   router.get('/getPolls', getPolls.bind(this, models));
@@ -297,10 +289,7 @@ function setupRouter(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
     [
-      DatabaseValidationService.validateAuthor.bind(
-        DatabaseValidationService,
-        models
-      ),
+      databaseValidationService.validateAuthor.bind(databaseValidationService),
       updateThreadStage.bind(this, models),
     ]
   );
@@ -326,10 +315,7 @@ function setupRouter(
   );
 
   router.post('/updateVote', passport.authenticate('jwt', { session: false }), [
-    DatabaseValidationService.validateAuthor.bind(
-      DatabaseValidationService,
-      models
-    ),
+    databaseValidationService.validateAuthor.bind(databaseValidationService),
     updateVote.bind(this, models, tokenBalanceCache, ruleCache),
   ]);
   router.get('/viewVotes', viewVotes.bind(this, models));
@@ -349,28 +335,19 @@ function setupRouter(
     '/updateLinkedThreads',
     passport.authenticate('jwt', { session: false }),
     [
-      DatabaseValidationService.validateAuthor.bind(
-        DatabaseValidationService,
-        models
-      ),
+      databaseValidationService.validateAuthor.bind(databaseValidationService),
       updateLinkedThreads.bind(this, models),
     ]
   );
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), [
-    DatabaseValidationService.validateAuthor.bind(
-      DatabaseValidationService,
-      models
-    ),
+    databaseValidationService.validateAuthor.bind(databaseValidationService),
     addEditors.bind(this, models),
   ]);
   router.post(
     '/deleteEditors',
     passport.authenticate('jwt', { session: false }),
     [
-      DatabaseValidationService.validateAuthor.bind(
-        DatabaseValidationService,
-        models
-      ),
+      databaseValidationService.validateAuthor.bind(databaseValidationService),
       deleteEditors.bind(this, models),
     ]
   );
@@ -389,25 +366,16 @@ function setupRouter(
 
   // discussion drafts
   router.post('/drafts', passport.authenticate('jwt', { session: false }), [
-    DatabaseValidationService.validateAuthor.bind(
-      DatabaseValidationService,
-      models
-    ),
+    databaseValidationService.validateAuthor.bind(databaseValidationService),
     createDraft.bind(this, models),
   ]);
   router.get('/drafts', getDrafts.bind(this, models));
   router.delete('/drafts', passport.authenticate('jwt', { session: false }), [
-    DatabaseValidationService.validateAuthor.bind(
-      DatabaseValidationService,
-      models
-    ),
+    databaseValidationService.validateAuthor.bind(databaseValidationService),
     deleteDraft.bind(this, models),
   ]);
   router.patch('/drafts', passport.authenticate('jwt', { session: false }), [
-    DatabaseValidationService.validateAuthor.bind(
-      DatabaseValidationService,
-      models
-    ),
+    databaseValidationService.validateAuthor.bind(databaseValidationService),
     editDraft.bind(this, models),
   ]);
 
@@ -418,10 +386,7 @@ function setupRouter(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
     [
-      DatabaseValidationService.validateAuthor.bind(
-        DatabaseValidationService,
-        models
-      ),
+      databaseValidationService.validateAuthor.bind(databaseValidationService),
       createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache),
     ]
   );
@@ -429,10 +394,7 @@ function setupRouter(
     '/editComment',
     passport.authenticate('jwt', { session: false }),
     [
-      DatabaseValidationService.validateAuthor.bind(
-        DatabaseValidationService,
-        models
-      ),
+      databaseValidationService.validateAuthor.bind(databaseValidationService),
       editComment.bind(this, models, banCache),
     ]
   );
@@ -482,10 +444,7 @@ function setupRouter(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
     [
-      DatabaseValidationService.validateAuthor.bind(
-        DatabaseValidationService,
-        models
-      ),
+      databaseValidationService.validateAuthor.bind(databaseValidationService),
       createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache),
     ]
   );
@@ -690,10 +649,7 @@ function setupRouter(
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
     [
-      DatabaseValidationService.validateAuthor.bind(
-        DatabaseValidationService,
-        models
-      ),
+      databaseValidationService.validateAuthor.bind(databaseValidationService),
       setAddressWallet.bind(this, models),
     ]
   );

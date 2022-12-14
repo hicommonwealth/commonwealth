@@ -1,5 +1,5 @@
 import { AppError } from 'common-common/src/errors';
-import { NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 
@@ -8,13 +8,18 @@ export const Errors = {
 };
 
 export default class DatabaseValidationService {
-  static async validateAuthor(
-    models: DB,
-    req: Express.Request,
-    res: Express.Response,
+  private models: DB;
+
+  constructor(models: DB) {
+    this.models = models;
+  }
+
+  public async validateAuthor(
+    req: Request,
+    res: Response,
     next: NextFunction
   ) {
-    const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
+    const [author, authorError] = await lookupAddressIsOwnedByUser(this.models, req);
     if (!author) return next(new AppError(Errors.InvalidUser));
     if (authorError) return next(new AppError(authorError));
     // If the author is valid, add it to the request object
