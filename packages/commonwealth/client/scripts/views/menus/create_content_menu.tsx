@@ -193,7 +193,14 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         });
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
-        window.open('https://discord.com/oauth2/authorize?client_id=1027967017896132639&redirect_uri=https%3A%2F%2Fbot-admin.commonwealth.im%2Fcallback&response_type=code&permissions=8&scope=applications.commands%20bot')
+
+        window.open(
+          `https://discord.com/oauth2/authorize?client_id=${
+            process.env.DISCORD_CLIENT_ID
+          }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+            process.env.DISCORD_UI_URL
+          )}/callback&response_type=code&scope=bot`
+        );
       },
     },
   ];
