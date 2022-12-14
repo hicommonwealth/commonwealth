@@ -30,7 +30,7 @@ import {
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import emitNotifications from 'server/util/emitNotifications';
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,17 +1,14 @@
-import Sequelize from 'sequelize';
 import { DB } from 'server/models';
-import { success, TypedRequestQuery, TypedResponse } from 'server/types';
 import {
   GetBalanceProvidersReq, GetBalanceProvidersResp,
 } from 'common-common/src/api/extApiTypes';
-import { AppError } from 'server/util/errors';
 import { TokenBalanceCache } from 'token-balance-cache/src';
+import { query, validationResult } from "express-validator";
+import { failure, success, TypedRequestQuery, TypedResponse } from '../types';
 
-const { Op } = Sequelize;
-
-export const Errors = {
-  NoArgs: "Must provide chain_node_ids",
-};
+export const getBalanceProvidersValidation = [
+    query('chain_node_ids').exists().toInt().toArray(),
+];
 
 export const getBalanceProviders = async (
   models: DB,
@@ -19,7 +16,10 @@ export const getBalanceProviders = async (
   req: TypedRequestQuery<GetBalanceProvidersReq>,
   res: TypedResponse<GetBalanceProvidersResp>,
 ) => {
-  if (!req.query) throw new AppError(Errors.NoArgs);
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return failure(res.status(400), errors);
+  }
 
   const { chain_node_ids } = req.query;
 

@@ -1,30 +1,32 @@
 import Sequelize, {} from 'sequelize';
-import { AppError } from '../../util/errors';
 import { GetThreadsReq, GetThreadsResp } from 'common-common/src/api/extApiTypes';
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import { query, validationResult } from 'express-validator';
+import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
-import { formatPagination } from 'server/util/queries';
-import { oneOf, query } from 'express-validator';
+import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
-export const Errors = {
-  NoArgs: "Must provide arguments",
-  NoCommunityId: "Must provide a Community_id",
-  AddressesOrAddressIds: "Cannot provide both addresses and address_ids",
-};
+export const getThreadsValidation = [
+  query('community_id').isString().trim(),
+  query('topic_id').optional().isNumeric(),
+  query('count_only').optional().isBoolean().toBoolean(),
+  query('address_ids').optional().toArray(),
+  query('addresses').optional().toArray(),
+  query('no_body').optional().isBoolean().toBoolean(),
+  query('include_comments').optional().isBoolean().toBoolean(),
+  query('count_only').optional().isBoolean().toBoolean(),
+];
 
-const getThreads = async (
+export const getThreads = async (
   models: DB,
   req: TypedRequestQuery<GetThreadsReq>,
   res: TypedResponse<GetThreadsResp>,
 ) => {
-  query('community_id').isString().trim();
-  query('addresses').not();
-  query(['addresses', 'address_ids']).not();
-  query('no_body').optional().toBoolean();
-  query('include_comments').optional().toBoolean();
-  query('count_only').optional().toBoolean();
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return failure(res.status(400), errors);
+  }
 
   const { community_id, topic_id, address_ids, no_body, include_comments, addresses, count_only } = req.query;
 
@@ -67,7 +69,5 @@ const getThreads = async (
     });
   }
 
-  return success(res, { threads: threads, count });
+  return success(res, { threads, count });
 };
-
-export default getThreads;

@@ -1,21 +1,27 @@
-import { AppError } from '../../util/errors';
 import Sequelize from 'sequelize';
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
-import { DB } from '../../models';
 import { GetCommentsReq, GetCommentsResp } from 'common-common/src/api/extApiTypes';
-import { formatPagination } from 'server/util/queries';
-import { check, query, validationResult } from 'express-validator';
+import { query, validationResult } from 'express-validator';
+import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
+import { DB } from '../../models';
+import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;
 
-const getComments = async (
+export const getCommentsValidation = [
+  query('community_id').isString().trim(),
+  query('addresses').optional().toArray(),
+  query('count_only').optional().isBoolean().toBoolean()
+];
+
+export const getComments = async (
   models: DB,
   req: TypedRequestQuery<GetCommentsReq>,
   res: TypedResponse<GetCommentsResp>,
 ) => {
-  query('community_id').isString().trim();
-  query('address').optional().isString();
-  query('count_only').optional().toBoolean();
+  const errors = validationResult(req).array();
+  if (errors.length !== 0) {
+    return failure(res.status(400), errors);
+  }
 
   const { community_id, addresses, count_only } = req.query;
 
@@ -31,19 +37,17 @@ const getComments = async (
   let comments, count;
   if (!count_only) {
     ({ rows: comments, count } = await models.Comment.findAndCountAll({
-      where: where,
-      include: include,
+      where,
+      include,
       ...formatPagination(req.query)
     }));
-  } else{
+  } else {
     count = <any>await models.Comment.count({
-      where: where,
-      include: include,
+      where,
+      include,
       ...formatPagination(req.query)
     });
   }
 
-  return success(res, { comments: comments, count });
+  return success(res, { comments, count });
 };
-
-export default getComments;

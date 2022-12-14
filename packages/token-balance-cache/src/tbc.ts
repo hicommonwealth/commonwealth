@@ -52,9 +52,22 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     providers: BalanceProvider[] = null,
     private readonly _nodesProvider: (lastQueryUnixTime: number) => Promise<IChainNode[]> = queryChainNodesFromDB,
   ) {
-    // lazy load import to improve test speed
-    if(providers == null) import('./providers').then((p) => providers = p.default);
     super({}, noBalancePruneTimeS);
+
+    // if providers is set, init during constructor
+    if(providers != null) {
+      for (const provider of providers) {
+        this._providers[provider.name] = provider;
+      }
+    }
+  }
+
+  public async initBalanceProviders(providers: BalanceProvider[] = null) {
+    // lazy load import to improve test speed
+    if(providers == null) {
+      const p = await import('./providers')
+      providers = p.default;
+    }
     for (const provider of providers) {
       this._providers[provider.name] = provider;
     }
