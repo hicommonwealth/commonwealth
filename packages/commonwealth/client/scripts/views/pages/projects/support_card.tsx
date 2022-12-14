@@ -44,12 +44,12 @@ export default class SupportCard extends ClassComponent<SupportCardAttrs> {
       headerText = 'Back This Project';
       buttonLabel = 'Back This Project';
       inputLabel = 'Enter Amount To Back';
-      onclick = () => app.projects.back(project.id, this.amount);
+      onclick = () => app.projects.back(+project.id, this.amount);
     } else if (supportType === ProjectRole.Curator) {
       headerText = 'Be A Curator';
       buttonLabel = 'Curate This Project';
       inputLabel = 'Enter Amount To Curate';
-      onclick = () => app.projects.curate(project.id, this.amount);
+      onclick = () => app.projects.curate(+project.id, this.amount);
     } else {
       return;
     }

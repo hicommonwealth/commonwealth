@@ -40,7 +40,7 @@ class Project {
   public get beneficiary() { return this.createdEvent.beneficiary; }
   public get token() { return this.createdEvent.acceptedToken; }
 
-  public get curatorFee() { return this.createdEvent.curatorFee; }
+  public get curatorFee() { return +this.createdEvent.curatorFee; }
   public get threshold() { return new BN(this.createdEvent.threshold); }
   public get deadline() { return this.createdEvent.deadline; }
   public get createdAt() { return this._entity.createdAt; }
