@@ -180,6 +180,22 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         m.route.set('/createCommunity');
       },
     },
+    {
+      label: 'Gate your Discord',
+      iconLeft: 'discord',
+      onclick: (e) => {
+        e.preventDefault();
+        mixpanelBrowserTrack({
+          event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
+          chainBase: null,
+          isCustomDomain: app.isCustomDomain(),
+          communityType: null,
+        });
+        app.sidebarToggled = false;
+        app.sidebarMenu = 'default';
+        window.open('https://discord.com/oauth2/authorize?client_id=1027967017896132639&redirect_uri=https%3A%2F%2Fbot-admin.commonwealth.im%2Fcallback&response_type=code&permissions=8&scope=applications.commands%20bot')
+      },
+    },
   ];
 
   return [
