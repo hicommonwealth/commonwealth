@@ -12,6 +12,7 @@ import { weiToTokens } from 'helpers';
 import { CWAvatar } from '../../../components/component_kit/cw_avatar';
 import { ProjectRole } from '../types';
 import { getUserRoles } from '../helpers';
+import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
 type HeaderPanelAttrs = { project: Project };
 
@@ -35,7 +36,7 @@ export class HeaderPanel extends ClassComponent<HeaderPanelAttrs> {
                 {_.capitalize(userRole)}
               </CWText>
               {isSupporter && (
-                <CWIcon iconName={userRole} iconSize="small"></CWIcon>
+                <CWIcon iconName={userRole as IconName} iconSize="small"></CWIcon>
               )}
             </div>
             <div class="banner-right">

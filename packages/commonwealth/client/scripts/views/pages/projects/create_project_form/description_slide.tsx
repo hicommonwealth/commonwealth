@@ -4,10 +4,11 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { QuillEditor } from 'views/components/quill/quill_editor';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import { ICreateProjectForm } from '../types';
 
 export class DescriptionSlide
-  implements m.ClassComponent<{ form: ICreateProjectForm }>
+  extends ClassComponent<{ form: ICreateProjectForm }>
 {
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
     return (

@@ -8,8 +8,8 @@ import { CWText } from 'views/components/component_kit/cw_text';
 
 export type ButtonAttrs = {
   className?: string;
-  headers: string[] | Vnode<never>[];
-  entries: Vnode<never>[][];
+  headers: string[] | Vnode<unknown>[];
+  entries: Vnode<unknown>[][];
 };
 
 // TODO Graham 5-16-22: Only styled for simple two-column table; needs extending
