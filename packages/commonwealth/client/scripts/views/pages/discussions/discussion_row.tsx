@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { Button, Tag } from 'construct-ui';
 
@@ -20,12 +21,7 @@ import {
   threadStageToLabel,
   isCommandClick,
 } from 'helpers';
-import {
-  Thread,
-  ThreadStage,
-  AddressInfo,
-  ThreadKind,
-} from 'models';
+import { Thread, ThreadStage, AddressInfo, ThreadKind } from 'models';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
 import { DiscussionRowMenu } from './discussion_row_menu';
@@ -38,8 +34,8 @@ type DiscussionRowAttrs = {
   proposal: Thread;
 };
 
-export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
-  view(vnode: m.VnodeDOM<DiscussionRowAttrs, this>) {
+export class DiscussionRow extends ClassComponent<DiscussionRowAttrs> {
+  view(vnode: m.Vnode<DiscussionRowAttrs>) {
     const { proposal } = vnode.attrs;
 
     const discussionLink = getProposalUrlPath(
@@ -78,15 +74,19 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
           <div class="row-subheader">
             {proposal.readOnly && (
               <div class="discussion-locked">
-                <Tag
-                  size="xs"
-                  label={<CWIcon iconName="lock" iconSize="small" />}
-                />
+                {m(Tag, {
+                  size: 'xs',
+                  label: <CWIcon iconName="lock" iconSize="small" />,
+                })}
               </div>
             )}
-            {proposal.hasPoll && (
-              <Button label="Poll" intent="warning" size="xs" compact={true} />
-            )}
+            {proposal.hasPoll &&
+              m(Button, {
+                label: 'Poll',
+                intent: 'warning',
+                size: 'xs',
+                compact: true,
+              })}
             {proposal.chainEntities?.length > 0 &&
               proposal.chainEntities
                 .sort((a, b) => {
@@ -94,33 +94,30 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                 })
                 .map((ce) => {
                   if (!chainEntityTypeToProposalShortName(ce.type)) return;
-                  return (
-                    <Button
-                      label={[
-                        chainEntityTypeToProposalShortName(ce.type),
-                        Number.isNaN(parseInt(ce.typeId, 10))
-                          ? ''
-                          : ` #${ce.typeId}`,
-                      ]}
-                      intent="primary"
-                      class="proposal-button"
-                      size="xs"
-                      compact={true}
-                    />
-                  );
+                  return m(Button, {
+                    label: [
+                      chainEntityTypeToProposalShortName(ce.type),
+                      Number.isNaN(parseInt(ce.typeId, 10))
+                        ? ''
+                        : ` #${ce.typeId}`,
+                    ],
+                    intent: 'primary',
+                    class: 'proposal-button',
+                    size: 'xs',
+                    compact: true,
+                  });
                 })}
-            {proposal.snapshotProposal && (
-              <Button
-                label={['Snap ', `${proposal.snapshotProposal.slice(0, 4)}…`]}
-                intent="primary"
-                class="proposal-button"
-                size="xs"
-                compact={true}
-              />
-            )}
-            {proposal.stage !== ThreadStage.Discussion && (
-              <Button
-                intent={
+            {proposal.snapshotProposal &&
+              m(Button, {
+                label: ['Snap ', `${proposal.snapshotProposal.slice(0, 4)}…`],
+                intent: 'primary',
+                class: 'proposal-button',
+                size: 'xs',
+                compact: true,
+              })}
+            {proposal.stage !== ThreadStage.Discussion &&
+              m(Button, {
+                intent:
                   proposal.stage === ThreadStage.ProposalInReview
                     ? 'positive'
                     : proposal.stage === ThreadStage.Voting
@@ -129,13 +126,11 @@ export class DiscussionRow implements m.ClassComponent<DiscussionRowAttrs> {
                     ? 'positive'
                     : proposal.stage === ThreadStage.Failed
                     ? 'negative'
-                    : 'positive'
-                }
-                size="xs"
-                compact={true}
-                label={threadStageToLabel(proposal.stage)}
-              />
-            )}
+                    : 'positive',
+                size: 'xs',
+                compact: true,
+                label: threadStageToLabel(proposal.stage),
+              })}
             {proposal.kind === ThreadKind.Link &&
               proposal.url &&
               externalLink(

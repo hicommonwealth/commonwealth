@@ -1,9 +1,9 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import { ChainType, NotificationCategories } from 'common-common/src/types';
+import { ChainNetwork, ChainType, NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../util/validateChain';
 import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
@@ -11,17 +11,17 @@ import {
   getProposalUrl,
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
-import proposalIdToEntity from '../util/proposalIdToEntity';
 import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
+import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -49,7 +49,7 @@ const createReaction = async (
   if (error) return next(new AppError(error));
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
-  const { reaction, comment_id, proposal_id, thread_id } = req.body;
+  const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new AppError(Errors.NoPostId));
@@ -84,7 +84,12 @@ const createReaction = async (
       attributes: ['rule_id'],
     });
     if (topic?.rule_id) {
-      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      const passesRules = await checkRule(
+        ruleCache,
+        models,
+        topic.rule_id,
+        author.address
+      );
       if (!passesRules) {
         return next(new AppError(Errors.RuleCheckFailed));
       }
@@ -95,22 +100,21 @@ const createReaction = async (
   if (chain) {
     const [canInteract, banError] = await banCache.checkBan({
       chain: chain.id,
-      address: req.body.address
+      address: req.body.address,
     });
     if (!canInteract) {
       return next(new AppError(banError));
     }
   }
 
-  if (chain && chain.type === ChainType.Token) {
+  if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
     // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
+    const isAdmin = await findAllRoles(
+      models,
+      { where: { address_id: author.id } },
+      chain.id,
+      ['admin']
+    );
     if (thread && !req.user.isAdmin && isAdmin.length === 0) {
       try {
         const canReact = await validateTopicThreshold(
@@ -140,8 +144,7 @@ const createReaction = async (
 
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {
-    const chainEntity = await proposalIdToEntity(models, chain.id, proposal_id);
-    if (!chainEntity) return next(new AppError(Errors.NoProposalMatch));
+    if (!chain_entity_id) return next(new AppError(Errors.NoProposalMatch));
     const [prefix, id] = proposal_id.split('_');
     proposal = { id };
     root_type = proposal_id.split('_')[0];
@@ -237,7 +240,6 @@ const createReaction = async (
       chain: finalReaction.chain,
       body: comment_id ? comment.text : '',
     },
-    req.wss,
     [finalReaction.Address.address]
   );
 

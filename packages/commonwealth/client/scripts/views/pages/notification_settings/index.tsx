@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'pages/notification_settings/index.scss';
@@ -9,7 +10,6 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from '../loading';
-import ErrorPage from '../error';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
@@ -27,7 +27,7 @@ import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover'
 import { CWTooltip } from '../../components/component_kit/cw_popover/cw_tooltip';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
-class NotificationSettingsPage implements m.ClassComponent {
+class NotificationSettingsPage extends ClassComponent {
   private browserNotifsEnabled: boolean;
   oninit() {
     this.browserNotifsEnabled =

@@ -1,14 +1,14 @@
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
 
-import { DB } from '../models';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { DB } from '../models';
 import { JWT_SECRET } from '../config';
 import { useSocialAccountAuth } from './socialAccount';
 import { useMagicAuth } from './magic';
 import '../types';
+import { StatsDController } from 'common-common/src/statsd';
 
-import { getStatsDInstance } from '../util/metrics';
 const log = factory.getLogger(formatFilename(__filename));
 
 const JWTStrategy = passportJWT.Strategy;
@@ -44,9 +44,9 @@ function setupPassport(models: DB) {
   useMagicAuth(models);
 
   passport.serializeUser<any>((user, done) => {
-    getStatsDInstance().increment('cw.users.logged_in');
+    StatsDController.get().increment('cw.users.logged_in');
     if (user?.id) {
-      getStatsDInstance().set('cw.users.unique', user.id);
+      StatsDController.get().set('cw.users.unique', user.id);
     }
     done(null, user.id);
   });

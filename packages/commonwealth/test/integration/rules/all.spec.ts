@@ -36,66 +36,93 @@ describe('All rule tests', () => {
   });
 
   it('should validate correct all rule', () => {
-    const rule = { AllRule: [ [
-      {
-        AdminOnlyRule: [] as [],
-      }, {
-        AllowListRule: [ [loggedInAddr] ] as [ string[] ],
-      },
-    ] ] };
+    const rule = {
+      AllRule: [
+        [
+          {
+            AdminOnlyRule: [] as [],
+          },
+          {
+            AllowListRule: [[loggedInAddr]] as [string[]],
+          },
+        ],
+      ],
+    };
     const sanitizedRule = validateRule(rule);
     assert.deepEqual(rule, sanitizedRule);
   });
 
   it('should pass all rule on admin + allowList', async () => {
-    await models['Role'].create({
-      address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'admin',
+    // assign admin role to loggedInAddr
+    const communityRole = await models.CommunityRole.findOne({
+      where: { chain_id: chain, name: 'admin' },
     });
-    const rule = { AllRule: [ [
-      {
-        AdminOnlyRule: [] as [],
-      }, {
-        AllowListRule: [ [loggedInAddr] ] as [ string[] ],
-      },
-    ] ] as [ Array<DefaultSchemaT> ] };
+    await models['RoleAssignment'].create({
+      address_id: loggedInAddrId,
+      community_role_id: communityRole.id,
+    });
+    const rule = {
+      AllRule: [
+        [
+          {
+            AdminOnlyRule: [] as [],
+          },
+          {
+            AllowListRule: [[loggedInAddr]] as [string[]],
+          },
+        ],
+      ] as [Array<DefaultSchemaT>],
+    };
     const ruleType = new AllRule();
     const result = await ruleType.check(rule, loggedInAddr, chain, models);
     assert.isTrue(result);
   });
 
   it('should fail all rule on admin subRule', async () => {
-    await models['Role'].create({
-      address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'member',
+    const communityRole = await models.CommunityRole.findOne({
+      where: { chain_id: chain, name: 'member' },
     });
-    const rule = { AllRule: [ [
-      {
-        AdminOnlyRule: [] as [],
-      }, {
-        AllowListRule: [ [loggedInAddr] ] as [ string[] ],
-      },
-    ] ] as [ Array<DefaultSchemaT> ] };
+    await models['RoleAssignment'].create({
+      address_id: loggedInAddrId,
+      community_role_id: communityRole.id,
+    });
+    const rule = {
+      AllRule: [
+        [
+          {
+            AdminOnlyRule: [] as [],
+          },
+          {
+            AllowListRule: [[loggedInAddr]] as [string[]],
+          },
+        ],
+      ] as [Array<DefaultSchemaT>],
+    };
     const ruleType = new AllRule();
     const result = await ruleType.check(rule, loggedInAddr, chain, models);
     assert.isFalse(result);
   });
 
   it('should fail all rule on allowList subRule', async () => {
-    await models['Role'].create({
-      address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'member',
+    const communityRole = await models.CommunityRole.findOne({
+      where: { chain_id: chain, name: 'member' },
     });
-    const rule = { AllRule: [ [
-      {
-        AdminOnlyRule: [] as [],
-      }, {
-        AllowListRule: [ ['do not permit'] ] as [ string[] ],
-      },
-    ] ] as [ Array<DefaultSchemaT> ] };
+    await models['RoleAssignment'].create({
+      address_id: loggedInAddrId,
+      community_role_id: communityRole.id,
+    });
+    const rule = {
+      AllRule: [
+        [
+          {
+            AdminOnlyRule: [] as [],
+          },
+          {
+            AllowListRule: [['do not permit']] as [string[]],
+          },
+        ],
+      ] as [Array<DefaultSchemaT>],
+    };
     const ruleType = new AllRule();
     const result = await ruleType.check(rule, loggedInAddr, chain, models);
     assert.isFalse(result);

@@ -1,8 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { createRole, findAllRoles, findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,7 +16,12 @@ export const Errors = {
   AlreadyMember: 'Already a member of this community',
 };
 
-const addMember = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const addMember = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   if (!chain) return next(new AppError(Errors.InvalidCommunity));
@@ -29,13 +35,12 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
       user_id: req.user.id,
     },
   });
-  const requesterIsAdminOrMod = await models.Role.findAll({
-    where: {
-      address_id: adminAddress.id,
-      chain_id: chain.id,
-      permission: ['admin', 'moderator'],
-    },
-  });
+  const requesterIsAdminOrMod = await findAllRoles(
+    models,
+    { where: { address_id: adminAddress.id } },
+    chain.id,
+    ['admin', 'moderator']
+  );
   if (!requesterIsAdminOrMod) return next(new AppError(Errors.MustBeAdmin));
 
   const existingAddress = await models.Address.findOne({
@@ -45,20 +50,16 @@ const addMember = async (models: DB, req: Request, res: Response, next: NextFunc
     },
   });
   if (!existingAddress) return next(new AppError(Errors.AddressNotFound));
-  const existingRole = await models.Role.findOne({
-    where: {
-      address_id: existingAddress.id,
-      chain_id: chain.id,
-    },
-  });
+
+  const existingRole = await findOneRole(
+    models,
+    { where: { address_id: existingAddress.id } },
+    chain.id
+  );
 
   if (existingRole) return next(new AppError(Errors.AlreadyMember));
 
-  const role = await models.Role.create({
-    address_id: existingAddress.id,
-    chain_id: chain.id,
-    permission: 'member',
-  });
+  const role = await createRole(models, existingAddress.id, chain.id, 'member');
 
   return res.json({ status: 'Success', result: role.toJSON() });
 };

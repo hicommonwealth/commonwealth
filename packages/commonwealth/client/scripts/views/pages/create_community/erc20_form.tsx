@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import Web3 from 'web3';
 import { providers } from 'ethers';
@@ -36,7 +37,7 @@ type CreateERC20Form = ChainFormFields & EthFormFields & { decimals: number };
 
 type CreateERC20State = ChainFormState & { form: CreateERC20Form };
 
-export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
+export class ERC20Form extends ClassComponent<EthChainAttrs> {
   private state: CreateERC20State = {
     message: '',
     loaded: false,
@@ -57,11 +58,11 @@ export class ERC20Form implements m.ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 

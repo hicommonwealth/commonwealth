@@ -21,17 +21,12 @@
   }
 }
 
-.SnapshotInformationCard.Card {
+.SnapshotInformationCard {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  height: fit-content;
   padding: 16px;
-  width: 248px;
-
-  @include extraSmall {
-    width: 100%;
-  }
+  width: 100%;
 
   .info-rows-container {
     display: flex;

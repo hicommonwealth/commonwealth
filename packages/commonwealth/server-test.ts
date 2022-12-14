@@ -7,7 +7,6 @@ import passport from 'passport';
 import session from 'express-session';
 import express from 'express';
 import SessionSequelizeStore from 'connect-session-sequelize';
-import BN from 'bn.js';
 import Rollbar from 'rollbar';
 import {
   ChainBase,
@@ -16,18 +15,18 @@ import {
   ChainType,
   BalanceType,
 } from 'common-common/src/types';
-import TokenBalanceCache from 'token-balance-cache/src/index';
-import TokenBalanceProvider from 'token-balance-cache/src/provider';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
 import setupAPI from './server/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
 import models from './server/database';
 import ViewCountCache from './server/util/viewCountCache';
-import IdentityFetchCache from './server/util/identityFetchCache';
 import BanCache from './server/util/banCheckCache';
-import setupErrorHandlers from './server/scripts/setupErrorHandlers';
+import GlobalActivityCache from './server/util/globalActivityCache';
+import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
+import { MockTokenBalanceProvider } from './test/util/modelUtils';
 
 require('express-async-errors');
 
@@ -35,28 +34,16 @@ const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
-const identityFetchCache = new IdentityFetchCache(10 * 60);
-
-// always prune both token and non-token holders asap
-class MockTokenBalanceProvider extends TokenBalanceProvider {
-  public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
-
-  public async getEthTokenBalance(
-    address: string,
-    network: string,
-    tokenAddress?: string,
-    userAddress?: string
-  ): Promise<BN> {
-    if (this.balanceFn) {
-      return this.balanceFn(tokenAddress, userAddress);
-    } else {
-      throw new Error('unable to fetch token balance');
-    }
-  }
-}
-
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
+<<<<<<< HEAD
 const tokenBalanceCache = new TokenBalanceCache(0, 0, mockTokenBalanceProvider);
+=======
+const tokenBalanceCache = new TokenBalanceCache(
+  0,
+  0,
+  [ mockTokenBalanceProvider ],
+);
+>>>>>>> master
 const ruleCache = new RuleCache();
 let server;
 
@@ -104,23 +91,26 @@ const resetServer = (debug = false): Promise<void> => {
       });
 
       const nodes = [
-        ['mainnet1.edgewa.re'],
+        ['mainnet1.edgewa.re', 'Edgeware Mainnet'],
         [
           'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          'Ethereum Mainnet',
           '1',
         ],
         [
           'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+          'Ropsten Testnet',
           '3',
         ],
       ];
 
       const [edgewareNode, mainnetNode, testnetNode] = await Promise.all(
-        nodes.map(([url, eth_chain_id]) =>
+        nodes.map(([url, name, eth_chain_id]) =>
           models.ChainNode.create({
             url,
+            name,
             eth_chain_id: eth_chain_id ? +eth_chain_id : null,
-            balance_type: BalanceType.Ethereum,
+            balance_type: eth_chain_id ? BalanceType.Ethereum : BalanceType.Substrate,
           })
         )
       );
@@ -367,7 +357,10 @@ const setupServer = () => {
 };
 
 const banCache = new BanCache(models);
+const globalActivityCache = new GlobalActivityCache(models);
+globalActivityCache.start();
 setupPassport(models);
+<<<<<<< HEAD
 setupAPI(
   app,
   models,
@@ -377,6 +370,10 @@ setupAPI(
   ruleCache,
   banCache
 );
+=======
+// TODO: mock RabbitMQController
+setupAPI(app, models, viewCountCache, tokenBalanceCache, ruleCache, banCache, globalActivityCache);
+>>>>>>> master
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,
@@ -390,7 +387,6 @@ setupErrorHandlers(app, rollbar);
 setupServer();
 
 export const resetDatabase = () => resetServer();
-export const getIdentityFetchCache = () => identityFetchCache;
 export const getTokenBalanceCache = () => tokenBalanceCache;
 export const getBanCache = () => banCache;
 export const getMockBalanceProvider = () => mockTokenBalanceProvider;

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
@@ -17,7 +18,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
-import { SharePopover } from '../view_proposal/share_popover';
+import { SharePopover } from '../../components/share_popover';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 
@@ -26,8 +27,8 @@ type TopicSummaryRowAttrs = {
   topic: Topic;
 };
 
-export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
-  view(vnode: m.VnodeDOM<TopicSummaryRowAttrs, this>) {
+export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
+  view(vnode: m.Vnode<TopicSummaryRowAttrs>) {
     const { monthlyThreads, topic } = vnode.attrs;
 
     const topFiveSortedThreads = monthlyThreads
@@ -97,6 +98,7 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                         user,
                         showAddressWithDisplayName: true,
                         avatarSize: 24,
+                        linkify: true,
                       })}
                       <CWText className="last-updated-text">•</CWText>
                       <CWText

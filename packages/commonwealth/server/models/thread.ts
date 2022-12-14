@@ -4,9 +4,9 @@ import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes } from './address';
 import { ChainAttributes } from './chain';
 import { AttachmentAttributes } from './attachment';
-import { ChainEntityAttributes } from './chain_entity';
 import { LinkedThreadAttributes } from './linked_thread';
 import { TopicAttributes } from './topic';
+import { ChainEntityMetaAttributes } from "./chain_entity_meta";
 
 export type ThreadAttributes = {
   address_id: number;
@@ -38,7 +38,7 @@ export type ThreadAttributes = {
   Attachments?:
     | AttachmentAttributes[]
     | AttachmentAttributes['id'][];
-  ChainEntity?: ChainEntityAttributes;
+  ChainEntityMeta?: ChainEntityMetaAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
   topic?: TopicAttributes;
@@ -133,12 +133,6 @@ export default (
       as: 'topic',
       foreignKey: 'topic_id',
     });
-    models.Thread.belongsToMany(models.Role, {
-      through: 'read_only_roles_threads',
-      as: 'read_only_roles',
-      foreignKey: 'thread_id',
-      otherKey: 'id',
-    });
     models.Thread.belongsToMany(models.Address, {
       through: models.Collaboration,
       as: 'collaborators',
@@ -148,9 +142,10 @@ export default (
       as: 'reactions',
     });
     models.Thread.hasMany(models.Collaboration);
-    models.Thread.hasMany(models.ChainEntity, {
+    models.Thread.hasMany(models.ChainEntityMeta, {
       foreignKey: 'thread_id',
       constraints: false,
+      as: 'chain_entity_meta'
     });
     models.Thread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
@@ -163,6 +158,9 @@ export default (
     models.Thread.hasMany(models.Poll, {
       foreignKey: 'thread_id',
     });
+    models.Thread.hasOne(models.ChainEntityMeta, {
+      foreignKey: 'id'
+    })
   };
 
   return Thread;

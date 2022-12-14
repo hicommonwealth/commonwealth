@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 
@@ -17,13 +18,12 @@ import { UserDashboardRowTop } from './user_dashboard_row_top';
 import { UserDashboardChainEventRow } from './user_dashboard_chain_event_row';
 import { getClasses } from '../../components/component_kit/helpers';
 
-export class UserDashboardRow
-  implements
-    m.ClassComponent<{
-      notification: DashboardActivityNotification;
-    }>
-{
-  view(vnode) {
+type UserDashboardRowAttrs = {
+  notification: DashboardActivityNotification;
+};
+
+export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
+  view(vnode: m.Vnode<UserDashboardRowAttrs>) {
     const {
       likeCount,
       viewCount,

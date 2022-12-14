@@ -10,13 +10,14 @@ import { sequelize } from '../database';
 import { ProfileAttributes } from '../models/profile';
 import { DynamicTemplate } from '../../shared/types';
 
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { UserAttributes } from '../models/user';
 import { AddressAttributes } from '../models/address';
 
 import { redirectWithLoginError } from './finishEmailLogin';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
+import { createRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -323,14 +324,7 @@ const finishSsoLogin = async (
         { transaction: t }
       );
 
-      await models.Role.create(
-        {
-          address_id: newAddress.id,
-          chain_id: AXIE_INFINITY_CHAIN_ID,
-          permission: 'member',
-        },
-        { transaction: t }
-      );
+      await createRole(models, newAddress.id, AXIE_INFINITY_CHAIN_ID, 'member', false, t)
 
       // Automatically create subscription to their own mentions
       await models.Subscription.create(

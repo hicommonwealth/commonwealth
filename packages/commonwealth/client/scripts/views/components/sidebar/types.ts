@@ -1,13 +1,13 @@
 import m from 'mithril';
 
 export type BaseSidebarAttrs = {
-  isActive: boolean; // Is this the current page
+  isActive?: boolean; // Is this the current page
   isUpdated?: boolean; // Does this page have updates (relevant for chat, less so for other sections)
   isVisible?: boolean; // Is this section shown as an option
-  onclick: any;
+  onclick?: any;
   onhover?: () => void;
   rightIcon?: m.Vnode;
-  title: string;
+  title?: string;
   className?: string;
 };
 
@@ -22,8 +22,8 @@ export type SectionGroupAttrs = {
 } & BaseSidebarAttrs;
 
 export type SidebarSectionAttrs = {
-  hasDefaultToggle: boolean;
-  displayData: SectionGroupAttrs[];
+  hasDefaultToggle?: boolean;
+  displayData?: SectionGroupAttrs[];
   extraComponents?: m.Vnode;
   toggleDisabled?: boolean;
 } & BaseSidebarAttrs;

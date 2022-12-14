@@ -13,9 +13,8 @@ import {
   ChainCategoryTypeModelStatic
 } from './models/chain_category_type';
 import {
-  ChainEntityModelStatic
-} from './models/chain_entity';
-import { ChainEventModelStatic } from './models/chain_event';
+  ChainEntityMetaModelStatic
+} from './models/chain_entity_meta';
 import {
   ChainEventTypeModelStatic
 } from './models/chain_event_type';
@@ -32,6 +31,7 @@ import {
 } from './models/comment';
 import { CommunityBannerModelStatic } from './models/community_banner';
 import { CommunityContractModelStatic } from './models/community_contract';
+import { CommunityRoleModelStatic } from './models/community_role';
 import { ContractModelStatic } from './models/contract';
 import { ContractAbiModelStatic } from './models/contract_abi';
 import {
@@ -64,6 +64,7 @@ import {
   ReactionModelStatic
 } from './models/reaction';
 import { RoleModelStatic } from './models/role';
+import { RoleAssignmentModelStatic } from './models/role_assignment';
 import { RuleModelStatic } from './models/rule';
 import {
   SocialAccountModelStatic
@@ -103,8 +104,7 @@ export type Models = {
   Chain: ChainModelStatic;
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
-  ChainEntity: ChainEntityModelStatic;
-  ChainEvent: ChainEventModelStatic;
+  ChainEntityMeta: ChainEntityMetaModelStatic;
   ChainEventType: ChainEventTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
   ChatChannel: ChatChannelModelStatic;
@@ -112,6 +112,7 @@ export type Models = {
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
+  CommunityRole: CommunityRoleModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
@@ -133,6 +134,7 @@ export type Models = {
   ViewCount: ViewCountModelStatic;
   Vote: VoteModelStatic;
   Profile: ProfileModelStatic;
+  RoleAssignment: RoleAssignmentModelStatic;
   Role: RoleModelStatic;
   Rule: RuleModelStatic;
   SocialAccount: SocialAccountModelStatic;

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/linked_thread_modal.scss';
@@ -16,10 +17,8 @@ type LinkedThreadModalAttrs = {
   onclose: () => null;
 };
 
-export class LinkedThreadModal
-  implements m.ClassComponent<LinkedThreadModalAttrs>
-{
-  view(vnode) {
+export class LinkedThreadModal extends ClassComponent<LinkedThreadModalAttrs> {
+  view(vnode: m.Vnode<LinkedThreadModalAttrs>) {
     const { linkingThread, linkedThreads, onclose } = vnode.attrs;
 
     return (

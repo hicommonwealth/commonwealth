@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/community_card.scss';
 
@@ -14,8 +15,8 @@ import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 
 type CommunityCardAttrs = { chain: ChainInfo };
 
-export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
-  view(vnode) {
+export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
+  view(vnode: m.Vnode<CommunityCardAttrs>) {
     const { chain } = vnode.attrs as CommunityCardAttrs;
 
     const redirectFunction = (e) => {
@@ -78,7 +79,7 @@ export class CommunityCard implements m.ClassComponent<CommunityCardAttrs> {
   }
 }
 
-export class NewCommunityCard implements m.ClassComponent {
+export class NewCommunityCard extends ClassComponent {
   view() {
     return (
       <CWCard

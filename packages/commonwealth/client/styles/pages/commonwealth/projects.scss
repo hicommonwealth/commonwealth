@@ -52,12 +52,12 @@
     .project-progress-bar {
       width: 100%;
       height: $progress-bar-height;
-      border-radius: 9999px;
+      border-radius: $border-radius-round;
       background-color: $primary-300;
     }
     .project-progress-bar-fill {
       height: $progress-bar-height;
-      border-radius: 9999px;
+      border-radius: $border-radius-round;
       background-color: $green-500;
     }
     .project-progress-text {

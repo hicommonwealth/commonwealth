@@ -9,7 +9,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -138,7 +138,6 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
         title: proposal.title || '',
         chain: finalComment.chain,
       },
-      req.wss,
       [ finalComment.Address.address ],
     );
 
@@ -169,7 +168,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
               chain: mention[0],
               address: mention[1],
             },
-            include: [ models.User, models.Role ]
+            include: [ models.User, models.RoleAssignment ]
           });
           return user;
         } catch (err) {
@@ -207,7 +206,6 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
             chain: finalComment.chain,
             body: finalComment.text,
           },
-          req.wss,
           [ finalComment.Address.address ],
         );
       });

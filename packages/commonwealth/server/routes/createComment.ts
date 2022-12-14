@@ -1,12 +1,13 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import {
+  ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
@@ -18,7 +19,6 @@ import {
   getProposalUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
-import proposalIdToEntity from '../util/proposalIdToEntity';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
@@ -28,7 +28,8 @@ import { SENDGRID_API_KEY } from '../config';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { findAllRoles } from '../util/roles';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -39,7 +40,6 @@ export const Errors = {
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
-  // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to comment",
@@ -62,7 +62,7 @@ const createComment = async (
   const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
   if (authorError) return next(new AppError(authorError));
 
-  const { parent_id, root_id, text } = req.body;
+  const { parent_id, root_id, chain_entity_id, text } = req.body;
 
   if (!root_id || root_id.indexOf('_') === -1) {
     return next(new AppError(Errors.MissingRootId));
@@ -125,22 +125,26 @@ const createComment = async (
       attributes: ['rule_id'],
     });
     if (topic?.rule_id) {
-      const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+      const passesRules = await checkRule(
+        ruleCache,
+        models,
+        topic.rule_id,
+        author.address
+      );
       if (!passesRules) {
         return next(new AppError(Errors.RuleCheckFailed));
       }
     }
   }
 
-  if (chain && chain.type === ChainType.Token) {
+  if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
     // skip check for admins
-    const isAdmin = await models.Role.findAll({
-      where: {
-        address_id: author.id,
-        chain_id: chain.id,
-        permission: ['admin'],
-      },
-    });
+    const isAdmin = await findAllRoles(
+      models,
+      { where: { address_id: author.id } },
+      chain.id,
+      ['admin']
+    );
     if (thread?.topic_id && !req.user.isAdmin && isAdmin.length === 0) {
       try {
         const canReact = await validateTopicThreshold(
@@ -251,40 +255,12 @@ const createComment = async (
     proposal = await models.Thread.findOne({
       where: { id },
     });
+    // TODO: put this part on the front-end and pass in just the chain-entity id so we can check if it exists for the email part --- similar for reaction
   } else if (
     prefix.includes('proposal') ||
     prefix.includes('referendum') ||
     prefix.includes('motion')
   ) {
-    // TODO: better check for on-chain proposal types
-    const chainEntity = await proposalIdToEntity(
-      models,
-      chain.id,
-      finalComment.root_id
-    );
-    if (!chainEntity) {
-      // send a notification email if commenting on an invalid ChainEntity
-      const msg = {
-        to: 'founders@commonwealth.im',
-        from: 'Commonwealth <no-reply@commonwealth.im>',
-        subject: 'Missing ChainEntity',
-        text: `Comment created on a missing ChainEntity ${finalComment.root_id} on ${chain.id}`,
-      };
-      sgMail
-        .send(msg)
-        .then((result) => {
-          log.error(
-            `Sent notification: missing ChainEntity ${finalComment.root_id} on ${chain.id}`
-          );
-        })
-        .catch((e) => {
-          log.error(
-            `Could not send notification: missing chainEntity ${finalComment.root_id} on ${chain.id}`
-          );
-        });
-      // await finalComment.destroy();
-      // return next(new AppError(Errors.ChainEntityNotFound));
-    }
     proposal = id;
   } else {
     log.error(
@@ -345,7 +321,7 @@ const createComment = async (
               chain: mention[0] || null,
               address: mention[1],
             },
-            include: [models.User, models.Role],
+            include: [models.User, models.RoleAssignment],
           });
           return user;
         })
@@ -383,7 +359,6 @@ const createComment = async (
       chain: finalComment.chain,
       body: finalComment.text,
     },
-    req.wss,
     excludedAddrs
   );
 
@@ -414,45 +389,43 @@ const createComment = async (
         chain: finalComment.chain,
         body: finalComment.text,
       },
-      req.wss,
       excludedAddrs
     );
   }
 
   // notify mentioned users if they have permission to view the originating forum
   if (mentionedAddresses?.length > 0) {
-      mentionedAddresses.map((mentionedAddress) => {
-        if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
+    mentionedAddresses.map((mentionedAddress) => {
+      if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-        const shouldNotifyMentionedUser = true;
-        if (shouldNotifyMentionedUser)
-          models.Subscription.emitNotifications(
-            models,
-            NotificationCategories.NewMention,
-            `user-${mentionedAddress.User.id}`,
-            {
-              created_at: new Date(),
-              root_id: +id,
-              root_title,
-              root_type: prefix,
-              comment_id: +finalComment.id,
-              comment_text: finalComment.text,
-              chain_id: finalComment.chain,
-              author_address: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
-            },
-            {
-              user: finalComment.Address.address,
-              author_chain: finalComment.Address.chain,
-              url: cwUrl,
-              title: proposal.title || '',
-              chain: finalComment.chain,
-              body: finalComment.text,
-            }, // TODO: add webhook data for mentions
-            req.wss,
-            [finalComment.Address.address]
-          );
-      });
+      const shouldNotifyMentionedUser = true;
+      if (shouldNotifyMentionedUser)
+        models.Subscription.emitNotifications(
+          models,
+          NotificationCategories.NewMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            created_at: new Date(),
+            root_id: +id,
+            root_title,
+            root_type: prefix,
+            comment_id: +finalComment.id,
+            comment_text: finalComment.text,
+            chain_id: finalComment.chain,
+            author_address: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+          },
+          {
+            user: finalComment.Address.address,
+            author_chain: finalComment.Address.chain,
+            url: cwUrl,
+            title: proposal.title || '',
+            chain: finalComment.chain,
+            body: finalComment.text,
+          }, // TODO: add webhook data for mentions
+          [finalComment.Address.address]
+        );
+    });
   }
 
   // update author.last_active (no await)

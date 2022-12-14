@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'sublayout.scss';
 
@@ -17,22 +18,36 @@ import { SublayoutHeader } from './sublayout_header';
 type SublayoutAttrs = {
   hideFooter?: boolean;
   hideSearch?: boolean;
-  onscroll: () => null; // lazy loading for page content
+  onscroll?: () => void; // lazy loading for page content
 };
 
-class Sublayout implements m.ClassComponent<SublayoutAttrs> {
-  private isSidebarToggled: boolean;
+class Sublayout extends ClassComponent<SublayoutAttrs> {
+  private isWindowSmallInclusive: boolean;
+
+  onResize() {
+    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+    m.redraw();
+  }
 
   oninit() {
     if (localStorage.getItem('dark-mode-state') === 'on') {
       document.getElementsByTagName('html')[0].classList.add('invert');
     }
 
-    this.isSidebarToggled =
-      localStorage.getItem(`${app.activeChainId()}-sidebar-toggle`) === 'true';
+    this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
+
+    window.addEventListener('resize', () => {
+      this.onResize();
+    });
   }
 
-  view(vnode) {
+  onremove() {
+    window.removeEventListener('resize', () => {
+      this.onResize();
+    });
+  }
+
+  view(vnode: m.Vnode<SublayoutAttrs>) {
     const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
@@ -40,30 +55,21 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
     const banner = app.chain ? chain.communityBanner : null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
+    const showSidebar = app.sidebarToggled || !this.isWindowSmallInclusive;
 
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
-
-    const isSidebarToggleable =
-      app.chain && isWindowSmallInclusive(window.innerWidth);
 
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
           <SublayoutHeader
             hideSearch={hideSearch}
-            isSidebarToggleable={isSidebarToggleable}
-            isSidebarToggled={this.isSidebarToggled}
-            toggleSidebar={() => {
-              this.isSidebarToggled = !this.isSidebarToggled;
-            }}
+            onMobile={this.isWindowSmallInclusive}
           />
           <div class="sidebar-and-body-container">
-            <Sidebar
-              isSidebarToggleable={isSidebarToggleable}
-              isSidebarToggled={this.isSidebarToggled}
-            />
+            {showSidebar && <Sidebar />}
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}
@@ -73,7 +79,7 @@ class Sublayout implements m.ClassComponent<SublayoutAttrs> {
                 bannerStatus={bannerStatus}
               />
 
-              {isWindowSmallInclusive(window.innerWidth) && app.mobileMenu ? (
+              {this.isWindowSmallInclusive && app.mobileMenu ? (
                 <AppMobileMenus />
               ) : (
                 <div class="Body" onscroll={onscroll}>

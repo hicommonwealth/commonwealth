@@ -1,5 +1,5 @@
-import { ChainNetwork } from 'common-common/src/types';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import BN from 'bn.js';
+import { TokenBalanceCache, FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
@@ -28,32 +28,39 @@ const validateTopicThreshold = async (
         },
       ]
     });
-    if (!topic?.chain?.ChainNode?.balance_type) {
-      // if we have no balance type for node, always approve
+    if (!topic?.chain?.ChainNode?.id) {
+      // if we have no node, always approve
       return true;
     }
 
+    // skip query if no threshold
+    const threshold = new BN(topic.token_threshold || '0');
+    if (threshold.isZero()) {
+      return true;
+    }
+
+    // TODO: @JAKE in the future, we will have more than one contract,
+    // need to handle this through the TBC Rule, passing in associated Contract.id
     const communityContracts = await models.CommunityContract.findOne({
       where: { chain_id: topic.chain.id },
       include: [{ model: models.Contract, required: true }],
     });
-    // TODO: @JAKE in the future, we will have more than one contract,
-      // need to handle this through the TBC Rule, passing in associated Contract.id
-    const threshold = topic.token_threshold;
-    if (threshold && threshold > 0) {
-      const tokenBalance = await tbc.getBalance(
-        topic.chain.chain_node_id,
+
+    try {
+      const balance = await tbc.fetchUserBalance(
+        topic.chain.network,
+        topic.chain.ChainNode.id,
         userAddress,
-        communityContracts?.Contract?.address,
-        topic.chain.network === ChainNetwork.ERC20
-          ? 'erc20' : topic.chain.network === ChainNetwork.ERC721
-            ? 'erc721' : topic.chain.network === ChainNetwork.SPL
-              ? 'spl-token' : undefined,
+        communityContracts?.Contract?.address
       );
-      log.info(`Balance: ${tokenBalance.toString()}, threshold: ${threshold.toString()}`);
-      return tokenBalance.gten(threshold);
-    } else {
-      return true;
+
+      return (new BN(balance)).gte(threshold);
+    } catch (e) {
+      if (e.message === FetchTokenBalanceErrors.NoBalanceProvider) {
+        return true;
+      } else {
+        throw e;
+      }
     }
   } catch (err) {
     log.warn(`Could not validate topic threshold for ${topicId}: ${err.message}`);

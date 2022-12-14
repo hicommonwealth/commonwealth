@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { NextFunction } from 'express';
-import TokenBalanceCache from 'token-balance-cache/src/index';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';
@@ -14,7 +14,7 @@ import {
 } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',

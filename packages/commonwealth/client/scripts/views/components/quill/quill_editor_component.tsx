@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
@@ -41,9 +42,7 @@ type QuillEditorComponentAttrs = {
 // - Audit and fix image, video, & Twitter blots as necessary
 // - Convert generic HTML tags to CWText components in QuillFormattedText
 
-export class QuillEditorComponent
-  implements m.ClassComponent<QuillEditorComponentAttrs>
-{
+export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAttrs> {
   unsavedChanges;
   $editor: JQuery<HTMLElement>;
   editor: QuillEditor;
@@ -119,7 +118,7 @@ export class QuillEditorComponent
 
   // LIFECYCLE HELPERS
 
-  oncreate(vnode) {
+  oncreate(vnode: m.Vnode<QuillEditorComponentAttrs>) {
     // Only bind the alert if we are actually trying to persist the user's changes
     if (!vnode.attrs.contentsDoc) {
       this._beforeunloadHandler = () => {
@@ -131,13 +130,13 @@ export class QuillEditorComponent
     }
   }
 
-  onremove(vnode) {
+  onremove(vnode: m.Vnode<QuillEditorComponentAttrs>) {
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', this._beforeunloadHandler);
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<QuillEditorComponentAttrs>) {
     const {
       className,
       contentsDoc,
@@ -201,7 +200,7 @@ export class QuillEditorComponent
             fontWeight="semiBold"
             className="mode-switcher"
             title="Switch to Markdown mode"
-            onclick={async (e) => {
+            onclick={async () => {
               // Confirm before removing formatting and switching to Markdown mode.
               const confirmed = await this._confirmRemoveFormatting();
               if (!confirmed) return;

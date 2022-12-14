@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/proposals/proposal_extensions.scss';
 
@@ -19,16 +20,15 @@ import { BalanceInfo } from 'views/components/proposals/balance_info';
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWText } from '../component_kit/cw_text';
 
-export class ProposalExtensions
-  implements
-    m.ClassComponent<{
-      proposal: AnyProposal;
-      setDemocracyVoteConviction?;
-      setDemocracyVoteAmount?;
-      setCosmosDepositAmount?;
-    }>
-{
-  view(vnode) {
+type ProposalExtensionsAttrs = {
+  proposal: AnyProposal;
+  setDemocracyVoteConviction?;
+  setDemocracyVoteAmount?;
+  setCosmosDepositAmount?;
+};
+
+export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> {
+  view(vnode: m.Vnode<ProposalExtensionsAttrs>) {
     const {
       proposal,
       setCosmosDepositAmount,

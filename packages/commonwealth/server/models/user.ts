@@ -4,7 +4,10 @@ import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes, ChainInstance } from './chain';
 import { ProfileInstance, ProfileAttributes } from './profile';
-import { SocialAccountInstance, SocialAccountAttributes } from './social_account';
+import {
+  SocialAccountInstance,
+  SocialAccountAttributes,
+} from './social_account';
 import { DB } from '../models';
 import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
 
@@ -18,7 +21,7 @@ export type UserAttributes = {
   lastVisited?: string;
   disableRichText?: boolean;
   emailNotificationInterval?: EmailNotificationInterval;
-  selected_chain_id?: number;
+  selected_chain_id?: number | null;
   created_at?: Date;
   updated_at?: Date;
   browser_notifications_enabled?: boolean;

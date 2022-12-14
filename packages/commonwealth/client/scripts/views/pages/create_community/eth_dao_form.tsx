@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import Web3 from 'web3';
 
@@ -41,7 +42,6 @@ import {
   EthFormFields,
 } from 'views/pages/create_community/types';
 
-
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
   tokenName: string;
@@ -51,7 +51,7 @@ type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
 
 type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
 
-export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
+export class EthDaoForm extends ClassComponent<EthChainAttrs> {
   private state: CreateEthDaoState = {
     message: '',
     loaded: false,
@@ -72,11 +72,11 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 

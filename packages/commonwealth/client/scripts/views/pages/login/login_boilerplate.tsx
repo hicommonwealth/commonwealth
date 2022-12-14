@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/login/login_boilerplate.scss';
 
@@ -8,10 +9,12 @@ import { modalRedirectClick } from 'helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 
-export class LoginBoilerplate
-  implements m.ClassComponent<{ darkMode?: boolean }>
-{
-  view(vnode) {
+type LoginBoilerplateAttrs = {
+  darkMode?: boolean;
+};
+
+export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
+  view(vnode: m.Vnode<LoginBoilerplateAttrs>) {
     const { darkMode } = vnode.attrs;
 
     return (
