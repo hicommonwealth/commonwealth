@@ -66,47 +66,49 @@ describe('DatabaseValidationService Tests', () => {
       };
       request.body = resBody;
       request.user = { id: userId };
-      expect(DatabaseValidationService.validateAuthor(models, request, null, () => {
+      expect(
+        DatabaseValidationService.validateAuthor(models, request, null, () => {
+          return null;
+        })
+      ).to.not.throw;
+    });
+
+    it('should fail if no user is given', async () => {
+      const request = new MockExpressRequest();
+
+      const resBody = {
+        address: userAddress,
+        author_chain: chain,
+        chain,
+        title,
+        topic,
+        body,
+        jwt: userJWT,
+      };
+      request.body = resBody;
+      request.user = null;
+      DatabaseValidationService.validateAuthor(models, request, null, () => {
         return null;
-      })).to.not.throw;
+      });
+      expect(request.address).to.be.undefined;
     });
-  });
 
-  it('should fail if no user is given', async () => {
-    const request = new MockExpressRequest();
+    it('should fail if no address or author chain is given', async () => {
+      const request = new MockExpressRequest();
 
-    const resBody = {
-      address: userAddress,
-      author_chain: chain,
-      chain,
-      title,
-      topic,
-      body,
-      jwt: userJWT,
-    };
-    request.body = resBody;
-    request.user = null;
-    DatabaseValidationService.validateAuthor(models, request, null, () => {
-      return null;
+      const resBody = {
+        chain,
+        title,
+        topic,
+        body,
+        jwt: userJWT,
+      };
+      request.body = resBody;
+      request.user = { id: userId };
+      DatabaseValidationService.validateAuthor(models, request, null, () => {
+        return null;
+      });
+      expect(request.address).to.be.undefined;
     });
-    expect(request.address).to.be.undefined;
-  });
-
-  it('should fail if no address or author chain is given', async () => {
-    const request = new MockExpressRequest();
-
-    const resBody = {
-      chain,
-      title,
-      topic,
-      body,
-      jwt: userJWT,
-    };
-    request.body = resBody;
-    request.user = { id: userId };
-    DatabaseValidationService.validateAuthor(models, request, null, () => {
-      return null;
-    });
-    expect(request.address).to.be.undefined;
   });
 });
