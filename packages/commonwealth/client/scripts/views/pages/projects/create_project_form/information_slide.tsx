@@ -5,6 +5,7 @@ import m from 'mithril';
 
 import { Account, ChainInfo } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
+import ClassComponent from 'class_component';
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
 import { CWDropdown } from '../../../components/component_kit/cw_dropdown';
 import { CWText } from '../../../components/component_kit/cw_text';
@@ -19,7 +20,7 @@ import { ICreateProjectForm } from '../types';
 import { DefaultMenuItem } from '../../../components/component_kit/types';
 
 export class InformationSlide
-  implements m.ClassComponent<{ form: ICreateProjectForm }>
+  extends ClassComponent<{ form: ICreateProjectForm }>
 {
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
     if (!app) return;

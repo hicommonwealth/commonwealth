@@ -5,11 +5,12 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTokenInput } from 'views/components/component_kit/cw_token_input';
 import { CWDropdown } from 'views/components/component_kit/cw_dropdown';
+import ClassComponent from 'class_component';
 import { validateProjectForm } from '../helpers';
 import { ICreateProjectForm, WethUrl, weekInSeconds } from '../types';
 
 export class FundraisingSlide
-  implements m.ClassComponent<{ form: ICreateProjectForm }>
+  extends ClassComponent<{ form: ICreateProjectForm }>
 {
   private tokenName = 'WETH';
 

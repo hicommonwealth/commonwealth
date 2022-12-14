@@ -26,9 +26,9 @@ type SupportCardAttrs = {
   supportType: ProjectRole;
 };
 
-const validateSupportAmount = (value: string) => {
+const validateSupportAmount = (value: string): [ValidationStatus, string] => {
   if (Number.isNaN(+value)) return ['failure', 'Invalid number'];
-  return [ValidationStatus, 'Valid amount'];
+  return ['success', 'Valid amount'];
 };
 
 export default class SupportCard extends ClassComponent<SupportCardAttrs> {
