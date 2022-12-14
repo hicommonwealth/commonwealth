@@ -28,6 +28,7 @@ const renderCommunity = (item: ChainInfo) => {
     onclick: (e) => {
       e.preventDefault();
       e.stopPropagation();
+      app.sidebarToggled = false;
       app.sidebarMenu = 'default';
       m.route.set(item.id ? `/${item.id}` : '/');
     },
@@ -142,6 +143,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               label: 'Explore communities',
               iconLeft: 'compass',
               onclick: () => {
+                app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
                 m.route.set('/communities');
               },
@@ -151,6 +153,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               label: 'Notification settings',
               iconLeft: 'person',
               onclick: () => {
+                app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
                 m.route.set('/notification-settings');
               },
@@ -163,6 +166,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
                 if (app.activeChainId()) {
                   navigateToSubpage('/settings');
                 } else {
+                  app.sidebarToggled = false;
                   app.sidebarMenu = 'default';
                   m.route.set('/settings');
                 }

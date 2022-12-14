@@ -238,7 +238,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/adapter'
+        './controllers/chain/ethereum/tokenAdapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
@@ -723,6 +723,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/view_proposal/index',
               { scoped: true }
             ),
+            '/:scope/proposal/discussion/:identifier': redirectRoute(
+              (attrs) => `/discussion/${attrs.identifier}`
+            ),
             '/proposal/:identifier': importRoute(
               'views/pages/view_proposal/index',
               { scoped: true }
@@ -783,6 +786,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
 
             // Redirects
+
             '/:scope/dashboard': redirectRoute(() => '/'),
             '/:scope/notifications': redirectRoute(() => '/notifications'),
             '/:scope/notification-settings': redirectRoute(
@@ -890,6 +894,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             // Scoped routes
             //
+            '/:scope/proposal/discussion/:identifier': redirectRoute(
+              (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
+            ),
 
             // Notifications
             '/:scope/notifications': importRoute(

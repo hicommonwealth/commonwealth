@@ -321,7 +321,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
           {isModal && m.route.get() !== `${chainId}/new/discussion` && (
             <CWButton
               label="Full editor"
-              iconName="expand"
+              iconLeft="expand"
               buttonType="tertiary-blue"
               onclick={(e) => {
                 this.overwriteConfirmationModal = true;

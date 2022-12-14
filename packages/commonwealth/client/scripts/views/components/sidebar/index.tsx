@@ -19,20 +19,13 @@ import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
 
-type SidebarAttrs = {
-  onMobile: boolean;
-};
-
 export type SidebarMenuName =
   | 'default'
-  | 'create-content'
-  | 'explore-communities';
+  | 'createContent'
+  | 'exploreCommunities';
 
-export class Sidebar extends ClassComponent<SidebarAttrs> {
-  view(vnode: m.Vnode<SidebarAttrs>) {
-    const { onMobile } = vnode.attrs;
-    if (!app.sidebarMenu) app.sidebarMenu = 'default';
-
+export class Sidebar extends ClassComponent {
+  view() {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
     });
@@ -48,20 +41,12 @@ export class Sidebar extends ClassComponent<SidebarAttrs> {
         Action.VIEW_CHAT_CHANNELS
       );
 
-    const showSidebar = app.sidebarToggled || !onMobile;
-    const showDefaultSidebar = showSidebar;
-    const showCommunityMenu = showDefaultSidebar && app.chain;
-    const showCreateSidebar =
-      showSidebar && app.sidebarMenu === 'create-content';
-    const showExploreSidebar =
-      showSidebar && app.sidebarMenu === 'explore-communities';
-
     return (
       <div class="Sidebar">
-        {showDefaultSidebar && (
+        {app.sidebarMenu === 'default' && (
           <div class="sidebar-default-menu">
             <SidebarQuickSwitcher />
-            {showCommunityMenu && (
+            {app.chain && (
               <div class="community-menu">
                 <AdminSection />
                 <DiscussionSection />
@@ -87,8 +72,10 @@ export class Sidebar extends ClassComponent<SidebarAttrs> {
             )}
           </div>
         )}
-        {showCreateSidebar && <CreateContentSidebar />}
-        {showExploreSidebar && <ExploreCommunitiesSidebar />}
+        {app.sidebarMenu === 'createContent' && <CreateContentSidebar />}
+        {app.sidebarMenu === 'exploreCommunities' && (
+          <ExploreCommunitiesSidebar />
+        )}
       </div>
     );
   }
