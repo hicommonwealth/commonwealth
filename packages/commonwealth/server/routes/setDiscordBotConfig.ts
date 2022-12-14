@@ -97,6 +97,9 @@ const setDiscordBotConfig = async (
           chain_id,
         },
       });
+      console.log(
+        'Attempted to add a guild that was already connected to another CW community.'
+      );
     } catch (e) {
       console.log(e);
     }
