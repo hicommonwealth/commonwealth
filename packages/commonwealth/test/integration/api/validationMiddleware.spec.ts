@@ -66,10 +66,9 @@ describe('DatabaseValidationService Tests', () => {
       };
       request.body = resBody;
       request.user = { id: userId };
-      DatabaseValidationService.validateAuthor(models, request, null, () => {
+      expect(DatabaseValidationService.validateAuthor(models, request, null, () => {
         return null;
-      });
-      expect(request.address).to.not.be.null;
+      })).to.not.throw;
     });
   });
 
