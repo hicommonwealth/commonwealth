@@ -109,7 +109,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
 
         <div class="profile-name-and-bio">
           <CWText type="h3" className="name">
-            {profile?.name ? profile.name : DefaultProfileName}
+            {profile?.name ? profile?.name : DefaultProfileName}
           </CWText>
           <div class="buttons">
             <CWButton label="Delegate" buttonType="mini" onClick={() => {}} />

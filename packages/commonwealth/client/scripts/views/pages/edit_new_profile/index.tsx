@@ -133,7 +133,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private saved: boolean;
   private quillEditorState: QuillEditor;
 
-  private getProfile = async (vnode, address: string) => {
+  private getProfile = async (address: string) => {
     const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,
@@ -247,7 +247,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   oninit(vnode) {
     this.address = m.route.param('address');
     this.error = EditProfileError.None;
-    this.getProfile(vnode, this.address);
+    this.getProfile(this.address);
 
     // If not logged in or address not owned by logged in user
     if (
