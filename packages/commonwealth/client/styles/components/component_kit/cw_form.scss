@@ -1,0 +1,13 @@
+@import 'shared';
+
+.Form {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 36px;
+    
+    .h3 {
+      margin-bottom: 16px;
+    }
+  }
+}

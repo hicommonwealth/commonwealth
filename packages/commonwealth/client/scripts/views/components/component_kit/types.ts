@@ -19,6 +19,8 @@ export enum ComponentType {
   Divider = 'Divider',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
+  Form = 'Form',
+  FormSection = 'FormSection',
   GradientButton = 'GradientButton',
   Growl = 'Growl',
   Icon = 'Icon',
