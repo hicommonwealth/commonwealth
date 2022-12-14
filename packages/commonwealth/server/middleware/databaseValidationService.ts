@@ -1,7 +1,8 @@
 import { AppError } from 'common-common/src/errors';
-import { NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
+import validateChain from './validateChain';
 
 export const Errors = {
   InvalidUser: 'Invalid user',
@@ -10,8 +11,8 @@ export const Errors = {
 export default class DatabaseValidationService {
   static async validateAuthor(
     models: DB,
-    req: Express.Request,
-    res: Express.Response,
+    req: Request,
+    res: Response,
     next: NextFunction
   ) {
     const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
@@ -19,6 +20,20 @@ export default class DatabaseValidationService {
     if (authorError) return next(new AppError(authorError));
     // If the author is valid, add it to the request object
     req.address = author;
+    next();
+  }
+
+  static async validateChain(
+    models: DB,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
+    const [chain, error] = await validateChain(models, req.query);
+    if (error) return next(new AppError(error));
+
+    // If the chain is valid, add it to the request object
+    req.chain = chain;
     next();
   }
 }
