@@ -12,7 +12,6 @@ import {
   IUniqueId,
   ChainInfo,
   AddressInfo,
-  SocialAccount,
   NewProfile as Profile,
   Comment,
 } from 'models';
@@ -48,7 +47,6 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
   private loading: boolean;
   private profile: Profile;
   private threads: Array<Thread>;
-  private socialAccounts: Array<SocialAccount>;
 
   private _getProfileData = async (address: string) => {
     try {
@@ -71,9 +69,6 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
             a.wallet_id,
             a.ghost_address
           )
-      );
-      this.socialAccounts = response.socialAccounts.map(
-        (a) => new SocialAccount(a.provider, a.provider_username)
       );
     } catch (err) {
       if (
@@ -141,7 +136,6 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
             <NewProfileHeader
               profile={this.profile}
               address={this.address}
-              socialAccounts={this.socialAccounts}
             />
             <NewProfileActivity
               threads={this.threads}

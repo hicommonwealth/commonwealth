@@ -7,20 +7,25 @@ import jdenticon from 'jdenticon';
 import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
-import { NewProfile as Profile, SocialAccount } from 'client/scripts/models';
+import { NewProfile as Profile } from 'client/scripts/models';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
+import { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
 
 type NewProfileHeaderAttrs = {
   address: string;
   profile: Profile;
-  socialAccounts: Array<SocialAccount>;
 };
 
 type NewProfileBioAttrs = {
   bio: string;
   isBioExpanded: boolean;
+};
+
+type NewProfileSocialAccountAttrs = {
+  iconName: IconName;
+  link: string;
 };
 
 const DefaultProfileName = 'Anonymous';
@@ -31,32 +36,35 @@ Cursus et nulla erat pellentesque vitae, amet leo est aliquet. Ornare gravida vi
 const maxBioCharCount = 190;
 // TODO: Adjust value for responsiveness
 
-class SocialAccounts extends ClassComponent<NewProfileHeaderAttrs> {
-  view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
-    const { socialAccounts } = vnode.attrs;
+class SocialAccount extends ClassComponent<NewProfileSocialAccountAttrs> {
+  view(vnode: m.Vnode<NewProfileSocialAccountAttrs>) {
+    const { iconName, link } = vnode.attrs;
+    return (
+      <a href={link} target="_blank">
+        <CWIcon iconName={iconName} className="social-icon" />
+      </a>
+    );
+  }
+}
 
-    return socialAccounts?.map((account) => (
-      <div class="social-account-icon">
-        {account.provider === 'github' ? (
-          <a href={`https://github.com/${account.username}`} target="_blank">
-            <CWIcon iconName="github" iconSize="large" />
-          </a>
-        ) : account.provider === 'discord' ? (
-          <a
-            href={`https://discordapp.com/users/${account.username}`}
-            target="_blank"
-          >
-            <CWIcon iconName="discord" iconSize="large" />
-          </a>
-        ) : account.provider === 'telegram' ? (
-          <a href={`https://t.me/${account.username}`} target="_blank">
-            <CWIcon iconName="telegram" iconSize="large" />
-          </a>
-        ) : (
-          <div />
-        )}
+class SocialAccounts extends ClassComponent<{profile: Profile}> {
+  view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
+    const { profile } = vnode.attrs;
+
+    if (!profile) return;
+
+    const { github, discord, telegram, twitter, email, website } = profile;
+
+    return (
+      <div className="social-accounts">
+        {website && <SocialAccount link={website} iconName="website" />}
+        {twitter && <SocialAccount link={twitter} iconName="twitter" />}
+        {discord && <SocialAccount link={discord} iconName="discord" />}
+        {telegram && <SocialAccount link={telegram} iconName="telegram" />}
+        {github && <SocialAccount link={github} iconName="github" />}
+        {email && <SocialAccount link={email} iconName="mail" />}
       </div>
-    ));
+    );
   }
 }
 
@@ -107,10 +115,13 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
             <CWButton label="Delegate" buttonType="mini" onClick={() => {}} />
             <CWButton label="Follow" buttonType="mini" onClick={() => {}} />
           </div>
-          {m(SocialAccounts, vnode.attrs)}
+          <SocialAccounts profile={profile} />
           <CWText type="h4">Bio</CWText>
           <CWText className="bio">
-            {m(Bio, { bio, isBioExpanded: this.isBioExpanded })}
+            <Bio
+              bio={bio}
+              isBioExpanded={this.isBioExpanded}
+            />
           </CWText>
           {bio.length > maxBioCharCount && (
             <div

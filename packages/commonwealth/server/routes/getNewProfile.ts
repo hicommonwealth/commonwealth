@@ -66,20 +66,12 @@ const getNewProfile = async (
     include: [{ model: models.Address, as: 'Address' }],
   });
 
-  const socialAccounts = await models.SocialAccount.findAll({
-    where: {
-      user_id: profile.user_id,
-    },
-    attributes: { exclude: ['user_id'] },
-  });
-
   return res.status(200).json({
     profile,
     addresses: addresses.map((a) => a.toJSON()),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
     chains: chains.map((c) => c.toJSON()),
-    socialAccounts: socialAccounts.map((s) => s.toJSON()),
   });
 };
 
