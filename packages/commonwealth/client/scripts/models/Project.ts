@@ -30,7 +30,7 @@ export type IProjectCreationData = {
   beneficiary: string;
   threshold: string;
   deadline: number;
-  curatorFee: string;
+  curatorFee: number;
 };
 
 class Project {
