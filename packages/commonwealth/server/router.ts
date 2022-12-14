@@ -3,6 +3,7 @@ import passport from 'passport';
 import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { StatsDController } from 'common-common/src/statsd';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -141,7 +142,6 @@ import { DB } from './models';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
-import getProjects from './routes/getProjects';
 import setProjectChain from './routes/setProjectChain';
 import RuleCache from './util/rules/ruleCache';
 import banAddress from './routes/banAddress';
@@ -156,7 +156,6 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import { StatsDController } from 'common-common/src/statsd';
 import {getChainEventServiceData} from "./routes/getChainEventServiceData";
 import {getChain} from "./routes/getChain";
 import {getChainNode} from "./routes/getChainNode";
@@ -490,7 +489,6 @@ function setupRouter(
   router.get('/bulkAddresses', bulkAddresses.bind(this, models));
 
   // projects related routes
-  router.get('/getProjects', getProjects.bind(this, models));
   router.get(
     '/setProjectChain',
     passport.authenticate('jwt', { session: false }),

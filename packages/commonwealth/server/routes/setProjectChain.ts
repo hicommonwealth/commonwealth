@@ -36,6 +36,7 @@ const setProjectChain = async (
     },
   });
   if (!project) {
+    // TODO: we need to ensure we have the CE meta beforehand -- some sort of cache if we don't?
     throw new AppError(Errors.InvalidProjectId);
   }
 

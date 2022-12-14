@@ -119,6 +119,7 @@ export async function initAppState(
           app.setCustomDomain(customDomain);
         }
 
+        // THIS IS WHERE PROJECTS CONTROLLER IS INITIALIZED
         app.projects.init(app);
         resolve();
       })

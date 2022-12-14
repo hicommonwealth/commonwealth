@@ -4,27 +4,18 @@ import {
   ICuratedProjectFactory__factory,
   ICuratedProject__factory,
 } from 'common-common/src/eth/types';
-import { ChainInfo, Project } from 'models';
+import { CommonwealthTypes } from 'chain-events/src';
+import { ChainEntity, ChainInfo, Project } from 'models';
+import { IProjectCreationData } from 'models/Project';
 import { IApp } from 'state';
 import { ChainNetwork } from 'common-common/src/types';
-import { BigNumberish, ContractReceipt } from 'ethers';
+import { getBaseUrl, getFetch } from 'helpers/getUrl';
+import { ContractReceipt } from 'ethers';
 import { formatBytes32String } from 'ethers/lib/utils';
 import { attachSigner } from './contractApi';
 
 // TODO: this file needs to be reworked + Projects model as well
-export type IProjectCreationData = {
-  title: string; // TODO length limits for contract side
-  shortDescription: string;
-  description: string;
-  coverImage: string;
-  chainId: string;
-  token: string;
-  creator: string;
-  beneficiary: string;
-  threshold: BigNumberish;
-  deadline: BigNumberish;
-  curatorFee: BigNumberish;
-};
+
 export default class ProjectsController {
   private _initialized = false;
   public initialized() {
@@ -44,30 +35,61 @@ export default class ProjectsController {
   private _factoryInfo: ChainInfo;
   private _app: IApp;
 
-  private async _fetchProjectsFromServer(params: {
-    projectId?: number;
-    chainId?: string;
-  }) {
-    const { projectId, chainId } = params;
-    const res = await $.get(`${this._app.serverUrl()}/getProjects`, {
-      project_id: projectId,
-      chain_id: chainId,
-    });
+  // initializes a new Project object from an entity by querying its IPFS metadata
+  private async _initProject(entity: ChainEntity, projectChain?: string): Promise<Project> {
+    // retrieve IPFS hash from events and query ipfs data
+    const createEvent = entity.chainEvents.find((e) => e.data.kind === CommonwealthTypes.EventKind.ProjectCreated);
+    const ipfsHash = (createEvent.data as CommonwealthTypes.IProjectCreated).ipfsHash;
+    const ipfsData = await $.get(`${getBaseUrl()}/ipfsProxy/${ipfsHash}`);
 
-    for (const project of res.result) {
-      try {
-        const pObj = Project.fromJSON(project);
-        if (!this._store.getById(pObj.id)) {
-          this._store.add(pObj);
-        } else {
-          this._store.update(pObj);
-        }
-      } catch (e) {
-        console.error(
-          `Could not load project: ${JSON.stringify(project)}: ${e.message}`
-        );
+    return new Project(entity, ipfsData, projectChain);
+  }
+
+  // Refreshes a single project's entity data
+  private async _refreshProject(projectId: number, projectChain?: string) {
+    const options: Record<string, unknown> = { chain: ChainNetwork.CommonProtocol };
+    if (projectId) {
+      options.type_id = projectId;
+    }
+    const entityJSON = await getFetch(
+      `${getBaseUrl()}/entities`,
+      {
+        chain: ChainNetwork.CommonProtocol,
+        type_id: projectId
+      }
+    );
+    if (entityJSON?.length > 0) {
+      const entity = ChainEntity.fromJSON(entityJSON[0]);
+      const project = this._store.getById(projectId);
+      if (!project) {
+        // newly created entity -- init based on IPFS data
+        const newProject = await this._initProject(entity, projectChain);
+        this._store.add(newProject);
+      } else {
+        project.setEntity(entity);
       }
     }
+  }
+
+  // Queries all extant Common Protocol projects -- used for initializing the controller
+  private async _initProjects() {
+    // TODO later: only fetch for chain => currently no way to filter query beyond "all projects"
+    const options: Record<string, unknown> = { chain: ChainNetwork.CommonProtocol };
+
+    // entities contain the needed data, entityMeta contains source_chain
+    const [entities, entityMetas] = await Promise.all([
+      getFetch(`${getBaseUrl()}/entities`, options),
+      getFetch(`${getBaseUrl()}/getEntityMeta`, options),
+    ]);
+
+    await Promise.all(entities.map(async (entityJSON) => {
+      const entity = ChainEntity.fromJSON(entityJSON);
+
+      // query chain entity metas for project chain (i.e. community that created it)
+      const projectChain = entityMetas.find((meta) => meta.type_id === entity.typeId)?.project_chain;
+      const project = await this._initProject(entity, projectChain);
+      this._store.add(project);
+    }));
   }
 
   public async init(app: IApp) {
@@ -86,7 +108,7 @@ export default class ProjectsController {
 
     // load all projects from server
     try {
-      await this._fetchProjectsFromServer({});
+      await this._initProjects();
     } catch (e) {
       console.error(`Failed to load projects: ${e.message}`);
       this._initializing = false;
@@ -144,6 +166,7 @@ export default class ProjectsController {
     const projectId = await contract.numProjects();
     const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
 
+    // TODO: fix IPFS formatting here
     console.log([
       formatBytes32String(title.slice(0, 30)),
       formatBytes32String(ipfsHash.slice(0, 30)),
@@ -173,6 +196,7 @@ export default class ProjectsController {
 
     // JAKE TODO: disconnect provider?
     // on success, hit server to update chain
+    // TODO: retry every X seconds, Y times -- eventually fail
     if (chainId) {
       try {
         const response = await $.get(
@@ -186,15 +210,20 @@ export default class ProjectsController {
         if (response.status !== 'Success') {
           throw new Error();
         }
+
+        // refresh with chain set
+        await this._refreshProject(projectId, chainId);
       } catch (err) {
         console.error(
           `Failed to set project ${projectId.toString()} chain to ${chainId}`
         );
+
+        // refresh with chain unset
+        // however we should probably find out why this failed => if the entity doesn't exist, this wont work
+        await this._refreshProject(projectId);
       }
     }
 
-    // refresh metadata + return final result
-    await this._fetchProjectsFromServer({ projectId });
     return [txReceipt, projectId];
   }
 
@@ -221,7 +250,7 @@ export default class ProjectsController {
     // JAKE TODO: disconnect provider?
 
     // refresh metadata
-    await this._fetchProjectsFromServer({ projectId });
+    await this._refreshProject(projectId);
     return txReceipt;
   }
 
@@ -248,7 +277,7 @@ export default class ProjectsController {
     // JAKE TODO: disconnect provider?
 
     // refresh metadata
-    await this._fetchProjectsFromServer({ projectId });
+    await this._refreshProject(projectId);
     return txReceipt;
   }
 
@@ -278,7 +307,7 @@ export default class ProjectsController {
     // TODO: disconnect provider?
 
     // refresh metadata
-    await this._fetchProjectsFromServer({ projectId });
+    await this._refreshProject(projectId);
     return txReceipt;
   }
 
@@ -308,7 +337,7 @@ export default class ProjectsController {
     // TODO: disconnect provider?
 
     // refresh metadata
-    await this._fetchProjectsFromServer({ projectId });
+    await this._refreshProject(projectId);
     return txReceipt;
   }
 
@@ -340,7 +369,7 @@ export default class ProjectsController {
     // JAKE TODO: disconnect provider?
 
     // refresh metadata
-    await this._fetchProjectsFromServer({ projectId });
+    await this._refreshProject(projectId);
     return txReceipt;
   }
 }
