@@ -30,12 +30,13 @@ describe('DatabaseValidationService Tests', () => {
   let user2Address;
   let user2JWT;
   let user2Id;
+  let databaseValidationService
 
   before(async function () {
     this.timeout(300000);
     await resetDatabase();
     console.log('Database reset');
-
+    databaseValidationService = new DatabaseValidationService(models);
     let res = await modelUtils.createAndVerifyAddress({ chain });
     user2Address = res.address;
     user2JWT = jwt.sign({ id: res.user_id, email: res.email }, JWT_SECRET);
@@ -67,7 +68,7 @@ describe('DatabaseValidationService Tests', () => {
       request.body = resBody;
       request.user = { id: userId };
       expect(
-        DatabaseValidationService.validateAuthor(models, request, null, () => {
+        databaseValidationService.validateAuthor(models, request, null, () => {
           return null;
         })
       ).to.not.throw;
@@ -87,7 +88,7 @@ describe('DatabaseValidationService Tests', () => {
       };
       request.body = resBody;
       request.user = null;
-      DatabaseValidationService.validateAuthor(models, request, null, () => {
+      databaseValidationService.validateAuthor(models, request, null, () => {
         return null;
       });
       expect(request.address).to.be.undefined;
@@ -105,7 +106,7 @@ describe('DatabaseValidationService Tests', () => {
       };
       request.body = resBody;
       request.user = { id: userId };
-      DatabaseValidationService.validateAuthor(models, request, null, () => {
+      databaseValidationService.validateAuthor(models, request, null, () => {
         return null;
       });
       expect(request.address).to.be.undefined;
