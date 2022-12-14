@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import { ValidationError } from 'express-validator';
+import { ValidationError, validationResult } from 'express-validator';
 import { UserInstance } from './models/user';
+import { AppError } from "./util/errors";
 
 export type TypedRequestQuery<
   Q extends Record<string, unknown> = Record<string, unknown>

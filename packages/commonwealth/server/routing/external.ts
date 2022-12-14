@@ -10,6 +10,7 @@ import { TokenBalanceCache } from 'token-balance-cache/src';
 import { getChainNodes, getChainNodesValidation } from '../routes/getChainNodes';
 import { getBalanceProviders, getBalanceProvidersValidation } from '../routes/getBalanceProviders';
 import { getTokenBalance, getTokenBalanceValidation } from '../routes/getTokenBalance';
+import putComments from "../routes/comments/putComments";
 
 // contains external routes
 export function addExternalRoutes(
@@ -20,6 +21,7 @@ export function addExternalRoutes(
 ): Router {
   router.get('/threads', getThreadsValidation, getThreads.bind(this, models));
   router.get('/comments', getCommentsValidation, getComments.bind(this, models));
+  router.put('/comments', putComments.bind(this, models));
   router.get('/reactions', getReactionsValidation, getReactions.bind(this, models));
   router.get('/communities', getCommunitiesValidation, getCommunities.bind(this, models));
   router.get('/profiles', getProfilesValidation, getProfiles.bind(this, models));

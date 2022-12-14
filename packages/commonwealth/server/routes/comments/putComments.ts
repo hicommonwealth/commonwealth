@@ -1,16 +1,24 @@
-import Sequelize from 'sequelize';
-import { TypedRequestQuery, TypedResponse, success } from '../../types';
+import { PutCommentsReq, PutCommentsResp } from 'common-common/src/api/extApiTypes';
+import { query } from "express-validator";
+import { TypedResponse, success, TypedRequest } from '../../types';
 import { DB } from '../../models';
-import { GetCommentsResp, IPagination, PutCommentsReq, PutCommentsResp } from 'common-common/src/api/extApiTypes';
-import { CommentInstance } from 'commonwealth/server/models/comment';
 
-const { Op } = Sequelize;
+export const getCommentsValidation = [
+  query('community_id').isString().trim(),
+  query('addresses').optional().toArray(),
+  query('count_only').optional().isBoolean().toBoolean()
+];
+
 const putComments = async (
   models: DB,
-  req: TypedRequestQuery<PutCommentsReq>,
+  req: TypedRequest<PutCommentsReq>,
   res: TypedResponse<PutCommentsResp>,
 ) => {
-  await models.Comment.bulkCreate(req.query.comments);
+  try {
+    await models.Comment.bulkCreate(req.body.comments);
+  } catch (e) {
+    console.log(e);
+  }
 
   return success(res, {});
 };

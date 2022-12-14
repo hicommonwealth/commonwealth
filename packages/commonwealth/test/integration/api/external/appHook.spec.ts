@@ -54,6 +54,19 @@ export async function get(path: string, val: Record<string, unknown> = null, exp
 
   if (!expectError) assert.equal(res.statusCode, 200);
 
-  if (res.statusCode === 404) throw Error(`Cannot find api for ${path}`)
+  if (res.statusCode === 404) throw Error(`404 Cannot find api for GET ${path}`)
+  return JSON.parse(res.text);
+}
+
+export async function put(path: string, val: Record<string, unknown>, expectError = false) {
+  const res = <any>await chai
+    .request(app)
+    .put(path)
+    .set('Accept', 'application/json')
+    .send(val);
+
+  if (!expectError) assert.equal(res.statusCode, 200);
+
+  if (res.statusCode === 404) throw Error(`404 Cannot find api for PUT ${path}`)
   return JSON.parse(res.text);
 }

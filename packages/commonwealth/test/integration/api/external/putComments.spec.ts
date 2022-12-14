@@ -1,8 +1,8 @@
-import models from 'server/database';
+import { put } from "./appHook.spec";
 
 describe('putComments Tests', () => {
   it('fail on input error', async () => {
-    const err = await models.Comment.bulkCreate([{ a: '3' } as any]).catch(e => console.log(e));
+    const resp = await put('/api/comments', {a: 3}, true);
 
     console.log('');
 
