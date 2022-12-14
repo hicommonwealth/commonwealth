@@ -135,7 +135,7 @@ const getDiscussionPreview = (
       notifyError('Discussion not found.');
       return;
     }
-    m.route.set(`/${chain}/proposal/discussion/${proposalId}`);
+    m.route.set(`/${chain}/discussion/${proposalId}`);
     closeResultsFn();
   };
 
