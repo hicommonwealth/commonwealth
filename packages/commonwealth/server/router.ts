@@ -369,7 +369,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteThread.bind(this, models, banCache)
   );
-  router.get('/bulkThreads', bulkThreads.bind(this, models));
+  router.get(
+    '/bulkThreads',
+    databaseValidationService.validateChain,
+    bulkThreads.bind(this, models)
+  );
   router.get(
     '/activeThreads',
     databaseValidationService.validateChain.bind(databaseValidationService),
@@ -402,7 +406,11 @@ function setupRouter(
     editDraft.bind(this, models)
   );
 
-  router.get('/bulkOffchain', bulkOffchain.bind(this, models));
+  router.get(
+    '/bulkOffchain',
+    databaseValidationService.validateChain,
+    bulkOffchain.bind(this, models)
+  );
 
   // comments
   router.post(
@@ -455,7 +463,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteTopic.bind(this, models)
   );
-  router.get('/bulkTopics', bulkTopics.bind(this, models));
+  router.get(
+    '/bulkTopics',
+    databaseValidationService.validateChain,
+    bulkTopics.bind(this, models)
+  );
   router.post(
     '/setTopicThreshold',
     passport.authenticate('jwt', { session: false }),
@@ -483,7 +495,11 @@ function setupRouter(
   );
 
   // roles + permissions
-  router.get('/bulkMembers', bulkMembers.bind(this, models));
+  router.get(
+    '/bulkMembers',
+    databaseValidationService.validateChain,
+    bulkMembers.bind(this, models)
+  );
   router.post(
     '/createInvite',
     passport.authenticate('jwt', { session: false }),

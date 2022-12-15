@@ -1,7 +1,6 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes, Op } from 'sequelize';
-import validateChain from '../middleware/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../models';
@@ -16,8 +15,7 @@ const bulkThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   const { cutoff_date, topic_id, stage } = req.query;
 
   const bind = { chain: chain.id };
