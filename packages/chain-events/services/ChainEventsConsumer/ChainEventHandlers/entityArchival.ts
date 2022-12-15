@@ -46,7 +46,9 @@ export default class extends IEventHandler {
     // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
     const chain = event.chain || this._chain;
     if (!dbEvent) {
-      log.trace('no db event found!');
+      log.warn(
+        `no db event found for event ${event.chain}::${event.data.kind}!`
+      );
       return;
     }
 
