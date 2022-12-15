@@ -40,6 +40,7 @@ import expressStatsdInit from './server/scripts/setupExpressStats';
 import { StatsDController } from 'common-common/src/statsd';
 import {BrokerConfig} from "rascal";
 import GlobalActivityCache from './server/util/globalActivityCache';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -248,6 +249,11 @@ async function main() {
   const globalActivityCache = new GlobalActivityCache(models);
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   await globalActivityCache.start();
+
+  // Declare Validation Middleware Service
+  // middleware to use for all requests
+  const dbValidationService: DatabaseValidationService = new DatabaseValidationService(models);
+
   setupAPI(
     app,
     models,
@@ -256,6 +262,7 @@ async function main() {
     ruleCache,
     banCache,
     globalActivityCache,
+    dbValidationService,
   );
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);

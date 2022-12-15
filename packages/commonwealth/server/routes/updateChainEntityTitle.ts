@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
@@ -22,9 +22,9 @@ const updateChainEntityTitle = async (
   const { title, chain_entity_id } = req.body;
   const entity = await models.ChainEntityMeta.findOne({
     where: {
-      ce_id: chain_entity_id
-    }
-  })
+      ce_id: chain_entity_id,
+    },
+  });
   if (!entity) return next(new AppError(Errors.NoEntity));
   const userOwnedAddressObjects = (await req.user.getAddresses()).filter(
     (addr) => !!addr.verified

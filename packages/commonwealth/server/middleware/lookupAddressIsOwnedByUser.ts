@@ -5,7 +5,10 @@ import { DB } from '../models';
 import { AddressInstance } from '../models/address';
 import { UserInstance } from '../models/user';
 
-type AddressChainReq = { body?: { author_chain: string, address: string }, user?: UserInstance };
+type AddressChainReq = {
+  body?: { author_chain: string; address: string };
+  user?: UserInstance;
+};
 
 const lookupAddressIsOwnedByUser = async (
   models: DB,
@@ -19,11 +22,14 @@ const lookupAddressIsOwnedByUser = async (
     return [null, 'Invalid public key/chain'];
   }
 
-  const author = await models.Address.findOne({ where: {
-    chain: req.body.author_chain,
-    address: req.body.address,
-    user_id: req.user.id,
-  } });
+  const author = await models.Address.findOne({
+    where: {
+      chain: req.body.author_chain,
+      address: req.body.address,
+      user_id: req.user.id,
+    },
+  });
+
   if (!author || !author.verified || author.user_id !== req.user.id) {
     return [null, 'Invalid public key/chain'];
   }

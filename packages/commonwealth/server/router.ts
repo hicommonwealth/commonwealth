@@ -148,7 +148,7 @@ import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
 import BanCache from './util/banCheckCache';
 import authCallback from './routes/authCallback';
-import viewChainIcons from "./routes/viewChainIcons";
+import viewChainIcons from './routes/viewChainIcons';
 
 import getThreads from './routes/threads/getThreads';
 import getComments from './routes/comments/getComments';
@@ -156,14 +156,13 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import {getChainEventServiceData} from "./routes/getChainEventServiceData";
-import {getChain} from "./routes/getChain";
-import {getChainNode} from "./routes/getChainNode";
-import {getChainContracts} from "./routes/getChainContracts";
-import {getSubscribedChains} from "./routes/getSubscribedChains";
+import { getChainEventServiceData } from './routes/getChainEventServiceData';
+import { getChain } from './routes/getChain';
+import { getChainNode } from './routes/getChainNode';
+import { getChainContracts } from './routes/getChainContracts';
+import { getSubscribedChains } from './routes/getSubscribedChains';
 import GlobalActivityCache from './util/globalActivityCache';
-
-
+import DatabaseValidationService from './middleware/databaseValidationService';
 
 function setupRouter(
   app: Express,
@@ -173,19 +172,20 @@ function setupRouter(
   ruleCache: RuleCache,
   banCache: BanCache,
   globalActivityCache: GlobalActivityCache,
+  databaseValidationService: DatabaseValidationService
 ) {
   const router = express.Router();
 
   router.use((req, res, next) => {
-    StatsDController.get().increment('cw.path.called', { path: req.path.slice(1) });
+    StatsDController.get().increment('cw.path.called', {
+      path: req.path.slice(1),
+    });
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
-      StatsDController.get().histogram(
-        `cw.path.latency`,
-        latency,
-        { path: req.path.slice(1) }
-      );
+      StatsDController.get().histogram(`cw.path.latency`, latency, {
+        path: req.path.slice(1),
+      });
     });
     next();
   });
@@ -271,17 +271,20 @@ function setupRouter(
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.put(
     '/editThread',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     editThread.bind(this, models, banCache)
   );
 
   router.post(
     '/createPoll',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createPoll.bind(this, models)
   );
   router.get('/getPolls', getPolls.bind(this, models));
@@ -314,6 +317,7 @@ function setupRouter(
   router.post(
     '/updateVote',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     updateVote.bind(this, models, tokenBalanceCache, ruleCache)
   );
   router.get('/viewVotes', viewVotes.bind(this, models));
@@ -332,16 +336,19 @@ function setupRouter(
   router.post(
     '/updateLinkedThreads',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     updateLinkedThreads.bind(this, models)
   );
   router.post(
     '/addEditors',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     addEditors.bind(this, models)
   );
   router.post(
     '/deleteEditors',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteEditors.bind(this, models)
   );
   router.post(
@@ -361,17 +368,20 @@ function setupRouter(
   router.post(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createDraft.bind(this, models)
   );
   router.get('/drafts', getDrafts.bind(this, models));
   router.delete(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteDraft.bind(this, models)
   );
   router.patch(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     editDraft.bind(this, models)
   );
 
@@ -381,11 +391,13 @@ function setupRouter(
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
     '/editComment',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     editComment.bind(this, models, banCache)
   );
   router.post(
@@ -433,6 +445,7 @@ function setupRouter(
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
@@ -610,7 +623,10 @@ function setupRouter(
     viewUserActivity.bind(this, models)
   );
   router.post('/viewChainIcons', viewChainIcons.bind(this, models));
-  router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models, globalActivityCache));
+  router.post(
+    '/viewGlobalActivity',
+    viewGlobalActivity.bind(this, models, globalActivityCache)
+  );
   router.post(
     '/markNotificationsRead',
     passport.authenticate('jwt', { session: false }),
@@ -639,6 +655,7 @@ function setupRouter(
   router.post(
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     setAddressWallet.bind(this, models)
   );
 
@@ -818,22 +835,10 @@ function setupRouter(
     '/getChainEventServiceData',
     getChainEventServiceData.bind(this, models)
   );
-  router.post(
-    '/getChain',
-    getChain.bind(this, models)
-  );
-  router.post(
-    '/getChainNode',
-    getChainNode.bind(this, models)
-  );
-  router.post(
-    '/getChainContracts',
-    getChainContracts.bind(this, models)
-  );
-  router.post(
-    '/getSubscribedChains',
-    getSubscribedChains.bind(this, models)
-  );
+  router.post('/getChain', getChain.bind(this, models));
+  router.post('/getChainNode', getChainNode.bind(this, models));
+  router.post('/getChainContracts', getChainContracts.bind(this, models));
+  router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
 
   // new API
   router.get('/threads', getThreads.bind(this, models));
@@ -842,7 +847,6 @@ function setupRouter(
   router.get('/communities', getCommunities.bind(this, models));
   router.get('/profile', getProfile.bind(this, models));
   router.get('/profiles', getProfiles.bind(this, models));
-
 
   app.use('/api', router);
 }

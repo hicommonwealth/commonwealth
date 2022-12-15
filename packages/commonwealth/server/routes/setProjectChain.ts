@@ -1,5 +1,5 @@
 import { AppError } from 'common-common/src/errors';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 import { ChainEntityMetaAttributes } from '../models/chain_entity_meta';
