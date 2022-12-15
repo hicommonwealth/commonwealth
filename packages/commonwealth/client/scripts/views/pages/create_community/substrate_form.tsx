@@ -14,7 +14,9 @@ import { ChainBase, ChainType } from 'common-common/src/types';
 import { constructSubstrateUrl } from 'substrate';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow } from 'views/components/metadata_rows';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import {
+  MixpanelCommunityCreationEvent
+} from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { initChainForm, defaultChainRows } from './chain_input_rows';

@@ -1,10 +1,10 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
 import { TopicInstance } from 'server/models/topic';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import validateRoles from '../util/validateRoles';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 enum OrderTopicsErrors {
   NoUser = 'Not logged in',

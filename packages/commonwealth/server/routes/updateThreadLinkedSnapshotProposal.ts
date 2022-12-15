@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import bs58 from 'bs58';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {

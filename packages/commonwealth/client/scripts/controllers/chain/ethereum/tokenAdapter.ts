@@ -14,20 +14,19 @@ export default class Token extends Ethereum implements ITokenAdapter {
   public async activeAddressHasToken(activeAddress?: string): Promise<boolean> {
     if (!activeAddress) return false;
 
-    if (!this.contractAddress && this.network !== ChainNetwork.AxieInfinity) {
+    if (!this.contractAddress) {
       // iterate through selectedChain.Contracts for the erc20 type and return the address
       const tokenContracts = this.app.contracts.getByType(ContractType.ERC20);
-      if (!tokenContracts || !tokenContracts.length) {
-        throw new Error('No ERC20 contracts found');
+      if (tokenContracts?.length > 0) {
+        const tokenContract = tokenContracts[0];
+        this.contractAddress = tokenContract.address;
       }
-      const tokenContract = tokenContracts[0];
-      this.contractAddress = tokenContract.address;
     }
 
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
 
-    // query balance
+    // query balance -- defaults to native token
     const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
       chain: this.meta.id,
       address: account.address,

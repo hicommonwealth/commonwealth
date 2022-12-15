@@ -1,13 +1,20 @@
-import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from 'common-common/src/errors';
+import axios from 'axios';
+import FormData from 'form-data';
 import { DB } from '../models';
-import pinIpfsBlob from '../util/pinIpfsBlob';
-import { AppError } from '../util/errors';
+import { TypedRequestBody, TypedResponse, success } from '../types';
+import lookupAddressIsOwnedByUser from '../middleware/lookupAddressIsOwnedByUser';
+
+const log = factory.getLogger(formatFilename(__filename));
+
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   InvalidAddress: 'Invalid address',
   NoBlobPresent: 'No JSON blob was input',
   InvalidJson: 'Input is not a valid JSON string',
+  PinFailed: 'Failed to pin IPFS blob',
+  KeysError: 'Pinata Keys do not exist',
 };
 
 const isValidJSON = (input: string) => {
@@ -19,33 +26,44 @@ const isValidJSON = (input: string) => {
   return true;
 };
 
+type IpfsPinReq = { address: string; author_chain: string; blob: string };
+type IpfsPinResp = string;
+
 const ipfsPin = async (
   models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestBody<IpfsPinReq>,
+  res: TypedResponse<IpfsPinResp>
 ) => {
-  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-  if (!req.body.blob) return next(new AppError(Errors.NoBlobPresent));
-  if (!isValidJSON(req.body.blob)) return next(new AppError(Errors.InvalidJson));
-  const userOwnedAddresses = await req.user.getAddresses();
-  const userOwnedAddressIds = userOwnedAddresses.filter((addr) => !!addr.verified).map((addr) => addr.id);
-  const validAddress = await models.Address.findOne({
-    where: {
-      id: { [Op.in]: userOwnedAddressIds },
-      user_id: req.user.id,
-    }
-  });
-  if (!validAddress) return next(new AppError(Errors.InvalidAddress));
+  if (!req.user) throw new AppError(Errors.NotLoggedIn);
+  if (!req.body.blob) throw new AppError(Errors.NoBlobPresent);
+  if (!isValidJSON(req.body.blob)) throw new AppError(Errors.InvalidJson);
+
   try {
-    const ipfsHash = await pinIpfsBlob(
-      req.user.id,
-      req.body.address_id,
-      req.body.blob
-    );
-    return res.json({ status: 'Success', IPFSHash: ipfsHash });
+    const data = new FormData();
+    const jsonfile = req.body.blob;
+    data.append('file', JSON.stringify(jsonfile), 'user_idblob');
+    if (process.env.PINATA_API_KEY && process.env.PINATA_SECRET_API_KEY) {
+      const headers = {
+        pinata_api_key: process.env.PINATA_API_KEY,
+        'Content-Type': `multipart/form-data; boundary= ${data.getBoundary()}`,
+        pinata_secret_api_key: process.env.PINATA_SECRET_API_KEY,
+      };
+      const pinataResponse = await axios.post(
+        'https://api.pinata.cloud/pinning/pinFileToIPFS',
+        data,
+        { headers }
+      );
+      return success(res, pinataResponse.data.IpfsHash);
+    } else {
+      throw new ServerError(Errors.KeysError);
+    }
   } catch (e) {
-    return res.json({ status: 'Failure', message: e.message });
+    log.error(`Failed to pin IPFS blob: ${e.message}`);
+    if (e instanceof ServerError || e instanceof AppError) {
+      throw e;
+    } else {
+      throw new AppError(Errors.PinFailed)
+    }
   }
 };
 

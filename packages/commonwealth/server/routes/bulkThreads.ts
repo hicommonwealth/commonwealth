@@ -1,12 +1,12 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes, Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../models';
 import { ThreadInstance } from '../models/thread';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
@@ -45,7 +45,7 @@ const bulkThreads = async (
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
-        collaborators, chain_entities, linked_threads
+        collaborators, chain_entity_meta, linked_threads
       FROM "Addresses" AS addr
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
@@ -57,14 +57,9 @@ const bulkThreads = async (
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
               )
             ) AS collaborators,
-          ARRAY_AGG(DISTINCT
-            CONCAT(
-              '{ "id": "', chain_entities.id, '",
-                  "type": "', chain_entities.type, '",
-                 "type_id": "', chain_entities.type_id, '",
-                 "completed": "', chain_entities.completed, '" }'
-              )
-            ) AS chain_entities,
+          ARRAY_AGG(
+              JSON_BUILD_OBJECT('ce_id', entity_meta.ce_id, 'title', entity_meta.title)
+            ) AS chain_entity_meta,
           ARRAY_AGG(DISTINCT
             CONCAT(
               '{ "id": "', linked_threads.id, '",
@@ -79,8 +74,8 @@ const bulkThreads = async (
         ON t.id = collaborations.thread_id
         LEFT JOIN "Addresses" editors
         ON collaborations.address_id = editors.id
-        LEFT JOIN "ChainEntities" AS chain_entities
-        ON t.id = chain_entities.thread_id
+        LEFT JOIN "ChainEntityMeta" AS entity_meta
+        ON t.id = entity_meta.thread_id
         WHERE t.deleted_at IS NULL
           AND t.chain = $chain 
           ${topicOptions}
@@ -110,9 +105,8 @@ const bulkThreads = async (
       const collaborators = JSON.parse(t.collaborators[0]).address?.length
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
-      const chain_entities = JSON.parse(t.chain_entities[0]).id
-        ? t.chain_entities.map((c) => JSON.parse(c))
-        : [];
+      let chain_entity_meta = [];
+      if (t.chain_entity_meta[0].ce_id) chain_entity_meta = t.chain_entity_meta;
       const linked_threads = JSON.parse(t.linked_threads[0]).id
         ? t.linked_threads.map((c) => JSON.parse(c))
         : [];
@@ -132,7 +126,7 @@ const bulkThreads = async (
         created_at: t.thread_created,
         collaborators,
         linked_threads,
-        chain_entities,
+        chain_entity_meta,
         snapshot_proposal: t.snapshot_proposal,
         has_poll: t.has_poll,
         last_commented_on: t.last_commented_on,
@@ -173,7 +167,8 @@ const bulkThreads = async (
               as: 'topic',
             },
             {
-              model: models.ChainEntity,
+              model: models.ChainEntityMeta,
+              as: 'chain_entity_meta',
             },
             {
               model: models.LinkedThread,
@@ -195,11 +190,13 @@ const bulkThreads = async (
      SELECT id, title, stage FROM "Threads"
      WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-  const threadsInVoting: ThreadInstance[] =
-    await models.sequelize.query(countsQuery, {
+  const threadsInVoting: ThreadInstance[] = await models.sequelize.query(
+    countsQuery,
+    {
       bind,
       type: QueryTypes.SELECT,
-    });
+    }
+  );
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
   ).length;

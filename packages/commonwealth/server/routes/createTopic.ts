@@ -1,8 +1,8 @@
 import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {
@@ -49,7 +49,6 @@ const createTopic = async (
   if (!req.user.isAdmin && adminRoles.length === 0) {
     return next(new AppError(Errors.MustBeAdmin));
   }
-
 
   const isNumber = /^\d+$/.test(req.body.token_threshold);
   if (!isNumber) {

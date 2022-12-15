@@ -25,6 +25,7 @@ import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import { MobileMenuName } from './views/app_mobile_menus';
+import ChainEntityController from 'controllers/server/chain_entities';
 import { SidebarMenuName } from './views/components/sidebar';
 
 export enum ApiStatus {
@@ -42,6 +43,7 @@ export const enum LoginState {
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
+  chainEntities: ChainEntityController;
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
 
@@ -127,6 +129,7 @@ const roles = new RolesController(user);
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
+  chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 
   chainPreloading: false,

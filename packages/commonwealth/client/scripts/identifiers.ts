@@ -214,10 +214,10 @@ export const chainEntityTypeToProposalName = (t: IChainEntityKind): string => {
       return 'Moloch Proposal';
     }
     if (app.chain.network === ChainNetwork.Compound) {
-      return 'Onchain Proposal';
+      return 'On-Chain Proposal';
     }
     if (app.chain.network === ChainNetwork.Aave) {
-      return 'Onchain Proposal';
+      return 'On-Chain Proposal';
     }
     if (app.chain.base === ChainBase.CosmosSDK) {
       return 'Proposal';
@@ -234,4 +234,5 @@ export const chainEntityTypeToProposalShortName = (
   else if (t === SubstrateTypes.EntityKind.CollectiveProposal) return 'Mot';
   else if (t === SubstrateTypes.EntityKind.TipProposal) return 'Tip';
   else if (t === SubstrateTypes.EntityKind.TreasuryBounty) return 'Bounty';
+  else return 'Prop';
 };
