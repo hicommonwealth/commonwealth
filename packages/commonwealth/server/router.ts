@@ -341,6 +341,7 @@ function setupRouter(
   );
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), [
     databaseValidationService.validateAuthor.bind(databaseValidationService),
+    databaseValidationService.validateChain.bind(databaseValidationService),
     addEditors.bind(this, models),
   ]);
   router.post(
@@ -357,7 +358,11 @@ function setupRouter(
     deleteThread.bind(this, models, banCache)
   );
   router.get('/bulkThreads', bulkThreads.bind(this, models));
-  router.get('/activeThreads', activeThreads.bind(this, models));
+  router.get(
+    '/activeThreads',
+    databaseValidationService.validateChain.bind(databaseValidationService),
+    activeThreads.bind(this, models)
+  );
   router.get('/getThreads', getThreadsOld.bind(this, models));
   router.get('/searchDiscussions', searchDiscussions.bind(this, models));
   router.get('/searchComments', searchComments.bind(this, models));
@@ -404,7 +409,11 @@ function setupRouter(
     deleteComment.bind(this, models, banCache)
   );
   router.get('/viewComments', viewComments.bind(this, models));
-  router.get('/bulkComments', bulkComments.bind(this, models));
+  router.get(
+    '/bulkComments',
+    databaseValidationService.validateChain.bind(databaseValidationService),
+    bulkComments.bind(this, models)
+  );
 
   // topics
   router.post(
@@ -476,6 +485,7 @@ function setupRouter(
   router.post(
     '/addMember',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain.bind(databaseValidationService),
     addMember.bind(this, models)
   );
   router.post(
@@ -499,7 +509,11 @@ function setupRouter(
   );
 
   // fetch addresses (e.g. for mentions)
-  router.get('/bulkAddresses', bulkAddresses.bind(this, models));
+  router.get(
+    '/bulkAddresses',
+    databaseValidationService.validateChain.bind(databaseValidationService),
+    bulkAddresses.bind(this, models)
+  );
 
   // third-party webhooks
   router.post(
@@ -731,6 +745,7 @@ function setupRouter(
   router.post(
     '/banAddress',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain.bind(databaseValidationService),
     banAddress.bind(this, models)
   );
 

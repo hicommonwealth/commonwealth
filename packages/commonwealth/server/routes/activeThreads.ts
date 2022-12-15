@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
@@ -13,9 +12,6 @@ const activeThreads = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
-
   let { threads_per_topic } = req.query;
   if (
     !threads_per_topic ||
@@ -25,6 +21,8 @@ const activeThreads = async (
   ) {
     threads_per_topic = 3;
   }
+
+  const chain = req.chain;
 
   const allThreads = [];
   const communityWhere = { chain_id: chain.id };

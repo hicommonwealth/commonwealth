@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { AddressInstance } from './models/address';
+import { ChainInstance } from './models/chain';
 import { UserInstance } from './models/user';
 
 export type TypedRequestQuery<
@@ -48,6 +49,7 @@ declare global {
     interface Request {
       user?: User;
       address?: AddressInstance;
+      chain?: ChainInstance
       // TODO: session is used in logout.ts -> remove?
       session: any;
       sessionID: any;

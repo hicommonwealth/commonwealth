@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { findOneRole } from '../util/roles';
-import validateChain from '../middleware/validateChain';
 import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -30,8 +29,9 @@ const addEditors = async (
   } catch (e) {
     return next(new AppError(Errors.InvalidEditorFormat));
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+
+  const chain = req.chain;
+
   const author = req.address;
 
   const userOwnedAddressIds = (await req.user.getAddresses())
