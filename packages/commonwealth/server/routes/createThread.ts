@@ -15,7 +15,6 @@ import {
   isAddressPermitted,
 } from 'commonwealth/server/util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import validateChain from '../middleware/validateChain';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
@@ -212,9 +211,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-
-  if (error) return next(new AppError(error));
+  const chain = req.chain
 
   const author = req.address;
 

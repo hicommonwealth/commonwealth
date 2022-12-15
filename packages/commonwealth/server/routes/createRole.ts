@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { NotificationCategories } from 'common-common/src/types';
-import validateChain, {
+import {
   ValidateChainParams,
 } from '../middleware/validateChain';
 import { DB } from '../models';
@@ -31,9 +31,7 @@ const createRole = async (
   req: TypedRequestBody<CreateRoleReq>,
   res: TypedResponse<CreateRoleResp>
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-
-  if (error) throw new AppError(error);
+  const chain = req.chain;
   if (!req.user) throw new AppError(Errors.NotLoggedIn);
   if (!req.body.address_id) throw new AppError(Errors.InvalidAddress);
 

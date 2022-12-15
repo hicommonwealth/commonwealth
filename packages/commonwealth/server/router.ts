@@ -206,6 +206,7 @@ function setupRouter(
   router.post(
     '/editSubstrateSpec',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     editSubstrateSpec.bind(this, models)
   );
 
@@ -273,12 +274,14 @@ function setupRouter(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.put(
     '/editThread',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     editThread.bind(this, models, banCache)
   );
   router.put('/editThread', passport.authenticate('jwt', { session: false }), [
@@ -290,9 +293,14 @@ function setupRouter(
     '/createPoll',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     createPoll.bind(this, models)
   );
-  router.get('/getPolls', getPolls.bind(this, models));
+  router.get(
+    '/getPolls',
+    databaseValidationService.validateChain,
+    getPolls.bind(this, models)
+  );
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
@@ -362,6 +370,7 @@ function setupRouter(
     '/deleteEditors',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     deleteEditors.bind(this, models)
   );
   router.post(
@@ -424,6 +433,7 @@ function setupRouter(
     '/editComment',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     editComment.bind(this, models, banCache)
   );
   router.post(
@@ -442,6 +452,7 @@ function setupRouter(
   router.post(
     '/createTopic',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     createTopic.bind(this, models)
   );
   router.post(
@@ -457,11 +468,13 @@ function setupRouter(
   router.post(
     '/editTopic',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     editTopic.bind(this, models)
   );
   router.post(
     '/deleteTopic',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     deleteTopic.bind(this, models)
   );
   router.get(
@@ -480,6 +493,7 @@ function setupRouter(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
@@ -578,11 +592,13 @@ function setupRouter(
   router.post(
     '/createRole',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     createRole.bind(this, models)
   );
   router.post(
     '/deleteRole',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     deleteRole.bind(this, models)
   );
   router.post(
@@ -787,6 +803,7 @@ function setupRouter(
   router.get(
     '/getBannedAddresses',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     getBannedAddresses.bind(this, models)
   );
 
@@ -890,7 +907,11 @@ function setupRouter(
   router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
 
   // new API
-  router.get('/threads', getThreads.bind(this, models));
+  router.get(
+    '/threads',
+    databaseValidationService.validateChain,
+    getThreads.bind(this, models)
+  );
   router.get('/comments', getComments.bind(this, models));
   router.get('/reactions', getReactions.bind(this, models));
   router.get('/communities', getCommunities.bind(this, models));

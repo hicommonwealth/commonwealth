@@ -4,7 +4,6 @@ import moment from 'moment';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
-import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   renderQuillDeltaToText,
@@ -45,8 +44,7 @@ const editThread = async (
       return next(new AppError(Errors.NoBodyOrAttachment));
     }
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   const author = req.address;
 
