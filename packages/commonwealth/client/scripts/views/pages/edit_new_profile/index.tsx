@@ -17,11 +17,13 @@ import { AvatarUpload } from '../../components/avatar_upload';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWForm } from '../../components/component_kit/cw_form';
+import { CWFormSection } from '../../components/component_kit/cw_form_section';
+import { CWSocials } from '../../components/component_kit/cw_socials';
 
 type GetProfileResponse = {
   profile: any;
@@ -33,10 +35,7 @@ enum InputFormField {
   Bio,
   ProfileImage,
   Website,
-  Github,
-  Twitter,
-  Discord,
-  Telegram,
+  Socials,
 }
 
 enum EditProfileError {
@@ -148,7 +147,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       }
       m.redraw();
     });
-    this.profile = Profile.fromJSON(response.profile);
+    this.profile = new Profile(response.profile);
     m.redraw();
   };
 
@@ -169,6 +168,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       }),
       ...('website' in this.profileUpdate && {
         website: this.profileUpdate.website,
+      }),
+      ...('socials' in this.profileUpdate && {
+        socials: JSON.stringify(this.profileUpdate.socials),
       }),
       jwt: app.user.jwt,
     }).catch(() => {
@@ -196,7 +198,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
   };
 
-  handleInputChange = (vnode, value, formField: InputFormField) => {
+  handleInputChange = (value, formField: InputFormField) => {
     if (formField === InputFormField.Email) {
       if (value.length > 0 && value !== this.profile?.email)
         this.profileUpdate.email = value;
@@ -225,6 +227,12 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       if (value.length > 0 && value !== this.profile?.website)
         this.profileUpdate.website = value;
       else delete this.profileUpdate.website;
+    }
+
+    if (formField === InputFormField.Socials) {
+      if (value.filter((v) => v.trim().length > 0).length > 0 && value !== this.profile?.socials)
+        this.profileUpdate.socials = value;
+      else delete this.profileUpdate.socials;
     }
   };
 
@@ -270,201 +278,149 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
     return (
       <Sublayout class="Homepage">
-        <div className="EditProfilePage">
-          <div className="header">
-            <div>
-              <CWText type="h3" fontWeight="medium">Edit Profile</CWText>
-              <CWText type="b1">Create and edit profiles and manage your connected addresses.</CWText>
-            </div>
-            <div className="buttons">
-              <CWButton
-                label="Delete profile"
-                onclick={() => {
-                  this.handleSaveProfile(vnode);
-                }}
-                className={this.saved ? 'save-button confirm' : 'save-button'}
-                buttonType="secondary-black"
-              />
-              <CWButton
-                label={this.saved ? 'Saved!' : 'Save'}
-                onclick={() => {
-                  this.handleSaveProfile(vnode);
-                }}
-                className={this.saved ? 'save-button confirm' : 'save-button'}
-                buttonType="primary-black"
-              />
-            </div>
-          </div>
-          <CWDivider />
-          <div className="edit-pane">
-            {this.saved || this.imageUploading ? <CWSpinner /> : <div />}
-            <div
-              className={
-                this.failed ? 'save-button-message show' : 'save-button-message'
-              }
+        <div class="EditProfilePage">
+         <CWForm
+            title="Edit Profile"
+            description="Create and edit profiles and manage your connected addresses."
+            topRightElement={
+              <div className="buttons-container">
+                <div className="buttons">
+                <CWButton
+                  label="Delete profile"
+                  onclick={() => {
+                    this.handleSaveProfile(vnode);
+                  }}
+                  className={this.saved ? 'save-button confirm' : 'save-button'}
+                  buttonType="secondary-black"
+                />
+                <CWButton
+                  label={this.saved ? 'Saved!' : 'Save'}
+                  onclick={() => {
+                    this.handleSaveProfile(vnode);
+                  }}
+                  className={this.saved ? 'save-button confirm' : 'save-button'}
+                  buttonType="primary-black"
+                />
+                </div>
+                <div className="status">
+                  {(this.saved || this.imageUploading) && <CWSpinner />}
+                  <div
+                    className={
+                      this.failed ? 'save-button-message show' : 'save-button-message'
+                    }
+                  >
+                    <CWText> No changes saved.</CWText>
+                  </div>
+                </div>
+              </div>
+            }
+          >
+            <CWFormSection
+              title="General Info"
+              description="Some helpful text that makes the user feel welcome. This process will be quick and easy."
             >
-              <p> No changes saved. </p>
-            </div>
-            <div className="general-info">
-              <CWText type="h4">General Info</CWText>
-              <div className="columns">
-                <div className="left-side">
-                  <CWText type="b1">
-                    Some helpful text thats makes the user feel welcome. This process will be quick and easy.
-                  </CWText>
-                </div>
-                <div className="right-side">
-                  <div className="profile-image-section">
-                    <CWText type="caption" fontWeight="medium">Profile Image</CWText>
-                    <CWText type="caption" className="description">Select an image from your files to upload</CWText>
-                    <div className="image-upload">
-                      <div
-                        className={
-                          this.profileUpdate?.avatarUrl
-                            ? 'profile-image hide'
-                            : 'profile-image'
-                        }
-                      >
-                        <img src={this.profile?.avatarUrl} />
-                      </div>
-                      <AvatarUpload
-                        scope="community"
-                        uploadStartedCallback={() => {
-                          this.imageUploading = true;
-                        }}
-                        uploadCompleteBallback={(files) => {
-                          this.imageUploading = false;
-                          files.forEach((f) => {
-                            if (!f.uploadURL) return;
-                            const url = f.uploadURL.replace(/\?.*/, '').trim();
-                            this.profileUpdate.avatarUrl = url;
-                          });
-                          m.redraw();
-                        }}
-                      />
-                    </div>
+               <div className="profile-image-section">
+                <CWText type="caption" fontWeight="medium">Profile Image</CWText>
+                <CWText type="caption" className="description">Select an image from your files to upload</CWText>
+                <div className="image-upload">
+                  <div
+                    className={
+                      this.profileUpdate?.avatarUrl
+                        ? 'profile-image hide'
+                        : 'profile-image'
+                    }
+                  >
+                    <img src={this.profile?.avatarUrl} />
                   </div>
-                  <div className="info-section">
-                    <CWTextInput
-                      name="username-form-field"
-                      inputValidationFn={(val: string) => {
-                        if (val.match(/[^A-Za-z0-9]/)) {
-                          return ['failure', 'Must enter characters A-Z'];
-                        } else {
-                          return ['success', 'Input validated'];
-                        }
-                      }}
-                      label="Username"
-                      placeholder={this.profile?.name}
-                      oninput={(e) => {
-                        this.handleInputChange(
-                          vnode,
-                          (e.target as any).value,
-                          InputFormField.Username
-                        );
-                      }}
-                    />
-                    <CWTextInput
-                      name="email-form-field"
-                      inputValidationFn={(val: string) => {
-                        if (!val.match(/\S+@\S+\.\S+/)) {
-                          return ['failure', 'Must enter valid email'];
-                        } else {
-                          return ['success', 'Input validated'];
-                        }
-                      }}
-                      label="Email"
-                      placeholder={this.profile?.email}
-                      oninput={(e) => {
-                        this.handleInputChange(
-                          vnode,
-                          (e.target as any).value,
-                          InputFormField.Email
-                        );
-                      }}
-                    />
-                  </div>
-                  <div className="bio-container">
-                    <CWText type="caption">Bio</CWText>
-                    <QuillEditorComponent
-                      contentsDoc={this.profile?.bio}
-                      oncreateBind={(state: QuillEditor) => {
-                        this.quillEditorState = state;
-                      }}
-                      editorNamespace={`${document.location.pathname}-commenting`}
-                      imageUploader
-                    />
-                  </div>
-                  <CWDivider />
-                  <div className="social-links">
-                    <CWText type="b1">Social Links</CWText>
-                    <CWText type="caption">
-                      Add any of your community's links (Websites, social platforms, etc)
-                      These can be added and edited later.
-                    </CWText>
-                    <InputRow
-                      name="twitter-form-field"
-                      icon="twitter"
-                      field={InputFormField.Twitter}
-                      placeholder={this.profile?.twitter}
-                      handleInputChange={this.handleInputChange.bind(this)}
-                    />
-                    <InputRow
-                      name="telegram-form-field"
-                      icon="telegram"
-                      field={InputFormField.Telegram}
-                      placeholder={this.profile?.telegram}
-                      handleInputChange={this.handleInputChange.bind(this)}
-                    />
-                    <InputRow
-                      name="github-form-field"
-                      icon="github"
-                      field={InputFormField.Github}
-                      placeholder={this.profile?.github}
-                      handleInputChange={this.handleInputChange.bind(this)}
-                    />
-                    <InputRow
-                      name="discord-form-field"
-                      icon="discord"
-                      field={InputFormField.Discord}
-                      placeholder={this.profile?.discord}
-                      handleInputChange={this.handleInputChange.bind(this)}
-                    />
-                    <InputRow
-                      name="website-form-field"
-                      icon="website"
-                      field={InputFormField.Website}
-                      placeholder={this.profile?.website}
-                      handleInputChange={this.handleInputChange.bind(this)}
-                    />
-                    <div
-                      className="add-social-link"
-                      onClick={() => {}}
-                    >
-                      <CWIcon
-                        iconName="plus"
-                        iconSize="small"
-                        onclick={() => {}}
-                      />
-                      <CWText>
-                        Add social link
-                      </CWText>
-                    </div>
-                  </div>
+                  <AvatarUpload
+                    scope="community"
+                    uploadStartedCallback={() => {
+                      this.imageUploading = true;
+                    }}
+                    uploadCompleteBallback={(files) => {
+                      this.imageUploading = false;
+                      files.forEach((f) => {
+                        if (!f.uploadURL) return;
+                        const url = f.uploadURL.replace(/\?.*/, '').trim();
+                        this.profileUpdate.avatarUrl = url;
+                      });
+                      m.redraw();
+                    }}
+                  />
                 </div>
               </div>
-            </div>
-          </div>
-          <CWDivider />
-          <div className="linked-addresses">
-            <CWText type="h4" fontWeight="medium">Linked Addresses</CWText>
-            <div className="edit-section">
-              <div className="description">
-                <CWText type="b1">
-                  Transfer, Edit and Delete addresses connected to this profile.
+
+              <div className="info-section">
+                <CWTextInput
+                  name="username-form-field"
+                  inputValidationFn={(val: string) => {
+                    if (val.match(/[^A-Za-z0-9]/)) {
+                      return ['failure', 'Must enter characters A-Z'];
+                    } else {
+                      return ['success', 'Input validated'];
+                    }
+                  }}
+                  label="Username"
+                  placeholder={this.profile?.name}
+                  oninput={(e) => {
+                    this.handleInputChange(
+                      (e.target as any).value,
+                      InputFormField.Username
+                    );
+                  }}
+                />
+                <CWTextInput
+                  name="email-form-field"
+                  inputValidationFn={(val: string) => {
+                    if (!val.match(/\S+@\S+\.\S+/)) {
+                      return ['failure', 'Must enter valid email'];
+                    } else {
+                      return ['success', 'Input validated'];
+                    }
+                  }}
+                  label="Email"
+                  placeholder={this.profile?.email}
+                  oninput={(e) => {
+                    this.handleInputChange(
+                      (e.target as any).value,
+                      InputFormField.Email
+                    );
+                  }}
+                />
+              </div>
+
+              <div className="bio-section">
+                <CWText type="caption">Bio</CWText>
+                <QuillEditorComponent
+                  contentsDoc={this.profile?.bio}
+                  oncreateBind={(state: QuillEditor) => {
+                    this.quillEditorState = state;
+                  }}
+                  editorNamespace={`${document.location.pathname}-commenting`}
+                  imageUploader
+                />
+              </div>
+              <CWDivider />
+
+              <div className="socials-section">
+                <CWText type="b1">Social Links</CWText>
+                <CWText type="caption">
+                  Add any of your community's links (Websites, social platforms, etc)
+                  These can be added and edited later.
                 </CWText>
+                <CWSocials
+                  socials={this.profile?.socials}
+                  handleInputChange={(e) => {
+                    this.handleInputChange(e, InputFormField.Socials)
+                  }}
+                />
               </div>
-              <div className="addresses-container">
+            </CWFormSection>
+            <CWFormSection
+              title="Linked Addresses"
+              description="Transfer, Edit and Delete addresses connected to this profile."
+            >
+              <div className="addresses-section">
                 <div className="addresses">
                   <Address address="0x1234567890" />
                   <Address address="0x1234567890" />
@@ -477,8 +433,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   onclick={() => {}}
                 />
               </div>
-            </div>
-          </div>
+            </CWFormSection>
+          </CWForm>
         </div>
       </Sublayout>
     );

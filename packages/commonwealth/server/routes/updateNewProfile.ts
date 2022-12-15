@@ -25,12 +25,13 @@ const updateNewProfile = async (
     !req.body.name &&
     !req.body.bio &&
     !req.body.website &&
-    !req.body.avatarUrl
+    !req.body.avatarUrl &&
+    !req.body.socials
   ) {
-    return next(new Error(Errors.InvalidUpdate));
+    return next(new Error(Errors.InvalidUpdate, req.body));
   }
 
-  const { address, email, slug, name, bio, website, avatarUrl } = req.body;
+  const { address, email, slug, name, bio, website, avatarUrl, socials } = req.body;
 
   const addressModel = await models.Address.findOne({
     where: {
@@ -59,6 +60,7 @@ const updateNewProfile = async (
       ...(bio && { bio }),
       ...(website && { website }),
       ...(avatarUrl && { avatar_url: avatarUrl }),
+      ...(socials && { socials: JSON.parse(socials) }),
     },
     {
       where: {
