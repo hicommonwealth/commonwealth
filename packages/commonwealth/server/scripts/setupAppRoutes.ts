@@ -10,19 +10,23 @@ const DEV = process.env.NODE_ENV !== 'production';
 
 const log = factory.getLogger(formatFilename(__filename));
 
+function cleanMalformedUrl(str: string) {
+  return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
+}
+
 const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) => {
   if (NO_CLIENT_SERVER) {
     return;
   }
   log.info('setupAppRoutes');
   // Development: serve everything through devMiddleware
-  if (DEV) {
-    app.get('*', (req, res, next) => {
-      req.url = '/build/';
-      devMiddleware(req, res, next);
-    });
-    return;
-  }
+  // if (DEV) {
+  //   app.get('*', (req, res, next) => {
+  //     req.url = '/build/';
+  //     devMiddleware(req, res, next);
+  //   });
+  //   return;
+  // }
 
   // Production: serve SEO-optimized routes where possible
   //
@@ -32,17 +36,25 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     throw new Error('Template not found, cannot start production server');
   }
 
+ 
   const renderWithMetaTags = (res, title, description, author, image) => {
+    image = cleanMalformedUrl(image);
+
+    console.log({ title, description, author, image });
+
     description = description || `${title}: a decentralized community on Commonwealth.im.`;
     const $tmpl = cheerio.load(templateFile);
     $tmpl('meta[name="title"]').attr('content', title);
     $tmpl('meta[name="description"]').attr('content', description);
-    $tmpl('meta[name="author"]').attr('content', author);
-
+    if (author) {
+      $tmpl('meta[name="author"]').attr('content', author);
+    } else {
+      $tmpl('meta[name="author"]').remove();
+    }
     $tmpl('meta[name="twitter:title"]').attr('content', title);
     $tmpl('meta[name="twitter:description"]').attr('content', description);
     if (image) {
-      $tmpl('meta[name="twitter:image:src"]').attr('content', image);
+      $tmpl('meta[name="twitter:image"]').attr('content', image);
     }
 
     $tmpl('meta[property="og:site_name"]').attr('content', 'Commonwealth');
@@ -50,10 +62,17 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     $tmpl('meta[property="og:description"]').attr('content', description);
     if (image) {
       $tmpl('meta[property="og:image"]').attr('content', image);
-      // $tmpl('meta[property="og:image:width"]').attr('content', 707);
-      // $tmpl('meta[property="og:image:height"]').attr('content', 1000);
     }
-    res.send($tmpl.html());
+
+    const metadataHtml: string = $tmpl.html();
+    const twitterSafeHtml = metadataHtml.replace(
+      /<meta name="twitter:image:src" content="(.*?)">/g,
+      '<meta name="twitter:image" content="$1">'
+    );
+
+    console.log({ twitterSafeHtml })
+
+    res.send(twitterSafeHtml);
   };
 
   app.get('/:scope', async (req, res, next) => {
@@ -183,5 +202,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     sendFile(res);
   });
 };
+
+
 
 export default setupAppRoutes;
