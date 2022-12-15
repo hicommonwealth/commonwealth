@@ -11,6 +11,7 @@ import fetchNewSnapshotProposal from "./utils/fetchSnapshot";
 import { DEFAULT_PORT } from "./config"
 import { StatsDController } from "common-common/src/statsd";
 
+const log = factory.getLogger(formatFilename(__filename));
 
 const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
@@ -26,6 +27,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
   try {
     const event: SnapshotEvent = req.body.event;
     if (!event) {
+      log.error("No event found in request body");
       res.status(500).send("Error sending snapshot event");
     }
 
@@ -49,7 +51,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
 
     res.status(200).send({message: "Snapshot event received", event});
   } catch (err) {
-    console.log(err);
+    log.error("Error sending snapshot event", err);
     res.status(500).send("error: " + err);
   }
 });
@@ -61,7 +63,7 @@ app.listen(port, async () => {
   try {
     controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
     await controller.init();
-    console.log(`Server listening on port ${port}`);
+    log.info("Connected to RabbitMQ");
   } catch (err) {
     log.error(`Error starting server: ${err}`);
   }

@@ -1,6 +1,5 @@
 import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
 import { factory, formatFilename } from './logging';
-import { REDIS_URL, VULTR_IP } from 'commonwealth/server/config';
 import { RedisNamespaces } from './types';
 import Rollbar from 'rollbar';
 

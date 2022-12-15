@@ -1,5 +1,4 @@
-import {RmqMsgFormatError, RmqMsgNamespace} from "common-common/src/rabbitmq";
-import {SnapshotNotification} from "../../../../commonwealth/shared/types"
+import { RmqMsgFormatError, RmqMsgNamespace } from "common-common/src/rabbitmq";
 
 export const RmqSnapshotNotification: RmqMsgNamespace<SnapshotNotification> = {
   getInvalidFormatError(notif: any): RmqMsgFormatError {

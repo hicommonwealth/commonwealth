@@ -1,5 +1,8 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import fetch from 'node-fetch';
 import { DB } from '../models';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 async function createSnapshotProposal(res: any, models: DB) {
   try {
@@ -12,7 +15,7 @@ async function createSnapshotProposal(res: any, models: DB) {
 
     return createdProposal;
   } catch (err) {
-    console.log(err);
+    log.error('Error creating snapshot proposal record', err);
   }
 }
 
@@ -47,7 +50,7 @@ export default async function fetchNewSnapshotProposal(
 
     return proposal;
   } catch (err) {
-    console.log(err);
+    log.error('Error fetching snapshot proposal from GraphQL endpoint', err);
     return err;
   }
 }

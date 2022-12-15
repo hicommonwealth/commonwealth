@@ -104,3 +104,13 @@ export enum RascalRoutingKeys {
   DeadLetter = 'DeadLetter'
 }
 
+export interface SnapshotNotification {
+  id?: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space?: string;
+  event?: string;
+  start?: string;
+  expire?: string;
+}

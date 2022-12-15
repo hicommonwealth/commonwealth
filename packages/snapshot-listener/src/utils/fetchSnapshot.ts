@@ -1,6 +1,10 @@
 import fetch from "node-fetch";
 import dotenv from "dotenv";
+import { factory, formatFilename } from 'common-common/src/logging';
+
 dotenv.config();
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export default async function fetchNewSnapshotProposal(id: string) {
   try {
@@ -54,7 +58,7 @@ export default async function fetchNewSnapshotProposal(id: string) {
 
     return proposal;
   } catch (err) {
-    console.log(err);
+    log.error("Error fetching snapshot proposal from GraphQL endpoint", err);
     return err;
   }
 }

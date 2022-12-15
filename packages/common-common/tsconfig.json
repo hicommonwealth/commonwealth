@@ -19,10 +19,6 @@
       "snapshot-listener/*": ["../../packages/snapshot-listener/*"]
     }
   "extends": "../../tsconfig.json",
-  "compilerOptions": {
-    "outDir": "./dist",
-    "baseUrl": "."
-  },
   "include": [
     "src",
   ],
