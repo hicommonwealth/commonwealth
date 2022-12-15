@@ -20,13 +20,13 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
   }
   log.info('setupAppRoutes');
   // Development: serve everything through devMiddleware
-  // if (DEV) {
-  //   app.get('*', (req, res, next) => {
-  //     req.url = '/build/';
-  //     devMiddleware(req, res, next);
-  //   });
-  //   return;
-  // }
+  if (DEV) {
+    app.get('*', (req, res, next) => {
+      req.url = '/build/';
+      devMiddleware(req, res, next);
+    });
+    return;
+  }
 
   // Production: serve SEO-optimized routes where possible
   //
@@ -69,8 +69,6 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
       /<meta name="twitter:image:src" content="(.*?)">/g,
       '<meta name="twitter:image" content="$1">'
     );
-
-    console.log({ twitterSafeHtml })
 
     res.send(twitterSafeHtml);
   };
