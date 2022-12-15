@@ -3,6 +3,7 @@ import passport from 'passport';
 import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { StatsDController } from 'common-common/src/statsd';
 
 import domain from './routes/domain';
 import status from './routes/status';
@@ -141,6 +142,7 @@ import { DB } from './models';
 import { sendMessage } from './routes/snapshotAPI';
 import ipfsPin from './routes/ipfsPin';
 import setAddressWallet from './routes/setAddressWallet';
+import setProjectChain from './routes/setProjectChain';
 import RuleCache from './util/rules/ruleCache';
 import banAddress from './routes/banAddress';
 import getBannedAddresses from './routes/getBannedAddresses';
@@ -154,7 +156,6 @@ import getReactions from './routes/reactions/getReactions';
 import getCommunities from './routes/communities/getCommunities';
 import getProfile from './routes/profiles/getProfile';
 import getProfiles from './routes/profiles/getProfiles';
-import { StatsDController } from 'common-common/src/statsd';
 import { getChainEventServiceData } from './routes/getChainEventServiceData';
 import { getChain } from './routes/getChain';
 import { getChainNode } from './routes/getChainNode';
@@ -199,6 +200,7 @@ function setupRouter(
   router.post(
     '/ipfsPin',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     ipfsPin.bind(this, models)
   );
   router.post(
@@ -499,6 +501,13 @@ function setupRouter(
 
   // fetch addresses (e.g. for mentions)
   router.get('/bulkAddresses', bulkAddresses.bind(this, models));
+
+  // projects related routes
+  router.get(
+    '/setProjectChain',
+    passport.authenticate('jwt', { session: false }),
+    setProjectChain.bind(this, models)
+  );
 
   // third-party webhooks
   router.post(
