@@ -43,7 +43,6 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     await controller.publish(event, RascalPublications.SnapshotListener);
 
     StatsDController.get().increment("snapshot_listener.received_snapshot_event", 1, {
-      id: parsedId,
       event: eventType,
       space: event.space,
     });

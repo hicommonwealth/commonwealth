@@ -35,7 +35,6 @@ export async function processSnapshotMessage(this: { models: DB }, data: Snapsho
   }
 
   StatsDController.get().increment("cw.created_snapshot_proposal_record", 1, {
-    id,
     event: eventType,
     space,
   });
@@ -45,7 +44,6 @@ export async function processSnapshotMessage(this: { models: DB }, data: Snapsho
     await proposal.destroy();
 
     StatsDController.get().increment("cw.deleted_snapshot_proposal_record", 1, {
-      id,
       event: eventType,
       space,
     });
