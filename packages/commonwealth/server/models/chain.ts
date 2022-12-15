@@ -42,7 +42,6 @@ export type ChainAttributes = {
   snapshot?: string[];
   bech32_prefix?: string;
   hide_projects?: boolean;
-  address?: string;
   token_name?: string;
   ce_verbose?: boolean;
   default_allow_permissions: bigint;
