@@ -21,7 +21,7 @@ module.exports = {
         {
           type: Sequelize.STRING,
           allowNull: true,
-          references: { model: 'Chain', key: 'id', }
+          references: { model: 'Chains', key: 'id', }
         },
         { transaction: t }
       );
