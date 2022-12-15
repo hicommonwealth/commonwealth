@@ -6,6 +6,14 @@
   .title {
     display: flex;
     justify-content: space-between;
+
+    @include smallInclusive {
+      flex-direction: column-reverse;
+
+      .top-right-element {
+        margin-bottom: 16px;
+      }
+    }
   }
 
   .columns {
@@ -14,35 +22,24 @@
     width: 100%;
     margin: 24px 0;
 
+    @include smallInclusive {
+      flex-direction: column;
+    }
+
     .left-side {
       width: 40%;
       margin-right: 36px;
+
+      @include smallInclusive {
+        width: 100%;
+      }
     }
 
     .right-side {
       width: 60%;
-    }
-  }
-}
 
-@media only screen and (max-width: $breakpoint-small-max-px) {
-  .FormSection {
-    .title {
-      flex-direction: column-reverse;
-
-      .top-right-element {
-        margin-bottom: 16px;
-      }
-    }
-
-    .columns {
-      flex-direction: column;
-
-      .left-side, .right-side {
+      @include smallInclusive {
         width: 100%;
-      }
-
-      .right-side {
         margin-top: 36px;
       }
     }
