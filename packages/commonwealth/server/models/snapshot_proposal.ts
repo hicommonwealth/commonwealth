@@ -27,14 +27,41 @@ export default (
   const SnapshotProposal = <SnapshotProposalModelStatic>sequelize.define(
     'SnapshotProposal',
     {
-      id: { type: dataTypes.STRING, allowNull: false, primaryKey: true },
-      title: { type: dataTypes.STRING, allowNull: true },
-      body: { type: dataTypes.STRING, allowNull: true },
-      choices: { type: dataTypes.ARRAY(Sequelize.STRING), allowNull: true },
-      space: { type: dataTypes.STRING, allowNull: false },
-      event: { type: dataTypes.STRING, allowNull: true },
-      start: { type: dataTypes.STRING, allowNull: true },
-      expire: { type: dataTypes.STRING, allowNull: false },
+      id: {
+        type: Sequelize.STRING,
+        allowNull: false,
+        primaryKey: true,
+      },
+      title: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      body: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      choices: {
+        type: Sequelize.ARRAY(Sequelize.STRING),
+        allowNull: true,
+      },
+      space: {
+        type: Sequelize.STRING,
+        allowNull: false,
+      },
+      event: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      start: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      expire: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      createdAt: { type: Sequelize.DATE, allowNull: false },
+      updatedAt: { type: Sequelize.DATE, allowNull: false },
     }
   );
 

@@ -109,7 +109,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.defaultOverview = chain.defaultOverview;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
-    this.discordBotConnected = chain.discord_config_id !== null;
+    this.discordBotConnected = chain.discordConfigId !== null;
     this.discordBotConnecting = this.discordBotConnected;
     this.communityBanner = chain.communityBanner;
     this.channelsLoaded = false;

@@ -34,7 +34,6 @@ export default (
       chain_id: {
         type: Sequelize.STRING,
         allowNull: false,
-        references: { model: 'Chains', key: 'id' },
       },
       guild_id: { type: Sequelize.STRING, allowNull: true },
       snapshot_channel_id: { type: Sequelize.STRING, allowNull: true },
@@ -54,6 +53,13 @@ export default (
       updatedAt: 'updated_at',
     }
   );
+
+  DiscordBotConfig.associate = (models) => {
+    models.DiscordBotConfig.belongsTo(models.Chain, {
+      foreignKey: 'chain_id',
+      targetKey: 'id',
+    });
+  };
 
   return DiscordBotConfig;
 };
