@@ -270,28 +270,28 @@ function setupRouter(
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache),
-    ]
+    databaseValidationService.validateAuthor,
+    createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
-  router.put('/editThread', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    editThread.bind(this, models, banCache),
-  ]);
+  router.put(
+    '/editThread',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    editThread.bind(this, models, banCache)
+  );
 
-  router.post('/createPoll', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    createPoll.bind(this, models),
-  ]);
+  router.post(
+    '/createPoll',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    createPoll.bind(this, models)
+  );
   router.get('/getPolls', getPolls.bind(this, models));
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      updateThreadStage.bind(this, models),
-    ]
+    databaseValidationService.validateAuthor,
+    updateThreadStage.bind(this, models)
   );
   router.post(
     '/updateThreadPrivacy',
@@ -314,10 +314,12 @@ function setupRouter(
     updateThreadLinkedSnapshotProposal.bind(this, models)
   );
 
-  router.post('/updateVote', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    updateVote.bind(this, models, tokenBalanceCache, ruleCache),
-  ]);
+  router.post(
+    '/updateVote',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    updateVote.bind(this, models, tokenBalanceCache, ruleCache)
+  );
   router.get('/viewVotes', viewVotes.bind(this, models));
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
@@ -334,22 +336,20 @@ function setupRouter(
   router.post(
     '/updateLinkedThreads',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      updateLinkedThreads.bind(this, models),
-    ]
+    databaseValidationService.validateAuthor,
+    updateLinkedThreads.bind(this, models)
   );
-  router.post('/addEditors', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    addEditors.bind(this, models),
-  ]);
+  router.post(
+    '/addEditors',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    addEditors.bind(this, models)
+  );
   router.post(
     '/deleteEditors',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      deleteEditors.bind(this, models),
-    ]
+    databaseValidationService.validateAuthor,
+    deleteEditors.bind(this, models)
   );
   router.post(
     '/deleteThread',
@@ -365,19 +365,25 @@ function setupRouter(
   router.get('/profile', getProfileOld.bind(this, models));
 
   // discussion drafts
-  router.post('/drafts', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    createDraft.bind(this, models),
-  ]);
+  router.post(
+    '/drafts',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    createDraft.bind(this, models)
+  );
   router.get('/drafts', getDrafts.bind(this, models));
-  router.delete('/drafts', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    deleteDraft.bind(this, models),
-  ]);
-  router.patch('/drafts', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    editDraft.bind(this, models),
-  ]);
+  router.delete(
+    '/drafts',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    deleteDraft.bind(this, models)
+  );
+  router.patch(
+    '/drafts',
+    passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
+    editDraft.bind(this, models)
+  );
 
   router.get('/bulkOffchain', bulkOffchain.bind(this, models));
 
@@ -385,18 +391,14 @@ function setupRouter(
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache),
-    ]
+    databaseValidationService.validateAuthor,
+    createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
     '/editComment',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      editComment.bind(this, models, banCache),
-    ]
+    databaseValidationService.validateAuthor,
+    editComment.bind(this, models, banCache)
   );
   router.post(
     '/deleteComment',
@@ -443,10 +445,8 @@ function setupRouter(
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache),
-    ]
+    databaseValidationService.validateAuthor,
+    createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
     '/deleteReaction',
@@ -648,10 +648,8 @@ function setupRouter(
   router.post(
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      setAddressWallet.bind(this, models),
-    ]
+    databaseValidationService.validateAuthor,
+    setAddressWallet.bind(this, models)
   );
 
   // chain categories

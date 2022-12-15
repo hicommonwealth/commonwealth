@@ -40,7 +40,7 @@ import expressStatsdInit from './server/scripts/setupExpressStats';
 import { StatsDController } from 'common-common/src/statsd';
 import {BrokerConfig} from "rascal";
 import GlobalActivityCache from './server/util/globalActivityCache';
-import DatabaseValidationService from './server/middleware/DatabaseValidationService';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
 
 const log = factory.getLogger(formatFilename(__filename));
 
