@@ -8,6 +8,7 @@ export type TypedRequestQuery<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
+  chain?: ChainInstance
   query: Q;
 }
 
@@ -16,6 +17,7 @@ export type TypedRequestBody<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
+  chain?: ChainInstance
   body: B;
 }
 
@@ -25,6 +27,7 @@ export type TypedRequest<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
+  chain?: ChainInstance
   body?: B;
   query?: Q;
 }
@@ -49,7 +52,7 @@ declare global {
     interface Request {
       user?: User;
       address?: AddressInstance;
-      chain?: ChainInstance
+      chain?: ChainInstance;
       // TODO: session is used in logout.ts -> remove?
       session: any;
       sessionID: any;

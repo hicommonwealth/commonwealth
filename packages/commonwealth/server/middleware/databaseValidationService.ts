@@ -16,11 +16,12 @@ export default class DatabaseValidationService {
     this.models = models;
   }
 
-  public async validateAuthor(req: Request, res: Response, next: NextFunction) {
-    const [author, authorError] = await lookupAddressIsOwnedByUser(
-      this.models,
-      req
-    );
+  public validateAuthor = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) => {
+    const [author, authorError] = await lookupAddressIsOwnedByUser(this.models, req);
     if (!author) return next(new AppError(Errors.InvalidUser));
     if (authorError) return next(new AppError(authorError));
     // If the author is valid, add it to the request object
