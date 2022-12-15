@@ -45,7 +45,6 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     StatsDController.get().increment("snapshot_listener.received_snapshot_event", 1, {
       id: parsedId,
       event: eventType,
-      title: event.title,
       space: event.space,
     });
 
