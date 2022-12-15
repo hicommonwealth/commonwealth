@@ -6,6 +6,8 @@ import { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import { ChainAttributes } from 'commonwealth/server/models/chain';
 import { ProfileAttributes } from 'commonwealth/server/models/profile';
 import { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
+import { TopicAttributes } from "commonwealth/server/models/topic";
+import { RoleAttributes } from "commonwealth/server/models/role";
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -26,9 +28,9 @@ export type GetCommentsReq = {
 
 export type GetCommentsResp = { comments?: CommentAttributes[], count: number };
 
-export type PutCommentsReq = { comments: Omit<{ community_id: string; } & CommentAttributes, "chain">[] };
+export type PutCommentsReq = { comments: (CommentAttributes & { community_id: string })[] };
 
-export type PutCommentsResp = { error?: String };
+export type DeleteReq = { ids: number[] };
 
 export type GetThreadsReq = {
   community_id: string;
@@ -50,6 +52,8 @@ export type GetReactionsReq = {
   count_only?: boolean;
 } & IPagination;
 
+export type PostReactionsReq = { reactions: (ReactionAttributes & { community_id: string })[] };
+
 export type GetReactionsResp = { reactions?: ReactionAttributes[], count: number };
 
 export type GetCommunitiesReq = {
@@ -60,6 +64,8 @@ export type GetCommunitiesReq = {
   page?: number;
 };
 
+export type PutCommunitiesReq = { communities: ChainAttributes[] };
+
 export type GetCommunitiesResp = { communities?: ChainAttributes[], count: number };
 
 export type GetProfilesReq = {
@@ -67,6 +73,8 @@ export type GetProfilesReq = {
   profile_ids?: number[];
   count_only?: boolean;
 } & IPagination;
+
+export type PostProfilesReq = { profiles: (ProfileAttributes[] & { community_id: string })[] };
 
 export type GetProfilesResp = { profiles?: ProfileAttributes[], count: number };
 
@@ -89,5 +97,26 @@ export type GetTokenBalanceReq = {
   balance_provider: string,
   opts: Record<string, string | undefined>
 };
+
+export type GetTopicsReq = {
+  community_id: string,
+  count_only?: boolean,
+} & IPagination;
+
+export type PostTopicsReq = { topics: (TopicAttributes & { community_id: string })[] };
+
+export type GetTopicsResp = { topics?: TopicAttributes[], count: number };
+
+export type GetRolesReq = {
+  community_id: string;
+  addresses?: string[];
+  count_only?: boolean;
+} & IPagination;
+
+export type PostRolesReq = { roles: (RoleAttributes & { community_id: string })[] };
+
+export type GetRolesResp = { roles?: RoleAttributes[], count: number };
+
+export type OnlyErrorResp = { error?: String };
 
 export const needParamErrMsg = 'Please provide a parameter to query by';

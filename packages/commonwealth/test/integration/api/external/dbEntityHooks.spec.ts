@@ -10,9 +10,11 @@ import { ReactionAttributes } from 'server/models/reaction';
 import { ChainNodeAttributes } from 'server/models/chain_node';
 import { TopicAttributes } from 'server/models/topic';
 import { ProfileAttributes } from "../../../../server/models/profile";
+import { RoleAttributes } from "../../../../server/models/role";
 
 const Op = Sequelize.Op;
 
+/* eslint-disable import/no-mutable-exports */
 export let testThreads: ThreadInstance[];
 export let testComments: CommentInstance[];
 export let testUsers: UserInstance[];
@@ -23,6 +25,7 @@ export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
+export let testRoles: RoleAttributes[];
 
 before(async () => {
   await models.Topic.destroy({where: {id: {[Op.lt]: 0}}, force: true});
@@ -30,10 +33,11 @@ before(async () => {
   await models.Collaboration.destroy({where: {thread_id: {[Op.lt]: 0}}, force: true});
   await models.User.destroy({where: {id: {[Op.lt]: 0}}, force: true});
   await models.Thread.destroy({where: {id: {[Op.lt]: 0}}, force: true});
-  await models.Comment.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Comment.destroy({where: {id: {[Op.lt]: 10}}, force: true});
   await models.Address.destroy({where: {id: {[Op.lt]: 0}}, force: true});
   await models.Chain.destroy({where: {chain_node_id: {[Op.lt]: 0}}, force: true});
   await models.Profile.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Role.destroy({where: {id: {[Op.lt]: 0}}, force: true});
 
   testUsers = await Promise.all([...Array(2).keys()].map(
     async (i) => (await models.User.findOrCreate({
@@ -120,6 +124,15 @@ before(async () => {
         chain: 'cmntest',
         verification_token: '',
         profile_id: -i - 1,
+      }
+    }))[0]));
+
+  testRoles = await Promise.all([...Array(2).keys()].map(
+    async (i) => (await models.Role.findOrCreate({
+      where: {
+        id: -i - 1,
+        address_id: -i - 1,
+        chain_id: 'cmntest',
       }
     }))[0]));
 
@@ -215,4 +228,5 @@ after(async () => {
   await models.Chain.destroy({where: {chain_node_id: {[Op.lt]: 0}}, force: true});
   await models.ChainNode.destroy({where: {id: {[Op.lt]: 0}}, force: true});
   await models.Profile.destroy({where: {id: {[Op.lt]: 0}}, force: true});
+  await models.Role.destroy({where: {id: {[Op.lt]: 0}}, force: true});
 });
