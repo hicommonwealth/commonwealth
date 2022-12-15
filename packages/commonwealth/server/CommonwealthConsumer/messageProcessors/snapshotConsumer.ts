@@ -1,8 +1,8 @@
 import axios from 'axios';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {SnapshotNotification} from '../../../shared/types';
-import {DB} from "../../models";
-
+import { factory, formatFilename } from 'common-common/src/logging';
+import { SnapshotNotification } from '../../../shared/types';
+import { DB } from "../../models";
+import { StatsDController } from "common-common/src/statsd";
 
 export async function processSnapshotMessage(this: { models: DB }, data: SnapshotNotification) {
   const log = factory.getLogger(formatFilename(__filename));
@@ -34,9 +34,23 @@ export async function processSnapshotMessage(this: { models: DB }, data: Snapsho
     });
   }
 
+  StatsDController.get().increment("cw.created_snapshot_proposal_record", 1, {
+    id,
+    event: eventType,
+    title,
+    space,
+  });
+
   if (eventType === 'proposal/deleted') {
-    console.log('Deleting proposal');
+    log.info(`Proposal deleted, deleting record`);
     await proposal.destroy();
+
+    StatsDController.get().increment("cw.deleted_snapshot_proposal_record", 1, {
+      id,
+      event: eventType,
+      title,
+      space,
+    });
   }
 
   const associatedCommunities = await this.models.CommunitySnapshotSpaces.findAll({

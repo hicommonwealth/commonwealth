@@ -5,10 +5,11 @@ import {
   RabbitMQController,
   getRabbitMQConfig,
 } from "common-common/src/rabbitmq";
-import {factory, formatFilename} from "common-common/src/logging";
-import {RABBITMQ_URI} from "./config";
+import { factory, formatFilename } from "common-common/src/logging";
+import { RABBITMQ_URI } from "./config";
 import fetchNewSnapshotProposal from "./utils/fetchSnapshot";
-import {DEFAULT_PORT} from "./config"
+import { DEFAULT_PORT } from "./config"
+import { StatsDController } from "common-common/src/statsd";
 
 
 const app = express();
@@ -40,6 +41,14 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     event.expire = response.data.proposal.end;
 
     await controller.publish(event, RascalPublications.SnapshotListener);
+
+    StatsDController.get().increment("snapshot_listener.received_snapshot_event", 1, {
+      id: parsedId,
+      event: eventType,
+      title: event.title,
+      space: event.space,
+    });
+
     res.status(200).send({message: "Snapshot event received", event});
   } catch (err) {
     console.log(err);
