@@ -3,8 +3,13 @@
 .Form {
   .header {
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     margin-bottom: 36px;
+
+    @include smallInclusive {
+      flex-direction: column;
+    }
     
     .h3 {
       margin-bottom: 16px;
