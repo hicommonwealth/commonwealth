@@ -417,6 +417,7 @@ function setupRouter(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
@@ -503,6 +504,7 @@ function setupRouter(
   router.post(
     '/createInvite',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     createInvite.bind(this, models)
   );
   router.post(
@@ -870,7 +872,11 @@ function setupRouter(
   router.get('/getEntityMeta', getEntityMeta.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
-  router.get('/communityStats', communityStats.bind(this, models));
+  router.get(
+    '/communityStats',
+    databaseValidationService.validateChain,
+    communityStats.bind(this, models)
+  );
 
   // These routes behave like get (fetch data) but use POST because a secret
   // is passed in the request body -> passing the secret via query parameters is not safe

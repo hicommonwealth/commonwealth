@@ -12,7 +12,6 @@ import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 
-import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
@@ -56,8 +55,7 @@ const createComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   const author = req.address;
 

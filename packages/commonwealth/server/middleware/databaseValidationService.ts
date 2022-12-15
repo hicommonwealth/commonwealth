@@ -29,7 +29,7 @@ export default class DatabaseValidationService {
     next();
   }
 
-  public async validateChain(req: Request, res: Response, next: NextFunction) {
+  public validateChain = async (req: Request, res: Response, next: NextFunction) => {
     let chain = null;
     let error = null;
     if (req.method === 'GET') {
