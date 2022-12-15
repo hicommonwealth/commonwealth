@@ -6,10 +6,7 @@ class NewProfile {
   private _isDefault: boolean;
   private _avatarUrl: string;
   private _slug: string;
-  private _github: string;
-  private _twitter: string;
-  private _discord: string;
-  private _telegram: string;
+  private _socials: string[];
 
   get name() { return this._name; }
   get email() { return this._email; }
@@ -18,12 +15,9 @@ class NewProfile {
   get isDefault() { return this._isDefault; }
   get avatarUrl() { return this._avatarUrl; }
   get slug() { return this._slug; }
-  get github() { return this._github; }
-  get twitter() { return this._twitter; }
-  get discord() { return this._discord; }
-  get telegram() { return this._telegram; }
+  get socials() { return this._socials; }
 
-  constructor({profile_name, email, website, bio, is_default, avatarUrl, slug, github, twitter, discord, telegram}) {
+  constructor({profile_name, email, website, bio, is_default, avatarUrl, slug, socials}) {
     this._name = profile_name;
     this._email = email;
     this._website = website;
@@ -31,13 +25,10 @@ class NewProfile {
     this._isDefault = is_default;
     this._avatarUrl = avatarUrl;
     this._slug = slug;
-    this._github = github;
-    this._twitter = twitter;
-    this._discord = discord;
-    this._telegram = telegram;
+    this._socials = socials;
   }
 
-  public initialize(name, email, website, bio, isDefault, avatarUrl, slug, github, twitter, discord, telegram) {
+  public initialize(name, email, website, bio, isDefault, avatarUrl, slug, socials) {
     this._name = name;
     this._email = email;
     this._website = website;
@@ -45,10 +36,7 @@ class NewProfile {
     this._isDefault = isDefault;
     this._avatarUrl = avatarUrl;
     this._slug = slug;
-    this._github = github;
-    this._twitter = twitter;
-    this._discord = discord;
-    this._telegram = telegram;
+    this._socials = socials;
   }
 
   public static fromJSON(json) {

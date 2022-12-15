@@ -53,15 +53,15 @@ class SocialAccounts extends ClassComponent<{profile: Profile}> {
 
     if (!profile) return;
 
-    const { github, discord, telegram, twitter, email, website } = profile;
+    const { email, website } = profile;
 
     return (
       <div className="social-accounts">
         {website && <SocialAccount link={website} iconName="website" />}
-        {twitter && <SocialAccount link={twitter} iconName="twitter" />}
+        {/* {twitter && <SocialAccount link={twitter} iconName="twitter" />}
         {discord && <SocialAccount link={discord} iconName="discord" />}
         {telegram && <SocialAccount link={telegram} iconName="telegram" />}
-        {github && <SocialAccount link={github} iconName="github" />}
+        {github && <SocialAccount link={github} iconName="github" />} */}
         {email && <SocialAccount link={email} iconName="mail" />}
       </div>
     );

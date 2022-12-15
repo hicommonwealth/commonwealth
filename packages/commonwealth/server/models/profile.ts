@@ -1,5 +1,5 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 
 import { UserAttributes, UserInstance } from './user';
 import { ModelStatic, ModelInstance } from './types';
@@ -16,11 +16,7 @@ export type ProfileAttributes = {
   bio?: string;
   is_default?: boolean;
   avatar_url?: string;
-  slug?: string;
-  github?: string;
-  twitter?: string;
-  discord?: string;
-  telegram?: string;
+  socials?: string[];
 
   // associations
   User?: UserAttributes;
@@ -50,10 +46,7 @@ export default (
       is_default: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
       avatar_url: { type: dataTypes.STRING, allowNull: true},
       slug: { type: dataTypes.STRING, allowNull: true},
-      github: { type: dataTypes.STRING, allowNull: true },
-      twitter: { type: dataTypes.STRING, allowNull: true },
-      discord: { type: dataTypes.STRING, allowNull: true },
-      telegram: { type: dataTypes.STRING, allowNull: true },
+      socials: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: true },
     }, {
       tableName: 'Profiles',
       underscored: true,
