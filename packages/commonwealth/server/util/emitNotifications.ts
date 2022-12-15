@@ -1,5 +1,4 @@
 import { ChainBase, ChainType } from 'common-common/src/types';
-import WebSocket from 'ws';
 import { SERVER_URL } from 'commonwealth/server/config';
 import {
   createImmediateNotificationEmailObject,
@@ -15,7 +14,7 @@ import {
 import { DB } from 'commonwealth/server/models';
 import send, { WebhookContent } from 'commonwealth/server/webhookNotifier';
 import { NotificationInstance } from 'commonwealth/server/models/notification';
-import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
+import Sequelize, { QueryTypes } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));

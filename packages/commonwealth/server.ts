@@ -17,9 +17,11 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import {factory, formatFilename} from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq';
+import { StatsDController } from 'common-common/src/statsd';
+import {BrokerConfig} from "rascal";
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
-import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq';
 import ViewCountCache from './server/util/viewCountCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
@@ -31,15 +33,11 @@ import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers'
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
 import setupAPI from './server/routing/router';
-import {sendBatchedNotificationEmails} from './server/scripts/emails';
-import setupAPI from './server/router';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupEntityProxy from './server/util/entitiesProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import setupPassport from './server/passport';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import { StatsDController } from 'common-common/src/statsd';
-import {BrokerConfig} from "rascal";
 import GlobalActivityCache from './server/util/globalActivityCache';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
 

@@ -1,5 +1,4 @@
-import { IPagination, OrderByOptions } from 'common-common/src/api/extApiTypes';
-import { failure } from 'server/types';
+import { IPagination, OrderByOptions } from '../../../common-common/src/api/extApiTypes';
 
 /*
 These methods are for generating the sequelize formatting for
