@@ -4,27 +4,23 @@
  * from the chain, writing the results back into the database.
  */
 
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
-  SubstrateEvents,
-  IStorageFetcher,
-  CompoundEvents,
-  CosmosEvents,
-  AaveEvents,
-  IDisconnectedRange,
+  AaveEvents, CommonwealthEvents, CompoundEvents,
+  CosmosEvents, IDisconnectedRange, IStorageFetcher, SubstrateEvents
 } from 'chain-events/src';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 
-import cwModels from '../../commonwealth/server/database';
-import ceModels from 'chain-events/services/database/database'
-import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
 import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
-import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
-import {BrokerConfig} from "rascal";
-import {RABBITMQ_URI} from "../../commonwealth/server/config";
-import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq'
+import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
+import ceModels from 'chain-events/services/database/database';
+
+import { getRabbitMQConfig, RabbitMQController } from 'common-common/src/rabbitmq';
 import fetch from "node-fetch";
-import {CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL} from "../services/config";
+import { BrokerConfig } from "rascal";
+import { RABBITMQ_URI } from "../../commonwealth/server/config";
+import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
+import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from "../services/config";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -94,9 +90,7 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
       );
       fetcher = new SubstrateEvents.StorageFetcher(api);
     } else if (chainInstance.base === ChainBase.CosmosSDK) {
-      const api = await CosmosEvents.createApi(
-        node.private_url || node.url
-      );
+      const api = await CosmosEvents.createApi(node.private_url || node.url);
       fetcher = new CosmosEvents.StorageFetcher(api);
     } else if (chainInstance.network === ChainNetwork.Moloch) {
       // TODO: determine moloch API version
@@ -123,6 +117,16 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
         contracts[0].address
       );
       fetcher = new AaveEvents.StorageFetcher(api);
+      range.startBlock = 0;
+    } else if (chainInstance.network === ChainNetwork.CommonProtocol) {
+      const contracts = await chainInstance.getContracts({
+        include: [{ model: models.ChainNode, required: true }],
+      });
+      const api = await CommonwealthEvents.createApi(
+        contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
+        contracts[0].address
+      );
+      fetcher = new CommonwealthEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else {
       throw new Error('Unsupported migration chain');

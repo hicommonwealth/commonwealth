@@ -61,7 +61,7 @@ export default class extends IEventHandler {
     const createEntityFn = async (
       type: IChainEntityKind,
       type_id: string,
-      author?,
+      author?: string,
       completed = false
     ) => {
       if (type === SubstrateTypes.EntityKind.DemocracyPreimage) {
@@ -82,6 +82,8 @@ export default class extends IEventHandler {
       const publishData: RmqEntityCUD.RmqMsgType = {
         ce_id: dbEntity.id,
         chain_id: dbEntity.chain,
+        author,
+        entity_type_id: type_id,
         cud: 'create',
       };
 
@@ -146,7 +148,7 @@ export default class extends IEventHandler {
     const [entityKind, updateType] = entity;
     const fieldName = getUniqueEntityKey(event.network, entityKind);
     const fieldValue = event.data[fieldName].toString();
-    const author = event.data['proposer'];
+    const author = event.data['proposer'] || event.data['creator'];
     let result;
     switch (updateType) {
       case EntityEventKind.Create: {
