@@ -33,7 +33,6 @@
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
-    "migrate-flags": "NO_CLIENT=true NO_PRERENDER=true FLAG_MIGRATION=true ts-node --project tsconfig.json server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
     "profile": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.dev.js --json --profile > webpack-stats.json",
     "psql": "psql -h localhost commonwealth -U commonwealth",
