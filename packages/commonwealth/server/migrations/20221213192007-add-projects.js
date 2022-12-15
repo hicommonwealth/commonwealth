@@ -55,7 +55,7 @@ module.exports = {
             base: 'ethereum',
             active: true,
             description: '',
-            chain_node_id: ethChainNode[0].id,
+            chain_node_id: ethChainNode[0].id
           },
         ],
         { transaction: t }

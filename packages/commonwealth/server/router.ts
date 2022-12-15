@@ -200,6 +200,7 @@ function setupRouter(
   router.post(
     '/ipfsPin',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     ipfsPin.bind(this, models)
   );
   router.post(

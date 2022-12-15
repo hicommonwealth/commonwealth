@@ -4,7 +4,7 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import lookupAddressIsOwnedByUser from '../middleware/lookupAddressIsOwnedByUser';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -37,8 +37,6 @@ const ipfsPin = async (
   if (!req.user) throw new AppError(Errors.NotLoggedIn);
   if (!req.body.blob) throw new AppError(Errors.NoBlobPresent);
   if (!isValidJSON(req.body.blob)) throw new AppError(Errors.InvalidJson);
-  const [address, error] = await lookupAddressIsOwnedByUser(models, req);
-  if (error || !address) throw new AppError(Errors.InvalidAddress);
 
   try {
     const data = new FormData();
