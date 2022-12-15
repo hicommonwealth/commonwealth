@@ -10,7 +10,7 @@ import { TokenBalanceCache } from 'token-balance-cache/src';
 import {
   DeleteReq,
   OnlyErrorResp, PostProfilesReq,
-  PostReactionsReq, PostRolesReq, PostTopicsReq,
+  PostReactionsReq, PostRolesReq, PostRulesReq, PostTopicsReq,
   PutCommentsReq,
   PutCommunitiesReq
 } from "common-common/src/api/extApiTypes";
@@ -21,13 +21,14 @@ import { getBalanceProviders, getBalanceProvidersValidation } from '../routes/ge
 import { getTokenBalance, getTokenBalanceValidation } from '../routes/getTokenBalance';
 import {
   onlyIds, postProfilesValidation,
-  postReactionsValidation, postRolesValidation, postTopicsValidation,
+  postReactionsValidation, postRolesValidation, postRulesValidation, postTopicsValidation,
   putCommentsValidation,
   putCommunitiesValidation,
 } from "../util/helperValidations";
 import { failure, success, TypedRequest, TypedResponse } from "../types";
 import { getTopics, getTopicsValidation } from "../routes/topics/getTopics";
 import { getRoles, getRolesValidation } from "../routes/roles/getRoles";
+import { getRules, getRulesValidation } from "../routes/rulesext/getRules";
 
 const deleteEntities = async (
   models: DB,
@@ -115,6 +116,10 @@ export function addExternalRoutes(
   router.post('/roles', postRolesValidation, addEntities.bind(this, 'chain_id', models,
     (a) => models.Role.bulkCreate(a), (req: TypedRequest<PostRolesReq>) => req.body.roles));
   router.delete('/roles', onlyIds, deleteEntities.bind(this, models, (a) => models.Role.destroy(a)));
+
+  router.get('/rules', getRulesValidation, getRules.bind(this, models));
+  router.post('/rules', postRulesValidation, addEntities.bind(this, 'chain_id', models,
+    (a) => models.Rule.bulkCreate(a), (req: TypedRequest<PostRulesReq>) => req.body.rules));
 
   router.get('/chainNodes', getChainNodesValidation, getChainNodes.bind(this, models, tokenBalanceCache));
   router.get('/balanceProviders', getBalanceProvidersValidation,

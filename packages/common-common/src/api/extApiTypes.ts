@@ -8,6 +8,7 @@ import { ProfileAttributes } from 'commonwealth/server/models/profile';
 import { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
 import { TopicAttributes } from "commonwealth/server/models/topic";
 import { RoleAttributes } from "commonwealth/server/models/role";
+import { RuleAttributes } from "commonwealth/server/models/rule";
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -113,9 +114,19 @@ export type GetRolesReq = {
   count_only?: boolean;
 } & IPagination;
 
+export type GetRolesResp = { roles?: RoleAttributes[], count: number };
+
 export type PostRolesReq = { roles: (RoleAttributes & { community_id: string })[] };
 
-export type GetRolesResp = { roles?: RoleAttributes[], count: number };
+export type GetRulesReq = {
+  community_id?: string;
+  ids?: number[];
+  count_only?: boolean;
+} & IPagination;
+
+export type GetRulesResp = { rules?: RuleAttributes[], count: number };
+
+export type PostRulesReq = { rules: (RuleAttributes & { community_id: string })[] };
 
 export type OnlyErrorResp = { error?: String };
 

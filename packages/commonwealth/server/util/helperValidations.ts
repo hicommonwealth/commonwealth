@@ -41,6 +41,15 @@ export const postProfilesValidation = [
   body('profiles.*.deleted_at').not().exists(),
 ];
 
+export const postTopicsValidation = [
+  body('topics').exists().isArray(),
+  body('topics.*.community_id').exists().isString().trim(),
+  body('topics.*.name').exists().isString().trim(),
+  body('comments.*.created_at').not().exists(),
+  body('comments.*.updated_at').not().exists(),
+  body('comments.*.deleted_at').not().exists(),
+];
+
 export const postRolesValidation = [
   body('roles').exists().isArray(),
   body('roles.*.id').exists().toInt(),
@@ -50,11 +59,11 @@ export const postRolesValidation = [
   body('roles.*.deleted_at').not().exists(),
 ];
 
-export const postTopicsValidation = [
-  body('topics').exists().isArray(),
-  body('topics.*.community_id').exists().isString().trim(),
-  body('topics.*.name').exists().isString().trim(),
-  body('comments.*.created_at').not().exists(),
-  body('comments.*.updated_at').not().exists(),
-  body('comments.*.deleted_at').not().exists(),
-];
+export const postRulesValidation = [
+  body('rules').exists().isArray(),
+  body('rules.*.community_id').exists().isString().trim(),
+  body('rules.*.rule').exists().isString().trim(),
+  body('rules.*.created_at').not().exists(),
+  body('rules.*.updated_at').not().exists(),
+  body('rules.*.deleted_at').not().exists(),
+]

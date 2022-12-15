@@ -53,7 +53,6 @@ export const getThreads = async (
   let threads, count;
   if(!count_only) {
     ({ rows: threads, count } = await models.Thread.findAndCountAll({
-      logging: console.log,
       where,
       include,
       attributes,
@@ -61,7 +60,6 @@ export const getThreads = async (
     }));
   } else {
     count = <any>await models.Thread.count({
-      logging: console.log,
       where,
       include,
       attributes,
