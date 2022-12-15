@@ -27,7 +27,7 @@ export class CWForm extends ClassComponent<FormAttrs> {
             <CWText type="b1">{description}</CWText>
           </div>
           {vnode.attrs.topRightElement && (
-            <div>
+            <div className="top-right-element">
               {vnode.attrs.topRightElement}
             </div>
           )}

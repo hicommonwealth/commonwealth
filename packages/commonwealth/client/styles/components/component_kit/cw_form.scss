@@ -9,6 +9,10 @@
 
     @include smallInclusive {
       flex-direction: column;
+
+      .top-right-element {
+        margin-top: 16px;
+      }
     }
     
     .h3 {
