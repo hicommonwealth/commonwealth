@@ -5,12 +5,13 @@ import ClassComponent from 'class_component';
 
 import 'components/community_label.scss';
 
+import { ChainInfo } from 'models';
 import { CWText } from './component_kit/cw_text';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 import { IconSize } from './component_kit/cw_icons/types';
 
 type CommunityLabelAttrs = {
-  community: any;
+  community: ChainInfo;
   size?: IconSize;
 };
 

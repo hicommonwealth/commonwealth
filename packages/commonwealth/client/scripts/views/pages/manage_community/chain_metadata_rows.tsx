@@ -58,6 +58,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   default_deny_permissions: bigint;
   customDomain: string;
   terms: string;
+  hideProjects: boolean;
   defaultOverview: boolean;
   network: ChainNetwork;
   symbol: string;
@@ -91,6 +92,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.iconUrl = chain.iconUrl;
     this.network = chain.network;
     this.snapshot = chain.snapshot;
+    this.hideProjects = vnode.attrs.chain.hideProjects;
     this.defaultOverview = chain.defaultOverview;
     this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
@@ -197,6 +199,18 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             checked
               ? 'Discussion listing defaults to summary view'
               : 'Discussion listing defaults to latest activity view'
+          }
+        />
+        <ToggleRow
+          title="Hide Projects"
+          defaultValue={vnode.attrs.chain.hideProjects}
+          onToggle={(checked) => {
+            vnode.state.hideProjects = checked;
+          }}
+          caption={(checked) =>
+            checked
+              ? 'Projects are displayed in sidebar'
+              : 'Projects are hidden from sidebar'
           }
         />
         <ToggleRow
@@ -322,6 +336,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               snapshot,
               terms,
               iconUrl,
+              hideProjects,
               defaultOverview,
             } = this;
 
@@ -393,6 +408,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 snapshot,
                 terms,
                 iconUrl,
+                hideProjects,
                 defaultOverview,
                 default_allow_permissions: this.default_allow_permissions,
                 default_deny_permissions: this.default_deny_permissions,

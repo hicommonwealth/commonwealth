@@ -1,7 +1,7 @@
 import { ERC721Token } from 'adapters/chain/ethereum/types';
 import { ERC721, ERC721__factory } from 'common-common/src/eth/types';
 import Ethereum from 'controllers/chain/ethereum/adapter';
-import ContractApi from 'controllers/chain/ethereum/contractApi';
+import ContractApi from 'controllers/chain/ethereum/commonwealth/contractApi';
 
 import BN from 'bn.js';
 import { ContractType } from 'common-common/src/types';

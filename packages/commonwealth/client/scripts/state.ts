@@ -24,6 +24,7 @@ import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
+import ProjectsController from './controllers/chain/ethereum/commonwealth/projects';
 import { MobileMenuName } from './views/app_mobile_menus';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { SidebarMenuName } from './views/components/sidebar';
@@ -83,6 +84,7 @@ export interface IApp {
   // Web3
   wallets: WebWalletController;
   snapshot: SnapshotController;
+  projects: ProjectsController;
 
   toasts: ToastStore;
   modals: ModalStore;
@@ -165,6 +167,7 @@ const app: IApp = {
   // Web3
   snapshot: new SnapshotController(),
   wallets: new WebWalletController(),
+  projects: new ProjectsController(),
 
   // User
   user,

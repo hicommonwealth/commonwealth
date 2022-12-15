@@ -1,0 +1,182 @@
+@import 'shared';
+
+.ProjectCard {
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  display: flex;
+  filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.3));
+  flex-direction: column;
+  min-width: 336px;
+  max-width: 336px;
+
+  .HeaderPanel {
+    background-color: $neutral-200;
+    background-size: 100%;
+    border-radius: 5px 5px 0 0;
+    flex: 32;
+    min-height: 184px;
+    max-height: 184px;
+    .user-role-banner {
+      height: 40px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      padding: 12px;
+      &.author {
+        background-color: $primary-50;
+        .Text {
+          color: $primary-300;
+        }
+      }
+      &.curator {
+        background-color: $pink-50;
+        .banner-left {
+          .Text {
+            color: $pink-300;
+          }
+          svg > path {
+            fill: $pink-300;
+          }
+        }
+        .banner-right {
+          .Text {
+            color: $pink-500;
+          }
+        }
+      }
+      &.backer {
+        background-color: $purple-50;
+        .banner-left {
+          .Text {
+            color: $purple-200;
+          }
+          svg > path {
+            fill: $purple-200;
+          }
+        }
+        .banner-right {
+          .Text {
+            color: $purple-400;
+          }
+        }
+      }
+      .banner-left {
+        display: flex;
+        .caption {
+          margin-right: 8px;
+        }
+      }
+    }
+  }
+
+  .CompletionBar {
+    flex: 1;
+    height: 8px;
+    background-color: $neutral-300;
+    .completed-percentage {
+      height: 100%;
+      background-color: $green-400;
+      &.failed {
+        background-color: $rorange-500;
+      }
+    }
+  }
+
+  .InformationPanel {
+    background-color: $white;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 8px 16px;
+    min-height: 212px;
+    max-height: 212px;
+    border-radius: 0px 0px 5px 5px;
+    .funding-data {
+      display: flex;
+      justify-content: space-between;
+      .cui-tag {
+        border: none;
+        border-radius: 5px;
+        display: flex;
+        justify-content: space-between;
+        padding: 4px;
+        .Text,
+        svg {
+          color: $neutral-500;
+        }
+      }
+      .funding-state {
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
+        .bold {
+          margin-right: 4px;
+        }
+      }
+    }
+    .description {
+      border-radius: 0 0 5px 5px;
+      flex: 32;
+      margin: 16px 0 8px;
+      .h5 {
+        color: $neutral-800;
+        display: flex;
+        .DummyChainIcon {
+          margin-right: 6px;
+        }
+      }
+      .Text {
+        color: $neutral-800;
+        text-overflow: ellipsis;
+        white-space: break-spaces;
+        overflow: hidden;
+        &.caption {
+          min-height: 80px;
+        }
+      }
+    }
+    .beneficiary-data {
+      align-items: flex-end;
+      display: flex;
+      justify-content: space-between;
+      .data-left {
+        display: flex;
+        justify-content: left;
+        margin-bottom: 8px;
+        .User {
+          display: flex;
+          align-items: center;
+          .user-display-name {
+            color: $neutral-500;
+            font-size: 14px;
+            margin-left: 4px;
+          }
+          .user-avatar-only {
+            svg {
+              margin: 0 1px 1px 0 !important;
+            }
+          }
+        }
+      }
+      .data-right {
+        align-items: flex-end;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        margin-bottom: 8px;
+        .cui-tag {
+          background: $neutral-50;
+          border: none;
+          border-radius: 5px;
+          padding: 1px 2px 2px 2px;
+          margin-right: 0px;
+          max-width: min-content;
+        }
+        .Text {
+          color: $neutral-500;
+        }
+      }
+    }
+  }
+}

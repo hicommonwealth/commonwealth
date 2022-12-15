@@ -1,0 +1,69 @@
+@import 'shared';
+
+$formWidth: 480px;
+
+.CreateProjectForm {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 56px;
+  .h5 {
+    color: $primary-500;
+  }
+  .form-panel {
+    width: $formWidth;
+  }
+  .InformationSlide,
+  .DescriptionSlide,
+  .FundraisingSlide {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .CoverImageUpload {
+    margin-top: 16px;
+  }
+  .InformationSlide > .cui-button,
+  .FundraisingSlide > .cui-button {
+    background-color: $neutral-25;
+    border-radius: $border-radius-corners;
+    border: 2px solid $neutral-200;
+    padding: 6px 8px;
+  }
+  .NavigationButtons.cui-button-group {
+    width: 480px;
+    margin: 56px 0 28px;
+    .cui-button {
+      width: 50%;
+      .cui-button-label {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+      }
+    }
+  }
+}
+
+// Popover styles
+
+// ChainInfo and Account select list
+.chain-info-list > .cui-popover-content,
+.account-address-list > .cui-popover-content {
+  width: $formWidth;
+  .Text {
+    padding: 8px;
+    &.disabled {
+      cursor: default;
+    }
+    &:hover {
+      background-color: $neutral-50;
+    }
+  }
+}
+
+.fundraise-length-list .Text {
+  padding: 4px;
+  &:hover {
+    background-color: $neutral-50;
+  }
+}

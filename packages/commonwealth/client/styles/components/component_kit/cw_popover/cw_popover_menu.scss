@@ -1,10 +1,13 @@
 @import 'shared';
 
+$menu-item-height: 36px;
+
 .PopoverMenuItem {
   align-items: center;
   cursor: pointer;
   display: flex;
   gap: 4px;
+  height: $menu-item-height;
   padding: 8px 16px;
   user-select: none;
 

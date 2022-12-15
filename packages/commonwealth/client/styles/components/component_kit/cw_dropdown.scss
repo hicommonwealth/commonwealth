@@ -1,4 +1,5 @@
 @import 'shared';
+@import './cw_popover/cw_popover_menu';
 
 .dropdown-wrapper {
   position: relative;
@@ -8,9 +9,14 @@
     border-radius: $border-radius-corners;
     box-shadow: $elevation-3;
     margin-top: 5px;
-    overflow: hidden;
+    max-height: calc(6 * $menu-item-height);
+    overflow: auto;
     position: absolute;
     width: 100%;
     z-index: 1001;
+  }
+
+  input:disabled {
+    cursor: pointer;
   }
 }

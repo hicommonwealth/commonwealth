@@ -156,14 +156,20 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         ]
       : [];
 
-  const getUniversalCreateItems = (): MenuItem[] => [
-    // {
-    //   label: 'New Crowdfund',
-    //   iconLeft: 'wallet',
-    //   onclick: () => {
+    const getCrowdfundProposalItems = (): Array<MenuItem> =>
+      app.chain.base === ChainBase.Ethereum
+        ? [
+            { type: 'divider' },
+            {
+              label: 'New crowdfund',
+              iconLeft: 'wallet',
+              onclick: () => null, // navigateToSubpage('/new/project'),
+            },
+          ]
+        : [];
 
-    //   }
-    // },
+  const getUniversalCreateItems = (): MenuItem[] => [
+    ...getCrowdfundProposalItems(),
     {
       label: 'New Community',
       iconLeft: 'people',

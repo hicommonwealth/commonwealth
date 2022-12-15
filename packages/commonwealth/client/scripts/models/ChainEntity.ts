@@ -114,7 +114,7 @@ class ChainEntity {
       updatedAt: updated_at,
       id,
       threadId: thread_id,
-      threadTitle: Thread?.title,
+      threadTitle: title || Thread?.title,
       title,
       author,
       completed,

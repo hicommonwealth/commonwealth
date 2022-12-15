@@ -3,7 +3,7 @@ import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { ContractType } from 'common-common/src/types';
 import { ChainInfo } from 'models';
 import EthereumChain from '../chain';
-import { attachSigner } from '../contractApi';
+import { attachSigner } from '../commonwealth/contractApi';
 import AaveApi from './api';
 
 // Thin wrapper over EthereumChain to guarantee the `init()` implementation
@@ -12,7 +12,11 @@ export default class AaveChain extends EthereumChain {
   public aaveApi: AaveApi;
 
   public coins(n: number, inDollars?: boolean) {
-    return new EthereumCoin(this.app?.chain?.meta.default_symbol || '???', n, inDollars);
+    return new EthereumCoin(
+      this.app?.chain?.meta.defaultSymbol || '???',
+      n,
+      inDollars
+    );
   }
 
   public async init(selectedChain: ChainInfo) {
@@ -41,14 +45,21 @@ export default class AaveChain extends EthereumChain {
   public async setDelegate(delegatee: string) {
     const token = this.aaveApi?.Token;
     if (!token) throw new Error('No token contract found');
-    const contract = await attachSigner(this.app.wallets, this.app.user.activeAccount, token);
+    const contract = await attachSigner(
+      this.app.wallets,
+      this.app.user.activeAccount,
+      token
+    );
     await contract.delegate(delegatee);
   }
 
   public async getDelegate(delegator: string, type: 'voting' | 'proposition') {
     const token = this.aaveApi?.Token;
     if (!token) throw new Error('No token contract found');
-    const delegate = await token.getDelegateeByType(delegator, type === 'voting' ? 0 : 1);
+    const delegate = await token.getDelegateeByType(
+      delegator,
+      type === 'voting' ? 0 : 1
+    );
     return delegate;
   }
 }

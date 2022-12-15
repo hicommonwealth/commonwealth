@@ -10,6 +10,7 @@ import { CWRadioGroup } from './cw_radio_group';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCard } from './cw_card';
 import { CWTextInput } from './cw_text_input';
+import { CWTokenInput } from './cw_token_input';
 import { iconLookup, IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
@@ -132,6 +133,8 @@ export class ComponentShowcase extends ClassComponent {
         <div class="form-gallery">
           <CWText type="h4">Dropdown</CWText>
           <CWDropdown
+            label={'DropDownExample'}
+            uniqueId={'DropdownExample1'}
             inputOptions={[
               { label: 'Dropdown Option 1' },
               { label: 'Dropdown Option 2' },
@@ -184,7 +187,7 @@ export class ComponentShowcase extends ClassComponent {
                 label: 'Report',
                 iconLeft: 'cautionCircle',
                 isSecondary: true,
-                onclick: () => console.log('clicked'),
+                onclick: () => notifySuccess('clicked'),
               },
             ]}
           />
@@ -455,6 +458,37 @@ export class ComponentShowcase extends ClassComponent {
             label="Text area"
             placeholder="Type here"
           />
+          <CWDropdown
+            label={'dropdown2'}
+            uniqueId={'uniqueDropdown2'}
+            inputOptions={[
+              { label: 'Dropdown Option 1' },
+              { label: 'Dropdown Option 2' },
+              { label: 'Dropdown Option 3' },
+            ]}
+            onSelect={(optionLabel: string) =>
+              notifySuccess(`Selected option: ${optionLabel}`)
+            }
+          />
+          {/* <CWDropdown
+            menuItems={[
+              { label: 'Dropdown Option 1' },
+              { label: 'Dropdown Option 2' },
+              { label: 'Dropdown Option 3' },
+            ]}
+            inputValidationFn={(val: string): [ValidationStatus, string] => {
+              if (val.match(/[^A-Za-z]/)) {
+                return ['failure', 'Must enter characters A-Z'];
+              } else {
+                return ['success', 'Input validated'];
+              }
+            }}
+            label="This input accepts chars A-Z"
+            onSelect={(optionLabel) =>
+              notifySuccess(`Selected option: ${optionLabel}`)
+            }
+            searchable={true}
+          /> */}
           <CWCoverImageUploader
             uploadCompleteCallback={(url: string) => {
               notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
@@ -642,7 +676,7 @@ export class ComponentShowcase extends ClassComponent {
         <div class="text-gallery">
           <CWText type="h3">Text</CWText>
           <CWText fontWeight="semiBold" type="d1">
-            Display1 semi bold
+            Display1 semibold
           </CWText>
           <CWText type="d1" fontWeight="bold">
             Display1 bold
@@ -651,7 +685,7 @@ export class ComponentShowcase extends ClassComponent {
             Display1 black
           </CWText>
           <CWText fontWeight="semiBold" type="d2">
-            Display2 semi bold
+            Display2 semibold
           </CWText>
           <CWText type="d2" fontWeight="bold">
             Display2 bold
@@ -663,7 +697,7 @@ export class ComponentShowcase extends ClassComponent {
             Heading1 medium
           </CWText>
           <CWText type="h1" fontWeight="semiBold">
-            Heading1 semi bold
+            Heading1 semibold
           </CWText>
           <CWText type="h1" fontWeight="bold">
             Heading1 bold
@@ -672,7 +706,7 @@ export class ComponentShowcase extends ClassComponent {
             Heading2 medium
           </CWText>
           <CWText type="h2" fontWeight="semiBold">
-            Heading2 semi bold
+            Heading2 semibold
           </CWText>
           <CWText type="h2" fontWeight="bold">
             Heading2 bold
@@ -681,7 +715,7 @@ export class ComponentShowcase extends ClassComponent {
             Heading3 medium
           </CWText>
           <CWText type="h3" fontWeight="semiBold">
-            Heading3 semi bold
+            Heading3 semibold
           </CWText>
           <CWText type="h3" fontWeight="bold">
             Heading3 bold
@@ -690,7 +724,7 @@ export class ComponentShowcase extends ClassComponent {
             Heading4 medium
           </CWText>
           <CWText type="h4" fontWeight="semiBold">
-            Heading4 semi bold
+            Heading4 semibold
           </CWText>
           <CWText type="h4" fontWeight="bold">
             Heading4 bold
@@ -699,7 +733,7 @@ export class ComponentShowcase extends ClassComponent {
             Heading5 medium
           </CWText>
           <CWText type="h5" fontWeight="semiBold">
-            Heading5 semi bold
+            Heading5 semibold
           </CWText>
           <CWText type="h5" fontWeight="bold">
             Heading5 bold

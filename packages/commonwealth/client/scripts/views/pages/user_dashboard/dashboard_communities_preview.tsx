@@ -100,6 +100,13 @@ export class DashboardCommunitiesPreview extends ClassComponent {
           }}
           label="View more communities"
         />
+        <CWButton
+          onclick={() => {
+            m.route.set('/projects/explore');
+            m.redraw();
+          }}
+          label="View crowdfund projects"
+        />
       </div>
     );
   }

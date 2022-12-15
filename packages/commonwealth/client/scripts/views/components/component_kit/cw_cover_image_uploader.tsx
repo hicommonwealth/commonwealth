@@ -13,14 +13,15 @@ import { getClasses } from './helpers';
 import { MessageRow } from './cw_text_input';
 import { ValidationStatus } from './cw_validation_text';
 
-type CoverImageUploaderAttrs = {
+type ICWCoverImageUploaderAttrs = {
+  defaultBackground?: string;
   headerText?: string;
   subheaderText?: string;
   uploadCompleteCallback: CallableFunction;
 };
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
-export default class CWCoverImageUploader extends ClassComponent<CoverImageUploaderAttrs> {
+export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUploaderAttrs> {
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;
@@ -53,7 +54,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     }
   }
 
-  oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  oncreate(vnode: m.Vnode<ICWCoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
@@ -121,9 +122,15 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
 
     pseudoInput.addEventListener('change', pseudoInputHandler);
     attachZone.addEventListener('click', clickHandler);
+
+    if (vnode.attrs.defaultBackground) {
+      this.imageURL = vnode.attrs.defaultBackground;
+      this.uploadStatus = 'success';
+      m.redraw();
+    }
   }
 
-  view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  view(vnode: m.Vnode<ICWCoverImageUploaderAttrs>) {
     const { imageURL, isUploading, uploadStatus } = this;
     const { headerText, subheaderText } = vnode.attrs;
 

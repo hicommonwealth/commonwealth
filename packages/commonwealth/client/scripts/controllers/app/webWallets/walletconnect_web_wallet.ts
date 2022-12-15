@@ -1,9 +1,10 @@
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, ChainInfo, IWebWallet, BlockInfo } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
 import WalletConnectProvider from '@walletconnect/web3-provider';
+
+import { Account, ChainInfo, IWebWallet, NodeInfo, BlockInfo } from 'models';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
@@ -11,7 +12,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[];
-  private _chainInfo: ChainInfo;
+  private _node: NodeInfo;
   private _provider: WalletConnectProvider;
   private _web3: Web3;
 
@@ -37,14 +38,21 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public get node() {
+    return this._node;
+  }
+
   public async getRecentBlock(): Promise<BlockInfo> {
-    const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
+    const block = await this._web3.givenProvider.request({
+      method: 'eth_getBlockByNumber',
+      params: ['latest', false],
+    });
 
     return {
       number: hexToNumber(block.number),
       hash: block.hash,
       timestamp: hexToNumber(block.timestamp),
-    }
+    };
   }
 
   public async signMessage(message: string): Promise<string> {
@@ -53,12 +61,14 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   }
 
   public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const sessionPublicAddress = app.sessions.getOrCreateAddress(this._chainInfo.node.ethChainId);
+    const sessionPublicAddress = app.sessions.getOrCreateAddress(
+      this._node.ethChainId
+    );
     const msgParams = await constructTypedMessage(
       this.accounts[0],
-      this._chainInfo.node.ethChainId || 1,
+      this._node.ethChainId || 1,
       sessionPublicAddress,
-      validationBlockInfo,
+      validationBlockInfo
     );
     const signature = await this._provider.wc.signTypedData([
       this.accounts[0],
@@ -68,11 +78,16 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   }
 
   public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
+    const webWalletSignature = await this.signLoginToken(
+      account.validationBlockInfo
+    );
     return webWalletSignature;
   }
 
-  public async validateWithAccount(account: Account, walletSignature: string): Promise<void> {
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
     return account.validate(walletSignature);
   }
 
@@ -86,39 +101,37 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabled = false;
   }
 
-  public async enable() {
+  public async enable(node?: NodeInfo) {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
     // try {
-      // Create WalletConnect Provider
-      this._chainInfo =
-        app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-      const chainId = this._chainInfo.node.ethChainId;
+    // Create WalletConnect Provider
+    this._node =
+      node ||
+      app.chain?.meta.node ||
+      app.config.chains.getById(this.defaultNetwork).node;
+    const chainId = this._node.ethChainId;
 
-      // use alt wallet url if available
-      const rpc = {
-        [chainId]:
-          this._chainInfo.node.altWalletUrl || this._chainInfo.node.url,
-      };
+    // use alt wallet url if available
+    const rpc = { [chainId]: this._node.altWalletUrl || this._node.url };
+    this._provider = new WalletConnectProvider({ rpc, chainId });
 
-      this._provider = new WalletConnectProvider({ rpc, chainId });
+    // destroy pre-existing session if exists
+    if (this._provider.wc?.connected) {
+      await this._provider.wc.killSession();
+    }
 
-      // destroy pre-existing session if exists
-      if (this._provider.wc?.connected) {
-        await this._provider.wc.killSession();
-      }
+    //  Enable session (triggers QR Code modal)
+    await this._provider.enable();
+    this._web3 = new Web3(this._provider as any);
+    this._accounts = await this._web3.eth.getAccounts();
+    if (this._accounts.length === 0) {
+      throw new Error('WalletConnect fetched no accounts.');
+    }
 
-      //  Enable session (triggers QR Code modal)
-      await this._provider.enable();
-      this._web3 = new Web3(this._provider as any);
-      this._accounts = await this._web3.eth.getAccounts();
-      if (this._accounts.length === 0) {
-        throw new Error('WalletConnect fetched no accounts.');
-      }
-
-      await this.initAccountsChanged();
-      this._enabled = true;
-      this._enabling = false;
+    await this.initAccountsChanged();
+    this._enabled = true;
+    this._enabling = false;
     // } catch (error) {
     //   this._enabling = false;
     //   throw new Error(`Failed to enable WalletConnect: ${error.message}`);

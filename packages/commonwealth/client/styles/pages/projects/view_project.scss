@@ -1,0 +1,170 @@
+@import 'shared';
+
+.ViewProject {
+  margin: 56px 0;
+  max-width: 1000px;
+
+  @include large {
+    margin-left: 256px;
+    margin-right: 256px;
+  }
+  @include mediumInclusive {
+    margin-left: 128px;
+    margin-right: 128px;
+  }
+  @include mediumSmallInclusive {
+    margin-left: 96px;
+    margin-right: 96px;
+  }
+  @include smallInclusive {
+    margin-left: 64px;
+    margin-right: 64px;
+  }
+  @include extraSmall {
+    margin-left: 32px;
+    margin-right: 32px;
+  }
+
+  .project-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin: 8px 0;
+
+    .metadata-left {
+      align-items: center;
+      display: flex;
+      gap: 12px;
+      margin: 8px 0;
+    }
+
+    .metadata-right {
+      display: flex;
+      .cui-tag {
+        gap: 4px;
+        .Icon,
+        .Text {
+          color: $neutral-500;
+        }
+      }
+      margin: 8px 0;
+    }
+  }
+
+  .project-overview-and-support {
+    display: flex;
+
+    @include smallInclusive {
+      flex-direction: column;
+    }
+
+    .project-overview-panel {
+      flex: 2;
+      margin-right: 16px;
+
+      .ProjectCompletionBar {
+        height: 16px;
+      }
+
+      .project-header-img {
+        max-height: 512px;
+        height: auto;
+        width: 100%;
+        object-fit: cover;
+        object-position: left top;
+      }
+
+      .project-funding-data {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .left-panel {
+          display: flex;
+
+          .project-funds-raised,
+          .project-funds-goal {
+            padding: 8px;
+            border-left: 2px solid $neutral-200;
+            display: flex;
+            flex-direction: column;
+            margin-right: 48px;
+
+            .h1,
+            .h5 {
+              margin-top: 0;
+              text-transform: uppercase;
+              color: $neutral-800;
+            }
+          }
+
+          .project-funds-goal {
+            .h1 {
+              color: $green-500;
+            }
+          }
+        }
+
+        .right-panel {
+          .Button {
+            background-color: $rorange-500;
+            border-radius: 100px;
+          }
+        }
+      }
+    }
+
+    .project-support-panel {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      gap: 16px;
+      height: min-content;
+
+      @include small {
+        flex-direction: row !important;
+        justify-content: space-between;
+      }
+
+      @include extraSmall {
+        flex-direction: column !important;
+      }
+
+      .SupportCard {
+        flex: 1;
+      }
+    }
+  }
+
+  .project-about {
+    margin-top: 40px;
+    .MarkdownFormattedText {
+      p,
+      a,
+      i,
+      b {
+        color: $neutral-800;
+        line-height: 24px;
+      }
+    }
+  }
+
+  .Table {
+    th:nth-child(even),
+    td:nth-child(even) {
+      display: flex;
+      justify-content: flex-end;
+    }
+  }
+
+  // Components
+
+  .Divider {
+    margin: 40px 0;
+  }
+
+  .User {
+    display: flex;
+    align-items: center;
+  }
+}

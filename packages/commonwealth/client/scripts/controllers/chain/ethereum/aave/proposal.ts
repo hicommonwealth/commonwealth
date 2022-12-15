@@ -24,7 +24,7 @@ import { blocknumToTime } from 'helpers';
 
 import AaveAPI, { AaveExecutor } from './api';
 import AaveGovernance from './governance';
-import { attachSigner } from '../contractApi';
+import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import AaveChain from './chain';
 import EthereumAccounts from '../accounts';
 import EthereumAccount from '../account';
@@ -42,7 +42,7 @@ export class AaveProposalVote implements IVote<EthereumCoin> {
 
   public format(): string {
     return `${formatNumberLong(+Web3.utils.fromWei(this.power))} ${
-      this.account.chain.default_symbol
+      this.account.chain.defaultSymbol
     }`;
   }
 }

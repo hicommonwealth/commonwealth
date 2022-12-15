@@ -52,7 +52,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         app.chain.network === ChainNetwork.Moloch ||
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
-        app.chain.network === ChainNetwork.Commonwealth ||
+        app.chain.network === ChainNetwork.CommonProtocol ||
         app.chain.meta.snapshot?.length);
 
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
@@ -107,6 +107,8 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       app.chain?.base === ChainBase.Substrate &&
       app.chain?.network !== ChainNetwork.Kulupu &&
       app.chain?.network !== ChainNetwork.Darwinia;
+
+    const showProjects = app.chain?.base === ChainBase.Ethereum;
 
     // ---------- Build Toggle Tree ---------- //
     const governanceDefaultToggleTree: ToggleTree = {
@@ -166,6 +168,12 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         }),
         ...(showValidators && {
           Validators: {
+            toggledState: false,
+            children: {},
+          },
+        }),
+        ...(showProjects && {
+          Projects: {
             toggledState: false,
             children: {},
           },
@@ -230,7 +238,10 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
     const onValidatorsPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/validators`);
 
-    const onNotificationsPage = (p) => p.startsWith('/notifications');
+    const onProjectsPage = (p) =>
+      p.startsWith(`/${app.activeChainId()}/projects`);
+
+      const onNotificationsPage = (p) => p.startsWith('/notifications');
 
     const onMembersPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/members`) ||
@@ -299,6 +310,25 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
             );
           }
         }
+      },
+      displayData: null,
+    };
+
+    // Delegate
+    const delegateData: SectionGroupAttrs = {
+      title: 'Delegate',
+      containsChildren: false,
+      hasDefaultToggle: showCompoundOptions
+        ? toggleTreeState['children']['Delegate']['toggledState']
+        : false,
+      isVisible: showCompoundOptions,
+      isUpdated: true,
+      isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        handleRedirectClicks(e, '/delegate', app.activeChainId(), () => {
+          setGovernanceToggleTree('children.Delegate.toggledState', toggle);
+        });
       },
       displayData: null,
     };
@@ -431,22 +461,27 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       displayData: null,
     };
 
-    // Delegate
-    const delegateData: SectionGroupAttrs = {
-      title: 'Delegate',
+    // Projects
+    const projectsData: SectionGroupAttrs = {
+      title: 'Projects',
       containsChildren: false,
-      hasDefaultToggle: showCompoundOptions
-        ? toggleTreeState['children']['Delegate']['toggledState']
+      hasDefaultToggle: showProjects
+        ? toggleTreeState['children']['Projects']['toggledState']
         : false,
-      isVisible: showCompoundOptions,
-      isUpdated: true,
-      isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/delegate', app.activeChainId(), () => {
-          setGovernanceToggleTree('children.Delegate.toggledState', toggle);
-        });
+        handleRedirectClicks(
+          e,
+          '/projects/explore',
+          app.activeChainId(),
+          () => {
+            setGovernanceToggleTree('children.Projects.toggledState', toggle);
+          }
+        );
       },
+      isVisible: showProjects,
+      isUpdated: true,
+      isActive: onProjectsPage(m.route.get()),
       displayData: null,
     };
 
@@ -461,6 +496,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       tipsData,
       councillorsData,
       validatorsData,
+      projectsData,
     ];
 
     if (!hasProposals) governanceGroupData = [membersData];

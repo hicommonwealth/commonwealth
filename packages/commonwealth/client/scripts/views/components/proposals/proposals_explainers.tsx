@@ -54,7 +54,7 @@ export class CompoundProposalStats extends ClassComponent<CompoundProposalStatsA
   view(vnode: m.Vnode<CompoundProposalStatsAttrs>) {
     const { chain } = vnode.attrs;
 
-    const symbol = chain.meta.default_symbol;
+    const symbol = chain.meta.defaultSymbol;
 
     return (
       <GovExplainer
