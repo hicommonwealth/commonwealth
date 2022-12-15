@@ -22,15 +22,14 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
-export default async function emitNotifications(
+export default async function emitNotifications (
   models: DB,
   category_id: string,
   object_id: string,
   notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
   webhook_data?: Partial<WebhookContent>,
-  wss?: WebSocket.Server,
   excludeAddresses?: string[],
-  includeAddresses?: string[]
+  includeAddresses?: string[],
 ): Promise<NotificationInstance> {
   // get subscribers to send notifications to
   StatsDController.get().increment(
@@ -105,11 +104,10 @@ export default async function emitNotifications(
   });
 
   // if the notification does not yet exist create it here
-  // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
   if (!notification) {
     if (isChainEventData) {
-      const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
-      event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
+      const event: any = (<IChainEventNotificationData>notification_data).chainEvent;
+      event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType;
 
       notification = await models.Notification.create({
         notification_data: JSON.stringify(event),
@@ -205,4 +203,4 @@ export default async function emitNotifications(
   }
 
   return notification;
-};
+}

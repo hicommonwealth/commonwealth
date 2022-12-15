@@ -7,6 +7,7 @@ import { RabbitMQController } from "common-common/src/rabbitmq/rabbitMQControlle
 import {ChainEventNotification} from "types";
 import { DB } from '../../models';
 import {NotificationInstance} from "../../models/notification";
+import emitNotifications from "../../util/emitNotifications";
 
 export type Ithis = {
   models: DB;
@@ -24,7 +25,7 @@ export async function processChainEventNotificationsCUD(
   let dbNotification: NotificationInstance;
   try {
     // creates a notification instance if it doesn't exist and then creates NotificationsRead instances for subscribers
-    dbNotification = await this.models.Subscription.emitNotifications(
+    dbNotification = await emitNotifications(
       this.models,
       NotificationCategories.ChainEvent,
       chainEvent.ChainEventType.id,

@@ -40,7 +40,7 @@ import RuleFactory from './models/rule';
 import SocialAccountFactory from './models/social_account';
 import SsoTokenFactory from './models/sso_token';
 import StarredCommunityFactory from './models/starred_community';
-import SubscriptionFactory from './models/subscription/subscription';
+import SubscriptionFactory from './models/subscription';
 import TaggedThreadFactory from './models/tagged_threads';
 import ThreadFactory from './models/thread';
 import TokenFactory from './models/token';
@@ -79,6 +79,7 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   },
 });
 
+export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),

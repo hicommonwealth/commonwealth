@@ -8,6 +8,7 @@ import {
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { AppError, ServerError } from 'common-common/src/errors';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../middleware/validateChain';
 import {
@@ -24,7 +25,7 @@ import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
+import emitNotifications from "../util/emitNotifications";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -235,7 +236,7 @@ const createReaction = async (
     ? `discussion_${thread_id}`
     : proposal_id || `comment-${comment_id}`;
 
-  models.Subscription.emitNotifications(
+  emitNotifications(
     models,
     NotificationCategories.NewReaction,
     location,
