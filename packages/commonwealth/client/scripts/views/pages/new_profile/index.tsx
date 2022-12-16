@@ -84,6 +84,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
         this.error = ProfileError.NoProfileFound;
       }
     }
+    m.redraw();
   };
 
   oninit() {

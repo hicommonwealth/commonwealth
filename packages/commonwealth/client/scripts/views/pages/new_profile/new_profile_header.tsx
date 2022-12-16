@@ -12,6 +12,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 
 type NewProfileHeaderAttrs = {
   address: string;
@@ -27,11 +28,6 @@ type NewProfileSocialAccountAttrs = {
   iconName: IconName;
   link: string;
 };
-
-const DefaultProfileName = 'Anonymous';
-const DefaultProfileBio = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sollicitudin vitae faucibus eros
-semper pharetra lacus tincidunt diam. Turpis fermentum commodo in suspendisse id auctor libero bibendum egestas.
-Cursus et nulla erat pellentesque vitae, amet leo est aliquet. Ornare gravida vitae`;
 
 const maxBioCharCount = 190;
 // TODO: Adjust value for responsiveness
@@ -79,11 +75,13 @@ class Bio extends ClassComponent<NewProfileBioAttrs> {
   view(vnode: m.Vnode<NewProfileBioAttrs>) {
     const { bio, isBioExpanded } = vnode.attrs;
 
-    if (bio?.length > maxBioCharCount && !isBioExpanded) {
-      return `${bio.slice(0, maxBioCharCount)}...`;
-    }
+    // if (bio?.length > maxBioCharCount && !isBioExpanded) {
+    //   return `${bio.slice(0, maxBioCharCount)}...`;
+    // }
 
-    return bio;
+    return renderQuillTextBody(bio, {
+      collapse: true,
+    });
   }
 }
 
@@ -98,7 +96,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
 
   view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
     const { profile, address } = vnode.attrs;
-    const bio = profile?.bio || DefaultProfileBio;
+    const bio = profile?.bio;
 
     return (
       <div class="ProfileHeader">
@@ -116,7 +114,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
 
         <div class="profile-name-and-bio">
           <CWText type="h3" className="name">
-            {profile?.name ? profile?.name : DefaultProfileName}
+            {profile?.name}
           </CWText>
           <div class="buttons">
             <CWButton label="Delegate" buttonType="mini" onClick={() => {}} />
@@ -142,7 +140,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
               isBioExpanded={this.isBioExpanded}
             />
           </CWText>
-          {bio.length > maxBioCharCount && (
+          {bio?.length > maxBioCharCount && (
             <div
               class="read-more"
               onclick={() => {

@@ -25,19 +25,6 @@ import { CWForm } from '../../components/component_kit/cw_form';
 import { CWFormSection } from '../../components/component_kit/cw_form_section';
 import { CWSocials } from '../../components/component_kit/cw_socials';
 
-type GetProfileResponse = {
-  profile: any;
-};
-
-enum InputFormField {
-  Email,
-  Username,
-  Bio,
-  ProfileImage,
-  Website,
-  Socials,
-}
-
 enum EditProfileError {
   None,
   NoProfileFound,
@@ -49,50 +36,8 @@ const NoProfileFoundError = 'No profile found';
 
 type EditNewProfileAttrs = { placeholder?: string };
 
-type InputRowAttrs = {
-  name: string;
-  icon: IconName;
-  field: InputFormField;
-  placeholder: string;
-  handleInputChange: (vnode, value: string, field: InputFormField) => void;
-}
-
 type AddressAttrs = {
   address: string;
-}
-
-class InputRow extends ClassComponent<InputRowAttrs> {
-  view(vnode: m.Vnode<InputRowAttrs>) {
-    const { name, icon, field, placeholder, handleInputChange } = vnode.attrs;
-
-    return (
-      <div className="input-row">
-        <CWTextInput
-          name={name}
-          inputValidationFn={(val: string) => {
-            if (!val.match(/\S+.\S+/)) {
-              return ['failure', 'Must enter valid website'];
-            } else {
-              return ['success', 'Input validated'];
-            }
-          }}
-          iconRight={icon}
-          placeholder={placeholder}
-          oninput={(e) => {
-            handleInputChange(
-              vnode,
-              (e.target as any).value,
-              field,
-            );
-          }}
-        />
-        <CWIconButton
-          iconButtonTheme="primary"
-          iconName="trash"
-        />
-      </div>
-    );
-  }
 }
 
 class Address extends ClassComponent<AddressAttrs> {
@@ -124,6 +69,7 @@ class Address extends ClassComponent<AddressAttrs> {
 
 export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
   private address: string;
+  private email: string;
   private error: EditProfileError;
   private failed: boolean;
   private imageUploading: boolean;
@@ -131,7 +77,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private profile: Profile;
   private profileUpdate: any;
   private saved: boolean;
-  private quillEditorState: QuillEditor;
+  private socials: string[];
+  private username: string;
+  private bio: QuillEditor;
 
   private getProfile = async (address: string) => {
     this.loading = true;
@@ -150,6 +98,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       m.redraw();
     });
     this.profile = new Profile(response.profile);
+    this.username = this.profile.name;
+    this.email = this.profile.email;
+    this.socials = this.profile.socials;
     this.loading = false;
     m.redraw();
   };
@@ -168,9 +119,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       }),
       ...('avatarUrl' in this.profileUpdate && {
         avatarUrl: this.profileUpdate.avatarUrl,
-      }),
-      ...('website' in this.profileUpdate && {
-        website: this.profileUpdate.website,
       }),
       ...('socials' in this.profileUpdate && {
         socials: JSON.stringify(this.profileUpdate.socials),
@@ -201,45 +149,30 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
   };
 
-  handleInputChange = (value, formField: InputFormField) => {
-    if (formField === InputFormField.Email) {
-      if (value.length > 0 && value !== this.profile?.email)
-        this.profileUpdate.email = value;
+  checkForUpdates = () => {
+      if (this.email.length > 0 && this.email !== this.profile?.email)
+        this.profileUpdate.email = this.email;
       else delete this.profileUpdate.email;
-    }
 
-    if (formField === InputFormField.Username) {
-      if (value.length > 0 && value !== this.profile?.name)
-        this.profileUpdate.name = value;
+      if (this.username.length > 0 && this.username !== this.profile?.name)
+        this.profileUpdate.name = this.username;
       else delete this.profileUpdate.name;
-    }
 
-    if (formField === InputFormField.Bio) {
-      if (value.length > 0 && value !== this.profile?.bio)
-        this.profileUpdate.bio = value;
+      if (this.bio.text.length > 0 && this.bio.textContentsAsString !== this.profile?.bio)
+        this.profileUpdate.bio = this.bio.textContentsAsString;
       else delete this.profileUpdate.bio;
-    }
 
-    if (formField === InputFormField.ProfileImage) {
       if (value.length > 0 && value !== this.profile?.avatarUrl)
         this.profileUpdate.avatarUrl = value;
       else delete this.profileUpdate.avatarUrl;
-    }
 
-    if (formField === InputFormField.Website) {
-      if (value.length > 0 && value !== this.profile?.website)
-        this.profileUpdate.website = value;
-      else delete this.profileUpdate.website;
-    }
-
-    if (formField === InputFormField.Socials) {
-      if (value.filter((v) => v.trim().length > 0).length > 0 && value !== this.profile?.socials)
-        this.profileUpdate.socials = value;
+      if (this.socials.filter((v) => v.trim().length > 0).length > 0 && this.socials !== this.profile?.socials)
+        this.profileUpdate.socials = this.socials;
       else delete this.profileUpdate.socials;
-    }
   };
 
   handleSaveProfile = (vnode) => {
+    this.checkForUpdates();
     if (Object.keys(this.profileUpdate).length > 0) {
       this.updateProfile();
     } else {
@@ -372,12 +305,10 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                     }
                   }}
                   label="Username"
-                  placeholder={this.profile?.name}
+                  value={this.username}
+                  placeholder="username"
                   oninput={(e) => {
-                    this.handleInputChange(
-                      (e.target as any).value,
-                      InputFormField.Username
-                    );
+                    this.username = e.target.value;
                   }}
                 />
                 <CWTextInput
@@ -390,12 +321,10 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                     }
                   }}
                   label="Email"
-                  placeholder={this.profile?.email}
+                  value={this.email}
+                  placeholder="email"
                   oninput={(e) => {
-                    this.handleInputChange(
-                      (e.target as any).value,
-                      InputFormField.Email
-                    );
+                    this.email = e.target.value;
                   }}
                 />
               </div>
@@ -405,9 +334,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <QuillEditorComponent
                   contentsDoc={this.profile?.bio}
                   oncreateBind={(state: QuillEditor) => {
-                    this.quillEditorState = state;
+                    this.bio = state;
                   }}
-                  editorNamespace={`${document.location.pathname}-commenting`}
+                  editorNamespace={`${document.location.pathname}-bio`}
                   imageUploader
                 />
               </div>
@@ -422,7 +351,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <CWSocials
                   socials={this.profile?.socials}
                   handleInputChange={(e) => {
-                    this.handleInputChange(e, InputFormField.Socials)
+                    this.socials = e
                   }}
                 />
               </div>
