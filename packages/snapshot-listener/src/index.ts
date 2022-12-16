@@ -25,6 +25,11 @@ app.get("/", (req: Request, res: Response) => {
 
 app.post("/snapshot", async (req: Request, res: Response) => {
   try {
+    if (process.env.LOG_LEVEL === "debug") {
+      log.info("request received")
+      log.info(JSON.stringify(req));
+    }
+
     const event: ISnapshotNotification = req.body.event;
     if (!event) {
       log.error("No event found in request body");
@@ -34,7 +39,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     if (process.env.LOG_LEVEL === "debug") {
       const eventLog = JSON.stringify(event);
       log.info("snapshot received")
-      log.info("eventLog");
+      log.info(eventLog);
     }
 
     const parsedId = event.id.replace(/.*\//, "");
