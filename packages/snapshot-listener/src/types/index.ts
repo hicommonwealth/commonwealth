@@ -1,6 +1,8 @@
-export abstract class EventHandler<DBEventType = SnapshotEvent> {
+import { ISnapshotNotification } from 'common-common/src/types';
+
+export abstract class EventHandler<DBEventType = ISnapshotNotification> {
   public abstract handle(
-    event: SnapshotEvent,
+    event: ISnapshotNotification,
     dbEvent?: DBEventType
   ): Promise<DBEventType>;
 }
@@ -25,13 +27,4 @@ export class AppError extends Error {
   }
 }
 
-export interface SnapshotEvent {
-  id?: string;
-  title?: string;
-  body?: string;
-  choices?: string[];
-  space: string;
-  event: string;
-  start?: string;
-  expire: string;
-}
+

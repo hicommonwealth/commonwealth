@@ -1,5 +1,5 @@
 import express, {Request, Response} from "express";
-import {SnapshotEvent} from "./types";
+import { ISnapshotNotification } from "common-common/src/types";
 import {
   RascalPublications,
   RabbitMQController,
@@ -25,7 +25,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.post("/snapshot", async (req: Request, res: Response) => {
   try {
-    const event: SnapshotEvent = req.body.event;
+    const event: ISnapshotNotification = req.body.event;
     if (!event) {
       log.error("No event found in request body");
       res.status(500).send("Error sending snapshot event");
