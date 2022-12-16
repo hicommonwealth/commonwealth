@@ -1,18 +1,18 @@
-import { SnapshotEvent } from '../../../../snapshot-listener/src/types';
+import { ISnapshotNotification } from '../../types' 
 import { RmqMsgFormatError, RmqMsgNamespace } from "common-common/src/rabbitmq";
 
-export const RmqSnapshotEvent: RmqMsgNamespace<SnapshotEvent> = {
+export const RmqSnapshotEvent: RmqMsgNamespace<ISnapshotNotification> = {
   getInvalidFormatError(event: any): RmqMsgFormatError {
     return new RmqMsgFormatError(
       `The following snapshot event is improperly formatted: ${JSON.stringify(event)}`
     );
   },
 
-  isValidMsgFormat(data: any): data is SnapshotEvent {
+  isValidMsgFormat(data: any): data is ISnapshotNotification {
     return (
       typeof data.id === 'string'
-      && data.event === 'string'
-      && data.space === 'string'
+      && typeof data.event === 'string'
+      && typeof data.space === 'string'
       && typeof data.expire === 'number'
     );
   },
@@ -31,7 +31,5 @@ export const RmqSnapshotEvent: RmqMsgNamespace<SnapshotEvent> = {
 
 // merged with class above
 export namespace RmqSnapshotEvent {
-  export type RmqMsgType = SnapshotEvent;
+  export type RmqMsgType = ISnapshotNotification;
 }
-
-

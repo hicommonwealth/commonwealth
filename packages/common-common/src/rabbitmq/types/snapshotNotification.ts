@@ -1,7 +1,8 @@
 import { RmqMsgFormatError, RmqMsgNamespace } from "common-common/src/rabbitmq";
-import { SnapshotNotification } from "../../../../../packages/commonwealth/shared/types";
+import { ISnapshotNotification } from '../../types' 
 
-export const RmqSnapshotNotification: RmqMsgNamespace<SnapshotNotification> = {
+
+export const RmqSnapshotNotification: RmqMsgNamespace<ISnapshotNotification> = {
   getInvalidFormatError(notif: any): RmqMsgFormatError {
     return new RmqMsgFormatError(
       `The following Snapshot Notification is improperly formatted: ${JSON.stringify(
@@ -10,24 +11,15 @@ export const RmqSnapshotNotification: RmqMsgNamespace<SnapshotNotification> = {
     );
   },
 
-  isValidMsgFormat(data: any): data is SnapshotNotification {
+  isValidMsgFormat(data: any): data is ISnapshotNotification {
     return !!(
       data.id &&
       typeof data.id === "string" &&
       data.title &&
       typeof data.title === "string" &&
-      data.body &&
-      typeof data.id === "string" &&
-      data.choices &&
-      Array.isArray(data.choices) &&
-      data.space &&
-      typeof data.id === "string" &&
-      data.event &&
-      typeof data.id === "string" &&
-      data.start &&
-      typeof data.id === "string" &&
-      data.expire &&
-      typeof data.id === "string"
+      data.body && typeof data.body === "string" &&
+      data.choices && Array.isArray(data.choices) &&
+      data.space && typeof data.space === "string"
     );
   },
 
@@ -45,5 +37,5 @@ export const RmqSnapshotNotification: RmqMsgNamespace<SnapshotNotification> = {
 };
 
 export namespace RmqSnapshotNotification {
-  export type RmqMsgType = SnapshotNotification;
+  export type RmqMsgType = ISnapshotNotification;
 }

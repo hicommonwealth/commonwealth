@@ -1,19 +1,19 @@
-import {RmqEntityCUD} from './chainEntityCUD'
+import { RmqEntityCUD } from './chainEntityCUD'
 import {
   RmqCENotificationCUD
 } from "./chainEventNotificationsCUD";
-import {RmqCETypeCUD} from "./chainEventTypeCUD";
+import { RmqCETypeCUD } from "./chainEventTypeCUD";
 
 export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD'
 export * from './chainEventTypeCUD'
 
-export * from "./chainEvents"
-export * from "./chainEventNotification"
-import { RmqCWEvent } from "common-common/src/rabbitmq/types/chainEvents";
-import { RmqSnapshotEvent } from "common-common/src/rabbitmq/types/snapshotListener";
-import { RmqCENotification } from "common-common/src/rabbitmq/types/chainEventNotification";
-import {RmqSnapshotNotification} from "common-common/src/rabbitmq/types/snapshotNotification";
+export * from "./ChainEvents"
+export * from "./ChainEventNotification"
+import { RmqCWEvent } from "./ChainEvents";
+import { RmqCENotification } from "./ChainEventNotification";
+import { RmqSnapshotEvent } from "./snapshotListener";
+import { RmqSnapshotNotification } from "./snapshotNotification";
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -35,7 +35,7 @@ export type TRmqMessages = RmqEntityCUD.RmqMsgType
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
-  | RmqSnapshotNotification.RmqMsgType;
+  | RmqSnapshotNotification.RmqMsgType
 
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError,
@@ -49,8 +49,7 @@ export enum RascalPublications {
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
   ChainEventTypeCUDMain = 'ChainEventTypeCUDMainPublication',
-  SnapshotProposalNotifications = 'SnapshotProposalNotificationsPublication',
-  SnapshotListener = 'SnapshotListenerPublication',
+  SnapshotListener = 'SnapshotListenerPublication'
 }
 
 export enum RascalSubscriptions {
@@ -104,13 +103,3 @@ export enum RascalRoutingKeys {
   DeadLetter = 'DeadLetter'
 }
 
-export interface SnapshotNotification {
-  id?: string;
-  title?: string;
-  body?: string;
-  choices?: string[];
-  space?: string;
-  event?: string;
-  start?: string;
-  expire?: string;
-}
