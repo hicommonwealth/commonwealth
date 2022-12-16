@@ -31,6 +31,10 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       res.status(500).send("Error sending snapshot event");
     }
 
+    if(process.env.LOG_LEVEL === "debug") {
+      console.log({ event })
+    }
+
     const parsedId = event.id.replace(/.*\//, "");
     const eventType = event.event.split("/")[1];
     const response = await fetchNewSnapshotProposal(parsedId);
