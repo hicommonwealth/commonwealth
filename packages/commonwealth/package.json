@@ -33,7 +33,6 @@
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
-    "migrate-flags": "NO_CLIENT=true NO_PRERENDER=true FLAG_MIGRATION=true ts-node --project tsconfig.json server.ts",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
     "profile": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.config.dev.js --json --profile > webpack-stats.json",
     "psql": "psql -h localhost commonwealth -U commonwealth",
@@ -50,7 +49,8 @@
     "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
-    "sync-entities": "ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)"
+    "sync-entities": "ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)",
+    "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'"
   },
   "engines": {
     "node": "14.x"
@@ -86,6 +86,7 @@
     "@glidejs/glide": "^3.4.1",
     "@keplr-wallet/types": "^0.10.19",
     "@magic-sdk/admin": "^1.3.1",
+    "@metamask/detect-provider": "^2.0.0",
     "@metamask/eth-sig-util": "^4.0.0",
     "@openzeppelin/contracts": "^2.4.0",
     "@openzeppelin/contracts-governance": "npm:@openzeppelin/contracts@^4.3.2",
@@ -182,6 +183,7 @@
     "mithril-infinite": "^1.3.0",
     "mixpanel": "^0.14.0",
     "mixpanel-browser": "^2.45.0",
+    "mock-express-request": "^0.2.2",
     "morgan": "^1.9.1",
     "near-api-js": "^0.42.0",
     "node-fetch": "2",

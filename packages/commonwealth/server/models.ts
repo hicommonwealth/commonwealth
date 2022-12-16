@@ -21,7 +21,6 @@ import { ContractAbiModelStatic } from './models/contract_abi';
 import { DiscussionDraftModelStatic } from './models/discussion_draft';
 import { IdentityCacheStatic } from './models/identity_cache';
 import { InviteCodeModelStatic } from './models/invite_code';
-import { IpfsPinsModelStatic } from './models/ipfs_pins';
 import { LinkedThreadModelStatic } from './models/linked_thread';
 import { LoginTokenModelStatic } from './models/login_token';
 import { NotificationModelStatic } from './models/notification';
@@ -74,7 +73,6 @@ export type Models = {
   DiscordBotConfig: DiscordBotConfigModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
-  IpfsPins: IpfsPinsModelStatic;
   LinkedThread: LinkedThreadModelStatic;
   LoginToken: LoginTokenModelStatic;
   Notification: NotificationModelStatic;

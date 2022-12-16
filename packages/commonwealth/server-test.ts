@@ -27,6 +27,7 @@ import GlobalActivityCache from './server/util/globalActivityCache';
 import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
 
 require('express-async-errors');
 
@@ -41,6 +42,7 @@ const tokenBalanceCache = new TokenBalanceCache(
   [ mockTokenBalanceProvider ],
 );
 const ruleCache = new RuleCache();
+const databaseValidationService = new DatabaseValidationService(models);
 let server;
 
 const sessionStore = new SequelizeStore({
@@ -368,7 +370,7 @@ const globalActivityCache = new GlobalActivityCache(models);
 globalActivityCache.start();
 setupPassport(models);
 // TODO: mock RabbitMQController
-setupAPI(app, models, viewCountCache, tokenBalanceCache, ruleCache, banCache, globalActivityCache);
+setupAPI(app, models, viewCountCache, tokenBalanceCache, ruleCache, banCache, globalActivityCache, databaseValidationService);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

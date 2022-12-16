@@ -1,4 +1,5 @@
 import { AppError } from 'common-common/src/errors';
+import validateChain from '../middleware/validateChain';
 import {
   success,
   TypedRequestBody,
@@ -6,8 +7,6 @@ import {
   TypedResponse,
 } from '../types';
 import { DB } from '../models';
-import validateChain from '../util/validateChain';
-import validateRoles from '../util/validateRoles';
 import { BanAttributes } from '../models/ban';
 
 enum SetDiscordBotConfigErrors {

@@ -27,7 +27,6 @@ import ContractAbiFactory from './models/contract_abi';
 import DiscussionDraftFactory from './models/discussion_draft';
 import IdentityCacheFactory from './models/identity_cache';
 import InviteCodeFactory from './models/invite_code';
-import IpfsPinsFactory from './models/ipfs_pins';
 import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
@@ -107,7 +106,6 @@ const models: Models = {
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),

@@ -7,8 +7,7 @@ import {
   TypedResponse,
 } from '../types';
 import { DB } from '../models';
-import validateChain from '../util/validateChain';
-import validateRoles from '../util/validateRoles';
+import validateChain from '../middleware/validateChain';
 import { BanAttributes } from '../models/ban';
 
 enum SetDiscordBotConfigErrors {
