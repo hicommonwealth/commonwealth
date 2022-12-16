@@ -99,6 +99,10 @@
 
       .title {
         margin-bottom: 8px;
+
+        .link a {
+          color: $neutral-800;
+        }
       }
     }
 

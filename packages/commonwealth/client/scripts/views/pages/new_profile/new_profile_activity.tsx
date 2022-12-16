@@ -7,6 +7,7 @@ import ClassComponent from 'class_component';
 import 'pages/new_profile/new_profile_activity.scss';
 
 import app from 'state';
+import { link } from 'helpers';
 import Thread from 'client/scripts/models/Thread';
 import ChainInfo from 'client/scripts/models/ChainInfo';
 import Comment from 'client/scripts/models/Comment';
@@ -51,6 +52,7 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
     const { activity, address, charLimit } = vnode.attrs;
     const { chain, createdAt, plaintext, author, title } = activity;
+    const isThread = (activity as Thread).kind;
 
     // force redraw or on initial load comments don't render
     // m.redraw();
@@ -69,10 +71,17 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
           </div>
         </div>
         <CWText className="title">
-          {(activity as Thread).kind
+          {isThread
             ? 'Created a thread'
             : 'Commented on the thread'}
-          <CWText fontWeight="semiBold">&nbsp;{title}</CWText>
+          <CWText fontWeight="semiBold" className="link">
+            &nbsp;{isThread
+              ? link('a', `/${activity.chain}/discussion/${activity.id}`, [
+                  `${title}`,
+                ])
+              : `${title}`
+            }
+          </CWText>
         </CWText>
         <CWText type="b2" className="gray-text">
           {plaintext.length > charLimit
