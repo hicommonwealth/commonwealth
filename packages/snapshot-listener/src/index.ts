@@ -31,10 +31,10 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       res.status(500).send("Error sending snapshot event");
     }
 
-    if(process.env.LOG_LEVEL === "debug") {
+    if (process.env.LOG_LEVEL === "debug") {
       const eventLog = JSON.stringify(event);
       log.info("snapshot received")
-      log.debug("eventLog");
+      log.info("eventLog");
     }
 
     const parsedId = event.id.replace(/.*\//, "");
