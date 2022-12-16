@@ -1,6 +1,5 @@
 import {  DB } from '../models';
 import { AppError } from 'common-common/src/errors';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { WalletId } from 'common-common/src/types';
 
@@ -22,9 +21,7 @@ const setAddressWallet = async (
   req: TypedRequestBody<SetAddressWalletReq>,
   res: TypedResponse<Record<string, never>>,
 ) => {
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (!author) throw new AppError(Errors.InvalidUser);
-  if (authorError) throw new AppError(authorError);
+  const author = req.address;
   if (author.wallet_id) throw new AppError(Errors.AddressAlreadyHasWalletId);
   if (!Object.values(WalletId).includes(req.body.wallet_id)) {
     throw new AppError(Errors.InvalidWalletId);
