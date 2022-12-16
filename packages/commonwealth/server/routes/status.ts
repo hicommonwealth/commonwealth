@@ -1,22 +1,12 @@
 import { QueryTypes, Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
-import {
-  CommunitySnapshotSpaceWithSpaceAttached,
-} from 'server/models/community_snapshot_spaces';
+import { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { Request } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  ChainNodeInstance,
-} from 'server/models/chain_node';
-import {
-  NotificationCategoryInstance,
-} from 'server/models/notification_category';
-import {
-  ChainCategoryInstance,
-} from 'server/models/chain_category';
-import {
-  ChainCategoryTypeInstance,
-} from 'server/models/chain_category_type';
+import { ChainNodeInstance } from 'server/models/chain_node';
+import { NotificationCategoryInstance } from 'server/models/notification_category';
+import { ChainCategoryInstance } from 'server/models/chain_category';
+import { ChainCategoryTypeInstance } from 'server/models/chain_category_type';
 import { InviteCodeAttributes } from 'server/models/invite_code';
 import { EmailNotificationInterval } from 'server/models/user';
 import { SocialAccountInstance } from 'server/models/social_account';
@@ -29,7 +19,7 @@ import { JWT_SECRET } from '../config';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ServerError } from 'common-common/src/errors';
-import {findAllRoles, RoleInstanceWithPermission} from '../util/roles';
+import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -41,7 +31,7 @@ type ThreadCountQueryData = {
 type StatusResp = {
   chainsWithSnapshots: {
     chain: ChainInstance;
-    snapshot: string[] | null;
+    snapshot: string[];
   }[];
   nodes: ChainNodeInstance[];
   notificationCategories: NotificationCategoryInstance[];
@@ -119,8 +109,7 @@ const status = async (
 
         return {
           chain,
-          snapshot:
-            snapshot_space_names.length > 0 ? snapshot_space_names : null,
+          snapshot: snapshot_space_names.length > 0 ? snapshot_space_names : [],
         };
       })
     );
