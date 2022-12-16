@@ -184,10 +184,10 @@ A number of migrations for loading the latest on-chain data are
 defined in server.ts and package.json. To run these migrations on
 Heroku, some special syntax is needed.
 
-For example, to run the councillor/validator flags migration:
+For example, to run the chain events migration:
 
 ```
-FLAG_MIGRATION=true ts-node --log-error --project tsconfig.json server.ts
+CHAIN_ID=dydx yarn migrate-events
 ```
 
 ## Production Logs
