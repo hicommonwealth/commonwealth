@@ -6,9 +6,8 @@ import {
   TypedResponse,
 } from '../types';
 import { DB } from '../models';
-import validateChain from '../util/validateChain';
-import validateRoles from '../util/validateRoles';
 import { BanAttributes } from '../models/ban';
+import validateRoles from '../util/validateRoles';
 
 enum CreateDiscordBotConfigErrors {
   NoChain = 'Must supply a chain ID',
