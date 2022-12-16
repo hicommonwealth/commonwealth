@@ -127,12 +127,14 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private error: EditProfileError;
   private failed: boolean;
   private imageUploading: boolean;
+  private loading: boolean;
   private profile: Profile;
   private profileUpdate: any;
   private saved: boolean;
   private quillEditorState: QuillEditor;
 
   private getProfile = async (address: string) => {
+    this.loading = true;
     const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
       address,
       jwt: app.user.jwt,
@@ -148,6 +150,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       m.redraw();
     });
     this.profile = new Profile(response.profile);
+    this.loading = false;
     m.redraw();
   };
 
@@ -275,6 +278,14 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
   view(vnode) {
     if (this.error !== EditProfileError.None) return;
+
+    if (this.loading) {
+      return (
+        <div class="EditProfilePage">
+          <CWSpinner />
+        </div>
+      );
+    }
 
     return (
       <Sublayout class="Homepage">

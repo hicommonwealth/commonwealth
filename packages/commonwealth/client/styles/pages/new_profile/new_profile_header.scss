@@ -29,7 +29,7 @@
       justify-content: center;
       margin-bottom: 24px;
 
-      > :first-child {
+      > :not(last-child) {
         margin-right: 8px;
       }
     }

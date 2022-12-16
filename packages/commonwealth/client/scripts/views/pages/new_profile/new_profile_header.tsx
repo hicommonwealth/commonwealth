@@ -53,16 +53,23 @@ class SocialAccounts extends ClassComponent<{profile: Profile}> {
 
     if (!profile) return;
 
-    const { email, website } = profile;
+    const { email, website, socials } = profile;
 
     return (
       <div className="social-accounts">
-        {website && <SocialAccount link={website} iconName="website" />}
-        {/* {twitter && <SocialAccount link={twitter} iconName="twitter" />}
-        {discord && <SocialAccount link={discord} iconName="discord" />}
-        {telegram && <SocialAccount link={telegram} iconName="telegram" />}
-        {github && <SocialAccount link={github} iconName="github" />} */}
-        {email && <SocialAccount link={email} iconName="mail" />}
+        {email && <SocialAccount link={`mailto:${email}`} iconName="mail" />}
+        {socials.map((social) => {
+          if (social.includes('twitter')) {
+            return <SocialAccount link={social} iconName="twitter" />
+          } else if (social.includes('discord')) {
+            return <SocialAccount link={social} iconName="discord" />
+          } else if (social.includes('telegram')) {
+            return <SocialAccount link={social} iconName="telegram" />
+          } else if (social.includes('github')) {
+            return <SocialAccount link={social} iconName="github" />
+          }
+          return <SocialAccount link={website} iconName="website" />
+        })}
       </div>
     );
   }
@@ -114,6 +121,18 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
           <div class="buttons">
             <CWButton label="Delegate" buttonType="mini" onClick={() => {}} />
             <CWButton label="Follow" buttonType="mini" onClick={() => {}} />
+            {app.isLoggedIn() && app.user.addresses
+              .map((addressInfo) => addressInfo.address)
+              .includes(address) && (
+                <CWButton
+                  label="Edit"
+                  buttonType="mini"
+                  onclick={() =>
+                    m.route.set(`/profile/${m.route.param('address')}/edit`)
+                  }
+                />
+              )
+            }
           </div>
           <SocialAccounts profile={profile} />
           <CWText type="h4">Bio</CWText>
@@ -133,23 +152,6 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
               <p>{!this.isBioExpanded ? 'Show More' : 'Show Less'}</p>
             </div>
           )}
-        </div>
-
-        <div class="edit">
-          {app.isLoggedIn() &&
-            app.user.addresses
-              .map((addressInfo) => addressInfo.address)
-              .includes(address) && (
-              <div class="edit-button">
-                <CWButton
-                  label="Edit"
-                  buttonType="primary-blue"
-                  onclick={() =>
-                    m.route.set(`/profile/${m.route.param('address')}/edit`)
-                  }
-                />
-              </div>
-            )}
         </div>
       </div>
     );
