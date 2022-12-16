@@ -49,6 +49,7 @@ export enum RascalPublications {
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
   ChainEventTypeCUDMain = 'ChainEventTypeCUDMainPublication',
+  SnapshotProposalNotifications = 'SnapshotProposalNotificationsPublication',
   SnapshotListener = 'SnapshotListenerPublication'
 }
 
