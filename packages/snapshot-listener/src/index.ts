@@ -26,8 +26,9 @@ app.get("/", (req: Request, res: Response) => {
 app.post("/snapshot", async (req: Request, res: Response) => {
   try {
     if (process.env.LOG_LEVEL === "debug") {
+      const requestLog = JSON.stringify(req.body);
       log.info("request received")
-      log.info(JSON.stringify(req));
+      log.info(requestLog);
     }
 
     const event: ISnapshotNotification = req.body.event;
