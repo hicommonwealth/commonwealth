@@ -8,10 +8,10 @@ export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD'
 export * from './chainEventTypeCUD'
 
-export * from "./ChainEvents"
-export * from "./ChainEventNotification"
-import { RmqCWEvent } from "./ChainEvents";
-import { RmqCENotification } from "./ChainEventNotification";
+export * from "./chainEvents"
+export * from "./chainEventNotification"
+import { RmqCWEvent } from "./chainEvents";
+import { RmqCENotification } from "./chainEventNotification";
 import { RmqSnapshotEvent } from "./snapshotListener";
 import { RmqSnapshotNotification } from "./snapshotNotification";
 
