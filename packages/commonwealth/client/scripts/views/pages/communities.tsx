@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import numeral from 'numeral';
 
-import 'pages/landing/community_cards.scss';
+import 'pages/communities.scss';
 
 import app from 'state';
 import { ChainInfo } from 'models';
@@ -50,7 +50,7 @@ export const buildChainToCategoriesMap = (
   return chainToCategoriesMap;
 };
 
-class HomepageCommunityCards extends ClassComponent {
+class CommunitiesPage extends ClassComponent {
   private chainCategories: Array<string>;
   private chainNetworks: Array<string>;
   private chainBases: Array<string>;
@@ -183,72 +183,68 @@ class HomepageCommunityCards extends ClassComponent {
     const totalCommunitiesString = buildCommunityString(sortedChains.length);
 
     return (
-      <div class="HomepageCommunityCards">
-        <div class="header-section">
-          <CWText type="h3" fontWeight="semiBold" className="communities-count">
-            {totalCommunitiesString}
-          </CWText>
-          <div class="filter-buttons">
-            {this.chainCategories.map((cat) => {
-              return (
-                <CWButton
-                  label={cat}
-                  buttonType={
-                    this.filterMap[cat] ? 'primary-black' : 'secondary-black'
-                  }
-                  onclick={() => {
-                    this.filterMap[cat] = !this.filterMap[cat];
-                  }}
-                />
-              );
-            })}
-            {this.chainNetworks.map((network) => {
-              return (
-                <CWButton
-                  label={network}
-                  buttonType={
-                    this.filterMap[network]
-                      ? 'primary-black'
-                      : 'secondary-black'
-                  }
-                  onclick={() => {
-                    this.filterMap[network] = !this.filterMap[network];
-                  }}
-                />
-              );
-            })}
-            {this.chainBases.map((base) => {
-              return (
-                <CWButton
-                  label={base}
-                  buttonType={
-                    this.filterMap[base] ? 'primary-black' : 'secondary-black'
-                  }
-                  onclick={() => {
-                    this.filterMap[base] = !this.filterMap[base];
-                  }}
-                />
-              );
-            })}
+      <Sublayout>
+        <div class="CommunitiesPage">
+          <div class="header-section">
+            <CWText
+              type="h3"
+              fontWeight="semiBold"
+              className="communities-count"
+            >
+              {totalCommunitiesString}
+            </CWText>
+            <div class="filter-buttons">
+              {this.chainCategories.map((cat) => {
+                return (
+                  <CWButton
+                    label={cat}
+                    buttonType={
+                      this.filterMap[cat] ? 'primary-black' : 'secondary-black'
+                    }
+                    onclick={() => {
+                      this.filterMap[cat] = !this.filterMap[cat];
+                    }}
+                  />
+                );
+              })}
+              {this.chainNetworks.map((network) => {
+                return (
+                  <CWButton
+                    label={network}
+                    buttonType={
+                      this.filterMap[network]
+                        ? 'primary-black'
+                        : 'secondary-black'
+                    }
+                    onclick={() => {
+                      this.filterMap[network] = !this.filterMap[network];
+                    }}
+                  />
+                );
+              })}
+              {this.chainBases.map((base) => {
+                return (
+                  <CWButton
+                    label={base}
+                    buttonType={
+                      this.filterMap[base] ? 'primary-black' : 'secondary-black'
+                    }
+                    onclick={() => {
+                      this.filterMap[base] = !this.filterMap[base];
+                    }}
+                  />
+                );
+              })}
+            </div>
+          </div>
+          <div class="communities-list">
+            {sortedChains}
+            <NewCommunityCard />
           </div>
         </div>
-        <div class="communities-list">
-          {sortedChains}
-          <NewCommunityCard />
-        </div>
-      </div>
+      </Sublayout>
     );
   }
 }
 
-const CommunityCardPage: m.Component = {
-  view: () => {
-    return (
-      <Sublayout>
-        <HomepageCommunityCards />
-      </Sublayout>
-    );
-  },
-};
-
-export default CommunityCardPage;
+export default CommunitiesPage;
