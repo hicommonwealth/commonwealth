@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import validateRoles from '../util/validateRoles';
 import { DB } from '../models';
 import { TopicAttributes } from '../models/topic';

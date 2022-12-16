@@ -1,7 +1,10 @@
-import { TokenBalanceCache, FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
+import {
+  TokenBalanceCache,
+  FetchTokenBalanceErrors,
+} from 'token-balance-cache/src/index';
 
 import { AppError, ServerError } from 'common-common/src/errors';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { ChainInstance } from '../models/chain';
@@ -63,7 +66,7 @@ const tokenBalance = async (
       chain_node_id,
       req.body.address,
       req.body.contract_address
-    )
+    );
     return success(res, balance);
   } catch (e) {
     if (e.message === FetchTokenBalanceErrors.NoBalanceProvider) {
