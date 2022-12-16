@@ -105,7 +105,7 @@ const getDiscussionResult = (thread, searchTerm) => {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
-      m.route.set(`/${chain}/proposal/discussion/${proposalId}`);
+      m.route.set(`/${chain}/discussion/${proposalId}`);
     },
     label: (
       <a class="search-results-item">

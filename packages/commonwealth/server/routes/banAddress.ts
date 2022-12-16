@@ -1,7 +1,7 @@
 import { AppError } from 'common-common/src/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import { DB } from '../models';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import validateRoles from '../util/validateRoles';
 import { BanAttributes, BanInstance } from '../models/ban';
 
@@ -21,7 +21,7 @@ type BanAddressResp = BanAttributes;
 const banAddress = async (
   models: DB,
   req: TypedRequestBody<BanAddressReq>,
-  res: TypedResponse<BanAddressResp>,
+  res: TypedResponse<BanAddressResp>
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) throw new AppError(BanAddressErrors.NoChain);
@@ -40,7 +40,7 @@ const banAddress = async (
     defaults: {
       chain_id: chain.id,
       address,
-    }
+    },
   });
 
   return success(res, ban.toJSON());
