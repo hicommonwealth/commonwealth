@@ -52,7 +52,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         app.chain.network === ChainNetwork.Moloch ||
         app.chain.network === ChainNetwork.Compound ||
         app.chain.network === ChainNetwork.Aave ||
-        app.chain.network === ChainNetwork.Commonwealth ||
+        // app.chain.network === ChainNetwork.CommonProtocol ||
         app.chain.meta.snapshot?.length);
 
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
