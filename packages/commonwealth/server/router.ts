@@ -251,11 +251,13 @@ function setupRouter(
   router.post(
     '/starCommunity',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     starCommunity.bind(this, models)
   );
 
   router.post(
     '/tokenBalance',
+    databaseValidationService.validateChain,
     tokenBalance.bind(this, models, tokenBalanceCache)
   );
   router.post(
@@ -322,11 +324,13 @@ function setupRouter(
   router.post(
     '/updateThreadLinkedChainEntities',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     updateThreadLinkedChainEntities.bind(this, models)
   );
   router.post(
     '/updateThreadLinkedSnapshotProposal',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     updateThreadLinkedSnapshotProposal.bind(this, models)
   );
 
@@ -334,9 +338,14 @@ function setupRouter(
     '/updateVote',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     updateVote.bind(this, models, tokenBalanceCache, ruleCache)
   );
-  router.get('/viewVotes', viewVotes.bind(this, models));
+  router.get(
+    '/viewVotes',
+    databaseValidationService.validateChain,
+    viewVotes.bind(this, models)
+  );
 
   router.get('/fetchEntityTitle', fetchEntityTitle.bind(this, models));
   router.get(
@@ -347,12 +356,14 @@ function setupRouter(
   router.post(
     '/updateChainEntityTitle',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     updateChainEntityTitle.bind(this, models)
   );
   router.post(
     '/updateLinkedThreads',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     updateLinkedThreads.bind(this, models)
   );
   router.post(
@@ -389,8 +400,16 @@ function setupRouter(
     activeThreads.bind(this, models)
   );
   router.get('/getThreads', getThreadsOld.bind(this, models));
-  router.get('/searchDiscussions', searchDiscussions.bind(this, models));
-  router.get('/searchComments', searchComments.bind(this, models));
+  router.get(
+    '/searchDiscussions',
+    databaseValidationService.validateChain,
+    searchDiscussions.bind(this, models)
+  );
+  router.get(
+    '/searchComments',
+    databaseValidationService.validateChain,
+    searchComments.bind(this, models)
+  );
 
   router.get('/profile', getProfileOld.bind(this, models));
 
@@ -399,6 +418,7 @@ function setupRouter(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     createDraft.bind(this, models)
   );
   router.get('/drafts', getDrafts.bind(this, models));
@@ -406,12 +426,14 @@ function setupRouter(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     deleteDraft.bind(this, models)
   );
   router.patch(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     editDraft.bind(this, models)
   );
 
@@ -441,7 +463,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteComment.bind(this, models, banCache)
   );
-  router.get('/viewComments', viewComments.bind(this, models));
+  router.get(
+    '/viewComments',
+    databaseValidationService.validateChain,
+    viewComments.bind(this, models)
+  );
   router.get(
     '/bulkComments',
     databaseValidationService.validateChain.bind(databaseValidationService),
@@ -463,6 +489,7 @@ function setupRouter(
   router.post(
     '/orderTopics',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     orderTopics.bind(this, models)
   );
   router.post(
@@ -501,7 +528,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     deleteReaction.bind(this, models, banCache)
   );
-  router.get('/viewReactions', viewReactions.bind(this, models));
+  router.get(
+    '/viewReactions',
+    databaseValidationService.validateChain,
+    viewReactions.bind(this, models)
+  );
   router.get('/bulkReactions', bulkReactions.bind(this, models));
   router.post('/reactionsCounts', reactionsCounts.bind(this, models));
   router.post(
@@ -535,6 +566,7 @@ function setupRouter(
   router.post(
     '/upgradeMember',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     upgradeMember.bind(this, models)
   );
 
@@ -549,6 +581,7 @@ function setupRouter(
   router.post(
     '/updateBanner',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     updateBanner.bind(this, models)
   );
 
@@ -563,6 +596,7 @@ function setupRouter(
   router.get(
     '/setProjectChain',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     setProjectChain.bind(this, models)
   );
 
@@ -570,21 +604,25 @@ function setupRouter(
   router.post(
     '/createWebhook',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     createWebhook.bind(this, models)
   );
   router.post(
     '/updateWebhook',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     updateWebhook.bind(this, models)
   );
   router.post(
     '/deleteWebhook',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     deleteWebhook.bind(this, models)
   );
   router.get(
     '/getWebhooks',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     getWebhooks.bind(this, models)
   );
 
@@ -604,6 +642,7 @@ function setupRouter(
   router.post(
     '/setDefaultRole',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     setDefaultRole.bind(this, models)
   );
 
@@ -611,6 +650,7 @@ function setupRouter(
   router.post(
     '/updateProfile',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     updateProfile.bind(this, models)
   );
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
@@ -773,6 +813,7 @@ function setupRouter(
   router.post(
     '/createRule',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateChain,
     createRule.bind(this, models)
   );
   router.post(

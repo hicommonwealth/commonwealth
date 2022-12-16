@@ -37,7 +37,7 @@ export default class DatabaseValidationService {
       if (error) return next(new AppError(error));
       // If the chain is valid, add it to the request object
       req.chain = chain;
-    } else if (req.method === 'POST' || req.method === 'PUT') {
+    } else if (req.method === 'POST' || req.method === 'PUT' || req.method === 'DELETE' || req.method === 'PATCH') {
       [chain, error] = await validateChain(this.models, req.body);
       if (error) return next(new AppError(error));
       // If the chain is valid, add it to the request object
