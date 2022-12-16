@@ -35,304 +35,47 @@ export enum Action {
   DELETE_TOPIC = 21,
 }
 
-const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+// Implicit Permissions are a tree hierarchy of permissions that are implied by other permissions
+export const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+  // Chat Subtree
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
   [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
-  [
-    Action.VIEW_REACTIONS,
-    [
-      Action.VIEW_COMMENTS,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-      Action.VIEW_TOPICS,
-    ],
-  ],
-  [
-    Action.CREATE_REACTION,
-    [
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.VIEW_COMMENTS,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.VIEW_COMMENTS,
-    [
-      Action.VIEW_REACTIONS,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-      Action.VIEW_TOPICS,
-    ],
-  ],
-  [
-    Action.CREATE_COMMENT,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.EDIT_COMMENT,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.VIEW_COMMENTS,
-      Action.CREATE_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.DELETE_COMMENT,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.VIEW_POLLS,
-    [
-      Action.VIEW_REACTIONS,
-      Action.VIEW_COMMENTS,
-      Action.VIEW_THREADS,
-      Action.VIEW_TOPICS,
-    ],
-  ],
-  [
-    Action.CREATE_POLL,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.VOTE_ON_POLLS,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-    ],
-  ],
-  [
-    Action.VIEW_THREADS,
-    [
-      Action.VIEW_REACTIONS,
-      Action.VIEW_COMMENTS,
-      Action.VIEW_POLLS,
-      Action.VIEW_TOPICS,
-    ],
-  ],
-  [
-    Action.CREATE_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-    ],
-  ],
-  [
-    Action.EDIT_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-    ],
-  ],
-  [
-    Action.DELETE_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-    ],
-  ],
-  [
-    Action.LINK_THREAD_TO_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-    ],
-  ],
-  [
-    Action.LINK_PROPOSAL_TO_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-    ],
-  ],
-  [
-    Action.VIEW_TOPICS,
-    [
-      Action.VIEW_REACTIONS,
-      Action.VIEW_COMMENTS,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.CREATE_TOPIC,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-      Action.VIEW_TOPICS,
-      Action.EDIT_TOPIC,
-      Action.DELETE_TOPIC,
-    ],
-  ],
-  [
-    Action.EDIT_TOPIC,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-      Action.VIEW_TOPICS,
-      Action.CREATE_TOPIC,
-      Action.DELETE_TOPIC,
-    ],
-  ],
-  [
-    Action.DELETE_TOPIC,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-      Action.VIEW_TOPICS,
-      Action.CREATE_TOPIC,
-      Action.EDIT_TOPIC,
-    ],
-  ],
+  // View Subtree
+  [Action.VIEW_TOPICS, [Action.VIEW_THREADS]],
+  [Action.VIEW_THREADS, [Action.VIEW_POLLS]],
+  [Action.VIEW_POLLS, [Action.VIEW_COMMENTS]],
+  [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS]],
+  // Create Subtree
+  [Action.CREATE_TOPIC, [Action.CREATE_THREAD, Action.EDIT_TOPIC, Action.DELETE_TOPIC, Action.VIEW_TOPICS]],
+  [Action.CREATE_THREAD, [Action.CREATE_POLL, Action.EDIT_THREAD, Action.DELETE_THREAD, Action.VIEW_TOPICS]],
+  [Action.CREATE_POLL, [Action.CREATE_COMMENT, Action.VOTE_ON_POLLS, Action.VIEW_TOPICS]],
+  [Action.CREATE_COMMENT, [Action.CREATE_REACTION, Action.EDIT_COMMENT, Action.DELETE_COMMENT, Action.VIEW_TOPICS]],
+  [Action.CREATE_REACTION, [Action.DELETE_REACTION, Action.VIEW_TOPICS]],
+  // Voting Subtree
+  [Action.VOTE_ON_POLLS, [Action.VIEW_POLLS]],
+  // Delete Subtree
+  [Action.DELETE_TOPIC, [Action.DELETE_THREAD]],
+  [Action.DELETE_THREAD, [Action.DELETE_COMMENT]],
+  [Action.DELETE_COMMENT, [Action.DELETE_REACTION]],
+  // Edit Subtree
+  [Action.EDIT_TOPIC, [Action.EDIT_THREAD]],
+  [Action.EDIT_THREAD, [Action.EDIT_COMMENT, Action.LINK_THREAD_TO_THREAD, Action.LINK_PROPOSAL_TO_THREAD]],
 ]);
+
+// Recursive function to get all implicit permissions of an action
+export const getImplicitActions = (action: Action, result_actions: Action[]): Action[] => {
+  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(action);
+  // Base Case, if there are no implicit permission leaves, return the action
+  if (!implicitActions) {
+    return [ action ];
+  }
+  // Recursive Case, if there are implicit permission leaves, return the action and the leaves
+  for (let i = 0; i < implicitActions.length; i++) {
+    result_actions = result_actions.concat(getImplicitActions(implicitActions[i], []));
+  };
+  let uniqueActions = [...new Set(result_actions.concat([action], implicitActions))];
+  return uniqueActions;
+}
 
 // Adds or Removes the implicit permissions of a permission
 export function addRemoveImplicitPermissions(
@@ -441,6 +184,7 @@ type RoleObject = {
   deny: Permissions;
 };
 
+// Aggregates role permissions with chain permissions for a user by ordering the roles by lowest to highest permission levels and then computing the permissions
 export function aggregatePermissions(
   roles: RoleObject[],
   chain_permissions: { allow: Permissions; deny: Permissions }
