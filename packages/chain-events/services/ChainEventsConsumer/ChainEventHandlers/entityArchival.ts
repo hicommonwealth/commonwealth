@@ -46,7 +46,9 @@ export default class extends IEventHandler {
     // (allows backwards compatibility between reduced memory consuming chain consumer/handlers and other scripts)
     const chain = event.chain || this._chain;
     if (!dbEvent) {
-      log.trace('no db event found!');
+      log.warn(
+        `no db event found for event ${event.chain}::${event.data.kind}!`
+      );
       return;
     }
 
@@ -61,7 +63,7 @@ export default class extends IEventHandler {
     const createEntityFn = async (
       type: IChainEntityKind,
       type_id: string,
-      author?,
+      author?: string,
       completed = false
     ) => {
       if (type === SubstrateTypes.EntityKind.DemocracyPreimage) {
@@ -82,6 +84,8 @@ export default class extends IEventHandler {
       const publishData: RmqEntityCUD.RmqMsgType = {
         ce_id: dbEntity.id,
         chain_id: dbEntity.chain,
+        author,
+        entity_type_id: type_id,
         cud: 'create',
       };
 
@@ -146,7 +150,7 @@ export default class extends IEventHandler {
     const [entityKind, updateType] = entity;
     const fieldName = getUniqueEntityKey(event.network, entityKind);
     const fieldValue = event.data[fieldName].toString();
-    const author = event.data['proposer'];
+    const author = event.data['proposer'] || event.data['creator'];
     let result;
     switch (updateType) {
       case EntityEventKind.Create: {

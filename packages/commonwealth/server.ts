@@ -35,11 +35,11 @@ import setupCosmosProxy from './server/util/cosmosProxy';
 import setupEntityProxy from './server/util/entitiesProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import setupPassport from './server/passport';
-import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import { StatsDController } from 'common-common/src/statsd';
 import {BrokerConfig} from "rascal";
 import GlobalActivityCache from './server/util/globalActivityCache';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -63,27 +63,11 @@ async function main() {
     SHOULD_SEND_EMAILS ||
     SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
-  // CLI parameters used to configure specific tasks
-  const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
-
   const tokenBalanceCache = new TokenBalanceCache();
   const ruleCache = new RuleCache();
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
-  } else if (FLAG_MIGRATION) {
-    log.info('Started migrating councillor and validator flags into the DB');
-    try {
-      await migrateCouncillorValidatorFlags(models);
-      log.info('Finished migrating councillor and validator flags into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error(
-        'Failed migrating councillor and validator flags into the DB: ',
-        e.message
-      );
-      rc = 1;
-    }
   }
 
   // exit if we have performed a one-off event
@@ -248,6 +232,11 @@ async function main() {
   const globalActivityCache = new GlobalActivityCache(models);
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   await globalActivityCache.start();
+
+  // Declare Validation Middleware Service
+  // middleware to use for all requests
+  const dbValidationService: DatabaseValidationService = new DatabaseValidationService(models);
+
   setupAPI(
     app,
     models,
@@ -256,6 +245,7 @@ async function main() {
     ruleCache,
     banCache,
     globalActivityCache,
+    dbValidationService,
   );
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);

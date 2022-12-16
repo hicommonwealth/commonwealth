@@ -1,8 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
-import { performance, PerformanceObserver } from 'perf_hooks';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;
@@ -114,7 +113,8 @@ export default async (
   //   },
   // });
 
-  const [notificationsRead,
+  const [
+    notificationsRead,
     // allSubscriptions
   ] = await Promise.all([
     notificationsReadPromise,
