@@ -34,7 +34,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     if (process.env.LOG_LEVEL === "debug") {
       const eventLog = JSON.stringify(event);
       log.info("snapshot received")
-      log.info("eventLog");
+      log.info(eventLog);
     }
 
     const parsedId = event.id.replace(/.*\//, "");
