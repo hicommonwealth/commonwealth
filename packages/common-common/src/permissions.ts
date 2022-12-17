@@ -36,7 +36,7 @@ export enum Action {
 }
 
 // Implicit Permissions are a tree hierarchy of permissions that are implied by other permissions
-export const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   // Chat Subtree
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
   [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
@@ -63,7 +63,7 @@ export const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
 ]);
 
 // Recursive function to get all implicit permissions of an action
-export const getImplicitActions = (action: Action, result_actions: Action[]): Action[] => {
+const recurseImplicitActions = (action: Action, result_actions: Action[]): Action[] => {
   const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(action);
   // Base Case, if there are no implicit permission leaves, return the action
   if (!implicitActions) {
@@ -71,10 +71,14 @@ export const getImplicitActions = (action: Action, result_actions: Action[]): Ac
   }
   // Recursive Case, if there are implicit permission leaves, return the action and the leaves
   for (let i = 0; i < implicitActions.length; i++) {
-    result_actions = result_actions.concat(getImplicitActions(implicitActions[i], []));
+    result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], []));
   };
   let uniqueActions = [...new Set(result_actions.concat([action], implicitActions))];
   return uniqueActions;
+}
+
+export const getImplicitActionsSet = (action: Action): Action[] => {
+  return recurseImplicitActions(action, IMPLICIT_PERMISSIONS_BY_ACTION.get(action));
 }
 
 // Adds or Removes the implicit permissions of a permission
