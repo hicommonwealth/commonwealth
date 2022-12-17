@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import axios from 'axios';
 import axiosRetry from 'axios-retry';
-import { AppError } from '../util/errors';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ETHERSCAN_JS_API_KEY } from '../config';
