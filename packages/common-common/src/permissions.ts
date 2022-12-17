@@ -71,9 +71,9 @@ const recurseImplicitActions = (action: Action, result_actions: Action[]): Actio
   }
   // Recursive Case, if there are implicit permission leaves, return the action and the leaves
   for (let i = 0; i < implicitActions.length; i++) {
-    result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], []));
+    result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], IMPLICIT_PERMISSIONS_BY_ACTION.get(implicitActions[i])));
   };
-  let uniqueActions = [...new Set(result_actions.concat([action], implicitActions))];
+  let uniqueActions = [...new Set(result_actions.concat([action]))];
   return uniqueActions;
 }
 
