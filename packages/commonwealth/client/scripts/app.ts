@@ -238,7 +238,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/adapter'
+        './controllers/chain/ethereum/tokenAdapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
@@ -331,15 +331,6 @@ export async function selectChain(
       )
     ).default;
     newChain = new Solana(chain, app);
-  } else if (chain.network === ChainNetwork.Commonwealth) {
-    const Commonwealth = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "commonwealth-main" */
-        './controllers/chain/ethereum/commonwealth/adapter'
-      )
-    ).default;
-    newChain = new Commonwealth(chain, app);
   } else if (
     chain.base === ChainBase.Ethereum &&
     chain.type === ChainType.Offchain
@@ -732,6 +723,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/view_proposal/index',
               { scoped: true }
             ),
+            '/:scope/proposal/discussion/:identifier': redirectRoute(
+              (attrs) => `/discussion/${attrs.identifier}`
+            ),
             '/proposal/:identifier': importRoute(
               'views/pages/view_proposal/index',
               { scoped: true }
@@ -792,6 +786,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
 
             // Redirects
+
             '/:scope/dashboard': redirectRoute(() => '/'),
             '/:scope/notifications': redirectRoute(() => '/notifications'),
             '/:scope/notification-settings': redirectRoute(
@@ -899,6 +894,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             // Scoped routes
             //
+            '/:scope/proposal/discussion/:identifier': redirectRoute(
+              (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
+            ),
 
             // Notifications
             '/:scope/notifications': importRoute(
@@ -909,18 +907,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            // CMN
-            '/:scope/projects': importRoute(
-              'views/pages/commonwealth/projects',
-              { scoped: true }
-            ),
-            '/:scope/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
-            '/:scope/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
-              { scoped: true }
             ),
             // NEAR
             '/:scope/finishNearLogin': importRoute(

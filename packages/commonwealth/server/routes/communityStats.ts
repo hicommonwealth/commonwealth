@@ -1,6 +1,6 @@
 import { QueryTypes, Op } from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
