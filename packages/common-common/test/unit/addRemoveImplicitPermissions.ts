@@ -8,7 +8,7 @@ import {
   computePermissions,
 } from 'common-common/src/permissions';
 
-describe('computeImplicitPermissions() unit tests', () => {
+describe('addRemoveImplicitPermissions() unit tests', () => {
   let base_permission;
   let overwrite_admin;
   let overwrite_moderator;
