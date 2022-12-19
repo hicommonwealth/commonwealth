@@ -13,10 +13,12 @@ export function ParseType(typeUrl: string, chain?: string): EventKind | null {
   switch (typeUrl) {
     case '/cosmos.gov.v1beta1.MsgSubmitProposal':
       return EventKind.SubmitProposal;
+    /* JAKE 12/16: voting disabled for time being
     case '/cosmos.gov.v1beta1.MsgVote':
       return EventKind.Vote;
     case '/cosmos.gov.v1beta1.MsgDeposit':
       return EventKind.Deposit;
+    */
     default: {
       log.trace(`Unknown event typeUrl: ${typeUrl}!`);
       return null;
