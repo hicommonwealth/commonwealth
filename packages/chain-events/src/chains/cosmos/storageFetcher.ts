@@ -90,6 +90,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
     };
     events.push(submitEvent);
 
+    /* JAKE 12/16: voting disabled for time being
     if (proposal.status === ProposalStatus.PROPOSAL_STATUS_DEPOSIT_PERIOD) {
       // query deposit events if active
       this.log.info(`Starting paginated deposits query...`);
@@ -131,7 +132,7 @@ export class StorageFetcher extends IStorageFetcher<Api> {
         },
       }));
       events.push(...voteEvents);
-    }
+    } */
     return events;
   }
 
