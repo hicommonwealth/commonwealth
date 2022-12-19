@@ -93,7 +93,7 @@ describe('computePermissions() unit tests', () => {
     assert.isFalse(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
   });
 
-  it('should correctly do implicit permissions for an addPermission', () => {
+  it('should correctly implicit permissions for an addPermission', () => {
     const actionPermission = addPermission(
       base_permission,
       Action.VIEW_THREADS
