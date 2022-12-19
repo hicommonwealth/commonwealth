@@ -14,59 +14,20 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import User from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 
-const getBalancedContentListing = (
-  unfilteredResults: Record<string, Array<any>>,
-  types: Array<SearchScope>
-) => {
-  const results = {};
-  let unfilteredResultsLength = 0;
-
-  for (const key of types) {
-    results[key] = [];
-    unfilteredResultsLength += unfilteredResults[key]?.length || 0;
-  }
-
-  let priorityPosition = 0;
-  let resultsLength = 0;
-
-  while (resultsLength < 6 && resultsLength < unfilteredResultsLength) {
-    for (let i = 0; i < types.length; i++) {
-      const type = types[i];
-
-      if (resultsLength < 6) {
-        const nextResult = unfilteredResults[type][priorityPosition];
-
-        if (nextResult) {
-          results[type].push(nextResult);
-          resultsLength += 1;
-        }
-      }
-    }
-
-    priorityPosition += 1;
-  }
-
-  return results;
-};
-
 const getResultsPreview = (searchQuery: SearchQuery) => {
   const types = searchQuery.getSearchScope();
 
-  const results = getBalancedContentListing(
-    app.search.getByQuery(searchQuery).results,
-    types
+  const results = Object.fromEntries(
+    Object.entries(app.search.getByQuery(searchQuery).results).map(([k, v]) => [
+      k,
+      v.slice(0, 2),
+    ])
   );
 
-  const organizedResults = [];
+  const resultsPreview = [];
 
   types.forEach((type: SearchScope) => {
-    const result = results[type];
-
-    if (result?.length === 0) {
-      return;
-    }
-
-    result.forEach((item) => {
+    results[type].forEach((item) => {
       const resultRow =
         item.searchType === SearchScope.Threads ? (
           <div
@@ -137,11 +98,11 @@ const getResultsPreview = (searchQuery: SearchQuery) => {
           </div>
         ) : null;
 
-      organizedResults.push(resultRow);
+      resultsPreview.push(resultRow);
     });
   });
 
-  return organizedResults;
+  return resultsPreview;
 };
 
 export const getSearchPreview = async (searchQuery: SearchQuery, state) => {
