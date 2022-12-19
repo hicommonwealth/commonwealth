@@ -2,17 +2,6 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import $ from 'jquery';
-import {
-  ControlGroup,
-  Icon,
-  Icons,
-  Input,
-  List,
-  ListItem,
-  Button,
-  Size,
-} from 'construct-ui';
 
 import 'pages/search/search_bar.scss';
 
@@ -21,6 +10,37 @@ import { SearchQuery } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { getSearchHistoryPreview, executeSearch, search } from './helpers';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWText } from '../../components/component_kit/cw_text';
+import { getClasses } from '../../components/component_kit/helpers';
+
+type SearchChipAttrs = {
+  isActive: boolean;
+  label: string;
+  onclick: () => void;
+};
+
+export class SearchChip extends ClassComponent<SearchChipAttrs> {
+  view(vnode: m.Vnode<SearchChipAttrs>) {
+    const { isActive, label, onclick } = vnode.attrs;
+
+    return (
+      <CWText
+        type="b2"
+        fontWeight="medium"
+        className={getClasses<{ isActive: boolean }>(
+          {
+            isActive,
+          },
+          'SearchChip'
+        )}
+        onclick={onclick}
+      >
+        {label}
+      </CWText>
+    );
+  }
+}
 
 export class SearchBar extends ClassComponent {
   private activeChain: string;
@@ -33,7 +53,7 @@ export class SearchBar extends ClassComponent {
   private isTyping: boolean;
   private results: any[];
   private searchQuery: SearchQuery;
-  private searchTerm: string;
+  private searchTerm: Lowercase<string>;
   private setUsingFilterMenu: (boolean) => void;
 
   view() {
@@ -84,179 +104,155 @@ export class SearchBar extends ClassComponent {
 
     if (historyList.length > 0) {
       historyList.push(
-        m(ListItem, {
-          class: 'search-history-no-results upper-border',
-          // eslint-disable-next-line max-len
-          label:
-            "Tip: You can use operators like 'single quotes', and the keyword &quot;or&quot; to limit your search!",
-        })
+        <CWText type="caption">
+          Tip: You can use operators like 'single quotes', and the keyword
+          &quot;or&quot; to limit your search!
+        </CWText>
       );
     }
 
-    const scopeTitle = m(ListItem, {
-      class: 'disabled',
-      label: 'Limit search to:',
-    });
-
-    const scopeToButton = (scope, disabled) => {
-      return m(Button, {
-        size: Size.SM,
-        class: disabled ? 'disabled' : '',
-        active: this.searchQuery.searchScope.includes(scope),
-        onclick: () => {
-          this.searchQuery.toggleScope(scope);
-          search(this.searchQuery, this);
-        },
-        onmouseover: () => {
-          this.filterMenuActive = true;
-        },
-        onmouseout: () => {
-          this.filterMenuActive = false;
-        },
-        label: scope,
-      });
-    };
-
-    const scopeButtons = [SearchScope.Threads, SearchScope.Replies]
-      .map((s) => scopeToButton(s, false))
+    const scopeChips = [SearchScope.Threads, SearchScope.Replies]
+      .map((s) => {
+        return (
+          <SearchChip
+            isActive={this.searchQuery.searchScope.includes(s)}
+            label={s}
+            onclick={() => {
+              this.searchQuery.toggleScope(s);
+              // search(this.searchQuery, this);
+            }}
+          />
+        );
+      })
       .concat(
         (app.isCustomDomain()
           ? []
           : [SearchScope.Communities, SearchScope.Members]
-        ).map((s) => scopeToButton(s, false))
+        ).map((s) => {
+          return (
+            <SearchChip
+              isActive={this.searchQuery.searchScope.includes(s)}
+              label={s}
+              onclick={() => {
+                this.searchQuery.toggleScope(s);
+                // search(this.searchQuery, this);
+              }}
+            />
+          );
+        })
       );
 
-    const filterDropdown = m(List, { class: 'search-results-list' }, [
-      m(ListItem, { class: 'disabled', label: "I'm looking for: " }),
-      m(ListItem, {
-        class: 'disabled search-filter-button-bar',
-        label: scopeButtons,
-      }),
-      this.activeChain &&
-        !app.isCustomDomain() && [
-          scopeTitle,
-          m(ListItem, {
-            class: 'disabled',
-            label: m(Button, {
-              size: Size.SM,
-              onclick: () => {
-                this.searchQuery.chainScope =
-                  this.searchQuery.chainScope === this.activeChain
-                    ? undefined
-                    : this.activeChain;
-                search(this.searchQuery, this);
-              },
-              active: this.searchQuery.chainScope === this.activeChain,
-              onmouseover: () => {
-                this.filterMenuActive = true;
-              },
-              onmouseout: () => {
-                this.filterMenuActive = false;
-              },
-              label: `Inside chain: ${this.activeChain}`,
-            }),
-          }),
-        ],
-      this.searchTerm.length < 1
-        ? historyList.length === 0
-          ? m(ListItem, {
-              class: 'search-history-no-results upper-border',
-              label: 'Enter a term into the field and press Enter to start',
-            })
-          : [
-              m(ListItem, {
-                class: 'disabled upper-border',
-                label: 'Search History',
-              }),
-              historyList,
-            ]
-        : !results || results?.length === 0
-        ? app.search.getByQuery(searchQuery)?.loaded
-          ? m(ListItem, {
-              class: 'search-history-no-results upper-border',
-              label: 'No Results Found',
-            })
-          : this.isTyping
-          ? m(ListItem, {
-              class: 'disabled upper-border',
-              label: <CWSpinner size="small" />,
-            })
-          : m(ListItem, {
-              class: 'search-history-no-results upper-border',
-              label: 'Make your query longer than 3 characters to search',
-            })
-        : this.isTyping
-        ? m(ListItem, {
-            class: 'disabled upper-border',
-            label: <CWSpinner size="small" />,
-          })
-        : results,
-    ]);
+    return (
+      <div class="SearchBar">
+        <div class="search-and-icon-container">
+          <input
+            placeholder="Search Common"
+            defaultValue={m.route.param('q') || this.searchTerm}
+            value={this.searchTerm}
+            autocomplete="off"
+            onclick={async () => {
+              this.focused = true;
+            }}
+            // onfocusout={() => {
+            //   if (!this.filterMenuActive) {
+            //     this.focused = false;
+            //   }
+            // }}
+            oninput={(e) => {
+              e.stopPropagation();
 
-    const cancelInputIcon = this.searchTerm
-      ? m(Icon, {
-          name: Icons.X,
-          onclick: () => {
-            const input = $('.SearchBar').find('input[name=search');
-            input.val('');
-            this.searchTerm = '';
-          },
-        })
-      : null;
+              this.isTyping = true;
 
-    const searchIcon = this.searchTerm
-      ? m(Icon, {
-          name: Icons.CORNER_DOWN_LEFT,
-          onclick: () => {
-            executeSearch(this.searchQuery);
-          },
-        })
-      : null;
+              this.focused = true;
 
-    return m(ControlGroup, { class: 'SearchBar' }, [
-      m(Input, {
-        name: 'search',
-        placeholder: 'Type to search...',
-        autofocus: false, // !isMobile,
-        fluid: true,
-        tabIndex: -10,
-        contentRight:
-          this.searchTerm && m(ControlGroup, [cancelInputIcon, searchIcon]),
-        defaultValue: m.route.param('q') || this.searchTerm,
-        value: this.searchTerm,
-        autocomplete: 'off',
-        onclick: async () => {
-          this.focused = true;
-        },
-        onfocusout: () => {
-          if (!this.filterMenuActive) this.focused = false;
-        },
-        oninput: (e) => {
-          e.stopPropagation();
-          this.isTyping = true;
-          this.focused = true;
-          this.searchTerm = e.target.value?.toLowerCase();
-          clearTimeout(this.inputTimeout);
-          const timeout = e.target.value?.length > 3 ? 250 : 1000;
-          this.inputTimeout = setTimeout(() => {
-            this.isTyping = false;
-            if (e.target.value?.length > 3) {
-              search(this.searchQuery, this);
-            } else {
-              this.searchQuery.searchTerm = e.target.value?.toLowerCase();
-              this.results = [];
-              m.redraw();
-            }
-          }, timeout);
-        },
-        onkeyup: (e) => {
-          e.stopPropagation();
-          if (e.key === 'Enter') {
-            executeSearch(this.searchQuery);
-          }
-        },
-      }),
-      this.focused && !this.hideResults && filterDropdown,
-    ]);
+              this.searchTerm = e.target.value?.toLowerCase();
+
+              clearTimeout(this.inputTimeout);
+
+              const timeout = e.target.value?.length > 3 ? 250 : 1000;
+
+              this.inputTimeout = setTimeout(() => {
+                this.isTyping = false;
+
+                if (e.target.value?.length > 3) {
+                  search(this.searchQuery, this);
+                } else {
+                  this.searchQuery.searchTerm = e.target.value?.toLowerCase();
+
+                  this.results = [];
+
+                  m.redraw();
+                }
+              }, timeout);
+            }}
+            onkeyup={(e) => {
+              e.stopPropagation();
+
+              if (e.key === 'Enter') {
+                executeSearch(this.searchQuery);
+              }
+            }}
+          />
+          <div class="searchbar-icon">
+            <CWIconButton
+              iconName="search"
+              onclick={(e) => {
+                e.stopPropagation();
+
+                executeSearch(this.searchQuery);
+              }}
+            />
+          </div>
+          {this.focused && !this.hideResults && (
+            <div class="search-results-dropdown">
+              <CWText type="caption">I'm looking for</CWText>
+              <div class="chips-row">{scopeChips}</div>
+              {/* {this.activeChain && !app.isCustomDomain() && (
+                <>
+                  <CWText type="caption">Limit search to</CWText>
+                  <SearchChip
+                    isActive={this.searchQuery.chainScope === this.activeChain}
+                    label={`Inside chain: ${this.activeChain}`}
+                    onclick={() => {
+                      this.searchQuery.chainScope =
+                        this.searchQuery.chainScope === this.activeChain
+                          ? undefined
+                          : this.activeChain;
+                      search(this.searchQuery, this);
+                    }}
+                  />
+                </>
+              )}
+              {this.searchTerm.length < 1 ? (
+                historyList.length === 0 ? (
+                  <CWText type="caption">
+                    Enter a term into the field and press enter to start
+                  </CWText>
+                ) : (
+                  <>
+                    <CWText type="caption">Search History</CWText>
+                    {historyList}
+                  </>
+                )
+              ) : !results || results?.length === 0 ? (
+                app.search.getByQuery(searchQuery)?.loaded ? (
+                  <CWText type="caption">No Results Found</CWText>
+                ) : this.isTyping ? (
+                  <CWSpinner size="small" />
+                ) : (
+                  <CWText type="caption">
+                    Make your query longer than 3 characters to search
+                  </CWText>
+                )
+              ) : this.isTyping ? (
+                <CWSpinner size="small" />
+              ) : (
+                results
+              )} */}
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 }

@@ -34,18 +34,14 @@ const getMemberPreview = (
 
   return m(ListItem, {
     tabIndex,
-    label: (
-      <a class="search-results-item">
-        {m(UserBlock, {
-          user: profile,
-          searchTerm,
-          avatarSize: 24,
-          showAddressWithDisplayName: true,
-          addressDisplayOptions: { showFullAddress: true },
-          showChainName,
-        })}
-      </a>
-    ),
+    label: m(UserBlock, {
+      user: profile,
+      searchTerm,
+      avatarSize: 24,
+      showAddressWithDisplayName: true,
+      addressDisplayOptions: { showFullAddress: true },
+      showChainName,
+    }),
     onclick: () => {
       m.route.set(userLink);
       closeResultsFn();

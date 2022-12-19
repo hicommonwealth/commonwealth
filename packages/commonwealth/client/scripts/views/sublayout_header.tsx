@@ -16,7 +16,6 @@ import { HelpMenuPopover } from './menus/help_menu';
 import { InvitesMenuPopover } from './menus/invites_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
 import { SearchBar } from './pages/search/search_bar';
-import { _SearchBar } from './pages/search/_search_bar';
 
 type SublayoutHeaderAttrs = {
   hideSearch?: boolean;
@@ -61,7 +60,7 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
             />
           )}
         </div>
-        {!hideSearch && <_SearchBar />}
+        {!hideSearch && <SearchBar />}
         <div class="header-right">
           <div class="MobileMenuContainer">
             <CWIconButton
