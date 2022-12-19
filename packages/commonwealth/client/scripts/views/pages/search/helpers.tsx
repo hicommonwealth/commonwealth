@@ -18,11 +18,9 @@ import User, { UserBlock } from '../../components/widgets/user';
 
 const getMemberPreview = (
   addr,
-  closeResultsFn,
-  searchTerm,
-  tabIndex,
-  setUsingFilterMenuFn,
-  showChainName?
+  // closeResultsFn,
+  searchTerm
+  // setUsingFilterMenuFn
 ) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
 
@@ -33,35 +31,32 @@ const getMemberPreview = (
   }/account/${addr.address}?base=${addr.chain}`;
 
   return m(ListItem, {
-    tabIndex,
     label: m(UserBlock, {
       user: profile,
       searchTerm,
       avatarSize: 24,
       showAddressWithDisplayName: true,
       addressDisplayOptions: { showFullAddress: true },
-      showChainName,
     }),
     onclick: () => {
       m.route.set(userLink);
-      closeResultsFn();
+      // closeResultsFn();
     },
     onkeyup: (e) => {
       if (e.key === 'Enter') {
         m.route.set(userLink);
-        closeResultsFn();
+        // closeResultsFn();
       }
     },
-    onmouseover: () => setUsingFilterMenuFn(true),
-    onmouseout: () => setUsingFilterMenuFn(false),
+    // onmouseover: () => setUsingFilterMenuFn(true),
+    // onmouseout: () => setUsingFilterMenuFn(false),
   });
 };
 
 const getCommunityPreview = (
-  community,
-  closeResultsFn,
-  tabIndex,
-  setUsingFilterMenuFn
+  community
+  // closeResultsFn
+  // setUsingFilterMenuFn
 ) => {
   const params =
     community.contentType === SearchContentType.Token
@@ -70,7 +65,7 @@ const getCommunityPreview = (
       ? { community }
       : null;
 
-  params['size'] = 'large';
+  // params['size'] = 'large';
 
   const onSelect = () => {
     // if (params.community) {
@@ -86,10 +81,9 @@ const getCommunityPreview = (
   };
 
   return m(ListItem, {
-    tabIndex,
     label: (
       <a class="search-results-item community-result">
-        <CommunityLabel {...params} />
+        {/* <CommunityLabel {...params} /> */}
       </a>
     ),
     onclick: onSelect,
@@ -98,17 +92,16 @@ const getCommunityPreview = (
         onSelect();
       }
     },
-    onmouseover: () => setUsingFilterMenuFn(true),
-    onmouseout: () => setUsingFilterMenuFn(false),
+    // onmouseover: () => setUsingFilterMenuFn(true),
+    // onmouseout: () => setUsingFilterMenuFn(false),
   });
 };
 
 const getDiscussionPreview = (
   thread,
-  closeResultsFn,
-  searchTerm,
-  tabIndex,
-  setUsingFilterMenuFn
+  // closeResultsFn,
+  searchTerm
+  // setUsingFilterMenuFn
 ) => {
   const proposalId = thread.proposalid;
 
@@ -120,19 +113,18 @@ const getDiscussionPreview = (
       return;
     }
     m.route.set(`/${chain}/discussion/${proposalId}`);
-    closeResultsFn();
+    // closeResultsFn();
   };
 
   return m(ListItem, {
-    tabIndex,
     onclick: onSelect,
     onkeyup: (e) => {
       if (e.key === 'Enter') {
         onSelect();
       }
     },
-    onmouseover: () => setUsingFilterMenuFn(true),
-    onmouseout: () => setUsingFilterMenuFn(false),
+    // onmouseover: () => setUsingFilterMenuFn(true),
+    // onmouseout: () => setUsingFilterMenuFn(false),
     label: (
       <a class="search-results-item">
         <div class="search-results-thread-title">
@@ -163,10 +155,9 @@ const getDiscussionPreview = (
 
 const getCommentPreview = (
   comment,
-  closeResultsFn,
-  searchTerm,
-  tabIndex,
-  setUsingFilterMenuFn
+  // closeResultsFn,
+  searchTerm
+  // setUsingFilterMenuFn
 ) => {
   const proposalId = comment.proposalid;
 
@@ -182,19 +173,18 @@ const getCommentPreview = (
         proposalId.split('_')[1]
       }`
     );
-    closeResultsFn();
+    // closeResultsFn();
   };
 
   return m(ListItem, {
-    tabIndex,
     onclick: onSelect,
     onkeyup: (e) => {
       if (e.key === 'Enter') {
         onSelect();
       }
     },
-    onmouseover: () => setUsingFilterMenuFn(true),
-    onmouseout: () => setUsingFilterMenuFn(false),
+    // onmouseover: () => setUsingFilterMenuFn(true),
+    // onmouseout: () => setUsingFilterMenuFn(false),
     label: (
       <a class="search-results-item">
         <div class="search-results-thread-title">
@@ -224,43 +214,45 @@ const getCommentPreview = (
 };
 
 const getBalancedContentListing = (
-  unfilteredResults: Record<any, any>,
-  types: SearchScope[]
+  unfilteredResults: Record<string, Array<any>>,
+  types: Array<SearchScope>
 ) => {
   const results = {};
+
   let unfilteredResultsLength = 0;
+
   for (const key of types) {
     results[key] = [];
     unfilteredResultsLength += unfilteredResults[key]?.length || 0;
   }
+
   let priorityPosition = 0;
+
   let resultsLength = 0;
+
   while (resultsLength < 6 && resultsLength < unfilteredResultsLength) {
     for (let i = 0; i < types.length; i++) {
       const type = types[i];
+
       if (resultsLength < 6) {
         const nextResult = unfilteredResults[type][priorityPosition];
+
         if (nextResult) {
           results[type].push(nextResult);
+
           resultsLength += 1;
         }
       }
     }
+
     priorityPosition += 1;
   }
+
   return results;
 };
 
 const getResultsPreview = (searchQuery: SearchQuery, state) => {
-  // TODO: using chainScope instead of communityScope OK?
-  const { chainScope } = searchQuery;
-
   const types = searchQuery.getSearchScope();
-
-  if (types.indexOf(SearchScope.Communities) > 0) {
-    types.splice(types.indexOf(SearchScope.Communities), 1);
-    types.unshift(SearchScope.Communities);
-  }
 
   const results = getBalancedContentListing(
     app.search.getByQuery(searchQuery).results,
@@ -268,65 +260,63 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
   );
 
   const organizedResults = [];
-  let tabIndex = 1;
 
   types.forEach((type: SearchScope) => {
-    const res = results[type];
+    const result = results[type];
 
-    if (res?.length === 0) return;
+    if (result?.length === 0) {
+      return;
+    }
 
-    const headerEle = m(ListItem, {
-      label: type,
-      class: `disabled ${organizedResults.length === 0 ? 'upper-border' : ''}`,
-      onclick: (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      },
-    });
+    // const headerEle = m(ListItem, {
+    //   label: type,
+    //   class: `disabled ${organizedResults.length === 0 ? 'upper-border' : ''}`,
+    //   onclick: (e) => {
+    //     e.preventDefault();
+    //     e.stopPropagation();
+    //   },
+    // });
 
-    organizedResults.push(headerEle);
+    // organizedResults.push(headerEle);
 
-    (res as any[]).forEach((item) => {
-      tabIndex += 1;
+    result.forEach((item) => {
+      console.log(item);
 
       const resultRow =
         item.searchType === SearchScope.Threads
           ? getDiscussionPreview(
               item,
-              state.closeResults,
-              searchQuery.searchTerm,
-              tabIndex,
-              state.setUsingFilterMenu
+              // state.closeResults,
+              searchQuery.searchTerm
+              // state.setUsingFilterMenu
             )
           : item.searchType === SearchScope.Members
           ? getMemberPreview(
               item,
-              state.closeResults,
-              searchQuery.searchTerm,
-              tabIndex,
-              state.setUsingFilterMenu,
-              !!chainScope
+              // state.closeResults,
+              searchQuery.searchTerm
+              // state.setUsingFilterMenu
             )
           : item.searchType === SearchScope.Communities
           ? getCommunityPreview(
-              item,
-              state.closeResults,
-              tabIndex,
-              state.setUsingFilterMenu
+              item
+              // state.closeResults
+              // state.setUsingFilterMenu
             )
           : item.searchType === SearchScope.Replies
           ? getCommentPreview(
               item,
-              state.closeResults,
-              searchQuery.searchTerm,
-              tabIndex,
-              state.setUsingFilterMenu
+              // state.closeResults,
+              searchQuery.searchTerm
+              // state.setUsingFilterMenu
             )
           : null;
 
       organizedResults.push(resultRow);
     });
   });
+
+  // console.log(organizedResults);
 
   return organizedResults;
 };
