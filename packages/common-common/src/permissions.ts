@@ -39,7 +39,6 @@ export enum Action {
 const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   // Chat Subtree
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
-  [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
   // View Subtree
   [Action.VIEW_TOPICS, [Action.VIEW_THREADS]],
   [Action.VIEW_THREADS, [Action.VIEW_POLLS]],
@@ -88,7 +87,7 @@ export function addRemoveImplicitPermissions(
   isAdd: boolean
 ): Permissions {
   let result = BigInt(permission);
-  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
+  const implicitActions = getImplicitActionsSet(actionNumber);
   if (implicitActions && isAdd) {
     for (let i = 0; i < implicitActions.length; i++) {
       result |= BigInt(1) << BigInt(implicitActions[i]);
@@ -121,7 +120,7 @@ export function removePermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result &= ~(BigInt(1) << BigInt(actionNumber));
-  result = addRemoveImplicitPermissions(result, actionNumber, true);
+  result = addRemoveImplicitPermissions(result, actionNumber, false);
   return result;
 }
 
@@ -138,13 +137,13 @@ export const BASE_PERMISSIONS: Permissions =
   // addPermission(BigInt(0), Action.CREATE_POLL) |
   // addPermission(BigInt(0), Action.VOTE_ON_POLLS) |
   // addPermission(BigInt(0), Action.VIEW_TOPICS) |
-  addPermission(BigInt(0), Action.CREATE_THREAD) |
+  BigInt(1) << BigInt(Action.CREATE_THREAD) |
   // addPermission(BigInt(0), Action.EDIT_THREAD) |
   // addPermission(BigInt(0), Action.DELETE_THREAD) |
   // addPermission(BigInt(0), Action.LINK_THREAD_TO_THREAD) |
   // addPermission(BigInt(0), Action.LINK_PROPOSAL_TO_THREAD) |
-  addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
-  addPermission(BigInt(0), Action.VIEW_THREADS);
+  BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS) |
+  BigInt(1) << BigInt(Action.VIEW_THREADS);
 
 // Checks implicitly if a permission has a specific action
 export function isImplicitlyPermitted(

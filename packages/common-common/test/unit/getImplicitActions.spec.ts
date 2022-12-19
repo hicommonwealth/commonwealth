@@ -69,4 +69,9 @@ describe('getImplicitActions() unit tests', () => {
     assert.isTrue(actions.includes(Action.LINK_THREAD_TO_THREAD));
     assert.isTrue(actions.includes(Action.VIEW_TOPICS));
   });
+
+  it('should correctly isImplicitlyPermitted for Allowing View Chat Channels action', () => {
+    const actions = getImplicitActionsSet(Action.VIEW_CHAT_CHANNELS);
+    assert.isTrue(actions.includes(Action.VIEW_CHAT_CHANNELS));
+  });
 });
