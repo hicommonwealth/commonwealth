@@ -25,6 +25,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { PageNotFound } from '../404';
 import ErrorPage from '../error';
 import { search } from './helpers';
+import { CommunityLabel } from '../../components/community_label';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -61,29 +62,28 @@ const getMemberResult = (addr, searchTerm) => {
 
 const getCommunityResult = (community) => {
   const params =
-    community.contentType === SearchContentType.Token
+    community.SearchContentType === SearchContentType.Token
       ? { community }
-      : community.contentType === SearchContentType.Chain
+      : community.SearchContentType === SearchContentType.Chain
       ? { community }
       : null;
 
   // params['size'] = 'large';
 
   const onSelect = () => {
-    // if (params.community) {
-    //   m.route.set(
-    //     params.community.address ? `/${params.community.address}` : '/'
-    //   );
-    // } else {
-    //   m.route.set(community.id ? `/${community.id}` : '/');
-    // }
+    if (params.community) {
+      m.route.set(
+        params.community.address ? `/${params.community.address}` : '/'
+      );
+    } else {
+      m.route.set(community.id ? `/${community.id}` : '/');
+    }
   };
 
   return m(ListItem, {
     label: (
       <a class="search-results-item.community-result">
-        poop
-        {/* <CommunityLabel {...params} /> */}
+        <CommunityLabel {...params} />
       </a>
     ),
     onclick: onSelect,

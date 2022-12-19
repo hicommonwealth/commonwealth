@@ -12,7 +12,7 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 const SEARCH_HISTORY_KEY = 'COMMONWEALTH_SEARCH_HISTORY';
 const SEARCH_HISTORY_SIZE = 10;
 
-class SearchContoller {
+class SearchController {
   private _store: SearchStore = new SearchStore();
   public store() {
     return this._store;
@@ -262,4 +262,4 @@ class SearchContoller {
   }
 }
 
-export default SearchContoller;
+export default SearchController;
