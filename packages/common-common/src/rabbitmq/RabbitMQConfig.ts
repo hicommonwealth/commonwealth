@@ -86,7 +86,11 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           [RascalExchanges.Notifications]: {
             'type': 'topic',
             ...exchangeConfig
-          }
+          },
+          [RascalExchanges.SnapshotListener]: {
+            'type': 'fanout',
+            ...exchangeConfig
+          },
         },
         'queues': {
           [RascalQueues.ChainEvents]: {
@@ -114,6 +118,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalQueues.DeadLetter]: {
             ...queueConfig
+          },
+          [RascalQueues.SnapshotListener]: {
+            ...queueConfig,
+            'options': queueOptions
           }
         },
         'bindings': {
@@ -147,6 +155,12 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'destinationType': 'queue',
             'bindingKey': RascalRoutingKeys.ChainEventTypeCUD
           },
+          [RascalBindings.SnapshotListener]: {
+            'source': RascalExchanges.SnapshotListener,
+            'destination': RascalQueues.SnapshotListener,
+            'destinationType': 'queue',
+            'bindingKey': RascalRoutingKeys.SnapshotListener
+          },
           [RascalBindings.DeadLetter]: {
             'source': RascalExchanges.DeadLetter,
             'destination': RascalQueues.DeadLetter,
@@ -179,6 +193,11 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'exchange': RascalExchanges.CUD,
             'routingKey': RascalRoutingKeys.ChainEventTypeCUD,
             ...publicationConfig
+          }, 
+          [RascalPublications.SnapshotListener]: {
+            'exchange': RascalExchanges.SnapshotListener,
+            'routingKey': RascalRoutingKeys.SnapshotListener,
+            ...publicationConfig
           }
         },
         'subscriptions': {
@@ -200,6 +219,10 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           },
           [RascalSubscriptions.ChainEventTypeCUDMain]: {
             'queue': RascalQueues.ChainEventTypeCUDMain,
+            ...subscriptionConfig
+          },
+          [RascalSubscriptions.SnapshotListener]: {
+            'queue': RascalQueues.SnapshotListener,
             ...subscriptionConfig
           }
         }
