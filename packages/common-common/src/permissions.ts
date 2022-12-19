@@ -129,10 +129,10 @@ export const BASE_PERMISSIONS: Permissions =
   BigInt(1) << BigInt(Action.VIEW_REACTIONS) |
   BigInt(1) << BigInt(Action.CREATE_REACTION) |
   BigInt(1) << BigInt(Action.DELETE_REACTION) |
-  // addPermission(BigInt(0), Action.VIEW_COMMENTS) |
-  // addPermission(BigInt(0), Action.CREATE_COMMENT) |
-  // addPermission(BigInt(0), Action.EDIT_COMMENT) |
-  // addPermission(BigInt(0), Action.DELETE_COMMENT) |
+  BigInt(1) << BigInt(Action.VIEW_COMMENTS) |
+  BigInt(1) << BigInt(Action.CREATE_COMMENT) |
+  BigInt(1) << BigInt(Action.EDIT_COMMENT) |
+  BigInt(1) << BigInt(Action.DELETE_COMMENT) |
   // addPermission(BigInt(0), Action.VIEW_POLLS) |
   // addPermission(BigInt(0), Action.CREATE_POLL) |
   // addPermission(BigInt(0), Action.VOTE_ON_POLLS) |
