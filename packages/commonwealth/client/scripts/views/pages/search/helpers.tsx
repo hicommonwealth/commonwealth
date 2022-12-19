@@ -144,7 +144,7 @@ const getResultsPreview = (searchQuery: SearchQuery) => {
   return organizedResults;
 };
 
-export const search = async (searchQuery: SearchQuery, state) => {
+export const getSearchPreview = async (searchQuery: SearchQuery, state) => {
   try {
     await app.search.search(searchQuery);
   } catch (err) {
@@ -152,28 +152,26 @@ export const search = async (searchQuery: SearchQuery, state) => {
     notifyError(err.responseJSON?.error || err.responseText || err.toString());
   }
 
-  state.results = searchQuery.isSearchPreview
-    ? getResultsPreview(searchQuery)
-    : app.search.getByQuery(searchQuery).results;
+  state.results = getResultsPreview(searchQuery);
 
   app.search.addToHistory(searchQuery);
 
   m.redraw();
 };
 
-export const executeSearch = (query: SearchQuery) => {
-  if (!query.searchTerm || !query.searchTerm.toString().trim()) {
-    notifyError('Enter a valid search term');
-    return;
-  }
+// export const executeSearch = (query: SearchQuery) => {
+//   if (!query.searchTerm || !query.searchTerm.toString().trim()) {
+//     notifyError('Enter a valid search term');
+//     return;
+//   }
 
-  if (query.searchTerm.length < 4) {
-    notifyError('Query must be at least 4 characters');
-  }
+//   if (query.searchTerm.length < 4) {
+//     notifyError('Query must be at least 4 characters');
+//   }
 
-  query.isSearchPreview = false;
+//   query.isSearchPreview = false;
 
-  app.search.addToHistory(query);
+//   app.search.addToHistory(query);
 
-  m.route.set(`/search?${query.toUrlParams()}`);
-};
+//   m.route.set(`/search?${query.toUrlParams()}`);
+// };

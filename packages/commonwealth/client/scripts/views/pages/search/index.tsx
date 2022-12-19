@@ -10,6 +10,7 @@ import 'pages/search/index.scss';
 
 import { pluralize } from 'helpers';
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
 import User, { UserBlock } from 'views/components/widgets/user';
@@ -24,7 +25,6 @@ import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { PageNotFound } from '../404';
 import ErrorPage from '../error';
-import { search } from './helpers';
 import { CommunityLabel } from '../../components/community_label';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
@@ -209,6 +209,21 @@ const getListing = (
     .slice(0, pageCount * 50);
 
   return tabScopedResults;
+};
+
+const search = async (searchQuery: SearchQuery, state) => {
+  try {
+    await app.search.search(searchQuery);
+  } catch (err) {
+    state.results = {};
+    notifyError(err.responseJSON?.error || err.responseText || err.toString());
+  }
+
+  state.results = app.search.getByQuery(searchQuery).results;
+
+  app.search.addToHistory(searchQuery);
+
+  m.redraw();
 };
 
 type SearchPageAttrs = {

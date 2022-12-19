@@ -7,7 +7,7 @@ import 'pages/search/search_bar.scss';
 
 import app from 'state';
 import { SearchQuery } from 'models';
-import { executeSearch, search } from './helpers';
+import { getSearchPreview } from './helpers';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
@@ -50,18 +50,18 @@ export class SearchBar extends ClassComponent {
   }
 
   view() {
-    const historyList = app.search.getHistory().map((h) => (
+    const historyList = app.search.getHistory().map((previousQuery) => (
       <div
         onclick={() => {
-          executeSearch(h);
+          getSearchPreview(previousQuery, this);
         }}
       >
-        {h.searchTerm}
+        {previousQuery.searchTerm}
         <CWIconButton
           iconName="close"
           onclick={(e) => {
             e.stopPropagation();
-            app.search.removeFromHistory(h);
+            app.search.removeFromHistory(previousQuery);
           }}
         />
       </div>
@@ -79,7 +79,7 @@ export class SearchBar extends ClassComponent {
             });
       }
 
-      search(this.searchQuery, this);
+      getSearchPreview(this.searchQuery, this);
     };
 
     return (
@@ -87,6 +87,7 @@ export class SearchBar extends ClassComponent {
         <div class="search-and-icon-container">
           <input
             placeholder="Search Common"
+            defaultValue={m.route.param('q') || this.searchTerm}
             value={this.searchTerm}
             autocomplete="off"
             oninput={(e) => {
@@ -103,7 +104,11 @@ export class SearchBar extends ClassComponent {
           </div>
           {this.results && (
             <div class="search-results-dropdown">
-              {this.results}
+              {this.results.length > 0 ? (
+                this.results
+              ) : (
+                <CWText type="caption">No Results</CWText>
+              )}
               {historyList.length > 0 && (
                 <>
                   <CWText type="caption">Search History</CWText>
