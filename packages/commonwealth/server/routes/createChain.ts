@@ -1,5 +1,6 @@
 import {NextFunction} from 'express';
 import Web3 from 'web3';
+import fetch from 'node-fetch';
 import * as solw3 from '@solana/web3.js';
 import {Cluster} from '@solana/web3.js';
 import {Tendermint34Client} from '@cosmjs/tendermint-rpc';
@@ -7,6 +8,7 @@ import BN from 'bn.js';
 import {Op} from 'sequelize';
 import {factory, formatFilename} from 'common-common/src/logging';
 import {BalanceType,ChainBase, ChainType, NotificationCategories} from 'common-common/src/types';
+import {AppError, ServerError} from 'common-common/src/errors';
 import {urlHasValidHTTPPrefix} from '../../shared/utils';
 import {ChainAttributes} from '../models/chain';
 import {ChainNodeAttributes} from '../models/chain_node';
@@ -19,9 +21,10 @@ import {mixpanelTrack} from '../util/mixpanelUtil';
 import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
 import {RoleAttributes, RoleInstance} from '../models/role';
 
-import {AppError, ServerError} from 'common-common/src/errors';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
+
+const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -52,6 +55,8 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
+  ImageDoesntExist: `image url provided doesn't exist`,
+  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
 };
 
 type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
@@ -107,6 +112,17 @@ const createChain = async (
   }
   if (!req.body.base || !req.body.base.trim()) {
     return next(new AppError(Errors.NoBase));
+  }
+  // make sure icon_url provided exists and is below max size
+  try {
+    const resp = await fetch(req.body.icon_url, { headers: { Range: 'bytes=0-0' } });
+    const fileSizeBytes = resp.headers['Content-Range'];
+
+    if(parseInt(fileSizeBytes, 10) / 1024 > MAX_IMAGE_SIZE_KB) {
+      return next(new AppError(Errors.ImageTooLarge));
+    }
+  } catch (e) {
+    return next(new AppError(Errors.ImageDoesntExist));
   }
 
   const existingBaseChain = await models.Chain.findOne({
