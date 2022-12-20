@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import {
+  ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
@@ -11,14 +12,12 @@ import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
-import proposalIdToEntity from '../util/proposalIdToEntity';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
@@ -28,7 +27,7 @@ import { SENDGRID_API_KEY } from '../config';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 const sgMail = require('@sendgrid/mail');
@@ -40,7 +39,6 @@ export const Errors = {
   InvalidParent: 'Invalid parent',
   MissingTextOrAttachment: 'Must provide text or attachment',
   ThreadNotFound: 'Cannot comment; thread not found',
-  // ChainEntityNotFound: 'Cannot comment; chain entity not found',
   CantCommentOnReadOnly: 'Cannot comment when thread is read_only',
   InsufficientTokenBalance:
     "Users need to hold some of the community's tokens to comment",
@@ -60,10 +58,10 @@ const createComment = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
 
-  const { parent_id, root_id, text } = req.body;
+  const author = req.address;
+
+  const { parent_id, root_id, chain_entity_id, text } = req.body;
 
   if (!root_id || root_id.indexOf('_') === -1) {
     return next(new AppError(Errors.MissingRootId));
@@ -138,7 +136,10 @@ const createComment = async (
     }
   }
 
-  if (chain && chain.type === ChainType.Token) {
+  if (
+    chain &&
+    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+  ) {
     // skip check for admins
     const isAdmin = await findAllRoles(
       models,
@@ -256,40 +257,12 @@ const createComment = async (
     proposal = await models.Thread.findOne({
       where: { id },
     });
+    // TODO: put this part on the front-end and pass in just the chain-entity id so we can check if it exists for the email part --- similar for reaction
   } else if (
     prefix.includes('proposal') ||
     prefix.includes('referendum') ||
     prefix.includes('motion')
   ) {
-    // TODO: better check for on-chain proposal types
-    const chainEntity = await proposalIdToEntity(
-      models,
-      chain.id,
-      finalComment.root_id
-    );
-    if (!chainEntity) {
-      // send a notification email if commenting on an invalid ChainEntity
-      const msg = {
-        to: 'founders@commonwealth.im',
-        from: 'Commonwealth <no-reply@commonwealth.im>',
-        subject: 'Missing ChainEntity',
-        text: `Comment created on a missing ChainEntity ${finalComment.root_id} on ${chain.id}`,
-      };
-      sgMail
-        .send(msg)
-        .then((result) => {
-          log.error(
-            `Sent notification: missing ChainEntity ${finalComment.root_id} on ${chain.id}`
-          );
-        })
-        .catch((e) => {
-          log.error(
-            `Could not send notification: missing chainEntity ${finalComment.root_id} on ${chain.id}`
-          );
-        });
-      // await finalComment.destroy();
-      // return next(new AppError(Errors.ChainEntityNotFound));
-    }
     proposal = id;
   } else {
     log.error(
@@ -388,7 +361,6 @@ const createComment = async (
       chain: finalComment.chain,
       body: finalComment.text,
     },
-    req.wss,
     excludedAddrs
   );
 
@@ -419,7 +391,6 @@ const createComment = async (
         chain: finalComment.chain,
         body: finalComment.text,
       },
-      req.wss,
       excludedAddrs
     );
   }
@@ -454,7 +425,6 @@ const createComment = async (
             chain: finalComment.chain,
             body: finalComment.text,
           }, // TODO: add webhook data for mentions
-          req.wss,
           [finalComment.Address.address]
         );
     });

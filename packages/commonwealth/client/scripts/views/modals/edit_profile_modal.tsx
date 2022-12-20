@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/edit_profile_modal.scss';
@@ -18,9 +19,7 @@ type EditProfileModalAttrs = {
   refreshCallback: () => void;
 };
 
-export class EditProfileModal
-  implements m.ClassComponent<EditProfileModalAttrs>
-{
+export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
   private avatarUrl: string;
   private bio: string;
   private error: string;
@@ -28,7 +27,7 @@ export class EditProfileModal
   private name: string;
   private saving: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EditProfileModalAttrs>) {
     const { account } = vnode.attrs;
 
     this.avatarUrl = account.profile.avatarUrl;
@@ -37,7 +36,7 @@ export class EditProfileModal
     this.name = account.profile.name;
   }
 
-  view(vnode) {
+  view(vnode: m.VnodeDOM<EditProfileModalAttrs>) {
     const { account, refreshCallback } = vnode.attrs;
 
     return (

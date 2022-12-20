@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import {
@@ -19,10 +20,8 @@ type SublayoutBannersAttrs = {
   bannerStatus?: string;
 };
 
-export class SublayoutBanners
-  implements m.ClassComponent<SublayoutBannersAttrs>
-{
-  view(vnode) {
+export class SublayoutBanners extends ClassComponent<SublayoutBannersAttrs> {
+  view(vnode: m.Vnode<SublayoutBannersAttrs>) {
     const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
 
     return (

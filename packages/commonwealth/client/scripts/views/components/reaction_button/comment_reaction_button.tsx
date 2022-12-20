@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 
@@ -21,9 +22,7 @@ type CommentReactionButtonAttrs = {
   comment: Comment<any>;
 };
 
-export class CommentReactionButton
-  implements m.ClassComponent<CommentReactionButtonAttrs>
-{
+export class CommentReactionButton extends ClassComponent<CommentReactionButtonAttrs> {
   private loading: boolean;
   private reactors: any;
 
@@ -31,7 +30,7 @@ export class CommentReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<CommentReactionButtonAttrs, this>) {
+  view(vnode: m.Vnode<CommentReactionButtonAttrs>) {
     const { comment } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(comment);
     const { likes = 0, hasReacted } = reactionCounts || {};

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_thread_vote_button.scss';
 
@@ -15,18 +16,16 @@ type ThreadVoteButtonAttrs = {
   voteCount: number;
 };
 
-export class CWThreadVoteButton
-  implements m.ClassComponent<ThreadVoteButtonAttrs>
-{
+export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
   private isHoveringUpvote: boolean;
   private isHoveringDownvote: boolean;
   private initialVoteCount: number;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ThreadVoteButtonAttrs>) {
     this.initialVoteCount = vnode.attrs.voteCount;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ThreadVoteButtonAttrs>) {
     const { updateVoteCount, voteCount } = vnode.attrs;
 
     const handleVoteChange = (newCount: number) => {

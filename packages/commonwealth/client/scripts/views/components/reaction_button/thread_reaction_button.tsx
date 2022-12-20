@@ -1,8 +1,10 @@
 /* @jsx m */
 
+import m from 'mithril';
+import ClassComponent from 'class_component';
+
 import 'components/reaction_button/comment_reaction_button.scss';
 
-import m from 'mithril';
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { Thread, ChainInfo } from 'models';
@@ -20,9 +22,7 @@ type ThreadReactionButtonAttrs = {
   thread: Thread;
 };
 
-export class ThreadReactionButton
-  implements m.ClassComponent<ThreadReactionButtonAttrs>
-{
+export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAttrs> {
   private loading: boolean;
   private reactors: any;
 
@@ -30,7 +30,7 @@ export class ThreadReactionButton
     this.loading = false;
   }
 
-  view(vnode: m.VnodeDOM<ThreadReactionButtonAttrs, this>) {
+  view(vnode: m.Vnode<ThreadReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};

@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
@@ -15,7 +16,13 @@ import {
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { ChainInfo } from 'models';
+import { ChainInfo, RoleInfo } from 'models';
+import {
+  Action,
+  addPermission,
+  isPermitted,
+  removePermission,
+} from 'common-common/src/permissions';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
 import {
@@ -26,16 +33,14 @@ import {
 import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ChainMetadataRowsAttrs = {
-  admins: any;
+  admins: Array<RoleInfo>;
   chain?: ChainInfo;
   mods: any;
-  onRoleUpdate: (oldRole: string, newRole: string) => void;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
   onSave: () => void;
 };
 
-export class ChainMetadataRows
-  implements m.ClassComponent<ChainMetadataRowsAttrs>
-{
+export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   name: string;
   description: string;
   website: string;
@@ -50,6 +55,8 @@ export class ChainMetadataRows
   stagesEnabled: boolean;
   customStages: string;
   chatEnabled: boolean;
+  default_allow_permissions: bigint;
+  default_deny_permissions: bigint;
   customDomain: string;
   terms: string;
   contractsViewable: ContractsViewable;
@@ -64,31 +71,36 @@ export class ChainMetadataRows
   quillBanner: any;
   bannerStateUpdated: boolean;
 
-  oninit(vnode) {
-    this.name = vnode.attrs.chain.name;
-    this.description = vnode.attrs.chain.description;
-    this.website = vnode.attrs.chain.website;
-    this.discord = vnode.attrs.chain.discord;
-    this.element = vnode.attrs.chain.element;
-    this.telegram = vnode.attrs.chain.telegram;
-    this.github = vnode.attrs.chain.github;
-    this.stagesEnabled = vnode.attrs.chain.stagesEnabled;
-    this.customStages = vnode.attrs.chain.customStages;
-    this.chatEnabled = vnode.attrs.chain.chatEnabled;
-    this.customDomain = vnode.attrs.chain.customDomain;
-    this.terms = vnode.attrs.chain.terms;
-    this.iconUrl = vnode.attrs.chain.iconUrl;
-    this.network = vnode.attrs.chain.network;
-    this.symbol = vnode.attrs.chain.symbol;
-    this.snapshot = vnode.attrs.chain.snapshot;
-    this.contractsViewable = vnode.attrs.chain.contractsViewable;
-    this.defaultOverview = vnode.attrs.chain.defaultOverview;
-    this.selectedTags = setSelectedTags(vnode.attrs.chain.id);
+  oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
+    const chain: ChainInfo = vnode.attrs.chain;
+    this.name = chain.name;
+    this.description = chain.description;
+    this.website = chain.website;
+    this.discord = chain.discord;
+    this.element = chain.element;
+    this.telegram = chain.telegram;
+    this.github = chain.github;
+    this.stagesEnabled = chain.stagesEnabled;
+    this.customStages = chain.customStages;
+    this.chatEnabled = !isPermitted(
+      chain.defaultDenyPermissions,
+      Action.VIEW_CHAT_CHANNELS
+    );
+    this.default_allow_permissions = chain.defaultAllowPermissions;
+    this.default_deny_permissions = chain.defaultDenyPermissions;
+    this.customDomain = chain.customDomain;
+    this.terms = chain.terms;
+    this.iconUrl = chain.iconUrl;
+    this.network = chain.network;
+    this.snapshot = chain.snapshot;
+    this.defaultOverview = chain.defaultOverview;
+    this.selectedTags = setSelectedTags(chain.id);
     this.categoryMap = buildCategoryMap();
-    this.communityBanner = vnode.attrs.chain.communityBanner;
+    this.communityBanner = chain.communityBanner;
   }
 
-  view(vnode) {
+  view(vnode: m.VnodeDOM<ChainMetadataRowsAttrs, this>) {
+    const chain: ChainInfo = vnode.attrs.chain;
     return (
       <div class="ChainMetadataRows">
         <div class="AvatarUploadRow">
@@ -167,7 +179,7 @@ export class ChainMetadataRows
         />
         <ToggleRow
           title="Stages"
-          defaultValue={vnode.attrs.chain.stagesEnabled}
+          defaultValue={chain.stagesEnabled}
           onToggle={(checked) => {
             this.stagesEnabled = checked;
           }}
@@ -179,7 +191,7 @@ export class ChainMetadataRows
         />
         <ToggleRow
           title="Summary view"
-          defaultValue={vnode.attrs.chain.defaultOverview}
+          defaultValue={chain.defaultOverview}
           onToggle={(checked) => {
             this.defaultOverview = checked;
           }}
@@ -202,7 +214,7 @@ export class ChainMetadataRows
           }}/>
         <ToggleRow
           title="Chat Enabled"
-          defaultValue={vnode.attrs.chain.chatEnabled}
+          defaultValue={this.chatEnabled}
           onToggle={(checked) => {
             this.chatEnabled = checked;
           }}
@@ -232,7 +244,7 @@ export class ChainMetadataRows
         {app.chain?.meta.base === ChainBase.Ethereum && (
           <InputRow
             title="Snapshot(s)"
-            value={this.snapshot}
+            value={this.snapshot.join('')}
             placeholder={this.network}
             onChangeHandler={(v) => {
               const snapshots = v
@@ -319,7 +331,7 @@ export class ChainMetadataRows
               stagesEnabled,
               customStages,
               customDomain,
-              chatEnabled,
+              default_deny_permissions,
               snapshot,
               terms,
               iconUrl,
@@ -341,7 +353,7 @@ export class ChainMetadataRows
               for (const category of Object.keys(this.selectedTags)) {
                 await setChainCategories(
                   this.categoryMap[category],
-                  vnode.attrs.chain.id,
+                  chain.id,
                   this.selectedTags[category]
                 );
               }
@@ -351,7 +363,7 @@ export class ChainMetadataRows
 
             try {
               $.post(`${app.serverUrl()}/updateBanner`, {
-                chain_id: vnode.attrs.chain.id,
+                chain_id: chain.id,
                 banner_text: this.communityBanner,
                 auth: true,
                 jwt: app.user.jwt,
@@ -370,7 +382,18 @@ export class ChainMetadataRows
             }
 
             try {
-              await vnode.attrs.chain.updateChainData({
+              if (this.chatEnabled) {
+                this.default_deny_permissions = removePermission(
+                  default_deny_permissions,
+                  Action.VIEW_CHAT_CHANNELS
+                );
+              } else {
+                this.default_deny_permissions = addPermission(
+                  default_deny_permissions,
+                  Action.VIEW_CHAT_CHANNELS
+                );
+              }
+              await chain.updateChainData({
                 name,
                 description,
                 website,
@@ -386,12 +409,13 @@ export class ChainMetadataRows
                 iconUrl,
                 contractsViewable,
                 defaultOverview,
-                chatEnabled,
+                default_allow_permissions: this.default_allow_permissions,
+                default_deny_permissions: this.default_deny_permissions,
               });
               vnode.attrs.onSave();
               notifySuccess('Chain updated');
             } catch (err) {
-              notifyError(err.responseJSON?.error || 'Chain update failed');
+              notifyError(err || 'Chain update failed');
             }
 
             m.redraw();

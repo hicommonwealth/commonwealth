@@ -38,7 +38,7 @@ import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/key
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DB } from '../models';
 import { DynamicTemplate } from '../../shared/types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
 
@@ -66,7 +66,9 @@ const verifySignature = async (
   chain: ChainInstance,
   addressModel: AddressInstance,
   user_id: number,
-  signatureString: string
+  signatureString: string,
+  sessionPublicAddress: string | null, // used when signing a block to login, currently eth only
+  sessionBlockInfo: string | null,     // used when signing a block to login, currently eth only
 ): Promise<boolean> => {
   if (!chain) {
     log.error('no chain provided to verifySignature');
@@ -115,7 +117,6 @@ const verifySignature = async (
     //
     // ethereum address handling on cosmos chains via metamask
     //
-    console.log(signatureString);
     const msgBuffer = Buffer.from(addressModel.verification_token.trim());
     // toBuffer() doesn't work if there is a newline
     const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
@@ -251,10 +252,15 @@ const verifySignature = async (
     //
     try {
       const node = await chain.getChainNode();
-      const typedMessage = constructTypedMessage(
+      const typedMessage = await constructTypedMessage(
+        addressModel.address,
         node.eth_chain_id || 1,
-        addressModel.verification_token.trim()
+        sessionPublicAddress,
+        addressModel.block_info
       );
+      if (addressModel.block_info !== sessionBlockInfo) {
+        throw new Error(`Eth verification failed for ${addressModel.address}: signed a different block than expected`)
+      }
       const address = recoverTypedSignature({
         data: typedMessage,
         signature: signatureString.trim(),
@@ -357,8 +363,10 @@ const processAddress = async (
   chain: ChainInstance,
   address: string,
   wallet_id: WalletId,
-  signature?: string,
-  user?: Express.User
+  signature: string,
+  user: Express.User,
+  sessionPublicAddress: string | null,
+  sessionBlockInfo: string | null,
 ): Promise<void> => {
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
@@ -388,7 +396,9 @@ const processAddress = async (
       chain,
       existingAddress,
       user ? user.id : null,
-      signature
+      signature,
+      sessionPublicAddress,
+      sessionBlockInfo
     );
     if (!valid) {
       throw new AppError(Errors.InvalidSignature);
@@ -462,7 +472,9 @@ const verifyAddress = async (
     address,
     req.body.wallet_id,
     req.body.signature,
-    req.user
+    req.user,
+    req.body.session_public_address,
+    req.body.session_block_data,
   );
 
   if (req.user) {

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/snapshot/snapshot_space_card.scss';
 
@@ -15,31 +16,30 @@ function countActiveProposals(proposals: SnapshotProposal[]): number {
   return proposals.filter((proposal) => proposal.state === 'active').length;
 }
 
-export class SnapshotSpaceCard
-  implements
-    m.ClassComponent<{
-      proposal: null | Thread;
-      proposals: SnapshotProposal[];
-      redirect_action: string;
-      space: SnapshotSpace;
-    }>
-{
-  view(vnode) {
-    const { space, proposals, redirect_action, proposal } = vnode.attrs;
+type SnapshotSpaceCardAttrs = {
+  proposal: null | Thread;
+  proposals: SnapshotProposal[];
+  redirectAction: string;
+  space: SnapshotSpace;
+};
+
+export class SnapshotSpaceCard extends ClassComponent<SnapshotSpaceCardAttrs> {
+  view(vnode: m.Vnode<SnapshotSpaceCardAttrs>) {
+    const { space, proposals, redirectAction, proposal } = vnode.attrs;
     if (!space || !proposals) return;
 
-    const num_active_proposals = countActiveProposals(proposals);
+    const numActiveProposals = countActiveProposals(proposals);
 
     function handleClicks() {
-      if (redirect_action === REDIRECT_ACTIONS.ENTER_SPACE) {
+      if (redirectAction === REDIRECT_ACTIONS.ENTER_SPACE) {
         app.snapshot.init(space.id).then(() => {
           navigateToSubpage(`/snapshot/${space.id}`);
         });
-      } else if (redirect_action === REDIRECT_ACTIONS.NEW_PROPOSAL) {
+      } else if (redirectAction === REDIRECT_ACTIONS.NEW_PROPOSAL) {
         app.snapshot.init(space.id).then(() => {
           navigateToSubpage(`/new/snapshot/${space.id}`);
         });
-      } else if (redirect_action === REDIRECT_ACTIONS.NEW_FROM_THREAD) {
+      } else if (redirectAction === REDIRECT_ACTIONS.NEW_FROM_THREAD) {
         app.snapshot.init(space.id).then(() => {
           navigateToSubpage(
             `/new/snapshot/${app.chain.meta.snapshot}` +
@@ -52,7 +52,7 @@ export class SnapshotSpaceCard
     return (
       <CWCard
         elevation="elevation-2"
-        interactive={true}
+        interactive
         className="SnapshotSpaceCard"
         onclick={(e) => {
           e.stopPropagation();
@@ -66,8 +66,8 @@ export class SnapshotSpaceCard
             <div class="space-card-subheader">{space.id}</div>
           </div>
           <div class="space-card-status">
-            {`${num_active_proposals} Active Proposal${
-              num_active_proposals === 1 ? '' : 's'
+            {`${numActiveProposals} Active Proposal${
+              numActiveProposals === 1 ? '' : 's'
             }`}
           </div>
         </div>

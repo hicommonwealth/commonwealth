@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'modals/webhook_settings_modal.scss';
@@ -22,23 +23,21 @@ import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWText } from '../components/component_kit/cw_text';
 
 type WebhookSettingsModalAttrs = {
-  updateSuccessCallback: () => void;
+  updateSuccessCallback: (webhook: Webhook) => void;
   webhook: Webhook;
 };
 
-export class WebhookSettingsModal
-  implements m.ClassComponent<WebhookSettingsModalAttrs>
-{
+export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAttrs> {
   private selectedCategories: string[];
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<WebhookSettingsModalAttrs>) {
     this.selectedCategories = [];
     vnode.attrs.webhook.categories.forEach((v) =>
       this.selectedCategories.push(v)
     );
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<WebhookSettingsModalAttrs>) {
     const { webhook } = vnode.attrs;
     const isChain = !!webhook.chain_id;
 
@@ -67,6 +66,7 @@ export class WebhookSettingsModal
 
       return (
         <CWCheckbox
+          value=""
           checked={allValuesPresent}
           label={label}
           indeterminate={someValuesPresent && !allValuesPresent}

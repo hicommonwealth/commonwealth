@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import BN from 'bn.js';
 import moment from 'moment';
 
@@ -12,18 +13,17 @@ import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import Near from 'controllers/chain/near/adapter';
 import { IDaoInfo } from 'controllers/chain/near/chain';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+// import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';
 
-class SputnikDaoRow
-  implements
-    m.ClassComponent<{
-      dao: IDaoInfo;
-      clickable: boolean;
-    }>
-{
-  view(vnode) {
+type SputnikDaoRowAttrs = {
+  clickable: boolean;
+  dao: IDaoInfo;
+};
+
+class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
+  view(vnode: m.Vnode<SputnikDaoRowAttrs>) {
     const { dao, clickable } = vnode.attrs;
 
     const amountString = (app.chain as Near).chain
@@ -69,7 +69,7 @@ class SputnikDaoRow
   }
 }
 
-class SputnikDAOsPage implements m.ClassComponent {
+class SputnikDAOsPage extends ClassComponent {
   private daosList: IDaoInfo[];
   private daosRequested: boolean;
 

@@ -8,10 +8,10 @@ import '../types';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { ProfileAttributes } from '../models/profile';
 
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -81,16 +81,14 @@ export function useMagicAuth(models: DB) {
               wallet_id: WalletId.Magic,
             }, { transaction: t });
 
-          if (req.body.chain) {
-            await createRole(
-              models,
-              newAddress.id,
-              'ethereum',
-              'member',
-              false,
-              t
-            );
-          }
+          await createRole(
+            models,
+            newAddress.id,
+            chainId,
+            'member',
+            false,
+            t
+          );
 
           // Automatically create subscription to their own mentions
           await models.Subscription.create({

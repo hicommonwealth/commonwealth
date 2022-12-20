@@ -1,7 +1,8 @@
 /* eslint-disable quotes */
 import { Response, NextFunction } from 'express';
+import { Op } from 'sequelize';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 enum UpdateTopicErrors {
@@ -45,8 +46,18 @@ const updateTopic = async (
     ['admin', 'moderator']
   );
   const isAdminOrMod = roles.length > 0;
+
   if (!isAdminOrMod) {
-    return next(new AppError(UpdateTopicErrors.NoPermission));
+    const isAuthor = await models.Thread.findOne({
+      where: {
+        id: req.body.thread_id,
+        address_id: { [Op.in]: userAddresses.map((addr) => addr.id) },
+      },
+    });
+
+    if (!isAuthor) {
+      return next(new AppError(UpdateTopicErrors.NoPermission));
+    }
   }
 
   // remove deleted topics

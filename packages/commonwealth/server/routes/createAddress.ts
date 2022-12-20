@@ -12,7 +12,7 @@ import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { AddressAttributes } from '../models/address';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { createRole, findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -30,6 +30,7 @@ type CreateAddressReq = {
   wallet_id: WalletId;
   community?: string;
   keytype?: string;
+  block_info?: string;
 };
 
 type CreateAddressResp = AddressAttributes & { newly_created: boolean };
@@ -129,6 +130,7 @@ const createAddress = async (
     existingAddress.verification_token = verification_token;
     existingAddress.verification_token_expires = verification_token_expires;
     existingAddress.last_active = new Date();
+    existingAddress.block_info = req.body.block_info;
 
     // we update addresses with the wallet used to sign in
     existingAddress.wallet_id = req.body.wallet_id;
@@ -175,6 +177,7 @@ const createAddress = async (
         address: encodedAddress,
         verification_token,
         verification_token_expires,
+        block_info: req.body.block_info,
         keytype: req.body.keytype,
         last_active,
         wallet_id: req.body.wallet_id,

@@ -5,6 +5,8 @@ import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractType } from 'common-common/src/types';
 import { DB } from 'server/models';
+import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
+import { AbiItem } from 'web3-utils';
 import { ContractAttributes } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
@@ -38,7 +40,7 @@ export type CreateContractReq = ContractAttributes &
     community: string;
     node_url: string;
     address: string;
-    abi: Array<Record<string, unknown>>;
+    abi: string;
     contractType: ContractType;
   };
 
@@ -71,8 +73,25 @@ const createContract = async (
   if (!req.user.isAdmin) {
     return next(new Error(Errors.NotAdmin));
   }
-  if (abi && abi.length === 0) {
+
+  if (abi && (Object.keys(abi) as Array<string>).length === 0) {
     return next(new Error(Errors.InvalidABI));
+  }
+  let abiAsRecord: Array<Record<string, unknown>>;
+  if (abi) {
+    try {
+      // Parse ABI to validate it as a properly formatted ABI
+      abiAsRecord = JSON.parse(abi);
+      if (!abiAsRecord) {
+        return next(new Error(Errors.InvalidABI));
+      }
+      const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
+      if (!abiItems) {
+        return next(new Error(Errors.InvalidABI));
+      }
+    } catch {
+      return next(new Error(Errors.InvalidABI));
+    }
   }
 
   if (!contractType || !contractType.trim()) {
@@ -101,39 +120,53 @@ const createContract = async (
     return next(new Error(Errors.ContractAddressExists));
   }
 
-  try {
-    // override provided URL for eth chains (typically ERC20) with stored, unless none found
-    const node = await models.ChainNode.scope('withPrivateData').findOne({
-      where: {
-        id: chain_node_id,
-        balance_type,
-      },
-    });
-    if (!node) {
-      return next(new Error('Node not found'));
-    }
+  // override provided URL for eth chains (typically ERC20) with stored, unless none found
+  const node = await models.ChainNode.findOne({
+    where: {
+      id: chain_node_id,
+    },
+  });
 
-    let contract;
-    if (abi != null) {
-      const contract_abi = await models.ContractAbi.create({
-        abi,
+  if (!node) {
+    return next(new Error(Errors.InvalidNodeUrl));
+  }
+
+  let contract;
+  if (abi != null) {
+    // transactionalize contract creation
+    await models.sequelize.transaction(async (t) => {
+      const contract_abi = await models.ContractAbi.create(
+        {
+          abi: abiAsRecord,
+        },
+        { transaction: t }
+      );
+
+      [contract] = await models.Contract.findOrCreate({
+        where: {
+          address,
+          chain_node_id: node.id,
+          token_name,
+          abi_id: contract_abi.id,
+          symbol,
+          decimals,
+          type: contractType,
+        },
+        transaction: t,
       });
-      if (contract_abi) {
-        [contract] = await models.Contract.findOrCreate({
-          where: {
-            address,
-            chain_node_id: node.id,
-            token_name,
-            abi_id: contract_abi.id,
-            symbol,
-            decimals,
-            type: contractType,
-          },
-        });
-      } else {
-        return next(new Error('Could not create contract abi'));
-      }
-    } else {
+
+      await models.CommunityContract.create(
+        {
+          chain_id: community,
+          contract_id: contract.id,
+        },
+        { transaction: t }
+      );
+    });
+    return success(res, { contract: contract.toJSON() });
+  } else {
+    // transactionalize contract creation
+    await models.sequelize.transaction(async (t) => {
       [contract] = await models.Contract.findOrCreate({
         where: {
           address,
@@ -143,23 +176,17 @@ const createContract = async (
           type: contractType,
           chain_node_id: node.id,
         },
+        transaction: t,
       });
-    }
-
-    await models.CommunityContract.create({
-      chain_id: community,
-      contract_id: contract.id,
+      await models.CommunityContract.create(
+        {
+          chain_id: community,
+          contract_id: contract.id,
+        },
+        { transaction: t }
+      );
     });
-
-    const nodeJSON = node.toJSON();
-    delete nodeJSON.private_url;
-
-    return success(res, {
-      contract: contract.toJSON(),
-    });
-  } catch (err) {
-    console.log('Error creating contract: ', err);
-    return next(err);
+    return success(res, { contract: contract.toJSON() });
   }
 };
 

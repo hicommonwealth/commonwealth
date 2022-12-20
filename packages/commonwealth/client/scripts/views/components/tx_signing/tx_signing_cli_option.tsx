@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 
@@ -14,15 +15,13 @@ import { setupEventListeners } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { CWTextArea } from '../component_kit/cw_text_area';
 
-type TXSigningCLIOptionAttrs = ITXModalData & { next: NextFn };
+type TXSigningCLIOptionAttrs = ITXModalData & NextFn;
 
-export class TXSigningCLIOption
-  implements m.ClassComponent<TXSigningCLIOptionAttrs>
-{
+export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> {
   private calldata?: ISubstrateTXData;
   private signedTx: string;
 
-  async oncreate(vnode) {
+  async oncreate(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
     if (this.calldata === undefined) {
       this.calldata =
         (await vnode.attrs.txData.unsignedData()) as ISubstrateTXData;
@@ -30,7 +29,7 @@ export class TXSigningCLIOption
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
     const transact = (...args) => {
       setupEventListeners(vnode);
       vnode.attrs.txData.transact(...args);

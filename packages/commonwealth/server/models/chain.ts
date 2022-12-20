@@ -21,7 +21,6 @@ export type ChainAttributes = {
   icon_url: string;
   active: boolean;
   type: ChainType;
-  chat_enabled: boolean;
   id?: string;
   description?: string;
   discord?: string;
@@ -43,8 +42,11 @@ export type ChainAttributes = {
   admin_only_polling?: boolean;
   snapshot?: string[];
   bech32_prefix?: string;
+  hide_projects?: boolean;
   token_name?: string;
   ce_verbose?: boolean;
+  default_allow_permissions: bigint;
+  default_deny_permissions: bigint;
 
   // associations
   ChainNode?: ChainNodeAttributes;
@@ -90,7 +92,6 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
-      ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       discord: { type: dataTypes.STRING, allowNull: true },
       element: { type: dataTypes.STRING, allowNull: true },
@@ -116,11 +117,6 @@ export default (
         defaultValue: true,
       },
       type: { type: dataTypes.STRING, allowNull: false },
-      chat_enabled: {
-        type: dataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: true,
-      },
       substrate_spec: { type: dataTypes.JSONB, allowNull: true },
       has_chain_events_listener: {
         type: dataTypes.BOOLEAN,
@@ -133,9 +129,20 @@ export default (
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
       },
+      hide_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
+      default_allow_permissions: {
+        type: dataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
+      default_deny_permissions: {
+        type: dataTypes.BIGINT,
+        allowNull: false,
+        defaultValue: 0,
+      },
     },
     {
       tableName: 'Chains',
@@ -162,6 +169,7 @@ export default (
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
+    models.Chain.hasMany(models.ChainEntityMeta, { foreignKey: 'chain' })
   };
 
   return Chain;

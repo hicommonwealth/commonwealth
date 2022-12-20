@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import app from 'state';
 import { HelpMenu } from './menus/help_menu';
@@ -17,7 +18,7 @@ const mobileMenuLookup = {
 
 export type MobileMenuName = keyof typeof mobileMenuLookup;
 
-export class AppMobileMenus implements m.ClassComponent {
+export class AppMobileMenus extends ClassComponent {
   view() {
     const ActiveMenu = mobileMenuLookup[app.mobileMenu];
 

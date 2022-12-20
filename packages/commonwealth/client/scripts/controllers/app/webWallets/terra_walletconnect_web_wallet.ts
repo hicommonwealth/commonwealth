@@ -21,7 +21,7 @@ class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> 
   private _wallet: ConnectedWallet;
 
   public readonly name = WalletId.TerraWalletConnect;
-  public readonly label = 'Terra Station WalletConnect';
+  public readonly label = 'WalletConnect';
   public readonly chain = ChainBase.CosmosSDK;
   public readonly available = true;
   public readonly defaultNetwork = ChainNetwork.Terra;
@@ -38,8 +38,6 @@ class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> 
   public get accounts() {
     return this._accounts || [];
   }
-
-  api: () => any
 
   public async signWithAccount(account: Account): Promise<string> {
     try {

@@ -8,6 +8,11 @@ export interface ICache {
   }
 }
 
+export enum FetchTokenBalanceErrors {
+  NoBalanceProvider = 'Balance provider not found',
+  UnsupportedContractType = 'Unsupported contract type',
+}
+
 export type IChainNode = {
   id: number;
   url: string;

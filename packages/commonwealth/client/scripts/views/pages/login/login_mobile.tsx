@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/login/login_mobile.scss';
 
@@ -24,8 +25,8 @@ import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
 import { LoginAttrs } from './types';
 
-export class LoginMobile implements m.ClassComponent<LoginAttrs> {
-  view(vnode) {
+export class LoginMobile extends ClassComponent<LoginAttrs> {
+  view(vnode: m.Vnode<LoginAttrs>) {
     const {
       address,
       bodyType,

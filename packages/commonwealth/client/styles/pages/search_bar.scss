@@ -13,7 +13,7 @@
 .SearchBar {
   .cui-input {
     align-items: center;
-    border-radius: 25px;
+    border-radius: $border-radius-rounded-corners;
     border: 1px solid $neutral-50;
     color: $black;
     display: flex;
@@ -33,7 +33,7 @@
       z-index: 2;
       right: 30px;
       margin-right: -15px;
-      border-radius: 50%;
+      border-radius: $border-radius-round;
     }
 
     .cui-icon-corner-down-left {
@@ -57,8 +57,8 @@
     z-index: 11;
     top: 40px;
     left: 0;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0px 10px 10px rgba(0, 0, 0, 0.15);
+    border-radius: $border-radius-corners;
+    box-shadow: $elevation-1;
     width: 100%;
     padding: 20px 0 10px 0;
     overflow-y: visible;
@@ -175,7 +175,7 @@
           }
 
           .cui-tag {
-            border-radius: 10px;
+            border-radius: $border-radius-corners;
             text-transform: capitalize;
             margin-right: 3px;
             padding: 4px 8px;
@@ -226,7 +226,7 @@
         margin-bottom: 10px;
         padding: 15px 15px !important;
         font-size: 18px !important;
-        border-radius: 10px !important;
+        border-radius: $border-radius-corners;
         border: 1px solid $white;
         background: $neutral-50;
 

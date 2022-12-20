@@ -11,7 +11,7 @@ Discussions and governance for blockchain networks.
 ```bash
 brew install node yarn postgresql
 brew services start postgresql
-psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth CREATEDB;"
+psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth SUPERUSER;"
 psql postgres -h 127.0.0.1 -U commonwealth -c "CREATE DATABASE commonwealth;"
 ```
 
@@ -184,10 +184,10 @@ A number of migrations for loading the latest on-chain data are
 defined in server.ts and package.json. To run these migrations on
 Heroku, some special syntax is needed.
 
-For example, to run the councillor/validator flags migration:
+For example, to run the chain events migration:
 
 ```
-FLAG_MIGRATION=true ts-node --log-error --project tsconfig.node.json server.ts
+CHAIN_ID=dydx yarn migrate-events
 ```
 
 ## Production Logs
@@ -245,7 +245,7 @@ git push heroku master
 You should now set up any databases and services needed. In particular:
 
 - Schedule a daily task for sending notification email digests:
-  `SEND_EMAILS=true ts-node --project tsconfig.node.json server.ts`
+  `SEND_EMAILS=true ts-node --project tsconfig.json server.ts`
   at 1pm UTC / 6am PT / 9am ET / 3pm CEST
 
 ## Custom Domains

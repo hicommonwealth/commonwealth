@@ -1,8 +1,8 @@
 import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {
@@ -50,8 +50,8 @@ const createTopic = async (
     return next(new AppError(Errors.MustBeAdmin));
   }
 
-  const token_threshold_test = parseInt(req.body.token_threshold, 10);
-  if (Number.isNaN(token_threshold_test)) {
+  const isNumber = /^\d+$/.test(req.body.token_threshold);
+  if (!isNumber) {
     return next(new AppError(Errors.InvalidTokenThreshold));
   }
 

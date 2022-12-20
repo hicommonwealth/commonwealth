@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -36,6 +37,7 @@ export enum CommunityType {
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
   AbiFactory = 'Abi Factory',
+  AddContract = 'Add Contract',
 }
 
 const ADMIN_ONLY_TABS = [
@@ -51,7 +53,7 @@ type CreateCommunityState = {
   loadingEthChains: boolean;
 } & EthChainAttrs;
 
-class CreateCommunity implements m.ClassComponent {
+class CreateCommunity extends ClassComponent {
   private state: CreateCommunityState = {
     activeForm: CommunityType.StarterCommunity,
     ethChainNames: {},
@@ -76,13 +78,6 @@ class CreateCommunity implements m.ClassComponent {
       }
       this.state.loadingEthChains = false;
       m.redraw();
-    });
-  }
-
-  oncreate() {
-    mixpanelBrowserTrack({
-      event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
-      isCustomDomain: app.isCustomDomain(),
     });
   }
 

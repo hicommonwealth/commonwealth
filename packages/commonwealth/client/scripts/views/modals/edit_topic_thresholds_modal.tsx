@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 
@@ -13,15 +14,14 @@ import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 
-class EditTopicThresholdsRow
-  implements
-    m.ClassComponent<{
-      topic: Topic;
-    }>
-{
+type EditTopicThresholdsRowAttrs = {
+  topic: Topic;
+};
+
+class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs> {
   private newTokenThresholdInWei: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<EditTopicThresholdsRowAttrs>) {
     const { topic } = vnode.attrs;
 
     if (typeof this.newTokenThresholdInWei !== 'string') {
@@ -80,18 +80,17 @@ type NewTopicModalForm = {
   tokenThreshold: number;
 };
 
-export class EditTopicThresholdsModal
-  implements
-    m.ClassComponent<{
-      id: number;
-      name: string;
-      description: string;
-      tokenThreshold: number;
-    }>
-{
+type EditTopicThresholdsModalAttrs = {
+  id: number;
+  name: string;
+  description: string;
+  tokenThreshold: number;
+};
+
+export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholdsModalAttrs> {
   private form: NewTopicModalForm;
 
-  view(vnode) {
+  view(vnode: m.Vnode<EditTopicThresholdsModalAttrs>) {
     if (
       !app.user.isSiteAdmin &&
       !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
