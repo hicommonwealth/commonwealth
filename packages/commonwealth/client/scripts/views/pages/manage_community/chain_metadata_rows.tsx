@@ -97,7 +97,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.communityBanner = chain.communityBanner;
   }
 
-  view(vnode: m.VnodeDOM<ChainMetadataRowsAttrs, this>) {
+  view(vnode: ResultNode<ChainMetadataRowsAttrs, this>) {
     const chain: ChainInfo = vnode.attrs.chain;
     return (
       <div class="ChainMetadataRows">

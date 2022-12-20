@@ -42,7 +42,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
       m.redraw();
     });
   },
-  oncreate: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+  oncreate: (vnode: ResultNode<IAttrs, IState>) => {
     if (vnode.state.identity?.info) {
       const {
         additional,
@@ -70,7 +70,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
       $(vnode.dom).find('input[name=twitter]').val(d2s(twitter));
     }
   },
-  view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+  view: (vnode: ResultNode<IAttrs, IState>) => {
     const updateIdentity = async () => {
       const data = {
         display: `${$(vnode.dom).find('input[name=display]').val()}`.trim(),

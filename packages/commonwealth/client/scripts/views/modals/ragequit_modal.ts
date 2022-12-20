@@ -19,7 +19,7 @@
 // }
 
 // const RagequitModal: m.Component<IAttrs, IState> = {
-//   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+//   view: (vnode: ResultNode<IAttrs, IState>) => {
 //     const acct = vnode.attrs.account;
 //     return m('.RagequitModal', [
 //       m('.header', 'Ragequit'),

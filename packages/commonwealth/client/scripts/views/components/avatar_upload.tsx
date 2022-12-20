@@ -30,7 +30,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
   private dropzone?: any;
   private uploaded: boolean;
 
-  oncreate(vnode: m.VnodeDOM<AvatarUploadAttrs>) {
+  oncreate(vnode: ResultNode<AvatarUploadAttrs>) {
     $(vnode.dom).on('cleardropzone', () => {
       this.dropzone.files.map((file) => this.dropzone.removeFile(file));
     });

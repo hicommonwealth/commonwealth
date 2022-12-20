@@ -140,7 +140,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
 
   onbeforeupdate(
     vnode: ResultNode<SidebarSectionAttrs>,
-    old: m.VnodeDOM<SidebarSectionAttrs, this>
+    old: ResultNode<SidebarSectionAttrs, this>
   ) {
     if (
       !_.isEqual(Object.values(app.socket.chatNs.channels), old.state.channels)

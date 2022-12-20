@@ -24,14 +24,14 @@ interface IDropdownFormFieldAttrs {
 }
 
 export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
-  oninit: (vnode: m.VnodeDOM<IDropdownFormFieldAttrs>) => {
+  oninit: (vnode: ResultNode<IDropdownFormFieldAttrs>) => {
     if (vnode.attrs.callbackOnInit && vnode.attrs.callback) {
       vnode.attrs.callback(
         vnode.attrs.defaultValue || vnode.attrs.choices[0].value
       );
     }
   },
-  view: (vnode: m.VnodeDOM<IDropdownFormFieldAttrs>) => {
+  view: (vnode: ResultNode<IDropdownFormFieldAttrs>) => {
     const { choices, name, defaultValue, subtitle, title } = vnode.attrs;
     if (!choices || choices.length === 0) {
       return;
@@ -77,7 +77,7 @@ interface IRadioSelectorFormFieldAttrs {
 
 export const RadioSelectorFormField: m.Component<IRadioSelectorFormFieldAttrs> =
   {
-    view: (vnode: m.VnodeDOM<IRadioSelectorFormFieldAttrs>) => {
+    view: (vnode: ResultNode<IRadioSelectorFormFieldAttrs>) => {
       const { choices, name, subtitle, title } = vnode.attrs;
 
       return m('.RadioSelectorFormField.FormField', [

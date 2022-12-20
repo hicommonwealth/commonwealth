@@ -18,7 +18,7 @@
 // }
 
 // const VoterRow: m.Component<IVoterRowAttrs> = {
-//   view: (vnode: m.VnodeDOM<IVoterRowAttrs>) => {
+//   view: (vnode: ResultNode<IVoterRowAttrs>) => {
 //     const { account, stake } = vnode.attrs.vote;
 
 //     return m(

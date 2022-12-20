@@ -14,7 +14,7 @@ type BanUserModalAttrs = {
 };
 
 export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
-  view(vnode: m.VnodeDOM<BanUserModalAttrs, this>) {
+  view(vnode: ResultNode<BanUserModalAttrs, this>) {
     const { address } = vnode.attrs.profile;
 
     const exitModal = () => {

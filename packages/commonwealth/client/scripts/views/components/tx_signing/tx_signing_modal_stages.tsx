@@ -121,7 +121,7 @@ export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
 }
 
 export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
-  view(vnode: m.VnodeDOM<TxDataState, this>) {
+  view(vnode: ResultNode<TxDataState, this>) {
     const { blocknum, hash, timestamp } = vnode.attrs;
 
     return (
@@ -148,7 +148,7 @@ export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
 type TxSigningModalRejectedStageAttrs = TxDataState & NextFn;
 
 export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRejectedStageAttrs> {
-  view(vnode: m.VnodeDOM<TxSigningModalRejectedStageAttrs>) {
+  view(vnode: ResultNode<TxSigningModalRejectedStageAttrs>) {
     const { blocknum, error, hash, timestamp, next } = vnode.attrs;
 
     return (

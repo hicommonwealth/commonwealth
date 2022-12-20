@@ -237,7 +237,7 @@ interface IAdminActionsState {
 }
 
 const AdminActions: m.Component<{}, IAdminActionsState> = {
-  oninit: (vnode: m.VnodeDOM<{}, IAdminActionsState>) => {
+  oninit: (vnode: ResultNode<{}, IAdminActionsState>) => {
     const profiles = app.profiles.store.getAll();
     vnode.state.profiles = {};
 
@@ -250,7 +250,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
       }
     }
   },
-  view: (vnode: m.VnodeDOM<{}, IAdminActionsState>) => {
+  view: (vnode: ResultNode<{}, IAdminActionsState>) => {
     let adminChoices;
     if (vnode.state.profiles) {
       adminChoices = Object.keys(vnode.state.profiles).map((key) => {

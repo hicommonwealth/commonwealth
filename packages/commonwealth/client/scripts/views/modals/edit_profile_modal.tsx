@@ -36,7 +36,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
     this.name = account.profile.name;
   }
 
-  view(vnode: m.VnodeDOM<EditProfileModalAttrs>) {
+  view(vnode: ResultNode<EditProfileModalAttrs>) {
     const { account, refreshCallback } = vnode.attrs;
 
     return (

@@ -43,7 +43,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
   private isRendered: boolean;
   private triggerRef: Element;
 
-  oncreate(vnode: m.VnodeDOM<PopoverAttrs>) {
+  oncreate(vnode: ResultNode<PopoverAttrs>) {
     this.contentId = `popover-container-ref-${Math.random()}`; // has to be set first
     this.arrowId = `${this.contentId}-arrow`;
     this.isOpen = false;

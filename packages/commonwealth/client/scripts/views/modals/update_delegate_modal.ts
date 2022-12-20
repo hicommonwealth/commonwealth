@@ -22,7 +22,7 @@
 //   oninit: (vnode: ResultNode<IAttrs, IState>) => {
 //     vnode.state.newDelegateKey = vnode.attrs.delegateKey;
 //   },
-//   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {
+//   view: (vnode: ResultNode<IAttrs, IState>) => {
 //     return m('.UpdateDelegateModal', [
 //       m('.header', 'Update Delegate'),
 //       m('.compact-modal-body', [

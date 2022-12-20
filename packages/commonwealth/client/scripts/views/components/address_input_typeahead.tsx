@@ -30,7 +30,7 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
   private selectedItem: AddressInputTypeaheadItem;
   private typeaheadAddresses: Array<AddressInputTypeaheadItem>;
 
-  oncreate(vnode: m.VnodeDOM<AddressInputTypeaheadAttrs>) {
+  oncreate(vnode: ResultNode<AddressInputTypeaheadAttrs>) {
     if (vnode.attrs.options.placeholder) {
       $(vnode.dom)
         .find('input')

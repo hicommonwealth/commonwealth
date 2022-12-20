@@ -28,7 +28,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
   private isReplying: boolean;
   private parentCommentId: number;
 
-  oncreate(vnode: m.VnodeDOM<CommentsTreeAttrs, this>) {
+  oncreate(vnode: ResultNode<CommentsTreeAttrs, this>) {
     this.dom = vnode.dom;
   }
 
