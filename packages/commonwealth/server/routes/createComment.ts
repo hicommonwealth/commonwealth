@@ -12,8 +12,7 @@ import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
@@ -59,8 +58,8 @@ const createComment = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+
+  const author = req.address;
 
   const { parent_id, root_id, chain_entity_id, text } = req.body;
 
@@ -137,7 +136,10 @@ const createComment = async (
     }
   }
 
-  if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
+  if (
+    chain &&
+    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+  ) {
     // skip check for admins
     const isAdmin = await findAllRoles(
       models,

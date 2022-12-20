@@ -15,8 +15,7 @@ import {
   isAddressPermitted,
 } from 'commonwealth/server/util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import validateChain from '../middleware/validateChain';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
@@ -216,8 +215,8 @@ const createThread = async (
   const [chain, error] = await validateChain(models, req.body);
 
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+
+  const author = req.address;
 
   const permission_error = await isAddressPermitted(
     models,
@@ -330,7 +329,11 @@ const createThread = async (
       }
     }
 
-    if (chain && (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)) {
+    if (
+      chain &&
+      (chain.type === ChainType.Token ||
+        chain.network === ChainNetwork.Ethereum)
+    ) {
       // skip check for admins
       const isAdmin = await findAllRoles(
         models,
