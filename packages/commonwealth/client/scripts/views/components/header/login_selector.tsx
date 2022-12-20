@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import {
   MenuItem,
   MenuDivider,
@@ -71,7 +71,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             basic: true,
             onclick: async () => {
               await setActiveAccount(account);
-              m.redraw();
+              redraw();
             },
             label: render(UserBlock, {
               user: account,
@@ -108,7 +108,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
                 modal: EditProfileModal,
                 data: {
                   account: app.user.activeAccount,
-                  refreshCallback: () => m.redraw(),
+                  refreshCallback: () => redraw(),
                 },
               });
             },
@@ -196,7 +196,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
               localStorage.setItem('dark-mode-state', 'on');
             }
             e.stopPropagation();
-            m.redraw();
+            redraw();
           },
           label: (
             <div class="label-wrap">
@@ -221,7 +221,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
               .then(async () => {
                 await initAppState();
                 notifySuccess('Logged out');
-                m.redraw();
+                redraw();
               })
               .catch(() => {
                 // eslint-disable-next-line no-restricted-globals
@@ -454,7 +454,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
               app.user.activeAccount.address
             );
           }
-          m.redraw();
+          redraw();
         } catch (err) {
           console.error(err);
         }

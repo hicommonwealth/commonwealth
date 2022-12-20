@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
@@ -104,7 +104,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
                   notifySuccess('Member upgraded');
                   delete this.user;
                   delete this.role;
-                  m.redraw();
+                  redraw();
                 } else {
                   notifyError('Upgrade failed');
                 }

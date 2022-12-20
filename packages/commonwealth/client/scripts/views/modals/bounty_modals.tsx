@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'modals/bounty_modals.scss';
 

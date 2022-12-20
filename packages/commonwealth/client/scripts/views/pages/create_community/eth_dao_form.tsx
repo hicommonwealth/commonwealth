@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import Web3 from 'web3';
 
@@ -129,12 +129,12 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
         this.state.status = 'failure';
         this.state.message = e.message;
         this.state.loading = false;
-        m.redraw();
+        redraw();
         return;
       }
       this.state.loaded = true;
       this.state.loading = false;
-      m.redraw();
+      redraw();
     };
 
     return (

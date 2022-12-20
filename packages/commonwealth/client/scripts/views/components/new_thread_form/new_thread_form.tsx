@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import $ from 'jquery';
 
@@ -103,7 +103,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
       this.quillEditorState.alteredText = false;
     }
 
-    m.redraw();
+    redraw();
   }
 
   private async _saveDraft(
@@ -345,7 +345,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                       modal: EditProfileModal,
                       data: {
                         account: author,
-                        refreshCallback: () => m.redraw(),
+                        refreshCallback: () => redraw(),
                       },
                     });
                   }}
@@ -481,7 +481,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         if (isModal) {
                           notifySuccess('Draft saved');
                         }
-                        m.redraw();
+                        redraw();
                       } catch (err) {
                         this.saving = false;
                         notifyError(err.message);
@@ -677,12 +677,12 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                                   this.recentlyDeletedDrafts.push(draft.id);
                                   if (this.fromDraft === draft.id) {
                                     delete this.fromDraft;
-                                    m.redraw();
+                                    redraw();
                                   }
                                 } catch (err) {
                                   notifyError(err.message);
                                 }
-                                m.redraw();
+                                redraw();
                               }
                             }}
                           >

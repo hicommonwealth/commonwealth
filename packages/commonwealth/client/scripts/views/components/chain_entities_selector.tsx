@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -33,7 +33,7 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
         .then(() => {
           // refreshing loads the latest chain entities into app.chainEntities store
           this.chainEntitiesLoaded = true;
-          m.redraw();
+          redraw();
         });
     }
 

@@ -2,7 +2,7 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 
@@ -69,7 +69,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     const handleUpload = async (file: File) => {
       if (!file) return;
       this.isUploading = true;
-      m.redraw();
+      redraw();
 
       const [imageURL, uploadStatus] = await this.uploadImage(file);
       this.isUploading = false;
@@ -81,7 +81,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
         vnode.attrs.uploadCompleteCallback(imageURL);
       }
 
-      m.redraw();
+      redraw();
     };
 
     // Drag'n'Drop event handler declarations

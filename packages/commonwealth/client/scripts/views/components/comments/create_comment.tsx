@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -92,7 +92,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
         // once we are receiving notifications from the websocket
         await app.user.notifications.refresh();
 
-        m.redraw();
+        redraw();
 
         jumpHighlightComment(res.id);
       } catch (err) {
@@ -101,7 +101,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
         this.quillEditorState.enable();
         this.error = err.message;
         this.sendingComment = false;
-        m.redraw();
+        redraw();
       }
 
       this.saving = false;
@@ -109,7 +109,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       if (handleIsReplying) {
         handleIsReplying(false);
       }
-      m.redraw();
+      redraw();
     };
 
     const activeTopicName =
@@ -151,7 +151,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                   modal: EditProfileModal,
                   data: {
                     account: app.user.activeAccount,
-                    refreshCallback: () => m.redraw(),
+                    refreshCallback: () => redraw(),
                   },
                 });
               }}
@@ -203,7 +203,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
               class="form-bottom"
               onmouseover={() => {
                 // keeps Quill's isBlank up to date
-                return m.redraw();
+                return redraw();
               }}
             >
               <div class="form-buttons">

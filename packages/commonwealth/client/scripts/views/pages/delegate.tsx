@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/delegate.scss';
 
@@ -50,7 +50,7 @@ class DelegateForm extends ClassComponent {
       );
     }
 
-    m.redraw();
+    redraw();
   }
 
   async setDelegate(address: string) {
@@ -103,7 +103,7 @@ class DelegateForm extends ClassComponent {
           oninput={(e) => {
             const result = (e.target as any).value;
             this.form.address = result;
-            m.redraw();
+            redraw();
           }}
         />
         {hasValue && (
@@ -114,7 +114,7 @@ class DelegateForm extends ClassComponent {
             oninput={(e) => {
               const result = (e.target as any).value;
               this.form.amount = result;
-              m.redraw();
+              redraw();
             }}
           />
         )}
@@ -126,7 +126,7 @@ class DelegateForm extends ClassComponent {
             this.loading = true;
             await this.setDelegate(form.address);
             this.loading = false;
-            m.redraw();
+            redraw();
           }}
         />
       </div>

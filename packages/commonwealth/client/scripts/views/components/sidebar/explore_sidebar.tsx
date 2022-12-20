@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/sidebar/explore_sidebar.scss';
 
@@ -82,7 +82,7 @@ export class ExploreCommunitiesSidebar extends ClassComponent {
             setTimeout(() => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
-              m.redraw();
+              redraw();
             }, 200);
           },
         }}

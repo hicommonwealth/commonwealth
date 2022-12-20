@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 
@@ -67,7 +67,7 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
             ({ Address }) => Address.address !== userAddress
           );
           this.loading = false;
-          m.redraw();
+          redraw();
         });
     };
 
@@ -83,7 +83,7 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
               Address: { address: userAddress, chain },
             },
           ];
-          m.redraw();
+          redraw();
         });
     };
 

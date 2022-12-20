@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 
@@ -70,7 +70,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         this.totals = res.results;
       });
 
-      m.redraw();
+      redraw();
 
       getPower(
         this.space,
@@ -80,7 +80,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         this.validatedAgainstStrategies = vals.totalScore > 0;
         this.totalScore = vals.totalScore;
         this.fetchedPower = true;
-        m.redraw();
+        redraw();
       });
 
       try {
@@ -88,7 +88,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
           .then((res) => {
             this.threads = res;
-            m.redraw();
+            redraw();
           });
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);

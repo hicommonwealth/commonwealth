@@ -48,7 +48,7 @@
 //             vnode.attrs.account.updateDelegateKeyTx(vnode.state.newDelegateKey)
 //               .then((result) => {
 //                 $(vnode.dom).trigger('modalforceexit');
-//                 m.redraw();
+//                 redraw();
 //               })
 //               .catch((err) => notifyError(err.toString()));
 //           },

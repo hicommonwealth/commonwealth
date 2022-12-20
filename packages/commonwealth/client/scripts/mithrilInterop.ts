@@ -34,8 +34,10 @@ export function setRoute(route: string, data?: any, options?: m.RouteOptions) {
   m.route.set(route, data, options);
 }
 
-/*
-m.redraw (=> redraw())
-m.route.set (=> navigate())
-everything in app.ts (router)
-*/
+export function redraw(sync = false) {
+  if (!sync) {
+    m.redraw();
+  } else {
+    m.redraw.sync()
+  }
+}

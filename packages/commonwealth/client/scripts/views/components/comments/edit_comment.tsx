@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/comments/edit_comment.scss';
 
@@ -71,7 +71,7 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
               if (confirmed) {
                 setIsEditing(false);
                 clearEditingLocalStorage(comment.id, ContentType.Comment);
-                m.redraw();
+                redraw();
               }
             }}
           />

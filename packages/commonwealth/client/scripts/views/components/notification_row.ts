@@ -2,7 +2,7 @@ import 'components/notification_row.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
@@ -376,7 +376,7 @@ const NotificationRow: m.Component<
                     e.stopPropagation();
                     vnode.state.scrollOrStop = true;
                     app.user.notifications.delete([notification]).then(() => {
-                      m.redraw();
+                      redraw();
                     });
                   },
                 }),
@@ -401,9 +401,9 @@ const NotificationRow: m.Component<
           }
           app.user.notifications
             .markAsRead([notification])
-            .then(() => m.redraw());
+            .then(() => redraw());
         },
-        () => m.redraw.sync()
+        () => redraw(true)
       );
     } else if (category === NotificationCategories.NewChatMention) {
       const { chain_id, author_address, created_at, message_id, channel_id } =
@@ -454,11 +454,11 @@ const NotificationRow: m.Component<
                         .markAsRead(notifications)
                         ?.then(() => {
                           vnode.state.markingRead = false;
-                          m.redraw();
+                          redraw();
                         })
                         .catch(() => {
                           vnode.state.markingRead = false;
-                          m.redraw();
+                          redraw();
                         });
                     },
                   },
@@ -550,11 +550,11 @@ const NotificationRow: m.Component<
                         .markAsRead(notifications)
                         ?.then(() => {
                           vnode.state.markingRead = false;
-                          m.redraw();
+                          redraw();
                         })
                         .catch(() => {
                           vnode.state.markingRead = false;
-                          m.redraw();
+                          redraw();
                         });
                     },
                   },
@@ -576,7 +576,7 @@ const NotificationRow: m.Component<
             // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
             // array
             app.mobileMenu = null;
-            m.redraw();
+            redraw();
           },
         },
         null,

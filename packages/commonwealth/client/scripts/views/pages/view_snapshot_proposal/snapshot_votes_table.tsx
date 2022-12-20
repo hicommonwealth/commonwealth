@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
@@ -34,7 +34,7 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
 
     const toggleExpandedVoterList = () => {
       this.isVotersListExpanded = !this.isVotersListExpanded;
-      m.redraw();
+      redraw();
     };
 
     const displayedVoters = this.isVotersListExpanded

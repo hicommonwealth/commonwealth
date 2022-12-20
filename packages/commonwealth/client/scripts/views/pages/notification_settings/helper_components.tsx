@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -174,7 +174,7 @@ export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
               app.user.notifications
                 .deleteSubscription(subscription)
                 .then(() => {
-                  m.redraw();
+                  redraw();
                 }),
           },
         ]}

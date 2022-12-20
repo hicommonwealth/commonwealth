@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -48,10 +48,10 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
           this.items = response.result.filter((role) => {
             return role.Address.address !== app.user.activeAccount?.address;
           });
-          m.redraw();
+          redraw();
         })
         .catch((err) => {
-          m.redraw();
+          redraw();
           console.error(err);
         });
     }
@@ -240,7 +240,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                     } else {
                       throw new Error('Failed to remove collaborators');
                     }
-                    m.redraw();
+                    redraw();
                   } catch (err) {
                     const errMsg =
                       err.responseJSON?.error ||

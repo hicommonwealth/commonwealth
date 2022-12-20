@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import moment from 'moment';
 import {
@@ -411,7 +411,7 @@ export const search = async (searchQuery: SearchQuery, state) => {
   state.results = searchQuery.isSearchPreview
     ? getResultsPreview(searchQuery, state)
     : app.search.getByQuery(searchQuery).results;
-  m.redraw();
+  redraw();
 };
 
 const executeSearch = (query: SearchQuery) => {
@@ -648,7 +648,7 @@ export class SearchBar extends ClassComponent {
             } else {
               this.searchQuery.searchTerm = e.target.value?.toLowerCase();
               this.results = [];
-              m.redraw();
+              redraw();
             }
           }, timeout);
         },

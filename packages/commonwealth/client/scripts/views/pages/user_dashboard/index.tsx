@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -42,7 +42,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
   // Helper to load activity conditional on the selected tab
   handleToggle = () => {
     this.loadingData = false;
-    m.redraw();
+    redraw();
     const tab = this.activePage;
     if (tab === DashboardViews.ForYou) {
       if (this.fyNotifications.length === 0) this.loadingData = true;
@@ -51,7 +51,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
           DashboardActivityNotification.fromJSON(notification)
         );
         this.loadingData = false;
-        m.redraw();
+        redraw();
       });
     } else if (tab === DashboardViews.Global) {
       if (this.globalNotifications.length === 0) this.loadingData = true;
@@ -60,7 +60,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
           DashboardActivityNotification.fromJSON(notification)
         );
         this.loadingData = false;
-        m.redraw();
+        redraw();
       });
     } else if (tab === DashboardViews.Chain) {
       if (this.chainEvents.length === 0) this.loadingData = true;
@@ -69,7 +69,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
           DashboardActivityNotification.fromJSON(notification)
         );
         this.loadingData = false;
-        m.redraw();
+        redraw();
       });
     }
     this.activePage = tab;
@@ -126,7 +126,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > scrollHeight - 400) {
           this.fyCount += 10;
-          m.redraw();
+          redraw();
         }
       } else if (this.activePage === DashboardViews.Global) {
         if (
@@ -137,7 +137,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > scrollHeight - 400) {
           this.globalCount += 10;
-          m.redraw();
+          redraw();
         }
       } else {
         if (!notificationsRemaining(chainEvents.length, this.chainEventCount))
@@ -146,7 +146,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > scrollHeight - 400) {
           this.chainEventCount += 10;
-          m.redraw();
+          redraw();
         }
       }
     }, 400);
@@ -171,7 +171,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                       return;
                     }
                     setRoute('/dashboard/for-you');
-                    m.redraw();
+                    redraw();
                   }}
                 />
                 <CWTab
@@ -179,7 +179,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   isSelected={activePage === DashboardViews.Global}
                   onclick={() => {
                     setRoute('/dashboard/global');
-                    m.redraw();
+                    redraw();
                   }}
                 />
                 <CWTab
@@ -187,7 +187,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   isSelected={activePage === DashboardViews.Chain}
                   onclick={() => {
                     setRoute('/dashboard/chain-events');
-                    m.redraw();
+                    redraw();
                   }}
                 />
               </CWTabBar>

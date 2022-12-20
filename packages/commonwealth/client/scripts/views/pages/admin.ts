@@ -4,7 +4,7 @@ import 'pages/admin.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import app from 'state';
@@ -95,7 +95,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
               const call = EdgewareFunctionPicker.getMethod();
               vnode.state.txProcessing = true;
               vnode.state.resultText = 'Waiting...';
-              m.redraw();
+              redraw();
               (app.chain as Substrate).chain.api.tx.sudo
                 .sudo(call)
                 .signAndSend(keyring, (result: ISubmittableResult) => {
@@ -106,7 +106,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
                     } else {
                       vnode.state.resultText = 'Action was unsuccessful.';
                     }
-                    m.redraw();
+                    redraw();
                   }
                 });
             },
@@ -340,7 +340,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
                   if (response.status === 'Success') {
                     if (!app.isLoggedIn()) {
                     }
-                    m.redraw();
+                    redraw();
                   } else {
                     // error tracking
                   }
@@ -351,7 +351,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
                   vnode.state.disabled = false;
                   if (err.responseJSON)
                     vnode.state.error = err.responseJSON.error;
-                  m.redraw();
+                  redraw();
                 }
               );
             },

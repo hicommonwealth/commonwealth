@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -140,7 +140,7 @@ export class CosmosForm extends ClassComponent {
                 'Creating new Cosmos community failed';
             } finally {
               this.state.saving = false;
-              m.redraw();
+              redraw();
             }
           }}
         />

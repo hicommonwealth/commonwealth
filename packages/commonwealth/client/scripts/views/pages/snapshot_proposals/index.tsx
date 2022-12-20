@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 import { Button } from 'construct-ui';
 
@@ -85,7 +85,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
 
     if (!app.snapshot.initialized || app.snapshot?.space?.id !== snapshotId) {
       app.snapshot.init(snapshotId).then(() => {
-        m.redraw();
+        redraw();
       });
 
       return <PageLoading />;

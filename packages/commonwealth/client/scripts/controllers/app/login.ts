@@ -3,6 +3,7 @@
  */
 import $ from 'jquery';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import app from 'state';
 import { isSameAccount } from 'helpers';
 
@@ -38,7 +39,7 @@ export async function setActiveAccount(account: Account): Promise<void> {
   const role = app.roles.getRoleInCommunity({ account, chain });
 
   if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-    app.chain.activeAddressHasToken(account.address).then(() => m.redraw());
+    app.chain.activeAddressHasToken(account.address).then(() => redraw());
   }
 
   if (!role || role.is_user_default) {
@@ -126,7 +127,7 @@ export async function completeClientLogin(account: Account) {
     ) {
       app.user.setActiveAccounts(app.user.activeAccounts.concat([account]));
     }
-    m.redraw();
+    redraw();
   } catch (e) {
     console.trace(e);
   }

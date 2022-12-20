@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 
 import app from 'state';
@@ -136,7 +136,7 @@ export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCa
         voteInformation={buildVoteInformation(proposal?.choices, votes)}
         onVoteCast={(choice, callback) => {
           castSnapshotVote(choice, callback);
-          m.redraw();
+          redraw();
         }}
         incrementalVoteCast={totalScore}
         tooltipErrorMessage={voteErrorText}

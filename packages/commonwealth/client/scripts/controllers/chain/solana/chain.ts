@@ -1,6 +1,7 @@
 import { ITXModalData, NodeInfo, IChainModule, ChainInfo } from 'models';
 import { ApiStatus, IApp } from 'state';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 import BN from 'bn.js';
 import * as solw3 from '@solana/web3.js';
@@ -46,7 +47,7 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
     this.app.chain.block.duration = await this._connection.getBlockTime(this.app.chain.block.height);
     this.app.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
     this.app.chain.networkStatus = ApiStatus.Connected;
-    m.redraw();
+    redraw();
   }
 
   public async deinit() {

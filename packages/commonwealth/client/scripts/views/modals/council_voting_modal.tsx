@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
@@ -102,7 +102,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
         },
         (err) => {
           if (err) this.error = err;
-          m.redraw();
+          redraw();
         }
       );
     };
@@ -201,7 +201,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                   },
                   (err) => {
                     if (err) this.error = err;
-                    m.redraw();
+                    redraw();
                   }
                 );
               }}

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import * as solw3 from '@solana/web3.js';
 
@@ -78,7 +78,7 @@ export class SplTokenForm extends ClassComponent {
         this.state.message = `Error: ${err.message}` || 'Failed to load token';
       }
       this.state.loading = false;
-      m.redraw();
+      redraw();
     };
 
     return (

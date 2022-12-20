@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { InputSelect, ListItem } from 'construct-ui';
 
@@ -60,12 +60,12 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
             return res;
           });
           this.loading = false;
-          m.redraw();
+          redraw();
         })
         .catch(() => {
           console.error('bulkMembers did not return');
           this.loading = false;
-          m.redraw();
+          redraw();
         });
     }
 
@@ -111,7 +111,7 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
       onSelect: (item: AddressInputTypeaheadItem) => {
         this.selectedItem = item;
         if (oninput) oninput(item);
-        m.redraw();
+        redraw();
       },
       inputAttrs: {
         fluid: options.fluid,

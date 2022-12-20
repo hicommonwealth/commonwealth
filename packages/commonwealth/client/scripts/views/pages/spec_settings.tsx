@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
@@ -94,7 +94,7 @@ class SpecSettingsPage extends ClassComponent {
               this.error = '';
 
               // update spec display
-              m.redraw();
+              redraw();
             },
           })}
           <CWTextArea
@@ -114,7 +114,7 @@ class SpecSettingsPage extends ClassComponent {
                   return;
                 }
                 this.spec = specJson;
-                m.redraw();
+                redraw();
               }
             }}
           />
@@ -166,7 +166,7 @@ class SpecSettingsPage extends ClassComponent {
                 this.error = 'API initialization failed.';
               }
               this.isLoading = false;
-              m.redraw();
+              redraw();
             }}
           />
           <CWButton
@@ -188,7 +188,7 @@ class SpecSettingsPage extends ClassComponent {
               } catch (err) {
                 this.error = err.message || 'Spec update failure.';
                 this.isLoading = false;
-                m.redraw();
+                redraw();
                 return;
               }
 
@@ -205,7 +205,7 @@ class SpecSettingsPage extends ClassComponent {
               }
 
               this.isLoading = false;
-              m.redraw();
+              redraw();
             }}
           />
         </div>

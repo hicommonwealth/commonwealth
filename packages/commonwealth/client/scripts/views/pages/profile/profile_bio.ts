@@ -2,7 +2,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import { Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button } from 'construct-ui';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
@@ -98,13 +98,13 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       () => {
         if (window.scrollY > 142 && vnode.state.showProfileRight === false) {
           vnode.state.showProfileRight = true;
-          m.redraw();
+          redraw();
         } else if (
           window.scrollY < 142 &&
           vnode.state.showProfileRight === true
         ) {
           vnode.state.showProfileRight = false;
-          m.redraw();
+          redraw();
         }
       },
       { passive: true }
@@ -124,7 +124,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
-        m.redraw();
+        redraw();
         notifySuccess('Joined community');
       } catch (err) {
         vnode.state.loading = false;
@@ -216,7 +216,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   vnode.state.loading = true;
                   try {
                     await setActiveAccount(account);
-                    m.redraw();
+                    redraw();
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);
@@ -224,7 +224,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 } else {
                   try {
                     await joinCommunity();
-                    m.redraw();
+                    redraw();
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);

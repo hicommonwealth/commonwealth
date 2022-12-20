@@ -1,7 +1,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import app from 'state';
 import { link } from 'helpers';
 import { Thread, Comment, Account } from 'models';

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import BN from 'bn.js';
 import moment from 'moment';
 
@@ -118,7 +118,7 @@ class SputnikDAOsPage extends ClassComponent {
             return parseFloat(d2.amount) - parseFloat(d1.amount);
           }
         });
-        m.redraw();
+        redraw();
       });
     }
 

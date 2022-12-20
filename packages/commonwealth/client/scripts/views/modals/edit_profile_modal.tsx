@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/edit_profile_modal.scss';
@@ -49,7 +49,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
             scope="user"
             account={account}
             uploadStartedCallback={() => {
-              m.redraw();
+              redraw();
             }}
             uploadCompleteCallback={(files) => {
               files.forEach((f) => {
@@ -57,7 +57,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
                 const url = f.uploadURL.replace(/\?.*/, '');
                 this.avatarUrl = url.trim();
               });
-              m.redraw();
+              redraw();
             }}
           />
           <CWTextInput
@@ -123,7 +123,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
                   .updateProfileForAccount(account, data)
                   .then(() => {
                     this.saving = false;
-                    m.redraw();
+                    redraw();
                     refreshCallback();
                     $(vnode.dom).trigger('modalexit');
                   })
@@ -132,7 +132,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
                     this.error = error.responseJSON
                       ? error.responseJSON.error
                       : error.responseText;
-                    m.redraw();
+                    redraw();
                   });
               }}
               label="Save Changes"

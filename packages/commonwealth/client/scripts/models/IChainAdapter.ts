@@ -4,6 +4,7 @@ import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { ChainBase } from 'common-common/src/types';
 
 import ChainEntityController from 'controllers/server/chain_entities';
@@ -150,7 +151,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         modules.map((mod) => mod.init(this.chain, this.accounts))
       );
     }
-    m.redraw();
+    redraw();
   }
 
   public abstract base: ChainBase;

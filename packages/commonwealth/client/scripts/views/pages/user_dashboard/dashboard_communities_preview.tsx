@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { Tag } from 'construct-ui';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
@@ -96,7 +96,7 @@ export class DashboardCommunitiesPreview extends ClassComponent {
         <CWButton
           onclick={() => {
             setRoute('/communities');
-            m.redraw();
+            redraw();
           }}
           label="View more communities"
         />

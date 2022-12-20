@@ -3,7 +3,7 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { utils } from 'ethers';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import {
   Input,
   TextArea,
@@ -243,7 +243,7 @@ const NewProposalForm = {
           )
           .then(done)
           .then(() => {
-            m.redraw();
+            redraw();
           })
           .catch((err) => {
             console.error(err);
@@ -490,7 +490,7 @@ const NewProposalForm = {
           )
           // TODO: handling errors?
           .then((result) => done(result))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.data?.message || err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.CompoundProposal) {
@@ -541,7 +541,7 @@ const NewProposalForm = {
           })
           .then((result: string) => {
             notifySuccess(`Proposal ${result} created successfully!`);
-            m.redraw();
+            redraw();
           })
           .catch((err) => notifyError(err.data?.message || err.message));
         return;
@@ -585,7 +585,7 @@ const NewProposalForm = {
         (app.chain as Aave).governance
           .propose(details)
           .then((result) => done(result))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.data?.message || err.message));
         return;
         // @TODO: Create Proposal via WebTx
@@ -634,7 +634,7 @@ const NewProposalForm = {
         (app.chain as NearSputnik).dao
           .proposeTx(description, propArgs)
           .then((result) => done(result))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.message));
         return;
       } else if (proposalTypeEnum === ProposalType.SubstrateTreasuryTip) {
@@ -699,7 +699,7 @@ const NewProposalForm = {
                 vnode.state.councilMotionDescription = motions.find(
                   (m_) => m_.name === result
                 ).description;
-                m.redraw();
+                redraw();
               },
             }),
             vnode.state.councilMotionDescription &&
@@ -730,7 +730,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.title = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -746,7 +746,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.title = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -759,7 +759,7 @@ const NewProposalForm = {
                   const result = (e.target as any).value;
                   if (vnode.state.form.description === result) return;
                   vnode.state.form.description = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -777,7 +777,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.beneficiary = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -796,7 +796,7 @@ const NewProposalForm = {
                     parseFloat(result),
                     true
                   );
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -838,7 +838,7 @@ const NewProposalForm = {
               callback: async (value) => {
                 vnode.state.toggleValue = value;
                 vnode.attrs.onChangeSlugEnum(value);
-                m.redraw();
+                redraw();
               },
               choices: [
                 { label: 'Create Proposal', value: 'proposal', checked: true },
@@ -865,7 +865,7 @@ const NewProposalForm = {
                     parseFloat(result),
                     true
                   );
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -898,7 +898,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.deposit = parseFloat(result);
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -912,7 +912,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.votingPeriod = +result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -924,7 +924,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.enactmentDelay = +result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -941,7 +941,7 @@ const NewProposalForm = {
                 })),
               callback: (result) => {
                 vnode.state.referendumId = result;
-                m.redraw();
+                redraw();
               },
             }),
           hasExternalProposalSelector &&
@@ -964,7 +964,7 @@ const NewProposalForm = {
                 : [],
               callback: (result) => {
                 vnode.state.nextExternalProposalHash = result;
-                m.redraw();
+                redraw();
               },
             }),
           hasTreasuryProposalSelector &&
@@ -979,7 +979,7 @@ const NewProposalForm = {
                 })),
               callback: (result) => {
                 vnode.state.treasuryProposalIndex = result;
-                m.redraw();
+                redraw();
               },
             }),
           hasThreshold && [
@@ -991,7 +991,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.threshold = +result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1005,7 +1005,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.applicantAddress = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1020,7 +1020,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.tokenTribute = +result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1032,7 +1032,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.sharesRequested = +result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1044,7 +1044,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.title = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1056,7 +1056,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.description = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1083,7 +1083,7 @@ const NewProposalForm = {
                   oninput: (e) => {
                     const result = (e.target as any).value;
                     vnode.state.title = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1095,7 +1095,7 @@ const NewProposalForm = {
                   oninput: (e) => {
                     const result = (e.target as any).value;
                     vnode.state.description = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1158,7 +1158,7 @@ const NewProposalForm = {
                     const result = (e.target as any).value;
                     vnode.state.aaveProposalState[activeAaveTabIndex].target =
                       result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1172,7 +1172,7 @@ const NewProposalForm = {
                     const result = (e.target as any).value;
                     vnode.state.aaveProposalState[activeAaveTabIndex].value =
                       result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1186,7 +1186,7 @@ const NewProposalForm = {
                     const result = (e.target as any).value;
                     vnode.state.aaveProposalState[activeAaveTabIndex].calldata =
                       result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1204,7 +1204,7 @@ const NewProposalForm = {
                     vnode.state.aaveProposalState[
                       activeAaveTabIndex
                     ].signature = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1231,7 +1231,7 @@ const NewProposalForm = {
                   oninput: (e) => {
                     const result = (e.target as any).value;
                     vnode.state.ipfsHash = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1316,7 +1316,7 @@ const NewProposalForm = {
                     const result = (e.target as any).value;
                     vnode.state.aaveProposalState[activeAaveTabIndex].target =
                       result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1330,7 +1330,7 @@ const NewProposalForm = {
                     const result = (e.target as any).value;
                     vnode.state.aaveProposalState[activeAaveTabIndex].value =
                       result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1344,7 +1344,7 @@ const NewProposalForm = {
                     const result = (e.target as any).value;
                     vnode.state.aaveProposalState[activeAaveTabIndex].calldata =
                       result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1362,7 +1362,7 @@ const NewProposalForm = {
                     vnode.state.aaveProposalState[
                       activeAaveTabIndex
                     ].signature = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1411,7 +1411,7 @@ const NewProposalForm = {
               ),
               callback: (result) => {
                 vnode.state.sputnikProposalType = result;
-                m.redraw();
+                redraw();
               },
             }),
             render(FormGroup, [
@@ -1428,7 +1428,7 @@ const NewProposalForm = {
                   oninput: (e) => {
                     const result = (e.target as any).value;
                     vnode.state.member = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
             ]),
@@ -1443,7 +1443,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.description = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1460,7 +1460,7 @@ const NewProposalForm = {
                   oninput: (e) => {
                     const result = (e.target as any).value;
                     vnode.state.tokenId = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1477,7 +1477,7 @@ const NewProposalForm = {
                   oninput: (e) => {
                     const result = (e.target as any).value;
                     vnode.state.payoutAmount = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1494,7 +1494,7 @@ const NewProposalForm = {
               })),
               callback: (result) => {
                 vnode.state.cosmosProposalType = result;
-                m.redraw();
+                redraw();
               },
             }),
             render(FormGroup, [
@@ -1507,7 +1507,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.title = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1520,7 +1520,7 @@ const NewProposalForm = {
                   const result = (e.target as any).value;
                   if (vnode.state.form.description === result) return;
                   vnode.state.form.description = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1540,7 +1540,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.deposit = +result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1558,7 +1558,7 @@ const NewProposalForm = {
                   oninput: (e) => {
                     const result = (e.target as any).value;
                     vnode.state.recipient = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1581,7 +1581,7 @@ const NewProposalForm = {
                   oninput: (e) => {
                     const result = (e.target as any).value;
                     vnode.state.payoutAmount = result;
-                    m.redraw();
+                    redraw();
                   },
                 }),
               ]),
@@ -1604,7 +1604,7 @@ const NewProposalForm = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.beneficiary = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),
@@ -1618,7 +1618,7 @@ const NewProposalForm = {
                   const result = (e.target as any).value;
                   if (vnode.state.form.description === result) return;
                   vnode.state.form.description = result;
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]),

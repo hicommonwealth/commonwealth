@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_avatar_username_input.scss';
 
@@ -49,7 +49,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
           size={orientation === 'vertical' ? 'large' : 'small'}
           account={account}
           uploadStartedCallback={() => {
-            m.redraw();
+            redraw();
           }}
           uploadCompleteCallback={(files) => {
             files.forEach((f) => {
@@ -57,7 +57,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
               const url = f.uploadURL.replace(/\?.*/, '');
               onAvatarChangeHandler(url.trim);
             });
-            m.redraw();
+            redraw();
           }}
         />
         <div class="input-and-address-container">

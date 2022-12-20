@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
@@ -68,7 +68,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     this.isOpen = newIsOpen;
     this.isRendered = false;
 
-    m.redraw();
+    redraw();
   }
 
   applyPopoverPosition(vnode: ResultNode<PopoverAttrs>) {
@@ -98,7 +98,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     } catch (e) {
       console.log(e);
     }
-    m.redraw();
+    redraw();
   }
 
   handleHoverExit(

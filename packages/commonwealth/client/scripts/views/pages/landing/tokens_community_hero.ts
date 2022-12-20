@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
@@ -137,7 +137,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                           clearTimeout(vnode.state.inputTimeout);
                           vnode.state.inputTimeout = setTimeout(() => {
                             vnode.state.refilterResults = true;
-                            m.redraw();
+                            redraw();
                           }, 200);
                         },
                         onkeyupValue: (event: any) => {

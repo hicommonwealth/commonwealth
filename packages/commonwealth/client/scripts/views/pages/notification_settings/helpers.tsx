@@ -274,7 +274,7 @@ export const getNotificationTypeText = (category: string) => {
 //               notifyError(err.toString());
 //             }
 //             this.loading = false;
-//             m.redraw();
+//             redraw();
 //           },
 //         }),
 //       ]),
@@ -437,7 +437,7 @@ export const getNotificationTypeText = (category: string) => {
 //                   await app.user.notifications.enableImmediateEmails(
 //                     newSubscriptions
 //                   );
-//                   m.redraw();
+//                   redraw();
 //                 });
 //               } else {
 //                 if (!everySubscriptionActive)
@@ -451,7 +451,7 @@ export const getNotificationTypeText = (category: string) => {
 //               }
 //             }
 //             this.loading = false;
-//             m.redraw();
+//             redraw();
 //           },
 //         }),
 //       ]),
@@ -771,11 +771,11 @@ export const getNotificationTypeText = (category: string) => {
 //                   this.saving = false;
 //                   this.interval = value;
 //                   app.user.setEmailInterval(value);
-//                   m.redraw();
+//                   redraw();
 //                 })
 //                 .catch(() => {
 //                   this.saving = false;
-//                   m.redraw();
+//                   redraw();
 //                 });
 //             }}
 //             value={this.interval}

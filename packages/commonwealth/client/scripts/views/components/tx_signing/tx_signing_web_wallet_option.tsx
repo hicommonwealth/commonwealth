@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -22,7 +22,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
   oncreate(vnode: ResultNode<TXSigningWebWalletOptionAttrs>) {
     // try to enable web wallet
     if (vnode.attrs.wallet && !vnode.attrs.wallet.enabled) {
-      vnode.attrs.wallet.enable().then(() => m.redraw());
+      vnode.attrs.wallet.enable().then(() => redraw());
     }
   }
 
@@ -77,7 +77,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
           onclick={async () => {
             if (webWallet && !webWallet.available) {
               await vnode.attrs.wallet.enable();
-              m.redraw();
+              redraw();
             }
 
             await transact();

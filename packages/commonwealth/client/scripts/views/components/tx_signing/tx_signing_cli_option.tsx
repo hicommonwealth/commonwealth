@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 
@@ -25,7 +25,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
     if (this.calldata === undefined) {
       this.calldata =
         (await vnode.attrs.txData.unsignedData()) as ISubstrateTXData;
-      m.redraw();
+      redraw();
     }
   }
 

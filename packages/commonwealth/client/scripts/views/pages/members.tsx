@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -88,7 +88,7 @@ class MembersPage extends ClassComponent {
         this.membersLoaded = membersActive
           .concat(membersInactive)
           .sort((a, b) => b.count - a.count);
-        m.redraw();
+        redraw();
       });
     }
 
@@ -181,7 +181,7 @@ class MembersPage extends ClassComponent {
         }
 
         this.numProfilesLoaded += newBatchSize;
-        m.redraw();
+        redraw();
       }
     }, 400);
 

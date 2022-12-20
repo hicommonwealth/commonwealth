@@ -1,6 +1,6 @@
 /* @jsx m */
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
@@ -108,12 +108,12 @@ export class ComponentShowcase extends ClassComponent {
               // console.log(itemValue);
               if (this.checkboxGroupSelected.indexOf(itemValue) === -1) {
                 this.checkboxGroupSelected.push(itemValue);
-                // m.redraw();
+                // redraw();
               } else {
                 this.checkboxGroupSelected = this.checkboxGroupSelected.filter(
                   (item) => item !== itemValue
                 );
-                // m.redraw();
+                // redraw();
               }
             }}
           />

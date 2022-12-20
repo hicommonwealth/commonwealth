@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
@@ -24,13 +24,13 @@ export class SubscriptionButton extends ClassComponent {
           e.preventDefault();
           if (isNotUndefined(communitySubscription)) {
             subscriptions.deleteSubscription(communitySubscription).then(() => {
-              m.redraw();
+              redraw();
             });
           } else {
             subscriptions
               .subscribe(NotificationCategories.NewThread, communityOrChain)
               .then(() => {
-                m.redraw();
+                redraw();
               });
           }
         }}

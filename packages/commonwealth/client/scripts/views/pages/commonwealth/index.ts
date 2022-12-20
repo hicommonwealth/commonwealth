@@ -1,6 +1,6 @@
 import './commonwealth.scss';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import GeometricPatternSection from './geometric_pattern_section';
 import HeaderLandingPage from '../landing/landing_page_header';

@@ -5,7 +5,7 @@ import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Popover } from 'construct-ui';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -98,7 +98,7 @@ const User: m.Component<
       ).then((mod) => {
         app.cachedIdentityWidget = mod.default;
         vnode.state.identityWidgetLoading = false;
-        m.redraw();
+        redraw();
       });
     }
 

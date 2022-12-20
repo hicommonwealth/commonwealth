@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
@@ -44,7 +44,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
 
   onResize() {
     this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
-    m.redraw();
+    redraw();
   }
 
   oninit() {

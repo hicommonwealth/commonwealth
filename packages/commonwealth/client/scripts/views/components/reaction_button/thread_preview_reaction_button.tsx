@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
@@ -65,7 +65,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
             ({ Address }) => Address.address !== userAddress
           );
           this.loading = false;
-          m.redraw();
+          redraw();
         });
     };
 
@@ -81,7 +81,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
               Address: { address: userAddress, chain },
             },
           ];
-          m.redraw();
+          redraw();
         });
     };
 

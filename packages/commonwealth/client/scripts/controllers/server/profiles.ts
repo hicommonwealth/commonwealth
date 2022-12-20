@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'lodash';
 import { addressSwapper } from 'commonwealth/shared/utils';
@@ -39,7 +40,7 @@ class ProfilesController {
     this._store.add(profile);
     this._unfetched.push(profile);
     this._fetchNewProfiles();
-    m.redraw();
+    redraw();
     return profile;
   }
 
@@ -148,7 +149,7 @@ class ProfilesController {
         }
       })
     );
-    m.redraw();
+    redraw();
     return _.flatten(ps);
   }
 }

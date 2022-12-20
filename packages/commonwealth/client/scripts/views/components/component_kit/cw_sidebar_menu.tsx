@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
@@ -39,7 +39,7 @@ const renderCommunity = (item: ChainInfo) => {
           e.preventDefault();
           e.stopPropagation();
           await app.communities.setStarred(item.id);
-          m.redraw();
+          redraw();
         }}
       >
         {roles.map((role) => {

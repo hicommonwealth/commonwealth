@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 
@@ -85,7 +85,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
 
         this.snapshotProposalsLoaded = true;
         this.initialized = false;
-        m.redraw();
+        redraw();
       });
     }
 

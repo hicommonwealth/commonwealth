@@ -49,7 +49,7 @@
 //               .ragequitTx(toBurn)
 //               .then((result) => {
 //                 $(vnode.dom).trigger('modalforceexit');
-//                 m.redraw();
+//                 redraw();
 //               })
 //               .catch((err) => notifyError(err));
 //           },

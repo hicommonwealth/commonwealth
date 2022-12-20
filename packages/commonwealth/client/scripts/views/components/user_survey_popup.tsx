@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import app from 'state';
 
 import 'components/user_survey_popup.scss';
@@ -123,7 +123,7 @@ export class UserSurveyPopup extends ClassComponent<UserSurveyPopupAttrs> {
       this.surveyLocked = true;
       localStorage.setItem('user-survey-last-displayed', Date.now().toString());
       console.log('setting new survey-last-displayed');
-      m.redraw();
+      redraw();
     };
 
     const handleRedirect = () => {

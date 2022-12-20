@@ -1,7 +1,7 @@
 import m from 'mithril';
 import app from 'state';
 import { Button } from 'construct-ui';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -23,7 +23,7 @@ const ProfileBanner: m.Component<{ account: Account, addressInfo: AddressInfo },
       )();
       if (!confirmed) {
         vnode.state.loading = false;
-        m.redraw();
+        redraw();
         return;
       }
 
@@ -32,15 +32,15 @@ const ProfileBanner: m.Component<{ account: Account, addressInfo: AddressInfo },
         chain: app.activeChainId(),
       }).then(() => {
         vnode.state.loading = false;
-        m.redraw();
+        redraw();
         notifySuccess(`Joined with ${addrShort}`); // ${addrShort} is now a member of the [Edgeware] community!
         setActiveAccount(account).then(() => {
-          m.redraw();
+          redraw();
           $(e.target).trigger('modalexit');
         });
       }).catch((err: any) => {
         vnode.state.loading = false;
-        m.redraw();
+        redraw();
         notifyError(err.responseJSON.error);
       });
     };

@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
@@ -106,7 +106,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             scope="community"
             uploadStartedCallback={() => {
               this.uploadInProgress = true;
-              m.redraw();
+              redraw();
             }}
             uploadCompleteCallback={(files) => {
               files.forEach((f) => {
@@ -116,7 +116,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
               });
               this.uploadInProgress = false;
-              m.redraw();
+              redraw();
             }}
           />
         </div>
@@ -403,7 +403,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               notifyError(err || 'Chain update failed');
             }
 
-            m.redraw();
+            redraw();
           }}
         />
       </div>

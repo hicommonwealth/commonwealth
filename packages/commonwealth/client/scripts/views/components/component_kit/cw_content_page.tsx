@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
@@ -58,7 +58,7 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
         ? 'tabsView'
         : 'sidebarView';
 
-    m.redraw();
+    redraw();
   }
 
   oninit(vnode: ResultNode<ContentPageAttrs>) {

@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { Input, FormLabel, FormGroup } from 'construct-ui';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
@@ -65,9 +65,9 @@ const EdgewareFunctionPicker = {
                 app.chain as Substrate
               ).chain.listModuleFunctions(result)[0];
               vnode.state.form.args = [];
-              m.redraw();
+              redraw();
               setTimeout(() => {
-                m.redraw();
+                redraw();
               }, 0);
             },
           }),
@@ -87,7 +87,7 @@ const EdgewareFunctionPicker = {
               vnode.state.form.function = result;
               vnode.state.form.args = [];
               setTimeout(() => {
-                m.redraw();
+                redraw();
               }, 0);
             },
           }),
@@ -106,7 +106,7 @@ const EdgewareFunctionPicker = {
                       parseFloat(result),
                       true
                     );
-                    m.redraw(); // TODO: why is this needed?
+                    redraw(); // TODO: why is this needed?
                   },
                 }),
               ]);
@@ -122,7 +122,7 @@ const EdgewareFunctionPicker = {
                     vnode.state.form.args[index] = result
                       .split(',')
                       .map((str) => str.trim());
-                    m.redraw(); // TODO: why is this needed?
+                    redraw(); // TODO: why is this needed?
                   },
                 }),
               ]);
@@ -135,7 +135,7 @@ const EdgewareFunctionPicker = {
                 oninput: (e) => {
                   const result = (e.target as any).value;
                   vnode.state.form.args[index] = result;
-                  m.redraw(); // TODO: why is this needed?
+                  redraw(); // TODO: why is this needed?
                 },
               }),
             ]);

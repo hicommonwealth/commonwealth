@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -83,7 +83,7 @@ export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
     // TODO: set a timeout? We currently have no failure case due to how event handling works.
     this.timerHandle = global.setInterval(() => {
       this.timer++;
-      m.redraw();
+      redraw();
     }, 1000);
 
     // for edgeware mainnet, timeout after 10 sec

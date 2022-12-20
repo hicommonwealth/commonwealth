@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';

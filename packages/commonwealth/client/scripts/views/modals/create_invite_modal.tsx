@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
@@ -178,7 +178,7 @@ const concludeSearch = (
   } else {
     state.results = getResultsPreview(searchTerm, state, params);
   }
-  m.redraw();
+  redraw();
 };
 
 const searchMentionableAddresses = async (
@@ -352,12 +352,12 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
               } else {
                 failureCallback(true, response.message);
               }
-              m.redraw();
+              redraw();
             },
             (err) => {
               failureCallback(true, err.responseJSON.error);
               this.loading = false;
-              m.redraw();
+              redraw();
             }
           );
         }}
@@ -559,12 +559,12 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
             successCallback={(v: boolean) => {
               this.success = v;
               this.searchAddressTerm = '';
-              m.redraw();
+              redraw();
             }}
             failureCallback={(v: boolean, err?: string) => {
               this.failure = v;
               if (err) this.error = err;
-              m.redraw();
+              redraw();
             }}
             invitedAddress={this.searchAddressTerm}
             invitedAddressChain={selectedChainId}
@@ -583,12 +583,12 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
             successCallback={(v: boolean) => {
               this.success = v;
               this.invitedEmail = '';
-              m.redraw();
+              redraw();
             }}
             failureCallback={(v: boolean, err?: string) => {
               this.failure = v;
               if (err) this.error = err;
-              m.redraw();
+              redraw();
             }}
             invitedEmail={this.invitedEmail}
             {...chainOrCommunityObj}
@@ -684,7 +684,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //               this.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${
 //                 linkInfo.id
 //               }`;
-//               m.redraw();
+//               redraw();
 //             });
 //           },
 //           label: 'Get invite link',

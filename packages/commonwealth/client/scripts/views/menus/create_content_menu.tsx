@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -249,7 +249,7 @@ export class CreateContentSidebar extends ClassComponent {
             setTimeout(() => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
-              m.redraw();
+              redraw();
             }, 200);
           },
         }}

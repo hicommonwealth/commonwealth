@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/snapshot/multiple_snapshots_page.scss';
 
@@ -77,7 +77,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
     if (app.chain && !this.snapshotSpaces) {
       this.snapshotSpaces =
         app.config.chains?.getById(app.activeChainId()).snapshot || [];
-      m.redraw();
+      redraw();
     }
 
     const { snapshotSpaces } = this;
@@ -85,7 +85,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
     if (!this.spacesMetadata && snapshotSpaces) {
       loadMultipleSpacesData(snapshotSpaces).then((data) => {
         this.spacesMetadata = data;
-        m.redraw();
+        redraw();
       });
 
       return <PageLoading />;

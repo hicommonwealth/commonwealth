@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import _ from 'lodash';
 import moment from 'moment';
@@ -81,7 +81,7 @@ class StatsPage extends ClassComponent {
 
             this.data = data;
           }
-          m.redraw();
+          redraw();
         })
         .catch((error: any) => {
           if (error.responseJSON?.error) {
@@ -91,7 +91,7 @@ class StatsPage extends ClassComponent {
           } else {
             this.error = 'Error loading analytics';
           }
-          m.redraw();
+          redraw();
         });
     }
 

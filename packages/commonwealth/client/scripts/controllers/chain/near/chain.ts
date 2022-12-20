@@ -18,7 +18,7 @@ import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import * as m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import {
   isGroupRole,
   NearSputnikConfig,
@@ -125,13 +125,13 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       this.app.chain.block.duration = +latest_block_time - prevBlock.header.timestamp;
       if (this.app.chain.networkStatus !== ApiStatus.Connected) {
         this.app.chain.networkStatus = ApiStatus.Connected;
-        m.redraw();
+        redraw();
       }
     } catch (e) {
       if (this.app.chain.networkStatus !== ApiStatus.Disconnected) {
         console.error(`failed to query NEAR status: ${JSON.stringify(e)}`);
         this.app.chain.networkStatus = ApiStatus.Disconnected;
-        m.redraw();
+        redraw();
       }
     }
   }

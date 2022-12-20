@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -108,7 +108,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
       if (chat_channel_id === vnode.attrs.channel_id) {
         this.shouldScroll = false;
       }
-      m.redraw();
+      redraw();
     };
 
     app.socket.chatNs.addListener(

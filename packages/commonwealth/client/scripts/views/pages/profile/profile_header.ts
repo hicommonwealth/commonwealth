@@ -5,7 +5,7 @@ import { Button } from 'construct-ui';
 import { initChain } from 'app';
 import app from 'state';
 import { Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
@@ -112,7 +112,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
-        m.redraw();
+        redraw();
         notifySuccess('Joined community');
       } catch (err) {
         vnode.state.loading = false;
@@ -201,7 +201,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                     vnode.state.loading = true;
                     try {
                       await setActiveAccount(account);
-                      m.redraw();
+                      redraw();
                     } catch (e) {
                       vnode.state.loading = false;
                       notifyError(e);
@@ -209,7 +209,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   } else {
                     try {
                       await joinCommunity();
-                      m.redraw();
+                      redraw();
                     } catch (e) {
                       vnode.state.loading = false;
                       notifyError(e);

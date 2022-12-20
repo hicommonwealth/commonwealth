@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_area.scss';
 
@@ -68,7 +68,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
               this.isTyping = false;
               this.validationStatus = undefined;
               this.statusMessage = undefined;
-              m.redraw();
+              redraw();
             } else {
               e.stopPropagation();
               this.isTyping = true;
@@ -79,7 +79,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
                 if (inputValidationFn && e.target.value?.length > 3) {
                   [this.validationStatus, this.statusMessage] =
                     inputValidationFn(e.target.value);
-                  m.redraw();
+                  redraw();
                 }
               }, timeout);
             }
@@ -90,7 +90,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
                 this.isTyping = false;
                 this.validationStatus = undefined;
                 this.statusMessage = undefined;
-                m.redraw();
+                redraw();
               } else {
                 [this.validationStatus, this.statusMessage] = inputValidationFn(
                   e.target.value

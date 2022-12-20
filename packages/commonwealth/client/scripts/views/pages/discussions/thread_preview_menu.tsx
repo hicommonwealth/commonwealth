@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -74,7 +74,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                           threadId: thread.id,
                           readOnly: !thread.readOnly,
                         })
-                        .then(() => m.redraw());
+                        .then(() => redraw());
                     },
                     label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                     iconLeft: 'lock' as const,
@@ -91,7 +91,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                         data: {
                           onChangeHandler: (topic: Topic) => {
                             thread.topic = topic;
-                            m.redraw();
+                            redraw();
                           },
                           thread,
                         },
@@ -112,7 +112,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                         data: {
                           onChangeHandler: (stage: ThreadStage) => {
                             thread.stage = stage;
-                            m.redraw();
+                            redraw();
                           },
                           thread,
                         },

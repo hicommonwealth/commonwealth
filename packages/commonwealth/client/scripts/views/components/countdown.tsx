@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 
 import { formatDuration, blocknumToTime } from 'helpers';
@@ -29,7 +29,7 @@ export class Countdown extends ClassComponent<CountdownAttrs> {
         oncreate={() => {
           this.timerHandle = setInterval(() => {
             this.timer++;
-            m.redraw();
+            redraw();
           }, 1000);
         }}
         onremove={() => {

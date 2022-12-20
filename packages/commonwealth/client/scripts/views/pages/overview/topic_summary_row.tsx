@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
@@ -196,7 +196,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                                       readOnly: !thread.readOnly,
                                     })
                                     .then(() => {
-                                      m.redraw();
+                                      redraw();
                                     });
                                 },
                               },

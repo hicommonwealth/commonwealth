@@ -1,6 +1,7 @@
 import { ApiStatus, IApp } from 'state';
 import Web3 from 'web3';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 
 import {
@@ -97,7 +98,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       }
       this.app.chain.block.duration = totalDuration / nHeadersForBlocktime;
       console.log(`Computed block duration: ${this.app.chain.block.duration}`);
-      m.redraw();
+      redraw();
     }
     return this._api;
   }

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/overview/index.scss';
 
@@ -22,7 +22,7 @@ class OverviewPage extends ClassComponent {
 
   onResize() {
     this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
-    m.redraw();
+    redraw();
   }
 
   oninit() {

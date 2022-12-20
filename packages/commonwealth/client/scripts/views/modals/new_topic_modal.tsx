@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 
@@ -87,7 +87,7 @@ export class NewTopicModal extends ClassComponent {
               if (currentCommunityTopicNames.includes(text.toLowerCase())) {
                 errorMsg = 'Topic name already used within community.';
                 this.error = errorMsg;
-                m.redraw();
+                redraw();
                 return ['failure', errorMsg];
               }
 
@@ -100,7 +100,7 @@ export class NewTopicModal extends ClassComponent {
                 )} 
                 ${disallowedCharMatches.join(', ')} are not permitted`;
                 this.error = errorMsg;
-                m.redraw();
+                redraw();
                 return ['failure', errorMsg];
               }
 
@@ -191,7 +191,7 @@ export class NewTopicModal extends ClassComponent {
                 );
 
                 this.saving = false;
-                m.redraw();
+                redraw();
                 $(e.target).trigger('modalexit');
               } catch (err) {
                 this.error = 'Error creating topic';
@@ -199,7 +199,7 @@ export class NewTopicModal extends ClassComponent {
                 if (this.quillEditorState) {
                   this.quillEditorState.enable();
                 }
-                m.redraw();
+                redraw();
               }
             }}
           />

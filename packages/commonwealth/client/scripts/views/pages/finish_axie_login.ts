@@ -1,7 +1,7 @@
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import { initAppState } from 'app';
@@ -52,7 +52,7 @@ const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
     validate(token, stateId, 'axie-infinity').then((res) => {
       if (typeof res === 'string') {
         vnode.state.error = res;
-        m.redraw();
+        redraw();
       }
     });
   },

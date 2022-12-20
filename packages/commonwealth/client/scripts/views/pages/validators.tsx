@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/validators.scss';
 
@@ -111,7 +111,7 @@ class ValidatorsPage extends ClassComponent {
       });
       // TODO: handle error fetching vals
       this.validatorsInitialized = true;
-      m.redraw();
+      redraw();
     }
 
     const validators = this.validators;

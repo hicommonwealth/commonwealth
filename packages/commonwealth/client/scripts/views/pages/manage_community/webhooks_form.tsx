@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import smartTruncate from 'smart-truncate';
 
@@ -72,13 +72,13 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
             notifyError(result.message);
           }
 
-          m.redraw();
+          redraw();
         },
         (err) => {
           this.failure = true;
           this.disabled = false;
           notifyError(err?.responseJSON?.error || 'Unknown error');
-          m.redraw();
+          redraw();
         }
       );
     };
@@ -162,7 +162,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
 
                             notifyError(result.message);
                           }
-                          m.redraw();
+                          redraw();
                         },
                         (err) => {
                           this.failure = true;
@@ -173,7 +173,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                             err?.responseJSON?.error || 'Unknown error'
                           );
 
-                          m.redraw();
+                          redraw();
                         }
                       );
                     }}

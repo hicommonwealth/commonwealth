@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import { formatCoin } from 'adapters/currency';
 import app from 'state';
@@ -27,7 +27,7 @@ export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
 
       this.balance = await account.balance;
 
-      m.redraw();
+      redraw();
     });
   }
 

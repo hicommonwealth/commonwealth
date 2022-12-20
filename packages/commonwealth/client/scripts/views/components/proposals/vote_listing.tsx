@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/proposals/vote_listing.scss';
 
@@ -76,11 +76,11 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                 if (vote instanceof AaveProposalVote) {
                   balance = vote.power;
                   this.balancesCache[vote.account.address] = vote.format();
-                  m.redraw();
+                  redraw();
                 } else if (vote instanceof CompoundProposalVote) {
                   balance = formatCoin(app.chain.chain.coins(vote.power), true);
                   this.balancesCache[vote.account.address] = balance;
-                  m.redraw();
+                  redraw();
                 } else {
                   vote.account.balance.then((b) => {
                     balance = b;
@@ -88,7 +88,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                       b,
                       true
                     );
-                    m.redraw();
+                    redraw();
                   });
                   balance = '--';
                 }

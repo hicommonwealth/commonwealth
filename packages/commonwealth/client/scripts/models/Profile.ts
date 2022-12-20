@@ -1,4 +1,4 @@
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
 
 import {

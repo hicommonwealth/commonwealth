@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/tip_detail.scss';
 
@@ -93,7 +93,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                           ? app.chain.chain.coins(parseFloat(result), true)
                           : undefined
                       );
-                      m.redraw();
+                      redraw();
                     }}
                   />
                 </div>

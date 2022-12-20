@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/webhook_settings_modal.scss';
@@ -75,14 +75,14 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
               this.selectedCategories = this.selectedCategories.filter(
                 (v) => !values.includes(v)
               );
-              m.redraw();
+              redraw();
             } else {
               values.forEach((v) => {
                 if (!this.selectedCategories.includes(v)) {
                   this.selectedCategories.push(v);
                 }
               });
-              m.redraw();
+              redraw();
             }
           }}
         />
@@ -137,7 +137,7 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
                 },
                 error: (err) => {
                   notifyError(err.statusText);
-                  m.redraw();
+                  redraw();
                 },
               });
             }}

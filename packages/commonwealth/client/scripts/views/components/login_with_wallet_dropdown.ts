@@ -1,7 +1,7 @@
 import 'components/login_with_wallet_dropdown.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem } from 'construct-ui';
 
@@ -106,9 +106,9 @@ const LoginWithWalletDropdown: m.Component<{
                 } else {
                   setRoute(next);
                 }
-                m.redraw();
+                redraw();
                 setTimeout(() => {
-                  m.redraw();
+                  redraw();
                   if (onSuccess) onSuccess();
                 }, 1); // necessary because address linking may be deferred
               },

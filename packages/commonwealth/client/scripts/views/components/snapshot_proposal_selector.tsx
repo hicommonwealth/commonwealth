@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/snapshot_proposal_selector.scss';
@@ -39,7 +39,7 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
         }
 
         this.snapshotProposalsLoaded = true;
-        m.redraw();
+        redraw();
       });
     }
 

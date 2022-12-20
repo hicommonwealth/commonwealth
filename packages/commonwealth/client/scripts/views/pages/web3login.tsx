@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 
@@ -55,7 +55,7 @@ class Web3LoginPage extends ClassComponent {
         }
       } catch (e) {
         this.error = e.responseJSON.error;
-        m.redraw();
+        redraw();
       }
     };
 

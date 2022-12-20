@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 
@@ -31,7 +31,7 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
           if (label.linkUrl) {
             setRoute(label.linkUrl);
           }
-          m.redraw();
+          redraw();
         }}
       >
         <CWCommunityAvatar community={chain} />

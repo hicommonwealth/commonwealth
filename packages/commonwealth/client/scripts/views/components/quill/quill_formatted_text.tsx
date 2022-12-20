@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
@@ -64,7 +64,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
         this.truncatedDoc = doc;
       }
 
-      m.redraw();
+      redraw();
     };
 
     // if we're showing highlighted search terms, render the doc once, and cache the result

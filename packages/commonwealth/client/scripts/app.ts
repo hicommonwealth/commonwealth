@@ -13,7 +13,7 @@ import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
 
@@ -97,7 +97,7 @@ export async function initAppState(
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
-          app.user.notifications.refresh().then(() => m.redraw());
+          app.user.notifications.refresh().then(() => redraw());
         } else if (
           app.loginState == LoginState.LoggedOut &&
           app.socket.isConnected
@@ -211,7 +211,7 @@ export async function selectChain(
   await deinitChainOrCommunity();
   app.chainPreloading = true;
   document.title = `Commonwealth – ${chain.name}`;
-  setTimeout(() => m.redraw()); // redraw to show API status indicator
+  setTimeout(() => redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
@@ -385,7 +385,7 @@ export async function selectChain(
 
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
-  m.redraw();
+  redraw();
   return true;
 }
 
@@ -409,7 +409,7 @@ export async function initChain(): Promise<void> {
   await updateActiveAddresses(chain);
 
   // Finish redraw to remove loading dialog
-  m.redraw();
+  redraw();
 }
 
 export async function initNewTokenChain(address: string) {
@@ -466,7 +466,7 @@ export const navigateToSubpage = (...args) => {
 };
 
 /* Uncomment for redraw instrumentation
-const _redraw = m.redraw;
+const _redraw = redraw();
 function redrawInstrumented(...args) {
   console.log('redraw!');
   _redraw.apply(this, args);
@@ -475,7 +475,7 @@ redrawInstrumented.sync = (...args) => {
   console.log('redraw sync!');
   _redraw.sync.apply(this, args);
 };
-m.redraw = redrawInstrumented;
+redraw() = redrawInstrumented;
 */
 
 const _onpopstate = window.onpopstate;
@@ -1164,17 +1164,17 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         if (app.loginState === LoginState.LoggedIn) {
           // refresh notifications once
           // grab all discussion drafts
-          app.user.discussionDrafts.refreshAll().then(() => m.redraw());
+          app.user.discussionDrafts.refreshAll().then(() => redraw());
         }
 
         handleInviteLinkRedirect();
         // If the user updates their email
         handleUpdateEmailConfirmation();
 
-        m.redraw();
+        redraw();
       })
       .catch(() => {
-        m.redraw();
+        redraw();
       });
   }
 );
@@ -1186,7 +1186,7 @@ declare const module: any; // tslint:disable-line no-reserved-keywords
 if (module.hot) {
   module.hot.accept();
   // module.hot.dispose((data: any) => {
-  //   m.redraw();
+  //   redraw();
   // })
 }
 // /////////////////////////////////////////////////////////

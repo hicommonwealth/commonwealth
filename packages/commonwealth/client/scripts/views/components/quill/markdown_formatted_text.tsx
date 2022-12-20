@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
@@ -75,7 +75,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
       } else {
         this.truncatedDoc = doc;
       }
-      m.redraw();
+      redraw();
     };
 
     renderer.link = (href, title, text) => {

@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import {
   updateActiveAddresses,
@@ -228,13 +228,13 @@ const FinishNearLogin: m.Component<Record<string, never>, IState> = {
         validate(vnode, wallet).then(() => {
           vnode.state.validationCompleted = true;
           vnode.state.validating = false;
-          m.redraw();
+          redraw();
         });
       } else {
         vnode.state.validationError = 'Sign-in failed.';
         vnode.state.validating = false;
         vnode.state.validationCompleted = true;
-        m.redraw();
+        redraw();
       }
     } else {
       // validation in progress

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 
@@ -51,7 +52,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
         scope="community"
         uploadStartedCallback={() => {
           state.uploadInProgress = true;
-          m.redraw();
+          redraw();
         }}
         uploadCompleteCallback={(files) => {
           files.forEach((f) => {
@@ -60,7 +61,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
             state.iconUrl = url;
           });
           state.uploadInProgress = false;
-          m.redraw();
+          redraw();
         }}
       />
     </div>,

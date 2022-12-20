@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/edit_topic_modal.scss';
@@ -101,7 +101,7 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
         return true;
       } catch (err) {
         this.error = err.message || err;
-        m.redraw();
+        redraw();
         return false;
       }
     };
@@ -143,7 +143,7 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
                 )} 
                 ${disallowedCharMatches.join(', ')} are not permitted`;
                 this.error = errorMsg;
-                m.redraw();
+                redraw();
                 return ['failure', errorMsg];
               }
 
@@ -208,7 +208,7 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
                   })
                   .catch(() => {
                     this.saving = false;
-                    m.redraw();
+                    redraw();
                   });
               }}
               label="Save changes"
@@ -229,7 +229,7 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
                   })
                   .catch(() => {
                     this.saving = false;
-                    m.redraw();
+                    redraw();
                   });
               }}
               label="Delete topic"

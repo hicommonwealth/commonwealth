@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/view_thread/edit_body.scss';
 
@@ -68,7 +68,7 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
               if (confirmed) {
                 setIsEditing(false);
                 clearEditingLocalStorage(thread.id, ContentType.Thread);
-                m.redraw();
+                redraw();
               }
             }}
           />
@@ -89,7 +89,7 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
                 this.saving = false;
                 clearEditingLocalStorage(thread.id, ContentType.Thread);
                 setIsEditing(false);
-                m.redraw();
+                redraw();
                 notifySuccess('Thread successfully edited');
               });
             }}

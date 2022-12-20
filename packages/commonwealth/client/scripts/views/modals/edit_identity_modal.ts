@@ -1,7 +1,7 @@
 import 'modals/edit_identity_modal.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import {
   Button,
@@ -40,7 +40,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
       vnode.state.identity = await (app.chain as Substrate).identities.load(
         vnode.attrs.account
       );
-      m.redraw();
+      redraw();
     });
   },
   oncreate: (vnode: ResultNode<IAttrs, IState>) => {
@@ -140,7 +140,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
         profile.invalidateName();
       }
       vnode.state.saving = false;
-      m.redraw();
+      redraw();
     };
 
     const getInput = (inputLabel, inputName, description, prefixAt = false) => {

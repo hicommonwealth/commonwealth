@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import m, { RouteOptions } from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 

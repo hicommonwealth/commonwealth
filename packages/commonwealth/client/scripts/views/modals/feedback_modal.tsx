@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/feedback_modal.scss';
@@ -52,13 +52,13 @@ export class FeedbackModal extends ClassComponent {
                   this.sending = false;
                   this.status = 'success';
                   this.message = 'Sent successfully!';
-                  m.redraw();
+                  redraw();
                 },
                 (err) => {
                   this.sending = false;
                   this.status = 'failure';
                   this.message = err.responseJSON?.message || err.responseText;
-                  m.redraw();
+                  redraw();
                 }
               );
             }}

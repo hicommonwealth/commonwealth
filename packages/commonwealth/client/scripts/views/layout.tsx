@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
@@ -123,7 +123,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       if (!app.isCustomDomain()) {
         deinitChainOrCommunity().then(() => {
           this.loadingScope = null;
-          m.redraw();
+          redraw();
         });
       }
       return <LoadingLayout />;

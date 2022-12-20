@@ -14,7 +14,7 @@ import {
   Icons,
 } from 'construct-ui';
 
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -173,7 +173,7 @@ const NewProposalForm: m.Component<
     const pathVars = m.parsePathname(window.location.href);
 
     if (!app.snapshot.initialized) {
-      app.snapshot.init(vnode.attrs.snapshotId).then(() => m.redraw());
+      app.snapshot.init(vnode.attrs.snapshotId).then(() => redraw());
       return getLoadingPage();
     }
     if (!vnode.state.initialized) {
@@ -225,7 +225,7 @@ const NewProposalForm: m.Component<
         vnode.state.space = space;
         vnode.state.members = space.members;
         vnode.state.snapshotScoresFetched = true;
-        m.redraw();
+        redraw();
       });
     }
     if (!vnode.state.snapshotScoresFetched) return getLoadingPage();
@@ -339,7 +339,7 @@ const NewProposalForm: m.Component<
                       oninput: (e) => {
                         const result = (e.target as any).value;
                         vnode.state.form.choices[idx] = result;
-                        m.redraw();
+                        redraw();
                       },
                       contentRight:
                         idx > 1 &&
@@ -349,7 +349,7 @@ const NewProposalForm: m.Component<
                           iconSize: 'large',
                           onclick: () => {
                             vnode.state.form.choices.pop();
-                            m.redraw();
+                            redraw();
                           },
                         }),
                     }),
@@ -363,7 +363,7 @@ const NewProposalForm: m.Component<
                   onclick: () => {
                     const choiceLength = vnode.state.form.choices.length;
                     vnode.state.form.choices.push(`Option ${choiceLength + 1}`);
-                    m.redraw();
+                    redraw();
                   },
                 },
                 [

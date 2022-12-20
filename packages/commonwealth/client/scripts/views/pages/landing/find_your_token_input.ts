@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 interface IAttrs {
   onchangeValue: (event: any) => void;

@@ -3,7 +3,7 @@ import m from 'mithril';
 import app from 'state';
 import { pluralize } from 'helpers';
 import { Thread, Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
@@ -34,7 +34,7 @@ const ProfileContent: m.Component<
       if (!matches || isNaN(+matches[1])) return;
 
       vnode.attrs.count = +matches[1];
-      m.redraw();
+      redraw();
       const scrollY = localStorage[vnode.attrs.localStorageScrollYKey];
       setTimeout(() => {
         if (app.lastNavigatedBack() && Number(scrollY)) {

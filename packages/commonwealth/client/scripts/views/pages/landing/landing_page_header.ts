@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
 import { NewLoginModal } from 'views/modals/login_modal';

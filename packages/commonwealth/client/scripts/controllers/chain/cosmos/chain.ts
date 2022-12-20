@@ -1,6 +1,7 @@
 import { ITXModalData, NodeInfo, IChainModule, ITXData, ChainInfo } from 'models';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import _ from 'lodash';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
@@ -101,7 +102,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const { params: { bondDenom } } = await this._api.staking.params();
     this._denom = bondDenom;
     this.app.chain.networkStatus = ApiStatus.Connected;
-    m.redraw();
+    redraw();
   }
 
   public async deinit(): Promise<void> {

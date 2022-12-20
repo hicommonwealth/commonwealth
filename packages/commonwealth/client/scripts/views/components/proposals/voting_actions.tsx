@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'components/proposals/voting_actions.scss';
 
@@ -156,35 +156,35 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
               user,
               (app.chain as Cosmos).chain.coins(this.amount)
             )
-            .then(() => m.redraw())
+            .then(() => redraw())
             .catch((err) => notifyError(err.toString()));
         } else {
           proposal
             .voteTx(new CosmosVote(user, 'Yes'))
-            .then(() => m.redraw())
+            .then(() => redraw())
             .catch((err) => notifyError(err.toString()));
         }
       } else if (proposal instanceof MolochProposal) {
         proposal
           .submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof CompoundProposal) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
         proposal
           .submitVoteWebTx(new AaveProposalVote(user, true))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof NearSputnikProposal) {
         proposal
           .submitVoteWebTx(
             new NearSputnikVote(user, NearSputnikVoteString.Approve)
           )
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
         toggleVotingModal(false);
@@ -230,28 +230,28 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       } else if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'No'))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof MolochProposal) {
         proposal
           .submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO))
-          .then(() => m.redraw());
+          .then(() => redraw());
       } else if (proposal instanceof CompoundProposal) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.NO))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
         proposal
           .submitVoteWebTx(new AaveProposalVote(user, false))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof NearSputnikProposal) {
         proposal
           .submitVoteWebTx(
             new NearSputnikVote(user, NearSputnikVoteString.Reject)
           )
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
         toggleVotingModal(false);
@@ -268,7 +268,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           .processTx()
           .then(() => {
             onModalClose();
-            m.redraw();
+            redraw();
           })
           .catch((err) => {
             onModalClose();
@@ -287,7 +287,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'Abstain'))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (
         proposal instanceof CompoundProposal &&
@@ -295,7 +295,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       ) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.ABSTAIN))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
         toggleVotingModal(false);
@@ -310,7 +310,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'NoWithVeto'))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
         toggleVotingModal(false);
@@ -329,7 +329,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           )
           .then(() => {
             onModalClose();
-            m.redraw();
+            redraw();
           })
           .catch((err) => {
             onModalClose();

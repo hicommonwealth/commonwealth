@@ -37,7 +37,7 @@
 // })
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
@@ -64,19 +64,19 @@ function oncreate(spec, confirmExit, completeCallback, exitCallback, vnode) {
       const confirmedExit = await confirmExit();
       if (confirmedExit) {
         app.modals.remove(spec);
-        m.redraw();
+        redraw();
         setTimeout(exitCallback, MODAL_REMOVE_DELAY);
       }
     })
     .on('modalforceexit', async (e) => {
       e.stopPropagation();
       app.modals.remove(spec);
-      m.redraw();
+      redraw();
       setTimeout(exitCallback, MODAL_REMOVE_DELAY);
     })
     .on('modalcomplete', (e) => {
       e.stopPropagation();
-      m.redraw();
+      redraw();
       setTimeout(completeCallback, MODAL_REMOVE_DELAY);
     });
 }
@@ -85,7 +85,7 @@ async function onclickoverlay(spec, confirmExit, exitCallback) {
   const confirmedExit = await confirmExit();
   if (confirmedExit) {
     app.modals.remove(spec);
-    m.redraw();
+    redraw();
     setTimeout(exitCallback, MODAL_REMOVE_DELAY);
   }
 }
@@ -98,7 +98,7 @@ export class AppModals extends ClassComponent {
     this.escapeHandler = (e) => {
       if (e.keyCode !== 27) return;
       app.modals.getList().pop();
-      m.redraw();
+      redraw();
     };
     $(document).on('keyup', this.escapeHandler);
   }

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import Infinite from 'mithril-infinite';
 import { Button, PopoverMenu } from 'construct-ui';
 
@@ -37,7 +37,7 @@ export class NotificationsMenu extends ClassComponent {
       )
         this.minDiscussionNotification += MAX_NOTIFS;
     }
-    m.redraw();
+    redraw();
   }
 
   private _nextPage(showingChainEvents: boolean) {
@@ -70,7 +70,7 @@ export class NotificationsMenu extends ClassComponent {
     } else if (this.minDiscussionNotification !== 0) {
       this.minDiscussionNotification = 0;
     }
-    m.redraw();
+    redraw();
   }
 
   view() {
@@ -184,7 +184,7 @@ export class NotificationsMenu extends ClassComponent {
               if (typeNotif.length < 1) return;
               app.user.notifications
                 .markAsRead(typeNotif)
-                ?.then(() => m.redraw());
+                ?.then(() => redraw());
             },
           })}
           {render(Button, {

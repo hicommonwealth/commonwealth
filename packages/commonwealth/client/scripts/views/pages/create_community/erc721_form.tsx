@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import Web3 from 'web3';
 import { providers } from 'ethers';
@@ -143,7 +143,7 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
           err.responseJSON?.error || 'Failed to load Token Information';
       }
       this.state.loading = false;
-      m.redraw();
+      redraw();
     };
 
     return (

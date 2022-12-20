@@ -2,7 +2,7 @@
 import 'modals/select_address_modal.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';
 
@@ -39,7 +39,7 @@ const SelectAddressModal: m.Component<
         })
         .then(() => {
           vnode.state.loading = false;
-          m.redraw();
+          redraw();
           vnode.state.selectedIndex = null;
           // select the address, and close the form
           notifySuccess(
@@ -50,13 +50,13 @@ const SelectAddressModal: m.Component<
             )}`
           );
           setActiveAccount(account).then(() => {
-            m.redraw();
+            redraw();
             $(e.target).trigger('modalexit');
           });
         })
         .catch((err: any) => {
           vnode.state.loading = false;
-          m.redraw();
+          redraw();
           notifyError(err.responseJSON.error);
         });
     };
@@ -74,7 +74,7 @@ const SelectAddressModal: m.Component<
       )();
       if (!confirmed) {
         vnode.state.loading = false;
-        m.redraw();
+        redraw();
         return;
       }
 
@@ -85,7 +85,7 @@ const SelectAddressModal: m.Component<
         })
         .then(() => {
           vnode.state.loading = false;
-          m.redraw();
+          redraw();
           vnode.state.selectedIndex = null;
           // unset activeAccount, or set it to the next activeAccount
           if (isSameAccount(app.user.activeAccount, account)) {
@@ -94,7 +94,7 @@ const SelectAddressModal: m.Component<
         })
         .catch((err: any) => {
           vnode.state.loading = false;
-          m.redraw();
+          redraw();
           notifyError(err.responseJSON.error);
         });
     };

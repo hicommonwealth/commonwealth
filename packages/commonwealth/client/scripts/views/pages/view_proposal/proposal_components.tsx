@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/view_proposal/proposal_components.scss';
 
@@ -147,7 +147,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
             {proposal.isQueueable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.queueTx().then(() => m.redraw())}
+                onclick={() => proposal.queueTx().then(() => redraw())}
                 label={
                   proposal.data.queued || proposal.data.executed
                     ? 'Queued'
@@ -158,7 +158,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
             {proposal.isExecutable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.executeTx().then(() => m.redraw())}
+                onclick={() => proposal.executeTx().then(() => redraw())}
                 label={proposal.data.executed ? 'Executed' : 'Execute'}
               />
             )}
@@ -177,7 +177,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
             {proposal.isQueueable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.queueTx().then(() => m.redraw())}
+                onclick={() => proposal.queueTx().then(() => redraw())}
                 label={
                   proposal.data.queued || proposal.data.executed
                     ? 'Queued'
@@ -188,7 +188,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
             {proposal.isExecutable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.executeTx().then(() => m.redraw())}
+                onclick={() => proposal.executeTx().then(() => redraw())}
                 label={proposal.data.executed ? 'Executed' : 'Execute'}
               />
             )}

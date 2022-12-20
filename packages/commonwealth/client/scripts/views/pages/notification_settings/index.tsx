@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/notification_settings/index.scss';
@@ -106,12 +106,12 @@ class NotificationSettingsPage extends ClassComponent {
                             ? app.user.notifications
                                 .disableImmediateEmails(subs)
                                 .then(() => {
-                                  m.redraw();
+                                  redraw();
                                 })
                             : app.user.notifications
                                 .enableImmediateEmails(subs)
                                 .then(() => {
-                                  m.redraw();
+                                  redraw();
                                 });
                         }}
                       />
@@ -122,12 +122,12 @@ class NotificationSettingsPage extends ClassComponent {
                             ? app.user.notifications
                                 .disableSubscriptions(subs)
                                 .then(() => {
-                                  m.redraw();
+                                  redraw();
                                 })
                             : app.user.notifications
                                 .enableSubscriptions(subs)
                                 .then(() => {
-                                  m.redraw();
+                                  redraw();
                                 });
                         }}
                       />

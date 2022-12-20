@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -239,7 +239,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
         $('.LoginDesktop').trigger('modalexit');
       }
 
-      m.redraw();
+      redraw();
     };
 
     return (

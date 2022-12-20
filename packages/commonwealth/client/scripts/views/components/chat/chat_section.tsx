@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
@@ -122,7 +122,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
     });
 
     this.onIncomingMessage = (msg) => {
-      m.redraw.sync();
+      redraw(true);
     };
 
     app.socket.chatNs.addListener(
@@ -406,7 +406,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       Object.keys(this.adminModals).forEach((k) => {
         this.adminModals[k] = false;
       });
-      m.redraw();
+      redraw();
     };
 
     const overlayContent: ResultNode = this.adminModals['CreateCategory'] ? (

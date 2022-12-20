@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import { Profile } from 'models';
@@ -19,7 +19,7 @@ export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
 
     const exitModal = () => {
       $(vnode.dom).trigger('modalexit');
-      m.redraw();
+      redraw();
     };
 
     return (

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -180,12 +180,12 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             .getByProposal(this.proposal)
             .filter((c) => c.parentComment === null);
 
-          m.redraw();
+          redraw();
         })
         .catch(() => {
           notifyError('Failed to load comments');
           this.comments = [];
-          m.redraw();
+          redraw();
         });
 
       this.prefetch[proposalIdAndType]['commentsStarted'] = true;
@@ -205,7 +205,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       this.comments = app.comments
         .getByProposal(this.proposal)
         .filter((c) => c.parentComment === null);
-      m.redraw();
+      redraw();
     };
 
     if (this.comments === undefined) {
@@ -261,12 +261,12 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
 
     const toggleVotingModal = (newModalState: boolean) => {
       this.votingModalOpen = newModalState;
-      m.redraw();
+      redraw();
     };
 
     const onModalClose = () => {
       this.votingModalOpen = false;
-      m.redraw();
+      redraw();
     };
 
     return (

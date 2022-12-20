@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import bs58 from 'bs58';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -213,7 +213,7 @@ const loadProfile = async (
     state.account = account;
     state.threads = result.threads.map((t) => modelThreadFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
-    m.redraw();
+    redraw();
   } catch (err) {
     // for certain chains, display addresses not in db if formatted properly
     if (chainInfo?.base === ChainBase.Substrate) {
@@ -266,7 +266,7 @@ const loadProfile = async (
     }
     state.loaded = true;
     state.loading = false;
-    m.redraw();
+    redraw();
     if (!state.account)
       throw new Error(
         err.responseJSON && err.responseJSON.error
@@ -366,10 +366,10 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       vnode.state.refreshProfile = false;
       if (onOwnProfile) {
         setActiveAccount(account).then(() => {
-          m.redraw();
+          redraw();
         });
       } else {
-        m.redraw();
+        redraw();
       }
     }
 
@@ -406,7 +406,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
           if (m.route.get() === thisUrl)
             window.location.hash = vnode.state.commentsContentCount.toString();
         }
-        m.redraw();
+        redraw();
       }
     }, 400);
 

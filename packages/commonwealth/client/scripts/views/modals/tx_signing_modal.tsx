@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'modals/tx_signing_modal.scss';
 
@@ -41,7 +41,7 @@ class TXSigningModal extends ClassComponent<ITXModalData> {
     const next = (newStage: StageName, newData?: TxDataState) => {
       this.stageName = newStage;
       this.data = newData;
-      m.redraw();
+      redraw();
     };
 
     return (
@@ -108,7 +108,7 @@ export const createTXModal = async (
         data,
       });
 
-      m.redraw();
+      redraw();
     });
 
     return modalP;

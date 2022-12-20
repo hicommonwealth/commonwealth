@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import BN from 'bn.js';
@@ -128,7 +129,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         this.app.chain.networkError = null;
         this._suppressAPIDisconnectErrors = false;
         this._connectTime = 0;
-        m.redraw();
+        redraw();
       }
     };
     const disconnectedCb = () => {
@@ -139,7 +140,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
         setTimeout(() => {
           this._suppressAPIDisconnectErrors = false;
         }, CONNECT_TIMEOUT);
-        m.redraw();
+        redraw();
       }
     };
     const errorCb = (err) => {
@@ -159,9 +160,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           console.log('chain connection timed out!');
           provider.disconnect();
           this._timedOut = true;
-          m.redraw();
+          redraw();
         }, CONNECT_TIMEOUT);
-        m.redraw();
+        redraw();
       }
     };
 
@@ -310,7 +311,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     this._sudoKey = sudokey ? sudokey.toString() : undefined;
 
     // redraw
-    m.redraw();
+    redraw();
     this._metadataInitialized = true;
   }
 
@@ -388,7 +389,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
           }
         }
       });
-      m.redraw();
+      redraw();
     });
     this._eventsInitialized = true;
   }
@@ -510,7 +511,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
             } else {
               notifyError(err.toString());
             }
-            m.redraw();
+            redraw();
             events.emit(TransactionStatus.Error.toString(), { err: err.toString() });
           }
         },

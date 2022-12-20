@@ -3,6 +3,7 @@
 import _ from 'lodash';
 import moment from 'moment';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
@@ -359,7 +360,7 @@ class ThreadsController {
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
-          m.redraw();
+          redraw();
           resolve(result);
         })
         .catch((e) => {

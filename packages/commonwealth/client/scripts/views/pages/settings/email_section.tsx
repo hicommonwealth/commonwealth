@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/settings/email_section.scss';
@@ -98,11 +98,11 @@ export class EmailSection extends ClassComponent {
 
                   this.errorMessage = null;
 
-                  m.redraw();
+                  redraw();
                 } catch (err) {
                   this.errorMessage = err.responseJSON.error;
 
-                  m.redraw();
+                  redraw();
 
                   throw new Error(
                     err.responseJSON && err.responseJSON.error
@@ -154,11 +154,11 @@ export class EmailSection extends ClassComponent {
                   type: 'DELETE',
                   success: () => {
                     this.githubAccount = null;
-                    m.redraw();
+                    redraw();
                   },
                   error: (err) => {
                     console.dir(err);
-                    m.redraw();
+                    redraw();
                   },
                 });
               } else {
@@ -170,7 +170,7 @@ export class EmailSection extends ClassComponent {
                   })
                 );
                 document.location = `${app.serverUrl()}/auth/github` as any;
-                m.redraw();
+                redraw();
               }
             }}
           />
@@ -185,11 +185,11 @@ export class EmailSection extends ClassComponent {
                   type: 'DELETE',
                   success: () => {
                     this.discordAccount = null;
-                    m.redraw();
+                    redraw();
                   },
                   error: (err) => {
                     console.dir(err);
-                    m.redraw();
+                    redraw();
                   },
                 });
               } else {
@@ -201,7 +201,7 @@ export class EmailSection extends ClassComponent {
                   })
                 );
                 document.location = `${app.serverUrl()}/auth/discord` as any;
-                m.redraw();
+                redraw();
               }
             }}
           />

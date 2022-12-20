@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/confirm_snapshot_vote_modal.scss';
@@ -95,7 +95,7 @@ export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVote
                   castVote(author.address, votePayload).then(() => {
                     $(e.target).trigger('modalexit');
                     successCallback();
-                    m.redraw();
+                    redraw();
                   });
                   mixpanelBrowserTrack({
                     event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,

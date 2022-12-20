@@ -2,7 +2,7 @@
 import 'components/widgets/user.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import _ from 'lodash';
 import { link } from 'helpers';
 
@@ -41,7 +41,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
         (app.chain as Substrate).identities
           ? await (app.chain as Substrate).identities.load(vnode.attrs.account)
           : null;
-      m.redraw();
+      redraw();
     });
   },
   view: (vnode) => {

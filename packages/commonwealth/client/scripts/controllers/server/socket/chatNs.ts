@@ -4,6 +4,7 @@ import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import {io, Socket} from 'socket.io-client';
 import _ from 'lodash';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 export enum ChatErrors {
     NOT_LOGGED_IN='User must be logged in to load chat'
@@ -152,7 +153,7 @@ export class ChatNamespace {
             this.channels[msg.chat_channel_id].unread = 0;
         }
 
-        m.redraw();
+        redraw();
     }
 
     public readMessages(channel_id: string) {

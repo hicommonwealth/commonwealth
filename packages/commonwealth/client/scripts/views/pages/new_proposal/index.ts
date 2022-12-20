@@ -4,7 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalType } from 'common-common/src/types';
@@ -83,7 +83,7 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
                 vnode.state.titlePre = 'New';
               }
               vnode.state.typeEnum = `democracy${value}`;
-              m.redraw();
+              redraw();
             },
             callback: (proposal) => {
               if (

@@ -4,7 +4,7 @@ import 'pages/notifications_page.scss';
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';
@@ -43,21 +43,21 @@ function nextPage() {
   if (numChainEventNotif < minChainEventsNotification + MAX_NOTIFS) {
     app.user.notifications.getChainEventNotifications().then(() => {
       increment('chain-event');
-      m.redraw();
+      redraw();
     });
   } else {
     increment('chain-event');
-    m.redraw();
+    redraw();
   }
 
   if (numDiscussionNotif < minDiscussionNotification + MAX_NOTIFS) {
     app.user.notifications.getDiscussionNotifications().then(() => {
       increment('discussion');
-      m.redraw();
+      redraw();
     });
   } else {
     increment('discussion');
-    m.redraw();
+    redraw();
   }
 }
 
@@ -78,7 +78,7 @@ function previousPage() {
     minDiscussionNotification = 0;
     flag = true;
   }
-  if (flag) m.redraw();
+  if (flag) redraw();
 }
 
 const NotificationsPage: m.Component<{}> = {
@@ -202,7 +202,7 @@ const NotificationsPage: m.Component<{}> = {
                     .markAsRead(
                       discussionNotifications.concat(chainEventNotifications)
                     )
-                    .then(() => m.redraw());
+                    .then(() => redraw());
                 },
               }),
               render(Popover, {
@@ -225,7 +225,7 @@ const NotificationsPage: m.Component<{}> = {
                         return;
                       app.user.notifications
                         .delete(app.user.notifications.chainEventNotifications)
-                        .then(() => m.redraw());
+                        .then(() => redraw());
                     },
                   }),
                 ],
@@ -236,7 +236,7 @@ const NotificationsPage: m.Component<{}> = {
                 closeOnContentClick: true,
                 closeOnEscapeKey: true,
                 onClosed: () => {
-                  m.redraw();
+                  redraw();
                 },
               }),
             ]

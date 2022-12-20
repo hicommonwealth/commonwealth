@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/index.scss';
@@ -63,11 +63,11 @@ class ManageCommunityPage extends ClassComponent {
         this.webhooks = webhooks.result;
         this.roleData = bulkMembers.result;
         this.loadingFinished = true;
-        m.redraw();
+        redraw();
       } catch (err) {
         this.roleData = [];
         this.loadingFinished = true;
-        m.redraw();
+        redraw();
         console.error(err);
       }
     };
@@ -135,11 +135,11 @@ class ManageCommunityPage extends ClassComponent {
         );
       }
 
-      m.redraw();
+      redraw();
     };
 
     const onSave = () => {
-      m.redraw();
+      redraw();
     };
 
     return !this.loadingFinished ? (

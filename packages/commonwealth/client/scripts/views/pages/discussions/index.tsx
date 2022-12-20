@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 import { debounce } from 'lodash';
 
 import 'pages/discussions/index.scss';
@@ -45,7 +45,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       this.fetchingThreads = true;
       await app.threads.loadNextPage({ topicName, stageName });
       this.fetchingThreads = false;
-      m.redraw();
+      redraw();
     }
   }
 
@@ -80,7 +80,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       this.initializing = true;
       app.threads.loadNextPage({ topicName, stageName }).then(() => {
         this.initializing = false;
-        m.redraw();
+        redraw();
       });
     }
 

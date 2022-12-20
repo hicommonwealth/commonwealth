@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'pages/view_thread/index.scss';
 
@@ -172,7 +172,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
             .fetchThreadsFromId([+threadId])
             .then((res) => {
               this.thread = res[0];
-              m.redraw();
+              redraw();
             })
             .catch(() => {
               notifyError('Thread not found');
@@ -210,7 +210,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
     // load proposal
     if (!this.prefetch[threadIdAndType]['threadReactionsStarted']) {
-      app.threads.fetchReactionsCount([thread]).then(() => m.redraw);
+      app.threads.fetchReactionsCount([thread]).then(() => redraw());
       this.prefetch[threadIdAndType]['threadReactionsStarted'] = true;
     }
 
@@ -251,12 +251,12 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               modelReactionCountFromServer({ ...rc, id })
             );
           }
-          m.redraw();
+          redraw();
         })
         .catch(() => {
           notifyError('Failed to load comments');
           this.comments = [];
-          m.redraw();
+          redraw();
         });
 
       this.prefetch[threadIdAndType]['commentsStarted'] = true;
@@ -276,7 +276,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       this.comments = app.comments
         .getByProposal(thread)
         .filter((c) => c.parentComment === null);
-      m.redraw();
+      redraw();
     };
 
     // load polls
@@ -284,7 +284,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       app.polls.fetchPolls(app.activeChainId(), thread.id).catch(() => {
         notifyError('Failed to load comments');
         this.comments = [];
-        m.redraw();
+        redraw();
       });
 
       this.prefetch[threadIdAndType]['pollsStarted'] = true;
@@ -304,7 +304,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
             throw new Error(`got unsuccessful status: ${response.status}`);
           } else {
             this.viewCount = response.result.view_count;
-            m.redraw();
+            redraw();
           }
         })
         .catch(() => {
@@ -398,7 +398,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
         this.recentlyEdited = true;
       }
 
-      m.redraw();
+      redraw();
     };
 
     const setIsEditingBody = (status: boolean) => {
@@ -474,7 +474,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     data: {
                       onChangeHandler: (topic: Topic) => {
                         thread.topic = topic;
-                        m.redraw();
+                        redraw();
                       },
                       thread,
                     },
@@ -518,7 +518,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     })
                     .then(() => {
                       setIsEditingBody(false);
-                      m.redraw();
+                      redraw();
                     });
                 },
               },
@@ -656,7 +656,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                                 app.threads.fetchThreadsFromId([
                                   thread.identifier,
                                 ]);
-                                m.redraw();
+                                redraw();
                               }}
                               thread={thread}
                               showAddProposalButton={isAuthor || isAdminOrMod}

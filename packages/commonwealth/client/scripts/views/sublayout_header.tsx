@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
 
 import 'sublayout_header.scss';
 
@@ -55,7 +55,7 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
               }
               onclick={() => {
                 app.sidebarToggled = !app.sidebarToggled;
-                m.redraw();
+                redraw();
               }}
             />
           )}
@@ -69,7 +69,7 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
               onclick={() => {
                 app.sidebarToggled = false;
                 app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
-                m.redraw();
+                redraw();
               }}
             />
           </div>
