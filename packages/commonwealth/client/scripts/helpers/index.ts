@@ -2,7 +2,7 @@ import $ from 'jquery';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
-
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ICardListItem } from 'models/interfaces';
 import app from 'state';
 import { ThreadStage } from 'models';
@@ -391,3 +391,21 @@ export const handleRedirectClicks = (
     callback();
   }
 };
+
+// Returns a default chain for a chainbase
+export function baseToNetwork(n: ChainBase): ChainNetwork {
+  switch (n) {
+    case ChainBase.CosmosSDK:
+      return ChainNetwork.Osmosis;
+    case ChainBase.Substrate:
+      return ChainNetwork.Edgeware;
+    case ChainBase.Ethereum:
+      return ChainNetwork.Ethereum;
+    case ChainBase.NEAR:
+      return ChainNetwork.NEAR;
+    case ChainBase.Solana:
+      return ChainNetwork.Solana;
+    default:
+      return null;
+  }
+}

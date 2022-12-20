@@ -10,7 +10,6 @@ import User from '../../components/widgets/user';
 import { initChain } from '../../../app';
 import SubstrateIdentity from '../../../controllers/chain/substrate/identity';
 import app from '../../../state';
-import LoginWithWalletDropdown from '../../components/login_with_wallet_dropdown';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import EditIdentityModal from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
@@ -187,13 +186,6 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]
       ),
-      // isClaimable &&
-      //   render(LoginWithWalletDropdown, {
-      //     prepopulateAddress: account.address,
-      //     loggingInWithAddress: !app.isLoggedIn(),
-      //     joiningChain: app.activeChainId(),
-      //     label: 'Claim address',
-      //   }),
       render('.bio-actions-right', [
         onOwnProfile
           ? [

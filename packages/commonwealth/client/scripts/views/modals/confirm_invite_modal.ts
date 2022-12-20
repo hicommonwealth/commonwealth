@@ -14,7 +14,6 @@ import { navigateToSubpage } from 'app';
 import { InviteCodeAttributes } from 'types';
 import { AddressInfo } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { isWindowSmallInclusive } from '../components/component_kit/helpers';
 
 const SideMenu: Component<{ invites; onChangeHandler; location }, {}> = {
@@ -271,18 +270,6 @@ const ConfirmInviteModal: Component<
                       },
                       'Connect a new address'
                     ),
-                  // addresses.length === 0 &&
-                  //   render(LoginWithWalletDropdown, {
-                  //     loggingInWithAddress: false,
-                  //     joiningChain: app.chain?.id || 'edgeware',
-                  //     label: 'Connect an address',
-                  //     onSuccess: (e) => {
-                  //       // $('.ConfirmInviteModal').trigger('modalexit');
-                  //       setRoute(
-                  //         `/${invites[vnode.state.location].chain_id}`
-                  //       );
-                  //     },
-                  //   }),
                 ],
           ])
         : render('.compact-modal-body', [

@@ -4,8 +4,8 @@ import m from 'mithril';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
-// import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
-// import { CodeResult } from 'near-api-js/lib/providers/provider';
+import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
+import { CodeResult } from 'near-api-js/lib/providers/provider';
 
 import 'pages/create_community.scss';
 
@@ -116,32 +116,30 @@ export class SputnikForm extends ClassComponent {
             });
 
             try {
-              // Gabe 2/14/22 Commenting this bit out because it isn't actually used, but maybe it will be someday?
-              //
               // verify the DAO exists
-              //   const config: ConnectConfig = {
-              //     networkId: isMainnet ? 'mainnet' : 'testnet',
-              //     nodeUrl: url,
-              //     keyStore: new keyStores.BrowserLocalStorageKeyStore(
-              //       localStorage
-              //     ),
-              //   };
-              //   const api = await nearConnect(config);
+              const config: ConnectConfig = {
+                networkId: isMainnet ? 'mainnet' : 'testnet',
+                nodeUrl: url,
+                keyStore: new keyStores.BrowserLocalStorageKeyStore(
+                  localStorage
+                ),
+              };
+              const api = await nearConnect(config);
 
-              //   const rawResult = await api.connection.provider.query<CodeResult>(
-              //     {
-              //       request_type: 'call_function',
-              //       account_id: id,
-              //       method_name: 'get_last_proposal_id',
-              //       args_base64: Buffer.from(JSON.stringify({})).toString(
-              //         'base64'
-              //       ),
-              //       finality: 'optimistic',
-              //     }
-              //   );
-              //   const _validResponse = JSON.parse(
-              //     Buffer.from(rawResult.result).toString()
-              //   );
+              const rawResult = await api.connection.provider.query<CodeResult>(
+                {
+                  request_type: 'call_function',
+                  account_id: id,
+                  method_name: 'get_last_proposal_id',
+                  args_base64: Buffer.from(JSON.stringify({})).toString(
+                    'base64'
+                  ),
+                  finality: 'optimistic',
+                }
+              );
+              const _validResponse = JSON.parse(
+                Buffer.from(rawResult.result).toString()
+              );
 
               // POST object
               const res = await $.post(

@@ -15,7 +15,7 @@ import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
-import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
+import { baseToNetwork } from '../../../helpers';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ChainFormFields, ChainFormState } from './types';
@@ -24,7 +24,7 @@ import { CommunityType } from '.';
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 
 // TODO: ChainFormState contains "uploadInProgress" which is technically
-// not part of the form (what we pass to /createChain), but of the general view's state,
+// not part of the form what we pass to /createChain, but of the general view's state,
 // and should be located elsewhere.
 type CreateStarterForm = ChainFormFields & { base: ChainBase };
 
