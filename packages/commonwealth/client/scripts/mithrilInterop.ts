@@ -54,7 +54,7 @@ export function redraw(sync = false) {
   }
 }
 
-export function parsePathname(url: string): { path: string; params: Params } {
+export function parsePathname(url: string): { path: string; params: m.Params } {
   return m.parsePathname(url);
 }
 
