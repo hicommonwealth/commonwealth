@@ -36,7 +36,7 @@ export enum Action {
 }
 
 // Implicit Permissions are a tree hierarchy of permissions that are implied by other permissions
-const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+const ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   // Chat Subtree
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
   // View Subtree
@@ -58,41 +58,81 @@ const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   [Action.DELETE_COMMENT, [Action.DELETE_REACTION]],
   // Edit Subtree
   [Action.EDIT_TOPIC, [Action.EDIT_THREAD]],
-  [Action.EDIT_THREAD, [Action.EDIT_COMMENT, Action.LINK_THREAD_TO_THREAD, Action.LINK_PROPOSAL_TO_THREAD]],
+  [Action.EDIT_THREAD, [Action.LINK_THREAD_TO_THREAD, Action.LINK_PROPOSAL_TO_THREAD, Action.EDIT_COMMENT]],
+]);
+
+const DENY_IMPLICT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+  // Chat Subtree
+  [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
+  // View Subtree
+  [Action.VIEW_REACTIONS, [Action.VIEW_COMMENTS, Action.CREATE_REACTION]],
+  [Action.VIEW_COMMENTS, [Action.VIEW_POLLS, Action.CREATE_COMMENT]],
+  [Action.VIEW_POLLS, [Action.VIEW_THREADS, Action.CREATE_POLL]],
+  [Action.VIEW_THREADS, [Action.VIEW_TOPICS, Action.CREATE_THREAD]],
+  [Action.VIEW_TOPICS, [Action.CREATE_TOPIC]],
+  // Create Subtree
+  [Action.CREATE_REACTION, [Action.VIEW_COMMENTS, Action.DELETE_REACTION]],
+  [Action.CREATE_COMMENT, [Action.VOTE_ON_POLLS, Action.EDIT_COMMENT, Action.DELETE_COMMENT]],
+  [Action.CREATE_POLL, [Action.VIEW_THREADS]],
+  [Action.CREATE_THREAD, [Action.VIEW_TOPICS, Action.EDIT_THREAD, Action.DELETE_THREAD, Action.LINK_PROPOSAL_TO_THREAD, Action.LINK_THREAD_TO_THREAD]],
+  [Action.CREATE_TOPIC, [Action.EDIT_TOPIC, Action.DELETE_TOPIC]],
+  // Voting Subtree
+  [Action.VOTE_ON_POLLS, [Action.CREATE_POLL]],
+  // Delete Subtree
+  [Action.DELETE_REACTION, [Action.DELETE_COMMENT]],
+  [Action.DELETE_COMMENT, [Action.DELETE_THREAD]],
+  [Action.DELETE_THREAD, [Action.DELETE_TOPIC]],
+  // Edit Subtree
+  [Action.EDIT_COMMENT, [Action.EDIT_THREAD]],
+  [Action.EDIT_THREAD, [Action.EDIT_TOPIC]]
 ]);
 
 // Recursive function to get all implicit permissions of an action
-const recurseImplicitActions = (action: Action, result_actions: Action[]): Action[] => {
-  const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(action);
+const recurseImplicitActions = (action: Action, result_actions: Action[], allowDeny: boolean): Action[] => {
+  let implicitActions;
+  if (allowDeny) {
+    implicitActions = ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(action);
+  } else {
+    implicitActions = DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(action);
+  }
   // Base Case, if there are no implicit permission leaves, return the action
   if (!implicitActions) {
     return [ action ];
   }
   // Recursive Case, if there are implicit permission leaves, return the action and the leaves
   for (let i = 0; i < implicitActions.length; i++) {
-    result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], IMPLICIT_PERMISSIONS_BY_ACTION.get(implicitActions[i])));
+    if (allowDeny) {
+      result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(implicitActions[i]), allowDeny));
+    } else {
+      result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(implicitActions[i]), allowDeny));
+    }
   };
+
   let uniqueActions = [...new Set(result_actions.concat([action]))];
   return uniqueActions;
 }
 
-export const getImplicitActionsSet = (action: Action): Action[] => {
-  return recurseImplicitActions(action, IMPLICIT_PERMISSIONS_BY_ACTION.get(action));
+export const getImplicitActionsSet = (action: Action, allowDeny: boolean): Action[] => {
+  if (allowDeny) {
+    return recurseImplicitActions(action, ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(action), allowDeny);
+  } else {
+    return recurseImplicitActions(action, DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(action), allowDeny);
+  }
 }
 
-// Adds or Removes the implicit permissions of a permission
-export function addRemoveImplicitPermissions(
+// Allows or Denies the implicit permissions of a permission
+export function allowDenyImplicitPermissions(
   permission: Permissions,
   actionNumber: number,
-  isAdd: boolean
+  allowDeny: boolean
 ): Permissions {
   let result = BigInt(permission);
-  const implicitActions = getImplicitActionsSet(actionNumber);
-  if (implicitActions && isAdd) {
+  const implicitActions = getImplicitActionsSet(actionNumber, allowDeny);
+  if (implicitActions && allowDeny) {
     for (let i = 0; i < implicitActions.length; i++) {
       result |= BigInt(1) << BigInt(implicitActions[i]);
     }
-  } else if (implicitActions && !isAdd) {
+  } else if (implicitActions && !allowDeny) {
     for (let i = 0; i < implicitActions.length; i++) {
       result &= ~(BigInt(1) << BigInt(implicitActions[i]));
     }
@@ -108,7 +148,7 @@ export function addPermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result |= BigInt(1) << BigInt(actionNumber);
-  result = addRemoveImplicitPermissions(result, actionNumber, true);
+  result = allowDenyImplicitPermissions(result, actionNumber, true);
   return result;
 }
 
@@ -120,7 +160,7 @@ export function removePermission(
   let result = BigInt(permission);
   // eslint-disable-next-line no-bitwise
   result &= ~(BigInt(1) << BigInt(actionNumber));
-  result = addRemoveImplicitPermissions(result, actionNumber, false);
+  result = allowDenyImplicitPermissions(result, actionNumber, false);
   return result;
 }
 
