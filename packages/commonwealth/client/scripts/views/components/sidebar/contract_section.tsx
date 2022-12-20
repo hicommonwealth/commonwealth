@@ -12,6 +12,7 @@ import { handleRedirectClicks } from 'helpers';
 import { Contract } from 'models';
 import { SidebarSectionGroup } from './sidebar_section';
 import { ToggleTree, SectionGroupAttrs, SidebarSectionAttrs } from './types';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 export class ContractSection implements m.ClassComponent<SidebarSectionAttrs> {
   contracts: Contract[];
   loaded: boolean;
@@ -34,15 +35,13 @@ export class ContractSection implements m.ClassComponent<SidebarSectionAttrs> {
 
     // ---------- Build Section Props ---------- //
 
-    const sectionAdminButton: m.Vnode = (
-      <Icon
-        name={Icons.PLUS_CIRCLE}
-        onclick={(e) => {
-          e.stopPropagation();
-          handleRedirectClicks(e, `/new/contract`, app.activeChainId(), null);
-        }}
-      />
-    );
+    const sectionAdminButton: m.Vnode = m(Icon, {
+      name: Icons.PLUS_CIRCLE,
+      onclick: (e: any) => {
+        e.stopPropagation();
+        handleRedirectClicks(e, `/new/contract`, app.activeChainId(), null);
+      }
+    });
 
     const contractData = (contractAddress: string): SectionGroupAttrs => {
       return {

@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
 import { DB } from '../models';
-import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
