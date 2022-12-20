@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { int } from 'aws-sdk/clients/datapipeline';
 
 import { CWIconButton } from './component_kit/cw_icon_button';

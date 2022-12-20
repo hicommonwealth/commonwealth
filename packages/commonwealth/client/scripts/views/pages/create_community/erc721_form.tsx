@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import $ from 'jquery';
 import Web3 from 'web3';
 import { providers } from 'ethers';
@@ -222,7 +222,7 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
                 );
               }
               await initAppState(false);
-              m.route.set(`/${res.result.chain?.id}`);
+              setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error ||

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import 'sublayout_header.scss';
 
@@ -35,9 +35,9 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
             iconSize="xl"
             onclick={() => {
               if (app.isCustomDomain()) {
-                m.route.set('/');
+                setRoute('/');
               } else {
-                m.route.set('/dashboard/for-you');
+                setRoute('/dashboard/for-you');
               }
             }}
           />

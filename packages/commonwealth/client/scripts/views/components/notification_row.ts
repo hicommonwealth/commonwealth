@@ -2,7 +2,7 @@ import 'components/notification_row.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 

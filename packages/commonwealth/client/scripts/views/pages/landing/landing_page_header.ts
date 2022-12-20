@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
 import { NewLoginModal } from 'views/modals/login_modal';
@@ -61,7 +61,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     const redirectClick = (route) => {
-      m.route.set(route);
+      setRoute(route);
     };
 
     return render(

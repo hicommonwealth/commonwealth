@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
@@ -119,7 +119,7 @@ export const renderQuillDelta = (
                           // don't open a new window if the link is on Commonwealth
                           e.preventDefault();
                           e.stopPropagation();
-                          m.route.set(child.attributes.link);
+                          setRoute(child.attributes.link);
                         }
                       },
                     },
@@ -216,7 +216,7 @@ export const renderQuillDelta = (
                     // don't open a new window if the link is on Commonwealth
                     e.preventDefault();
                     e.stopPropagation();
-                    m.route.set(child.attributes.link);
+                    setRoute(child.attributes.link);
                   }
                 },
               },

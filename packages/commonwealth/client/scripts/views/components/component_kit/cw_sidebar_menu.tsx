@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
@@ -30,7 +30,7 @@ const renderCommunity = (item: ChainInfo) => {
       e.stopPropagation();
       app.sidebarToggled = false;
       app.sidebarMenu = 'default';
-      m.route.set(item.id ? `/${item.id}` : '/');
+      setRoute(item.id ? `/${item.id}` : '/');
     },
     contentRight: app.isLoggedIn() && roles.length > 0 && (
       <div
@@ -145,7 +145,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               onclick: () => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
-                m.route.set('/communities');
+                setRoute('/communities');
               },
             },
             {
@@ -155,7 +155,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               onclick: () => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
-                m.route.set('/notification-settings');
+                setRoute('/notification-settings');
               },
             },
             {
@@ -168,7 +168,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
                 } else {
                   app.sidebarToggled = false;
                   app.sidebarMenu = 'default';
-                  m.route.set('/settings');
+                  setRoute('/settings');
                 }
               },
             } as MenuItem,

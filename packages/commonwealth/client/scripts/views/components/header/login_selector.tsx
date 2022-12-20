@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import {
   MenuItem,
   MenuDivider,
@@ -163,7 +163,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
     return (
       <>
         {render(MenuItem, {
-          onclick: () => m.route.set('/notification-settings'),
+          onclick: () => setRoute('/notification-settings'),
           label: (
             <div class="label-wrap">
               {mobile && <CWIcon iconName="bell" />}
@@ -175,7 +175,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
           onclick: () =>
             app.activeChainId()
               ? navigateToSubpage('/settings')
-              : m.route.set('/settings'),
+              : setRoute('/settings'),
           label: (
             <div class="label-wrap">
               {mobile && <CWIcon iconName="person" />}

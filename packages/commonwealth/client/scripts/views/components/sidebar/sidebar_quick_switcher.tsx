@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelPageViewEvent } from 'analytics/types';
 import 'components/sidebar/sidebar_quick_switcher.scss';
@@ -61,7 +61,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
             <CWCommunityAvatar
               size="large"
               community={item}
-              onclick={link ? () => m.route.set(`/${item.id}`) : undefined}
+              onclick={link ? () => setRoute(`/${item.id}`) : undefined}
             />
           ))}
         </div>

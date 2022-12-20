@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import {
   updateActiveAddresses,
@@ -56,7 +56,7 @@ const redirectToNextPage = () => {
         +new Date() - postAuth.timestamp < 24 * 60 * 60 * 1000
       ) {
         localStorage.removeItem('nearPostAuthRedirect');
-        m.route.set(postAuth.path, {}, { replace: true });
+        setRoute(postAuth.path, {}, { replace: true });
       } else {
         navigateToSubpage('/', { replace: true });
       }
@@ -153,7 +153,7 @@ const validate = async (
         chainCreateArgs
       );
       await initAppState(false);
-      m.route.set(`${window.location.origin}/${res.result.chain.id}`);
+      setRoute(`${window.location.origin}/${res.result.chain.id}`);
     } catch (err) {
       vnode.state.validationError = `Failed to initialize chain node: ${err.message}`;
     }

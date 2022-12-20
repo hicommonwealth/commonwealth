@@ -1,7 +1,7 @@
 import 'components/login_with_wallet_dropdown.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem } from 'construct-ui';
 
@@ -104,7 +104,7 @@ const LoginWithWalletDropdown: m.Component<{
                 if (next === '/?') {
                   navigateToSubpage('/');
                 } else {
-                  m.route.set(next);
+                  setRoute(next);
                 }
                 m.redraw();
                 setTimeout(() => {

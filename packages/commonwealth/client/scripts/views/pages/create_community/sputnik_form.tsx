@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import $ from 'jquery';
 // import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
 // import { CodeResult } from 'near-api-js/lib/providers/provider';
@@ -155,7 +155,7 @@ export class SputnikForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              m.route.set(`${window.location.origin}/${res.result.chain.id}`);
+              setRoute(`${window.location.origin}/${res.result.chain.id}`);
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Adding DAO failed.');
               console.error(err.responseJSON?.error || err.message);

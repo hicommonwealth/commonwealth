@@ -1,7 +1,7 @@
 import 'pages/commonwealth/collectives.scss';
 
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { Card, Button, Input } from 'construct-ui';
 
 import app from 'state';

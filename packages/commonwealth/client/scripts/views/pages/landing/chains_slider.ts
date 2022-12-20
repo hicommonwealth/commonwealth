@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';
 
@@ -63,7 +63,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
 
                         onclick: (e) => {
                           e.preventDefault();
-                          m.route.set(`/${chain.id}`);
+                          setRoute(`/${chain.id}`);
                           localStorage['home-scrollY'] = window.scrollY;
                         },
 

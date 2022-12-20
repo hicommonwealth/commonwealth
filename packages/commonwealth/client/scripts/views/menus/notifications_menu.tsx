@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import Infinite from 'mithril-infinite';
 import { Button, PopoverMenu } from 'construct-ui';
 
@@ -171,7 +171,7 @@ export class NotificationsMenu extends ClassComponent {
             onclick: () =>
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
-                : m.route.set('/notifications'),
+                : setRoute('/notifications'),
           })}
           {render(Button, {
             label: 'Mark all read',

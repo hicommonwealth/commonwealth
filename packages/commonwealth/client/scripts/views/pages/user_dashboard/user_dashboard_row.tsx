@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 
@@ -68,7 +68,7 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
           'UserDashboardRow'
         )}
         onclick={() => {
-          m.route.set(path);
+          setRoute(path);
           m.redraw();
         }}
       >

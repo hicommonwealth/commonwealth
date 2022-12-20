@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';

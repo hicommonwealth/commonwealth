@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
@@ -39,7 +39,7 @@ const initiateFullSearch = (searchTerm) => {
     notifyError('Query must be at least 3 characters');
   }
   const params = `q=${encodeURIComponent(searchTerm.toString().trim())}&scope[]=Communities`;
-  m.route.set(`/search?${params}`);
+  setRoute(`/search?${params}`);
 };
 
 const TokensCommunityComponent: m.Component<IAttrs, IState> = {

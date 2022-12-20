@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import { QuillFormattedText, QuillTextParams } from './quill_formatted_text';

@@ -13,7 +13,7 @@ import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
 

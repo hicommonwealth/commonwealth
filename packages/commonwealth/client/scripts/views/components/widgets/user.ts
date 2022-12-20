@@ -5,7 +5,7 @@ import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Popover } from 'construct-ui';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import app from 'state';
 import jdenticon from 'jdenticon';

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import BN from 'bn.js';
 import moment from 'moment';
 
@@ -53,7 +53,7 @@ class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
         onclick={(e) => {
           if (clickable) {
             e.preventDefault();
-            m.route.set(`/${dao.contractId}`);
+            setRoute(`/${dao.contractId}`);
           }
         }}
       >
@@ -75,7 +75,7 @@ class SputnikDAOsPage extends ClassComponent {
 
   view() {
     if (app.activeChainId() && app.activeChainId() !== 'near')
-      m.route.set(`/${app.activeChainId()}`);
+      setRoute(`/${app.activeChainId()}`);
 
     const activeEntity = app.chain;
     const allCommunities = app.config.chains.getAll();

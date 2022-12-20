@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 const ListContainer: m.Component<
   {

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
 import { ListItem, Select } from 'construct-ui';
@@ -55,7 +55,7 @@ const getMemberResult = (addr, searchTerm) => {
       </a>
     ),
     onclick: () => {
-      m.route.set(userLink);
+      setRoute(userLink);
     },
   });
 };
@@ -72,11 +72,11 @@ const getCommunityResult = (community) => {
 
   const onSelect = () => {
     if (params.community) {
-      m.route.set(
+      setRoute(
         params.community.address ? `/${params.community.address}` : '/'
       );
     } else {
-      m.route.set(community.id ? `/${community.id}` : '/');
+      setRoute(community.id ? `/${community.id}` : '/');
     }
   };
 
@@ -105,7 +105,7 @@ const getDiscussionResult = (thread, searchTerm) => {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
-      m.route.set(`/${chain}/discussion/${proposalId}`);
+      setRoute(`/${chain}/discussion/${proposalId}`);
     },
     label: (
       <a class="search-results-item">
@@ -148,7 +148,7 @@ const getCommentResult = (comment, searchTerm) => {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
-      m.route.set(
+      setRoute(
         `/${chain}/proposal/${proposalId.split('_')[0]}/${
           proposalId.split('_')[1]
         }`
@@ -339,7 +339,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                         class="search-all-communities"
                         onclick={() => {
                           searchQuery.chainScope = undefined;
-                          m.route.set(`/search?${searchQuery.toUrlParams()}`);
+                          setRoute(`/search?${searchQuery.toUrlParams()}`);
                           setTimeout(() => {
                             this.refreshResults = true;
                           }, 0);
@@ -358,7 +358,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                       value: this.searchQuery.sort,
                       onchange: (e) => {
                         searchQuery.sort = SearchSort[e.currentTarget['value']];
-                        m.route.set(`/search?${searchQuery.toUrlParams()}`);
+                        setRoute(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);

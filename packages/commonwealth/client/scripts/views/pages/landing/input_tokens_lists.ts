@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import InputTokenOptionComponent from './input_token_option';
 import { Chain, Token } from './index';
 import { placeholderChain } from './tokens_community_hero';

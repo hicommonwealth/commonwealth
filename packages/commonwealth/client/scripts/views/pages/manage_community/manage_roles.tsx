@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/manage_roles.scss';
@@ -133,7 +133,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                       vnode.attrs.onRoleUpdate(role, newRole);
 
                       if (isLosingAdminPermissions) {
-                        m.route.set(`/${app.activeChainId()}`);
+                        setRoute(`/${app.activeChainId()}`);
                       }
                     } catch (err) {
                       const errMsg =

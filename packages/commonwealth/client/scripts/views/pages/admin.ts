@@ -4,7 +4,7 @@ import 'pages/admin.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import app from 'state';
@@ -371,7 +371,7 @@ const AdminPage: m.Component<{}> = {
   oncreate: () => {},
   view: () => {
     if (!app.user.isSiteAdmin) {
-      m.route.set('/', {}, { replace: true });
+      setRoute('/', {}, { replace: true });
       return render(PageLoading);
     }
 

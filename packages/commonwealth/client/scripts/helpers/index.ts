@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import m, { RouteOptions } from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 
@@ -46,7 +46,7 @@ export function parseCustomStages(str) {
 export const modalRedirectClick = (e, route) => {
   e.preventDefault();
   $(e.target).trigger('modalexit');
-  m.route.set(route);
+  setRoute(route);
 };
 
 /*
@@ -65,7 +65,7 @@ export function externalLink(selector, target, children) {
           // don't open a new window if the link is on Commonwealth
           e.preventDefault();
           e.stopPropagation();
-          m.route.set(target);
+          setRoute(target);
         }
       },
     },
@@ -101,11 +101,11 @@ export function link(
           : [target];
       if (afterRouteSet) {
         (async () => {
-          await m.route.set(...routeArgs);
+          await setRoute(...routeArgs);
           afterRouteSet();
         })();
       } else {
-        m.route.set(...routeArgs);
+        setRoute(...routeArgs);
       }
     },
   };

@@ -1,7 +1,7 @@
 import 'modals/confirm_invite_modal.scss';
 
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 import { Button } from 'construct-ui';
@@ -181,7 +181,7 @@ const ConfirmInviteModal: m.Component<
                                   }
                                   const chainId = invites[location].chain_id;
                                   // if private community, re-init app
-                                  m.route.set(`/${chainId}`);
+                                  setRoute(`/${chainId}`);
                                   notifySuccess(
                                     `Successfully joined ${communityName}.`
                                   );
@@ -252,7 +252,7 @@ const ConfirmInviteModal: m.Component<
                           if (app.activeChainId()) {
                             navigateToSubpage('/web3login', web3loginParams);
                           } else {
-                            m.route.set(
+                            setRoute(
                               `${defaultChainId}/web3login`,
                               web3loginParams
                             );
@@ -263,7 +263,7 @@ const ConfirmInviteModal: m.Component<
                             joiningCommunity,
                             targetCommunity,
                             successCallback: () => {
-                              m.route.set(next);
+                              setRoute(next);
                               $(e.target).trigger('modalexit');
                             },
                           });
@@ -278,7 +278,7 @@ const ConfirmInviteModal: m.Component<
                   //     label: 'Connect an address',
                   //     onSuccess: (e) => {
                   //       // $('.ConfirmInviteModal').trigger('modalexit');
-                  //       m.route.set(
+                  //       setRoute(
                   //         `/${invites[vnode.state.location].chain_id}`
                   //       );
                   //     },

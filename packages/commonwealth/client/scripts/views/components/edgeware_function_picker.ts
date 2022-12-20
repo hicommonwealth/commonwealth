@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { Input, FormLabel, FormGroup } from 'construct-ui';
 import { blake2AsHex } from '@polkadot/util-crypto';
 

@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import bs58 from 'bs58';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';

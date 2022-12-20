@@ -4,7 +4,7 @@ import 'pages/notifications_page.scss';
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';

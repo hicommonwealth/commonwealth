@@ -2,7 +2,7 @@
 import 'components/widgets/user.scss';
 
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import _ from 'lodash';
 import { link } from 'helpers';
 

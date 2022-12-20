@@ -18,6 +18,7 @@ import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import * as m from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import {
   isGroupRole,
   NearSputnikConfig,
@@ -326,7 +327,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         failureUrl,
       });
     } else {
-      m.route.set(successUrl);
+      setRoute(successUrl);
     }
   }
 

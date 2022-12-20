@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -29,7 +29,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
 
     return (
       <>
-        <div class="header-row" onclick={() => m.route.set(threadUrl)}>
+        <div class="header-row" onclick={() => setRoute(threadUrl)}>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             className="attribution-text"
@@ -114,7 +114,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
     return (
       <div
         class="header-row"
-        onclick={() => m.route.set(subscription.Chain.id)}
+        onclick={() => setRoute(subscription.Chain.id)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}

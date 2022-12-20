@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -98,9 +98,9 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     const loggedIn = app.loginState === LoginState.LoggedIn;
 
     if (!vnode.attrs.type) {
-      m.route.set(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+      setRoute(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
     } else if (vnode.attrs.type === 'for-you' && !loggedIn) {
-      m.route.set('/dashboard/global');
+      setRoute('/dashboard/global');
     }
 
     const subpage: DashboardViews =
@@ -170,7 +170,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                       );
                       return;
                     }
-                    m.route.set('/dashboard/for-you');
+                    setRoute('/dashboard/for-you');
                     m.redraw();
                   }}
                 />
@@ -178,7 +178,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   label={DashboardViews.Global}
                   isSelected={activePage === DashboardViews.Global}
                   onclick={() => {
-                    m.route.set('/dashboard/global');
+                    setRoute('/dashboard/global');
                     m.redraw();
                   }}
                 />
@@ -186,7 +186,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                   label={DashboardViews.Chain}
                   isSelected={activePage === DashboardViews.Chain}
                   onclick={() => {
-                    m.route.set('/dashboard/chain-events');
+                    setRoute('/dashboard/chain-events');
                     m.redraw();
                   }}
                 />

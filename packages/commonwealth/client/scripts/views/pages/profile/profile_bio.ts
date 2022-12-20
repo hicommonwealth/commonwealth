@@ -2,7 +2,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import { Account } from 'models';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button } from 'construct-ui';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
@@ -39,7 +39,7 @@ const editIdentityAction = (
           const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
           confirmed = await confirmationModalWithText(msg)();
           if (confirmed) {
-            m.route.set(`/${chainObj.id}/account/${account.address}`, {
+            setRoute(`/${chainObj.id}/account/${account.address}`, {
               setIdentity: true,
             });
           }

@@ -4,7 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalType } from 'common-common/src/types';

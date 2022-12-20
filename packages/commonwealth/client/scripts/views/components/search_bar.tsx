@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import $ from 'jquery';
 import moment from 'moment';
 import {
@@ -59,12 +59,12 @@ const getMemberPreview = (
       </a>
     ),
     onclick: () => {
-      m.route.set(userLink);
+      setRoute(userLink);
       closeResultsFn();
     },
     onkeyup: (e) => {
       if (e.key === 'Enter') {
-        m.route.set(userLink);
+        setRoute(userLink);
         closeResultsFn();
       }
     },
@@ -90,7 +90,7 @@ const getCommunityPreview = (
 
   const onSelect = () => {
     if (params.community) {
-      m.route.set(
+      setRoute(
         params.community.address
           ? `/${params.community.address}`
           : params.community.id
@@ -135,7 +135,7 @@ const getDiscussionPreview = (
       notifyError('Discussion not found.');
       return;
     }
-    m.route.set(`/${chain}/discussion/${proposalId}`);
+    setRoute(`/${chain}/discussion/${proposalId}`);
     closeResultsFn();
   };
 
@@ -193,7 +193,7 @@ const getCommentPreview = (
       notifyError('Discussion not found.');
       return;
     }
-    m.route.set(
+    setRoute(
       `/${chain}/proposal/${proposalId.split('_')[0]}/${
         proposalId.split('_')[1]
       }`
@@ -424,7 +424,7 @@ const executeSearch = (query: SearchQuery) => {
   }
   query.isSearchPreview = false;
   app.search.addToHistory(query);
-  m.route.set(`/search?${query.toUrlParams()}`);
+  setRoute(`/search?${query.toUrlParams()}`);
 };
 
 export class SearchBar extends ClassComponent {

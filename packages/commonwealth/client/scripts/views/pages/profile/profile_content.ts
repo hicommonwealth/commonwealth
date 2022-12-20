@@ -3,7 +3,7 @@ import m from 'mithril';
 import app from 'state';
 import { pluralize } from 'helpers';
 import { Thread, Account } from 'models';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';

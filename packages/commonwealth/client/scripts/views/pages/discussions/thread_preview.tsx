@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
@@ -111,7 +111,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
             scrollEle.scrollTop;
 
-          m.route.set(discussionLink);
+          setRoute(discussionLink);
         }}
         key={thread.id}
       >

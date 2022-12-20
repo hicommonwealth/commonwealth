@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -67,7 +67,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
       onclick: (e: any) => {
         e.preventDefault();
         e.stopPropagation();
-        m.route.set(`/${author_chain}/account/${author_address}`);
+        setRoute(`/${author_chain}/account/${author_address}`);
       },
     });
 
@@ -87,7 +87,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
               onclick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                m.route.set(`/${chain_id}`);
+                setRoute(`/${chain_id}`);
               }}
             >
               {communityName}
@@ -111,7 +111,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
               onclick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                m.route.set(`/${chain_id}`);
+                setRoute(`/${chain_id}`);
               }}
             >
               {communityName}

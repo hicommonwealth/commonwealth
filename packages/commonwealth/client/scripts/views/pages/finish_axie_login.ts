@@ -1,7 +1,7 @@
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import { initAppState } from 'app';
@@ -36,7 +36,7 @@ const validate = async (
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
     await updateActiveAddresses(selectedChainMeta);
     console.log('Navigating to axie infinite community');
-    m.route.set('/axie-infinity');
+    setRoute('/axie-infinity');
   } else {
     console.error(`Got login error: ${JSON.stringify(result)}`);
     return `Login error: ${JSON.stringify(result)}`;

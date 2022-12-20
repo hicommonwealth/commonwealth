@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
 
@@ -32,7 +32,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
                 type="caption"
                 fontWeight="medium"
                 className={isCurrent ? 'current-text' : 'parent-text'}
-                onclick={isCurrent ? undefined : () => m.route.set(b.path)}
+                onclick={isCurrent ? undefined : () => setRoute(b.path)}
               >
                 {b.label}
               </CWText>

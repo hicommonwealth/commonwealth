@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
@@ -62,7 +62,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
               className="topic-name-text"
               onclick={(e) => {
                 e.preventDefault();
-                m.route.set(
+                setRoute(
                   `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
                 );
               }}
@@ -98,7 +98,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                   )}
                   onclick={(e) => {
                     e.stopPropagation();
-                    m.route.set(discussionLink);
+                    setRoute(discussionLink);
                   }}
                 >
                   <div class="row-top">

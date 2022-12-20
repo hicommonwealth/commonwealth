@@ -6,7 +6,7 @@ import app from 'state';
 import { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 const ProfileProposal: m.Component<
   { proposal: Thread },

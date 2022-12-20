@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -177,7 +177,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         });
         app.sidebarToggled = false;
         app.sidebarMenu = 'default';
-        m.route.set('/createCommunity');
+        setRoute('/createCommunity');
       },
     },
     {

@@ -4,7 +4,7 @@ import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';
 
 import app, { LoginState } from 'state';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';

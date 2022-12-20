@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 
@@ -44,7 +44,7 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
             } else {
               e.preventDefault();
               localStorage['home-scrollY'] = window.scrollY;
-              m.route.set(`/${vnode.attrs.route}`);
+              setRoute(`/${vnode.attrs.route}`);
             }
           },
           class:

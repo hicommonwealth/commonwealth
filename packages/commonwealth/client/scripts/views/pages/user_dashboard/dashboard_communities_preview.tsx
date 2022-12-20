@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import { Tag } from 'construct-ui';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
@@ -45,7 +45,7 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
         interactive
         onclick={(e) => {
           e.preventDefault();
-          m.route.set(`/${chain.id}`);
+          setRoute(`/${chain.id}`);
         }}
       >
         <div class="card-top">
@@ -95,7 +95,7 @@ export class DashboardCommunitiesPreview extends ClassComponent {
         </div>
         <CWButton
           onclick={() => {
-            m.route.set('/communities');
+            setRoute('/communities');
             m.redraw();
           }}
           label="View more communities"

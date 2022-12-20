@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
@@ -16,7 +16,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
     //   iconName: 'search',
     //   mobileCaret: true,
     //   onclick: () => {
-    //     m.route.set('/search');
+    //     setRoute('/search');
     //   },
     // },
     ...((app.activeChainId()

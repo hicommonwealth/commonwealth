@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 import app from 'state';
 
 import 'pages/settings/index.scss';
@@ -15,7 +15,7 @@ import { ComposerSection } from './composer_section';
 class SettingsPage extends ClassComponent {
   view() {
     if (app.loginStatusLoaded() && !app.isLoggedIn()) {
-      m.route.set('/', {}, { replace: true });
+      setRoute('/', {}, { replace: true });
       return <PageLoading />;
     }
     if (!app.loginStatusLoaded()) return <PageLoading />;

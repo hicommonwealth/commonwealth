@@ -4,7 +4,7 @@
 /* eslint-disable max-len */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute } from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
