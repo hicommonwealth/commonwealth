@@ -18,7 +18,7 @@ export async function processSnapshotMessage(this: { models: DB }, data: Snapsho
   });
 
   if (eventType === 'proposal/created' && proposal) {
-    log.error(`Proposal ${id} already exists`);
+    log.info(`Proposal ${id} already exists`);
     return;
   }
 
@@ -90,7 +90,7 @@ export async function processSnapshotMessage(this: { models: DB }, data: Snapsho
           );
         } catch (e) {
           // TODO: should we NACK the message if sending to discord fails or just rollbar report it and continue?
-          log.error(`Error sending snapshot notification to Discord: ${e.message}`);
+          log.error('Error sending snapshot notification to discord', e);
           console.log(
             'Error sending snapshot notification to discord bot',
             e
