@@ -4,6 +4,8 @@ import 'pages/new_contract_page.scss';
 import app from 'state';
 import m from 'mithril';
 import $ from 'jquery';
+import ClassComponent from 'class_component';
+
 
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { BigNumber, ethers } from 'ethers';
@@ -18,9 +20,9 @@ import { AddContractForm } from './add_contract_form';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
-import { Spinner } from 'construct-ui';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
-class NewContractPage implements m.ClassComponent<any> {
+class NewContractPage extends ClassComponent {
   private state = {
     ethChainNames: {},
     ethChains: {},
@@ -71,7 +73,7 @@ class NewContractPage implements m.ClassComponent<any> {
       <Sublayout>
         <div class="NewContractPage">
           <CWText type="h4">Add New Contract</CWText>
-          {!this.state.loadingEthChains ? getActiveForm() : <Spinner/>}
+          {!this.state.loadingEthChains ? getActiveForm() : <CWSpinner />}
         </div>
       </Sublayout>
     );

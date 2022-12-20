@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -23,12 +24,12 @@ import { CWValidationText } from '../component_kit/cw_validation_text';
 
 type CreateCommmentAttrs = {
   handleIsReplying?: (isReplying: boolean, id?: number) => void;
-  parentCommentId: number;
+  parentCommentId?: number;
   rootProposal: AnyProposal | Thread;
   updatedCommentsCallback: () => void;
 };
 
-export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
+export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
   private error;
   private quillEditorState: QuillEditor;
   private saving: boolean;
@@ -121,9 +122,11 @@ export class CreateComment implements m.ClassComponent<CreateCommmentAttrs> {
       TopicGateCheck.getTopicThreshold(activeTopicName);
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
+    const userFailsThreshold =
+      tokenPostingThreshold?.gtn(0) && userBalance?.gtn(0) && userBalance.lt(tokenPostingThreshold);
 
     const disabled =
-      this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress;
+      this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress || userFailsThreshold;
 
     const decimals = app.chain?.meta?.decimals
       ? app.chain.meta.decimals

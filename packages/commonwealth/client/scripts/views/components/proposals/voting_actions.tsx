@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/proposals/voting_actions.scss';
 
@@ -52,7 +53,7 @@ import {
 
 type CannotVoteAttrs = { label: string };
 
-class CannotVote implements m.ClassComponent<CannotVoteAttrs> {
+class CannotVote extends ClassComponent<CannotVoteAttrs> {
   view(vnode: m.Vnode<CannotVoteAttrs>) {
     return (
       <div class="CannotVote">
@@ -69,7 +70,7 @@ type VotingActionsAttrs = {
   votingModalOpen: boolean;
 };
 
-export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
+export class VotingActions extends ClassComponent<VotingActionsAttrs> {
   private amount: number;
   private conviction: number;
 
@@ -489,7 +490,7 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
             <MolochCancelButton
               molochMember={user}
               onModalClose={onModalClose}
-              proposal={proposal}
+              proposal={proposal as MolochProposal}
               votingModalOpen={votingModalOpen}
             />
           </div>
@@ -502,7 +503,7 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
           {yesButton}
           <CompoundCancelButton
             onModalClose={onModalClose}
-            proposal={proposal}
+            proposal={proposal as CompoundProposal}
             votingModalOpen={votingModalOpen}
           />
         </div>
@@ -515,7 +516,7 @@ export class VotingActions implements m.ClassComponent<VotingActionsAttrs> {
           {abstainButton}
           <CompoundCancelButton
             onModalClose={onModalClose}
-            proposal={proposal}
+            proposal={proposal as CompoundProposal}
             votingModalOpen={votingModalOpen}
           />
         </div>

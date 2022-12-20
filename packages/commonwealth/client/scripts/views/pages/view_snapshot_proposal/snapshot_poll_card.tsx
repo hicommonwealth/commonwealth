@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/poll_card.scss';
 
@@ -21,9 +22,7 @@ export type SnapshotPollCardAttrs = Omit<
   'multiSelect' | 'onResultsClick'
 >;
 
-export class SnapshotPollCard
-  implements m.ClassComponent<SnapshotPollCardAttrs>
-{
+export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
   private hasVoted: boolean;
   private selectedOptions: Array<string>;
   private totalVoteCount: number;
@@ -41,7 +40,7 @@ export class SnapshotPollCard
     this.localVoteInformation = vnode.attrs.voteInformation;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SnapshotPollCardAttrs>) {
     const {
       disableVoteButton = false,
       incrementalVoteCast,

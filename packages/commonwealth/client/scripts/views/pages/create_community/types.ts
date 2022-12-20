@@ -1,3 +1,4 @@
+import { ChainNetwork } from 'common-common/src/types';
 import { ValidationTextAttrs } from '../../components/component_kit/cw_validation_text';
 
 export type ChainFormIdFields = {
@@ -37,3 +38,12 @@ export type EthFormFields = {
   ethChainId?: string | number;
   nodeUrl?: string;
 };
+
+export type EthDaoFormFields = {
+  network: ChainNetwork.Ethereum;
+  tokenName: string;
+};
+
+export type CreateFactoryEthDaoForm = ChainFormFields &
+  EthFormFields &
+  EthDaoFormFields;

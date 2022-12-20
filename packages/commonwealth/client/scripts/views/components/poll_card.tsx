@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/poll_card.scss';
 
@@ -30,11 +31,11 @@ export function buildVoteDirectionString(voteOption: string) {
 export type PollOptionAttrs = {
   multiSelect: boolean;
   voteInformation: Array<VoteInformation>;
-  selectedOptions: Array<string>;
-  disableVoteOptions: boolean;
+  selectedOptions?: Array<string>;
+  disableVoteOptions?: boolean;
 };
 
-export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
+export class PollOptions extends ClassComponent<PollOptionAttrs> {
   view(vnode: m.Vnode<PollOptionAttrs>) {
     const {
       multiSelect,
@@ -49,6 +50,7 @@ export class PollOptions implements m.ClassComponent<PollOptionAttrs> {
           ? voteInformation.map((option) => (
               <CWCheckbox
                 checked={false}
+                value=""
                 label={option.label}
                 onchange={() => {
                   // TODO: Build this out when multiple vote options are introduced.
@@ -82,13 +84,13 @@ export type CastVoteAttrs = {
   timeRemaining: string;
   tooltipErrorMessage: string;
   onVoteCast: (
-    selectedOption: string,
-    handleVoteCast: () => void,
+    selectedOption?: string,
+    handleVoteCast?: () => void,
     isSelected?: boolean
   ) => void;
 };
 
-export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
+export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
   view(vnode: m.Vnode<CastVoteAttrs>) {
     const {
       disableVoteButton,
@@ -108,18 +110,18 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
             trigger={
               <CWButton
                 label="Vote"
-                buttonType="mini"
+                buttonType="mini-black"
                 disabled={disableVoteButton}
-                onclick={onVoteCast}
+                onclick={() => onVoteCast()}
               />
             }
           />
         ) : (
           <CWButton
             label="Vote"
-            buttonType="mini"
+            buttonType="mini-black"
             disabled={disableVoteButton}
-            onclick={onVoteCast}
+            onclick={() => onVoteCast()}
           />
         )}
         <CWText className="time-remaining-text" type="caption">
@@ -133,11 +135,11 @@ export class CastVoteSection implements m.ClassComponent<CastVoteAttrs> {
 export type VoteDisplayAttrs = {
   timeRemaining: string;
   voteDirectionString: string;
-  pollEnded: string;
+  pollEnded: boolean;
   voteInformation: Array<VoteInformation>;
 };
 
-export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
+export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
   view(vnode: m.Vnode<VoteDisplayAttrs>) {
     const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
       vnode.attrs;
@@ -183,9 +185,9 @@ export class VoteDisplay implements m.ClassComponent<VoteDisplayAttrs> {
 }
 
 export type ResultsSectionAttrs = {
-  resultString: string;
+  resultString?: string;
   onResultsClick: (e: Event) => any;
-  tokenSymbol: string;
+  tokenSymbol?: string;
   totalVoteCount: number;
   voteInformation: Array<VoteInformation>;
   pollEnded: boolean;
@@ -193,7 +195,7 @@ export type ResultsSectionAttrs = {
   isPreview: boolean;
 };
 
-export class ResultsSection implements m.ClassComponent<ResultsSectionAttrs> {
+export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
   view(vnode: m.Vnode<ResultsSectionAttrs>) {
     const {
       resultString,
@@ -307,7 +309,7 @@ export type PollCardAttrs = PollOptionAttrs &
     proposalTitle?: string;
   };
 
-export class PollCard implements m.ClassComponent<PollCardAttrs> {
+export class PollCard extends ClassComponent<PollCardAttrs> {
   private hasVoted: boolean;
   private selectedOptions: Array<string>;
   private totalVoteCount: number;

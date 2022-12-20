@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {
@@ -52,7 +52,7 @@ const updateThreadLinkedChainEntities = async (
       : [];
 
   // remove any chain entities no longer linked to this thread
-  const existingChainEntities = await models.ChainEntity.findAll({
+  const existingChainEntities = await models.ChainEntityMeta.findAll({
     where: { thread_id },
   });
   const entitiesToClear = existingChainEntities.filter(
@@ -68,7 +68,7 @@ const updateThreadLinkedChainEntities = async (
   const entityIdsToSet = chain_entity_ids.filter(
     (id) => existingEntityIds.indexOf(id) === -1
   );
-  const entitiesToSet = await models.ChainEntity.findAll({
+  const entitiesToSet = await models.ChainEntityMeta.findAll({
     where: {
       id: { [Op.in]: entityIdsToSet },
     },

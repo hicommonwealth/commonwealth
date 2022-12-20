@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
 import { ListItem, Select } from 'construct-ui';
@@ -104,7 +105,7 @@ const getDiscussionResult = (thread, searchTerm) => {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
-      m.route.set(`/${chain}/proposal/discussion/${proposalId}`);
+      m.route.set(`/${chain}/discussion/${proposalId}`);
     },
     label: (
       <a class="search-results-item">
@@ -214,7 +215,7 @@ type SearchPageAttrs = {
   results: any[];
 };
 
-class SearchPage implements m.Component<SearchPageAttrs> {
+class SearchPage extends ClassComponent<SearchPageAttrs> {
   private activeTab: SearchScope;
   private errorText: string;
   private pageCount: number;

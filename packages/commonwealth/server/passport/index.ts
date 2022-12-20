@@ -8,6 +8,7 @@ import { JWT_SECRET } from '../config';
 import { useSocialAccountAuth } from './socialAccount';
 import { useMagicAuth } from './magic';
 import '../types';
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -37,6 +37,7 @@
 // })
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import app from 'state';
@@ -89,7 +90,7 @@ async function onclickoverlay(spec, confirmExit, exitCallback) {
   }
 }
 
-export class AppModals implements m.ClassComponent {
+export class AppModals extends ClassComponent {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   escapeHandler: (e: any) => void; // TODO Gabe 2/2/22 - What kind of event?
 

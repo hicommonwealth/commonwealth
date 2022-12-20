@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
 
@@ -17,26 +18,16 @@ import { ExternalLinksModule } from './external_links_module';
 import { ChatSection } from '../chat/chat_section';
 import { AdminSection } from './admin_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
-import { getClasses } from '../component_kit/helpers';
-import { CWCommunityAvatar } from '../component_kit/cw_community_avatar';
-import { CWText } from '../component_kit/cw_text';
+import { ExploreCommunitiesSidebar } from './explore_sidebar';
+import { CreateContentSidebar } from '../../menus/create_content_menu';
 
-type SidebarAttrs = {
-  isSidebarToggleable?: boolean;
-  isSidebarToggled?: boolean;
-};
+export type SidebarMenuName =
+  | 'default'
+  | 'createContent'
+  | 'exploreCommunities';
 
-export class Sidebar implements m.ClassComponent<SidebarAttrs> {
-  view(vnode: m.Vnode<SidebarAttrs>) {
-    const { isSidebarToggleable, isSidebarToggled } = vnode.attrs;
-    const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
-    const contractsViewable = app.config.chains.getById(
-      app.activeChainId()
-    )?.contractsViewable;
-    const isContractsViewable =
-      (contractsViewable === ContractsViewable.AdminOnly && isAdmin) ||
-      contractsViewable === ContractsViewable.AllUsers;
-
+export class Sidebar extends ClassComponent {
+  view() {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
     });
@@ -52,53 +43,41 @@ export class Sidebar implements m.ClassComponent<SidebarAttrs> {
         Action.VIEW_CHAT_CHANNELS
       );
 
-    const showQuickSwitcher = isSidebarToggleable ? isSidebarToggled : true;
-
     return (
       <div class="Sidebar">
-        {app.chain && isSidebarToggleable && isSidebarToggled && (
-          <div class="CommunityHeader">
-            <div class="inner-container">
-              <CWCommunityAvatar size="large" community={app.chain.meta} />
-              <CWText type="h5" fontStyle="medium">
-                {app.chain.meta.name}
-              </CWText>
-            </div>
+        {app.sidebarMenu === 'default' && (
+          <div class="sidebar-default-menu">
+            <SidebarQuickSwitcher />
+            {app.chain && (
+              <div class="community-menu">
+                <AdminSection />
+                <DiscussionSection />
+                <GovernanceSection />
+                {app.socket && !hideChat && <ChatSection />}
+                <ExternalLinksModule />
+                <div class="buttons-container">
+                  {app.isLoggedIn() && app.chain && (
+                    <div class="subscription-button">
+                      <SubscriptionButton />
+                    </div>
+                  )}
+                  {app.isCustomDomain() && (
+                    <div
+                      class="powered-by"
+                      onclick={() => {
+                        window.open('https://commonwealth.im/');
+                      }}
+                    />
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
-        <div class="quickswitcher-and-sidebar-inner">
-          {showQuickSwitcher && <SidebarQuickSwitcher />}
-          {app.chain && (
-            <div
-              class={getClasses<{
-                isSidebarToggleable: boolean;
-                isSidebarToggled: boolean;
-              }>({ isSidebarToggleable, isSidebarToggled }, 'sidebar-inner')}
-            >
-              <AdminSection />
-              <DiscussionSection />
-              <GovernanceSection />
-              {isContractsViewable && <ContractSection />}
-              {app.socket && !hideChat && <ChatSection />}
-              <ExternalLinksModule />
-              <div class="buttons-container">
-                {app.isLoggedIn() && app.chain && (
-                  <div class="subscription-button">
-                    <SubscriptionButton />
-                  </div>
-                )}
-                {app.isCustomDomain() && (
-                  <div
-                    class="powered-by"
-                    onclick={() => {
-                      window.open('https://commonwealth.im/');
-                    }}
-                  />
-                )}
-              </div>
-            </div>
-          )}
-        </div>
+        {app.sidebarMenu === 'createContent' && <CreateContentSidebar />}
+        {app.sidebarMenu === 'exploreCommunities' && (
+          <ExploreCommunitiesSidebar />
+        )}
       </div>
     );
   }

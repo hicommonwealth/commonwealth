@@ -2,11 +2,10 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { findOneRole } from '../util/roles';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import validateChain from '../middleware/validateChain';
 import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -33,8 +32,7 @@ const addEditors = async (
   }
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+  const author = req.address;
 
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -148,7 +146,6 @@ const addEditors = async (
           chain: thread.chain,
           body: thread.body,
         },
-        req.wss,
         [author.address]
       );
     });

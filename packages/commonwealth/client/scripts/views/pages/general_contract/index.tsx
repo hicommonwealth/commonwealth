@@ -4,7 +4,8 @@ import 'pages/general_contract/index.scss';
 import app from 'state';
 import { Contract } from 'models';
 import m from 'mithril';
-import { Spinner } from 'construct-ui';
+import ClassComponent from 'class_component';
+
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
 import { CWText } from 'views/components/component_kit/cw_text';
@@ -19,6 +20,7 @@ import {
   processAbiInputsToDataTypes,
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
+import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -33,7 +35,7 @@ type CreateContractState = ChainFormState & {
   form: CreateContractForm;
 };
 class GeneralContractPage
-  implements m.ClassComponent<{ contractAddress?: string }>
+  extends ClassComponent<{ contractAddress?: string }>
 {
   generalContractsController: GeneralContractsController;
   private state: CreateContractState = {
@@ -60,27 +62,17 @@ class GeneralContractPage
     };
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
-      const contract = app.contracts.getByAddress(contractAddress);
-      this.state.loading = true;
-      let tx: string | TransactionReceipt;
-
       try {
-
+        this.state.loading = true;
         // initialize daoFactory Controller
         this.generalContractsController = new GeneralContractsController(
-          contract
+          contractAddress
         );
 
         // handle processing the forms inputs into their proper data types
-        tx = await this.generalContractsController.callContractFunction(
+        const result: any[] = await this.generalContractsController.callContractFunction(
           fn,
           this.state.form.functionNameToFunctionInputArgs
-        );
-        console.log('tx is ', tx);
-
-        const result = await this.generalContractsController.decodeTransactionData(
-          fn,
-          tx
         );
 
         this.state.functionNameToFunctionOutput.set(fn.name, result);
@@ -190,7 +182,7 @@ class GeneralContractPage
                             <CWText>{output.name}</CWText>
                           </div>
                           <div>
-                            {this.state.loading && <Spinner active />}
+                            {this.state.loading && <CWSpinner />}
                             <CWText>
                               {fnOutputArray && fnOutputArray[i].toString()
                                 ? fnOutputArray[i].toString()

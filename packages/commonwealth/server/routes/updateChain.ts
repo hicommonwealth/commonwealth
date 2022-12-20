@@ -7,7 +7,7 @@ import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../models';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -76,6 +76,7 @@ const updateChain = async (
     element,
     telegram,
     github,
+    hide_projects,
     stages_enabled,
     custom_stages,
     custom_domain,
@@ -132,6 +133,7 @@ const updateChain = async (
   if (element) chain.element = element;
   if (telegram) chain.telegram = telegram;
   if (github) chain.github = github;
+  if (hide_projects) chain.hide_projects = hide_projects;
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;

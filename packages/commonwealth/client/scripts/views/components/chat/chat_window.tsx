@@ -2,6 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -40,7 +41,7 @@ type ChatWindowAttrs = {
   channel_id: string;
 };
 
-export class ChatWindow implements m.Component<ChatWindowAttrs> {
+export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
   private onIncomingMessage: (any: any) => void;
   private scrollToBottom: () => void;
   private shouldScroll: boolean;
