@@ -57,7 +57,7 @@ const getSearchPreview = async (searchQuery: SearchQuery, state) => {
 };
 
 export class SearchBar extends ClassComponent {
-  private isInputFocused: boolean;
+  private showDropdown: boolean;
   private searchResults: Record<string, Array<any>>;
   private searchQuery: SearchQuery;
   private searchTerm: Lowercase<string>;
@@ -123,11 +123,11 @@ export class SearchBar extends ClassComponent {
             value={this.searchTerm}
             autocomplete="off"
             onfocus={() => {
-              this.isInputFocused = true;
+              this.showDropdown = true;
             }}
             onblur={() => {
               setTimeout(() => {
-                this.isInputFocused = false;
+                this.showDropdown = false;
                 m.redraw();
               }, 500); // hack to prevent the dropdown closing too quickly on click
             }}
@@ -154,7 +154,7 @@ export class SearchBar extends ClassComponent {
               />
             </div>
           )}
-          {this.isInputFocused && this.searchResults && (
+          {this.searchResults && this.showDropdown && (
             <div class="search-results-dropdown">
               {Object.keys(this.searchResults).length > 0 ? (
                 <div class="previews-section">
