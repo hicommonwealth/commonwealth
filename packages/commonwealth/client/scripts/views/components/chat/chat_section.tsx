@@ -1,6 +1,7 @@
 /* @jsx m */
-
 import m from 'mithril';
+
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';

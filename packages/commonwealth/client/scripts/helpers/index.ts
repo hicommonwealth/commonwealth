@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import m, { RouteOptions } from 'mithril';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
@@ -95,7 +94,7 @@ export function link(
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
       if (beforeRouteSet) beforeRouteSet();
-      const routeArgs: [string, any?, RouteOptions?] =
+      const routeArgs: [string, any?, any?] =
         window.location.href.split('?')[0] === target.split('?')[0]
           ? [target, {}, { replace: true }]
           : [target];

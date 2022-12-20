@@ -1,7 +1,7 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import _ from 'lodash';
 import { link } from 'helpers';

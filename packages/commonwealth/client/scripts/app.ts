@@ -13,7 +13,7 @@ import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, rootRender } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
 
@@ -421,7 +421,7 @@ export async function initNewTokenChain(address: string) {
   });
   if (response.status !== 'Success') {
     // TODO: better custom 404
-    m.route.set('/404');
+    setRoute('/404');
   }
   // TODO: check if this is valid
   const { chain, node } = response.result;
@@ -434,6 +434,7 @@ export async function initNewTokenChain(address: string) {
   await selectChain(chainInfo);
 }
 
+// TODO: fix this vs mithrilInterop
 // set up route navigation
 m.route.prefix = '';
 const _updateRoute = m.route.set;
@@ -462,7 +463,7 @@ export const navigateToSubpage = (...args) => {
     args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   app.sidebarMenu = 'default';
-  m.route.set.apply(this, args);
+  setRoute.apply(this, args);
 };
 
 /* Uncomment for redraw instrumentation
@@ -538,7 +539,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     const redirectRoute = (path: string | Function) => ({
       render: (vnode) => {
-        m.route.set(
+        setRoute(
           typeof path === 'string' ? path : path(vnode.attrs),
           {},
           { replace: true }
@@ -1070,9 +1071,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     const script = document.createElement('noscript');
     // eslint-disable-next-line max-len
-    m.render(
+    rootRender(
       script,
-      m.trust(
+      render.trust(
         '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'
       )
     );
@@ -1116,7 +1117,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         }
       } else {
       }
-      m.route.set(getRouteParam('path'), {}, { replace: true });
+      setRoute(getRouteParam('path'), {}, { replace: true });
     } else if (
       localStorage &&
       localStorage.getItem &&
@@ -1128,7 +1129,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           localStorage.getItem('githubPostAuthRedirect')
         );
         if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-          m.route.set(postAuth.path, {}, { replace: true });
+          setRoute(postAuth.path, {}, { replace: true });
         }
         localStorage.removeItem('githubPostAuthRedirect');
       } catch (e) {
@@ -1144,7 +1145,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           localStorage.getItem('discordPostAuthRedirect')
         );
         if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-          m.route.set(postAuth.path, {}, { replace: true });
+          setRoute(postAuth.path, {}, { replace: true });
         }
         localStorage.removeItem('discordPostAuthRedirect');
       } catch (e) {

@@ -1,7 +1,8 @@
 /* @jsx m */
-
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, rootMount } from 'mithrilInterop';
 
 export class CWPortal extends ClassComponent {
   private rootElement: HTMLElement;
@@ -14,14 +15,14 @@ export class CWPortal extends ClassComponent {
     container.appendChild(rootElement);
     this.rootElement = rootElement;
     this.content = { view: () => vnode.children };
-    m.mount(this.rootElement, this.content);
+    rootMount(this.rootElement, this.content);
   }
 
   onremove() {
     const container = document.body;
 
     if (container.contains(this.rootElement)) {
-      m.mount(this.rootElement, null);
+      rootMount(this.rootElement, null);
       container.removeChild(this.rootElement);
     }
   }

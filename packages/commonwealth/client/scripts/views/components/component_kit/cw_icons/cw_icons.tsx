@@ -1,9 +1,10 @@
 /* @jsx m */
+import m from 'mithril';
 
 /* eslint-disable max-classes-per-file */
 /* eslint-disable max-len */
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';

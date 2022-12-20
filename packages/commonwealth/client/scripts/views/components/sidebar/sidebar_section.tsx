@@ -1,8 +1,9 @@
 /* @jsx m */
+import m from 'mithril';
 
 import 'components/sidebar/sidebar_section.scss';
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';

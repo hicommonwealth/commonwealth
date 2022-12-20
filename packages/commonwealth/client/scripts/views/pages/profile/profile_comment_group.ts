@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 import _ from 'lodash';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';

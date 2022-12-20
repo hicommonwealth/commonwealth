@@ -1,7 +1,8 @@
 /* @jsx m */
+import m from 'mithril';
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';

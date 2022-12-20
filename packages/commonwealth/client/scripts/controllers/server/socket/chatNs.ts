@@ -3,7 +3,7 @@ import app from 'state';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import {io, Socket} from 'socket.io-client';
 import _ from 'lodash';
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 export enum ChatErrors {

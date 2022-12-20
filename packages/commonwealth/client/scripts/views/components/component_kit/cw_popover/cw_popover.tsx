@@ -1,7 +1,8 @@
 /* @jsx m */
-
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, Children } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
@@ -29,7 +30,7 @@ export type SharedPopoverAttrs = {
 };
 
 type PopoverAttrs = {
-  content: m.Children;
+  content: Children;
   onToggle?: (isOpen: boolean) => void;
 } & SharedPopoverAttrs;
 

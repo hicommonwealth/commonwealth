@@ -36,14 +36,14 @@ export function setRoute(route: string, data?: any, options?: m.RouteOptions) {
 
 export function getRouteParam(name?: string) {
   if (name) {
-    return getRouteParam(name);
+    return m.route.param(name);
   } else {
-    return getRouteParam();
+    return m.route.param();
   }
 }
 
 export function getRoute() {
-  return getRoute();
+  return m.route.get();
 }
 
 export function redraw(sync = false) {
@@ -52,4 +52,16 @@ export function redraw(sync = false) {
   } else {
     m.redraw.sync()
   }
+}
+
+export function parsePathname(url: string): { path: string; params: Params } {
+  return m.parsePathname(url);
+}
+
+export function rootRender(el: Element, vnodes: Children): void {
+  return m.render(el, vnodes);
+}
+
+export function rootMount(element: Element, component?: any | null): void {
+  m.mount(element, component);
 }

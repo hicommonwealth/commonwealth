@@ -2,7 +2,7 @@
 
 // import 'modals/ragequit_modal.scss';
 
-// import m from 'mithril';
+// 
 // import $ from 'jquery';
 // import { Button, Input, FormLabel, FormGroup } from 'construct-ui';
 

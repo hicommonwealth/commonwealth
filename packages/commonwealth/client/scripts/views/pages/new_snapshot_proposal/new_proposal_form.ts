@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import 'pages/new_proposal_page.scss';
 
-import m from 'mithril';
+
 import {
   Input,
   Form,
@@ -14,7 +14,7 @@ import {
   Icons,
 } from 'construct-ui';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, parsePathname } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -170,7 +170,7 @@ const NewProposalForm: Component<
       render('.topic-loading-spinner-wrap', [render(CWSpinner, { size: 'large' })]);
     if (!app.chain) return getLoadingPage();
 
-    const pathVars = m.parsePathname(window.location.href);
+    const pathVars = parsePathname(window.location.href);
 
     if (!app.snapshot.initialized) {
       app.snapshot.init(vnode.attrs.snapshotId).then(() => redraw());

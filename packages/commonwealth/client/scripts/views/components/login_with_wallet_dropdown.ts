@@ -1,6 +1,6 @@
 import 'components/login_with_wallet_dropdown.scss';
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem } from 'construct-ui';

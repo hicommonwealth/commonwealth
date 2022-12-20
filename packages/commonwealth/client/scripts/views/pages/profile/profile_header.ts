@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import m from 'mithril';
+
 import { Button } from 'construct-ui';
 
 import { initChain } from 'app';

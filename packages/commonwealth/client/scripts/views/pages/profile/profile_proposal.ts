@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 import lity from 'lity';
 import { slugify } from 'utils';
 

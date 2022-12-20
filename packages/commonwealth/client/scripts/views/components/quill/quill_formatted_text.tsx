@@ -1,7 +1,8 @@
 /* @jsx m */
-
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, rootRender } from 'mithrilInterop';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
@@ -78,7 +79,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
 
         const root = document.createElement('div');
 
-        m.render(root, vnodes);
+        rootRender(root, vnodes);
 
         const textToHighlight = root.innerText
           .replace(/\n/g, ' ')

@@ -3,7 +3,7 @@
 // import 'modals/view_voters_modal.scss';
 
 // import $ from 'jquery';
-// import m from 'mithril';
+// 
 
 // import { navigateToSubpage } from 'app';
 

@@ -2,7 +2,7 @@
 
 // import 'modals/update_delegate_modal.scss';
 
-// import m from 'mithril';
+// 
 // import $ from 'jquery';
 // import { FormLabel, FormGroup, Input, Button } from 'construct-ui';
 

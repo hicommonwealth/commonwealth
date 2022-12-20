@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import 'modals/select_address_modal.scss';
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';

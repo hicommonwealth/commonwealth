@@ -2,7 +2,7 @@
 
 import 'pages/landing/privacyAndTerms.scss';
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { renderMultilineText } from 'helpers';
 import HeaderLandingPage from './landing_page_header';

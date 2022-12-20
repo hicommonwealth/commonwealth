@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import 'pages/notifications_page.scss';
 
-import m from 'mithril';
+
 import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';

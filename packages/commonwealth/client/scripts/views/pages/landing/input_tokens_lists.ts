@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import InputTokenOptionComponent from './input_token_option';
 import { Chain, Token } from './index';

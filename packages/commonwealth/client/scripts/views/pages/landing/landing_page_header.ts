@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';

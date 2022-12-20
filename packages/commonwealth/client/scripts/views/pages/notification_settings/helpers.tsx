@@ -1,7 +1,8 @@
 /* eslint-disable max-classes-per-file */
 /* @jsx m */
+import m from 'mithril';
 
-// import m from 'mithril';
+// 
 // import $ from 'jquery';
 // import _ from 'lodash';
 // import moment from 'moment';

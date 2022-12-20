@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 // Logged Out Homepage View
 import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';

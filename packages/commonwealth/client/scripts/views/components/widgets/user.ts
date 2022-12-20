@@ -1,7 +1,7 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
 
-import m from 'mithril';
+
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Popover } from 'construct-ui';

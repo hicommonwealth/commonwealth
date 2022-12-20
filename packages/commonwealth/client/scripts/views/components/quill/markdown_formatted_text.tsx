@@ -1,7 +1,8 @@
 /* @jsx m */
+import m from 'mithril';
 /* eslint-disable no-useless-escape */
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
@@ -97,7 +98,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
           ADD_ATTR: ['target'],
         });
 
-        const vnodes = m.trust(sanitized);
+        const vnodes = render.trust(sanitized);
 
         const root = document.createElement('div');
 
@@ -174,7 +175,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
             ADD_ATTR: ['target'],
           });
 
-      const results = m.trust(sanitized);
+      const results = render.trust(sanitized);
 
       return (
         <>

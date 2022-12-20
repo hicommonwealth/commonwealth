@@ -1,7 +1,8 @@
 /* @jsx m */
+import m from 'mithril';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import m from 'mithril'; // required for getStatusText
+ // required for getStatusText
 import moment from 'moment';
 import { AaveTypes, CompoundTypes } from 'chain-events/src';
 

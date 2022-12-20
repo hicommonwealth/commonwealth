@@ -1,6 +1,7 @@
 /* @jsx m */
-
 import m from 'mithril';
+
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import 'components/component_kit/cw_thread_vote_button.scss';

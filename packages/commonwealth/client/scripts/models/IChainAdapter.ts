@@ -3,7 +3,7 @@ import { ApiStatus, IApp, LoginState } from 'state';
 import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { ChainBase } from 'common-common/src/types';
 

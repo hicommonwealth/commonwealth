@@ -1,5 +1,5 @@
 import './commonwealth.scss';
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import GeometricPatternSection from './geometric_pattern_section';

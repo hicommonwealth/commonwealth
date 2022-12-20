@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 import { WalletAccount, WalletConnection } from 'near-api-js';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 import BN from 'bn.js';

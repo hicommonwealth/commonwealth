@@ -1,6 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import {NotificationStore} from 'stores';

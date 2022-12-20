@@ -1,6 +1,6 @@
 import { ApiStatus, IApp } from 'state';
 import Web3 from 'web3';
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import moment from 'moment';
 

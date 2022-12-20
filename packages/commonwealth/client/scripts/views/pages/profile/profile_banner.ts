@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 import app from 'state';
 import { Button } from 'construct-ui';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';

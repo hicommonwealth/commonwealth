@@ -1,6 +1,6 @@
 import 'pages/commonwealth/projects.scss';
 
-import m from 'mithril';
+
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import moment from 'moment';
 import { Card, Button } from 'construct-ui';

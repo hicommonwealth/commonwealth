@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 
 import app from 'state';
 import { pluralize } from 'helpers';

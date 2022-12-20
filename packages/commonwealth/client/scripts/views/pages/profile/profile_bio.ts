@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import m from 'mithril';
+
 import _ from 'lodash';
 import { Account } from 'models';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
