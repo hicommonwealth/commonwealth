@@ -1,10 +1,14 @@
+/* @jsx m */
 /* eslint-disable max-len */
 
-import 'pages/landing/privacyAndTerms.scss';
-
 import m from 'mithril';
+import ClassComponent from 'class_component';
+
+import 'pages/privacy_and_terms.scss';
+
 import { renderMultilineText } from 'helpers';
-import HeaderLandingPage from './landing_page_header';
+import Sublayout from '../sublayout';
+import { CWText } from '../components/component_kit/cw_text';
 
 const PrivacyPolicy = `
 Last updated: January 14, 2019
@@ -113,20 +117,19 @@ CONTACT US
 If you have any questions about this Privacy Statement, please contact us at: hello@commonwealth.im.
 `;
 
-const PrivacyPage: m.Component<{}> = {
-  oncreate: (vnode) => {},
-  view: (vnode) => {
-    return m('.PrivacyPage', [
-      m(HeaderLandingPage, {
-        scrollHeader: false,
-        navs: [{ text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' }],
-      }),
-      m('.forum-container', [
-        m('h1.page-title', 'Privacy Policy'),
-        renderMultilineText(PrivacyPolicy),
-      ]),
-    ]);
-  },
-};
+class PrivacyPage extends ClassComponent {
+  view() {
+    return (
+      <Sublayout>
+        <div class="PrivacyPage">
+          <div class="forum-container">
+            <CWText type="h3">Privacy Policy</CWText>
+            {renderMultilineText(PrivacyPolicy)}
+          </div>
+        </div>
+      </Sublayout>
+    );
+  }
+}
 
 export default PrivacyPage;
