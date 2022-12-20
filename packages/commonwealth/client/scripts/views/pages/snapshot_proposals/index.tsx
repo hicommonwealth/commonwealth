@@ -6,7 +6,6 @@ import moment from 'moment';
 import { Button } from 'construct-ui';
 
 import 'pages/snapshot_proposals.scss';
-import 'pages/discussions/discussion_filter_bar.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
@@ -17,6 +16,7 @@ import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
 import { CardsCollection } from '../../components/cards_collection';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
+import { CWText } from '../../components/component_kit/cw_text';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -35,7 +35,7 @@ type SnapshotProposalStagesBarAttrs = {
 class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
   view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
     return (
-      <div class="DiscussionFilterBar">
+      <div class="SnapshotProposalStagesBar">
         {Object.values(SnapshotProposalFilter).map(
           (option: SnapshotProposalFilter) =>
             m(Button, {
@@ -128,24 +128,20 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
               selected={selectedFilter}
               onChangeFilter={onChangeFilter}
             />
-            <CardsCollection
-              content={
-                <>
-                  {proposals.length > 0 ? (
-                    proposals.map((proposal) => (
-                      <SnapshotProposalCard
-                        snapshotId={snapshotId}
-                        proposal={proposal}
-                      />
-                    ))
-                  ) : (
-                    <div class="no-proposals">
-                      No {this.selectedFilter.toLowerCase()} proposals found.
-                    </div>
-                  )}
-                </>
-              }
-            />
+            {proposals.length > 0 ? (
+              <CardsCollection
+                content={proposals.map((proposal) => (
+                  <SnapshotProposalCard
+                    snapshotId={snapshotId}
+                    proposal={proposal}
+                  />
+                ))}
+              />
+            ) : (
+              <CWText className="no-proposals-text">
+                No {this.selectedFilter.toLowerCase()} proposals found.
+              </CWText>
+            )}
           </div>
         )}
       </Sublayout>

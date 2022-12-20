@@ -3,7 +3,7 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-import 'pages/snapshot/index.scss';
+// import 'pages/snapshot/index.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';
