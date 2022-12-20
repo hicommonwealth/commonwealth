@@ -1,0 +1,73 @@
+@import 'shared';
+
+.RecentThreadsHeader {
+  background-color: $white;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  // sticky header
+  // position: sticky;
+  // top: 0;
+  padding: 56px 0 16px;
+
+  @include medium {
+    padding: 40px 0 16px;
+  }
+
+  @include mediumSmall {
+    padding: 32px 0 16px;
+  }
+
+  @include smallInclusive {
+    padding: 24px 0 16px;
+  }
+
+  // .header-text.Text {
+  //   margin-bottom: 12px;
+  // }
+
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+
+    .count-and-button {
+      align-items: center;
+      display: flex;
+      gap: 16px;
+
+      .thread-count-text.Text {
+        color: $neutral-400;
+      }
+    }
+  }
+
+  .subheader-text.Text {
+    color: $neutral-600;
+    // margin-bottom: 32px;
+  }
+
+  .buttons-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    > .cui-button {
+      color: $neutral-800;
+      cursor: pointer;
+      max-width: 192px;
+      padding: 0 8px;
+
+      span {
+        font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &.active {
+        border-color: $neutral-800;
+      }
+    }
+  }
+}
