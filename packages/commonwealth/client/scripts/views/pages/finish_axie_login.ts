@@ -1,4 +1,5 @@
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import app from 'state';
 
@@ -42,27 +43,33 @@ const validate = async (
   }
 };
 
-const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
-  oninit: (vnode) => {
+class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
+  private state: IState = {
+    validating: false,
+    error: '',
+  };
+
+  public oninit() {
     // grab token
     // TODO: how to use state id?
     const token = m.route.param('token');
     const stateId = m.route.param('stateId');
     validate(token, stateId, 'axie-infinity').then((res) => {
       if (typeof res === 'string') {
-        vnode.state.error = res;
+        this.state.error = res;
         m.redraw();
       }
     });
-  },
-  view: (vnode) => {
+  }
+
+  public view() {
     console.log('finish axie login');
-    if (vnode.state.error) {
-      return m(ErrorPage, { title: 'Login Error', message: vnode.state.error });
+    if (this.state.error) {
+      return m(ErrorPage, { title: 'Login Error', message: this.state.error });
     } else {
       return m(PageLoading);
     }
-  },
-};
+  }
+}
 
 export default FinishAxieLogin;
