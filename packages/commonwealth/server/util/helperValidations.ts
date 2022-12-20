@@ -24,15 +24,6 @@ export const postReactionsValidation = [
   body('reactions.*.deleted_at').not().exists(),
 ];
 
-export const putCommunitiesValidation = [
-  body('communities').exists().isArray(),
-  body('communities.*.id').exists().isString().trim(),
-  body('communities.*.name').exists().isString().trim(),
-  body('communities.*.created_at').not().exists(),
-  body('communities.*.updated_at').not().exists(),
-  body('communities.*.deleted_at').not().exists(),
-];
-
 export const postProfilesValidation = [
   body('profiles').exists().isArray(),
   body('profiles.*.community_id').exists().isString().trim(),

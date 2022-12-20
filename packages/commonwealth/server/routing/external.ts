@@ -23,12 +23,12 @@ import {
   onlyIds, postProfilesValidation,
   postReactionsValidation, postRolesValidation, postRulesValidation, postTopicsValidation,
   putCommentsValidation,
-  putCommunitiesValidation,
 } from "../util/helperValidations";
 import { failure, success, TypedRequest, TypedResponse } from "../types";
 import { getTopics, getTopicsValidation } from "../routes/topics/getTopics";
 import { getRoles, getRolesValidation } from "../routes/roles/getRoles";
 import { getRules, getRulesValidation } from "../routes/rulesext/getRules";
+import { putCommunities, putCommunitiesValidation } from '../routes/communities/putCommunities';
 
 const deleteEntities = async (
   models: DB,
@@ -100,8 +100,7 @@ export function addExternalRoutes(
   router.delete('/reactions', onlyIds, deleteEntities.bind(this, models, (a) => models.Reaction.destroy(a)));
 
   router.get('/communities', getCommunitiesValidation, getCommunities.bind(this, models));
-  router.put('/communities', putCommunitiesValidation, addEntities.bind(this, 'chain', models,
-    (a) => models.Chain.bulkCreate(a), (req: TypedRequest<PutCommunitiesReq>) => req.body.communities));
+  router.put('/communities', putCommunitiesValidation, putCommunities.bind(this, models, tokenBalanceCache));
 
   router.get('/profiles', getProfilesValidation, getProfiles.bind(this, models));
   router.post('/profiles', postProfilesValidation, addEntities.bind(this, 'chain', models,

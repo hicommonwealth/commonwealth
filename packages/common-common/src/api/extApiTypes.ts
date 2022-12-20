@@ -65,7 +65,9 @@ export type GetCommunitiesReq = {
   page?: number;
 };
 
-export type PutCommunitiesReq = { communities: ChainAttributes[] };
+export type PutCommunitiesReq = { community: ChainAttributes, token: string, admin_addresses: string[] };
+
+export type PutCommunitiesResp = { url: string, error?: string };
 
 export type GetCommunitiesResp = { communities?: ChainAttributes[], count: number };
 
