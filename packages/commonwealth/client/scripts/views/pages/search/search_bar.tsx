@@ -17,6 +17,7 @@ import {
   SearchBarThreadPreviewRow,
 } from './search_bar_components';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWDivider } from '../../components/component_kit/cw_divider';
 
 // export const executeSearch = (query: SearchQuery) => {
 //   if (!query.searchTerm || !query.searchTerm.toString().trim()) {
@@ -123,39 +124,99 @@ export class SearchBar extends ClassComponent {
           {this.searchResults && (
             <div class="search-results-dropdown">
               {Object.keys(this.searchResults).length > 0 ? (
-                Object.entries(this.searchResults).map(([k, v]) => {
-                  if (k === SearchScope.Threads) {
-                    return v.map((res) => (
-                      <SearchBarThreadPreviewRow
-                        searchResult={res}
-                        searchTerm={this.searchQuery.searchTerm}
-                      />
-                    ));
-                  } else if (k === SearchScope.Replies) {
-                    return v.map((res) => (
-                      <SearchBarCommentPreviewRow
-                        searchResult={res}
-                        searchTerm={this.searchQuery.searchTerm}
-                      />
-                    ));
-                  } else if (k === SearchScope.Communities) {
-                    return v.map((res) => (
-                      <SearchBarCommunityPreviewRow searchResult={res} />
-                    ));
-                  } else {
-                    return v.map((res) => (
-                      <SearchBarMemberPreviewRow searchResult={res} />
-                    ));
-                  }
-                })
+                <div class="previews-section">
+                  {Object.entries(this.searchResults).map(([k, v]) => {
+                    if (k === SearchScope.Threads) {
+                      return (
+                        <div class="preview-section">
+                          <div class="section-header">
+                            <CWText
+                              type="caption"
+                              className="section-header-text"
+                            >
+                              Threads
+                            </CWText>
+                            <CWDivider />
+                          </div>
+                          {v.map((res) => (
+                            <SearchBarThreadPreviewRow
+                              searchResult={res}
+                              searchTerm={this.searchQuery.searchTerm}
+                            />
+                          ))}
+                        </div>
+                      );
+                    } else if (k === SearchScope.Replies) {
+                      return (
+                        <div class="preview-section">
+                          <div class="section-header">
+                            <CWText
+                              type="caption"
+                              className="section-header-text"
+                            >
+                              Comments
+                            </CWText>
+                            <CWDivider />
+                          </div>
+                          {v.map((res) => (
+                            <SearchBarCommentPreviewRow
+                              searchResult={res}
+                              searchTerm={this.searchQuery.searchTerm}
+                            />
+                          ))}
+                        </div>
+                      );
+                    } else if (k === SearchScope.Communities) {
+                      return (
+                        <div class="preview-section">
+                          <div class="section-header">
+                            <CWText
+                              type="caption"
+                              className="section-header-text"
+                            >
+                              Communities
+                            </CWText>
+                            <CWDivider />
+                          </div>
+                          {v.map((res) => (
+                            <SearchBarCommunityPreviewRow searchResult={res} />
+                          ))}
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div class="preview-section">
+                          <div class="section-header">
+                            <CWText
+                              type="caption"
+                              className="section-header-text"
+                            >
+                              Members
+                            </CWText>
+                            <CWDivider />
+                          </div>
+                          {v.map((res) => (
+                            <SearchBarMemberPreviewRow searchResult={res} />
+                          ))}
+                        </div>
+                      );
+                    }
+                  })}
+                </div>
               ) : (
                 <CWText type="caption">No Results</CWText>
               )}
               {historyList.length > 0 && (
-                <>
-                  <CWText type="caption">Search History</CWText>
+                <div class="history-section">
+                  <CWText
+                    type="caption"
+                    fontWeight="medium"
+                    className="search-history-header"
+                  >
+                    Search History
+                  </CWText>
                   {historyList}
-                </>
+                </div>
               )}
             </div>
           )}

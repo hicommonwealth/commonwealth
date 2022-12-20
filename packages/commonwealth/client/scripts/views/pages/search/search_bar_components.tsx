@@ -60,18 +60,25 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
           )
         }
       >
-        {m(User, {
-          user: new AddressInfo(
-            searchResult.address_id,
-            searchResult.address,
-            searchResult.address_chain,
-            null
-          ),
-        })}
-        <CWText>{moment(searchResult.created_at).fromNow()}</CWText>
-        <CWText>{searchResult.chain}</CWText>
-        <CWText>{decodeURIComponent(searchResult.title)}</CWText>
-        <CWText>
+        <div class="header-row">
+          {m(User, {
+            user: new AddressInfo(
+              searchResult.address_id,
+              searchResult.address,
+              searchResult.address_chain,
+              null
+            ),
+          })}
+          <CWText className="last-updated-text">•</CWText>
+          <CWText type="caption" className="last-updated-text">
+            {moment(searchResult.created_at).format('l')}
+          </CWText>
+          {/* <CWText type="caption">{searchResult.chain}</CWText> */}
+        </div>
+        <CWText type="b2" fontWeight="bold">
+          {decodeURIComponent(searchResult.title)}
+        </CWText>
+        <CWText type="caption" className="excerpt-text" fontWeight="medium">
           {renderQuillTextBody(searchResult.body, {
             hideFormatting: true,
             collapse: true,
@@ -98,23 +105,20 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
           );
         }}
       >
-        <CWText>{`Comment on ${decodeURIComponent(
-          searchResult.title
-        )}`}</CWText>
-        <CWText>{moment(searchResult.created_at).fromNow()}</CWText>
-        {m(User, {
-          user: new AddressInfo(
-            searchResult.address_id,
-            searchResult.address,
-            searchResult.address_chain,
-            null
-          ),
-        })}
-        {renderQuillTextBody(searchResult.text, {
-          hideFormatting: true,
-          collapse: true,
-          searchTerm,
-        })}
+        <CWText type="caption" className="last-updated-text">
+          {moment(searchResult.created_at).format('l')}
+        </CWText>
+        {/* <CWText type="caption">{searchResult.chain}</CWText> */}
+        <CWText type="b2" fontWeight="medium">
+          {decodeURIComponent(searchResult.title)}
+        </CWText>
+        <CWText type="caption" className="excerpt-text">
+          {renderQuillTextBody(searchResult.text, {
+            hideFormatting: true,
+            collapse: true,
+            searchTerm,
+          })}
+        </CWText>
       </div>
     );
   }
