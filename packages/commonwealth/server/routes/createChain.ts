@@ -59,7 +59,7 @@ export const Errors = {
   ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
 };
 
-type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
+export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
   id: string;
   node_url: string;
   substrate_spec: string;
@@ -73,6 +73,18 @@ type CreateChainResp = {
   role: RoleAttributes;
   admin_address: string;
 };
+
+export async function getFileSizeBytes(url: string) {
+  let fileSizeBytes = 0;
+  try {
+    const resp = await fetch(url, { headers: { Range: 'bytes=0-0' } });
+    fileSizeBytes = parseInt(resp.headers['Content-Range'], 10);
+  } catch (e) {
+    throw new AppError(Errors.ImageDoesntExist);
+  }
+
+  return fileSizeBytes;
+}
 
 const createChain = async (
   models: DB,
@@ -113,16 +125,9 @@ const createChain = async (
   if (!req.body.base || !req.body.base.trim()) {
     return next(new AppError(Errors.NoBase));
   }
-  // make sure icon_url provided exists and is below max size
-  try {
-    const resp = await fetch(req.body.icon_url, { headers: { Range: 'bytes=0-0' } });
-    const fileSizeBytes = resp.headers['Content-Range'];
 
-    if(parseInt(fileSizeBytes, 10) / 1024 > MAX_IMAGE_SIZE_KB) {
-      return next(new AppError(Errors.ImageTooLarge));
-    }
-  } catch (e) {
-    return next(new AppError(Errors.ImageDoesntExist));
+  if(await getFileSizeBytes(req.body.icon_url) / 1024 > MAX_IMAGE_SIZE_KB) {
+    throw new AppError(Errors.ImageTooLarge);
   }
 
   const existingBaseChain = await models.Chain.findOne({
