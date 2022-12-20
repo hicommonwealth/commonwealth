@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 
@@ -29,7 +29,7 @@ type LinkedProposalAttrs = {
 };
 
 class LinkedProposal extends ClassComponent<LinkedProposalAttrs> {
-  view(vnode: m.Vnode<LinkedProposalAttrs>) {
+  view(vnode: ResultNode<LinkedProposalAttrs>) {
     const { thread, chainEntity } = vnode.attrs;
 
     const slug = chainEntityTypeToProposalSlug(chainEntity.type);
@@ -64,7 +64,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
   private snapshotProposalsLoaded: boolean;
   private space: SnapshotSpace;
 
-  view(vnode: m.Vnode<LinkedProposalsCardAttrs>) {
+  view(vnode: ResultNode<LinkedProposalsCardAttrs>) {
     const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
 
     if (!this.initialized && thread.snapshotProposal?.length > 0) {

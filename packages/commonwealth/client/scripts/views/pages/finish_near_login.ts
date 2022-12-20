@@ -68,7 +68,7 @@ const redirectToNextPage = () => {
 };
 
 const validate = async (
-  vnode: m.Vnode<Record<string, never>, IState>,
+  vnode: ResultNode<Record<string, never>, IState>,
   wallet: WalletConnection
 ) => {
   try {

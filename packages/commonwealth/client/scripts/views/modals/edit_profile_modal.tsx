@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/edit_profile_modal.scss';
@@ -27,7 +27,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
   private name: string;
   private saving: boolean;
 
-  oninit(vnode: m.Vnode<EditProfileModalAttrs>) {
+  oninit(vnode: ResultNode<EditProfileModalAttrs>) {
     const { account } = vnode.attrs;
 
     this.avatarUrl = account.profile.avatarUrl;

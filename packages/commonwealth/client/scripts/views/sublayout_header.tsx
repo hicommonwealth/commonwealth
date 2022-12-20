@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'sublayout_header.scss';
 
@@ -23,7 +23,7 @@ type SublayoutHeaderAttrs = {
 };
 
 export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
-  view(vnode: m.Vnode<SublayoutHeaderAttrs>) {
+  view(vnode: ResultNode<SublayoutHeaderAttrs>) {
     const { hideSearch, onMobile } = vnode.attrs;
 
     return (

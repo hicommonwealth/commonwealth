@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { Icons, MenuItem, PopoverMenu } from 'construct-ui';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
@@ -22,7 +22,7 @@ type UserDashboardRowBottomAttrs = {
 };
 
 export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBottomAttrs> {
-  view(vnode: m.Vnode<UserDashboardRowBottomAttrs>) {
+  view(vnode: ResultNode<UserDashboardRowBottomAttrs>) {
     const { path, threadId, viewCount, likeCount, commentCount } = vnode.attrs;
 
     const adjustedId = `discussion_${threadId}`;

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_tag.scss';
 
@@ -26,7 +26,7 @@ export type TagAttrs = {
 };
 
 export class CWTag extends ClassComponent<TagAttrs> {
-  view(vnode: m.Vnode<TagAttrs>) {
+  view(vnode: ResultNode<TagAttrs>) {
     const { iconName, label, type } = vnode.attrs;
 
     return (

@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'modals/bounty_modals.scss';
 
@@ -24,7 +24,7 @@ type BountyModalAttrs = {
 export class ApproveBountyModal extends ClassComponent<BountyModalAttrs> {
   private approvals: number;
 
-  view(vnode: m.Vnode<BountyModalAttrs>) {
+  view(vnode: ResultNode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
 
     return (
@@ -82,7 +82,7 @@ export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
   private curator: string;
   private fee: number;
 
-  view(vnode: m.Vnode<BountyModalAttrs>) {
+  view(vnode: ResultNode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
     const { curator, fee, approvals } = this;
     const feeCoins = app.chain.chain.coins(fee, true);
@@ -160,7 +160,7 @@ export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
 export class AwardBountyModal extends ClassComponent<BountyModalAttrs> {
   private recipient: string;
 
-  view(vnode: m.Vnode<BountyModalAttrs>) {
+  view(vnode: ResultNode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
     const { recipient } = this;
 
@@ -216,7 +216,7 @@ export class AwardBountyModal extends ClassComponent<BountyModalAttrs> {
 export class ExtendExpiryModal extends ClassComponent<BountyModalAttrs> {
   private remark: string;
 
-  view(vnode: m.Vnode<BountyModalAttrs>) {
+  view(vnode: ResultNode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
     const { remark } = this;
 

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -18,11 +18,11 @@ import { CWContentPageCard } from '../../components/component_kit/cw_content_pag
 
 type SnapshotInfoRowAttrs = {
   label: string;
-  value: string | m.Vnode;
+  value: string | ResultNode;
 };
 
 class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
-  view(vnode: m.Vnode<SnapshotInfoRowAttrs>) {
+  view(vnode: ResultNode<SnapshotInfoRowAttrs>) {
     const { label, value } = vnode.attrs;
 
     return (
@@ -39,7 +39,7 @@ class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
 type SnapshotInfoLinkRowAttrs = SnapshotInfoRowAttrs & { url: string };
 
 class SnapshotInfoLinkRow extends ClassComponent<SnapshotInfoLinkRowAttrs> {
-  view(vnode: m.Vnode<SnapshotInfoLinkRowAttrs>) {
+  view(vnode: ResultNode<SnapshotInfoLinkRowAttrs>) {
     const { label, url, value } = vnode.attrs;
 
     return (
@@ -64,7 +64,7 @@ type SnapshotInformationCardAttrs = {
 };
 
 export class SnapshotInformationCard extends ClassComponent<SnapshotInformationCardAttrs> {
-  view(vnode: m.Vnode<SnapshotInformationCardAttrs>) {
+  view(vnode: ResultNode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;
 
     const votingSystem = capitalize(

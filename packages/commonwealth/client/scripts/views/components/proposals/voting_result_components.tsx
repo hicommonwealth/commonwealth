@@ -2,7 +2,7 @@
 /* eslint-disable max-classes-per-file */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/proposals/voting_result_components.scss';
 
@@ -32,7 +32,7 @@ type VotingResultAttrs = {
 };
 
 export class VotingResult extends ClassComponent<VotingResultAttrs> {
-  view(vnode: m.Vnode<VotingResultAttrs>) {
+  view(vnode: ResultNode<VotingResultAttrs>) {
     const { abstainVotes, noVotes, yesVotes, proposal } = vnode.attrs;
 
     return (
@@ -74,7 +74,7 @@ type CompletedProposalVotingResultAttrs = {
 };
 
 export class CompletedProposalVotingResult extends ClassComponent<CompletedProposalVotingResultAttrs> {
-  view(vnode: m.Vnode<CompletedProposalVotingResultAttrs>) {
+  view(vnode: ResultNode<CompletedProposalVotingResultAttrs>) {
     const {
       abstainPct,
       abstainResults,
@@ -122,7 +122,7 @@ type SimpleYesApprovalVotingResultAttrs = {
 } & BaseVotingResultAttrs;
 
 export class SimpleYesApprovalVotingResult extends ClassComponent<SimpleYesApprovalVotingResultAttrs> {
-  view(vnode: m.Vnode<SimpleYesApprovalVotingResultAttrs>) {
+  view(vnode: ResultNode<SimpleYesApprovalVotingResultAttrs>) {
     const { approvedCount, proposal, votes } = vnode.attrs;
 
     return (
@@ -148,7 +148,7 @@ type AaveVotingResultAttrs = {
 };
 
 export class AaveVotingResult extends ClassComponent<AaveVotingResultAttrs> {
-  view(vnode: m.Vnode<AaveVotingResultAttrs>) {
+  view(vnode: ResultNode<AaveVotingResultAttrs>) {
     const {
       noBalanceString,
       noVotesCount,
@@ -205,7 +205,7 @@ type YesNoAbstainVetoVotingResultAttrs = {
 };
 
 export class YesNoAbstainVetoVotingResult extends ClassComponent<YesNoAbstainVetoVotingResultAttrs> {
-  view(vnode: m.Vnode<YesNoAbstainVetoVotingResultAttrs>) {
+  view(vnode: ResultNode<YesNoAbstainVetoVotingResultAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
     return (
@@ -261,7 +261,7 @@ type YesNoRejectVotingResultAttrs = {
 };
 
 export class YesNoRejectVotingResult extends ClassComponent<YesNoRejectVotingResultAttrs> {
-  view(vnode: m.Vnode<YesNoRejectVotingResultAttrs>) {
+  view(vnode: ResultNode<YesNoRejectVotingResultAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
     return (

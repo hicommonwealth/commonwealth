@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_dropdown.scss';
 
@@ -19,13 +19,13 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
   private showDropdown: boolean;
   private selectedValue: string;
 
-  oninit(vnode: m.Vnode<DropdownAttrs>) {
+  oninit(vnode: ResultNode<DropdownAttrs>) {
     this.showDropdown = false;
     this.selectedValue =
       vnode.attrs.initialValue ?? vnode.attrs.inputOptions[0].label;
   }
 
-  view(vnode: m.Vnode<DropdownAttrs>) {
+  view(vnode: ResultNode<DropdownAttrs>) {
     const { inputOptions, onSelect } = vnode.attrs;
 
     return (

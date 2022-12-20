@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/bounties.scss';
 
@@ -28,7 +28,7 @@ type BountyDetailAttrs = {
 };
 
 class BountyDetail extends ClassComponent<BountyDetailAttrs> {
-  view(vnode: m.Vnode<BountyDetailAttrs>) {
+  view(vnode: ResultNode<BountyDetailAttrs>) {
     const { bounty } = vnode.attrs;
 
     const isCouncillor =

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/comments/comments_tree.scss';
 
@@ -32,7 +32,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
     this.dom = vnode.dom;
   }
 
-  view(vnode: m.Vnode<CommentsTreeAttrs>) {
+  view(vnode: ResultNode<CommentsTreeAttrs>) {
     const {
       comments,
       proposal,

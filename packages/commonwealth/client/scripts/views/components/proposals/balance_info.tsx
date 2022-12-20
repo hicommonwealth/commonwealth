@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import { formatCoin } from 'adapters/currency';
 import app from 'state';
@@ -17,7 +17,7 @@ export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
   private freeBalance: any;
   private lockedBalance: any;
 
-  oninit(vnode: m.Vnode<BalanceInfoAttrs>) {
+  oninit(vnode: ResultNode<BalanceInfoAttrs>) {
     const { account } = vnode.attrs;
 
     app.runWhenReady(async () => {

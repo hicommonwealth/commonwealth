@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -85,7 +85,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     this.chainEvents = [];
   }
 
-  view(vnode: m.Vnode<UserDashboardAttrs>) {
+  view(vnode: ResultNode<UserDashboardAttrs>) {
     const {
       activePage,
       fyNotifications,

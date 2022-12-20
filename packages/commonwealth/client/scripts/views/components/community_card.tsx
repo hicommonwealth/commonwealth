@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/community_card.scss';
 
@@ -16,7 +16,7 @@ import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 type CommunityCardAttrs = { chain: ChainInfo };
 
 export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
-  view(vnode: m.Vnode<CommunityCardAttrs>) {
+  view(vnode: ResultNode<CommunityCardAttrs>) {
     const { chain } = vnode.attrs as CommunityCardAttrs;
 
     const redirectFunction = (e) => {

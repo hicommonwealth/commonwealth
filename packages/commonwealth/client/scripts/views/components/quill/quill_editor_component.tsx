@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
@@ -118,7 +118,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
 
   // LIFECYCLE HELPERS
 
-  oncreate(vnode: m.Vnode<QuillEditorComponentAttrs>) {
+  oncreate(vnode: ResultNode<QuillEditorComponentAttrs>) {
     // Only bind the alert if we are actually trying to persist the user's changes
     if (!vnode.attrs.contentsDoc) {
       this._beforeunloadHandler = () => {
@@ -130,13 +130,13 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
     }
   }
 
-  onremove(vnode: m.Vnode<QuillEditorComponentAttrs>) {
+  onremove(vnode: ResultNode<QuillEditorComponentAttrs>) {
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', this._beforeunloadHandler);
     }
   }
 
-  view(vnode: m.Vnode<QuillEditorComponentAttrs>) {
+  view(vnode: ResultNode<QuillEditorComponentAttrs>) {
     const {
       className,
       contentsDoc,

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
@@ -28,7 +28,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
     this.loading = false;
   }
 
-  view(vnode: m.Vnode<ThreadPreviewReactionButtonAttrs>) {
+  view(vnode: ResultNode<ThreadPreviewReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_area.scss';
 
@@ -23,7 +23,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode: m.Vnode<TextAreaAttrs>) {
+  view(vnode: ResultNode<TextAreaAttrs>) {
     const {
       autocomplete,
       autofocus,

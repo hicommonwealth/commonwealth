@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import app from 'state';
@@ -45,7 +45,7 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
 }
 
 export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCardsAttrs> {
-  view(vnode: m.Vnode<SnapshotProposalCardsAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalCardsAttrs>) {
     const {
       identifier,
       proposal,

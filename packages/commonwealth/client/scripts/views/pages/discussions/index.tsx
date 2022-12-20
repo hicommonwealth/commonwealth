@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { debounce } from 'lodash';
 
 import 'pages/discussions/index.scss';
@@ -60,7 +60,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<DiscussionPageAttrs>) {
+  view(vnode: ResultNode<DiscussionPageAttrs>) {
     if (!app.chain || !app.chain.serverLoaded) {
       return <PageLoading />;
     }

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -21,7 +21,7 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
   private chainEntitiesLoaded: boolean;
   private initialized: boolean;
 
-  view(vnode: m.Vnode<ChainEntitiesSelectorAttrs>) {
+  view(vnode: ResultNode<ChainEntitiesSelectorAttrs>) {
     const { thread, onSelect } = vnode.attrs;
 
     if (!app.chain || !app.activeChainId()) return;

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -140,7 +140,7 @@ type SubscriptionRowAttrs = {
 };
 
 export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRowAttrs> {
-  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
+  view(vnode: ResultNode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
 
     return (
@@ -160,7 +160,7 @@ export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRow
 }
 
 export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
-  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
+  view(vnode: ResultNode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
     return (
       <CWPopoverMenu

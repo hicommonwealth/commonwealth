@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -24,7 +24,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
   private initialized: boolean;
   private linkedThreads: Thread[] = [];
 
-  view(vnode: m.Vnode<LinkedThreadsCardAttrs>) {
+  view(vnode: ResultNode<LinkedThreadsCardAttrs>) {
     const { allowLinking, threadId } = vnode.attrs;
 
     const thread = app.threads.getById(threadId);

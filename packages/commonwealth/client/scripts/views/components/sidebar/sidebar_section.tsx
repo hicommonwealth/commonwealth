@@ -3,7 +3,7 @@
 import 'components/sidebar/sidebar_section.scss';
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import {
@@ -15,7 +15,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 
 class SubSection extends ClassComponent<SubSectionAttrs> {
-  view(vnode: m.Vnode<SubSectionAttrs>) {
+  view(vnode: ResultNode<SubSectionAttrs>) {
     const {
       isActive,
       isUpdated,
@@ -60,13 +60,13 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
-  oninit(vnode: m.Vnode<SectionGroupAttrs>) {
+  oninit(vnode: ResultNode<SectionGroupAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
   }
 
-  view(vnode: m.Vnode<SectionGroupAttrs>) {
+  view(vnode: ResultNode<SectionGroupAttrs>) {
     const {
       containsChildren,
       displayData,
@@ -167,14 +167,14 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
   private toggled: boolean;
   private hoverColor: string;
 
-  oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
+  oninit(vnode: ResultNode<SidebarSectionAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
     this.hoverColor = 'none';
   }
 
-  view(vnode: m.Vnode<SidebarSectionAttrs>) {
+  view(vnode: ResultNode<SidebarSectionAttrs>) {
     const {
       displayData,
       extraComponents,

@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_thread/index.scss';
 
@@ -98,7 +98,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     });
   }
 
-  view(vnode: m.Vnode<ViewThreadPageAttrs>) {
+  view(vnode: ResultNode<ViewThreadPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {

@@ -2,7 +2,7 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 
@@ -53,7 +53,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     }
   }
 
-  oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  oncreate(vnode: ResultNode<CoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
@@ -123,7 +123,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     attachZone.addEventListener('click', clickHandler);
   }
 
-  view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  view(vnode: ResultNode<CoverImageUploaderAttrs>) {
     const { imageURL, isUploading, uploadStatus } = this;
     const { headerText, subheaderText } = vnode.attrs;
 

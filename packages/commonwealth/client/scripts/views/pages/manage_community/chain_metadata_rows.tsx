@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
@@ -69,7 +69,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   quillBanner: any;
   bannerStateUpdated: boolean;
 
-  oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
+  oninit(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
     this.name = chain.name;
     this.description = chain.description;

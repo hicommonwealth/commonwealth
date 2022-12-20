@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -36,7 +36,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
   private sendingComment;
   private uploadsInProgress;
 
-  view(vnode: m.Vnode<CreateCommmentAttrs>) {
+  view(vnode: ResultNode<CreateCommmentAttrs>) {
     const {
       handleIsReplying,
       parentCommentId,

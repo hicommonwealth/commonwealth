@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/webhook_settings_modal.scss';
@@ -30,14 +30,14 @@ type WebhookSettingsModalAttrs = {
 export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAttrs> {
   private selectedCategories: string[];
 
-  oninit(vnode: m.Vnode<WebhookSettingsModalAttrs>) {
+  oninit(vnode: ResultNode<WebhookSettingsModalAttrs>) {
     this.selectedCategories = [];
     vnode.attrs.webhook.categories.forEach((v) =>
       this.selectedCategories.push(v)
     );
   }
 
-  view(vnode: m.Vnode<WebhookSettingsModalAttrs>) {
+  view(vnode: ResultNode<WebhookSettingsModalAttrs>) {
     const { webhook } = vnode.attrs;
     const isChain = !!webhook.chain_id;
 

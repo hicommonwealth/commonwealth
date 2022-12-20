@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_collapsible.scss';
 
@@ -9,14 +9,14 @@ import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
 
 type CollapsibleAttrs = {
-  collapsibleContent: m.Vnode;
-  headerContent: m.Vnode;
+  collapsibleContent: ResultNode;
+  headerContent: ResultNode;
 };
 
 export class CWCollapsible extends ClassComponent<CollapsibleAttrs> {
   private isExpanded: boolean;
 
-  view(vnode: m.Vnode<CollapsibleAttrs>) {
+  view(vnode: ResultNode<CollapsibleAttrs>) {
     const { collapsibleContent, headerContent } = vnode.attrs;
 
     return (

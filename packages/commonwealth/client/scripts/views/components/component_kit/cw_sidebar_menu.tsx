@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
@@ -64,7 +64,7 @@ const renderCommunity = (item: ChainInfo) => {
 };
 
 class CWSidebarMenuItem extends ClassComponent<MenuItem> {
-  view(vnode: m.Vnode<MenuItem>) {
+  view(vnode: ResultNode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
       const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
         vnode.attrs;
@@ -109,7 +109,7 @@ type SidebarMenuAttrs = {
 };
 
 export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
-  view(vnode: m.Vnode<SidebarMenuAttrs>) {
+  view(vnode: ResultNode<SidebarMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
 
     return (

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import {
   Button,
   Icons,
@@ -36,7 +36,7 @@ type TopicsMenuAttrs = {
 };
 
 export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
-  view(vnode: m.Vnode<TopicsMenuAttrs>) {
+  view(vnode: ResultNode<TopicsMenuAttrs>) {
     const { featuredTopics, otherTopics, selectedTopic, topic } = vnode.attrs;
 
     return m(PopoverMenu, {

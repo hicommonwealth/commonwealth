@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'sublayout.scss';
 
@@ -47,7 +47,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
     });
   }
 
-  view(vnode: m.Vnode<SublayoutAttrs>) {
+  view(vnode: ResultNode<SublayoutAttrs>) {
     const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;

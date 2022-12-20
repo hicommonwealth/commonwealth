@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 
@@ -17,7 +17,7 @@ type ProposalHeaderLinkAttrs = {
 
 // "View in Subscan"
 export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
+  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
@@ -34,7 +34,7 @@ export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
 
 // "Vote on polkadot-js"
 export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
+  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
@@ -51,7 +51,7 @@ export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs>
 
 // "Go to discussion"
 export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
+  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     const path = getProposalUrlPath(
@@ -75,7 +75,7 @@ type SnapshotThreadLinkAttrs = {
 };
 
 export class SnapshotThreadLink extends ClassComponent<SnapshotThreadLinkAttrs> {
-  view(vnode: m.Vnode<SnapshotThreadLinkAttrs>) {
+  view(vnode: ResultNode<SnapshotThreadLinkAttrs>) {
     const { id, title } = vnode.attrs.thread;
 
     const proposalLink = getProposalUrlPath(ProposalType.Thread, id);

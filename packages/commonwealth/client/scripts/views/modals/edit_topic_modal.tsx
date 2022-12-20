@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/edit_topic_modal.scss';
@@ -45,7 +45,7 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
   private saving: boolean;
   private _contentsDoc: QuillTextContents;
 
-  view(vnode: m.Vnode<EditTopicModalAttrs>) {
+  view(vnode: ResultNode<EditTopicModalAttrs>) {
     const {
       defaultOffchainTemplate,
       description,

@@ -19,7 +19,7 @@
 // }
 
 // const UpdateDelegateModal: m.Component<IAttrs, IState> = {
-//   oninit: (vnode: m.Vnode<IAttrs, IState>) => {
+//   oninit: (vnode: ResultNode<IAttrs, IState>) => {
 //     vnode.state.newDelegateKey = vnode.attrs.delegateKey;
 //   },
 //   view: (vnode: m.VnodeDOM<IAttrs, IState>) => {

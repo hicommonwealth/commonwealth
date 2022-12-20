@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import Dropzone from 'dropzone';
 
 import 'components/avatar_upload.scss';
@@ -97,7 +97,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
     });
   }
 
-  view(vnode: m.Vnode<AvatarUploadAttrs>) {
+  view(vnode: ResultNode<AvatarUploadAttrs>) {
     const { account, darkMode, scope, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_toggle.scss';
 
@@ -17,7 +17,7 @@ type ToggleAttrs = {
 } & ToggleStyleAttrs;
 
 export class CWToggle extends ClassComponent<ToggleAttrs> {
-  view(vnode: m.Vnode<ToggleAttrs>) {
+  view(vnode: ResultNode<ToggleAttrs>) {
     const { className, disabled = false, onchange, checked } = vnode.attrs;
 
     const params = {

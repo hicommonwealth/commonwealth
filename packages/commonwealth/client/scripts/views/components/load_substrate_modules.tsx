@@ -12,7 +12,7 @@ import { BreadcrumbsTitleTag } from './breadcrumbs_title_tag';
 export const loadSubstrateModules = (
   name: string,
   getModules: () => ProposalModule<any, any, any>[]
-): m.Vnode | undefined => {
+): ResultNode | undefined => {
   const onSubstrate = app.chain?.base === ChainBase.Substrate;
 
   if (onSubstrate) {

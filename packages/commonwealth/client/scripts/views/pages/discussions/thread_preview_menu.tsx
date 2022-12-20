@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -17,7 +17,7 @@ type ThreadPreviewMenuAttrs = {
 };
 
 export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
-  view(vnode: m.Vnode<ThreadPreviewMenuAttrs>) {
+  view(vnode: ResultNode<ThreadPreviewMenuAttrs>) {
     if (!app.isLoggedIn()) return;
 
     const { thread } = vnode.attrs;

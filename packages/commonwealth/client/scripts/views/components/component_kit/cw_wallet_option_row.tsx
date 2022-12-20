@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_wallet_option_row.scss';
 
@@ -23,7 +23,7 @@ type WalletOptionRowAttrs = {
 } & WalletOptionRowStyleAttrs;
 
 export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
-  view(vnode: m.Vnode<WalletOptionRowAttrs>) {
+  view(vnode: ResultNode<WalletOptionRowAttrs>) {
     const {
       disabled = false,
       darkMode,

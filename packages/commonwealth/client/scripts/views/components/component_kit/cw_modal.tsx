@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'components/component_kit/cw_modal.scss';
@@ -22,7 +22,7 @@ type ModalAttrs = {
     confirmExit: () => void,
     completeCallback: () => void,
     exitCallback: () => void,
-    vnode: m.Vnode<ModalAttrs>
+    vnode: ResultNode<ModalAttrs>
   ) => void;
   modalType: 'centered' | 'fullScreen';
   spec: any; // TODO Gabe 2/2/22 - What is a spec?
@@ -32,7 +32,7 @@ type ModalAttrs = {
 export class CWModal extends ClassComponent<ModalAttrs> {
   private modalTypeState: string;
 
-  oncreate(vnode: m.Vnode<ModalAttrs>) {
+  oncreate(vnode: ResultNode<ModalAttrs>) {
     const { spec, oncreatemodal } = vnode.attrs;
     const completeCallback = spec.completeCallback || (() => undefined);
     const exitCallback = spec.exitCallback || (() => undefined);
@@ -41,7 +41,7 @@ export class CWModal extends ClassComponent<ModalAttrs> {
     oncreatemodal(spec, confirmExit, completeCallback, exitCallback, vnode);
   }
 
-  oninit(vnode: m.Vnode<ModalAttrs>) {
+  oninit(vnode: ResultNode<ModalAttrs>) {
     const { modalType, breakpointFn } = vnode.attrs;
     this.modalTypeState = modalType || 'centered';
 
@@ -59,7 +59,7 @@ export class CWModal extends ClassComponent<ModalAttrs> {
     }
   }
 
-  onremove(vnode: m.Vnode<ModalAttrs>) {
+  onremove(vnode: ResultNode<ModalAttrs>) {
     const { breakpointFn } = vnode.attrs;
     if (breakpointFn) {
       // eslint-disable-next-line no-restricted-globals
@@ -75,7 +75,7 @@ export class CWModal extends ClassComponent<ModalAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<ModalAttrs>) {
+  view(vnode: ResultNode<ModalAttrs>) {
     const { onclick, spec } = vnode.attrs;
 
     const exitCallback = spec.exitCallback || (() => undefined);
@@ -110,7 +110,7 @@ type ModalExitButtonAttrs = {
 };
 
 export class ModalExitButton extends ClassComponent<ModalExitButtonAttrs> {
-  view(vnode: m.Vnode<ModalExitButtonAttrs>) {
+  view(vnode: ResultNode<ModalExitButtonAttrs>) {
     const { disabled, iconButtonTheme } = vnode.attrs;
 
     return (

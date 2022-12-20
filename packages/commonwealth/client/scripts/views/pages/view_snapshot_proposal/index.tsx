@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 
@@ -48,7 +48,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private validatedAgainstStrategies: boolean;
   private votes: Array<SnapshotProposalVote>;
 
-  oninit(vnode: m.Vnode<ViewProposalPageAttrs>) {
+  oninit(vnode: ResultNode<ViewProposalPageAttrs>) {
     this.fetchedPower = false;
     this.proposal = null;
     this.scores = [];
@@ -116,7 +116,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
+  view(vnode: ResultNode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     return !this.votes || !this.totals || !this.proposal ? (

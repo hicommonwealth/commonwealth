@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_thread/thread_components.scss';
 import 'pages/view_proposal/proposal_header_links.scss';
@@ -31,7 +31,7 @@ type ThreadComponentAttrs = {
 };
 
 export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: m.Vnode<ThreadComponentAttrs>) {
+  view(vnode: ResultNode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     const author: Account = app.chain.accounts.get(thread.author);
@@ -73,7 +73,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
 }
 
 export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: m.Vnode<ThreadComponentAttrs>) {
+  view(vnode: ResultNode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     return (
@@ -106,7 +106,7 @@ export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
 }
 
 export class ExternalLink extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: m.Vnode<ThreadComponentAttrs>) {
+  view(vnode: ResultNode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     return (

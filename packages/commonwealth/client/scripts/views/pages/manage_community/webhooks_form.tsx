@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import smartTruncate from 'smart-truncate';
 
@@ -27,7 +27,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
   private success: boolean;
   private webhookUrl: string;
 
-  view(vnode: m.Vnode<WebhooksFormAttrs>) {
+  view(vnode: ResultNode<WebhooksFormAttrs>) {
     const { webhooks } = vnode.attrs;
     const chainOrCommObj = { chain: app.activeChainId() };
 

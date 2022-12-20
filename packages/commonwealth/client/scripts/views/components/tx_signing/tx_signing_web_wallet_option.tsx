@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -19,14 +19,14 @@ type TXSigningWebWalletOptionAttrs = {
   NextFn;
 
 export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletOptionAttrs> {
-  oncreate(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
+  oncreate(vnode: ResultNode<TXSigningWebWalletOptionAttrs>) {
     // try to enable web wallet
     if (vnode.attrs.wallet && !vnode.attrs.wallet.enabled) {
       vnode.attrs.wallet.enable().then(() => m.redraw());
     }
   }
 
-  view(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
+  view(vnode: ResultNode<TXSigningWebWalletOptionAttrs>) {
     const { author, wallet } = vnode.attrs;
 
     const webWallet = wallet as PolkadotWebWalletController;

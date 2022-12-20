@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/council.scss';
 
@@ -31,7 +31,7 @@ type CouncillorAttrs = {
 };
 
 class Councillor extends ClassComponent<CouncillorAttrs> {
-  view(vnode: m.Vnode<CouncillorAttrs>) {
+  view(vnode: ResultNode<CouncillorAttrs>) {
     if (!vnode.attrs.account) return;
 
     const { account } = vnode.attrs;

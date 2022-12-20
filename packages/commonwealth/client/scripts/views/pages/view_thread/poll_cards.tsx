@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
@@ -21,7 +21,7 @@ type ThreadPollEditorCardAttrs = {
 };
 
 export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAttrs> {
-  view(vnode: m.Vnode<ThreadPollEditorCardAttrs>) {
+  view(vnode: ResultNode<ThreadPollEditorCardAttrs>) {
     const { thread, threadAlreadyHasPolling } = vnode.attrs;
 
     return (
@@ -57,7 +57,7 @@ type ThreadPollCardAttrs = {
 };
 
 export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
-  view(vnode: m.Vnode<ThreadPollCardAttrs>) {
+  view(vnode: ResultNode<ThreadPollCardAttrs>) {
     const { poll } = vnode.attrs;
 
     return (

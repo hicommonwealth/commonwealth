@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import BN from 'bn.js';
 import moment from 'moment';
 
@@ -23,7 +23,7 @@ type SputnikDaoRowAttrs = {
 };
 
 class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
-  view(vnode: m.Vnode<SputnikDaoRowAttrs>) {
+  view(vnode: ResultNode<SputnikDaoRowAttrs>) {
     const { dao, clickable } = vnode.attrs;
 
     const amountString = (app.chain as Near).chain

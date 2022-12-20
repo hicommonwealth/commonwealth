@@ -46,7 +46,7 @@ export const getTransactionLabel = (txname) => {
 };
 
 export const setupEventListeners = (
-  vnode: m.Vnode<
+  vnode: ResultNode<
     NextFn & ITXModalData,
     // eslint-disable-next-line @typescript-eslint/ban-types
     { timerHandle?: NodeJS.Timeout } | {}

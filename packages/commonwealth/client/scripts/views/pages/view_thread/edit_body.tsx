@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_thread/edit_body.scss';
 
@@ -28,7 +28,7 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
   private quillEditorState: QuillEditor;
   private saving: boolean;
 
-  view(vnode: m.Vnode<EditBodyAttrs>) {
+  view(vnode: ResultNode<EditBodyAttrs>) {
     const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } =
       vnode.attrs;
 

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/confirm_snapshot_vote_modal.scss';
@@ -34,7 +34,7 @@ type ConfirmSnapshotVoteModalAttrs = {
 export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVoteModalAttrs> {
   private saving: boolean;
 
-  view(vnode: m.Vnode<ConfirmSnapshotVoteModalAttrs>) {
+  view(vnode: ResultNode<ConfirmSnapshotVoteModalAttrs>) {
     const author = app.user.activeAccount;
 
     const { proposal, space, id, selectedChoice, totalScore, successCallback } =

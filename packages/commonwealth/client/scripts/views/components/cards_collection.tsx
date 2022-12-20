@@ -1,19 +1,19 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/cards_collection.scss';
 
 import { CWText } from './component_kit/cw_text';
 
 type CardsCollectionAttrs = {
-  content: Array<m.Vnode> | m.Vnode;
+  content: Array<ResultNode> | ResultNode;
   header?: string;
 };
 
 export class CardsCollection extends ClassComponent<CardsCollectionAttrs> {
-  view(vnode: m.Vnode<CardsCollectionAttrs>) {
+  view(vnode: ResultNode<CardsCollectionAttrs>) {
     const { content, header } = vnode.attrs;
     return (
       <div class="CardsCollection">

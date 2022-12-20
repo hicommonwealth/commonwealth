@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/snapshot_proposal_selector.scss';
@@ -24,7 +24,7 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
   private initialized: boolean;
   private snapshotProposalsLoaded: boolean;
 
-  view(vnode: m.Vnode<SnapshotProposalSelectorAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalSelectorAttrs>) {
     const { onSelect } = vnode.attrs;
 
     if (!app.chain || !app.activeChainId()) return;

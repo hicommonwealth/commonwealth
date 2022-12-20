@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
@@ -31,7 +31,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
   private isTruncated: boolean;
   private truncatedDoc;
 
-  oninit(vnode: m.Vnode<QuillFormattedTextAttrs>) {
+  oninit(vnode: ResultNode<QuillFormattedTextAttrs>) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesQuill(vnode.attrs.doc.ops);
@@ -45,7 +45,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
     }
   }
 
-  view(vnode: m.Vnode<QuillFormattedTextAttrs>) {
+  view(vnode: ResultNode<QuillFormattedTextAttrs>) {
     const {
       doc,
       hideFormatting,

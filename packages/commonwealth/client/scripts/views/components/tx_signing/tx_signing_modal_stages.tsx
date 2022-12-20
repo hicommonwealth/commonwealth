@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -27,7 +27,7 @@ export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntro
     this.introTab = 'webWallet';
   }
 
-  view(vnode: m.Vnode<TxSigningModalIntroStageAttrs>) {
+  view(vnode: ResultNode<TxSigningModalIntroStageAttrs>) {
     const { author, next, polkaWallet, txData, txType } = vnode.attrs;
 
     return (
@@ -75,7 +75,7 @@ export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
   private timer?: number;
   private timerHandle?: NodeJS.Timeout;
 
-  oncreate(vnode: m.Vnode<NextFn>) {
+  oncreate(vnode: ResultNode<NextFn>) {
     const $parent = $('.TXSigningModal');
 
     this.timer = 0;

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import $ from 'jquery';
 
@@ -178,7 +178,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.form.topic = topic;
   }
 
-  oninit(vnode: m.Vnode<NewThreadFormAttrs>) {
+  oninit(vnode: ResultNode<NewThreadFormAttrs>) {
     const { isModal } = vnode.attrs;
     this.form = {
       topic: null,
@@ -256,7 +256,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<NewThreadFormAttrs>) {
+  view(vnode: ResultNode<NewThreadFormAttrs>) {
     if (!app.chain) return;
     const { isModal, hasTopics } = vnode.attrs;
     const { fromDraft, saving, form } = this;

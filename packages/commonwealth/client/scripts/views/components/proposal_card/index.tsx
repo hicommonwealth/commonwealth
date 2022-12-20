@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
 
@@ -27,12 +27,12 @@ import { CWDivider } from '../component_kit/cw_divider';
 import { ProposalTag } from './proposal_tag';
 
 type ProposalCardAttrs = {
-  injectedContent?: m.Vnode;
+  injectedContent?: ResultNode;
   proposal: AnyProposal;
 };
 
 export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
-  view(vnode: m.Vnode<ProposalCardAttrs>) {
+  view(vnode: ResultNode<ProposalCardAttrs>) {
     const { proposal, injectedContent } = vnode.attrs;
 
     const secondaryTagText = getSecondaryTagText(proposal);

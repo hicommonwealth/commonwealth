@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'modals/tx_signing_modal.scss';
 
@@ -29,7 +29,7 @@ class TXSigningModal extends ClassComponent<ITXModalData> {
     this.stageName = 'intro';
   }
 
-  view(vnode: m.Vnode<ITXModalData>) {
+  view(vnode: ResultNode<ITXModalData>) {
     const { author, txData, txType } = vnode.attrs;
 
     const txLabel = getTransactionLabel(txType);

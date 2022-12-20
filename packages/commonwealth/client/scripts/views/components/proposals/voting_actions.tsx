@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/proposals/voting_actions.scss';
 
@@ -54,7 +54,7 @@ import {
 type CannotVoteAttrs = { label: string };
 
 class CannotVote extends ClassComponent<CannotVoteAttrs> {
-  view(vnode: m.Vnode<CannotVoteAttrs>) {
+  view(vnode: ResultNode<CannotVoteAttrs>) {
     return (
       <div class="CannotVote">
         <CWButton disabled label={vnode.attrs.label} />
@@ -74,7 +74,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
   private amount: number;
   private conviction: number;
 
-  view(vnode: m.Vnode<VotingActionsAttrs>) {
+  view(vnode: ResultNode<VotingActionsAttrs>) {
     const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
       vnode.attrs;
 

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 
@@ -21,7 +21,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
   private calldata?: ISubstrateTXData;
   private signedTx: string;
 
-  async oncreate(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
+  async oncreate(vnode: ResultNode<TXSigningCLIOptionAttrs>) {
     if (this.calldata === undefined) {
       this.calldata =
         (await vnode.attrs.txData.unsignedData()) as ISubstrateTXData;
@@ -29,7 +29,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
     }
   }
 
-  view(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
+  view(vnode: ResultNode<TXSigningCLIOptionAttrs>) {
     const transact = (...args) => {
       setupEventListeners(vnode);
       vnode.attrs.txData.transact(...args);

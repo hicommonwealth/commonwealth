@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_group.scss';
 
@@ -15,7 +15,7 @@ type RadioGroupAttrs = {
   toggledOption: string;
 };
 export class CWRadioGroup extends ClassComponent<RadioGroupAttrs> {
-  view(vnode: m.Vnode<RadioGroupAttrs>) {
+  view(vnode: ResultNode<RadioGroupAttrs>) {
     const { options, onchange, name, toggledOption } = vnode.attrs;
 
     return (

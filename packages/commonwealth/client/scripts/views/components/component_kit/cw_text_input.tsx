@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_input.scss';
 
@@ -61,7 +61,7 @@ type TextInputAttrs = BaseTextInputAttrs &
   InputInternalStyleAttrs;
 
 export class MessageRow extends ClassComponent<MessageRowAttrs> {
-  view(vnode: m.Vnode<MessageRowAttrs>) {
+  view(vnode: ResultNode<MessageRowAttrs>) {
     const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
 
     return (
@@ -94,7 +94,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode: m.Vnode<TextInputAttrs>) {
+  view(vnode: ResultNode<TextInputAttrs>) {
     const {
       autocomplete = 'off',
       autofocus,

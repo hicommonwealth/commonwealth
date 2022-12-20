@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
@@ -52,7 +52,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private magicLoading: boolean;
   private showMobile: boolean;
 
-  oninit(vnode: m.Vnode<LoginModalAttrs>) {
+  oninit(vnode: ResultNode<LoginModalAttrs>) {
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
@@ -124,7 +124,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     );
   }
 
-  view(vnode: m.Vnode<LoginModalAttrs>) {
+  view(vnode: ResultNode<LoginModalAttrs>) {
     const { onSuccess } = vnode.attrs;
     const wcEnabled = _.any(
       this.wallets,

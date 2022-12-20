@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_mobile_menu.scss';
 
@@ -13,7 +13,7 @@ import { CWCustomIcon } from './cw_icons/cw_custom_icon';
 import { ComponentType, MenuItem } from './types';
 
 class CWMobileMenuItem extends ClassComponent<MenuItem> {
-  view(vnode: m.Vnode<MenuItem>) {
+  view(vnode: ResultNode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
       const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
         vnode.attrs;
@@ -78,7 +78,7 @@ type MobileMenuAttrs = {
 };
 
 export class CWMobileMenu extends ClassComponent<MobileMenuAttrs> {
-  view(vnode: m.Vnode<MobileMenuAttrs>) {
+  view(vnode: ResultNode<MobileMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
 
     return (

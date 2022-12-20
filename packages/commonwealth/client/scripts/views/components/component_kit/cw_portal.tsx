@@ -1,14 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 export class CWPortal extends ClassComponent {
   private rootElement: HTMLElement;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private content: any;
 
-  oncreate(vnode: m.Vnode) {
+  oncreate(vnode: ResultNode) {
     const rootElement = document.createElement('div');
     const container = document.body;
     container.appendChild(rootElement);

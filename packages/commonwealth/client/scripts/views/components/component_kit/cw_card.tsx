@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_card.scss';
 
@@ -25,7 +25,7 @@ type CardAttrs = {
 } & CardStyleAttrs;
 
 export class CWCard extends ClassComponent<CardAttrs> {
-  view(vnode: m.Vnode<CardAttrs>) {
+  view(vnode: ResultNode<CardAttrs>) {
     const {
       className,
       elevation,

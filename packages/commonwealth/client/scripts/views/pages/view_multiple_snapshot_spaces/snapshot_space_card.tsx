@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_space_card.scss';
 
@@ -24,7 +24,7 @@ type SnapshotSpaceCardAttrs = {
 };
 
 export class SnapshotSpaceCard extends ClassComponent<SnapshotSpaceCardAttrs> {
-  view(vnode: m.Vnode<SnapshotSpaceCardAttrs>) {
+  view(vnode: ResultNode<SnapshotSpaceCardAttrs>) {
     const { space, proposals, redirectAction, proposal } = vnode.attrs;
     if (!space || !proposals) return;
 

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
@@ -32,7 +32,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
   private phragmenStakeAmount: SubstrateCoin;
   private votes: Array<string>;
 
-  oninit(vnode: m.Vnode<CouncilVotingModalAttrs>) {
+  oninit(vnode: ResultNode<CouncilVotingModalAttrs>) {
     const candidates = vnode.attrs.candidates || [];
     // get currently set approvals
     const currentVote = (
@@ -61,7 +61,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
       .map(([candidate]) => candidate.address);
   }
 
-  view(vnode: m.Vnode<CouncilVotingModalAttrs>) {
+  view(vnode: ResultNode<CouncilVotingModalAttrs>) {
     const { candidates } = vnode.attrs;
 
     const submitVote = (e) => {

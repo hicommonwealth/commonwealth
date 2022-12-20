@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/login/login_mobile.scss';
 
@@ -26,7 +26,7 @@ import { LoginText } from './login_text';
 import { LoginAttrs } from './types';
 
 export class LoginMobile extends ClassComponent<LoginAttrs> {
-  view(vnode: m.Vnode<LoginAttrs>) {
+  view(vnode: ResultNode<LoginAttrs>) {
     const {
       address,
       bodyType,

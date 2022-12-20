@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/comments/comment.scss';
@@ -27,7 +27,7 @@ type CommentAuthorAttrs = {
 };
 
 class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
-  view(vnode: m.Vnode<CommentAuthorAttrs>) {
+  view(vnode: ResultNode<CommentAuthorAttrs>) {
     const { comment } = vnode.attrs;
 
     // Check for accounts on forums that originally signed up on a different base chain,
@@ -74,7 +74,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
 
-  view(vnode: m.Vnode<CommentAttrs>) {
+  view(vnode: ResultNode<CommentAttrs>) {
     const {
       comment,
       handleIsReplying,

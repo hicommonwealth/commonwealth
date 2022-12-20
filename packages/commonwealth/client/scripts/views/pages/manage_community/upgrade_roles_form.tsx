@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
@@ -22,7 +22,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
   private role: string;
   private user: string;
 
-  view(vnode: m.Vnode<UpgradeRolesFormAttrs>) {
+  view(vnode: ResultNode<UpgradeRolesFormAttrs>) {
     const { roleData, onRoleUpgrade } = vnode.attrs;
 
     const nonAdmins: RoleInfo[] = roleData.filter((role) => {

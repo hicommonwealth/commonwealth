@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_proposal/proposal_components.scss';
 
@@ -34,7 +34,7 @@ type MolochCancelButtonAttrs = {
 } & BaseCancelButtonAttrs;
 
 export class MolochCancelButton extends ClassComponent<MolochCancelButtonAttrs> {
-  view(vnode: m.Vnode<MolochCancelButtonAttrs>) {
+  view(vnode: ResultNode<MolochCancelButtonAttrs>) {
     const {
       proposal,
       votingModalOpen,
@@ -64,7 +64,7 @@ type AaveCancelButtonAttrs = {
 } & BaseCancelButtonAttrs;
 
 export class AaveCancelButton extends ClassComponent<AaveCancelButtonAttrs> {
-  view(vnode: m.Vnode<AaveCancelButtonAttrs>) {
+  view(vnode: ResultNode<AaveCancelButtonAttrs>) {
     const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
       vnode.attrs;
 
@@ -86,7 +86,7 @@ type CompoundCancelButtonAttrs = {
 } & BaseCancelButtonAttrs;
 
 export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAttrs> {
-  view(vnode: m.Vnode<CompoundCancelButtonAttrs>) {
+  view(vnode: ResultNode<CompoundCancelButtonAttrs>) {
     const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
       vnode.attrs;
 
@@ -114,7 +114,7 @@ type ProposalSubheaderAttrs = {
 } & BaseCancelButtonAttrs;
 
 export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
-  view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
+  view(vnode: ResultNode<ProposalSubheaderAttrs>) {
     const {
       molochMember,
       onModalClose,

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/proposals/vote_listing.scss';
 
@@ -35,7 +35,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
   private balancesCache;
   private balancesCacheInitialized;
 
-  view(vnode: m.Vnode<VoteListingAttrs>) {
+  view(vnode: ResultNode<VoteListingAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
     const balanceWeighted =

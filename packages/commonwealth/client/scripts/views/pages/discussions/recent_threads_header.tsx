@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/discussions/recent_threads_header.scss';
 
@@ -45,7 +45,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
     });
   }
 
-  view(vnode: m.Vnode<RecentThreadsHeaderAttrs>) {
+  view(vnode: ResultNode<RecentThreadsHeaderAttrs>) {
     const { topic, stage, totalThreadCount } = vnode.attrs;
 
     const { stagesEnabled, customStages } = app.chain?.meta;

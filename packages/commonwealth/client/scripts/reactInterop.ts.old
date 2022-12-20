@@ -1,0 +1,81 @@
+import {
+  createElement,
+  ForwardedRef,
+  forwardRef,
+  Fragment,
+  FunctionComponent,
+  ReactElement,
+  ReactNode,
+  // eslint-disable-next-line import/no-unresolved
+  Component as ReactComponent
+} from 'react';
+import renderer from 'react-hyperscript';
+
+
+/// CYANO CODE
+
+
+type RenderElement = ReactElement | string | number | null;
+export type Children = ReactNode | ReactNode[];
+
+declare function renderFunction(
+  children?: Children | ReadonlyArray<RenderElement> | RenderElement,
+): ReactElement;
+
+declare function renderFunction<P = unknown>(
+  componentOrTag: FunctionComponent<P> | string,
+  children?: Children | ReadonlyArray<RenderElement> | RenderElement,
+): ReactElement;
+
+declare function renderFunction<P = unknown>(
+  componentOrTag: FunctionComponent<P> | string,
+  properties: P | null,
+  children?: Children | ReadonlyArray<RenderElement> | RenderElement,
+): ReactElement<P>;
+
+type FragmentProps = {
+  [key: string]: string | number;
+};
+
+type HyperScript = typeof renderFunction & {
+  trust: (
+    html: string,
+    wrapper?: string,
+  ) => ReactElement<{
+    dangerouslySetInnerHTML: {
+      __html: string;
+    };
+  }>;
+  fragment: (props?: FragmentProps, children?: ReactNode) => JSX.Element;
+  displayName: string;
+};
+
+export const render: HyperScript = Object.assign(renderer as typeof renderFunction, {
+  trust: (
+    html: string,
+    wrapper: FunctionComponent | string = '',
+  ): ReactElement =>
+    renderer(wrapper, {
+      dangerouslySetInnerHTML: { __html: html },
+    }),
+  fragment: (props: FragmentProps = {}, children: ReactNode = []) => (
+    <Fragment {...props}>{children}</Fragment>
+  ),
+  displayName: 'react',
+});
+
+export type Component<Props = unknown> = FunctionComponent<Props>;
+
+export const jsx = createElement;
+
+export type ResultNode = ReactElement;
+
+
+/// END CYANO CODE
+
+
+export class ClassComponent<A = {}> extends ReactComponent<A> {
+  public view(v: ResultNode): ResultNode {
+    return this.render() as ResultNode;
+  }
+}

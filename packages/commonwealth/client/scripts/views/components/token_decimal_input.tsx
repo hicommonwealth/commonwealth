@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/token_decimal_input.scss';
 
@@ -22,7 +22,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
   private switchCaption: string;
   private valueInWei: string;
 
-  oninit(vnode: m.Vnode<TokenDecimalInputAttrs>) {
+  oninit(vnode: ResultNode<TokenDecimalInputAttrs>) {
     const { defaultValueInWei } = vnode.attrs;
 
     this.valueInWei = defaultValueInWei || '0';
@@ -31,7 +31,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
     this.switchCaption = 'Using base token value';
   }
 
-  view(vnode: m.Vnode<TokenDecimalInputAttrs>) {
+  view(vnode: ResultNode<TokenDecimalInputAttrs>) {
     const { onInputChange, decimals } = vnode.attrs;
 
     return (

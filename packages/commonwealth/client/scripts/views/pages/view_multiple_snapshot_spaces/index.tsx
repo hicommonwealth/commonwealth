@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/snapshot/multiple_snapshots_page.scss';
 
@@ -70,7 +70,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
     proposals: SnapshotProposal[];
   }>;
 
-  view(vnode: m.Vnode<MultipleSnapshotsPageAttrs>) {
+  view(vnode: ResultNode<MultipleSnapshotsPageAttrs>) {
     const { action, proposal } = vnode.attrs;
     const redirectOptions = redirectHandler(action, proposal);
 

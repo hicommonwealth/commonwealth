@@ -2,7 +2,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import app from 'state';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -29,7 +29,7 @@ export class CreateCategory extends ClassComponent<ChannelAttrs> {
     this.channel = '';
   }
 
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.createChatChannel(
         this.channel,
@@ -95,7 +95,7 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
     this.channel = '';
   }
 
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.createChatChannel(
         this.channel,
@@ -150,7 +150,7 @@ export class RenameChannel extends ClassComponent<ChannelAttrs> {
     this.channelName = '';
   }
 
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       vnode.attrs.handleClose();
       await app.socket.chatNs.editChatChannel(
@@ -202,7 +202,7 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
     this.newCategory = '';
   }
 
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.editChatCategory(
         vnode.attrs.category,
@@ -248,7 +248,7 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
 }
 
 export class DeleteChannel extends ClassComponent<ChannelAttrs> {
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.deleteChatChannel(vnode.attrs.channel.id);
       vnode.attrs.handleClose();
@@ -282,7 +282,7 @@ export class DeleteChannel extends ClassComponent<ChannelAttrs> {
 }
 
 export class DeleteCategory extends ClassComponent<ChannelAttrs> {
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.deleteChatCategory(vnode.attrs.category);
       vnode.attrs.handleClose();

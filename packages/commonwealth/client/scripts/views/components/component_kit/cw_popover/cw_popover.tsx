@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
@@ -25,7 +25,7 @@ export type SharedPopoverAttrs = {
   persistOnHover?: boolean;
   tooltipType?: TooltipType;
   toSide?: boolean;
-  trigger: m.Vnode;
+  trigger: ResultNode;
 };
 
 type PopoverAttrs = {
@@ -51,7 +51,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     this.triggerRef = findRef(vnode.dom, 'trigger-wrapper-ref');
   }
 
-  onupdate(vnode: m.Vnode<PopoverAttrs>) {
+  onupdate(vnode: ResultNode<PopoverAttrs>) {
     if (this.isOpen && !this.isRendered) {
       try {
         this.applyPopoverPosition(vnode);
@@ -71,7 +71,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     m.redraw();
   }
 
-  applyPopoverPosition(vnode: m.Vnode<PopoverAttrs>) {
+  applyPopoverPosition(vnode: ResultNode<PopoverAttrs>) {
     // Apply styles in real time
     try {
       // TODO Gabe 6/1/22 - Figure out how to avoid these both being null at first
@@ -104,7 +104,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
   handleHoverExit(
     e: MouseEvent,
     onToggle: (isOpen: boolean) => void,
-    vnode: m.Vnode<PopoverAttrs>
+    vnode: ResultNode<PopoverAttrs>
   ) {
     const { persistOnHover } = vnode.attrs;
 
@@ -144,7 +144,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<PopoverAttrs>) {
+  view(vnode: ResultNode<PopoverAttrs>) {
     const {
       content,
       hoverOpenDelay,

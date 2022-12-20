@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/loading.scss';
 
@@ -14,7 +14,7 @@ type PageLoadingAttrs = {
 };
 
 export class PageLoading extends ClassComponent<PageLoadingAttrs> {
-  view(vnode: m.Vnode<PageLoadingAttrs>) {
+  view(vnode: ResultNode<PageLoadingAttrs>) {
     const { message } = vnode.attrs;
 
     return (

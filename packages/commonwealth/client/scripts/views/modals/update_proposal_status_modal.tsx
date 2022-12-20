@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/update_proposal_status_modal.scss';
@@ -29,7 +29,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
   private snapshotProposalsToSet: SnapshotProposal[];
   private stage: ThreadStage;
 
-  oninit(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
+  oninit(vnode: ResultNode<UpdateProposalStatusModalAttrs>) {
     this.stage = vnode.attrs.thread.stage;
 
     this.chainEntitiesToSet = [];
@@ -39,7 +39,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
     );
   }
 
-  view(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
+  view(vnode: ResultNode<UpdateProposalStatusModalAttrs>) {
     if (!app.chain?.meta) return;
 
     const { customStages } = app.chain.meta;

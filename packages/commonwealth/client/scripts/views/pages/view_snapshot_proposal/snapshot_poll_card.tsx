@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
 
@@ -29,7 +29,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
   private voteDirectionString: string;
   private localVoteInformation: Array<VoteInformation>;
 
-  oninit(vnode: m.Vnode<SnapshotPollCardAttrs>) {
+  oninit(vnode: ResultNode<SnapshotPollCardAttrs>) {
     // Initialize state which can change during the lifecycle of the component.
     this.hasVoted = vnode.attrs.hasVoted;
     this.voteDirectionString = vnode.attrs.votedFor
@@ -40,7 +40,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
     this.localVoteInformation = vnode.attrs.voteInformation;
   }
 
-  view(vnode: m.Vnode<SnapshotPollCardAttrs>) {
+  view(vnode: ResultNode<SnapshotPollCardAttrs>) {
     const {
       disableVoteButton = false,
       incrementalVoteCast,

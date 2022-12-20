@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import { Tag } from 'construct-ui';
 
@@ -10,7 +10,7 @@ type BreadcrumbsTitleTagAttrs = {
 };
 
 export class BreadcrumbsTitleTag extends ClassComponent<BreadcrumbsTitleTagAttrs> {
-  view(vnode: m.Vnode<BreadcrumbsTitleTagAttrs>) {
+  view(vnode: ResultNode<BreadcrumbsTitleTagAttrs>) {
     const { title } = vnode.attrs;
 
     return (

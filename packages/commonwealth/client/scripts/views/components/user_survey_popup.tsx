@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import app from 'state';
 
 import 'components/user_survey_popup.scss';
@@ -23,7 +23,7 @@ type UserSurveyViewAttrs = {
 };
 
 class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
-  view(vnode: m.Vnode<UserSurveyViewAttrs>) {
+  view(vnode: ResultNode<UserSurveyViewAttrs>) {
     const { disabled, checked, onRedirectClick, onClose, onCheckboxClick } =
       vnode.attrs;
     return (
@@ -113,7 +113,7 @@ export class UserSurveyPopup extends ClassComponent<UserSurveyPopupAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<UserSurveyPopupAttrs>) {
+  view(vnode: ResultNode<UserSurveyPopupAttrs>) {
     const { surveyReadyForDisplay } = vnode.attrs;
 
     const handleClose = () => {

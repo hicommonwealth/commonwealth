@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_avatar_username_input.scss';
 
@@ -25,7 +25,7 @@ type AvatarUsernameInputAttrs = {
 };
 
 export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAttrs> {
-  view(vnode: m.Vnode<AvatarUsernameInputAttrs>) {
+  view(vnode: ResultNode<AvatarUsernameInputAttrs>) {
     const {
       account,
       address,

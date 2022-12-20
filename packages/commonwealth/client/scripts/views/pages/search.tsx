@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
 import { ListItem, Select } from 'construct-ui';

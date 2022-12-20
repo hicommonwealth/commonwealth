@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 
@@ -30,7 +30,7 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
     this.loading = false;
   }
 
-  view(vnode: m.Vnode<ThreadReactionButtonAttrs>) {
+  view(vnode: ResultNode<ThreadReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};

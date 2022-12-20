@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
@@ -47,7 +47,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
 
-  view(vnode: m.Vnode<LayoutAttrs>) {
+  view(vnode: ResultNode<LayoutAttrs>) {
     const { scope, deferChain } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;

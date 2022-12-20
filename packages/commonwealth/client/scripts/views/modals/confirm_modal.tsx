@@ -12,7 +12,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 const ConfirmModal = {
   confirmExit: async () => true,
   view(
-    vnode: m.Vnode<{
+    vnode: ResultNode<{
       prompt: string;
       primaryButton?: string;
       secondaryButton?: string;

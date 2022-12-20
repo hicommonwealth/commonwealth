@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -61,7 +61,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private tipAmount: number;
   private votingModalOpen: boolean;
 
-  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
+  view(vnode: ResultNode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {

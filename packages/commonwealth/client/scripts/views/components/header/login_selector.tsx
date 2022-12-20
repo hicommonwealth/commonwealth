@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import {
   MenuItem,
   MenuDivider,
@@ -59,7 +59,7 @@ type LoginSelectorMenuLeftAttrs = {
 };
 
 export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftAttrs> {
-  view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
+  view(vnode: ResultNode<LoginSelectorMenuLeftAttrs>) {
     const { activeAddressesWithRole, nAccountsWithoutRole, mobile } =
       vnode.attrs;
 
@@ -156,7 +156,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
 type LoginSelectorMenuRightAttrs = { mobile?: boolean };
 
 export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRightAttrs> {
-  view(vnode: m.Vnode<LoginSelectorMenuRightAttrs>) {
+  view(vnode: ResultNode<LoginSelectorMenuRightAttrs>) {
     const { mobile } = vnode.attrs;
     const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
@@ -246,7 +246,7 @@ type TOSModalAttrs = {
 
 // TODO: Replace this with a proper TOS Compoment when we have one
 class TOSModal extends ClassComponent<TOSModalAttrs> {
-  view(vnode: m.Vnode<TOSModalAttrs>) {
+  view(vnode: ResultNode<TOSModalAttrs>) {
     return (
       <div class="TOSModal">
         <div class="close-button-wrapper">
@@ -274,7 +274,7 @@ type LoginSelectorAttrs = { small?: boolean };
 export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
   private profileLoadComplete: boolean;
 
-  view(vnode: m.Vnode<LoginSelectorAttrs>) {
+  view(vnode: ResultNode<LoginSelectorAttrs>) {
     const { small } = vnode.attrs;
 
     if (!app.isLoggedIn()) {

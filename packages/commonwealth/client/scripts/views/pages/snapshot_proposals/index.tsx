@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 import { Button } from 'construct-ui';
 
@@ -33,7 +33,7 @@ type SnapshotProposalStagesBarAttrs = {
 };
 
 class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
-  view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalStagesBarAttrs>) {
     return (
       <div class="SnapshotProposalStagesBar">
         {Object.values(SnapshotProposalFilter).map(
@@ -79,7 +79,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
     this.selectedFilter = SnapshotProposalFilter.Active;
   }
 
-  view(vnode: m.Vnode<SnapshotProposalsPageAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalsPageAttrs>) {
     const { selectedFilter } = this;
     const { snapshotId } = vnode.attrs;
 

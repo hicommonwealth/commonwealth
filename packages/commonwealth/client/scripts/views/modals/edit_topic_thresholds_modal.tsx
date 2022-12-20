@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 
@@ -21,7 +21,7 @@ type EditTopicThresholdsRowAttrs = {
 class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs> {
   private newTokenThresholdInWei: string;
 
-  view(vnode: m.Vnode<EditTopicThresholdsRowAttrs>) {
+  view(vnode: ResultNode<EditTopicThresholdsRowAttrs>) {
     const { topic } = vnode.attrs;
 
     if (typeof this.newTokenThresholdInWei !== 'string') {
@@ -90,7 +90,7 @@ type EditTopicThresholdsModalAttrs = {
 export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholdsModalAttrs> {
   private form: NewTopicModalForm;
 
-  view(vnode: m.Vnode<EditTopicThresholdsModalAttrs>) {
+  view(vnode: ResultNode<EditTopicThresholdsModalAttrs>) {
     if (
       !app.user.isSiteAdmin &&
       !app.roles.isAdminOfEntity({ chain: app.activeChainId() })

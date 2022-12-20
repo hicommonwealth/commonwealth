@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
@@ -262,7 +262,7 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
     this.loading = false;
   }
 
-  view(vnode: m.Vnode<InviteButtonAttrs>) {
+  view(vnode: ResultNode<InviteButtonAttrs>) {
     const {
       selection,
       successCallback,
@@ -388,7 +388,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
   private searchAddressTerm: string;
   private success: boolean;
 
-  view(vnode: m.Vnode<CreateInviteModalAttrs>) {
+  view(vnode: ResultNode<CreateInviteModalAttrs>) {
     const { chainInfo } = vnode.attrs;
 
     const chainOrCommunityObj = chainInfo ? { chain: chainInfo } : null;

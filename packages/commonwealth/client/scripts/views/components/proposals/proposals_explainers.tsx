@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import BN from 'bn.js';
 
 import { navigateToSubpage } from 'app';
@@ -13,7 +13,7 @@ import { CWButton } from '../component_kit/cw_button';
 type SubstrateProposalStatsAttrs = { nextLaunchBlock: number };
 
 export class SubstrateProposalStats extends ClassComponent<SubstrateProposalStatsAttrs> {
-  view(vnode: m.Vnode<SubstrateProposalStatsAttrs>) {
+  view(vnode: ResultNode<SubstrateProposalStatsAttrs>) {
     const { nextLaunchBlock } = vnode.attrs;
 
     return (
@@ -51,7 +51,7 @@ export class SubstrateProposalStats extends ClassComponent<SubstrateProposalStat
 type CompoundProposalStatsAttrs = { chain: Compound };
 
 export class CompoundProposalStats extends ClassComponent<CompoundProposalStatsAttrs> {
-  view(vnode: m.Vnode<CompoundProposalStatsAttrs>) {
+  view(vnode: ResultNode<CompoundProposalStatsAttrs>) {
     const { chain } = vnode.attrs;
 
     const symbol = chain.meta.default_symbol;

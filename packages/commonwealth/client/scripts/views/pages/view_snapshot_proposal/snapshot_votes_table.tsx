@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
@@ -29,7 +29,7 @@ type SnapshotVotesTableAttrs = {
 export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> {
   isVotersListExpanded: boolean;
 
-  view(vnode: m.Vnode<SnapshotVotesTableAttrs>) {
+  view(vnode: ResultNode<SnapshotVotesTableAttrs>) {
     const { choices, symbol, voters } = vnode.attrs;
 
     const toggleExpandedVoterList = () => {

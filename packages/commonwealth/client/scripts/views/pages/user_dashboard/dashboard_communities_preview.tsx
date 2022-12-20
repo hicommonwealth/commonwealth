@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { Tag } from 'construct-ui';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
@@ -25,7 +25,7 @@ type CommunityPreviewCardAttrs = {
 };
 
 class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
-  view(vnode: m.Vnode<CommunityPreviewCardAttrs>) {
+  view(vnode: ResultNode<CommunityPreviewCardAttrs>) {
     const { chain } = vnode.attrs;
     const { unseenPosts } = app.user;
     const visitedChain = !!unseenPosts[chain.id];

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/validators.scss';
 
@@ -37,7 +37,7 @@ type ValidatorAttrs = {
 };
 
 class Validator extends ClassComponent<ValidatorAttrs> {
-  view(vnode: m.Vnode<ValidatorAttrs>) {
+  view(vnode: ResultNode<ValidatorAttrs>) {
     const { info } = vnode.attrs;
 
     return (

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { InputSelect, ListItem } from 'construct-ui';
 
@@ -39,7 +39,7 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
     }
   }
 
-  view(vnode: m.Vnode<AddressInputTypeaheadAttrs>) {
+  view(vnode: ResultNode<AddressInputTypeaheadAttrs>) {
     const { options, oninput } = vnode.attrs;
 
     if (!this.initialized) {

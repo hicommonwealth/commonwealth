@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/proposal_card/index.scss';
@@ -20,7 +20,7 @@ type SnapshotProposalCardAttrs = {
 };
 
 export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAttrs> {
-  view(vnode: m.Vnode<SnapshotProposalCardAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalCardAttrs>) {
     const { proposal } = vnode.attrs;
 
     const proposalLink = `/snapshot/${vnode.attrs.snapshotId}/${proposal.id}`;

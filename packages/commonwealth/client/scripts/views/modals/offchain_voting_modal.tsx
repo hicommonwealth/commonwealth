@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'modals/offchain_voting_modal.scss';
 
@@ -14,7 +14,7 @@ type OffchainVotingModalAttrs = {
 };
 
 export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs> {
-  view(vnode: m.Vnode<OffchainVotingModalAttrs>) {
+  view(vnode: ResultNode<OffchainVotingModalAttrs>) {
     const { votes } = vnode.attrs;
 
     if (!votes || votes.length === 0) return;

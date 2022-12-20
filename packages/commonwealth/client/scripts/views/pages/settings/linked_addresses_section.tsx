@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 
 import 'pages/settings/linked_addresses_section.scss';
@@ -26,7 +26,7 @@ type AccountRowAttrs = {
 class AccountRow extends ClassComponent<AccountRowAttrs> {
   private removing: boolean;
 
-  view(vnode: m.Vnode<AccountRowAttrs>) {
+  view(vnode: ResultNode<AccountRowAttrs>) {
     const { account } = vnode.attrs;
     const isActiveAccount =
       app.user.activeAccount &&

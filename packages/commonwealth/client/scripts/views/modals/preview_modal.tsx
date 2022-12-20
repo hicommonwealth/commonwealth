@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'modals/preview_modal.scss';
 
@@ -28,7 +28,7 @@ type PreviewModalAttrs = {
 };
 
 export class PreviewModal extends ClassComponent<PreviewModalAttrs> {
-  view(vnode: m.Vnode<PreviewModalAttrs>) {
+  view(vnode: ResultNode<PreviewModalAttrs>) {
     const { title } = vnode.attrs;
 
     return (

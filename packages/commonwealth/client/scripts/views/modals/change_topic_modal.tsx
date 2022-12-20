@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/change_topic_modal.scss';
@@ -20,12 +20,12 @@ type ChangeTopicModalAttrs = {
 export class ChangeTopicModal extends ClassComponent<ChangeTopicModalAttrs> {
   private activeTopic: Topic;
 
-  oninit(vnode: m.Vnode<ChangeTopicModalAttrs>) {
+  oninit(vnode: ResultNode<ChangeTopicModalAttrs>) {
     if (!vnode.attrs.thread.topic) return;
     this.activeTopic = vnode.attrs.thread.topic;
   }
 
-  view(vnode: m.Vnode<ChangeTopicModalAttrs>) {
+  view(vnode: ResultNode<ChangeTopicModalAttrs>) {
     const { thread } = vnode.attrs;
 
     return (

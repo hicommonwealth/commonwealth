@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_empty_state.scss';
 
@@ -10,12 +10,12 @@ import { IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 
 type EmptyStateAttrs = {
-  content: string | m.Vnode;
+  content: string | ResultNode;
   iconName?: IconName;
 };
 
 export class CWEmptyState extends ClassComponent<EmptyStateAttrs> {
-  view(vnode: m.Vnode<EmptyStateAttrs>) {
+  view(vnode: ResultNode<EmptyStateAttrs>) {
     const { content, iconName } = vnode.attrs;
 
     return (

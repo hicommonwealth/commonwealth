@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/proposal_pills.scss';
@@ -12,7 +12,7 @@ import { CWText } from './component_kit/cw_text';
 type ActiveProposalPillAttrs = { proposalEnd: number };
 
 export class ActiveProposalPill extends ClassComponent<ActiveProposalPillAttrs> {
-  view(vnode: m.Vnode<ActiveProposalPillAttrs>) {
+  view(vnode: ResultNode<ActiveProposalPillAttrs>) {
     const { proposalEnd } = vnode.attrs;
 
     return (
@@ -31,7 +31,7 @@ export class ActiveProposalPill extends ClassComponent<ActiveProposalPillAttrs> 
 type ClosedProposalPillAttrs = { proposalState: string };
 
 export class ClosedProposalPill extends ClassComponent<ClosedProposalPillAttrs> {
-  view(vnode: m.Vnode<ClosedProposalPillAttrs>) {
+  view(vnode: ResultNode<ClosedProposalPillAttrs>) {
     const { proposalState } = vnode.attrs;
 
     return (

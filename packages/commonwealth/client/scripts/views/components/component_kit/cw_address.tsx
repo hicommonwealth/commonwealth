@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_address.scss';
 
@@ -14,7 +14,7 @@ type AddressAttrs = {
 };
 
 export class CWAddress extends ClassComponent<AddressAttrs> {
-  view(vnode: m.Vnode<AddressAttrs>) {
+  view(vnode: ResultNode<AddressAttrs>) {
     const { address, darkMode } = vnode.attrs;
     return (
       <div class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'Address')}>

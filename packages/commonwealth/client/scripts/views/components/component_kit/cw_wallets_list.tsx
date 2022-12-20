@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -118,7 +118,7 @@ type AccountSelectorAttrs = {
 };
 
 export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
-  view(vnode: m.Vnode<AccountSelectorAttrs>) {
+  view(vnode: ResultNode<AccountSelectorAttrs>) {
     const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
 
     return (
@@ -164,7 +164,7 @@ type WalletsListAttrs = {
 };
 
 export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
-  view(vnode: m.Vnode<WalletsListAttrs>) {
+  view(vnode: ResultNode<WalletsListAttrs>) {
     const {
       connectAnotherWayOnclick,
       darkMode,

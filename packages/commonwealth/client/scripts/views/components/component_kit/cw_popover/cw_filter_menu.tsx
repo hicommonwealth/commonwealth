@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
 
@@ -22,7 +22,7 @@ type FilterMenuAttrs = {
 // DO NOT USE! DOESN'T WORK YET
 
 export class CWFilterMenu extends ClassComponent<FilterMenuAttrs> {
-  view(vnode: m.Vnode<FilterMenuAttrs>) {
+  view(vnode: ResultNode<FilterMenuAttrs>) {
     const { filterMenuItems, header, onchange, selectedItems } = vnode.attrs;
     // console.log({ selectedItems });
 

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_button.scss';
 
@@ -27,7 +27,7 @@ type RadioButtonAttrs = {
   RadioButtonStyleAttrs;
 
 export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
-  view(vnode: m.Vnode<RadioButtonAttrs>) {
+  view(vnode: ResultNode<RadioButtonAttrs>) {
     const {
       disabled = false,
       groupName,

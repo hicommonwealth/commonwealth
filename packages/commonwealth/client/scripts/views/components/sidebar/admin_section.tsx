@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import app from 'state';
 import { handleRedirectClicks } from 'helpers';
 import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';

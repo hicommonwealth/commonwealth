@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/comments/edit_comment.scss';
 
@@ -26,7 +26,7 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
   private quillEditorState: QuillEditor;
   private saving: boolean;
 
-  view(vnode: m.Vnode<EditCommentAttrs>) {
+  view(vnode: ResultNode<EditCommentAttrs>) {
     const {
       comment,
       savedEdits,

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
 
@@ -10,7 +10,7 @@ import { IconComponentAttrs } from './types';
 import { ComponentType } from '../types';
 
 export class CWIcon extends ClassComponent<IconComponentAttrs> {
-  view(vnode: m.Vnode<IconComponentAttrs>) {
+  view(vnode: ResultNode<IconComponentAttrs>) {
     const {
       className,
       componentType = ComponentType.Icon,

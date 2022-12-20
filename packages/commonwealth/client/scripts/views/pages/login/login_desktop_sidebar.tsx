@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import app from 'state';
 
 import 'pages/login/login_desktop_sidebar.scss';
@@ -46,7 +46,7 @@ type LoginDesktopSidebarAttrs = {
 };
 
 export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs> {
-  view(vnode: m.Vnode<LoginDesktopSidebarAttrs>) {
+  view(vnode: ResultNode<LoginDesktopSidebarAttrs>) {
     const {
       sidebarType,
       createNewAccountCallback,

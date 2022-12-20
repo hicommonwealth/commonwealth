@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_thread_vote_button.scss';
 
@@ -21,11 +21,11 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
   private isHoveringDownvote: boolean;
   private initialVoteCount: number;
 
-  oninit(vnode: m.Vnode<ThreadVoteButtonAttrs>) {
+  oninit(vnode: ResultNode<ThreadVoteButtonAttrs>) {
     this.initialVoteCount = vnode.attrs.voteCount;
   }
 
-  view(vnode: m.Vnode<ThreadVoteButtonAttrs>) {
+  view(vnode: ResultNode<ThreadVoteButtonAttrs>) {
     const { updateVoteCount, voteCount } = vnode.attrs;
 
     const handleVoteChange = (newCount: number) => {

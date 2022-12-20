@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_profiles_list.scss';
 
@@ -20,7 +20,7 @@ export type ProfileRowAttrs = {
 } & ProfileRowStyleAttrs;
 
 export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
-  view(vnode: m.Vnode<ProfileRowAttrs>) {
+  view(vnode: ResultNode<ProfileRowAttrs>) {
     const { darkMode, isSelected, onclick, name } = vnode.attrs;
 
     return (
@@ -55,7 +55,7 @@ type ProfilesListAttrs = {
 };
 
 export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
-  view(vnode: m.Vnode<ProfilesListAttrs>) {
+  view(vnode: ResultNode<ProfilesListAttrs>) {
     const { darkMode, onclick, profiles } = vnode.attrs;
 
     return (

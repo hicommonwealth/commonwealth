@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -124,7 +124,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     );
   }
 
-  view(vnode: m.Vnode<ChatWindowAttrs>) {
+  view(vnode: ResultNode<ChatWindowAttrs>) {
     if (this.hideChat) return;
 
     const { channel_id } = vnode.attrs;

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import app from 'state';
 import { AnyProposal, Thread } from 'models';
@@ -21,7 +21,7 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
   private body: any;
   private collapsed: boolean;
 
-  oninit(vnode: m.Vnode<CollapsibleThreadBodyAttrs>) {
+  oninit(vnode: ResultNode<CollapsibleThreadBodyAttrs>) {
     const { thread } = vnode.attrs;
 
     this.collapsed = false;
@@ -41,13 +41,13 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
     }
   }
 
-  onupdate(vnode: m.Vnode<CollapsibleThreadBodyAttrs>) {
+  onupdate(vnode: ResultNode<CollapsibleThreadBodyAttrs>) {
     const { thread } = vnode.attrs;
 
     this.body = thread.body;
   }
 
-  view(vnode: m.Vnode<CollapsibleThreadBodyAttrs>) {
+  view(vnode: ResultNode<CollapsibleThreadBodyAttrs>) {
     const { body } = this;
 
     const getPlaceholder = () => {
@@ -118,7 +118,7 @@ export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalB
   private body: any;
   private collapsed: boolean;
 
-  oninit(vnode: m.Vnode<CollapsibleProposalBodyAttrs>) {
+  oninit(vnode: ResultNode<CollapsibleProposalBodyAttrs>) {
     const { proposal } = vnode.attrs;
 
     this.collapsed = false;
@@ -139,7 +139,7 @@ export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalB
     }
   }
 
-  onupdate(vnode: m.Vnode<CollapsibleProposalBodyAttrs>) {
+  onupdate(vnode: ResultNode<CollapsibleProposalBodyAttrs>) {
     const { proposal } = vnode.attrs;
 
     this.body = proposal.description;

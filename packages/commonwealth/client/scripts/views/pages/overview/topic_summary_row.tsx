@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
@@ -28,7 +28,7 @@ type TopicSummaryRowAttrs = {
 };
 
 export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
-  view(vnode: m.Vnode<TopicSummaryRowAttrs>) {
+  view(vnode: ResultNode<TopicSummaryRowAttrs>) {
     const { monthlyThreads, topic } = vnode.attrs;
 
     const topFiveSortedThreads = monthlyThreads

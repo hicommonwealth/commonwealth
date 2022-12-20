@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -31,7 +31,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
   private membersFetched: boolean;
   private removedEditors: any;
 
-  view(vnode: m.Vnode<EditCollaboratorsModalAttrs>) {
+  view(vnode: ResultNode<EditCollaboratorsModalAttrs>) {
     const { thread } = vnode.attrs;
 
     // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state

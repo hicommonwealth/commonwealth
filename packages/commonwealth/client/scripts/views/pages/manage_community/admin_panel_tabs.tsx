@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 
@@ -20,11 +20,11 @@ type AdminPanelTabsAttrs = {
 export class AdminPanelTabs extends ClassComponent<AdminPanelTabsAttrs> {
   private index: number;
 
-  oninit(vnode: m.Vnode<AdminPanelTabsAttrs>) {
+  oninit(vnode: ResultNode<AdminPanelTabsAttrs>) {
     this.index = vnode.attrs.defaultTab;
   }
 
-  view(vnode: m.Vnode<AdminPanelTabsAttrs>) {
+  view(vnode: ResultNode<AdminPanelTabsAttrs>) {
     return (
       <div class="AdminPanelTabs">
         <CWTabBar>

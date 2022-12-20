@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { ListItem, QueryList } from 'construct-ui';
 
 import 'components/thread_selector.scss';
@@ -57,14 +57,14 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
   private searchTerm: string;
   private showOnlyLinkedThreads: boolean;
 
-  oninit(vnode: m.Vnode<ThreadSelectorAttrs>) {
+  oninit(vnode: ResultNode<ThreadSelectorAttrs>) {
     this.showOnlyLinkedThreads = true;
     this.searchResults = [];
     this.linkedThreads = vnode.attrs.linkedThreads;
     this.searchTerm = '';
   }
 
-  view(vnode: m.Vnode<ThreadSelectorAttrs>) {
+  view(vnode: ResultNode<ThreadSelectorAttrs>) {
     const { linkingThread } = vnode.attrs;
     const { searchResults } = this;
 

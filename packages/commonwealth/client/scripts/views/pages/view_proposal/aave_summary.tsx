@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_proposal/aave_summary.scss';
 
@@ -14,7 +14,7 @@ type AaveViewProposalDetailAttrs = {
 };
 
 export class AaveViewProposalDetail extends ClassComponent<AaveViewProposalDetailAttrs> {
-  view(vnode: m.Vnode<AaveViewProposalDetailAttrs>) {
+  view(vnode: ResultNode<AaveViewProposalDetailAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (

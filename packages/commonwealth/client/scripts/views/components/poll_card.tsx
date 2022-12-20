@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
 
@@ -36,7 +36,7 @@ export type PollOptionAttrs = {
 };
 
 export class PollOptions extends ClassComponent<PollOptionAttrs> {
-  view(vnode: m.Vnode<PollOptionAttrs>) {
+  view(vnode: ResultNode<PollOptionAttrs>) {
     const {
       multiSelect,
       voteInformation,
@@ -91,7 +91,7 @@ export type CastVoteAttrs = {
 };
 
 export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
-  view(vnode: m.Vnode<CastVoteAttrs>) {
+  view(vnode: ResultNode<CastVoteAttrs>) {
     const {
       disableVoteButton,
       timeRemaining,
@@ -140,7 +140,7 @@ export type VoteDisplayAttrs = {
 };
 
 export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
-  view(vnode: m.Vnode<VoteDisplayAttrs>) {
+  view(vnode: ResultNode<VoteDisplayAttrs>) {
     const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
       vnode.attrs;
 
@@ -196,7 +196,7 @@ export type ResultsSectionAttrs = {
 };
 
 export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
-  view(vnode: m.Vnode<ResultsSectionAttrs>) {
+  view(vnode: ResultNode<ResultsSectionAttrs>) {
     const {
       resultString,
       onResultsClick,
@@ -315,7 +315,7 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
   private totalVoteCount: number;
   private voteDirectionString: string;
 
-  oninit(vnode: m.Vnode<PollCardAttrs>) {
+  oninit(vnode: ResultNode<PollCardAttrs>) {
     // Initialize state which can change during the lifecycle of the component.
     this.hasVoted = vnode.attrs.hasVoted;
     this.voteDirectionString = vnode.attrs.votedFor
@@ -325,7 +325,7 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
     this.selectedOptions = [];
   }
 
-  view(vnode: m.Vnode<PollCardAttrs>) {
+  view(vnode: ResultNode<PollCardAttrs>) {
     const {
       disableVoteButton = false,
       incrementalVoteCast,

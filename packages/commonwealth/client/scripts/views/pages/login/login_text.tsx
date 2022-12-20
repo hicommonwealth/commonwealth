@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/login/login_text.scss';
 
@@ -19,7 +19,7 @@ type LoginTextAttrs = {
 };
 
 export class LoginText extends ClassComponent<LoginTextAttrs> {
-  view(vnode: m.Vnode<LoginTextAttrs>) {
+  view(vnode: ResultNode<LoginTextAttrs>) {
     const { bodyText, className, headerText, isMobile = false } = vnode.attrs;
 
     return (

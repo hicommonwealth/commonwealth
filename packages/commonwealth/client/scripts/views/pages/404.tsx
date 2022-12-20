@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import Sublayout from 'views/sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
@@ -9,7 +9,7 @@ import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 type PageNotFoundAttrs = { title?: string; message?: string };
 
 export class PageNotFound extends ClassComponent<PageNotFoundAttrs> {
-  view(vnode: m.Vnode<PageNotFoundAttrs>) {
+  view(vnode: ResultNode<PageNotFoundAttrs>) {
     const { message } = vnode.attrs;
 
     return (

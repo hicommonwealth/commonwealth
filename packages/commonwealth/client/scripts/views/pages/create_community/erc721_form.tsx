@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import $ from 'jquery';
 import Web3 from 'web3';
 import { providers } from 'ethers';
@@ -57,11 +57,11 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode: m.Vnode<EthChainAttrs>) {
+  oninit(vnode: ResultNode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode: m.Vnode<EthChainAttrs>) {
+  view(vnode: ResultNode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 

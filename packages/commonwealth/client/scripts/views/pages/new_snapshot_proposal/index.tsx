@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/new_proposal_page.scss';
 
@@ -11,7 +11,7 @@ import NewProposalForm from './new_proposal_form';
 type NewProposalSnapshotPageAttrs = { snapshotId: string };
 
 class NewSnapshotProposalPage extends ClassComponent<NewProposalSnapshotPageAttrs> {
-  view(vnode: m.Vnode<NewProposalSnapshotPageAttrs>) {
+  view(vnode: ResultNode<NewProposalSnapshotPageAttrs>) {
     return (
       <Sublayout
       // title="New Snapshot Proposal"

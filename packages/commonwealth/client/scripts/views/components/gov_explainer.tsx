@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/gov_explainer.scss';
 import { CWText } from './component_kit/cw_text';
@@ -23,7 +23,7 @@ type GovExplainerAttrs = {
 };
 
 export class GovExplainer extends ClassComponent<GovExplainerAttrs> {
-  view(vnode: m.Vnode<GovExplainerAttrs>) {
+  view(vnode: ResultNode<GovExplainerAttrs>) {
     const { statHeaders, stats, statAction } = vnode.attrs;
 
     return (

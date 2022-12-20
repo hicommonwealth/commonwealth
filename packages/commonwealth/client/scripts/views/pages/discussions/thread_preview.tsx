@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
@@ -61,7 +61,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
     });
   }
 
-  view(vnode: m.Vnode<ThreadPreviewAttrs>) {
+  view(vnode: ResultNode<ThreadPreviewAttrs>) {
     const { thread } = vnode.attrs;
 
     // const commentsCount = app.comments.nComments(thread);

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 
@@ -23,7 +23,7 @@ type UserDashboardRowAttrs = {
 };
 
 export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
-  view(vnode: m.Vnode<UserDashboardRowAttrs>) {
+  view(vnode: ResultNode<UserDashboardRowAttrs>) {
     const {
       likeCount,
       viewCount,

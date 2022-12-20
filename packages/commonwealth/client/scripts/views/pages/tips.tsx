@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/tips.scss';
 
@@ -28,7 +28,7 @@ type TipAttrs = {
 };
 
 class Tip extends ClassComponent<TipAttrs> {
-  view(vnode: m.Vnode<TipAttrs>) {
+  view(vnode: ResultNode<TipAttrs>) {
     const { proposal } = vnode.attrs;
     const beneficiary = app.chain.accounts.get(proposal.data.who);
 

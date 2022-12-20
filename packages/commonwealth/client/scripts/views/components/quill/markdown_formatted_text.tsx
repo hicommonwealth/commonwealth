@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
@@ -39,7 +39,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
   truncatedDoc;
   isTruncated: boolean;
 
-  oninit(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
+  oninit(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
@@ -53,7 +53,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
     }
   }
 
-  view(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
+  view(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
     const {
       doc,
       hideFormatting,

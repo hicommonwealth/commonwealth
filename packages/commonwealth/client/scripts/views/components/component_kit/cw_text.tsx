@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text.scss';
 
@@ -60,7 +60,7 @@ const getFontWeight = (type: FontType) => {
 };
 
 export class CWText extends ClassComponent<TextAttrs> {
-  view(vnode: m.Vnode<TextAttrs>) {
+  view(vnode: ResultNode<TextAttrs>) {
     const {
       className,
       disabled = false,

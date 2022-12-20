@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_button.scss';
 
@@ -38,7 +38,7 @@ export type ButtonStyleAttrs = {
 export type ButtonAttrs = {
   iconLeft?: IconName;
   iconRight?: IconName;
-  label: string | m.Vnode;
+  label: string | ResultNode;
   onclick?: (e?: MouseEvent) => void;
 } & ButtonStyleAttrs;
 
@@ -53,7 +53,7 @@ const getTextType = (buttonType: ButtonType) => {
 };
 
 export class CWButton extends ClassComponent<ButtonAttrs> {
-  view(vnode: m.Vnode<ButtonAttrs>) {
+  view(vnode: ResultNode<ButtonAttrs>) {
     const {
       buttonType = 'primary-blue',
       className,

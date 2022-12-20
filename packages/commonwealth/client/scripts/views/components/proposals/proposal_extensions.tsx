@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/proposals/proposal_extensions.scss';
 
@@ -28,7 +28,7 @@ type ProposalExtensionsAttrs = {
 };
 
 export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> {
-  view(vnode: m.Vnode<ProposalExtensionsAttrs>) {
+  view(vnode: ResultNode<ProposalExtensionsAttrs>) {
     const {
       proposal,
       setCosmosDepositAmount,

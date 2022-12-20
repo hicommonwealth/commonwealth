@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
@@ -70,7 +70,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
   chain: string;
   activeChannel: number;
 
-  async oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
+  async oninit(vnode: ResultNode<SidebarSectionAttrs>) {
     this.loaded = false;
     this.chain = app.activeChainId();
     this.activeChannel = null;
@@ -139,7 +139,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
   }
 
   onbeforeupdate(
-    vnode: m.Vnode<SidebarSectionAttrs>,
+    vnode: ResultNode<SidebarSectionAttrs>,
     old: m.VnodeDOM<SidebarSectionAttrs, this>
   ) {
     if (
@@ -204,7 +204,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
 
     // ---------- Build Section Props ---------- //
 
-    const sectionAdminButton: m.Vnode = m(Icon, {
+    const sectionAdminButton: ResultNode = m(Icon, {
       name: Icons.PLUS_CIRCLE,
       onclick: (e) => {
         e.stopPropagation();
@@ -212,7 +212,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       },
     });
 
-    const categoryAdminButton = (category: string): m.Vnode => {
+    const categoryAdminButton = (category: string): ResultNode => {
       const handleMouseout = () => {
         if (this.menuToggleTree['children'][category]['toggledState']) {
           this.menuToggleTree['children'][category]['toggledState'] = false;
@@ -409,7 +409,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       m.redraw();
     };
 
-    const overlayContent: m.Vnode = this.adminModals['CreateCategory'] ? (
+    const overlayContent: ResultNode = this.adminModals['CreateCategory'] ? (
       <CreateCategory handleClose={closeOverlay} />
     ) : this.adminModals['CreateChannel'] ? (
       <CreateChannel handleClose={closeOverlay} category={this.adminCategory} />

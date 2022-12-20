@@ -11,7 +11,7 @@ import app from 'state';
 
 const AlertModal = {
   confirmExit: async () => true,
-  view(vnode: m.Vnode<{ text: string; primaryButton?: string }>) {
+  view(vnode: ResultNode<{ text: string; primaryButton?: string }>) {
     const alertText = vnode.attrs.text;
     const primaryButton = vnode.attrs.primaryButton || 'Continue';
 

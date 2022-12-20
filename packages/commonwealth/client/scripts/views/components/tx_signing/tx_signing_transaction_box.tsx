@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_transaction_box.scss';
 
@@ -17,7 +17,7 @@ type TXSigningTransactionBoxAttrs = {
 };
 
 export class TXSigningTransactionBox extends ClassComponent<TXSigningTransactionBoxAttrs> {
-  view(vnode: m.Vnode<TXSigningTransactionBoxAttrs>) {
+  view(vnode: ResultNode<TXSigningTransactionBoxAttrs>) {
     const { blockHash, blockNum, status, success, timestamp } = vnode.attrs;
 
     return (

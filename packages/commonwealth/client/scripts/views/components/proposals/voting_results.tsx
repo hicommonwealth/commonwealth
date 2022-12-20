@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import BN from 'bn.js';
 import Web3 from 'web3';
 
@@ -27,7 +27,7 @@ import {
 type VotingResultsAttrs = { proposal: AnyProposal };
 
 export class VotingResults extends ClassComponent<VotingResultsAttrs> {
-  view(vnode: m.Vnode<VotingResultsAttrs>) {
+  view(vnode: ResultNode<VotingResultsAttrs>) {
     const { proposal } = vnode.attrs;
     const votes = proposal.getVotes();
 

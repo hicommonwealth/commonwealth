@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'components/component_kit/cw_banner.scss';
 
@@ -11,13 +11,13 @@ import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
 
 type BannerAttrs = {
-  bannerContent: string | m.Vnode;
+  bannerContent: string | ResultNode;
   className?: string;
   onClose?: () => void;
 };
 
 export class CWBanner extends ClassComponent<BannerAttrs> {
-  view(vnode: m.Vnode<BannerAttrs>) {
+  view(vnode: ResultNode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
@@ -35,7 +35,7 @@ export class CWBanner extends ClassComponent<BannerAttrs> {
 }
 
 export class CWMessageBanner extends ClassComponent<BannerAttrs> {
-  view(vnode: m.Vnode<BannerAttrs>) {
+  view(vnode: ResultNode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 
 import 'pages/view_proposal/linked_proposals_embed.scss';
 
@@ -28,7 +28,7 @@ type LinkedProposalsEmbedAttrs = {
 };
 
 export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAttrs> {
-  view(vnode: m.Vnode<LinkedProposalsEmbedAttrs>) {
+  view(vnode: ResultNode<LinkedProposalsEmbedAttrs>) {
     const { proposal } = vnode.attrs;
 
     // show link to treasury proposal if this is a proposal that passes a treasury spend

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent } from 'mithrilInterop';
+import { ClassComponent, ResultNode } from 'mithrilInterop';
 import { int } from 'aws-sdk/clients/datapipeline';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
@@ -10,7 +10,7 @@ import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 type SharePopoverAttrs = { commentId?: int };
 
 export class SharePopover extends ClassComponent<{ commentId?: int }> {
-  view(vnode: m.Vnode<SharePopoverAttrs>) {
+  view(vnode: ResultNode<SharePopoverAttrs>) {
     const domain = document.location.origin;
 
     return (
