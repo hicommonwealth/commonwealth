@@ -54,22 +54,6 @@ class SearchController {
         );
       }
 
-      if (scope.includes(SearchScope.Members)) {
-        const addrs = await this.searchMentionableAddresses(
-          searchTerm,
-          { resultSize, chainScope },
-          ['created_at', 'DESC']
-        );
-
-        searchCache.results[SearchScope.Members] = addrs
-          .map((addr) => {
-            addr.SearchContentType = SearchContentType.Member;
-            addr.searchType = SearchScope.Members;
-            return addr;
-          })
-          .sort(this.sortResults);
-      }
-
       if (scope.includes(SearchScope.Replies)) {
         const comments = await this.searchComments(searchTerm, {
           resultSize,
@@ -99,6 +83,22 @@ class SearchController {
             return chain;
           })
           .sort(this.sortCommunities);
+      }
+
+      if (scope.includes(SearchScope.Members)) {
+        const addrs = await this.searchMentionableAddresses(
+          searchTerm,
+          { resultSize, chainScope },
+          ['created_at', 'DESC']
+        );
+
+        searchCache.results[SearchScope.Members] = addrs
+          .map((addr) => {
+            addr.SearchContentType = SearchContentType.Member;
+            addr.searchType = SearchScope.Members;
+            return addr;
+          })
+          .sort(this.sortResults);
       }
     } finally {
       searchCache.loaded = true;
