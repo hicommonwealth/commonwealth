@@ -78,14 +78,6 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
       return <PageLoading />;
     }
 
-    if (!app.user.activeAccount) {
-      return <CWText>Must be logged in</CWText>;
-    }
-
-    if (app.chain?.network === ChainNetwork.Plasm) {
-      return <CWText>Unsupported network</CWText>;
-    }
-
     const getForm = (typeEnum) => {
       switch (typeEnum) {
         case ProposalType.AaveProposal:
@@ -113,13 +105,23 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
       }
     };
 
+    const getBody = () => {
+      if (!app.user.activeAccount) {
+        return <CWText>Must be logged in</CWText>;
+      } else if (app.chain?.network === ChainNetwork.Plasm) {
+        return <CWText>Unsupported network</CWText>;
+      } else {
+        return getForm(this.typeEnum);
+      }
+    };
+
     return (
       <Sublayout>
         <div class="NewProposalPage">
           <CWText type="h3" fontWeight="medium">
             New {proposalSlugToFriendlyName.get(this.typeEnum)}
           </CWText>
-          {getForm(this.typeEnum)}
+          {getBody()}
         </div>
       </Sublayout>
     );
