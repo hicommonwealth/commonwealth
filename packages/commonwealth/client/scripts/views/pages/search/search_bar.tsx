@@ -108,6 +108,8 @@ export class SearchBar extends ClassComponent {
       goToSearchPage(this.searchQuery);
     };
 
+    console.log(this.searchResults);
+
     return (
       <div class="SearchBar">
         <div class="search-and-icon-container">
@@ -156,7 +158,7 @@ export class SearchBar extends ClassComponent {
           )}
           {this.searchResults && this.showDropdown && (
             <div class="search-results-dropdown">
-              {Object.keys(this.searchResults).length > 0 ? (
+              {Object.values(this.searchResults).flat(1).length > 0 ? (
                 <div class="previews-section">
                   {Object.entries(this.searchResults).map(([k, v]) => {
                     if (k === SearchScope.Threads && v.length > 0) {
@@ -239,7 +241,9 @@ export class SearchBar extends ClassComponent {
                   })}
                 </div>
               ) : (
-                <CWText type="caption">No Results</CWText>
+                <CWText type="caption" className="no-results-text">
+                  No Results
+                </CWText>
               )}
               {/* {historyList.length > 0 && (
                 <div class="history-section">
