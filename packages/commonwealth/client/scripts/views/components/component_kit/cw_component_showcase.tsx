@@ -163,6 +163,9 @@ export class ComponentShowcase extends ClassComponent {
           <CWTag label="Passed" status="passed" />
           <CWTag label="Failed" status="failed" />
           <CWTag label="Active" status="active" />
+          <CWTag label="Poll" type="poll" />
+          <CWTag label="Prop #52" type="proposal" />
+          <CWTag label="Ref #90" type="referendum" />
           <CWTag label="12 days" iconName="clock" />
         </div>
         <div class="basic-gallery">
