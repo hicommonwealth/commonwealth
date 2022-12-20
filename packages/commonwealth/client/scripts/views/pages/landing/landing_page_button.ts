@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 interface IAttrs {
   onclick?: () => {};
@@ -7,7 +7,7 @@ interface IAttrs {
   text: string;
 }
 
-const LandingPageButton: m.Component<IAttrs, {}> = {
+const LandingPageButton: Component<IAttrs, {}> = {
   view: (vnode) => {
     return render(
       'a',

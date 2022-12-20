@@ -1,13 +1,13 @@
 import 'pages/landing/creators_card_section.scss';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import { ICardListItem } from 'models/interfaces';
 
 import LandingPageButton from './landing_page_button';
 import ItemListsMapper from './list_mapper_with_item';
 
-const TokensCreatorComponent: m.Component<{ creators: ICardListItem[] }, {}> = {
+const TokensCreatorComponent: Component<{ creators: ICardListItem[] }, {}> = {
   view: (vnode) => {
     const { creators } = vnode.attrs;
 

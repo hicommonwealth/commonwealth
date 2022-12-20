@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { debounce } from 'lodash';
 
 import 'pages/discussions/index.scss';
@@ -66,7 +66,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
     }
 
     this.topicName = vnode.attrs.topic;
-    this.stageName = m.route.param('stage');
+    this.stageName = getRouteParam('stage');
 
     const { topicName, stageName } = this;
 

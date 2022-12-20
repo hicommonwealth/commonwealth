@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import moment from 'moment';
 import {
@@ -446,8 +446,8 @@ export class SearchBar extends ClassComponent {
     if (!this.searchTerm) this.searchTerm = '';
 
     if (!this.searchQuery) {
-      this.searchQuery = m.route.get().startsWith('/search')
-        ? SearchQuery.fromUrlParams(m.route.param())
+      this.searchQuery = getRoute().startsWith('/search')
+        ? SearchQuery.fromUrlParams(getRouteParam())
         : new SearchQuery('', {
             isSearchPreview: true,
             chainScope: app.activeChainId(),
@@ -625,7 +625,7 @@ export class SearchBar extends ClassComponent {
         tabIndex: -10,
         contentRight:
           this.searchTerm && render(ControlGroup, [cancelInputIcon, searchIcon]),
-        defaultValue: m.route.param('q') || this.searchTerm,
+        defaultValue: getRouteParam('q') || this.searchTerm,
         value: this.searchTerm,
         autocomplete: 'off',
         onclick: async () => {

@@ -18,7 +18,7 @@
 //   item: Thread | Comment<any>;
 // }
 
-// const VersionHistoryModal: m.Component<IVersionHistoryAttrs, {}> = {
+// const VersionHistoryModal: Component<IVersionHistoryAttrs, {}> = {
 //   view: (vnode) => {
 //     const { item } = vnode.attrs;
 //     if (!item) return;

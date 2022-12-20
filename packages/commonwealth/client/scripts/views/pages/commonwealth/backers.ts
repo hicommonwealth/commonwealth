@@ -6,7 +6,7 @@
 // import Sublayout from 'views/sublayout';
 // import { PageLoading } from 'views/pages/loading';
 
-// const BackersPage: m.Component<{}> = {
+// const BackersPage: Component<{}> = {
 //   view: (vnode) => {
 //     if (!app.chain || !app.chain.loaded) {
 //       return render(PageLoading, {

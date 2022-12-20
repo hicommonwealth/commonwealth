@@ -4,7 +4,7 @@ import 'pages/admin.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import app from 'state';
@@ -24,7 +24,7 @@ interface ISudoFormState {
   resultText: string;
 }
 
-const SudoForm: m.Component<{}, ISudoFormState> = {
+const SudoForm: Component<{}, ISudoFormState> = {
   view: (vnode) => {
     const author = app.user.activeAccount as SubstrateAccount;
     if (!(app.chain as Substrate).chain.sudoKey) {
@@ -120,7 +120,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
   },
 };
 
-const ChainStats: m.Component<{}> = {
+const ChainStats: Component<{}> = {
   view: () => {
     const header = (label) =>
       render('h4.header', { style: 'margin: 15px 0;' }, label);
@@ -237,7 +237,7 @@ interface IAdminActionsState {
   role: string;
 }
 
-const AdminActions: m.Component<{}, IAdminActionsState> = {
+const AdminActions: Component<{}, IAdminActionsState> = {
   oninit: (vnode: ResultNode<{}, IAdminActionsState>) => {
     const profiles = app.profiles.store.getAll();
     vnode.state.profiles = {};
@@ -367,7 +367,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
   },
 };
 
-const AdminPage: m.Component<{}> = {
+const AdminPage: Component<{}> = {
   oncreate: () => {},
   view: () => {
     if (!app.user.isSiteAdmin) {

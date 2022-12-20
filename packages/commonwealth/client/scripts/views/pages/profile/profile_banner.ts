@@ -1,7 +1,7 @@
 import m from 'mithril';
 import app from 'state';
 import { Button } from 'construct-ui';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -9,7 +9,7 @@ import { setActiveAccount } from 'controllers/app/login';
 import { Account, AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 
-const ProfileBanner: m.Component<{ account: Account, addressInfo: AddressInfo }, { loading: boolean }> = {
+const ProfileBanner: Component<{ account: Account, addressInfo: AddressInfo }, { loading: boolean }> = {
   view: (vnode) => {
     const { account, addressInfo } = vnode.attrs;
     const addrShort = formatAddressShort(addressInfo.address, addressInfo.chain.id);

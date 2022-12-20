@@ -4,7 +4,7 @@ import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { ChainBase } from 'common-common/src/types';
 
 import ChainEntityController from 'controllers/server/chain_entities';
@@ -59,7 +59,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
     if (
-      this.meta.id !== (this.app.customDomainId() || m.route.param('scope'))
+      this.meta.id !== (this.app.customDomainId() || getRouteParam('scope'))
     ) {
       return false;
     }

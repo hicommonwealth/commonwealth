@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -26,7 +26,7 @@ import { CWSpinner } from './cw_spinner';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
-const LinkAccountItem: m.Component<
+const LinkAccountItem: Component<
   {
     account: { address: string; meta?: { name: string } };
     walletNetwork: ChainNetwork;

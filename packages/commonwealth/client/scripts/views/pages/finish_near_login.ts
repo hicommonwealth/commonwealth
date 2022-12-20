@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import {
   updateActiveAddresses,
@@ -103,7 +103,7 @@ const validate = async (
   }
 
   // tx error handling
-  const failedTx = m.route.param('tx_failure');
+  const failedTx = getRouteParam('tx_failure');
   if (failedTx) {
     console.log(`Login failed: deleting storage key ${failedTx}`);
     if (localStorage[failedTx]) {
@@ -115,7 +115,7 @@ const validate = async (
 
   // tx success handling
   // TODO: ensure that create() calls redirect correctly
-  const savedTx = m.route.param('saved_tx');
+  const savedTx = getRouteParam('saved_tx');
   if (savedTx && localStorage[savedTx]) {
     try {
       // fetch tx localstorage hash and execute
@@ -140,7 +140,7 @@ const validate = async (
   // create new chain handling
   // TODO: we need to figure out how to clean this localStorage entry up
   //   in the case of transaction failure!!
-  const chainName = m.route.param('chain_name');
+  const chainName = getRouteParam('chain_name');
   if (chainName && localStorage[chainName]) {
     try {
       const chainCreateArgString = localStorage[chainName];
@@ -160,7 +160,7 @@ const validate = async (
   }
 };
 
-const FinishNearLogin: m.Component<Record<string, never>, IState> = {
+const FinishNearLogin: Component<Record<string, never>, IState> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded || vnode.state.validating) {
       return render(PageLoading);

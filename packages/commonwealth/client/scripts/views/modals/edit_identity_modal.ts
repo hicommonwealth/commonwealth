@@ -1,7 +1,7 @@
 import 'modals/edit_identity_modal.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import {
   Button,
@@ -34,7 +34,7 @@ interface IState {
   saving: boolean;
 }
 
-const EditIdentityModal: m.Component<IAttrs, IState> = {
+const EditIdentityModal: Component<IAttrs, IState> = {
   oninit: (vnode) => {
     app.runWhenReady(async () => {
       vnode.state.identity = await (app.chain as Substrate).identities.load(

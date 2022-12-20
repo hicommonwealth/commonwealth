@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/settings/email_section.scss';
@@ -166,7 +166,7 @@ export class EmailSection extends ClassComponent {
                   'githubPostAuthRedirect',
                   JSON.stringify({
                     timestamp: (+new Date()).toString(),
-                    path: m.route.get(),
+                    path: getRoute(),
                   })
                 );
                 document.location = `${app.serverUrl()}/auth/github` as any;
@@ -197,7 +197,7 @@ export class EmailSection extends ClassComponent {
                   'discordPostAuthRedirect',
                   JSON.stringify({
                     timestamp: (+new Date()).toString(),
-                    path: m.route.get(),
+                    path: getRoute(),
                   })
                 );
                 document.location = `${app.serverUrl()}/auth/discord` as any;

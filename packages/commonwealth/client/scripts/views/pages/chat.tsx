@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import 'pages/chat.scss';
 
@@ -28,7 +28,7 @@ class ChatPage extends ClassComponent {
 
     if (!app.socket) navigateToSubpage('/'); // Stops un-logged in access
 
-    const channel_id = m.route.param()['channel'];
+    const channel_id = getRouteParam()['channel'];
 
     return !app.socket.chatNs.hasChannels() ? (
       <PageLoading />

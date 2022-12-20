@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import app from 'state';
 import {NotificationCategories} from 'common-common/src/types';
 import {NotificationSubscription} from 'models';

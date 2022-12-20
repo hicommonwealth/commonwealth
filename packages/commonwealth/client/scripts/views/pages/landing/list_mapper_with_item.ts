@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import { removeOrAddClasslistToAllElements } from 'helpers';
 import { ICardListItem } from 'models/interfaces';
@@ -7,7 +7,7 @@ import { ICardListItem } from 'models/interfaces';
 import ListedCardWithImage from './listed_card_with_image';
 import ListContainer from './list_container';
 
-const ItemListsMapper: m.Component<
+const ItemListsMapper: Component<
   {
     cardItems: ICardListItem[];
     textType?: string;

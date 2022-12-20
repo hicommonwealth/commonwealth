@@ -4,7 +4,7 @@ import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import {io, Socket} from 'socket.io-client';
 import _ from 'lodash';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 export enum ChatErrors {
     NOT_LOGGED_IN='User must be logged in to load chat'

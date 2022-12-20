@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { int } from 'aws-sdk/clients/datapipeline';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
@@ -20,8 +20,7 @@ export class SharePopover extends ClassComponent<{ commentId?: int }> {
             iconLeft: 'copy',
             label: 'Copy URL',
             onclick: async () => {
-              const currentRouteSansCommentParam = m.route
-                .get()
+              const currentRouteSansCommentParam = getRoute()
                 .split('?comment=')[0];
               if (!vnode.attrs.commentId) {
                 await navigator.clipboard.writeText(
@@ -40,12 +39,12 @@ export class SharePopover extends ClassComponent<{ commentId?: int }> {
             onclick: async () => {
               if (!vnode.attrs.commentId) {
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}`,
+                  `https://twitter.com/intent/tweet?text=${domain}${getRoute()}`,
                   '_blank'
                 );
               } else {
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}?comment=${
+                  `https://twitter.com/intent/tweet?text=${domain}${getRoute()}?comment=${
                     vnode.attrs.commentId
                   }`,
                   '_blank'

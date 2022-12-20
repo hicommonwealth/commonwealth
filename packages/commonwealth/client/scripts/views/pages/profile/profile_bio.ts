@@ -2,7 +2,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import { Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button } from 'construct-ui';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
@@ -83,7 +83,7 @@ export interface IProfileHeaderState {
   showProfileRight: boolean;
 }
 
-const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
+const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   oninit: (vnode) => {
     vnode.state.showProfileRight = false;
   },

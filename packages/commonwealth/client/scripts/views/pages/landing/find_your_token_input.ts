@@ -1,12 +1,12 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 interface IAttrs {
   onchangeValue: (event: any) => void;
   onkeyupValue: (event: any) => void;
 }
 
-const FindYourTokenInputComponent: m.Component<IAttrs, {}> = {
+const FindYourTokenInputComponent: Component<IAttrs, {}> = {
   view: (vnode) => {
     return render('input', {
       autocomplete: 'off',

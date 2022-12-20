@@ -3,7 +3,7 @@ import m from 'mithril';
 import app from 'state';
 import { pluralize } from 'helpers';
 import { Thread, Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
@@ -14,7 +14,7 @@ const postsRemaining = (contentLength, count) => {
   return contentLength > 10 && count < contentLength;
 };
 
-const ProfileContent: m.Component<
+const ProfileContent: Component<
   {
     account: Account;
     type: UserContent;

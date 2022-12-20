@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 // import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
 // import { CodeResult } from 'near-api-js/lib/providers/provider';

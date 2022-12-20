@@ -5,7 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import bs58 from 'bs58';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -136,7 +136,7 @@ const loadProfile = async (
   state: IProfilePageState
 ) => {
   const chain =
-    m.route.param('base') || app.customDomainId() || m.route.param('scope');
+    getRouteParam('base') || app.customDomainId() || getRouteParam('scope');
   const { address } = attrs;
   const chainInfo = app.config.chains.getById(chain);
   let valid = false;
@@ -280,7 +280,7 @@ const postsRemaining = (contentLength, count) => {
   return contentLength > 10 && count < contentLength;
 };
 
-const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
+const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.tabSelected = 0;
@@ -291,10 +291,10 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
     const chain =
-      m.route.param('base') || app.customDomainId() || m.route.param('scope');
+      getRouteParam('base') || app.customDomainId() || getRouteParam('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
-    const baseSuffix = m.route.param('base');
+    const baseSuffix = getRouteParam('base');
 
     if (chainInfo?.base === ChainBase.Substrate) {
       const decodedAddress = decodeAddress(address);
@@ -392,18 +392,18 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       if (scrollPos > scrollHeight - 400) {
         if (tab === 0) {
           vnode.state.allContentCount += 20;
-          const thisUrl = m.route.get();
-          if (m.route.get() === thisUrl)
+          const thisUrl = getRoute();
+          if (getRoute() === thisUrl)
             window.location.hash = vnode.state.allContentCount.toString();
         } else if (tab === 1) {
           vnode.state.proposalsContentCount += 20;
-          const thisUrl = m.route.get();
-          if (m.route.get() === thisUrl)
+          const thisUrl = getRoute();
+          if (getRoute() === thisUrl)
             window.location.hash = vnode.state.proposalsContentCount.toString();
         } else {
           vnode.state.commentsContentCount += 20;
-          const thisUrl = m.route.get();
-          if (m.route.get() === thisUrl)
+          const thisUrl = getRoute();
+          if (getRoute() === thisUrl)
             window.location.hash = vnode.state.commentsContentCount.toString();
         }
         redraw();
@@ -488,7 +488,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 1 &&
                 render(ProfileContent, {
@@ -499,7 +499,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 2 &&
                 render(ProfileContent, {
@@ -510,7 +510,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
                 }),
             ]),
             render('.xs-display-none .col-md-4', [

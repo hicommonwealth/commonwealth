@@ -13,7 +13,7 @@ import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
 
@@ -147,11 +147,11 @@ export async function deinitChainOrCommunity() {
 }
 
 export async function handleInviteLinkRedirect() {
-  const inviteMessage = m.route.param('invitemessage');
+  const inviteMessage = getRouteParam('invitemessage');
   if (inviteMessage) {
     if (
       inviteMessage === 'failure' &&
-      m.route.param('message') === 'Must be logged in to accept invites'
+      getRouteParam('message') === 'Must be logged in to accept invites'
     ) {
       notifyInfo('Log in to join a community with an invite link');
       app.modals.create({
@@ -164,7 +164,7 @@ export async function handleInviteLinkRedirect() {
         },
       });
     } else if (inviteMessage === 'failure') {
-      const message = m.route.param('message');
+      const message = getRouteParam('message');
       notifyError(message);
     } else if (inviteMessage === 'success') {
       if (app.config.invites.length === 0) return;
@@ -176,8 +176,8 @@ export async function handleInviteLinkRedirect() {
 }
 
 export async function handleUpdateEmailConfirmation() {
-  if (m.route.param('confirmation')) {
-    if (m.route.param('confirmation') === 'success') {
+  if (getRouteParam('confirmation')) {
+    if (getRouteParam('confirmation') === 'success') {
       notifySuccess('Email confirmed!');
     }
   }
@@ -439,17 +439,17 @@ m.route.prefix = '';
 const _updateRoute = m.route.set;
 export const updateRoute = (...args) => {
   app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
-  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
+  app._lastNavigatedFrom = getRoute();
+  if (args[0] !== getRoute()) _updateRoute.apply(this, args);
 };
 m.route.set = (...args) => {
   // set app params that maintain global state for:
   // - whether the user last clicked the back button
   // - the last page the user was on
   app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
+  app._lastNavigatedFrom = getRoute();
   // update route
-  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
+  if (args[0] !== getRoute()) _updateRoute.apply(this, args);
   // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
@@ -481,7 +481,7 @@ redraw() = redrawInstrumented;
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
-  app._lastNavigatedFrom = m.route.get();
+  app._lastNavigatedFrom = getRoute();
   if (_onpopstate) _onpopstate.apply(this, args);
 };
 
@@ -1095,28 +1095,28 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     // handle login redirects
     if (
-      m.route.param('loggedin') &&
-      m.route.param('loggedin').toString() === 'true' &&
-      m.route.param('path') &&
-      !m.route.param('path').startsWith('/login')
+      getRouteParam('loggedin') &&
+      getRouteParam('loggedin').toString() === 'true' &&
+      getRouteParam('path') &&
+      !getRouteParam('path').startsWith('/login')
     ) {
-      // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
+      // (we call toString() because getRouteParam() returns booleans, even though the types don't reflect this)
       // handle param-based redirect after email login
 
       /* If we are creating a new account, then we alias to create a new mixpanel user
        else we identify to associate mixpanel events
     */
-      if (m.route.param('new') && m.route.param('new').toString() === 'true') {
+      if (getRouteParam('new') && getRouteParam('new').toString() === 'true') {
         console.log('creating account');
 
         try {
         } catch (err) {
           // Don't do anything... Just identify if there is an error
-          // mixpanel.identify(m.route.param('email').toString());
+          // mixpanel.identify(getRouteParam('email').toString());
         }
       } else {
       }
-      m.route.set(m.route.param('path'), {}, { replace: true });
+      m.route.set(getRouteParam('path'), {}, { replace: true });
     } else if (
       localStorage &&
       localStorage.getItem &&
@@ -1151,11 +1151,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         console.log('Error restoring path from localStorage');
       }
     }
-    if (m.route.param('loggedin')) {
+    if (getRouteParam('loggedin')) {
       notifySuccess('Logged in!');
-    } else if (m.route.param('loginerror')) {
+    } else if (getRouteParam('loginerror')) {
       notifyError('Could not log in');
-      console.error(m.route.param('loginerror'));
+      console.error(getRouteParam('loginerror'));
     }
 
     // initialize the app

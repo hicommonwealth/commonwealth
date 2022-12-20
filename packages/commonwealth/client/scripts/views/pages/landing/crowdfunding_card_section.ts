@@ -1,13 +1,13 @@
 import 'pages/landing/crowdfunding_card_section.scss';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import { ICardListItem } from 'models/interfaces';
 
 import LandingPageButton from './landing_page_button';
 import ItemListsMapper from './list_mapper_with_item';
 
-const ChainsCrowdfundingComponent: m.Component<{ chains: ICardListItem[] }, {}> = {
+const ChainsCrowdfundingComponent: Component<{ chains: ICardListItem[] }, {}> = {
   view: (vnode) => {
     const { chains } = vnode.attrs;
 

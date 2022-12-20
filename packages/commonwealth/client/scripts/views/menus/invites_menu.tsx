@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { PopoverMenu, Button, Icons, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 
@@ -19,7 +19,7 @@ export const handleEmailInvites = (state) => {
     if (app.config.invites?.length) {
       app.modals.create({
         modal: ConfirmInviteModal,
-        data: { community: m.route.param('inviteComm') },
+        data: { community: getRouteParam('inviteComm') },
       });
     } else if (!app.user.activeAccount) {
       app.modals.create({

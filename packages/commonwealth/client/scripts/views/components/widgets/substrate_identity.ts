@@ -2,7 +2,7 @@
 import 'components/widgets/user.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import _ from 'lodash';
 import { link } from 'helpers';
 
@@ -29,7 +29,7 @@ export interface ISubstrateIdentityState {
   identity: SubstrateIdentity | null;
 }
 
-const SubstrateOnlineIdentityWidget: m.Component<
+const SubstrateOnlineIdentityWidget: Component<
   ISubstrateIdentityAttrs,
   ISubstrateIdentityState
 > = {
@@ -162,7 +162,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
   },
 };
 
-const SubstrateOfflineIdentityWidget: m.Component<
+const SubstrateOfflineIdentityWidget: Component<
   ISubstrateIdentityAttrs,
   ISubstrateIdentityState
 > = {
@@ -267,7 +267,7 @@ const SubstrateOfflineIdentityWidget: m.Component<
   },
 };
 
-const SubstrateIdentityWidget: m.Component<
+const SubstrateIdentityWidget: Component<
   ISubstrateIdentityAttrs,
   ISubstrateIdentityState
 > = {

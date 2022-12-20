@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import 'sublayout.scss';
 
@@ -57,7 +57,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
     const showSidebar = app.sidebarToggled || !this.isWindowSmallInclusive;
 
-    if (m.route.param('triggerInvite') === 't') {
+    if (getRouteParam('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 

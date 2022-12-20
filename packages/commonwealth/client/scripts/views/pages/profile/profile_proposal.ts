@@ -6,9 +6,9 @@ import app from 'state';
 import { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
-const ProfileProposal: m.Component<
+const ProfileProposal: Component<
   { proposal: Thread },
   { revealThread: boolean }
 > = {

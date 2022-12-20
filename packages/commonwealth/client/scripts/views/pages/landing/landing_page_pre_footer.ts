@@ -1,7 +1,7 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
-const JoinCommonWealthSection: m.Component<{}, {}> = {
+const JoinCommonWealthSection: Component<{}, {}> = {
   view: (vnode) => {
     return render(
       'section.JoinCommonWealthSection',

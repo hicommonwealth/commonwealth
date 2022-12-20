@@ -2,7 +2,7 @@
 import 'components/widgets/user_gallery.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import _ from 'lodash';
 
 import { Account, AddressInfo } from 'models';
@@ -13,7 +13,7 @@ import User, { AnonymousUser } from './user';
 // The list of passed users must be unique to begin with, if one
 // wishes to prevent redundant rendering of avatars.
 
-const UserGallery: m.Component<
+const UserGallery: Component<
   {
     users: Account[] | AddressInfo[];
     addressesCount?: number;

@@ -1,7 +1,7 @@
 import 'pages/commonwealth/projects.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import moment from 'moment';
 import { Card, Button } from 'construct-ui';
 
@@ -45,7 +45,7 @@ const PROJECTS: CWProjectStub[] = [
   },
 ];
 
-const ProjectsPage: m.Component<{}> = {
+const ProjectsPage: Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       return render(PageLoading, {

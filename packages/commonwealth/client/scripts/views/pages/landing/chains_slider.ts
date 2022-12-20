@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';
 
@@ -9,7 +9,7 @@ interface IState {
   oncreateSlider: Function;
 }
 
-const TokensChainsComponent: m.Component<IState, IState> = {
+const TokensChainsComponent: Component<IState, IState> = {
   oninit: (vnode) => {
     vnode.state.oncreateSlider = vnode.attrs.oncreateSlider;
   },

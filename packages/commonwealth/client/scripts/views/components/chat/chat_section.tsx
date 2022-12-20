@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
@@ -171,7 +171,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
   view() {
     if (!app.socket) return;
     if (!this.loaded) return <CWSpinner />;
-    this.activeChannel = m.route.param()['channel'];
+    this.activeChannel = getRouteParam()['channel'];
     app.socket.chatNs.activeChannel = String(this.activeChannel);
 
     const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
@@ -365,7 +365,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         title: channel.name,
         rowIcon: true,
         isVisible: true,
-        isActive: onChannelPage(m.route.get()),
+        isActive: onChannelPage(getRoute()),
         isUpdated: channel.unread > 0,
         onclick: (e) => {
           handleRedirectClicks(

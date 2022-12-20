@@ -1,13 +1,13 @@
 import './commonwealth.scss';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import GeometricPatternSection from './geometric_pattern_section';
 import HeaderLandingPage from '../landing/landing_page_header';
 import LandingPageButton from '../landing/landing_page_button';
 import { Footer } from '../../footer';
 
-const WhyCommonWealthView: m.Component<{}, {}> = {
+const WhyCommonWealthView: Component<{}, {}> = {
   view: (vnode) => {
     return render('.WhyCommonWealth', [
       render(

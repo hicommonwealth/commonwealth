@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
@@ -607,7 +607,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 
 // Gabe 7/28/22 - Invite link generation doesn't work right now
 
-// const CreateInviteLink: m.Component<
+// const CreateInviteLink: Component<
 //   {
 //     chain?: ChainInfo;
 //     onChangeHandler?: Function;

@@ -17,7 +17,7 @@
 //   vote: PhragmenElectionVote;
 // }
 
-// const VoterRow: m.Component<IVoterRowAttrs> = {
+// const VoterRow: Component<IVoterRowAttrs> = {
 //   view: (vnode: ResultNode<IVoterRowAttrs>) => {
 //     const { account, stake } = vnode.attrs.vote;
 
@@ -86,7 +86,7 @@
 //   votes: PhragmenElectionVote[];
 // }
 
-// const ViewVotersModal: m.Component<IViewVotersModalAttrs> = {
+// const ViewVotersModal: Component<IViewVotersModalAttrs> = {
 //   view: (vnode) => {
 //     const { address, chain } = vnode.attrs.account;
 

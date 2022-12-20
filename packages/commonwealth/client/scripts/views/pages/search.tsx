@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
 import { ListItem, Select } from 'construct-ui';
@@ -35,7 +35,7 @@ const getMemberResult = (addr, searchTerm) => {
 
   if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
 
-  const scope = m.route.param('chain');
+  const scope = getRouteParam('chain');
   const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${
     addr.chain
   }`;
@@ -230,7 +230,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
       />
     );
 
-    const searchQuery = SearchQuery.fromUrlParams(m.route.param());
+    const searchQuery = SearchQuery.fromUrlParams(getRouteParam());
 
     const { chainScope, searchTerm } = searchQuery;
     const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;

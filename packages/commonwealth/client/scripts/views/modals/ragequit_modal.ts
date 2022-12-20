@@ -18,7 +18,7 @@
 //   sharesToBurn: string;
 // }
 
-// const RagequitModal: m.Component<IAttrs, IState> = {
+// const RagequitModal: Component<IAttrs, IState> = {
 //   view: (vnode: ResultNode<IAttrs, IState>) => {
 //     const acct = vnode.attrs.account;
 //     return render('.RagequitModal', [

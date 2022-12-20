@@ -34,6 +34,18 @@ export function setRoute(route: string, data?: any, options?: m.RouteOptions) {
   m.route.set(route, data, options);
 }
 
+export function getRouteParam(name?: string) {
+  if (name) {
+    return getRouteParam(name);
+  } else {
+    return getRouteParam();
+  }
+}
+
+export function getRoute() {
+  return getRoute();
+}
+
 export function redraw(sync = false) {
   if (!sync) {
     m.redraw();

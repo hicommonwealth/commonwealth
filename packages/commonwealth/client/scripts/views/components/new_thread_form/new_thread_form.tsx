@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import $ from 'jquery';
 
@@ -190,7 +190,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.overwriteConfirmationModal = false;
     try {
       this.activeTopic = isModal
-        ? m.route.param('topic')
+        ? getRouteParam('topic')
         : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
         ? app.lastNavigatedFrom().split('/')[
             app.lastNavigatedFrom().split('/').indexOf('discussions') + 1
@@ -318,7 +318,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
               isSelected={this.form.kind === ThreadKind.Link}
             />
           </CWTabBar>
-          {isModal && m.route.get() !== `${chainId}/new/discussion` && (
+          {isModal && getRoute() !== `${chainId}/new/discussion` && (
             <CWButton
               label="Full editor"
               iconLeft="expand"

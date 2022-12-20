@@ -3,7 +3,7 @@
 import 'pages/landing/privacyAndTerms.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { renderMultilineText } from 'helpers';
 import HeaderLandingPage from './landing_page_header';
 
@@ -114,7 +114,7 @@ CONTACT US
 If you have any questions about this Privacy Statement, please contact us at: hello@commonwealth.im.
 `;
 
-const PrivacyPage: m.Component<{}> = {
+const PrivacyPage: Component<{}> = {
   oncreate: (vnode) => {},
   view: (vnode) => {
     return render('.PrivacyPage', [

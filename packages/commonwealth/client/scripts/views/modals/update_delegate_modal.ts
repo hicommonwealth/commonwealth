@@ -18,7 +18,7 @@
 //   newDelegateKey: string;
 // }
 
-// const UpdateDelegateModal: m.Component<IAttrs, IState> = {
+// const UpdateDelegateModal: Component<IAttrs, IState> = {
 //   oninit: (vnode: ResultNode<IAttrs, IState>) => {
 //     vnode.state.newDelegateKey = vnode.attrs.delegateKey;
 //   },

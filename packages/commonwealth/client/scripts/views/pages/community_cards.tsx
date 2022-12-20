@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import numeral from 'numeral';
 
 import 'pages/landing/community_cards.scss';
@@ -241,7 +241,7 @@ class HomepageCommunityCards extends ClassComponent {
   }
 }
 
-const CommunityCardPage: m.Component = {
+const CommunityCardPage: Component = {
   view: () => {
     return (
       <Sublayout>

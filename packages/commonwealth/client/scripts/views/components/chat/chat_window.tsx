@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -76,8 +76,8 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
 
   private _messageIsHighlighted = (message: any): boolean => {
     return (
-      m.route.param('message') &&
-      Number(m.route.param('message')) === message.id
+      getRouteParam('message') &&
+      Number(getRouteParam('message')) === message.id
     );
   };
 
@@ -97,7 +97,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     if (this.hideChat) return;
 
     this.shouldScroll = true;
-    this.shouldScrollToHighlight = Boolean(m.route.param('message'));
+    this.shouldScrollToHighlight = Boolean(getRouteParam('message'));
 
     this.scrollToBottom = () => {
       const scroller = $(vnode.dom).find('.chat-messages')[0];

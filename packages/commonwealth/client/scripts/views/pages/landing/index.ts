@@ -4,7 +4,7 @@ import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';
 
 import app, { LoginState } from 'state';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -48,7 +48,7 @@ interface IState {
   modalAutoTriggered: boolean;
 }
 
-const LandingPage: m.Component<{}, IState> = {
+const LandingPage: Component<{}, IState> = {
   oncreate: () => {
     if (!app.isLoggedIn()) {
       mixpanelBrowserTrack({
@@ -91,7 +91,7 @@ const LandingPage: m.Component<{}, IState> = {
     ];
   },
   view: (vnode) => {
-    if (m.route.param('triggerInvite') === 't') {
+    if (getRouteParam('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
     if (app.loginState !== LoginState.LoggedIn) {

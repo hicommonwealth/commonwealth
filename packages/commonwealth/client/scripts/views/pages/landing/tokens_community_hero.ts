@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { notifyError } from 'controllers/app/notifications';
 import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
@@ -42,7 +42,7 @@ const initiateFullSearch = (searchTerm) => {
   setRoute(`/search?${params}`);
 };
 
-const TokensCommunityComponent: m.Component<IAttrs, IState> = {
+const TokensCommunityComponent: Component<IAttrs, IState> = {
   oninit: (vnode) => {
     vnode.state.hiddenInputTokenList = true;
     vnode.state.inputTokenValue = '';

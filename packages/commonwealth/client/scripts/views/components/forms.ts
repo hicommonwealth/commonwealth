@@ -1,7 +1,7 @@
 import 'components/forms.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import { CustomSelect } from 'construct-ui';
 
@@ -24,7 +24,7 @@ interface IDropdownFormFieldAttrs {
   title?: string;
 }
 
-export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
+export const DropdownFormField: Component<IDropdownFormFieldAttrs> = {
   oninit: (vnode: ResultNode<IDropdownFormFieldAttrs>) => {
     if (vnode.attrs.callbackOnInit && vnode.attrs.callback) {
       vnode.attrs.callback(
@@ -76,7 +76,7 @@ interface IRadioSelectorFormFieldAttrs {
   title?: string;
 }
 
-export const RadioSelectorFormField: m.Component<IRadioSelectorFormFieldAttrs> =
+export const RadioSelectorFormField: Component<IRadioSelectorFormFieldAttrs> =
   {
     view: (vnode: ResultNode<IRadioSelectorFormFieldAttrs>) => {
       const { choices, name, subtitle, title } = vnode.attrs;

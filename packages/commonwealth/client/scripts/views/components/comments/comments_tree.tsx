@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import 'components/comments/comments_tree.scss';
 
@@ -41,7 +41,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
     } = vnode.attrs;
 
     // Jump to the comment indicated in the URL upon page load. Avoid
-    // using m.route.param('comment') because it may return stale
+    // using getRouteParam('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
 
     if (this.dom && comments?.length > 0 && !this.highlightedComment) {

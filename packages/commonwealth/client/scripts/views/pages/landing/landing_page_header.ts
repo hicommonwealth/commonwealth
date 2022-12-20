@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
 import { NewLoginModal } from 'views/modals/login_modal';
@@ -48,7 +48,7 @@ const scrollingHeader = () => {
   }
 };
 
-const HeaderLandingPage: m.Component<IAttrs, IState> = {
+const HeaderLandingPage: Component<IAttrs, IState> = {
   oninit: (vnode) => {
     if (vnode.attrs.scrollHeader) {
       window.addEventListener('scroll', scrollingHeader);
@@ -78,7 +78,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
           //   iconName: 'commonLogo',
           //   iconSize: 'xxl',
           //   alt: 'Commonwealth',
-          //   style: m.route.get() === '/' ? '' : 'cursor:pointer',
+          //   style: getRoute() === '/' ? '' : 'cursor:pointer',
           //   onclick: () => redirectClick('/'),
           // }),
           render('img', {

@@ -2,7 +2,7 @@ import 'components/notification_row.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
@@ -302,7 +302,7 @@ const getBatchNotificationFields = (
   };
 };
 
-const NotificationRow: m.Component<
+const NotificationRow: Component<
   {
     notifications: Notification[];
     onListPage?: boolean;
@@ -314,9 +314,9 @@ const NotificationRow: m.Component<
 > = {
   oncreate: (vnode) => {
     if (
-      m.route.param('id') &&
+      getRouteParam('id') &&
       vnode.attrs.onListPage &&
-      m.route.param('id') === vnode.attrs.notifications[0].id.toString()
+      getRouteParam('id') === vnode.attrs.notifications[0].id.toString()
     ) {
       vnode.state.scrollOrStop = true;
     }
@@ -344,7 +344,7 @@ const NotificationRow: m.Component<
 
       if (vnode.state.scrollOrStop) {
         setTimeout(() => {
-          const el = document.getElementById(m.route.param('id'));
+          const el = document.getElementById(getRouteParam('id'));
           if (el) el.scrollIntoView();
         }, 1);
         vnode.state.scrollOrStop = false;

@@ -1,7 +1,7 @@
 import 'components/login_with_wallet_dropdown.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem } from 'construct-ui';
 
@@ -30,7 +30,7 @@ export function baseToNetwork(n: ChainBase): ChainNetwork {
   }
 }
 
-const LoginWithWalletDropdown: m.Component<{
+const LoginWithWalletDropdown: Component<{
   label;
   loggingInWithAddress;
   joiningChain;
@@ -47,17 +47,17 @@ const LoginWithWalletDropdown: m.Component<{
     } = vnode.attrs;
 
     // prev and next must work whether the modal is on the web3login page, or not...which is why this is so confusing
-    const prev = m.route.param('prev') ? m.route.param('prev') : m.route.get();
+    const prev = getRouteParam('prev') ? getRouteParam('prev') : getRoute();
     const next =
-      m.route.param('prev') &&
-      m.route.param('prev').indexOf('web3login') === -1 &&
-      m.route.param('prev') !== '/'
-        ? m.route.param('prev')
+      getRouteParam('prev') &&
+      getRouteParam('prev').indexOf('web3login') === -1 &&
+      getRouteParam('prev') !== '/'
+        ? getRouteParam('prev')
         : joiningChain
         ? `/${joiningChain}`
-        : m.route.get().indexOf('web3login') === -1 &&
-          m.route.get().replace(/\?.*/, '') !== '/'
-        ? m.route.get()
+        : getRoute().indexOf('web3login') === -1 &&
+          getRoute().replace(/\?.*/, '') !== '/'
+        ? getRoute()
         : app.chain
         ? `/${app.chain.meta.id}`
         : '/?';

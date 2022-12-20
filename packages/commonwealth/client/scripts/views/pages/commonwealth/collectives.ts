@@ -1,7 +1,7 @@
 import 'pages/commonwealth/collectives.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import { Card, Button, Input } from 'construct-ui';
 
 import app from 'state';
@@ -36,7 +36,7 @@ const COLLECTIVES: CWCollectiveStub[] = [
   },
 ];
 
-const CollectivesPage: m.Component<{}> = {
+const CollectivesPage: Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
       return render(PageLoading, {

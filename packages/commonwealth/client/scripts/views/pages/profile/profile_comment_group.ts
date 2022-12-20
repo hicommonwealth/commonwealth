@@ -1,7 +1,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import app from 'state';
 import { link } from 'helpers';
 import { Thread, Comment, Account } from 'models';
@@ -14,7 +14,7 @@ interface IProfileCommentGroupAttrs {
   account: Account;
 }
 
-const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
+const ProfileCommentGroup: Component<IProfileCommentGroupAttrs> = {
   view: (vnode) => {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;

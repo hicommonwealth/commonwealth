@@ -18,7 +18,7 @@ import BN from 'bn.js';
 import { ApiStatus, IApp } from 'state';
 import moment from 'moment';
 import * as m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import {
   isGroupRole,
   NearSputnikConfig,

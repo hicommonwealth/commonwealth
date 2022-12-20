@@ -5,7 +5,7 @@ import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Popover } from 'construct-ui';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -24,7 +24,7 @@ export interface IAddressDisplayOptions {
   maxCharLength?: number;
 }
 
-const User: m.Component<
+const User: Component<
   {
     user: Account | AddressInfo | Profile;
     avatarSize?: number;
@@ -369,7 +369,7 @@ const User: m.Component<
   },
 };
 
-export const UserBlock: m.Component<{
+export const UserBlock: Component<{
   user: Account | AddressInfo | Profile;
   hideIdentityIcon?: boolean;
   popover?: boolean;
@@ -502,7 +502,7 @@ export const UserBlock: m.Component<{
   },
 };
 
-export const AnonymousUser: m.Component<
+export const AnonymousUser: Component<
   {
     avatarSize?: number;
     avatarOnly?: boolean;

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import app from 'state';
 import { handleRedirectClicks } from 'helpers';
 import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
@@ -54,7 +54,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         containsChildren: false,
         displayData: null,
         hasDefaultToggle: false,
-        isActive: m.route.get().includes('/manage'),
+        isActive: getRoute().includes('/manage'),
         isVisible: true,
         isUpdated: false,
         onclick: (e, toggle: boolean) => {
@@ -69,7 +69,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         containsChildren: false,
         displayData: null,
         hasDefaultToggle: false,
-        isActive: m.route.get().includes('/analytics'),
+        isActive: getRoute().includes('/analytics'),
         isVisible: true,
         isUpdated: false,
         onclick: (e, toggle: boolean) => {

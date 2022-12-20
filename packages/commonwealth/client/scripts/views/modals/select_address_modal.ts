@@ -2,7 +2,7 @@
 import 'modals/select_address_modal.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';
 
@@ -17,7 +17,7 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
 
-const SelectAddressModal: m.Component<
+const SelectAddressModal: Component<
   {},
   { selectedIndex: number; loading: boolean }
 > = {

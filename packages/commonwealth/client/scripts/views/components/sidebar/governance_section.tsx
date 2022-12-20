@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 
@@ -236,7 +236,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       p.startsWith(`/${app.activeChainId()}/members`) ||
       p.startsWith(`/${app.activeChainId()}/account/`);
 
-    if (onNotificationsPage(m.route.get())) return;
+    if (onNotificationsPage(getRoute())) return;
 
     // ---------- Build Section Props ---------- //
 
@@ -248,7 +248,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       isVisible: true,
       isUpdated: true,
       isActive:
-        onMembersPage(m.route.get()) &&
+        onMembersPage(getRoute()) &&
         (app.chain ? app.chain.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
         handleRedirectClicks(e, '/members', app.activeChainId(), () => {
@@ -266,7 +266,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         ? toggleTreeState['children']['Snapshots']['toggledState']
         : false,
       isVisible: showSnapshotOptions,
-      isActive: onSnapshotProposal(m.route.get()),
+      isActive: onSnapshotProposal(getRoute()),
       isUpdated: true,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
@@ -318,7 +318,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       },
       isVisible: showProposals,
       isUpdated: true,
-      isActive: onProposalPage(m.route.get()),
+      isActive: onProposalPage(getRoute()),
       displayData: null,
     };
 
@@ -337,7 +337,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       },
       isVisible: showTreasury,
       isUpdated: true,
-      isActive: onTreasuryPage(m.route.get()),
+      isActive: onTreasuryPage(getRoute()),
       displayData: null,
     };
 
@@ -355,7 +355,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       },
       isVisible: showBounties,
       isUpdated: true,
-      isActive: onBountiesPage(m.route.get()),
+      isActive: onBountiesPage(getRoute()),
       displayData: null,
     };
 
@@ -373,7 +373,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       },
       isVisible: showReferenda,
       isUpdated: true,
-      isActive: onReferendaPage(m.route.get()),
+      isActive: onReferendaPage(getRoute()),
       displayData: null,
     };
 
@@ -391,7 +391,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       },
       isVisible: showTips,
       isUpdated: true,
-      isActive: onTipsPage(m.route.get()),
+      isActive: onTipsPage(getRoute()),
       displayData: null,
     };
 
@@ -409,7 +409,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       },
       isVisible: showCouncillors,
       isUpdated: true,
-      isActive: onCouncilPage(m.route.get()),
+      isActive: onCouncilPage(getRoute()),
       displayData: null,
     };
 
@@ -427,7 +427,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       },
       isVisible: showValidators,
       isUpdated: true,
-      isActive: onValidatorsPage(m.route.get()),
+      isActive: onValidatorsPage(getRoute()),
       displayData: null,
     };
 
@@ -440,7 +440,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       isVisible: showCompoundOptions,
       isUpdated: true,
-      isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
+      isActive: getRoute() === `/${app.activeChainId()}/delegate`,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/delegate', app.activeChainId(), () => {

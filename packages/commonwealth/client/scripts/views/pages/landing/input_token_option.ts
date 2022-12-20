@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 
@@ -9,7 +9,7 @@ interface IAttrs {
   route: string;
 }
 
-const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
+const InputTokenOptionComponent: Component<IAttrs, {}> = {
   view: (vnode) => {
     const { iconImg } = vnode.attrs;
     let tokenImage;

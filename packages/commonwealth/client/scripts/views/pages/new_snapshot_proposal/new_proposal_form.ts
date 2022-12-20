@@ -14,7 +14,7 @@ import {
   Icons,
 } from 'construct-ui';
 
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -151,7 +151,7 @@ const newLink = async (
   return errors;
 };
 
-const NewProposalForm: m.Component<
+const NewProposalForm: Component<
   { snapshotId: string },
   {
     form: IThreadForm;

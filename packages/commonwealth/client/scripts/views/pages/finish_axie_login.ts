@@ -1,7 +1,7 @@
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import { initAppState } from 'app';
@@ -43,12 +43,12 @@ const validate = async (
   }
 };
 
-const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
+const FinishAxieLogin: Component<Record<string, unknown>, IState> = {
   oninit: (vnode) => {
     // grab token
     // TODO: how to use state id?
-    const token = m.route.param('token');
-    const stateId = m.route.param('stateId');
+    const token = getRouteParam('token');
+    const stateId = getRouteParam('stateId');
     validate(token, stateId, 'axie-infinity').then((res) => {
       if (typeof res === 'string') {
         vnode.state.error = res;

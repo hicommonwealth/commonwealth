@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import 'pages/landing/find_your_community_section.scss';
 
 interface IState {
@@ -11,7 +11,7 @@ interface IState {
   }[];
 }
 
-const TokenHoldersComponent: m.Component<IState, IState> = {
+const TokenHoldersComponent: Component<IState, IState> = {
   oninit: (vnode) => {
     vnode.state.holders = vnode.attrs.holders;
   },

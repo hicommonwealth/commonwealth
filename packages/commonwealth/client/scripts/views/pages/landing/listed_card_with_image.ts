@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
 interface IAttrs {
   handleClick: (creator) => void;
@@ -17,7 +17,7 @@ interface IAttrs {
   variant?: string
 }
 
-const ListedCardWithImage: m.Component<IAttrs, {}> = {
+const ListedCardWithImage: Component<IAttrs, {}> = {
   view: (vnode) => {
     return render(
       'li',

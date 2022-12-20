@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 
@@ -21,7 +21,7 @@ class Web3LoginPage extends ClassComponent {
   private loading?: boolean;
 
   view() {
-    const token = m.route.param('connect');
+    const token = getRouteParam('connect');
     if (app.isCustomDomain() || !token) {
       // hide page if invalid arguments or via custom domain
       return <PageNotFound />;
@@ -84,8 +84,8 @@ class Web3LoginPage extends ClassComponent {
                 }
               }}
             />
-            {m.route.param('prev')
-              ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
+            {getRouteParam('prev')
+              ? link('a.web3login-go-home', getRouteParam('prev'), 'Go back')
               : link(
                   'a.web3login-go-home',
                   app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,

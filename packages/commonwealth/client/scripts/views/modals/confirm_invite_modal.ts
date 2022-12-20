@@ -1,7 +1,7 @@
 import 'modals/confirm_invite_modal.scss';
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 import { Button } from 'construct-ui';
@@ -17,7 +17,7 @@ import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import LoginWithWalletDropdown from 'views/components/login_with_wallet_dropdown';
 import { isWindowSmallInclusive } from '../components/component_kit/helpers';
 
-const SideMenu: m.Component<{ invites; onChangeHandler; location }, {}> = {
+const SideMenu: Component<{ invites; onChangeHandler; location }, {}> = {
   view: (vnode) => {
     const { location } = vnode.attrs;
     return render('.SideMenu', [
@@ -37,7 +37,7 @@ const SideMenu: m.Component<{ invites; onChangeHandler; location }, {}> = {
   },
 };
 
-const ConfirmInviteModal: m.Component<
+const ConfirmInviteModal: Component<
   {},
   {
     invites: InviteCodeAttributes[];
@@ -241,7 +241,7 @@ const ConfirmInviteModal: m.Component<
                           const joiningCommunity =
                             invites[vnode.state.location].chain_id;
                           const targetCommunity = joiningCommunity;
-                          const prev = m.route.get();
+                          const prev = getRoute();
                           const next = `/${joiningCommunity}`;
                           // TODO: implement joiningChain once confirm_invite_modal supports chains
                           const web3loginParams = joiningCommunity

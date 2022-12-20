@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, redraw } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 import {
   Button,
   Icons,
@@ -53,9 +53,9 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
       content: (
         <div class="topic-items">
           {render(MenuItem, {
-            active: m.route.get() === `/${app.activeChainId()}` || !topic,
+            active: getRoute() === `/${app.activeChainId()}` || !topic,
             iconLeft:
-              m.route.get() === `/${app.activeChainId()}` || !topic
+              getRoute() === `/${app.activeChainId()}` || !topic
                 ? Icons.CHECK
                 : null,
             label: 'All Topics',
@@ -77,7 +77,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                 defaultOffchainTemplate,
               }) => {
                 const active =
-                  m.route.get() ===
+                  getRoute() ===
                     `/${app.activeChainId()}/discussions/${encodeURI(
                       name.toString().trim()
                     )}` ||
