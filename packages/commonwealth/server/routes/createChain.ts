@@ -55,7 +55,7 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
-  ImageDoesntExist: `image url provided doesn't exist`,
+  ImageDoesntExist: `Image url provided doesn't exist`,
   ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
 };
 
