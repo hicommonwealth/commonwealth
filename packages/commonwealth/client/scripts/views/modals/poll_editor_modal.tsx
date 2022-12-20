@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 import moment from 'moment';
 import _ from 'underscore';
@@ -118,7 +118,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                 }}
                 value=""
               />
-              {m(SelectList, {
+              {render(SelectList, {
                 filterable: false,
                 items: ['Infinite'].concat(
                   _.range(1, 31).map((n) => pluralize(Number(n), 'day'))

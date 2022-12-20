@@ -1,6 +1,7 @@
 import 'modals/confirm_invite_modal.scss';
 
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 import { Button } from 'construct-ui';
@@ -19,9 +20,9 @@ import { isWindowSmallInclusive } from '../components/component_kit/helpers';
 const SideMenu: m.Component<{ invites; onChangeHandler; location }, {}> = {
   view: (vnode) => {
     const { location } = vnode.attrs;
-    return m('.SideMenu', [
+    return render('.SideMenu', [
       vnode.attrs.invites.map((invite, index) => {
-        return m(
+        return render(
           '.inviteTitle',
           {
             class: location === index ? 'selected' : '',
@@ -61,7 +62,7 @@ const ConfirmInviteModal: m.Component<
   view: (vnode) => {
     const SelectAddress = (account) => {
       const isMobile = isWindowSmallInclusive(window.innerWidth);
-      return m(
+      return render(
         '.SwitchAddress.account-menu-item',
         {
           key: `${account.chain.id}-${account.address}`,
@@ -79,7 +80,7 @@ const ConfirmInviteModal: m.Component<
           },
         },
         [
-          m(UserBlock, {
+          render(UserBlock, {
             user: account,
             showChainName: true,
             addressDisplayOptions: { showFullAddress: !isMobile },
@@ -104,15 +105,15 @@ const ConfirmInviteModal: m.Component<
     const activeInvite = app.config.chains.getById(invites[location].chain_id);
     const hasTermsOfService = !!activeInvite?.terms;
 
-    return m('.ConfirmInviteModal', [
-      m('.compact-modal-title', [
+    return render('.ConfirmInviteModal', [
+      render('.compact-modal-title', [
         !vnode.state.isComplete
-          ? m('h3', 'Manage Invites')
-          : m('h3', 'No more invites'),
-        m(ModalExitButton),
+          ? render('h3', 'Manage Invites')
+          : render('h3', 'No more invites'),
+        render(ModalExitButton),
       ]),
       !vnode.state.isComplete &&
-        m(SideMenu, {
+        render(SideMenu, {
           invites,
           location,
           onChangeHandler: (result) => {
@@ -121,19 +122,19 @@ const ConfirmInviteModal: m.Component<
           },
         }),
       invites.length > 0 && !vnode.state.isComplete
-        ? m('.compact-modal-body', [
-            m('p', [
+        ? render('.compact-modal-body', [
+            render('p', [
               "You've been invited to the ",
-              m('strong', invites[location].community_name),
+              render('strong', invites[location].community_name),
               ' community. ',
               addresses.length > 0
                 ? 'Select an address to accept the invite:'
                 : 'To get started, connect an address:',
             ]),
             hasTermsOfService &&
-              m('p.terms-of-service', [
+              render('p.terms-of-service', [
                 `By linking an address, you agree to ${activeInvite.name}'s `,
-                m(
+                render(
                   'a',
                   { href: activeInvite.terms, target: '_blank' },
                   'terms of service'
@@ -141,14 +142,14 @@ const ConfirmInviteModal: m.Component<
                 '.',
               ]),
             vnode.state.accepted.includes(location)
-              ? m('h4', "You've accepted this invite!")
+              ? render('h4', "You've accepted this invite!")
               : vnode.state.rejected.includes(location)
-              ? m('h4', "You've already deleted this invite!")
+              ? render('h4', "You've already deleted this invite!")
               : [
-                  m('.invite-addresses', [addresses]),
+                  render('.invite-addresses', [addresses]),
                   addresses.length > 0 &&
-                    m('.invite-actions', [
-                      m(Button, {
+                    render('.invite-actions', [
+                      render(Button, {
                         class: 'submit',
                         intent: 'primary',
                         rounded: true,
@@ -193,8 +194,8 @@ const ConfirmInviteModal: m.Component<
                         },
                         label: 'Accept invite',
                       }),
-                      m('.invite-actions-or', 'or'),
-                      m(Button, {
+                      render('.invite-actions-or', 'or'),
+                      render(Button, {
                         class: 'reject',
                         intent: 'negative',
                         rounded: true,
@@ -227,7 +228,7 @@ const ConfirmInviteModal: m.Component<
                       }),
                     ]),
                   addresses.length === 0 &&
-                    m(
+                    render(
                       'a.btn.add-account',
                       {
                         href: '#',
@@ -271,7 +272,7 @@ const ConfirmInviteModal: m.Component<
                       'Connect a new address'
                     ),
                   // addresses.length === 0 &&
-                  //   m(LoginWithWalletDropdown, {
+                  //   render(LoginWithWalletDropdown, {
                   //     loggingInWithAddress: false,
                   //     joiningChain: app.chain?.id || 'edgeware',
                   //     label: 'Connect an address',
@@ -284,10 +285,10 @@ const ConfirmInviteModal: m.Component<
                   //   }),
                 ],
           ])
-        : m('.compact-modal-body', [
-            m('div', [
-              m('p', 'No more invites!'),
-              m('p', 'Click anywhere outside this window to close it.'),
+        : render('.compact-modal-body', [
+            render('div', [
+              render('p', 'No more invites!'),
+              render('p', 'Click anywhere outside this window to close it.'),
             ]),
           ]),
     ]);

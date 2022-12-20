@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { SelectList, ListItem, Callout, Icons } from 'construct-ui';
 
 import 'components/topic_selector.scss';
@@ -36,7 +36,7 @@ export class TopicSelector extends ClassComponent<TopicSelectorAttrs> {
       .sort((a, b) => b.order - a.order);
 
     const itemRender = (topic) => {
-      return m(ListItem, {
+      return render(ListItem, {
         label: topic.name,
         selected: (selectedTopic as Topic)?.name === topic.name,
       });
@@ -68,14 +68,14 @@ export class TopicSelector extends ClassComponent<TopicSelectorAttrs> {
         );
     };
 
-    return m(SelectList, {
+    return render(SelectList, {
       class: 'TopicSelector',
       filterable: false,
       checkmark: false,
       closeOnSelect: true,
       emptyContent:
         // This appears if no topics are available because all require token thresholds
-        m(Callout, {
+        render(Callout, {
           size: 'sm',
           class: 'no-matching-topics',
           icon: Icons.ALERT_TRIANGLE,

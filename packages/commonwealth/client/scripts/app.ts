@@ -13,6 +13,7 @@ import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
+import { render } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
 
@@ -542,7 +543,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           {},
           { replace: true }
         );
-        return m(Layout);
+        return render(Layout);
       },
     });
 
@@ -603,7 +604,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         if (app.chain?.meta.type === ChainType.Token) {
           deferChain = false;
         }
-        return m(Layout, { scope, deferChain, hideSidebar }, [vnode]);
+        return render(Layout, { scope, deferChain, hideSidebar }, [vnode]);
       },
     });
 

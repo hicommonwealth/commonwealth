@@ -2,7 +2,7 @@
 /* eslint-disable max-classes-per-file */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'components/proposals/voting_result_components.scss';
 

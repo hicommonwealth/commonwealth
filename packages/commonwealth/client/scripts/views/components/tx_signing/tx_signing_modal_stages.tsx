@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -121,7 +121,7 @@ export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
 }
 
 export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
-  view(vnode: ResultNode<TxDataState, this>) {
+  view(vnode: ResultNode<TxDataState>) {
     const { blocknum, hash, timestamp } = vnode.attrs;
 
     return (

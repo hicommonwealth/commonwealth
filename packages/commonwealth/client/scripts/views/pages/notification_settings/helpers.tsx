@@ -108,15 +108,15 @@ export const getNotificationTypeText = (category: string) => {
 //                   threadOrComment.toString(),
 //                   { target: '_blank' }
 //                 ),
-//                 m(
+//                 render(
 //                   'span.item-metadata',
 //                   moment(subscription.Thread.created_at).fromNow()
 //                 ),
-//                 m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
+//                 render('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
 //               ]
 //             : [
 //                 threadOrComment.toString(),
-//                 m('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
+//                 render('span.item-metadata', NEW_COMMENTS_LABEL_SUFFIX),
 //               ];
 //         }
 //         case NotificationCategories.NewReaction: {
@@ -137,15 +137,15 @@ export const getNotificationTypeText = (category: string) => {
 //                   threadOrComment.toString(),
 //                   { target: '_blank' }
 //                 ),
-//                 m(
+//                 render(
 //                   'span.item-metadata',
 //                   moment(subscription.Thread.created_at).fromNow()
 //                 ),
-//                 m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
+//                 render('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
 //               ]
 //             : [
 //                 threadOrComment.toString(),
-//                 m('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
+//                 render('span.item-metadata', NEW_REACTIONS_LABEL_SUFFIX),
 //               ];
 //         }
 //         default:
@@ -177,7 +177,7 @@ export const getNotificationTypeText = (category: string) => {
 //               threadOrComment.toString(),
 //               { target: '_blank' }
 //             ),
-//             m(
+//             render(
 //               'span.item-metadata',
 //               moment(subscription.Thread.created_at).fromNow()
 //             ),
@@ -199,15 +199,15 @@ export const getNotificationTypeText = (category: string) => {
 //       return;
 //     }
 
-//     return m('tr.BatchedSubscriptionRow', [
-//       m('td.subscription-label', [
+//     return render('tr.BatchedSubscriptionRow', [
+//       render('td.subscription-label', [
 //         label ||
 //           (subscriptions?.length > 1
 //             ? batchLabel(subscriptions)
 //             : singleLabel(subscriptions[0])),
 //       ]),
-//       m('td.subscription-setting', [
-//         m(SelectList, {
+//       render('td.subscription-setting', [
+//         render(SelectList, {
 //           class: 'BatchedNotificationSelectList',
 //           filterable: false,
 //           checkmark: false,
@@ -219,7 +219,7 @@ export const getNotificationTypeText = (category: string) => {
 //             transitionDuration: 0,
 //           },
 //           itemRender: (option: string) => {
-//             return m(ListItem, {
+//             return render(ListItem, {
 //               label: option,
 //               selected: this.option === option,
 //             });
@@ -229,7 +229,7 @@ export const getNotificationTypeText = (category: string) => {
 //             NOTIFICATION_ON_OPTION,
 //             NOTIFICATION_OFF_OPTION,
 //           ],
-//           trigger: m(Button, {
+//           trigger: render(Button, {
 //             align: 'left',
 //             compact: true,
 //             rounded: true,
@@ -300,7 +300,7 @@ export const getNotificationTypeText = (category: string) => {
 
 //     return (
 //       subscription &&
-//       m(BatchedSubscriptionRow, {
+//       render(BatchedSubscriptionRow, {
 //         subscriptions: [subscription],
 //         label: NEW_THREADS_LABEL,
 //       })
@@ -347,10 +347,10 @@ export const getNotificationTypeText = (category: string) => {
 //       this.option = NOTIFICATION_OFF_OPTION;
 //     }
 
-//     return m('tr.ChainEventSubscriptionRow', [
-//       m('td.subscription-label', [
+//     return render('tr.ChainEventSubscriptionRow', [
+//       render('td.subscription-label', [
 //         title,
-//         m('.ChainEventDetails', [
+//         render('.ChainEventDetails', [
 //           notificationTypeArray
 //             .filter((s) => s.indexOf('reward') === -1) // filter out treasury-reward and reward events (they are silent)
 //             .map((s) => `${s.replace(/^[a-z]+-/, '')}, `)
@@ -358,8 +358,8 @@ export const getNotificationTypeText = (category: string) => {
 //             .replace(/, $/, ''),
 //         ]),
 //       ]),
-//       m('td.subscription-setting', [
-//         m(SelectList, {
+//       render('td.subscription-setting', [
+//         render(SelectList, {
 //           class: 'EventSubscriptionTypeSelectList',
 //           filterable: false,
 //           checkmark: false,
@@ -371,7 +371,7 @@ export const getNotificationTypeText = (category: string) => {
 //             class: 'EventSubscriptionTypeSelectRow',
 //           },
 //           itemRender: (option: string) => {
-//             return m(ListItem, {
+//             return render(ListItem, {
 //               label: option,
 //               selected: this.option === option,
 //             });
@@ -381,7 +381,7 @@ export const getNotificationTypeText = (category: string) => {
 //             NOTIFICATION_ON_OPTION,
 //             NOTIFICATION_OFF_OPTION,
 //           ],
-//           trigger: m(Button, {
+//           trigger: render(Button, {
 //             align: 'left',
 //             compact: true,
 //             rounded: true,
@@ -489,23 +489,23 @@ export const getNotificationTypeText = (category: string) => {
 //       'objectId'
 //     );
 //     return [
-//       newThreads && m(NewThreadRow, { community, subscriptions }),
+//       newThreads && render(NewThreadRow, { community, subscriptions }),
 //       batchedSubscriptions.length > 0 &&
-//         m('tr.NewActivityRow', [m('td', NEW_ACTIVITY_LABEL), m('td')]),
+//         render('tr.NewActivityRow', [render('td', NEW_ACTIVITY_LABEL), render('td')]),
 //       // TODO: Filter community past-thread/comment subscriptions here into SubscriptionRows.
 //       this.expanded &&
 //         batchedSubscriptions.map(
 //           (subscriptions2: NotificationSubscription[]) => {
-//             return m(BatchedSubscriptionRow, {
+//             return render(BatchedSubscriptionRow, {
 //               subscriptions: subscriptions2,
 //               key: subscriptions2[0].id,
 //             });
 //           }
 //         ),
 //       batchedSubscriptions.length > 0 &&
-//         m('tr', [
-//           m('td', { colspan: 2 }, [
-//             m(
+//         render('tr', [
+//           render('td', { colspan: 2 }, [
+//             render(
 //               'a.expand-notifications-link',
 //               {
 //                 href: '#',
@@ -559,34 +559,34 @@ export const getNotificationTypeText = (category: string) => {
 //       'objectId'
 //     );
 //     return [
-//       m(BatchedSubscriptionRow, {
+//       render(BatchedSubscriptionRow, {
 //         subscriptions: subscriptions.filter((s) =>
 //           communityIds.includes(s.objectId)
 //         ),
 //         label: NEW_THREADS_LABEL,
 //       }),
 //       mentionsSubscription &&
-//         m(BatchedSubscriptionRow, {
+//         render(BatchedSubscriptionRow, {
 //           subscriptions: [mentionsSubscription],
 //           label: NEW_MENTIONS_LABEL,
 //         }),
 //       collaborationsSubscription &&
-//         m(BatchedSubscriptionRow, {
+//         render(BatchedSubscriptionRow, {
 //           subscriptions: [collaborationsSubscription],
 //           label: NEW_COLLABORATIONS_LABEL,
 //         }),
 //       batchedSubscriptions.length > 0 &&
-//         m('tr.NewActivityRow', [m('td', NEW_ACTIVITY_LABEL), m('td')]),
+//         render('tr.NewActivityRow', [render('td', NEW_ACTIVITY_LABEL), render('td')]),
 //       this.expanded &&
 //         batchedSubscriptions.map(
 //           (subscriptions2: NotificationSubscription[]) => {
-//             return m(BatchedSubscriptionRow, { subscriptions: subscriptions2 });
+//             return render(BatchedSubscriptionRow, { subscriptions: subscriptions2 });
 //           }
 //         ),
 //       batchedSubscriptions.length > 0 &&
-//         m('tr', [
-//           m('td', { colspan: 2 }, [
-//             m(
+//         render('tr', [
+//           render('td', { colspan: 2 }, [
+//             render(
 //               'a.expand-notifications-link',
 //               {
 //                 href: '#',
@@ -611,26 +611,26 @@ export const getNotificationTypeText = (category: string) => {
 // export class EdgewareChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Council events',
 //           notificationTypeArray: EdgewareChainNotificationTypes.Council,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Democracy events',
 //           notificationTypeArray: EdgewareChainNotificationTypes.Democracy,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Treasury events',
 //           notificationTypeArray: EdgewareChainNotificationTypes.Treasury,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Preimage events',
 //           notificationTypeArray: EdgewareChainNotificationTypes.Preimage,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Voting delegation events',
 //           notificationTypeArray: EdgewareChainNotificationTypes.VotingDelegation,
 //         }),
@@ -641,26 +641,26 @@ export const getNotificationTypeText = (category: string) => {
 //   export class KusamaChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Council events',
 //           notificationTypeArray: KusamaChainNotificationTypes.Council,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Democracy events',
 //           notificationTypeArray: KusamaChainNotificationTypes.Democracy,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Treasury events',
 //           notificationTypeArray: KusamaChainNotificationTypes.Treasury,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Preimage events',
 //           notificationTypeArray: KusamaChainNotificationTypes.Preimage,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Voting delegation events',
 //           notificationTypeArray: KusamaChainNotificationTypes.VotingDelegation,
 //         }),
@@ -671,26 +671,26 @@ export const getNotificationTypeText = (category: string) => {
 //   export class PolkadotChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Council events',
 //           notificationTypeArray: PolkadotChainNotificationTypes.Council,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Democracy events',
 //           notificationTypeArray: PolkadotChainNotificationTypes.Democracy,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Treasury events',
 //           notificationTypeArray: PolkadotChainNotificationTypes.Treasury,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Preimage events',
 //           notificationTypeArray: PolkadotChainNotificationTypes.Preimage,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Voting delegation events',
 //           notificationTypeArray: PolkadotChainNotificationTypes.VotingDelegation,
 //         }),
@@ -701,26 +701,26 @@ export const getNotificationTypeText = (category: string) => {
 //   export class KulupuChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Council events',
 //           notificationTypeArray: KulupuChainNotificationTypes.Council,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Democracy events',
 //           notificationTypeArray: KulupuChainNotificationTypes.Democracy,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Treasury events',
 //           notificationTypeArray: KulupuChainNotificationTypes.Treasury,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Preimage events',
 //           notificationTypeArray: KulupuChainNotificationTypes.Preimage,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Voting delegation events',
 //           notificationTypeArray: KulupuChainNotificationTypes.VotingDelegation,
 //         }),
@@ -731,12 +731,12 @@ export const getNotificationTypeText = (category: string) => {
 //   export class DydxChainEventNotifications extends ClassComponent {
 //     view() {
 //       return [
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Governance events',
 //           notificationTypeArray: DydxChainNotificationTypes.Governance,
 //           recommended: true,
 //         }),
-//         m(ChainEventSubscriptionRow, {
+//         render(ChainEventSubscriptionRow, {
 //           title: 'Token events',
 //           notificationTypeArray: DydxChainNotificationTypes.Token,
 //           recommended: true,
@@ -781,12 +781,12 @@ export const getNotificationTypeText = (category: string) => {
 //             value={this.interval}
 //           />
 //           {!app.user.email
-//             ? m('p', [
+//             ? render('p', [
 //                 link('a', `/${app.activeChainId()}/settings`, 'Set an email'),
 //                 ' to start receiving notification digests.',
 //               ])
 //             : !app.user.emailVerified
-//             ? m('p', [
+//             ? render('p', [
 //                 'Your email has not been verified. ',
 //                 link(
 //                   'a',
@@ -796,7 +796,7 @@ export const getNotificationTypeText = (category: string) => {
 //                 ' to continue receiving notification emails.',
 //               ])
 //             : ''}
-//           {this.saving === false && m('p', 'Setting saved!')}
+//           {this.saving === false && render('p', 'Setting saved!')}
 //           {/* this.saving is undefined upon init */}
 //         </>
 //       );

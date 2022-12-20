@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import _ from 'lodash';
 
 import 'pages/settings/linked_addresses_section.scss';
@@ -42,7 +42,7 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
         key={`${account.chain.id}#${account.address}`}
         onclick={vnode.attrs.onclick}
       >
-        {m(User, {
+        {render(User, {
           user: account,
           avatarOnly: true,
           avatarSize: 32,
@@ -50,7 +50,7 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
           popover: true,
         })}
         <div class="info-col">
-          {m(User, {
+          {render(User, {
             user: account,
             hideAvatar: true,
             linkify: true,
@@ -126,7 +126,7 @@ export class LinkedAddressesSection extends ClassComponent {
         {addressGroups.map(([chain_id, addresses]) =>
           addresses
             .sort(orderAccountsByAddress)
-            .map((account) => m(AccountRow, { account }))
+            .map((account) => render(AccountRow, { account }))
         )}
         {app.user.addresses.length === 0 && <CWText>No addresses</CWText>}
       </div>

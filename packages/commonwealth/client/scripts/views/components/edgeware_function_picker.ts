@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { Input, FormLabel, FormGroup } from 'construct-ui';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
@@ -38,17 +39,17 @@ const EdgewareFunctionPicker = {
         vnode.state.form.function
       );
     } catch (e) {
-      return m('.FunctionPicker', 'Invalid function!');
+      return render('.FunctionPicker', 'Invalid function!');
     }
 
-    return m(
+    return render(
       '.FunctionPicker',
       {
         style: 'margin-bottom: 19.5px',
       },
       [
-        m('div', [
-          m(DropdownFormField, {
+        render('div', [
+          render(DropdownFormField, {
             title: 'Module',
             name: 'module',
             choices: (app.chain as Substrate).chain
@@ -70,7 +71,7 @@ const EdgewareFunctionPicker = {
               }, 0);
             },
           }),
-          m(DropdownFormField, {
+          render(DropdownFormField, {
             title: 'Function',
             name: 'function',
             choices: (app.chain as Substrate).chain
@@ -91,13 +92,13 @@ const EdgewareFunctionPicker = {
             },
           }),
         ]),
-        m(
+        render(
           'div',
           argumentInputs.map(({ name, type }, index) => {
             if (`${type}` === 'Compact<BalanceOf>') {
-              return m(FormGroup, [
-                m(FormLabel, `${name} (${app.chain.currency})`),
-                m(Input, {
+              return render(FormGroup, [
+                render(FormLabel, `${name} (${app.chain.currency})`),
+                render(Input, {
                   placeholder: `${name} (${app.chain.currency})`,
                   oninput: (e) => {
                     const result = (e.target as any).value;
@@ -112,9 +113,9 @@ const EdgewareFunctionPicker = {
             }
 
             if (`${type}`.match(/Vec<[A-Za-z]+>/)) {
-              return m(FormGroup, [
-                m(FormLabel, `${name} (${type})`),
-                m(Input, {
+              return render(FormGroup, [
+                render(FormLabel, `${name} (${type})`),
+                render(Input, {
                   placeholder: `${name} (${type})`,
                   oninput: (e) => {
                     const result = (e.target as any).value;
@@ -127,9 +128,9 @@ const EdgewareFunctionPicker = {
               ]);
             }
 
-            return m(FormGroup, [
-              m(FormLabel, `${name}`),
-              m(Input, {
+            return render(FormGroup, [
+              render(FormLabel, `${name}`),
+              render(Input, {
                 placeholder: `${name} (${type})`,
                 oninput: (e) => {
                   const result = (e.target as any).value;
@@ -141,9 +142,9 @@ const EdgewareFunctionPicker = {
           })
         ),
 
-        m(FormGroup, { style: 'margin-top: 20px' }, [
-          m(FormLabel, 'Proposal Hash'),
-          m(Input, {
+        render(FormGroup, { style: 'margin-top: 20px' }, [
+          render(FormLabel, 'Proposal Hash'),
+          render(Input, {
             disabled: true,
             value: EdgewareFunctionPicker.getMethod()
               ? blake2AsHex(EdgewareFunctionPicker.getMethod().toHex())

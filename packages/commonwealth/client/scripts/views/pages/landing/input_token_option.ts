@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 
 const ADD_TOKEN_LINK = 'https://hicommonwealth.typeform.com/to/cRP27Rp5';
 
@@ -13,26 +14,26 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
     const { iconImg } = vnode.attrs;
     let tokenImage;
     if (!iconImg || !iconImg.length || iconImg.slice(0, 4) === 'ipfs') {
-      tokenImage = m('.TokenIcon', [
-        m('.token-icon.no-image', {
+      tokenImage = render('.TokenIcon', [
+        render('.token-icon.no-image', {
           style: 'width: 1.5rem; height: 1.5rem; margin-right: 1rem;',
           onclick
         }, [
-          m('span', {
+          render('span', {
             style: 'font-size: 1.25rem;'
           }, vnode.attrs.text.slice(0, 1))
         ])
       ]);
     } else {
-      tokenImage = m('img', {
+      tokenImage = render('img', {
         class: 'mr-4 h-6 w-6',
         src: iconImg,
         alt: '',
       });
     }
-    return m(
+    return render(
       'li',
-      m(
+      render(
         'button',
         {
           type: 'button',
@@ -49,9 +50,9 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
           class:
             'p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row text-left leading-none w-full justify-between focus:outline-none',
         },
-        m('span', { class: 'flex flex-row font-bold' }, [
+        render('span', { class: 'flex flex-row font-bold' }, [
           tokenImage,
-          m('span', { class: 'mt-1' }, vnode.attrs.text),
+          render('span', { class: 'mt-1' }, vnode.attrs.text),
         ])
       )
     );

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
@@ -104,7 +104,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
     );
 
     return likes > 0
-      ? m(Popover, {
+      ? render(Popover, {
           interactionType: 'hover',
           content: (
             <div class="reaction-button-tooltip-contents">

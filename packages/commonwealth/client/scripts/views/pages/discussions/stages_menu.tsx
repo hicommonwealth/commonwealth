@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import {
   Button,
   Icons,
@@ -27,8 +27,8 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
   view(vnode: ResultNode<StagesMenuAttrs>) {
     const { selectedStage, stage, stages } = vnode.attrs;
 
-    return m(PopoverMenu, {
-      trigger: m(Button, {
+    return render(PopoverMenu, {
+      trigger: render(Button, {
         rounded: true,
         compact: true,
         label: selectedStage
@@ -42,7 +42,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
       closeOnContentClick: true,
       content: (
         <div class="stage-items">
-          {m(MenuItem, {
+          {render(MenuItem, {
             onclick: (e) => {
               e.preventDefault();
               navigateToSubpage('/');
@@ -51,9 +51,9 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
             iconLeft: !stage ? Icons.CHECK : null,
             label: 'All Stages',
           })}
-          {m(MenuDivider)}
+          {render(MenuDivider)}
           {stages.map((targetStage) =>
-            m(MenuItem, {
+            render(MenuItem, {
               active: stage === targetStage,
               iconLeft: stage === targetStage ? Icons.CHECK : null,
               onclick: (e) => {

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -223,7 +223,7 @@ class MembersPage extends ClassComponent {
                       navigateToSubpage(`/account/${address}?base=${chain}`);
                     }}
                   >
-                    {m(User, { user: profileInfo.profile, showRole: true })}
+                    {render(User, { user: profileInfo.profile, showRole: true })}
                   </a>
                   <CWText>{profileInfo.postCount}</CWText>
                 </div>

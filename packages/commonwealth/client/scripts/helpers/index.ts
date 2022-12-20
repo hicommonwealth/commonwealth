@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import m, { RouteOptions } from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 
@@ -52,7 +53,7 @@ export const modalRedirectClick = (e, route) => {
  * mithril link helper
  */
 export function externalLink(selector, target, children) {
-  return m(
+  return render(
     selector,
     {
       href: target,
@@ -109,7 +110,7 @@ export function link(
     },
   };
   if (extraAttrs) Object.assign(attrs, extraAttrs);
-  return m(selector, attrs, children);
+  return render(selector, attrs, children);
 }
 
 /*
@@ -289,7 +290,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p) => m('p', p));
+  return paragraphs.map((p) => render('p', p));
 }
 
 /*

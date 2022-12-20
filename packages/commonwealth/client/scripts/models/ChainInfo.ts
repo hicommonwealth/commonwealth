@@ -327,8 +327,8 @@ class ChainInfo {
 
   public getAvatar(size: number) {
     return this.iconUrl
-      ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: undefined, size });
+      ? render(CWAvatar, { avatarUrl: this.iconUrl, size })
+      : render(CWJdenticon, { address: undefined, size });
   }
 }
 

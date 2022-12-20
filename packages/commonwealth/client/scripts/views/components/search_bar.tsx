@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 import moment from 'moment';
 import {
@@ -44,11 +44,11 @@ const getMemberPreview = (
     app.isCustomDomain() ? '' : `/${app.activeChainId() || addr.chain}`
   }/account/${addr.address}?base=${addr.chain}`;
 
-  return m(ListItem, {
+  return render(ListItem, {
     tabIndex,
     label: (
       <a class="search-results-item">
-        {m(UserBlock, {
+        {render(UserBlock, {
           user: profile,
           searchTerm,
           avatarSize: 24,
@@ -101,7 +101,7 @@ const getCommunityPreview = (
     closeResultsFn();
   };
 
-  return m(ListItem, {
+  return render(ListItem, {
     tabIndex,
     label: (
       <a class="search-results-item community-result">
@@ -139,7 +139,7 @@ const getDiscussionPreview = (
     closeResultsFn();
   };
 
-  return m(ListItem, {
+  return render(ListItem, {
     tabIndex,
     onclick: onSelect,
     onkeyup: (e) => {
@@ -156,7 +156,7 @@ const getDiscussionPreview = (
         </div>
         <div class="search-results-thread-subtitle">
           <span class="created-at">{moment(thread.created_at).fromNow()}</span>
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(
               thread.address_id,
               thread.address,
@@ -201,7 +201,7 @@ const getCommentPreview = (
     closeResultsFn();
   };
 
-  return m(ListItem, {
+  return render(ListItem, {
     tabIndex,
     onclick: onSelect,
     onkeyup: (e) => {
@@ -218,7 +218,7 @@ const getCommentPreview = (
         </div>
         <div class="search-results-thread-subtitle">
           <span class="created-at">{moment(comment.created_at).fromNow()}</span>
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(
               comment.address_id,
               comment.address,
@@ -288,7 +288,7 @@ const getResultsPreview = (searchQuery: SearchQuery, state) => {
 
     if (res?.length === 0) return;
 
-    const headerEle = m(ListItem, {
+    const headerEle = render(ListItem, {
       label: type,
       class: `disabled ${organizedResults.length === 0 ? 'upper-border' : ''}`,
       onclick: (e) => {
@@ -352,12 +352,12 @@ const getSearchHistoryPreview = (
     searchQuery.searchScope[0] === SearchScope.All
       ? []
       : searchQuery.searchScope.map((scope) =>
-          m(Tag, { label: SearchScope[scope].toLowerCase() })
+          render(Tag, { label: SearchScope[scope].toLowerCase() })
         );
 
   if (searchQuery.chainScope && !app.isCustomDomain()) {
     scopeTags.unshift(
-      m(Tag, {
+      render(Tag, {
         label: searchQuery.chainScope.toLowerCase(),
         class: 'search-history-primary-tag',
       })
@@ -369,10 +369,10 @@ const getSearchHistoryPreview = (
   }
 
   if (scopeTags.length >= 1) {
-    scopeTags.unshift(m(Icon, { name: Icons.ARROW_RIGHT }));
+    scopeTags.unshift(render(Icon, { name: Icons.ARROW_RIGHT }));
   }
 
-  return m(ListItem, {
+  return render(ListItem, {
     class: 'search-history-item',
     onclick: () => {
       app.search.removeFromHistory(searchQuery);
@@ -390,7 +390,7 @@ const getSearchHistoryPreview = (
         {scopeTags}
       </>
     ),
-    contentRight: m(Icon, {
+    contentRight: render(Icon, {
       name: Icons.X,
       onclick: () => {
         app.search.removeFromHistory(searchQuery);
@@ -487,7 +487,7 @@ export class SearchBar extends ClassComponent {
 
     if (historyList.length > 0) {
       historyList.push(
-        m(ListItem, {
+        render(ListItem, {
           class: 'search-history-no-results upper-border',
           // eslint-disable-next-line max-len
           label:
@@ -496,13 +496,13 @@ export class SearchBar extends ClassComponent {
       );
     }
 
-    const scopeTitle = m(ListItem, {
+    const scopeTitle = render(ListItem, {
       class: 'disabled',
       label: 'Limit search to:',
     });
 
     const scopeToButton = (scope, disabled) => {
-      return m(Button, {
+      return render(Button, {
         size: Size.SM,
         class: disabled ? 'disabled' : '',
         active: this.searchQuery.searchScope.includes(scope),
@@ -529,18 +529,18 @@ export class SearchBar extends ClassComponent {
         ).map((s) => scopeToButton(s, false))
       );
 
-    const filterDropdown = m(List, { class: 'search-results-list' }, [
-      m(ListItem, { class: 'disabled', label: "I'm looking for: " }),
-      m(ListItem, {
+    const filterDropdown = render(List, { class: 'search-results-list' }, [
+      render(ListItem, { class: 'disabled', label: "I'm looking for: " }),
+      render(ListItem, {
         class: 'disabled search-filter-button-bar',
         label: scopeButtons,
       }),
       this.activeChain &&
         !app.isCustomDomain() && [
           scopeTitle,
-          m(ListItem, {
+          render(ListItem, {
             class: 'disabled',
-            label: m(Button, {
+            label: render(Button, {
               size: Size.SM,
               onclick: () => {
                 this.searchQuery.chainScope =
@@ -562,12 +562,12 @@ export class SearchBar extends ClassComponent {
         ],
       this.searchTerm.length < 1
         ? historyList.length === 0
-          ? m(ListItem, {
+          ? render(ListItem, {
               class: 'search-history-no-results upper-border',
               label: 'Enter a term into the field and press Enter to start',
             })
           : [
-              m(ListItem, {
+              render(ListItem, {
                 class: 'disabled upper-border',
                 label: 'Search History',
               }),
@@ -575,21 +575,21 @@ export class SearchBar extends ClassComponent {
             ]
         : !results || results?.length === 0
         ? app.search.getByQuery(searchQuery)?.loaded
-          ? m(ListItem, {
+          ? render(ListItem, {
               class: 'search-history-no-results upper-border',
               label: 'No Results Found',
             })
           : this.isTyping
-          ? m(ListItem, {
+          ? render(ListItem, {
               class: 'disabled upper-border',
               label: <CWSpinner size="small" />,
             })
-          : m(ListItem, {
+          : render(ListItem, {
               class: 'search-history-no-results upper-border',
               label: 'Make your query longer than 3 characters to search',
             })
         : this.isTyping
-        ? m(ListItem, {
+        ? render(ListItem, {
             class: 'disabled upper-border',
             label: <CWSpinner size="small" />,
           })
@@ -597,7 +597,7 @@ export class SearchBar extends ClassComponent {
     ]);
 
     const cancelInputIcon = this.searchTerm
-      ? m(Icon, {
+      ? render(Icon, {
           name: Icons.X,
           onclick: () => {
             const input = $('.SearchBar').find('input[name=search');
@@ -608,7 +608,7 @@ export class SearchBar extends ClassComponent {
       : null;
 
     const searchIcon = this.searchTerm
-      ? m(Icon, {
+      ? render(Icon, {
           name: Icons.CORNER_DOWN_LEFT,
           onclick: () => {
             executeSearch(this.searchQuery);
@@ -616,15 +616,15 @@ export class SearchBar extends ClassComponent {
         })
       : null;
 
-    return m(ControlGroup, { class: 'SearchBar' }, [
-      m(Input, {
+    return render(ControlGroup, { class: 'SearchBar' }, [
+      render(Input, {
         name: 'search',
         placeholder: 'Type to search...',
         autofocus: false, // !isMobile,
         fluid: true,
         tabIndex: -10,
         contentRight:
-          this.searchTerm && m(ControlGroup, [cancelInputIcon, searchIcon]),
+          this.searchTerm && render(ControlGroup, [cancelInputIcon, searchIcon]),
         defaultValue: m.route.param('q') || this.searchTerm,
         value: this.searchTerm,
         autocomplete: 'off',

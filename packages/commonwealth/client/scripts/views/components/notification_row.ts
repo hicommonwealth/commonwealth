@@ -2,6 +2,7 @@ import 'components/notification_row.scss';
 
 import _ from 'lodash';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
@@ -57,7 +58,7 @@ const getCommentPreview = (comment_text) => {
   try {
     const doc = JSON.parse(decodeURIComponent(comment_text));
     if (!doc.ops) throw new Error();
-    decoded_comment_text = m(QuillFormattedText, {
+    decoded_comment_text = render(QuillFormattedText, {
       doc,
       hideFormatting: true,
       collapse: true,
@@ -70,7 +71,7 @@ const getCommentPreview = (comment_text) => {
     Array.from(matches).forEach((match) => {
       doc = doc.replace(match[0], match[1]);
     });
-    decoded_comment_text = m(MarkdownFormattedText, {
+    decoded_comment_text = render(MarkdownFormattedText, {
       doc: doc.slice(0, 140),
       hideFormatting: true,
       collapse: true,
@@ -107,7 +108,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = m(User, {
+  const actorName = render(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
     hideIdentityIcon: true,
@@ -116,45 +117,45 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
     notificationHeader = parent_comment_id
-      ? m('span', [
+      ? render('span', [
           actorName,
           ' commented on ',
-          m('span.commented-obj', decoded_title),
+          render('span.commented-obj', decoded_title),
         ])
-      : m('span', [
+      : render('span', [
           actorName,
           ' responded in ',
-          m('span.commented-obj', decoded_title),
+          render('span.commented-obj', decoded_title),
         ]);
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [
+    notificationHeader = render('span', [
       actorName,
       ' created a new thread ',
-      m('span.commented-obj', decoded_title),
+      render('span.commented-obj', decoded_title),
     ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
-    notificationHeader = m('span', [
+    notificationHeader = render('span', [
       actorName,
       ' mentioned you in ',
-      m('span.commented-obj', decoded_title),
+      render('span.commented-obj', decoded_title),
     ]);
   } else if (category === `${NotificationCategories.NewCollaboration}`) {
-    notificationHeader = m('span', [
+    notificationHeader = render('span', [
       actorName,
       ' added you as a collaborator on ',
-      m('span.commented-obj', decoded_title),
+      render('span.commented-obj', decoded_title),
     ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = !comment_id
-      ? m('span', [
+      ? render('span', [
           actorName,
           ' liked the post ',
-          m('span.commented-obj', decoded_title),
+          render('span.commented-obj', decoded_title),
         ])
-      : m('span', [
+      : render('span', [
           actorName,
           ' liked your comment in ',
-          m('span.commented-obj', decoded_title || community_name),
+          render('span.commented-obj', decoded_title || community_name),
         ]);
   }
   const pseudoProposal = {
@@ -219,7 +220,7 @@ const getBatchNotificationFields = (
     notificationBody = null;
   }
 
-  const actorName = m(User, {
+  const actorName = render(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
     hideIdentityIcon: true,
@@ -228,52 +229,52 @@ const getBatchNotificationFields = (
   if (category === NotificationCategories.NewComment) {
     // Needs logic for notifications issued to parents of nested comments
     notificationHeader = parent_comment_id
-      ? m('span', [
+      ? render('span', [
           actorName,
           length > 0 && ` and ${pluralize(length, 'other')}`,
           ' commented on ',
-          m('span.commented-obj', decoded_title),
+          render('span.commented-obj', decoded_title),
         ])
-      : m('span', [
+      : render('span', [
           actorName,
           length > 0 && ` and ${pluralize(length, 'other')}`,
           ' responded in ',
-          m('span.commented-obj', decoded_title),
+          render('span.commented-obj', decoded_title),
         ]);
   } else if (category === NotificationCategories.NewThread) {
-    notificationHeader = m('span', [
+    notificationHeader = render('span', [
       actorName,
       length > 0 && ` and ${pluralize(length, 'other')}`,
       ' created new threads in ',
-      m('span.commented-obj', community_name),
+      render('span.commented-obj', community_name),
     ]);
   } else if (category === `${NotificationCategories.NewMention}`) {
     notificationHeader = !comment_id
-      ? m('span', [
+      ? render('span', [
           actorName,
           length > 0 && ` and ${pluralize(length, 'other')}`,
           ' mentioned you in ',
-          m('span.commented-obj', community_name),
+          render('span.commented-obj', community_name),
         ])
-      : m('span', [
+      : render('span', [
           actorName,
           length > 0 && ` and ${pluralize(length, 'other')}`,
           ' mentioned you in ',
-          m('span.commented-obj', decoded_title || community_name),
+          render('span.commented-obj', decoded_title || community_name),
         ]);
   } else if (category === `${NotificationCategories.NewReaction}`) {
     notificationHeader = !comment_id
-      ? m('span', [
+      ? render('span', [
           actorName,
           length > 0 && ` and ${pluralize(length, 'other')}`,
           ' liked the post ',
-          m('span.commented-obj', decoded_title),
+          render('span.commented-obj', decoded_title),
         ])
-      : m('span', [
+      : render('span', [
           actorName,
           length > 0 && ` and ${pluralize(length, 'other')}`,
           ' liked your comment in ',
-          m('span.commented-obj', decoded_title || community_name),
+          render('span.commented-obj', decoded_title || community_name),
         ]);
   }
   const pseudoProposal = {
@@ -350,25 +351,25 @@ const NotificationRow: m.Component<
       }
 
       if (!label) {
-        return m(
+        return render(
           'li.NotificationRow',
           {
             class: notification.isRead ? '' : 'unread',
             key: notification.id,
             id: notification.id,
           },
-          [m('.comment-body', [m('.comment-body-top', 'Loading...')])]
+          [render('.comment-body', [render('.comment-body-top', 'Loading...')])]
         );
       }
       return link(
         'a.NotificationRow',
         `/notifications?id=${notification.id}`,
         [
-          m('.comment-body', [
-            m('.comment-body-top.chain-event-notification-top', [
+          render('.comment-body', [
+            render('.comment-body-top.chain-event-notification-top', [
               `${label.heading} on ${chainName}`,
               !vnode.attrs.onListPage &&
-                m(CWIconButton, {
+                render(CWIconButton, {
                   iconName: 'close',
                   onclick: (e) => {
                     e.preventDefault();
@@ -380,11 +381,11 @@ const NotificationRow: m.Component<
                   },
                 }),
             ]),
-            m(
+            render(
               '.comment-body-bottom',
               `Block ${notification.chainEvent.blockNumber}`
             ),
-            m('.comment-body-excerpt', label.label),
+            render('.comment-body-excerpt', label.label),
           ]),
         ],
         {
@@ -414,7 +415,7 @@ const NotificationRow: m.Component<
       );
       const author = new AddressInfo(null, author_address, chain_id, null);
 
-      const authorName = m(User, {
+      const authorName = render(User, {
         user: author,
         hideAvatar: true,
         hideIdentityIcon: true,
@@ -424,25 +425,25 @@ const NotificationRow: m.Component<
         'a.NotificationRow',
         route,
         [
-          m(User, {
+          render(User, {
             user: author,
             avatarOnly: true,
             avatarSize: 26,
           }),
-          m('.comment-body', [
-            m(
+          render('.comment-body', [
+            render(
               '.comment-body-title',
-              m('span', [
+              render('span', [
                 authorName,
                 ' mentioned you in ',
-                m('span.commented-obj', chain_id),
+                render('span.commented-obj', chain_id),
                 ' chat ',
               ])
             ),
-            m('.comment-body-bottom-wrap', [
-              m('.comment-body-created', moment(created_at).fromNow()),
+            render('.comment-body-bottom-wrap', [
+              render('.comment-body-created', moment(created_at).fromNow()),
               !notification.isRead &&
-                m(
+                render(
                   '.comment-body-mark-as-read',
                   {
                     onclick: (e) => {
@@ -463,7 +464,7 @@ const NotificationRow: m.Component<
                   },
                   [
                     vnode.state.markingRead
-                      ? m(CWSpinner, { size: 'small' })
+                      ? render(CWSpinner, { size: 'small' })
                       : 'Mark as read',
                   ]
                 ),
@@ -513,7 +514,7 @@ const NotificationRow: m.Component<
         path.replace(/ /g, '%20'),
         [
           authorInfo.length === 1
-            ? m(User, {
+            ? render(User, {
                 user: new AddressInfo(
                   null,
                   (authorInfo[0] as [string, string])[1],
@@ -523,22 +524,22 @@ const NotificationRow: m.Component<
                 avatarOnly: true,
                 avatarSize: 26,
               })
-            : m(UserGallery, {
+            : render(UserGallery, {
                 users: authorInfo.map(
                   (auth) => new AddressInfo(null, auth[1], auth[0], null)
                 ),
                 avatarSize: 26,
               }),
-          m('.comment-body', [
-            m('.comment-body-title', notificationHeader),
+          render('.comment-body', [
+            render('.comment-body-title', notificationHeader),
             notificationBody &&
               category !== `${NotificationCategories.NewReaction}` &&
               category !== `${NotificationCategories.NewThread}` &&
-              m('.comment-body-excerpt', notificationBody),
-            m('.comment-body-bottom-wrap', [
-              m('.comment-body-created', moment(createdAt).fromNow()),
+              render('.comment-body-excerpt', notificationBody),
+            render('.comment-body-bottom-wrap', [
+              render('.comment-body-created', moment(createdAt).fromNow()),
               !notification.isRead &&
-                m(
+                render(
                   '.comment-body-mark-as-read',
                   {
                     onclick: (e) => {
@@ -559,7 +560,7 @@ const NotificationRow: m.Component<
                   },
                   [
                     vnode.state.markingRead
-                      ? m(CWSpinner, { size: 'small' })
+                      ? render(CWSpinner, { size: 'small' })
                       : 'Mark as read',
                   ]
                 ),

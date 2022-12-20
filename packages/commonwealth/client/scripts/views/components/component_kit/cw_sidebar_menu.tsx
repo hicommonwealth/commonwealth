@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
@@ -21,7 +21,7 @@ const renderCommunity = (item: ChainInfo) => {
   const roles: RoleInfo[] = [];
   roles.push(...app.roles.getAllRolesInCommunity({ chain: item.id }));
 
-  return m(ListItem, {
+  return render(ListItem, {
     class: app.communities.isStarred(item.id) ? 'starred' : '',
     label: <CommunityLabel community={item} />,
     selected: app.activeChainId() === item.id,
@@ -44,7 +44,7 @@ const renderCommunity = (item: ChainInfo) => {
       >
         {roles.map((role) => {
           // TODO: sometimes address_chain is null here -- why??
-          return m(User, {
+          return render(User, {
             avatarSize: 18,
             avatarOnly: true,
             user: new AddressInfo(
@@ -56,7 +56,7 @@ const renderCommunity = (item: ChainInfo) => {
           });
         })}
         <div class="star-icon">
-          {m(Icon, { name: Icons.STAR, key: item.id })}
+          {render(Icon, { name: Icons.STAR, key: item.id })}
         </div>
       </div>
     ),

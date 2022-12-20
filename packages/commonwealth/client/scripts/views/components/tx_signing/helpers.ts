@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import { ITXModalData, TransactionStatus } from 'models';
 import { NextFn, StageName } from './types';

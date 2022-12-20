@@ -2,6 +2,7 @@
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/confirm_modal.scss';

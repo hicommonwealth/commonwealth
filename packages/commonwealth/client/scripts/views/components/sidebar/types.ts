@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 export type BaseSidebarAttrs = {
   isActive?: boolean; // Is this the current page

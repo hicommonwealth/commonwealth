@@ -1,5 +1,6 @@
 import './commonwealth.scss';
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 
 import GeometricPatternSection from './geometric_pattern_section';
 import HeaderLandingPage from '../landing/landing_page_header';
@@ -8,11 +9,11 @@ import { Footer } from '../../footer';
 
 const WhyCommonWealthView: m.Component<{}, {}> = {
   view: (vnode) => {
-    return m('.WhyCommonWealth', [
-      m(
+    return render('.WhyCommonWealth', [
+      render(
         'div',
         { class: 'absolute w-screen z-20' },
-        m(HeaderLandingPage, {
+        render(HeaderLandingPage, {
           scrollHeader: true,
           navs: [
             { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
@@ -22,10 +23,10 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           ],
         })
       ),
-      m(
+      render(
         GeometricPatternSection,
-        m('div.WhyCommonWealthInitialSection', { class: 'container mx-auto' }, [
-          m(
+        render('div.WhyCommonWealthInitialSection', { class: 'container mx-auto' }, [
+          render(
             'h2',
             {
               class:
@@ -33,19 +34,19 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
             },
             ' Crypto-native communities deserve crypto-native software. '
           ),
-          m(
+          render(
             'p',
             {
               class: 'text-xl text-gray-600 mb-12 mt-4 text-center',
             },
             ' Combine multiple tools in one. '
           ),
-          m(
+          render(
             'div',
-            m(
+            render(
               'div.SeeDocsButton',
               { class: 'text-center hidden lg:block xl:block mb-20' },
-              m(LandingPageButton, {
+              render(LandingPageButton, {
                 href: 'https://docs.commonwealth.im/commonwealth/',
                 text: 'See docs',
               })
@@ -53,24 +54,24 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           ),
         ])
       ),
-      m('section', { class: 'container mx-auto p-10' }, [
-        m(
+      render('section', { class: 'container mx-auto p-10' }, [
+        render(
           'div',
           {
             class: 'md:w-5/6 mx-auto',
           },
           [
-            m(
+            render(
               'p.Gradient-purple-text',
               { class: 'mt-20 text-xl text-gray-600 text-center ' },
               ' The medium is the message.'
             ),
-            m(
+            render(
               'h2',
               { class: 'mt-4 text-3xl text-center  font-bold' },
               ' Threads drive thoughtful conversation. '
             ),
-            m(
+            render(
               'p',
               {
                 class:
@@ -80,23 +81,23 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
             ),
           ]
         ),
-        m(
+        render(
           'div',
           { class: 'flex justify-center max-w-5xl max-h-2xl shadow-2xl' },
-          m('img', { src: 'static/img/chatCommonWealth.svg', alt: '' })
+          render('img', { src: 'static/img/chatCommonWealth.svg', alt: '' })
         ),
       ]),
-      m('section', { class: 'container mx-auto' }, [
-        m(
+      render('section', { class: 'container mx-auto' }, [
+        render(
           'div',
           { class: 'mt-20' },
-          m('img', {
+          render('img', {
             class: 'mx-auto my-auto',
             src: 'static/img/group-87.svg',
             alt: '',
           })
         ),
-        m(
+        render(
           'h2',
           {
             class:
@@ -104,13 +105,13 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           },
           'Integrate your existing community tools. '
         ),
-        m(
+        render(
           'div',
           { class: 'grid md:grid-cols-5' },
-          m(
+          render(
             'div',
             { class: 'md:col-start-2 md:col-span-3' },
-            m(
+            render(
               'p',
               {
                 class:
@@ -121,71 +122,71 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           )
         ),
       ]),
-      m(
+      render(
         'section',
         { class: 'bg-white' },
-        m(
+        render(
           'div',
           { class: 'container mx-auto p-10 ' },
-          m(
+          render(
             'div',
             {
               class:
                 'grid grid-cols-1 lg:grid-cols-2  gap-10 mb-64 mt-10 sm:mt-40',
             },
             [
-              m('div', { class: 'mt-10' }, [
-                m(
+              render('div', { class: 'mt-10' }, [
+                render(
                   'p.Gradient-purple-text',
                   { class: 'mt-4 text-xl text-gray-600 text-left ' },
                   ' Your tech should match your values.'
                 ),
-                m(
+                render(
                   'h2',
                   { class: 'mt-4 text-3xl text-left  font-bold' },
                   ' Crypto-native integrations for the most popular protocols. '
                 ),
-                m(
+                render(
                   'p',
                   { class: 'mt-8 text-xl text-gray-600 text-left ' },
                   ' No matter what protocol you build on, give easy access to your project’s most important on-chain actions like staking and voting. Commonwealth has a growing list of integrations--including Ethereum, NEAR, Cosmos, Substrate, and popular DAO frameworks like Moloch or Aragon. '
                 ),
               ]),
-              m('div', { class: 'grid grid-cols-4 lg:grid-cols-2 ' }, [
-                m(
+              render('div', { class: 'grid grid-cols-4 lg:grid-cols-2 ' }, [
+                render(
                   'div',
                   { class: 'relative' },
-                  m(
+                  render(
                     'div',
                     { class: 'absolute mt-10' },
-                    m('img', { src: 'static/img/ethToken.svg', alt: '' })
+                    render('img', { src: 'static/img/ethToken.svg', alt: '' })
                   )
                 ),
-                m(
+                render(
                   'div',
                   { class: 'relative' },
-                  m(
+                  render(
                     'div',
                     { class: 'absolute' },
-                    m('img', { src: 'static/img/nToken.svg', alt: '' })
+                    render('img', { src: 'static/img/nToken.svg', alt: '' })
                   )
                 ),
-                m(
+                render(
                   'div',
                   { class: 'relative' },
-                  m(
+                  render(
                     'div',
                     { class: 'absolute mt-20' },
-                    m('img', { src: 'static/img/diabloToken.svg', alt: '' })
+                    render('img', { src: 'static/img/diabloToken.svg', alt: '' })
                   )
                 ),
-                m(
+                render(
                   'div',
                   { class: 'relative' },
-                  m(
+                  render(
                     'div',
                     { class: 'absolute mt-10' },
-                    m('img', { src: 'static/img/rToken.svg', alt: '' })
+                    render('img', { src: 'static/img/rToken.svg', alt: '' })
                   )
                 ),
               ]),
@@ -193,32 +194,32 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           )
         )
       ),
-      m(
+      render(
         'section',
         { class: 'bg-white' },
-        m(
+        render(
           'div',
           { class: 'container mx-auto p-10' },
-          m('div', { class: 'grid md:grid-cols-2 mb-40' }, [
-            m(
+          render('div', { class: 'grid md:grid-cols-2 mb-40' }, [
+            render(
               'div',
               { class: 'flex justify-left' },
-              m(
+              render(
                 'div',
-                m('img', {
+                render('img', {
                   class: 'mt-40 md:mt-1',
                   src: 'static/img/commonWealthFork.svg',
                   alt: '',
                 })
               )
             ),
-            m('div', { class: 'mt-10 lg:-ml-20 ' }, [
-              m(
+            render('div', { class: 'mt-10 lg:-ml-20 ' }, [
+              render(
                 'h2',
                 { class: 'mt-4 text-3xl text-left font-bold' },
                 ' Commonwealth is open. '
               ),
-              m(
+              render(
                 'p',
                 { class: 'mt-8 text-xl text-gray-600 text-left ' },
                 ' Fork, develop, alter, share - Commonwealth is explicitly designed for open-source ecosystems. Existing solutions like chat and email lock your data, users, and brand into platforms you don’t control. Default openness allows new members to discover you through SEO. '
@@ -227,32 +228,32 @@ const WhyCommonWealthView: m.Component<{}, {}> = {
           ])
         )
       ),
-      m('section', { class: 'container mx-auto p-10 mb-20' }, [
-        m('div', { class: 'mt-10 md:w-100 sm:w-2/4 text-center mx-auto' }, [
-          m(
+      render('section', { class: 'container mx-auto p-10 mb-20' }, [
+        render('div', { class: 'mt-10 md:w-100 sm:w-2/4 text-center mx-auto' }, [
+          render(
             'h2',
             { class: 'mt-4 text-3xl text-center  font-bold' },
             ' Commonwealth compared '
           ),
-          m(
+          render(
             'p',
             { class: 'mt-4 text-xl text-gray-600 text-center mb-20' },
             ' Commonwealth combines all the features of your favorite tools into a single platform. '
           ),
         ]),
-        m(
+        render(
           'div',
           {
             class: 'mb-20 overflow-x-scroll',
           },
-          m('img', {
+          render('img', {
             src: 'static/img/wealthTable.svg',
             alt: '',
             class: 'cwTable mx-auto',
           })
         ),
       ]),
-      m(Footer, {
+      render(Footer, {
         list: [
           { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
           {

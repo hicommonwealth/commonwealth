@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -173,7 +173,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                   fontWeight="medium"
                   className="user-link-text"
                 >
-                  {m(User, { user: author, hideAvatar: true, linkify: true })}
+                  {render(User, { user: author, hideAvatar: true, linkify: true })}
                 </CWText>
               </div>
               {error && <CWValidationText message={error} status="failure" />}

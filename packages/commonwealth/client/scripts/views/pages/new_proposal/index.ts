@@ -4,6 +4,7 @@ import m from 'mithril';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 
+import { render } from 'mithrilInterop';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalType } from 'common-common/src/types';
@@ -28,19 +29,19 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
 
     // wait for chain
     if (app.chain?.failed)
-      return m(PageNotFound, {
+      return render(PageNotFound, {
         title: 'Wrong Ethereum Provider Network!',
         message: 'Change Metamask to point to Ethereum Mainnet',
       });
     if (!app.chain || !app.chain.loaded || !app.chain.meta)
-      return m(PageLoading);
+      return render(PageLoading);
 
     // infer proposal type if possible
     if (!vnode.state.typeEnum) {
       try {
         vnode.state.typeEnum = chainToProposalSlug(app.chain.meta);
       } catch (e) {
-        return m(PageNotFound, {
+        return render(PageNotFound, {
           title: 'Invalid Page',
           message: 'Cannot determine proposal type.',
         });
@@ -55,10 +56,10 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
     >;
     if (!c.ready) {
       app.chain.loadModules([c]);
-      return m(PageLoading);
+      return render(PageLoading);
     }
 
-    return m(
+    return render(
       Sublayout,
       // {
       //   title: `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(
@@ -66,14 +67,14 @@ const NewProposalPage: m.Component<{ type }, { typeEnum; titlePre }> = {
       //   )}`,
       // },
       [
-        m('.NewProposalPage', [
-          m(
+        render('.NewProposalPage', [
+          render(
             'h3',
             `${vnode.state.titlePre} ${proposalSlugToFriendlyName.get(
               vnode.state.typeEnum
             )}`
           ),
-          m(NewProposalForm, {
+          render(NewProposalForm, {
             typeEnum: vnode.state.typeEnum,
             onChangeSlugEnum: (value) => {
               if (value !== 'proposal') {

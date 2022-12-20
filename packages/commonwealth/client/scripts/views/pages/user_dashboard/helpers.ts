@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import $ from 'jquery';
-
+import { render } from 'mithrilInterop';
 import app from 'state';
 import {NotificationCategories} from 'common-common/src/types';
 import {NotificationSubscription} from 'models';
@@ -21,7 +21,7 @@ export const getCommentPreview = (commentText) => {
 
     if (!doc.ops) throw new Error();
 
-    decodedCommentText = m(QuillFormattedText, {
+    decodedCommentText = render(QuillFormattedText, {
       doc,
       collapse: true,
     });
@@ -36,7 +36,7 @@ export const getCommentPreview = (commentText) => {
       doc = doc.replace(match[0], match[1]);
     });
 
-    decodedCommentText = m(MarkdownFormattedText, {
+    decodedCommentText = render(MarkdownFormattedText, {
       doc: doc.slice(0, 140),
       collapse: true,
     });

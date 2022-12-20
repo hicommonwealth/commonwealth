@@ -1,6 +1,7 @@
 import 'pages/commonwealth/collectives.scss';
 
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 import { Card, Button, Input } from 'construct-ui';
 
 import app from 'state';
@@ -38,27 +39,27 @@ const COLLECTIVES: CWCollectiveStub[] = [
 const CollectivesPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
-      return m(PageLoading, {
+      return render(PageLoading, {
         message: 'Connecting to chain',
       });
     }
 
-    return m(
+    return render(
       Sublayout,
-      m('.CollectivesPage', [
+      render('.CollectivesPage', [
         COLLECTIVES.map((collective) => {
-          return m(
+          return render(
             Card,
             {
               size: 'lg',
               elevation: 0,
             },
             [
-              m('h4', collective.name),
-              m('.collective-description', collective.description),
-              m('.collective-metadata', [
-                m('.collective-metadata-beneficiary', [
-                  m(User, {
+              render('h4', collective.name),
+              render('.collective-description', collective.description),
+              render('.collective-metadata', [
+                render('.collective-metadata-beneficiary', [
+                  render(User, {
                     user: new AddressInfo(
                       null,
                       collective.ownerAddress,
@@ -67,40 +68,40 @@ const CollectivesPage: m.Component<{}> = {
                     ),
                   }),
                 ]),
-                m('.collective-metadata-members', [
+                render('.collective-metadata-members', [
                   pluralize(collective.numMembers, 'backer'),
                 ]),
               ]),
-              m('.collective-metrics', [
-                m('.collective-metric', [
-                  m('.collective-metric-figure', collective.amountBacking),
-                  m('.collective-metric-title', 'Backing'),
+              render('.collective-metrics', [
+                render('.collective-metric', [
+                  render('.collective-metric-figure', collective.amountBacking),
+                  render('.collective-metric-title', 'Backing'),
                 ]),
-                m('.collective-metric', [
-                  m(
+                render('.collective-metric', [
+                  render(
                     '.collective-metric-figure',
                     collective.amountWithdrawableBacking
                   ),
-                  m('.collective-metric-title', 'Your Backing'),
+                  render('.collective-metric-title', 'Your Backing'),
                 ]),
               ]),
-              m('.collective-action', [
-                m(Input, {
+              render('.collective-action', [
+                render(Input, {
                   fluid: true,
                   placeholder: 'Amount of ETH to back',
                 }),
-                m(Button, {
+                render(Button, {
                   label: 'Back Collective',
                   rounded: true,
                   fluid: true,
                   intent: 'primary',
                 }),
-                m(Button, {
+                render(Button, {
                   label: 'Withdraw Backing',
                   rounded: true,
                   fluid: true,
                 }),
-                m(Button, {
+                render(Button, {
                   label: `Withdraw Interest (${collective.amountWithdrawableInterest} ETH)`,
                   rounded: true,
                   fluid: true,

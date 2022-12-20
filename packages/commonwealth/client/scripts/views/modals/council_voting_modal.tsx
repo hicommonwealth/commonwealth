@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
@@ -167,7 +167,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                         label=""
                         value=""
                       />
-                      {m(User, { user: candidate })}
+                      {render(User, { user: candidate })}
                     </div>
                   );
                 })

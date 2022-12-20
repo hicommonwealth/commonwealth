@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -166,7 +166,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
               }
             >
               <div class="user-and-timestamp-container">
-                {m(User, {
+                {render(User, {
                   user: new AddressInfo(
                     null,
                     grp.address,
@@ -179,7 +179,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                 <div class="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
-                {m(Icon, {
+                {render(Icon, {
                   name: Icons.LINK,
                   onclick: async () => {
                     const route = app.socket.chatNs.getRouteToMessage(

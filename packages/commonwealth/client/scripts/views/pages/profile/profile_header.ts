@@ -5,6 +5,7 @@ import { Button } from 'construct-ui';
 import { initChain } from 'app';
 import app from 'state';
 import { Account } from 'models';
+import { render } from 'mithrilInterop';
 
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
@@ -28,7 +29,7 @@ const editIdentityAction = (
   return (
     (account.chain.id.indexOf('edgeware') !== -1 ||
       account.chain.id.indexOf('kusama') !== -1) &&
-    m(Button, {
+    render(Button, {
       intent: 'primary',
       // wait for info to load before making it clickable
       disabled: vnode.state.chainLoading,
@@ -119,29 +120,29 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       }
     };
 
-    return m('.ProfileHeader', [
-      m('.bio-main', [
-        m('.bio-left', [
+    return render('.ProfileHeader', [
+      render('.bio-main', [
+        render('.bio-left', [
           // TODO: Rename class to non-bio to avoid confusion with Bio component
           account.profile && account.profile?.getAvatar(90),
         ]),
-        m('.bio-right', [
-          m('.name-row', [
-            m(
+        render('.bio-right', [
+          render('.name-row', [
+            render(
               '.User',
               account.profile
-                ? m(User, { user: account, hideAvatar: true, showRole: true })
+                ? render(User, { user: account, hideAvatar: true, showRole: true })
                 : account.address
             ),
           ]),
-          m('.address-block-left', [
-            m(
+          render('.address-block-left', [
+            render(
               '.address',
               `${account.address.slice(0, 6)}...${account.address.slice(
                 account.address.length - 6
               )}`
             ),
-            m('img', {
+            render('img', {
               src: '/static/img/copy_default.svg',
               alt: '',
               class: 'cursor-pointer',
@@ -152,12 +153,12 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               },
             }),
           ]),
-          m('.info-row', [
+          render('.info-row', [
             account.profile?.headline &&
-              m('span.profile-headline', account.profile.headline),
-            m('.space'),
+              render('span.profile-headline', account.profile.headline),
+            render('.space'),
             // isClaimable &&
-            //   m(LoginWithWalletDropdown, {
+            //   render(LoginWithWalletDropdown, {
             //     prepopulateAddress: account.address,
             //     loggingInWithAddress: !app.isLoggedIn(),
             //     joiningChain: app.activeChainId(),
@@ -166,10 +167,10 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]),
       ]),
-      m('.bio-actions', [
+      render('.bio-actions', [
         account.profile &&
           account.profile.bio &&
-          m(CWButton, {
+          render(CWButton, {
             onclick: () => {
               alertModalWithText(account.profile.bio, 'Close')();
             },
@@ -177,8 +178,8 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           }),
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
-          m('.ban-wrapper', [
-            m(CWButton, {
+          render('.ban-wrapper', [
+            render(CWButton, {
               onclick: () => {
                 app.modals.create({
                   modal: BanUserModal,
@@ -189,10 +190,10 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               buttonType: 'primary-red',
             }),
           ]),
-        m('', [
+        render('', [
           onOwnProfile
             ? showJoinCommunityButton && app.activeChainId()
-            : m(Button, {
+            : render(Button, {
                 intent: 'primary',
                 rounded: true,
                 onclick: async () => {

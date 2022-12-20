@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'modals/offchain_voting_modal.scss';
 
@@ -47,7 +47,7 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
           {votes.map((vote) => (
             <div class="offchain-poll-voter">
               <div class="offchain-poll-voter-user">
-                {m(User, {
+                {render(User, {
                   avatarSize: 16,
                   popover: true,
                   linkify: true,

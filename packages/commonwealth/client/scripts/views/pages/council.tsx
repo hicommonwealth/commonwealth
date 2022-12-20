@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'pages/council.scss';
 
@@ -47,7 +47,7 @@ class Councillor extends ClassComponent<CouncillorAttrs> {
 
     return (
       <CWCard className="CouncillorCard">
-        {m(User, { user: account, popover: true, hideIdentityIcon: true })}
+        {render(User, { user: account, popover: true, hideIdentityIcon: true })}
         <CWText className="councillor-status-text">
           {election.isMember(account)
             ? `${election.backing(account).format(true)} from ${pluralize(

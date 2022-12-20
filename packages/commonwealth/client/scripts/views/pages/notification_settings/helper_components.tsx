@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -80,7 +80,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             fontWeight="bold"
           >
-            {m(User, {
+            {render(User, {
               hideAvatar: true,
               user: new AddressInfo(
                 null,

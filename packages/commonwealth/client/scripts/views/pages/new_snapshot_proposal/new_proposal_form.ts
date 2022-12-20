@@ -14,6 +14,7 @@ import {
   Icons,
 } from 'construct-ui';
 
+import { render } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -166,7 +167,7 @@ const NewProposalForm: m.Component<
 > = {
   view: (vnode) => {
     const getLoadingPage = () =>
-      m('.topic-loading-spinner-wrap', [m(CWSpinner, { size: 'large' })]);
+      render('.topic-loading-spinner-wrap', [render(CWSpinner, { size: 'large' })]);
     if (!app.chain) return getLoadingPage();
 
     const pathVars = m.parsePathname(window.location.href);
@@ -280,7 +281,7 @@ const NewProposalForm: m.Component<
       today.getMonth(),
       today.getDate() + 7
     );
-    return m(
+    return render(
       '.NewThreadForm',
       {
         oncreate: (vvnode) => {
@@ -288,10 +289,10 @@ const NewProposalForm: m.Component<
         },
       },
       [
-        m('.new-thread-form-body', [
+        render('.new-thread-form-body', [
           vnode.state.space.filters?.onlyMembers &&
             !isMember &&
-            m(Callout, {
+            render(Callout, {
               class: 'no-profile-callout',
               intent: 'primary',
               content: [
@@ -299,19 +300,19 @@ const NewProposalForm: m.Component<
               ],
             }),
           showScoreWarning
-            ? m(Callout, {
+            ? render(Callout, {
                 class: 'no-profile-callout',
                 intent: 'primary',
                 content: [
                   `You need to have a minimum of ${vnode.state.space.filters.minScore} ${vnode.state.space.symbol} in order to submit a proposal`,
                 ],
               })
-            : m(CWSpinner),
-          m('.new-snapshot-proposal-form', [
-            m(Form, { style: 'width:100%' }, [
-              m(FormGroup, [
-                m(FormLabel, 'Question/Proposal'),
-                m(Input, {
+            : render(CWSpinner),
+          render('.new-snapshot-proposal-form', [
+            render(Form, { style: 'width:100%' }, [
+              render(FormGroup, [
+                render(FormLabel, 'Question/Proposal'),
+                render(Input, {
                   placeholder: 'Should 0xMaki be our new Mayor?',
                   oninput: (e) => {
                     e.redraw = false; // do not redraw on input
@@ -325,14 +326,14 @@ const NewProposalForm: m.Component<
                   defaultValue: vnode.state.form.name,
                 }),
               ]),
-              m(
+              render(
                 FormGroup,
                 vnode.state.form.choices.map((choice, idx) => {
                   const placeholder =
                     idx === 0 ? 'Yes' : idx === 1 ? 'No' : `Option ${idx + 1}`;
-                  return m(FormGroup, [
-                    m(FormLabel, `Choice ${idx + 1}`),
-                    m(Input, {
+                  return render(FormGroup, [
+                    render(FormLabel, `Choice ${idx + 1}`),
+                    render(Input, {
                       name: 'targets',
                       placeholder,
                       oninput: (e) => {
@@ -343,7 +344,7 @@ const NewProposalForm: m.Component<
                       contentRight:
                         idx > 1 &&
                         idx === vnode.state.form.choices.length - 1 &&
-                        m(CWIconButton, {
+                        render(CWIconButton, {
                           iconName: 'trash',
                           iconSize: 'large',
                           onclick: () => {
@@ -355,7 +356,7 @@ const NewProposalForm: m.Component<
                   ]);
                 })
               ),
-              m(
+              render(
                 '.add-vote-choice',
                 {
                   style: 'cursor: pointer;',
@@ -366,16 +367,16 @@ const NewProposalForm: m.Component<
                   },
                 },
                 [
-                  m('span', 'Add voting choice'),
-                  m(Icon, {
+                  render('span', 'Add voting choice'),
+                  render(Icon, {
                     name: Icons.PLUS,
                     size: 'xl',
                   }),
                 ]
               ),
-              m(FormGroup, [
-                m(FormLabel, { for: 'period' }, 'Date Range:'),
-                m(RadioGroup, {
+              render(FormGroup, [
+                render(FormLabel, { for: 'period' }, 'Date Range:'),
+                render(RadioGroup, {
                   name: 'period',
                   options: [{ value: '4d', label: '4-day' }],
                   value: vnode.state.form.range,
@@ -395,8 +396,8 @@ const NewProposalForm: m.Component<
                   },
                 }),
               ]),
-              m(FormGroup, {}, [
-                m(QuillEditorComponent, {
+              render(FormGroup, {}, [
+                render(QuillEditorComponent, {
                   contentsDoc: vnode.state.form.body || ' ',
                   oncreateBind: (state: QuillEditor) => {
                     vnode.state.quillEditorState = state;
@@ -405,8 +406,8 @@ const NewProposalForm: m.Component<
                   editorNamespace: 'new-proposal',
                 }),
               ]),
-              m(FormGroup, { order: 5 }, [
-                m(Button, {
+              render(FormGroup, { order: 5 }, [
+                render(Button, {
                   intent: 'primary',
                   label: 'Publish',
                   name: 'submit',

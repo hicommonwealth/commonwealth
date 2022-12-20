@@ -3,6 +3,7 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 import m from 'mithril';
 import { utils } from 'ethers';
+import { render } from 'mithrilInterop';
 import {
   Input,
   TextArea,
@@ -100,10 +101,10 @@ const NewProposalForm = {
     const author = app.user.activeAccount;
     const proposalTypeEnum = vnode.attrs.typeEnum;
 
-    if (!author) return m('div', 'Must be logged in');
-    if (!callback) return m('div', 'Must have callback');
+    if (!author) return render('div', 'Must be logged in');
+    if (!callback) return render('div', 'Must have callback');
     if (app.chain?.network === ChainNetwork.Plasm)
-      return m('div', 'Unsupported network');
+      return render('div', 'Unsupported network');
 
     let hasCouncilMotionChooser: boolean;
     let hasAction: boolean;
@@ -200,7 +201,7 @@ const NewProposalForm = {
     } else if (proposalTypeEnum === ProposalType.SputnikProposal) {
       hasSputnikFields = true;
     } else {
-      return m('.NewProposalForm', 'Invalid proposal type');
+      return render('.NewProposalForm', 'Invalid proposal type');
     }
 
     if (
@@ -669,24 +670,24 @@ const NewProposalForm = {
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut
       ) {
-        return m(ErrorPage, {
+        return render(ErrorPage, {
           message: 'Could not connect to chain',
           title: 'Proposals',
         });
       }
-      return m(CWSpinner);
+      return render(CWSpinner);
     }
 
     const activeEntityInfo = app.chain.meta;
 
     const { activeAaveTabIndex, aaveProposalState } = vnode.state;
 
-    return m(Form, { class: 'NewProposalForm' }, [
-      m(Grid, [
-        m(Col, [
-          vnode.state.error && m('.error', vnode.state.error.message),
+    return render(Form, { class: 'NewProposalForm' }, [
+      render(Grid, [
+        render(Col, [
+          vnode.state.error && render('.error', vnode.state.error.message),
           hasCouncilMotionChooser && [
-            m(DropdownFormField, {
+            render(DropdownFormField, {
               title: 'Motion',
               choices: motions.map((m_) => ({
                 name: 'councilMotionType',
@@ -702,15 +703,15 @@ const NewProposalForm = {
               },
             }),
             vnode.state.councilMotionDescription &&
-              m(
+              render(
                 '.council-motion-description',
                 vnode.state.councilMotionDescription
               ),
           ],
           // actions
-          hasAction && m(EdgewareFunctionPicker),
+          hasAction && render(EdgewareFunctionPicker),
           hasTopics &&
-            m(TopicSelector, {
+            render(TopicSelector, {
               topics: app.topics.getByCommunity(app.chain.id),
               updateFormData: (topic: Topic) => {
                 vnode.state.form.topicName = topic.name;
@@ -719,9 +720,9 @@ const NewProposalForm = {
               tabindex: 3,
             }),
           hasBountyTitle && [
-            m(FormGroup, [
-              m(FormLabel, 'Title'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Title'),
+              render(Input, {
                 placeholder: 'Bounty title (stored on chain)',
                 name: 'title',
                 autofocus: true,
@@ -735,9 +736,9 @@ const NewProposalForm = {
             ]),
           ],
           hasTitleAndDescription && [
-            m(FormGroup, [
-              m(FormLabel, 'Title'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Title'),
+              render(Input, {
                 placeholder: 'Enter a title',
                 name: 'title',
                 autofocus: true,
@@ -749,9 +750,9 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Description'),
-              m(TextArea, {
+            render(FormGroup, [
+              render(FormLabel, 'Description'),
+              render(TextArea, {
                 name: 'description',
                 placeholder: 'Enter a description',
                 oninput: (e) => {
@@ -764,9 +765,9 @@ const NewProposalForm = {
             ]),
           ],
           hasBeneficiary && [
-            m(FormGroup, [
-              m(FormLabel, 'Beneficiary'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Beneficiary'),
+              render(Input, {
                 name: 'beneficiary',
                 placeholder: 'Beneficiary of proposal',
                 defaultValue: author.address,
@@ -782,9 +783,9 @@ const NewProposalForm = {
             ]),
           ],
           hasAmount && [
-            m(FormGroup, [
-              m(FormLabel, `Amount (${app.chain.chain.denom})`),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, `Amount (${app.chain.chain.denom})`),
+              render(Input, {
                 name: 'amount',
                 autofocus: true,
                 placeholder: 'Amount of proposal',
@@ -799,7 +800,7 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m('p', [
+            render('p', [
               'Bond: ',
               app.chain.chain
                 .coins(
@@ -820,8 +821,8 @@ const NewProposalForm = {
             ]),
           ],
           hasPhragmenInfo &&
-            m('.council-slot-info', [
-              m('p', [
+            render('.council-slot-info', [
+              render('p', [
                 'Becoming a candidate requires a deposit of ',
                 formatCoin(
                   (app.chain as Substrate).phragmenElections.candidacyBond
@@ -833,7 +834,7 @@ const NewProposalForm = {
               ]),
             ]),
           hasToggle && [
-            m(RadioSelectorFormField, {
+            render(RadioSelectorFormField, {
               callback: async (value) => {
                 vnode.state.toggleValue = value;
                 vnode.attrs.onChangeSlugEnum(value);
@@ -852,9 +853,9 @@ const NewProposalForm = {
             }),
           ],
           hasBountyValue && [
-            m(FormGroup, [
-              m(FormLabel, `Value (${app.chain.chain.denom})`),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, `Value (${app.chain.chain.denom})`),
+              render(Input, {
                 name: 'value',
                 placeholder: 'Amount allocated to bounty',
                 autocomplete: 'off',
@@ -870,8 +871,8 @@ const NewProposalForm = {
             ]),
           ],
           hasDepositChooser && [
-            m(FormGroup, [
-              m(
+            render(FormGroup, [
+              render(
                 FormLabel,
                 `Deposit (${
                   app.chain.base === ChainBase.Substrate
@@ -879,7 +880,7 @@ const NewProposalForm = {
                     : (app.chain as Cosmos).governance.minDeposit.denom
                 })`
               ),
-              m(Input, {
+              render(Input, {
                 name: 'deposit',
                 placeholder: `Min: ${
                   app.chain.base === ChainBase.Substrate
@@ -903,9 +904,9 @@ const NewProposalForm = {
             ]),
           ],
           hasVotingPeriodAndDelaySelector && [
-            m(FormGroup, [
-              m(FormLabel, 'Voting Period'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Voting Period'),
+              render(Input, {
                 name: 'voting_period',
                 placeholder: 'Blocks (minimum enforced)',
                 oninput: (e) => {
@@ -915,9 +916,9 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Enactment Delay'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Enactment Delay'),
+              render(Input, {
                 name: 'enactment_delay',
                 placeholder: 'Blocks (minimum enforced)',
                 oninput: (e) => {
@@ -929,7 +930,7 @@ const NewProposalForm = {
             ]),
           ],
           hasReferendumSelector &&
-            m(DropdownFormField, {
+            render(DropdownFormField, {
               title: 'Referendum',
               choices: (app.chain as Substrate).democracy.store
                 .getAll()
@@ -944,7 +945,7 @@ const NewProposalForm = {
               },
             }),
           hasExternalProposalSelector &&
-            m(DropdownFormField, {
+            render(DropdownFormField, {
               title: 'Proposal',
               choices: (app.chain as Substrate).democracyProposals.nextExternal
                 ? [
@@ -967,7 +968,7 @@ const NewProposalForm = {
               },
             }),
           hasTreasuryProposalSelector &&
-            m(DropdownFormField, {
+            render(DropdownFormField, {
               title: 'Treasury Proposal',
               choices: (app.chain as Substrate).treasury.store
                 .getAll()
@@ -982,9 +983,9 @@ const NewProposalForm = {
               },
             }),
           hasThreshold && [
-            m(FormGroup, [
-              m(FormLabel, 'Threshold'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Threshold'),
+              render(Input, {
                 name: 'threshold',
                 placeholder: 'How many members must vote yes to execute?',
                 oninput: (e) => {
@@ -996,9 +997,9 @@ const NewProposalForm = {
             ]),
           ],
           hasMolochFields && [
-            m(FormGroup, [
-              m(FormLabel, 'Applicant Address (will receive Moloch shares)'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Applicant Address (will receive Moloch shares)'),
+              render(Input, {
                 name: 'applicant_address',
                 placeholder: 'Applicant Address',
                 oninput: (e) => {
@@ -1008,12 +1009,12 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(
+            render(FormGroup, [
+              render(
                 FormLabel,
                 'Token Tribute (offered to Moloch, must be pre-approved for transfer)'
               ),
-              m(Input, {
+              render(Input, {
                 name: 'token_tribute',
                 placeholder: 'Tribute in tokens',
                 oninput: (e) => {
@@ -1023,9 +1024,9 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Shares Requested'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Shares Requested'),
+              render(Input, {
                 name: 'shares_requested',
                 placeholder: 'Moloch shares requested',
                 oninput: (e) => {
@@ -1035,9 +1036,9 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Title'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Proposal Title'),
+              render(Input, {
                 name: 'title',
                 placeholder: 'Proposal Title',
                 oninput: (e) => {
@@ -1047,9 +1048,9 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Proposal Description'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Proposal Description'),
+              render(Input, {
                 name: 'description',
                 placeholder: 'Proposal Description',
                 oninput: (e) => {
@@ -1062,11 +1063,11 @@ const NewProposalForm = {
           ],
 
           hasCompoundFields &&
-            m('.AaveGovernance', [
-              m(FormGroup, [
-                m(FormLabel, 'Proposer (you)'),
-                m('', [
-                  m(User, {
+            render('.AaveGovernance', [
+              render(FormGroup, [
+                render(FormLabel, 'Proposer (you)'),
+                render('', [
+                  render(User, {
                     user: author,
                     linkify: true,
                     popover: true,
@@ -1074,9 +1075,9 @@ const NewProposalForm = {
                   }),
                 ]),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Proposal Title (leave blank for no title)'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Proposal Title (leave blank for no title)'),
+                render(Input, {
                   name: 'title',
                   placeholder: 'Proposal Title',
                   oninput: (e) => {
@@ -1086,9 +1087,9 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Proposal Description'),
-                m(TextArea, {
+              render(FormGroup, [
+                render(FormLabel, 'Proposal Description'),
+                render(TextArea, {
                   name: 'description',
                   placeholder: 'Proposal Description',
                   oninput: (e) => {
@@ -1098,10 +1099,10 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m('.tab-selector', [
-                m(CWTabBar, [
+              render('.tab-selector', [
+                render(CWTabBar, [
                   aaveProposalState.map((_, index) =>
-                    m(CWTab, {
+                    render(CWTab, {
                       label: `Call ${index + 1}`,
                       isSelected: activeAaveTabIndex === index,
                       onclick: () => {
@@ -1110,10 +1111,10 @@ const NewProposalForm = {
                     })
                   ),
                 ]),
-                m(PopoverMenu, {
+                render(PopoverMenu, {
                   closeOnContentClick: true,
                   content: [
-                    m(MenuItem, {
+                    render(MenuItem, {
                       iconLeft: Icons.EDIT_2,
                       label: 'Add',
                       onclick: () => {
@@ -1129,7 +1130,7 @@ const NewProposalForm = {
                         });
                       },
                     }),
-                    m(MenuItem, {
+                    render(MenuItem, {
                       iconLeft: Icons.TRASH_2,
                       label: 'Delete',
                       disabled: vnode.state.activeAaveTabIndex === 0,
@@ -1141,15 +1142,15 @@ const NewProposalForm = {
                       },
                     }),
                   ],
-                  trigger: m(Button, {
+                  trigger: render(Button, {
                     iconLeft: Icons.MORE_HORIZONTAL,
                     basic: true,
                   }),
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Target Address'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Target Address'),
+                render(Input, {
                   name: 'targets',
                   placeholder: 'Add Target',
                   value: aaveProposalState[activeAaveTabIndex].target,
@@ -1161,9 +1162,9 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Value'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Value'),
+                render(Input, {
                   name: 'values',
                   placeholder: 'Enter amount in wei',
                   value: aaveProposalState[activeAaveTabIndex].value,
@@ -1175,9 +1176,9 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Calldata'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Calldata'),
+                render(Input, {
                   name: 'calldatas',
                   placeholder: 'Add Calldata',
                   value: aaveProposalState[activeAaveTabIndex].calldata,
@@ -1189,12 +1190,12 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m('.flex-label', [
-                  m(FormLabel, 'Function Signature'),
-                  m('.helper-text', 'Optional'),
+              render(FormGroup, [
+                render('.flex-label', [
+                  render(FormLabel, 'Function Signature'),
+                  render('.helper-text', 'Optional'),
                 ]),
-                m(Input, {
+                render(Input, {
                   name: 'signatures',
                   placeholder: 'Add a signature',
                   value: aaveProposalState[activeAaveTabIndex].signature,
@@ -1209,11 +1210,11 @@ const NewProposalForm = {
               ]),
             ]),
           hasAaveFields &&
-            m('.AaveGovernance', [
-              m(FormGroup, [
-                m(FormLabel, 'Proposer (you)'),
-                m('', [
-                  m(User, {
+            render('.AaveGovernance', [
+              render(FormGroup, [
+                render(FormLabel, 'Proposer (you)'),
+                render('', [
+                  render(User, {
                     user: author,
                     linkify: true,
                     popover: true,
@@ -1222,9 +1223,9 @@ const NewProposalForm = {
                 ]),
               ]),
               // TODO: validate this is the correct length, or else hash it ourselves
-              m(FormGroup, [
-                m(FormLabel, 'IPFS Hash'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'IPFS Hash'),
+                render(Input, {
                   name: 'ipfsHash',
                   placeholder: 'Proposal IPFS Hash',
                   oninput: (e) => {
@@ -1234,10 +1235,10 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Executor'),
+              render(FormGroup, [
+                render(FormLabel, 'Executor'),
                 (app.chain as Aave).governance.api.Executors.map((r) =>
-                  m(
+                  render(
                     `.executor ${
                       vnode.state.executor === r.address && '.selected-executor'
                     }`,
@@ -1247,19 +1248,19 @@ const NewProposalForm = {
                       },
                     },
                     [
-                      m('.label', 'Address'),
-                      m('', r.address),
-                      m('.label .mt-16', 'Time Delay'),
-                      m('', `${r.delay / (60 * 60 * 24)} Day(s)`),
+                      render('.label', 'Address'),
+                      render('', r.address),
+                      render('.label .mt-16', 'Time Delay'),
+                      render('', `${r.delay / (60 * 60 * 24)} Day(s)`),
                     ]
                   )
                 ),
               ]),
               // TODO: display copy re AIPs and ARCs from https://docs.aave.com/governance/
-              m('.tab-selector', [
-                m(CWTabBar, [
+              render('.tab-selector', [
+                render(CWTabBar, [
                   aaveProposalState.map((_, index) =>
-                    m(CWTab, {
+                    render(CWTab, {
                       label: `Call ${index + 1}`,
                       isSelected: activeAaveTabIndex === index,
                       onclick: () => {
@@ -1268,10 +1269,10 @@ const NewProposalForm = {
                     })
                   ),
                 ]),
-                m(PopoverMenu, {
+                render(PopoverMenu, {
                   closeOnContentClick: true,
                   content: [
-                    m(MenuItem, {
+                    render(MenuItem, {
                       iconLeft: Icons.EDIT_2,
                       label: 'Add',
                       onclick: () => {
@@ -1287,7 +1288,7 @@ const NewProposalForm = {
                         });
                       },
                     }),
-                    m(MenuItem, {
+                    render(MenuItem, {
                       iconLeft: Icons.TRASH_2,
                       label: 'Delete',
                       disabled: vnode.state.activeAaveTabIndex === 0,
@@ -1299,15 +1300,15 @@ const NewProposalForm = {
                       },
                     }),
                   ],
-                  trigger: m(Button, {
+                  trigger: render(Button, {
                     iconLeft: Icons.MORE_HORIZONTAL,
                     basic: true,
                   }),
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Target Address'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Target Address'),
+                render(Input, {
                   name: 'targets',
                   placeholder: 'Add Target',
                   value: aaveProposalState[activeAaveTabIndex].target,
@@ -1319,9 +1320,9 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Value'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Value'),
+                render(Input, {
                   name: 'values',
                   placeholder: 'Enter amount in wei',
                   value: aaveProposalState[activeAaveTabIndex].value,
@@ -1333,9 +1334,9 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Calldata'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Calldata'),
+                render(Input, {
                   name: 'calldatas',
                   placeholder: 'Add Calldata',
                   value: aaveProposalState[activeAaveTabIndex].calldata,
@@ -1347,12 +1348,12 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m('.flex-label', [
-                  m(FormLabel, 'Function Signature'),
-                  m('.helper-text', 'Optional'),
+              render(FormGroup, [
+                render('.flex-label', [
+                  render(FormLabel, 'Function Signature'),
+                  render('.helper-text', 'Optional'),
                 ]),
-                m(Input, {
+                render(Input, {
                   name: 'signatures',
                   placeholder: 'Add a signature',
                   value: aaveProposalState[activeAaveTabIndex].signature,
@@ -1365,10 +1366,10 @@ const NewProposalForm = {
                   },
                 }),
               ]),
-              m(FormGroup, [
-                m(FormLabel, 'Delegate Call'),
-                m('', [
-                  m(Button, {
+              render(FormGroup, [
+                render(FormLabel, 'Delegate Call'),
+                render('', [
+                  render(Button, {
                     label: 'TRUE',
                     class: `button ${
                       aaveProposalState[activeAaveTabIndex].withDelegateCall ===
@@ -1380,7 +1381,7 @@ const NewProposalForm = {
                       ].withDelegateCall = true;
                     },
                   }),
-                  m(Button, {
+                  render(Button, {
                     label: 'FALSE',
                     class: `ml-12 button ${
                       aaveProposalState[activeAaveTabIndex].withDelegateCall ===
@@ -1397,7 +1398,7 @@ const NewProposalForm = {
             ]),
           hasSputnikFields && [
             // TODO: add deposit copy
-            m(DropdownFormField, {
+            render(DropdownFormField, {
               title: 'Proposal Type',
               value: vnode.state.sputnikProposalType,
               defaultValue: SupportedSputnikProposalTypes.AddMemberToRole,
@@ -1413,12 +1414,12 @@ const NewProposalForm = {
                 m.redraw();
               },
             }),
-            m(FormGroup, [
+            render(FormGroup, [
               vnode.state.sputnikProposalType !==
-                SupportedSputnikProposalTypes.Vote && m(FormLabel, 'Member'),
+                SupportedSputnikProposalTypes.Vote && render(FormLabel, 'Member'),
               vnode.state.sputnikProposalType !==
                 SupportedSputnikProposalTypes.Vote &&
-                m(Input, {
+                render(Input, {
                   name: 'member',
                   defaultValue: 'tokenfactory.testnet',
                   oncreate: (vvnode) => {
@@ -1431,9 +1432,9 @@ const NewProposalForm = {
                   },
                 }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Description'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Description'),
+              render(Input, {
                 name: 'description',
                 defaultValue: '',
                 oncreate: (vvnode) => {
@@ -1448,9 +1449,9 @@ const NewProposalForm = {
             ]),
             vnode.state.sputnikProposalType ===
               SupportedSputnikProposalTypes.Transfer &&
-              m(FormGroup, [
-                m(FormLabel, 'Token ID (leave blank for Ⓝ)'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Token ID (leave blank for Ⓝ)'),
+                render(Input, {
                   name: 'token_id',
                   defaultValue: '',
                   oncreate: (vvnode) => {
@@ -1465,9 +1466,9 @@ const NewProposalForm = {
               ]),
             vnode.state.sputnikProposalType ===
               SupportedSputnikProposalTypes.Transfer &&
-              m(FormGroup, [
-                m(FormLabel, 'Amount'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Amount'),
+                render(Input, {
                   name: 'amount',
                   defaultValue: '',
                   oncreate: (vvnode) => {
@@ -1482,7 +1483,7 @@ const NewProposalForm = {
               ]),
           ],
           hasCosmosFields && [
-            m(DropdownFormField, {
+            render(DropdownFormField, {
               title: 'Proposal Type',
               value: vnode.state.cosmosProposalType,
               defaultValue: SupportedCosmosProposalTypes.Text,
@@ -1496,9 +1497,9 @@ const NewProposalForm = {
                 m.redraw();
               },
             }),
-            m(FormGroup, [
-              m(FormLabel, 'Title'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Title'),
+              render(Input, {
                 placeholder: 'Enter a title',
                 name: 'title',
                 autofocus: true,
@@ -1510,9 +1511,9 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Description'),
-              m(TextArea, {
+            render(FormGroup, [
+              render(FormLabel, 'Description'),
+              render(TextArea, {
                 name: 'description',
                 placeholder: 'Enter a description',
                 oninput: (e) => {
@@ -1523,12 +1524,12 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(
+            render(FormGroup, [
+              render(
                 FormLabel,
                 `Deposit (${(app.chain as Cosmos).governance.minDeposit.denom})`
               ),
-              m(Input, {
+              render(Input, {
                 name: 'deposit',
                 placeholder: `Min: ${+(app.chain as Cosmos).governance
                   .minDeposit}`,
@@ -1545,9 +1546,9 @@ const NewProposalForm = {
             ]),
             vnode.state.cosmosProposalType !==
               SupportedCosmosProposalTypes.Text &&
-              m(FormGroup, [
-                m(FormLabel, 'Recipient'),
-                m(Input, {
+              render(FormGroup, [
+                render(FormLabel, 'Recipient'),
+                render(Input, {
                   name: 'recipient',
                   placeholder: app.user.activeAccount.address,
                   defaultValue: '',
@@ -1563,14 +1564,14 @@ const NewProposalForm = {
               ]),
             vnode.state.cosmosProposalType !==
               SupportedCosmosProposalTypes.Text &&
-              m(FormGroup, [
-                m(
+              render(FormGroup, [
+                render(
                   FormLabel,
                   `Amount (${
                     (app.chain as Cosmos).governance.minDeposit.denom
                   })`
                 ),
-                m(Input, {
+                render(Input, {
                   name: 'amount',
                   placeholder: '12345',
                   defaultValue: '',
@@ -1586,18 +1587,18 @@ const NewProposalForm = {
               ]),
           ],
           hasTipsFields && [
-            m(FormGroup, [
-              m('.label', 'Finder'),
-              m(User, {
+            render(FormGroup, [
+              render('.label', 'Finder'),
+              render(User, {
                 user: author,
                 linkify: true,
                 popover: true,
                 showAddressWithDisplayName: true,
               }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Beneficiary'),
-              m(Input, {
+            render(FormGroup, [
+              render(FormLabel, 'Beneficiary'),
+              render(Input, {
                 name: 'beneficiary',
                 placeholder: 'Beneficiary of treasury proposal',
                 oninput: (e) => {
@@ -1607,9 +1608,9 @@ const NewProposalForm = {
                 },
               }),
             ]),
-            m(FormGroup, [
-              m(FormLabel, 'Reason'),
-              m(TextArea, {
+            render(FormGroup, [
+              render(FormLabel, 'Reason'),
+              render(TextArea, {
                 name: 'reason',
                 placeholder:
                   'What’s the reason you want to tip the beneficiary?',
@@ -1622,8 +1623,8 @@ const NewProposalForm = {
               }),
             ]),
           ],
-          m(FormGroup, [
-            m(Button, {
+          render(FormGroup, [
+            render(Button, {
               disabled:
                 proposalTypeEnum === ProposalType.SubstrateCollectiveProposal &&
                 !(author as SubstrateAccount).isCouncillor,

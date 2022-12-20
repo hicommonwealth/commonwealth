@@ -1,6 +1,7 @@
 import 'modals/edit_identity_modal.scss';
 
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 import $ from 'jquery';
 import {
   Button,
@@ -143,27 +144,27 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
     };
 
     const getInput = (inputLabel, inputName, description, prefixAt = false) => {
-      return m(FormGroup, [
-        m(
+      return render(FormGroup, [
+        render(
           FormLabel,
           {
             for: inputName,
           },
           inputLabel
         ),
-        m(Input, {
+        render(Input, {
           name: inputName,
           id: inputName,
           placeholder: description,
           autocomplete: 'off',
-          contentLeft: prefixAt ? m(Icon, { name: Icons.AT_SIGN }) : null,
+          contentLeft: prefixAt ? render(Icon, { name: Icons.AT_SIGN }) : null,
         }),
       ]);
     };
 
-    return m('.EditIdentityModal', [
-      m('.compact-modal-title', [m('h3', 'Set on-chain identity')]),
-      m(Form, { class: 'form' }, [
+    return render('.EditIdentityModal', [
+      render('.compact-modal-title', [render('h3', 'Set on-chain identity')]),
+      render(Form, { class: 'form' }, [
         getInput(
           'Display Name',
           'display',
@@ -196,9 +197,9 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
           'Twitter identity of the controller of the account',
           true
         ),
-        m('.form-bottom', [
-          m('.buttons', [
-            m(Button, {
+        render('.form-bottom', [
+          render('.buttons', [
+            render(Button, {
               intent: 'primary',
               disabled: vnode.state.saving || !app.chain?.loaded,
               rounded: true,
@@ -208,7 +209,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
               },
               label: 'Set identity',
             }),
-            m(Button, {
+            render(Button, {
               rounded: true,
               onclick: (e) => {
                 e.preventDefault();
@@ -217,7 +218,7 @@ const EditIdentityModal: m.Component<IAttrs, IState> = {
               label: 'Cancel',
             }),
           ]),
-          m('.clear'),
+          render('.clear'),
         ]),
       ]),
     ]);

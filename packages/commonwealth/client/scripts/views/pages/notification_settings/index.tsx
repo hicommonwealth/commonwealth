@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/notification_settings/index.scss';
@@ -158,7 +158,7 @@ class NotificationSettingsPage extends ClassComponent {
                       {subs.map((sub) => {
                         const getUser = () => {
                           if (sub.Thread) {
-                            return m(User, {
+                            return render(User, {
                               user: new AddressInfo(
                                 null,
                                 sub.Thread.author,
@@ -167,7 +167,7 @@ class NotificationSettingsPage extends ClassComponent {
                               ),
                             });
                           } else if (sub.Comment) {
-                            return m(User, {
+                            return render(User, {
                               user: new AddressInfo(
                                 null,
                                 sub.Comment.author,

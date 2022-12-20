@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -79,7 +79,7 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
             <div class="info-rows-container">
               <SnapshotInfoRow
                 label="Author"
-                value={m(User, {
+                value={render(User, {
                   user: new AddressInfo(
                     null,
                     proposal.author,

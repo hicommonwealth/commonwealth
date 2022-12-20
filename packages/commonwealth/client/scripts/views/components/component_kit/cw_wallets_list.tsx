@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -59,17 +59,17 @@ const LinkAccountItem: m.Component<
       account.meta?.name ||
       `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
 
-    return m(
+    return render(
       '.account-item',
       {
         class: `account-item-emphasized`,
         onclick: () => onSelect(idx),
       },
       [
-        m('.account-item-avatar', [
-          m(
+        render('.account-item-avatar', [
+          render(
             '.account-user',
-            m(User, {
+            render(User, {
               user: new AddressInfo(
                 null,
                 address,
@@ -80,12 +80,12 @@ const LinkAccountItem: m.Component<
             })
           ),
         ]),
-        m('.account-item-left', [
-          m('.account-item-name', `${name}`),
-          m('.account-item-address', [
-            m(
+        render('.account-item-left', [
+          render('.account-item-name', `${name}`),
+          render('.account-item-address', [
+            render(
               '.account-user',
-              m(User, {
+              render(User, {
                 user: new AddressInfo(
                   null,
                   address,
@@ -96,13 +96,13 @@ const LinkAccountItem: m.Component<
             ),
           ]),
           vnode.state.linking &&
-            m('p.small-text', 'Check your wallet for a confirmation prompt.'),
+            render('p.small-text', 'Check your wallet for a confirmation prompt.'),
         ]),
-        m('.account-item-right', [
+        render('.account-item-right', [
           vnode.state.linking &&
-            m('.account-waiting', [
+            render('.account-waiting', [
               // TODO: show a (?) icon with a tooltip explaining to check your wallet
-              m(CWSpinner, { size: 'small' }),
+              render(CWSpinner, { size: 'small' }),
             ]),
         ]),
       ]
@@ -134,7 +134,7 @@ export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
         </div>
 
         {accounts.map((account, idx) => {
-          return m(LinkAccountItem, {
+          return render(LinkAccountItem, {
             account,
             walletChain,
             walletNetwork,

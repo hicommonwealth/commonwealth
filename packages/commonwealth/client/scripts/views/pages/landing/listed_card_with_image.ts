@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 
 interface IAttrs {
   handleClick: (creator) => void;
@@ -18,17 +19,17 @@ interface IAttrs {
 
 const ListedCardWithImage: m.Component<IAttrs, {}> = {
   view: (vnode) => {
-    return m(
+    return render(
       'li',
       { class: 'lg:flex-grow' },
-      m('div', { class: 'lg:flex lg:flex-row' }, [
-        m(
+      render('div', { class: 'lg:flex lg:flex-row' }, [
+        render(
           'div',
           {
             class:
               'lg:w-1/3 lg:mr-5 xl:mr-20 p-1 rounded-2xl transition hover:transition-all duration-500',
           },
-          m(
+          render(
             'button',
             {
               class: `rounded-2xl p-5 text-left w-full focus:outline-none transition transition-all duration-500 ${
@@ -38,7 +39,7 @@ const ListedCardWithImage: m.Component<IAttrs, {}> = {
               id: vnode.attrs.buttonId,
             },
             [
-              m(
+              render(
                 'h4',
                 {
                   class: `${
@@ -47,7 +48,7 @@ const ListedCardWithImage: m.Component<IAttrs, {}> = {
                 },
                 vnode.attrs.title
               ),
-              m(
+              render(
                 'p',
                 {
                   id: vnode.attrs.subtitleId,
@@ -60,7 +61,7 @@ const ListedCardWithImage: m.Component<IAttrs, {}> = {
             ]
           )
         ),
-        m(
+        render(
           'div',
           {
             class: `${
@@ -68,7 +69,7 @@ const ListedCardWithImage: m.Component<IAttrs, {}> = {
             }  lg:w-2/3 lg:absolute lg:w-2/3 lg:right-0 lg:top-0`,
             id: vnode.attrs.cardId,
           },
-          m('img.TokensCreatorsImage', {
+          render('img.TokensCreatorsImage', {
             class: `${
               vnode.attrs.imageActive ? 'block' : 'hidden'
             } block max-w-2xl w-full h-auto`,

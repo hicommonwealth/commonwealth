@@ -5,6 +5,7 @@ import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Popover } from 'construct-ui';
+import { render } from 'mithrilInterop';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -150,7 +151,7 @@ const User: m.Component<
       // 'long' makes role tags show as full length text
       profile.isCouncillor &&
         !hideIdentityIcon &&
-        m(
+        render(
           '.role-icon.role-icon-councillor',
           {
             class: long ? 'long' : '',
@@ -159,7 +160,7 @@ const User: m.Component<
         ),
       profile.isValidator &&
         !hideIdentityIcon &&
-        m(
+        render(
           '.role-icon.role-icon-validator',
           {
             class: long ? 'long' : '',
@@ -169,7 +170,7 @@ const User: m.Component<
       // role in commonwealth forum
       showRole &&
         role &&
-        m(Tag, {
+        render(Tag, {
           class: 'role-tag',
           label: role.permission,
           rounded: true,
@@ -184,7 +185,7 @@ const User: m.Component<
     );
 
     const userFinal = avatarOnly
-      ? m(
+      ? render(
           '.User.avatar-only',
           {
             key: profile?.address || '-',
@@ -195,7 +196,7 @@ const User: m.Component<
             ? profile.getAvatar(avatarSize)
             : profile.getAvatar(avatarSize - 4)
         )
-      : m(
+      : render(
           '.User',
           {
             key: profile?.address || '-',
@@ -203,7 +204,7 @@ const User: m.Component<
           },
           [
             showAvatar &&
-              m(
+              render(
                 '.user-avatar',
                 {
                   style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
@@ -214,7 +215,7 @@ const User: m.Component<
             app.chain.base === ChainBase.Substrate &&
             app.cachedIdentityWidget
               ? // substrate name
-                m(app.cachedIdentityWidget, {
+                render(app.cachedIdentityWidget, {
                   account,
                   linkify,
                   profile,
@@ -239,7 +240,7 @@ const User: m.Component<
                             ? profile.displayName
                             : [
                                 profile.displayName,
-                                m(
+                                render(
                                   '.id-short',
                                   formatAddressShort(
                                     profile.address,
@@ -250,14 +251,14 @@ const User: m.Component<
                           getRoleTags(false),
                         ]
                       )
-                    : m('a.user-display-name.username', [
+                    : render('a.user-display-name.username', [
                         !profile
                           ? addrShort
                           : !showAddressWithDisplayName
                           ? profile.displayName
                           : [
                               profile.displayName,
-                              m(
+                              render(
                                 '.id-short',
                                 formatAddressShort(
                                   profile.address,
@@ -268,7 +269,7 @@ const User: m.Component<
                         getRoleTags(false),
                       ]),
                   ghostAddress &&
-                    m('img', {
+                    render('img', {
                       src: '/static/img/ghost.svg',
                       width: '20px',
                       style: 'display: inline-block',
@@ -277,7 +278,7 @@ const User: m.Component<
           ]
         );
 
-    const userPopover = m(
+    const userPopover = render(
       '.UserPopover',
       {
         onclick: (e) => {
@@ -285,18 +286,18 @@ const User: m.Component<
         },
       },
       [
-        m('.user-avatar', [
+        render('.user-avatar', [
           !profile
             ? null
             : profile.avatarUrl
             ? profile.getAvatar(36)
             : profile.getAvatar(32),
         ]),
-        m('.user-name', [
+        render('.user-name', [
           app.chain &&
           app.chain.base === ChainBase.Substrate &&
           app.cachedIdentityWidget
-            ? m(app.cachedIdentityWidget, {
+            ? render(app.cachedIdentityWidget, {
                 account,
                 linkify: true,
                 profile,
@@ -317,7 +318,7 @@ const User: m.Component<
                   ? profile.displayName
                   : [
                       profile.displayName,
-                      m(
+                      render(
                         '.id-short',
                         formatAddressShort(profile.address, profile.chain)
                       ),
@@ -325,7 +326,7 @@ const User: m.Component<
               ),
         ]),
         profile?.address &&
-          m(
+          render(
             '.user-address',
             formatAddressShort(
               profile.address,
@@ -334,13 +335,13 @@ const User: m.Component<
               maxCharLength
             )
           ),
-        friendlyChainName && m('.user-chain', friendlyChainName),
+        friendlyChainName && render('.user-chain', friendlyChainName),
         getRoleTags(true), // always show roleTags in .UserPopover
 
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
-          m('.ban-wrapper', [
-            m(CWButton, {
+          render('.ban-wrapper', [
+            render(CWButton, {
               onclick: () => {
                 app.modals.create({
                   modal: BanUserModal,
@@ -355,7 +356,7 @@ const User: m.Component<
     );
 
     return popover
-      ? m(Popover, {
+      ? render(Popover, {
           interactionType: 'hover',
           content: userPopover,
           trigger: userFinal,
@@ -422,25 +423,25 @@ export const UserBlock: m.Component<{
           const queryEnd = queryStart + searchTerm.length;
 
           return [
-            m('span', profile.address.slice(0, queryStart)),
-            m('mark', profile.address.slice(queryStart, queryEnd)),
-            m('span', profile.address.slice(queryEnd, profile.address.length)),
+            render('span', profile.address.slice(0, queryStart)),
+            render('mark', profile.address.slice(queryStart, queryEnd)),
+            render('span', profile.address.slice(queryEnd, profile.address.length)),
           ];
         })()
       : null;
 
     const children = [
-      m('.user-block-left', [
-        m(User, {
+      render('.user-block-left', [
+        render(User, {
           user,
           avatarOnly: true,
           avatarSize: vnode.attrs.avatarSize || 28,
           popover,
         }),
       ]),
-      m('.user-block-center', [
-        m('.user-block-name', [
-          m(User, {
+      render('.user-block-center', [
+        render('.user-block-name', [
+          render(User, {
             user,
             hideAvatar: true,
             hideIdentityIcon,
@@ -450,13 +451,13 @@ export const UserBlock: m.Component<{
             showRole,
           }),
         ]),
-        m(
+        render(
           '.user-block-address',
           {
             class: profile?.address ? '' : 'no-address',
           },
           [
-            m(
+            render(
               '',
               highlightSearchTerm
                 ? highlightedAddress
@@ -464,9 +465,9 @@ export const UserBlock: m.Component<{
                 ? profile.address
                 : formatAddressShort(profile.address, profile.chain)
             ),
-            profile?.address && showChainName && m('.address-divider', ' · '),
+            profile?.address && showChainName && render('.address-divider', ' · '),
             showChainName &&
-              m(
+              render(
                 '',
                 typeof user.chain === 'string'
                   ? capitalize(user.chain)
@@ -475,10 +476,10 @@ export const UserBlock: m.Component<{
           ]
         ),
       ]),
-      m('.user-block-right', [
-        m(
+      render('.user-block-right', [
+        render(
           '.user-block-selected',
-          selected ? m(CWIcon, { iconName: 'check' }) : ''
+          selected ? render(CWIcon, { iconName: 'check' }) : ''
         ),
       ]),
     ];
@@ -491,7 +492,7 @@ export const UserBlock: m.Component<{
 
     return linkify
       ? link('.UserBlock', userLink, children)
-      : m(
+      : render(
           '.UserBlock',
           {
             class: compact ? 'compact' : '',
@@ -527,7 +528,7 @@ export const AnonymousUser: m.Component<
     if (showAvatar) {
       const pseudoAddress = distinguishingKey;
 
-      profileAvatar = m('svg.Jdenticon', {
+      profileAvatar = render('svg.Jdenticon', {
         style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         'data-address': pseudoAddress,
         oncreate: (vnode_) => {
@@ -540,13 +541,13 @@ export const AnonymousUser: m.Component<
     }
 
     return avatarOnly
-      ? m(
+      ? render(
           '.User.avatar-only',
           {
             key: '-',
           },
           [
-            m(
+            render(
               '.user-avatar-only',
               {
                 style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
@@ -555,14 +556,14 @@ export const AnonymousUser: m.Component<
             ),
           ]
         )
-      : m(
+      : render(
           '.User',
           {
             key: '-',
           },
           [
             showAvatar &&
-              m(
+              render(
                 '.user-avatar-only',
                 {
                   style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
@@ -570,7 +571,7 @@ export const AnonymousUser: m.Component<
                 [profileAvatar]
               ),
             [
-              m(
+              render(
                 'a.user-display-name.username',
                 showAsDeleted ? 'Deleted' : 'Anonymous'
               ),

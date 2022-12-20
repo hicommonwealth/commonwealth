@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 
 import { Profile } from 'models';
@@ -14,7 +14,7 @@ type BanUserModalAttrs = {
 };
 
 export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
-  view(vnode: ResultNode<BanUserModalAttrs, this>) {
+  view(vnode: ResultNode<BanUserModalAttrs>) {
     const { address } = vnode.attrs.profile;
 
     const exitModal = () => {

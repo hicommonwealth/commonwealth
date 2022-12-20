@@ -37,7 +37,7 @@
 // })
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
@@ -118,7 +118,7 @@ export class AppModals extends ClassComponent {
           modalType={spec.data?.modalType}
           breakpointFn={spec.data?.breakpointFn}
         >
-          {m(spec.modal, spec.data)}
+          {render(spec.modal, spec.data)}
         </CWModal>
       );
     });

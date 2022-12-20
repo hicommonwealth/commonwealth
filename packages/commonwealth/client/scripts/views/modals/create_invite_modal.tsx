@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
@@ -103,11 +103,11 @@ const getMemberPreview = (
 
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
 
-  return m(ListItem, {
+  return render(ListItem, {
     tabIndex,
     label: (
       <a class="search-results-item">
-        {m(UserBlock, {
+        {render(UserBlock, {
           user: profile,
           searchTerm,
           avatarSize: 24,
@@ -449,7 +449,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
           <div class="community-and-address-row">
             <div class="community-select-container">
               <CWLabel label="Community" />
-              {m(SelectList, {
+              {render(SelectList, {
                 closeOnSelect: true,
                 items: chainInfo
                   ? [{ label: chainInfo.name, value: chainInfo.id }]
@@ -465,7 +465,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
                         return 0;
                       }),
                 itemRender: (item: CommunityOption) =>
-                  m(ListItem, {
+                  render(ListItem, {
                     label: item.label,
                     selected:
                       this.invitedAddressChain &&
@@ -530,10 +530,10 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
           </div>
           {searchAddressTerm?.length > 3 &&
             !this.hideResults &&
-            m(List, [
+            render(List, [
               !results || results?.length === 0
                 ? app.searchAddressCache[searchAddressTerm]?.loaded
-                  ? m(ListItem, {
+                  ? render(ListItem, {
                       label: (
                         <div class="no-addresses">
                           <CWText fontWeight="medium">
@@ -548,9 +548,9 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
                         }
                       },
                     })
-                  : m(ListItem, { label: <CWSpinner size="small" /> })
+                  : render(ListItem, { label: <CWSpinner size="small" /> })
                 : this.isTyping
-                ? m(ListItem, { label: <CWSpinner size="small" /> })
+                ? render(ListItem, { label: <CWSpinner size="small" /> })
                 : results,
             ])}
           <InviteButton
@@ -626,13 +626,13 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //   view: (vnode) => {
 //     const { chain, onChangeHandler } = vnode.attrs;
 //     const chainOrCommunityObj = { chain: chain.id };
-//     return m(Form, { class: 'CreateInviteLink' }, [
-//       m(FormGroup, { span: 12 }, [
-//         m('h2.invite-link-title', 'Generate Invite Link'),
+//     return render(Form, { class: 'CreateInviteLink' }, [
+//       render(FormGroup, { span: 12 }, [
+//         render('h2.invite-link-title', 'Generate Invite Link'),
 //       ]),
-//       m(FormGroup, { span: 4 }, [
-//         m(FormLabel, { for: 'uses' }, 'Number of Uses'),
-//         m(RadioGroup, {
+//       render(FormGroup, { span: 4 }, [
+//         render(FormLabel, { for: 'uses' }, 'Number of Uses'),
+//         render(RadioGroup, {
 //           name: 'uses',
 //           options: [
 //             { value: 'none', label: 'Unlimited uses' },
@@ -644,9 +644,9 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //           },
 //         }),
 //       ]),
-//       m(FormGroup, { span: 4 }, [
-//         m(FormLabel, { for: 'time' }, 'Expires after'),
-//         m(RadioGroup, {
+//       render(FormGroup, { span: 4 }, [
+//         render(FormLabel, { for: 'time' }, 'Expires after'),
+//         render(RadioGroup, {
 //           name: 'time',
 //           options: [
 //             { value: 'none', label: 'Never expires' },
@@ -661,9 +661,9 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //           },
 //         }),
 //       ]),
-//       m(FormGroup, { span: 4 }),
-//       m(FormGroup, { span: 4 }, [
-//         m(Button, {
+//       render(FormGroup, { span: 4 }),
+//       render(FormGroup, { span: 4 }, [
+//         render(Button, {
 //           type: 'submit',
 //           intent: 'primary',
 //           rounded: true,
@@ -690,8 +690,8 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //           label: 'Get invite link',
 //         }),
 //       ]),
-//       m(FormGroup, { span: 8, class: 'copy-link-line' }, [
-//         m(Input, {
+//       render(FormGroup, { span: 8, class: 'copy-link-line' }, [
+//         render(Input, {
 //           id: 'invite-link-pastebin',
 //           class: 'invite-link-pastebin',
 //           fluid: true,
@@ -699,7 +699,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //           placeholder: 'Click to generate a link',
 //           value: `${this.link}`,
 //         }),
-//         m('img', {
+//         render('img', {
 //           src: 'static/img/copy_default.svg',
 //           alt: '',
 //           class: 'mx-auto',

@@ -21,7 +21,7 @@
 //   view: (vnode: ResultNode<IVoterRowAttrs>) => {
 //     const { account, stake } = vnode.attrs.vote;
 
-//     return m(
+//     return render(
 //       '.VoterRow',
 //       {
 //         onclick: (e) => {
@@ -31,17 +31,17 @@
 //         },
 //       },
 //       [
-//         m('.proposal-row-left', [
-//           m('.proposal-pre', [
-//             m(User, {
+//         render('.proposal-row-left', [
+//           render('.proposal-pre', [
+//             render(User, {
 //               user: account,
 //               avatarOnly: true,
 //               avatarSize: 36,
 //               popover: true,
 //             }),
 //           ]),
-//           m('.proposal-pre-mobile', [
-//             m(User, {
+//           render('.proposal-pre-mobile', [
+//             render(User, {
 //               user: account,
 //               avatarOnly: true,
 //               avatarSize: 16,
@@ -49,19 +49,19 @@
 //             }),
 //           ]),
 //         ]),
-//         m('.proposal-row-main.container', [
-//           m('.proposal-row-main.item', [
-//             m('.proposal-row-subheading', 'Voter'),
-//             m('.proposal-row-metadata', [
-//               m('.proposal-user', [
-//                 m(User, {
+//         render('.proposal-row-main.container', [
+//           render('.proposal-row-main.item', [
+//             render('.proposal-row-subheading', 'Voter'),
+//             render('.proposal-row-metadata', [
+//               render('.proposal-user', [
+//                 render(User, {
 //                   user: account,
 //                   hideAvatar: true,
 //                   popover: true,
 //                 }),
 //               ]),
-//               m('.proposal-user-mobile', [
-//                 m(User, {
+//               render('.proposal-user-mobile', [
+//                 render(User, {
 //                   user: account,
 //                   hideAvatar: true,
 //                   popover: true,
@@ -71,9 +71,9 @@
 //           ]),
 //           // Hiding this for now because it looks like the API Query for Stakes of is returning the incorrect value
 //           // on both Polkadot Apps and CW
-//           m('.proposal-row-main.item', [
-//             m('.proposal-row-subheading', 'Locked'),
-//             m('.proposal-row-metadata', stake.format(true)),
+//           render('.proposal-row-main.item', [
+//             render('.proposal-row-subheading', 'Locked'),
+//             render('.proposal-row-metadata', stake.format(true)),
 //           ]),
 //         ]),
 //       ]
@@ -90,14 +90,14 @@
 //   view: (vnode) => {
 //     const { address, chain } = vnode.attrs.account;
 
-//     return m('.ViewVotersModal', [
-//       m('.compact-modal-title', [
-//         m('h3', `Voters for ${formatAddressShort(address, chain.id, true)}`),
-//         m(CompactModalExitButton),
+//     return render('.ViewVotersModal', [
+//       render('.compact-modal-title', [
+//         render('h3', `Voters for ${formatAddressShort(address, chain.id, true)}`),
+//         render(CompactModalExitButton),
 //       ]),
-//       m('.compact-modal-body', [
-//         vnode.attrs.votes.map((vote) => m(VoterRow, { vote })),
-//         m('.clear'),
+//       render('.compact-modal-body', [
+//         vnode.attrs.votes.map((vote) => render(VoterRow, { vote })),
+//         render('.clear'),
 //       ]),
 //     ]);
 //   },

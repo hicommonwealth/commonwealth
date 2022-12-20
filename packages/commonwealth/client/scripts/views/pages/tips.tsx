@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'pages/tips.scss';
 
@@ -58,7 +58,7 @@ class Tip extends ClassComponent<TipAttrs> {
           >
             Beneficiary
           </CWText>
-          {m(User, {
+          {render(User, {
             user: beneficiary,
             popover: true,
             showAddressWithDisplayName: true,

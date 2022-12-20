@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import { MarkdownFormattedText } from './markdown_formatted_text';
 import { QuillFormattedText, QuillTextParams } from './quill_formatted_text';
@@ -44,8 +45,8 @@ export const renderQuillTextBody = (
   try {
     const doc = JSON.parse(decodedTextbody);
     if (!doc.ops) throw new Error();
-    return m(QuillFormattedText, { ...params, doc });
+    return render(QuillFormattedText, { ...params, doc });
   } catch (e) {
-    return m(MarkdownFormattedText, { ...params, doc: decodedTextbody });
+    return render(MarkdownFormattedText, { ...params, doc: decodedTextbody });
   }
 };

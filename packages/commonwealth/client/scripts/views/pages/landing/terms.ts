@@ -3,6 +3,7 @@
 import 'pages/landing/privacyAndTerms.scss';
 
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 import { renderMultilineText } from 'helpers';
 import HeaderLandingPage from './landing_page_header';
 
@@ -122,13 +123,13 @@ Section 6.10 No Waiver. No failure on the part of any Person to exercise any pow
 const TermsPage: m.Component<{}> = {
   oncreate: (vnode) => {},
   view: (vnode) => {
-    return m('.TermsPage', [
-      m(HeaderLandingPage, {
+    return render('.TermsPage', [
+      render(HeaderLandingPage, {
         scrollHeader: false,
         navs: [{ text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' }],
       }),
-      m('.forum-container', [
-        m('h1.page-title', 'Terms of Service'),
+      render('.forum-container', [
+        render('h1.page-title', 'Terms of Service'),
         renderMultilineText(TermsOfService),
       ]),
     ]);

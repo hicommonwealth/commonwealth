@@ -1,6 +1,7 @@
 import m from 'mithril';
 import $ from 'jquery';
 import app from 'state';
+import { render } from 'mithrilInterop';
 
 import { PageLoading } from 'views/pages/loading';
 import { initAppState } from 'app';
@@ -58,9 +59,9 @@ const FinishAxieLogin: m.Component<Record<string, unknown>, IState> = {
   view: (vnode) => {
     console.log('finish axie login');
     if (vnode.state.error) {
-      return m(ErrorPage, { title: 'Login Error', message: vnode.state.error });
+      return render(ErrorPage, { title: 'Login Error', message: vnode.state.error });
     } else {
-      return m(PageLoading);
+      return render(PageLoading);
     }
   },
 };

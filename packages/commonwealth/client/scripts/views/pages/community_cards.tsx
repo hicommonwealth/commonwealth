@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import numeral from 'numeral';
 
 import 'pages/landing/community_cards.scss';
@@ -172,7 +172,7 @@ class HomepageCommunityCards extends ClassComponent {
           return threadCountB - threadCountA;
         })
         .map((chain: ChainInfo) => {
-          return m(CommunityCard, { chain });
+          return render(CommunityCard, { chain });
         });
 
       return res;

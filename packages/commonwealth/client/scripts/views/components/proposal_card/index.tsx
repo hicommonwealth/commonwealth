@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
 
@@ -135,11 +135,11 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
 //  linked treasury proposals
 //   proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
 //      && proposal.preimage?.method === 'approveProposal'
-//     && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+//     && render('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
 //    proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
 //     && proposal.preimage?.method === 'approveProposal'
-//     && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+//     && render('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
 //    proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
 //      && proposal.call?.method === 'approveProposal'
-//      && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
+//      && render('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
 //    linked referenda

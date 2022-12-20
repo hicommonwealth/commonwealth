@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { Select } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
@@ -113,7 +113,7 @@ export class SelectRow extends ClassComponent<SelectRowAttrs> {
     return (
       <div class="SelectRow">
         <CWLabel label={title} />
-        {m(Select, {
+        {render(Select, {
           options,
           onchange: (e) => {
             onchange((e.currentTarget as HTMLInputElement).value);

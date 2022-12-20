@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';
 
@@ -16,22 +17,22 @@ const TokensChainsComponent: m.Component<IState, IState> = {
     vnode.state.oncreateSlider();
   },
   view: (vnode) => {
-    return m(
+    return render(
       'section.TokensChainsComponent',
       {
         class:
           'bg-geometric-pattern bg-cover bg-full pt-20 pb-40 md:pb-48 mb-48 relative',
       },
       [
-        m('div', { class: 'container mx-auto' }, [
-          m(
+        render('div', { class: 'container mx-auto' }, [
+          render(
             'h2',
             {
               class: 'text-3xl text-left font-extrabold mb-5 text-center',
             },
             ' Every token, every chain '
           ),
-          m(
+          render(
             'p',
             {
               class:
@@ -40,21 +41,21 @@ const TokensChainsComponent: m.Component<IState, IState> = {
             ' Subscribe to chain activity like whale transfers or major votes. Discuss new ideas, crowdfund projects, and access native governance for Layer 1s, tokens, and NFTs alike. '
           ),
         ]),
-        m(
+        render(
           'div',
           {
             class: 'absolute bottom-0 left-0 right-0 transform translate-y-1/2',
           },
-          m(
+          render(
             'div',
             { class: 'glide' },
-            m(
+            render(
               'div',
               { class: 'glide__track', 'data-glide-el': 'track' },
-              m('ul', { class: 'glide__slides' }, [
+              render('ul', { class: 'glide__slides' }, [
                 vnode.attrs.chains.map(
                   (chain: any, index: number) => {
-                    return m(
+                    return render(
                       'li',
                       {
                         id:`card_${index}`,
@@ -67,19 +68,19 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                         },
 
                       },
-                      m(
+                      render(
                         'div',
                         {
                           class:
                             'bg-white shadow-xl p-5 xl:p-10 rounded-xl text-center h-56 grow',
                         },
                         [
-                          m('img', {
+                          render('img', {
                             class: 'mx-auto mb-3 w-12 h-auto',
                             src: chain.img,
                             alt: '',
                           }),
-                          m(
+                          render(
                             'h3',
                             {
                               class: 'text-2xl font-extrabold mb-1',
@@ -87,7 +88,7 @@ const TokensChainsComponent: m.Component<IState, IState> = {
                             },
                             chain.name
                           ),
-                          m('p', { class: 'text-xl' }, chain.description),
+                          render('p', { class: 'text-xl' }, chain.description),
                         ]
                       )
                     );

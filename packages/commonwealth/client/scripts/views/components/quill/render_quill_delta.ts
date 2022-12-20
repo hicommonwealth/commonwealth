@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 
 import { loadScript } from 'helpers';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
@@ -84,14 +85,14 @@ export const renderQuillDelta = (
   return hideFormatting || collapse
     ? groups.map((group) => {
         const wrapGroupForHiddenFormatting = (content) => {
-          return m(`${getGroupTag(group)}.hidden-formatting`, content);
+          return render(`${getGroupTag(group)}.hidden-formatting`, content);
         };
         return wrapGroupForHiddenFormatting(
           group.parents.map((parent) => {
-            return m(`${getParentTag(parent)}.hidden-formatting-inner`, [
+            return render(`${getParentTag(parent)}.hidden-formatting-inner`, [
               parent.children.map((child) => {
                 if (child.insert?.mention)
-                  return m(
+                  return render(
                     'span.mention',
                     child.insert.mention.denotationChar +
                       child.insert.mention.value
@@ -100,7 +101,7 @@ export const renderQuillDelta = (
                 if (child.insert?.twitter) return;
                 if (child.insert?.video) return;
                 if (child.attributes?.link)
-                  return m(
+                  return render(
                     'a',
                     {
                       href: child.attributes.link,
@@ -127,9 +128,9 @@ export const renderQuillDelta = (
                 if (child.insert.match(/[A-Za-z0-9]$/)) {
                   // add a period and space after lines that end on a word or
                   // number, like Google does in search previews
-                  return m('span', `${child.insert}. `);
+                  return render('span', `${child.insert}. `);
                 } else {
-                  return m('span', `${child.insert}`);
+                  return render('span', `${child.insert}`);
                 }
               }),
             ]);
@@ -140,19 +141,19 @@ export const renderQuillDelta = (
         const renderChild = (child) => {
           // handle images
           if (child.insert?.image) {
-            return m('img', {
+            return render('img', {
               src: child.insert?.image,
             });
           }
           // handle video
           if (child.insert?.video) {
-            return m('div', [
-              m('iframe', {
+            return render('div', [
+              render('iframe', {
                 frameborder: 0,
                 allowfullscreen: true,
                 src: child.insert?.video,
               }),
-              m('br'),
+              render('br'),
             ]);
           }
           // handle tweets
@@ -172,13 +173,13 @@ export const renderQuillDelta = (
               }, 1);
             }
             const url = `https://twitter.com/user/status/${id}`;
-            return m(
+            return render(
               'blockquote',
               {
                 class: 'twitter-tweet',
               },
               [
-                m('a', {
+                render('a', {
                   tabindex: -1,
                   href: url,
                 }),
@@ -188,7 +189,7 @@ export const renderQuillDelta = (
           // handle text nodes
           let result;
           if (child.insert?.mention) {
-            result = m(
+            result = render(
               'span.mention',
               {
                 onclick: (e) => {
@@ -198,7 +199,7 @@ export const renderQuillDelta = (
               child.insert.mention.denotationChar + child.insert.mention.value
             );
           } else if (child.attributes?.link) {
-            result = m(
+            result = render(
               'a',
               {
                 href: child.attributes.link,
@@ -222,34 +223,34 @@ export const renderQuillDelta = (
               `${child.insert}`
             );
           } else {
-            result = m('span', `${child.insert}`);
+            result = render('span', `${child.insert}`);
           }
           Object.entries(child.attributes || {}).forEach(([k, v]) => {
             if (k !== 'color' && k !== 'background' && v !== true) return;
             switch (k) {
               case 'bold':
-                result = m('strong', result);
+                result = render('strong', result);
                 return;
               case 'italic':
-                result = m('em', result);
+                result = render('em', result);
                 return;
               case 'strike':
-                result = m('s', result);
+                result = render('s', result);
                 return;
               case 'underline':
-                result = m('u', result);
+                result = render('u', result);
                 return;
               case 'code':
-                result = m('code', result);
+                result = render('code', result);
                 return;
               case 'added':
-                result = m('span.added', result);
+                result = render('span.added', result);
                 return;
               case 'deleted':
-                result = m('span.deleted', result);
+                result = render('span.deleted', result);
                 return;
               default:
-                result = m('span', result);
+                result = render('span', result);
             }
           });
           return result;
@@ -261,10 +262,10 @@ export const renderQuillDelta = (
             parent.children.length === 1 &&
             parent.children[0].insert === '\n'
           ) {
-            return m('.between-paragraphs');
+            return render('.between-paragraphs');
           }
           // render normal parent nodes with content
-          return m(
+          return render(
             parent.attributes && parent.attributes.blockquote
               ? 'blockquote'
               : parent.attributes && parent.attributes['code-block']
@@ -300,9 +301,9 @@ export const renderQuillDelta = (
             const tag = getParentTag(parent);
             const content = parent.children.map(renderChild);
             if (tag === 'li.checked') {
-              content.unshift(m(`input[type='checkbox'][disabled][checked]`));
+              content.unshift(render(`input[type='checkbox'][disabled][checked]`));
             } else if (tag === 'li.unchecked') {
-              content.unshift(m(`input[type='checkbox'][disabled]`));
+              content.unshift(render(`input[type='checkbox'][disabled]`));
             }
             const indent = parent.attributes.indent || 0;
 
@@ -318,10 +319,10 @@ export const renderQuillDelta = (
               while (indent < temp.length - 1) {
                 const outdentBuffer = temp[temp.length - 2];
                 outdentBuffer[outdentBuffer.length - 1].content.push(
-                  m(
+                  render(
                     getGroupTag(_group),
                     temp.pop().map((data) => {
-                      return m(data.tag, data.content);
+                      return render(data.tag, data.content);
                     })
                   )
                 );
@@ -334,18 +335,18 @@ export const renderQuillDelta = (
           while (temp.length > 1) {
             const outdentBuffer = temp[temp.length - 2];
             outdentBuffer[outdentBuffer.length - 1].content.push(
-              m(
+              render(
                 getGroupTag(_group),
                 temp.pop().map(({ tag, content }) => {
-                  return m(tag, content);
+                  return render(tag, content);
                 })
               )
             );
           }
-          return m(
+          return render(
             getGroupTag(_group),
             temp[0].map(({ tag, content }) => {
-              return m(tag, content);
+              return render(tag, content);
             })
           );
         };

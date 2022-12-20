@@ -1,6 +1,7 @@
 import m from 'mithril';
 import app from 'state';
 import { Button } from 'construct-ui';
+import { render } from 'mithrilInterop';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -44,11 +45,11 @@ const ProfileBanner: m.Component<{ account: Account, addressInfo: AddressInfo },
       });
     };
 
-    return m('.ProfileBanner', [
-      m('.banner-text', [
+    return render('.ProfileBanner', [
+      render('.banner-text', [
         'You are already logged in with this address' // but have not joined the [Edgeware] community
       ]),
-      m(Button, {
+      render(Button, {
         label: 'Join community',
         intent: 'primary',
         rounded: true,

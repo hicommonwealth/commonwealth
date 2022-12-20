@@ -4,6 +4,7 @@ import 'pages/notifications_page.scss';
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
+import { render } from 'mithrilInterop';
 
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';
@@ -83,10 +84,10 @@ function previousPage() {
 const NotificationsPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.isLoggedIn())
-      return m(PageError, {
+      return render(PageError, {
         title: [
           'Notifications ',
-          m(Tag, {
+          render(Tag, {
             size: 'xs',
             label: 'Beta',
             style: 'position: relative; top: -2px; margin-left: 6px',
@@ -97,10 +98,10 @@ const NotificationsPage: m.Component<{}> = {
 
     const activeEntity = app.chain;
     if (!activeEntity)
-      return m(PageLoading, {
+      return render(PageLoading, {
         // title: [
         //   'Notifications ',
-        //   m(Tag, {
+        //   render(Tag, {
         //     size: 'xs',
         //     label: 'Beta',
         //     style: 'position: relative; top: -2px; margin-left: 6px',
@@ -116,12 +117,12 @@ const NotificationsPage: m.Component<{}> = {
     // const sortedNotifications = sortNotifications(app.user.notifications.allNotifications).reverse();
     // console.log("Sorted Notifications:", sortedNotifications);
 
-    return m(
+    return render(
       Sublayout,
       // {
       //   title: [
       //     'Notifications ',
-      //     m(Tag, {
+      //     render(Tag, {
       //       size: 'xs',
       //       label: 'Beta',
       //       style: 'position: relative; top: -2px; margin-left: 6px',
@@ -129,15 +130,15 @@ const NotificationsPage: m.Component<{}> = {
       //   ],
       // },
       [
-        m('.NotificationsPage', [
-          m(
+        render('.NotificationsPage', [
+          render(
             ButtonGroup,
             {
               class: 'NotificationButtons',
               outlined: true,
             },
             [
-              m(Button, {
+              render(Button, {
                 label: 'Previous Page',
                 onclick: (e) => {
                   e.preventDefault();
@@ -161,7 +162,7 @@ const NotificationsPage: m.Component<{}> = {
                   );
                 },
               }),
-              m(Button, {
+              render(Button, {
                 label: 'Next Page',
                 onclick: (e) => {
                   e.preventDefault();
@@ -193,7 +194,7 @@ const NotificationsPage: m.Component<{}> = {
                   );
                 },
               }),
-              m(Button, {
+              render(Button, {
                 label: 'Mark all as read',
                 onclick: (e) => {
                   e.preventDefault();
@@ -204,14 +205,14 @@ const NotificationsPage: m.Component<{}> = {
                     .then(() => m.redraw());
                 },
               }),
-              m(Popover, {
+              render(Popover, {
                 content: [
-                  m(
+                  render(
                     'div',
                     { style: 'margin-bottom: 10px' },
                     'Clear all chain notifications?'
                   ),
-                  m(Button, {
+                  render(Button, {
                     label: 'Confirm',
                     fluid: true,
                     rounded: true,
@@ -228,7 +229,7 @@ const NotificationsPage: m.Component<{}> = {
                     },
                   }),
                 ],
-                trigger: m(Button, {
+                trigger: render(Button, {
                   label: 'Clear chain events',
                 }),
                 transitionDuration: 0,
@@ -240,7 +241,7 @@ const NotificationsPage: m.Component<{}> = {
               }),
             ]
           ),
-          m('.NotificationsList', [
+          render('.NotificationsList', [
             (() => {
               const discussionNotif = discussionNotifications.slice(
                 minDiscussionNotification,
@@ -257,7 +258,7 @@ const NotificationsPage: m.Component<{}> = {
 
               const totalLength = allNotifications.length;
               if (totalLength > 0) {
-                return m(Infinite, {
+                return render(Infinite, {
                   maxPages: 1, // prevents rollover/repeat
                   key: totalLength,
                   pageData: () => {
@@ -267,13 +268,13 @@ const NotificationsPage: m.Component<{}> = {
                     return pageKey;
                   },
                   item: (data, opts, index) => {
-                    return m(NotificationRow, {
+                    return render(NotificationRow, {
                       notifications: [data],
                       onListPage: true,
                     });
                   },
                 });
-              } else return m('.no-notifications', 'No Notifications');
+              } else return render('.no-notifications', 'No Notifications');
             })(),
           ]),
         ]),

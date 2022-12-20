@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'pages/view_thread/thread_components.scss';
 import 'pages/view_proposal/proposal_header_links.scss';
@@ -38,7 +38,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
 
     return (
       <div class="ThreadAuthor">
-        {m(User, {
+        {render(User, {
           avatarSize: 24,
           user: author,
           popover: true,
@@ -53,7 +53,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
               content={
                 <div class="collaborators">
                   {thread.collaborators.map(({ address, chain }) => {
-                    return m(User, {
+                    return render(User, {
                       user: new AddressInfo(null, address, chain, null),
                     });
                   })}

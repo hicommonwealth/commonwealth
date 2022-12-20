@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { ListItem, QueryList } from 'construct-ui';
 
 import 'components/thread_selector.scss';
@@ -23,7 +23,7 @@ const renderThreadPreview = (
   const selected = linkedThreads.some((lt) => +lt.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
-  return m(ListItem, {
+  return render(ListItem, {
     label: (
       <div class="thread-preview-row">
         <CWText fontWeight="medium" noWrap>
@@ -142,7 +142,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                 }, 250);
               }}
             />
-            {m(QueryList, {
+            {render(QueryList, {
               filterable: false,
               checkmark: true,
               inputAttrs: {

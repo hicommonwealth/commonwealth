@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/snapshot_proposal_selector.scss';
@@ -46,7 +46,7 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
     return (
       <div class="SnapshotProposalSelector">
         {this.snapshotProposalsLoaded ? (
-          m(QueryList, {
+          render(QueryList, {
             checkmark: true,
             items: this.allProposals.sort((a, b) => {
               return b.created - a.created;
@@ -58,7 +58,7 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
               const selected = sn.id === vnode.attrs.thread.snapshotProposal;
               // TODO: show additional info on the ListItem,
               // like any set proposal title, the creator, or other metadata
-              return m(ListItem, {
+              return render(ListItem, {
                 label: (
                   <div class="chain-entity">
                     <div class="chain-entity-text" title={sn.title}>

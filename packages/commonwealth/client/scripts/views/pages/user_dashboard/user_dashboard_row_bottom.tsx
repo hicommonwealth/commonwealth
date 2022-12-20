@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { Icons, MenuItem, PopoverMenu } from 'construct-ui';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
@@ -70,20 +70,20 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
               e.stopPropagation();
             }}
           >
-            {m(PopoverMenu, {
+            {render(PopoverMenu, {
               transitionDuration: 0,
               closeOnOutsideClick: true,
               closeOnContentClick: true,
               menuAttrs: { size: 'default' },
               content: [
-                m(MenuItem, {
+                render(MenuItem, {
                   iconLeft: Icons.COPY,
                   label: 'Copy URL',
                   onclick: async () => {
                     await navigator.clipboard.writeText(path);
                   },
                 }),
-                m(MenuItem, {
+                render(MenuItem, {
                   iconLeft: Icons.TWITTER,
                   label: 'Share on Twitter',
                   onclick: async () => {

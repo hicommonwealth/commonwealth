@@ -4,6 +4,7 @@ import 'pages/admin.scss';
 
 import $ from 'jquery';
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import app from 'state';
@@ -27,7 +28,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
   view: (vnode) => {
     const author = app.user.activeAccount as SubstrateAccount;
     if (!(app.chain as Substrate).chain.sudoKey) {
-      return m(
+      return render(
         '.SudoForm',
         {
           style:
@@ -38,7 +39,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
     }
 
     if (author && author.address !== (app.chain as Substrate).chain.sudoKey) {
-      return m(
+      return render(
         '.SudoForm',
         {
           style:
@@ -46,7 +47,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
         },
         [
           'Must be logged into admin account to use Sudo: ',
-          m(User, {
+          render(User, {
             user: app.chain.accounts.get(
               (app.chain as Substrate).chain.sudoKey
             ),
@@ -61,7 +62,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
       // TODO: FIXME: we do not support unlocking with seed/mnemonic, so we will need to use
       //   the signer from Polkadotjs web wallet to perform sudo actions.
     } catch (e) {
-      return m(
+      return render(
         '.SudoForm',
         {
           style:
@@ -71,20 +72,20 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
       );
     }
 
-    return m(
+    return render(
       '.SudoForm',
       {
         style:
           'width: 80%; padding: 5px 24px; border: 1px solid #eee; margin-bottom: 15px;',
       },
       [
-        m(
+        render(
           'h2.header',
           { style: 'margin: 15px 0;' },
           'Sudo: run function as Admin'
         ),
-        m(EdgewareFunctionPicker),
-        m(
+        render(EdgewareFunctionPicker),
+        render(
           'button',
           {
             type: 'submit',
@@ -112,8 +113,8 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
           },
           'Submit Action'
         ),
-        m('h4.header', { style: 'margin: 15px 0;' }, vnode.state.resultText),
-        m('br'),
+        render('h4.header', { style: 'margin: 15px 0;' }, vnode.state.resultText),
+        render('br'),
       ]
     );
   },
@@ -122,23 +123,23 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
 const ChainStats: m.Component<{}> = {
   view: () => {
     const header = (label) =>
-      m('h4.header', { style: 'margin: 15px 0;' }, label);
+      render('h4.header', { style: 'margin: 15px 0;' }, label);
     const stat = (label, content) =>
-      m('.stat', [m('.label', label), m('.value', content)]);
+      render('.stat', [render('.label', label), render('.value', content)]);
     const formatBlocks = (blocks) => [
       blocks,
       ' blocks - ',
       formatDuration(blockperiodToDuration(blocks)),
     ];
 
-    return m(
+    return render(
       '.ChainStats',
       {
         style:
           'padding: 5px 24px; border: 1px solid #eee; margin-bottom: 40px;',
       },
       [
-        m(
+        render(
           'style',
           '.ChainStats .stat > * { display: inline-block; width: 50%; }'
         ),
@@ -186,7 +187,7 @@ const ChainStats: m.Component<{}> = {
           'Candidacy bond',
           formatCoin((app.chain as Substrate).phragmenElections.candidacyBond)
         ),
-        m('br'),
+        render('br'),
       ]
     );
   },
@@ -195,9 +196,9 @@ const ChainStats: m.Component<{}> = {
 /*
 const ProposalCreationRow = {
   view: (vnode) => {
-    return m('span', [
-      m('p', `Create ${vnode.attrs.name} proposal`),
-      m('button', {
+    return render('span', [
+      render('p', `Create ${vnode.attrs.name} proposal`),
+      render('button', {
         class: vnode.state.inprogress ? 'disabled' : '',
         onclick: (e) => {
           e.preventDefault();
@@ -259,12 +260,12 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
       vnode.state.selected_profile = adminChoices[0];
     }
 
-    return m('.AdminActions', [
-      m('h4', 'Admin'),
-      m('p', 'Set up the chain with test proposals'),
-      m('p', 'Run individual test suites (suite 1 required before 2 and 3)'),
-      m('p', 'Create identities'),
-      // m('button', {
+    return render('.AdminActions', [
+      render('h4', 'Admin'),
+      render('p', 'Set up the chain with test proposals'),
+      render('p', 'Run individual test suites (suite 1 required before 2 and 3)'),
+      render('p', 'Create identities'),
+      // render('button', {
       //   class: vnode.state.inprogress ? 'disabled' : '',
       //   onclick: (e) => {
       //     e.preventDefault();
@@ -272,18 +273,18 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
       //     vnode.state.inprogress = true;
       //   }
       // }, vnode.state.inprogress ? 'Creating identities' : 'Create identities'),
-      // m('br'),
-      m('br'),
-      m('h4', 'Site admin panel (unimplemented)'),
-      m('.form', [
-        m('.form-left', [
+      // render('br'),
+      render('br'),
+      render('h4', 'Site admin panel (unimplemented)'),
+      render('.form', [
+        render('.form-left', [
           // TD: verify this is correct char lim
-          m(
+          render(
             '.caption',
             { style: 'margin-top: 20px;' },
             'Choose a possible admin'
           ),
-          m(DropdownFormField, {
+          render(DropdownFormField, {
             name: 'alt-del',
             options: { style: 'padding: 5px' },
             choices: adminChoices,
@@ -292,16 +293,16 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
             },
           }),
         ]),
-        m('.explanation', [
-          m('span', [
+        render('.explanation', [
+          render('span', [
             'This list contains all potential ',
             'individuals to make admin. ',
           ]),
         ]),
-        m('.form-left', [
+        render('.form-left', [
           // TD: verify this is correct char lim
-          m('.caption', { style: 'margin-top: 20px;' }, 'Choose a role'),
-          m(DropdownFormField, {
+          render('.caption', { style: 'margin-top: 20px;' }, 'Choose a role'),
+          render(DropdownFormField, {
             name: 'alt-del',
             options: { style: 'padding: 5px' },
             choices: [
@@ -321,7 +322,7 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
             },
           }),
         ]),
-        m(
+        render(
           'button',
           {
             class: vnode.state.inprogress ? 'disabled' : '',
@@ -360,8 +361,8 @@ const AdminActions: m.Component<{}, IAdminActionsState> = {
             : 'Add admin'
         ),
       ]),
-      m('br'),
-      m('br'),
+      render('br'),
+      render('br'),
     ]);
   },
 };
@@ -371,13 +372,13 @@ const AdminPage: m.Component<{}> = {
   view: () => {
     if (!app.user.isSiteAdmin) {
       m.route.set('/', {}, { replace: true });
-      return m(PageLoading);
+      return render(PageLoading);
     }
 
-    return m(
+    return render(
       Sublayout,
-      m('.AdminPage', [
-        app.chain ? [m(AdminActions), m(SudoForm), m(ChainStats)] : [],
+      render('.AdminPage', [
+        app.chain ? [render(AdminActions), render(SudoForm), render(ChainStats)] : [],
       ])
     );
   },

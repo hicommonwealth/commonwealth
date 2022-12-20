@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 
 import 'pages/bounties.scss';
 
@@ -120,7 +121,7 @@ export const getActionSection = (
         )}
         <div class="action-info-row">
           <CWText>Proposed curator: </CWText>
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(null, bounty.curator, app.chain.id, null),
             linkify: true,
           })}
@@ -156,7 +157,7 @@ export const getActionSection = (
         )}
         <div class="action-info-row">
           <CWText>Curator: </CWText>
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(null, bounty.curator, app.chain.id, null),
             linkify: true,
           })}
@@ -216,14 +217,14 @@ export const getActionSection = (
         />
         <div class="action-info-row">
           <CWText>Curator: </CWText>
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(null, bounty.curator, app.chain.id, null),
             linkify: true,
           })}
         </div>
         <div class="action-info-row">
           <CWText>Recipient: </CWText>
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(null, bounty.beneficiary, app.chain.id, null),
             linkify: true,
           })}

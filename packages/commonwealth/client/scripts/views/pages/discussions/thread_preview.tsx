@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
@@ -121,7 +121,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
         <div class="main-content">
           <div class="top-row">
             <div class="user-and-date">
-              {m(User, {
+              {render(User, {
                 avatarSize: 24,
                 user: new AddressInfo(
                   null,

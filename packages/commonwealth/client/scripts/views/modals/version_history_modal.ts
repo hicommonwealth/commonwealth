@@ -75,39 +75,39 @@
 //         }
 //         const diffedDoc =
 //           quillDiff && prevDoc ? prevDoc.compose(quillDiff) : doc;
-//         return m('.version', [
-//           m('.panel-left', [
-//             m(User, userOptions),
-//             m('span.timestamp', timestamp),
+//         return render('.version', [
+//           render('.panel-left', [
+//             render(User, userOptions),
+//             render('span.timestamp', timestamp),
 //           ]),
-//           m('.panel-right', [m(QuillFormattedText, { doc: diffedDoc })]),
+//           render('.panel-right', [render(QuillFormattedText, { doc: diffedDoc })]),
 //         ]);
 //       } catch {
-//         return m('.version', [
-//           m('.panel-left', [
-//             m(User, userOptions),
-//             m('span.timestamp', timestamp),
+//         return render('.version', [
+//           render('.panel-left', [
+//             render(User, userOptions),
+//             render('span.timestamp', timestamp),
 //           ]),
-//           m('.panel-right', [m(MarkdownFormattedText, { doc: edit.body })]),
+//           render('.panel-right', [render(MarkdownFormattedText, { doc: edit.body })]),
 //         ]);
 //       }
 //     };
 
-//     return m('.VersionHistoryModal', [
-//       m('.compact-modal-title', [
-//         m('h3', 'Version History'),
-//         m(ModalExitButton),
+//     return render('.VersionHistoryModal', [
+//       render('.compact-modal-title', [
+//         render('h3', 'Version History'),
+//         render(ModalExitButton),
 //       ]),
-//       m('.compact-modal-body', [
+//       render('.compact-modal-body', [
 //         item.versionHistory && item.versionHistory?.length
-//           ? m('.versions', [
+//           ? render('.versions', [
 //               item.versionHistory.map((edit, idx) => {
 //                 const prevEdit = item.versionHistory[idx + 1];
 //                 if (!edit) return null;
 //                 return getVersion(edit, prevEdit);
 //               }),
 //             ])
-//           : m('.versions.versions-loading', [m(CWSpinner)]),
+//           : render('.versions.versions-loading', [render(CWSpinner)]),
 //       ]),
 //     ]);
 //   },

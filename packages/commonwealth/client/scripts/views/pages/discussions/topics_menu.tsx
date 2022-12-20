@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import {
   Button,
   Icons,
@@ -39,8 +39,8 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
   view(vnode: ResultNode<TopicsMenuAttrs>) {
     const { featuredTopics, otherTopics, selectedTopic, topic } = vnode.attrs;
 
-    return m(PopoverMenu, {
-      trigger: m(Button, {
+    return render(PopoverMenu, {
+      trigger: render(Button, {
         rounded: true,
         compact: true,
         label: selectedTopic ? `Topic: ${topic}` : 'All Topics',
@@ -52,7 +52,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
       closeOnContentClick: true,
       content: (
         <div class="topic-items">
-          {m(MenuItem, {
+          {render(MenuItem, {
             active: m.route.get() === `/${app.activeChainId()}` || !topic,
             iconLeft:
               m.route.get() === `/${app.activeChainId()}` || !topic
@@ -63,7 +63,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
               navigateToSubpage('/discussions');
             },
           })}
-          {m(MenuDivider)}
+          {render(MenuDivider)}
           {featuredTopics
             .concat(otherTopics)
             .map(
@@ -83,7 +83,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                     )}` ||
                   (topic && topic === name);
 
-                return m(MenuItem, {
+                return render(MenuItem, {
                   key: name,
                   active,
                   onclick: (e) => {
@@ -101,7 +101,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                       {app.roles?.isAdminOfEntity({
                         chain: app.activeChainId(),
                       }) &&
-                        m(Button, {
+                        render(Button, {
                           size: 'xs',
                           label: 'Edit',
                           class: 'edit-button',

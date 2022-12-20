@@ -23,12 +23,12 @@
 //     vnode.state.newDelegateKey = vnode.attrs.delegateKey;
 //   },
 //   view: (vnode: ResultNode<IAttrs, IState>) => {
-//     return m('.UpdateDelegateModal', [
-//       m('.header', 'Update Delegate'),
-//       m('.compact-modal-body', [
-//         m(FormGroup, [
-//           m(FormLabel, 'Delegate Key (update your selected delegate)'),
-//           m(Input, {
+//     return render('.UpdateDelegateModal', [
+//       render('.header', 'Update Delegate'),
+//       render('.compact-modal-body', [
+//         render(FormGroup, [
+//           render(FormLabel, 'Delegate Key (update your selected delegate)'),
+//           render(Input, {
 //             value: vnode.state.newDelegateKey,
 //             oncreate: (vvnode) => {
 //               $(vvnode.dom).focus();
@@ -39,7 +39,7 @@
 //             }
 //           }),
 //         ]),
-//         m(Button, {
+//         render(Button, {
 //           intent: 'primary',
 //           type: 'submit',
 //           rounded: true,

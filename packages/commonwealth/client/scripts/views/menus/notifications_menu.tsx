@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import Infinite from 'mithril-infinite';
 import { Button, PopoverMenu } from 'construct-ui';
 
@@ -89,7 +89,7 @@ export class NotificationsMenu extends ClassComponent {
     return (
       <div class="NotificationsMenu">
         <div class="NotificationsMenuHeader">
-          {m(Button, {
+          {render(Button, {
             label:
               // discussionNotificationsCount
               //   ? `Discussions (${discussionNotificationsCount})`
@@ -102,7 +102,7 @@ export class NotificationsMenu extends ClassComponent {
               this.selectedChainEvents = false;
             },
           })}
-          {m(Button, {
+          {render(Button, {
             label:
               // chainNotificationsCount
               //   ? `Chain events (${chainNotificationsCount})`
@@ -120,7 +120,7 @@ export class NotificationsMenu extends ClassComponent {
           {(() => {
             if (this.selectedChainEvents) {
               if (this.showingChainEventNotifications.length > 0) {
-                return m(Infinite, {
+                return render(Infinite, {
                   maxPages: 1, // prevents rollover/repeat
                   pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
                   pageKey: () =>
@@ -133,7 +133,7 @@ export class NotificationsMenu extends ClassComponent {
                     'chain',
                   // TODO: add the length/num of total chain-events once
                   // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
+                  item: (data) => render(NotificationRow, { notifications: [data] }),
                 });
               } else if (
                 app.user.notifications.chainEventNotifications.length === 0
@@ -142,7 +142,7 @@ export class NotificationsMenu extends ClassComponent {
               else return 'No more chain notifications';
             } else {
               if (this.showingDiscussionNotifications.length > 0) {
-                return m(Infinite, {
+                return render(Infinite, {
                   maxPages: 1, // prevents rollover/repeat
                   pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
                   pageKey: () =>
@@ -155,7 +155,7 @@ export class NotificationsMenu extends ClassComponent {
                     'discussion',
                   // TODO: add the length/num of total chain-events once
                   // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
+                  item: (data) => render(NotificationRow, { notifications: [data] }),
                 });
               } else if (
                 app.user.notifications.discussionNotifications.length === 0
@@ -166,14 +166,14 @@ export class NotificationsMenu extends ClassComponent {
           })()}
         </div>
         <div class="NotificationsMenuFooter">
-          {m(Button, {
+          {render(Button, {
             label: 'See all',
             onclick: () =>
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
                 : m.route.set('/notifications'),
           })}
-          {m(Button, {
+          {render(Button, {
             label: 'Mark all read',
             onclick: (e) => {
               e.preventDefault();
@@ -187,7 +187,7 @@ export class NotificationsMenu extends ClassComponent {
                 ?.then(() => m.redraw());
             },
           })}
-          {m(Button, {
+          {render(Button, {
             label: '<',
             onclick: (e) => {
               e.preventDefault();
@@ -195,7 +195,7 @@ export class NotificationsMenu extends ClassComponent {
               this._previousPage(this.selectedChainEvents);
             },
           })}
-          {m(Button, {
+          {render(Button, {
             label: '>',
             onclick: (e) => {
               e.preventDefault();
@@ -219,7 +219,7 @@ export class NotificationsMenu extends ClassComponent {
 
 export class NotificationsMenuPopover extends ClassComponent {
   view() {
-    return m(PopoverMenu, {
+    return render(PopoverMenu, {
       closeOnContentClick: true,
       closeOnOutsideClick: true,
       hasArrow: false,

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 
@@ -130,7 +130,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={
             <CWText>
-              {m(User, {
+              {render(User, {
                 user: new AddressInfo(
                   null,
                   this.proposal.author,

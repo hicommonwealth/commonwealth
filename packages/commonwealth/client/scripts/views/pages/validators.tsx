@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'pages/validators.scss';
 
@@ -43,7 +43,7 @@ class Validator extends ClassComponent<ValidatorAttrs> {
     return (
       <CWCard className="ValidatorCard">
         <div class="user-and-nominator">
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(null, info.stash, info.chain, null),
             popover: true,
             hideIdentityIcon: true,

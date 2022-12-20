@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
@@ -103,7 +103,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                 >
                   <div class="row-top">
                     <div class="user-and-date-row">
-                      {m(User, {
+                      {render(User, {
                         user,
                         showAddressWithDisplayName: true,
                         avatarSize: 24,

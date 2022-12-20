@@ -5,6 +5,7 @@ import _ from 'lodash';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import bs58 from 'bs58';
+import { render } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -338,11 +339,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       vnode.state.loaded = false;
       loadProfile(vnode.attrs, vnode.state);
     }
-    if (loading) return m(PageLoading);
+    if (loading) return render(PageLoading);
     if (!account && !vnode.state.initialized) {
-      return m(PageNotFound, { message: 'Invalid address provided' });
+      return render(PageNotFound, { message: 'Invalid address provided' });
     } else if (!account) {
-      return m(PageLoading);
+      return render(PageLoading);
     }
 
     if (!vnode.state.allContentCount) {
@@ -432,21 +433,21 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       ? `Comments ${comments.length}`
       : 'Comments';
 
-    return m(
+    return render(
       Sublayout,
       {
         onscroll,
       },
       [
-        m('.ProfilePage', [
+        render('.ProfilePage', [
           displayBanner &&
-            m(ProfileBanner, {
+            render(ProfileBanner, {
               account,
               addressInfo: currentAddressInfo,
             }),
-          m('.row.row-narrow.forum-row', [
-            m('.col-xs-12 .col-md-8', [
-              m(ProfileHeader, {
+          render('.row.row-narrow.forum-row', [
+            render('.col-xs-12 .col-md-8', [
+              render(ProfileHeader, {
                 account,
                 setIdentity,
                 onOwnProfile,
@@ -455,22 +456,22 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   vnode.state.refreshProfile = true;
                 },
               }),
-              m(CWTabBar, [
-                m(CWTab, {
+              render(CWTabBar, [
+                render(CWTab, {
                   label: allTabTitle,
                   onclick: () => {
                     vnode.state.tabSelected = 0;
                   },
                   isSelected: vnode.state.tabSelected === 0,
                 }),
-                m(CWTab, {
+                render(CWTab, {
                   label: threadsTabTitle,
                   onclick: () => {
                     vnode.state.tabSelected = 1;
                   },
                   isSelected: vnode.state.tabSelected === 1,
                 }),
-                m(CWTab, {
+                render(CWTab, {
                   label: commentsTabTitle,
                   onclick: () => {
                     vnode.state.tabSelected = 2;
@@ -479,7 +480,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                 }),
               ]),
               vnode.state.tabSelected === 0 &&
-                m(ProfileContent, {
+                render(ProfileContent, {
                   account,
                   type: UserContent.All,
                   content: allContent,
@@ -490,7 +491,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 1 &&
-                m(ProfileContent, {
+                render(ProfileContent, {
                   account,
                   type: UserContent.Threads,
                   content: proposals,
@@ -501,7 +502,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 2 &&
-                m(ProfileContent, {
+                render(ProfileContent, {
                   account,
                   type: UserContent.Comments,
                   content: comments,
@@ -512,8 +513,8 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
                 }),
             ]),
-            m('.xs-display-none .col-md-4', [
-              m(ProfileBio, {
+            render('.xs-display-none .col-md-4', [
+              render(ProfileBio, {
                 account,
                 setIdentity,
                 onOwnProfile,

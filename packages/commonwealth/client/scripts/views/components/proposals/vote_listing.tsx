@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'components/proposals/vote_listing.scss';
 
@@ -99,7 +99,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof CosmosVote:
                 return (
                   <div class="vote">
-                    {m(User, {
+                    {render(User, {
                       user: vote.account,
                       linkify: true,
                       popover: true,
@@ -111,7 +111,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof MolochProposalVote:
                 return (
                   <div class="vote">
-                    {m(User, { user: vote.account, linkify: true })}
+                    {render(User, { user: vote.account, linkify: true })}
                     {balance && typeof balance === 'string' && (
                       <div class="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -125,7 +125,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof CompoundProposalVote:
                 return (
                   <div class="vote">
-                    {m(User, { user: vote.account, linkify: true })}
+                    {render(User, { user: vote.account, linkify: true })}
                     {balance && typeof balance === 'string' && (
                       <div class="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -139,7 +139,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof AaveProposalVote:
                 return (
                   <div class="vote">
-                    {m(User, { user: vote.account, linkify: true })}
+                    {render(User, { user: vote.account, linkify: true })}
                     {balance && typeof balance === 'string' && (
                       <div class="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -155,7 +155,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   case vote instanceof SubstrateDemocracyVote:
                     return (
                       <div class="vote">
-                        {m(User, {
+                        {render(User, {
                           user: vote.account,
                           linkify: true,
                           popover: true,
@@ -190,7 +190,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   case vote instanceof SubstrateCollectiveVote:
                     return (
                       <div class="vote">
-                        {m(User, {
+                        {render(User, {
                           user: vote.account,
                           linkify: true,
                           popover: true,
@@ -201,7 +201,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   default:
                     return (
                       <div class="vote">
-                        {m(User, {
+                        {render(User, {
                           user: vote.account,
                           linkify: true,
                           popover: true,
@@ -229,7 +229,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof DepositVote:
                 return (
                   <div class="vote">
-                    {m(User, {
+                    {render(User, {
                       user: vote.account,
                       linkify: true,
                       popover: true,
@@ -243,7 +243,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               default:
                 return (
                   <div class="vote">
-                    {m(User, {
+                    {render(User, {
                       user: vote.account,
                       linkify: true,
                       popover: true,

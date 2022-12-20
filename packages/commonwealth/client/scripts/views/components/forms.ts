@@ -1,6 +1,7 @@
 import 'components/forms.scss';
 
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 import { CustomSelect } from 'construct-ui';
 
@@ -50,11 +51,11 @@ export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
       }
     };
 
-    return m('.DropdownFormField.FormField', [
-      m('.form-group', [
-        title && m('.form-title', title),
-        subtitle && m('.form-subtitle', subtitle),
-        m(CustomSelect, selectAttrs),
+    return render('.DropdownFormField.FormField', [
+      render('.form-group', [
+        title && render('.form-title', title),
+        subtitle && render('.form-subtitle', subtitle),
+        render(CustomSelect, selectAttrs),
       ]),
     ]);
   },
@@ -80,15 +81,15 @@ export const RadioSelectorFormField: m.Component<IRadioSelectorFormFieldAttrs> =
     view: (vnode: ResultNode<IRadioSelectorFormFieldAttrs>) => {
       const { choices, name, subtitle, title } = vnode.attrs;
 
-      return m('.RadioSelectorFormField.FormField', [
-        m('.form-group', [
-          title && m('.form-title', title),
-          subtitle && m('.form-subtitle', subtitle),
-          m(
+      return render('.RadioSelectorFormField.FormField', [
+        render('.form-group', [
+          title && render('.form-title', title),
+          subtitle && render('.form-subtitle', subtitle),
+          render(
             'form.radio-buttons.form-field',
             choices.map((item) => {
               return [
-                m('input[type="radio"]', {
+                render('input[type="radio"]', {
                   name,
                   value: item.value,
                   id: item.value,
@@ -103,7 +104,7 @@ export const RadioSelectorFormField: m.Component<IRadioSelectorFormFieldAttrs> =
                     }
                   },
                 }),
-                m('label', { for: item.value }, item.label),
+                render('label', { for: item.value }, item.label),
               ];
             })
           ),

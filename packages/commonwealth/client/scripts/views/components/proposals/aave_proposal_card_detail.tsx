@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'components/proposals/aave_proposal_card_detail.scss';
 
@@ -58,7 +58,7 @@ export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetai
                 {proposal.ipfsData.author.split(' (')[0]}
               </CWText>
             ) : (
-              m(User, {
+              render(User, {
                 user: proposal.author,
                 hideAvatar: true,
                 linkify: true,

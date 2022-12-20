@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'modals/preview_modal.scss';
 
@@ -45,7 +45,7 @@ export class PreviewModal extends ClassComponent<PreviewModalAttrs> {
               if (doc.ops.length === 1 && doc.ops[0].insert === '\n') {
                 return <PreviewModalEmptyState />;
               }
-              return m(QuillFormattedText, { doc });
+              return render(QuillFormattedText, { doc });
             } catch (e) {
               if (vnode.attrs.doc.trim() === '') {
                 return <PreviewModalEmptyState />;

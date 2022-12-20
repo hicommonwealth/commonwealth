@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
@@ -67,7 +67,7 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
           </div>
           {displayedVoters.map((vote) => (
             <div class="vote-row">
-              {m(User, {
+              {render(User, {
                 user: new AddressInfo(
                   null,
                   vote.voter,

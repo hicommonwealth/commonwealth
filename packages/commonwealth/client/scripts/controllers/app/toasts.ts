@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
 import { uuidv4 } from 'lib/util';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -22,7 +23,7 @@ export class ToastStore {
 
   public createSuccess(message) {
     const key = uuidv4();
-    const toast = m(Toast, {
+    const toast = render(Toast, {
       key,
       message,
       onDismiss: this.remove.bind(this, key),
@@ -44,7 +45,7 @@ export class ToastStore {
       event: MixpanelErrorCaptureEvent.ERROR_CAPTURED,
     });
     const key = uuidv4();
-    const toast = m(Toast, {
+    const toast = render(Toast, {
       key,
       message,
       onDismiss: this.remove.bind(this, key),
@@ -60,7 +61,7 @@ export class ToastStore {
   }
   public createInfo(message) {
     const key = uuidv4();
-    const toast = m(Toast, {
+    const toast = render(Toast, {
       key,
       message,
       onDismiss: this.remove.bind(this, key),

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'pages/new_proposal_page.scss';
 
@@ -17,7 +17,7 @@ class NewSnapshotProposalPage extends ClassComponent<NewProposalSnapshotPageAttr
       // title="New Snapshot Proposal"
       >
         <div class="NewProposalPage">
-          {m(NewProposalForm, { snapshotId: vnode.attrs.snapshotId })}
+          {render(NewProposalForm, { snapshotId: vnode.attrs.snapshotId })}
         </div>
       </Sublayout>
     );

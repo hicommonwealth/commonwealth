@@ -1,4 +1,5 @@
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 
 interface IAttrs {
   onclick?: () => {};
@@ -8,7 +9,7 @@ interface IAttrs {
 
 const LandingPageButton: m.Component<IAttrs, {}> = {
   view: (vnode) => {
-    return m(
+    return render(
       'a',
       {
         class: 'btn-outline text-xl rounded-lg pb-2 pt-3 px-3 ',

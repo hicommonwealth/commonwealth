@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/manage_roles.scss';
@@ -43,7 +43,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
             ).length;
             return (
               <div class="role-row">
-                {m(User, {
+                {render(User, {
                   user: new AddressInfo(
                     addr.id,
                     addr.address,

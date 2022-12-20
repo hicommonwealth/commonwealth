@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import app from 'state';
 import { AnyProposal, Thread } from 'models';
@@ -57,7 +57,7 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
 
       return author ? (
         <>
-          {m(User, {
+          {render(User, {
             user: author,
             hideAvatar: true,
             hideIdentityIcon: true,

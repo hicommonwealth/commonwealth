@@ -2,7 +2,7 @@ import m from 'mithril';
 
 /// CYANO CODE
 
-// m() => render
+// render() => render
 export const render: m.Static & {
   trust: (html: string, wrapper?: string) => m.Vnode<unknown, unknown>;
 } = m;
@@ -18,7 +18,7 @@ export type Component<Attrs = {}, State = {}> = m.Component<Attrs, State>;
 export const jsx = m;
 
 // vnode => ResultNode
-export type ResultNode<T = unknown> = m.Vnode<T, unknown>;
+export type ResultNode<T = unknown> = m.Vnode<T, unknown> & { dom?: Element };
 
 /// END CYANO CODE
 

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import 'pages/tip_detail.scss';
 
@@ -45,7 +45,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
             <div class="title">{title}</div>
             <div class="proposal-page-row">
               <div class="label">Finder</div>
-              {m(User, {
+              {render(User, {
                 user: author,
                 linkify: true,
                 popover: true,
@@ -54,7 +54,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
             </div>
             <div class="proposal-page-row">
               <div class="label">Beneficiary</div>
-              {m(User, {
+              {render(User, {
                 user: app.profiles.getProfile(proposal.author.chain.id, who),
                 linkify: true,
                 popover: true,
@@ -123,7 +123,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                       <div class="denominator">{deposit.denom}</div>
                       <div>{deposit.inDollars}</div>
                     </div>
-                    {m(User, {
+                    {render(User, {
                       user: account,
                       linkify: true,
                       popover: true,

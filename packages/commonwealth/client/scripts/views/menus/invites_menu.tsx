@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { PopoverMenu, Button, Icons, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 
@@ -53,13 +53,13 @@ export class InvitesMenu extends ClassComponent {
 
 export class InvitesMenuPopover extends ClassComponent {
   view() {
-    return m(PopoverMenu, {
+    return render(PopoverMenu, {
       hasArrow: false,
       transitionDuration: 0,
       hoverCloseDelay: 0,
       trigger: (
         <div class="invites-button-wrap">
-          {m(Button, {
+          {render(Button, {
             iconLeft: Icons.MAIL,
             intent: 'primary',
             size: 'default',
@@ -83,7 +83,7 @@ export class InvitesMenuPopover extends ClassComponent {
       menuAttrs: {
         align: 'left',
       },
-      content: m(MenuItem, {
+      content: render(MenuItem, {
         onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
         label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
       }),

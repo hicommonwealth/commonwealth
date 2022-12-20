@@ -9,12 +9,12 @@
 // const BackersPage: m.Component<{}> = {
 //   view: (vnode) => {
 //     if (!app.chain || !app.chain.loaded) {
-//       return m(PageLoading, {
+//       return render(PageLoading, {
 //         message: 'Connecting to chain',
 //       });
 //     }
 
-//     return m(Sublayout, {
+//     return render(Sublayout, {
 //       class: 'BackersPage',
 //     }, [
 //       'backers go here'

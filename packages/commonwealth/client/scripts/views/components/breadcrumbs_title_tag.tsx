@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import { Tag } from 'construct-ui';
 
@@ -16,7 +16,7 @@ export class BreadcrumbsTitleTag extends ClassComponent<BreadcrumbsTitleTagAttrs
     return (
       <>
         {title}
-        {m(Tag, {
+        {render(Tag, {
           size: 'xs',
           label: 'Beta',
           style: 'position: relative; top: -2px; margin-left: 6px',

@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import {
   MenuItem,
   MenuDivider,
@@ -66,14 +66,14 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
     return (
       <>
         {activeAddressesWithRole.map((account) =>
-          m(MenuItem, {
+          render(MenuItem, {
             align: 'left',
             basic: true,
             onclick: async () => {
               await setActiveAccount(account);
               m.redraw();
             },
-            label: m(UserBlock, {
+            label: render(UserBlock, {
               user: account,
               selected: isSameAccount(account, app.user.activeAccount),
               showRole: false,
@@ -82,10 +82,10 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             }),
           })
         )}
-        {activeAddressesWithRole.length > 0 && m(MenuDivider)}
+        {activeAddressesWithRole.length > 0 && render(MenuDivider)}
         {activeAddressesWithRole.length > 0 &&
           app.activeChainId() &&
-          m(MenuItem, {
+          render(MenuItem, {
             onclick: () => {
               const pf = app.user.activeAccount.profile;
               if (app.chain) {
@@ -101,7 +101,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
           })}
         {activeAddressesWithRole.length > 0 &&
           app.activeChainId() &&
-          m(MenuItem, {
+          render(MenuItem, {
             onclick: (e) => {
               e.preventDefault();
               app.modals.create({
@@ -119,7 +119,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               </div>
             ),
           })}
-        {m(MenuItem, {
+        {render(MenuItem, {
           onclick: () => {
             if (nAccountsWithoutRole > 0) {
               app.modals.create({
@@ -162,7 +162,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
 
     return (
       <>
-        {m(MenuItem, {
+        {render(MenuItem, {
           onclick: () => m.route.set('/notification-settings'),
           label: (
             <div class="label-wrap">
@@ -171,7 +171,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
             </div>
           ),
         })}
-        {m(MenuItem, {
+        {render(MenuItem, {
           onclick: () =>
             app.activeChainId()
               ? navigateToSubpage('/settings')
@@ -183,7 +183,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
             </div>
           ),
         })}
-        {m(MenuItem, {
+        {render(MenuItem, {
           class: 'dark-mode-toggle',
           onclick: (e) => {
             if (isDarkModeOn) {
@@ -205,8 +205,8 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
             </div>
           ),
         })}
-        {m(MenuDivider)}
-        {m(MenuItem, {
+        {render(MenuDivider)}
+        {render(MenuItem, {
           onclick: () => app.modals.create({ modal: FeedbackModal }),
           label: (
             <div class="label-wrap">
@@ -215,7 +215,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
             </div>
           ),
         })}
-        {m(MenuItem, {
+        {render(MenuItem, {
           onclick: () => {
             $.get(`${app.serverUrl()}/logout`)
               .then(async () => {
@@ -281,7 +281,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
       return (
         <div class="LoginSelector">
           <div class="login-selector-user">
-            {m(Button, {
+            {render(Button, {
               iconLeft: Icons.USER,
               fluid: true,
               label: 'Log in',
@@ -500,12 +500,12 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
       }
     }
 
-    return m(ButtonGroup, { class: 'LoginSelector' }, [
+    return render(ButtonGroup, { class: 'LoginSelector' }, [
       app.chain &&
         !app.chainPreloading &&
         this.profileLoadComplete &&
         !app.user.activeAccount &&
-        m(Button, {
+        render(Button, {
           onclick: async () => {
             if (hasTermsOfService) {
               // TODO: Replace this with a much prettier TOS
@@ -538,14 +538,14 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
         !app.chainPreloading &&
         this.profileLoadComplete &&
         app.user.activeAccount &&
-        m(PopoverMenu, {
+        render(PopoverMenu, {
           hasArrow: false,
           closeOnContentClick: true,
           transitionDuration: 0,
           hoverCloseDelay: 0,
           position: 'top-end',
-          trigger: m(Button, {
-            label: m(User, {
+          trigger: render(Button, {
+            label: render(User, {
               user: app.user.activeAccount,
               hideIdentityIcon: true,
             }),
@@ -557,14 +557,14 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
             />
           ),
         }),
-      m(PopoverMenu, {
+      render(PopoverMenu, {
         hasArrow: false,
         closeOnContentClick: true,
         transitionDuration: 0,
         hoverCloseDelay: 0,
         position: 'top-end',
         overlayClass: 'LoginSelectorMenuRight',
-        trigger: m(Button, {
+        trigger: render(Button, {
           class: 'login-selector-right-button',
           intent: 'none',
           fluid: true,

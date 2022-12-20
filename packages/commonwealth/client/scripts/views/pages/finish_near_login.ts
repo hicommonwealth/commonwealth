@@ -6,6 +6,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 
 import {
   updateActiveAddresses,
@@ -162,15 +163,15 @@ const validate = async (
 const FinishNearLogin: m.Component<Record<string, never>, IState> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded || vnode.state.validating) {
-      return m(PageLoading);
+      return render(PageLoading);
     }
     if (app.chain.base !== ChainBase.NEAR) {
-      return m(PageNotFound);
+      return render(PageNotFound);
     }
     if (vnode.state.validationError) {
-      return m(Sublayout, [
-        m('h3', `NEAR account log in error: ${vnode.state.validationError}`),
-        m(
+      return render(Sublayout, [
+        render('h3', `NEAR account log in error: ${vnode.state.validationError}`),
+        render(
           'button.formular-button-primary',
           {
             onclick: (e) => {
@@ -182,8 +183,8 @@ const FinishNearLogin: m.Component<Record<string, never>, IState> = {
         ),
       ]);
     } else if (vnode.state.validationCompleted) {
-      return m(Sublayout, [
-        m('div', {
+      return render(Sublayout, [
+        render('div', {
           oncreate: async (e) => {
             if (vnode.state.validatedAccount.profile.name) {
               redirectToNextPage();

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import _ from 'lodash';
 import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
@@ -204,7 +204,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
 
     // ---------- Build Section Props ---------- //
 
-    const sectionAdminButton: ResultNode = m(Icon, {
+    const sectionAdminButton: ResultNode = render(Icon, {
       name: Icons.PLUS_CIRCLE,
       onclick: (e) => {
         e.stopPropagation();
@@ -235,7 +235,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         handleMouseout();
       };
 
-      const menuComponent = m(
+      const menuComponent = render(
         Menu,
         {
           class: 'admin-menu',
@@ -243,21 +243,21 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
           onmouseleave: handleMouseout,
         },
         [
-          m(MenuItem, {
+          render(MenuItem, {
             iconLeft: Icons.PLUS_CIRCLE,
             label: 'Add Channel',
             onclick: (e) => {
               handleMenuClick(e, 'CreateChannel');
             },
           }),
-          m(MenuItem, {
+          render(MenuItem, {
             iconLeft: Icons.EDIT_2,
             label: 'Rename Category',
             onclick: (e) => {
               handleMenuClick(e, 'RenameCategory');
             },
           }),
-          m(MenuItem, {
+          render(MenuItem, {
             iconLeft: Icons.DELETE,
             label: 'Delete Category',
             onclick: (e) => {
@@ -269,7 +269,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
 
       return (
         <>
-          {m(Icon, {
+          {render(Icon, {
             name: Icons.EDIT,
             onmouseenter: handleMouseover,
             onmouseleave: handleMouseout,
@@ -315,7 +315,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         handleMouseout();
       };
 
-      const menuComponent = m(
+      const menuComponent = render(
         Menu,
         {
           class: 'admin-menu',
@@ -323,14 +323,14 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
           onmouseleave: handleMouseout,
         },
         [
-          m(MenuItem, {
+          render(MenuItem, {
             iconLeft: Icons.EDIT_2,
             label: 'Rename Channel',
             onclick: (e) => {
               handleMenuClick(e, 'RenameChannel');
             },
           }),
-          m(MenuItem, {
+          render(MenuItem, {
             iconLeft: Icons.DELETE,
             label: 'Delete Channel',
             onclick: (e) => {
@@ -345,7 +345,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
           {channel.unread > 0 && (
             <div class="unread-icon">{channel.unread}</div>
           )}
-          {m(Icon, {
+          {render(Icon, {
             name: Icons.EDIT,
             onmouseenter: handleMouseover,
             onmouseleave: handleMouseout,
@@ -440,7 +440,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       displayData: channelData,
       isActive: false,
       rightIcon: isAdmin && sectionAdminButton,
-      extraComponents: m(Overlay, {
+      extraComponents: render(Overlay, {
         class: 'chatAdminOverlay',
         isOpen: Object.values(this.adminModals).some(Boolean),
         onClose: closeOverlay,

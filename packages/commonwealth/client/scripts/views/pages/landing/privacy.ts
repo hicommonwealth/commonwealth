@@ -3,6 +3,7 @@
 import 'pages/landing/privacyAndTerms.scss';
 
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 import { renderMultilineText } from 'helpers';
 import HeaderLandingPage from './landing_page_header';
 
@@ -116,13 +117,13 @@ If you have any questions about this Privacy Statement, please contact us at: he
 const PrivacyPage: m.Component<{}> = {
   oncreate: (vnode) => {},
   view: (vnode) => {
-    return m('.PrivacyPage', [
-      m(HeaderLandingPage, {
+    return render('.PrivacyPage', [
+      render(HeaderLandingPage, {
         scrollHeader: false,
         navs: [{ text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' }],
       }),
-      m('.forum-container', [
-        m('h1.page-title', 'Privacy Policy'),
+      render('.forum-container', [
+        render('h1.page-title', 'Privacy Policy'),
         renderMultilineText(PrivacyPolicy),
       ]),
     ]);

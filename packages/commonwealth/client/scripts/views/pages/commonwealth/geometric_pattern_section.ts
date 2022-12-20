@@ -1,8 +1,9 @@
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 
 const GeometricPatternSection: m.Component<{}, {}> = {
   view: (vnode) => {
-    return m(
+    return render(
       'section',
       {
         class:

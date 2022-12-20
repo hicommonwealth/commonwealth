@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -40,7 +40,7 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
     return (
       <div class="ChainEntitiesSelector">
         {this.chainEntitiesLoaded ? (
-          m(QueryList, {
+          render(QueryList, {
             checkmark: true,
             items: app.chainEntities.store.getAll().sort((a, b) => {
               if (!a.threadId && b.threadId) return -1;
@@ -57,7 +57,7 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
                   .indexOf(ce.id) !== -1;
               // TODO: show additional info on the ListItem,
               // like any set proposal title, the creator, or other metadata
-              return m(ListItem, {
+              return render(ListItem, {
                 disabled: ce.threadId && ce.threadId !== thread.id,
                 label: (
                   <div class="chain-entity">

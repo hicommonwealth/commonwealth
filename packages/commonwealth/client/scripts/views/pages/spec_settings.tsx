@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
@@ -77,7 +77,7 @@ class SpecSettingsPage extends ClassComponent {
       <Sublayout>
         <div class="SpecSettingsPage">
           <CWText type="h3">Substrate Spec Settings</CWText>
-          {m(DropdownFormField, {
+          {render(DropdownFormField, {
             options: {
               disabled: this.isLoading,
             },

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -54,7 +54,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         ? `${decodedTitle.slice(0, 47)}...`
         : decodedTitle;
 
-    const actorName = m(User, {
+    const actorName = render(User, {
       user: new AddressInfo(
         null,
         author_address,

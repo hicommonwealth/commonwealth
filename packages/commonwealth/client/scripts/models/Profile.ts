@@ -1,4 +1,4 @@
-import m from 'mithril';
+import { render } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
 
 import {
@@ -135,8 +135,8 @@ class Profile {
 
   public getAvatar(size: number) {
     return this.avatarUrl
-      ? m(CWAvatar, { avatarUrl: this.avatarUrl, size })
-      : m(CWJdenticon, { address: this.address, size });
+      ? render(CWAvatar, { avatarUrl: this.avatarUrl, size })
+      : render(CWJdenticon, { address: this.address, size });
   }
 
   public static getSVGAvatar(address, size) {

@@ -2,6 +2,7 @@
 import 'modals/select_address_modal.scss';
 
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 import $ from 'jquery';
 import { Tag, Button } from 'construct-ui';
 
@@ -103,12 +104,12 @@ const SelectAddressModal: m.Component<
     const activeCommunityMeta = app.chain.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
-    return m('.SelectAddressModal', [
-      m('.compact-modal-title', [m('h3', 'Manage addresses')]),
-      m('.compact-modal-body', [
+    return render('.SelectAddressModal', [
+      render('.compact-modal-title', [render('h3', 'Manage addresses')]),
+      render('.compact-modal-body', [
         activeAccountsByRole.length === 0
-          ? m('.select-address-placeholder', [
-              m('p', [
+          ? render('.select-address-placeholder', [
+              render('p', [
                 `Connect ${
                   chainbase && app.chain.network === ChainNetwork.Terra
                     ? 'Terra'
@@ -118,31 +119,31 @@ const SelectAddressModal: m.Component<
                 } address to join this community: `,
               ]),
             ])
-          : m('.select-address-options', [
+          : render('.select-address-options', [
               activeAccountsByRole.map(
                 ([account, role], index) =>
                   role &&
-                  m('.select-address-option.existing', [
-                    m('.select-address-option-left', [
-                      m(UserBlock, { user: account }),
+                  render('.select-address-option.existing', [
+                    render('.select-address-option-left', [
+                      render(UserBlock, { user: account }),
                       app.user.addresses.find(
                         (a) =>
                           a.address === account.address &&
                           a.chain.id === account.chain.id
                       )?.walletId === WalletId.Magic &&
-                        m(
+                        render(
                           '.magic-label',
                           `Magically linked to ${app.user.email}`
                         ),
                     ]),
-                    m('.role-remove', [
-                      m(
+                    render('.role-remove', [
+                      render(
                         'span.already-connected',
                         `${formatAsTitleCase(role.permission)} of '${
                           activeEntityInfo?.name
                         }'`
                       ),
-                      m(CWIcon, {
+                      render(CWIcon, {
                         iconName: 'close',
                         iconSize: 'small',
                         onclick: deleteRole.bind(this, index),
@@ -153,7 +154,7 @@ const SelectAddressModal: m.Component<
               activeAccountsByRole.map(
                 ([account, role], index) =>
                   !role &&
-                  m(
+                  render(
                     '.select-address-option',
                     {
                       class:
@@ -164,8 +165,8 @@ const SelectAddressModal: m.Component<
                       },
                     },
                     [
-                      m('.select-address-option-left', [
-                        m(UserBlock, {
+                      render('.select-address-option-left', [
+                        render(UserBlock, {
                           user: account,
                           showRole: true,
                           selected: vnode.state.selectedIndex === index,
@@ -175,20 +176,20 @@ const SelectAddressModal: m.Component<
                             a.address === account.address &&
                             a.chain.id === account.chain.id
                         )?.walletId === WalletId.Magic &&
-                          m(
+                          render(
                             '.magic-label',
                             `Magically linked to ${app.user.email}`
                           ),
                       ]),
                       role &&
-                        m('.role-permission', [
-                          m(Tag, {
+                        render('.role-permission', [
+                          render(Tag, {
                             label: formatAsTitleCase(role.permission),
                             rounded: true,
                             size: 'sm',
                           }),
                           role.is_user_default &&
-                            m(Tag, {
+                            render(Tag, {
                               label: 'Last used',
                               rounded: true,
                               size: 'sm',
@@ -199,9 +200,9 @@ const SelectAddressModal: m.Component<
               ),
             ]),
         hasTermsOfService &&
-          m('p.terms-of-service', [
+          render('p.terms-of-service', [
             `By linking an address, you agree to ${activeCommunityMeta.name}'s `,
-            m(
+            render(
               'a',
               { href: activeCommunityMeta.terms, target: '_blank' },
               'terms of service'
@@ -209,7 +210,7 @@ const SelectAddressModal: m.Component<
             '.',
           ]),
         activeAccountsByRole.length !== 0 &&
-          m(Button, {
+          render(Button, {
             label: 'Join community with address',
             intent: 'primary',
             compact: true,
@@ -220,7 +221,7 @@ const SelectAddressModal: m.Component<
               vnode.state.loading,
             onclick: createRole.bind(this),
           }),
-        // m(LoginWithWalletDropdown, {
+        // render(LoginWithWalletDropdown, {
         //   loggingInWithAddress: false,
         //   joiningChain: app.activeChainId(),
         //   label:

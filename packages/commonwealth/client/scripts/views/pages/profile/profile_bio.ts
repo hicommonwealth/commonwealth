@@ -2,6 +2,7 @@
 import m from 'mithril';
 import _ from 'lodash';
 import { Account } from 'models';
+import { render } from 'mithrilInterop';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button } from 'construct-ui';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
@@ -28,7 +29,7 @@ const editIdentityAction = (
   return (
     (account.chain.id.indexOf('edgeware') !== -1 ||
       account.chain.id.indexOf('kusama') !== -1) &&
-    m(Button, {
+    render(Button, {
       intent: 'primary',
       // wait for info to load before making it clickable
       disabled: vnode.state.chainLoading,
@@ -131,24 +132,24 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       }
     };
 
-    return m('.ProfileBio', [
-      m(
+    return render('.ProfileBio', [
+      render(
         `.ProfileHeader${
           vnode.state.showProfileRight ? '.show-profile' : '.hide-profile'
         }`,
         [
-          m('.bio-main', [
+          render('.bio-main', [
             account.profile &&
-              m('.bio-left', [
+              render('.bio-left', [
                 // TODO: Rename class to non-bio to avoid confusion with Bio component
                 account.profile?.getAvatar(90),
               ]),
-            m('.bio-right', [
-              m('.name-row', [
-                m(
+            render('.bio-right', [
+              render('.name-row', [
+                render(
                   '.User',
                   account.profile
-                    ? m(User, {
+                    ? render(User, {
                         user: account,
                         hideAvatar: true,
                         showRole: true,
@@ -156,14 +157,14 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                     : account.address
                 ),
               ]),
-              m('.address-block-right', [
-                m(
+              render('.address-block-right', [
+                render(
                   '.address',
                   `${account.address.slice(0, 6)}...${account.address.slice(
                     account.address.length - 6
                   )}`
                 ),
-                m('img', {
+                render('img', {
                   src: !account.ghostAddress
                     ? '/static/img/copy_default.svg'
                     : '/static/img/ghost.svg',
@@ -187,17 +188,17 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]
       ),
       // isClaimable &&
-      //   m(LoginWithWalletDropdown, {
+      //   render(LoginWithWalletDropdown, {
       //     prepopulateAddress: account.address,
       //     loggingInWithAddress: !app.isLoggedIn(),
       //     joiningChain: app.activeChainId(),
       //     label: 'Claim address',
       //   }),
-      m('.bio-actions-right', [
+      render('.bio-actions-right', [
         onOwnProfile
           ? [
               editIdentityAction(account, vnode.state.identity, vnode),
-              m(CWButton, {
+              render(CWButton, {
                 onclick: () => {
                   app.modals.create({
                     modal: EditProfileModal,
@@ -208,7 +209,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               }),
             ]
           : showJoinCommunityButton && app.activeChainId()
-          ? m(Button, {
+          ? render(Button, {
               intent: 'primary',
               onclick: async () => {
                 if (onLinkedProfile) {
@@ -236,18 +237,18 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               // TODO: actions for others' accounts
             ],
       ]),
-      m(
+      render(
         `.address-block-right${
           vnode.state.showProfileRight ? '.hide-address' : '.show-address'
         }`,
         [
-          m(
+          render(
             '.address',
             `${account.address.slice(0, 6)}...${account.address.slice(
               account.address.length - 6
             )}`
           ),
-          m('img', {
+          render('img', {
             src: !account.ghostAddress
               ? '/static/img/copy_default.svg'
               : '/static/img/ghost.svg',
@@ -265,7 +266,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]
       ),
       account.ghostAddress
-        ? m(
+        ? render(
             'div',
             {
               style: 'font-style: italic; font-size: 12px;',
@@ -278,10 +279,10 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       `
           )
         : [],
-      m('.header', 'Bio'),
+      render('.header', 'Bio'),
       account.profile && account.profile.bio
-        ? m('p', [m(MarkdownFormattedText, { doc: account.profile.bio })])
-        : m('.no-items', [
+        ? render('p', [render(MarkdownFormattedText, { doc: account.profile.bio })])
+        : render('.no-items', [
             account.profile && account.profile.name
               ? account.profile.name
               : 'This account',

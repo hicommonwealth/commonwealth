@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { Tag } from 'construct-ui';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
@@ -17,7 +17,7 @@ import { CWButton } from '../../components/component_kit/cw_button';
 const getNewTag = (labelCount?: number) => {
   const label = !labelCount ? 'New' : `${labelCount} new`;
 
-  return m(Tag, { label, size: 'xs', rounded: true, intent: 'primary' });
+  return render(Tag, { label, size: 'xs', rounded: true, intent: 'primary' });
 };
 
 type CommunityPreviewCardAttrs = {

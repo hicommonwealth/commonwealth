@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/comments/comment.scss';
@@ -37,7 +37,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
         comment.authorChain !== app.chain.id &&
         comment.authorChain !== app.chain.base
       ) {
-        return m(AnonymousUser, {
+        return render(AnonymousUser, {
           distinguishingKey: comment.author,
         });
       }
@@ -48,7 +48,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
     return comment.deleted ? (
       <span>[deleted]</span>
     ) : (
-      m(User, {
+      render(User, {
         avatarSize: 24,
         user: author,
         popover: true,

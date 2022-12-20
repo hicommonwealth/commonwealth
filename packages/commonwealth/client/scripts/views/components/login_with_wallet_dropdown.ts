@@ -1,6 +1,7 @@
 import 'components/login_with_wallet_dropdown.scss';
 
 import m from 'mithril';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 import { Button, PopoverMenu, MenuItem } from 'construct-ui';
 
@@ -77,20 +78,20 @@ const LoginWithWalletDropdown: m.Component<{
       ChainBase.Solana,
     ].filter((base) => allChains.find((chain) => chain.base === base));
 
-    const emptyWalletMenuItem = m(MenuItem, {
-      label: m('.chain-login-label', [
+    const emptyWalletMenuItem = render(MenuItem, {
+      label: render('.chain-login-label', [
         // TODO Graham 4/7/22: Better copy
-        m('.chain-login-label-name', 'No wallets found'),
+        render('.chain-login-label-name', 'No wallets found'),
       ]),
     });
 
     const getMenuItemsForChainBase = (base: ChainBase) => {
       const wallets = app.wallets.availableWallets(base);
       const createItem = (webWallet?: IWebWallet<any>) =>
-        m(MenuItem, {
-          label: m('.chain-login-label', [
-            webWallet && m(CWCustomIcon, { iconName: webWallet.name }),
-            m('.chain-login-label-name', [webWallet.label]),
+        render(MenuItem, {
+          label: render('.chain-login-label', [
+            webWallet && render(CWCustomIcon, { iconName: webWallet.name }),
+            render('.chain-login-label-name', [webWallet.label]),
           ]),
           onclick: (e) => {
             $('.Login').trigger('modalexit');
@@ -135,8 +136,8 @@ const LoginWithWalletDropdown: m.Component<{
       menuItems.push(emptyWalletMenuItem);
     }
 
-    return m(PopoverMenu, {
-      trigger: m(Button, {
+    return render(PopoverMenu, {
+      trigger: render(Button, {
         intent: 'primary',
         fluid: true,
         rounded: true,

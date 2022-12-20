@@ -3,6 +3,7 @@ import m from 'mithril';
 import app from 'state';
 import { pluralize } from 'helpers';
 import { Thread, Account } from 'models';
+import { render } from 'mithrilInterop';
 
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
@@ -45,14 +46,14 @@ const ProfileContent: m.Component<
   view: (vnode) => {
     const { account, type, content } = vnode.attrs;
 
-    return m('.ProfileContent', [
+    return render('.ProfileContent', [
       content?.length > 0
         ? [
             content.slice(0, vnode.attrs.count).map((data) => {
               if (data instanceof Thread) {
-                return m(ProfileProposal, { proposal: data });
+                return render(ProfileProposal, { proposal: data });
               } else {
-                return m(ProfileCommentGroup, {
+                return render(ProfileCommentGroup, {
                   proposal: data,
                   comments: [data],
                   account,
@@ -60,15 +61,15 @@ const ProfileContent: m.Component<
               }
             }),
             postsRemaining(content.length, vnode.attrs.count)
-              ? m('.infinite-scroll-spinner-wrap', [m(CWSpinner)])
-              : m('.infinite-scroll-reached-end', [
+              ? render('.infinite-scroll-spinner-wrap', [render(CWSpinner)])
+              : render('.infinite-scroll-reached-end', [
                   `Showing ${content.length} of ${pluralize(
                     content.length,
                     type
                   )}`,
                 ]),
           ]
-        : m('.no-content', `No ${type} to display.`),
+        : render('.no-content', `No ${type} to display.`),
     ]);
   },
 };

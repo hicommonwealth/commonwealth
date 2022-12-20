@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
 import { ListItem, Select } from 'construct-ui';
@@ -40,12 +40,12 @@ const getMemberResult = (addr, searchTerm) => {
     addr.chain
   }`;
 
-  return m(ListItem, {
+  return render(ListItem, {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconSize="large" iconName="person" />,
     label: (
       <a class="search-results-item">
-        {m(UserBlock, {
+        {render(UserBlock, {
           user: profile,
           searchTerm,
           avatarSize: 36,
@@ -80,7 +80,7 @@ const getCommunityResult = (community) => {
     }
   };
 
-  return m(ListItem, {
+  return render(ListItem, {
     label: (
       <a class="search-results-item.community-result">
         <CommunityLabel {...params} />
@@ -101,7 +101,7 @@ const getDiscussionResult = (thread, searchTerm) => {
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;
 
-  return m(ListItem, {
+  return render(ListItem, {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
@@ -114,7 +114,7 @@ const getDiscussionResult = (thread, searchTerm) => {
         </CWText>
         <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
         <div class="search-results-thread-subtitle">
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(
               thread.address_id,
               thread.address,
@@ -144,7 +144,7 @@ const getCommentResult = (comment, searchTerm) => {
 
   if (app.isCustomDomain() && app.customDomainId() !== chain) return;
 
-  return m(ListItem, {
+  return render(ListItem, {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
@@ -164,7 +164,7 @@ const getCommentResult = (comment, searchTerm) => {
         </div>
         <div class="search-results-thread-subtitle">
           <span class="created-at">{moment(comment.created_at).fromNow()}</span>
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(
               comment.address_id,
               comment.address,
@@ -353,7 +353,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                 {tabScopedListing.length > 0 && (
                   <div class="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
-                    {m(Select, {
+                    {render(Select, {
                       options: ['Best', 'Newest', 'Oldest'],
                       value: this.searchQuery.sort,
                       onchange: (e) => {

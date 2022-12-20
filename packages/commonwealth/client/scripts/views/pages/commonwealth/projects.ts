@@ -1,6 +1,7 @@
 import 'pages/commonwealth/projects.scss';
 
 import m from 'mithril';
+import { render } from 'mithrilInterop';
 import moment from 'moment';
 import { Card, Button } from 'construct-ui';
 
@@ -47,27 +48,27 @@ const PROJECTS: CWProjectStub[] = [
 const ProjectsPage: m.Component<{}> = {
   view: (vnode) => {
     if (!app.chain || !app.chain.loaded) {
-      return m(PageLoading, {
+      return render(PageLoading, {
         message: 'Connecting to chain',
       });
     }
 
-    return m(
+    return render(
       Sublayout,
-      m('.ProjectsPage', [
+      render('.ProjectsPage', [
         PROJECTS.map((project) => {
-          return m(
+          return render(
             Card,
             {
               size: 'lg',
               elevation: 0,
             },
             [
-              m('h4', project.title),
-              m('.project-description', project.description),
-              m('.project-metadata', [
-                m('.project-metadata-beneficiary', [
-                  m(User, {
+              render('h4', project.title),
+              render('.project-description', project.description),
+              render('.project-metadata', [
+                render('.project-metadata-beneficiary', [
+                  render(User, {
                     user: new AddressInfo(
                       null,
                       project.beneficiary_address,
@@ -76,57 +77,57 @@ const ProjectsPage: m.Component<{}> = {
                     ),
                   }),
                 ]),
-                m('.project-metadata-created', [
+                render('.project-metadata-created', [
                   'Created ',
                   moment(Date.now()).diff(project.created_at, 'days'),
                   ' days ago',
                 ]),
               ]),
               // backing progress
-              m('.project-metrics', [
-                m('.project-metric', [
-                  m(
+              render('.project-metrics', [
+                render('.project-metric', [
+                  render(
                     '.project-metric-figure',
                     `${project.curator_amount.toFixed(1)} ETH`
                   ),
-                  m('.project-metric-title', 'Curating'),
+                  render('.project-metric-title', 'Curating'),
                 ]),
-                m('.project-metric', [
-                  m(
+                render('.project-metric', [
+                  render(
                     '.project-metric-figure',
                     `${project.backer_amount.toFixed(1)} ETH`
                   ),
-                  m('.project-metric-title', 'Backing'),
+                  render('.project-metric-title', 'Backing'),
                 ]),
-                // m('.project-metric', [
-                //   m('.project-metric-figure', project.backer_count),
-                //   m('.project-metric-title', 'Backers'),
+                // render('.project-metric', [
+                //   render('.project-metric-figure', project.backer_count),
+                //   render('.project-metric-title', 'Backers'),
                 // ]),
               ]),
-              m('.project-progress', [
-                m('.project-progress-bar', [
-                  m('.project-progress-bar-fill', {
+              render('.project-progress', [
+                render('.project-progress-bar', [
+                  render('.project-progress-bar-fill', {
                     style: `width: ${(
                       100 *
                       (project.backer_amount / project.backer_required)
                     ).toFixed(1)}%`,
                   }),
                 ]),
-                m('.project-progress-text', [
-                  m('.project-progress-text-left', [
+                render('.project-progress-text', [
+                  render('.project-progress-text-left', [
                     `${(
                       100 *
                       (project.backer_amount / project.backer_required)
                     ).toFixed(1)}% of the minimum reached`,
                   ]),
-                  m('.project-progress-text-right', [
+                  render('.project-progress-text-right', [
                     moment(Date.now()).diff(project.expires_at, 'days'),
                     ' days left',
                   ]),
                 ]),
               ]),
-              m('.project-funding-action', [
-                m(Button, {
+              render('.project-funding-action', [
+                render(Button, {
                   class: 'contribute-button',
                   label: 'Contribute',
                   rounded: true,
@@ -136,7 +137,7 @@ const ProjectsPage: m.Component<{}> = {
                     // TODO
                   },
                 }),
-                m(Button, {
+                render(Button, {
                   class: 'more-info-button',
                   label: 'More info',
                   rounded: true,

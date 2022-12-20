@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import moment from 'moment';
 import { Button } from 'construct-ui';
 
@@ -38,7 +38,7 @@ class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBar
       <div class="SnapshotProposalStagesBar">
         {Object.values(SnapshotProposalFilter).map(
           (option: SnapshotProposalFilter) =>
-            m(Button, {
+            render(Button, {
               rounded: true,
               compact: true,
               size: 'sm',

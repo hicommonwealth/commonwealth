@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import $ from 'jquery';
 import { QueryList, ListItem } from 'construct-ui';
 
@@ -81,7 +81,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
         <div class="compact-modal-body">
           <div class="user-list-container">
             <CWLabel label="Users" />
-            {m(QueryList, {
+            {render(QueryList, {
               checkmark: true,
               items,
               inputAttrs: {
@@ -97,8 +97,8 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   this.addedEditors[role.Address.address]
                 );
 
-                return m(ListItem, {
-                  label: m(User, { user }),
+                return render(ListItem, {
+                  label: render(User, { user }),
                   selected: recentlyAdded,
                   key: role.Address.address,
                 });
@@ -149,7 +149,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
 
                   return (
                     <div class="collaborator-row">
-                      {m(User, { user })}
+                      {render(User, { user })}
                       <CWIconButton
                         iconName="close"
                         iconSize="small"

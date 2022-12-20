@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { ClassComponent, ResultNode } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render } from 'mithrilInterop';
 import { Select } from 'construct-ui';
 
 import 'components/proposals/convictions_chooser.scss';
@@ -16,7 +16,7 @@ type ConvictionsChooserAttrs = { callback: (number) => void };
 
 export class ConvictionsChooser extends ClassComponent<ConvictionsChooserAttrs> {
   view(vnode: ResultNode<ConvictionsChooserAttrs>) {
-    return m(Select, {
+    return render(Select, {
       class: 'ConvictionsChooser',
       name: 'convictions',
       oncreate: () => {
