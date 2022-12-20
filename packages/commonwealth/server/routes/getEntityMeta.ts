@@ -1,6 +1,8 @@
 import { Response, NextFunction, Request } from 'express';
-import { DB } from '../models';
 import {AppError} from "common-common/src/errors";
+import { WhereOptions } from 'sequelize/types';
+import { ChainEntityMetaAttributes } from 'server/models/chain_entity_meta';
+import { DB } from '../models';
 
 export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',
@@ -20,21 +22,24 @@ const getEntityMeta = async (models: DB, req: Request, res: Response, next: Next
     return next(new AppError(Errors.InvalidChain));
   }
 
-  const entityMetaFindOptions: any = {
+  const entityMetaWhereOptions: WhereOptions<ChainEntityMetaAttributes> = {
+    chain: chain.id,
+  };
+  if (req.query.id) {
+    entityMetaWhereOptions.id = req.query.id;
+  }
+  if (req.query.type_id) {
+    entityMetaWhereOptions.type_id = req.query.type_id;
+  }
+  const entityMeta = await models.ChainEntityMeta.findAll({
+    where: entityMetaWhereOptions,
     include: [
       {
         model: models.Thread,
         attributes: ['title'],
       }
     ],
-    where: {
-      chain: req.query.chain,
-    }
-  };
-  if (req.query.id) {
-    entityMetaFindOptions.where.id = req.query.id;
-  }
-  const entityMeta = await models.ChainEntityMeta.findAll(entityMetaFindOptions);
+  });
   return res.json({ status: 'Success', result: entityMeta.map((e) => e.toJSON()) });
 };
 
