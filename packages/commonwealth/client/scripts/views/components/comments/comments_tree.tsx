@@ -29,7 +29,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
   private isReplying: boolean;
   private parentCommentId: number;
 
-  oncreate(vnode: ResultNode<CommentsTreeAttrs, this>) {
+  oncreate(vnode: ResultNode<CommentsTreeAttrs>) {
     this.dom = vnode.dom;
   }
 

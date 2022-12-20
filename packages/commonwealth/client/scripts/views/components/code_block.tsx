@@ -14,7 +14,7 @@ type CodeBlockAttrs = {
 };
 
 export class CodeBlock extends ClassComponent<CodeBlockAttrs> {
-  view(vnode: ResultNode<CodeBlockAttrs, this>) {
+  view(vnode: ResultNode<CodeBlockAttrs>) {
     const { clickToSelect } = vnode.attrs;
 
     return (

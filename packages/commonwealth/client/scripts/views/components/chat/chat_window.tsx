@@ -82,7 +82,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     );
   };
 
-  oninit(vnode: ResultNode<ChatWindowAttrs, this>) {
+  oninit(vnode: ResultNode<ChatWindowAttrs>) {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
     });
