@@ -74,16 +74,14 @@ type CreateChainResp = {
   admin_address: string;
 };
 
-export async function getFileSizeBytes(url: string) {
-  let fileSizeBytes = 0;
+export async function getFileSizeBytes(url: string): Promise<number> {
   try {
+    // Range header is to prevent it from reading any bytes from the GET request because we only want the headers.
     const resp = await fetch(url, { headers: { Range: 'bytes=0-0' } });
-    fileSizeBytes = parseInt(resp.headers['Content-Range'], 10);
+    return parseInt(resp.headers.get('content-range').split('/')[1], 10);
   } catch (e) {
     throw new AppError(Errors.ImageDoesntExist);
   }
-
-  return fileSizeBytes;
 }
 
 const createChain = async (
