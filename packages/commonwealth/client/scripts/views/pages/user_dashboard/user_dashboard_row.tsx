@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 

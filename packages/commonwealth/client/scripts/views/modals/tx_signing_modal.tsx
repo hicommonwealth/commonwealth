@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'modals/tx_signing_modal.scss';
 

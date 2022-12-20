@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 
 import Sublayout from 'views/sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';

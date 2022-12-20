@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 

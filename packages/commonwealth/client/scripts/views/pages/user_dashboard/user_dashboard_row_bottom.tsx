@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import { Icons, MenuItem, PopoverMenu } from 'construct-ui';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';

@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import { Tag } from 'construct-ui';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';

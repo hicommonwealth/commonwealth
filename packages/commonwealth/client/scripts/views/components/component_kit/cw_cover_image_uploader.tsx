@@ -2,7 +2,7 @@
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 

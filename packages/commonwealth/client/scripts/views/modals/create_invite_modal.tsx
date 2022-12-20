@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';

@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import Dropzone from 'dropzone';
 
 import 'components/avatar_upload.scss';

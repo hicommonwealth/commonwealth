@@ -2,7 +2,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 
 import app from 'state';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';

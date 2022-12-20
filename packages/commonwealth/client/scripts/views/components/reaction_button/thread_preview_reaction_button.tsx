@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';

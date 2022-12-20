@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import { PopoverMenu, Button, Icons, MenuItem } from 'construct-ui';
 import { pluralize } from 'helpers';
 

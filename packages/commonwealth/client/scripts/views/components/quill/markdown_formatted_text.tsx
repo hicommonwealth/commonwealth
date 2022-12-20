@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';

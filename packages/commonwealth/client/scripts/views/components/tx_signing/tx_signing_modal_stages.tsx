@@ -2,7 +2,7 @@
 
 import $ from 'jquery';
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';

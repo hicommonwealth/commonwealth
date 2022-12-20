@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';

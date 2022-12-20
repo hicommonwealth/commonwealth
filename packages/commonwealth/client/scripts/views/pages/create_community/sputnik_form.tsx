@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 // import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
 // import { CodeResult } from 'near-api-js/lib/providers/provider';

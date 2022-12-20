@@ -1,6 +1,6 @@
 import m from 'mithril';
 
-export default abstract class ClassComponent<
+export abstract class ClassComponent<
   A extends Record<string, unknown> = Record<string, unknown>
 > implements m.ClassComponent<A>
 {

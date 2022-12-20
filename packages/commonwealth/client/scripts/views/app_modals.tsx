@@ -37,7 +37,7 @@
 // })
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
