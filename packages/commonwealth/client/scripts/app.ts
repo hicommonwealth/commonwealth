@@ -10,6 +10,8 @@ import mixpanel from 'mixpanel-browser';
 import m from 'mithril';
 import $ from 'jquery';
 import moment from 'moment';
+import { datadogRum } from '@datadog/browser-rum';
+import { datadogLogs } from '@datadog/browser-logs';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
@@ -44,6 +46,31 @@ const APPLICATION_UPDATE_ACTION = 'Okay';
 
 const MIXPANEL_DEV_TOKEN = '312b6c5fadb9a88d98dc1fb38de5d900';
 const MIXPANEL_PROD_TOKEN = '993ca6dd7df2ccdc2a5d2b116c0e18c5';
+
+// Initialize datadog user monitoring
+// TODO: add specific data about custom domain, chain, etc
+datadogRum.init({
+  applicationId: 'ef4435b8-1054-4397-9165-e8250621e663',
+  clientToken: 'pubbb09c714edaba40cec1a93d502134c1d',
+  site: 'us5.datadoghq.com',
+  service:'commonwealth',
+
+  env: app.isProduction ? 'production' : undefined,
+  sampleRate: 100,
+  sessionReplaySampleRate: 100, // if not included, the default is 100
+  trackResources: true,
+  trackLongTasks: true,
+  trackInteractions: true,
+})
+datadogRum.startSessionReplayRecording();
+
+datadogLogs.init({
+  clientToken: 'pub45910c202534f3c60ea53eca6ffe896d',
+  site: 'us5.datadoghq.com',
+  forwardErrorsToLogs: true,
+  sampleRate: 100,
+  env: app.isProduction ? 'production' : undefined,
+})
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything

@@ -72,6 +72,8 @@
     "@canvas-js/interfaces": "0.0.17-alpha2",
     "@cosmjs/amino": "^0.26.1",
     "@cosmjs/proto-signing": "^0.26.1",
+    "@datadog/browser-logs": "^4.28.1",
+    "@datadog/browser-rum": "^4.28.1",
     "@ethersproject/abi": "^5.0.1",
     "@ethersproject/address": "^5.0.1",
     "@ethersproject/bytes": "^5.0.5",

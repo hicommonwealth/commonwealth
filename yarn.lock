@@ -1711,6 +1711,33 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
+"@datadog/browser-core@4.28.1":
+  version "4.28.1"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-core/-/browser-core-4.28.1.tgz#a2846340d45c85c03b0570cd66c4858d396e9328"
+  integrity sha512-BmMJA3SpZtI5VVukuxMKYc7ALBLcydnG+tRh5pXP/Tjjejh9sx611TdspeAd00rfpYQ4c51CcHkhem3oU/WJCQ==
+
+"@datadog/browser-logs@^4.28.1":
+  version "4.28.1"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-logs/-/browser-logs-4.28.1.tgz#ac0f12a52108fc21ddbcf3ee8824bf974e7575eb"
+  integrity sha512-3TUybhC1apfGnyAREBuqOI6LA96tlrdgilKoPGR/8wf9wvpRJ/zXx0gm4WgzRPilEDFfJxWfvB/IUYg0MYh/GA==
+  dependencies:
+    "@datadog/browser-core" "4.28.1"
+
+"@datadog/browser-rum-core@4.28.1":
+  version "4.28.1"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum-core/-/browser-rum-core-4.28.1.tgz#a0dae06234e62f2de7ef1021b1893c560b2b2193"
+  integrity sha512-uN9rjaQodDmYBF0LPeOzW5nH2z7Zcsrn/r0+PgEtdKuZKugGBF5vmFx8LthzFTF1F7e7LXsm1MbuDQS7LCYjiQ==
+  dependencies:
+    "@datadog/browser-core" "4.28.1"
+
+"@datadog/browser-rum@^4.28.1":
+  version "4.28.1"
+  resolved "https://registry.yarnpkg.com/@datadog/browser-rum/-/browser-rum-4.28.1.tgz#1c97a98a1006ee7378f6decd86ecc86436826e02"
+  integrity sha512-pHFgutFeFKDe4akDRhVE28wcqDSzlr2JBEOesSy6eJQOw9W006zUTC4c9zkjSlZpBved8ndj6zjcy9DAuQ7+7g==
+  dependencies:
+    "@datadog/browser-core" "4.28.1"
+    "@datadog/browser-rum-core" "4.28.1"
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "https://registry.yarnpkg.com/@discoveryjs/json-ext/-/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
