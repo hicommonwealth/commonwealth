@@ -222,6 +222,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
               name="period"
               options={[{ value: '4d', label: '4-day' }]}
               value={this.form.range}
+              toggledOption="4d"
               onchange={(e: Event) => {
                 this.form.range = (e.target as any).value;
                 this.form.start = new Date().getTime();
