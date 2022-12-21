@@ -21,7 +21,7 @@ export async function processSnapshotMessage(
   });
 
   if (eventType === 'proposal/created' && proposal) {
-    log.error(`Proposal already exists, cannot create`);
+    log.info(`Proposal ${id} already exists`);
     return;
   }
 
@@ -95,6 +95,7 @@ export async function processSnapshotMessage(
           );
         } catch (e) {
           // TODO: should we NACK the message if sending to discord fails or just rollbar report it and continue?
+          log.error('Error sending snapshot notification to discord', e);
           console.log('Error sending snapshot notification to discord bot', e);
         }
       }
