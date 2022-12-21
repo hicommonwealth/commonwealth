@@ -71,6 +71,7 @@ export const iconLookup = {
   trash: Icons.CWTrash,
   treasuryProposal: Icons.CWTreasuryProposal,
   twitter: Icons.CWTwitter,
+  unsubscribe: Icons.CWUnsubscribe,
   upvote: Icons.CWUpvote,
   views: Icons.CWViews,
   wallet: Icons.CWWallet,

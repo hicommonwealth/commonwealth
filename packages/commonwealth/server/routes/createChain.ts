@@ -1,5 +1,6 @@
 import {NextFunction} from 'express';
 import Web3 from 'web3';
+import fetch from 'node-fetch';
 import * as solw3 from '@solana/web3.js';
 import {Cluster} from '@solana/web3.js';
 import {Tendermint34Client} from '@cosmjs/tendermint-rpc';
@@ -22,6 +23,8 @@ import {RoleAttributes, RoleInstance} from '../models/role';
 import {AppError, ServerError} from 'common-common/src/errors';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
+
+const MAX_IMAGE_SIZE_KB = 500;
 
 export const Errors = {
   NoId: 'Must provide id',
@@ -52,9 +55,11 @@ export const Errors = {
   InvalidGithub: 'Github must begin with https://github.com/',
   InvalidAddress: 'Address is invalid',
   NotAdmin: 'Must be admin',
+  ImageDoesntExist: `Image url provided doesn't exist`,
+  ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
 };
 
-type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
+export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
   id: string;
   node_url: string;
   substrate_spec: string;
@@ -68,6 +73,16 @@ type CreateChainResp = {
   role: RoleAttributes;
   admin_address: string;
 };
+
+export async function getFileSizeBytes(url: string): Promise<number> {
+  try {
+    // Range header is to prevent it from reading any bytes from the GET request because we only want the headers.
+    const resp = await fetch(url, { headers: { Range: 'bytes=0-0' } });
+    return parseInt(resp.headers.get('content-range').split('/')[1], 10);
+  } catch (e) {
+    throw new AppError(Errors.ImageDoesntExist);
+  }
+}
 
 const createChain = async (
   models: DB,
@@ -107,6 +122,10 @@ const createChain = async (
   }
   if (!req.body.base || !req.body.base.trim()) {
     return next(new AppError(Errors.NoBase));
+  }
+
+  if(await getFileSizeBytes(req.body.icon_url) / 1024 > MAX_IMAGE_SIZE_KB) {
+    throw new AppError(Errors.ImageTooLarge);
   }
 
   const existingBaseChain = await models.Chain.findOne({
