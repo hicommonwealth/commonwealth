@@ -2,8 +2,10 @@
 
 .AdminPage {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 16px;
+  padding: 24px;
 
   .admin-column {
     display: flex;
