@@ -39,7 +39,6 @@ import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
 import { CollapsibleThreadBody } from '../../components/collapsible_body_text';
 import { CreateComment } from '../../components/comments/create_comment';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -49,6 +48,7 @@ import { EditBody } from './edit_body';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
+import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -610,7 +610,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
-                  ) : !this.isGloballyEditing && canComment ? (
+                  ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
                     <>
                       {reactionsAndReplyButtons}
                       <CreateComment
