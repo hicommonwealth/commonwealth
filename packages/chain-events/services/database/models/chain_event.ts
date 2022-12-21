@@ -1,11 +1,6 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
 import { ModelStatic, ModelInstance } from './types';
-
-import {
-  ChainEventTypeAttributes,
-  ChainEventTypeInstance,
-} from './chain_event_type';
 import { ChainEntityAttributes } from './chain_entity';
 import {SupportedNetwork} from "../../../src";
 
@@ -23,11 +18,7 @@ export type ChainEventAttributes = {
   ChainEntity?: ChainEntityAttributes;
 };
 
-export type ChainEventInstance = ModelInstance<ChainEventAttributes> & {
-  getChainEventType: Sequelize.HasOneGetAssociationMixin<
-    ChainEventTypeInstance
-  >;
-};
+export type ChainEventInstance = ModelInstance<ChainEventAttributes>;
 
 export type ChainEventModelStatic = ModelStatic<ChainEventInstance>;
 

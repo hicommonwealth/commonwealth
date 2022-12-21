@@ -2,9 +2,6 @@ import ChainEntityFactory, {
   ChainEntityModelStatic,
 } from './models/chain_entity';
 import ChainEventFactory, { ChainEventModelStatic } from './models/chain_event';
-import ChainEventTypeFactory, {
-  ChainEventTypeModelStatic,
-} from './models/chain_event_type';
 import { Sequelize, DataTypes } from 'sequelize';
 import { DATABASE_URI } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -12,7 +9,6 @@ import { factory, formatFilename } from 'common-common/src/logging';
 export type Models = {
   ChainEntity: ChainEntityModelStatic;
   ChainEvent: ChainEventModelStatic;
-  ChainEventType: ChainEventTypeModelStatic;
 };
 
 export interface DB extends Models {
@@ -51,7 +47,6 @@ export const sequelize = new Sequelize(DATABASE_URI, {
 const models: Models = {
   ChainEntity: ChainEntityFactory(sequelize, DataTypes),
   ChainEvent: ChainEventFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
 };
 
 const db: DB = {
