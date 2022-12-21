@@ -71,6 +71,8 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
       );
     }
 
+    const formState = { module: '', function: '', args: [] };
+
     return m(
       '.SudoForm',
       {
@@ -83,7 +85,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
           { style: 'margin: 15px 0;' },
           'Sudo: run function as Admin'
         ),
-        m(EdgewareFunctionPicker),
+        m(EdgewareFunctionPicker, formState),
         m(
           'button',
           {
@@ -91,7 +93,7 @@ const SudoForm: m.Component<{}, ISudoFormState> = {
             disabled: vnode.state.txProcessing,
             onclick: (e) => {
               e.preventDefault();
-              const call = EdgewareFunctionPicker.getMethod();
+              const call = EdgewareFunctionPicker.getMethod(formState);
               vnode.state.txProcessing = true;
               vnode.state.resultText = 'Waiting...';
               m.redraw();
