@@ -10,7 +10,9 @@ import {
   Component as ReactComponent
 } from 'react';
 import renderer from 'react-hyperscript';
-
+import {
+  matchPath,
+} from 'react-router-dom';
 
 /// CYANO CODE
 
@@ -81,39 +83,74 @@ export abstract class ClassComponent<A = {}> extends React.Component<A> {
     this.oninit(this.props);
   }
 
+  public componentDidUpdate(prevProps: A) {
+    this.onupdate(this.props);
+  }
+
+  public componentWillUnmount() {
+    this.onremove(this.props);
+  }
+
   public oninit(v: ResultNode<A>) {};
+  public onupdate(v: ResultNode<A>) {};
+  public onremove(v: ResultNode<A>) {};
+  public oncreate(v: ResultNode<A>) {};
 
   abstract view(v: ResultNode<A>): Children | null;
 
   render() {
+    this.oncreate(this.props);
     return this.view(this.props);
   }
 }
 
-export function setRoute(route: string, data?: any, options?: m.RouteOptions) {
-  // TODO
+type RouteOptions = {
+  replace?: boolean;
+};
+
+type Params = { [key: string]: string };
+
+export function setRoute(route: string, data?: any, options?: RouteOptions) {
+  const { history } = this.props;
+  const { replace } = options || {};
+  if (replace) {
+    history.replace(route, data);
+  } else {
+    history.push(route, data);
+  }
 }
 
 export function getRouteParam(name?: string) {
-  // TODO
+  const { match } = this.props;
+  return name ? match.params[name] : match.params;
 }
 
 export function getRoute() {
-  // TODO
+  const { location } = this.props;
+  return location.pathname;
 }
 
 export function redraw(sync = false) {
-  // TODO
+  // React does not have a built-in method for manually triggering a re-render.
+  // Instead, you can use the `setState` method to update the component's state and trigger a re-render.
 }
 
-export function parsePathname(url: string): { path: string; params: m.Params } {
-  // TODO
+export function parsePathname(url: string): { path: string; params: Params } {
+  const match = matchPath(url, { path: url });
+  return {
+    path: match ? match.path : '',
+    params: match ? match.params : {},
+  };
 }
 
-export function rootRender(el: Element, vnodes: Children): void {
-  // TODO
+export function rootRender(el: Element, vnodes: Children) {
+  // React does not have a built-in method for rendering to an element directly.
+  // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
+  ReactDOM.render(vnodes, el);
 }
 
-export function rootMount(element: Element, component?: any | null): void {
-  // TODO
+export function rootMount(element: Element, component?: any | null) {
+  // React does not have a built-in method for mounting a component to an element directly.
+  // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
+  ReactDOM.render(component, element);
 }

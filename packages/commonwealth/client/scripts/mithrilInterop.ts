@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/ban-types */
+/* eslint-disable @typescript-eslint/no-empty-function */
 import m from 'mithril';
 
 /// CYANO CODE
@@ -27,10 +29,10 @@ export abstract class ClassComponent<A = {}> implements m.ClassComponent<A> {
   /** Do not use, only used for JSX validation */
   protected readonly __props: A;
 
-  public oninit(v: ResultNode<A>) { };
-  public onupdate(v: ResultNode<A>) { };
-  public onremove(v: ResultNode<A>) { };
-  public oncreate(v: ResultNode<A>) { };
+  public oninit(v: ResultNode<A>) { }
+  public onupdate(v: ResultNode<A>) { }
+  public onremove(v: ResultNode<A>) { }
+  public oncreate(v: ResultNode<A>) { }
 
   abstract view(v: ResultNode<A>): Children | null;
 }
