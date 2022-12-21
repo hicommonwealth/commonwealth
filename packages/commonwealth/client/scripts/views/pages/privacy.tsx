@@ -4,7 +4,7 @@
 import m from 'mithril';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
 
-import 'pages/landing/privacy_and_terms.scss';
+import 'pages/privacy_and_terms.scss';
 
 import { renderMultilineText } from 'helpers';
 import Sublayout from '../sublayout';

@@ -73,9 +73,47 @@ export type ResultNode = ReactElement;
 
 /// END CYANO CODE
 
+// TODO: verify this works
+export abstract class ClassComponent<A = {}> extends React.Component<A> {
+  protected readonly __props: A;
 
-export class ClassComponent<A = {}> extends ReactComponent<A> {
-  public view(v: ResultNode): ResultNode {
-    return this.render() as ResultNode;
+  public componentDidMount() {
+    this.oninit(this.props);
   }
+
+  public oninit(v: ResultNode<A>) {};
+
+  abstract view(v: ResultNode<A>): Children | null;
+
+  render() {
+    return this.view(this.props);
+  }
+}
+
+export function setRoute(route: string, data?: any, options?: m.RouteOptions) {
+  // TODO
+}
+
+export function getRouteParam(name?: string) {
+  // TODO
+}
+
+export function getRoute() {
+  // TODO
+}
+
+export function redraw(sync = false) {
+  // TODO
+}
+
+export function parsePathname(url: string): { path: string; params: m.Params } {
+  // TODO
+}
+
+export function rootRender(el: Element, vnodes: Children): void {
+  // TODO
+}
+
+export function rootMount(element: Element, component?: any | null): void {
+  // TODO
 }

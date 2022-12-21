@@ -27,6 +27,8 @@ export abstract class ClassComponent<A = {}> implements m.ClassComponent<A> {
   /** Do not use, only used for JSX validation */
   protected readonly __props: A;
 
+  public oninit(v: ResultNode<A>) { };
+
   abstract view(v: ResultNode<A>): Children | null;
 }
 
