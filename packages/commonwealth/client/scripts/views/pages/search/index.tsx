@@ -6,26 +6,26 @@ import _, { capitalize } from 'lodash';
 import moment from 'moment';
 import { ListItem, Select } from 'construct-ui';
 
-import 'pages/search.scss';
+import 'pages/search/index.scss';
 
 import { pluralize } from 'helpers';
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { SearchContentType } from 'types';
-import { PageNotFound } from './404';
-import { search } from '../components/search_bar';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { CommunityLabel } from '../components/community_label';
-import { renderQuillTextBody } from '../components/quill/helpers';
-import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
-import { CWText } from '../components/component_kit/cw_text';
-import ErrorPage from './error';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
+import { renderQuillTextBody } from '../../components/quill/helpers';
+import { PageNotFound } from '../404';
+import ErrorPage from '../error';
+import { CommunityLabel } from '../../components/community_label';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -62,18 +62,18 @@ const getMemberResult = (addr, searchTerm) => {
 
 const getCommunityResult = (community) => {
   const params =
-    community.contentType === SearchContentType.Token
+    community.SearchContentType === SearchContentType.Token
       ? { community }
-      : community.contentType === SearchContentType.Chain
+      : community.SearchContentType === SearchContentType.Chain
       ? { community }
       : null;
 
-  params['size'] = 'large';
+  // params['size'] = 'large';
 
   const onSelect = () => {
     if (params.community) {
       m.route.set(
-        params.community.address ? `/${params.community.address}` : '/'
+        params.community.id ? `/${params.community.id}` : '/'
       );
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
@@ -149,7 +149,7 @@ const getCommentResult = (comment, searchTerm) => {
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
       m.route.set(
-        `/${chain}/proposal/${proposalId.split('_')[0]}/${
+        `/${chain}/discussion/${proposalId.split('_')[0]}/${
           proposalId.split('_')[1]
         }`
       );
@@ -211,6 +211,21 @@ const getListing = (
   return tabScopedResults;
 };
 
+const search = async (searchQuery: SearchQuery, state) => {
+  try {
+    await app.search.search(searchQuery);
+  } catch (err) {
+    state.results = {};
+    notifyError(err.responseJSON?.error || err.responseText || err.toString());
+  }
+
+  state.results = app.search.getByQuery(searchQuery).results;
+
+  app.search.addToHistory(searchQuery);
+
+  m.redraw();
+};
+
 type SearchPageAttrs = {
   results: any[];
 };
@@ -224,12 +239,6 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
-    const LoadingPage = (
-      <PageLoading
-      // title={<BreadcrumbsTitleTag title="Search" />}
-      />
-    );
-
     const searchQuery = SearchQuery.fromUrlParams(m.route.param());
 
     const { chainScope, searchTerm } = searchQuery;
@@ -253,11 +262,11 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
       this.refreshResults = false;
       this.results = {};
       search(searchQuery, this);
-      return LoadingPage;
+      return <PageLoading />;
     }
 
     if (!app.search.getByQuery(searchQuery)?.loaded) {
-      return LoadingPage;
+      return <PageLoading />;
     }
 
     if (!this.activeTab) {
