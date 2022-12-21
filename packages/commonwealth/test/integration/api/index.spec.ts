@@ -7,7 +7,8 @@ import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from '../../util/modelUtils';
-import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
+import { constructTypedCanvasMessage, TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
+import { constructCanvasMessage } from 'shared/adapters/shared';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -53,7 +54,8 @@ describe('API Tests', () => {
       const token = res.body.result.verification_token;
       const chain_id = 1;   // use ETH mainnet for testing
       const sessionWallet = ethers.Wallet.createRandom()
-      const data = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+      const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+      const data = constructTypedCanvasMessage(message);
       const privateKey = keypair.getPrivateKey();
       const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
       res = await chai.request(app)
@@ -66,6 +68,7 @@ describe('API Tests', () => {
           wallet_id,
           session_public_address: sessionWallet.address,
           session_block_data: TEST_BLOCK_INFO_STRING,
+          timestamp,
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');

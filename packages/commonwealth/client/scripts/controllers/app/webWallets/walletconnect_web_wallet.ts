@@ -1,11 +1,12 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, ChainInfo, IWebWallet, BlockInfo } from 'models';
+import { Account, ChainInfo, BlockInfo, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
 import WalletConnectProvider from '@walletconnect/web3-provider';
 import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
+import { CanvasData } from 'shared/adapters/shared';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -37,7 +38,11 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async getRecentBlock(): Promise<BlockInfo> {
+  public getChainId() {
+    return this._chainInfo.node.ethChainId || 1;
+  }
+
+  public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
     const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
 
     return {
@@ -47,33 +52,13 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     }
   }
 
-  public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.sign(message, this.accounts[0]);
-    return signature;
-  }
-
-  public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const sessionPublicAddress = app.sessions.getOrCreateAddress(this._chainInfo.node.ethChainId);
-    const msgParams = await constructTypedMessage(
-      this.accounts[0],
-      this._chainInfo.node.ethChainId || 1,
-      sessionPublicAddress,
-      validationBlockInfo,
-    );
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+    const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
     const signature = await this._provider.wc.signTypedData([
-      this.accounts[0],
-      JSON.stringify(msgParams),
+      account.address,
+      JSON.stringify(typedCanvasMessage),
     ]);
     return signature;
-  }
-
-  public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
-    return webWalletSignature;
-  }
-
-  public async validateWithAccount(account: Account, walletSignature: string): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   public async reset() {

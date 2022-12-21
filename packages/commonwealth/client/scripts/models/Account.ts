@@ -12,6 +12,7 @@ class Account {
 
   // validation token sent by server
   private _validationToken?: string;
+  private _sessionPublicAddress: string;
   // block that the client is signing, in order to validate login to the server
   private _validationBlockInfo?: string;
 
@@ -30,6 +31,7 @@ class Account {
     addressId,
     walletId,
     validationToken,
+    sessionPublicAddress,
     validationBlockInfo,
     profile,
     ignoreProfile,
@@ -42,6 +44,7 @@ class Account {
     addressId?: number;
     walletId?: WalletId;
     validationToken?: string;
+    sessionPublicAddress?: string;
     validationBlockInfo?: string;
     profile?: Profile;
 
@@ -56,6 +59,7 @@ class Account {
     this._addressId = addressId;
     this._walletId = walletId;
     this._validationToken = validationToken;
+    this._sessionPublicAddress = sessionPublicAddress;
     this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
     if (profile) {
@@ -91,6 +95,13 @@ class Account {
   }
   public setValidationBlockInfo(token: string) {
     this._validationBlockInfo = token;
+  }
+
+  get sessionPublicAddress() {
+    return this._sessionPublicAddress;
+  }
+  public setSessionPublicAddress(sessionPublicAddress: string) {
+    this._sessionPublicAddress = sessionPublicAddress;
   }
 
   public async validate(signature: string) {

@@ -6,6 +6,7 @@ import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
 
+import { constructCanvasMessage, chainBasetoCanvasChain } from 'adapters/shared';
 import { initAppState } from 'app';
 import {
   completeClientLogin,
@@ -34,6 +35,21 @@ type LoginModalAttrs = {
   onSuccess?: () => void;
 };
 
+async function signWithWallet<T extends { address: string }>(wallet: IWebWallet<T>, account: Account) {
+  const chainId = wallet.getChainId();
+  const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, chainId)
+
+  const canvasMessage = constructCanvasMessage(
+    chainBasetoCanvasChain(wallet.chain),
+    chainId,
+    account.address,
+    sessionPublicAddress,
+    account.validationBlockInfo,
+  );
+
+  return wallet.signCanvasMessage(account, canvasMessage);
+}
+
 export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private avatarUrl: string;
   private address: string;
@@ -45,7 +61,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private wallets: Array<IWebWallet<any>>;
   private selectedWallet: IWebWallet<any>;
   private selectedLinkingWallet: IWebWallet<any>;
-  private cashedWalletSignature: string;
+  private cachedWalletSignature: string;
   private primaryAccount: Account;
   private secondaryLinkAccount: Account;
   private currentlyInCommunityPage: boolean;
@@ -208,8 +224,8 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     ) => {
       // Handle Logged in and joining community of different chain base
       if (this.currentlyInCommunityPage && app.isLoggedIn()) {
-        const signature = await this.selectedWallet.signWithAccount(account);
-        await this.selectedWallet.validateWithAccount(account, signature);
+        const signature = await signWithWallet(this.selectedWallet, account);
+        await account.validate(signature);
         await logInWithAccount(account, true);
         return;
       }
@@ -235,8 +251,8 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       // Handle receiving and caching wallet signature strings
       if (!newlyCreated && !linking) {
         try {
-          const signature = await this.selectedWallet.signWithAccount(account);
-          await this.selectedWallet.validateWithAccount(account, signature);
+          const signature = await signWithWallet(this.selectedWallet, account);
+          await account.validate(signature);
           await logInWithAccount(account, true);
         } catch (e) {
           console.log(e);
@@ -244,10 +260,8 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       } else {
         if (!linking) {
           try {
-            const signature = await this.selectedWallet.signWithAccount(
-              account
-            );
-            this.cashedWalletSignature = signature;
+            const signature = await signWithWallet(this.selectedWallet, account);
+            this.cachedWalletSignature = signature;
           } catch (e) {
             console.log(e);
           }
@@ -265,10 +279,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     const createNewAccountCallback = async () => {
       try {
         if (this.selectedWallet.chain !== 'near') {
-          await this.selectedWallet.validateWithAccount(
-            this.primaryAccount,
-            this.cashedWalletSignature
-          );
+          await this.primaryAccount.validate(this.cachedWalletSignature);
         }
         await logInWithAccount(this.primaryAccount, false);
       } catch (e) {
@@ -294,17 +305,10 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     // Validates both linking (secondary) and primary accounts
     const performLinkingCallback = async () => {
       try {
-        const signature = await this.selectedLinkingWallet.signWithAccount(
-          this.secondaryLinkAccount
-        );
-        await this.selectedLinkingWallet.validateWithAccount(
-          this.secondaryLinkAccount,
-          signature
-        );
-        await this.selectedWallet.validateWithAccount(
-          this.primaryAccount,
-          this.cashedWalletSignature
-        );
+        const signature = await signWithWallet(
+          this.selectedLinkingWallet, this.secondaryLinkAccount);
+        await this.secondaryLinkAccount.validate(signature);
+        await this.primaryAccount.validate(this.cachedWalletSignature);
         await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);
