@@ -37,9 +37,9 @@
     "create-db": "npx sequelize db:create",
     "migrate-db": "npx sequelize db:migrate",
     "create-migration": "npx sequelize migration:generate --name",
-    "psql": "psql -h localhost commonwealth_chain_events -U commonwealth",
-    "reset-db": "psql -d postgres -U commonwealth -c 'DROP DATABASE commonwealth_chain_events WITH (FORCE);' && npx sequelize db:create",
-    "load-db": "psql -d commonwealth_chain_events -U commonwealth -W -f latest.dump",
+    "psql": "chmod u+x scripts/start-psql.sh && ./scripts/start-psql.sh",
+    "reset-db": "chmod u+x scripts/reset-db.sh && ./scripts/reset-db.sh",
+    "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "dump-db": "pg_dump $(heroku config:get DATABASE_URL -a chain-events) --verbose --no-privileges --no-owner -f latest.dump",
     "dump-db-empty": "pg_dump $(heroku config:get DATABASE_URL -a chain-events) --exclude-table-data=\"public.\\\"ChainEntities\\\"\" --exclude-table-data=\"public.\\\"ChainEventTypes\\\"\" --exclude-table-data=\"public.\\\"ChainEvents\\\"\" --verbose --no-privileges --no-owner -f latest.dump",
     "migrate-events": "NODE_OPTIONS='--max-old-space-size=460' ts-node --project tsconfig.json scripts/migrateChainEntities.ts run-as-script"
