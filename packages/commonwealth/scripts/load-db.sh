@@ -5,9 +5,8 @@
 
 load-env-var '.env';
 
-echo "$DB_PASSWORD";
+PGPASSWORD=$DB_PASSWORD psql -d commonwealth -U commonwealth -f latest.dump;
 
-PGPASSWORD=$DB_PASSWORD psql -d commonwealth -U commonwealth -W -f latest.dump
 if [ "$ETH_ALCHEMY_API_KEY" ]
 then
   ETH_ALCHEMY_URL="wss://eth-mainnet.g.alchemy.com/v2"
