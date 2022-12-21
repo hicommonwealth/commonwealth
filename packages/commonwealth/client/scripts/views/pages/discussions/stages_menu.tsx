@@ -45,7 +45,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
           {render(MenuItem, {
             onclick: (e) => {
               e.preventDefault();
-              navigateToSubpage('/');
+              navigateToSubpage('/discussions');
             },
             active: !stage,
             iconLeft: !stage ? Icons.CHECK : null,
@@ -58,7 +58,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
               iconLeft: stage === targetStage ? Icons.CHECK : null,
               onclick: (e) => {
                 e.preventDefault();
-                navigateToSubpage(`/?stage=${targetStage}`);
+                navigateToSubpage(`/discussions?stage=${targetStage}`);
               },
               label: (
                 <div class="stages-item">

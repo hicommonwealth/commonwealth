@@ -132,14 +132,13 @@ export class ComponentShowcase extends ClassComponent {
         <div class="form-gallery">
           <CWText type="h4">Dropdown</CWText>
           <CWDropdown
-            inputOptions={[
-              { label: 'Dropdown Option 1' },
-              { label: 'Dropdown Option 2' },
-              { label: 'Dropdown Option 3' },
+            label="Dropdown"
+            options={[
+              { label: 'Dropdown Option 1', value: 'dropdownOption1' },
+              { label: 'Dropdown Option 2', value: 'dropdownOption2' },
+              { label: 'Dropdown Option 3', value: 'dropdownOption3' },
             ]}
-            onSelect={(optionLabel) =>
-              console.log('Selected option: ', optionLabel)
-            }
+            onSelect={(item) => console.log('Selected option: ', item.label)}
           />
         </div>
         <div class="basic-gallery">

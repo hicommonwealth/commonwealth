@@ -6,26 +6,26 @@ import _, { capitalize } from 'lodash';
 import moment from 'moment';
 import { ListItem, Select } from 'construct-ui';
 
-import 'pages/search.scss';
+import 'pages/search/index.scss';
 
 import { pluralize } from 'helpers';
 import app from 'state';
+import { notifyError } from 'controllers/app/notifications';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
 import User, { UserBlock } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { SearchContentType } from 'types';
-import { PageNotFound } from './404';
-import { search } from '../components/search_bar';
-import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
-import { CommunityLabel } from '../components/community_label';
-import { renderQuillTextBody } from '../components/quill/helpers';
-import { CWTab, CWTabBar } from '../components/component_kit/cw_tabs';
-import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
-import { CWText } from '../components/component_kit/cw_text';
-import ErrorPage from './error';
-import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
+import { renderQuillTextBody } from '../../components/quill/helpers';
+import { PageNotFound } from '../404';
+import ErrorPage from '../error';
+import { CommunityLabel } from '../../components/community_label';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 
@@ -62,18 +62,23 @@ const getMemberResult = (addr, searchTerm) => {
 
 const getCommunityResult = (community) => {
   const params =
-    community.contentType === SearchContentType.Token
+    community.SearchContentType === SearchContentType.Token
       ? { community }
-      : community.contentType === SearchContentType.Chain
+      : community.SearchContentType === SearchContentType.Chain
       ? { community }
       : null;
 
-  params['size'] = 'large';
+  // params['size'] = 'large';
 
   const onSelect = () => {
     if (params.community) {
+<<<<<<< HEAD:packages/commonwealth/client/scripts/views/pages/search.tsx
       setRoute(
         params.community.address ? `/${params.community.address}` : '/'
+=======
+      m.route.set(
+        params.community.id ? `/${params.community.id}` : '/'
+>>>>>>> master:packages/commonwealth/client/scripts/views/pages/search/index.tsx
       );
     } else {
       setRoute(community.id ? `/${community.id}` : '/');
@@ -148,8 +153,13 @@ const getCommentResult = (comment, searchTerm) => {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
+<<<<<<< HEAD:packages/commonwealth/client/scripts/views/pages/search.tsx
       setRoute(
         `/${chain}/proposal/${proposalId.split('_')[0]}/${
+=======
+      m.route.set(
+        `/${chain}/discussion/${proposalId.split('_')[0]}/${
+>>>>>>> master:packages/commonwealth/client/scripts/views/pages/search/index.tsx
           proposalId.split('_')[1]
         }`
       );
@@ -159,9 +169,9 @@ const getCommentResult = (comment, searchTerm) => {
         <div class="search-results-thread-header">
           {`comment - ${comment.chain || comment.community}`}
         </div>
-        <div class="search-results-thread-title">
+        {/* <div class="search-results-thread-title">
           {decodeURIComponent(comment.title)}
-        </div>
+        </div> */}
         <div class="search-results-thread-subtitle">
           <span class="created-at">{moment(comment.created_at).fromNow()}</span>
           {render(User, {
@@ -211,6 +221,21 @@ const getListing = (
   return tabScopedResults;
 };
 
+const search = async (searchQuery: SearchQuery, state) => {
+  try {
+    await app.search.search(searchQuery);
+  } catch (err) {
+    state.results = {};
+    notifyError(err.responseJSON?.error || err.responseText || err.toString());
+  }
+
+  state.results = app.search.getByQuery(searchQuery).results;
+
+  app.search.addToHistory(searchQuery);
+
+  m.redraw();
+};
+
 type SearchPageAttrs = {
   results: any[];
 };
@@ -224,6 +249,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
+<<<<<<< HEAD:packages/commonwealth/client/scripts/views/pages/search.tsx
     const LoadingPage = (
       <PageLoading
       // title={<BreadcrumbsTitleTag title="Search" />}
@@ -231,6 +257,9 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
     );
 
     const searchQuery = SearchQuery.fromUrlParams(getRouteParam());
+=======
+    const searchQuery = SearchQuery.fromUrlParams(m.route.param());
+>>>>>>> master:packages/commonwealth/client/scripts/views/pages/search/index.tsx
 
     const { chainScope, searchTerm } = searchQuery;
     const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
@@ -253,11 +282,11 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
       this.refreshResults = false;
       this.results = {};
       search(searchQuery, this);
-      return LoadingPage;
+      return <PageLoading />;
     }
 
     if (!app.search.getByQuery(searchQuery)?.loaded) {
-      return LoadingPage;
+      return <PageLoading />;
     }
 
     if (!this.activeTab) {
