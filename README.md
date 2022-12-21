@@ -1,10 +1,3 @@
-# Environment Variables
-- `PGPASSWORD` [OPTIONAL]
-  - avoids the password prompt for all local database commands
-- `ETH_ALCHEMY_API_KEY` [OPTIONAL]
-  - if set, the load-db commands will replace production Alchemy urls with their locally supported variants
-
-
 # Scripts
 - `yarn start-all`
   - Starts ALL the microservices in different processes. Requires a RabbitMQ instance/connection to function properly.
