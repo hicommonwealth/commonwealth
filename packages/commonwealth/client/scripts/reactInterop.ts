@@ -11,8 +11,9 @@ import {
 } from 'react';
 import renderer from 'react-hyperscript';
 import {
-  matchPath,
+  matchPath, BrowserRouter
 } from 'react-router-dom';
+import * as ReactDOM from 'react-dom';
 
 /// CYANO CODE
 
@@ -70,13 +71,13 @@ export type Component<Props = unknown> = FunctionComponent<Props>;
 
 export const jsx = createElement;
 
-export type ResultNode = ReactElement;
+export type ResultNode<A> = ReactElement<A>;
 
 
 /// END CYANO CODE
 
 // TODO: verify this works
-export abstract class ClassComponent<A = {}> extends React.Component<A> {
+export abstract class ClassComponent<A = {}> extends ReactComponent<A> {
   protected readonly __props: A;
 
   public componentDidMount() {
@@ -91,12 +92,12 @@ export abstract class ClassComponent<A = {}> extends React.Component<A> {
     this.onremove(this.props);
   }
 
-  public oninit(v: ResultNode<A>) {};
-  public onupdate(v: ResultNode<A>) {};
-  public onremove(v: ResultNode<A>) {};
-  public oncreate(v: ResultNode<A>) {};
+  public oninit(v: Readonly<A>) {};
+  public onupdate(v: Readonly<A>) {};
+  public onremove(v: Readonly<A>) {};
+  public oncreate(v: Readonly<A>) {};
 
-  abstract view(v: ResultNode<A>): Children | null;
+  abstract view(v: Readonly<A>): Children | null;
 
   render() {
     this.oncreate(this.props);
@@ -111,23 +112,15 @@ type RouteOptions = {
 type Params = { [key: string]: string };
 
 export function setRoute(route: string, data?: any, options?: RouteOptions) {
-  const { history } = this.props;
-  const { replace } = options || {};
-  if (replace) {
-    history.replace(route, data);
-  } else {
-    history.push(route, data);
-  }
+
 }
 
 export function getRouteParam(name?: string) {
-  const { match } = this.props;
-  return name ? match.params[name] : match.params;
+
 }
 
 export function getRoute() {
-  const { location } = this.props;
-  return location.pathname;
+
 }
 
 export function redraw(sync = false) {
