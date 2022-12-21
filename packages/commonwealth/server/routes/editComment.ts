@@ -49,8 +49,6 @@ const editComment = async (
     return next(new AppError(Errors.NoId));
   }
 
-  const author = req.address;
-
   // check if banned
   const [canInteract, banError] = await banCache.checkBan({
     chain: chain.id,
