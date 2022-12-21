@@ -73,7 +73,7 @@ class EdgewareFunctionPicker extends ClassComponent {
             .map((func) => {
               return { label: func, value: func };
             })}
-          callback={(result) => {
+          onSelect={(result) => {
             this.form.function = result.value;
             this.form.args = [];
             setTimeout(() => {
