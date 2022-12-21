@@ -37,7 +37,7 @@ class WhyCommonwealthPage extends ClassComponent {
               label="Explore Our Communities"
               onclick={(e) => {
                 e.preventDefault();
-                m.route.set('/communities');
+                setRoute('/communities');
               }}
             />
             <CWText>
