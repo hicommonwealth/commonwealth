@@ -109,9 +109,9 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
           {moment(searchResult.created_at).format('l')}
         </CWText>
         {/* <CWText type="caption">{searchResult.chain}</CWText> */}
-        <CWText type="b2" fontWeight="medium">
+        {/* <CWText type="b2" fontWeight="medium">
           {decodeURIComponent(searchResult.title)}
-        </CWText>
+        </CWText> */}
         <CWText type="caption" className="excerpt-text">
           {renderQuillTextBody(searchResult.text, {
             hideFormatting: true,
