@@ -12,6 +12,14 @@
   padding: 6px 20px;
   width: fit-content;
 
+  &:active {
+    outline: none;
+  }
+
+  &:focus {
+    outline: none;
+  }
+
   &.primary-red {
     @include primaryRed;
   }

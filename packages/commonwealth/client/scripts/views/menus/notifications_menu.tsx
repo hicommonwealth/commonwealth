@@ -76,7 +76,7 @@ export class NotificationsMenu extends ClassComponent {
     m.redraw();
   }
 
-  oninit() {
+  view() {
     this.showingDiscussionNotifications =
       app.user.notifications.discussionNotifications.slice(
         this.minDiscussionNotification,
@@ -88,52 +88,6 @@ export class NotificationsMenu extends ClassComponent {
         this.minChainEventsNotification,
         this.minChainEventsNotification + MAX_NOTIFS
       );
-  }
-
-  view() {
-    const getContents = () => {
-      if (this.selectedChainEvents) {
-        if (this.showingChainEventNotifications.length > 0) {
-          return m(Infinite, {
-            maxPages: 1, // prevents rollover/repeat
-            pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
-            pageKey: () =>
-              `${this.minChainEventsNotification} - ${
-                this.minChainEventsNotification + MAX_NOTIFS
-              }`,
-            key:
-              // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-              // sortedFilteredNotifications.length
-              'chain',
-            // TODO: add the length/num of total chain-events once
-            // notifications and notifications read table are split
-            item: (data) => <NotificationRow notifications={[data]} />,
-          });
-        } else if (app.user.notifications.chainEventNotifications.length === 0)
-          return <CWText>No chain notifications</CWText>;
-        else return <CWText>No more chain notifications</CWText>;
-      } else {
-        if (this.showingDiscussionNotifications.length > 0) {
-          return m(Infinite, {
-            maxPages: 1, // prevents rollover/repeat
-            pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
-            pageKey: () =>
-              `${this.minDiscussionNotification} - ${
-                this.minDiscussionNotification + MAX_NOTIFS
-              }`,
-            key:
-              // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-              // sortedFilteredNotifications.length
-              'discussion',
-            // TODO: add the length/num of total chain-events once
-            // notifications and notifications read table are split
-            item: (data) => <NotificationRow notifications={[data]} />,
-          });
-        } else if (app.user.notifications.discussionNotifications.length === 0)
-          return <CWText>No discussion notifications</CWText>;
-        else return <CWText>No more discussion notifications</CWText>;
-      }
-    };
 
     return (
       <div class="NotificationsMenu">
@@ -158,7 +112,55 @@ export class NotificationsMenu extends ClassComponent {
             }}
           />
         </div>
-        <div class="notification-list">{getContents()}</div>
+        <div class="notification-list">
+          {(() => {
+            if (this.selectedChainEvents) {
+              if (this.showingChainEventNotifications.length > 0) {
+                return m(Infinite, {
+                  maxPages: 1, // prevents rollover/repeat
+                  pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
+                  pageKey: () =>
+                    `${this.minChainEventsNotification} - ${
+                      this.minChainEventsNotification + MAX_NOTIFS
+                    }`,
+                  key:
+                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+                    // sortedFilteredNotifications.length
+                    'chain',
+                  // TODO: add the length/num of total chain-events once
+                  // notifications and notifications read table are split
+                  item: (data) => <NotificationRow notifications={[data]} />,
+                });
+              } else if (
+                app.user.notifications.chainEventNotifications.length === 0
+              )
+                return <CWText>No chain notifications</CWText>;
+              else return <CWText>No more chain notifications</CWText>;
+            } else {
+              if (this.showingDiscussionNotifications.length > 0) {
+                return m(Infinite, {
+                  maxPages: 1, // prevents rollover/repeat
+                  pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
+                  pageKey: () =>
+                    `${this.minDiscussionNotification} - ${
+                      this.minDiscussionNotification + MAX_NOTIFS
+                    }`,
+                  key:
+                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+                    // sortedFilteredNotifications.length
+                    'discussion',
+                  // TODO: add the length/num of total chain-events once
+                  // notifications and notifications read table are split
+                  item: (data) => <NotificationRow notifications={[data]} />,
+                });
+              } else if (
+                app.user.notifications.discussionNotifications.length === 0
+              )
+                return <CWText>No discussion notifications</CWText>;
+              else return <CWText>No more discussion notifications</CWText>;
+            }
+          })()}
+        </div>
         <div class="footer">
           <CWButton
             label="See all"
