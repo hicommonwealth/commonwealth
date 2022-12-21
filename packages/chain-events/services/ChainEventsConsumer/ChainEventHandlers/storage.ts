@@ -11,8 +11,6 @@ import * as Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
-  RascalPublications,
-  RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
@@ -89,51 +87,7 @@ export default class extends IEventHandler {
       return;
     }
 
-    // locate event type and add event (and event type if needed) to database
-    const [
-      dbEventType,
-      created,
-    ] = await this._models.ChainEventType.findOrCreate({
-      where: {
-        id: `${chain}-${event.data.kind.toString()}`,
-        chain,
-        event_network: event.network,
-        event_name: event.data.kind.toString(),
-      },
-    });
-
-    if (created) {
-      const publishData: RmqCETypeCUD.RmqMsgType = {
-        chainEventTypeId: dbEventType.id,
-        cud: 'create',
-      };
-
-      await this._rmqController.safePublish(
-        publishData,
-        dbEventType.id,
-        RascalPublications.ChainEventTypeCUDMain,
-        {
-          sequelize: this._models.sequelize,
-          model: this._models.ChainEventType,
-        }
-      );
-
-      log.info(`STORAGE HANDLER MESSAGE PUBLISHED`);
-    }
-
-    if (!dbEventType) {
-      log.error(`unknown event type: ${event.data.kind}`);
-      return;
-    } else {
-      if (created) {
-        log.info(`Created new ChainEventType: ${dbEventType.id}`);
-      } else {
-        log.trace(`found chain event type: ${dbEventType.id}`);
-      }
-    }
-
     const eventData = {
-      chain_event_type_id: dbEventType.id,
       block_number: event.blockNumber,
       event_data: event.data,
       network: event.network,

@@ -13,7 +13,7 @@ import { WhereOptions } from 'sequelize';
 
 import {
   RabbitMQController,
-  RascalPublications, RmqCENotificationCUD, RmqCETypeCUD,
+  RascalPublications, RmqCENotificationCUD,
 } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../../database/database';
@@ -45,50 +45,18 @@ export default class extends IEventHandler<ChainEventInstance> {
       fieldValue: string,
       eventType: EntityEventKind
     ) => {
-      const [
-        dbEventType,
-        created,
-      ] = await this._models.ChainEventType.findOrCreate({
-        where: {
-          id: `${chain}-${event.data.kind.toString()}`,
-          chain,
-          event_network: event.network,
-          event_name: event.data.kind.toString(),
-        },
-      });
-      log.trace(
-        `${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`
-      );
-
-      if (created) {
-        const publishData: RmqCETypeCUD.RmqMsgType = {
-          chainEventTypeId: dbEventType.id,
-          cud: 'create',
-        };
-
-        await this._rmqController.safePublish(
-          publishData,
-          dbEventType.id,
-          RascalPublications.ChainEventTypeCUDMain,
-          {
-            sequelize: this._models.sequelize,
-            model: this._models.ChainEventType,
-          }
-        );
-      }
-
       const queryFieldName = `event_data.${fieldName}`;
       const queryArgs: WhereOptions<ChainEventAttributes> =
         eventType === EntityEventKind.Vote
           ? {
-              chain_event_type_id: dbEventType.id,
               [queryFieldName]: fieldValue,
               // votes will be unique by data rather than by type
               event_data: event.data as any,
+              chain
             }
           : {
-              chain_event_type_id: dbEventType.id,
               [queryFieldName]: fieldValue,
+              chain
             };
       const existingEvent = await this._models.ChainEvent.findOne({
         where: queryArgs,
@@ -102,7 +70,6 @@ export default class extends IEventHandler<ChainEventInstance> {
 
       log.info('No existing event found, creating new event in db!');
       const dbEvent = await this._models.ChainEvent.create({
-        chain_event_type_id: dbEventType.id,
         block_number: event.blockNumber,
         event_data: event.data,
         network: event.network,
@@ -110,7 +77,6 @@ export default class extends IEventHandler<ChainEventInstance> {
       });
 
       const formattedEvent: ChainEventAttributes = dbEvent.toJSON();
-      formattedEvent.ChainEventType = dbEventType.toJSON();
 
       const publishData: RmqCENotificationCUD.RmqMsgType = {
         ChainEvent: formattedEvent,

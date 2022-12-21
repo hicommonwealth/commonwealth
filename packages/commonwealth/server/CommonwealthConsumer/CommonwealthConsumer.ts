@@ -11,7 +11,6 @@ import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN} from '../config';
 import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import models from '../database';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
-import {processChainEventTypeCUD} from "./messageProcessors/chainEventTypeCUDQueue";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -54,16 +53,9 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
     msgProcessorContext: context,
   };
 
-  const ceTypeCUDProcessorRmqSub: RabbitMQSubscription = {
-    messageProcessor: processChainEventTypeCUD,
-    subscriptionName: RascalSubscriptions.ChainEventTypeCUDMain,
-    msgProcessorContext: context,
-  };
-
   const subscriptions: RabbitMQSubscription[] = [
     chainEntityCUDProcessorRmqSub,
     ceNotifsCUDProcessorRmqSub,
-    ceTypeCUDProcessorRmqSub,
   ];
 
   const serviceConsumer = new ServiceConsumer(
