@@ -14,10 +14,13 @@ import { formatCoin } from 'adapters/currency';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
-import { DropdownFormField } from 'views/components/forms';
 import User from 'views/components/widgets/user';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from './404';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWLabel } from '../components/component_kit/cw_label';
+import { CWDropdown } from '../components/component_kit/cw_dropdown';
 
 class SudoForm extends ClassComponent {
   private resultText: string;
@@ -28,29 +31,17 @@ class SudoForm extends ClassComponent {
     const substrate = app.chain as Substrate;
 
     if (!substrate.chain.sudoKey) {
-      return m(
-        '.SudoForm',
-        {
-          style:
-            'padding: 20px 24px; border: 1px solid #eee; margin-bottom: 40px;',
-        },
-        'No sudo key available on this chain.'
-      );
+      return <CWText type="h5">No sudo key available on this chain.</CWText>;
     }
 
     if (author && author.address !== substrate.chain.sudoKey) {
-      return m(
-        '.SudoForm',
-        {
-          style:
-            'padding: 20px 24px; border: 1px solid #eee; margin-bottom: 40px;',
-        },
-        [
-          'Must be logged into admin account to use Sudo: ',
-          m(User, {
+      return (
+        <div class="admin-column">
+          <CWText>Must be logged into admin account to use Sudo: </CWText>
+          {m(User, {
             user: app.chain.accounts.get(substrate.chain.sudoKey),
-          }),
-        ]
+          })}
+        </div>
       );
     }
 
@@ -61,60 +52,39 @@ class SudoForm extends ClassComponent {
       // TODO: FIXME: we do not support unlocking with seed/mnemonic, so we will need to use
       //   the signer from Polkadotjs web wallet to perform sudo actions.
     } catch (e) {
-      return m(
-        '.SudoForm',
-        {
-          style:
-            'padding: 20px 24px; border: 1px solid #eee; margin-bottom: 40px;',
-        },
-        'Account must be unlocked to use Sudo.'
-      );
+      return <CWText type="h5">Account must be unlocked to use Sudo.</CWText>;
     }
 
-    return m(
-      '.SudoForm',
-      {
-        style:
-          'width: 80%; padding: 5px 24px; border: 1px solid #eee; margin-bottom: 15px;',
-      },
-      [
-        m(
-          'h2.header',
-          { style: 'margin: 15px 0;' },
-          'Sudo: run function as Admin'
-        ),
-        m(EdgewareFunctionPicker),
-        m(
-          'button',
-          {
-            type: 'submit',
-            disabled: this.txProcessing,
-            onclick: (e) => {
-              e.preventDefault();
-              const call = EdgewareFunctionPicker.getMethod();
-              this.txProcessing = true;
-              this.resultText = 'Waiting...';
-              m.redraw();
-              substrate.chain.api.tx.sudo
-                .sudo(call)
-                .signAndSend(keyring, (result: ISubmittableResult) => {
-                  if (result.isCompleted) {
-                    this.txProcessing = false;
-                    if (result.isFinalized) {
-                      this.resultText = 'Action completed successfully.';
-                    } else {
-                      this.resultText = 'Action was unsuccessful.';
-                    }
-                    m.redraw();
+    return (
+      <div class="admin-column">
+        <CWText type="h5">Sudo: run function as Admin</CWText>
+        {m(EdgewareFunctionPicker)}
+        <CWButton
+          disabled={this.txProcessing}
+          onclick={(e) => {
+            e.preventDefault();
+            const call = EdgewareFunctionPicker.getMethod();
+            this.txProcessing = true;
+            this.resultText = 'Waiting...';
+            m.redraw();
+            substrate.chain.api.tx.sudo
+              .sudo(call)
+              .signAndSend(keyring, (result: ISubmittableResult) => {
+                if (result.isCompleted) {
+                  this.txProcessing = false;
+                  if (result.isFinalized) {
+                    this.resultText = 'Action completed successfully.';
+                  } else {
+                    this.resultText = 'Action was unsuccessful.';
                   }
-                });
-            },
-          },
-          'Submit Action'
-        ),
-        m('h4.header', { style: 'margin: 15px 0;' }, this.resultText),
-        m('br'),
-      ]
+                  m.redraw();
+                }
+              });
+          }}
+          label="Submit Action"
+        />
+        <CWText>{this.resultText}</CWText>
+      </div>
     );
   }
 }
@@ -123,67 +93,84 @@ class ChainStats extends ClassComponent {
   view() {
     const substrate = app.chain as Substrate;
 
-    const header = (label) =>
-      m('h4.header', { style: 'margin: 15px 0;' }, label);
-    const stat = (label, content) =>
-      m('.stat', [m('.label', label), m('.value', content)]);
     const formatBlocks = (blocks) => [
       blocks,
       ' blocks - ',
       formatDuration(blockperiodToDuration(blocks)),
     ];
 
-    return m(
-      '.ChainStats',
-      {
-        style:
-          'padding: 5px 24px; border: 1px solid #eee; margin-bottom: 40px;',
-      },
-      [
-        m(
-          'style',
-          '.ChainStats .stat > * { display: inline-block; width: 50%; }'
-        ),
-        header('ChainInfo'),
-        stat('ChainInfo', app.activeChainId()),
-        stat('ChainInfo Name', app.chain.name?.toString()),
-        stat('ChainInfo Version', app.chain.version?.toString()),
-        stat('ChainInfo Runtime', app.chain.runtimeName?.toString()),
-        header('Block Production'),
-        stat('Current block', app.chain.block?.height),
-        stat(
-          'Last block created',
-          app.chain.block?.lastTime.format('HH:mm:ss')
-        ),
-        stat('Target block time', `${app.chain.block?.duration} sec`),
-        header('Balances'),
-        stat('Total EDG', formatCoin(substrate.chain.totalbalance)),
-        stat(
-          'Existential deposit',
-          formatCoin(substrate.chain.existentialdeposit)
-        ),
-        // stat('Transfer fee',        formatCoin(substrate.chain.transferfee)),
-        header('Democracy Proposals'),
-        stat(
-          'Launch period',
-          formatBlocks(substrate.democracyProposals.launchPeriod)
-        ),
-        stat(
-          'Minimum deposit',
-          formatCoin(substrate.democracyProposals.minimumDeposit)
-        ),
-        header('Phragmen Elections'),
-        stat(
-          'Term length',
-          formatBlocks(substrate.phragmenElections.termDuration)
-        ),
-        stat('Voting bond', formatCoin(substrate.phragmenElections.votingBond)),
-        stat(
-          'Candidacy bond',
-          formatCoin(substrate.phragmenElections.candidacyBond)
-        ),
-        m('br'),
-      ]
+    return (
+      <div class="admin-column">
+        <CWText type="h5">ChainInfo</CWText>
+        <div class="stat">
+          <CWLabel label="Id" />
+          <CWText>{app.activeChainId()}</CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Name" />
+          <CWText>{app.chain.name?.toString()}</CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Version" />
+          <CWText>{app.chain.version?.toString()}</CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Runtime" />
+          <CWText>{app.chain.runtimeName?.toString()}</CWText>
+        </div>
+        <CWText type="h5">Block Production</CWText>
+        <div class="stat">
+          <CWLabel label="Current Block" />
+          <CWText>{app.chain.block?.height}</CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Last Block Created" />
+          <CWText>{app.chain.block?.lastTime.format('HH:mm:ss')}</CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Target Block Time" />
+          <CWText>{app.chain.block?.duration} sec</CWText>
+        </div>
+        <CWText type="h5">Balances</CWText>
+        <div class="stat">
+          <CWLabel label="Total EDG" />
+          <CWText>{formatCoin(substrate.chain.totalbalance)}</CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Existential Deposit" />
+          <CWText>{formatCoin(substrate.chain.existentialdeposit)}</CWText>
+        </div>
+        <CWText type="h5">Democracy Proposals</CWText>
+        <div class="stat">
+          <CWLabel label="Launch Period" />
+          <CWText>
+            {formatBlocks(substrate.democracyProposals.launchPeriod)}
+          </CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Minimum Deposit" />
+          <CWText>
+            {formatCoin(substrate.democracyProposals.minimumDeposit)}
+          </CWText>
+        </div>
+        <CWText type="h5">Phragmen Elections</CWText>
+        <div class="stat">
+          <CWLabel label="Term Length" />
+          <CWText>
+            {formatBlocks(substrate.phragmenElections.termDuration)}
+          </CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Voting Bond" />
+          <CWText>{formatCoin(substrate.phragmenElections.votingBond)}</CWText>
+        </div>
+        <div class="stat">
+          <CWLabel label="Candidacy Bond" />
+          <CWText>
+            {formatCoin(substrate.phragmenElections.candidacyBond)}
+          </CWText>
+        </div>
+      </div>
     );
   }
 }
@@ -214,112 +201,85 @@ class AdminActions extends ClassComponent {
 
   view() {
     let adminChoices;
+
     if (this.profiles) {
       adminChoices = Object.keys(this.profiles).map((key) => {
-        return this.profiles[key].address;
+        const addr = this.profiles[key].address;
+        return { label: addr, value: addr };
       });
+
       this.selectedProfile = adminChoices[0];
     }
 
-    return m('.AdminActions', [
-      m('h4', 'Admin'),
-      m('p', 'Set up the chain with test proposals'),
-      m('p', 'Run individual test suites (suite 1 required before 2 and 3)'),
-      m('p', 'Create identities'),
-      // m('button', {
-      //   class: this.inprogress ? 'disabled' : '',
-      //   onclick: (e) => {
-      //     e.preventDefault();
-      //     console.log('registering and attesting identities for initial council set');
-      //     this.inprogress = true;
-      //   }
-      // }, this.inprogress ? 'Creating identities' : 'Create identities'),
-      // m('br'),
-      m('br'),
-      m('h4', 'Site admin panel (unimplemented)'),
-      m('.form', [
-        m('.form-left', [
-          // TD: verify this is correct char lim
-          m(
-            '.caption',
-            { style: 'margin-top: 20px;' },
-            'Choose a possible admin'
-          ),
-          m(DropdownFormField, {
-            name: 'alt-del',
-            options: { style: 'padding: 5px' },
-            choices: adminChoices,
-            callback: (result) => {
-              this.selectedProfile = result;
+    return (
+      <div class="admin-column">
+        <CWText type="h5">Admin</CWText>
+        <CWText>Set up the chain with test proposals</CWText>
+        <CWText>
+          Run individual test suites (suite 1 required before 2 and 3)
+        </CWText>
+        <CWText>Create identities</CWText>
+        <CWText type="h5">Site admin panel (unimplemented)</CWText>
+        <CWDropdown
+          label="Choose a possible admin"
+          options={adminChoices}
+          onSelect={(result) => {
+            this.selectedProfile = result.value;
+          }}
+        />
+        <CWText>
+          This list contains all potential individuals to make admin.
+        </CWText>
+        <CWDropdown
+          label="Choose a role"
+          options={[
+            {
+              label: 'siteAdmin',
+              value: 'siteAdmin',
             },
-          }),
-        ]),
-        m('.explanation', [
-          m('span', [
-            'This list contains all potential ',
-            'individuals to make admin. ',
-          ]),
-        ]),
-        m('.form-left', [
-          // TD: verify this is correct char lim
-          m('.caption', { style: 'margin-top: 20px;' }, 'Choose a role'),
-          m(DropdownFormField, {
-            name: 'alt-del',
-            options: { style: 'padding: 5px' },
-            choices: [
-              {
-                name: 'siteAdmin',
-                label: 'siteAdmin',
-                value: 'siteAdmin',
-              },
-              {
-                name: 'chainAdmin',
-                label: 'chainAdmin',
-                value: 'chainAdmin',
-              },
-            ],
-            callback: (result) => {
-              this.role = result;
+            {
+              label: 'chainAdmin',
+              value: 'chainAdmin',
             },
-          }),
-        ]),
-        m(
-          'button',
-          {
-            class: this.inprogress ? 'disabled' : '',
-            onclick: (e) => {
-              e.preventDefault();
-              this.inprogress = true;
-              // TODO: Change to PUT /adminStatus
-              $.post(`${app.serverUrl()}/updateAdminStatus`, {
-                admin: app.user.activeAccount.address,
-                address: this.selectedProfile, // the address to be changed
-                role: this.role,
-                jwt: app.user.jwt,
-              }).then(
-                (response) => {
-                  if (response.status === 'Success') {
-                    m.redraw();
-                  } else {
-                    // error tracking
-                  }
-                  this.inprogress = false;
-                },
-                (err) => {
-                  this.failure = true;
-                  this.disabled = false;
-                  if (err.responseJSON) this.error = err.responseJSON.error;
+          ]}
+          onSelect={(result) => {
+            this.role = result.value;
+          }}
+        />
+        <CWButton
+          disabled={this.inprogress}
+          onclick={(e) => {
+            e.preventDefault();
+            this.inprogress = true;
+            // TODO: Change to PUT /adminStatus
+            $.post(`${app.serverUrl()}/updateAdminStatus`, {
+              admin: app.user.activeAccount.address,
+              address: this.selectedProfile, // the address to be changed
+              role: this.role,
+              jwt: app.user.jwt,
+            }).then(
+              (response) => {
+                if (response.status === 'Success') {
                   m.redraw();
+                } else {
+                  // error tracking
                 }
-              );
-            },
-          },
-          this.inprogress ? `Adding ${this.selectedProfile}` : 'Add admin'
-        ),
-      ]),
-      m('br'),
-      m('br'),
-    ]);
+                this.inprogress = false;
+              },
+              (err) => {
+                this.failure = true;
+                this.disabled = false;
+                if (err.responseJSON) this.error = err.responseJSON.error;
+                m.redraw();
+              }
+            );
+          }}
+          label={
+            this.inprogress ? `Adding ${this.selectedProfile}` : 'Add admin'
+          }
+        />
+      </div>
+    );
   }
 }
 
