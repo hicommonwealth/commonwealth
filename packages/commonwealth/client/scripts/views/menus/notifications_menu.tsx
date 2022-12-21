@@ -13,6 +13,8 @@ import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { NotificationRow } from '../pages/notifications/notification_row';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
+import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWText } from '../components/component_kit/cw_text';
 
 const MAX_NOTIFS = 40;
 
@@ -108,8 +110,8 @@ export class NotificationsMenu extends ClassComponent {
             item: (data) => <NotificationRow notifications={[data]} />,
           });
         } else if (app.user.notifications.chainEventNotifications.length === 0)
-          return 'No chain notifications';
-        else return 'No more chain notifications';
+          return <CWText>No chain notifications</CWText>;
+        else return <CWText>No more chain notifications</CWText>;
       } else {
         if (this.showingDiscussionNotifications.length > 0) {
           return m(Infinite, {
@@ -128,26 +130,27 @@ export class NotificationsMenu extends ClassComponent {
             item: (data) => <NotificationRow notifications={[data]} />,
           });
         } else if (app.user.notifications.discussionNotifications.length === 0)
-          return 'No discussion notifications';
-        else return 'No more discussion notifications';
+          return <CWText>No discussion notifications</CWText>;
+        else return <CWText>No more discussion notifications</CWText>;
       }
     };
 
     return (
       <div class="NotificationsMenu">
-        <div class="NotificationsMenuHeader">
+        <div class="header">
           <CWButton
             label="Discussions"
-            buttonType="tertiary-blue"
+            buttonType="tertiary-black"
             onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = false;
             }}
           />
+          <CWDivider isVertical />
           <CWButton
             label="Chain events"
-            buttonType="tertiary-blue"
+            buttonType="tertiary-black"
             onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
@@ -156,19 +159,20 @@ export class NotificationsMenu extends ClassComponent {
           />
         </div>
         <div class="notification-list">{getContents()}</div>
-        <div class="NotificationsMenuFooter">
+        <div class="footer">
           <CWButton
             label="See all"
-            buttonType="tertiary-blue"
+            buttonType="tertiary-black"
             onclick={() => {
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
                 : m.route.set('/notifications');
             }}
           />
+          <CWDivider isVertical />
           <CWButton
             label="Mark all read"
-            buttonType="tertiary-blue"
+            buttonType="tertiary-black"
             onclick={(e) => {
               e.preventDefault();
               // e.stopPropagation();
@@ -181,18 +185,20 @@ export class NotificationsMenu extends ClassComponent {
                 ?.then(() => m.redraw());
             }}
           />
+          <CWDivider isVertical />
           <CWButton
             label="<"
-            buttonType="tertiary-blue"
+            buttonType="tertiary-black"
             onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this._previousPage(this.selectedChainEvents);
             }}
           />
+          <CWDivider isVertical />
           <CWButton
             label=">"
-            buttonType="tertiary-blue"
+            buttonType="tertiary-black"
             onclick={(e) => {
               e.preventDefault();
               e.stopPropagation();
