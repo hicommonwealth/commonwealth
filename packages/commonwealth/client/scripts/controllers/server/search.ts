@@ -12,7 +12,7 @@ const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the datab
 const SEARCH_HISTORY_KEY = 'COMMONWEALTH_SEARCH_HISTORY';
 const SEARCH_HISTORY_SIZE = 10;
 
-class SearchContoller {
+class SearchController {
   private _store: SearchStore = new SearchStore();
   public store() {
     return this._store;
@@ -54,22 +54,6 @@ class SearchContoller {
         );
       }
 
-      if (scope.includes(SearchScope.Members)) {
-        const addrs = await this.searchMentionableAddresses(
-          searchTerm,
-          { resultSize, chainScope },
-          ['created_at', 'DESC']
-        );
-
-        searchCache.results[SearchScope.Members] = addrs
-          .map((addr) => {
-            addr.SearchContentType = SearchContentType.Member;
-            addr.searchType = SearchScope.Members;
-            return addr;
-          })
-          .sort(this.sortResults);
-      }
-
       if (scope.includes(SearchScope.Replies)) {
         const comments = await this.searchComments(searchTerm, {
           resultSize,
@@ -99,6 +83,22 @@ class SearchContoller {
             return chain;
           })
           .sort(this.sortCommunities);
+      }
+
+      if (scope.includes(SearchScope.Members)) {
+        const addrs = await this.searchMentionableAddresses(
+          searchTerm,
+          { resultSize, chainScope },
+          ['created_at', 'DESC']
+        );
+
+        searchCache.results[SearchScope.Members] = addrs
+          .map((addr) => {
+            addr.SearchContentType = SearchContentType.Member;
+            addr.searchType = SearchScope.Members;
+            return addr;
+          })
+          .sort(this.sortResults);
       }
     } finally {
       searchCache.loaded = true;
@@ -262,4 +262,4 @@ class SearchContoller {
   }
 }
 
-export default SearchContoller;
+export default SearchController;
