@@ -11,13 +11,10 @@ else
 fi
 
 psql -d commonwealth -U commonwealth -W -f latest.dump
-if [ "$ETH_ALCHEMY_URL" ] && \
-   [ "$ETH_ALCHEMY_ALT_WALLET_URL" ] && \
-   [ "$BLOCKED_ETH_ALCHEMY_URL_1" ] && \
-   [ "$BLOCKED_ETH_ALCHEMY_URL_2" ] && \
-   [ "$BLOCKED_ETH_ALCHEMY_URL_3" ];
+if [ "$ETH_ALCHEMY_API_KEY" ]
 then
-  psql -d commonwealth -U commonwealth -c "UPDATE \"ChainNodes\" SET url = '$ETH_ALCHEMY_URL', alt_wallet_url = '$ETH_ALCHEMY_ALT_WALLET_URL' WHERE url = '$BLOCKED_ETH_ALCHEMY_URL_1' OR url = '$BLOCKED_ETH_ALCHEMY_URL_2' OR url = '$BLOCKED_ETH_ALCHEMY_URL_3'"
+  ETH_ALCHEMY_URL="=wss://eth-mainnet.g.alchemy.com/v2"
+  psql -d commonwealth -U commonwealth -c "UPDATE \"ChainNodes\" SET url = '$ETH_ALCHEMY_URL/$ETH_ALCHEMY_API_KEY', alt_wallet_url = '$ETH_ALCHEMY_URL/$ETH_ALCHEMY_API_KEY' WHERE eth_chain_id = 1;"
 else
   echo "You don't have the correct env var set so the Alchemy API urls were not updated"
 fi
