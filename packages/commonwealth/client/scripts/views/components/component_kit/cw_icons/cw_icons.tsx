@@ -2482,6 +2482,40 @@ export class CWTwitter extends ClassComponent<IconAttrs> {
   }
 }
 
+export class CWUnsubscribe extends ClassComponent<IconAttrs> {
+  view(vnode: m.Vnode<IconAttrs>) {
+    const {
+      className,
+      componentType,
+      disabled,
+      iconButtonTheme,
+      iconSize,
+      selected,
+      ...otherAttrs
+    } = vnode.attrs;
+    return (
+      <svg
+        class={getClasses<IconStyleAttrs>(
+          { className, disabled, iconButtonTheme, iconSize, selected },
+          componentType
+        )}
+        xmlns="http://www.w3.org/2000/svg"
+        width="32"
+        height="32"
+        fill="none"
+        viewBox="0 0 32 32"
+        {...otherAttrs}
+      >
+        <path
+          fillRule="evenodd"
+          d="M18.536 4.737a2.24 2.24 0 01-.495 1.407 9.403 9.403 0 014.171 2.032L5.757 24.63h-.815a.586.586 0 01-.588-.584v-1.168c0-.322.264-.584.588-.584h1.176a.586.586 0 00.588-.584V15.29c0-4.608 3.362-8.438 7.783-9.202a2.249 2.249 0 114.047-1.35zM3.743 28.197a.995.995 0 01.236-.373l3.193-3.193L22.94 8.86l3.665-3.665a1 1 0 011.415 1.414L5.393 29.237a1 1 0 01-1.65-1.04zm7.671-3.566h2.23a3.46 3.46 0 104.94 0h8.702a.586.586 0 00.588-.584v-1.168a.586.586 0 00-.588-.584H26.11a.586.586 0 01-.588-.584V15.29a9.25 9.25 0 00-.86-3.907L11.414 24.631z"
+          clipRule="evenodd"
+        ></path>
+      </svg>
+    );
+  }
+}
+
 export class CWUpvote extends ClassComponent<IconAttrs> {
   view(vnode: m.Vnode<IconAttrs>) {
     const {
