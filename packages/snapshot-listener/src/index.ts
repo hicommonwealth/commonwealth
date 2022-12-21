@@ -1,4 +1,4 @@
-import express, {Request, Response} from "express";
+import express, { Request, Response } from "express";
 import { ISnapshotNotification } from "common-common/src/types";
 import {
   RascalPublications,
@@ -8,7 +8,7 @@ import {
 import { factory, formatFilename } from "common-common/src/logging";
 import { RABBITMQ_URI } from "./config";
 import fetchNewSnapshotProposal from "./utils/fetchSnapshot";
-import { DEFAULT_PORT } from "./config"
+import { DEFAULT_PORT } from "./config";
 import { StatsDController } from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -33,7 +33,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
 
     if (process.env.LOG_LEVEL === "debug") {
       const eventLog = JSON.stringify(event);
-      log.info("snapshot received")
+      log.info("snapshot received");
       log.info(eventLog);
     }
 
@@ -44,18 +44,22 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     event.title = response.data.proposal.title;
     event.body = response.data.proposal.body;
     event.choices = response.data.proposal.choices;
-    event.space = response.data.proposal.space;
+    event.space = response.data.proposal.space.id;
     event.start = response.data.proposal.start;
     event.expire = response.data.proposal.end;
 
     await controller.publish(event, RascalPublications.SnapshotListener);
 
-    StatsDController.get().increment("snapshot_listener.received_snapshot_event", 1, {
-      event: eventType,
-      space: event.space,
-    });
+    StatsDController.get().increment(
+      "snapshot_listener.received_snapshot_event",
+      1,
+      {
+        event: eventType,
+        space: event.space,
+      }
+    );
 
-    res.status(200).send({message: "Snapshot event received", event});
+    res.status(200).send({ message: "Snapshot event received", event });
   } catch (err) {
     log.error("Error sending snapshot event", err);
     res.status(500).send("error: " + err);
