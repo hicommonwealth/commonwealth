@@ -364,23 +364,8 @@ export function getListenerNames(
 async function discoverReconnectRange(this: DB, chain: string) {
   let latestBlock;
   try {
-    const eventTypes = (
-      await this.ChainEventType.findAll({
-        where: { chain },
-      })
-    ).map((x) => x.id);
-
-    if (eventTypes.length === 0) {
-      log.info(
-        `[${chain}]: No event types exist in the database`
-      );
-      return { startBlock: null };
-    }
-
     latestBlock = await this.ChainEvent.max('block_number', {
-      where: {
-        chain_event_type_id: eventTypes,
-      },
+      where: { chain },
     });
 
     if (latestBlock) {

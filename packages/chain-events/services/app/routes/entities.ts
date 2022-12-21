@@ -21,7 +21,6 @@ const entities = async (
       {
         model: models.ChainEvent,
         order: [[models.ChainEvent, 'id', 'asc']],
-        include: [models.ChainEventType],
       },
     ],
     order: [['created_at', 'DESC']],

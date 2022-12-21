@@ -4,7 +4,6 @@ import {RascalPublications, RascalSubscriptions, RmqMsgFormatError, TRmqMessages
 import {Sequelize} from "sequelize";
 import {ChainEntityModelStatic} from "chain-events/services/database/models/chain_entity";
 import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
-import {ChainEventTypeModelStatic} from "chain-events/services/database/models/chain_event_type";
 import Rollbar from "rollbar";
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -12,7 +11,6 @@ const log = factory.getLogger(formatFilename(__filename));
 export type SafeRmqPublishSupported =
   ChainEntityModelStatic
   | ChainEventModelStatic
-  | ChainEventTypeModelStatic;
 
 export class RabbitMQControllerError extends Error {
   constructor(msg: string) {
