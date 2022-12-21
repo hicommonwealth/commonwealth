@@ -1,7 +1,6 @@
 import 'components/forms.scss';
 
 import m from 'mithril';
-import $ from 'jquery';
 import { CustomSelect } from 'construct-ui';
 
 interface IDropdownFormFieldChoice {
@@ -59,55 +58,3 @@ export const DropdownFormField: m.Component<IDropdownFormFieldAttrs> = {
     ]);
   },
 };
-
-interface IRadioSelectorChoice {
-  name?: string;
-  label: string;
-  value: number | string;
-  checked?: boolean;
-}
-
-interface IRadioSelectorFormFieldAttrs {
-  callback?: any;
-  choices: IRadioSelectorChoice[];
-  name: string; // required, used for the form submission
-  subtitle?: string;
-  title?: string;
-}
-
-export const RadioSelectorFormField: m.Component<IRadioSelectorFormFieldAttrs> =
-  {
-    view: (vnode: m.VnodeDOM<IRadioSelectorFormFieldAttrs>) => {
-      const { choices, name, subtitle, title } = vnode.attrs;
-
-      return m('.RadioSelectorFormField.FormField', [
-        m('.form-group', [
-          title && m('.form-title', title),
-          subtitle && m('.form-subtitle', subtitle),
-          m(
-            'form.radio-buttons.form-field',
-            choices.map((item) => {
-              return [
-                m('input[type="radio"]', {
-                  name,
-                  value: item.value,
-                  id: item.value,
-                  oncreate: (vvnode) => {
-                    if (item.checked) {
-                      $(vvnode.dom).prop('checked', true);
-                    }
-                  },
-                  oninput: () => {
-                    if (vnode.attrs.callback) {
-                      vnode.attrs.callback(item.value);
-                    }
-                  },
-                }),
-                m('label', { for: item.value }, item.label),
-              ];
-            })
-          ),
-        ]),
-      ]);
-    },
-  };
