@@ -1,5 +1,5 @@
 # Environment Variables
-- `DB_PASSWORD` [OPTIONAL]
+- `PGPASSWORD` [OPTIONAL]
   - avoids the password prompt for all local database commands
 - `ETH_ALCHEMY_API_KEY` [OPTIONAL]
   - if set, the load-db commands will replace production Alchemy urls with their locally supported variants

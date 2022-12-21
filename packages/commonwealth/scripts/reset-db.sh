@@ -7,4 +7,4 @@
 
 load-env-var '.env';
 
-PGPASSWORD=$DB_PASSWORD psql -d postgres -U commonwealth -c 'DROP DATABASE commonwealth WITH (FORCE);' && npx sequelize db:create
+psql -d postgres -U commonwealth -c 'DROP DATABASE commonwealth WITH (FORCE);' && npx sequelize db:create

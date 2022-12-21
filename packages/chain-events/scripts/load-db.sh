@@ -12,4 +12,4 @@ if [ "$1" ]; then
   DUMP_NAME=$1
 fi
 
-PGPASSWORD=$DB_PASSWORD psql -d commonwealth_chain_events -U commonwealth -f "$DUMP_NAME";
+psql -d commonwealth_chain_events -U commonwealth -f "$DUMP_NAME";

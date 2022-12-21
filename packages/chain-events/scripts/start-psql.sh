@@ -7,4 +7,4 @@
 
 load-env-var '.env';
 
-PGPASSWORD=$DB_PASSWORD psql -h localhost commonwealth_chain_events -U commonwealth
+psql -h localhost commonwealth_chain_events -U commonwealth
