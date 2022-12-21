@@ -85,10 +85,6 @@
           margin-top: 2px;
           opacity: 1;
           color: $neutral-500;
-
-          mark {
-            background-color: $purple-100;
-          }
         }
 
         .thread-header.Text {
@@ -117,13 +113,6 @@
 
         .search-results-comment {
           color: $neutral-500;
-        }
-
-        .search-results-thread-body,
-        .search-results-comment {
-          mark {
-            background-color: $purple-100;
-          }
         }
       }
 
