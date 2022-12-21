@@ -42,6 +42,7 @@ export default async function fetchNewSnapshotProposal(id: string) {
             title
             body
             start
+            choices
             end
             space {
               name
