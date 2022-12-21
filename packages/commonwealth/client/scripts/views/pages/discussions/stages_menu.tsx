@@ -18,15 +18,14 @@ import { ThreadStage } from 'models';
 import { threadStageToLabel } from 'helpers';
 
 type StagesMenuAttrs = {
-  disabled: boolean;
-  selectedStage?: ThreadStage;
+  selectedStage: ThreadStage;
   stage: string;
-  stages: ThreadStage[];
+  stages: Array<ThreadStage>;
 };
 
 export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
   view(vnode: m.Vnode<StagesMenuAttrs>) {
-    const { disabled, selectedStage, stage, stages } = vnode.attrs;
+    const { selectedStage, stage, stages } = vnode.attrs;
 
     return m(PopoverMenu, {
       trigger: m(Button, {
@@ -37,7 +36,6 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
           : 'All Stages',
         iconRight: Icons.CHEVRON_DOWN,
         size: 'sm',
-        disabled,
       }),
       hasArrow: false,
       transitionDuration: 0,
@@ -47,7 +45,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
           {m(MenuItem, {
             onclick: (e) => {
               e.preventDefault();
-              navigateToSubpage('/');
+              navigateToSubpage('/discussions');
             },
             active: !stage,
             iconLeft: !stage ? Icons.CHECK : null,
@@ -60,7 +58,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
               iconLeft: stage === targetStage ? Icons.CHECK : null,
               onclick: (e) => {
                 e.preventDefault();
-                navigateToSubpage(`/?stage=${targetStage}`);
+                navigateToSubpage(`/discussions?stage=${targetStage}`);
               },
               label: (
                 <div class="stages-item">
