@@ -1,10 +1,12 @@
+/* @jsx m */
+
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import app from 'state';
 
-import { PageLoading } from 'views/pages/loading';
+import app from 'state';
 import { initAppState } from 'app';
+import { PageLoading } from 'views/pages/loading';
 import { updateActiveAddresses } from 'controllers/app/login';
 import ErrorPage from './error';
 
@@ -54,6 +56,7 @@ class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
     // TODO: how to use state id?
     const token = m.route.param('token');
     const stateId = m.route.param('stateId');
+
     validate(token, stateId, 'axie-infinity').then((res) => {
       if (typeof res === 'string') {
         this.state.error = res;
@@ -65,9 +68,9 @@ class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
   public view() {
     console.log('finish axie login');
     if (this.state.error) {
-      return m(ErrorPage, { title: 'Login Error', message: this.state.error });
+      return <ErrorPage title="Login Error" message={this.state.error} />;
     } else {
-      return m(PageLoading);
+      return <PageLoading />;
     }
   }
 }

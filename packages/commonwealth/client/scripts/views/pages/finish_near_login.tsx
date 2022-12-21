@@ -1,3 +1,5 @@
+/* @jsx m */
+
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import { WalletAccount, WalletConnection } from 'near-api-js';
@@ -7,14 +9,13 @@ import $ from 'jquery';
 
 import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
-
 import {
   updateActiveAddresses,
   createUserWithAddress,
   setActiveAccount,
   completeClientLogin,
 } from 'controllers/app/login';
-import { Account, AddressInfo } from 'models';
+import { Account } from 'models';
 import Near from 'controllers/chain/near/adapter';
 import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
@@ -23,6 +24,8 @@ import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 import { NewLoginModal } from '../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWButton } from '../components/component_kit/cw_button';
 
 interface IState {
   validating: boolean;
@@ -83,7 +86,8 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       // TODO: do we need to do this every time, or only on first connect?
       const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
       const chain =
-        app.user.selectedChain || app.config.chains.getById(app.activeChainId());
+        app.user.selectedChain ||
+        app.config.chains.getById(app.activeChainId());
       const newAcct = await createUserWithAddress(
         acct.address,
         WalletId.NearWallet,
@@ -169,60 +173,65 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
 
   public view() {
     if (!app.chain || !app.chain.loaded || this.state.validating) {
-      return m(PageLoading);
+      return <PageLoading />;
     }
     if (app.chain.base !== ChainBase.NEAR) {
-      return m(PageNotFound);
+      return <PageNotFound />;
     }
     if (this.state.validationError) {
-      return m(Sublayout, [
-        m('h3', `NEAR account log in error: ${this.state.validationError}`),
-        m(
-          'button.formular-button-primary',
-          {
-            onclick: (e) => {
+      return (
+        <Sublayout>
+          <CWText>
+            NEAR account log in error: {this.state.validationError}
+          </CWText>
+          <CWButton
+            onclick={(e) => {
               e.preventDefault();
               redirectToNextPage();
-            },
-          },
-          'Return Home'
-        ),
-      ]);
+            }}
+            label="Return Home"
+          />
+        </Sublayout>
+      );
     } else if (this.state.validationCompleted) {
-      return m(Sublayout, [
-        m('div', {
-          oncreate: async (e) => {
-            if (this.state.validatedAccount.profile.name) {
-              redirectToNextPage();
-            } else {
-              if (this.state.isNewAccount) {
-                if (!app.isLoggedIn()) {
-                  app.modals.create({
-                    modal: NewLoginModal,
-                    data: {
-                      initialBody: 'welcome',
-                      initialSidebar: 'newOrReturning',
-                      initialAccount: this.state.validatedAccount,
-                      modalType: isWindowMediumSmallInclusive(window.innerWidth)
-                        ? 'fullScreen'
-                        : 'centered',
-                      breakpointFn: isWindowMediumSmallInclusive,
-                    },
-                    exitCallback: () => {
-                      redirectToNextPage();
-                    },
-                  });
+      return (
+        <Sublayout>
+          <div
+            oncreate={async () => {
+              if (this.state.validatedAccount.profile.name) {
+                redirectToNextPage();
+              } else {
+                if (this.state.isNewAccount) {
+                  if (!app.isLoggedIn()) {
+                    app.modals.create({
+                      modal: NewLoginModal,
+                      data: {
+                        initialBody: 'welcome',
+                        initialSidebar: 'newOrReturning',
+                        initialAccount: this.state.validatedAccount,
+                        modalType: isWindowMediumSmallInclusive(
+                          window.innerWidth
+                        )
+                          ? 'fullScreen'
+                          : 'centered',
+                        breakpointFn: isWindowMediumSmallInclusive,
+                      },
+                      exitCallback: () => {
+                        redirectToNextPage();
+                      },
+                    });
+                  } else {
+                    await completeClientLogin(this.state.validatedAccount);
+                    redirectToNextPage();
+                  }
                 } else {
-                  await completeClientLogin(this.state.validatedAccount);
                   redirectToNextPage();
                 }
-              } else {
-                redirectToNextPage();
               }
-            }
-          },
-        }),
-      ]);
+            }}
+          />
+        </Sublayout>
+      );
     } else if (!this.state.validating) {
       // chain loaded and on near -- finish login and call lingering txs
       this.state.validating = true;
