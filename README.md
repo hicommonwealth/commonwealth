@@ -9,7 +9,7 @@
 - `yarn start-all`
   - Starts ALL the microservices in different processes. Requires a RabbitMQ instance/connection to function properly.
 - `yarn start-apps`
-  - Starts just the web-servers from all the microservices (current just Commonwealth and Chain-Events)
+  - Starts just the web-servers from all the microservices (currently just Commonwealth and Chain-Events)
   - This should be enough for most local front-end development
 - `yarn start-rmq`
   - Starts a local RabbitMQ instance using Docker.
