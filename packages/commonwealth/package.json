@@ -49,7 +49,8 @@
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh",
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "sync-entities": "ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)",
-    "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'"
+    "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
+    "compress-images": "npx ts-node -T ./scripts/compressImages.ts"
   },
   "engines": {
     "node": "14.x"
@@ -217,6 +218,7 @@
     "sequelize": "^6.16.1",
     "sequelize-cli": "^6.2.0",
     "serve-favicon": "^2.5.0",
+    "sharp": "^0.31.2",
     "sleep-promise": "^8.0.1",
     "smart-truncate": "^1.0.1",
     "socket.io": "^4.3.2",
