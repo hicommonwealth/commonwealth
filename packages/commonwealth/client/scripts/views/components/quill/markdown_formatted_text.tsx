@@ -2,7 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, rootRender } from 'mithrilInterop';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
@@ -101,7 +101,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
 
         const root = document.createElement('div');
 
-        m.render(root, vnodes);
+        rootRender(root, vnodes);
 
         const textToHighlight = root.innerText
           .replace(/\n/g, ' ')
