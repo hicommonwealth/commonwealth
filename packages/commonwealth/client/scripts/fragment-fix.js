@@ -1,6 +1,6 @@
-import m from 'mithril';
+import { jsx } from 'mithrilInterop';
 
-m.Fragment = {
+jsx.Fragment = {
   view(vnode) {
     return vnode.children;
   },

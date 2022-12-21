@@ -4,7 +4,7 @@ import 'pages/new_proposal_page.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalType } from 'common-common/src/types';

@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import {NotificationStore} from 'stores';
 import {NotificationSubscription, Notification, ChainEventType} from 'models';

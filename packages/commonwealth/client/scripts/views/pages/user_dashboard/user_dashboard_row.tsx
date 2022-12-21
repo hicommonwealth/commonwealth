@@ -1,8 +1,7 @@
-/* @jsx m */
-import m from 'mithril';
+/* @jsx jsx */
 
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 

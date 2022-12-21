@@ -2,7 +2,7 @@
 import 'components/widgets/user_gallery.scss';
 
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
 
 import { Account, AddressInfo } from 'models';

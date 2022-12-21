@@ -3,7 +3,7 @@ import 'pages/new_proposal_page.scss';
 import $ from 'jquery';
 
 import { utils } from 'ethers';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import {
   Input,
   TextArea,

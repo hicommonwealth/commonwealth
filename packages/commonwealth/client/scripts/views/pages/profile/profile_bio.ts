@@ -2,7 +2,7 @@
 
 import _ from 'lodash';
 import { Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { Button } from 'construct-ui';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';

@@ -4,7 +4,7 @@ import 'pages/admin.scss';
 
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import app from 'state';

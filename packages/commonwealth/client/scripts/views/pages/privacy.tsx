@@ -1,8 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
 /* eslint-disable max-len */
 
-import m from 'mithril';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/privacy_and_terms.scss';
 

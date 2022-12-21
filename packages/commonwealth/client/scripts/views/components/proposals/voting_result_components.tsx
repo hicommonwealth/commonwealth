@@ -1,9 +1,8 @@
-/* @jsx m */
-import m from 'mithril';
+/* @jsx jsx */
 /* eslint-disable max-classes-per-file */
 
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/proposals/voting_result_components.scss';
 

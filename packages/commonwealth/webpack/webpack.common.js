@@ -155,7 +155,7 @@ module.exports = {
         loader: 'esbuild-loader',
         options: {
           loader: 'tsx',
-          jsxFragment: 'm.Fragment',
+          jsxFragment: 'jsx.Fragment',
         },
       },
       {

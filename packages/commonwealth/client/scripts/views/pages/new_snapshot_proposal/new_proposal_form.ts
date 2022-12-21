@@ -14,7 +14,7 @@ import {
   Icons,
 } from 'construct-ui';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, parsePathname } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, parsePathname } from 'mithrilInterop';
 import moment from 'moment';
 import app from 'state';
 import { navigateToSubpage } from 'app';

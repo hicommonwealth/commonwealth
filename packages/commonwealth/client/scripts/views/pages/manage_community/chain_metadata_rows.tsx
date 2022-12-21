@@ -1,9 +1,8 @@
-/* @jsx m */
-import m from 'mithril';
+/* @jsx jsx */
 
 import $ from 'jquery';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 

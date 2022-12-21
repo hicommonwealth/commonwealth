@@ -1,5 +1,4 @@
-/* @jsx m */
-import m from 'mithril';
+/* @jsx jsx */
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
  // required for getStatusText

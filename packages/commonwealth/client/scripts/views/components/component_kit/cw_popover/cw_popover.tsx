@@ -1,8 +1,6 @@
-/* @jsx m */
-import m from 'mithril';
+/* @jsx jsx */
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, Children } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, Children } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 

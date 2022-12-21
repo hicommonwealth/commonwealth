@@ -1,5 +1,5 @@
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import InputTokenOptionComponent from './input_token_option';
 import { Chain, Token } from './index';
 import { placeholderChain } from './tokens_community_hero';

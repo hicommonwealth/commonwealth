@@ -1,9 +1,8 @@
-/* @jsx m */
-import m from 'mithril';
+/* @jsx jsx */
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import { Button } from 'construct-ui';
 

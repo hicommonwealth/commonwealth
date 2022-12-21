@@ -3,7 +3,7 @@
 import app from 'state';
 import { pluralize } from 'helpers';
 import { Thread, Account } from 'models';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';

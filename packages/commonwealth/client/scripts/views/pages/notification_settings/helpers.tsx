@@ -1,6 +1,5 @@
 /* eslint-disable max-classes-per-file */
-/* @jsx m */
-import m from 'mithril';
+/* @jsx jsx */
 
 // 
 // import $ from 'jquery';

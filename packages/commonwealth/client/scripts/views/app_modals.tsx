@@ -1,5 +1,4 @@
-/* @jsx m */
-import m from 'mithril';
+/* @jsx jsx */
 
 // Modals are Mithril components rendered within the Layout system,
 // which manages a stack of currently displayed modals on the screen.
@@ -38,7 +37,7 @@ import m from 'mithril';
 // })
 
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';

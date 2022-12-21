@@ -1,6 +1,6 @@
 import 'pages/landing/crowdfunding_card_section.scss';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { ICardListItem } from 'models/interfaces';
 
