@@ -3,7 +3,6 @@ import { AppError, ServerError } from 'common-common/src/errors';
 import axios from 'axios';
 import FormData from 'form-data';
 import { DB } from '../models';
-import pinIpfsBlob from '../util/pinIpfsBlob';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 
 const log = factory.getLogger(formatFilename(__filename));
