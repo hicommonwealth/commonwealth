@@ -144,7 +144,8 @@ describe("Tests for the commonwealth-app consumer", () => {
     const entity: RmqEntityCUD.RmqMsgType = {
       ce_id: maxEntityId + 1,
       chain_id: 'aave',
-      cud: 'create'
+      cud: 'create',
+      entity_type_id: '123',
     }
 
     const publishJson = await publishRmqMsg(

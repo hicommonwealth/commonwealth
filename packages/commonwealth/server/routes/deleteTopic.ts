@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import { Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
@@ -13,7 +13,12 @@ export const Errors = {
   DeleteFail: 'Could not delete topic',
 };
 
-const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) => {
+const deleteTopic = async (
+  models: DB,
+  req,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
   if (!req.user) {
@@ -39,11 +44,14 @@ const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) =
     type: QueryTypes.UPDATE,
   });
 
-  topic.destroy().then(() => {
-    res.json({ status: 'Success' });
-  }).catch((e) => {
-    next(new ServerError(Errors.DeleteFail));
-  });
+  topic
+    .destroy()
+    .then(() => {
+      res.json({ status: 'Success' });
+    })
+    .catch((e) => {
+      next(new ServerError(Errors.DeleteFail));
+    });
 };
 
 export default deleteTopic;

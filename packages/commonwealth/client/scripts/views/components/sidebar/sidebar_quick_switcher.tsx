@@ -2,7 +2,8 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { MixpanelPageViewEvent } from 'analytics/types';
 import 'components/sidebar/sidebar_quick_switcher.scss';
 
 import app from 'state';
@@ -37,7 +38,11 @@ export class SidebarQuickSwitcher extends ClassComponent {
               iconButtonTheme="black"
               onclick={(e) => {
                 e.preventDefault();
-                app.sidebarMenu = 'create-content';
+                mixpanelBrowserTrack({
+                  event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
+                  isCustomDomain: app.isCustomDomain(),
+                });
+                app.sidebarMenu = 'createContent';
               }}
             />
           )}
@@ -46,7 +51,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
             iconButtonTheme="black"
             onclick={(e) => {
               e.preventDefault();
-              app.sidebarMenu = 'explore-communities';
+              app.sidebarMenu = 'exploreCommunities';
             }}
           />
         </div>
