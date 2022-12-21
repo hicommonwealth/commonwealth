@@ -21,11 +21,11 @@ const log = factory.getLogger(formatFilename(__filename));
 
 async function queryChainNodesFromDB(lastQueryUnixTime: number): Promise<IChainNode[]> {
   const query = `SELECT * FROM "ChainNodes" WHERE updated_at >= to_timestamp (${lastQueryUnixTime})::date;`;
-  
+
   const DATABASE_URI =
-  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    : process.env.DATABASE_URL;
+    !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+      ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+      : process.env.DATABASE_URL;
 
   const db = new Client({
     connectionString: DATABASE_URI,
@@ -48,6 +48,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
   private _lastQueryTime: number = 0;
   private statsDSender: TbcStatsDSender = new TbcStatsDSender();
   private cacheContents = { zero: 0, nonZero: 0 };
+
   constructor(
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 1 * 60 * 60,
@@ -57,7 +58,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     super({}, noBalancePruneTimeS);
 
     // if providers is set, init during constructor
-    if(providers != null) {
+    if (providers != null) {
       for (const provider of providers) {
         this._providers[provider.name] = provider;
       }
@@ -66,8 +67,8 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
 
   public async initBalanceProviders(providers: BalanceProvider[] = null) {
     // lazy load import to improve test speed
-    if(providers == null) {
-      const p = await import('./providers')
+    if (providers == null) {
+      const p = await import('./providers');
       providers = p.default;
     }
     for (const provider of providers) {
@@ -151,10 +152,10 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
       await this.access((async (c: ICache) => {
         c[cacheKey] = { balance, fetchedAt };
 
-        if(new BN(balance).eqn(0)) {
-          this.cacheContents['zero']++
+        if (new BN(balance).eqn(0)) {
+          this.cacheContents['zero']++;
         } else {
-          this.cacheContents['nonZero']++
+          this.cacheContents['nonZero']++;
         }
       }));
       return balance;
@@ -212,7 +213,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     try {
       balancesResp = await this.getBalancesForAddresses(
         nodeId,
-        [ userAddress ],
+        [userAddress],
         bp,
         opts,
       );
@@ -253,7 +254,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     await this.access(async (cache) => {
       for (const key of Object.keys(cache)) {
         delete cache[key];
-        this.statsDSender.sendJobItemRemoved(key)
+        this.statsDSender.sendJobItemRemoved(key);
       }
     });
     return this.start();

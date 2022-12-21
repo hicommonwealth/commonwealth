@@ -105,7 +105,7 @@ describe('getThreads Tests', () => {
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
     chai.assert.equal(resp.result[0].param, 'community_id');
 
-    resp = await get('/api/threads', {community_id: testComments[0].chain, count_only: 3}, true);
+    resp = await get('/api/threads', { community_id: testComments[0].chain, count_only: 3 }, true);
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

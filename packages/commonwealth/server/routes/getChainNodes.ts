@@ -3,7 +3,7 @@ import {
   GetChainNodesReq, GetChainNodesResp, needParamErrMsg
 } from 'common-common/src/api/extApiTypes';
 import { ChainNodeResp, TokenBalanceCache } from 'token-balance-cache/src';
-import { oneOf, query, validationResult } from "express-validator";
+import { oneOf, query, validationResult } from 'express-validator';
 import { failure, success, TypedRequestQuery, TypedResponse } from '../types';
 
 export const getChainNodesValidation = [

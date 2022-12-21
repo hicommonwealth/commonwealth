@@ -1,5 +1,5 @@
 import { GetCommunitiesReq, GetCommunitiesResp, needParamErrMsg } from 'common-common/src/api/extApiTypes';
-import { oneOf, query, validationResult } from "express-validator";
+import { oneOf, query, validationResult } from 'express-validator';
 import { formatPaginationNoSort } from '../../util/queries';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
@@ -27,8 +27,8 @@ const getCommunities = async (
   const { community_id, network, count_only } = req.query;
 
   let where;
-  if(community_id) where = { id: community_id };
-  if(network) where = { network };
+  if (community_id) where = { id: community_id };
+  if (network) where = { network };
 
   let communities, count;
   if (!count_only) {

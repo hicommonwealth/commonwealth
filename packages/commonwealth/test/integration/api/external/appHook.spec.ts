@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import passport from 'passport';
@@ -41,7 +41,7 @@ before(async () => {
   app.use(passport.session());
 
   const router = express.Router();
-  addExternalRoutes(router, app, models, tokenBalanceCache)
+  addExternalRoutes(router, app, models, tokenBalanceCache);
   app.use('/api', router);
 });
 
@@ -54,6 +54,6 @@ export async function get(path: string, val: Record<string, unknown> = null, exp
 
   if (!expectError) assert.equal(res.statusCode, 200);
 
-  if (res.statusCode === 404) throw Error(`Cannot find api for ${path}`)
+  if (res.statusCode === 404) throw Error(`Cannot find api for ${path}`);
   return JSON.parse(res.text);
 }

@@ -42,7 +42,7 @@ export const getComments = async (
       ...formatPagination(req.query)
     }));
   } else {
-    count = <any>await models.Comment.count({
+    count = await models.Comment.count({
       where,
       include,
       ...formatPagination(req.query)

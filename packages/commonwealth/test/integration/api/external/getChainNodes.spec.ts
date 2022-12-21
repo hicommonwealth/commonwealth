@@ -2,7 +2,7 @@ import 'chai/register-should';
 import chai from 'chai';
 import { GetChainNodesReq } from 'common-common/src/api/extApiTypes';
 import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
-import { get } from "./appHook.spec";
+import { get } from './appHook.spec';
 
 describe('getChainNodes Tests', () => {
   it('should return chainNodes with specified chain_node_ids correctly', async () => {
@@ -28,7 +28,7 @@ describe('getChainNodes Tests', () => {
     chai.assert.equal(resp.result[0].msg, 'Please provide a parameter to query by (chain_node_ids, names)');
 
     resp = await get('/api/chainNodes',
-      { names: (await tokenBalanceCache.getChainNodes()).map(c => c.name), count_only: 3}, true);
+      { names: (await tokenBalanceCache.getChainNodes()).map(c => c.name), count_only: 3 }, true);
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

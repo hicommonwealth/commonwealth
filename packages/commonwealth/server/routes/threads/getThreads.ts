@@ -38,7 +38,7 @@ export const getThreads = async (
   if (addresses) {
     include.push({
       model: models.Address,
-      where: { address: { [Op.in]: addresses }},
+      where: { address: { [Op.in]: addresses } },
       as: 'Address'
     });
   }
@@ -51,7 +51,7 @@ export const getThreads = async (
   if (include_comments) include.push({ model: models.Comment, required: false, });
 
   let threads, count;
-  if(!count_only) {
+  if (!count_only) {
     ({ rows: threads, count } = await models.Thread.findAndCountAll({
       logging: console.log,
       where,

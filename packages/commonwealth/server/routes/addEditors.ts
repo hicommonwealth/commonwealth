@@ -6,7 +6,7 @@ import { findOneRole } from '../util/roles';
 import validateChain from '../middleware/validateChain';
 import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
-import emitNotifications from "../util/emitNotifications";
+import emitNotifications from '../util/emitNotifications';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',

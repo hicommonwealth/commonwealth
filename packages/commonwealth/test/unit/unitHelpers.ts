@@ -8,5 +8,5 @@ export function req<T extends Record<string, unknown> = Record<string, unknown>>
 }
 
 export function res<T>(): TypedResponse<T> {
-  return ({json: (t: T) => t} as never) as TypedResponse<T>;
+  return ({ json: (t: T) => t } as never) as TypedResponse<T>;
 }

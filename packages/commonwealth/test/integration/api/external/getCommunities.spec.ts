@@ -2,7 +2,7 @@ import 'chai/register-should';
 import chai from 'chai';
 import { GetCommunitiesReq } from 'common-common/src/api/extApiTypes';
 import { testChains, testComments } from 'test/integration/api/external/dbEntityHooks.spec';
-import { get } from "./appHook.spec";
+import { get } from './appHook.spec';
 
 describe('getCommunities Tests', () => {
   it('should return communities with specified community_id correctly', async () => {
@@ -34,7 +34,7 @@ describe('getCommunities Tests', () => {
     chai.assert.equal(resp.result[0].msg,
       'Please provide a parameter to query by (community_id, network, comment_id, address_ids, addresses)');
 
-    resp = await get('/api/communities', {community_id: testComments[0].chain, count_only: 3}, true);
+    resp = await get('/api/communities', { community_id: testComments[0].chain, count_only: 3 }, true);
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

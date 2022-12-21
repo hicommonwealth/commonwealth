@@ -21,7 +21,7 @@ const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;
 
-export default async function emitNotifications (
+export default async function emitNotifications(
   models: DB,
   category_id: string,
   object_id: string,
@@ -48,7 +48,7 @@ export default async function emitNotifications (
   };
 
   // typeguard function to differentiate between chain event notifications as needed
-  const isChainEventData = (<IChainEventNotificationData>notification_data).chainEvent !== undefined
+  const isChainEventData = (<IChainEventNotificationData>notification_data).chainEvent !== undefined;
 
   // retrieve distinct user ids given a set of addresses
   const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
@@ -113,7 +113,7 @@ export default async function emitNotifications (
         chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
         category_id: 'chain-event',
         chain_id: (<IChainEventNotificationData>notification_data).chain_id
-      })
+      });
     } else {
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
@@ -154,7 +154,7 @@ export default async function emitNotifications (
           subscriber: `${subscription.subscriber_id}`,
         }
       );
-      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `
+      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `;
       replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
     } else {
       // TODO: rollbar reported issue originates from here

@@ -1,6 +1,6 @@
 import Sequelize from 'sequelize';
 import { GetProfilesReq, GetProfilesResp, needParamErrMsg } from 'common-common/src/api/extApiTypes';
-import { oneOf, query, validationResult } from "express-validator";
+import { oneOf, query, validationResult } from 'express-validator';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
@@ -30,7 +30,7 @@ const getProfiles = async (
   const pagination = formatPagination(req.query);
 
   const where = {};
-  if(profile_ids) where['id'] = { [Op.in]: profile_ids, };
+  if (profile_ids) where['id'] = { [Op.in]: profile_ids, };
   const include = [];
   if (addresses) include.push({
     model: models.Address,
@@ -39,8 +39,8 @@ const getProfiles = async (
   });
 
   let profiles, count;
-  if(!count_only) {
-    ({rows: profiles, count} = await models.Profile.findAndCountAll({
+  if (!count_only) {
+    ({ rows: profiles, count } = await models.Profile.findAndCountAll({
       logging: console.log,
       where,
       include,

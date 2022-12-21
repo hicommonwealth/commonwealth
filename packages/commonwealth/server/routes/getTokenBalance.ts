@@ -2,7 +2,7 @@ import { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
 import { TokenBalanceCache, TokenBalanceResp } from 'token-balance-cache/src';
 import { DB } from 'commonwealth/server/models';
 import { failure, success, TypedRequestQuery, TypedResponse } from 'commonwealth/server/types';
-import { query, validationResult } from "express-validator";
+import { query, validationResult } from 'express-validator';
 
 export const getTokenBalanceValidation = [
   query('chain_node_id').exists().toInt(),

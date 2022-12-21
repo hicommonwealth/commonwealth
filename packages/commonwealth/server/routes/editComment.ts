@@ -13,7 +13,7 @@ import {
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import emitNotifications from "../util/emitNotifications";
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {

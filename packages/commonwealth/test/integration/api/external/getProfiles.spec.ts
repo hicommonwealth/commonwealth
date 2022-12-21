@@ -5,11 +5,11 @@ import {
   testAddresses,
   testProfiles
 } from 'test/integration/api/external/dbEntityHooks.spec';
-import { get } from "./appHook.spec";
+import { get } from './appHook.spec';
 
 describe('getProfiles Tests', () => {
   it('should return profiles with specified profile_id correctly', async () => {
-    console.log(testAddresses.map(p => p.address))
+    console.log(testAddresses.map(p => p.address));
     const r: GetProfilesReq = { addresses: testAddresses.map(p => p.address) };
     const resp = await get('/api/profiles', r, true);
 
@@ -37,7 +37,7 @@ describe('getProfiles Tests', () => {
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Please provide a parameter to query by (addresses, profile_ids)');
 
-    resp = await get('/api/profiles', {profile_ids: testProfiles.map(p => p.id) , count_only: 3}, true);
+    resp = await get('/api/profiles', { profile_ids: testProfiles.map(p => p.id), count_only: 3 }, true);
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
