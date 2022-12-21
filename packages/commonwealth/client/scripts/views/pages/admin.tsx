@@ -63,7 +63,11 @@ class SudoForm extends ClassComponent {
           disabled={this.txProcessing}
           onclick={(e) => {
             e.preventDefault();
-            const call = EdgewareFunctionPicker.getMethod();
+            const call = EdgewareFunctionPicker.getMethod({
+              module: '',
+              function: '',
+              args: [],
+            });
             this.txProcessing = true;
             this.resultText = 'Waiting...';
             m.redraw();
