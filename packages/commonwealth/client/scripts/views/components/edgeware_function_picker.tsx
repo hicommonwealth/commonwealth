@@ -10,13 +10,17 @@ import { CWText } from './component_kit/cw_text';
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWDropdown } from './component_kit/cw_dropdown';
 
-class EdgewareFunctionPicker extends ClassComponent {
-  private form = { module: '', function: '', args: [] };
+type EdgewareFunctionPickerProps = {
+  module: string;
+  function: string;
+  args: any[];
+};
 
-  public getMethod() {
-    const mod = this.form.module;
-    const func = this.form.function;
-    const args = this.form.args;
+class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps> {
+  public static getMethod(attrs: EdgewareFunctionPickerProps) {
+    const mod = attrs.module;
+    const func = attrs.function;
+    const args = attrs.args;
     try {
       return (app.chain as Substrate).chain.getTxMethod(mod, func, args);
     } catch (error) {
@@ -25,21 +29,21 @@ class EdgewareFunctionPicker extends ClassComponent {
     }
   }
 
-  public view() {
-    this.form = this.form || { module: '', function: '', args: [] };
-    this.form.module =
-      this.form.module || (app.chain as Substrate).chain.listApiModules()[0];
-    this.form.function =
-      this.form.function ||
-      (app.chain as Substrate).chain.listModuleFunctions(this.form.module)[0];
-    this.form.args = this.form.args || [];
+  public view(vnode: m.Vnode<EdgewareFunctionPickerProps>) {
+    vnode.attrs = vnode.attrs || { module: '', function: '', args: [] };
+    vnode.attrs.module =
+      vnode.attrs.module || (app.chain as Substrate).chain.listApiModules()[0];
+    vnode.attrs.function =
+      vnode.attrs.function ||
+      (app.chain as Substrate).chain.listModuleFunctions(vnode.attrs.module)[0];
+    vnode.attrs.args = vnode.attrs.args || [];
 
     let argumentInputs;
 
     try {
       argumentInputs = (app.chain as Substrate).chain.generateArgumentInputs(
-        this.form.module,
-        this.form.function
+        vnode.attrs.module,
+        vnode.attrs.function
       );
     } catch (e) {
       return <CWText>Invalid function!</CWText>;
@@ -55,11 +59,11 @@ class EdgewareFunctionPicker extends ClassComponent {
               return { label: mod, value: mod };
             })}
           onSelect={(result) => {
-            this.form.module = result.value;
-            this.form.function = (
+            vnode.attrs.module = result.value;
+            vnode.attrs.function = (
               app.chain as Substrate
             ).chain.listModuleFunctions(result.value)[0];
-            this.form.args = [];
+            vnode.attrs.args = [];
             m.redraw();
             setTimeout(() => {
               m.redraw();
@@ -69,13 +73,13 @@ class EdgewareFunctionPicker extends ClassComponent {
         <CWDropdown
           label="Function"
           options={(app.chain as Substrate).chain
-            .listModuleFunctions(this.form.module)
+            .listModuleFunctions(vnode.attrs.module)
             .map((func) => {
               return { label: func, value: func };
             })}
           onSelect={(result) => {
-            this.form.function = result.value;
-            this.form.args = [];
+            vnode.attrs.function = result.value;
+            vnode.attrs.args = [];
             setTimeout(() => {
               m.redraw();
             }, 0);
@@ -89,7 +93,7 @@ class EdgewareFunctionPicker extends ClassComponent {
                 placeholder={`${name} (${app.chain.currency})`}
                 oninput={(e) => {
                   const result = (e.target as any).value;
-                  this.form.args[index] = app.chain.chain.coins(
+                  vnode.attrs.args[index] = app.chain.chain.coins(
                     parseFloat(result),
                     true
                   );
@@ -104,7 +108,7 @@ class EdgewareFunctionPicker extends ClassComponent {
                 placeholder={`${name} (${type})`}
                 oninput={(e) => {
                   const result = (e.target as any).value;
-                  this.form.args[index] = result
+                  vnode.attrs.args[index] = result
                     .split(',')
                     .map((str) => str.trim());
                   m.redraw(); // TODO: why is this needed?
@@ -118,7 +122,7 @@ class EdgewareFunctionPicker extends ClassComponent {
                 placeholder={`${name} (${type})`}
                 oninput={(e) => {
                   const result = (e.target as any).value;
-                  this.form.args[index] = result;
+                  vnode.attrs.args[index] = result;
                   m.redraw(); // TODO: why is this needed?
                 }}
               />
@@ -129,7 +133,9 @@ class EdgewareFunctionPicker extends ClassComponent {
         <CWTextInput
           label="Proposal Hash"
           disabled
-          value={this.getMethod() ? blake2AsHex(this.getMethod().toHex()) : ''}
+          value={EdgewareFunctionPicker.getMethod(vnode.attrs)
+            ? blake2AsHex(EdgewareFunctionPicker.getMethod(vnode.attrs).toHex())
+            : ''}
         />
       </>
     );
