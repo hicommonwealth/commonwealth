@@ -111,124 +111,25 @@ export class SelectAddressModal extends ClassComponent {
     const activeCommunityMeta = app.chain.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
-    return m('.SelectAddressModal', [
-      m('.compact-modal-title', [m('h3', 'Manage addresses')]),
-      m('.compact-modal-body', [
-        this.activeAccountsByRole.length === 0
-          ? m('.select-address-placeholder', [
-              m('p', [
-                `Connect ${
-                  chainbase && app.chain.network === ChainNetwork.Terra
+    return (
+      <div class='SelectAddressModal'>
+        <div class='.compact-modal-title'>
+          <h3> Manage addresses </h3>
+        </div>
+        <div class='compact-modal-body'>
+          {this.activeAccountsByRole === 0 ? (
+            <div class='.select-address-placeholder'>
+              <p>Connect{ chainbase && app.chain.network === ChainNetwork.Terra
                     ? 'Terra'
                     : chainbase
                     ? chainbase[0].toUpperCase() + chainbase.slice(1)
                     : 'Web3'
-                } address to join this community: `,
-              ]),
-            ])
-          : m('.select-address-options', [
-              this.activeAccountsByRole.map(
-                ([account, role], index) =>
-                  role &&
-                  m('.select-address-option.existing', [
-                    m('.select-address-option-left', [
-                      m(UserBlock, { user: account }),
-                      app.user.addresses.find(
-                        (a) =>
-                          a.address === account.address &&
-                          a.chain.id === account.chain.id
-                      )?.walletId === WalletId.Magic &&
-                        m(
-                          '.magic-label',
-                          `Magically linked to ${app.user.email}`
-                        ),
-                    ]),
-                    m('.role-remove', [
-                      m(
-                        'span.already-connected',
-                        `${formatAsTitleCase(role.permission)} of '${
-                          activeEntityInfo?.name
-                        }'`
-                      ),
-                      m(CWIcon, {
-                        iconName: 'close',
-                        iconSize: 'small',
-                        onclick: deleteRole.bind(this, index),
-                      }),
-                    ]),
-                  ])
-              ),
-              this.activeAccountsByRole.map(
-                ([account, role], index) =>
-                  !role &&
-                  m(
-                    '.select-address-option',
-                    {
-                      class:
-                        this.selectedIndex === index ? 'selected' : '',
-                      onclick: async (e) => {
-                        e.preventDefault();
-                        this.selectedIndex = index;
-                      },
-                    },
-                    [
-                      m('.select-address-option-left', [
-                        m(UserBlock, {
-                          user: account,
-                          showRole: true,
-                          selected: this.selectedIndex === index,
-                        }),
-                        app.user.addresses.find(
-                          (a) =>
-                            a.address === account.address &&
-                            a.chain.id === account.chain.id
-                        )?.walletId === WalletId.Magic &&
-                          m(
-                            '.magic-label',
-                            `Magically linked to ${app.user.email}`
-                          ),
-                      ]),
-                      role &&
-                        m('.role-permission', [
-                          m(Tag, {
-                            label: formatAsTitleCase(role.permission),
-                            rounded: true,
-                            size: 'sm',
-                          }),
-                          role.is_user_default &&
-                            m(Tag, {
-                              label: 'Last used',
-                              rounded: true,
-                              size: 'sm',
-                            }),
-                        ]),
-                    ]
-                  )
-              ),
-            ]),
-        hasTermsOfService &&
-          m('p.terms-of-service', [
-            `By linking an address, you agree to ${activeCommunityMeta.name}'s `,
-            m(
-              'a',
-              { href: activeCommunityMeta.terms, target: '_blank' },
-              'terms of service'
-            ),
-            '.',
-          ]),
-        this.activeAccountsByRole.length !== 0 &&
-          m(Button, {
-            label: 'Join community with address',
-            intent: 'primary',
-            compact: true,
-            fluid: true,
-            rounded: true,
-            disabled:
-              typeof this.selectedIndex !== 'number' || this.loading,
-            onclick: createRole.bind(this),
-          }),
-      ]),
-    ]);
+}</p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 }
 
