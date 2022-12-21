@@ -13,9 +13,6 @@ import {
 import {
   ChainEntityMetaModelStatic
 } from './models/chain_entity_meta';
-import {
-  ChainEventTypeModelStatic
-} from './models/chain_event_type';
 import { ChainNodeModelStatic } from './models/chain_node';
 import { ChatChannelModelStatic } from './models/chat_channel';
 import { ChatMessageModelStatic } from './models/chat_message';
@@ -62,7 +59,6 @@ export type Models = {
   ChainCategory: ChainCategoryModelStatic;
   ChainCategoryType: ChainCategoryTypeModelStatic;
   ChainEntityMeta: ChainEntityMetaModelStatic;
-  ChainEventType: ChainEventTypeModelStatic;
   ChainNode: ChainNodeModelStatic;
   ChatChannel: ChatChannelModelStatic;
   ChatMessage: ChatMessageModelStatic;
