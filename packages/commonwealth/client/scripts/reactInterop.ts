@@ -92,17 +92,17 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A> {
     this.onremove(this.props);
   }
 
+  render() {
+    this.oncreate(this.props);
+    return this.view(this.props);
+  }
+
   public oninit(v: Readonly<A>) {};
   public onupdate(v: Readonly<A>) {};
   public onremove(v: Readonly<A>) {};
   public oncreate(v: Readonly<A>) {};
 
   abstract view(v: Readonly<A>): Children | null;
-
-  render() {
-    this.oncreate(this.props);
-    return this.view(this.props);
-  }
 }
 
 type RouteOptions = {

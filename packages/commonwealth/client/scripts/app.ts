@@ -436,6 +436,7 @@ export async function initNewTokenChain(address: string) {
 
 // TODO: fix this vs mithrilInterop
 // set up route navigation
+/*
 m.route.prefix = '';
 const _updateRoute = m.route.set;
 export const updateRoute = (...args) => {
@@ -457,6 +458,7 @@ m.route.set = (...args) => {
   const body = document.getElementsByTagName('body')[0];
   if (body) body.scrollTo(0, 0);
 };
+*/
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain() && app.activeChainId()) {
