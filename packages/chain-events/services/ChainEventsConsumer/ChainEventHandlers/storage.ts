@@ -148,8 +148,6 @@ export default class extends IEventHandler {
 
     if (!cachedEvent) {
       const dbEvent = await this._models.ChainEvent.create(eventData);
-      // populate chainEventType, so we don't need to re-populate it in subsequence handlers
-      dbEvent.ChainEventType = dbEventType;
       // no need to save the entire event data since the key is the hash of the data
       this.eventCache.set(eventKey, true);
 
