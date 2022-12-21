@@ -17,11 +17,12 @@ import WalletConnectWebWalletController from 'controllers/app/webWallets/walletc
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import { CWText } from './cw_text';
-import { CWWalletOptionRow } from './cw_wallet_option_row';
+import { CWWalletOptionRow, CWWalletMissingOptionRow } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
+import KeplrWebWalletController from 'client/scripts/controllers/app/webWallets/keplr_web_wallet';
 import { CWSpinner } from './cw_spinner';
 
 // Copied over from the old wallet selector with modifications
@@ -207,13 +208,15 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       }
 
       try {
-        const validationBlockInfo =
-          wallet.getRecentBlock && (await wallet.getRecentBlock());
+        const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, wallet.getChainId());
+        const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
+        const validationBlockInfo = wallet.getRecentBlock && await wallet.getRecentBlock(chainIdentifier);
         const { account: signerAccount, newlyCreated } =
           await createUserWithAddress(
             address,
             wallet.name,
-            app.chain?.id || wallet.defaultNetwork,
+            chainIdentifier,
+            sessionPublicAddress,
             validationBlockInfo
           );
         accountVerifiedCallback(signerAccount, newlyCreated, linking);
@@ -276,7 +279,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                             address = wallet.accounts[accountIndex].address;
                           }
                           $('.AccountSelector').trigger('modalexit');
-                          await handleNormalWalletLogin(wallet, address);
+                          await handleNormalWalletLogin(wallet as KeplrWebWalletController, address);
                         },
                       },
                     });
@@ -351,6 +354,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                 }}
               />
             ))}
+            {wallets.length === 0 && <CWWalletMissingOptionRow darkMode={darkMode} />}
           </div>
           <div className="wallet-list-links">
             {showResetWalletConnect && (
