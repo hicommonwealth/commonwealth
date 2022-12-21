@@ -55,10 +55,12 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
     const banner = app.chain ? chain.communityBanner : null;
     const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
+    const showSidebar = app.sidebarToggled || !this.isWindowSmallInclusive;
 
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
+
     return (
       <div class="Sublayout">
         <div class="header-and-body-container">
@@ -67,7 +69,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
             onMobile={this.isWindowSmallInclusive}
           />
           <div class="sidebar-and-body-container">
-            <Sidebar onMobile={this.isWindowSmallInclusive} />
+            {showSidebar && <Sidebar />}
             <div class="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}

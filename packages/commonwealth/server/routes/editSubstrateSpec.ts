@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { ChainBase } from 'common-common/src/types';
 import { AppError, ServerError } from 'common-common/src/errors';

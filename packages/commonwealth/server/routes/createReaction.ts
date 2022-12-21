@@ -1,12 +1,15 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import { ChainType, NotificationCategories } from 'common-common/src/types';
+import {
+  ChainNetwork,
+  ChainType,
+  NotificationCategories,
+} from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
@@ -47,9 +50,11 @@ const createReaction = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
-  const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } = req.body;
+
+  const author = req.address;
+
+  const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } =
+    req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new AppError(Errors.NoPostId));
@@ -107,7 +112,10 @@ const createReaction = async (
     }
   }
 
-  if (chain && chain.type === ChainType.Token) {
+  if (
+    chain &&
+    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+  ) {
     // skip check for admins
     const isAdmin = await findAllRoles(
       models,

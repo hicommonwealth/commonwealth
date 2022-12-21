@@ -1,8 +1,8 @@
-import {RmqEntityCUD} from './chainEntityCUD'
+import { RmqEntityCUD } from './chainEntityCUD'
 import {
   RmqCENotificationCUD
 } from "./chainEventNotificationsCUD";
-import {RmqCETypeCUD} from "./chainEventTypeCUD";
+import { RmqCETypeCUD } from "./chainEventTypeCUD";
 
 export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD'
@@ -10,8 +10,10 @@ export * from './chainEventTypeCUD'
 
 export * from "./ChainEvents"
 export * from "./ChainEventNotification"
-import {RmqCWEvent} from "common-common/src/rabbitmq/types/ChainEvents";
-import {RmqCENotification} from "common-common/src/rabbitmq/types/ChainEventNotification";
+import { RmqCWEvent } from "./ChainEvents";
+import { RmqCENotification } from "./ChainEventNotification";
+import { RmqSnapshotEvent } from "./snapshotListener";
+import { RmqSnapshotNotification } from "./snapshotNotification";
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -33,6 +35,8 @@ export type TRmqMessages =
   | RmqCETypeCUD.RmqMsgType
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
+  | RmqSnapshotEvent.RmqMsgType
+  | RmqSnapshotNotification.RmqMsgType
 
 export interface RmqMsgNamespace<MsgType> {
   getInvalidFormatError(...args): RmqMsgFormatError,
@@ -45,7 +49,8 @@ export enum RascalPublications {
   ChainEntityCUDMain = 'ChainEntityCUDMainPublication',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainPublication',
   ChainEventNotifications = 'ChainEventNotificationsPublication',
-  ChainEventTypeCUDMain = 'ChainEventTypeCUDMainPublication'
+  ChainEventTypeCUDMain = 'ChainEventTypeCUDMainPublication',
+  SnapshotListener = 'SnapshotListenerPublication'
 }
 
 export enum RascalSubscriptions {
@@ -53,13 +58,15 @@ export enum RascalSubscriptions {
   ChainEntityCUDMain = 'ChainEntityCUDMainSubscription',
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDSubscription',
   ChainEventNotifications = 'ChainEventNotificationsSubscription',
-  ChainEventTypeCUDMain = 'ChainEventTypeCUDMainSubscription'
+  ChainEventTypeCUDMain = 'ChainEventTypeCUDMainSubscription',
+  SnapshotListener = 'SnapshotListenerSubscription'
 }
 
 export enum RascalExchanges {
   ChainEvents = 'ChainEventsExchange',
   CUD = 'CreateUpdateDeleteExchange',
   Notifications = 'NotificationsExchange',
+  SnapshotListener = 'SnapshotListenerExchange',
   DeadLetter = 'DeadLetterExchange'
 }
 
@@ -69,6 +76,7 @@ export enum RascalQueues {
   ChainEventNotificationsCUDMain = 'ChainEventNotificationsCUDMainQueue',
   ChainEventNotifications = 'ChainEventNotificationsQueue',
   ChainEventTypeCUDMain = 'ChainEventTypeCUDMainQueue',
+  SnapshotListener = 'SnapshotListenerQueue',
   DeadLetter = 'DeadLetterQueue'
 }
 
@@ -78,6 +86,7 @@ export enum RascalBindings {
   ChainEventNotificationsCUD = 'ChainEventNotificationsCUDBinding',
   ChainEventNotifications = 'ChainEventNotificationsBinding',
   ChainEventType = 'ChainEventTypeBinding',
+  SnapshotListener = 'SnapshotListenerBinding',
   DeadLetter = 'DeadLetterBinding'
 }
 
@@ -87,6 +96,9 @@ export enum RascalRoutingKeys {
   ChainEventNotificationsCUD = 'ChainEventNotificationsCUD',
   ChainEventNotifications = 'ChainEventNotifications',
   ChainEventTypeCUD = 'ChainEventTypeCUD',
+  SnapshotListener = 'SnapshotListener',
   DeadLetter = 'deadLetter'
 }
+
+
 

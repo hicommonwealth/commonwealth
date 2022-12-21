@@ -39,7 +39,6 @@ import { clearEditingLocalStorage } from '../../components/comments/helpers';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
 import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { getThreadSubScriptionMenuItem } from '../discussions/discussion_row_menu';
 import { CollapsibleThreadBody } from '../../components/collapsible_body_text';
 import { CreateComment } from '../../components/comments/create_comment';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -49,6 +48,7 @@ import { EditBody } from './edit_body';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
+import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -68,7 +68,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
   private comments: Array<Comment<Thread>>;
   private isEditingBody: boolean;
   private isGloballyEditing: boolean;
-  private polls: Poll[];
+  private polls: Array<Poll>;
   private prefetch: ThreadPrefetch;
   private recentlyEdited: boolean;
   private savedEdits: string;
@@ -378,7 +378,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
         chain: app.activeChainId(),
       });
 
-    const showLinkedSnapshotOptions =
+    const showLinkedProposalOptions =
       thread.snapshotProposal?.length > 0 ||
       thread.chainEntities?.length > 0 ||
       isAuthor ||
@@ -556,7 +556,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
         <CWContentPage
           contentBodyLabel="Thread"
           showSidebar={
-            showLinkedSnapshotOptions ||
+            showLinkedProposalOptions ||
             showLinkedThreadOptions ||
             this.polls?.length > 0 ||
             isAuthor
@@ -608,7 +608,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
-                  ) : !this.isGloballyEditing && canComment ? (
+                  ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
                     <>
                       {reactionsAndReplyButtons}
                       <CreateComment
@@ -634,13 +634,13 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           }
           sidebarComponents={
             [
-              ...(showLinkedSnapshotOptions || showLinkedThreadOptions
+              ...(showLinkedProposalOptions || showLinkedThreadOptions
                 ? [
                     {
                       label: 'Links',
                       item: (
                         <div class="cards-column">
-                          {showLinkedSnapshotOptions && (
+                          {showLinkedProposalOptions && (
                             <LinkedProposalsCard
                               onChangeHandler={(
                                 stage: ThreadStageType,
@@ -664,7 +664,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                           )}
                           {showLinkedThreadOptions && (
                             <LinkedThreadsCard
-                              threadlId={thread.id}
+                              threadId={thread.id}
                               allowLinking={isAuthor || isAdminOrMod}
                             />
                           )}

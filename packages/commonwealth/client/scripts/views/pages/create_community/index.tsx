@@ -78,13 +78,6 @@ class CreateCommunity extends ClassComponent {
     });
   }
 
-  oncreate() {
-    mixpanelBrowserTrack({
-      event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
-      isCustomDomain: app.isCustomDomain(),
-    });
-  }
-
   view() {
     const getActiveForm = () => {
       const { ethChains, ethChainNames } = this.state;

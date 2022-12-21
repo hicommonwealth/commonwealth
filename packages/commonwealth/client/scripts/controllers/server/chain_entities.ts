@@ -1,9 +1,9 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 
-import {ChainEntityStore} from 'stores';
-import {ChainBase, ChainNetwork} from 'common-common/src/types';
-import {ChainEntity, ChainEvent, ChainInfo} from 'models';
+import { ChainEntityStore } from 'stores';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainEntity, ChainEvent, ChainInfo } from 'models';
 import app from 'state';
 import {
   CWEvent,
@@ -13,11 +13,10 @@ import {
   SubstrateTypes,
   SupportedNetwork,
   getUniqueEntityKey,
-  IChainEntityKind
+  IChainEntityKind,
 } from 'chain-events/src';
-import {notifyError} from '../app/notifications';
-import {getBaseUrl, getFetch, ServiceUrls} from 'helpers/getUrl';
-
+import { notifyError } from '../app/notifications';
+import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
@@ -43,7 +42,6 @@ const get = (route, args, callback) => {
     })
     .catch((e) => console.error(e));
 };
-
 
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
@@ -90,12 +88,12 @@ class ChainEntityController {
    * @param chain
    */
   public async refresh(chain: string) {
-    const options: any = {chain};
+    const options: any = { chain };
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
       getFetch(getBaseUrl() + '/entities', options),
-      getFetch(getBaseUrl() + '/getEntityMeta', options)
+      getFetch(getBaseUrl() + '/getEntityMeta', options),
     ]);
 
     if (Array.isArray(entities)) {
@@ -117,7 +115,7 @@ class ChainEntityController {
   }
 
   public async refreshRawEntities(chain: string) {
-    const entities = await getFetch(getBaseUrl() + '/entities', {chain});
+    const entities = await getFetch(getBaseUrl() + '/entities', { chain });
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);
@@ -147,7 +145,11 @@ class ChainEntityController {
     this._handlers = {};
   }
 
-  private _handleEvents(chain: string, network: SupportedNetwork, events: CWEvent[]) {
+  private _handleEvents(
+    chain: string,
+    network: SupportedNetwork,
+    events: CWEvent[]
+  ) {
     for (const cwEvent of events) {
       // immediately return if no entity involved, event unrelated to proposals/etc
       const eventEntity = eventToEntity(network, cwEvent.data.kind);
@@ -168,9 +170,15 @@ class ChainEntityController {
       if (!fieldName) continue;
       const fieldValue = event.data[fieldName];
 
-      const entity = this.store.getByUniqueData(chain, entityKind, fieldValue.toString());
+      const entity = this.store.getByUniqueData(
+        chain,
+        entityKind,
+        fieldValue.toString()
+      );
       if (!entity) {
-        console.log("Client creation of entities not supported. Please refresh to fetch new entities from the server.");
+        console.log(
+          'Client creation of entities not supported. Please refresh to fetch new entities from the server.'
+        );
         return;
       }
 
@@ -189,15 +197,19 @@ class ChainEntityController {
   }
 
   public async updateEntityTitle(uniqueIdentifier: string, title: string) {
-    const chainEntity = this.store.getByUniqueId(app.activeChainId(), uniqueIdentifier);
-    if (!chainEntity) console.error("Cannot update title for non-existent entity")
+    const chainEntity = this.store.getByUniqueId(
+      app.activeChainId(),
+      uniqueIdentifier
+    );
+    if (!chainEntity)
+      console.error('Cannot update title for non-existent entity');
     return $.ajax({
       url: `${app.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
         jwt: app.user.jwt,
         chain_entity_id: chainEntity.id,
-        title: title,
+        title,
         chain: app.activeChainId(),
       },
       success: (response) => {

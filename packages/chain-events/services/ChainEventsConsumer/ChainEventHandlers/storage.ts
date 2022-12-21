@@ -161,6 +161,10 @@ export default class extends IEventHandler {
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
 
+      StatsDController.get().increment(
+        'ce.event-cache-chain-hit', {chain}
+      );
+
       const cacheStats = this.eventCache.getStats();
       StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
       StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);

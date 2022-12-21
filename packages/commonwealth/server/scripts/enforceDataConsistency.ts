@@ -44,10 +44,10 @@ export async function enforceDataConsistency(
 
   const chainEntitySyncQuery = `
       WITH existingCeIds AS (SELECT ce_id FROM "ChainEntityMeta")
-      INSERT INTO "ChainEntityMeta" (ce_id, chain, author)
-      SELECT "AllChainEntities".id as ce_id, chain, author
+      INSERT INTO "ChainEntityMeta" (ce_id, chain, author, type_id)
+      SELECT "AllChainEntities".id as ce_id, chain, author, type_id
       FROM dblink('${ce_db_uri}',
-                  'SELECT id, chain, author FROM "ChainEntities";') as "AllChainEntities"(id int, chain varchar(255), author varchar(255))
+                  'SELECT id, chain, author, type_id FROM "ChainEntities";') as "AllChainEntities"(id int, chain varchar(255), author varchar(255), type_id varchar(255))
       WHERE "AllChainEntities".id NOT IN (SELECT * FROM existingCeIds)
       RETURNING ce_id;
   `;
@@ -74,7 +74,8 @@ export async function enforceDataConsistency(
 if (process.argv[2] == 'run-as-script') {
   enforceDataConsistency(process.argv[3])
     .then(() => {
-      console.log("Successfully synced the databases")
+      console.log("Successfully synced the databases");
+      process.exit(0);
     })
     .catch((e) => {
       console.error(e);

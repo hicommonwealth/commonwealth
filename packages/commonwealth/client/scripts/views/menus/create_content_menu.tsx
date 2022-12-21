@@ -175,8 +175,32 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           isCustomDomain: app.isCustomDomain(),
           communityType: null,
         });
+        app.sidebarToggled = false;
         app.sidebarMenu = 'default';
         m.route.set('/createCommunity');
+      },
+    },
+    {
+      label: 'Gate your Discord',
+      iconLeft: 'discord',
+      onclick: (e) => {
+        e.preventDefault();
+        mixpanelBrowserTrack({
+          event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
+          chainBase: null,
+          isCustomDomain: app.isCustomDomain(),
+          communityType: null,
+        });
+        app.sidebarToggled = false;
+        app.sidebarMenu = 'default';
+
+        window.open(
+          `https://discord.com/oauth2/authorize?client_id=${
+            process.env.DISCORD_CLIENT_ID
+          }&permissions=8&scope=applications.commands%20bot&redirect_uri=${encodeURI(
+            process.env.DISCORD_UI_URL
+          )}/callback&response_type=code&scope=bot`
+        );
       },
     },
   ];
@@ -223,6 +247,7 @@ export class CreateContentSidebar extends ClassComponent {
             );
             sidebar[0].classList.add('onremove');
             setTimeout(() => {
+              app.sidebarToggled = false;
               app.sidebarMenu = 'default';
               m.redraw();
             }, 200);
@@ -253,17 +278,18 @@ export class CreateContentMenu extends ClassComponent {
 
 export class CreateContentPopover extends ClassComponent {
   view() {
-    if (!app.isLoggedIn() || !app.chain || !app.activeChainId()) return;
+    if (
+      !app.isLoggedIn() ||
+      !app.chain ||
+      !app.activeChainId() ||
+      !app.user.activeAccount
+    ) {
+      return;
+    }
 
     return (
       <CWPopoverMenu
-        trigger={
-          <CWIconButton
-            iconButtonTheme="black"
-            disabled={!app.user.activeAccount}
-            iconName="plusCircle"
-          />
-        }
+        trigger={<CWIconButton iconButtonTheme="black" iconName="plusCircle" />}
         menuItems={getCreateContentMenuItems()}
       />
     );
