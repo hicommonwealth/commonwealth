@@ -13,7 +13,7 @@ fi
 psql -d commonwealth -U commonwealth -W -f latest.dump
 if [ "$ETH_ALCHEMY_API_KEY" ]
 then
-  ETH_ALCHEMY_URL="=wss://eth-mainnet.g.alchemy.com/v2"
+  ETH_ALCHEMY_URL="wss://eth-mainnet.g.alchemy.com/v2"
   psql -d commonwealth -U commonwealth -c "UPDATE \"ChainNodes\" SET url = '$ETH_ALCHEMY_URL/$ETH_ALCHEMY_API_KEY', alt_wallet_url = '$ETH_ALCHEMY_URL/$ETH_ALCHEMY_API_KEY' WHERE eth_chain_id = 1;"
 else
   echo "You don't have the correct env var set so the Alchemy API urls were not updated"
