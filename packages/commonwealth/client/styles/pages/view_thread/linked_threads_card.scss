@@ -1,8 +1,6 @@
 @import 'shared';
 
 .LinkedThreadsCard {
-  border-radius: $border-radius-corners;
-  border: 1px solid $neutral-200;
   display: flex;
   flex-direction: column;
   gap: 16px;
