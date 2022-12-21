@@ -159,9 +159,9 @@ const getCommentResult = (comment, searchTerm) => {
         <div class="search-results-thread-header">
           {`comment - ${comment.chain || comment.community}`}
         </div>
-        <div class="search-results-thread-title">
+        {/* <div class="search-results-thread-title">
           {decodeURIComponent(comment.title)}
-        </div>
+        </div> */}
         <div class="search-results-thread-subtitle">
           <span class="created-at">{moment(comment.created_at).fromNow()}</span>
           {m(User, {
