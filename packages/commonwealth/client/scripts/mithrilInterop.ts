@@ -28,6 +28,9 @@ export abstract class ClassComponent<A = {}> implements m.ClassComponent<A> {
   protected readonly __props: A;
 
   public oninit(v: ResultNode<A>) { };
+  public onupdate(v: ResultNode<A>) { };
+  public onremove(v: ResultNode<A>) { };
+  public oncreate(v: ResultNode<A>) { };
 
   abstract view(v: ResultNode<A>): Children | null;
 }
