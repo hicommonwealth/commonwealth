@@ -59,8 +59,6 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
       }
     }
 
-    const formState = { module: '', function: '', args: [] };
-
     return (
       <>
         <CWDropdown
@@ -83,7 +81,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
         )}
         {this.councilMotionType === 'createExternalProposal' ||
           (this.councilMotionType === 'createExternalProposalMajority' &&
-            m(EdgewareFunctionPicker, formState))}
+            m(EdgewareFunctionPicker))}
         {hasExternalProposalSelector &&
           substrate.democracyProposals.nextExternal && (
             <CWDropdown
@@ -184,8 +182,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               args = [
                 author,
                 threshold,
-                EdgewareFunctionPicker.getMethod(formState),
-                EdgewareFunctionPicker.getMethod(formState).encodedLength,
+                EdgewareFunctionPicker.getMethod(),
+                EdgewareFunctionPicker.getMethod().encodedLength,
               ];
 
               createFunc = ([a, t, mt, l]) =>
@@ -196,8 +194,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               args = [
                 author,
                 threshold,
-                EdgewareFunctionPicker.getMethod(formState),
-                EdgewareFunctionPicker.getMethod(formState).encodedLength,
+                EdgewareFunctionPicker.getMethod(),
+                EdgewareFunctionPicker.getMethod().encodedLength,
               ];
 
               createFunc = ([a, t, mt, l]) =>
@@ -208,8 +206,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               args = [
                 author,
                 threshold,
-                EdgewareFunctionPicker.getMethod(formState),
-                EdgewareFunctionPicker.getMethod(formState).encodedLength,
+                EdgewareFunctionPicker.getMethod(),
+                EdgewareFunctionPicker.getMethod().encodedLength,
               ];
 
               createFunc = ([a, t, mt, l]) =>

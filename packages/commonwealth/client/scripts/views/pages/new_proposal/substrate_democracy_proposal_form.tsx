@@ -47,8 +47,6 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
       }
     }
 
-    const formState = { module: '', function: '', args: [] };
-
     return (
       <>
         <CWRadioGroup
@@ -66,7 +64,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
             },
           ]}
         />
-        {m(EdgewareFunctionPicker, formState)}
+        {m(EdgewareFunctionPicker)}
         {this.toggleValue === 'proposal' && (
           <CWTextInput
             label={`Deposit (${app.chain.currency})`}
@@ -97,16 +95,16 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
               ? app.chain.chain.coins(this.deposit, true)
               : substrate.democracyProposals.minimumDeposit;
 
-            if (!EdgewareFunctionPicker.getMethod(formState)) {
+            if (!EdgewareFunctionPicker.getMethod()) {
               notifyError('Missing arguments');
             } else if (this.toggleValue === 'proposal') {
               const proposalHash = blake2AsHex(
-                EdgewareFunctionPicker.getMethod(formState).toHex()
+                EdgewareFunctionPicker.getMethod().toHex()
               );
 
               args = [
                 author,
-                EdgewareFunctionPicker.getMethod(formState),
+                EdgewareFunctionPicker.getMethod(),
                 proposalHash,
                 deposit,
               ];
@@ -115,11 +113,11 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
                 substrate.democracyProposals.createTx(au, mt, pr, dep);
             } else if (this.toggleValue === 'preimage') {
               const encodedProposal =
-                EdgewareFunctionPicker.getMethod(formState).toHex();
+                EdgewareFunctionPicker.getMethod().toHex();
 
               args = [
                 author,
-                EdgewareFunctionPicker.getMethod(formState),
+                EdgewareFunctionPicker.getMethod(),
                 encodedProposal,
               ];
 
@@ -127,11 +125,11 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
                 substrate.democracyProposals.notePreimage(au, mt, pr);
             } else if (this.toggleValue === 'imminent') {
               const encodedProposal =
-                EdgewareFunctionPicker.getMethod(formState).toHex();
+                EdgewareFunctionPicker.getMethod().toHex();
 
               args = [
                 author,
-                EdgewareFunctionPicker.getMethod(formState),
+                EdgewareFunctionPicker.getMethod(),
                 encodedProposal,
               ];
 
