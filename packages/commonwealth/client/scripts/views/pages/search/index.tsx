@@ -147,21 +147,21 @@ const getCommentResult = (comment, searchTerm) => {
   return m(ListItem, {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
-    // onclick: () => {
-    //   m.route.set(
-    //     `/${chain}/proposal/${proposalId.split('_')[0]}/${
-    //       proposalId.split('_')[1]
-    //     }`
-    //   );
-    // },
+    onclick: () => {
+      m.route.set(
+        `/${chain}/discussion/${proposalId.split('_')[0]}/${
+          proposalId.split('_')[1]
+        }`
+      );
+    },
     label: (
       <a class="search-results-item">
         <div class="search-results-thread-header">
           {`comment - ${comment.chain || comment.community}`}
         </div>
-        {/* <div class="search-results-thread-title">
+        <div class="search-results-thread-title">
           {decodeURIComponent(comment.title)}
-        </div> */}
+        </div>
         <div class="search-results-thread-subtitle">
           <span class="created-at">{moment(comment.created_at).fromNow()}</span>
           {m(User, {
