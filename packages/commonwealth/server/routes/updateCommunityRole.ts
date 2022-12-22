@@ -1,7 +1,7 @@
 import { Op } from 'sequelize';
-import validateChain, { ValidateChainParams } from '../util/validateChain';
+import { AppError } from 'common-common/src/errors';
+import validateChain, { ValidateChainParams } from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError } from '../util/errors';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import {
   findOneRole,

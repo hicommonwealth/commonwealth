@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { uniqBy } from 'lodash';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { Action } from 'common-common/src/permissions';
-import { AppError, ServerError } from '../util/errors';
-import { DB } from '../models';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { checkReadPermitted } from '../util/roles';
+import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

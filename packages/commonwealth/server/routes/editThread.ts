@@ -4,9 +4,9 @@ import moment from 'moment';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { parseUserMentions } from '../util/parseUserMentions';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
+import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   renderQuillDeltaToText,
@@ -14,7 +14,6 @@ import {
 } from '../../shared/utils';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
 import { findOneRole, isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -49,8 +48,8 @@ const editThread = async (
   }
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+
+  const author = req.address;
 
   const permission_error = await isAddressPermitted(
     models,
@@ -205,7 +204,6 @@ const editThread = async (
       },
       // don't send webhook notifications for edits
       null,
-      req.wss,
       [userOwnedAddresses[0].address]
     );
 
@@ -279,7 +277,6 @@ const editThread = async (
             chain: finalThread.chain,
             body: finalThread.body,
           },
-          req.wss,
           [finalThread.Address.address]
         );
       });

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { Action } from 'common-common/src/permissions';
-import { AppError, ServerError } from '../util/errors';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { checkReadPermitted } from '../util/roles';
 
@@ -27,7 +27,7 @@ const getThreads = async (
     threads = await models.Thread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
-        chain: chain.id
+        chain: chain.id,
       },
       include: [
         {
@@ -44,7 +44,8 @@ const getThreads = async (
           as: 'topic',
         },
         {
-          model: models.ChainEntity,
+          model: models.ChainEntityMeta,
+          as: 'chain_entity_meta',
         },
         {
           model: models.Reaction,
@@ -65,7 +66,7 @@ const getThreads = async (
     });
   } catch (e) {
     console.log(e);
-    throw new ServerError(error)
+    throw new ServerError(error);
   }
 
   return threads.length

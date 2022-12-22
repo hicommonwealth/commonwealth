@@ -1,16 +1,28 @@
+// Permissioning Library for Common
+// Modeled after the Discord Permissions Implementation
+
+export type Permissions = bigint;
+
+export type Permission = 'admin' | 'moderator' | 'member';
+
+export enum PermissionError {
+  NOT_PERMITTED = 'Action not permitted',
+}
+
+// Note all new actions MUST be added to the end of this list (some migrations are tied to this ordering)
 export enum Action {
   CREATE_CHAT = 0,
-  VIEW_CHAT_CHANNELS = 1,
-  CREATE_REACTION = 2,
-  VIEW_REACTIONS = 3,
-  DELETE_REACTION = 4,
-  CREATE_COMMENT = 5,
-  VIEW_COMMENTS = 6,
-  EDIT_COMMENT = 7,
-  DELETE_COMMENT = 8,
-  CREATE_POLL = 9,
-  VIEW_POLLS = 10,
-  VOTE_ON_POLLS = 11,
+  CREATE_REACTION = 1,
+  VIEW_REACTIONS = 2,
+  DELETE_REACTION = 3,
+  CREATE_COMMENT = 4,
+  VIEW_COMMENTS = 5,
+  EDIT_COMMENT = 6,
+  DELETE_COMMENT = 7,
+  CREATE_POLL = 8,
+  VIEW_POLLS = 9,
+  VOTE_ON_POLLS = 10,
+  VIEW_CHAT_CHANNELS = 11,
   CREATE_THREAD = 12,
   VIEW_THREADS = 13,
   EDIT_THREAD = 14,
@@ -23,309 +35,110 @@ export enum Action {
   DELETE_TOPIC = 21,
 }
 
-const IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+// Implicit Permissions are a tree hierarchy of permissions that are implied by other permissions
+const ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+  // Chat Subtree
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
-  [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
-  [
-    Action.VIEW_REACTIONS,
-    [
-      Action.VIEW_COMMENTS,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-      Action.VIEW_TOPICS,
-    ],
-  ],
-  [
-    Action.CREATE_REACTION,
-    [
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.VIEW_COMMENTS,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.VIEW_COMMENTS,
-    [
-      Action.VIEW_REACTIONS,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-      Action.VIEW_TOPICS,
-    ],
-  ],
-  [
-    Action.CREATE_COMMENT,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.EDIT_COMMENT,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.VIEW_COMMENTS,
-      Action.CREATE_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.DELETE_COMMENT,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.VIEW_POLLS,
-    [
-      Action.VIEW_REACTIONS,
-      Action.VIEW_COMMENTS,
-      Action.VIEW_THREADS,
-      Action.VIEW_TOPICS,
-    ],
-  ],
-  [
-    Action.CREATE_POLL,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.VOTE_ON_POLLS,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-    ],
-  ],
-  [
-    Action.VIEW_THREADS,
-    [
-      Action.VIEW_REACTIONS,
-      Action.VIEW_COMMENTS,
-      Action.VIEW_POLLS,
-      Action.VIEW_TOPICS,
-    ],
-  ],
-  [
-    Action.CREATE_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-    ],
-  ],
-  [
-    Action.EDIT_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-    ],
-  ],
-  [
-    Action.DELETE_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-    ],
-  ],
-  [
-    Action.LINK_THREAD_TO_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-    ],
-  ],
-  [
-    Action.LINK_PROPOSAL_TO_THREAD,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-    ],
-  ],
-  [
-    Action.VIEW_TOPICS,
-    [
-      Action.VIEW_REACTIONS,
-      Action.VIEW_COMMENTS,
-      Action.VIEW_POLLS,
-      Action.VIEW_THREADS,
-    ],
-  ],
-  [
-    Action.CREATE_TOPIC,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-      Action.VIEW_TOPICS,
-      Action.EDIT_TOPIC,
-      Action.DELETE_TOPIC,
-    ],
-  ],
-  [
-    Action.EDIT_TOPIC,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-      Action.VIEW_TOPICS,
-      Action.CREATE_TOPIC,
-      Action.DELETE_TOPIC,
-    ],
-  ],
-  [
-    Action.DELETE_TOPIC,
-    [
-      Action.CREATE_REACTION,
-      Action.VIEW_REACTIONS,
-      Action.DELETE_REACTION,
-      Action.CREATE_COMMENT,
-      Action.VIEW_COMMENTS,
-      Action.EDIT_COMMENT,
-      Action.DELETE_COMMENT,
-      Action.CREATE_POLL,
-      Action.VIEW_POLLS,
-      Action.VOTE_ON_POLLS,
-      Action.VIEW_THREADS,
-      Action.CREATE_THREAD,
-      Action.EDIT_THREAD,
-      Action.DELETE_THREAD,
-      Action.LINK_THREAD_TO_THREAD,
-      Action.LINK_PROPOSAL_TO_THREAD,
-      Action.VIEW_TOPICS,
-      Action.CREATE_TOPIC,
-      Action.EDIT_TOPIC,
-    ],
-  ],
+
+  // View Subtree
+  [Action.VIEW_TOPICS, [Action.VIEW_THREADS]],
+  [Action.VIEW_THREADS, [Action.VIEW_POLLS]],
+  [Action.VIEW_POLLS, [Action.VIEW_COMMENTS]],
+  [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS]],
+  // Create Subtree
+  [Action.CREATE_TOPIC, [Action.CREATE_THREAD, Action.EDIT_TOPIC, Action.DELETE_TOPIC, Action.VIEW_TOPICS]],
+  [Action.CREATE_THREAD, [Action.CREATE_POLL, Action.EDIT_THREAD, Action.DELETE_THREAD, Action.VIEW_TOPICS]],
+  [Action.CREATE_POLL, [Action.CREATE_COMMENT, Action.VOTE_ON_POLLS, Action.VIEW_TOPICS]],
+  [Action.CREATE_COMMENT, [Action.CREATE_REACTION, Action.EDIT_COMMENT, Action.DELETE_COMMENT, Action.VIEW_TOPICS]],
+  [Action.CREATE_REACTION, [Action.DELETE_REACTION, Action.VIEW_TOPICS]],
+  // Voting Subtree
+  [Action.VOTE_ON_POLLS, [Action.VIEW_POLLS]],
+  // Delete Subtree
+  [Action.DELETE_TOPIC, [Action.DELETE_THREAD]],
+  [Action.DELETE_THREAD, [Action.DELETE_COMMENT]],
+  [Action.DELETE_COMMENT, [Action.DELETE_REACTION]],
+  // Edit Subtree
+  [Action.EDIT_TOPIC, [Action.EDIT_THREAD]],
+  [Action.EDIT_THREAD, [Action.LINK_THREAD_TO_THREAD, Action.LINK_PROPOSAL_TO_THREAD, Action.EDIT_COMMENT]],
 ]);
 
-export type Permissions = bigint;
+const DENY_IMPLICT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+  // Chat Subtree
+  [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
+  // View Subtree
+  [Action.VIEW_REACTIONS, [Action.VIEW_COMMENTS, Action.CREATE_REACTION]],
+  [Action.VIEW_COMMENTS, [Action.VIEW_POLLS, Action.CREATE_COMMENT]],
+  [Action.VIEW_POLLS, [Action.VIEW_THREADS, Action.CREATE_POLL]],
+  [Action.VIEW_THREADS, [Action.VIEW_TOPICS, Action.CREATE_THREAD]],
+  [Action.VIEW_TOPICS, [Action.CREATE_TOPIC]],
+  // Create Subtree
+  [Action.CREATE_REACTION, [Action.VIEW_COMMENTS, Action.DELETE_REACTION]],
+  [Action.CREATE_COMMENT, [Action.VOTE_ON_POLLS, Action.EDIT_COMMENT, Action.DELETE_COMMENT]],
+  [Action.CREATE_POLL, [Action.VIEW_THREADS]],
+  [Action.CREATE_THREAD, [Action.VIEW_TOPICS, Action.EDIT_THREAD, Action.DELETE_THREAD, Action.LINK_PROPOSAL_TO_THREAD, Action.LINK_THREAD_TO_THREAD]],
+  [Action.CREATE_TOPIC, [Action.EDIT_TOPIC, Action.DELETE_TOPIC]],
+  // Voting Subtree
+  [Action.VOTE_ON_POLLS, [Action.CREATE_POLL]],
+  // Delete Subtree
+  [Action.DELETE_REACTION, [Action.DELETE_COMMENT]],
+  [Action.DELETE_COMMENT, [Action.DELETE_THREAD]],
+  [Action.DELETE_THREAD, [Action.DELETE_TOPIC]],
+  // Edit Subtree
+  [Action.EDIT_COMMENT, [Action.EDIT_THREAD]],
+  [Action.EDIT_THREAD, [Action.EDIT_TOPIC]]
+]);
 
-export enum PermissionError {
-  NOT_PERMITTED = 'Action not permitted',
+// Recursive function to get all implicit permissions of an action
+const recurseImplicitActions = (action: Action, result_actions: Action[], allowDeny: boolean): Action[] => {
+  let implicitActions;
+  if (allowDeny) {
+    implicitActions = ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(action);
+  } else {
+    implicitActions = DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(action);
+  }
+  // Base Case, if there are no implicit permission leaves, return the action
+  if (!implicitActions) {
+    return [ action ];
+  }
+  // Recursive Case, if there are implicit permission leaves, return the action and the leaves
+  for (let i = 0; i < implicitActions.length; i++) {
+    if (allowDeny) {
+      result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(implicitActions[i]), allowDeny));
+    } else {
+      result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(implicitActions[i]), allowDeny));
+    }
+  };
+
+  let uniqueActions = [...new Set(result_actions.concat([action]))];
+  return uniqueActions;
+}
+
+export const getImplicitActionsSet = (action: Action, allowDeny: boolean): Action[] => {
+  if (allowDeny) {
+    return recurseImplicitActions(action, ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(action), allowDeny);
+  } else {
+    return recurseImplicitActions(action, DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(action), allowDeny);
+  }
+}
+
+// Allows or Denies the implicit permissions of a permission
+export function allowDenyImplicitPermissions(
+  permission: Permissions,
+  actionNumber: number,
+  allowDeny: boolean
+): Permissions {
+  let result = BigInt(permission);
+  const implicitActions = getImplicitActionsSet(actionNumber, allowDeny);
+  if (implicitActions && allowDeny) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      result |= BigInt(1) << BigInt(implicitActions[i]);
+    }
+  } else if (implicitActions && !allowDeny) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      result &= ~(BigInt(1) << BigInt(implicitActions[i]));
+    }
+  }
+  return result;
 }
 
 // Must be Used to Add Permissions
@@ -334,19 +147,9 @@ export function addPermission(
   actionNumber: number
 ): Permissions {
   let result = BigInt(permission);
-  // Only add permission action if it is not already set
-  if (!isPermitted(result, actionNumber)) {
-    // eslint-disable-next-line no-bitwise
-    result |= BigInt(1) << BigInt(actionNumber);
-    const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
-    if (implicitActions) {
-      for (let i = 0; i < implicitActions.length; i++) {
-        // eslint-disable-next-line no-bitwise
-        result |= BigInt(1) << BigInt(Number(implicitActions[i]));
-      }
-      return result;
-    }
-  }
+  // eslint-disable-next-line no-bitwise
+  result |= BigInt(1) << BigInt(actionNumber);
+  result = allowDenyImplicitPermissions(result, actionNumber, true);
   return result;
 }
 
@@ -356,59 +159,39 @@ export function removePermission(
   actionNumber: number
 ): Permissions {
   let result = BigInt(permission);
-  // Only remove permission action if its set
-  if (isPermitted(result, actionNumber)) {
-    // eslint-disable-next-line no-bitwise
-    result &= ~(BigInt(1) << BigInt(actionNumber));
-    const implicitActions = IMPLICIT_PERMISSIONS_BY_ACTION.get(actionNumber);
-    if (implicitActions) {
-      for (let i = 0; i < implicitActions.length; i++) {
-        result &= ~(BigInt(1) << BigInt(Number(implicitActions[i])));
-      }
-    }
-  }
+  // eslint-disable-next-line no-bitwise
+  result &= ~(BigInt(1) << BigInt(actionNumber));
+  result = allowDenyImplicitPermissions(result, actionNumber, false);
   return result;
 }
 
 // Default Permissions
 export const BASE_PERMISSIONS: Permissions =
-  addPermission(BigInt(0), Action.CREATE_THREAD) |
-  addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS) |
-  addPermission(BigInt(0), Action.VIEW_THREADS);
+  BigInt(1) << BigInt(Action.VIEW_REACTIONS) |
+  BigInt(1) << BigInt(Action.CREATE_REACTION) |
+  BigInt(1) << BigInt(Action.DELETE_REACTION) |
+  BigInt(1) << BigInt(Action.VIEW_COMMENTS) |
+  BigInt(1) << BigInt(Action.CREATE_COMMENT) |
+  BigInt(1) << BigInt(Action.EDIT_COMMENT) |
+  BigInt(1) << BigInt(Action.DELETE_COMMENT) |
+  // addPermission(BigInt(0), Action.VIEW_POLLS) |
+  // addPermission(BigInt(0), Action.CREATE_POLL) |
+  // addPermission(BigInt(0), Action.VOTE_ON_POLLS) |
+  // addPermission(BigInt(0), Action.VIEW_TOPICS) |
+  BigInt(1) << BigInt(Action.CREATE_THREAD) |
+  // addPermission(BigInt(0), Action.EDIT_THREAD) |
+  // addPermission(BigInt(0), Action.DELETE_THREAD) |
+  // addPermission(BigInt(0), Action.LINK_THREAD_TO_THREAD) |
+  // addPermission(BigInt(0), Action.LINK_PROPOSAL_TO_THREAD) |
+  BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS) |
+  BigInt(1) << BigInt(Action.VIEW_THREADS);
 
-// Checks if a permission has a specific action
+// Checks if a permission explicitly has a specific action
 export function isPermitted(permission: Permissions, action: number): boolean {
   const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
   const hasAction: boolean =
     (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
   return hasAction;
-}
-
-// Adds the implicit permissions to a permission
-export function computeImplicitPermissions(
-  permission: Permissions
-): Permissions {
-  let result = BigInt(permission);
-  // Find the highest hierachy action that is permitted
-  for (const [action, implicitActions] of IMPLICIT_PERMISSIONS_BY_ACTION) {
-    // If the action is permitted, add all the implicit actions
-    if (isPermitted(permission, Number(action))) {
-      // add all the implicit actions and then return the result
-      for (const implicitAction of implicitActions) {
-        if (!isPermitted(result, Number(implicitAction))) {
-          result = addPermission(result, implicitAction);
-        }
-      }
-    } else {
-      // If the action is denied, deny all the implicit actions
-      for (const implicitAction of implicitActions) {
-        if (isPermitted(result, Number(implicitAction))) {
-          result = removePermission(result, implicitAction);
-        }
-      }
-    }
-  }
-  return result;
 }
 
 // Computes the permissions for a user
@@ -422,5 +205,40 @@ export function computePermissions(
     permission &= ~BigInt(assignment.deny);
     permission |= BigInt(assignment.allow);
   }
+  return permission;
+}
+
+type RoleObject = {
+  permission: Permission;
+  allow: Permissions;
+  deny: Permissions;
+};
+
+// Aggregates role permissions with chain permissions for a user by ordering the roles by lowest to highest permission levels and then computing the permissions
+export function aggregatePermissions(
+  roles: RoleObject[],
+  chain_permissions: { allow: Permissions; deny: Permissions }
+) {
+  // sort roles by roles with highest permissions last
+  const ORDER: Permission[] = ['member', 'moderator', 'admin'];
+
+  function compare(o1: RoleObject, o2: RoleObject) {
+    return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
+  }
+  roles = roles.sort(compare);
+
+  const permissionsAllowDeny: Array<{
+    allow: Permissions;
+    deny: Permissions;
+  }> = roles;
+
+  // add chain default permissions to beginning of permissions array
+  permissionsAllowDeny.unshift(chain_permissions);
+
+  // compute permissions
+  const permission: bigint = computePermissions(
+    BASE_PERMISSIONS,
+    permissionsAllowDeny
+  );
   return permission;
 }

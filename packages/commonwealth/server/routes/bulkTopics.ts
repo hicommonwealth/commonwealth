@@ -1,16 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { Action } from 'common-common/src/permissions';
-import validateChain from '../util/validateChain';
+import { AppError, ServerError } from 'common-common/src/errors';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
 import { checkReadPermitted } from '../util/roles';
+import { Action } from '../../../common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export const Errors = { };
+export const Errors = {};
 
-const bulkTopics = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const bulkTopics = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new AppError(error));
 

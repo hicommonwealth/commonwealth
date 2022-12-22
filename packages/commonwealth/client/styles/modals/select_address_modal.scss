@@ -12,7 +12,7 @@
   .select-address-placeholder {
     padding: 30px 30px 24px;
     border: 1px solid $neutral-100;
-    border-radius: 15px;
+    border-radius: $border-radius-corners;
     margin-bottom: 12px;
     p:first-child {
       margin-top: 0;

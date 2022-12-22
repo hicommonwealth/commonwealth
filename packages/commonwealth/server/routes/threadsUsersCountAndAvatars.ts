@@ -63,6 +63,13 @@ const threadsUsersCountAndAvatar = async (
   );
   try {
     if (chain && threads.length) {
+      await checkReadPermitted(
+        models,
+        chain,
+        Action.VIEW_POLLS,
+        req.user?.id,
+      );
+
       const root_ids = threads.map(({ root_id }) => root_id);
       const uniqueAddressesByRootIds = await fetchUniqueAddressesByRootIds(
         models,

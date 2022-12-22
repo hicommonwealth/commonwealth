@@ -41,6 +41,7 @@ export type ChainAttributes = {
   admin_only_polling?: boolean;
   snapshot?: string[];
   bech32_prefix?: string;
+  hide_projects?: boolean;
   token_name?: string;
   ce_verbose?: boolean;
   default_allow_permissions: bigint;
@@ -90,7 +91,6 @@ export default (
       name: { type: dataTypes.STRING, allowNull: false },
       description: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
-      ce_verbose: { type: dataTypes.BOOLEAN, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       discord: { type: dataTypes.STRING, allowNull: true },
       element: { type: dataTypes.STRING, allowNull: true },
@@ -127,6 +127,7 @@ export default (
         type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
       },
+      hide_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
@@ -166,6 +167,7 @@ export default (
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
+    models.Chain.hasMany(models.ChainEntityMeta, { foreignKey: 'chain' })
   };
 
   return Chain;

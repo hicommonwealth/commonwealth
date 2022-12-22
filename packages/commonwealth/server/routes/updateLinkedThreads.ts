@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import { AppError, ServerError } from 'common-common/src/errors';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { AppError, ServerError } from '../util/errors';
 import { findAllRoles, isAddressPermitted } from '../util/roles';
 import { Action, PermissionError } from '../../../common-common/src/permissions';
 
@@ -24,16 +23,7 @@ const updateLinkedThreads = async (
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
 
-  const { linked_thread_id, linking_thread_id, remove_link } = req.body;
-  if (!linked_thread_id) {
-    return next(new AppError(Errors.MustHaveLinkedThreadId));
-  }
-  if (!linking_thread_id) {
-    return next(new AppError(Errors.MustHaveLinkingThreadId));
-  }
-
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+  const author = req.address;
 
   const permission_error = await isAddressPermitted(
     models,
@@ -43,6 +33,14 @@ const updateLinkedThreads = async (
   );
   if (permission_error === PermissionError.NOT_PERMITTED) {
     return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
+
+  const { linked_thread_id, linking_thread_id, remove_link } = req.body;
+  if (!linked_thread_id) {
+    return next(new AppError(Errors.MustHaveLinkedThreadId));
+  }
+  if (!linking_thread_id) {
+    return next(new AppError(Errors.MustHaveLinkingThreadId));
   }
 
   const userOwnedAddresses = await req.user.getAddresses();
@@ -120,7 +118,8 @@ const updateLinkedThreads = async (
           as: 'topic',
         },
         {
-          model: models.ChainEntity,
+          model: models.ChainEntityMeta,
+          as: 'chain_entity_meta',
         },
         {
           model: models.Reaction,

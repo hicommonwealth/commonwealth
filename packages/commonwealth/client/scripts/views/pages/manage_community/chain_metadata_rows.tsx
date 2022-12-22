@@ -84,7 +84,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
     // Note: Comparing using the Deny Permissions, so if Action is not permitted on Deny, then the Action is permitted
-    // TODO need to figure out this logic
     this.chatEnabled = !isPermitted(
       chain.defaultDenyPermissions,
       Action.VIEW_CHAT_CHANNELS
@@ -408,38 +407,35 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 );
               }
 
-              if (this.ThreadsViewable === ThreadsViewable.MembersOnly) {
-                // Make sure Members can view threads
-                const membersRole = chain.communityRoles.find(
-                  (r) => r.name === 'member'
-                );
-                if (!isPermitted(membersRole.allow, Action.VIEW_THREADS)) {
-                  await app.roles.addPermissionToRole({
-                    chain: chain.id,
-                    permission: 'member',
-                    action: Action.VIEW_THREADS
-                  });
-                }
-                // Shouldn't we add this to all roles in community?
-                // Deny non-members from viewing threads
-                this.default_deny_permissions = addPermission(
-                  default_deny_permissions,
-                  Action.VIEW_THREADS
-                );
-                this.default_allow_permissions = removePermission(
-                  default_allow_permissions,
-                  Action.VIEW_THREADS
-                );
-              } else {
-                this.default_deny_permissions = removePermission(
-                  default_deny_permissions,
-                  Action.VIEW_THREADS
-                );
-                this.default_allow_permissions = addPermission(
-                  default_allow_permissions,
-                  Action.VIEW_THREADS
-                );
-              }
+              // if (this.ThreadsViewable === ThreadsViewable.MembersOnly) {
+              //   // Make sure Members can view threads
+              //   const membersRole = chain.communityRoles.find(
+              //     (r) => r.name === 'member'
+              //   );
+              //   if (!isPermitted(membersRole.allow, Action.VIEW_THREADS)) {
+              //     let newAllow = membersRole.allow;
+              //     newAllow = addPermission(
+              //       membersRole.allow,
+              //       Action.VIEW_THREADS
+              //     );
+              //     app.roles.updateRole({
+              //       chain_id: chain.id,
+              //       permission: 'member',
+              //       allow: newAllow,
+              //       deny: membersRole.deny,
+              //     });
+              //   }
+              //   // Deny non-members from viewing threads
+              //   this.default_deny_permissions = addPermission(
+              //     default_deny_permissions,
+              //     Action.VIEW_THREADS
+              //   );
+              // } else {
+              //   this.default_deny_permissions = removePermission(
+              //     default_deny_permissions,
+              //     Action.VIEW_THREADS
+              //   );
+              // }
 
               await chain.updateChainData({
                 name,

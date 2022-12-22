@@ -1,8 +1,7 @@
 import Sequelize from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
-import { performance, PerformanceObserver } from 'perf_hooks';
-import { AppError, ServerError } from '../util/errors';
 
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;
@@ -114,7 +113,8 @@ export default async (
   //   },
   // });
 
-  const [notificationsRead,
+  const [
+    notificationsRead,
     // allSubscriptions
   ] = await Promise.all([
     notificationsReadPromise,
@@ -127,7 +127,7 @@ export default async (
      iterate through the notification read instances which contain a Notification instance as well as a Chain
      Event instance embedded in the notification data if the Notification is a chain-event notification. The
      NotificationsRead instance also contains the associated subscription instance
-    
+
       NotificationsRead instance:
       {
          notification_id,
@@ -157,8 +157,8 @@ export default async (
       };
       // If the Notification is a chain-event notification then save the chain event type
       if (nr.Notification.chain_event_id) {
-        subscriptionsObj[nr.subscription_id].ChainEventType =
-          chainEvent.ChainEventType;
+        subscriptionsObj[nr.subscription_id].chain_event_type_id =
+          chainEvent.ChainEventType.id;
       }
     }
 
