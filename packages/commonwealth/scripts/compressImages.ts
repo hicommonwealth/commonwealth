@@ -3,42 +3,40 @@
 // this script will compress the images in the Chains.icon_url, and re-upload these compressed images to s3.
 // Then it will update the icon_url with the new compressed image link
 
-import { Op } from "sequelize";
+import { Op } from 'sequelize';
 import fetch from 'node-fetch';
 import sharp from 'sharp';
-import AWS, { S3 } from "aws-sdk";
-
+import AWS, { S3 } from 'aws-sdk';
 import models, { sequelize } from '../server/database';
 
 const s3 = new AWS.S3();
 
-// TODO setting proper header for s3
-
-async function compressImage(url: string) {
-  const metaData = url.substr(url.length - 4);
-
-  if (!metaData.includes('jpeg') && !metaData.includes('jpg') &&
-    !metaData.includes('png') &&
-    !!metaData.includes('webp')
+async function compressImage(data: Buffer, contentType: string, resolution: number) {
+  if (!contentType.includes('jpeg') && !contentType.includes('jpg') &&
+    !contentType.includes('png') &&
+    !contentType.includes('webp')
   ) {
-    return; // we dont support so just early exit
+    return null; // we dont support so just early exit
   }
-  const resp = await fetch(url);
-  const data = await resp.arrayBuffer();
-  const originalImage = sharp(Buffer.of(data)).resize(200, 200);
+  const originalImage = sharp(data).resize(200, 200).withMetadata();
   let finalImage;
-
-  if (metaData.includes('jpeg') || metaData.includes('jpg')) {
-    finalImage = originalImage.jpeg({ quality: 50 });
-  } else if (metaData.includes('png')) {
-    finalImage = originalImage.png({ compressionLevel: 5 });
-  } else if (metaData.includes('png')) {
-    finalImage = originalImage.webp({ quality: 50 });
+  if (contentType.includes('jpeg') || contentType.includes('jpg')) {
+    finalImage = originalImage.jpeg({ quality: resolution * 10 });
+  } else if (contentType.includes('png')) {
+    finalImage = originalImage.png({ compressionLevel: resolution });
+  } else if (contentType.includes('png')) {
+    finalImage = originalImage.webp({ quality: resolution * 10 });
   } else {
-    return; // shouldn't reach here, but if we do just return
+    return null; // shouldn't reach here, but if we do just return
   }
 
-  return [resp.headers.get('content-type'), finalImage];
+  const b = await finalImage.toBuffer({ resolveWithObject: true });
+  // if file size larger than 500 kb, make another compression pass with worse resolution
+  if (b.info.size > 500 * 1000 && resolution !== 1) {
+    return compressImage(b.data, contentType, resolution - 1);
+  }
+
+  return b.data;
 }
 
 async function main() {
@@ -47,37 +45,41 @@ async function main() {
 
   try {
     for (const chain of chains) {
-      const [contentType, compressedImage] = await compressImage(chain.icon_url);
+      const resp = await fetch(chain.icon_url);
+      const contentType = resp.headers.get('content-type');
+      const buffer = await resp.buffer();
+
+      const compressedImage = await compressImage(buffer, contentType, 10);
+      if (!contentType) {
+        // eslint-disable-next-line no-continue
+        continue;
+      }
 
       const expiryDate = new Date();
-      expiryDate.setHours(expiryDate.getHours() + 0.1)
+      expiryDate.setHours(expiryDate.getHours() + 0.1);
 
       const params: S3.Types.PutObjectRequest = {
         Bucket: 'commonwealth-uploads',
-        Key: `${chain.id}_200x200`,
+        Key: `${chain.id}_200x200.${contentType.split('/')[1]}`,
         Body: compressedImage,
-        Expires: expiryDate,
         ContentType: contentType,
       };
 
-      s3.upload(params, (err, data) => {
-        if (err) {
-          console.log(err)
-        } else {
-          console.log(`Success for community ${chain.id} with new url ${data.Location}`);
-          models.Chain.update(
-            { icon_url: data.Location },
-            { where: { id: chain.id }, transaction }
-          );
-        }
-      });
-    }
-  } catch (e) {
-    await transaction.rollback();
-    return;
-  }
+      const data = await s3.upload(params).promise();
 
-  await transaction.commit();
+      console.log(`Success for community ${chain.id} with new url ${data.Location}`);
+      await models.Chain.update(
+        { icon_url: data.Location },
+        { where: { id: chain.id }, transaction }
+      );
+    }
+
+    // commit changes to db if all passes
+    await transaction.commit();
+  } catch (e) {
+    console.log('Failed to compressImages, rolling back db changes');
+    await transaction.rollback();
+  }
 }
 
 main().then(() => console.log('done')).catch(e => console.error(e));
