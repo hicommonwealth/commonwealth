@@ -19,6 +19,13 @@
   .card-subtext.Text {
     color: $neutral-500;
   }
+
+  .new-activity-tag.Text {
+    background-color: $purple-400;
+    border-radius: $border-radius-rounded-corners;
+    color: $white;
+    padding: 2px 8px;
+  }
 }
 
 .DashboardCommunitiesPreview {
