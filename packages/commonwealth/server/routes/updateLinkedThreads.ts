@@ -1,11 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import { AppError, ServerError } from 'common-common/src/errors';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { AppError, ServerError } from '../util/errors';
-import { findAllRoles, isAddressPermitted } from '../util/roles';
-import { Action, PermissionError } from '../../../common-common/src/permissions';
+import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   InsufficientPermissions:
@@ -30,19 +28,6 @@ const updateLinkedThreads = async (
   }
   if (!linking_thread_id) {
     return next(new AppError(Errors.MustHaveLinkingThreadId));
-  }
-
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
-
-  const permission_error = await isAddressPermitted(
-    models,
-    author.id,
-    chain.id,
-    Action.LINK_THREAD_TO_THREAD
-  );
-  if (permission_error === PermissionError.NOT_PERMITTED) {
-    return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
   const userOwnedAddresses = await req.user.getAddresses();
@@ -120,7 +105,8 @@ const updateLinkedThreads = async (
           as: 'topic',
         },
         {
-          model: models.ChainEntity,
+          model: models.ChainEntityMeta,
+          as: 'chain_entity_meta',
         },
         {
           model: models.Reaction,

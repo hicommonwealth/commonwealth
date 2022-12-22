@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { Action } from 'common-common/src/permissions';
-import validateChain from '../util/validateChain';
-import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
 import { checkReadPermitted } from '../util/roles';
+import validateChain from '../middleware/validateChain';
+import { DB } from '../models';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
@@ -46,7 +46,7 @@ const activeThreads = async (
     { model: models.Address, as: 'collaborators' },
     { model: models.Topic, as: 'topic', required: true },
     { model: models.LinkedThread, as: 'linked_threads' },
-    { model: models.ChainEntity },
+    { model: models.ChainEntityMeta, as: 'chain_entity_meta' },
   ];
 
   await Promise.all(

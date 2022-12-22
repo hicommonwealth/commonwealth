@@ -1,3 +1,4 @@
+import { closestPythagoreanTriples } from './../../src/permissions';
 import { assert } from 'chai';
 import { isPermitted, Permissions, Action } from 'common-common/src/permissions';
 
@@ -19,4 +20,5 @@ describe('isPermitted() unit tests', () => {
     const permission: Permissions = BigInt(1 << Action.CREATE_COMMENT) | BigInt(1 << 15);
     assert.isFalse(isPermitted(permission, Action.CREATE_THREAD));
   });
+
 });

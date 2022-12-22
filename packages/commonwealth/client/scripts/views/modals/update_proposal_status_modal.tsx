@@ -66,7 +66,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
             <div class="stage-options">
               {stages.map((targetStage) => (
                 <CWButton
-                  iconName={this.stage === targetStage ? 'check' : undefined}
+                  iconLeft={this.stage === targetStage ? 'check' : undefined}
                   label={threadStageToLabel(targetStage)}
                   onclick={() => {
                     this.stage = targetStage;
@@ -96,7 +96,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
               snapshotProposalsToSet={this.snapshotProposalsToSet}
             />
           )}
-          {app.chain.chainEntities && (
+          {app.chainEntities && (
             <ChainEntitiesSelector
               thread={vnode.attrs.thread}
               onSelect={() => {

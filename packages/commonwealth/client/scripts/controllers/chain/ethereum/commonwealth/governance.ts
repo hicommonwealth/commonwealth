@@ -1,11 +1,7 @@
-import BN from 'bn.js';
-import EthDater from 'ethereum-block-by-date';
-
-import { ProposalModule, ITXModalData, ChainEntity, IChainModule } from 'models';
+import { ProposalModule, ITXModalData } from 'models';
 
 import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 // import { ICommonwealthProposalResponse } from 'adapters/chain/moloch/types';
-import { EntityRefreshOption } from 'controllers/server/chain_entities';
 
 // import { CommonwealthEvents } from 'chain-events/src';
 
@@ -54,10 +50,9 @@ export default class CommonwealthGovernance extends ProposalModule<
   // }
 
   public get api() { return this._api; }
-  public get usingServerChainEntities() { return this._usingServerChainEntities; }
 
   // INIT / DEINIT
-  constructor(app: IApp, private _usingServerChainEntities = false) {
+  constructor(app: IApp) {
     super(app, (e) => {
       return null;
       // return new CommonwealthProposal(this._Members, this, e);
@@ -81,8 +76,8 @@ export default class CommonwealthGovernance extends ProposalModule<
     // TODO: fetch all proposals
     // if (this._usingServerChainEntities) {
     //   console.log('Fetching moloch proposals from backend.');
-    //   await this.app.chain.chainEntities.refresh(this.app.chain.id, EntityRefreshOption.AllEntities);
-    //   const entities = this.app.chain.chainEntities.store.getByType(CommonwealthEvents.Types.EntityKind.Proposal);
+    //   await this.app.chainEntities.refresh(this.app.chain.id);
+    //   const entities = this.app.chainEntities.store.getByType(CommonwealthEvents.Types.EntityKind.Proposal);
     //   entities.map((p) => this._entityConstructor(p));
     // } else {
     //   console.log('Fetching moloch proposals from chain.');
@@ -93,8 +88,8 @@ export default class CommonwealthGovernance extends ProposalModule<
     //   );
     //   const subscriber = new CommonwealthEvents.Subscriber(api.Contract, this.app.chain.id);
     //   const processor = new CommonwealthEvents.Processor(api.Contract, 1);
-    //   await this.app.chain.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
-    //   await this.app.chain.chainEntities.subscribeEntities(
+    //   await this.app.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
+    //   await this.app.chainEntities.subscribeEntities(
     //     this.app.chain.id,
     //     subscriber,
     //     processor,

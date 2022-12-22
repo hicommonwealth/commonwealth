@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DATABASE_URI } from './config';
@@ -10,8 +10,7 @@ import BanFactory from './models/ban';
 import ChainFactory from './models/chain';
 import ChainCategoryFactory from './models/chain_category';
 import ChainCategoryTypeFactory from './models/chain_category_type';
-import ChainEntityFactory from './models/chain_entity';
-import ChainEventFactory from './models/chain_event';
+import ChainEntityMetaFactory from './models/chain_entity_meta';
 import ChainEventTypeFactory from './models/chain_event_type';
 import ChainNodeFactory from './models/chain_node';
 import ChatChannelFactory from './models/chat_channel';
@@ -26,7 +25,6 @@ import ContractAbiFactory from './models/contract_abi';
 import DiscussionDraftFactory from './models/discussion_draft';
 import IdentityCacheFactory from './models/identity_cache';
 import InviteCodeFactory from './models/invite_code';
-import IpfsPinsFactory from './models/ipfs_pins';
 import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
@@ -88,11 +86,10 @@ const models: Models = {
   Chain: ChainFactory(sequelize, DataTypes),
   ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
-  ChainEntity: ChainEntityFactory(sequelize, DataTypes),
-  ChainEvent: ChainEventFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
+  ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
+  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
@@ -103,7 +100,6 @@ const models: Models = {
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),

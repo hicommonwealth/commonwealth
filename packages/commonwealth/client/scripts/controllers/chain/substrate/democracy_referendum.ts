@@ -43,6 +43,7 @@ export const convictionToSubstrate = (
   chain: SubstrateChain,
   c: DemocracyConviction
 ): Conviction => {
+  // @ts-ignore
   return chain.createType('Conviction', c);
 };
 
@@ -265,7 +266,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
     this.threadTitle = entity.threadTitle;
 
     // see if associated entity title exists, otherwise try to populate title with preimage
-    const preimage = this._Democracy.app.chain.chainEntities.getPreimage(
+    const preimage = this._Democracy.app.chainEntities.getPreimage(
       eventData.proposalHash
     );
     const associatedProposalOrMotion = this.getProposalOrMotion(preimage);
@@ -396,7 +397,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
         break;
       }
       case SubstrateTypes.EventKind.PreimageNoted: {
-        const preimage = this._Democracy.app.chain.chainEntities.getPreimage(
+        const preimage = this._Democracy.app.chainEntities.getPreimage(
           this.hash
         );
         if (preimage) {

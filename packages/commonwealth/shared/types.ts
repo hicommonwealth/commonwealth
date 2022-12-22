@@ -1,6 +1,5 @@
-import moment from 'moment';
-import type { ChainAttributes } from '../server/models/chain';
-import type { ChainEventAttributes } from '../server/models/chain_event';
+import { ChainAttributes } from '../server/models/chain';
+import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
@@ -13,13 +12,13 @@ export enum WebsocketMessageNames {
 }
 
 export type ChainEventNotification = {
-  id: string;
-  notification_data: '';
-  chain_event_id: string;
+  id: number;
+  notification_data: string;
+  chain_event_id: number;
   category_id: 'chain-event';
   chain_id: string;
-  updated_at: moment.Moment;
-  created_at: moment.Moment;
+  updated_at: Date;
+  created_at: Date;
   ChainEvent: ChainEventAttributes;
 };
 
