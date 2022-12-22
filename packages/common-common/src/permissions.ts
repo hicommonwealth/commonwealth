@@ -173,9 +173,9 @@ export const BASE_PERMISSIONS: Permissions =
   BigInt(1) << BigInt(Action.CREATE_COMMENT) |
   BigInt(1) << BigInt(Action.EDIT_COMMENT) |
   BigInt(1) << BigInt(Action.DELETE_COMMENT) |
-  // addPermission(BigInt(0), Action.VIEW_POLLS) |
-  // addPermission(BigInt(0), Action.CREATE_POLL) |
-  // addPermission(BigInt(0), Action.VOTE_ON_POLLS) |
+  BigInt(1) << BigInt(Action.VIEW_POLLS) |
+  BigInt(1) << BigInt(Action.CREATE_POLL) |
+  BigInt(1) << BigInt(Action.VOTE_ON_POLLS) |
   // addPermission(BigInt(0), Action.VIEW_TOPICS) |
   BigInt(1) << BigInt(Action.CREATE_THREAD) |
   // addPermission(BigInt(0), Action.EDIT_THREAD) |
