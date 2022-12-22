@@ -14,6 +14,7 @@ import ExplorePage from './explore_page';
 import YoursPage from './yours_page';
 import { getUserEthChains } from './helpers';
 import { PageLoading } from '../loading';
+import { PageNotFound } from '../404';
 
 export default class ProjectListing implements m.ClassComponent {
   private web3Initialized: boolean;
@@ -59,6 +60,11 @@ export default class ProjectListing implements m.ClassComponent {
 
   view() {
     if (!app) return <PageLoading />;
+
+    // @TODO Remove admin toggles
+    if (!app.roles.isAdminOfEntity({ chain: app.chain?.id }) && !app.user.isSiteAdmin) {
+      return <PageNotFound />;
+    }
 
     const onExplorePage = m.route.get().includes('/explore');
     const onYoursPage = m.route.get().includes('/yours');
