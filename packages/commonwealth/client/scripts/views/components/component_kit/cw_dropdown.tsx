@@ -8,7 +8,7 @@ import 'components/component_kit/cw_dropdown.scss';
 import { CWTextInput } from './cw_text_input';
 import { CWText } from './cw_text';
 
-type DropdownItemType = {
+export type DropdownItemType = {
   label: string;
   value: string;
 };

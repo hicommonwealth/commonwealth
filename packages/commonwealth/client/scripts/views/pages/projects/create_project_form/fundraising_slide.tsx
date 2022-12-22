@@ -23,13 +23,12 @@ export class FundraisingSlide
           what address the funds will be going.
         </CWText>
         <CWDropdown
-          inputOptions={[
-            {
-              label: 'WETH',
-            },
-          ]}
+          options={[{
+            label: 'WETH',
+            value: 'WETH',
+          }]}
+          initialValue={{ label: 'WETH', value: 'WETH' }}
           label="Raise In"
-          uniqueId="token-selector"
         />
         <CWTokenInput
           label="Goal"
@@ -45,14 +44,15 @@ export class FundraisingSlide
           value={vnode.attrs.form.threshold.toString()}
         />
         <CWDropdown
-          inputOptions={['1 week', '2 weeks', '3 weeks', '4 weeks'].map(
-            (length) => {
-              return { label: length };
-            }
-          )}
+          options={[
+            { label: '1 week', value: '1' },
+            { label: '2 weeks', value: '2' },
+            { label: '3 weeks', value: '3' },
+            { label: '4 weeks', value: '4' },
+          ]}
           label="Fundraising Period"
-          onSelect={(length: string) => {
-            const lengthInSeconds = +length.split(' ')[0] * weekInSeconds;
+          onSelect={(item) => {
+            const lengthInSeconds = Number(item.value) * weekInSeconds;
             vnode.attrs.form.fundraiseLength = lengthInSeconds;
           }}
           uniqueId="length-selector"

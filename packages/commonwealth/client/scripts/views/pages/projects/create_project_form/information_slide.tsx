@@ -7,7 +7,7 @@ import { Account, ChainInfo } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import ClassComponent from 'class_component';
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
-import { CWDropdown } from '../../../components/component_kit/cw_dropdown';
+import { CWDropdown, DropdownItemType } from '../../../components/component_kit/cw_dropdown';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CWTextArea } from '../../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../../components/component_kit/cw_text_input';
@@ -39,9 +39,20 @@ export class InformationSlide
       if (userEthChains.includes(b) && !userEthChains.includes(a)) return 1;
       else return 0;
     });
-    const defaultChainIdx = userEthChains
+    const defaultChain = userEthChains
       .concat(allEthChains)
-      .findIndex((c) => c.id === app.activeChainId());
+      .filter((c) => c.id === app.activeChainId());
+
+    const chainOptions: Array<DropdownItemType> = allEthChains.map((chain: ChainInfo) => {
+        const disabled = !userEthChains.includes(chain);
+        return { label: chain.name, value: chain.name, disabled };
+    });
+
+    const accountOptions: Array<DropdownItemType> = chainAccounts.map((acc: Account) => {
+      return { label: acc.address, value: acc.address };
+    });
+
+    const initialOption = chainOptions.filter((option) => option.label === defaultChain[0].name);
 
     return (
       <form class="InformationSlide">
@@ -62,18 +73,13 @@ export class InformationSlide
           required
         />
         <CWDropdown
-          inputOptions={
-            allEthChains.map((chain: ChainInfo) => {
-              const disabled = !userEthChains.includes(chain);
-              return { label: chain.name, disabled };
-            }) as DefaultMenuItem[]
-          }
-          defaultActiveIndex={defaultChainIdx}
+          options={chainOptions}
+          initialValue={initialOption[0]}
           label="Chain"
-          onSelect={(label: string) => {
+          onSelect={(item) => {
             const chain: ChainInfo = app.config.chains
               .getAll()
-              .find((c: ChainInfo) => c.name === label);
+              .find((c: ChainInfo) => c.name === item.label);
             if (chain) {
               m.route.set(`/${chain.id}/new/project`);
             }
@@ -81,20 +87,16 @@ export class InformationSlide
           uniqueId="chain-selector"
         />
         <CWDropdown
-          inputOptions={
-            chainAccounts.map((acc: Account) => {
-              return { label: acc.address };
-            }) as DefaultMenuItem[]
-          }
+          options={accountOptions}
           label="Creator address"
-          onSelect={(label: string) => {
+          onSelect={(item) => {
             const selectedAccount = chainAccounts.find(
-              (a) => a.address === label
+              (a) => a.address === item.label
             );
             setActiveAccount(selectedAccount);
             vnode.attrs.form.creator === selectedAccount.address;
           }}
-          uniqueId="creator-address-selector"
+          initialValue={accountOptions.find((option) => option.label === vnode.attrs.form.creator)}
         />
         <CWTextArea
           placeholder="Write a short 2 or 3 sentence description of your project"
