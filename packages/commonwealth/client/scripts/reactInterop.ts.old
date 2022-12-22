@@ -45,15 +45,20 @@ export abstract class ClassComponent<A = {}> extends React.Component<A> {
   protected readonly __props: A;
 
   public componentDidMount() {
-    this.oninit({ attrs: this.props });
+    this.oninit({ attrs: this.props, children: this.props.children });
   }
 
   public componentDidUpdate(prevProps: A) {
-    this.onupdate({ attrs: this.props });
+    this.onupdate({ attrs: this.props, children: this.props.children });
   }
 
   public componentWillUnmount() {
-    this.onremove({ attrs: this.props });
+    this.onremove({ attrs: this.props, children: this.props.children });
+  }
+
+  render() {
+    this.oncreate({ attrs: this.props, children: this.props.children });
+    return this.view({ attrs: this.props, children: this.props.children });
   }
 
   public oninit(v: ResultNode<A>) {};
@@ -62,11 +67,6 @@ export abstract class ClassComponent<A = {}> extends React.Component<A> {
   public oncreate(v: ResultNode<A>) {};
 
   abstract view(v: ResultNode<A>): Children | null;
-
-  render() {
-    this.oncreate({ attrs: this.props });
-    return this.view({ attrs: this.props });
-  }
 }
 
 type RouteOptions = {
