@@ -72,13 +72,8 @@ const getCommunityResult = (community) => {
 
   const onSelect = () => {
     if (params.community) {
-<<<<<<< HEAD:packages/commonwealth/client/scripts/views/pages/search.tsx
-      setRoute(
-        params.community.address ? `/${params.community.address}` : '/'
-=======
       setRoute(
         params.community.id ? `/${params.community.id}` : '/'
->>>>>>> master:packages/commonwealth/client/scripts/views/pages/search/index.tsx
       );
     } else {
       setRoute(community.id ? `/${community.id}` : '/');
@@ -153,13 +148,8 @@ const getCommentResult = (comment, searchTerm) => {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconName="feedback" />,
     onclick: () => {
-<<<<<<< HEAD:packages/commonwealth/client/scripts/views/pages/search.tsx
-      setRoute(
-        `/${chain}/proposal/${proposalId.split('_')[0]}/${
-=======
       setRoute(
         `/${chain}/discussion/${proposalId.split('_')[0]}/${
->>>>>>> master:packages/commonwealth/client/scripts/views/pages/search/index.tsx
           proposalId.split('_')[1]
         }`
       );
@@ -249,17 +239,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
-<<<<<<< HEAD:packages/commonwealth/client/scripts/views/pages/search.tsx
-    const LoadingPage = (
-      <PageLoading
-      // title={<BreadcrumbsTitleTag title="Search" />}
-      />
-    );
-
     const searchQuery = SearchQuery.fromUrlParams(getRouteParam());
-=======
-    const searchQuery = SearchQuery.fromUrlParams(m.route.param());
->>>>>>> master:packages/commonwealth/client/scripts/views/pages/search/index.tsx
 
     const { chainScope, searchTerm } = searchQuery;
     const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
