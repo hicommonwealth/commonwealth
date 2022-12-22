@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 import { Action } from 'common-common/src/permissions';
 import { addPrefix, factory } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
+import emitNotifications from '../util/emitNotifications';
 import { NotificationCategories, RedisNamespaces } from 'common-common/src/types';
 import {
     WebsocketEngineEvents,
@@ -48,7 +49,7 @@ const handleMentions = async (models: DB, socket: any, message: any, id: number,
           mentionedAddresses.map(async (mentionedAddress) => {
             // some Addresses may be missing users, e.g. if the user removed the address
             if (!mentionedAddress.User) return;
-            await models.Subscription.emitNotifications(
+            await emitNotifications(
                 models,
                 NotificationCategories.NewChatMention,
                 `user-${mentionedAddress.User.id}`,
