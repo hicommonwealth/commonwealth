@@ -14,13 +14,14 @@ const s3 = new AWS.S3();
 async function compressImage(data: Buffer, contentType: string, resolution: number) {
   if (!contentType.includes('jpeg') && !contentType.includes('jpg') &&
     !contentType.includes('png') &&
-    !contentType.includes('webp')
+    !contentType.includes('webp') &&
+    !contentType.includes('gif')
   ) {
     return null; // we dont support so just early exit
   }
   const originalImage = sharp(data).resize(200, 200).withMetadata();
   let finalImage;
-  if (contentType.includes('jpeg') || contentType.includes('jpg')) {
+  if (contentType.includes('jpeg') || contentType.includes('jpg') || contentType.includes('gif')) {
     finalImage = originalImage.jpeg({ quality: resolution * 10 });
   } else if (contentType.includes('png')) {
     finalImage = originalImage.png({ compressionLevel: resolution });
@@ -46,17 +47,22 @@ async function main() {
   try {
     for (const chain of chains) {
       const resp = await fetch(chain.icon_url);
-      const contentType = resp.headers.get('content-type');
+      let contentType = resp.headers.get('content-type');
       const buffer = await resp.buffer();
 
-      const compressedImage = await compressImage(buffer, contentType, 10);
-      if (!contentType) {
+      const compressedImage = await compressImage(buffer, contentType, 9);
+      if (!compressedImage) {
         // eslint-disable-next-line no-continue
         continue;
       }
 
       const expiryDate = new Date();
       expiryDate.setHours(expiryDate.getHours() + 0.1);
+
+      // we convert gif to jpeg
+      if (contentType.includes('gif')) {
+        contentType = 'image/jpeg';
+      }
 
       const params: S3.Types.PutObjectRequest = {
         Bucket: 'commonwealth-uploads',
