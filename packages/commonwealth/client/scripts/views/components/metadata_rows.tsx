@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { Select } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
@@ -94,32 +93,6 @@ export class ToggleRow extends ClassComponent<ToggleRowAttrs> {
           />
           {caption && <CWText type="caption">{caption(this.checked)}</CWText>}
         </div>
-      </div>
-    );
-  }
-}
-
-type SelectRowAttrs = {
-  onchange: (e) => void;
-  options: string[];
-  title: string;
-  value: string;
-};
-
-export class SelectRow extends ClassComponent<SelectRowAttrs> {
-  view(vnode: m.Vnode<SelectRowAttrs>) {
-    const { onchange, options, title, value } = vnode.attrs;
-
-    return (
-      <div class="SelectRow">
-        <CWLabel label={title} />
-        {m(Select, {
-          options,
-          onchange: (e) => {
-            onchange((e.currentTarget as HTMLInputElement).value);
-          },
-          defaultValue: value,
-        })}
       </div>
     );
   }
