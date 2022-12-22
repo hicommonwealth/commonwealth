@@ -59,6 +59,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
       }
     }
 
+    const formState = { module: '', function: '', args: [] };
+
     return (
       <>
         <CWDropdown
@@ -81,7 +83,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
         )}
         {this.councilMotionType === 'createExternalProposal' ||
           (this.councilMotionType === 'createExternalProposalMajority' &&
-            m(EdgewareFunctionPicker))}
+            m(EdgewareFunctionPicker, formState))}
         {hasExternalProposalSelector &&
           substrate.democracyProposals.nextExternal && (
             <CWDropdown
@@ -182,8 +184,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               args = [
                 author,
                 threshold,
-                EdgewareFunctionPicker.getMethod(),
-                EdgewareFunctionPicker.getMethod().encodedLength,
+                EdgewareFunctionPicker.getMethod(formState),
+                EdgewareFunctionPicker.getMethod(formState).encodedLength,
               ];
 
               createFunc = ([a, t, mt, l]) =>
@@ -194,8 +196,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               args = [
                 author,
                 threshold,
-                EdgewareFunctionPicker.getMethod(),
-                EdgewareFunctionPicker.getMethod().encodedLength,
+                EdgewareFunctionPicker.getMethod(formState),
+                EdgewareFunctionPicker.getMethod(formState).encodedLength,
               ];
 
               createFunc = ([a, t, mt, l]) =>
@@ -206,8 +208,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               args = [
                 author,
                 threshold,
-                EdgewareFunctionPicker.getMethod(),
-                EdgewareFunctionPicker.getMethod().encodedLength,
+                EdgewareFunctionPicker.getMethod(formState),
+                EdgewareFunctionPicker.getMethod(formState).encodedLength,
               ];
 
               createFunc = ([a, t, mt, l]) =>
