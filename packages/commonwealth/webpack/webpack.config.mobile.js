@@ -32,7 +32,16 @@ module.exports = merge(common, {
       {
         test: /\.s?css/i,
         use : ['style-loader', 'css-loader', 'sass-loader']
-      }
+      },
+      // patch import for process/browser, so yarn build-ios works
+      {
+        test: /\.mjs$/,
+        include: /node_modules/,
+        type: 'javascript/auto',
+        resolve: {
+          fullySpecified: false
+        }
+    }
     ]
   }
 });
