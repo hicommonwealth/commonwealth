@@ -1,4 +1,4 @@
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';

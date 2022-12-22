@@ -8,6 +8,7 @@ import BN from 'bn.js';
 import {Op} from 'sequelize';
 import {factory, formatFilename} from 'common-common/src/logging';
 import {BalanceType,ChainBase, ChainType, NotificationCategories} from 'common-common/src/types';
+import {AppError, ServerError} from 'common-common/src/errors';
 import {urlHasValidHTTPPrefix} from '../../shared/utils';
 import {ChainAttributes} from '../models/chain';
 import {ChainNodeAttributes} from '../models/chain_node';
@@ -20,7 +21,6 @@ import {mixpanelTrack} from '../util/mixpanelUtil';
 import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
 import {RoleAttributes, RoleInstance} from '../models/role';
 
-import {AppError, ServerError} from 'common-common/src/errors';
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
