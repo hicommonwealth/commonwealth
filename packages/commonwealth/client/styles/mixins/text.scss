@@ -33,5 +33,14 @@
   display: -webkit-box;
   -webkit-line-clamp: $max-lines;
   -webkit-box-orient: vertical;
+
+  -moz-line-clamp: $max-lines;
+  -moz-box-orient: vertical;
+
+  -o-line-clamp: $max-lines;
+  -o-box-orient: vertical;
+
+  -ms-line-clamp: $max-lines;
+  -ms-box-orient: vertical;
   overflow: hidden;
 }
