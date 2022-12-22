@@ -25,6 +25,7 @@
     "./test",
     "./globals.d.ts",
     "./server",
-    "./server.ts"],
+    "./server.ts"
+  ],
   "exclude": ["./node_modules"]
 }
