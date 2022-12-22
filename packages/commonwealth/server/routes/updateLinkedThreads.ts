@@ -3,7 +3,8 @@ import { Op } from 'sequelize';
 import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import { findAllRoles } from '../util/roles';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
+import { Action, PermissionError } from '../../../common-common/src/permissions';
 
 export const Errors = {
   InsufficientPermissions:
@@ -21,6 +22,18 @@ const updateLinkedThreads = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
+
+  const author = req.address;
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.LINK_THREAD_TO_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { linked_thread_id, linking_thread_id, remove_link } = req.body;
   if (!linked_thread_id) {
