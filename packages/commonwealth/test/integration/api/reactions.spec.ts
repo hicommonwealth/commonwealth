@@ -149,7 +149,7 @@ describe('Thread Tests', () => {
 
     it('should fail to create a reaction because user is not permitted to create a reaction', async () => {
 
-      addAllowDenyPermissionsForCommunityRole('member', chain, undefined, Action.VIEW_REACTIONS);
+      addAllowDenyPermissionsForCommunityRole('member', chain, undefined, Action.CREATE_REACTION);
 
       const rRes = await modelUtils.createReaction({
         chain,
