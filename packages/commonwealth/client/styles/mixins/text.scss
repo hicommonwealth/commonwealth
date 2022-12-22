@@ -28,3 +28,10 @@
   letter-spacing: 0.02em;
   line-height: 16px;
 }
+
+@mixin multiline-text-ellipsis($max-lines: 1) {
+  display: -webkit-box;
+  -webkit-line-clamp: $max-lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

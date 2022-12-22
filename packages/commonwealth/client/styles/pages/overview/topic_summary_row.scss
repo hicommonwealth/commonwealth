@@ -117,6 +117,11 @@
           display: flex;
           gap: 16px;
 
+          .thread-preview {
+            @include multiline-text-ellipsis(2);
+            word-break: break-word;
+          }
+
           .comments-count {
             align-items: center;
             display: flex;
@@ -152,6 +157,7 @@
         .row-bottom-menu {
           display: flex;
           gap: 16px;
+          margin-left: 8px;
         }
       }
     }
