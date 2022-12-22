@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
@@ -66,7 +65,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
             },
           ]}
         />
-        {m(EdgewareFunctionPicker, formState)}
+        {render(EdgewareFunctionPicker, formState)}
         {this.toggleValue === 'proposal' && (
           <CWTextInput
             label={`Deposit (${app.chain.currency})`}

@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/new_proposal/compound_proposal_form.scss';
 
@@ -41,7 +40,7 @@ export class CompoundProposalForm extends ClassComponent {
       <div class="CompoundProposalForm">
         <div class="row-with-label">
           <CWLabel label="Proposer (you)" />
-          {m(User, {
+          {render(User, {
             user: author,
             linkify: true,
             popover: true,
@@ -186,7 +185,7 @@ export class CompoundProposalForm extends ClassComponent {
               .propose(details)
               .then((result: string) => {
                 notifySuccess(`Proposal ${result} created successfully!`);
-                m.redraw();
+                redraw();
               })
               .catch((err) => notifyError(err.data?.message || err.message));
           }}

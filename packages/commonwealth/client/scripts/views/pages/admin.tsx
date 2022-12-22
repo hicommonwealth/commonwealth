@@ -1,8 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
 
 import $ from 'jquery';
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import 'pages/admin.scss';
@@ -38,7 +37,7 @@ class SudoForm extends ClassComponent {
       return (
         <div class="admin-column">
           <CWText>Must be logged into admin account to use Sudo: </CWText>
-          {m(User, {
+          {render(User, {
             user: app.chain.accounts.get(substrate.chain.sudoKey),
           })}
         </div>
@@ -58,7 +57,7 @@ class SudoForm extends ClassComponent {
     return (
       <div class="admin-column">
         <CWText type="h5">Sudo: run function as Admin</CWText>
-        {m(EdgewareFunctionPicker)}
+        {render(EdgewareFunctionPicker)}
         <CWButton
           disabled={this.txProcessing}
           onclick={(e) => {
@@ -70,7 +69,7 @@ class SudoForm extends ClassComponent {
             });
             this.txProcessing = true;
             this.resultText = 'Waiting...';
-            m.redraw();
+            redraw();
             substrate.chain.api.tx.sudo
               .sudo(call)
               .signAndSend(keyring, (result: ISubmittableResult) => {
@@ -81,7 +80,7 @@ class SudoForm extends ClassComponent {
                   } else {
                     this.resultText = 'Action was unsuccessful.';
                   }
-                  m.redraw();
+                  redraw();
                 }
               });
           }}
@@ -264,7 +263,7 @@ class AdminActions extends ClassComponent {
             }).then(
               (response) => {
                 if (response.status === 'Success') {
-                  m.redraw();
+                  redraw();
                 } else {
                   // error tracking
                 }
@@ -274,7 +273,7 @@ class AdminActions extends ClassComponent {
                 this.failure = true;
                 this.disabled = false;
                 if (err.responseJSON) this.error = err.responseJSON.error;
-                m.redraw();
+                redraw();
               }
             );
           }}
@@ -290,7 +289,7 @@ class AdminActions extends ClassComponent {
 class AdminPage extends ClassComponent {
   view() {
     if (!app.chain) {
-      m.route.set('/', {}, { replace: true });
+      setRoute('/', {}, { replace: true });
       return <PageLoading />;
     } else if (app.chain && app.user.isSiteAdmin) {
       return (

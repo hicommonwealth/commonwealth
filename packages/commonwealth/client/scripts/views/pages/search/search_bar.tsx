@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/search/search_bar.scss';
 
@@ -32,7 +31,7 @@ const goToSearchPage = (query: SearchQuery) => {
 
   app.search.addToHistory(query);
 
-  m.route.set(`/search?${query.toUrlParams()}`);
+  setRoute(`/search?${query.toUrlParams()}`);
 };
 
 const getSearchPreview = async (searchQuery: SearchQuery, state) => {
@@ -53,7 +52,7 @@ const getSearchPreview = async (searchQuery: SearchQuery, state) => {
 
   app.search.addToHistory(searchQuery);
 
-  m.redraw();
+  redraw();
 };
 
 export class SearchBar extends ClassComponent {
@@ -121,7 +120,7 @@ export class SearchBar extends ClassComponent {
               isClearable: this.searchTerm.length > 0,
             })}
             placeholder="Search Common"
-            defaultValue={m.route.param('q') || this.searchTerm}
+            defaultValue={getRouteParam('q') || this.searchTerm}
             value={this.searchTerm}
             autocomplete="off"
             onfocus={() => {
@@ -130,7 +129,7 @@ export class SearchBar extends ClassComponent {
             onblur={() => {
               setTimeout(() => {
                 this.showDropdown = false;
-                m.redraw();
+                redraw();
               }, 500); // hack to prevent the dropdown closing too quickly on click
             }}
             oninput={(e) => {

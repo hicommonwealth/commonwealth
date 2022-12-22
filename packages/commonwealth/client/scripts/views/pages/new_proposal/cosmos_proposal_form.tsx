@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';

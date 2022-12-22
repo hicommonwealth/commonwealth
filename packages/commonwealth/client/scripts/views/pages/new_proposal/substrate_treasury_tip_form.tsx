@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -38,7 +37,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
     return (
       <>
         <CWLabel label="Finder" />,
-        {m(User, {
+        {render(User, {
           user: author,
           linkify: true,
           popover: true,

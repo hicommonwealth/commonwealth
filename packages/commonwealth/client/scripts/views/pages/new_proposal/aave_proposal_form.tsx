@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { utils } from 'ethers';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
@@ -45,7 +44,7 @@ export class AaveProposalForm extends ClassComponent {
       <div class="AaveProposalForm">
         <div class="row-with-label">
           <CWLabel label="Proposer (you)" />
-          {m(User, {
+          {render(User, {
             user: author,
             linkify: true,
             popover: true,
@@ -220,7 +219,7 @@ export class AaveProposalForm extends ClassComponent {
 
             aave.governance
               .propose(details)
-              .then(() => m.redraw())
+              .then(() => redraw())
               .catch((err) => notifyError(err.data?.message || err.message));
           }}
         />

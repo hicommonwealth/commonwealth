@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -83,7 +82,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
         )}
         {this.councilMotionType === 'createExternalProposal' ||
           (this.councilMotionType === 'createExternalProposalMajority' &&
-            m(EdgewareFunctionPicker, formState))}
+            render(EdgewareFunctionPicker, formState))}
         {hasExternalProposalSelector &&
           substrate.democracyProposals.nextExternal && (
             <CWDropdown

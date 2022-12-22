@@ -76,7 +76,7 @@ const getCommunityResult = (community) => {
       setRoute(
         params.community.address ? `/${params.community.address}` : '/'
 =======
-      m.route.set(
+      setRoute(
         params.community.id ? `/${params.community.id}` : '/'
 >>>>>>> master:packages/commonwealth/client/scripts/views/pages/search/index.tsx
       );
@@ -157,7 +157,7 @@ const getCommentResult = (comment, searchTerm) => {
       setRoute(
         `/${chain}/proposal/${proposalId.split('_')[0]}/${
 =======
-      m.route.set(
+      setRoute(
         `/${chain}/discussion/${proposalId.split('_')[0]}/${
 >>>>>>> master:packages/commonwealth/client/scripts/views/pages/search/index.tsx
           proposalId.split('_')[1]
@@ -233,7 +233,7 @@ const search = async (searchQuery: SearchQuery, state) => {
 
   app.search.addToHistory(searchQuery);
 
-  m.redraw();
+  redraw();
 };
 
 type SearchPageAttrs = {

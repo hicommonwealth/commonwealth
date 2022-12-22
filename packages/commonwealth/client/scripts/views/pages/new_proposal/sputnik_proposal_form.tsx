@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
@@ -131,7 +130,7 @@ export class SputnikProposalForm extends ClassComponent {
 
             (app.chain as NearSputnik).dao
               .proposeTx(description, propArgs)
-              .then(() => m.redraw())
+              .then(() => redraw())
               .catch((err) => notifyError(err.message));
           }}
         />

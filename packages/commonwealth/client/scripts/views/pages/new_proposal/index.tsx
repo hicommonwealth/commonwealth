@@ -1,7 +1,6 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/new_proposal/index.scss';
 
@@ -35,7 +34,7 @@ type NewProposalPageAttrs = {
 class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
   private typeEnum: ProposalType;
 
-  view(vnode: m.Vnode<NewProposalPageAttrs>) {
+  view(vnode: ResultNode<NewProposalPageAttrs>) {
     this.typeEnum = vnode.attrs.type;
 
     // wait for chain
