@@ -24,7 +24,7 @@ async function compressImage(data: Buffer, contentType: string, resolution: numb
     finalImage = originalImage.jpeg({ quality: resolution * 10 });
   } else if (contentType.includes('png')) {
     finalImage = originalImage.png({ compressionLevel: resolution });
-  } else if (contentType.includes('png')) {
+  } else if (contentType.includes('webp')) {
     finalImage = originalImage.webp({ quality: resolution * 10 });
   } else {
     return null; // shouldn't reach here, but if we do just return
