@@ -11,7 +11,7 @@ import { Errors as CreateCommentErrors } from 'server/routes/createComment';
 import app, { resetDatabase } from 'commonwealth/server-test';
 import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
-import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
+import { addAllowDenyPermissionsForCommunityRole, removeAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
 import { Action, addAllowImplicitPermissions } from 'common-common/src/permissions';
 
 chai.use(chaiHttp);
@@ -163,6 +163,81 @@ describe('Thread Tests', () => {
       expect(rRes.status).to.equal(400);
       expect(rRes.error).to.not.be.null;
       expect(rRes.error).to.equal(Errors.NotPermitted);
+
+      // Set permissions back to default
+      removeAllowDenyPermissionsForCommunityRole('member', chain, undefined, Action.CREATE_REACTION);
+    });
+  });
+
+  describe('/viewReactions', () => {
+    beforeEach(async () => {
+      addAllowDenyPermissionsForCommunityRole('member', chain, Action.CREATE_THREAD, undefined);
+
+      const res2 = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        stage,
+        chainId: chain,
+        title,
+        topicName,
+        topicId,
+        body,
+        jwt: userJWT,
+      });
+      expect(res2.status).to.be.equal('Success');
+      expect(res2.result).to.not.be.null;
+      thread = res2.result;
+
+      const cRes = await modelUtils.createComment({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        text: markdownComment.text,
+        root_id: `discussion_${thread.id}`,
+      });
+
+      expect(cRes.status).to.equal('Success');
+      expect(cRes.result).to.not.be.null;
+      comment = cRes.result;
+
+      const rRes = await modelUtils.createReaction({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        comment_id: comment.id,
+        reaction: 'like',
+        author_chain: chain,
+      });
+
+      expect(rRes.status).to.equal('Success');
+      expect(rRes.result).to.not.be.null;
+      expect(rRes.result.chain).to.equal(chain);
+    });
+
+    it('should fetch reactions for a comment', async () => {
+      const rRes = await modelUtils.viewReactions({
+        chain,
+        jwt: userJWT,
+        comment_id: comment.id,
+      });
+
+      console.log('rRes: ', rRes.error)
+      expect(rRes.status).to.equal('Success');
+      expect(rRes.result).to.not.be.null;
+    });
+
+    it('should still view reactions if user is denied viewReaction because this user is not logged in', async () => {
+      removeAllowDenyPermissionsForCommunityRole('member', chain, Action.VIEW_REACTIONS, undefined);
+      addAllowDenyPermissionsForCommunityRole('member', chain, undefined, Action.VIEW_REACTIONS);
+
+      const rRes = await modelUtils.viewReactions({
+        chain,
+        jwt: userJWT,
+        comment_id: comment.id,
+      });
+
+      expect(rRes.status).to.equal('Success');
+      expect(rRes.result).to.not.be.null;
     });
   });
 });

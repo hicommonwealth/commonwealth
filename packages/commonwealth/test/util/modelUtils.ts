@@ -17,6 +17,8 @@ import {
   addAllowPermission,
   addAllowImplicitPermissions,
   addDenyPermission,
+  removeDenyPermission,
+  removeAllowPermission,
 } from 'common-common/src/permissions';
 import app from '../../server-test';
 import models from '../../server/database';
@@ -53,14 +55,47 @@ export async function addAllowDenyPermissionsForCommunityRole(
   if (deny_permission) {
     denyPermission = addDenyPermission(
       BigInt(communityRole?.deny || 0),
-      deny_permission,
+      deny_permission
     );
     communityRole.deny = denyPermission;
   }
   if (allow_permission) {
     allowPermission = addAllowPermission(
       BigInt(communityRole?.allow || 0),
-      allow_permission,
+      allow_permission
+    );
+    communityRole.allow = allowPermission;
+  }
+  // save community role object to the database
+  await communityRole.save();
+}
+
+export async function removeAllowDenyPermissionsForCommunityRole(
+  role_name: Permission,
+  chain_id: string,
+  allow_permission: number | undefined,
+  deny_permission: number | undefined
+) {
+  // get community role object from the database
+  const communityRole = await models.CommunityRole.findOne({
+    where: {
+      chain_id,
+      name: role_name,
+    },
+  });
+  let denyPermission;
+  let allowPermission;
+  if (deny_permission) {
+    denyPermission = removeDenyPermission(
+      BigInt(communityRole?.deny || 0),
+      deny_permission
+    );
+    communityRole.deny = denyPermission;
+  }
+  if (allow_permission) {
+    allowPermission = removeAllowPermission(
+      BigInt(communityRole?.allow || 0),
+      allow_permission
     );
     communityRole.allow = allowPermission;
   }
@@ -281,6 +316,26 @@ export const createReaction = async (args: CreateReactionArgs) => {
       comment_id,
       author_chain,
       jwt,
+    });
+  return res.body;
+};
+
+export interface ViewReactionArgs {
+  chain: string;
+  jwt: string;
+  comment_id: number;
+}
+
+export const viewReactions = async (args: ViewReactionArgs) => {
+  const { chain, jwt, comment_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .get('/api/viewReactions')
+    .set('Accept', 'application/json')
+    .query({
+      chain,
+      jwt,
+      comment_id,
     });
   return res.body;
 };
