@@ -1,14 +1,17 @@
 import { assert } from 'chai';
 import {
-  allowDenyImplicitPermissions,
+  addAllowImplicitPermissions,
+  removeAllowImplicitPermissions,
+  addDenyImplicitPermissions,
+  removeDenyImplicitPermissions,
   Permissions,
   Action,
-  addPermission,
+  addDenyPermission,
   isPermitted,
   computePermissions,
 } from 'common-common/src/permissions';
 
-describe('allowDenyImplicitPermissions() unit tests', () => {
+describe('add, remove Allow and Deny ImplicitPermissions() unit tests', () => {
   let base_permission;
   let overwrite_admin;
   let overwrite_moderator;
@@ -22,22 +25,22 @@ describe('allowDenyImplicitPermissions() unit tests', () => {
     chain_permission = { allow: base_permission, deny: base_permission };
   });
 
-  it('should correctly allowDenyImplicitPermissions for Allowing createThread action with one role overwrite', () => {
+  it('should correctly addAllowImplicitPermissions for Allowing createThread action with one role overwrite', () => {
     overwrite_moderator.deny = BigInt(1) << BigInt(Action.CREATE_THREAD);
-    const permission = allowDenyImplicitPermissions(overwrite_moderator.deny, Action.CREATE_THREAD, true);
-    assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
-    assert.isTrue(isPermitted(permission, Action.VIEW_COMMENTS));
+    const allow_permission = addAllowImplicitPermissions(overwrite_moderator.deny, Action.CREATE_THREAD);
+    assert.isTrue(isPermitted(allow_permission, Action.CREATE_THREAD));
+    assert.isTrue(isPermitted(allow_permission, Action.VIEW_COMMENTS));
   });
 
   it('Should still be able to view comments if creating thread is denied', () => {
-    overwrite_moderator.deny = addPermission(base_permission, Action.CREATE_THREAD) | addPermission(base_permission, Action.VIEW_COMMENTS);
-    const permission = allowDenyImplicitPermissions(overwrite_moderator.deny, Action.CREATE_THREAD, false);
-    assert.isTrue(isPermitted(permission, Action.VIEW_COMMENTS));
+    overwrite_moderator.deny = addDenyPermission(base_permission, Action.CREATE_THREAD) | addDenyPermission(base_permission, Action.VIEW_COMMENTS);
+    const deny_permission = removeDenyImplicitPermissions(overwrite_moderator.deny, Action.CREATE_THREAD);
+    assert.isTrue(isPermitted(deny_permission, Action.VIEW_COMMENTS));
   });
 
-  it('Should still be able to view threads if creating topic is denied', () => {
-    overwrite_moderator.deny = addPermission(base_permission, Action.CREATE_TOPIC);
-    const permission = allowDenyImplicitPermissions(overwrite_moderator.deny, Action.CREATE_TOPIC, false);
-    assert.isTrue(isPermitted(permission, Action.VIEW_THREADS));
+  it('View Threads should not be been part of the deny permission', () => {
+    overwrite_moderator.deny = addDenyPermission(base_permission, Action.CREATE_TOPIC);
+    const deny_permission = removeDenyImplicitPermissions(overwrite_moderator.deny, Action.CREATE_TOPIC);
+    assert.isFalse(isPermitted(deny_permission, Action.VIEW_THREADS));
   });
 });
