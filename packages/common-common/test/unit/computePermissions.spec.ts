@@ -161,5 +161,8 @@ describe('computePermissions() unit tests', () => {
     ]);
     assert.isFalse(isPermitted(permission, Action.VIEW_THREADS));
     assert.isFalse(isPermitted(permission, Action.VIEW_COMMENTS));
+    assert.isFalse(isPermitted(permission, Action.VIEW_THREADS));
+    assert.isFalse(isPermitted(permission, Action.CREATE_THREAD));
+    assert.isFalse(isPermitted(permission, Action.CREATE_TOPIC));
   });
 });

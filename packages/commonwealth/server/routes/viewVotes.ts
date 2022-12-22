@@ -1,4 +1,4 @@
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { VoteAttributes } from '../models/vote';

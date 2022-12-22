@@ -1,19 +1,25 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import validateChain from '../middleware/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { Action } from 'common-common/src/permissions';
-import { AppError, ServerError } from 'common-common/src/errors';
-import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { checkReadPermitted } from '../util/roles';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { checkReadPermitted } from '../../server/util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
-  MutuallyExclusive: 'Cannot select mutually exclusive threads and proposals only options',
+  MutuallyExclusive:
+    'Cannot select mutually exclusive threads and proposals only options',
 };
 
-const bulkComments = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const bulkComments = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new AppError(error));
 
@@ -36,11 +42,14 @@ const bulkComments = async (models: DB, req: Request, res: Response, next: NextF
   }
   const comments = await models.Comment.findAll({
     where: whereOptions,
-    include: [ models.Address, models.Attachment ],
+    include: [models.Address, models.Attachment],
     order: [['created_at', 'DESC']],
   });
 
-  return res.json({ status: 'Success', result: comments.map((c) => c.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: comments.map((c) => c.toJSON()),
+  });
 };
 
 export default bulkComments;

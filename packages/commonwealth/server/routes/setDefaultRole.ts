@@ -1,6 +1,6 @@
 import Sequelize, { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
@@ -45,7 +45,7 @@ const setDefaultRole = async (
       address_id: validAddress.id,
       community_role_id: existingRole.toJSON().community_role_id,
     },
-  })
+  });
 
   validAddress.last_active = new Date();
   await validAddress.save();

@@ -2,7 +2,7 @@ import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 import sgMail from '@sendgrid/mail';
 import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));

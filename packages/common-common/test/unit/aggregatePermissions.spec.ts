@@ -65,7 +65,7 @@ describe('aggregatePermissions() unit tests', () => {
     assert.isFalse(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
   });
 
-  it('should correctly aggregate permissions for a community with multiple role and community overwrites', () => {
+  it('should correctly aggregate permissions for a community with multiple role and community overwrites (no implicit)', () => {
     const createThread = addPermission(base_permission, Action.CREATE_THREAD);
     const viewChat = addPermission(base_permission, Action.VIEW_CHAT_CHANNELS);
     const createChat = addPermission(base_permission, Action.CREATE_CHAT);
@@ -97,7 +97,8 @@ describe('aggregatePermissions() unit tests', () => {
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
     // View chat should be denied because it is denied by admin
     assert.isFalse(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
-    assert.isFalse(isPermitted(permission, Action.CREATE_CHAT));
+    // However Create Chat is still permitted because it is a higher hierachy permission
+    assert.isTrue(isPermitted(permission, Action.CREATE_CHAT));
   });
 
   it('should correctly aggregate permissions for a community with multiple role overwrites', () => {

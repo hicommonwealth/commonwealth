@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes, Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../models';
@@ -106,7 +106,7 @@ const bulkThreads = async (
         ? t.collaborators.map((c) => JSON.parse(c))
         : [];
       let chain_entity_meta = [];
-      if (t.chain_entity_meta[0].ce_id) chain_entity_meta = t.chain_entity_meta
+      if (t.chain_entity_meta[0].ce_id) chain_entity_meta = t.chain_entity_meta;
       const linked_threads = JSON.parse(t.linked_threads[0]).id
         ? t.linked_threads.map((c) => JSON.parse(c))
         : [];
@@ -168,7 +168,7 @@ const bulkThreads = async (
             },
             {
               model: models.ChainEntityMeta,
-              as: 'chain_entity_meta'
+              as: 'chain_entity_meta',
             },
             {
               model: models.LinkedThread,
@@ -190,11 +190,13 @@ const bulkThreads = async (
      SELECT id, title, stage FROM "Threads"
      WHERE chain = $chain AND (stage = 'proposal_in_review' OR stage = 'voting')`;
 
-  const threadsInVoting: ThreadInstance[] =
-    await models.sequelize.query(countsQuery, {
+  const threadsInVoting: ThreadInstance[] = await models.sequelize.query(
+    countsQuery,
+    {
       bind,
       type: QueryTypes.SELECT,
-    });
+    }
+  );
   const numVotingThreads = threadsInVoting.filter(
     (t) => t.stage === 'voting'
   ).length;

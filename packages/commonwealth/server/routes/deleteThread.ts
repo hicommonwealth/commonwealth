@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
+import { TypedRequestBody, TypedResponse, success } from '../types';
 import validateRoles from '../util/validateRoles';
+import deleteThreadFromDb from '../util/deleteThread';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -14,82 +14,57 @@ enum DeleteThreadErrors {
   NoPermission = 'Not owned by this user',
 }
 
-const deleteThread = async (
+type DeleteThreadReq = {
+  thread_id: number;
+};
+
+type DeleteThreadResp = Record<string, never>;
+
+const deleteThread = async(
   models: DB,
   banCache: BanCache,
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestBody<DeleteThreadReq>,
+  resp: TypedResponse<DeleteThreadResp>,
 ) => {
-  const { thread_id, chain_id } = req.body;
+  const { thread_id } = req.body;
   if (!req.user) {
     throw new AppError(DeleteThreadErrors.NoUser);
   }
   if (!thread_id) {
     throw new AppError(DeleteThreadErrors.NoThread);
   }
-
-  try {
-    const userOwnedAddressIds = (await req.user.getAddresses())
-      .filter((addr) => !!addr.verified)
-      .map((addr) => addr.id);
-
-    const myThread = await models.Thread.findOne({
-      where: {
-        id: req.body.thread_id,
-        address_id: { [Op.in]: userOwnedAddressIds },
-      },
-      include: [{
-        model: models.Chain,
-      }, {
-        association: 'Address',
-      }],
-    });
-
-    let thread = myThread;
-
-    // check if author can delete post
-    if (thread) {
-      const [canInteract, error] = await banCache.checkBan({
-        chain: thread.chain,
-        address: thread.Address.address,
-      });
-      if (!canInteract) {
-        throw new AppError(error);
-      }
-    }
-
-    if (!myThread) {
-      const isAdminOrMod = await validateRoles(models, req.user, 'moderator', chain_id);
-
-      if (!isAdminOrMod) {
-        throw new AppError(DeleteThreadErrors.NoPermission);
-      }
-
-      thread = await models.Thread.findOne({
-        where: {
-          id: req.body.thread_id,
-        },
-        include: [models.Chain],
-      });
-
-      if (!thread) {
-        throw new ServerError(DeleteThreadErrors.NoThread);
-      }
-    }
-
-    // find and delete all associated subscriptions
-    await models.Subscription.destroy({
-      where: {
-        offchain_thread_id: thread.id,
-      },
-    });
-
-    await thread.destroy();
-    return res.json({ status: 'Success' });
-  } catch (e) {
-    throw new ServerError(e);
+  const thread = await models.Thread.findOne({
+    where: {
+      id: thread_id,
+    },
+    include: [
+      { model: models.Address, as: 'Address' },
+    ]
+  });
+  if (!thread) {
+    throw new AppError(DeleteThreadErrors.NoThread);
   }
+
+  // permit author to delete if not banned
+  if (thread.Address.user_id === req.user.id) {
+    const [canInteract, banError] = await banCache.checkBan({
+      chain: thread.chain,
+      address: thread.Address.address,
+    });
+    if (!canInteract) {
+      throw new AppError(banError);
+    }
+    await deleteThreadFromDb(models, thread_id);
+    return success(resp, {});
+  }
+
+  // permit community mod or admin to delete
+  const isAdminOrMod = await validateRoles(models, req.user, 'moderator', thread.chain);
+  if (!isAdminOrMod) {
+    throw new AppError(DeleteThreadErrors.NoPermission);
+  }
+  await deleteThreadFromDb(models, thread_id);
+  return success(resp, {});
 };
 
 export default deleteThread;
