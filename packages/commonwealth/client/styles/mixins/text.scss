@@ -31,6 +31,8 @@
 
 @mixin multiline-text-ellipsis($max-lines: 1) {
   display: -webkit-box;
+  overflow: hidden;
+
   -webkit-line-clamp: $max-lines;
   -webkit-box-orient: vertical;
 
@@ -42,5 +44,4 @@
 
   -ms-line-clamp: $max-lines;
   -ms-box-orient: vertical;
-  overflow: hidden;
 }
