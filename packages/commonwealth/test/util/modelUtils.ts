@@ -408,11 +408,11 @@ export const createInvite = async (args: InviteArgs) => {
 
 // always prune both token and non-token holders asap
 export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
-  public name = 'eth-token'
+  public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
     contractType: 'string',
-  }
+  };
   public validBases = [BalanceType.Ethereum];
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 

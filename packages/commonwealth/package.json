@@ -158,6 +158,7 @@
     "express-async-errors": "^3.1.1",
     "express-http-to-https": "^1.1.4",
     "express-session": "^1.17.0",
+    "express-validator": "^6.14.2",
     "faker": "^4.1.0",
     "file-loader": "^2.0.0",
     "graphql": "^15.5.0",
