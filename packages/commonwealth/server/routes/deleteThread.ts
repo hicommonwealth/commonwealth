@@ -18,6 +18,7 @@ enum DeleteThreadErrors {
 
 type DeleteThreadReq = {
   thread_id: number;
+  chain_id: string;
 };
 
 type DeleteThreadResp = Record<string, never>;
@@ -28,13 +29,26 @@ const deleteThread = async(
   req: TypedRequestBody<DeleteThreadReq>,
   resp: TypedResponse<DeleteThreadResp>,
 ) => {
-  const { thread_id } = req.body;
+  const { thread_id, chain_id } = req.body;
+
   if (!req.user) {
     throw new AppError(DeleteThreadErrors.NoUser);
   }
   if (!thread_id) {
     throw new AppError(DeleteThreadErrors.NoThread);
   }
+
+  const permission_error = await isAddressPermitted(
+    models,
+    req.user?.id,
+    chain_id,
+    Action.DELETE_THREAD
+  );
+
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return new AppError(PermissionError.NOT_PERMITTED);
+  }
+
   const thread = await models.Thread.findOne({
     where: {
       id: thread_id,
