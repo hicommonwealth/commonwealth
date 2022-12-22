@@ -28,7 +28,7 @@ switch (process.env.NODE_ENV) {
     config = {
       ...baseConfig,
       server: {
-        url: 'http://192.168.1.42:8080', // replace with your IP address + port
+        url: 'http://127.0.0.1:8080',
         cleartext: true,
         allowNavigation: ['*'],
       },
