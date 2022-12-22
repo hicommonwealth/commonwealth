@@ -12,11 +12,19 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceType } from 'common-common/src/types';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
+import {
+  Action,
+  addAllowPermission,
+  addAllowImplicitPermissions,
+  addDenyPermission,
+} from 'common-common/src/permissions';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
-import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-import { Action } from '../../../common-common/src/permissions';
+import {
+  constructTypedMessage,
+  TEST_BLOCK_INFO_STRING,
+} from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,11 +35,11 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
-export async function addAllowDenyPermissions(
+export async function addAllowDenyPermissionsForCommunityRole(
   role_name: Permission,
   chain_id: string,
-  allow_permission: number,
-  deny_permission: number
+  allow_permission: number | undefined,
+  deny_permission: number | undefined
 ) {
   // get community role object from the database
   const communityRole = await models.CommunityRole.findOne({
@@ -40,12 +48,22 @@ export async function addAllowDenyPermissions(
       name: role_name,
     },
   });
-  // update allow permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.allow = BigInt(communityRole.allow) | BigInt(1) << BigInt(allow_permission);
-  // update deny permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.deny = BigInt(communityRole.deny) | BigInt(1) << BigInt(deny_permission);
+  let denyPermission;
+  let allowPermission;
+  if (deny_permission) {
+    denyPermission = addDenyPermission(
+      BigInt(communityRole?.deny || 0),
+      deny_permission,
+    );
+    communityRole.deny = denyPermission;
+  }
+  if (allow_permission) {
+    allowPermission = addAllowPermission(
+      BigInt(communityRole?.allow || 0),
+      allow_permission,
+    );
+    communityRole.allow = allowPermission;
+  }
   // save community role object to the database
   await communityRole.save();
 }
@@ -62,8 +80,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
-    const sessionWallet = ethers.Wallet.createRandom()
-    const data = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+    const sessionWallet = ethers.Wallet.createRandom();
+    const data = await constructTypedMessage(
+      address,
+      chain_id,
+      sessionWallet.address,
+      TEST_BLOCK_INFO_STRING
+    );
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -188,6 +211,7 @@ export interface CommentArgs {
   parentCommentId?: any;
   root_id?: any;
 }
+
 export const createComment = async (args: CommentArgs) => {
   const { chain, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request
@@ -231,6 +255,32 @@ export const editComment = async (args: EditCommentArgs) => {
       jwt,
       chain: community ? undefined : chain,
       community,
+    });
+  return res.body;
+};
+
+export interface CreateReactionArgs {
+  author_chain: string;
+  chain: string;
+  address: string;
+  reaction: string;
+  jwt: string;
+  comment_id: number;
+}
+
+export const createReaction = async (args: CreateReactionArgs) => {
+  const { chain, address, jwt, author_chain, reaction, comment_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/createReaction')
+    .set('Accept', 'application/json')
+    .send({
+      chain,
+      address,
+      reaction,
+      comment_id,
+      author_chain,
+      jwt,
     });
   return res.body;
 };
@@ -407,19 +457,22 @@ export const createInvite = async (args: InviteArgs) => {
 };
 
 // always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
-  public name = 'eth-token'
+export class MockTokenBalanceProvider extends BalanceProvider<{
+  tokenAddress: string;
+  contractType: string;
+}> {
+  public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
     contractType: 'string',
-  }
+  };
   public validBases = [BalanceType.Ethereum];
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: { tokenAddress: string, contractType: string }
+    opts: { tokenAddress: string; contractType: string }
   ): Promise<string> {
     if (this.balanceFn) {
       const bal = await this.balanceFn(opts.tokenAddress, address);

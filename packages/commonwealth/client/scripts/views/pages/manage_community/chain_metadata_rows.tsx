@@ -18,9 +18,11 @@ import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
-  addPermission,
+  addAllowPermission,
+  addDenyPermission,
   isPermitted,
-  removePermission,
+  removeAllowPermission,
+  removeDenyPermission,
 } from 'common-common/src/permissions';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
@@ -369,12 +371,12 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
 
             try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = removePermission(
+                this.default_deny_permissions = removeDenyPermission(
                   default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );
               } else {
-                this.default_deny_permissions = addPermission(
+                this.default_deny_permissions = addDenyPermission(
                   default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );

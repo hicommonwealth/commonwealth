@@ -11,12 +11,17 @@ import { Errors as CreateCommentErrors } from 'server/routes/createComment';
 import app, { resetDatabase } from 'commonwealth/server-test';
 import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
-import { addAllowDenyPermissions } from 'commonwealth/test/util/modelUtils';
-import { Action } from '../../../../common-common/src/permissions';
+import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
+import { Action, allowDenyImplicitPermissions } from 'common-common/src/permissions';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 const markdownComment = require('../../util/fixtures/markdownComment');
+
+export const Errors = {
+  InvalidUser: 'Invalid user',
+  NotPermitted: 'Action not permitted',
+};
 
 describe('Thread Tests', () => {
   const chain = 'ethereum';
@@ -79,7 +84,7 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    addAllowDenyPermissions('member', chain2, 0, Action.CREATE_THREAD);
+    addAllowDenyPermissionsForCommunityRole('member', chain2, 0, Action.CREATE_THREAD);
   });
 
   describe('/createReaction', () => {
@@ -127,7 +132,7 @@ describe('Thread Tests', () => {
       expect(rRes.result.chain).to.equal(chain);
     });
 
-    it('should fail to create a reaction because it is denied', async () => {
+    it('middelware should fail to create a reaction because user is not the author', async () => {
       const rRes = await modelUtils.createReaction({
         chain,
         address: userAddress2,
@@ -139,7 +144,25 @@ describe('Thread Tests', () => {
 
       expect(rRes.status).to.equal(400);
       expect(rRes.error).to.not.be.null;
-      console.log(rRes.error);
+      expect(rRes.error).to.equal(Errors.InvalidUser);
+    });
+
+    it('should fail to create a reaction because user is not permitted to create a reaction', async () => {
+
+      addAllowDenyPermissionsForCommunityRole('member', chain, undefined, Action.VIEW_REACTIONS);
+
+      const rRes = await modelUtils.createReaction({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        comment_id: comment.id,
+        reaction: 'like',
+        author_chain: chain,
+      });
+
+      expect(rRes.status).to.equal(400);
+      expect(rRes.error).to.not.be.null;
+      expect(rRes.error).to.equal(Errors.NotPermitted);
     });
   });
 });

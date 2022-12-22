@@ -3,7 +3,8 @@ import {
   computePermissions,
   Permissions,
   Action,
-  addPermission,
+  addAllowPermission,
+  addDenyPermission,
   isPermitted,
 } from 'common-common/src/permissions';
 
@@ -32,7 +33,6 @@ describe('computePermissions() unit tests', () => {
       overwrite_moderator,
       overwrite_admin,
     ]);
-    // eslint-disable-next-line no-bitwise
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
   });
 
@@ -47,7 +47,6 @@ describe('computePermissions() unit tests', () => {
       overwrite_moderator,
       overwrite_admin,
     ]);
-    // eslint-disable-next-line no-bitwise
     assert.isFalse(isPermitted(permission, Action.CREATE_THREAD));
   });
 
@@ -59,42 +58,34 @@ describe('computePermissions() unit tests', () => {
       chain_permission,
       overwrite_admin,
     ]);
-    // eslint-disable-next-line no-bitwise
     assert.isFalse(isPermitted(permission, Action.CREATE_THREAD));
   });
 
   it('should correctly default to allow for computePermissions for a permission with the same allow and deny', () => {
-    // eslint-disable-next-line no-bitwise
-    overwrite_admin.deny = addPermission(BigInt(0), Action.CREATE_THREAD);
-    // eslint-disable-next-line no-bitwise
-    overwrite_admin.allow = addPermission(BigInt(0), Action.CREATE_THREAD);
+    overwrite_admin.deny = addDenyPermission(BigInt(0), Action.CREATE_THREAD);
+    overwrite_admin.allow = addAllowPermission(BigInt(0), Action.CREATE_THREAD);
 
     const permission = computePermissions(base_permission, [
       chain_permission,
       overwrite_admin,
     ]);
-    // eslint-disable-next-line no-bitwise
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
   });
 
   it('should correctly default to allow for computePermissions for a permission with the same allow and deny and community permissions', () => {
-    // eslint-disable-next-line no-bitwise
-    overwrite_admin.deny = addPermission(BigInt(0), Action.CREATE_THREAD);
-    // eslint-disable-next-line no-bitwise
-    overwrite_admin.allow = addPermission(BigInt(0), Action.CREATE_THREAD);
-    chain_permission.deny = addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS);
+    overwrite_admin.deny = addDenyPermission(BigInt(0), Action.CREATE_THREAD);
+    overwrite_admin.allow = addAllowPermission(BigInt(0), Action.CREATE_THREAD);
+    chain_permission.deny = addDenyPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS);
     const permission = computePermissions(base_permission, [
       chain_permission,
       overwrite_admin,
     ]);
-    // eslint-disable-next-line no-bitwise
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
-    // eslint-disable-next-line no-bitwise
     assert.isFalse(isPermitted(permission, Action.VIEW_CHAT_CHANNELS));
   });
 
-  it('should correctly implicit permissions for an addPermission', () => {
-    const actionPermission = addPermission(
+  it('should correctly implicit permissions for an addAllowPermission', () => {
+    const actionPermission = addAllowPermission(
       base_permission,
       Action.VIEW_THREADS
     );
@@ -107,11 +98,8 @@ describe('computePermissions() unit tests', () => {
   });
 
   it('should correctly computePermissions for an action and its implicit permissions', () => {
-    // eslint-disable-next-line no-bitwise
-    overwrite_admin.allow = addPermission(BigInt(0), Action.CREATE_THREAD);
-
-    // eslint-disable-next-line no-bitwise
-    overwrite_moderator.deny = addPermission(BigInt(0), Action.CREATE_THREAD);
+    overwrite_admin.allow = addAllowPermission(BigInt(0), Action.CREATE_THREAD);
+    overwrite_moderator.deny = addDenyPermission(BigInt(0), Action.CREATE_THREAD);
 
     const permission = computePermissions(base_permission, [
       overwrite_moderator,
@@ -131,13 +119,11 @@ describe('computePermissions() unit tests', () => {
   });
 
   it('should correctly computePermissions for an action and its implicit permissions with one denial that is overwritten by admin', () => {
-    // If moderator allows viewing comments, but admin denies threads. Then view threads should be allowed because viewing comments implies viewing threads.
 
-    // eslint-disable-next-line no-bitwise
-    overwrite_admin.deny = addPermission(BigInt(0), Action.VIEW_THREADS);
-
-    // eslint-disable-next-line no-bitwise
-    overwrite_moderator.allow = addPermission(BigInt(0), Action.VIEW_COMMENTS);
+    // If moderator allows viewing comments, but admin denies threads, we should still be able 
+    // to view comments because View Comments is not implicit for denying View Threads
+    overwrite_admin.deny = addDenyPermission(BigInt(0), Action.VIEW_THREADS);
+    overwrite_moderator.allow = addAllowPermission(BigInt(0), Action.VIEW_COMMENTS);
 
     const permission = computePermissions(base_permission, [
       overwrite_moderator,
@@ -145,7 +131,7 @@ describe('computePermissions() unit tests', () => {
     ]);
 
     assert.isFalse(isPermitted(permission, Action.VIEW_THREADS));
-    assert.isFalse(isPermitted(permission, Action.VIEW_COMMENTS));
+    assert.isTrue(isPermitted(permission, Action.VIEW_COMMENTS));
   });
 
   it('should correctly computePermissions for an action and its implicit permissions with one denial', () => {

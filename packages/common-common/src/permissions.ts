@@ -121,46 +121,104 @@ export const getImplicitActionsSet = (action: Action, allowDeny: boolean): Actio
 }
 
 // Allows or Denies the implicit permissions of a permission
-export function allowDenyImplicitPermissions(
-  permission: Permissions,
+export function addAllowImplicitPermissions(
+  allow_permission: Permissions,
   actionNumber: number,
-  allowDeny: boolean
 ): Permissions {
-  let result = BigInt(permission);
-  const implicitActions = getImplicitActionsSet(actionNumber, allowDeny);
-  if (implicitActions && allowDeny) {
+  let result = BigInt(allow_permission);
+  const implicitActions = getImplicitActionsSet(actionNumber, true);
+  if (implicitActions) {
     for (let i = 0; i < implicitActions.length; i++) {
       result |= BigInt(1) << BigInt(implicitActions[i]);
-    }
-  } else if (implicitActions && !allowDeny) {
-    for (let i = 0; i < implicitActions.length; i++) {
-      result &= ~(BigInt(1) << BigInt(implicitActions[i]));
     }
   }
   return result;
 }
 
-// Must be Used to Add Permissions
-export function addPermission(
-  permission: Permissions,
+export function removeAllowImplicitPermissions(
+  allow_permission: Permissions,
+  actionNumber: number,
+): Permissions {
+  let result = BigInt(allow_permission);
+  const implicitActions = getImplicitActionsSet(actionNumber, true);
+  for (let i = 0; i < implicitActions.length; i++) {
+      result &= ~(BigInt(1) << BigInt(implicitActions[i]));
+    }
+  
+  return result;
+};
+
+export function addDenyImplicitPermissions(
+  deny_permission: Permissions,
   actionNumber: number
 ): Permissions {
-  let result = BigInt(permission);
-  // eslint-disable-next-line no-bitwise
-  result |= BigInt(1) << BigInt(actionNumber);
-  result = allowDenyImplicitPermissions(result, actionNumber, true);
+  let result = BigInt(deny_permission);
+  const implicitActions = getImplicitActionsSet(actionNumber, false);
+  if (implicitActions) {
+    for (let i = 0; i < implicitActions.length; i++) {
+      result |= BigInt(1) << BigInt(implicitActions[i]);
+    }
+  }
   return result;
 }
 
-// Must be Used to Remove Permissions
-export function removePermission(
-  permission: Permissions,
+export function removeDenyImplicitPermissions(
+  deny_permission: Permissions,
   actionNumber: number
 ): Permissions {
-  let result = BigInt(permission);
+  let result = BigInt(deny_permission);
+  const implicitActions = getImplicitActionsSet(actionNumber, false);
+  for (let i = 0; i < implicitActions.length; i++) {
+    result &= ~(BigInt(1) << BigInt(implicitActions[i]));
+  }
+  return result;
+}
+
+// Must be Used to Add Permissions to allow permission set
+export function addAllowPermission(
+  allow_permission: Permissions,
+  actionNumber: number
+): Permissions {
+  let result = BigInt(allow_permission);
+  // eslint-disable-next-line no-bitwise
+  result |= BigInt(1) << BigInt(actionNumber);
+  result = addAllowImplicitPermissions(result, actionNumber);
+  return result;
+}
+
+// Must be Used to Remove Permissions from allow permission set
+export function removeAllowPermission(
+  allow_permission: Permissions,
+  actionNumber: number
+): Permissions {
+  let result = BigInt(allow_permission);
   // eslint-disable-next-line no-bitwise
   result &= ~(BigInt(1) << BigInt(actionNumber));
-  result = allowDenyImplicitPermissions(result, actionNumber, false);
+  result = removeAllowImplicitPermissions(result, actionNumber);
+  return result;
+}
+
+// Must be Used to Add Permissions to deny permission set
+export function addDenyPermission(
+  deny_permission: Permissions,
+  actionNumber: number
+): Permissions {
+  let result = BigInt(deny_permission);
+  // eslint-disable-next-line no-bitwise
+  result |= BigInt(1) << BigInt(actionNumber);
+  result = addDenyImplicitPermissions(result, actionNumber);
+  return result;
+}
+
+// Must be Used to Remove Permissions from deny permission set
+export function removeDenyPermission(
+  deny_permission: Permissions,
+  actionNumber: number
+): Permissions {
+  let result = BigInt(deny_permission);
+  // eslint-disable-next-line no-bitwise
+  result &= ~(BigInt(1) << BigInt(actionNumber));
+  result = removeDenyImplicitPermissions(result, actionNumber);
   return result;
 }
 
