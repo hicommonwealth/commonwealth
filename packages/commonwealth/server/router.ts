@@ -59,6 +59,7 @@ import addMember from './routes/addMember';
 import upgradeMember from './routes/upgradeMember';
 import deleteSocialAccount from './routes/deleteSocialAccount';
 import getProfileOld from './routes/getProfile';
+import generateImage from './routes/generateImage';
 
 import createRole from './routes/createRole';
 import deleteRole from './routes/deleteRole';
@@ -753,6 +754,12 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+
+  router.post(
+    '/generateImage',
+    // passport.authenticate('jwt', { session: false }),
+    generateImage.bind(this, models)
+  );
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));

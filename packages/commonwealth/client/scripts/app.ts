@@ -699,6 +699,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
             '/council': importRoute('views/pages/council', { scoped: true }),
             '/delegate': importRoute('views/pages/delegate', { scoped: true }),
+            '/community-art': importRoute('views/pages/community_art', {
+              scoped: true,
+            }),
             '/proposal/:type/:identifier': importRoute(
               'views/pages/view_proposal/index',
               { scoped: true }
@@ -801,6 +804,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/proposals': redirectRoute(() => '/proposals'),
             '/:scope/council': redirectRoute(() => '/council'),
             '/:scope/delegate': redirectRoute(() => '/delegate'),
+            '/:scope/community-art': redirectRoute(() => '/commnity-art'),
             '/:scope/proposal/:type/:identifier': redirectRoute(
               (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
             ),
@@ -964,6 +968,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/delegate': importRoute('views/pages/delegate', {
               scoped: true,
             }),
+
             '/:scope/proposal/:type/:identifier': importRoute(
               'views/pages/view_proposal/index',
               { scoped: true }
@@ -984,6 +989,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/new_proposal/index',
               { scoped: true }
             ),
+
+            '/:scope/community-art': importRoute('views/pages/community_art', {
+              scoped: true,
+            }),
 
             // Treasury
             '/:scope/treasury': importRoute('views/pages/treasury', {
