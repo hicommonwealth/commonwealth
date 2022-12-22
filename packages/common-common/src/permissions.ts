@@ -174,15 +174,15 @@ export const BASE_PERMISSIONS: Permissions =
   BigInt(1) << BigInt(Action.CREATE_COMMENT) |
   BigInt(1) << BigInt(Action.EDIT_COMMENT) |
   BigInt(1) << BigInt(Action.DELETE_COMMENT) |
-  // addPermission(BigInt(0), Action.VIEW_POLLS) |
-  // addPermission(BigInt(0), Action.CREATE_POLL) |
-  // addPermission(BigInt(0), Action.VOTE_ON_POLLS) |
-  // addPermission(BigInt(0), Action.VIEW_TOPICS) |
+  BigInt(1) << BigInt(Action.VIEW_POLLS) |
+  BigInt(1) << BigInt(Action.CREATE_POLL) |
+  BigInt(1) << BigInt(Action.VOTE_ON_POLLS) |
+  BigInt(1) << BigInt(Action.VIEW_TOPICS) |
   BigInt(1) << BigInt(Action.CREATE_THREAD) |
-  // addPermission(BigInt(0), Action.EDIT_THREAD) |
-  // addPermission(BigInt(0), Action.DELETE_THREAD) |
-  // addPermission(BigInt(0), Action.LINK_THREAD_TO_THREAD) |
-  // addPermission(BigInt(0), Action.LINK_PROPOSAL_TO_THREAD) |
+  BigInt(1) << BigInt(Action.EDIT_THREAD) |
+  BigInt(1) << BigInt(Action.DELETE_THREAD) |
+  BigInt(1) << BigInt(Action.LINK_THREAD_TO_THREAD) |
+  BigInt(1) << BigInt(Action.LINK_PROPOSAL_TO_THREAD) |
   BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS) |
   BigInt(1) << BigInt(Action.VIEW_THREADS);
 
