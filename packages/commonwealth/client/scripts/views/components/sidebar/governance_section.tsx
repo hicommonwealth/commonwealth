@@ -108,7 +108,8 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       app.chain?.network !== ChainNetwork.Kulupu &&
       app.chain?.network !== ChainNetwork.Darwinia;
 
-    const showProjects = app.chain?.base === ChainBase.Ethereum;
+    // @TODO remove admin toggle when ready
+    const showProjects = app.chain?.base === ChainBase.Ethereum && app.roles.isAdminOfEntity({chain: app.chain.id});
 
     // ---------- Build Toggle Tree ---------- //
     const governanceDefaultToggleTree: ToggleTree = {

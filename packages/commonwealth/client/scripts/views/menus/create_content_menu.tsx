@@ -158,7 +158,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
 
     const getCrowdfundProposalItems = (): Array<MenuItem> =>
       app.chain?.base === ChainBase.Ethereum
-        ?  (app.roles.isAdminOfEntity(app.chain?.id)) ? [
+        ?  (app.roles.isAdminOfEntity({chain: app.chain?.id})) ? [
             { type: 'divider' },
             {
               label: 'New Crowdfund',
