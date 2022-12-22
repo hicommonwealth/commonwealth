@@ -138,27 +138,6 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
     };
   }
 
-  onbeforeupdate(
-    vnode: ResultNode<SidebarSectionAttrs>,
-    old: ResultNode<SidebarSectionAttrs, this>
-  ) {
-    if (
-      !_.isEqual(Object.values(app.socket.chatNs.channels), old.state.channels)
-    ) {
-      Object.values(app.socket.chatNs.channels).forEach((c) => {
-        const { ChatMessages, ...metadata } = c;
-        this.channels[metadata.category]
-          ? this.channels[metadata.category].push(metadata)
-          : (this.channels[metadata.category] = [metadata]);
-      });
-
-      this.menuToggleTree = {
-        toggledState: false,
-        children: this.categoryToToggleTree(Object.keys(this.channels), false),
-      };
-    }
-  }
-
   onremove() {
     if (app.socket) {
       app.socket.chatNs.removeListener(
