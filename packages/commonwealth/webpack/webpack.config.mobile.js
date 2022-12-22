@@ -35,13 +35,11 @@ module.exports = merge(common, {
       },
       // patch import for process/browser, so yarn build-ios works
       {
-        test: /\.mjs$/,
-        include: /node_modules/,
-        type: 'javascript/auto',
+        test: /\.m?js/,
         resolve: {
-          fullySpecified: false
-        }
-    }
+          fullySpecified: false,
+        },
+      },
     ]
   }
 });
