@@ -258,7 +258,6 @@ export async function getResults(
             parseInt(proposal.snapshot, 10)
             // provider,
           );
-          console.log('scores', scores)
           votes = votes
             .map((vote: any) => {
               vote.scores = strategies.map(
