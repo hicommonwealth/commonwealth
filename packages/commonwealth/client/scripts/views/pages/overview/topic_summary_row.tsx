@@ -131,6 +131,9 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                   </CWText>
                   <div class="row-bottom">
                     <div class="comments-and-users">
+                      <CWText type="caption" className="thread-preview">
+                        {thread.plaintext}
+                      </CWText>
                       {/* TODO Gabe 12/7/22 - Comment count isn't available before the comments store is initialized */}
                       {/* <div class="comments-count">
                         <CWIcon iconName="feedback" iconSize="small" />
