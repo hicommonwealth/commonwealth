@@ -14,64 +14,29 @@ import {
   matchPath,
 } from 'react-router-dom';
 
-/// CYANO CODE
-
-
-type RenderElement = ReactElement | string | number | null;
 export type Children = ReactNode | ReactNode[];
 
-declare function renderFunction(
-  children?: Children | ReadonlyArray<RenderElement> | RenderElement,
-): ReactElement;
-
-declare function renderFunction<P = unknown>(
-  componentOrTag: FunctionComponent<P> | string,
-  children?: Children | ReadonlyArray<RenderElement> | RenderElement,
-): ReactElement;
-
-declare function renderFunction<P = unknown>(
-  componentOrTag: FunctionComponent<P> | string,
-  properties: P | null,
-  children?: Children | ReadonlyArray<RenderElement> | RenderElement,
-): ReactElement<P>;
-
-type FragmentProps = {
-  [key: string]: string | number;
+export const render = (tag: string | React.ComponentType, attrs: any, ...children: any[]) => {
+  if (typeof tag === 'string') {
+    return createElement(tag, attrs, ...children);
+  } else {
+    return createElement(tag, attrs, ...children);
+  }
 };
 
-type HyperScript = typeof renderFunction & {
-  trust: (
-    html: string,
-    wrapper?: string,
-  ) => ReactElement<{
-    dangerouslySetInnerHTML: {
-      __html: string;
-    };
-  }>;
-  fragment: (props?: FragmentProps, children?: ReactNode) => JSX.Element;
-  displayName: string;
+render.trust = (html: string, wrapper?: string) => {
+  if (wrapper) {
+    return createElement(wrapper, { dangerouslySetInnerHTML: { __html: html } });
+  } else {
+    return createElement('div', { dangerouslySetInnerHTML: { __html: html } });
+  }
 };
-
-export const render: HyperScript = Object.assign(renderer as typeof renderFunction, {
-  trust: (
-    html: string,
-    wrapper: FunctionComponent | string = '',
-  ): ReactElement =>
-    renderer(wrapper, {
-      dangerouslySetInnerHTML: { __html: html },
-    }),
-  fragment: (props: FragmentProps = {}, children: ReactNode = []) => (
-    <Fragment {...props}>{children}</Fragment>
-  ),
-  displayName: 'react',
-});
 
 export type Component<Props = unknown> = FunctionComponent<Props>;
 
 export const jsx = createElement;
 
-export type ResultNode = ReactElement;
-
+export type ResultNode<A> = ReactElement<A>;
 
 /// END CYANO CODE
 
