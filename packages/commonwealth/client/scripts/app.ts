@@ -7,7 +7,7 @@ import 'construct.scss';
 import 'lity/dist/lity.min.css';
 import mixpanel from 'mixpanel-browser';
 
-import m from 'mithril';
+import mithril from 'mithril';
 import $ from 'jquery';
 import moment from 'moment';
 
@@ -436,14 +436,14 @@ export async function initNewTokenChain(address: string) {
 
 // TODO: fix this vs mithrilInterop
 // set up route navigation
-m.route.prefix = '';
-const _updateRoute = m.route.set;
+mithril.route.prefix = '';
+const _updateRoute = mithril.route.set;
 export const updateRoute = (...args) => {
   app._lastNavigatedBack = false;
   app._lastNavigatedFrom = getRoute();
   if (args[0] !== getRoute()) _updateRoute.apply(this, args);
 };
-m.route.set = (...args) => {
+mithril.route.set = (...args) => {
   // set app params that maintain global state for:
   // - whether the user last clicked the back button
   // - the last page the user was on
@@ -611,7 +611,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     const isCustomDomain = !!customDomain;
     const { activeAccount } = app.user;
-    m.route(document.body, '/', {
+    mithril.route(document.body, '/', {
       // Sitewide pages
       '/about': importRoute('views/pages/why_commonwealth', {
         scoped: false,
