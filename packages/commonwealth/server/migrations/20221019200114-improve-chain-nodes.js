@@ -360,7 +360,7 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 18 },
-        { transaction }
+        { transaction, truncate: true, cascade: true }
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
