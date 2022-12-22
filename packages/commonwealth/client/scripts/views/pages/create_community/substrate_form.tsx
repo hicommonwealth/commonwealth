@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 
@@ -14,8 +15,7 @@ import { constructSubstrateUrl } from 'substrate';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow } from 'views/components/metadata_rows';
 import {
-  MixpanelCommunityCreationEvent,
-  MixpanelCommunityCreationPayload,
+  MixpanelCommunityCreationEvent
 } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
@@ -32,7 +32,7 @@ type CreateSubstrateForm = ChainFormFields & SubstrateFormFields;
 
 type CreateSubstrateState = ChainFormState & { form: CreateSubstrateForm };
 
-export class SubstrateForm implements m.ClassComponent {
+export class SubstrateForm extends ClassComponent {
   private state: CreateSubstrateState = {
     saving: false,
     form: {
@@ -115,7 +115,8 @@ export class SubstrateForm implements m.ClassComponent {
           label="Save changes"
           disabled={this.state.saving}
           onclick={async () => {
-            const { name, nodeUrl, iconUrl, substrateSpec, symbol } = this.state.form;
+            const { name, nodeUrl, iconUrl, substrateSpec, symbol } =
+              this.state.form;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,

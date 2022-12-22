@@ -2,8 +2,9 @@
 
 import $ from 'jquery';
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
-import 'pages/view_proposal/index.scss';
+import 'pages/view_thread/index.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -12,42 +13,92 @@ import { ProposalType } from 'common-common/src/types';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import { slugify } from 'utils';
 import { notifyError } from 'controllers/app/notifications';
-import { Comment, Poll, Thread } from 'models';
+import {
+  ChainEntity,
+  Comment,
+  Poll,
+  Thread,
+  ThreadStage as ThreadStageType,
+  Topic,
+} from 'models';
+import { ContentType } from 'types';
+import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';
+import { activeQuillEditorHasText } from './helpers';
 import {
-  getClasses,
-  isWindowMediumSmallInclusive,
-} from '../../components/component_kit/helpers';
-import { activeQuillEditorHasText } from '../view_proposal/helpers';
-import { ProposalBody } from '../view_proposal/proposal_body';
-import { ThreadSidebar } from './thread_sidebar';
-import { Prefetch } from '../view_proposal/types';
+  CWContentPage,
+  SidebarComponents,
+} from '../../components/component_kit/cw_content_page';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
+import { CommentsTree } from '../../components/comments/comments_tree';
+import { clearEditingLocalStorage } from '../../components/comments/helpers';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
+import { ChangeTopicModal } from '../../modals/change_topic_modal';
+import { CollapsibleThreadBody } from '../../components/collapsible_body_text';
+import { CreateComment } from '../../components/comments/create_comment';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
+import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { EditBody } from './edit_body';
+import { LinkedProposalsCard } from './linked_proposals_card';
+import { LinkedThreadsCard } from './linked_threads_card';
+import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
+import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 
-class ViewThreadPage
-  implements
-    m.ClassComponent<{
-      identifier: string;
-    }>
-{
+export type ThreadPrefetch = {
+  [identifier: string]: {
+    commentsStarted: boolean;
+    pollsStarted?: boolean;
+    profilesFinished: boolean;
+    profilesStarted: boolean;
+    viewCountStarted?: boolean;
+  };
+};
+
+type ViewThreadPageAttrs = {
+  identifier: string;
+};
+
+class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
   private comments: Array<Comment<Thread>>;
+  private isEditingBody: boolean;
   private isGloballyEditing: boolean;
-  private polls: Poll[];
-  private prefetch: Prefetch;
-  private thread: Thread;
+  private polls: Array<Poll>;
+  private prefetch: ThreadPrefetch;
   private recentlyEdited: boolean;
-  private tabSelected: 'viewProposal' | 'viewSidebar';
+  private savedEdits: string;
+  private shouldRestoreEdits: boolean;
+  private thread: Thread;
   private threadFetched: boolean;
   private threadFetchFailed: boolean;
+  private title: string;
   private viewCount: number;
 
-  oninit() {
-    this.tabSelected = 'viewProposal';
+  editorListener(e) {
+    if (this.isGloballyEditing || activeQuillEditorHasText()) {
+      e.preventDefault();
+      e.returnValue = '';
+    }
   }
 
-  view(vnode) {
+  oninit() {
+    window.addEventListener('beforeunload', (e) => {
+      this.editorListener(e);
+    });
+  }
+
+  onremove() {
+    window.removeEventListener('beforeunload', (e) => {
+      this.editorListener(e);
+    });
+  }
+
+  view(vnode: m.Vnode<ViewThreadPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
@@ -141,7 +192,9 @@ class ViewThreadPage
 
     const { thread } = this;
 
-    if (threadRecentlyEdited) this.recentlyEdited = false;
+    if (threadRecentlyEdited) {
+      this.recentlyEdited = false;
+    }
 
     if (identifier !== `${threadId}-${slugify(thread.title)}`) {
       navigateToSubpage(
@@ -325,6 +378,19 @@ class ViewThreadPage
         chain: app.activeChainId(),
       });
 
+    const showLinkedProposalOptions =
+      thread.snapshotProposal?.length > 0 ||
+      thread.chainEntities?.length > 0 ||
+      isAuthor ||
+      isAdminOrMod;
+
+    const showLinkedThreadOptions =
+      thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
+
+    const canComment =
+      app.user.activeAccount ||
+      (!isAdminOrMod && TopicGateCheck.isGatedTopic(thread?.topic?.name));
+
     const setIsGloballyEditing = (status: boolean) => {
       this.isGloballyEditing = status;
 
@@ -335,124 +401,307 @@ class ViewThreadPage
       m.redraw();
     };
 
-    const showLinkedSnapshotOptions =
-      thread.snapshotProposal?.length > 0 ||
-      thread.chainEntities?.length > 0 ||
-      isAuthor ||
-      isAdminOrMod;
-
-    const showLinkedThreadOptions =
-      thread.linkedThreads?.length > 0 || isAuthor || isAdminOrMod;
-
-    window.onresize = () => {
-      if (
-        isWindowMediumSmallInclusive(window.innerWidth) &&
-        this.tabSelected !== 'viewProposal'
-      ) {
-        this.tabSelected = 'viewProposal';
-        m.redraw();
-      }
+    const setIsEditingBody = (status: boolean) => {
+      setIsGloballyEditing(status);
+      this.isEditingBody = status;
     };
 
-    const windowListener = (e) => {
-      if (this.isGloballyEditing || activeQuillEditorHasText()) {
-        e.preventDefault();
-        e.returnValue = '';
-      }
+    const reactionsAndReplyButtons = (
+      <div class="thread-footer-row">
+        <ThreadReactionButton thread={thread} />
+        <div class="comments-count">
+          <CWIcon iconName="feedback" iconSize="small" />
+          <CWText type="caption">{commentCount} Comments</CWText>
+        </div>
+      </div>
+    );
+
+    const hasEditPerms = isAuthor || isEditor;
+
+    const getActionMenuItems = () => {
+      return [
+        ...(hasEditPerms && !thread.readOnly
+          ? [
+              {
+                label: 'Edit',
+                iconLeft: 'write' as const,
+                onclick: async (e) => {
+                  e.preventDefault();
+                  this.savedEdits = localStorage.getItem(
+                    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
+                  );
+
+                  if (this.savedEdits) {
+                    clearEditingLocalStorage(thread.id, ContentType.Thread);
+                    this.shouldRestoreEdits = await confirmationModalWithText(
+                      'Previous changes found. Restore edits?',
+                      'Yes',
+                      'No'
+                    )();
+                  }
+
+                  setIsEditingBody(true);
+                },
+              },
+            ]
+          : []),
+        ...(hasEditPerms
+          ? [
+              {
+                label: 'Edit collaborators',
+                iconLeft: 'write' as const,
+                onclick: async (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: EditCollaboratorsModal,
+                    data: {
+                      thread,
+                    },
+                  });
+                },
+              },
+            ]
+          : []),
+        ...(isAdminOrMod || isAuthor
+          ? [
+              {
+                label: 'Change topic',
+                iconLeft: 'write' as const,
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.modals.create({
+                    modal: ChangeTopicModal,
+                    data: {
+                      onChangeHandler: (topic: Topic) => {
+                        thread.topic = topic;
+                        m.redraw();
+                      },
+                      thread,
+                    },
+                  });
+                },
+              },
+            ]
+          : []),
+        ...(isAuthor || isAdminOrMod
+          ? [
+              {
+                label: 'Delete',
+                iconLeft: 'trash' as const,
+                onclick: async (e) => {
+                  e.preventDefault();
+
+                  const confirmed = await confirmationModalWithText(
+                    'Delete this entire thread?'
+                  )();
+
+                  if (!confirmed) return;
+
+                  app.threads.delete(thread).then(() => {
+                    navigateToSubpage('/discussions');
+                  });
+                },
+              },
+            ]
+          : []),
+        ...(isAuthor || isAdminOrMod
+          ? [
+              {
+                label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
+                iconLeft: 'lock' as const,
+                onclick: (e) => {
+                  e.preventDefault();
+                  app.threads
+                    .setPrivacy({
+                      threadId: thread.id,
+                      readOnly: !thread.readOnly,
+                    })
+                    .then(() => {
+                      setIsEditingBody(false);
+                      m.redraw();
+                    });
+                },
+              },
+            ]
+          : []),
+        ...((isAuthor || isAdminOrMod) && !!app.chain?.meta.snapshot.length
+          ? [
+              {
+                label: 'Snapshot proposal from thread',
+                iconLeft: 'democraticProposal' as const,
+                onclick: () => {
+                  const snapshotSpaces = app.chain.meta.snapshot;
+
+                  if (snapshotSpaces.length > 1) {
+                    navigateToSubpage('/multiple-snapshots', {
+                      action: 'create-from-thread',
+                      thread,
+                    });
+                  } else {
+                    navigateToSubpage(`/snapshot/${snapshotSpaces}`);
+                  }
+                },
+              },
+            ]
+          : []),
+        { type: 'divider' as const },
+        getThreadSubScriptionMenuItem(thread),
+      ];
     };
-
-    window.addEventListener('beforeunload', windowListener);
-
-    const hasSidebar =
-      showLinkedSnapshotOptions ||
-      showLinkedThreadOptions ||
-      this.polls?.length > 0 ||
-      isAuthor;
 
     return (
       <Sublayout
       //  title={headerTitle}
       >
-        <div class="ViewProposalPage">
-          <div
-            class={getClasses<{ hasSidebar?: boolean }>(
-              { hasSidebar },
-              'proposal-body-with-tabs'
-            )}
-          >
-            <CWTabBar>
-              <CWTab
-                label="Thread"
-                onclick={() => {
-                  this.tabSelected = 'viewProposal';
+        <CWContentPage
+          contentBodyLabel="Thread"
+          showSidebar={
+            showLinkedProposalOptions ||
+            showLinkedThreadOptions ||
+            this.polls?.length > 0 ||
+            isAuthor
+          }
+          title={
+            this.isEditingBody ? (
+              <CWTextInput
+                oninput={(e) => {
+                  this.title = e.target.value;
                 }}
-                isSelected={this.tabSelected === 'viewProposal'}
+                defaultValue={thread.title}
               />
-              <CWTab
-                label="Info & Results"
-                onclick={() => {
-                  this.tabSelected = 'viewSidebar';
-                }}
-                isSelected={this.tabSelected === 'viewSidebar'}
-              />
-            </CWTabBar>
-            {this.tabSelected === 'viewProposal' && (
-              <ProposalBody
-                commentCount={commentCount}
-                comments={this.comments}
-                updatedCommentsCallback={updatedCommentsCallback}
-                setIsGloballyEditing={setIsGloballyEditing}
-                isAdminOrMod={isAdminOrMod}
-                isAuthor={isAuthor}
-                isEditor={isEditor}
-                isGloballyEditing={this.isGloballyEditing}
-                proposal={thread}
-                viewCount={this.viewCount}
-              />
-            )}
-            {hasSidebar && this.tabSelected === 'viewSidebar' && (
-              <ThreadSidebar
-                isAdmin={isAdmin}
-                isAdminOrMod={isAdminOrMod}
-                isAuthor={isAuthor}
-                polls={this.polls}
-                thread={thread}
-                showLinkedSnapshotOptions={showLinkedSnapshotOptions}
-                showLinkedThreadOptions={showLinkedThreadOptions}
-              />
-            )}
-          </div>
-          <div
-            class={getClasses<{ hasSidebar?: boolean }>(
-              { hasSidebar },
-              'proposal-body'
-            )}
-          >
-            <ProposalBody
-              commentCount={commentCount}
+            ) : (
+              thread.title
+            )
+          }
+          author={<ThreadAuthor thread={thread} />}
+          createdAt={thread.createdAt}
+          viewCount={this.viewCount}
+          readOnly={thread.readOnly}
+          headerComponents={
+            thread.stage !== ThreadStageType.Discussion && (
+              <ThreadStage thread={thread} />
+            )
+          }
+          subHeader={!!thread.url && <ExternalLink thread={thread} />}
+          actions={
+            app.user.activeAccount &&
+            !this.isGloballyEditing &&
+            getActionMenuItems()
+          }
+          body={
+            <div class="thread-content">
+              {this.isEditingBody ? (
+                <>
+                  {reactionsAndReplyButtons}
+                  <EditBody
+                    thread={thread}
+                    savedEdits={this.savedEdits}
+                    shouldRestoreEdits={this.shouldRestoreEdits}
+                    setIsEditing={setIsEditingBody}
+                    title={this.title}
+                  />
+                </>
+              ) : (
+                <>
+                  <CollapsibleThreadBody thread={thread} />
+                  {thread.readOnly ? (
+                    <CWText type="h5" className="callout-text">
+                      Commenting is disabled because this post has been locked.
+                    </CWText>
+                  ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
+                    <>
+                      {reactionsAndReplyButtons}
+                      <CreateComment
+                        updatedCommentsCallback={updatedCommentsCallback}
+                        setIsGloballyEditing={setIsGloballyEditing}
+                        isGloballyEditing={this.isGloballyEditing}
+                        parentComment={null}
+                        rootProposal={thread}
+                      />
+                    </>
+                  ) : null}
+                </>
+              )}
+            </div>
+          }
+          comments={
+            <CommentsTree
               comments={this.comments}
-              updatedCommentsCallback={updatedCommentsCallback}
-              setIsGloballyEditing={setIsGloballyEditing}
-              isAdminOrMod={isAdminOrMod}
-              isAuthor={isAuthor}
-              isEditor={isEditor}
-              isGloballyEditing={this.isGloballyEditing}
               proposal={thread}
-              viewCount={this.viewCount}
+              setIsGloballyEditing={setIsGloballyEditing}
+              updatedCommentsCallback={updatedCommentsCallback}
             />
-            {hasSidebar && (
-              <ThreadSidebar
-                isAdmin={isAdmin}
-                isAdminOrMod={isAdminOrMod}
-                isAuthor={isAuthor}
-                polls={this.polls}
-                thread={thread}
-                showLinkedSnapshotOptions={showLinkedSnapshotOptions}
-                showLinkedThreadOptions={showLinkedThreadOptions}
-              />
-            )}
-          </div>
-        </div>
+          }
+          sidebarComponents={
+            [
+              ...(showLinkedProposalOptions || showLinkedThreadOptions
+                ? [
+                    {
+                      label: 'Links',
+                      item: (
+                        <div class="cards-column">
+                          {showLinkedProposalOptions && (
+                            <LinkedProposalsCard
+                              onChangeHandler={(
+                                stage: ThreadStageType,
+                                chainEntities: ChainEntity[],
+                                snapshotProposal: SnapshotProposal[]
+                              ) => {
+                                thread.stage = stage;
+                                thread.chainEntities = chainEntities;
+                                if (app.chain?.meta.snapshot.length) {
+                                  thread.snapshotProposal =
+                                    snapshotProposal[0]?.id;
+                                }
+                                app.threads.fetchThreadsFromId([
+                                  thread.identifier,
+                                ]);
+                                m.redraw();
+                              }}
+                              thread={thread}
+                              showAddProposalButton={isAuthor || isAdminOrMod}
+                            />
+                          )}
+                          {showLinkedThreadOptions && (
+                            <LinkedThreadsCard
+                              threadId={thread.id}
+                              allowLinking={isAuthor || isAdminOrMod}
+                            />
+                          )}
+                        </div>
+                      ),
+                    },
+                  ]
+                : []),
+              ...(this.polls?.length > 0 ||
+              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+                ? [
+                    {
+                      label: 'Polls',
+                      item: (
+                        <div class="cards-column">
+                          {[
+                            ...new Map(
+                              this.polls?.map((poll) => [poll.id, poll])
+                            ).values(),
+                          ].map((poll: Poll) => {
+                            return <ThreadPollCard poll={poll} />;
+                          })}
+                          {isAuthor &&
+                            (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                              <ThreadPollEditorCard
+                                thread={thread}
+                                threadAlreadyHasPolling={!this.polls?.length}
+                              />
+                            )}
+                        </div>
+                      ),
+                    },
+                  ]
+                : []),
+            ] as SidebarComponents
+          }
+        />
       </Sublayout>
     );
   }

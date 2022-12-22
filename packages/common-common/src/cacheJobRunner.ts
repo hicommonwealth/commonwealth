@@ -14,6 +14,7 @@ export default abstract class JobRunner<CacheT> {
   constructor(
     private _cache: CacheT,
     private _jobTimeS: number,
+    private _writelockOnRun = false,
   ) {
   }
 
@@ -29,18 +30,29 @@ export default abstract class JobRunner<CacheT> {
   }
 
   // viewFn may manipulate the cache, but it must do so atomically
-  public async access<ReturnT>(viewFn: (c: CacheT) => Promise<ReturnT>): Promise<ReturnT> {
+  protected async access<ReturnT>(viewFn: (c: CacheT) => Promise<ReturnT>): Promise<ReturnT> {
     await this._lock.readLock();
     const result = await viewFn(this._cache);
     this._lock.unlock();
     return result;
   }
 
+  protected async write<ReturnT>(writeFn: (c: CacheT) => Promise<ReturnT>): Promise<ReturnT> {
+    await this._lock.writeLock();
+    const result = await writeFn(this._cache);
+    this._lock.unlock();
+    return result;
+  }
+
   // job can be run manually as well, if desired -- will not reset timer
   protected abstract _job(c: CacheT): Promise<void>;
-  public async run(): Promise<void> {
-    await this._lock.writeLock();
-    await this._job(this._cache);
-    this._lock.unlock();
+  protected async run(): Promise<void> {
+    if (this._writelockOnRun) {
+      await this._lock.writeLock();
+      await this._job(this._cache);
+      this._lock.unlock();
+    } else {
+      await this._job(this._cache);
+    }
   }
 }

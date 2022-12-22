@@ -117,13 +117,14 @@ export enum ChainNetwork {
   HydraDX = 'hydradx',
   Crust = 'crust',
   Sputnik = 'sputnik',
-  Commonwealth = 'commonwealth',
   SolanaDevnet = 'solana-devnet',
   SolanaTestnet = 'solana-testnet',
   Solana = 'solana',
   SPL = 'spl', // solana token
   AxieInfinity = 'axie-infinity',
+  CommonProtocol = 'common-protocol', // dummy chain used for event handling
   Evmos = 'evmos',
+  Kava = 'kava',
 }
 
 export enum BalanceType {
@@ -134,4 +135,19 @@ export enum BalanceType {
   Cosmos = 'cosmos',
   NEAR = 'near',
   Substrate = 'substrate',
+}
+
+export enum RedisNamespaces {
+  Chat_Socket = 'chat_socket',
+}
+
+export interface ISnapshotNotification {
+  id?: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space?: string;
+  event?: string;
+  start?: string;
+  expire?: string;
 }

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/settings/email_section.scss';
@@ -16,7 +17,7 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { getClasses } from '../../components/component_kit/helpers';
 
-export class EmailSection implements m.ClassComponent {
+export class EmailSection extends ClassComponent {
   private discordAccount: SocialAccount;
   private email: string;
   private emailInputUpdated: boolean;

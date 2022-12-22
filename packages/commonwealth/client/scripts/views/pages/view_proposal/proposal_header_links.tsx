@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 
@@ -10,39 +11,17 @@ import { getProposalUrlPath } from 'identifiers';
 import { ProposalType } from 'common-common/src/types';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
-
-// Threads Kind.Link
-export class ProposalHeaderExternalLink
-  implements
-    m.ClassComponent<{
-      proposal: AnyProposal;
-    }>
-{
-  view(vnode) {
-    const { proposal } = vnode.attrs;
-
-    return (
-      <div class="ProposalHeaderLink">
-        {externalLink('a', proposal.url, [extractDomain(proposal.url)])}
-        <CWIcon iconName="externalLink" iconSize="small" />
-      </div>
-    );
-  }
-}
-
+type ProposalHeaderLinkAttrs = {
+  proposal: AnyProposal;
+};
 
 // "View in Subscan"
-export class ProposalHeaderBlockExplorerLink
-  implements
-    m.ClassComponent<{
-      proposal: AnyProposal;
-    }>
-{
-  view(vnode) {
+export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
+  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="ProposalHeaderLink">
+      <div class="HeaderLink">
         {externalLink('a', proposal['blockExplorerLink'], [
           proposal['blockExplorerLinkLabel'] ||
             extractDomain(proposal['blockExplorerLink']),
@@ -54,17 +33,12 @@ export class ProposalHeaderBlockExplorerLink
 }
 
 // "Vote on polkadot-js"
-export class ProposalHeaderVotingInterfaceLink
-  implements
-    m.ClassComponent<{
-      proposal: AnyProposal;
-    }>
-{
-  view(vnode) {
+export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs> {
+  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="ProposalHeaderLink">
+      <div class="HeaderLink">
         {externalLink('a', proposal['votingInterfaceLink'], [
           proposal['votingInterfaceLinkLabel'] ||
             extractDomain(proposal['votingInterfaceLink']),
@@ -76,10 +50,8 @@ export class ProposalHeaderVotingInterfaceLink
 }
 
 // "Go to discussion"
-export class ProposalHeaderThreadLink
-  implements m.ClassComponent<{ proposal: AnyProposal }>
-{
-  view(vnode) {
+export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {
+  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     const path = getProposalUrlPath(
@@ -90,7 +62,7 @@ export class ProposalHeaderThreadLink
     );
 
     return (
-      <div class="ProposalHeaderLink">
+      <div class="HeaderLink">
         {link('a', path, ['Go to discussion'])}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>
@@ -98,19 +70,18 @@ export class ProposalHeaderThreadLink
   }
 }
 
-export class ProposalHeaderSnapshotThreadLink
-  implements
-    m.ClassComponent<{
-      thread: { id: string; title: string };
-    }>
-{
-  view(vnode) {
+type SnapshotThreadLinkAttrs = {
+  thread: { id: string; title: string };
+};
+
+export class SnapshotThreadLink extends ClassComponent<SnapshotThreadLinkAttrs> {
+  view(vnode: m.Vnode<SnapshotThreadLinkAttrs>) {
     const { id, title } = vnode.attrs.thread;
 
     const proposalLink = getProposalUrlPath(ProposalType.Thread, id);
 
     return (
-      <div class="ProposalHeaderLink">
+      <div class="HeaderLink">
         {link('a', proposalLink, [decodeURIComponent(title)])}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>

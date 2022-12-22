@@ -2,11 +2,12 @@ import { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase } from 'common-common/src/types';
+import { Action } from 'common-common/src/permissions';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../models';
 import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -75,10 +76,12 @@ const updateChain = async (
     element,
     telegram,
     github,
+    hide_projects,
     stages_enabled,
     custom_stages,
     custom_domain,
-    chat_enabled,
+    default_allow_permissions,
+    default_deny_permissions,
     default_summary_view,
     terms,
   } = req.body;
@@ -129,12 +132,14 @@ const updateChain = async (
   if (element) chain.element = element;
   if (telegram) chain.telegram = telegram;
   if (github) chain.github = github;
+  if (hide_projects) chain.hide_projects = hide_projects;
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   if (snapshot) chain.snapshot = snapshot;
-  if (chat_enabled) chain.chat_enabled = chat_enabled;
-
+  // Set default allow/deny permissions
+  chain.default_allow_permissions = default_allow_permissions || BigInt(0);
+  chain.default_deny_permissions = default_deny_permissions || BigInt(0);
   // TODO Graham 3/31/22: Will this potentially lead to undesirable effects if toggle
   // is left un-updated? Is there a better approach?
   chain.default_summary_view = default_summary_view || false;
@@ -146,6 +151,12 @@ const updateChain = async (
   // chain.custom_domain = custom_domain;
 
   await chain.save();
+
+  // Suggested solution for serializing BigInts
+  // https://github.com/GoogleChromeLabs/jsbi/issues/30#issuecomment-1006086291
+  (BigInt.prototype as any).toJSON = function () {
+    return this.toString();
+  };
 
   return success(res, chain.toJSON());
 };

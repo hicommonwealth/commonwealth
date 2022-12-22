@@ -220,18 +220,6 @@ const SelectAddressModal: m.Component<
               vnode.state.loading,
             onclick: createRole.bind(this),
           }),
-        // m(LoginWithWalletDropdown, {
-        //   loggingInWithAddress: false,
-        //   joiningChain: app.activeChainId(),
-        //   label:
-        //     activeAccountsByRole.length !== 0
-        //       ? 'Connect a new address'
-        //       : 'Connect address',
-        //   onSuccess: () => {
-        //     $('.SelectAddressModal').trigger('modalexit');
-        //     notifySuccess('New address connected!');
-        //   },
-        // }),
       ]),
     ]);
   },

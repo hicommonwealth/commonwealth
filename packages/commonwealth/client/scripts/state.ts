@@ -25,6 +25,8 @@ import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import { MobileMenuName } from './views/app_mobile_menus';
+import ChainEntityController from 'controllers/server/chain_entities';
+import { SidebarMenuName } from './views/components/sidebar';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -41,6 +43,7 @@ export const enum LoginState {
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
+  chainEntities: ChainEntityController;
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
 
@@ -83,7 +86,11 @@ export interface IApp {
 
   toasts: ToastStore;
   modals: ModalStore;
+
   mobileMenu: MobileMenuName;
+  sidebarMenu: SidebarMenuName;
+  sidebarToggled: boolean;
+
   loginState: LoginState;
   // stored on server-side
   config: {
@@ -122,6 +129,7 @@ const roles = new RolesController(user);
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
+  chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 
   chainPreloading: false,
@@ -164,11 +172,16 @@ const app: IApp = {
   recentActivity: new RecentActivityController(),
   profiles: new ProfilesController(),
   sessions: new SessionsController(),
+  loginState: LoginState.NotLoaded,
+
+  // Global nav state
+  mobileMenu: null,
+  sidebarMenu: 'default',
+  sidebarToggled: false,
 
   toasts: getToastStore(),
   modals: getModalStore(),
-  mobileMenu: null,
-  loginState: LoginState.NotLoaded,
+
   config: {
     chains: new ChainStore(),
     nodes: new NodeStore(),

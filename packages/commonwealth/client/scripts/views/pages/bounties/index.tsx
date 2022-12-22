@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/bounties.scss';
 
@@ -8,6 +9,7 @@ import app from 'state';
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
 import Substrate from 'controllers/chain/substrate/adapter';
+import { SubstrateBounty } from 'controllers/chain/substrate/bounty';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
@@ -21,9 +23,13 @@ import { loadSubstrateModules } from '../../components/load_substrate_modules';
 import ErrorPage from '../error';
 import { getActionSection, getModules } from './helpers';
 
-class BountyDetail implements m.ClassComponent {
-  view(vnode) {
-    const { proposal: bounty } = vnode.attrs;
+type BountyDetailAttrs = {
+  bounty: SubstrateBounty;
+};
+
+class BountyDetail extends ClassComponent<BountyDetailAttrs> {
+  view(vnode: m.Vnode<BountyDetailAttrs>) {
+    const { bounty } = vnode.attrs;
 
     const isCouncillor =
       app.chain &&
@@ -85,7 +91,7 @@ class BountyDetail implements m.ClassComponent {
   }
 }
 
-class BountiesPage implements m.ClassComponent {
+class BountiesPage extends ClassComponent {
   view() {
     if (!app.chain || !app.chain.loaded) {
       if (
@@ -131,7 +137,7 @@ class BountiesPage implements m.ClassComponent {
       activeBounties.map((bounty) => (
         <ProposalCard
           proposal={bounty}
-          injectedContent={<BountyDetail proposal={bounty} />}
+          injectedContent={<BountyDetail bounty={bounty} />}
         />
       ))
     ) : (
@@ -142,7 +148,7 @@ class BountiesPage implements m.ClassComponent {
       pendingBounties.map((bounty) => (
         <ProposalCard
           proposal={bounty}
-          injectedContent={<BountyDetail proposal={bounty} />}
+          injectedContent={<BountyDetail bounty={bounty} />}
         />
       ))
     ) : (
@@ -153,7 +159,7 @@ class BountiesPage implements m.ClassComponent {
       inactiveBounties.map((bounty) => (
         <ProposalCard
           proposal={bounty}
-          injectedContent={<BountyDetail proposal={bounty} />}
+          injectedContent={<BountyDetail bounty={bounty} />}
         />
       ))
     ) : (

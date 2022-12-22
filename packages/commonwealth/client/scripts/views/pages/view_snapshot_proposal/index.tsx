@@ -1,10 +1,12 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
-import 'pages/snapshot/index.scss';
+// import 'pages/snapshot/index.scss';
 
 import app from 'state';
+import { AddressInfo } from 'models';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
 import {
@@ -25,6 +27,8 @@ import {
   ActiveProposalPill,
   ClosedProposalPill,
 } from '../../components/proposal_pills';
+import { CWText } from '../../components/component_kit/cw_text';
+import User from '../../components/widgets/user';
 
 type ViewProposalPageAttrs = {
   identifier: string;
@@ -32,7 +36,7 @@ type ViewProposalPageAttrs = {
   snapshotId: string;
 };
 
-class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
+class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private fetchedPower: boolean;
   private proposal: SnapshotProposal;
   private scores: Array<number>;
@@ -44,7 +48,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private validatedAgainstStrategies: boolean;
   private votes: Array<SnapshotProposalVote>;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ViewProposalPageAttrs>) {
     this.fetchedPower = false;
     this.proposal = null;
     this.scores = [];
@@ -80,12 +84,14 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
       });
 
       try {
-        app.threads
+        if (app.activeChainId()) {
+          app.threads
           .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
           .then((res) => {
             this.threads = res;
             m.redraw();
           });
+        }
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);
       }
@@ -112,7 +118,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     return !this.votes || !this.totals || !this.proposal ? (
@@ -124,7 +130,21 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
         <CWContentPage
           showSidebar
           title={this.proposal.title}
-          author={this.proposal.author}
+          author={
+            <CWText>
+              {m(User, {
+                user: new AddressInfo(
+                  null,
+                  this.proposal.author,
+                  app.activeChainId(),
+                  null
+                ),
+                showAddressWithDisplayName: true,
+                linkify: true,
+                popover: true,
+              })}
+            </CWText>
+          }
           createdAt={this.proposal.created}
           contentBodyLabel="Snapshot"
           subHeader={

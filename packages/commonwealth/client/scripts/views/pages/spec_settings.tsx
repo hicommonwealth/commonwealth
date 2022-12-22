@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
@@ -12,7 +13,6 @@ import { initChain, selectChain } from 'app';
 import { ChainBase } from 'common-common/src/types';
 import { ChainInfo, RolePermission } from 'models';
 import { constructSubstrateUrl } from 'substrate';
-import { DropdownFormField } from '../components/forms';
 import Sublayout from '../sublayout';
 import { PageLoading } from './loading';
 import { PageNotFound } from './404';
@@ -20,8 +20,9 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWDropdown } from '../components/component_kit/cw_dropdown';
 
-class SpecSettingsPage implements m.ClassComponent {
+class SpecSettingsPage extends ClassComponent {
   private chain: string;
   private chains: string[];
   private error: string;
@@ -76,26 +77,23 @@ class SpecSettingsPage implements m.ClassComponent {
       <Sublayout>
         <div class="SpecSettingsPage">
           <CWText type="h3">Substrate Spec Settings</CWText>
-          {m(DropdownFormField, {
-            options: {
-              disabled: this.isLoading,
-            },
-            value: this.chain,
-            choices: this.chains.map((c) => ({
-              name: 'chain',
+          <CWDropdown
+            label="Chains"
+            options={this.chains.map((c) => ({
               value: c,
               label: c,
-            })),
-            callback: (result) => {
-              this.chain = result;
-              this.spec = app.config.chains.getById(result).substrateSpec || {};
+            }))}
+            onSelect={(result) => {
+              this.chain = result.value;
+              this.spec =
+                app.config.chains.getById(result.value).substrateSpec || {};
               this.isSpecValid = false;
               this.error = '';
 
               // update spec display
               m.redraw();
-            },
-          })}
+            }}
+          />
           <CWTextArea
             disabled={this.isLoading}
             value={JSON.stringify(this.spec, null, 2)}

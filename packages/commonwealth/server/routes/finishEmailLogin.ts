@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { getStatsDInstance } from '../util/metrics';
 import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelLoginEvent,
   MixpanelLoginPayload,
 } from '../../shared/analytics/types';
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -20,9 +20,9 @@ export const redirectWithLoginSuccess = (
 ) => {
   // Returns new if we are creating a new account
   if (res?.user?.id) {
-    getStatsDInstance().set('cw.users.unique', res.user.id);
+    StatsDController.get().set('cw.users.unique', res.user.id);
   }
-  getStatsDInstance().increment('cw.users.logged_in');
+  StatsDController.get().increment('cw.users.logged_in');
   const url = `/?loggedin=true&email=${email}&new=${newAcct}${
     path ? `&path=${encodeURIComponent(path)}` : ''
   }${confirmation ? '&confirmation=success' : ''}`;

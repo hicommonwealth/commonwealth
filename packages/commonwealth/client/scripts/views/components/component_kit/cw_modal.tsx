@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'components/component_kit/cw_modal.scss';
@@ -11,18 +12,27 @@ import { breakpointFnValidator, getClasses } from './helpers';
 import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onclick: () => void;
-  oncreatemodal: () => void;
+  onclick: (
+    spec: any,
+    confirmExit: () => void,
+    exitCallback: () => void
+  ) => void;
+  oncreatemodal: (
+    spec: any,
+    confirmExit: () => void,
+    completeCallback: () => void,
+    exitCallback: () => void,
+    vnode: m.Vnode<ModalAttrs>
+  ) => void;
   modalType: 'centered' | 'fullScreen';
   spec: any; // TODO Gabe 2/2/22 - What is a spec?
   breakpointFn?: (width: number) => boolean;
 };
 
-export class CWModal implements m.ClassComponent<ModalAttrs> {
+export class CWModal extends ClassComponent<ModalAttrs> {
   private modalTypeState: string;
 
-  oncreate(vnode) {
+  oncreate(vnode: m.Vnode<ModalAttrs>) {
     const { spec, oncreatemodal } = vnode.attrs;
     const completeCallback = spec.completeCallback || (() => undefined);
     const exitCallback = spec.exitCallback || (() => undefined);
@@ -31,7 +41,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
     oncreatemodal(spec, confirmExit, completeCallback, exitCallback, vnode);
   }
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ModalAttrs>) {
     const { modalType, breakpointFn } = vnode.attrs;
     this.modalTypeState = modalType || 'centered';
 
@@ -49,7 +59,7 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
     }
   }
 
-  onremove(vnode) {
+  onremove(vnode: m.Vnode<ModalAttrs>) {
     const { breakpointFn } = vnode.attrs;
     if (breakpointFn) {
       // eslint-disable-next-line no-restricted-globals
@@ -65,8 +75,8 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
     }
   }
 
-  view(vnode) {
-    const { onclick, spec, breakpointFn } = vnode.attrs;
+  view(vnode: m.Vnode<ModalAttrs>) {
+    const { onclick, spec } = vnode.attrs;
 
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
@@ -94,11 +104,13 @@ export class CWModal implements m.ClassComponent<ModalAttrs> {
   }
 }
 
-export class ModalExitButton
-  implements
-    m.ClassComponent<{ disabled?: boolean; iconButtonTheme: IconButtonTheme }>
-{
-  view(vnode) {
+type ModalExitButtonAttrs = {
+  disabled?: boolean;
+  iconButtonTheme?: IconButtonTheme;
+};
+
+export class ModalExitButton extends ClassComponent<ModalExitButtonAttrs> {
+  view(vnode: m.Vnode<ModalExitButtonAttrs>) {
     const { disabled, iconButtonTheme } = vnode.attrs;
 
     return (

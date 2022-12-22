@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -134,10 +135,12 @@ const getTextRows = (subscription: NotificationSubscription) => {
   }
 };
 
-export class SubscriptionRowTextContainer
-  implements m.ClassComponent<{ subscription: NotificationSubscription }>
-{
-  view(vnode) {
+type SubscriptionRowAttrs = {
+  subscription: NotificationSubscription;
+};
+
+export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRowAttrs> {
+  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
 
     return (
@@ -156,10 +159,8 @@ export class SubscriptionRowTextContainer
   }
 }
 
-export class SubscriptionRowMenu
-  implements m.ClassComponent<{ subscription: NotificationSubscription }>
-{
-  view(vnode) {
+export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
+  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
     return (
       <CWPopoverMenu

@@ -1,58 +1,67 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_dropdown.scss';
 
 import { CWTextInput } from './cw_text_input';
-import { CWPopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { MenuItem } from './types';
+import { CWText } from './cw_text';
 
-export type DropdownInputAttrs = {
-  inputOptions: Array<MenuItem>;
-  onSelect?: (optionLabel: string, index?: number) => void;
-  initialValue?: string;
+type DropdownItemType = {
+  label: string;
+  value: string;
 };
 
-export class CWDropdown implements m.ClassComponent<DropdownInputAttrs> {
-  private showDropdown: boolean;
-  private selectedValue: string;
+type DropdownAttrs = {
+  initialValue?: DropdownItemType;
+  label: string;
+  onSelect?: (item: DropdownItemType) => void;
+  options: Array<DropdownItemType>;
+};
 
-  oninit(vnode) {
+export class CWDropdown extends ClassComponent<DropdownAttrs> {
+  private showDropdown: boolean;
+  private selectedValue: DropdownItemType;
+
+  oninit(vnode: m.Vnode<DropdownAttrs>) {
     this.showDropdown = false;
-    this.selectedValue =
-      vnode.attrs.initialValue ?? vnode.attrs.inputOptions[0].label;
+    this.selectedValue = vnode.attrs.initialValue ?? vnode.attrs.options[0];
   }
 
-  view(vnode) {
-    const { inputOptions, onSelect } = vnode.attrs;
+  view(vnode: m.Vnode<DropdownAttrs>) {
+    const { label, options, onSelect } = vnode.attrs;
 
     return (
       <div class="dropdown-wrapper">
         <CWTextInput
           iconRight="chevronDown"
-          placeholder={this.selectedValue}
+          placeholder={this.selectedValue.label}
           displayOnly
           iconRightonclick={() => {
             // Only here because it makes TextInput display correctly
           }}
+          label={label}
           onclick={() => {
             this.showDropdown = !this.showDropdown;
           }}
         />
         {this.showDropdown && (
           <div class="dropdown-options-display">
-            {inputOptions.map((item, idx) => {
+            {options.map((item) => {
               return (
-                <CWPopoverMenuItem
-                  {...item}
-                  type="default"
+                <div
+                  class="dropdown-item"
                   onclick={() => {
                     this.showDropdown = false;
-                    this.selectedValue = item.label;
-                    if (onSelect) onSelect(item.label, idx);
+                    this.selectedValue = item;
+                    if (onSelect) {
+                      onSelect(item);
+                    }
                   }}
-                />
+                >
+                  <CWText className="dropdown-item-text">{item.label}</CWText>
+                </div>
               );
             })}
           </div>

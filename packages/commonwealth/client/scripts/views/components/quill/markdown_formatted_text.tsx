@@ -2,6 +2,7 @@
 /* eslint-disable no-useless-escape */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
@@ -32,15 +33,13 @@ type MarkdownFormattedTextAttrs = {
   cutoffLines?: number;
 };
 
-export class MarkdownFormattedText
-  implements m.Component<MarkdownFormattedTextAttrs>
-{
+export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextAttrs> {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;
   truncatedDoc;
   isTruncated: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
@@ -54,7 +53,7 @@ export class MarkdownFormattedText
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
     const {
       doc,
       hideFormatting,

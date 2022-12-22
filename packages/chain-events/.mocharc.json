@@ -2,6 +2,11 @@
   "extension": [".spec.ts"],
   "package": "./package.json",
   "timeout": 60000,
-  "require": [ "jsdom-global/register", "tsconfig-paths/register", "@babel/register", "source-map-support/register" ],
+  "require": [
+    "jsdom-global/register",
+    "tsconfig-paths/register",
+    "@babel/register",
+    "source-map-support/register"
+  ],
   "exit": true
 }

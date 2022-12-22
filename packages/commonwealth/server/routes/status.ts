@@ -7,7 +7,7 @@ import { JWT_SECRET } from '../config';
 import '../types';
 import { DB } from '../models';
 import { sequelize } from '../database';
-import { ServerError } from '../util/errors';
+import { ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -109,6 +109,7 @@ const status = async (
       where: { address_id: { [Op.in]: myAddressIds } },
       include: [models.Address],
     });
+
     const discussionDrafts = await models.DiscussionDraft.findAll({
       where: {
         address_id: { [Op.in]: myAddressIds },

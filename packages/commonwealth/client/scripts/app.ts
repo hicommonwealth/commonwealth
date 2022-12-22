@@ -9,7 +9,6 @@ import mixpanel from 'mixpanel-browser';
 
 import m from 'mithril';
 import $ from 'jquery';
-import { FocusManager } from 'construct-ui';
 import moment from 'moment';
 
 import './fragment-fix';
@@ -33,7 +32,7 @@ import { isWindowMediumSmallInclusive } from './views/components/component_kit/h
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
-import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
+// import(/* webpackPrefetch: true */ 'views/pages/why_commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 import(/* webpackPrefetch: true */ 'views/pages/view_thread');
@@ -239,7 +238,7 @@ export async function selectChain(
       await import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "ethereum-main" */
-        './controllers/chain/ethereum/adapter'
+        './controllers/chain/ethereum/tokenAdapter'
       )
     ).default;
     newChain = new Ethereum(chain, app);
@@ -332,15 +331,6 @@ export async function selectChain(
       )
     ).default;
     newChain = new Solana(chain, app);
-  } else if (chain.network === ChainNetwork.Commonwealth) {
-    const Commonwealth = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "commonwealth-main" */
-        './controllers/chain/ethereum/commonwealth/adapter'
-      )
-    ).default;
-    newChain = new Commonwealth(chain, app);
   } else if (
     chain.base === ChainBase.Ethereum &&
     chain.type === ChainType.Offchain
@@ -470,6 +460,7 @@ export const navigateToSubpage = (...args) => {
   if (!app.isCustomDomain() && app.activeChainId()) {
     args[0] = `/${app.activeChainId()}${args[0]}`;
   }
+  app.sidebarMenu = 'default';
   m.route.set.apply(this, args);
 };
 
@@ -599,25 +590,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             : // false => scope is null
               null;
 
-        /* Deprecating the contract_address => community pipeline.
-        This breaks our mental model of where our site is going. 
-        */
-
-        // if (scope) {
-        //   const scopeIsEthereumAddress =
-        //     scope.startsWith('0x') && scope.length === 42;
-        //   if (scopeIsEthereumAddress) {
-        //     const chains = app.config.chains.getAll();
-        //     const chain = chains.find((o) => o.address === scope);
-        //     if (chain) {
-        //       const pagePath = window.location.href.substr(
-        //         window.location.href.indexOf(scope) + scope.length
-        //       );
-        //       m.route.set(`/${chain.id}${pagePath}`);
-        //     }
-        //   }
-        // }
-
         // Special case to defer chain loading specifically for viewing an offchain thread. We need
         // a special case because Threads and on-chain proposals are all viewed through the
         // same "/:scope/proposal/:type/:id" route.
@@ -639,11 +611,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
-      '/about': importRoute('views/pages/commonwealth', {
+      '/about': importRoute('views/pages/why_commonwealth', {
         scoped: false,
       }),
-      '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
-      '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
+      '/terms': importRoute('views/pages/terms', { scoped: false }),
+      '/privacy': importRoute('views/pages/privacy', { scoped: false }),
       '/components': importRoute('views/pages/components', {
         scoped: false,
         hideSidebar: true,
@@ -673,17 +645,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            // CMN
-            '/projects': importRoute('views/pages/commonwealth/projects', {
-              scoped: true,
-            }),
-            '/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
-            '/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
-              { scoped: true }
-            ),
             // NEAR
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {
               scoped: true,
@@ -741,6 +702,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/proposal/:type/:identifier': importRoute(
               'views/pages/view_proposal/index',
               { scoped: true }
+            ),
+            '/:scope/proposal/discussion/:identifier': redirectRoute(
+              (attrs) => `/discussion/${attrs.identifier}`
             ),
             '/proposal/:identifier': importRoute(
               'views/pages/view_proposal/index',
@@ -802,6 +766,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
 
             // Redirects
+
             '/:scope/dashboard': redirectRoute(() => '/'),
             '/:scope/notifications': redirectRoute(() => '/notifications'),
             '/:scope/notification-settings': redirectRoute(
@@ -883,7 +848,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
-            '/communities': importRoute('views/pages/community_cards', {
+            '/communities': importRoute('views/pages/communities', {
               scoped: false,
               hideSidebar: false,
             }),
@@ -891,7 +856,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            '/whyCommonwealth': importRoute('views/pages/commonwealth', {
+            '/whyCommonwealth': importRoute('views/pages/why_commonwealth', {
               scoped: false,
               hideSidebar: true,
             }),
@@ -917,6 +882,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
             // Scoped routes
             //
+            '/:scope/proposal/discussion/:identifier': redirectRoute(
+              (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
+            ),
 
             // Notifications
             '/:scope/notifications': importRoute(
@@ -927,18 +895,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            // CMN
-            '/:scope/projects': importRoute(
-              'views/pages/commonwealth/projects',
-              { scoped: true }
-            ),
-            '/:scope/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
-            '/:scope/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
-              { scoped: true }
             ),
             // NEAR
             '/:scope/finishNearLogin': importRoute(
@@ -1117,9 +1073,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       )
     );
     document.body.insertBefore(script, document.body.firstChild);
-
-    // initialize construct-ui focus manager
-    FocusManager.showFocusOnlyOnTab();
 
     // initialize mixpanel, before adding an alias or tracking identity
     try {

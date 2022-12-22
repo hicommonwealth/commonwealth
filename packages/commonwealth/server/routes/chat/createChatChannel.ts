@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { DB } from '../../models';
-import { AppError } from '../../util/errors';
+import { AppError } from 'common-common/src/errors';
 
 export const Errors = {
     NotLoggedIn: 'Not logged in',
