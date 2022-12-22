@@ -5,75 +5,63 @@ import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_dropdown.scss';
 
-import { CWTextInput, BaseTextInputAttrs } from './cw_text_input';
-import { CWPopoverMenuItem } from './cw_popover/cw_popover_menu';
-import { DefaultMenuItem } from './types';
+import { CWTextInput } from './cw_text_input';
+import { CWText } from './cw_text';
+
+type DropdownItemType = {
+  label: string;
+  value: string;
+};
 
 type DropdownAttrs = {
-  inputOptions: Array<DefaultMenuItem>;
-  onSelect?: (optionLabel: string, index?: number) => void;
+  initialValue?: DropdownItemType;
   label: string;
-  placeholder?: string;
-  defaultActiveIndex?: number;
-  textInputAttrs?: BaseTextInputAttrs;
-  uniqueId: string; // Allows for identification of the dropdown in a form
+  onSelect?: (item: DropdownItemType) => void;
+  options: Array<DropdownItemType>;
 };
 
 export class CWDropdown extends ClassComponent<DropdownAttrs> {
   private showDropdown: boolean;
-  private value: string;
+  private selectedValue: DropdownItemType;
 
   oninit(vnode: m.Vnode<DropdownAttrs>) {
     this.showDropdown = false;
-
-    document.body.addEventListener('click', (event) => {
-      const $dropdown = document.getElementById(vnode.attrs.uniqueId);
-      if (!$dropdown) return;
-      if (!$dropdown.contains(event.target as Node)) {
-        this.showDropdown = false;
-        m.redraw();
-      }
-    });
+    this.selectedValue = vnode.attrs.initialValue ?? vnode.attrs.options[0];
   }
 
   view(vnode: m.Vnode<DropdownAttrs>) {
-    const { defaultActiveIndex, inputOptions, label, onSelect, placeholder } =
-      vnode.attrs;
-
-      if (!this.value) {
-        this.value = inputOptions[defaultActiveIndex ?? 0].label;
-      }
-      const { showDropdown, value } = this;
+    const { label, options, onSelect } = vnode.attrs;
 
     return (
-      <div id={vnode.attrs.uniqueId} class="dropdown-wrapper">
+      <div class="dropdown-wrapper">
         <CWTextInput
           iconRight="chevronDown"
-          displayOnly={true}
-          iconRightonclick={(e: MouseEvent) => {
-            this.showDropdown = !showDropdown;
-            e.stopPropagation();
-          }}
-          onclick={() => {
-            this.showDropdown = !showDropdown;
+          placeholder={this.selectedValue.label}
+          displayOnly
+          iconRightonclick={() => {
+            // Only here because it makes TextInput display correctly
           }}
           label={label}
-          placeholder={placeholder}
-          value={value}
+          onclick={() => {
+            this.showDropdown = !this.showDropdown;
+          }}
         />
-        {showDropdown && (
+        {this.showDropdown && (
           <div class="dropdown-options-display">
-            {inputOptions.map((item, idx) => {
+            {options.map((item) => {
               return (
-                <CWPopoverMenuItem
-                  {...item}
-                  type="default"
+                <div
+                  class="dropdown-item"
                   onclick={() => {
                     this.showDropdown = false;
-                    this.value = item.label;
-                    if (onSelect) onSelect(item.label, idx);
+                    this.selectedValue = item;
+                    if (onSelect) {
+                      onSelect(item);
+                    }
                   }}
-                />
+                >
+                  <CWText className="dropdown-item-text">{item.label}</CWText>
+                </div>
               );
             })}
           </div>

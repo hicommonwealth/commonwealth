@@ -6,9 +6,9 @@ const log = factory.getLogger(formatFilename(__filename));
 
 function setupIpfsProxy(app: Express) {
   // using bodyParser here because cosmjs generates text/plain type headers
-  app.get('/api/ipfsProxy/:hash', async function cosmosProxy(req, res, next) {
+  app.get('/api/ipfsProxy', async function cosmosProxy(req, res, next) {
     try {
-      const hash = req.params.hash;
+      const hash = req.query.hash;
       const response = await axios.get(`https://cloudflare-ipfs.com/ipfs/${hash}#x-ipfs-companion-no-redirect`, {
         headers: {
           origin: 'https://commonwealth.im'

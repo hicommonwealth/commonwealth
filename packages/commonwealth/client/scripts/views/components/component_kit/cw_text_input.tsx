@@ -21,7 +21,7 @@ export type BaseTextInputAttrs = {
   autocomplete?: string;
   autofocus?: boolean;
   containerClassName?: string;
-  defaultValue?: string;
+  defaultValue?: string | number;
   value?: string | number;
   iconRight?: IconName;
   iconRightonclick?: (e: MouseEvent) => void;

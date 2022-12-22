@@ -18,7 +18,7 @@ import { ThreadInstance } from '../models/thread';
 import { TopicInstance } from '../models/topic';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
@@ -90,7 +90,7 @@ const bulkOffchain = async (
             },
             {
               model: models.ChainEntityMeta,
-                as: 'chain_entity_meta'
+              as: 'chain_entity_meta',
             },
             {
               model: models.LinkedThread,

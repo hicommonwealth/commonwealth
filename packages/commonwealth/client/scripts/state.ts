@@ -180,7 +180,7 @@ const app: IApp = {
   // Global nav state
   mobileMenu: null,
   sidebarMenu: 'default',
-  sidebarToggled: true,
+  sidebarToggled: false,
 
   toasts: getToastStore(),
   modals: getModalStore(),

@@ -283,7 +283,7 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.get(`${this._Gov.app.serverUrl()}/ipfsProxy/${this._ipfsAddress}`)
+    $.get(`${this._Gov.app.serverUrl()}/ipfsProxy?hash=${this._ipfsAddress}`)
       .then((ipfsData) => {
         if (typeof ipfsData === 'string') {
           this._ipfsData = JSON.parse(ipfsData);

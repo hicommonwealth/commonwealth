@@ -14,7 +14,7 @@ import moment from 'moment';
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
 import {
   notifyError,
@@ -32,6 +32,7 @@ import { isWindowMediumSmallInclusive } from './views/components/component_kit/h
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
+// import(/* webpackPrefetch: true */ 'views/pages/why_commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 import(/* webpackPrefetch: true */ 'views/pages/view_thread');
@@ -612,11 +613,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
-      '/about': importRoute('views/pages/commonwealth', {
+      '/about': importRoute('views/pages/why_commonwealth', {
         scoped: false,
       }),
-      '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
-      '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
+      '/terms': importRoute('views/pages/terms', { scoped: false }),
+      '/privacy': importRoute('views/pages/privacy', { scoped: false }),
       '/components': importRoute('views/pages/components', {
         scoped: false,
         hideSidebar: true,
@@ -646,7 +647,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-
             // CMN
             '/projects/explore': importRoute('views/pages/projects/index.tsx', {
               scoped: true,
@@ -676,7 +676,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               { scoped: true, hideSidebar: true }
             ),
             '/:scope/new/project': redirectRoute(() => `/new/project`),
-
             // NEAR
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {
               scoped: true,
@@ -876,13 +875,17 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
-            '/communities': importRoute('views/pages/community_cards', {
+            '/communities': importRoute('views/pages/communities', {
               scoped: false,
               hideSidebar: false,
             }),
             '/search': importRoute('views/pages/search', {
               scoped: false,
               deferChain: true,
+            }),
+            '/whyCommonwealth': importRoute('views/pages/why_commonwealth', {
+              scoped: false,
+              hideSidebar: true,
             }),
             '/dashboard': importRoute('views/pages/user_dashboard', {
               scoped: false,
@@ -912,7 +915,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
             ),
-
             // Crowdfund
             '/projects/explore': importRoute('views/pages/projects/index.tsx', {
               scoped: false,

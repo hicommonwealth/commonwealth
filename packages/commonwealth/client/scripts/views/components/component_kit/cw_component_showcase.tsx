@@ -133,16 +133,13 @@ export class ComponentShowcase extends ClassComponent {
         <div class="form-gallery">
           <CWText type="h4">Dropdown</CWText>
           <CWDropdown
-            label={'DropDownExample'}
-            uniqueId={'DropdownExample1'}
-            inputOptions={[
-              { label: 'Dropdown Option 1' },
-              { label: 'Dropdown Option 2' },
-              { label: 'Dropdown Option 3' },
+            label="Dropdown"
+            options={[
+              { label: 'Dropdown Option 1', value: 'dropdownOption1' },
+              { label: 'Dropdown Option 2', value: 'dropdownOption2' },
+              { label: 'Dropdown Option 3', value: 'dropdownOption3' },
             ]}
-            onSelect={(optionLabel) =>
-              console.log('Selected option: ', optionLabel)
-            }
+            onSelect={(item) => console.log('Selected option: ', item.label)}
           />
         </div>
         <div class="basic-gallery">
@@ -166,6 +163,9 @@ export class ComponentShowcase extends ClassComponent {
           <CWTag label="Passed" status="passed" />
           <CWTag label="Failed" status="failed" />
           <CWTag label="Active" status="active" />
+          <CWTag label="Poll" type="poll" />
+          <CWTag label="Prop #52" type="proposal" />
+          <CWTag label="Ref #90" type="referendum" />
           <CWTag label="12 days" iconName="clock" />
         </div>
         <div class="basic-gallery">
@@ -459,16 +459,13 @@ export class ComponentShowcase extends ClassComponent {
             placeholder="Type here"
           />
           <CWDropdown
-            label={'dropdown2'}
-            uniqueId={'uniqueDropdown2'}
-            inputOptions={[
-              { label: 'Dropdown Option 1' },
-              { label: 'Dropdown Option 2' },
-              { label: 'Dropdown Option 3' },
+            label="Dropdown"
+            options={[
+              { label: 'Dropdown Option 1', value: 'dropdownOption1' },
+              { label: 'Dropdown Option 2', value: 'dropdownOption2' },
+              { label: 'Dropdown Option 3', value: 'dropdownOption3' },
             ]}
-            onSelect={(optionLabel: string) =>
-              notifySuccess(`Selected option: ${optionLabel}`)
-            }
+            onSelect={(item) => console.log('Selected option: ', item.label)}
           />
           {/* <CWDropdown
             menuItems={[
