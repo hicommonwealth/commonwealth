@@ -61,7 +61,7 @@ const ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   [Action.EDIT_THREAD, [Action.LINK_THREAD_TO_THREAD, Action.LINK_PROPOSAL_TO_THREAD, Action.EDIT_COMMENT]],
 ]);
 
-const DENY_IMPLICT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
+const DENY_IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   // Chat Subtree
   [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
   // View Subtree
@@ -93,7 +93,7 @@ const recurseImplicitActions = (action: Action, result_actions: Action[], allowD
   if (allowDeny) {
     implicitActions = ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(action);
   } else {
-    implicitActions = DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(action);
+    implicitActions = DENY_IMPLICIT_PERMISSIONS_BY_ACTION.get(action);
   }
   // Base Case, if there are no implicit permission leaves, return the action
   if (!implicitActions) {
@@ -104,7 +104,7 @@ const recurseImplicitActions = (action: Action, result_actions: Action[], allowD
     if (allowDeny) {
       result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(implicitActions[i]), allowDeny));
     } else {
-      result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(implicitActions[i]), allowDeny));
+      result_actions = result_actions.concat(recurseImplicitActions(implicitActions[i], DENY_IMPLICIT_PERMISSIONS_BY_ACTION.get(implicitActions[i]), allowDeny));
     }
   };
 
@@ -116,7 +116,7 @@ export const getImplicitActionsSet = (action: Action, allowDeny: boolean): Actio
   if (allowDeny) {
     return recurseImplicitActions(action, ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION.get(action), allowDeny);
   } else {
-    return recurseImplicitActions(action, DENY_IMPLICT_PERMISSIONS_BY_ACTION.get(action), allowDeny);
+    return recurseImplicitActions(action, DENY_IMPLICIT_PERMISSIONS_BY_ACTION.get(action), allowDeny);
   }
 }
 
