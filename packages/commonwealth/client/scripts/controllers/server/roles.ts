@@ -10,11 +10,11 @@ import {
 } from 'models';
 import {
   Action,
+  addPermission,
   aggregatePermissions,
   BASE_PERMISSIONS,
   computePermissions,
   isPermitted,
-  PermissionError,
   Permissions,
   removePermission,
 } from 'common-common/src/permissions';
