@@ -12,7 +12,7 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 import { VoteAttributes, VoteInstance } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
-import { isAddressPermitted } from '../../server/util/roles';
+import { isAddressPermitted } from '../util/roles';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',

@@ -1,12 +1,12 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
 import { getNextPollEndingTime } from '../../shared/utils';
 import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole, isAddressPermitted } from '../util/roles';
-import { Action, PermissionError } from 'common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
