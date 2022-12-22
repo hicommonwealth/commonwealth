@@ -11,6 +11,7 @@ module.exports = merge(common, {
   mode: 'production',
   stats: 'errors-only',
   bail: true,
+  optimization: { minimize: false },
   output: {
     publicPath: '/',
     path: path.join(__dirname, '../build'),
@@ -25,7 +26,6 @@ module.exports = merge(common, {
       //     (process.env.NODE_ENV ==='device') ? process.env.SERVICE_URL : `http://localhost:8080`),
       CHAT_SERVER: JSON.stringify('commonwealthchat.herokuapp.com')
     }),
-    new webpack.optimize.ModuleConcatenationPlugin(),
   ],
   module: {
     rules: [
