@@ -8,10 +8,7 @@ import {
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import {
-  Action,
-  PermissionError,
-} from 'common-common/src/permissions';
+import { Action, PermissionError } from 'common-common/src/permissions';
 import { AppError, ServerError } from 'common-common/src/errors';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../middleware/validateChain';
@@ -56,6 +53,17 @@ const createReaction = async (
   if (error) return next(new AppError(error));
 
   const author = req.address;
+
+  // Gatekeeper: check if user is permitted to react
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.CREATE_REACTION
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } =
     req.body;
