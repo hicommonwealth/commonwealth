@@ -11,7 +11,7 @@ import { initChain } from '../../../app';
 import SubstrateIdentity from '../../../controllers/chain/substrate/identity';
 import app from '../../../state';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import EditIdentityModal from '../../modals/edit_identity_modal';
+import { EditIdentityModal } from '../../modals/edit_identity_modal';
 import { setActiveAccount } from '../../../controllers/app/login';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
 import { CWButton } from '../../components/component_kit/cw_button';

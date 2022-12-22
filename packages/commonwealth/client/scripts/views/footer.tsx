@@ -8,6 +8,7 @@ import 'footer.scss';
 import { isNotUndefined } from '../helpers/typeGuards';
 
 const footercontents = [
+  { text: 'About', redirectTo: '/whyCommonwealth' },
   { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
   {
     text: 'Jobs',

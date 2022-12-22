@@ -1,10 +1,11 @@
+/* @jsx jsx */
 
 import $ from 'jquery';
 import app from 'state';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
-import { PageLoading } from 'views/pages/loading';
 import { initAppState } from 'app';
+import { PageLoading } from 'views/pages/loading';
 import { updateActiveAddresses } from 'controllers/app/login';
 import ErrorPage from './error';
 
@@ -43,27 +44,34 @@ const validate = async (
   }
 };
 
-const FinishAxieLogin: Component<Record<string, unknown>, IState> = {
-  oninit: (vnode) => {
+class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
+  private state: IState = {
+    validating: false,
+    error: '',
+  };
+
+  public oninit() {
     // grab token
     // TODO: how to use state id?
     const token = getRouteParam('token');
     const stateId = getRouteParam('stateId');
+
     validate(token, stateId, 'axie-infinity').then((res) => {
       if (typeof res === 'string') {
-        vnode.state.error = res;
+        this.state.error = res;
         redraw();
       }
     });
-  },
-  view: (vnode) => {
+  }
+
+  public view() {
     console.log('finish axie login');
-    if (vnode.state.error) {
-      return render(ErrorPage, { title: 'Login Error', message: vnode.state.error });
+    if (this.state.error) {
+      return <ErrorPage title="Login Error" message={this.state.error} />;
     } else {
-      return render(PageLoading);
+      return <PageLoading />;
     }
-  },
-};
+  }
+}
 
 export default FinishAxieLogin;
