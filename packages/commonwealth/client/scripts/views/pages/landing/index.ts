@@ -1,10 +1,19 @@
-
 // Logged Out Homepage View
 import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';
 
 import app, { LoginState } from 'state';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -281,28 +290,7 @@ const LandingPage: Component<{}, IState> = {
           ],
         }),
         render(JoinCommonWealthSection),
-        render(Footer, {
-          list: [
-            // { text:  'Use Cases' },
-            // { text:  'Crowdfunding' },
-            // { text:  'Developers' },
-            { text: 'About', redirectTo: '/whyCommonwealth' },
-            { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
-            {
-              text: 'Jobs',
-              externalLink: 'https://angel.co/company/commonwealth-labs/jobs',
-            },
-            { text: 'Terms', redirectTo: '/terms' },
-            { text: 'Privacy', redirectTo: '/privacy' },
-            { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
-            { text: 'Discord', externalLink: 'https://discord.gg/t9XscHdZrG' },
-            { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
-            {
-              text: 'Twitter',
-              externalLink: 'https://twitter.com/hicommonwealth',
-            },
-          ],
-        }),
+        render(Footer),
         render('script', {
           src: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js',
           integrity:

@@ -1,5 +1,14 @@
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { ITXModalData, TransactionStatus } from 'models';
 import { NextFn, StageName } from './types';
@@ -47,11 +56,8 @@ export const getTransactionLabel = (txname) => {
 };
 
 export const setupEventListeners = (
-  vnode: ResultNode<
-    NextFn & ITXModalData,
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    { timerHandle?: NodeJS.Timeout } | {}
-  >
+  vnode: ResultNode<NextFn & ITXModalData>,
+  timerHandle?: NodeJS.Timeout
 ) => {
   vnode.attrs.txData.events.once(TransactionStatus.Ready.toString(), () => {
     vnode.attrs.next('waiting', {
@@ -76,10 +82,8 @@ export const setupEventListeners = (
     ({ hash, blocknum, err, timestamp }) => {
       // the transaction may be submitted twice, so only go to a
       // failure state if transaction has not already succeeded
-      if ((vnode.state as { timerHandle?: NodeJS.Timeout }).timerHandle) {
-        clearInterval(
-          (vnode.state as { timerHandle?: NodeJS.Timeout }).timerHandle
-        );
+      if (timerHandle) {
+        clearInterval(timerHandle);
       }
 
       vnode.attrs.txData.events.removeAllListeners();
