@@ -1,4 +1,5 @@
-import { WsProvider, ApiPromise } from '@polkadot/api';
+import { WsProvider} from '@polkadot/rpc-provider/ws';
+import { ApiPromise } from '@polkadot/api/promise';
 import { RegisteredTypes } from '@polkadot/types/types';
 
 import {
