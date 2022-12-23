@@ -13,11 +13,12 @@ import {
   FunctionComponent,
   ReactNode,
   // eslint-disable-next-line import/no-unresolved
-  Component as ReactComponent
+  Component as ReactComponent,
 } from 'react';
 import {
   matchPath,
 } from 'react-router-dom';
+import { createRoot } from 'react-dom/client';
 
 // RENDERING FUNCTIONS
 export type Children = ReactNode | ReactNode[];
@@ -46,8 +47,31 @@ export const jsx = createElement;
 
 export type ResultNode<A = {}> = { attrs: A, children: Children };
 
+const REACT_INTERNAL_PROPS = [
+  'props',
+  'context',
+  'refs',
+  'updater',
+  '_reactInternals',
+  '_reactInternalInstance',
+  'state'
+]
+
 export abstract class ClassComponent<A = {}> extends ReactComponent<A & { children?: Children }> {
   protected readonly __props: A;
+
+  constructor(props) {
+    super(props);
+    return new Proxy(this, {
+      set(obj, prop, value) {
+        if (!REACT_INTERNAL_PROPS.includes(prop as string)) {
+          obj.setState({ ...obj.state, [prop]: value })
+        }
+        //@ts-ignore
+        return Reflect.set(...arguments);
+      }
+    })
+  }
 
   public componentDidMount() {
     this.oninit({ attrs: this.props, children: this.props.children });
@@ -82,13 +106,13 @@ export function redraw(sync = false) {
 export function rootRender(el: Element, vnodes: Children) {
   // React does not have a built-in method for rendering to an element directly.
   // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
-  ReactDOM.render(vnodes, el);
+  // ReactRender(vnodes, el);
 }
 
 export function rootMount(element: Element, component?: any | null) {
   // React does not have a built-in method for mounting a component to an element directly.
   // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
-  ReactDOM.render(component, element);
+  createRoot(element).render(component);
 }
 
 // ROUTING FUNCTIONS
