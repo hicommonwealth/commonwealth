@@ -27,7 +27,7 @@ import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
-import SelectAddressModal from '../../modals/select_address_modal';
+import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWToggle } from '../component_kit/cw_toggle';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWPopover } from '../component_kit/cw_popover/cw_popover';
