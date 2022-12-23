@@ -14,25 +14,22 @@ export enum Action {
   CREATE_CHAT = 0,
   CREATE_REACTION = 1,
   VIEW_REACTIONS = 2,
-  DELETE_REACTION = 3,
-  CREATE_COMMENT = 4,
-  VIEW_COMMENTS = 5,
-  EDIT_COMMENT = 6,
-  DELETE_COMMENT = 7,
-  CREATE_POLL = 8,
-  VIEW_POLLS = 9,
-  VOTE_ON_POLLS = 10,
+  CREATE_COMMENT = 3,
+  VIEW_COMMENTS = 4,
+  EDIT_COMMENT = 5,
+  DELETE_COMMENT = 6,
+  CREATE_POLL = 7,
+  VIEW_POLLS = 8,
+  VOTE_ON_POLLS = 9,
+  CREATE_THREAD = 10,
   VIEW_CHAT_CHANNELS = 11,
-  CREATE_THREAD = 12,
-  VIEW_THREADS = 13,
-  EDIT_THREAD = 14,
-  DELETE_THREAD = 15,
-  LINK_THREAD_TO_THREAD = 16,
-  LINK_PROPOSAL_TO_THREAD = 17,
-  CREATE_TOPIC = 18,
-  VIEW_TOPICS = 19,
-  EDIT_TOPIC = 20,
-  DELETE_TOPIC = 21,
+  VIEW_THREADS = 12,
+  EDIT_THREAD = 13,
+  DELETE_THREAD = 14,
+  LINK_THREAD_TO_THREAD = 15,
+  LINK_PROPOSAL_TO_THREAD = 16,
+  MANAGE_TOPICS = 17,
+  DELETE_TOPIC = 18,
 }
 
 // Implicit Permissions are a tree hierarchy of permissions that are implied by other permissions
@@ -40,25 +37,22 @@ const ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   // Chat Subtree
   [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
   // View Subtree
-  [Action.VIEW_TOPICS, [Action.VIEW_THREADS]],
-  [Action.VIEW_THREADS, [Action.VIEW_POLLS]],
-  [Action.VIEW_POLLS, [Action.VIEW_COMMENTS]],
+  [Action.VIEW_THREADS, [Action.VIEW_COMMENTS]],
   [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS]],
   // Create Subtree
-  [Action.CREATE_TOPIC, [Action.CREATE_THREAD, Action.EDIT_TOPIC, Action.DELETE_TOPIC, Action.VIEW_TOPICS]],
-  [Action.CREATE_THREAD, [Action.CREATE_POLL, Action.EDIT_THREAD, Action.DELETE_THREAD, Action.VIEW_TOPICS]],
-  [Action.CREATE_POLL, [Action.CREATE_COMMENT, Action.VOTE_ON_POLLS, Action.VIEW_TOPICS]],
-  [Action.CREATE_COMMENT, [Action.CREATE_REACTION, Action.EDIT_COMMENT, Action.DELETE_COMMENT, Action.VIEW_TOPICS]],
-  [Action.CREATE_REACTION, [Action.DELETE_REACTION, Action.VIEW_TOPICS]],
+  [Action.CREATE_THREAD, [Action.VIEW_THREADS, Action.CREATE_COMMENT]],
+  [Action.CREATE_POLL, [Action.VOTE_ON_POLLS]],
+  [Action.CREATE_COMMENT, [Action.CREATE_REACTION, Action.VIEW_COMMENTS]],
+  [Action.CREATE_REACTION, [Action.VIEW_REACTIONS]],
   // Voting Subtree
   [Action.VOTE_ON_POLLS, [Action.VIEW_POLLS]],
   // Delete Subtree
-  [Action.DELETE_TOPIC, [Action.DELETE_THREAD]],
-  [Action.DELETE_THREAD, [Action.DELETE_COMMENT]],
-  [Action.DELETE_COMMENT, [Action.DELETE_REACTION]],
+  [Action.DELETE_THREAD, [Action.EDIT_THREAD]],
+  [Action.DELETE_COMMENT, [Action.EDIT_COMMENT]],
+  [Action.DELETE_TOPIC, [Action.MANAGE_TOPICS]],
   // Edit Subtree
-  [Action.EDIT_TOPIC, [Action.EDIT_THREAD]],
-  [Action.EDIT_THREAD, [Action.LINK_THREAD_TO_THREAD, Action.LINK_PROPOSAL_TO_THREAD, Action.EDIT_COMMENT]],
+  [Action.EDIT_THREAD, [Action.CREATE_THREAD]],
+  [Action.EDIT_COMMENT, [Action.CREATE_COMMENT]],
 ]);
 
 const DENY_IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
@@ -66,25 +60,19 @@ const DENY_IMPLICIT_PERMISSIONS_BY_ACTION = new Map<number, Action[]>([
   [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
   // View Subtree
   [Action.VIEW_REACTIONS, [Action.VIEW_COMMENTS, Action.CREATE_REACTION]],
-  [Action.VIEW_COMMENTS, [Action.VIEW_POLLS, Action.CREATE_COMMENT]],
-  [Action.VIEW_POLLS, [Action.VIEW_THREADS, Action.CREATE_POLL]],
-  [Action.VIEW_THREADS, [Action.VIEW_TOPICS, Action.CREATE_THREAD]],
-  [Action.VIEW_TOPICS, [Action.CREATE_TOPIC]],
+  [Action.VIEW_COMMENTS, [Action.VIEW_THREADS, Action.CREATE_COMMENT]],
+  [Action.VIEW_POLLS, [Action.VOTE_ON_POLLS]],
+  [Action.VIEW_THREADS, [Action.CREATE_THREAD]],
   // Create Subtree
-  [Action.CREATE_REACTION, [Action.VIEW_COMMENTS, Action.DELETE_REACTION]],
-  [Action.CREATE_COMMENT, [Action.VOTE_ON_POLLS, Action.EDIT_COMMENT, Action.DELETE_COMMENT]],
-  [Action.CREATE_POLL, [Action.VIEW_THREADS]],
-  [Action.CREATE_THREAD, [Action.VIEW_TOPICS, Action.EDIT_THREAD, Action.DELETE_THREAD, Action.LINK_PROPOSAL_TO_THREAD, Action.LINK_THREAD_TO_THREAD]],
-  [Action.CREATE_TOPIC, [Action.EDIT_TOPIC, Action.DELETE_TOPIC]],
+  [Action.CREATE_REACTION, [Action.CREATE_COMMENT]],
+  [Action.CREATE_COMMENT, [Action.EDIT_COMMENT, Action.CREATE_THREAD]],
+  [Action.CREATE_THREAD, [Action.EDIT_THREAD]],
+  [Action.MANAGE_TOPICS, [Action.DELETE_TOPIC]],
   // Voting Subtree
   [Action.VOTE_ON_POLLS, [Action.CREATE_POLL]],
-  // Delete Subtree
-  [Action.DELETE_REACTION, [Action.DELETE_COMMENT]],
-  [Action.DELETE_COMMENT, [Action.DELETE_THREAD]],
-  [Action.DELETE_THREAD, [Action.DELETE_TOPIC]],
   // Edit Subtree
-  [Action.EDIT_COMMENT, [Action.EDIT_THREAD]],
-  [Action.EDIT_THREAD, [Action.EDIT_TOPIC]]
+  [Action.EDIT_COMMENT, [Action.DELETE_COMMENT]],
+  [Action.EDIT_THREAD, [Action.DELETE_THREAD]]
 ]);
 
 // Recursive function to get all implicit permissions of an action

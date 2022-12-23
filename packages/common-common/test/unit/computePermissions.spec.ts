@@ -93,7 +93,6 @@ describe('computePermissions() unit tests', () => {
     assert.isTrue(isPermitted(actionPermission, Action.VIEW_COMMENTS));
     assert.isTrue(isPermitted(actionPermission, Action.VIEW_THREADS));
     assert.isTrue(isPermitted(actionPermission, Action.VIEW_REACTIONS));
-    assert.isTrue(isPermitted(actionPermission, Action.VIEW_POLLS));
     assert.isFalse(isPermitted(actionPermission, Action.CREATE_THREAD));
   });
 
@@ -108,13 +107,10 @@ describe('computePermissions() unit tests', () => {
 
     assert.isTrue(isPermitted(permission, Action.CREATE_THREAD));
     assert.isTrue(isPermitted(permission, Action.CREATE_COMMENT));
-    assert.isTrue(isPermitted(permission, Action.CREATE_POLL));
     assert.isTrue(isPermitted(permission, Action.CREATE_REACTION));
     assert.isTrue(isPermitted(permission, Action.VIEW_COMMENTS));
     assert.isTrue(isPermitted(permission, Action.VIEW_THREADS));
     assert.isTrue(isPermitted(permission, Action.VIEW_REACTIONS));
-    assert.isTrue(isPermitted(permission, Action.VIEW_POLLS));
-    assert.isTrue(isPermitted(permission, Action.DELETE_THREAD));
     assert.isFalse(isPermitted(permission, Action.CREATE_CHAT));
   });
 
@@ -149,6 +145,5 @@ describe('computePermissions() unit tests', () => {
     assert.isFalse(isPermitted(permission, Action.VIEW_COMMENTS));
     assert.isFalse(isPermitted(permission, Action.VIEW_THREADS));
     assert.isFalse(isPermitted(permission, Action.CREATE_THREAD));
-    assert.isFalse(isPermitted(permission, Action.CREATE_TOPIC));
   });
 });

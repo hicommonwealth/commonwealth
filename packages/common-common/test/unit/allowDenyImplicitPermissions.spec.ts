@@ -39,8 +39,8 @@ describe('add, remove Allow and Deny ImplicitPermissions() unit tests', () => {
   });
 
   it('View Threads should not be been part of the deny permission', () => {
-    overwrite_moderator.deny = addDenyPermission(base_permission, Action.CREATE_TOPIC);
-    const deny_permission = removeDenyImplicitPermissions(overwrite_moderator.deny, Action.CREATE_TOPIC);
+    overwrite_moderator.deny = addDenyPermission(base_permission, Action.MANAGE_TOPICS);
+    const deny_permission = removeDenyImplicitPermissions(overwrite_moderator.deny, Action.MANAGE_TOPICS);
     assert.isFalse(isPermitted(deny_permission, Action.VIEW_THREADS));
   });
 });
