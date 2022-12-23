@@ -1,22 +1,30 @@
+/**
+ * Defines a mithril interoperability layer whose functionality is backed by REACT.
+ *
+ * The set of functions defined here should match the exact interfaces mithril-based layer,
+ * such that it can be swapped out by exporting this file in `mithrilInterop.ts`.
+ *
+ * This file is currently using the `.ts.new` extension to avoid compilation and typechecking,
+ * as we do not want to expose its imports and features until we are prepared to migrate to react.
+ */
+
 import {
   createElement,
-  ForwardedRef,
-  forwardRef,
-  Fragment,
   FunctionComponent,
-  ReactElement,
   ReactNode,
   // eslint-disable-next-line import/no-unresolved
   Component as ReactComponent
 } from 'react';
-import renderer from 'react-hyperscript';
 import {
   matchPath,
 } from 'react-router-dom';
 
+// RENDERING FUNCTIONS
 export type Children = ReactNode | ReactNode[];
 
-export const render = (tag: string | React.ComponentType, attrs: any, ...children: any[]) => {
+export const render = (tag: string | React.ComponentType, attrs: any = {}, ...children: any[]) => {
+  // ensure vnode.children exists
+  attrs.children = children;
   if (typeof tag === 'string') {
     return createElement(tag, attrs, ...children);
   } else {
@@ -36,12 +44,9 @@ export type Component<Props = unknown> = FunctionComponent<Props>;
 
 export const jsx = createElement;
 
-export type ResultNode<A> = { attrs: A, children: Children };
+export type ResultNode<A = {}> = { attrs: A, children: Children };
 
-/// END CYANO CODE
-
-// TODO: verify this works
-export abstract class ClassComponent<A = {}> extends React.Component<A> {
+export abstract class ClassComponent<A = {}> extends ReactComponent<A & { children?: Children }> {
   protected readonly __props: A;
 
   public componentDidMount() {
@@ -69,6 +74,24 @@ export abstract class ClassComponent<A = {}> extends React.Component<A> {
   abstract view(v: ResultNode<A>): Children | null;
 }
 
+export function redraw(sync = false) {
+  // TODO
+}
+
+// DOM FUNCTIONS
+export function rootRender(el: Element, vnodes: Children) {
+  // React does not have a built-in method for rendering to an element directly.
+  // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
+  ReactDOM.render(vnodes, el);
+}
+
+export function rootMount(element: Element, component?: any | null) {
+  // React does not have a built-in method for mounting a component to an element directly.
+  // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
+  ReactDOM.render(component, element);
+}
+
+// ROUTING FUNCTIONS
 type RouteOptions = {
   replace?: boolean;
 };
@@ -95,27 +118,10 @@ export function getRoute() {
   return location.pathname;
 }
 
-export function redraw(sync = false) {
-  // React does not have a built-in method for manually triggering a re-render.
-  // Instead, you can use the `setState` method to update the component's state and trigger a re-render.
-}
-
 export function parsePathname(url: string): { path: string; params: Params } {
   const match = matchPath(url, { path: url });
   return {
     path: match ? match.path : '',
     params: match ? match.params : {},
   };
-}
-
-export function rootRender(el: Element, vnodes: Children) {
-  // React does not have a built-in method for rendering to an element directly.
-  // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
-  ReactDOM.render(vnodes, el);
-}
-
-export function rootMount(element: Element, component?: any | null) {
-  // React does not have a built-in method for mounting a component to an element directly.
-  // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
-  ReactDOM.render(component, element);
 }
