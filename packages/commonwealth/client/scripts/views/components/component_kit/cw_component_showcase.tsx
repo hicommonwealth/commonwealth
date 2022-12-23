@@ -159,9 +159,9 @@ export class ComponentShowcase extends ClassComponent {
         <div class="basic-gallery">
           <CWText type="h3">Tag</CWText>
           <CWTag label="Ref #90" />
-          <CWTag label="Passed" status="passed" />
-          <CWTag label="Failed" status="failed" />
-          <CWTag label="Active" status="active" />
+          <CWTag label="Passed" type="passed" />
+          <CWTag label="Failed" type="failed" />
+          <CWTag label="Active" type="active" />
           <CWTag label="Poll" type="poll" />
           <CWTag label="Prop #52" type="proposal" />
           <CWTag label="Ref #90" type="referendum" />

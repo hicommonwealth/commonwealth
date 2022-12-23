@@ -50,12 +50,9 @@
   }
 
   .comment-body-excerpt {
-    margin: 7px 0 8px;
+    @include multiline-text-ellipsis(2);
     color: $neutral-500;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+    margin: 7px 0 8px;
 
     .QuillFormattedText {
       overflow: hidden;

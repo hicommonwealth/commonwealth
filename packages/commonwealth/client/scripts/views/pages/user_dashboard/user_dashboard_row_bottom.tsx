@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { Icons, MenuItem, PopoverMenu } from 'construct-ui';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
@@ -12,6 +11,7 @@ import { subscribeToThread } from './helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
+import { SharePopover } from '../../components/share_popover';
 
 type UserDashboardRowBottomAttrs = {
   commentCount: number;
@@ -70,38 +70,15 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
               e.stopPropagation();
             }}
           >
-            {m(PopoverMenu, {
-              transitionDuration: 0,
-              closeOnOutsideClick: true,
-              closeOnContentClick: true,
-              menuAttrs: { size: 'default' },
-              content: [
-                m(MenuItem, {
-                  iconLeft: Icons.COPY,
-                  label: 'Copy URL',
-                  onclick: async () => {
-                    await navigator.clipboard.writeText(path);
-                  },
-                }),
-                m(MenuItem, {
-                  iconLeft: Icons.TWITTER,
-                  label: 'Share on Twitter',
-                  onclick: async () => {
-                    await window.open(
-                      `https://twitter.com/intent/tweet?text=${path}`,
-                      '_blank'
-                    );
-                  },
-                }),
-              ],
-              trigger: (
+            <SharePopover
+              trigger={
                 <CWButton
                   label="Share"
                   iconLeft="share"
                   buttonType="secondary-blue"
                 />
-              ),
-            })}
+              }
+            />
           </div>
         </div>
         <div class="interaction-counts">
