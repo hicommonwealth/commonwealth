@@ -57,18 +57,19 @@
   }
 }
 
-.LoginSelectorMenuRight {
-  .dark-mode-toggle {
-    cursor: default;
+.LoginSelectorMenu {
+  background-color: $white;
+  border-radius: $border-radius-corners;
+  box-shadow: $elevation-3;
 
-    .label-wrap {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+  .login-menu-item {
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
 
-      .Toggle {
-        cursor: pointer;
-      }
+    &:hover {
+      background-color: $neutral-100;
     }
   }
 }
