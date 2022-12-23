@@ -15,6 +15,10 @@
     justify-content: space-between;
     width: 100%;
 
+    &:hover {
+      background-color: $neutral-100;
+    }
+
     &.isSelected {
       background-color: $purple-100;
     }
