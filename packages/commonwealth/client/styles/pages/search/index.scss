@@ -1,5 +1,17 @@
 @import 'shared';
 
+@mixin searchRowStyles {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+
+  &:hover {
+    background-color: $neutral-50;
+  }
+}
+
 .SearchPage {
   display: flex;
   flex: 1;
@@ -10,7 +22,7 @@
   .search-results {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
     margin: 0 auto;
     width: 796px;
 
@@ -20,6 +32,7 @@
 
     .TabBar {
       justify-content: center;
+      margin-bottom: 0;
     }
 
     .search-results-caption.Text {
@@ -47,15 +60,7 @@
       gap: 8px;
 
       .search-result-row {
-        align-items: center;
-        cursor: pointer;
-        display: flex;
-        gap: 8px;
-        padding: 16px;
-
-        &:hover {
-          background-color: $neutral-50;
-        }
+        @include searchRowStyles;
 
         .inner-container {
           display: flex;
@@ -86,26 +91,11 @@
       }
 
       .community-result-row {
-        cursor: pointer;
-        padding: 8px;
-        width: 100%;
-
-        &:hover {
-          background-color: $neutral-50;
-        }
+        @include searchRowStyles;
       }
 
       .member-result-row {
-        align-items: center;
-        cursor: pointer;
-        display: flex;
-        gap: 8px;
-        padding: 16px;
-        width: 100%;
-
-        &:hover {
-          background-color: $neutral-50;
-        }
+        @include searchRowStyles;
 
         .User {
           align-items: center;

@@ -332,7 +332,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                     </a>
                   )}
                 </CWText>
-                {tabScopedListing.length > 0 && (
+                {tabScopedListing.length > 0 && this.activeTab === 'Threads' && (
                   <div class="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
                     <CWDropdown
