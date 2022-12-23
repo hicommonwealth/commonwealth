@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
 import app from 'state';
 
@@ -120,24 +119,20 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           }),
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
-          m('.ban-wrapper', [
-            m(CWButton, {
-              onclick: () => {
-                app.modals.create({
-                  modal: BanUserModal,
-                  data: { profile: account.profile },
-                });
-              },
-              label: 'Ban User',
-              buttonType: 'primary-red',
-            }),
-          ]),
+          m(CWButton, {
+            onclick: () => {
+              app.modals.create({
+                modal: BanUserModal,
+                data: { profile: account.profile },
+              });
+            },
+            label: 'Ban User',
+            buttonType: 'primary-red',
+          }),
         m('', [
           onOwnProfile
             ? showJoinCommunityButton && app.activeChainId()
-            : m(Button, {
-                intent: 'primary',
-                rounded: true,
+            : m(CWButton, {
                 onclick: async () => {
                   if (onLinkedProfile) {
                     vnode.state.loading = true;

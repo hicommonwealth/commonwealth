@@ -4,7 +4,7 @@ import m from 'mithril';
 
 import app from 'state';
 
-import { InputRow, SelectRow } from 'views/components/metadata_rows';
+import { InputRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -17,6 +17,10 @@ import {
 } from './types';
 import { CommunityType } from '.';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import {
+  CWDropdown,
+  DropdownItemType,
+} from '../../components/component_kit/cw_dropdown';
 
 export const initChainForm = (): ChainFormDefaultFields => {
   return {
@@ -130,24 +134,29 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
 type EthChainState = EthFormFields & ChainFormState;
 
 export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
-  const addlChainStrings = app?.user.isSiteAdmin ? ['Custom'] : [];
+  const options = [
+    ...Object.keys(attrs.ethChains).map(
+      (c) =>
+        ({
+          label: attrs.ethChainNames[c],
+          value: attrs.ethChainNames[c],
+        } || { label: c, value: c })
+    ),
+    app?.user.isSiteAdmin ? { label: 'Custom', value: 'Custom' } : {},
+  ] as Array<DropdownItemType>;
+
   return [
-    <SelectRow
-      title="Chain"
-      options={[
-        ...Object.keys(attrs.ethChains).map(
-          (c) => attrs.ethChainNames[c] || `${c}`
-        ),
-        ...addlChainStrings,
-      ]}
-      value={state.chainString}
-      onchange={(value) => {
-        state.chainString = value;
-        if (value !== 'Custom') {
+    <CWDropdown
+      label="Chain"
+      options={options}
+      onSelect={(o) => {
+        state.chainString = o.value;
+        if (o.value !== 'Custom') {
           const [id] =
             Object.entries(attrs.ethChainNames).find(
-              ([, name]) => name === value
-            ) || Object.keys(attrs.ethChains).find((cId) => `${cId}` === value);
+              ([, name]) => name === o.value
+            ) ||
+            Object.keys(attrs.ethChains).find((cId) => `${cId}` === o.value);
           state.ethChainId = id;
           state.nodeUrl = attrs.ethChains[id].url;
           state.altWalletUrl = attrs.ethChains[id].alt_wallet_url;
@@ -159,7 +168,7 @@ export const ethChainRows = (attrs: EthChainAttrs, state: EthChainState) => {
         state.loaded = false;
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
-          chainBase: value,
+          chainBase: o.value,
           isCustomDomain: app.isCustomDomain(),
           communityType: CommunityType.Erc20Community,
         });
