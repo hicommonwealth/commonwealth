@@ -324,6 +324,7 @@ export interface ViewReactionArgs {
   chain: string;
   jwt: string;
   comment_id: number;
+  user?: any;
 }
 
 export const viewReactions = async (args: ViewReactionArgs) => {
@@ -336,6 +337,70 @@ export const viewReactions = async (args: ViewReactionArgs) => {
       chain,
       jwt,
       comment_id,
+    });
+  return res.body;
+};
+
+export interface ReactionCountArgs {
+  thread_ids: number[];
+  active_address: string;
+  chain_id: string;
+  jwt: string;
+}
+
+export const reactionsCounts = async (args: ReactionCountArgs) => {
+  const { thread_ids, active_address, chain_id, jwt } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/reactionsCounts')
+    .set('Accept', 'application/json')
+    .send({
+      thread_ids,
+      active_address,
+      chain_id,
+      jwt,
+    });
+  return res.body;
+};
+
+export interface DeleteReactionArgs {
+  jwt: string;
+  reaction_id: number;
+}
+
+export const deleteReaction = async (args: DeleteReactionArgs) => {
+  const { jwt, reaction_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/deleteReaction')
+    .set('Accept', 'application/json')
+    .send({
+      jwt,
+      reaction_id,
+    });
+  return res.body;
+};
+
+export interface BulkReactionArgs {
+  thread_id?: number;
+  comment_id?: number;
+  proposal_id?: number;
+  chain_id: string;
+  jwt: string;
+}
+
+export const bulkReactions = async (args: BulkReactionArgs) => {
+  const { thread_id, comment_id, proposal_id, chain_id, jwt } = args;
+  const res = await chai.request
+    .agent(app)
+    .get('/api/bulkReactions')
+    .set('Accept', 'application/json')
+    .query({
+      thread_id,
+      comment_id,
+      proposal_id,
+      chain_id,
+      jwt,
     });
   return res.body;
 };
@@ -512,7 +577,10 @@ export const createInvite = async (args: InviteArgs) => {
 };
 
 // always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
+export class MockTokenBalanceProvider extends BalanceProvider<{
+  tokenAddress: string;
+  contractType: string;
+}> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
