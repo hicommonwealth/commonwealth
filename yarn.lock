@@ -3432,10 +3432,10 @@
     "@ethersproject/properties" "^5.6.0"
     "@ethersproject/strings" "^5.6.1"
 
-"@glidejs/glide@^3.4.1":
-  version "3.4.1"
-  resolved "https://registry.npmjs.org/@glidejs/glide/-/glide-3.4.1.tgz"
-  integrity sha512-C34AEcK1HjSyxilRToUL54I6KAoodojUbeRlXoruobZuG0eGm8xfDL+3kgkWj7AJK4EZtunSOYfoqMp70eDtwg==
+"@glidejs/glide@^3.6.0":
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/@glidejs/glide/-/glide-3.6.0.tgz#d13fd57de8473a2d86022ac601b5cbc98c9dcfe5"
+  integrity sha512-47Aa+JmYjY4xTFpTtYCwrqirmI1arnp1UZETwtWpbTPisXUAuxrdJxKJLH8KHFWMsSrLi9+AcfyfzDIuO75rEA==
 
 "@graphql-typed-document-node/core@^3.0.0":
   version "3.1.0"
