@@ -275,18 +275,6 @@ describe('Thread Tests', () => {
       expect(rRes.status).to.equal('Success');
       expect(rRes.result).to.not.be.null;
     });
-
-    it('should not view reactions if user is logged in because he is denied', async () => {
-      const rRes = await modelUtils.viewReactions({
-        chain,
-        jwt: userJWT,
-        comment_id: comment.id,
-        user: { id: userId },
-      });
-
-      expect(rRes.status).to.equal('Success');
-      expect(rRes.result).to.not.be.null;
-    });
   });
 
   describe('/reactionCount', () => {
@@ -472,6 +460,92 @@ describe('Thread Tests', () => {
       expect(dRes.status).to.equal(400);
       expect(dRes.error).to.not.be.null;
       expect(dRes.error).to.equal(Errors.NotPermitted);
+    });
+  });
+
+  describe('/bulkReactions', () => {
+    beforeEach(async () => {
+      addAllowDenyPermissionsForCommunityRole(
+        'member',
+        chain,
+        Action.CREATE_THREAD,
+        undefined
+      );
+
+      const res2 = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        stage,
+        chainId: chain,
+        title,
+        topicName,
+        topicId,
+        body,
+        jwt: userJWT,
+      });
+      expect(res2.status).to.be.equal('Success');
+      expect(res2.result).to.not.be.null;
+      thread = res2.result;
+
+      const cRes = await modelUtils.createComment({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        text: markdownComment.text,
+        root_id: `discussion_${thread.id}`,
+      });
+
+      expect(cRes.status).to.equal('Success');
+      expect(cRes.result).to.not.be.null;
+      comment = cRes.result;
+
+      const rRes = await modelUtils.createReaction({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        comment_id: comment.id,
+        reaction: 'like',
+        author_chain: chain,
+      });
+
+      expect(rRes.status).to.equal('Success');
+      expect(rRes.result).to.not.be.null;
+      expect(rRes.result.chain).to.equal(chain);
+    });
+
+    it('should fetch bulk reactions', async () => {
+      const rRes = await modelUtils.bulkReactions({
+        comment_id: comment.id,
+        jwt: userJWT,
+        chain_id: chain,
+      });
+
+      expect(rRes.status).to.equal('Success');
+      expect(rRes.result).to.not.be.null;
+    });
+
+    it('should still fetch bulk reactions if not permitted because user is not logged in', async () => {
+      removeAllowDenyPermissionsForCommunityRole(
+        'member',
+        chain,
+        Action.VIEW_REACTIONS,
+        undefined
+      );
+      addAllowDenyPermissionsForCommunityRole(
+        'member',
+        chain,
+        undefined,
+        Action.VIEW_REACTIONS
+      );
+
+      const rRes = await modelUtils.bulkReactions({
+        comment_id: comment.id,
+        jwt: userJWT,
+        chain_id: chain,
+      });
+
+      expect(rRes.status).to.equal('Success');
+      expect(rRes.result).to.not.be.null;
     });
   });
 
