@@ -1,9 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
-import _ from 'lodash';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { Button } from 'construct-ui';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import User from '../../components/widgets/user';
 import { initChain } from '../../../app';
@@ -27,8 +25,7 @@ const editIdentityAction = (
   return (
     (account.chain.id.indexOf('edgeware') !== -1 ||
       account.chain.id.indexOf('kusama') !== -1) &&
-    m(Button, {
-      intent: 'primary',
+    m(CWButton, {
       // wait for info to load before making it clickable
       disabled: vnode.state.chainLoading,
       onclick: async () => {
@@ -61,7 +58,6 @@ const editIdentityAction = (
           });
         }
       },
-      loading: !!vnode.state.chainLoading,
       label: currentIdentity?.exists ? 'Edit identity' : 'Set identity',
     })
   );
@@ -200,8 +196,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               }),
             ]
           : showJoinCommunityButton && app.activeChainId()
-          ? m(Button, {
-              intent: 'primary',
+          ? m(CWButton, {
               onclick: async () => {
                 if (onLinkedProfile) {
                   vnode.state.loading = true;
