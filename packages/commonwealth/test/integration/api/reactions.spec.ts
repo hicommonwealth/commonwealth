@@ -58,6 +58,7 @@ describe('Thread Tests', () => {
   let userAddressId2;
   let thread;
   let comment;
+  let reaction;
 
   before(async () => {
     await resetDatabase();
@@ -350,7 +351,7 @@ describe('Thread Tests', () => {
       expect(rRes.result).to.not.be.null;
     });
 
-    it('should still fetch reaction count for threads if not permitted because this user is not logged in', async () => {
+    it('should still fetch reaction count for threads if not permitted because user is not logged in', async () => {
       removeAllowDenyPermissionsForCommunityRole(
         'member',
         chain,
@@ -373,4 +374,105 @@ describe('Thread Tests', () => {
       expect(rRes.result).to.not.be.null;
     });
   });
+
+  describe('/deleteReaction', () => {
+    beforeEach(async () => {
+      addAllowDenyPermissionsForCommunityRole(
+        'member',
+        chain,
+        Action.CREATE_THREAD,
+        undefined
+      );
+
+      const res2 = await modelUtils.createThread({
+        address: userAddress,
+        kind,
+        stage,
+        chainId: chain,
+        title,
+        topicName,
+        topicId,
+        body,
+        jwt: userJWT,
+      });
+      expect(res2.status).to.be.equal('Success');
+      expect(res2.result).to.not.be.null;
+      thread = res2.result;
+
+      const cRes = await modelUtils.createComment({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        text: markdownComment.text,
+        root_id: `discussion_${thread.id}`,
+      });
+
+      expect(cRes.status).to.equal('Success');
+      expect(cRes.result).to.not.be.null;
+      comment = cRes.result;
+    });
+
+    it('should delete reaction', async () => {
+      const rRes = await modelUtils.createReaction({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        comment_id: comment.id,
+        reaction: 'like',
+        author_chain: chain,
+      });
+
+      expect(rRes.status).to.equal('Success');
+      expect(rRes.result).to.not.be.null;
+      expect(rRes.result.chain).to.equal(chain);
+      reaction = rRes.result;
+
+      const dRes = await modelUtils.deleteReaction({
+        reaction_id: reaction.id,
+        jwt: userJWT,
+      });
+
+      expect(dRes.status).to.equal('Success');
+      expect(dRes.result).to.not.be.null;
+    });
+
+    it('should deny permission for deleting reaction', async () => {
+      const rRes = await modelUtils.createReaction({
+        chain,
+        address: userAddress,
+        jwt: userJWT,
+        comment_id: comment.id,
+        reaction: 'like',
+        author_chain: chain,
+      });
+
+      expect(rRes.status).to.equal('Success');
+      expect(rRes.result).to.not.be.null;
+      expect(rRes.result.chain).to.equal(chain);
+      reaction = rRes.result;
+
+      removeAllowDenyPermissionsForCommunityRole(
+        'member',
+        chain,
+        Action.DELETE_REACTION,
+        undefined
+      );
+      addAllowDenyPermissionsForCommunityRole(
+        'member',
+        chain,
+        undefined,
+        Action.DELETE_REACTION
+      );
+
+      const dRes = await modelUtils.deleteReaction({
+        reaction_id: reaction.id,
+        jwt: userJWT,
+      });
+
+      expect(dRes.status).to.equal(400);
+      expect(dRes.error).to.not.be.null;
+      expect(dRes.error).to.equal(Errors.NotPermitted);
+    });
+  });
+
 });
