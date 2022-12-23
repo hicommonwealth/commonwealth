@@ -1,12 +1,12 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
-import { QueryTypes, Op } from 'sequelize';
-import validateChain from '../middleware/validateChain';
+import { QueryTypes } from 'sequelize';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import validateChain from '../middleware/validateChain';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../models';
 import { ThreadInstance } from '../models/thread';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
@@ -41,7 +41,7 @@ const bulkThreads = async (
         addr.chain AS addr_chain, thread_id, thread_title,
         thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
-        threads.has_poll,
+        threads.has_poll, threads.plaintext,
         threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
@@ -52,6 +52,7 @@ const bulkThreads = async (
           t.created_at AS thread_created,
           t.chain AS thread_chain, t.read_only, t.body,
           t.has_poll,
+          t.plaintext,
           t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
             CONCAT(
               '{ "address": "', editors.address, '", "chain": "', editors.chain, '" }'
@@ -130,6 +131,7 @@ const bulkThreads = async (
         snapshot_proposal: t.snapshot_proposal,
         has_poll: t.has_poll,
         last_commented_on: t.last_commented_on,
+        plaintext: t.plaintext,
         Address: {
           id: t.addr_id,
           address: t.addr_address,
