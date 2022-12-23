@@ -77,7 +77,6 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
             <CreateContentPopover />
             <HelpMenuPopover />
             {app.isLoggedIn() && <NotificationsMenuPopover />}
-            {true && <InvitesMenuPopover />}
             {app.isLoggedIn() && app.config.invites?.length > 0 && (
               <InvitesMenuPopover />
             )}
