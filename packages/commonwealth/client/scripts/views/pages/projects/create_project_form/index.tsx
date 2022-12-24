@@ -169,42 +169,47 @@ export default class CreateProjectForm implements m.ClassComponent {
             </CWText>
             <FormSlide form={this.form} />
           </div>
-          <CWButton
-            disabled={this.slideNumber === 1}
-            label={
-              <>
-                <CWIcon iconName="arrowLeft" />
-                <span>Previous Page</span>
-              </>
-            }
-            onclick={(e) => {
-              this.slideNumber -= 1;
-            }}
-          />
-          {this.slideNumber !== 3 ? (
+          <div class="NavigationButtons">
             <CWButton
+              disabled={this.slideNumber === 1}
+              className="cui-button"
               label={
                 <>
-                  <span>Next Page</span>
-                  <CWIcon iconName="arrowRight" />
+                  <CWIcon iconName="arrowLeft" />
+                  <span> Previous Page</span>
                 </>
               }
               onclick={(e) => {
-                const requiredInputsFilled = this.$form?.reportValidity();
-                if (requiredInputsFilled) {
-                  this.slideNumber += 1;
+                this.slideNumber -= 1;
+              }}
+            />
+            {this.slideNumber !== 3 ? (
+              <CWButton
+                label={
+                  <>
+                    <span>Next Page </span>
+                    <CWIcon iconName="arrowRight" />
+                  </>
                 }
-              }}
-            />
-          ) : (
-            <CWButton
-              label="Submit"
-              onclick={async (e) => {
-                console.log(this.form);
-                this.submitForm();
-              }}
-            />
-          )}
+                className="cui-button"
+                onclick={(e) => {
+                  const requiredInputsFilled = this.$form?.reportValidity();
+                  if (requiredInputsFilled) {
+                    this.slideNumber += 1;
+                  }
+                }}
+              />
+            ) : (
+              <CWButton
+                label="Submit"
+                className="cui-button"
+                onclick={async (e) => {
+                  console.log(this.form);
+                  this.submitForm();
+                }}
+              />
+            )}
+          </div>
         </div>
       </Sublayout>
     );
