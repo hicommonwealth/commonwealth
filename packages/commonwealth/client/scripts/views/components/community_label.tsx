@@ -19,7 +19,7 @@ export class CommunityLabel extends ClassComponent<CommunityLabelAttrs> {
     const { community, size = 'small' } = vnode.attrs;
 
     return (
-      <div class="CommunityLabel">
+      <div className="CommunityLabel">
         <CWCommunityAvatar community={community} size={size} />
         <CWText noWrap type="b1" fontWeight="medium" title={community.name}>
           {community.name}

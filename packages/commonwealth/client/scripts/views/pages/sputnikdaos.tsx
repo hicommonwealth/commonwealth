@@ -46,18 +46,18 @@ class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
 
     return (
       <div
-        class={getClasses<{ clickable?: boolean }>(
+        className={getClasses<{ clickable?: boolean }>(
           { clickable },
           'sputnik-row'
         )}
-        onclick={(e) => {
+        onClick={(e) => {
           if (clickable) {
             e.preventDefault();
             setRoute(`/${dao.contractId}`);
           }
         }}
       >
-        <CWText className={getClasses<{ clickable?: boolean }>({ clickable })}>
+        <CWText class={getClasses<{ clickable?: boolean }>({ clickable })}>
           {dao.name}
         </CWText>
         <CWText>{amountString}</CWText>
@@ -140,9 +140,9 @@ class SputnikDAOsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
       >
-        <div class="SputnikDAOsPage">
+        <div className="SputnikDAOsPage">
           <CWText type="h3">Sputnik DAOs</CWText>
-          <div class="sputnik-row">
+          <div className="sputnik-row">
             <CWText fontWeight="medium">Name</CWText>
             <CWText fontWeight="medium">Dao Funds Ⓝ</CWText>
             <CWText fontWeight="medium">Council Size</CWText>

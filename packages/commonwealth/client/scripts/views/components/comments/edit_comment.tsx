@@ -38,7 +38,7 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
     const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
 
     return (
-      <div class="EditComment">
+      <div className="EditComment">
         <QuillEditorComponent
           contentsDoc={body}
           oncreateBind={(state: QuillEditor) => {
@@ -48,12 +48,12 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
           theme="snow"
           editorNamespace={`edit-comment-${comment.id}`}
         />
-        <div class="buttons-row">
+        <div className="buttons-row">
           <CWButton
             label="Cancel"
             disabled={this.saving}
             buttonType="secondary-blue"
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
 
               let confirmed = true;
@@ -78,7 +78,7 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
           <CWButton
             label="Save"
             disabled={this.saving}
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
 
               this.saving = true;

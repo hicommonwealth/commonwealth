@@ -17,8 +17,8 @@ export class CWAddress extends ClassComponent<AddressAttrs> {
   view(vnode: ResultNode<AddressAttrs>) {
     const { address, darkMode } = vnode.attrs;
     return (
-      <div class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'Address')}>
-        <CWText type="caption" className="address-text">
+      <div className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'Address')}>
+        <CWText type="caption" class="address-text">
           {address}
         </CWText>
       </div>

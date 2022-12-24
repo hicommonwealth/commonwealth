@@ -27,10 +27,10 @@ export class GovExplainer extends ClassComponent<GovExplainerAttrs> {
     const { statHeaders, stats, statAction } = vnode.attrs;
 
     return (
-      <div class="GovExplainer">
-        <div class="emoji">💭</div>
-        <div class="main-container">
-          <div class="stat-headers-container">
+      <div className="GovExplainer">
+        <div className="emoji">💭</div>
+        <div className="main-container">
+          <div className="stat-headers-container">
             {statHeaders.map((s) => (
               <CWText>
                 <div>
@@ -39,10 +39,10 @@ export class GovExplainer extends ClassComponent<GovExplainerAttrs> {
               </CWText>
             ))}
           </div>
-          <div class="stats-container">
+          <div className="stats-container">
             {stats.map((s) => (
-              <div class="stat">
-                <CWText type="b1" fontWeight="medium" className="stat-text">
+              <div className="stat">
+                <CWText type="b1" fontWeight="medium" class="stat-text">
                   {s.statHeading}
                 </CWText>
                 <CWText type="b1" fontWeight="medium">

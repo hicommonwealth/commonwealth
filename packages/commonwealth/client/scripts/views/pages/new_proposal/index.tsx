@@ -116,7 +116,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
 
     return (
       <Sublayout>
-        <div class="NewProposalPage">
+        <div className="NewProposalPage">
           <CWText type="h3" fontWeight="medium">
             New {proposalSlugToFriendlyName.get(this.typeEnum)}
           </CWText>

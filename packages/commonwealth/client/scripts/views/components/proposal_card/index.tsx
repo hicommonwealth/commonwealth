@@ -41,8 +41,8 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
       <CWCard
         elevation="elevation-2"
         interactive
-        className="ProposalCard"
-        onclick={(e) => {
+        class="ProposalCard"
+        onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
 
@@ -58,8 +58,8 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
           navigateToSubpage(path); // avoid resetting scroll point
         }}
       >
-        <div class="proposal-card-metadata">
-          <div class="tag-row">
+        <div className="proposal-card-metadata">
+          <div className="tag-row">
             <ProposalTag label={getPrimaryTagText(proposal)} />
             {isNotNil(secondaryTagText) && (
               <ProposalTag label={secondaryTagText} />
@@ -69,12 +69,12 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
             {proposal.title}
           </CWText>
           {proposal instanceof SubstrateTreasuryProposal && (
-            <CWText className="proposal-amount-text">
+            <CWText class="proposal-amount-text">
               {proposal.value?.format(true)}
             </CWText>
           )}
           {proposal instanceof SubstrateDemocracyReferendum && (
-            <CWText className="proposal-amount-text">
+            <CWText class="proposal-amount-text">
               {proposal.threshold}
             </CWText>
           )}
@@ -88,24 +88,24 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
         {injectedContent ? (
           <>
             <CWDivider />
-            <div class="proposal-injected">{injectedContent}</div>
+            <div className="proposal-injected">{injectedContent}</div>
           </>
         ) : proposal.isPassing !== 'none' ? (
           <CWText
             fontWeight="medium"
-            className={`proposal-status-text ${getStatusClass(proposal)}`}
+            class={`proposal-status-text ${getStatusClass(proposal)}`}
           >
             {getStatusText(proposal)}
           </CWText>
         ) : null}
         {proposal.threadId && (
-          <CWText type="caption" className="proposal-thread-link-text">
+          <CWText type="caption" class="proposal-thread-link-text">
             <a
               href={getProposalUrlPath(
                 ProposalType.Thread,
                 `${proposal.threadId}`
               )}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
 

@@ -114,13 +114,13 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
 
     return (
       <div
-        class={getClasses<AvatarUploadStyleAttrs>(
+        className={getClasses<AvatarUploadStyleAttrs>(
           { size },
           ComponentType.AvatarUpload
         )}
       >
         <div
-          class={getClasses<{ darkMode?: boolean }>(
+          className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
             'icon-button-container'
           )}
@@ -133,7 +133,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
         </div>
         {!this.uploaded && (
           <div
-            class={getClasses<{ hasNoAvatar: boolean }>(
+            className={getClasses<{ hasNoAvatar: boolean }>(
               { hasNoAvatar: isUndefined(avatar) },
               'dropzone-attach'
             )}
@@ -142,7 +142,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
           </div>
         )}
         <div
-          class={getClasses<{ hidden: boolean }>(
+          className={getClasses<{ hidden: boolean }>(
             { hidden: !this.uploaded },
             'dropzone-preview-container'
           )}

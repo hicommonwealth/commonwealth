@@ -21,7 +21,7 @@ export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {externalLink('a', proposal['blockExplorerLink'], [
           proposal['blockExplorerLinkLabel'] ||
             extractDomain(proposal['blockExplorerLink']),
@@ -38,7 +38,7 @@ export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs>
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {externalLink('a', proposal['votingInterfaceLink'], [
           proposal['votingInterfaceLinkLabel'] ||
             extractDomain(proposal['votingInterfaceLink']),
@@ -62,7 +62,7 @@ export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {
     );
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {link('a', path, ['Go to discussion'])}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>
@@ -81,7 +81,7 @@ export class SnapshotThreadLink extends ClassComponent<SnapshotThreadLinkAttrs> 
     const proposalLink = getProposalUrlPath(ProposalType.Thread, id);
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {link('a', proposalLink, [decodeURIComponent(title)])}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>

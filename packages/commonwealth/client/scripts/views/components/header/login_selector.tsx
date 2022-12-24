@@ -93,7 +93,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               }
             },
             label: (
-              <div class="label-wrap">
+              <div className="label-wrap">
                 {mobile && <CWIcon iconName="views" />}
                 <span>View profile</span>
               </div>
@@ -113,7 +113,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               });
             },
             label: (
-              <div class="label-wrap">
+              <div className="label-wrap">
                 {mobile && <CWIcon iconName="write" />}
                 <span>Edit profile</span>
               </div>
@@ -138,7 +138,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             }
           },
           label: (
-            <div class="label-wrap">
+            <div className="label-wrap">
               {mobile && <CWIcon iconName="wallet" />}
               <span>
                 {nAccountsWithoutRole > 0
@@ -165,7 +165,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
         {render(MenuItem, {
           onclick: () => setRoute('/notification-settings'),
           label: (
-            <div class="label-wrap">
+            <div className="label-wrap">
               {mobile && <CWIcon iconName="bell" />}
               <span>Notification settings</span>
             </div>
@@ -177,7 +177,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
               ? navigateToSubpage('/settings')
               : setRoute('/settings'),
           label: (
-            <div class="label-wrap">
+            <div className="label-wrap">
               {mobile && <CWIcon iconName="person" />}
               <span>Account settings</span>
             </div>
@@ -199,7 +199,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
             redraw();
           },
           label: (
-            <div class="label-wrap">
+            <div className="label-wrap">
               <CWToggle checked={isDarkModeOn} onchange={(e) => {}} />
               <span>Dark mode</span>
             </div>
@@ -209,7 +209,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
         {render(MenuItem, {
           onclick: () => app.modals.create({ modal: FeedbackModal }),
           label: (
-            <div class="label-wrap">
+            <div className="label-wrap">
               {mobile && <CWIcon iconName="feedback" />}
               <span>Send feedback</span>
             </div>
@@ -229,7 +229,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
               });
           },
           label: (
-            <div class="label-wrap">
+            <div className="label-wrap">
               {mobile && <CWIcon iconName="logout" />}
               <span>Logout</span>
             </div>
@@ -248,21 +248,21 @@ type TOSModalAttrs = {
 class TOSModal extends ClassComponent<TOSModalAttrs> {
   view(vnode: ResultNode<TOSModalAttrs>) {
     return (
-      <div class="TOSModal">
-        <div class="close-button-wrapper">
+      <div className="TOSModal">
+        <div className="close-button-wrapper">
           <CWIconButton
             iconButtonTheme="primary"
             iconName="close"
             iconSize="small"
-            className="close-icon"
-            onclick={() => $('.TOSModal').trigger('modalexit')}
+            class="close-icon"
+            onClick={() => $('.TOSModal').trigger('modalexit')}
           />
         </div>
-        <div class="content-wrapper">
+        <div className="content-wrapper">
           <CWText>
             By clicking accept you agree to the community's Terms of Service
           </CWText>
-          <CWButton onclick={vnode.attrs.onAccept} label="Accept"></CWButton>{' '}
+          <CWButton onClick={vnode.attrs.onAccept} label="Accept"></CWButton>{' '}
         </div>
       </div>
     );
@@ -279,8 +279,8 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
 
     if (!app.isLoggedIn()) {
       return (
-        <div class="LoginSelector">
-          <div class="login-selector-user">
+        <div className="LoginSelector">
+          <div className="login-selector-user">
             {render(Button, {
               iconLeft: Icons.USER,
               fluid: true,
@@ -523,7 +523,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
             }
           },
           label: (
-            <span class="hidden-sm">
+            <span className="hidden-sm">
               {sameBaseAddressesRemoveDuplicates.length === 0
                 ? `No ${
                     CHAINNETWORK_SHORT[app.chain?.meta?.network] ||

@@ -19,8 +19,8 @@ export class CWEmptyState extends ClassComponent<EmptyStateAttrs> {
     const { content, iconName } = vnode.attrs;
 
     return (
-      <div class="EmptyState">
-        <div class="inner-content">
+      <div className="EmptyState">
+        <div className="inner-content">
           <CWIcon iconName={iconName} iconSize="xl" />
           {typeof content === 'string' ? <CWText>{content}</CWText> : content}
         </div>

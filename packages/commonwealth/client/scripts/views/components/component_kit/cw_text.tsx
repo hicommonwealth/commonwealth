@@ -75,7 +75,7 @@ export class CWText extends ClassComponent<TextAttrs> {
 
     return (
       <div
-        class={getClasses<TextStyleAttrs & { onclick?: boolean }>(
+        className={getClasses<TextStyleAttrs & { onclick?: boolean }>(
           {
             type,
             fontWeight,
@@ -89,7 +89,7 @@ export class CWText extends ClassComponent<TextAttrs> {
           ComponentType.Text
         )}
         title={title}
-        onclick={onclick}
+        onClick={onclick}
       >
         {vnode.children}
       </div>

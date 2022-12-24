@@ -37,7 +37,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
     const author: Account = app.chain.accounts.get(thread.author);
 
     return (
-      <div class="ThreadAuthor">
+      <div className="ThreadAuthor">
         {render(User, {
           avatarSize: 24,
           user: author,
@@ -51,7 +51,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
               interactionType="hover"
               hoverCloseDelay={500}
               content={
-                <div class="collaborators">
+                <div className="collaborators">
                   {thread.collaborators.map(({ address, chain }) => {
                     return render(User, {
                       user: new AddressInfo(null, address, chain, null),
@@ -60,7 +60,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
                 </div>
               }
               trigger={
-                <CWText type="caption" className="trigger-text">
+                <CWText type="caption" class="trigger-text">
                   {pluralize(thread.collaborators?.length, 'other')}
                 </CWText>
               }
@@ -79,7 +79,7 @@ export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
     return (
       <CWText
         type="caption"
-        className={getClasses<{ stage: 'negative' | 'positive' }>(
+        class={getClasses<{ stage: 'negative' | 'positive' }>(
           {
             stage:
               thread.stage === ThreadStageType.ProposalInReview
@@ -94,7 +94,7 @@ export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
           },
           'proposal-stage-text'
         )}
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           navigateToSubpage(`?stage=${thread.stage}`);
         }}
@@ -110,7 +110,7 @@ export class ExternalLink extends ClassComponent<ThreadComponentAttrs> {
     const { thread } = vnode.attrs;
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {externalLink('a', thread.url, [extractDomain(thread.url)])}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>

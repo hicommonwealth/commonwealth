@@ -41,7 +41,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
       transitionDuration: 0,
       closeOnContentClick: true,
       content: (
-        <div class="stage-items">
+        <div className="stage-items">
           {render(MenuItem, {
             onclick: (e) => {
               e.preventDefault();
@@ -61,10 +61,10 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
                 navigateToSubpage(`/discussions?stage=${targetStage}`);
               },
               label: (
-                <div class="stages-item">
+                <div className="stages-item">
                   {threadStageToLabel(targetStage)}
                   {targetStage === ThreadStage.Voting && (
-                    <div class="discussions-stage-count">
+                    <div className="discussions-stage-count">
                       {app.threads.numVotingThreads}
                     </div>
                   )}

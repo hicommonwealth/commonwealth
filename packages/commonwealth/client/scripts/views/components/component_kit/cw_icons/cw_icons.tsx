@@ -42,7 +42,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 // } = vnode.attrs;
 // return (
 //   <svg
-//     class={getClasses<IconStyleAttrs>(
+//     className={getClasses<IconStyleAttrs>(
 //       { className, disabled, iconButtonTheme, iconSize, selected },
 //       componentType
 //     )}
@@ -71,7 +71,7 @@ export class CWArrowLeft extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -105,7 +105,7 @@ export class CWArrowRight extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -139,7 +139,7 @@ export class CWBacker extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -180,7 +180,7 @@ export class CWBadge extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -211,7 +211,7 @@ export class CWBell extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -246,7 +246,7 @@ export class CWCautionCircle extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -282,7 +282,7 @@ export class CWCautionTriangle extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -318,7 +318,7 @@ export class CWCheck extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -352,7 +352,7 @@ export class CWChevronDown extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -386,7 +386,7 @@ export class CWChevronLeft extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -420,7 +420,7 @@ export class CWChevronRight extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -454,7 +454,7 @@ export class CWChevronUp extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -488,7 +488,7 @@ export class CWClock extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -522,7 +522,7 @@ export class CWClose extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -560,7 +560,7 @@ export class CWCloud extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -598,7 +598,7 @@ export class CWCollapse extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -632,7 +632,7 @@ export class CWCommonLogo extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -662,7 +662,7 @@ export class CWCompass extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -697,7 +697,7 @@ export class CWCopy extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -732,7 +732,7 @@ export class CWCouncilProposal extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -762,7 +762,7 @@ export class CWCow extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -796,7 +796,7 @@ export class CWCurator extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -832,7 +832,7 @@ export class CWDemocraticProposal extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -866,7 +866,7 @@ export class CWDiscord extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -896,7 +896,7 @@ export class CWDots extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -926,7 +926,7 @@ export class CWDotsVertical extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -956,7 +956,7 @@ export class CWDownvote extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -986,7 +986,7 @@ export class CWElement extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1020,7 +1020,7 @@ export class CWExpand extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1054,7 +1054,7 @@ export class CWExploreCommunities extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1089,7 +1089,7 @@ export class CWExternalLink extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1123,7 +1123,7 @@ export class CWFeedback extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1157,7 +1157,7 @@ export class CWFilter extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1191,7 +1191,7 @@ export class CWFlag extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1225,7 +1225,7 @@ export class CWFlame extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1255,7 +1255,7 @@ export class CWGear extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1339,7 +1339,7 @@ export class CWGithub extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1373,7 +1373,7 @@ export class CWHamburger extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1402,7 +1402,7 @@ export class CWHash extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1436,7 +1436,7 @@ export class CWHeartEmpty extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1470,7 +1470,7 @@ export class CWHeartFilled extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1504,7 +1504,7 @@ export class CWHelp extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1538,7 +1538,7 @@ export class CWHome extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1572,7 +1572,7 @@ export class CWInfoEmpty extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1607,7 +1607,7 @@ export class CWImageUpload extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1637,7 +1637,7 @@ export class CWInfoFilled extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1671,7 +1671,7 @@ export class CWJar extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1706,7 +1706,7 @@ export class CWLink extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1740,7 +1740,7 @@ export class CWLock extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1774,7 +1774,7 @@ export class CWLogout extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1813,7 +1813,7 @@ export class CWMail extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1847,7 +1847,7 @@ export class CWMute extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1882,7 +1882,7 @@ export class CWPeople extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1917,7 +1917,7 @@ export class CWPerson extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1951,7 +1951,7 @@ export class CWPin extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -1983,7 +1983,7 @@ export class CWPlus extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2014,7 +2014,7 @@ export class CWPlusCircle extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2048,7 +2048,7 @@ export class CWSearch extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2082,7 +2082,7 @@ export class CWSend extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2116,7 +2116,7 @@ export class CWShare extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2150,7 +2150,7 @@ export class CWShare2 extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2184,7 +2184,7 @@ export class CWSidebarCollapse extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2218,7 +2218,7 @@ export class CWSidebarExpand extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2252,7 +2252,7 @@ export class CWStar extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2282,7 +2282,7 @@ export class CWSun extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2362,7 +2362,7 @@ export class CWTelegram extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2396,7 +2396,7 @@ export class CWTrash extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2431,7 +2431,7 @@ export class CWTreasuryProposal extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2465,7 +2465,7 @@ export class CWTwitter extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2495,7 +2495,7 @@ export class CWUnsubscribe extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2529,7 +2529,7 @@ export class CWUpvote extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2559,7 +2559,7 @@ export class CWViews extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2594,7 +2594,7 @@ export class CWWallet extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2634,7 +2634,7 @@ export class CWWebsite extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}
@@ -2668,7 +2668,7 @@ export class CWWrite extends ClassComponent<IconAttrs> {
     } = vnode.attrs;
     return (
       <svg
-        class={getClasses<IconStyleAttrs>(
+        className={getClasses<IconStyleAttrs>(
           { className, disabled, iconButtonTheme, iconSize, selected },
           componentType
         )}

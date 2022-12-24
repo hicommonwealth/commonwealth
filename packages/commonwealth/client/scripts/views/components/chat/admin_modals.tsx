@@ -55,9 +55,9 @@ export class CreateCategory extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Create Category</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>A new category will be added to chat.</CWText>
         <CWTextInput
@@ -70,17 +70,17 @@ export class CreateCategory extends ClassComponent<ChannelAttrs> {
           placeholder="Enter a channel title"
           oninput={handleChannelChange}
         />
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-blue"
             disabled={!this.category.length || !this.channel.length}
             label="Submit"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -112,9 +112,9 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Create Channel</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           A new channel will be added to the <b>{vnode.attrs.category}</b>{' '}
@@ -125,17 +125,17 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
           placeholder="Enter a channel title"
           oninput={handleChannelChange}
         />
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-blue"
             disabled={!this.channel.length}
             label="Submit"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -165,9 +165,9 @@ export class RenameChannel extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Rename Channel</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           Give a new name to <b>{vnode.attrs.channel.name}</b>
@@ -177,17 +177,17 @@ export class RenameChannel extends ClassComponent<ChannelAttrs> {
           placeholder="Enter a new channel name"
           oninput={handleChange}
         />
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-blue"
             disabled={!this.channelName.length}
             label="Submit"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -217,9 +217,9 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Rename Category</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           Give a new name to <b>{vnode.attrs.category}</b>
@@ -229,17 +229,17 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
           placeholder="Enter a category name"
           oninput={handleChange}
         />
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-blue"
             disabled={!this.newCategory.length}
             label="Submit"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -256,24 +256,24 @@ export class DeleteChannel extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Delete Channel</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           The <b>{vnode.attrs.channel.name} </b> channel will be deleted.
           <b> All messages within will be lost forever.</b> Ok?
         </CWText>
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-red"
             label="Yes, Delete"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -290,25 +290,25 @@ export class DeleteCategory extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Delete Category</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           Deleting the <b>{vnode.attrs.category}</b> category will delete all
           channels inside.
           <b> All messages inside all the channels will be lost forever.</b> Ok?
         </CWText>
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-red"
             label="Yes, Delete"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>

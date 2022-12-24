@@ -81,7 +81,7 @@ class DelegateForm extends ClassComponent {
     const hasValue = app.chain.network === ChainNetwork.Compound;
 
     return (
-      <div class="DelegateForm">
+      <div className="DelegateForm">
         <GovExplainer
           statHeaders={[
             {
@@ -121,7 +121,7 @@ class DelegateForm extends ClassComponent {
         <CWButton
           disabled={form.address === '' || loading}
           label="Delegate!"
-          onclick={async (e) => {
+          onClick={async (e) => {
             e.preventDefault();
             this.loading = true;
             await this.setDelegate(form.address);

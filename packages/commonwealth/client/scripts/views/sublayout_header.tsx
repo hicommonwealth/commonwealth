@@ -27,13 +27,13 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
     const { hideSearch, onMobile } = vnode.attrs;
 
     return (
-      <div class="SublayoutHeader">
-        <div class="header-left">
+      <div className="SublayoutHeader">
+        <div className="header-left">
           <CWIconButton
             iconName="commonLogo"
             iconButtonTheme="black"
             iconSize="xl"
-            onclick={() => {
+            onClick={() => {
               if (app.isCustomDomain()) {
                 setRoute('/');
               } else {
@@ -53,7 +53,7 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
               iconName={
                 app.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'
               }
-              onclick={() => {
+              onClick={() => {
                 app.sidebarToggled = !app.sidebarToggled;
                 redraw();
               }}
@@ -61,19 +61,19 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
           )}
         </div>
         {!hideSearch && <SearchBar />}
-        <div class="header-right">
-          <div class="MobileMenuContainer">
+        <div className="header-right">
+          <div className="MobileMenuContainer">
             <CWIconButton
               iconName="dotsVertical"
               iconButtonTheme="black"
-              onclick={() => {
+              onClick={() => {
                 app.sidebarToggled = false;
                 app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
                 redraw();
               }}
             />
           </div>
-          <div class="DesktopMenuContainer">
+          <div className="DesktopMenuContainer">
             <CreateContentPopover />
             <HelpMenuPopover />
             {app.isLoggedIn() && <NotificationsMenuPopover />}

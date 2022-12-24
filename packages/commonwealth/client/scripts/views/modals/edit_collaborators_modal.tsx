@@ -73,13 +73,13 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
       .filter((c) => !Object.keys(this.removedEditors).includes(c.address));
 
     return (
-      <div class="EditCollaboratorsModal">
-        <div class="compact-modal-title">
+      <div className="EditCollaboratorsModal">
+        <div className="compact-modal-title">
           <h3>Edit collaborators</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
-          <div class="user-list-container">
+        <div className="compact-modal-body">
+          <div className="user-list-container">
             <CWLabel label="Users" />
             {render(QueryList, {
               checkmark: true,
@@ -138,9 +138,9 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
             })}
           </div>
           {allCollaborators.length > 0 ? (
-            <div class="selected-collaborators-section">
+            <div className="selected-collaborators-section">
               <CWLabel label="Selected collaborators" />
-              <div class="collaborator-rows-container">
+              <div className="collaborator-rows-container">
                 {allCollaborators.map((c) => {
                   const user: Profile = app.profiles.getProfile(
                     c.chain,
@@ -148,12 +148,12 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   );
 
                   return (
-                    <div class="collaborator-row">
+                    <div className="collaborator-row">
                       {render(User, { user })}
                       <CWIconButton
                         iconName="close"
                         iconSize="small"
-                        onclick={async () => {
+                        onClick={async () => {
                           // If already scheduled for addition, un-schedule
                           if (this.addedEditors[c.address]) {
                             delete this.addedEditors[c.address];
@@ -169,17 +169,17 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
               </div>
             </div>
           ) : (
-            <div class="no-collaborators">
-              <CWText className="no-collaborators-text">
+            <div className="no-collaborators">
+              <CWText class="no-collaborators-text">
                 No collaborators selected
               </CWText>
             </div>
           )}
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               label="Cancel"
               buttonType="secondary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 $(e.target).trigger('modalexit');
               }}
             />
@@ -189,7 +189,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                 $.isEmptyObject(this.removedEditors)
               }
               label="Save changes"
-              onclick={async (e) => {
+              onClick={async (e) => {
                 if (!$.isEmptyObject(this.addedEditors)) {
                   try {
                     // TODO Graham 4/4/22: Break off into proper controller methods

@@ -24,7 +24,7 @@ class SettingsPage extends ClassComponent {
       <Sublayout
       // title="Account Settings"
       >
-        <div class="SettingsPage">
+        <div className="SettingsPage">
           <EmailSection />
           <LinkedAddressesSection />
           <ComposerSection />

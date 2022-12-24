@@ -35,7 +35,7 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
     const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
 
     return (
-      <div class="EditBody">
+      <div className="EditBody">
         <QuillEditorComponent
           contentsDoc={body}
           oncreateBind={(state: QuillEditor) => {
@@ -45,12 +45,12 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
           theme="snow"
           editorNamespace={`edit-thread-${thread.id}`}
         />
-        <div class="buttons-row">
+        <div className="buttons-row">
           <CWButton
             label="Cancel"
             disabled={this.saving}
             buttonType="secondary-blue"
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
 
               let confirmed = true;
@@ -75,7 +75,7 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
           <CWButton
             label="Save"
             disabled={this.saving}
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
 
               this.saving = true;

@@ -10,12 +10,12 @@ import { CWText } from '../../components/component_kit/cw_text';
 export class LoginEthAlert extends ClassComponent {
   view() {
     return (
-      <div class="LoginEthAlert">
+      <div className="LoginEthAlert">
         <CWIcon iconName="cautionTriangle" iconSize="xl" />
         <CWText
           type="h4"
           fontWeight="semiBold"
-          className="login-eth-alert-text"
+          class="login-eth-alert-text"
         >
           This Community requires an Ethereum wallet
         </CWText>

@@ -22,13 +22,13 @@ export class CWBanner extends ClassComponent<BannerAttrs> {
 
     return (
       <div
-        class={getClasses<{ className?: string }>(
+        className={getClasses<{ className?: string }>(
           { className },
           ComponentType.Banner
         )}
       >
         <CWText type="b2">{bannerContent}</CWText>
-        {onClose && <CWIconButton iconName="close" onclick={onClose} />}
+        {onClose && <CWIconButton iconName="close" onClick={onClose} />}
       </div>
     );
   }
@@ -40,7 +40,7 @@ export class CWMessageBanner extends ClassComponent<BannerAttrs> {
 
     return (
       <div
-        class={getClasses<{ className?: string }>(
+        className={getClasses<{ className?: string }>(
           { className },
           ComponentType.MessageBanner
         )}
@@ -51,7 +51,7 @@ export class CWMessageBanner extends ClassComponent<BannerAttrs> {
         {onClose && (
           <CWIconButton
             iconName="close"
-            onclick={onClose}
+            onClick={onClose}
             iconButtonTheme="primary"
           />
         )}

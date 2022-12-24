@@ -28,9 +28,9 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
     const communityMeta = app.chain.meta;
 
     return (
-      <div class="ManageRoles">
+      <div className="ManageRoles">
         <CWLabel label={vnode.attrs.label} />
-        <div class="roles-container">
+        <div className="roles-container">
           {vnode.attrs.roledata?.map((role) => {
             const addr = role.Address;
 
@@ -42,7 +42,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
               (addr_) => addr_.id === (role.address_id || role.Address.id)
             ).length;
             return (
-              <div class="role-row">
+              <div className="role-row">
                 {render(User, {
                   user: new AddressInfo(
                     addr.id,
@@ -59,7 +59,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                 <CWIcon
                   iconName="close"
                   iconSize="small"
-                  onclick={async () => {
+                  onClick={async () => {
                     const adminsAndMods = await communityMeta.getMembers(
                       app.activeChainId()
                     );

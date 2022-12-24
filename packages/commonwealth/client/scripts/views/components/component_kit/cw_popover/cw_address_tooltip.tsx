@@ -25,13 +25,13 @@ export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
         persistOnHover
         interactionType="hover"
         tooltipContent={
-          <div class={ComponentType.AddressTooltip}>
+          <div className={ComponentType.AddressTooltip}>
             <CWText type="caption">{address}</CWText>
             <CWIconButton
               iconName="copy"
               iconSize="small"
               iconButtonTheme="primary"
-              onclick={async () => {
+              onClick={async () => {
                 navigator.clipboard
                   .writeText(address)
                   .then(() => {

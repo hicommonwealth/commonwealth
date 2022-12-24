@@ -46,7 +46,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
       }}
       textarea
     />,
-    <div class="AvatarUploadRow">
+    <div className="AvatarUploadRow">
       <CWLabel label="Upload Icon" />
       <AvatarUpload
         scope="community"

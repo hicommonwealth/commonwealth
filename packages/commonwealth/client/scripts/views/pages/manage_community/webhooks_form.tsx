@@ -84,8 +84,8 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
     };
 
     return (
-      <div class="WebhooksForm">
-        <div class="webhooks-container">
+      <div className="WebhooksForm">
+        <div className="webhooks-container">
           {webhooks.map((webhook) => {
             const label =
               webhook.url.indexOf('discord') !== -1
@@ -95,23 +95,23 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                 : null;
 
             return (
-              <div class="webhook-row">
-                <div class="webhook-info">
+              <div className="webhook-row">
+                <div className="webhook-info">
                   <CWText>{smartTruncate(webhook.url, 25)}</CWText>
                   {label && (
-                    <CWText type="caption" className="webhook-tag-text">
+                    <CWText type="caption" class="webhook-tag-text">
                       {label}
                     </CWText>
                   )}
-                  <CWText type="caption" className="webhook-tag-text">
+                  <CWText type="caption" class="webhook-tag-text">
                     {pluralize(webhook.categories.length, 'event')}
                   </CWText>
                 </div>
-                <div class="buttons">
+                <div className="buttons">
                   <CWIconButton
                     iconName="gear"
                     iconSize="small"
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       app.modals.create({
                         modal: WebhookSettingsModal,
@@ -132,7 +132,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                     iconName="trash"
                     iconSize="small"
                     disabled={this.disabled}
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       this.disabled = true;
                       this.success = false;
@@ -184,7 +184,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
           })}
         </div>
         {webhooks.length === 0 && (
-          <CWText className="no-webhooks-text">
+          <CWText class="no-webhooks-text">
             No webhooks yet. Slack, Discord, and Telegram webhooks are
             supported. For more information and examples for setting these up,
             please view our
@@ -201,7 +201,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
         <CWButton
           disabled={!this.webhookUrl}
           label="Add webhook"
-          onclick={createWebhook}
+          onClick={createWebhook}
         />
       </div>
     );

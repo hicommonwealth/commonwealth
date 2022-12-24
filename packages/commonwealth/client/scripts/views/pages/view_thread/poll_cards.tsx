@@ -31,11 +31,11 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
         } offchain poll to this
         thread?`}
         content={
-          <div className="PollEditorCard">
+          <div class="PollEditorCard">
             <CWButton
               buttonType="mini-black"
               label="Create poll"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 app.modals.create({
                   modal: PollEditorModal,

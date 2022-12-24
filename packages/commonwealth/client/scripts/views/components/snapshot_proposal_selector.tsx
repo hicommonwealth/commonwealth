@@ -44,7 +44,7 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
     }
 
     return (
-      <div class="SnapshotProposalSelector">
+      <div className="SnapshotProposalSelector">
         {this.snapshotProposalsLoaded ? (
           render(QueryList, {
             checkmark: true,
@@ -60,11 +60,11 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
               // like any set proposal title, the creator, or other metadata
               return render(ListItem, {
                 label: (
-                  <div class="chain-entity">
-                    <div class="chain-entity-text" title={sn.title}>
+                  <div className="chain-entity">
+                    <div className="chain-entity-text" title={sn.title}>
                       {sn.title}
                     </div>
-                    <div class="chain-entity-subtext" title={sn.id}>
+                    <div className="chain-entity-subtext" title={sn.id}>
                       Hash: ${sn.id}
                     </div>
                   </div>
@@ -85,8 +85,8 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
             },
           })
         ) : (
-          <div class="loading-container">
-            <div class="loading-text">
+          <div className="loading-container">
+            <div className="loading-text">
               {this.snapshotProposalsLoaded
                 ? 'TODO: how to begin?'
                 : 'Loading snapshot proposals...'}

@@ -34,8 +34,8 @@ const renderCommunity = (item: ChainInfo) => {
     },
     contentRight: app.isLoggedIn() && roles.length > 0 && (
       <div
-        class="community-star-toggle"
-        onclick={async (e) => {
+        className="community-star-toggle"
+        onClick={async (e) => {
           e.preventDefault();
           e.stopPropagation();
           await app.communities.setStarred(item.id);
@@ -55,7 +55,7 @@ const renderCommunity = (item: ChainInfo) => {
             ),
           });
         })}
-        <div class="star-icon">
+        <div className="star-icon">
           {render(Icon, { name: Icons.STAR, key: item.id })}
         </div>
       </div>
@@ -71,15 +71,15 @@ class CWSidebarMenuItem extends ClassComponent<MenuItem> {
 
       return (
         <div
-          class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
+          className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
             { disabled, isSecondary },
             'SidebarMenuItem default'
           )}
-          onclick={(e) => {
+          onClick={(e) => {
             if (onclick) onclick(e);
           }}
         >
-          <div class="sidebar-menu-item-left">
+          <div className="sidebar-menu-item-left">
             {iconLeft && <CWIcon iconName={iconLeft} />}
             <CWText type="b2">{label}</CWText>
           </div>
@@ -88,13 +88,13 @@ class CWSidebarMenuItem extends ClassComponent<MenuItem> {
       );
     } else if (vnode.attrs.type === 'header') {
       return (
-        <div class="SidebarMenuItem header">
+        <div className="SidebarMenuItem header">
           <CWText type="caption">{vnode.attrs.label}</CWText>
         </div>
       );
     } else if (vnode.attrs.type === 'community') {
       return (
-        <div class="SidebarMenuItem community">
+        <div className="SidebarMenuItem community">
           {renderCommunity(vnode.attrs.community)}
         </div>
       );
@@ -114,14 +114,14 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
 
     return (
       <div
-        class={getClasses<{ className: string }>(
+        className={getClasses<{ className: string }>(
           { className },
           ComponentType.SidebarMenu
         )}
       >
-        <div class="sidebar-top">
+        <div className="sidebar-top">
           {menuHeader && (
-            <div class="sidebar-menu-header" onclick={menuHeader.onclick}>
+            <div className="sidebar-menu-header" onClick={menuHeader.onclick}>
               <CWIcon iconName="chevronLeft" />
               <CWText type="h5" fontWeight="medium">
                 {menuHeader.label}
@@ -132,7 +132,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
             <CWSidebarMenuItem type={item.type || 'default'} {...item} />
           ))}
         </div>
-        <div class="sidebar-bottom">
+        <div className="sidebar-bottom">
           {[
             {
               type: 'header',

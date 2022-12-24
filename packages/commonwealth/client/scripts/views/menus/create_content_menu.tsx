@@ -238,7 +238,7 @@ export class CreateContentSidebar extends ClassComponent {
   view() {
     return (
       <CWSidebarMenu
-        className="CreateContentSidebar"
+        class="CreateContentSidebar"
         menuHeader={{
           label: 'Create',
           onclick: async () => {
@@ -263,7 +263,7 @@ export class CreateContentMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
-        className="CreateContentMenu"
+        class="CreateContentMenu"
         menuHeader={{
           label: 'Create',
           onclick: () => {

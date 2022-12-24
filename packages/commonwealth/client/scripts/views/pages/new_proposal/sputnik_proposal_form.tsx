@@ -87,7 +87,7 @@ export class SputnikProposalForm extends ClassComponent {
         )}
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             // TODO: make type of proposal switchable

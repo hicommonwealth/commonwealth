@@ -16,7 +16,7 @@ export class CWLabel extends ClassComponent<LabelAttrs> {
   view(vnode: ResultNode<LabelAttrs>) {
     const { label } = vnode.attrs;
     return (
-      <CWText type="caption" className={ComponentType.Label}>
+      <CWText type="caption" class={ComponentType.Label}>
         {label}
       </CWText>
     );

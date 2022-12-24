@@ -22,19 +22,19 @@ export class LinkedThreadModal extends ClassComponent<LinkedThreadModalAttrs> {
     const { linkingThread, linkedThreads, onclose } = vnode.attrs;
 
     return (
-      <div class="LinkedThreadModal">
-        <div class="compact-modal-title">
+      <div className="LinkedThreadModal">
+        <div className="compact-modal-title">
           <h3>Link to Existing Threads</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <ThreadSelector
             linkingThread={linkingThread}
             linkedThreads={linkedThreads}
           />
           <CWButton
             label="Close"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               if (onclose) onclose();
               $(e.target).trigger('modalexit');

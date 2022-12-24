@@ -82,7 +82,7 @@ export class SplTokenForm extends ClassComponent {
     };
 
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <SelectRow
           title="Cluster"
           options={['mainnet-beta', 'testnet', 'devnet']}
@@ -104,7 +104,7 @@ export class SplTokenForm extends ClassComponent {
         <CWButton
           label="Check address"
           disabled={this.state.saving || this.state.loading}
-          onclick={async () => {
+          onClick={async () => {
             await updateTokenForum();
           }}
         />
@@ -145,7 +145,7 @@ export class SplTokenForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving || !this.state.loaded}
-          onclick={async () => {
+          onClick={async () => {
             const { cluster, iconUrl, mint, symbol } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({

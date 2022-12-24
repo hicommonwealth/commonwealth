@@ -6,7 +6,7 @@
  */
 
 // **** USE MITHRIL ****
-export * from './mithrilInteropMithril';
+// export * from './mithrilInteropMithril';
 
 // **** USE REACT ****
-// export * from './mithrilInteropReact';
+export * from './mithrilInteropReact';

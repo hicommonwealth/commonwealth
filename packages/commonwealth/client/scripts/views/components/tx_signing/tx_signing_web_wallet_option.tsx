@@ -74,7 +74,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
           disabled={
             !webWallet || (webWallet?.enabled && !foundAuthorInWebWallet)
           }
-          onclick={async () => {
+          onClick={async () => {
             if (webWallet && !webWallet.available) {
               await vnode.attrs.wallet.enable();
               redraw();

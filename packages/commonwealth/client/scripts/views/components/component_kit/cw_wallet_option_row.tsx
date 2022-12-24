@@ -33,20 +33,20 @@ export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
     } = vnode.attrs;
     return (
       <div
-        class={getClasses<WalletOptionRowStyleAttrs>(
+        className={getClasses<WalletOptionRowStyleAttrs>(
           {
             disabled,
             darkMode,
           },
           ComponentType.WalletOptionRow
         )}
-        onclick={onclick}
+        onClick={onclick}
       >
         <CWCustomIcon size={32} iconName={walletName} iconSize="large" />
         <CWText
           type="h5"
           fontWeight="semiBold"
-          className="wallet-option-text"
+          class="wallet-option-text"
           noWrap
         >
           {walletLabel}

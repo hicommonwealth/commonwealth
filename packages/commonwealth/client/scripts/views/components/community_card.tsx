@@ -43,24 +43,24 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
       <CWCard
         elevation="elevation-2"
         interactive
-        className="community-card"
-        onclick={redirectFunction}
+        class="community-card"
+        onClick={redirectFunction}
       >
-        <div class="top-content">
+        <div className="top-content">
           <CWCommunityAvatar community={chain} size="xxl" />
           <CWText
             type="h4"
             fontWeight="semiBold"
-            className="chain-name"
+            class="chain-name"
             title={chain.name}
             noWrap
           >
             {chain.name}
           </CWText>
         </div>
-        <div class="bottom-content">
+        <div className="bottom-content">
           <CWText
-            className="card-description"
+            class="card-description"
             type="caption"
             title={prettyDescription}
           >
@@ -69,10 +69,10 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
           <CWButton
             buttonType="secondary-black"
             label="See More"
-            onclick={redirectFunction}
+            onClick={redirectFunction}
           />
           {/* for mobile */}
-          <CWIconButton iconName="expand" onclick={redirectFunction} />
+          <CWIconButton iconName="expand" onClick={redirectFunction} />
         </div>
       </CWCard>
     );
@@ -85,25 +85,25 @@ export class NewCommunityCard extends ClassComponent {
       <CWCard
         elevation="elevation-2"
         interactive={true}
-        className="new-community-card"
-        onclick={(e) => {
+        class="new-community-card"
+        onClick={(e) => {
           e.preventDefault();
           document.location =
             'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
         }}
       >
-        <div class="new-community-card-body">
+        <div className="new-community-card-body">
           <CWText
             type="h3"
             fontWeight="semiBold"
-            className="new-community-header"
+            class="new-community-header"
           >
             Create a new community
           </CWText>
-          <CWText className="new-community">
+          <CWText class="new-community">
             Launch and grow your decentralized community on Commonwealth
           </CWText>
-          <a class="learn-more" href="#">
+          <a className="learn-more" href="#">
             Learn more
           </a>
         </div>

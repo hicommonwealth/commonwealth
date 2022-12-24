@@ -19,16 +19,16 @@ export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
 
     return (
       <div
-        class={getClasses<{ darkMode?: boolean }>(
+        className={getClasses<{ darkMode?: boolean }>(
           { darkMode },
           'LoginBoilerplate'
         )}
       >
-        <CWText type="caption" className="boilerplate-text" isCentered>
+        <CWText type="caption" class="boilerplate-text" isCentered>
           By connecting to Common, you agree to our{' '}
           <a
-            class="link"
-            onclick={(e) => {
+            className="link"
+            onClick={(e) => {
               modalRedirectClick(e, '/terms');
             }}
           >
@@ -36,8 +36,8 @@ export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
           </a>{' '}
           and{' '}
           <a
-            class="link"
-            onclick={(e) => {
+            className="link"
+            onClick={(e) => {
               modalRedirectClick(e, '/privacy');
             }}
           >

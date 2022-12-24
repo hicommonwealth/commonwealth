@@ -50,7 +50,7 @@ export class MolochCancelButton extends ClassComponent<MolochCancelButtonAttrs> 
           !(proposal.canAbort(molochMember) && !proposal.completed) ||
           votingModalOpen
         }
-        onclick={(e) =>
+        onClick={(e) =>
           cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
@@ -72,7 +72,7 @@ export class AaveCancelButton extends ClassComponent<AaveCancelButtonAttrs> {
       <CWButton
         buttonType="primary-red"
         disabled={!proposal.isCancellable || votingModalOpen}
-        onclick={(e) =>
+        onClick={(e) =>
           cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
@@ -94,7 +94,7 @@ export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAtt
       <CWButton
         buttonType="primary-red"
         disabled={proposal.completed || votingModalOpen}
-        onclick={(e) =>
+        onClick={(e) =>
           cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
@@ -124,14 +124,14 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="ProposalSubheader">
-        <CWText className={`onchain-status-text ${getStatusClass(proposal)}`}>
+      <div className="ProposalSubheader">
+        <CWText class={`onchain-status-text ${getStatusClass(proposal)}`}>
           {getStatusText(proposal)}
         </CWText>
         {(proposal['blockExplorerLink'] ||
           proposal['votingInterfaceLink'] ||
           proposal.threadId) && (
-          <div class="proposal-links">
+          <div className="proposal-links">
             {proposal.threadId && <ThreadLink proposal={proposal} />}
             {proposal['blockExplorerLink'] && (
               <BlockExplorerLink proposal={proposal} />
@@ -143,11 +143,11 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
         )}
 
         {proposal instanceof AaveProposal && (
-          <div class="proposal-buttons">
+          <div className="proposal-buttons">
             {proposal.isQueueable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.queueTx().then(() => redraw())}
+                onClick={() => proposal.queueTx().then(() => redraw())}
                 label={
                   proposal.data.queued || proposal.data.executed
                     ? 'Queued'
@@ -158,7 +158,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
             {proposal.isExecutable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.executeTx().then(() => redraw())}
+                onClick={() => proposal.executeTx().then(() => redraw())}
                 label={proposal.data.executed ? 'Executed' : 'Execute'}
               />
             )}
@@ -173,11 +173,11 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
           </div>
         )}
         {proposal instanceof CompoundProposal && (
-          <div class="proposal-buttons">
+          <div className="proposal-buttons">
             {proposal.isQueueable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.queueTx().then(() => redraw())}
+                onClick={() => proposal.queueTx().then(() => redraw())}
                 label={
                   proposal.data.queued || proposal.data.executed
                     ? 'Queued'
@@ -188,7 +188,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
             {proposal.isExecutable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.executeTx().then(() => redraw())}
+                onClick={() => proposal.executeTx().then(() => redraw())}
                 label={proposal.data.executed ? 'Executed' : 'Execute'}
               />
             )}
@@ -231,7 +231,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
 //     return (
 //       <a
 //         href="#"
-//         onclick={async (e) => {
+//         onClick={async (e) => {
 //           e.preventDefault();
 
 //           let postWithHistory;

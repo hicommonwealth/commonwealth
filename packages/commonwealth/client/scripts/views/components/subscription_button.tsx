@@ -20,7 +20,7 @@ export class SubscriptionButton extends ClassComponent {
 
     return (
       <CWButton
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           if (isNotUndefined(communitySubscription)) {
             subscriptions.deleteSubscription(communitySubscription).then(() => {

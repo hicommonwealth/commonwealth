@@ -24,12 +24,12 @@ export class CWGrowl extends ClassComponent<GrowlAttrs> {
     return (
       !disabled && (
         <div
-          class={getClasses<{ className?: string; position: GrowlPosition }>(
+          className={getClasses<{ className?: string; position: GrowlPosition }>(
             { className, position },
             ComponentType.Growl
           )}
         >
-          <CWCard className="growl-card" elevation="elevation-3" interactive>
+          <CWCard class="growl-card" elevation="elevation-3" interactive>
             {vnode.children}
           </CWCard>
         </div>

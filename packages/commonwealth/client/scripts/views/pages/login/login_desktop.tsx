@@ -50,20 +50,20 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="LoginDesktop">
+      <div className="LoginDesktop">
         <LoginDesktopSidebar
           sidebarType={sidebarType}
           createNewAccountCallback={createNewAccountCallback}
           linkExistingAccountCallback={linkExistingAccountCallback}
           wallets={wallets}
         />
-        <div class="body">
+        <div className="body">
           <ModalExitButton />
           {bodyType === 'walletList' && (
-            <div class="inner-body-container centered">
+            <div className="inner-body-container centered">
               <LoginBoilerplate />
               <CWWalletsList
-                connectAnotherWayOnclick={() => {
+                connectAnotherWayonClick={() => {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
@@ -78,23 +78,23 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             </div>
           )}
           {bodyType === 'selectAccountType' && (
-            <div class="inner-body-container centered">
-              <div class="header-container">
+            <div className="inner-body-container centered">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
-                  className="header-text"
+                  class="header-text"
                   isCentered
                 >
                   Looks like this address hasn't been connected before.
                 </CWText>
               </div>
-              <div class="select-row">
+              <div className="select-row">
                 <CWIcon iconName="arrowLeft" />
                 <CWText
                   type="h5"
                   fontWeight="semiBold"
-                  className="select-text"
+                  class="select-text"
                   isCentered
                 >
                   Select Account Type
@@ -103,12 +103,12 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             </div>
           )}
           {bodyType === 'connectWithEmail' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
-                  className="header-text"
+                  class="header-text"
                   isCentered
                 >
                   Connect With Email?
@@ -125,30 +125,30 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
               ) : (
                 <CWSpinner />
               )}
-              <div class="buttons-row">
+              <div className="buttons-row">
                 <CWButton
                   label="Back"
                   buttonType="secondary-blue"
-                  onclick={() => {
+                  onClick={() => {
                     setBodyType('walletList');
                   }}
                 />
-                <CWButton label="Connect" onclick={handleEmailLoginCallback} />
+                <CWButton label="Connect" onClick={handleEmailLoginCallback} />
               </div>
             </div>
           )}
           {bodyType === 'welcome' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="bold"
-                  className="header-text"
+                  class="header-text"
                   isCentered
                 >
                   Welcome to Common!
                 </CWText>
-                <CWText type="b2" className="subheader-text" isCentered>
+                <CWText type="b2" class="subheader-text" isCentered>
                   Use a generated username and photo to edit later, or edit now
                 </CWText>
               </div>
@@ -162,21 +162,21 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                   handleSetUsername(u);
                 }}
               />
-              <CWButton label="Finish" onclick={saveProfileInfoCallback} />
+              <CWButton label="Finish" onClick={saveProfileInfoCallback} />
             </div>
           )}
           {bodyType === 'ethWalletList' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
-                  className="header-text-eth"
+                  class="header-text-eth"
                   isCentered
                 >
                   Select an Ethereum Wallet
                 </CWText>
-                <CWText type="caption" className="subheader-text" isCentered>
+                <CWText type="caption" class="subheader-text" isCentered>
                   Manage your profiles, addresses and communities under one
                   account.
                 </CWText>
@@ -190,23 +190,23 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             </div>
           )}
           {bodyType === 'selectPrevious' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
-                  className="header-text"
+                  class="header-text"
                   isCentered
                 >
                   Select a Previously Linked Address
                 </CWText>
-                <CWText type="caption" className="subheader-text" isCentered>
+                <CWText type="caption" class="subheader-text" isCentered>
                   Manage your profiles, addresses and communities under one
                   account.
                 </CWText>
               </div>
               <CWWalletsList
-                connectAnotherWayOnclick={() => {
+                connectAnotherWayonClick={() => {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
@@ -221,12 +221,12 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             </div>
           )}
           {bodyType === 'selectProfile' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="bold"
-                  className="header-text"
+                  class="header-text"
                   isCentered
                 >
                   Select Profile
@@ -240,16 +240,16 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 </CWText>
               </div>
               <CWProfilesList profiles={profiles} />
-              <CWButton label="Finish" onclick={performLinkingCallback} />
+              <CWButton label="Finish" onClick={performLinkingCallback} />
             </div>
           )}
           {bodyType === 'allSet' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="bold"
-                  className="header-text"
+                  class="header-text"
                   isCentered
                 >
                   You’re All Set!

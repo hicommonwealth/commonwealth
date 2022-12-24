@@ -152,10 +152,10 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     }, 400);
 
     return (
-      <Sublayout onscroll={this.onscroll}>
-        <div class="UserDashboard">
-          <div class="dashboard-column">
-            <div class="dashboard-header">
+      <Sublayout onScroll={this.onscroll}>
+        <div className="UserDashboard">
+          <div className="dashboard-column">
+            <div className="dashboard-header">
               <CWText type="h3" fontWeight="semiBold">
                 Activity
               </CWText>
@@ -163,7 +163,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                 <CWTab
                   label={DashboardViews.ForYou}
                   isSelected={activePage === DashboardViews.ForYou}
-                  onclick={() => {
+                  onClick={() => {
                     if (!loggedIn) {
                       notifyInfo(
                         'Log in or create an account for custom activity feed'
@@ -177,7 +177,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                 <CWTab
                   label={DashboardViews.Global}
                   isSelected={activePage === DashboardViews.Global}
-                  onclick={() => {
+                  onClick={() => {
                     setRoute('/dashboard/global');
                     redraw();
                   }}
@@ -185,7 +185,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                 <CWTab
                   label={DashboardViews.Chain}
                   isSelected={activePage === DashboardViews.Chain}
-                  onclick={() => {
+                  onClick={() => {
                     setRoute('/dashboard/chain-events');
                     redraw();
                   }}

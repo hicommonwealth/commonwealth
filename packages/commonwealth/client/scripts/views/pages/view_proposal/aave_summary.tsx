@@ -18,7 +18,7 @@ export class AaveViewProposalDetail extends ClassComponent<AaveViewProposalDetai
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="AaveSummary">
+      <div className="AaveSummary">
         {proposal.ipfsData?.shortDescription && (
           <div>
             <CWText type="h4" fontWeight="semiBold">

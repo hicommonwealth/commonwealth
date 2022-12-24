@@ -112,13 +112,13 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
     const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
 
     return (
-      <div class="CouncilVotingModal">
-        <div class="compact-modal-title">
+      <div className="CouncilVotingModal">
+        <div className="compact-modal-title">
           <h3>Approval Voting</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
-          <div class="chooser">
+        <div className="compact-modal-body">
+          <div className="chooser">
             <CWText fontWeight="semiBold">
               Lock any amount of{' '}
               {(app.chain && app.chain.chain && app.chain.chain.denom) ||
@@ -141,7 +141,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                 );
               }}
             />
-            <div class="candidates-container">
+            <div className="candidates-container">
               {candidates.length > 0 ? (
                 candidates.map((candidateTuple) => {
                   const candidate = candidateTuple[0];
@@ -160,7 +160,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                   };
 
                   return (
-                    <div class="candidate-row" onclick={onclick}>
+                    <div className="candidate-row" onClick={onclick}>
                       <CWCheckbox
                         checked={this.votes.indexOf(address) !== -1}
                         onchange={onclick}
@@ -180,15 +180,15 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
             )}
           </div>
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={submitVote}
+            onClick={submitVote}
             label={hasApprovals ? 'Update vote' : 'Submit vote'}
           />
           {hasApprovals && (
             <CWButton
               buttonType="primary-red"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 const account = app.user.activeAccount as SubstrateAccount;
                 createTXModal(

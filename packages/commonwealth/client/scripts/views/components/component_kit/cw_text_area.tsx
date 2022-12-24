@@ -39,7 +39,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class={ComponentType.TextArea}>
+      <div className={ComponentType.TextArea}>
         {label && (
           <MessageRow
             hasFeedback={!!inputValidationFn}
@@ -51,7 +51,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
         <textarea
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={getClasses<TextAreaStyleAttrs & { isTyping: boolean }>({
+          className={getClasses<TextAreaStyleAttrs & { isTyping: boolean }>({
             validationStatus: this.validationStatus,
             disabled,
             isTyping: this.isTyping,

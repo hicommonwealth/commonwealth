@@ -34,7 +34,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
 
     return (
       <div
-        class={getClasses<{
+        className={getClasses<{
           isHoveringUpvote: boolean;
           isHoveringDownvote: boolean;
           hasUpvoted: boolean;
@@ -52,12 +52,12 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
         <CWIcon
           iconName="upvote"
           iconSize="small"
-          onclick={() => {
+          onClick={() => {
             voteCount === this.initialVoteCount + 1
               ? handleVoteChange(this.initialVoteCount)
               : handleVoteChange(voteCount + 1);
           }}
-          className="upvote-button"
+          class="upvote-button"
           onmouseenter={() => {
             this.isHoveringUpvote = true;
           }}
@@ -68,7 +68,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
         <CWText
           type="caption"
           fontWeight="medium"
-          className="vote-count"
+          class="vote-count"
           title={voteCount}
         >
           {formatNumberShort(voteCount)}
@@ -76,7 +76,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
         <CWIcon
           iconName="downvote"
           iconSize="small"
-          onclick={() => {
+          onClick={() => {
             voteCount === this.initialVoteCount - 1
               ? handleVoteChange(this.initialVoteCount)
               : handleVoteChange(voteCount - 1);
@@ -87,7 +87,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
           onmouseleave={() => {
             this.isHoveringDownvote = false;
           }}
-          className="downvote-button"
+          class="downvote-button"
         />
       </div>
     );

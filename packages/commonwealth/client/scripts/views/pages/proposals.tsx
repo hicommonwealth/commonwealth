@@ -163,7 +163,7 @@ class ProposalsPage extends ClassComponent {
       !activeCompoundProposals?.length &&
       !activeAaveProposals?.length &&
       !activeSputnikProposals?.length
-        ? [<div class="no-proposals">No active proposals</div>]
+        ? [<div className="no-proposals">No active proposals</div>]
         : (activeDemocracyProposals || [])
             .map((proposal) => <ProposalCard proposal={proposal} />)
             .concat(
@@ -262,7 +262,7 @@ class ProposalsPage extends ClassComponent {
       !inactiveCompoundProposals?.length &&
       !inactiveAaveProposals?.length &&
       !inactiveSputnikProposals?.length
-        ? [<div class="no-proposals">No past proposals</div>]
+        ? [<div className="no-proposals">No past proposals</div>]
         : (inactiveDemocracyProposals || [])
             .map((proposal) => <ProposalCard proposal={proposal} />)
             .concat(
@@ -308,7 +308,7 @@ class ProposalsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Proposals" />}
       >
-        <div class="ProposalsPage">
+        <div className="ProposalsPage">
           {onSubstrate && (
             <SubstrateProposalStats
               nextLaunchBlock={

@@ -38,7 +38,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
         </CWText>
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =

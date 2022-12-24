@@ -14,7 +14,7 @@ export class ProposalTag extends ClassComponent<ProposalTagAttrs> {
     const { label } = vnode.attrs;
 
     return (
-      <CWText fontWeight="medium" className="ProposalTag">
+      <CWText fontWeight="medium" class="ProposalTag">
         {label}
       </CWText>
     );

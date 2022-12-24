@@ -48,7 +48,7 @@ export const getActionSection = (
       <CWButton
         label="Motion to approve"
         disabled={!isCouncillor}
-        onclick={() => {
+        onClick={() => {
           app.modals.create({
             modal: ApproveBountyModal,
             data: { bountyId: bounty.identifier },
@@ -82,7 +82,7 @@ export const getActionSection = (
         <CWButton
           label="Motion to assign curator"
           disabled={!isCouncillor}
-          onclick={() => {
+          onClick={() => {
             app.modals.create({
               modal: ProposeCuratorModal,
               data: { bountyId: bounty.identifier },
@@ -102,7 +102,7 @@ export const getActionSection = (
             isCurator ? 'Accept curator role' : 'Waiting for curator to accept'
           }
           disabled={!isCurator}
-          onclick={async () => {
+          onClick={async () => {
             const confirmed = await confirmationModalWithText(
               'Accept your role as curator? This requires putting down a curator deposit.',
               'Yes'
@@ -119,7 +119,7 @@ export const getActionSection = (
         {bounty.value && (
           <CWText>Bounty amount: {formatCoin(bounty.value)}</CWText>
         )}
-        <div class="action-info-row">
+        <div className="action-info-row">
           <CWText>Proposed curator: </CWText>
           {render(User, {
             user: new AddressInfo(null, bounty.curator, app.chain.id, null),
@@ -135,7 +135,7 @@ export const getActionSection = (
         <CWButton
           label="Payout to recipient"
           disabled={!isCurator}
-          onclick={() => {
+          onClick={() => {
             app.modals.create({
               modal: AwardBountyModal,
               data: { bountyId: bounty.identifier },
@@ -145,7 +145,7 @@ export const getActionSection = (
         <CWButton
           label="Extend expiry"
           disabled={!isCurator}
-          onclick={() => {
+          onClick={() => {
             app.modals.create({
               modal: ExtendExpiryModal,
               data: { bountyId: bounty.identifier },
@@ -155,7 +155,7 @@ export const getActionSection = (
         {bounty.value && (
           <CWText>Bounty amount: {formatCoin(bounty.value)}</CWText>
         )}
-        <div class="action-info-row">
+        <div className="action-info-row">
           <CWText>Curator: </CWText>
           {render(User, {
             user: new AddressInfo(null, bounty.curator, app.chain.id, null),
@@ -190,7 +190,7 @@ export const getActionSection = (
         {bounty.value && (
           <CWText>Bounty amount: {formatCoin(bounty.value)}</CWText>
         )}
-        <div class="action-info-row">
+        <div className="action-info-row">
           <CWText>Can be claimed in: </CWText>
           <CountdownUntilBlock block={bounty.unlockAt} includeSeconds={false} />
         </div>
@@ -202,7 +202,7 @@ export const getActionSection = (
         <CWButton
           label={isRecipient ? 'Claim payout' : 'Payout ready to claim'}
           disabled={!isRecipient}
-          onclick={async () => {
+          onClick={async () => {
             const confirmed = await confirmationModalWithText(
               'Claim your bounty payout?',
               'Yes'
@@ -215,21 +215,21 @@ export const getActionSection = (
             }
           }}
         />
-        <div class="action-info-row">
+        <div className="action-info-row">
           <CWText>Curator: </CWText>
           {render(User, {
             user: new AddressInfo(null, bounty.curator, app.chain.id, null),
             linkify: true,
           })}
         </div>
-        <div class="action-info-row">
+        <div className="action-info-row">
           <CWText>Recipient: </CWText>
           {render(User, {
             user: new AddressInfo(null, bounty.beneficiary, app.chain.id, null),
             linkify: true,
           })}
         </div>
-        <div class="action-info-row">
+        <div className="action-info-row">
           <CWText>Review period ends at: </CWText>
           <CountdownUntilBlock block={bounty.unlockAt} includeSeconds={false} />
         </div>

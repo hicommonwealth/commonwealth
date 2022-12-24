@@ -26,11 +26,11 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
 
     return (
       <Icon
-        className={className}
+        class={className}
         componentType={componentType}
         disabled={disabled}
         iconSize={iconSize}
-        onclick={onclick}
+        onClick={onclick}
         selected={selected}
         {...otherAttrs}
       />

@@ -18,8 +18,8 @@ const AlertModal = {
 
     return (
       <div
-        class="ConfirmModal"
-        onclick={(e) => {
+        className="ConfirmModal"
+        onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
@@ -28,10 +28,10 @@ const AlertModal = {
           e.stopPropagation();
         }}
       >
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <h3>{alertText}</h3>
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           {render(Button, {
             intent: 'primary',
             rounded: true,

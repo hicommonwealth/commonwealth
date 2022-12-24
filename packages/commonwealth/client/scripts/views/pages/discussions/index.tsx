@@ -108,16 +108,16 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
         description={
           app.topics.getByName(this.topicName, app.activeChainId()) || ''
         }
-        onscroll={debounce(this.onscroll.bind(this), 400)}
+        onScroll={debounce(this.onscroll.bind(this), 400)}
       >
-        <div class="DiscussionsPage">
+        <div className="DiscussionsPage">
           <RecentThreadsHeader
             topic={this.topicName}
             stage={this.stageName}
             totalThreadCount={totalThreadCount}
           />
           {totalThreadCount > 0 ? (
-            <div class="RecentThreads">
+            <div className="RecentThreads">
               {pinnedThreads.map((t) => (
                 <ThreadPreview thread={t} />
               ))}
@@ -128,8 +128,8 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
                 topicName,
                 stageName,
               }) && (
-                <div class="listing-scroll">
-                  <CWText className="thread-count-text">
+                <div className="listing-scroll">
+                  <CWText class="thread-count-text">
                     {`Showing ${totalThreadCount} of ${pluralize(
                       totalThreadCount,
                       'thread'
@@ -139,7 +139,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
               )}
             </div>
           ) : (
-            <CWText className="no-threads-text">
+            <CWText class="no-threads-text">
               {isNotUndefined(topicName)
                 ? 'There are no threads matching your filter.'
                 : 'There are no threads here yet.'}

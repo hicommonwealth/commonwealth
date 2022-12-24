@@ -68,8 +68,8 @@ export class SearchBar extends ClassComponent {
   view() {
     // const historyList = app.search.getHistory().map((previousQuery) => (
     //   <div
-    //     class="history-row"
-    //     onclick={() => {
+    //     className="history-row"
+    //     onClick={() => {
     //       this.searchTerm = previousQuery.searchTerm;
     //       getSearchPreview(previousQuery, this);
     //     }}
@@ -77,7 +77,7 @@ export class SearchBar extends ClassComponent {
     //     {previousQuery.searchTerm}
     //     <CWIconButton
     //       iconName="close"
-    //       onclick={(e) => {
+    //       onClick={(e) => {
     //         e.stopPropagation();
     //         app.search.removeFromHistory(previousQuery);
     //       }}
@@ -110,13 +110,13 @@ export class SearchBar extends ClassComponent {
     console.log(this.searchResults);
 
     return (
-      <div class="SearchBar">
-        <div class="search-and-icon-container">
-          <div class="search-icon">
-            <CWIconButton iconName="search" onclick={handleGoToSearchPage} />
+      <div className="SearchBar">
+        <div className="search-and-icon-container">
+          <div className="search-icon">
+            <CWIconButton iconName="search" onClick={handleGoToSearchPage} />
           </div>
           <input
-            class={getClasses<{ isClearable: boolean }>({
+            className={getClasses<{ isClearable: boolean }>({
               isClearable: this.searchTerm.length > 0,
             })}
             placeholder="Search Common"
@@ -146,27 +146,27 @@ export class SearchBar extends ClassComponent {
             }}
           />
           {this.searchTerm.length > 0 && (
-            <div class="clear-icon">
+            <div className="clear-icon">
               <CWIconButton
                 iconName="close"
-                onclick={() => {
+                onClick={() => {
                   this.searchTerm = '';
                 }}
               />
             </div>
           )}
           {this.searchResults && this.showDropdown && (
-            <div class="search-results-dropdown">
+            <div className="search-results-dropdown">
               {Object.values(this.searchResults).flat(1).length > 0 ? (
-                <div class="previews-section">
+                <div className="previews-section">
                   {Object.entries(this.searchResults).map(([k, v]) => {
                     if (k === SearchScope.Threads && v.length > 0) {
                       return (
-                        <div class="preview-section">
-                          <div class="section-header">
+                        <div className="preview-section">
+                          <div className="section-header">
                             <CWText
                               type="caption"
-                              className="section-header-text"
+                              class="section-header-text"
                             >
                               Threads
                             </CWText>
@@ -182,11 +182,11 @@ export class SearchBar extends ClassComponent {
                       );
                     } else if (k === SearchScope.Replies && v.length > 0) {
                       return (
-                        <div class="preview-section">
-                          <div class="section-header">
+                        <div className="preview-section">
+                          <div className="section-header">
                             <CWText
                               type="caption"
-                              className="section-header-text"
+                              class="section-header-text"
                             >
                               Comments
                             </CWText>
@@ -202,11 +202,11 @@ export class SearchBar extends ClassComponent {
                       );
                     } else if (k === SearchScope.Communities && v.length > 0) {
                       return (
-                        <div class="preview-section">
-                          <div class="section-header">
+                        <div className="preview-section">
+                          <div className="section-header">
                             <CWText
                               type="caption"
-                              className="section-header-text"
+                              class="section-header-text"
                             >
                               Communities
                             </CWText>
@@ -219,11 +219,11 @@ export class SearchBar extends ClassComponent {
                       );
                     } else if (k === SearchScope.Members && v.length > 0) {
                       return (
-                        <div class="preview-section">
-                          <div class="section-header">
+                        <div className="preview-section">
+                          <div className="section-header">
                             <CWText
                               type="caption"
-                              className="section-header-text"
+                              class="section-header-text"
                             >
                               Members
                             </CWText>
@@ -240,16 +240,16 @@ export class SearchBar extends ClassComponent {
                   })}
                 </div>
               ) : (
-                <CWText type="caption" className="no-results-text">
+                <CWText type="caption" class="no-results-text">
                   No Results
                 </CWText>
               )}
               {/* {historyList.length > 0 && (
-                <div class="history-section">
+                <div className="history-section">
                   <CWText
                     type="caption"
                     fontWeight="medium"
-                    className="search-history-header"
+                    class="search-history-header"
                   >
                     Search History
                   </CWText>

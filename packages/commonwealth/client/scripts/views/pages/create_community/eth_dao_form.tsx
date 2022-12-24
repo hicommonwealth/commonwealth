@@ -138,7 +138,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
     };
 
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
         <SelectRow
           title="DAO Type"
@@ -167,7 +167,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
             !this.state.form.ethChainId ||
             this.state.loading
           }
-          onclick={async () => {
+          onClick={async () => {
             await updateDAO();
           }}
         />
@@ -200,7 +200,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
         <CWButton
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
-          onclick={async () => {
+          onClick={async () => {
             const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
               this.state.form;
             this.state.saving = true;

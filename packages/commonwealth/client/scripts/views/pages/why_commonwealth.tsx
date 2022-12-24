@@ -12,14 +12,14 @@ class WhyCommonwealthPage extends ClassComponent {
   view() {
     return (
       <Sublayout>
-        <div class="WhyCommonwealthPage">
-          <div class="inner-container">
+        <div className="WhyCommonwealthPage">
+          <div className="inner-container">
             <CWText type="h3">
               Crypto-native communities deserve crypto-native software.
             </CWText>
             <CWButton
               label="Read The Docs"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 window.location.href =
                   'https://docs.commonwealth.im/commonwealth/';
@@ -35,7 +35,7 @@ class WhyCommonwealthPage extends ClassComponent {
             </CWText>
             <CWButton
               label="Explore Our Communities"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 setRoute('/communities');
               }}

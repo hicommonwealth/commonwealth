@@ -53,19 +53,19 @@ export class SnapshotSpaceCard extends ClassComponent<SnapshotSpaceCardAttrs> {
       <CWCard
         elevation="elevation-2"
         interactive
-        className="SnapshotSpaceCard"
-        onclick={(e) => {
+        class="SnapshotSpaceCard"
+        onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
           handleClicks();
         }}
       >
-        <div class="space-card-container">
-          <div class="space-card-metadata">
-            <div class="space-card-title">{space.name}</div>
-            <div class="space-card-subheader">{space.id}</div>
+        <div className="space-card-container">
+          <div className="space-card-metadata">
+            <div className="space-card-title">{space.name}</div>
+            <div className="space-card-subheader">{space.id}</div>
           </div>
-          <div class="space-card-status">
+          <div className="space-card-status">
             {`${numActiveProposals} Active Proposal${
               numActiveProposals === 1 ? '' : 's'
             }`}

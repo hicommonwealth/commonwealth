@@ -44,7 +44,7 @@ const getMemberResult = (addr, searchTerm) => {
     allowOnContentClick: true,
     contentLeft: <CWIcon iconSize="large" iconName="person" />,
     label: (
-      <a class="search-results-item">
+      <a className="search-results-item">
         {render(UserBlock, {
           user: profile,
           searchTerm,
@@ -82,7 +82,7 @@ const getCommunityResult = (community) => {
 
   return render(ListItem, {
     label: (
-      <a class="search-results-item.community-result">
+      <a className="search-results-item.community-result">
         <CommunityLabel {...params} />
       </a>
     ),
@@ -108,12 +108,12 @@ const getDiscussionResult = (thread, searchTerm) => {
       setRoute(`/${chain}/discussion/${proposalId}`);
     },
     label: (
-      <a class="search-results-item">
-        <CWText fontStyle="uppercase" type="caption" className="thread-header">
+      <a className="search-results-item">
+        <CWText fontStyle="uppercase" type="caption" class="thread-header">
           {`discussion - ${thread.chain}`}
         </CWText>
         <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
-        <div class="search-results-thread-subtitle">
+        <div className="search-results-thread-subtitle">
           {render(User, {
             user: new AddressInfo(
               thread.address_id,
@@ -122,11 +122,11 @@ const getDiscussionResult = (thread, searchTerm) => {
               null
             ),
           })}
-          <CWText className="created-at">
+          <CWText class="created-at">
             {moment(thread.created_at).fromNow()}
           </CWText>
         </div>
-        <div class="search-results-thread-body">
+        <div className="search-results-thread-body">
           {renderQuillTextBody(thread.body, {
             hideFormatting: true,
             collapse: true,
@@ -155,15 +155,15 @@ const getCommentResult = (comment, searchTerm) => {
       );
     },
     label: (
-      <a class="search-results-item">
-        <div class="search-results-thread-header">
+      <a className="search-results-item">
+        <div className="search-results-thread-header">
           {`comment - ${comment.chain || comment.community}`}
         </div>
-        {/* <div class="search-results-thread-title">
+        {/* <div className="search-results-thread-title">
           {decodeURIComponent(comment.title)}
         </div> */}
-        <div class="search-results-thread-subtitle">
-          <span class="created-at">{moment(comment.created_at).fromNow()}</span>
+        <div className="search-results-thread-subtitle">
+          <span className="created-at">{moment(comment.created_at).fromNow()}</span>
           {render(User, {
             user: new AddressInfo(
               comment.address_id,
@@ -173,7 +173,7 @@ const getCommentResult = (comment, searchTerm) => {
             ),
           })}
         </div>
-        <div class="search-results-comment">
+        <div className="search-results-comment">
           {renderQuillTextBody(comment.text, {
             hideFormatting: true,
             collapse: true,
@@ -283,7 +283,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
         <CWTab
           label={searchScope}
           isSelected={this.activeTab === searchScope}
-          onclick={() => {
+          onClick={() => {
             this.pageCount = 1;
             this.activeTab = searchScope;
           }}
@@ -332,21 +332,21 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
       />
     ) : (
       <Sublayout>
-        <div class="SearchPage">
+        <div className="SearchPage">
           <>
             {!app.search.getByQuery(searchQuery)?.loaded ? (
               <CWSpinner size="xl" />
             ) : (
-              <div class="search-results">
+              <div className="search-results">
                 <CWTabBar>{tabs}</CWTabBar>
-                <CWText isCentered className="search-results-caption">
+                <CWText isCentered class="search-results-caption">
                   <div>
                     {getSearchResultsCaption()}
                     {scope && !app.isCustomDomain() && (
                       <a
                         href="#"
-                        class="search-all-communities"
-                        onclick={() => {
+                        className="search-all-communities"
+                        onClick={() => {
                           searchQuery.chainScope = undefined;
                           setRoute(`/search?${searchQuery.toUrlParams()}`);
                           setTimeout(() => {
@@ -360,7 +360,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                   </div>
                 </CWText>
                 {tabScopedListing.length > 0 && (
-                  <div class="search-results-filters">
+                  <div className="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
                     {render(Select, {
                       options: ['Best', 'Newest', 'Oldest'],
@@ -375,7 +375,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                     })}
                   </div>
                 )}
-                <div class="search-results-list">{tabScopedListing}</div>
+                <div className="search-results-list">{tabScopedListing}</div>
               </div>
             )}
           </>

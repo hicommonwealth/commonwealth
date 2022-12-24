@@ -76,18 +76,18 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
     const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
     return (
-      <div class="RecentThreadsHeader">
+      <div className="RecentThreadsHeader">
         {isUndefined(topic) && (
           <>
-            <div class="header-row">
-              <CWText type="h3" fontWeight="semiBold" className="header-text">
+            <div className="header-row">
+              <CWText type="h3" fontWeight="semiBold" class="header-text">
                 All Discussions
               </CWText>
-              <div class="count-and-button">
+              <div className="count-and-button">
                 <CWText
                   type="caption"
                   fontWeight="medium"
-                  className="thread-count-text"
+                  class="thread-count-text"
                 >
                   {totalThreadCount} Threads
                 </CWText>
@@ -95,7 +95,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
                   <CWIconButton
                     iconName="plusCircle"
                     iconButtonTheme="black"
-                    onclick={() => {
+                    onClick={() => {
                       navigateToSubpage('/new/discussion');
                     }}
                   />
@@ -104,14 +104,14 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
                     buttonType="mini-black"
                     label="Create Thread"
                     iconName="plus"
-                    onclick={() => {
+                    onClick={() => {
                       navigateToSubpage('/new/discussion');
                     }}
                   />
                 )}
               </div>
             </div>
-            <CWText className="subheader-text">
+            <CWText class="subheader-text">
               This section is for the community to discuss how to manage the
               community treasury and spending on contributor grants, community
               initiatives, liquidity mining and other programs.
@@ -119,7 +119,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
           </>
         )}
         {app.chain?.meta && (
-          <div class="buttons-row">
+          <div className="buttons-row">
             {topics.length > 0 && (
               <TopicsMenu
                 featuredTopics={featuredTopics}

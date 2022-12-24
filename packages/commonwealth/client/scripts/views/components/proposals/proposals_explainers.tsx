@@ -85,7 +85,7 @@ export class CompoundProposalStats extends ClassComponent<CompoundProposalStatsA
         statAction={
           <CWButton
             buttonType="primary-blue"
-            onclick={() => navigateToSubpage('/new/proposal')}
+            onClick={() => navigateToSubpage('/new/proposal')}
             label="New proposal"
           />
         }

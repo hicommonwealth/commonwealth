@@ -40,11 +40,11 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
     const { account, refreshCallback } = vnode.attrs;
 
     return (
-      <div class="EditProfileModal">
-        <div class="compact-modal-title">
+      <div className="EditProfileModal">
+        <div className="compact-modal-title">
           <h3>Edit profile</h3>
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <AvatarUpload
             scope="user"
             account={account}
@@ -96,10 +96,10 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
               }
             }}
           />
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               buttonType="secondary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
               }}
@@ -107,7 +107,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
             />
             <CWButton
               disabled={this.saving}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
 
                 const data = {

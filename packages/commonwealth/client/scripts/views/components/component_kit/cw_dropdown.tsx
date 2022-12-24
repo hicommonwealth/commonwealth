@@ -33,26 +33,26 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
     const { label, options, onSelect } = vnode.attrs;
 
     return (
-      <div class="dropdown-wrapper">
+      <div className="dropdown-wrapper">
         <CWTextInput
           iconRight="chevronDown"
           placeholder={this.selectedValue.label}
           displayOnly
-          iconRightonclick={() => {
+          iconRightonClick={() => {
             // Only here because it makes TextInput display correctly
           }}
           label={label}
-          onclick={() => {
+          onClick={() => {
             this.showDropdown = !this.showDropdown;
           }}
         />
         {this.showDropdown && (
-          <div class="dropdown-options-display">
+          <div className="dropdown-options-display">
             {options.map((item) => {
               return (
                 <div
-                  class="dropdown-item"
-                  onclick={() => {
+                  className="dropdown-item"
+                  onClick={() => {
                     this.showDropdown = false;
                     this.selectedValue = item;
                     if (onSelect) {
@@ -60,7 +60,7 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
                     }
                   }}
                 >
-                  <CWText className="dropdown-item-text">{item.label}</CWText>
+                  <CWText class="dropdown-item-text">{item.label}</CWText>
                 </div>
               );
             })}

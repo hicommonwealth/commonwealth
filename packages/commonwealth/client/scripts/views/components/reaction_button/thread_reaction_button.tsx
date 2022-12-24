@@ -88,14 +88,14 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
     };
 
     const countsComponent = (
-      <CWText className="menu-buttons-text" type="caption" fontWeight="medium">
+      <CWText class="menu-buttons-text" type="caption" fontWeight="medium">
         {likes}
       </CWText>
     );
 
     return (
       <div
-        class={getClasses<{ disabled?: boolean }>(
+        className={getClasses<{ disabled?: boolean }>(
           { disabled: this.loading },
           'CommentReactionButton'
         )}
@@ -107,13 +107,13 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
           iconName="upvote"
           iconSize="small"
           selected={hasReacted}
-          onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
+          onClick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
         />
         {likes > 0 ? (
           <CWTooltip
             interactionType="hover"
             tooltipContent={
-              <div class="reaction-button-tooltip-contents">
+              <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
                   likes,
                   reactors: this.reactors,

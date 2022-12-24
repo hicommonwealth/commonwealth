@@ -24,8 +24,8 @@ import { CWText } from './components/component_kit/cw_text';
 class LoadingLayout extends ClassComponent {
   view() {
     return (
-      <div class="Layout">
-        <div class="spinner-container">
+      <div className="Layout">
+        <div className="spinner-container">
           <CWSpinner size="xl" />
         </div>
         <AppModals />
@@ -63,11 +63,11 @@ export class Layout extends ClassComponent<LayoutAttrs> {
 
     if (app.loadingError) {
       return (
-        <div class="Layout">
+        <div className="Layout">
           <CWEmptyState
             iconName="cautionTriangle"
             content={
-              <div class="loading-error">
+              <div className="loading-error">
                 <CWText>Application error: {app.loadingError}</CWText>
                 <CWText>Please try again later</CWText>
               </div>
@@ -88,7 +88,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return (
-        <div class="Layout">
+        <div className="Layout">
           <PageNotFound />
           <AppModals />
           <AppToasts />
@@ -129,7 +129,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
     return (
-      <div class="Layout">
+      <div className="Layout">
         {vnode.children}
         <AppModals />
         <AppToasts />

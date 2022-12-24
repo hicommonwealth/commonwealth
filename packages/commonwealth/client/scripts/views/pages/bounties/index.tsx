@@ -47,43 +47,43 @@ class BountyDetail extends ClassComponent<BountyDetailAttrs> {
 
     return (
       <div
-        class="BountyDetail"
-        onclick={(e) => {
+        className="BountyDetail"
+        onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
       >
-        <div class="bounty-info-container">
-          <div class="bounty-info-row">
+        <div className="bounty-info-container">
+          <div className="bounty-info-row">
             <CWText>Proposed</CWText>
             {bounty.isProposed && <CWIcon iconName="check" iconSize="small" />}
           </div>
-          <div class="bounty-info-row">
+          <div className="bounty-info-row">
             <CWText>Approved by council</CWText>
             {bounty.isApproved && <CWIcon iconName="check" iconSize="small" />}
           </div>
-          <div class="bounty-info-row">
+          <div className="bounty-info-row">
             <CWText>Funded by treasury</CWText>
             {bounty.isFunded && <CWIcon iconName="check" iconSize="small" />}
           </div>
-          <div class="bounty-info-row">
+          <div className="bounty-info-row">
             <CWText>Curator proposed</CWText>
             {bounty.isCuratorProposed && (
               <CWIcon iconName="check" iconSize="small" />
             )}
           </div>
-          <div class="bounty-info-row">
+          <div className="bounty-info-row">
             <CWText>Curator selected</CWText>
             {bounty.isActive && <CWIcon iconName="check" iconSize="small" />}
           </div>
-          <div class="bounty-info-row">
+          <div className="bounty-info-row">
             <CWText>Payout pending</CWText>
             {bounty.isPendingPayout && (
               <CWIcon iconName="check" iconSize="small" />
             )}
           </div>
         </div>
-        <div class="action">
+        <div className="action">
           {getActionSection(bounty, isCouncillor, isCurator, isRecipient)}
         </div>
       </div>
@@ -141,7 +141,7 @@ class BountiesPage extends ClassComponent {
         />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     const pendingBountyContent = pendingBounties.length ? (
@@ -152,7 +152,7 @@ class BountiesPage extends ClassComponent {
         />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     const inactiveBountyContent = inactiveBounties.length ? (
@@ -163,14 +163,14 @@ class BountiesPage extends ClassComponent {
         />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     return (
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Council" />}
       >
-        <div class="BountiesPage">
+        <div className="BountiesPage">
           <GovExplainer
             statHeaders={[
               {

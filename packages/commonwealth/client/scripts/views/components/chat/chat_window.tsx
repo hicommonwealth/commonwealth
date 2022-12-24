@@ -149,23 +149,23 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     }, []);
 
     return (
-      <div class="ChatPage">
-        <div class="chat-messages">
+      <div className="ChatPage">
+        <div className="chat-messages">
           {groupedMessages.length === 0 && app.socket.chatNs.isConnected && (
-            <div class="no-messages-container">
-              <div class="no-messages-placeholder">No messages yet</div>
+            <div className="no-messages-container">
+              <div className="no-messages-placeholder">No messages yet</div>
             </div>
           )}
           {groupedMessages.map((grp) => (
             <div
-              class="chat-message-group"
+              className="chat-message-group"
               id={
                 grp.messages.some(this._messageIsHighlighted)
                   ? 'highlighted'
                   : ''
               }
             >
-              <div class="user-and-timestamp-container">
+              <div className="user-and-timestamp-container">
                 {render(User, {
                   user: new AddressInfo(
                     null,
@@ -176,7 +176,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                   linkify: true,
                   avatarSize: 24,
                 })}
-                <div class="chat-message-group-timestamp">
+                <div className="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
                 {render(Icon, {
@@ -201,9 +201,9 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                   },
                 })}
               </div>
-              <div class="clear" />
+              <div className="clear" />
               {grp.messages.map((msg) => (
-                <div class="chat-message-text">
+                <div className="chat-message-text">
                   {renderQuillTextBody(msg.message, {
                     openLinksInNewTab: true,
                   })}
@@ -214,16 +214,16 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
         </div>
 
         {!app.isLoggedIn() ? (
-          <div class="chat-composer-unavailable">Log in to join chat</div>
+          <div className="chat-composer-unavailable">Log in to join chat</div>
         ) : !app.user.activeAccount ? (
-          <div class="chat-composer-unavailable">
+          <div className="chat-composer-unavailable">
             Set up an account to join chat
           </div>
         ) : !app.socket.chatNs.isConnected ? (
-          <div class="chat-composer-unavailable">Waiting for connection</div>
+          <div className="chat-composer-unavailable">Waiting for connection</div>
         ) : (
           <div
-            class={`chat-composer${
+            className={`chat-composer${
               app.socket.chatNs.isConnected ? '' : ' disabled'
             }`}
           >
@@ -238,7 +238,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                 this._handleSubmitMessage();
               }}
             />
-            <CWIcon iconName="send" onclick={this._handleSubmitMessage} />
+            <CWIcon iconName="send" onClick={this._handleSubmitMessage} />
           </div>
         )}
       </div>

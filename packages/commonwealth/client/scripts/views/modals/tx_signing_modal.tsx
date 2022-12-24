@@ -45,12 +45,12 @@ class TXSigningModal extends ClassComponent<ITXModalData> {
     };
 
     return (
-      <div class="TXSigningModal">
-        <div class="compact-modal-title">
+      <div className="TXSigningModal">
+        <div className="compact-modal-title">
           <h3>{getModalTitle(this.stageName, txLabel)}</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           {this.stageName === 'intro' && (
             <TxSigningModalIntroStage
               author={author}

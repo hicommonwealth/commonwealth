@@ -35,7 +35,7 @@ type SnapshotProposalStagesBarAttrs = {
 class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
   view(vnode: ResultNode<SnapshotProposalStagesBarAttrs>) {
     return (
-      <div class="SnapshotProposalStagesBar">
+      <div className="SnapshotProposalStagesBar">
         {Object.values(SnapshotProposalFilter).map(
           (option: SnapshotProposalFilter) =>
             render(Button, {
@@ -123,7 +123,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
       // title="Proposals"
       >
         {app.chain && (
-          <div class="SnapshotProposalsPage">
+          <div className="SnapshotProposalsPage">
             <SnapshotProposalStagesBar
               selected={selectedFilter}
               onChangeFilter={onChangeFilter}
@@ -138,7 +138,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
                 ))}
               />
             ) : (
-              <CWText className="no-proposals-text">
+              <CWText class="no-proposals-text">
                 No {this.selectedFilter.toLowerCase()} proposals found.
               </CWText>
             )}

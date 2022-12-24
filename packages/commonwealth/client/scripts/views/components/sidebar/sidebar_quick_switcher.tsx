@@ -30,13 +30,13 @@ export class SidebarQuickSwitcher extends ClassComponent {
     });
 
     return (
-      <div class="SidebarQuickSwitcher">
-        <div class="community-nav-bar">
+      <div className="SidebarQuickSwitcher">
+        <div className="community-nav-bar">
           {app.isLoggedIn() && (
             <CWIconButton
               iconName="plusCircle"
               iconButtonTheme="black"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 mixpanelBrowserTrack({
                   event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
@@ -49,19 +49,19 @@ export class SidebarQuickSwitcher extends ClassComponent {
           <CWIconButton
             iconName="compass"
             iconButtonTheme="black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               app.sidebarMenu = 'exploreCommunities';
             }}
           />
         </div>
         <CWDivider />
-        <div class="scrollable-community-bar">
+        <div className="scrollable-community-bar">
           {starredCommunities.map((item) => (
             <CWCommunityAvatar
               size="large"
               community={item}
-              onclick={link ? () => setRoute(`/${item.id}`) : undefined}
+              onClick={link ? () => setRoute(`/${item.id}`) : undefined}
             />
           ))}
         </div>

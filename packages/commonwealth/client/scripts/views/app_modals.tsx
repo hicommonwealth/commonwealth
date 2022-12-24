@@ -114,7 +114,7 @@ export class AppModals extends ClassComponent {
           spec={spec}
           key={spec.id || '-'}
           oncreatemodal={oncreate}
-          onclick={onclickoverlay}
+          onClick={onclickoverlay}
           modalType={spec.data?.modalType}
           breakpointFn={spec.data?.breakpointFn}
         >

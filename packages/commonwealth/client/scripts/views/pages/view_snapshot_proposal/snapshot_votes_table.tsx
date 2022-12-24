@@ -42,31 +42,31 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
       : voters.slice(0, 10);
 
     return (
-      <div class="SnapshotVotesTable">
-        <div class="votes-header-row">
+      <div className="SnapshotVotesTable">
+        <div className="votes-header-row">
           <CWText type="h4" fontWeight="semiBold">
             Votes
           </CWText>
-          <div class="vote-count">
-            <CWText className="vote-count-text" fontWeight="medium">
+          <div className="vote-count">
+            <CWText class="vote-count-text" fontWeight="medium">
               {voters.length}
             </CWText>
           </div>
         </div>
-        <div class="votes-container">
-          <div class="column-header-row">
-            <CWText type="h5" className="column-header-text">
+        <div className="votes-container">
+          <div className="column-header-row">
+            <CWText type="h5" class="column-header-text">
               User
             </CWText>
-            <CWText type="h5" className="column-header-text">
+            <CWText type="h5" class="column-header-text">
               Vote
             </CWText>
-            <CWText type="h5" className="column-header-text">
+            <CWText type="h5" class="column-header-text">
               Power
             </CWText>
           </div>
           {displayedVoters.map((vote) => (
-            <div class="vote-row">
+            <div className="vote-row">
               {render(User, {
                 user: new AddressInfo(
                   null,
@@ -77,16 +77,16 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
                 linkify: true,
                 popover: true,
               })}
-              <CWText className="column-text" noWrap>
+              <CWText class="column-text" noWrap>
                 {choices[vote.choice - 1]}
               </CWText>
-              <CWText className="column-text" noWrap>
+              <CWText class="column-text" noWrap>
                 {formatNumberLong(vote.balance)} {symbol}
               </CWText>
             </div>
           ))}
-          <div class="view-more-footer" onclick={toggleExpandedVoterList}>
-            <CWText className="view-more-text" fontWeight="medium">
+          <div className="view-more-footer" onClick={toggleExpandedVoterList}>
+            <CWText class="view-more-text" fontWeight="medium">
               View More
             </CWText>
           </div>

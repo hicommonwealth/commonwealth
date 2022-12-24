@@ -64,12 +64,12 @@ export class NewTopicModal extends ClassComponent {
       : 18;
 
     return (
-      <div class="NewTopicModal">
-        <div class="compact-modal-title">
+      <div className="NewTopicModal">
+        <div className="compact-modal-title">
           <h3>New topic</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWTextInput
             label="Name"
             name="name"
@@ -139,7 +139,7 @@ export class NewTopicModal extends ClassComponent {
               />
             </>
           )}
-          <div class="checkboxes">
+          <div className="checkboxes">
             <CWCheckbox
               label="Featured in Sidebar"
               checked={this.form.featuredInSidebar}
@@ -170,7 +170,7 @@ export class NewTopicModal extends ClassComponent {
           <CWButton
             label="Create topic"
             disabled={this.saving || !!this.error || disabled}
-            onclick={async (e: Event) => {
+            onClick={async (e: Event) => {
               e.preventDefault();
               const { form } = this;
               try {

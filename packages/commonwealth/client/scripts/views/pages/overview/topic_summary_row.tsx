@@ -53,14 +53,14 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
     //   });
 
     return (
-      <div class="TopicSummaryRow">
-        <div class="topic-column">
-          <div class="name-and-count">
+      <div className="TopicSummaryRow">
+        <div className="topic-column">
+          <div className="name-and-count">
             <CWText
               type="h4"
               fontWeight="semiBold"
-              className="topic-name-text"
-              onclick={(e) => {
+              class="topic-name-text"
+              onClick={(e) => {
                 e.preventDefault();
                 setRoute(
                   `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
@@ -72,14 +72,14 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             <CWText
               type="caption"
               fontWeight="medium"
-              className="threads-count-text"
+              class="threads-count-text"
             >
               {monthlyThreads.length} Threads
             </CWText>
           </div>
           {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
-        <div class="recent-threads-column">
+        <div className="recent-threads-column">
           {topFiveSortedThreads.map((thread, idx) => {
             const discussionLink = getProposalUrlPath(
               thread.slug,
@@ -92,28 +92,28 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             return (
               <>
                 <div
-                  class={getClasses<{ isPinned?: boolean }>(
+                  className={getClasses<{ isPinned?: boolean }>(
                     { isPinned: thread.pinned },
                     'recent-thread-row'
                   )}
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.stopPropagation();
                     setRoute(discussionLink);
                   }}
                 >
-                  <div class="row-top">
-                    <div class="user-and-date-row">
+                  <div className="row-top">
+                    <div className="user-and-date-row">
                       {render(User, {
                         user,
                         showAddressWithDisplayName: true,
                         avatarSize: 24,
                         linkify: true,
                       })}
-                      <CWText className="last-updated-text">•</CWText>
+                      <CWText class="last-updated-text">•</CWText>
                       <CWText
                         type="caption"
                         fontWeight="medium"
-                        className="last-updated-text"
+                        class="last-updated-text"
                       >
                         {moment(getLastUpdated(thread)).format('l')}
                       </CWText>
@@ -121,32 +121,32 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                         <CWIcon iconName="lock" iconSize="small" />
                       )}
                     </div>
-                    <div class="row-top-icons">
-                      {isHot(thread) && <div class="flame" />}
+                    <div className="row-top-icons">
+                      {isHot(thread) && <div className="flame" />}
                       {thread.pinned && <CWIcon iconName="pin" />}
                     </div>
                   </div>
                   <CWText type="b2" fontWeight="bold">
                     {thread.title}
                   </CWText>
-                  <div class="row-bottom">
-                    <div class="comments-and-users">
+                  <div className="row-bottom">
+                    <div className="comments-and-users">
                       {/* TODO Gabe 12/7/22 - Comment count isn't available before the comments store is initialized */}
-                      {/* <div class="comments-count">
+                      {/* <div className="comments-count">
                         <CWIcon iconName="feedback" iconSize="small" />
                         <CWText type="caption">{commentsCount} comments</CWText>
                       </div> */}
                       {/* TODO Gabe 10/3/22 - user gallery blocked by changes to user model */}
-                      {/* <div class="user-gallery">
-                        <div class="avatars-row">
+                      {/* <div className="user-gallery">
+                        <div className="avatars-row">
                           {gallery.map((u) => u.profile.getAvatar(16))}
                         </div>
                         <CWText type="caption">+4 others</CWText>
                       </div> */}
                     </div>
-                    <div class="row-bottom-menu">
+                    <div className="row-bottom-menu">
                       <div
-                        onclick={(e) => {
+                        onClick={(e) => {
                           // prevent clicks from propagating to discussion row
                           e.preventDefault();
                           e.stopPropagation();
@@ -157,7 +157,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                       {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
                       {/* {isAdminOrMod && (
                         <div
-                          onclick={(e) => {
+                          onClick={(e) => {
                             // prevent clicks from propagating to discussion row
                             e.preventDefault();
                             e.stopPropagation();

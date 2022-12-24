@@ -25,7 +25,7 @@ export class CWCosmosEvmMetamask extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -47,7 +47,7 @@ export class CWKeplr extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -78,7 +78,7 @@ export class CWMagic extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -100,7 +100,7 @@ export class CWMetaMask extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -202,7 +202,7 @@ export class CWNearWallet extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -224,7 +224,7 @@ export class CWPhantom extends ClassComponent<CustomIconAttrs> {
     const { componentType, ...customIconStyleAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>(
+        className={getClasses<CustomIconStyleAttrs>(
           { ...customIconStyleAttrs },
           componentType
         )}
@@ -285,7 +285,7 @@ export class CWPolkadot extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -311,7 +311,7 @@ export class CWRonin extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -333,7 +333,7 @@ export class CWTerraStation extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -388,7 +388,7 @@ export class CWTerraStation2 extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -510,7 +510,7 @@ export class CWUnreads extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"
@@ -535,7 +535,7 @@ export class CWWalletConnect extends ClassComponent<CustomIconAttrs> {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
-        class={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
+        className={getClasses<CustomIconStyleAttrs>({ iconSize }, componentType)}
         xmlns="http://www.w3.org/2000/svg"
         width="32"
         height="32"

@@ -18,7 +18,7 @@ export class CWDivider extends ClassComponent<DividerAttrs> {
 
     return (
       <div
-        class={getClasses<DividerAttrs>({ isVertical }, ComponentType.Divider)}
+        className={getClasses<DividerAttrs>({ isVertical }, ComponentType.Divider)}
       />
     );
   }

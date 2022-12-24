@@ -33,7 +33,7 @@ export class InvitesMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
-        className="InvitesMenu"
+        class="InvitesMenu"
         menuHeader={{
           label: 'Invites',
           onclick: () => {
@@ -58,7 +58,7 @@ export class InvitesMenuPopover extends ClassComponent {
       transitionDuration: 0,
       hoverCloseDelay: 0,
       trigger: (
-        <div class="invites-button-wrap">
+        <div className="invites-button-wrap">
           {render(Button, {
             iconLeft: Icons.MAIL,
             intent: 'primary',
@@ -66,14 +66,14 @@ export class InvitesMenuPopover extends ClassComponent {
             compact: true,
           })}
           <div
-            class="invites-count-container"
+            className="invites-count-container"
             style={
               app.config.invites.length === 1
                 ? 'padding: 2px 3px'
                 : 'padding: 2px'
             }
           >
-            <div class="invites-count">{app.config.invites.length}</div>
+            <div className="invites-count">{app.config.invites.length}</div>
           </div>
         </div>
       ),

@@ -144,7 +144,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
     };
 
     return (
-      <div class="ProposalComments">
+      <div className="ProposalComments">
         {recursivelyGatherComments(comments, comments[0], 0)}
         {this.commentError && (
           <CWValidationText message={this.commentError} status="failure" />

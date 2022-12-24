@@ -20,17 +20,17 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
 
       return (
         <div
-          class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
+          className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
             { disabled, isSecondary },
             'MobileMenuItem'
           )}
-          onclick={(e) => {
+          onClick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
             onclick(e);
           }}
         >
-          <div class="mobile-menu-item-left">
+          <div className="mobile-menu-item-left">
             {iconLeft && <CWIcon iconName={iconLeft} />}
             <CWText type="b2">{label}</CWText>
           </div>
@@ -39,7 +39,7 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
       );
     } else if (vnode.attrs.type === 'header') {
       return (
-        <div class="MobileMenuItem">
+        <div className="MobileMenuItem">
           <CWText type="caption">{vnode.attrs.label}</CWText>
         </div>
       );
@@ -48,14 +48,14 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
 
       return (
         <div
-          class="MobileMenuItem"
-          onclick={(e) => {
+          className="MobileMenuItem"
+          onClick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
             onclick(e);
           }}
         >
-          <div class="mobile-menu-item-left">
+          <div className="mobile-menu-item-left">
             {iconLeft &&
               (hasUnreads ? (
                 <CWCustomIcon iconName="unreads" />
@@ -83,13 +83,13 @@ export class CWMobileMenu extends ClassComponent<MobileMenuAttrs> {
 
     return (
       <div
-        class={getClasses<{ className: string }>(
+        className={getClasses<{ className: string }>(
           { className },
           ComponentType.MobileMenu
         )}
       >
         {menuHeader && (
-          <div class="mobile-menu-header" onclick={menuHeader.onclick}>
+          <div className="mobile-menu-header" onClick={menuHeader.onclick}>
             <CWIcon iconName="chevronLeft" />
             <CWText type="h5" fontWeight="medium">
               {menuHeader.label}

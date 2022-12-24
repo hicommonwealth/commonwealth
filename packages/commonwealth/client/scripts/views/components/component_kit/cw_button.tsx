@@ -65,7 +65,7 @@ export class CWButton extends ClassComponent<ButtonAttrs> {
     } = vnode.attrs;
     return (
       <button
-        class={getClasses<ButtonStyleAttrs>(
+        className={getClasses<ButtonStyleAttrs>(
           {
             disabled,
             buttonType,
@@ -73,24 +73,24 @@ export class CWButton extends ClassComponent<ButtonAttrs> {
           },
           ComponentType.Button
         )}
-        onclick={onclick}
+        onClick={onclick}
         disabled={disabled}
       >
         {!!iconLeft && (
           <CWIcon
             iconName={iconLeft}
             iconSize="small"
-            className="button-icon"
+            class="button-icon"
           />
         )}
-        <CWText type={getTextType(buttonType)} className="button-text" noWrap>
+        <CWText type={getTextType(buttonType)} class="button-text" noWrap>
           {label}
         </CWText>
         {!!iconRight && (
           <CWIcon
             iconName={iconRight}
             iconSize="small"
-            className="button-icon"
+            class="button-icon"
           />
         )}
       </button>

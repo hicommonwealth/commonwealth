@@ -106,15 +106,15 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
         content={
           thread.snapshotProposal?.length > 0 &&
           !this.snapshotProposalsLoaded ? (
-            <div class="spinner-container">
+            <div className="spinner-container">
               <CWSpinner size="medium" />
             </div>
           ) : (
-            <div class="LinkedProposalsCard">
+            <div className="LinkedProposalsCard">
               {thread.chainEntities.length > 0 || showSnapshot ? (
-                <div class="links-container">
+                <div className="links-container">
                   {thread.chainEntities.length > 0 && (
-                    <div class="linked-proposals">
+                    <div className="linked-proposals">
                       {thread.chainEntities.map((chainEntity) => {
                         return (
                           <LinkedProposal
@@ -130,7 +130,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
                   )}
                 </div>
               ) : (
-                <CWText type="b2" className="no-proposals-text">
+                <CWText type="b2" class="no-proposals-text">
                   There are currently no linked proposals.
                 </CWText>
               )}
@@ -138,7 +138,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
                 <CWButton
                   buttonType="mini-black"
                   label="Link proposal"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     app.modals.create({
                       modal: UpdateProposalStatusModal,

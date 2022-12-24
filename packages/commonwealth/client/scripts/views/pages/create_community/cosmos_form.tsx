@@ -48,7 +48,7 @@ export class CosmosForm extends ClassComponent {
 
   view() {
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <InputRow
           title="RPC URL"
           value={this.state.form.nodeUrl}
@@ -95,7 +95,7 @@ export class CosmosForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving}
-          onclick={async () => {
+          onClick={async () => {
             const {
               altWalletUrl,
               bech32Prefix,

@@ -25,7 +25,7 @@ export class ComposerSection extends ClassComponent {
     ];
 
     return (
-      <div class="ComposerSection">
+      <div className="ComposerSection">
         <CWText type="h5" fontWeight="semiBold">
           Composer
         </CWText>

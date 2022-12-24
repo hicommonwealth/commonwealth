@@ -101,8 +101,8 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
     } = vnode.attrs;
 
     const mainBody = (
-      <div class="main-body-container">
-        <div class="header">
+      <div className="main-body-container">
+        <div className="header">
           {typeof title === 'string' ? (
             <CWText type="h3" fontWeight="semiBold">
               {title}
@@ -110,16 +110,16 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
           ) : (
             title
           )}
-          <div class="header-info-row">
+          <div className="header-info-row">
             {author}
             {typeof createdAt === 'number' ||
               (moment.isMoment(createdAt) && createdAt.isValid() && (
-                <CWText type="caption" className="header-text">
+                <CWText type="caption" class="header-text">
                   published on {moment(createdAt).format('l')}
                 </CWText>
               ))}
             {!!viewCount && (
-              <CWText type="caption" className="header-text">
+              <CWText type="caption" class="header-text">
                 {pluralize(viewCount, 'view')}
               </CWText>
             )}
@@ -144,21 +144,21 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
     );
 
     return (
-      <div class={ComponentType.ContentPage}>
+      <div className={ComponentType.ContentPage}>
         {this.viewType === 'sidebarView' && (
-          <div class="sidebar-view">
+          <div className="sidebar-view">
             {mainBody}
             {showSidebar && (
-              <div class="sidebar">{sidebarComponents.map((c) => c.item)}</div>
+              <div className="sidebar">{sidebarComponents.map((c) => c.item)}</div>
             )}
           </div>
         )}
         {this.viewType === 'tabsView' && (
-          <div class="tabs-view">
+          <div className="tabs-view">
             <CWTabBar>
               <CWTab
                 label={contentBodyLabel}
-                onclick={() => {
+                onClick={() => {
                   this.tabSelected = 0;
                 }}
                 isSelected={this.tabSelected === 0}
@@ -166,7 +166,7 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
               {sidebarComponents.map((item, i) => (
                 <CWTab
                   label={item.label}
-                  onclick={() => {
+                  onClick={() => {
                     this.tabSelected = i + 1;
                   }}
                   isSelected={this.tabSelected === i + 1}
@@ -200,8 +200,8 @@ export class CWContentPageCard extends ClassComponent<ContentPageCardAttrs> {
     const { content, header } = vnode.attrs;
 
     return (
-      <CWCard className="ContentPageCard">
-        <div class="header-container">
+      <CWCard class="ContentPageCard">
+        <div className="header-container">
           <CWText type="h5" fontWeight="semiBold">
             {header}
           </CWText>

@@ -25,7 +25,7 @@ const renderThreadPreview = (
 
   return render(ListItem, {
     label: (
-      <div class="thread-preview-row">
+      <div className="thread-preview-row">
         <CWText fontWeight="medium" noWrap>
           {thread.title}
         </CWText>
@@ -87,14 +87,14 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
     };
 
     return (
-      <div class="ThreadSelector">
+      <div className="ThreadSelector">
         {this.loading ? (
           <CWSpinner />
         ) : (
           <>
             <CWTextInput
               placeholder="Search thread titles..."
-              iconRightonclick={() => {
+              iconRightonClick={() => {
                 this.searchTerm = '';
                 this.searchResults = [];
                 this.showOnlyLinkedThreads = true;

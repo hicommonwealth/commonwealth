@@ -63,11 +63,11 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
 
     return (
       <div
-        class={getClasses<{ isLink?: boolean }>(
+        className={getClasses<{ isLink?: boolean }>(
           { isLink: !!path },
           'UserDashboardRow'
         )}
-        onclick={() => {
+        onClick={() => {
           setRoute(path);
           redraw();
         }}

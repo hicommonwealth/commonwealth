@@ -24,15 +24,15 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
     votes.forEach((vote) => csvRows.push([vote.address, vote.option]));
 
     return (
-      <div class="OffchainVotingModal">
-        <div class="compact-modal-title">
+      <div className="OffchainVotingModal">
+        <div className="compact-modal-title">
           <h3>Votes</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
-          <div class="download-link">
+        <div className="compact-modal-body">
+          <div className="download-link">
             <a
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 const csvContent = `data:text/csv;charset=utf-8,${csvRows
                   .map((r) => r.join(','))
@@ -45,8 +45,8 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
             </a>
           </div>
           {votes.map((vote) => (
-            <div class="offchain-poll-voter">
-              <div class="offchain-poll-voter-user">
+            <div className="offchain-poll-voter">
+              <div className="offchain-poll-voter-user">
                 {render(User, {
                   avatarSize: 16,
                   popover: true,
@@ -61,7 +61,7 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
                   hideIdentityIcon: true,
                 })}
               </div>
-              <div class="offchain-poll-voter-choice">{vote.option}</div>
+              <div className="offchain-poll-voter-choice">{vote.option}</div>
             </div>
           ))}
         </div>

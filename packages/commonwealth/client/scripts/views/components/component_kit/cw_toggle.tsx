@@ -29,7 +29,7 @@ export class CWToggle extends ClassComponent<ToggleAttrs> {
 
     return (
       <label
-        class={getClasses<ToggleStyleAttrs>(
+        className={getClasses<ToggleStyleAttrs>(
           {
             checked,
             disabled,
@@ -38,8 +38,8 @@ export class CWToggle extends ClassComponent<ToggleAttrs> {
           ComponentType.Toggle
         )}
       >
-        <input class="toggle-input" {...params} />
-        <div class="slider" />
+        <input className="toggle-input" {...params} />
+        <div className="slider" />
       </label>
     );
   }

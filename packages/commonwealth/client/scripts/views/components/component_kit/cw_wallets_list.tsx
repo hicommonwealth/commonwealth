@@ -122,14 +122,14 @@ export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
     const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
 
     return (
-      <div class="AccountSelector">
-        <div class="close-button-wrapper">
+      <div className="AccountSelector">
+        <div className="close-button-wrapper">
           <CWIconButton
             iconButtonTheme="primary"
             iconName="close"
             iconSize="small"
-            className="close-icon"
-            onclick={() => $('.AccountSelector').trigger('modalexit')}
+            class="close-icon"
+            onClick={() => $('.AccountSelector').trigger('modalexit')}
           />
         </div>
 
@@ -243,17 +243,17 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
     };
 
     return (
-      <div class="WalletsList">
-        <div class="wallets-and-link-container">
+      <div className="WalletsList">
+        <div className="wallets-and-link-container">
           <div
-            class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'wallets')}
+            className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'wallets')}
           >
             {wallets.map((wallet: IWebWallet<any>) => (
               <CWWalletOptionRow
                 walletName={wallet.name}
                 walletLabel={wallet.label}
                 darkMode={darkMode}
-                onclick={async () => {
+                onClick={async () => {
                   await wallet.enable();
                   setSelectedWallet(wallet);
 
@@ -352,18 +352,18 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
               />
             ))}
           </div>
-          <div className="wallet-list-links">
+          <div class="wallet-list-links">
             {showResetWalletConnect && (
               <CWText
                 type="caption"
-                className={getClasses<{ darkMode?: boolean }>(
+                class={getClasses<{ darkMode?: boolean }>(
                   { darkMode },
                   'reset-wc-link'
                 )}
               >
                 <a
                   href="#"
-                  onclick={resetWalletConnectOnclick.bind(this, wallets)}
+                  onClick={resetWalletConnectOnclick.bind(this, wallets)}
                 >
                   Reset WalletConnect
                 </a>
@@ -389,7 +389,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                 trigger={
                   <CWText
                     type="caption"
-                    className={getClasses<{ darkMode?: boolean }>(
+                    class={getClasses<{ darkMode?: boolean }>(
                       { darkMode },
                       'no-wallet-link'
                     )}
@@ -403,12 +403,12 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
         </div>
         <CWText
           type="b2"
-          className={getClasses<{ darkMode?: boolean }>(
+          class={getClasses<{ darkMode?: boolean }>(
             { darkMode },
             'connect-another-way-link'
           )}
         >
-          <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
+          <a onClick={connectAnotherWayOnclick}>Connect Another Way</a>
         </CWText>
       </div>
     );

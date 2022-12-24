@@ -90,8 +90,8 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
         onmouseenter={async () => {
           this.reactors = await fetchReactionsByPost(thread);
         }}
-        onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
-        class={`ThreadPreviewReactionButton${this.loading ? ' disabled' : ''}${
+        onClick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
+        className={`ThreadPreviewReactionButton${this.loading ? ' disabled' : ''}${
           hasReacted ? ' has-reacted' : ''
         }`}
       >
@@ -99,7 +99,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
           iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
           iconSize="small"
         />
-        <div class="reactions-count">{likes}</div>
+        <div className="reactions-count">{likes}</div>
       </div>
     );
 
@@ -107,7 +107,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
       ? render(Popover, {
           interactionType: 'hover',
           content: (
-            <div class="reaction-button-tooltip-contents">
+            <div className="reaction-button-tooltip-contents">
               {getDisplayedReactorsForPopup({
                 likes,
                 reactors: this.reactors,

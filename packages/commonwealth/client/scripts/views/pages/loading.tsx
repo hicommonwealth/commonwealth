@@ -19,8 +19,8 @@ export class PageLoading extends ClassComponent<PageLoadingAttrs> {
 
     return (
       <Sublayout hideSearch>
-        <div class="LoadingPage">
-          <div class="inner-content">
+        <div className="LoadingPage">
+          <div className="inner-content">
             <CWSpinner size="xl" />
             <CWText>{message}</CWText>
           </div>

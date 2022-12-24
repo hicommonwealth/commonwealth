@@ -18,7 +18,7 @@ export class CWSpinner extends ClassComponent<SpinnerAttrs> {
     const { size = 'xl' } = vnode.attrs;
 
     return (
-      <div className={ComponentType.Spinner}>
+      <div class={ComponentType.Spinner}>
         <CWIcon iconName="cow" iconSize={size} />
       </div>
     );

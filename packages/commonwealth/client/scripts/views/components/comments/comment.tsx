@@ -109,27 +109,27 @@ export class Comment extends ClassComponent<CommentAttrs> {
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
     return (
-      <div class={`Comment comment-${comment.id}`}>
+      <div className={`Comment comment-${comment.id}`}>
         {threadLevel > 0 && (
-          <div class="thread-connectors-container">
+          <div className="thread-connectors-container">
             {Array(threadLevel)
               .fill(undefined)
               .map(() => (
-                <div class="thread-connector" />
+                <div className="thread-connector" />
               ))}
           </div>
         )}
-        <div class="comment-body">
-          <div class="comment-header">
+        <div className="comment-body">
+          <div className="comment-header">
             <CommentAuthor comment={comment} />
             {/* don't need this distinction yet since we aren't showing "edited at" */}
-            {/* <CWText type="caption" className="published-text">
+            {/* <CWText type="caption" class="published-text">
               published on
             </CWText> */}
             <CWText
               type="caption"
               fontWeight="medium"
-              className="published-text"
+              class="published-text"
             >
               {moment(comment.createdAt).format('l')}
             </CWText>
@@ -144,28 +144,28 @@ export class Comment extends ClassComponent<CommentAttrs> {
             />
           ) : (
             <>
-              <CWText className="comment-text">
+              <CWText class="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
               {!comment.deleted && (
-                <div class="comment-footer">
-                  <div class="menu-buttons-left">
+                <div className="comment-footer">
+                  <div className="menu-buttons-left">
                     <CommentReactionButton comment={comment} />
                     {canReply && (
                       <div
-                        class="reply-button"
-                        onclick={() => {
+                        className="reply-button"
+                        onClick={() => {
                           handleIsReplying(true, comment.id);
                         }}
                       >
                         <CWIcon iconName="feedback" iconSize="small" />
-                        <CWText type="caption" className="menu-buttons-text">
+                        <CWText type="caption" class="menu-buttons-text">
                           Reply
                         </CWText>
                       </div>
                     )}
                   </div>
-                  <div class="menu-buttons-right">
+                  <div className="menu-buttons-right">
                     <SharePopover commentId={comment.id} />
                     {canEditAndDelete && (
                       <CWPopoverMenu

@@ -152,7 +152,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
 
     return (
       <Sublayout>
-        <div class="NewSnapshotProposalPage">
+        <div className="NewSnapshotProposalPage">
           <CWText type="h3" fontWeight="medium">
             New Snapshot Proposal
           </CWText>
@@ -201,7 +201,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
                     ? 'trash'
                     : undefined
                 }
-                iconRightonclick={() => {
+                iconRightonClick={() => {
                   this.form.choices.pop();
                   redraw();
                 }}
@@ -211,12 +211,12 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
           <CWButton
             iconLeft="plus"
             label="Add voting choice"
-            onclick={() => {
+            onClick={() => {
               this.form.choices.push(`Option ${this.form.choices.length + 1}`);
               redraw();
             }}
           />
-          <div class="date-range">
+          <div className="date-range">
             <CWLabel label="Date Range" />
             <CWRadioGroup
               name="period"
@@ -248,7 +248,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
           <CWButton
             label="Publish"
             disabled={!author || this.saving || !isValid}
-            onclick={async () => {
+            onClick={async () => {
               this.saving = true;
 
               try {

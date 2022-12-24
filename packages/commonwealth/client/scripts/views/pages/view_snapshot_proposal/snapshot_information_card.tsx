@@ -26,8 +26,8 @@ class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
     const { label, value } = vnode.attrs;
 
     return (
-      <div class="SnapshotInfoRow">
-        <CWText type="caption" className="snapshot-info-row-label">
+      <div className="SnapshotInfoRow">
+        <CWText type="caption" class="snapshot-info-row-label">
           {label}
         </CWText>
         <CWText noWrap>{value}</CWText>
@@ -43,12 +43,12 @@ class SnapshotInfoLinkRow extends ClassComponent<SnapshotInfoLinkRowAttrs> {
     const { label, url, value } = vnode.attrs;
 
     return (
-      <div class="SnapshotInfoRow">
-        <CWText type="caption" className="snapshot-info-row-label">
+      <div className="SnapshotInfoRow">
+        <CWText type="caption" class="snapshot-info-row-label">
           {label}
         </CWText>
         <a href={url} target="_blank">
-          <CWText className="snapshot-link" noWrap>
+          <CWText class="snapshot-link" noWrap>
             {value}
           </CWText>
           <CWIcon iconName="externalLink" iconSize="small" />
@@ -75,8 +75,8 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
       <CWContentPageCard
         header="Information"
         content={
-          <div className="SnapshotInformationCard">
-            <div class="info-rows-container">
+          <div class="SnapshotInformationCard">
+            <div className="info-rows-container">
               <SnapshotInfoRow
                 label="Author"
                 value={render(User, {
@@ -123,7 +123,7 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
               />
             </div>
             {!!threads && (
-              <div class="linked-discussions">
+              <div className="linked-discussions">
                 <CWText type="h5" fontWeight="semiBold">
                   Linked Discussions
                 </CWText>

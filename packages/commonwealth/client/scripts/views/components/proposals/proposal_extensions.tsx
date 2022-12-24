@@ -42,7 +42,7 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
       if (!app.user.activeAccount) return 'Misconfigured';
 
       return (
-        <div class="ProposalExtensions">
+        <div className="ProposalExtensions">
           <CWText>
             The winning side's coins will be timelocked according to the weight
             of their vote.
@@ -81,7 +81,7 @@ export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> 
       if (!setCosmosDepositAmount) return 'Misconfigured';
 
       return (
-        <div class="ProposalExtensions">
+        <div className="ProposalExtensions">
           <CWText>
             Must deposit at least:{' '}
             {(app.chain as Cosmos).governance.minDeposit.format()}

@@ -29,10 +29,10 @@ const getTextRows = (subscription: NotificationSubscription) => {
 
     return (
       <>
-        <div class="header-row" onclick={() => setRoute(threadUrl)}>
+        <div className="header-row" onClick={() => setRoute(threadUrl)}>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-            className="attribution-text"
+            class="attribution-text"
             noWrap
           >
             {getNotificationTypeText(subscription.category)}
@@ -41,12 +41,12 @@ const getTextRows = (subscription: NotificationSubscription) => {
             type="b2"
             fontWeight="bold"
             noWrap
-            className="thread-title-text"
+            class="thread-title-text"
           >
             {subscription.Thread.title}
           </CWText>
         </div>
-        <CWText type="caption" className="subscription-body-text" noWrap>
+        <CWText type="caption" class="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Thread.body, {
             collapse: true,
             hideFormatting: true,
@@ -69,10 +69,10 @@ const getTextRows = (subscription: NotificationSubscription) => {
     // );
     return (
       <>
-        <div class="header-row">
+        <div className="header-row">
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-            className="attribution-text"
+            class="attribution-text"
           >
             {getNotificationTypeText(subscription.category)}
           </CWText>
@@ -93,12 +93,12 @@ const getTextRows = (subscription: NotificationSubscription) => {
           </CWText>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-            className="attribution-text"
+            class="attribution-text"
           >
             comment
           </CWText>
         </div>
-        <CWText type="caption" className="subscription-body-text" noWrap>
+        <CWText type="caption" class="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Comment.text, {
             collapse: true,
             hideFormatting: true,
@@ -113,12 +113,12 @@ const getTextRows = (subscription: NotificationSubscription) => {
   ) {
     return (
       <div
-        class="header-row"
-        onclick={() => setRoute(subscription.Chain.id)}
+        className="header-row"
+        onClick={() => setRoute(subscription.Chain.id)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-          className="attribution-text"
+          class="attribution-text"
         >
           New Threads in
         </CWText>
@@ -144,7 +144,7 @@ export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRow
     const { subscription } = vnode.attrs;
 
     return (
-      <div class="SubscriptionRowTextContainer">
+      <div className="SubscriptionRowTextContainer">
         <CWIcon
           iconName={
             subscription.category === 'new-reaction'
@@ -153,7 +153,7 @@ export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRow
           }
           iconSize="small"
         />
-        <div class="title-and-body-container">{getTextRows(subscription)}</div>
+        <div className="title-and-body-container">{getTextRows(subscription)}</div>
       </div>
     );
   }

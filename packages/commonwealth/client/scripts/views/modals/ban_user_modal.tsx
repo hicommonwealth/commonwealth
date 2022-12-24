@@ -24,18 +24,18 @@ export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
 
     return (
       <>
-        <div class="compact-modal-title ban-user">
+        <div className="compact-modal-title ban-user">
           <h3>Are You Sure?</h3>
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <div>
             Banning an address prevents it from interacting with the forum.
           </div>
-          <div class="ban-modal-content">
+          <div className="ban-modal-content">
             <CWButton
               label="Ban Address (just click once and wait)"
               buttonType="primary-red"
-              onclick={async () => {
+              onClick={async () => {
                 try {
                   // ZAK TODO: Update Banned User Table with userProfile
                   if (!address) {

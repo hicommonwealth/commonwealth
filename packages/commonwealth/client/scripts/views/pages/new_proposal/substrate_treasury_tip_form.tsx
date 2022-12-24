@@ -59,7 +59,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
         />
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             if (!this.beneficiary) {

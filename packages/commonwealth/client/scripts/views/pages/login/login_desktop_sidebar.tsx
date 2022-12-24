@@ -54,10 +54,10 @@ export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs
       wallets,
     } = vnode.attrs;
     return (
-      <div class="LoginDesktopSidebar">
+      <div className="LoginDesktopSidebar">
         {sidebarType === 'connectWallet' && (
-          <div class="connect-wallet">
-            <div class="sidebar-content">
+          <div className="connect-wallet">
+            <div className="sidebar-content">
               <LoginText
                 headerText={
                   wallets.length > 0
@@ -72,31 +72,31 @@ export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs
           </div>
         )}
         {sidebarType === 'newOrReturning' && (
-          <div class="new-or-returning">
-            <CWText type="h4" fontWeight="semiBold" className="header-text">
+          <div className="new-or-returning">
+            <CWText type="h4" fontWeight="semiBold" class="header-text">
               New or Returning?
             </CWText>
-            <CWAccountCreationButton onclick={createNewAccountCallback} />
+            <CWAccountCreationButton onClick={createNewAccountCallback} />
             <CWAccountCreationButton
               creationType="linkAccount"
-              onclick={linkExistingAccountCallback}
+              onClick={linkExistingAccountCallback}
             />
           </div>
         )}
         {sidebarType === 'communityWalletOptions' && (
-          <div class="eth-wallet">
-            <CWText type="h4" fontWeight="semiBold" className="header-text">
+          <div className="eth-wallet">
+            <CWText type="h4" fontWeight="semiBold" class="header-text">
               {generateText(wallets)}
             </CWText>
-            <CWText type="b2" className="sidebar-body-text">
+            <CWText type="b2" class="sidebar-body-text">
               Many communities require different wallets based on the chain they
               are built on and the types of tokens members hold.
             </CWText>
           </div>
         )}
         {sidebarType === 'newAddressLinked' && (
-          <div class="connect-wallet">
-            <div class="sidebar-content">
+          <div className="connect-wallet">
+            <div className="sidebar-content">
               <LoginText
                 headerText="New Address Linked"
                 bodyText={` By linking a new address, you are able to switch with ease and
@@ -106,7 +106,7 @@ export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs
               <CWButton
                 buttonType="tertiary-blue"
                 label="Manage Addresses"
-                onclick={() => {
+                onClick={() => {
                   // fill in
                 }}
               />

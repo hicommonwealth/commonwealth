@@ -46,7 +46,7 @@ export class StarterCommunityForm extends ClassComponent {
 
   view() {
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <InputRow
           title="Name"
           placeholder="Enter the name of your community"
@@ -82,7 +82,7 @@ export class StarterCommunityForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving || this.state.form.id.length < 1}
-          onclick={async () => {
+          onClick={async () => {
             this.state.saving = true;
             const additionalArgs: {
               eth_chain_id?: number;

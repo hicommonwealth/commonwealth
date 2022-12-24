@@ -61,13 +61,13 @@ class Web3LoginPage extends ClassComponent {
 
     return (
       <Sublayout>
-        <div class="Web3LoginPage">
-          <div class="web3-login-container">
+        <div className="Web3LoginPage">
+          <div className="web3-login-container">
             {/* <h3>{app.isLoggedIn() ? 'Connect to Commonwealth': 'Log into Commonwealth'}</h3> */}
             <CWButton
               label="Connect"
               buttonType="lg-primary-blue"
-              onclick={() => {
+              onClick={() => {
                 if (app.isLoggedIn()) {
                   onSuccess();
                 } else {

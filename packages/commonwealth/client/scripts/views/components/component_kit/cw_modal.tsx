@@ -82,17 +82,17 @@ export class CWModal extends ClassComponent<ModalAttrs> {
     const confirmExit = spec.modal.confirmExit || (() => true);
 
     return (
-      <div class={ComponentType.Modal}>
+      <div className={ComponentType.Modal}>
         <div
-          class="modal-overlay"
-          onclick={() => onclick(spec, confirmExit, exitCallback)}
+          className="modal-overlay"
+          onClick={() => onclick(spec, confirmExit, exitCallback)}
         >
           <div
-            class={getClasses<{ isFullScreen: boolean }>(
+            className={getClasses<{ isFullScreen: boolean }>(
               { isFullScreen: this.modalTypeState === 'fullScreen' },
               'modal-container'
             )}
-            onclick={(e) => {
+            onClick={(e) => {
               e.stopPropagation();
             }}
           >
@@ -116,12 +116,12 @@ export class ModalExitButton extends ClassComponent<ModalExitButtonAttrs> {
     return (
       // class is to avoid classname collisions when positioning the button,
       // since .IconButton will often be used in the same vicinity
-      <div class="ModalExitButton">
+      <div className="ModalExitButton">
         <CWIconButton
           disabled={disabled}
           iconButtonTheme={iconButtonTheme}
           iconName="close"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             $(e.target).trigger('modalexit');
           }}

@@ -46,9 +46,9 @@ class Councillor extends ClassComponent<CouncillorAttrs> {
       .filter((v) => v.votes.includes(account.address));
 
     return (
-      <CWCard className="CouncillorCard">
+      <CWCard class="CouncillorCard">
         {render(User, { user: account, popover: true, hideIdentityIcon: true })}
-        <CWText className="councillor-status-text">
+        <CWText class="councillor-status-text">
           {election.isMember(account)
             ? `${election.backing(account).format(true)} from ${pluralize(
                 votes?.length || 0,
@@ -167,7 +167,7 @@ class CouncilPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Council" />}
       >
-        <div class="CouncilPage">
+        <div className="CouncilPage">
           <GovExplainer
             statHeaders={[
               {
@@ -207,7 +207,7 @@ class CouncilPage extends ClassComponent {
               app.chain.networkStatus === ApiStatus.Connected && (
                 <>
                   <CWButton
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       app.modals.create({
                         modal: CouncilVotingModal,
@@ -217,7 +217,7 @@ class CouncilPage extends ClassComponent {
                     label="Vote"
                   />
                   <CWButton
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       if (activeAccountIsCandidate) {
                         return;

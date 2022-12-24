@@ -322,7 +322,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       return (
         <>
           {channel.unread > 0 && (
-            <div class="unread-icon">{channel.unread}</div>
+            <div className="unread-icon">{channel.unread}</div>
           )}
           {render(Icon, {
             name: Icons.EDIT,

@@ -53,8 +53,8 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
     const chainOrCommObj = { chain: app.activeChainId() };
 
     return (
-      <div class="UpgradeRolesForm">
-        <div class="members-container">
+      <div className="UpgradeRolesForm">
+        <div className="members-container">
           <CWRadioGroup
             name="members/mods"
             options={nonAdminNames.map((n) => ({ label: n, value: n }))}
@@ -64,7 +64,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
             }}
           />
         </div>
-        <div class="upgrade-buttons-container">
+        <div className="upgrade-buttons-container">
           <CWRadioGroup
             name="roles"
             options={[
@@ -79,7 +79,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
           <CWButton
             label="Upgrade Member"
             disabled={!this.role || !this.user}
-            onclick={() => {
+            onClick={() => {
               const indexOfName = nonAdminNames.indexOf(this.user);
 
               const user = nonAdmins[indexOfName];

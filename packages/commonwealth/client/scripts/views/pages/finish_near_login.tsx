@@ -184,7 +184,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
             NEAR account log in error: {this.state.validationError}
           </CWText>
           <CWButton
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               redirectToNextPage();
             }}

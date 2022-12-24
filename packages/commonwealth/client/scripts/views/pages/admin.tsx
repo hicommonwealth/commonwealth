@@ -35,7 +35,7 @@ class SudoForm extends ClassComponent {
 
     if (author && author.address !== substrate.chain.sudoKey) {
       return (
-        <div class="admin-column">
+        <div className="admin-column">
           <CWText>Must be logged into admin account to use Sudo: </CWText>
           {render(User, {
             user: app.chain.accounts.get(substrate.chain.sudoKey),
@@ -55,12 +55,12 @@ class SudoForm extends ClassComponent {
     }
 
     return (
-      <div class="admin-column">
+      <div className="admin-column">
         <CWText type="h5">Sudo: run function as Admin</CWText>
         {render(EdgewareFunctionPicker)}
         <CWButton
           disabled={this.txProcessing}
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             const call = EdgewareFunctionPicker.getMethod({
               module: '',
@@ -103,71 +103,71 @@ class ChainStats extends ClassComponent {
     ];
 
     return (
-      <div class="admin-column">
+      <div className="admin-column">
         <CWText type="h5">ChainInfo</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Id" />
           <CWText>{app.activeChainId()}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Name" />
           <CWText>{app.chain.name?.toString()}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Version" />
           <CWText>{app.chain.version?.toString()}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Runtime" />
           <CWText>{app.chain.runtimeName?.toString()}</CWText>
         </div>
         <CWText type="h5">Block Production</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Current Block" />
           <CWText>{app.chain.block?.height}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Last Block Created" />
           <CWText>{app.chain.block?.lastTime.format('HH:mm:ss')}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Target Block Time" />
           <CWText>{app.chain.block?.duration} sec</CWText>
         </div>
         <CWText type="h5">Balances</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Total EDG" />
           <CWText>{formatCoin(substrate.chain.totalbalance)}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Existential Deposit" />
           <CWText>{formatCoin(substrate.chain.existentialdeposit)}</CWText>
         </div>
         <CWText type="h5">Democracy Proposals</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Launch Period" />
           <CWText>
             {formatBlocks(substrate.democracyProposals.launchPeriod)}
           </CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Minimum Deposit" />
           <CWText>
             {formatCoin(substrate.democracyProposals.minimumDeposit)}
           </CWText>
         </div>
         <CWText type="h5">Phragmen Elections</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Term Length" />
           <CWText>
             {formatBlocks(substrate.phragmenElections.termDuration)}
           </CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Voting Bond" />
           <CWText>{formatCoin(substrate.phragmenElections.votingBond)}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Candidacy Bond" />
           <CWText>
             {formatCoin(substrate.phragmenElections.candidacyBond)}
@@ -215,7 +215,7 @@ class AdminActions extends ClassComponent {
     }
 
     return (
-      <div class="admin-column">
+      <div className="admin-column">
         <CWText type="h5">Admin</CWText>
         <CWText>Set up the chain with test proposals</CWText>
         <CWText>
@@ -251,7 +251,7 @@ class AdminActions extends ClassComponent {
         />
         <CWButton
           disabled={this.inprogress}
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             this.inprogress = true;
             // TODO: Change to PUT /adminStatus
@@ -294,7 +294,7 @@ class AdminPage extends ClassComponent {
     } else if (app.chain && app.user.isSiteAdmin) {
       return (
         <Sublayout>
-          <div class="AdminPage">
+          <div className="AdminPage">
             {app.chain ? (
               <>
                 <AdminActions />

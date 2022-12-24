@@ -21,9 +21,9 @@ export class CWAccountCreationButton extends ClassComponent<AccountCreationButto
 
     return (
       <CWCard
-        className={ComponentType.AccountCreationButton}
+        class={ComponentType.AccountCreationButton}
         elevation="elevation-3"
-        onclick={onclick}
+        onClick={onclick}
       >
         <CWIcon
           iconName={creationType === 'newAccount' ? 'plusCircle' : 'link'}

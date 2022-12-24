@@ -52,9 +52,9 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
       <CWContentPageCard
         header="Linked Discussions"
         content={
-          <div class="LinkedThreadsCard">
+          <div className="LinkedThreadsCard">
             {thread.linkedThreads.length > 0 ? (
-              <div class="links-container">
+              <div className="links-container">
                 {this.linkedThreads.map((t) => {
                   const discussionLink = getProposalUrlPath(
                     t.slug,
@@ -65,7 +65,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
                 })}
               </div>
             ) : (
-              <CWText type="b2" className="no-threads-text">
+              <CWText type="b2" class="no-threads-text">
                 There are currently no linked discussions.
               </CWText>
             )}
@@ -73,7 +73,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
               <CWButton
                 buttonType="mini-black"
                 label="Link discussion"
-                onclick={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   app.modals.create({
                     modal: LinkedThreadModal,

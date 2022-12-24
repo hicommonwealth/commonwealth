@@ -20,7 +20,7 @@ export class CWAvatar extends ClassComponent<AvatarAttrs> {
 
     return (
       <div
-        class={ComponentType.Avatar}
+        className={ComponentType.Avatar}
         style={`width: ${size}px; height: ${size}px; background-image: url('${avatarUrl}');`}
       />
     );

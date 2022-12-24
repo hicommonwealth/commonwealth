@@ -43,33 +43,33 @@ class NotificationSettingsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Notification Settings" />}
       >
-        <div class="NotificationSettingsPage">
-          <CWText type="h3" fontWeight="semiBold" className="page-header-text">
+        <div className="NotificationSettingsPage">
+          <CWText type="h3" fontWeight="semiBold" class="page-header-text">
             Notification Management
           </CWText>
-          <CWText className="page-subheader-text">
+          <CWText class="page-subheader-text">
             Notification settings for all new threads, comments, mentions,
             likes, and chain events in the following communities.
           </CWText>
-          <div class="column-header-row">
+          <div className="column-header-row">
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
-              className="column-header-text"
+              class="column-header-text"
             >
               Community
             </CWText>
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
-              className="column-header-text"
+              class="column-header-text"
             >
               Email
             </CWText>
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
-              className="last-column-header-text"
+              class="last-column-header-text"
             >
               In-App
             </CWText>
@@ -80,12 +80,12 @@ class NotificationSettingsPage extends ClassComponent {
             const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
             return (
-              <div class="notification-row">
+              <div className="notification-row">
                 <CWCollapsible
                   headerContent={
-                    <div class="notification-row-header">
-                      <div className="left-content-container">
-                        <div class="avatar-and-name">
+                    <div className="notification-row-header">
+                      <div class="left-content-container">
+                        <div className="avatar-and-name">
                           <CWCommunityAvatar
                             size="medium"
                             community={chainInfo}
@@ -94,7 +94,7 @@ class NotificationSettingsPage extends ClassComponent {
                             {chainInfo?.name}
                           </CWText>
                         </div>
-                        <CWText type="b2" className="subscriptions-count-text">
+                        <CWText type="b2" class="subscriptions-count-text">
                           {subs.length} subscriptions
                         </CWText>
                       </div>
@@ -134,23 +134,23 @@ class NotificationSettingsPage extends ClassComponent {
                     </div>
                   }
                   collapsibleContent={
-                    <div class="subscriptions-list-container">
-                      <div class="subscriptions-list-header">
+                    <div className="subscriptions-list-container">
+                      <div className="subscriptions-list-header">
                         <CWText
                           type="caption"
-                          className="subscription-list-header-text"
+                          class="subscription-list-header-text"
                         >
                           Title
                         </CWText>
                         <CWText
                           type="caption"
-                          className="subscription-list-header-text"
+                          class="subscription-list-header-text"
                         >
                           Subscribed
                         </CWText>
                         <CWText
                           type="caption"
-                          className="subscription-list-header-text"
+                          class="subscription-list-header-text"
                         >
                           Author
                         </CWText>
@@ -194,7 +194,7 @@ class NotificationSettingsPage extends ClassComponent {
 
                         return (
                           <>
-                            <div class="subscription-row-desktop">
+                            <div className="subscription-row-desktop">
                               <SubscriptionRowTextContainer
                                 subscription={sub}
                               />
@@ -202,19 +202,19 @@ class NotificationSettingsPage extends ClassComponent {
                               {getUser()}
                               <SubscriptionRowMenu subscription={sub} />
                             </div>
-                            <div class="subscription-row-mobile">
-                              <div class="subscription-row-mobile-top">
+                            <div className="subscription-row-mobile">
+                              <div className="subscription-row-mobile-top">
                                 <SubscriptionRowTextContainer
                                   subscription={sub}
                                 />
                                 <SubscriptionRowMenu subscription={sub} />
                               </div>
-                              <div class="subscription-row-mobile-bottom">
+                              <div className="subscription-row-mobile-bottom">
                                 {getUser()}
                                 {getTimeStamp() && (
                                   <CWText
                                     type="caption"
-                                    className="subscription-list-header-text"
+                                    class="subscription-list-header-text"
                                   >
                                     subscribed
                                   </CWText>
@@ -222,7 +222,7 @@ class NotificationSettingsPage extends ClassComponent {
                                 <CWText
                                   type="caption"
                                   fontWeight="medium"
-                                  className="subscription-list-header-text"
+                                  class="subscription-list-header-text"
                                 >
                                   {getTimeStamp()}
                                 </CWText>

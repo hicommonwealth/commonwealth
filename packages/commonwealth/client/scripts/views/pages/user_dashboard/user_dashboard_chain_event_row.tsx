@@ -23,11 +23,11 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
 
     return (
       <div
-        class={getClasses<{ isLink?: boolean }>(
+        className={getClasses<{ isLink?: boolean }>(
           { isLink: !!label.linkUrl },
           'UserDashboardChainEventRow'
         )}
-        onclick={() => {
+        onClick={() => {
           if (label.linkUrl) {
             setRoute(label.linkUrl);
           }
@@ -35,12 +35,12 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
         }}
       >
         <CWCommunityAvatar community={chain} />
-        <div class="chain-event-text-container">
-          <CWText className="row-top-text">
+        <div className="chain-event-text-container">
+          <CWText class="row-top-text">
             <b>{label.heading}</b>
             <span>in</span>
             <a
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setRoute(`/${chain}`);
@@ -48,7 +48,7 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
             >
               {chain?.name || 'Unknown chain'}
             </a>
-            <span class="block-number">Block {blockNumber}</span>
+            <span className="block-number">Block {blockNumber}</span>
           </CWText>
           <CWText>{label.label}</CWText>
         </div>

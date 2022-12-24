@@ -21,8 +21,8 @@ export class AaveInfoRow extends ClassComponent<AaveInfoRowAttrs> {
     const { aaveNum, aaveText } = vnode.attrs;
 
     return (
-      <div class="AaveInfoRow">
-        <CWText type="h5" fontWeight="semiBold" className="aave-num-text">
+      <div className="AaveInfoRow">
+        <CWText type="h5" fontWeight="semiBold" class="aave-num-text">
           {roundVote(aaveNum * 100)}%
         </CWText>
         <CWText noWrap>{aaveText}</CWText>
@@ -49,9 +49,9 @@ export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetai
     // const executor = proposal.Executor;
 
     return (
-      <div class="AaveProposalCardDetail">
-        <div class="aave-metadata-container">
-          <div class="aave-metadata-column">
+      <div className="AaveProposalCardDetail">
+        <div className="aave-metadata-container">
+          <div className="aave-metadata-column">
             <CWLabel label="Author" />
             {proposal.ipfsData?.author ? (
               <CWText title={proposal.ipfsData.author.split(' (')[0]} noWrap>
@@ -65,12 +65,12 @@ export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetai
               })
             )}
           </div>
-          <div class="aave-metadata-column">
+          <div className="aave-metadata-column">
             <CWLabel label="Status" />
             <CWText noWrap>{statusText}</CWText>
           </div>
         </div>
-        <div class="aave-voting-section">
+        <div className="aave-voting-section">
           <CWLabel label="Voting" />
           <AaveInfoRow aaveNum={proposal.turnout} aaveText="of token holders" />
           <AaveInfoRow aaveNum={proposal.support} aaveText="in favor" />
@@ -79,7 +79,7 @@ export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetai
             aaveText="differential"
           />
         </div>
-        <div class="aave-voting-section">
+        <div className="aave-voting-section">
           <CWLabel label="Required to pass" />
           <AaveInfoRow
             aaveNum={proposal.minimumQuorum}

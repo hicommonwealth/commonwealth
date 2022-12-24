@@ -56,7 +56,7 @@ type CannotVoteAttrs = { label: string };
 class CannotVote extends ClassComponent<CannotVoteAttrs> {
   view(vnode: ResultNode<CannotVoteAttrs>) {
     return (
-      <div class="CannotVote">
+      <div className="CannotVote">
         <CWButton disabled label={vnode.attrs.label} />
       </div>
     );
@@ -355,7 +355,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     const yesButton = (
       <CWButton
         disabled={!canVote || hasVotedYes || votingModalOpen}
-        onclick={voteYes}
+        onClick={voteYes}
         label={hasVotedYes ? 'Voted yes' : 'Vote yes'}
       />
     );
@@ -364,7 +364,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       <CWButton
         buttonType="primary-red"
         disabled={!canVote || hasVotedNo || votingModalOpen}
-        onclick={voteNo}
+        onClick={voteNo}
         label={hasVotedNo ? 'Voted no' : 'Vote no'}
       />
     );
@@ -373,7 +373,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     const multiDepositApproveButton = (
       <CWButton
         disabled={!canVote || votingModalOpen}
-        onclick={voteYes}
+        onClick={voteYes}
         label={hasVotedYes && !canVote ? 'Already approved' : 'Second'}
       />
     );
@@ -383,7 +383,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       <CWButton
         buttonType="primary-red"
         disabled={!canVote || hasVotedAbstain || votingModalOpen}
-        onclick={voteAbstain}
+        onClick={voteAbstain}
         label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
       />
     );
@@ -393,7 +393,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       <CWButton
         buttonType="primary-red"
         disabled={!canVote || hasVotedVeto || votingModalOpen}
-        onclick={voteVeto}
+        onClick={voteVeto}
         label={hasVotedVeto ? 'Vetoed' : 'Veto'}
       />
     );
@@ -405,7 +405,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           proposal.state !== MolochProposalState.ReadyToProcess ||
           votingModalOpen
         }
-        onclick={processProposal}
+        onClick={processProposal}
         label={proposal.data.processed ? 'Processed' : 'Process'}
       />
     );
@@ -414,7 +414,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     const removeButton = proposal instanceof NearSputnikProposal && (
       <CWButton
         disabled={!canVote || votingModalOpen}
-        onclick={voteRemove}
+        onClick={voteRemove}
         label={hasVotedRemove ? 'Voted remove' : 'Vote remove'}
       />
     );
@@ -423,7 +423,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
 
     if (proposal instanceof AaveProposal) {
       votingActionObj = (
-        <div class="button-row">
+        <div className="button-row">
           {yesButton}
           {noButton}
         </div>
@@ -431,7 +431,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       votingActionObj = (
         <>
-          <div class="button-row">
+          <div className="button-row">
             {yesButton}
             {noButton}
           </div>
@@ -441,7 +441,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       votingActionObj = (
         <>
-          <div class="button-row">
+          <div className="button-row">
             {yesButton}
             {noButton}
           </div>
@@ -459,7 +459,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
       votingActionObj = (
         <>
-          <div class="button-row">{multiDepositApproveButton}</div>
+          <div className="button-row">{multiDepositApproveButton}</div>
           <ProposalExtensions
             proposal={proposal}
             setCosmosDepositAmount={(c) => {
@@ -471,7 +471,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       votingActionObj = (
         <>
-          <div class="button-row">
+          <div className="button-row">
             {yesButton}
             {noButton}
             {abstainButton}
@@ -483,7 +483,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       votingActionObj = (
         <>
-          <div class="button-row">
+          <div className="button-row">
             {yesButton}
             {noButton}
             {processButton}
@@ -499,7 +499,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       );
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
       votingActionObj = (
-        <div class="button-row">
+        <div className="button-row">
           {yesButton}
           <CompoundCancelButton
             onModalClose={onModalClose}
@@ -510,7 +510,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       );
     } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
       votingActionObj = (
-        <div class="button-row">
+        <div className="button-row">
           {yesButton}
           {noButton}
           {abstainButton}
@@ -523,7 +523,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       );
     } else if (proposal.votingType === VotingType.YesNoReject) {
       votingActionObj = (
-        <div class="button-row">
+        <div className="button-row">
           {yesButton}
           {noButton}
           {removeButton}
@@ -538,8 +538,8 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     }
 
     return (
-      <div class="VotingActions">
-        <CWText type="h4" className="voting-actions-header">
+      <div className="VotingActions">
+        <CWText type="h4" class="voting-actions-header">
           Cast Your Vote
         </CWText>
         {votingActionObj}

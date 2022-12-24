@@ -38,7 +38,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
 
     return (
       <div
-        class={getClasses<{ orientation?: Orientation }>(
+        className={getClasses<{ orientation?: Orientation }>(
           { orientation },
           'AvatarUsernameInput'
         )}
@@ -60,7 +60,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
             redraw();
           }}
         />
-        <div class="input-and-address-container">
+        <div className="input-and-address-container">
           <CWTextInput
             darkMode={darkMode}
             size="small"
@@ -70,7 +70,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
               onUsernameChangeHandler((e.target as any).value);
             }}
           />
-          <CWText type="caption" className="abbreviated-address">
+          <CWText type="caption" class="abbreviated-address">
             {formatAddressShort(address)}
           </CWText>
         </div>

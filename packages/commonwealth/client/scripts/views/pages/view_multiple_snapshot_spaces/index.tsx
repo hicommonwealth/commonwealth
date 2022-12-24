@@ -95,7 +95,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
       <Sublayout
       // title="Proposals"
       >
-        <div class="MultipleSnapshotsPage">
+        <div className="MultipleSnapshotsPage">
           <CWText type="h3">{redirectOptions.headerMessage}</CWText>
           {app.chain && this.spacesMetadata && (
             <CardsCollection

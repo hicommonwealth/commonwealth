@@ -87,8 +87,8 @@ export class NotificationsMenu extends ClassComponent {
       );
 
     return (
-      <div class="NotificationsMenu">
-        <div class="NotificationsMenuHeader">
+      <div className="NotificationsMenu">
+        <div className="NotificationsMenuHeader">
           {render(Button, {
             label:
               // discussionNotificationsCount
@@ -116,7 +116,7 @@ export class NotificationsMenu extends ClassComponent {
             },
           })}
         </div>
-        <div class="notification-list">
+        <div className="notification-list">
           {(() => {
             if (this.selectedChainEvents) {
               if (this.showingChainEventNotifications.length > 0) {
@@ -165,7 +165,7 @@ export class NotificationsMenu extends ClassComponent {
             }
           })()}
         </div>
-        <div class="NotificationsMenuFooter">
+        <div className="NotificationsMenuFooter">
           {render(Button, {
             label: 'See all',
             onclick: () =>
@@ -228,7 +228,7 @@ export class NotificationsMenuPopover extends ClassComponent {
       transitionDuration: 0,
       trigger:
         app.user.notifications.numUnread > 0 ? (
-          <div class="unreads-icon">
+          <div className="unreads-icon">
             <CWCustomIcon iconName="unreads" />
           </div>
         ) : (

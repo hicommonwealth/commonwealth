@@ -196,24 +196,24 @@ class MembersPage extends ClassComponent {
     return (
       <Sublayout
         title={<BreadcrumbsTitleTag title="Members" />}
-        onscroll={this.onscroll}
+        onScroll={this.onscroll}
       >
-        <div class="MembersPage">
+        <div className="MembersPage">
           <CWText type="h3" fontWeight="medium">
             {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}
           </CWText>
-          <div class="header-row">
+          <div className="header-row">
             <CWText type="h5">Member</CWText>
             <CWText type="h5">Posts / Month</CWText>
           </div>
-          <div class="members-container">
+          <div className="members-container">
             {profilesLoaded.map((profileInfo) => {
               const { address, chain } = profileInfo.profile;
               return (
-                <div class="member-row">
+                <div className="member-row">
                   <a
                     href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       localStorage[`${app.activeChainId()}-members-scrollY`] =
                         window.scrollY;
@@ -230,9 +230,9 @@ class MembersPage extends ClassComponent {
               );
             })}
           </div>
-          <div class="infinite-scroll-wrapper">
+          <div className="infinite-scroll-wrapper">
             {profilesFinishedLoading ? (
-              <CWText className="infinite-scroll-reached-end-text">
+              <CWText class="infinite-scroll-reached-end-text">
                 Showing all {membersLoaded.length} community members
               </CWText>
             ) : (

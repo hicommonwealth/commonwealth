@@ -25,8 +25,8 @@ const ConfirmModal = {
 
     return (
       <div
-        class="ConfirmModal"
-        onclick={(e) => {
+        className="ConfirmModal"
+        onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
@@ -35,12 +35,12 @@ const ConfirmModal = {
           e.stopPropagation();
         }}
       >
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <h3>{confirmText}</h3>
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {
@@ -54,7 +54,7 @@ const ConfirmModal = {
           />
           <CWButton
             buttonType="secondary-blue"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
             }}

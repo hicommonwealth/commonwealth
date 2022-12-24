@@ -71,7 +71,7 @@ export class ExploreCommunitiesSidebar extends ClassComponent {
 
     return (
       <CWSidebarMenu
-        className="ExploreCommunitiesSidebar"
+        class="ExploreCommunitiesSidebar"
         menuHeader={{
           label: 'Explore',
           onclick: async () => {

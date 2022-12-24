@@ -162,7 +162,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
 
     return (
       <div
-        class={editorClass}
+        className={editorClass}
         oncreate={(childVnode) => {
           this.$editor = $(childVnode.dom).find('.quill-editor');
           this.editor = new QuillEditor(
@@ -179,14 +179,14 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
           if (oncreateBind) oncreateBind(this.editor);
         }}
       >
-        <div class="quill-editor" />
+        <div className="quill-editor" />
         {this.activeMode === 'markdown' && (
           <CWText
             type="h5"
             fontWeight="semiBold"
-            className="mode-switcher"
+            class="mode-switcher"
             title="Switch to RichText mode"
-            onclick={(e) => {
+            onClick={(e) => {
               this.activeMode = 'richText';
               this.editor.activeMode = this.activeMode;
             }}
@@ -198,9 +198,9 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
           <CWText
             type="h5"
             fontWeight="semiBold"
-            className="mode-switcher"
+            class="mode-switcher"
             title="Switch to Markdown mode"
-            onclick={async () => {
+            onClick={async () => {
               // Confirm before removing formatting and switching to Markdown mode.
               const confirmed = await this._confirmRemoveFormatting();
               if (!confirmed) return;
@@ -218,7 +218,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
           iconName="search"
           iconSize="small"
           iconButtonTheme="primary"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             app.modals.create({
               modal: PreviewModal,

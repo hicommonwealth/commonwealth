@@ -61,23 +61,23 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
     const { headerText, bodyText } = getText(bodyType);
 
     return (
-      <div class="LoginMobile">
+      <div className="LoginMobile">
         <ModalExitButton iconButtonTheme="hasBackground" />
         {bodyType === 'ethWalletList' && <LoginEthAlert />}
-        <div class={bodyType}>
+        <div className={bodyType}>
           <LoginText headerText={headerText} bodyText={bodyText} isMobile />
           {hasCreationButtons && (
-            <div class="account-creation-buttons-row">
-              <CWAccountCreationButton onclick={createNewAccountCallback} />
+            <div className="account-creation-buttons-row">
+              <CWAccountCreationButton onClick={createNewAccountCallback} />
               <CWAccountCreationButton
                 creationType="linkAccount"
-                onclick={linkExistingAccountCallback}
+                onClick={linkExistingAccountCallback}
               />
             </div>
           )}
           {bodyType === 'walletList' && (
             <CWWalletsList
-              connectAnotherWayOnclick={() => {
+              connectAnotherWayonClick={() => {
                 setBodyType('connectWithEmail');
               }}
               wallets={wallets}
@@ -93,7 +93,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
           )}
           {bodyType === 'selectPrevious' && (
             <CWWalletsList
-              connectAnotherWayOnclick={() => {
+              connectAnotherWayonClick={() => {
                 setBodyType('connectWithEmail');
               }}
               wallets={wallets}
@@ -108,7 +108,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
             />
           )}
           {bodyType === 'welcome' && (
-            <div class="inner-body-container">
+            <div className="inner-body-container">
               <CWAvatarUsernameInput
                 address={address}
                 darkMode
@@ -121,16 +121,16 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
                 }}
                 orientation="vertical"
               />
-              <CWButton label="Finish" onclick={saveProfileInfoCallback} />
+              <CWButton label="Finish" onClick={saveProfileInfoCallback} />
             </div>
           )}
           {bodyType === 'selectProfile' && (
-            <div class="inner-body-container">
-              <div class="inner-inner-body-container">
+            <div className="inner-body-container">
+              <div className="inner-inner-body-container">
                 <CWText
                   type="h5"
                   fontWeight="medium"
-                  className="inner-body-text"
+                  class="inner-body-text"
                 >
                   Linking
                 </CWText>
@@ -138,17 +138,17 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h5"
                   fontWeight="medium"
-                  className="inner-body-text"
+                  class="inner-body-text"
                 >
                   to your Profile
                 </CWText>
                 <CWProfilesList profiles={profiles} darkMode />
               </div>
-              <CWButton label="Finish" onclick={performLinkingCallback} />
+              <CWButton label="Finish" onClick={performLinkingCallback} />
             </div>
           )}
           {bodyType === 'connectWithEmail' && (
-            <div class="inner-body-container">
+            <div className="inner-body-container">
               {!magicLoading ? (
                 <CWTextInput
                   label="email address"
@@ -159,29 +159,29 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
               ) : (
                 <CWSpinner />
               )}
-              <div class="buttons-row">
+              <div className="buttons-row">
                 <CWButton
                   label="Back"
                   buttonType="secondary-blue-dark"
-                  onclick={() => {
+                  onClick={() => {
                     setBodyType('walletList');
                   }}
                 />
                 <CWButton
                   label="Connect"
-                  onclick={handleEmailLoginCallback}
+                  onClick={handleEmailLoginCallback}
                   buttonType="primary-blue-dark"
                 />
               </div>
             </div>
           )}
           {bodyType === 'allSet' && (
-            <div class="inner-body-container">
-              <div class="inner-inner-body-container">
+            <div className="inner-body-container">
+              <div className="inner-inner-body-container">
                 <CWText
                   type="h5"
                   fontWeight="medium"
-                  className="inner-body-text"
+                  class="inner-body-text"
                 >
                   You have sucessfully linked
                 </CWText>
@@ -189,7 +189,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h5"
                   fontWeight="medium"
-                  className="inner-body-text"
+                  class="inner-body-text"
                 >
                   to your Profile
                 </CWText>

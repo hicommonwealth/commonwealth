@@ -14,8 +14,8 @@ class NewThreadModal extends ClassComponent {
     const hasTopics = !!app.topics.getByCommunity(app.chain.id).length;
 
     return (
-      <div class="NewThreadModal">
-        <div class="compact-modal-title">
+      <div className="NewThreadModal">
+        <div className="compact-modal-title">
           <h3>New thread</h3>
           <ModalExitButton />
         </div>

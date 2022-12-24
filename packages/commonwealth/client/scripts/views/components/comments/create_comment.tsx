@@ -137,15 +137,15 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       : 18;
 
     return (
-      <div class="CreateComment">
+      <div className="CreateComment">
         {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
-          <CWText type="h5" className="callout-text">
+          <CWText type="h5" class="callout-text">
             You haven't set a display name yet.
             <a
               href={`/${app.activeChainId()}/account/${
                 app.user.activeAccount.address
               }?base=${app.user.activeAccount.chain.id}`}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 app.modals.create({
                   modal: EditProfileModal,
@@ -161,8 +161,8 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
           </CWText>
         ) : (
           <>
-            <div class="attribution-row">
-              <div class="attribution-left-content">
+            <div className="attribution-row">
+              <div className="attribution-left-content">
                 <CWText type="caption">
                   {parentType === ContentType.Comment
                     ? 'Reply as'
@@ -171,7 +171,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                 <CWText
                   type="caption"
                   fontWeight="medium"
-                  className="user-link-text"
+                  class="user-link-text"
                 >
                   {render(User, { user: author, hideAvatar: true, linkify: true })}
                 </CWText>
@@ -187,7 +187,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
               imageUploader
             />
             {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-              <CWText className="token-req-text">
+              <CWText class="token-req-text">
                 Commenting in {activeTopicName} requires{' '}
                 {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
                 {app.chain.meta.default_symbol}.{' '}
@@ -200,13 +200,13 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
               </CWText>
             )}
             <div
-              class="form-bottom"
+              className="form-bottom"
               onmouseover={() => {
                 // keeps Quill's isBlank up to date
                 return redraw();
               }}
             >
-              <div class="form-buttons">
+              <div className="form-buttons">
                 <CWButton
                   disabled={
                     !handleIsReplying
@@ -214,7 +214,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                       : undefined
                   }
                   buttonType="secondary-blue"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
 
                     if (handleIsReplying) {
@@ -225,7 +225,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                 />
                 <CWButton
                   disabled={disabled}
-                  onclick={handleSubmitComment}
+                  onClick={handleSubmitComment}
                   label={uploadsInProgress > 0 ? 'Uploading...' : 'Submit'}
                 />
               </div>

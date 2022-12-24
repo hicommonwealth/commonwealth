@@ -22,11 +22,11 @@ export class FeedbackModal extends ClassComponent {
 
   view() {
     return (
-      <div class="FeedbackModal">
-        <div class="compact-modal-title">
+      <div className="FeedbackModal">
+        <div className="compact-modal-title">
           <h3>Send feedback</h3>
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWTextArea
             placeholder="Report a bug, or suggest an improvement"
             value={this.feedbackText}
@@ -37,7 +37,7 @@ export class FeedbackModal extends ClassComponent {
           <CWButton
             disabled={this.sending}
             label="Send feedback"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               this.sending = true;
               const urlText = document.location.href;

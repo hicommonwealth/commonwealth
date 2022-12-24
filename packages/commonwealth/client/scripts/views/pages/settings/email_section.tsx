@@ -51,8 +51,8 @@ export class EmailSection extends ClassComponent {
     } = this;
 
     return (
-      <div class="EmailSection">
-        <div class="login-container">
+      <div className="EmailSection">
+        <div className="login-container">
           <CWText type="h5" fontWeight="semiBold">
             Login
           </CWText>
@@ -77,7 +77,7 @@ export class EmailSection extends ClassComponent {
                 verificationSent ||
                 app.user.addresses.some((a) => a.walletId === WalletId.Magic)
               }
-              onclick={async () => {
+              onClick={async () => {
                 this.errorMessage = null;
 
                 const confirmed = await confirmationModalWithText(
@@ -116,13 +116,13 @@ export class EmailSection extends ClassComponent {
           {verificationSent ? (
             <CWText>Check your email for a confirmation link</CWText>
           ) : (
-            <div class="verification-row">
+            <div className="verification-row">
               <CWIcon
                 iconName={emailVerified ? 'check' : 'cautionCircle'}
-                className="verification-icon"
+                class="verification-icon"
               />
               <CWText
-                className={getClasses<{ emailVerified?: boolean }>(
+                class={getClasses<{ emailVerified?: boolean }>(
                   { emailVerified },
                   'verification-text'
                 )}
@@ -139,14 +139,14 @@ export class EmailSection extends ClassComponent {
             <CWValidationText message={errorMessage} status="failure" />
           )}
         </div>
-        <div class="link-sites-container">
+        <div className="link-sites-container">
           <CWText type="h5" fontWeight="semiBold">
             Link other sites
           </CWText>
           <CWButton
             label={githubAccount ? 'Unlink Github' : 'Link Github'}
             buttonType={githubAccount ? 'primary-red' : 'primary-blue'}
-            onclick={() => {
+            onClick={() => {
               if (githubAccount) {
                 $.ajax({
                   url: `${app.serverUrl()}/githubAccount`,
@@ -177,7 +177,7 @@ export class EmailSection extends ClassComponent {
           <CWButton
             label={discordAccount ? 'Unlink Discord' : 'Link Discord'}
             buttonType={discordAccount ? 'primary-red' : 'primary-blue'}
-            onclick={() => {
+            onClick={() => {
               if (discordAccount) {
                 $.ajax({
                   url: `${app.serverUrl()}/discordAccount`,

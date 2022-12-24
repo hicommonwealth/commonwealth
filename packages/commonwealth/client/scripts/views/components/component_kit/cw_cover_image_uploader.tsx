@@ -128,7 +128,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     const { headerText, subheaderText } = vnode.attrs;
 
     return (
-      <div class="CoverImageUploader">
+      <div className="CoverImageUploader">
         {headerText && (
           <CWText type="caption" fontWeight="medium">
             {headerText}
@@ -147,7 +147,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
           validationStatus={this.uploadStatus}
         />
         <div
-          class={getClasses<{
+          className={getClasses<{
             isUploading: boolean;
             uploadStatus: ValidationStatus;
           }>(
@@ -165,7 +165,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
             id="pseudo-input"
           />
           {this.isUploading && <CWSpinner active="true" size="large" />}
-          <div class="attach-btn">
+          <div className="attach-btn">
             {!this.isUploading && (
               <CWIcon iconName="imageUpload" iconSize="medium" />
             )}

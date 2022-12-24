@@ -45,7 +45,7 @@ export class PollOptions extends ClassComponent<PollOptionAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="PollOptions">
+      <div className="PollOptions">
         {multiSelect
           ? voteInformation.map((option) => (
               <CWCheckbox
@@ -100,7 +100,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="CastVoteSection">
+      <div className="CastVoteSection">
         {disableVoteButton ? (
           <CWTooltip
             interactionType="hover"
@@ -112,7 +112,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
                 label="Vote"
                 buttonType="mini-black"
                 disabled={disableVoteButton}
-                onclick={() => onVoteCast()}
+                onClick={() => onVoteCast()}
               />
             }
           />
@@ -121,10 +121,10 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
             label="Vote"
             buttonType="mini-black"
             disabled={disableVoteButton}
-            onclick={() => onVoteCast()}
+            onClick={() => onVoteCast()}
           />
         )}
-        <CWText className="time-remaining-text" type="caption">
+        <CWText class="time-remaining-text" type="caption">
           {timeRemaining}
         </CWText>
       </div>
@@ -149,30 +149,30 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
     )[0].label;
 
     return (
-      <div class="VoteDisplay">
+      <div className="VoteDisplay">
         {!pollEnded ? (
           <>
-            <div class="vote-direction">
+            <div className="vote-direction">
               <CWIcon
                 iconName="check"
                 iconSize="small"
-                className="vote-check-icon"
+                class="vote-check-icon"
               />
               <CWText type="caption">{voteDirectionString}</CWText>
             </div>
-            <CWText className="time-remaining-text" type="caption">
+            <CWText class="time-remaining-text" type="caption">
               {timeRemaining}
             </CWText>
           </>
         ) : (
-          <div class="completed-vote-information">
+          <div className="completed-vote-information">
             <CWText type="caption">This Poll is Complete</CWText>
             <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
             {voteDirectionString !== '' && (
               <CWText
                 type="caption"
                 fontWeight="medium"
-                className="direction-text"
+                class="direction-text"
               >
                 {voteDirectionString}
               </CWText>
@@ -233,18 +233,18 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
     }
 
     return (
-      <div class="ResultsSection">
+      <div className="ResultsSection">
         {!isPreview && (
-          <div class="results-header">
+          <div className="results-header">
             <CWText type="b1" fontWeight="bold">
               {resultString}
             </CWText>
             <CWText
               type="caption"
-              className={getClasses<{ clickable?: boolean }>({
+              class={getClasses<{ clickable?: boolean }>({
                 clickable: onResultsClick && hasVotes,
               })}
-              onclick={
+              onClick={
                 onResultsClick && hasVotes
                   ? (e) => onResultsClick(e)
                   : undefined
@@ -256,7 +256,7 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
             </CWText>
           </div>
         )}
-        <div class="results-content">
+        <div className="results-content">
           {voteInformation
             .sort((option1, option2) => {
               if (pollEnded) {
@@ -290,7 +290,7 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
             })}
         </div>
         {isPreview && numOptionsBeyondPreview > 0 && (
-          <CWText type="caption" className="more-options">
+          <CWText type="caption" class="more-options">
             {`+ ${numOptionsBeyondPreview} more option${
               numOptionsBeyondPreview === 1 ? '' : 's'
             }`}
@@ -371,11 +371,11 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
     };
 
     return (
-      <CWCard className="PollCard">
-        <CWText type="b2" className="poll-title-text">
+      <CWCard class="PollCard">
+        <CWText type="b2" class="poll-title-text">
           {proposalTitle}
         </CWText>
-        <div class="poll-voting-section">
+        <div className="poll-voting-section">
           {!this.hasVoted && !pollEnded && !isPreview && (
             <>
               <PollOptions

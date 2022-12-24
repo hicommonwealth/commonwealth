@@ -22,7 +22,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
     const { breadcrumbs } = vnode.attrs;
 
     return (
-      <div class={ComponentType.Breadcrumbs}>
+      <div className={ComponentType.Breadcrumbs}>
         {breadcrumbs.map((b, k) => {
           const isCurrent = k === breadcrumbs.length - 1;
 
@@ -31,8 +31,8 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
               <CWText
                 type="caption"
                 fontWeight="medium"
-                className={isCurrent ? 'current-text' : 'parent-text'}
-                onclick={isCurrent ? undefined : () => setRoute(b.path)}
+                class={isCurrent ? 'current-text' : 'parent-text'}
+                onClick={isCurrent ? undefined : () => setRoute(b.path)}
               >
                 {b.label}
               </CWText>
@@ -40,7 +40,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
                 <CWText
                   type="caption"
                   fontWeight="medium"
-                  className="separator-text"
+                  class="separator-text"
                 >
                   /
                 </CWText>

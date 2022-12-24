@@ -115,7 +115,7 @@ class CreateCommunity extends ClassComponent {
       <Sublayout
       // title="Create Community"
       >
-        <div class="CreateCommunityIndex">
+        <div className="CreateCommunityIndex">
           <CWText type="h3" fontWeight="semiBold">
             New Commonwealth Community
           </CWText>
@@ -130,7 +130,7 @@ class CreateCommunity extends ClassComponent {
                     <CWTab
                       label={t.toString()}
                       isSelected={this.state.activeForm === t}
-                      onclick={() => {
+                      onClick={() => {
                         this.state.activeForm = t;
                         mixpanelBrowserTrack({
                           event:

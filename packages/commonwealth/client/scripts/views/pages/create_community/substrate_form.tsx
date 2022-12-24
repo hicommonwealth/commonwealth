@@ -46,7 +46,7 @@ export class SubstrateForm extends ClassComponent {
 
   view() {
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <InputRow
           title="Name"
           value={this.state.form.name}
@@ -83,8 +83,8 @@ export class SubstrateForm extends ClassComponent {
         />
         <CWButton
           label="Test Connection"
-          className="button-margin-bottom"
-          onclick={async () => {
+          class="button-margin-bottom"
+          onClick={async () => {
             // deinit substrate API if one exists
             if (app.chain?.apiInitialized) {
               await app.chain.deinit();
@@ -114,7 +114,7 @@ export class SubstrateForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving}
-          onclick={async () => {
+          onClick={async () => {
             const { name, nodeUrl, iconUrl, substrateSpec, symbol } =
               this.state.form;
             mixpanelBrowserTrack({

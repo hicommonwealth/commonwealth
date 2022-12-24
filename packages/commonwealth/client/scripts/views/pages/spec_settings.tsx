@@ -75,7 +75,7 @@ class SpecSettingsPage extends ClassComponent {
 
     return (
       <Sublayout>
-        <div class="SpecSettingsPage">
+        <div className="SpecSettingsPage">
           <CWText type="h3">Substrate Spec Settings</CWText>
           <CWDropdown
             label="Chains"
@@ -121,7 +121,7 @@ class SpecSettingsPage extends ClassComponent {
           <CWButton
             label="Test"
             disabled={this.isLoading || !!this.error}
-            onclick={async () => {
+            onClick={async () => {
               this.error = '';
 
               // deinit substrate API if one exists
@@ -169,7 +169,7 @@ class SpecSettingsPage extends ClassComponent {
           <CWButton
             label="Submit"
             disabled={!this.isSpecValid || this.isLoading || !!this.error}
-            onclick={async () => {
+            onClick={async () => {
               this.isLoading = true;
               let response;
               try {

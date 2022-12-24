@@ -7,7 +7,6 @@ import 'construct.scss';
 import 'lity/dist/lity.min.css';
 import mixpanel from 'mixpanel-browser';
 
-import mithril from 'mithril';
 import $ from 'jquery';
 import moment from 'moment';
 
@@ -30,6 +29,7 @@ import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -434,29 +434,6 @@ export async function initNewTokenChain(address: string) {
   await selectChain(chainInfo);
 }
 
-// TODO: fix this vs mithrilInterop
-// set up route navigation
-mithril.route.prefix = '';
-const _updateRoute = mithril.route.set;
-export const updateRoute = (...args) => {
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = getRoute();
-  if (args[0] !== getRoute()) _updateRoute.apply(this, args);
-};
-mithril.route.set = (...args) => {
-  // set app params that maintain global state for:
-  // - whether the user last clicked the back button
-  // - the last page the user was on
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = getRoute();
-  // update route
-  if (args[0] !== getRoute()) _updateRoute.apply(this, args);
-  // reset scroll position
-  const html = document.getElementsByTagName('html')[0];
-  if (html) html.scrollTo(0, 0);
-  const body = document.getElementsByTagName('body')[0];
-  if (body) body.scrollTo(0, 0);
-};
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain() && app.activeChainId()) {
@@ -611,7 +588,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     const isCustomDomain = !!customDomain;
     const { activeAccount } = app.user;
-    mithril.route(document.body, '/', {
+    const routes: {[route: string]: {
+      onmatch?: () => Promise<any>,
+      render: (vnode: any) => ReturnType<render>
+    }} = {
       // Sitewide pages
       '/about': importRoute('views/pages/why_commonwealth', {
         scoped: false,
@@ -1056,7 +1036,17 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
             ),
           }),
-    });
+    };
+    const reactRouter = createBrowserRouter(
+      Object.entries(routes).map(
+        ([path, { onmatch, render: renderFunc }]) => ({
+          path, element: renderFunc({}), loader: onmatch,
+        })
+      )
+    );
+    rootRender(
+      document.getElementById("root"), render(RouterProvider, { router: reactRouter })
+    );
 
     const script = document.createElement('noscript');
     // eslint-disable-next-line max-len

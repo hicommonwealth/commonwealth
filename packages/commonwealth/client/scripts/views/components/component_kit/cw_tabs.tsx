@@ -25,15 +25,15 @@ export class CWTab extends ClassComponent<TabAttrs> {
 
     return (
       <div
-        class={getClasses<TabStyleAttrs>(
+        className={getClasses<TabStyleAttrs>(
           { isSelected, disabled },
           ComponentType.Tab
         )}
-        onclick={onclick}
+        onClick={onclick}
       >
         <CWText
           type="h4"
-          className="tab-label-text"
+          class="tab-label-text"
           fontWeight={isSelected ? 'bold' : 'semiBold'}
         >
           {label}
@@ -45,6 +45,6 @@ export class CWTab extends ClassComponent<TabAttrs> {
 
 export class CWTabBar extends ClassComponent {
   view(vnode: ResultNode) {
-    return <div class={ComponentType.TabBar}>{vnode.children}</div>;
+    return <div className={ComponentType.TabBar}>{vnode.children}</div>;
   }
 }

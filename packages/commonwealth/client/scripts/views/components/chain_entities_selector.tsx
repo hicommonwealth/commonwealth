@@ -38,7 +38,7 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
     }
 
     return (
-      <div class="ChainEntitiesSelector">
+      <div className="ChainEntitiesSelector">
         {this.chainEntitiesLoaded ? (
           render(QueryList, {
             checkmark: true,
@@ -60,14 +60,14 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
               return render(ListItem, {
                 disabled: ce.threadId && ce.threadId !== thread.id,
                 label: (
-                  <div class="chain-entity">
-                    <div class="chain-entity-text">
+                  <div className="chain-entity">
+                    <div className="chain-entity-text">
                       {chainEntityTypeToProposalName(ce.type) +
                         (ce.typeId.startsWith('0x')
                           ? ` ${ce.typeId.slice(0, 6)}...`
                           : ` #${ce.typeId}`)}
                     </div>
-                    <div class="chain-entity-subtext">
+                    <div className="chain-entity-subtext">
                       {ce.threadTitle !== 'undefined'
                         ? decodeURIComponent(ce.threadTitle)
                         : 'No thread title'}
@@ -114,8 +114,8 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
             },
           })
         ) : (
-          <div class="loading-container">
-            <div class="loading-text">
+          <div className="loading-container">
+            <div className="loading-text">
               {this.chainEntitiesLoaded
                 ? 'Select "In Voting" to begin.'
                 : 'Loading on-chain proposals...'}

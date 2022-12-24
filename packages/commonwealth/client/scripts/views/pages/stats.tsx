@@ -115,8 +115,8 @@ class StatsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Analytics" />}
       >
-        <div class="StatsPage">
-          <div class="stat-row">
+        <div className="StatsPage">
+          <div className="stat-row">
             <CWText fontWeight="medium">Date</CWText>
             <CWText fontWeight="medium">New Addresses</CWText>
             <CWText fontWeight="medium">New Comments</CWText>
@@ -126,7 +126,7 @@ class StatsPage extends ClassComponent {
           {_.orderBy(Object.entries(this.data), (o) => o[0])
             .reverse()
             .map(([date, row]: [any, any]) => (
-              <div class="stat-row">
+              <div className="stat-row">
                 <CWText>{moment(date).format('l')}</CWText>
                 <CWText>{row.comments || 0}</CWText>
                 <CWText>{row.roles || 0}</CWText>

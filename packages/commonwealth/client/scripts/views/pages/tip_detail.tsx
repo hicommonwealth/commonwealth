@@ -40,11 +40,11 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
       <Sublayout
       // title={headerTitle}
       >
-        <div class="TipDetail">
-          <div class="tip-details">
-            <div class="title">{title}</div>
-            <div class="proposal-page-row">
-              <div class="label">Finder</div>
+        <div className="TipDetail">
+          <div className="tip-details">
+            <div className="title">{title}</div>
+            <div className="proposal-page-row">
+              <div className="label">Finder</div>
               {render(User, {
                 user: author,
                 linkify: true,
@@ -52,8 +52,8 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                 showAddressWithDisplayName: true,
               })}
             </div>
-            <div class="proposal-page-row">
-              <div class="label">Beneficiary</div>
+            <div className="proposal-page-row">
+              <div className="label">Beneficiary</div>
               {render(User, {
                 user: app.profiles.getProfile(proposal.author.chain.id, who),
                 linkify: true,
@@ -61,28 +61,28 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                 showAddressWithDisplayName: true,
               })}
             </div>
-            <div class="proposal-page-row">
-              <div class="label">Reason</div>
-              <div class="tip-reason">
+            <div className="proposal-page-row">
+              <div className="label">Reason</div>
+              <div className="tip-reason">
                 <MarkdownFormattedText doc={reason} />
               </div>
             </div>
-            <div class="proposal-page-row">
-              <div class="label">Amount</div>
-              <div class="amount">
-                <div class="denominator">{proposal.support.denom}</div>
+            <div className="proposal-page-row">
+              <div className="label">Amount</div>
+              <div className="amount">
+                <div className="denominator">{proposal.support.denom}</div>
                 <div>{proposal.support.inDollars}</div>
               </div>
             </div>
           </div>
-          <div class="tip-contributions">
+          <div className="tip-contributions">
             {proposal.canVoteFrom(
               app.user.activeAccount as SubstrateAccount
             ) && (
-              <div class="contribute">
-                <div class="title">Contribute</div>
-                <div class="mb-12">
-                  <div class="label">Amount</div>
+              <div className="contribute">
+                <div className="title">Contribute</div>
+                <div className="mb-12">
+                  <div className="label">Amount</div>
                   <CWTextInput
                     name="amount"
                     placeholder="Enter tip amount"
@@ -100,7 +100,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                 <CWButton
                   disabled={tipAmount === undefined}
                   label="Submit Transaction"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     createTXModal(
                       proposal.submitVoteTx(
@@ -116,11 +116,11 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
             )}
             {contributors.length > 0 && (
               <>
-                <div class="contributors title">Contributors</div>
+                <div className="contributors title">Contributors</div>
                 {contributors.map(({ account, deposit }) => (
-                  <div class="contributors-row">
-                    <div class="amount">
-                      <div class="denominator">{deposit.denom}</div>
+                  <div className="contributors-row">
+                    <div className="amount">
+                      <div className="denominator">{deposit.denom}</div>
                       <div>{deposit.inDollars}</div>
                     </div>
                     {render(User, {

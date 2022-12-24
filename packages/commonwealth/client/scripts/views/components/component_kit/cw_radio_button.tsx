@@ -48,7 +48,7 @@ export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
 
     return (
       <label
-        class={getClasses<RadioButtonStyleAttrs>(
+        className={getClasses<RadioButtonStyleAttrs>(
           {
             checked,
             disabled,
@@ -56,8 +56,8 @@ export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
           ComponentType.RadioButton
         )}
       >
-        <input class="radio-input" {...params} />
-        <div class="radio-control" />
+        <input className="radio-input" {...params} />
+        <div className="radio-control" />
         <CWText>{label || value}</CWText>
       </label>
     );

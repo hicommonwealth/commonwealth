@@ -20,6 +20,8 @@ import {
 } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
+import app from 'state';
+
 // RENDERING FUNCTIONS
 export type Children = ReactNode | ReactNode[];
 
@@ -67,7 +69,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
         if (!REACT_INTERNAL_PROPS.includes(prop as string)) {
           obj.setState({ ...obj.state, [prop]: value })
         }
-        //@ts-ignore
+        // @ts-ignore
         return Reflect.set(...arguments);
       }
     })
@@ -104,15 +106,11 @@ export function redraw(sync = false) {
 
 // DOM FUNCTIONS
 export function rootRender(el: Element, vnodes: Children) {
-  // React does not have a built-in method for rendering to an element directly.
-  // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
-  // ReactRender(vnodes, el);
+  return rootRender(el, render('div', {}, vnodes));
 }
 
 export function rootMount(element: Element, component?: any | null) {
-  // React does not have a built-in method for mounting a component to an element directly.
-  // Instead, you can use the `ReactDOM.render` method to render a React component to an element.
-  createRoot(element).render(component);
+  return createRoot(element).render(component);
 }
 
 // ROUTING FUNCTIONS
@@ -122,30 +120,38 @@ type RouteOptions = {
 
 type Params = { [key: string]: string };
 
-export function setRoute(route: string, data?: any, options?: RouteOptions) {
-  const { history } = this.props;
-  const { replace } = options || {};
-  if (replace) {
-    history.replace(route, data);
-  } else {
-    history.push(route, data);
-  }
-}
-
 export function getRouteParam(name?: string) {
-  const { match } = this.props;
-  return name ? match.params[name] : match.params;
+  const search = new URLSearchParams(window.location.search);
+  return search.get(name);
 }
 
 export function getRoute() {
-  const { location } = this.props;
-  return location.pathname;
+  return window.location.pathname;
+}
+
+export function setRoute(route: string, data?: Record<string, unknown>, options?: RouteOptions) {
+  app._lastNavigatedBack = false;
+  app._lastNavigatedFrom = getRoute();
+  if (route !== getRoute()) {
+    if (options?.replace) {
+      window.history.replaceState(data, null, route)
+    } else {
+      window.history.pushState(data, null, route)
+    }
+  }
+  // reset scroll position
+  const html = document.getElementsByTagName('html')[0];
+  if (html) html.scrollTo(0, 0);
+  const body = document.getElementsByTagName('body')[0];
+  if (body) body.scrollTo(0, 0);
 }
 
 export function parsePathname(url: string): { path: string; params: Params } {
-  const match = matchPath(url, { path: url });
-  return {
-    path: match ? match.path : '',
-    params: match ? match.params : {},
-  };
+  const path = window.location.pathname;
+  const search = new URLSearchParams(window.location.search);
+  const params: Params = {};
+  for (const [key, value] of search) {
+    params[key] = value;
+  }
+  return { path, params };
 }

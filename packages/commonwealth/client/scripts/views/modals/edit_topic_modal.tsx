@@ -119,12 +119,12 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
     };
 
     return (
-      <div class="EditTopicModal">
-        <div class="compact-modal-title">
+      <div className="EditTopicModal">
+        <div className="compact-modal-title">
           <h3>Edit topic</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWTextInput
             label="Name"
             name="name"
@@ -192,9 +192,9 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
               tabindex={3}
             />
           )}
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
-              onclick={async (e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 const { form } = this;
                 updateTopic(form)
@@ -216,7 +216,7 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
             <CWButton
               buttonType="primary-red"
               disabled={this.saving}
-              onclick={async (e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 const confirmed = await confirmationModalWithText(
                   'Delete this topic?'

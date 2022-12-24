@@ -73,8 +73,8 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
 
     if (vnode.attrs.category === 'new-comment-creation') {
       return (
-        <div class="UserDashboardRowTop">
-          <CWText className="row-top-text">
+        <div className="UserDashboardRowTop">
+          <CWText class="row-top-text">
             {actorName}
             <span>
               {numericalCommentCount > 1 &&
@@ -84,7 +84,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
             <b>{titleText}</b>
             <span>in</span>
             <a
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setRoute(`/${chain_id}`);
@@ -94,21 +94,21 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
             </a>
             <span>({formatTimestamp(moment(created_at))})</span>
           </CWText>
-          <div class="comment-preview-container">
+          <div className="comment-preview-container">
             {getCommentPreview(comment_text)}
           </div>
         </div>
       );
     } else if (vnode.attrs.category === 'new-thread-creation') {
       return (
-        <div class="UserDashboardRowTop">
-          <CWText className="row-top-text">
+        <div className="UserDashboardRowTop">
+          <CWText class="row-top-text">
             {actorName}
             <span>created new thread</span>
             <b>{titleText}</b>
             <span>in</span>
             <a
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 setRoute(`/${chain_id}`);
@@ -122,6 +122,6 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
       );
     }
 
-    return <div class="UserDashboardRowTop">{actorName}</div>;
+    return <div className="UserDashboardRowTop">{actorName}</div>;
   }
 }

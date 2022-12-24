@@ -19,7 +19,7 @@ export class CWRadioGroup extends ClassComponent<RadioGroupAttrs> {
     const { options, onchange, name, toggledOption } = vnode.attrs;
 
     return (
-      <div class={ComponentType.RadioGroup}>
+      <div className={ComponentType.RadioGroup}>
         {options.map((o) => {
           return (
             <CWRadioButton

@@ -35,12 +35,12 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
 
     return (
       <div
-        class={getClasses<{ isSelected?: boolean }>(
+        className={getClasses<{ isSelected?: boolean }>(
           { isSelected: isActiveAccount },
           'AccountRow'
         )}
         key={`${account.chain.id}#${account.address}`}
-        onclick={vnode.attrs.onclick}
+        onClick={vnode.attrs.onclick}
       >
         {render(User, {
           user: account,
@@ -49,19 +49,19 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
           linkify: true,
           popover: true,
         })}
-        <div class="info-col">
+        <div className="info-col">
           {render(User, {
             user: account,
             hideAvatar: true,
             linkify: true,
             popover: true,
           })}
-          <CWText className="address-text" type="caption">
+          <CWText class="address-text" type="caption">
             {formatAddressShort(account.address)} -{' '}
             {app.config.chains.getById(account.chain.id)?.name}
           </CWText>
           {account.walletId === WalletId.Magic && (
-            <CWText className="address-text" type="caption">
+            <CWText class="address-text" type="caption">
               Magically linked to {app.user.email}
             </CWText>
           )}
@@ -82,7 +82,7 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
         </div>
         <CWButton
           buttonType="primary-red"
-          onclick={async () => {
+          onClick={async () => {
             const confirmed = await confirmationModalWithText(
               'Are you sure you want to remove this account?'
             )();
@@ -119,7 +119,7 @@ export class LinkedAddressesSection extends ClassComponent {
     );
 
     return (
-      <div class="LinkedAddressesSection">
+      <div className="LinkedAddressesSection">
         <CWText type="h5" fontWeight="semiBold">
           Linked addresses
         </CWText>

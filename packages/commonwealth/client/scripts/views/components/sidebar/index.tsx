@@ -42,27 +42,27 @@ export class Sidebar extends ClassComponent {
       );
 
     return (
-      <div class="Sidebar">
+      <div className="Sidebar">
         {app.sidebarMenu === 'default' && (
-          <div class="sidebar-default-menu">
+          <div className="sidebar-default-menu">
             <SidebarQuickSwitcher />
             {app.chain && (
-              <div class="community-menu">
+              <div className="community-menu">
                 <AdminSection />
                 <DiscussionSection />
                 <GovernanceSection />
                 {app.socket && !hideChat && <ChatSection />}
                 <ExternalLinksModule />
-                <div class="buttons-container">
+                <div className="buttons-container">
                   {app.isLoggedIn() && app.chain && (
-                    <div class="subscription-button">
+                    <div className="subscription-button">
                       <SubscriptionButton />
                     </div>
                   )}
                   {app.isCustomDomain() && (
                     <div
-                      class="powered-by"
-                      onclick={() => {
+                      className="powered-by"
+                      onClick={() => {
                         window.open('https://commonwealth.im/');
                       }}
                     />

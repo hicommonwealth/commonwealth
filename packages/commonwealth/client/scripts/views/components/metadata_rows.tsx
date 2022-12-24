@@ -33,7 +33,7 @@ export class InputRow extends ClassComponent<InputRowAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="InputRow">
+      <div className="InputRow">
         {textarea && <CWLabel label={title} />}
         {textarea ? (
           <CWTextArea
@@ -81,9 +81,9 @@ export class ToggleRow extends ClassComponent<ToggleRowAttrs> {
     const { caption, disabled, onToggle, title } = vnode.attrs;
 
     return (
-      <div class="ToggleRow">
+      <div className="ToggleRow">
         <CWLabel label={title} />
-        <div class="toggle-and-caption">
+        <div className="toggle-and-caption">
           <CWToggle
             checked={this.checked}
             disabled={!!disabled}
@@ -111,7 +111,7 @@ export class SelectRow extends ClassComponent<SelectRowAttrs> {
     const { onchange, options, title, value } = vnode.attrs;
 
     return (
-      <div class="SelectRow">
+      <div className="SelectRow">
         <CWLabel label={title} />
         {render(Select, {
           options,
@@ -132,9 +132,9 @@ export class IdRow extends ClassComponent<IdRowAttrs> {
     const { id } = vnode.attrs;
 
     return (
-      <div class="IDRow">
+      <div className="IDRow">
         <CWLabel label="ID" />
-        <div class={`id ${!id.length && 'placeholder'}`}>
+        <div className={`id ${!id.length && 'placeholder'}`}>
           {!id.length ? 'ID will show up here based on your name' : id}
         </div>
       </div>

@@ -92,7 +92,7 @@ export class CosmosProposalForm extends ClassComponent {
         )}
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             let prop: ProtobufAny;

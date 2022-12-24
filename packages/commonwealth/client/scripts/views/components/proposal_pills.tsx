@@ -16,11 +16,11 @@ export class ActiveProposalPill extends ClassComponent<ActiveProposalPillAttrs> 
     const { proposalEnd } = vnode.attrs;
 
     return (
-      <div class="ActiveProposalPill">
+      <div className="ActiveProposalPill">
         <CWText type="caption">
           Ends in {formatTimestamp(moment(+proposalEnd * 1000))}
         </CWText>
-        <CWText type="caption" fontWeight="medium" className="active-text">
+        <CWText type="caption" fontWeight="medium" class="active-text">
           Active
         </CWText>
       </div>
@@ -35,8 +35,8 @@ export class ClosedProposalPill extends ClassComponent<ClosedProposalPillAttrs> 
     const { proposalState } = vnode.attrs;
 
     return (
-      <div class="ClosedProposalPill">
-        <CWText type="caption" fontWeight="semiBold" className="closed-text">
+      <div className="ClosedProposalPill">
+        <CWText type="caption" fontWeight="semiBold" class="closed-text">
           {proposalState}
         </CWText>
       </div>

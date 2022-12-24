@@ -17,10 +17,10 @@ export class CodeBlock extends ClassComponent<CodeBlockAttrs> {
     const { clickToSelect } = vnode.attrs;
 
     return (
-      <div class={getClasses<CodeBlockAttrs>({ clickToSelect }, 'CodeBlock')}>
+      <div className={getClasses<CodeBlockAttrs>({ clickToSelect }, 'CodeBlock')}>
         <CWLabel label="Use subkey to sign this transaction" />
         <pre
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             const element = vnode.dom;

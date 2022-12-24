@@ -40,25 +40,25 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
 
     return (
       <CWCard
-        className="CommunityPreviewCard"
+        class="CommunityPreviewCard"
         elevation="elevation-1"
         interactive
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           setRoute(`/${chain.id}`);
         }}
       >
-        <div class="card-top">
+        <div className="card-top">
           <CWCommunityAvatar community={chain} />
           <CWText type="h4" fontWeight="medium">
             {chain.name}
           </CWText>
         </div>
-        <CWText className="card-subtext">{chain.description}</CWText>
+        <CWText class="card-subtext">{chain.description}</CWText>
         {/* if no recently active threads, hide this module altogether */}
         {!!monthlyThreadCount && (
           <>
-            <CWText className="card-subtext" type="b2" fontWeight="medium">
+            <CWText class="card-subtext" type="b2" fontWeight="medium">
               {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
             </CWText>
             {isMember && (
@@ -88,13 +88,13 @@ export class DashboardCommunitiesPreview extends ClassComponent {
       });
 
     return (
-      <div class="DashboardCommunitiesPreview">
+      <div className="DashboardCommunitiesPreview">
         <CWText type="h3">Active Communities</CWText>
-        <div class="community-preview-cards-collection">
+        <div className="community-preview-cards-collection">
           {sortedChains.length > 3 ? sortedChains.slice(0, 3) : sortedChains}
         </div>
         <CWButton
-          onclick={() => {
+          onClick={() => {
             setRoute('/communities');
             redraw();
           }}

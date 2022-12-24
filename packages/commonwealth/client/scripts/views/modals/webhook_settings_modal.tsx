@@ -90,14 +90,14 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
     };
 
     return (
-      <div class="WebhookSettingsModal">
-        <div class="compact-modal-title">
+      <div className="WebhookSettingsModal">
+        <div className="compact-modal-title">
           <h3>Webhook Settings</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWText>Which events should trigger this webhook?</CWText>
-          <div class="checkbox-section">
+          <div className="checkbox-section">
             <CWText type="h5" fontWeight="semiBold">
               Off-chain discussions
             </CWText>
@@ -106,7 +106,7 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
             {row('New reaction', [NotificationCategories.NewReaction])}
           </div>
           {isChain && Object.keys(chainNotifications).length > 0 && (
-            <div class="checkbox-section">
+            <div className="checkbox-section">
               <CWText type="h5" fontWeight="semiBold">
                 On-chain events
               </CWText>
@@ -118,7 +118,7 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
           )}
           <CWButton
             label="Save webhook settings"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               const chainOrCommObj = { chain: webhook.chain_id };
               $.ajax({

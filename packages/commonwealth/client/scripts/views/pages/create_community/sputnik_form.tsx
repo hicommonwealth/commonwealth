@@ -40,7 +40,7 @@ export class SputnikForm extends ClassComponent {
 
   view() {
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <InputRow
           title="DAO Name"
           value={this.state.form.name}
@@ -73,7 +73,7 @@ export class SputnikForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving}
-          onclick={async () => {
+          onClick={async () => {
             const { iconUrl, name } = this.state.form;
 
             this.state.saving = true;

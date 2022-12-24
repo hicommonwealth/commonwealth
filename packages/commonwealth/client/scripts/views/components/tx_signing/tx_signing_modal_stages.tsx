@@ -36,14 +36,14 @@ export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntro
           <CWTab
             label="Web wallet"
             isSelected={this.introTab === 'webWallet'}
-            onclick={() => {
+            onClick={() => {
               this.introTab = 'webWallet';
             }}
           />
           <CWTab
             label="Command line"
             isSelected={this.introTab === 'commandLine'}
-            onclick={() => {
+            onClick={() => {
               this.introTab = 'commandLine';
             }}
           />
@@ -134,7 +134,7 @@ export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
           timestamp={timestamp ? timestamp.format() : '--'}
         />
         <CWButton
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalexit');
           }}
@@ -160,16 +160,16 @@ export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRe
           blockNum={blocknum || '--'}
           timestamp={timestamp ? timestamp.format() : '--'}
         />
-        <div class="buttons-row">
+        <div className="buttons-row">
           <CWButton
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(vnode.dom).trigger('modalexit');
             }}
             label="Done"
           />
           <CWButton
-            onclick={() => {
+            onClick={() => {
               next('intro');
             }}
             label="Try again"

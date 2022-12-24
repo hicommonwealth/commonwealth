@@ -91,7 +91,7 @@ class ReferendaPage extends ClassComponent {
         .filter((p) => !p.completed);
 
     const activeProposalContent = !activeDemocracyReferenda?.length ? (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     ) : (
       (activeDemocracyReferenda || []).map((proposal) => (
         <ProposalCard proposal={proposal} />
@@ -106,7 +106,7 @@ class ReferendaPage extends ClassComponent {
         .filter((p) => p.completed);
 
     const inactiveProposalContent = !inactiveDemocracyReferenda?.length ? (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     ) : (
       (inactiveDemocracyReferenda || []).map((proposal) => (
         <ProposalCard proposal={proposal} />
@@ -117,7 +117,7 @@ class ReferendaPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Referenda" />}
       >
-        <div class="ReferendaPage">
+        <div className="ReferendaPage">
           {onSubstrate && (
             <GovExplainer
               statHeaders={[

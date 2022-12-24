@@ -100,8 +100,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   view(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
     return (
-      <div class="ChainMetadataRows">
-        <div class="AvatarUploadRow">
+      <div className="ChainMetadataRows">
+        <div className="AvatarUploadRow">
           <AvatarUpload
             scope="community"
             uploadStartedCallback={() => {
@@ -269,9 +269,9 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           tabindex={1}
           editorNamespace="new-banner"
         />
-        <div class="tag-row">
+        <div className="tag-row">
           <CWLabel label="Community Tags" />
-          <div class="tag-group">
+          <div className="tag-group">
             {Object.keys(this.selectedTags).map((key) => {
               return (
                 <CWButton
@@ -279,7 +279,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   buttonType={
                     this.selectedTags[key] ? 'primary-black' : 'secondary-black'
                   }
-                  onclick={() => {
+                  onClick={() => {
                     this.selectedTags[key] = !this.selectedTags[key];
                   }}
                 />
@@ -306,7 +306,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <CWButton
           disabled={this.uploadInProgress}
           label="Save changes"
-          onclick={async () => {
+          onClick={async () => {
             const {
               name,
               description,

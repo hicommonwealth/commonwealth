@@ -39,7 +39,7 @@ export class CWCard extends ClassComponent<CardAttrs> {
 
     return (
       <div
-        class={getClasses<CardStyleAttrs>(
+        className={getClasses<CardStyleAttrs>(
           {
             elevation,
             fullWidth,
@@ -48,7 +48,7 @@ export class CWCard extends ClassComponent<CardAttrs> {
           },
           ComponentType.Card
         )}
-        onclick={onclick}
+        onClick={onclick}
         onmouseover={onmouseover}
         onmouseenter={onmouseenter}
         onmouseleave={onmouseleave}

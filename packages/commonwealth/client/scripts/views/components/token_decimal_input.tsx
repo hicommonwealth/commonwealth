@@ -35,7 +35,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
     const { onInputChange, decimals } = vnode.attrs;
 
     return (
-      <div class="TokenDecimalInput">
+      <div className="TokenDecimalInput">
         <CWTextInput
           value={this.displayValue}
           // type: 'number',
@@ -67,7 +67,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
           }}
         />
         {decimals > 0 && (
-          <div class="token-settings">
+          <div className="token-settings">
             <CWToggle
               checked={!this.isInputInWei}
               onchange={() => {
@@ -83,7 +83,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
                 }
               }}
             />
-            <CWText type="caption" className="toggle-caption-text">
+            <CWText type="caption" class="toggle-caption-text">
               {this.switchCaption}
             </CWText>
           </div>

@@ -28,26 +28,26 @@ class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
       vnode.attrs;
     return (
       <CWGrowl position="bottom-right" disabled={disabled}>
-        <div class="UserSurveyPopup">
-          <div class="survey-svg-header"></div>
-          <CWIcon iconName="close" className="close-icon" onclick={onClose} />
-          <CWText type="h3" fontWeight="bold" className="header-text">
+        <div className="UserSurveyPopup">
+          <div className="survey-svg-header"></div>
+          <CWIcon iconName="close" class="close-icon" onClick={onClose} />
+          <CWText type="h3" fontWeight="bold" class="header-text">
             Want a Milk Carton NFT?
           </CWText>
-          <CWText type="b1" className="body-text">
+          <CWText type="b1" class="body-text">
             Take a quick survey to help us improve Common and get a special NFT
             dropped to your ETH address!
           </CWText>
-          <div class="button-wrapper">
+          <div className="button-wrapper">
             <CWButton
               buttonType="secondary-black"
               label="No Thanks"
-              onclick={onClose}
+              onClick={onClose}
             />
             <CWButton
               buttonType="primary-black"
               label="Sure Thing!"
-              onclick={onRedirectClick}
+              onClick={onRedirectClick}
             />
           </div>
           <CWCheckbox
@@ -55,7 +55,7 @@ class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
             checked={checked}
             label="Please don't show this again"
             onchange={onCheckboxClick}
-            className="checkbox"
+            class="checkbox"
           />
         </div>
       </CWGrowl>

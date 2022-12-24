@@ -16,13 +16,13 @@ export class CardsCollection extends ClassComponent<CardsCollectionAttrs> {
   view(vnode: ResultNode<CardsCollectionAttrs>) {
     const { content, header } = vnode.attrs;
     return (
-      <div class="CardsCollection">
+      <div className="CardsCollection">
         {!!header && (
           <CWText type="h3" fontWeight="semiBold">
             {header}
           </CWText>
         )}
-        <div class="cards">{content}</div>
+        <div className="cards">{content}</div>
       </div>
     );
   }

@@ -91,7 +91,7 @@ class TreasuryPage extends ClassComponent {
         <ProposalCard proposal={proposal} />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     const inactiveTreasuryProposals =
@@ -105,14 +105,14 @@ class TreasuryPage extends ClassComponent {
         <ProposalCard proposal={proposal} />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     return (
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Referenda" />}
       >
-        <div class="TreasuryPage">
+        <div className="TreasuryPage">
           {onSubstrate && (
             <GovExplainer
               statHeaders={[

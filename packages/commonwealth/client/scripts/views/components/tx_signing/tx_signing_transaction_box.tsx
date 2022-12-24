@@ -21,10 +21,10 @@ export class TXSigningTransactionBox extends ClassComponent<TXSigningTransaction
     const { blockHash, blockNum, status, success, timestamp } = vnode.attrs;
 
     return (
-      <div class="TXSigningTransactionBox">
+      <div className="TXSigningTransactionBox">
         <CWText fontWeight="medium">Status</CWText>
         <CWText
-          className={getClasses<{ success?: boolean }>(
+          class={getClasses<{ success?: boolean }>(
             { success },
             'status-text'
           )}

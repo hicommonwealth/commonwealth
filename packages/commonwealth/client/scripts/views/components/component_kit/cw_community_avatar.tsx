@@ -26,19 +26,19 @@ export class CWCommunityAvatar extends ClassComponent<CommunityAvatarAttrs> {
 
     return (
       <div
-        class={getClasses<{ onclick: boolean; size: IconSize }>(
+        className={getClasses<{ onclick: boolean; size: IconSize }>(
           { onclick: !!onclick, size },
           ComponentType.CommunityAvatar
         )}
-        onclick={onclick}
+        onClick={onclick}
       >
         {community.iconUrl ? (
-          <img class="community-image" src={community.iconUrl} />
+          <img className="community-image" src={community.iconUrl} />
         ) : (
-          <div class={getClasses<{ size: IconSize }>({ size }, 'no-image')}>
+          <div className={getClasses<{ size: IconSize }>({ size }, 'no-image')}>
             <CWText
               type={sizeIsAboveLarge ? 'h5' : 'caption'}
-              className="avatar-no-image-letter"
+              class="avatar-no-image-letter"
               fontWeight="medium"
             >
               {community.name?.slice(0, 1)}

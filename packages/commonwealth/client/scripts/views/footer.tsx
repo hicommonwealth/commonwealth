@@ -34,14 +34,14 @@ export class Footer extends ClassComponent {
     };
 
     return (
-      <div class="Footer">
+      <div className="Footer">
         <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
-        <div class="footer-links-container">
+        <div className="footer-links-container">
           {footercontents.map((item) => {
             return isNotUndefined(item.redirectTo) ? (
               <a
-                class="footer-link"
-                onclick={(e) => {
+                className="footer-link"
+                onClick={(e) => {
                   e.preventDefault();
                   redirectClick(item.redirectTo);
                 }}
@@ -49,7 +49,7 @@ export class Footer extends ClassComponent {
                 {item.text}
               </a>
             ) : (
-              <a class="footer-link" href={item.externalLink} target="_blank">
+              <a className="footer-link" href={item.externalLink} target="_blank">
                 {item.text}
               </a>
             );

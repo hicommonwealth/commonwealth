@@ -184,16 +184,16 @@ class CommunitiesPage extends ClassComponent {
 
     return (
       <Sublayout>
-        <div class="CommunitiesPage">
-          <div class="header-section">
+        <div className="CommunitiesPage">
+          <div className="header-section">
             <CWText
               type="h3"
               fontWeight="semiBold"
-              className="communities-count"
+              class="communities-count"
             >
               {totalCommunitiesString}
             </CWText>
-            <div class="filter-buttons">
+            <div className="filter-buttons">
               {this.chainCategories.map((cat) => {
                 return (
                   <CWButton
@@ -201,7 +201,7 @@ class CommunitiesPage extends ClassComponent {
                     buttonType={
                       this.filterMap[cat] ? 'primary-black' : 'secondary-black'
                     }
-                    onclick={() => {
+                    onClick={() => {
                       this.filterMap[cat] = !this.filterMap[cat];
                     }}
                   />
@@ -216,7 +216,7 @@ class CommunitiesPage extends ClassComponent {
                         ? 'primary-black'
                         : 'secondary-black'
                     }
-                    onclick={() => {
+                    onClick={() => {
                       this.filterMap[network] = !this.filterMap[network];
                     }}
                   />
@@ -229,7 +229,7 @@ class CommunitiesPage extends ClassComponent {
                     buttonType={
                       this.filterMap[base] ? 'primary-black' : 'secondary-black'
                     }
-                    onclick={() => {
+                    onClick={() => {
                       this.filterMap[base] = !this.filterMap[base];
                     }}
                   />
@@ -237,7 +237,7 @@ class CommunitiesPage extends ClassComponent {
               })}
             </div>
           </div>
-          <div class="communities-list">
+          <div className="communities-list">
             {sortedChains}
             <NewCommunityCard />
           </div>

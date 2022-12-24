@@ -37,9 +37,9 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
       : 18;
 
     return (
-      <div class="EditTopicThresholdsRow">
+      <div className="EditTopicThresholdsRow">
         <CWText>{topic.name}</CWText>
-        <div class="input-and-button-row">
+        <div className="input-and-button-row">
           <TokenDecimalInput
             decimals={decimals}
             defaultValueInWei={topic.tokenThreshold.toString()}
@@ -50,7 +50,7 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
           <CWButton
             label="Update"
             disabled={!this.newTokenThresholdInWei}
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
               try {
                 const status = await app.topics.setTopicThreshold(
@@ -105,12 +105,12 @@ export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholds
     const topics = app.topics.getByCommunity(app.activeChainId());
 
     return (
-      <div class="EditTopicThresholdsModal">
-        <div class="compact-modal-title">
+      <div className="EditTopicThresholdsModal">
+        <div className="compact-modal-title">
           <h3>Edit topic thresholds</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           {topics.length > 0 ? (
             topics
               .sort((a, b) => {

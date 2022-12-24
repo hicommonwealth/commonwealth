@@ -66,7 +66,7 @@ export class MessageRow extends ClassComponent<MessageRowAttrs> {
 
     return (
       <div
-        class={getClasses<{ hasFeedback: boolean }>(
+        className={getClasses<{ hasFeedback: boolean }>(
           { hasFeedback },
           'MessageRow'
         )}
@@ -75,7 +75,7 @@ export class MessageRow extends ClassComponent<MessageRowAttrs> {
         {hasFeedback && (
           <CWText
             type="caption"
-            className={getClasses<{ status: ValidationStatus }>(
+            class={getClasses<{ status: ValidationStatus }>(
               { status: validationStatus },
               'feedback-message-text'
             )}
@@ -121,7 +121,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
 
     return (
       <div
-        class={getClasses<{
+        className={getClasses<{
           containerClassName?: string;
           validationStatus?: ValidationStatus;
         }>(
@@ -131,7 +131,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
           },
           ComponentType.TextInput
         )}
-        onclick={onclick}
+        onClick={onclick}
       >
         {label && (
           <MessageRow
@@ -141,11 +141,11 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
             validationStatus={this.validationStatus}
           />
         )}
-        <div class="input-and-icon-container">
+        <div className="input-and-icon-container">
           <input
             autofocus={autofocus}
             autocomplete={autocomplete}
-            class={getClasses<InputStyleAttrs & InputInternalStyleAttrs>({
+            className={getClasses<InputStyleAttrs & InputInternalStyleAttrs>({
               size,
               validationStatus: this.validationStatus,
               disabled,
@@ -205,11 +205,11 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
             defaultValue={defaultValue}
           />
           {iconRightonclick && !!iconRight && !disabled ? (
-            <div class="text-input-right-onclick-icon">
+            <div className="text-input-right-onclick-icon">
               <CWIconButton
                 iconName={iconRight}
                 iconSize="small"
-                onclick={iconRightonclick}
+                onClick={iconRightonclick}
                 theme="primary"
               />
             </div>
@@ -217,7 +217,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
             <CWIcon
               iconName={iconRight}
               iconSize="small"
-              className="text-input-right-icon"
+              class="text-input-right-icon"
             />
           ) : null}
         </div>

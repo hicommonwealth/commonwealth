@@ -89,11 +89,11 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
 
     return (
       <div
-        class={getClasses<{ isPinned?: boolean }>(
+        className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
           'ThreadPreview'
         )}
-        onclick={(e) => {
+        onClick={(e) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`
@@ -118,9 +118,9 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
         {!this.isWindowSmallInclusive && (
           <ThreadPreviewReactionButton thread={thread} />
         )}
-        <div class="main-content">
-          <div class="top-row">
-            <div class="user-and-date">
+        <div className="main-content">
+          <div className="top-row">
+            <div className="user-and-date">
               {render(User, {
                 avatarSize: 24,
                 user: new AddressInfo(
@@ -135,19 +135,19 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 hideIdentityIcon: true,
               })}
               {!this.isWindowSmallInclusive && (
-                <CWText className="last-updated-text">•</CWText>
+                <CWText class="last-updated-text">•</CWText>
               )}
               <CWText
                 type="caption"
                 fontWeight="medium"
-                className="last-updated-text"
+                class="last-updated-text"
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>
               {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
             </div>
-            <div class="top-row-icons">
-              {isHot(thread) && <div class="flame" />}
+            <div className="top-row-icons">
+              {isHot(thread) && <div className="flame" />}
               {thread.pinned && (
                 <CWIcon
                   iconName="pin"
@@ -156,7 +156,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
               )}
             </div>
           </div>
-          <div class="title-row">
+          <div className="title-row">
             <CWText type="h5" fontWeight="semiBold">
               {thread.title}
             </CWText>
@@ -170,7 +170,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
             )}
           </div>
           {thread.chainEntities?.length > 0 && (
-            <div class="tags-row">
+            <div className="tags-row">
               {thread.chainEntities
                 .sort((a, b) => {
                   return +a.typeId - +b.typeId;
@@ -191,8 +191,8 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 })}
             </div>
           )}
-          <div class="row-bottom">
-            <div class="comments-count">
+          <div className="row-bottom">
+            <div className="comments-count">
               {this.isWindowSmallInclusive && (
                 <ThreadReactionButton thread={thread} />
               )}
@@ -202,9 +202,9 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 {commentsCount} {!this.isWindowSmallInclusive && `comments`}
               </CWText> */}
             </div>
-            <div class="row-bottom-menu">
+            <div className="row-bottom-menu">
               <div
-                onclick={(e) => {
+                onClick={(e) => {
                   // prevent clicks from propagating to discussion row
                   e.preventDefault();
                   e.stopPropagation();
@@ -213,7 +213,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 <SharePopover />
               </div>
               <div
-                onclick={(e) => {
+                onClick={(e) => {
                   // prevent clicks from propagating to discussion row
                   e.preventDefault();
                   e.stopPropagation();

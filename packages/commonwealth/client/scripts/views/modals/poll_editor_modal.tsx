@@ -59,12 +59,12 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
     }
 
     return (
-      <div class="PollEditorModal">
-        <div class="compact-modal-title">
+      <div className="PollEditorModal">
+        <div className="compact-modal-title">
           <h3>Create Poll</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWTextInput
             label="Question"
             placeholder="Do you support this proposal?"
@@ -73,9 +73,9 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
               this.prompt = (e.target as HTMLInputElement).value;
             }}
           />
-          <div class="options-and-label-container">
+          <div className="options-and-label-container">
             <CWLabel label="Options" />
-            <div class="options-container">
+            <div className="options-container">
               {this.options?.map((_choice: string, index: number) => (
                 <CWTextInput
                   placeholder={`${index + 1}.`}
@@ -86,29 +86,29 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                 />
               ))}
             </div>
-            <div class="buttons-row">
+            <div className="buttons-row">
               <CWButton
                 label="Remove choice"
                 buttonType="secondary-red"
                 disabled={this.options.length <= 2}
-                onclick={() => {
+                onClick={() => {
                   this.options.pop();
                 }}
               />
               <CWButton
                 label="Add choice"
                 disabled={this.options.length >= 6}
-                onclick={() => {
+                onClick={() => {
                   this.options.push('');
                 }}
               />
             </div>
           </div>
-          <div class="duration-row">
-            <CWText type="caption" className="poll-duration-text">
+          <div className="duration-row">
+            <CWText type="caption" class="poll-duration-text">
               {getPollDurationCopy(customDuration, customDurationEnabled)}
             </CWText>
-            <div class="duration-row-actions">
+            <div className="duration-row-actions">
               <CWCheckbox
                 label="Custom duration"
                 checked={this.customDurationEnabled}
@@ -123,7 +123,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                 items: ['Infinite'].concat(
                   _.range(1, 31).map((n) => pluralize(Number(n), 'day'))
                 ),
-                itemRender: (n) => <div class="duration-item">{n}</div>,
+                itemRender: (n) => <div className="duration-item">{n}</div>,
                 onSelect: (e) => {
                   this.customDuration = e as string;
                 },
@@ -137,17 +137,17 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
               })}
             </div>
           </div>
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               label="Cancel"
               buttonType="secondary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 $(e.target).trigger('modalexit');
               }}
             />
             <CWButton
               label="Save changes"
-              onclick={async (e) => {
+              onClick={async (e) => {
                 if (!this.prompt) {
                   notifyError('Must set poll prompt');
                   return;

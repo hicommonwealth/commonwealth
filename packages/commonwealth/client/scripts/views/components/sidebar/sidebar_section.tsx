@@ -44,14 +44,14 @@ class SubSection extends ClassComponent<SubSectionAttrs> {
 
     return (
       <div
-        class={`SubSection${isActive ? ' active' : ''}`}
-        onclick={(e) => clickHandler(e)}
+        className={`SubSection${isActive ? ' active' : ''}`}
+        onClick={(e) => clickHandler(e)}
       >
         {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
-        <div class={titleTextClass} title={title}>
+        <div className={titleTextClass} title={title}>
           {title}
         </div>
-        {isNotUndefined(rightIcon) && <div class="right-icon">{rightIcon}</div>}
+        {isNotUndefined(rightIcon) && <div className="right-icon">{rightIcon}</div>}
       </div>
     );
   }
@@ -131,28 +131,28 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
 
     return (
       <div
-        class="SubSectionGroup"
+        className="SubSectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class={`sub-section-group-title ${
+          className={`sub-section-group-title ${
             this.hoverOn ? 'background' : backgroundColorClass
           }`}
-          onclick={(e) => clickHandler(e)}
+          onClick={(e) => clickHandler(e)}
         >
           {containsChildren ? (
-            <div class="carat">{carat}</div>
+            <div className="carat">{carat}</div>
           ) : (
-            <div class="no-carat" />
+            <div className="no-carat" />
           )}
-          <CWText type="b2" className={`title-text ${titleTextClass}`}>
+          <CWText type="b2" class={`title-text ${titleTextClass}`}>
             {title}
           </CWText>
-          {rightIcon && <div class="right-icon">{rightIcon}</div>}
+          {rightIcon && <div className="right-icon">{rightIcon}</div>}
         </div>
         {containsChildren && this.toggled && (
-          <div class="subsections">
+          <div className="subsections">
             {displayData.map((subsection) => (
               <SubSection {...subsection} />
             ))}
@@ -222,20 +222,20 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
 
     return (
       <div
-        class="SidebarSectionGroup"
+        className="SidebarSectionGroup"
         onmouseenter={(e) => mouseEnterHandler(e)}
         onmouseleave={() => mouseLeaveHandler()}
       >
         <div
-          class="section-group-title-container"
-          onclick={(e) => clickHandler(e, title)}
+          className="section-group-title-container"
+          onClick={(e) => clickHandler(e, title)}
         >
           {carat}
           <CWText>{title}</CWText>
-          {rightIcon && <div class="right-icon">{rightIcon}</div>}
+          {rightIcon && <div className="right-icon">{rightIcon}</div>}
         </div>
         {this.toggled && (
-          <div class="sections-container">
+          <div className="sections-container">
             {displayData.map((sectionGroup) => (
               <SubSectionGroup {...sectionGroup} />
             ))}

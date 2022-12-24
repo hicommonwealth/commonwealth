@@ -41,8 +41,8 @@ class Validator extends ClassComponent<ValidatorAttrs> {
     const { info } = vnode.attrs;
 
     return (
-      <CWCard className="ValidatorCard">
-        <div class="user-and-nominator">
+      <CWCard class="ValidatorCard">
+        <div className="user-and-nominator">
           {render(User, {
             user: new AddressInfo(null, info.stash, info.chain, null),
             popover: true,
@@ -58,7 +58,7 @@ class Validator extends ClassComponent<ValidatorAttrs> {
         {info.commission && (
           <CWText
             type="caption"
-            className="commission-text"
+            class="commission-text"
           >{`${info.commission} commission`}</CWText>
         )}
       </CWCard>
@@ -140,7 +140,7 @@ class ValidatorsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Validators" />}
       >
-        <div class="ValidatorsPage">
+        <div className="ValidatorsPage">
           <GovExplainer
             statHeaders={[
               {

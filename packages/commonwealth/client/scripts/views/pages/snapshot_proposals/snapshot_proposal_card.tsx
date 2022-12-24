@@ -33,8 +33,8 @@ export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAtt
       <CWCard
         elevation="elevation-2"
         interactive={true}
-        className="ProposalCard"
-        onclick={(e) => {
+        class="ProposalCard"
+        onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
           localStorage[`${app.activeChainId()}-proposals-scrollY`] =
@@ -42,7 +42,7 @@ export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAtt
           navigateToSubpage(proposalLink);
         }}
       >
-        <div class="proposal-card-metadata">
+        <div className="proposal-card-metadata">
           <ProposalTag
             label={`${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(
               proposal.ipfs.length - 6

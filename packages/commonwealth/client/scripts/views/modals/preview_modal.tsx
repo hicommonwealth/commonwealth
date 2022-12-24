@@ -13,8 +13,8 @@ import { CWText } from '../components/component_kit/cw_text';
 class PreviewModalEmptyState extends ClassComponent {
   view() {
     return (
-      <div class="empty-state-container">
-        <CWText type="h5" fontWeight="semiBold" className="empty-text">
+      <div className="empty-state-container">
+        <CWText type="h5" fontWeight="semiBold" class="empty-text">
           Nothing to preview
         </CWText>
       </div>
@@ -32,12 +32,12 @@ export class PreviewModal extends ClassComponent<PreviewModalAttrs> {
     const { title } = vnode.attrs;
 
     return (
-      <div class="PreviewModal">
-        <div class="compact-modal-title">
+      <div className="PreviewModal">
+        <div className="compact-modal-title">
           <h3>{title ? `Preview: ${title}` : 'Preview'}</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           {(() => {
             try {
               const doc = JSON.parse(vnode.attrs.doc);

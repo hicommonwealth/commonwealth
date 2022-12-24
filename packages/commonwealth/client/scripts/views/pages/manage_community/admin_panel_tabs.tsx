@@ -26,19 +26,19 @@ export class AdminPanelTabs extends ClassComponent<AdminPanelTabsAttrs> {
 
   view(vnode: ResultNode<AdminPanelTabsAttrs>) {
     return (
-      <div class="AdminPanelTabs">
+      <div className="AdminPanelTabs">
         <CWTabBar>
           <CWTab
             label="Admins"
             isSelected={this.index === 1}
-            onclick={() => {
+            onClick={() => {
               this.index = 1;
             }}
           />
           <CWTab
             label="Webhooks"
             isSelected={this.index === 2}
-            onclick={() => {
+            onClick={() => {
               this.index = 2;
             }}
           />

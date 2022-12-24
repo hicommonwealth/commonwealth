@@ -51,7 +51,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
       transitionDuration: 0,
       closeOnContentClick: true,
       content: (
-        <div class="topic-items">
+        <div className="topic-items">
           {render(MenuItem, {
             active: getRoute() === `/${app.activeChainId()}` || !topic,
             iconLeft:
@@ -91,10 +91,10 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                     navigateToSubpage(`/discussions/${name}`);
                   },
                   label: (
-                    <div class="topic-item">
-                      <div class="icon-and-item-name-container">
+                    <div className="topic-item">
+                      <div className="icon-and-item-name-container">
                         {active && <CWIcon iconName="check" iconSize="small" />}
-                        <div class="topic-item-name" title={name}>
+                        <div className="topic-item-name" title={name}>
                           {name}
                         </div>
                       </div>

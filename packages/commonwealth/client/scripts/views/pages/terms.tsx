@@ -126,8 +126,8 @@ class TermsPage extends ClassComponent {
   view() {
     return (
       <Sublayout>
-        <div class="TermsPage">
-          <div class="forum-container">
+        <div className="TermsPage">
+          <div className="forum-container">
             <CWText type="h3">Terms of Service</CWText>
             {renderMultilineText(TermsOfService)}
           </div>

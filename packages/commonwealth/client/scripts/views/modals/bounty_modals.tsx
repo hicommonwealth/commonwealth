@@ -28,12 +28,12 @@ export class ApproveBountyModal extends ClassComponent<BountyModalAttrs> {
     const { bountyId } = vnode.attrs;
 
     return (
-      <div class="ApproveBountyModal">
-        <div class="compact-modal-title">
+      <div className="ApproveBountyModal">
+        <div className="compact-modal-title">
           <h3>Approve bounty</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWText>Create a council motion to approve this bounty?</CWText>
           <CWText>
             You must select a valid number of approvals, or the motion will
@@ -47,9 +47,9 @@ export class ApproveBountyModal extends ClassComponent<BountyModalAttrs> {
             placeholder="Number of approvals"
           />
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
               if (Number.isNaN(this.approvals)) return;
               await createTXModal(
@@ -88,12 +88,12 @@ export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
     const feeCoins = app.chain.chain.coins(fee, true);
 
     return (
-      <div class="ProposeCuratorModal">
-        <div class="compact-modal-title">
+      <div className="ProposeCuratorModal">
+        <div className="compact-modal-title">
           <h3>Propose curator</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWText>Propose a curator and fee to manage this bounty.</CWText>
           <CWText>
             The fee should be a portion of the bounty that will go to the
@@ -125,9 +125,9 @@ export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
             placeholder="Approvals required"
           />
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
               if (Number.isNaN(this.approvals)) return;
               await createTXModal(
@@ -165,11 +165,11 @@ export class AwardBountyModal extends ClassComponent<BountyModalAttrs> {
     const { recipient } = this;
 
     return (
-      <div class="AwardBountyModal">
-        <div class="compact-modal-title">
+      <div className="AwardBountyModal">
+        <div className="compact-modal-title">
           <h3>Approve bounty</h3>
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWText>
             Award this bounty to the recipient. This action will take effect
             after a delay.
@@ -184,9 +184,9 @@ export class AwardBountyModal extends ClassComponent<BountyModalAttrs> {
             }}
           />
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
               await createTXModal(
                 (app.chain as Substrate).bounties.awardBountyTx(
@@ -221,11 +221,11 @@ export class ExtendExpiryModal extends ClassComponent<BountyModalAttrs> {
     const { remark } = this;
 
     return (
-      <div class="ExtendExpiryModal">
-        <div class="compact-modal-title">
+      <div className="ExtendExpiryModal">
+        <div className="compact-modal-title">
           <h3>Approve bounty</h3>
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWText>
             Extend this bounty? You should include a remark summarizing progress
             so far.
@@ -237,9 +237,9 @@ export class ExtendExpiryModal extends ClassComponent<BountyModalAttrs> {
             placeholder="Remark"
           />
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
               await createTXModal(
                 (app.chain as Substrate).bounties.extendBountyExpiryTx(

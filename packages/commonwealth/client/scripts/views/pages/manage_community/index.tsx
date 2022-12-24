@@ -148,7 +148,7 @@ class ManageCommunityPage extends ClassComponent {
       <Sublayout
       // title="Manage Community"
       >
-        <div class="ManageCommunityPage">
+        <div className="ManageCommunityPage">
           <ChainMetadataRows
             admins={admins}
             chain={app.config.chains.getById(app.activeChainId())}

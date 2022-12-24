@@ -25,18 +25,18 @@ export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
 
     return (
       <div
-        class={getClasses<ProfileRowStyleAttrs>(
+        className={getClasses<ProfileRowStyleAttrs>(
           { darkMode, isSelected },
           'ProfileRow'
         )}
-        onclick={onclick}
+        onClick={onclick}
       >
-        <div class="avatar-and-name">
-          <div class="avatar" />
+        <div className="avatar-and-name">
+          <div className="avatar" />
           <CWText
             type="b1"
             fontWeight="bold"
-            className="profile-row-text"
+            class="profile-row-text"
             noWrap
           >
             {name ?? 'Your Profile'}
@@ -60,10 +60,10 @@ export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
 
     return (
       <div
-        class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'ProfilesList')}
+        className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'ProfilesList')}
       >
         <div
-          class={getClasses<{ darkMode?: boolean }>(
+          className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
             'profile-rows-container'
           )}
@@ -73,7 +73,7 @@ export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
               darkMode={darkMode}
               isSelected={profile.isSelected}
               name={profile.name}
-              onclick={onclick}
+              onClick={onclick}
             />
           ))}
         </div>

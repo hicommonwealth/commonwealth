@@ -163,9 +163,9 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     return (
       <>
         <div
-          class="trigger-wrapper"
+          className="trigger-wrapper"
           ref="trigger-wrapper-ref"
-          onclick={() => {
+          onClick={() => {
             if (!interactionType || interactionType === 'click') {
               this.togglePopOver(onToggle);
             }
@@ -181,8 +181,8 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
         {isOpen ? (
           <CWPortal>
             <div
-              class="popover-overlay"
-              onclick={() => {
+              className="popover-overlay"
+              onClick={() => {
                 if (!interactionType || interactionType === 'click') {
                   this.togglePopOver(onToggle);
                 }
@@ -194,7 +194,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
               }}
             >
               <div
-                class={getClasses<{ tooltipType: TooltipType }>(
+                className={getClasses<{ tooltipType: TooltipType }>(
                   {
                     tooltipType,
                   },

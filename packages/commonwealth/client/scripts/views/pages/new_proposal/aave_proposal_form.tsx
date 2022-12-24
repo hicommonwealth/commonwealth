@@ -41,8 +41,8 @@ export class AaveProposalForm extends ClassComponent {
     const { activeTabIndex, aaveProposalState } = this;
 
     return (
-      <div class="AaveProposalForm">
-        <div class="row-with-label">
+      <div className="AaveProposalForm">
+        <div className="row-with-label">
           <CWLabel label="Proposer (you)" />
           {render(User, {
             user: author,
@@ -58,25 +58,25 @@ export class AaveProposalForm extends ClassComponent {
             this.ipfsHash = e.target.value;
           }}
         />
-        <div class="row-with-label">
+        <div className="row-with-label">
           <CWLabel label="Executor" />
-          <div class="executors-container">
+          <div className="executors-container">
             {aave.governance.api.Executors.map((r) => (
               <div
-                class={`executor ${
+                className={`executor ${
                   this.executor === r.address && 'selected-executor'
                 }`}
-                onclick={() => {
+                onClick={() => {
                   this.executor = r.address;
                 }}
               >
-                <div class="executor-row">
+                <div className="executor-row">
                   <CWText fontWeight="medium">Address</CWText>
                   <CWText type="caption" noWrap>
                     {r.address}
                   </CWText>
                 </div>
-                <div class="executor-row">
+                <div className="executor-row">
                   <CWText fontWeight="medium">Time Delay</CWText>
                   <CWText type="caption">
                     {r.delay / (60 * 60 * 24)} Day(s)
@@ -86,13 +86,13 @@ export class AaveProposalForm extends ClassComponent {
             ))}
           </div>
         </div>
-        <div class="tab-selector">
+        <div className="tab-selector">
           <CWTabBar>
             {aaveProposalState.map((_, index) => (
               <CWTab
                 label={`Call ${index + 1}`}
                 isSelected={activeTabIndex === index}
-                onclick={() => {
+                onClick={() => {
                   this.activeTabIndex = index;
                 }}
               />
@@ -166,7 +166,7 @@ export class AaveProposalForm extends ClassComponent {
         />
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             this.proposer = app.user?.activeAccount?.address;

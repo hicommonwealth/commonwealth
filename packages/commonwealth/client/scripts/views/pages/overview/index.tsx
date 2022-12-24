@@ -69,18 +69,18 @@ class OverviewPage extends ClassComponent {
       <PageLoading />
     ) : (
       <Sublayout>
-        <div class="OverviewPage">
-          <div class="header-row">
-            <div class="header-row-left">
+        <div className="OverviewPage">
+          <div className="header-row">
+            <div className="header-row-left">
               <CWText type="h3" fontWeight="semiBold">
                 Overview
               </CWText>
               <CWButton
-                className="latest-button"
+                class="latest-button"
                 buttonType="mini-black"
                 label="Latest Threads"
                 iconName="home"
-                onclick={() => {
+                onClick={() => {
                   navigateToSubpage('/discussions');
                 }}
               />
@@ -89,7 +89,7 @@ class OverviewPage extends ClassComponent {
               <CWIconButton
                 iconName="plusCircle"
                 iconButtonTheme="black"
-                onclick={() => {
+                onClick={() => {
                   navigateToSubpage('/new/discussion');
                 }}
               />
@@ -98,25 +98,25 @@ class OverviewPage extends ClassComponent {
                 buttonType="mini-black"
                 label="Create Thread"
                 iconName="plus"
-                onclick={() => {
+                onClick={() => {
                   navigateToSubpage('/new/discussion');
                 }}
               />
             )}
           </div>
-          <div class="column-headers-row">
+          <div className="column-headers-row">
             <CWText
               type="h5"
               fontWeight="semiBold"
-              className="threads-header-row-text"
+              class="threads-header-row-text"
             >
               Topic
             </CWText>
-            <div class="threads-header-container">
+            <div className="threads-header-container">
               <CWText
                 type="h5"
                 fontWeight="semiBold"
-                className="threads-header-row-text"
+                class="threads-header-row-text"
               >
                 Recent threads
               </CWText>

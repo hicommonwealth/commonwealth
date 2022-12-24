@@ -17,9 +17,9 @@ export class TermsBanner extends ClassComponent<TermsBannerAttrs> {
 
     return (
       <CWBanner
-        className="TermsBanner"
+        class="TermsBanner"
         bannerContent={
-          <CWText type="b2" className="terms-text">
+          <CWText type="b2" class="terms-text">
             Please check out our <a href={terms}>terms of service</a>.
           </CWText>
         }

@@ -106,7 +106,7 @@ const getMemberPreview = (
   return render(ListItem, {
     tabIndex,
     label: (
-      <a class="search-results-item">
+      <a className="search-results-item">
         {render(UserBlock, {
           user: profile,
           searchTerm,
@@ -279,7 +279,7 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
         loading={this.loading}
         disabled={disabled}
         label={selection === 'email' ? 'Send Invite' : 'Add address'}
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           const address = invitedAddress;
           const emailAddress = invitedEmail;
@@ -440,14 +440,14 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
     };
 
     return (
-      <div class="CreateInviteModal">
-        <div class="compact-modal-title">
+      <div className="CreateInviteModal">
+        <div className="compact-modal-title">
           <h3>Invite members</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
-          <div class="community-and-address-row">
-            <div class="community-select-container">
+        <div className="compact-modal-body">
+          <div className="community-and-address-row">
+            <div className="community-select-container">
               <CWLabel label="Community" />
               {render(SelectList, {
                 closeOnSelect: true,
@@ -535,7 +535,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
                 ? app.searchAddressCache[searchAddressTerm]?.loaded
                   ? render(ListItem, {
                       label: (
-                        <div class="no-addresses">
+                        <div className="no-addresses">
                           <CWText fontWeight="medium">
                             {searchAddressTerm}
                           </CWText>
@@ -594,10 +594,10 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
             {...chainOrCommunityObj}
           />
           {this.success && (
-            <div class="success-message">Success! Your invite was sent</div>
+            <div className="success-message">Success! Your invite was sent</div>
           )}
           {this.failure && (
-            <div class="error-message">{this.error || 'An error occurred'}</div>
+            <div className="error-message">{this.error || 'An error occurred'}</div>
           )}
         </div>
       </div>

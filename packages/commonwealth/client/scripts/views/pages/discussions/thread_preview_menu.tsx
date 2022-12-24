@@ -39,8 +39,8 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
 
     return (
       <div
-        class="ThreadPreviewMenu"
-        onclick={(e) => {
+        className="ThreadPreviewMenu"
+        onClick={(e) => {
           // prevent clicks from propagating to discussion row
           e.preventDefault();
           e.stopPropagation();

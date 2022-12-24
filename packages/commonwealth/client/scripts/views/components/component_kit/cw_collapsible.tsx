@@ -20,21 +20,21 @@ export class CWCollapsible extends ClassComponent<CollapsibleAttrs> {
     const { collapsibleContent, headerContent } = vnode.attrs;
 
     return (
-      <div class={ComponentType.Collapsible}>
-        <div class="header-and-content-container">
-          <div class="collapsible-header">
-            <div class="expand-icon-button">
+      <div className={ComponentType.Collapsible}>
+        <div className="header-and-content-container">
+          <div className="collapsible-header">
+            <div className="expand-icon-button">
               <CWIconButton
                 iconName={this.isExpanded ? 'chevronDown' : 'chevronRight'}
                 iconSize="large"
-                onclick={() => {
+                onClick={() => {
                   this.isExpanded = !this.isExpanded;
                 }}
               />
             </div>
             {headerContent}
           </div>
-          <div class="content-container">
+          <div className="content-container">
             {this.isExpanded && collapsibleContent}
           </div>
         </div>

@@ -147,7 +147,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
 
       return (
         <div
-          class={getClasses<{ collapsed?: boolean }>(
+          className={getClasses<{ collapsed?: boolean }>(
             { collapsed: !!collapse },
             'MarkdownFormattedText'
           )}
@@ -179,7 +179,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
       return (
         <>
           <div
-            class={getClasses<{ collapsed?: boolean }>(
+            className={getClasses<{ collapsed?: boolean }>(
               { collapsed: !!collapse },
               'MarkdownFormattedText'
             )}
@@ -187,10 +187,10 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
             {results}
           </div>
           {this.isTruncated && (
-            <div class="show-more-button-wrapper">
-              <div class="show-more-button" onclick={toggleDisplay}>
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
                 <CWIcon iconName="plus" iconSize="small" />
-                <div class="show-more-text">Show More</div>
+                <div className="show-more-text">Show More</div>
               </div>
             </div>
           )}

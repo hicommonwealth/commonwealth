@@ -136,12 +136,12 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
     };
 
     return (
-      <div class="EditIdentityModal">
-        <div class="compact-modal-title">
+      <div className="EditIdentityModal">
+        <div className="compact-modal-title">
           <h3>Set on-chain identity</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWTextInput
             label="Display Name"
             placeholder="A reasonable display name for the controller of the account"
@@ -184,10 +184,10 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
               this.twitter = e.target.value;
             }}
           />
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               buttonType="secondary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
               }}
@@ -195,7 +195,7 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
             />
             <CWButton
               disabled={this.saving || !app.chain?.loaded}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 updateIdentity().then(() => $(vnode.dom).trigger('modalexit'));
               }}

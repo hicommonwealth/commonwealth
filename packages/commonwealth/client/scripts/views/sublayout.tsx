@@ -62,15 +62,15 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
     }
 
     return (
-      <div class="Sublayout">
-        <div class="header-and-body-container">
+      <div className="Sublayout">
+        <div className="header-and-body-container">
           <SublayoutHeader
             hideSearch={hideSearch}
             onMobile={this.isWindowSmallInclusive}
           />
-          <div class="sidebar-and-body-container">
+          <div className="sidebar-and-body-container">
             {showSidebar && <Sidebar />}
-            <div class="body-and-sticky-headers-container">
+            <div className="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}
                 chain={chain}
@@ -82,7 +82,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
               {this.isWindowSmallInclusive && app.mobileMenu ? (
                 <AppMobileMenus />
               ) : (
-                <div class="Body" onscroll={onscroll}>
+                <div className="Body" onScroll={onscroll}>
                   {vnode.children}
                   {!app.isCustomDomain() && !hideFooter && <Footer />}
                 </div>

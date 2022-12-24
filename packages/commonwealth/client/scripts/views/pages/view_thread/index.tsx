@@ -407,9 +407,9 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     };
 
     const reactionsAndReplyButtons = (
-      <div class="thread-footer-row">
+      <div className="thread-footer-row">
         <ThreadReactionButton thread={thread} />
-        <div class="comments-count">
+        <div className="comments-count">
           <CWIcon iconName="feedback" iconSize="small" />
           <CWText type="caption">{commentCount} Comments</CWText>
         </div>
@@ -589,7 +589,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
             getActionMenuItems()
           }
           body={
-            <div class="thread-content">
+            <div className="thread-content">
               {this.isEditingBody ? (
                 <>
                   {reactionsAndReplyButtons}
@@ -605,7 +605,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                 <>
                   <CollapsibleThreadBody thread={thread} />
                   {thread.readOnly ? (
-                    <CWText type="h5" className="callout-text">
+                    <CWText type="h5" class="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
                   ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
@@ -639,7 +639,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     {
                       label: 'Links',
                       item: (
-                        <div class="cards-column">
+                        <div className="cards-column">
                           {showLinkedProposalOptions && (
                             <LinkedProposalsCard
                               onChangeHandler={(
@@ -679,7 +679,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     {
                       label: 'Polls',
                       item: (
-                        <div class="cards-column">
+                        <div className="cards-column">
                           {[
                             ...new Map(
                               this.polls?.map((poll) => [poll.id, poll])

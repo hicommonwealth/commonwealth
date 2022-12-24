@@ -27,13 +27,13 @@ export class SearchChip extends ClassComponent<SearchChipAttrs> {
       <CWText
         type="b2"
         fontWeight="medium"
-        className={getClasses<{ isActive: boolean }>(
+        class={getClasses<{ isActive: boolean }>(
           {
             isActive,
           },
           'SearchChip'
         )}
-        onclick={onclick}
+        onClick={onclick}
       >
         {label}
       </CWText>
@@ -52,14 +52,14 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
 
     return (
       <div
-        class="SearchBarThreadPreviewRow"
-        onclick={() =>
+        className="SearchBarThreadPreviewRow"
+        onClick={() =>
           setRoute(
             `/${searchResult.chain}/discussion/${searchResult.proposalid}`
           )
         }
       >
-        <div class="header-row">
+        <div className="header-row">
           {render(User, {
             user: new AddressInfo(
               searchResult.address_id,
@@ -68,8 +68,8 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
               null
             ),
           })}
-          <CWText className="last-updated-text">•</CWText>
-          <CWText type="caption" className="last-updated-text">
+          <CWText class="last-updated-text">•</CWText>
+          <CWText type="caption" class="last-updated-text">
             {moment(searchResult.created_at).format('l')}
           </CWText>
           {/* <CWText type="caption">{searchResult.chain}</CWText> */}
@@ -77,7 +77,7 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
         <CWText type="b2" fontWeight="bold">
           {decodeURIComponent(searchResult.title)}
         </CWText>
-        <CWText type="caption" className="excerpt-text" fontWeight="medium">
+        <CWText type="caption" class="excerpt-text" fontWeight="medium">
           {renderQuillTextBody(searchResult.body, {
             hideFormatting: true,
             collapse: true,
@@ -95,8 +95,8 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
 
     return (
       <div
-        class="SearchBarCommentPreviewRow"
-        onclick={() => {
+        className="SearchBarCommentPreviewRow"
+        onClick={() => {
           setRoute(
             `/${searchResult.chain}/proposal/${
               searchResult.proposalid.split('_')[0]
@@ -104,14 +104,14 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
           );
         }}
       >
-        <CWText type="caption" className="last-updated-text">
+        <CWText type="caption" class="last-updated-text">
           {moment(searchResult.created_at).format('l')}
         </CWText>
         {/* <CWText type="caption">{searchResult.chain}</CWText> */}
         {/* <CWText type="b2" fontWeight="medium">
           {decodeURIComponent(searchResult.title)}
         </CWText> */}
-        <CWText type="caption" className="excerpt-text">
+        <CWText type="caption" class="excerpt-text">
           {renderQuillTextBody(searchResult.text, {
             hideFormatting: true,
             collapse: true,
@@ -129,8 +129,8 @@ export class SearchBarCommunityPreviewRow extends ClassComponent<SearchBarPrevie
 
     return (
       <div
-        class="SearchBarCommunityPreviewRow"
-        onclick={() => {
+        className="SearchBarCommunityPreviewRow"
+        onClick={() => {
           setRoute(
             searchResult.address
               ? `/${searchResult.address}`
@@ -151,7 +151,7 @@ export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRo
     const { searchResult } = vnode.attrs;
 
     return (
-      <div class="SearchBarMemberPreviewRow">
+      <div className="SearchBarMemberPreviewRow">
         {render(User, {
           user: app.profiles.getProfile(
             searchResult.chain,

@@ -26,31 +26,31 @@ export class CWProgressBar extends ClassComponent<ProgressBarAttrs> {
     const { label, progress, progressStatus, subtext, iconName } = vnode.attrs;
 
     return (
-      <div class={ComponentType.ProgressBar}>
-        <div class="progress-label">
-          <div class="label-wrapper">
-            <div class="label-display">
+      <div className={ComponentType.ProgressBar}>
+        <div className="progress-label">
+          <div className="label-wrapper">
+            <div className="label-display">
               {!!iconName && (
                 <CWIcon
                   iconName={iconName}
                   iconSize="small"
-                  className="button-icon"
+                  class="button-icon"
                 />
               )}
               <CWText>{label}</CWText>
             </div>
             {subtext && (
-              <CWText className="subtext-text" type="caption">
+              <CWText class="subtext-text" type="caption">
                 {subtext}
               </CWText>
             )}
           </div>
-          <CWText className="progress-percentage-text" type="caption">
+          <CWText class="progress-percentage-text" type="caption">
             {`${Math.min(100, Math.floor(progress * 1000) / 1000)}%`}
           </CWText>
         </div>
         <progress
-          class={getClasses<{ progressStatus: ProgressBarStatus }>({
+          className={getClasses<{ progressStatus: ProgressBarStatus }>({
             progressStatus,
           })}
           max="100"

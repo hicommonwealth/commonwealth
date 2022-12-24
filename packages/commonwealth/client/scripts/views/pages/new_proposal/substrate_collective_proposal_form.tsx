@@ -76,7 +76,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
           }}
         />
         {this.councilMotionDescription && (
-          <div class="council-motion-description">
+          <div className="council-motion-description">
             {this.councilMotionDescription}
           </div>
         )}
@@ -159,7 +159,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
         <CWButton
           disabled={!author.isCouncillor}
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             if (!this.threshold) {

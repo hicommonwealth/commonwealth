@@ -17,40 +17,40 @@ export class ExternalLinksModule extends ClassComponent {
     if (!website && !discord && !telegram && !github) return;
 
     return (
-      <div class="ExternalLinksModule">
+      <div className="ExternalLinksModule">
         {discord && (
           <CWIcon
             iconName="discord"
-            className="discord-link"
-            onclick={() => window.open(discord)}
+            class="discord-link"
+            onClick={() => window.open(discord)}
           />
         )}
         {element && (
           <CWIcon
             iconName="element"
-            className="element-link"
-            onclick={() => window.open(element)}
+            class="element-link"
+            onClick={() => window.open(element)}
           />
         )}
         {telegram && (
           <CWIcon
             iconName="telegram"
-            className="telegram-link"
-            onclick={() => window.open(telegram)}
+            class="telegram-link"
+            onClick={() => window.open(telegram)}
           />
         )}
         {github && (
           <CWIcon
             iconName="github"
-            className="github-link"
-            onclick={() => window.open(github)}
+            class="github-link"
+            onClick={() => window.open(github)}
           />
         )}
         {website && (
           <CWIcon
             iconName="website"
-            className="website-link"
-            onclick={() => window.open(website)}
+            class="website-link"
+            onClick={() => window.open(website)}
           />
         )}
       </div>

@@ -78,7 +78,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
       }
 
       return (
-        <div class="LinkedProposalsEmbed">
+        <div className="LinkedProposalsEmbed">
           {(proposal instanceof SubstrateDemocracyProposal ||
             proposal instanceof SubstrateCollectiveProposal) &&
             proposal.getReferendum() && (
@@ -89,7 +89,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                 {app.activeChainId() && (
                   <CWButton
                     buttonType="tertiary-blue"
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       navigateToSubpage(
                         `/proposal/${
@@ -113,7 +113,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                 {app.activeChainId() && (
                   <CWButton
                     buttonType="tertiary-blue"
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       navigateToSubpage(
                         `/proposal/${
@@ -171,7 +171,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
       }
 
       return (
-        <div class="LinkedProposalsEmbed">
+        <div className="LinkedProposalsEmbed">
           {democracyProposals.map((p) => (
             <>
               <CWText fontWeight="semiBold">
@@ -186,7 +186,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
               {app.activeChainId() && (
                 <CWButton
                   buttonType="tertiary-blue"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     navigateToSubpage(
                       `/proposal/${ProposalType.SubstrateDemocracyProposal}/${p.identifier}`
@@ -209,7 +209,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
               {app.activeChainId() && (
                 <CWButton
                   buttonType="tertiary-blue"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     navigateToSubpage(
                       `/proposal/${ProposalType.SubstrateDemocracyReferendum}/${r.identifier}`
@@ -234,7 +234,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
               {app.activeChainId() && (
                 <CWButton
                   buttonType="tertiary-blue"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     navigateToSubpage(
                       `/proposal/${ProposalType.SubstrateCollectiveProposal}/${mo.identifier}`

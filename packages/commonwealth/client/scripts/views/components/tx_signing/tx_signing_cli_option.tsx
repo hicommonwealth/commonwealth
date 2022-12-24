@@ -36,7 +36,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
     };
 
     return (
-      <div class="TXSigningCLIOption">
+      <div className="TXSigningCLIOption">
         {this.calldata &&
         app.chain &&
         app.chain.base === ChainBase.Substrate ? (
@@ -51,7 +51,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
             2
           )} \\ --password "" \\
           --suri "`}
-              <span class="no-select">secret phrase</span>
+              <span className="no-select">secret phrase</span>
               {`"`}
             </CodeBlock>
             <CWTextArea
@@ -63,7 +63,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
               }}
             />
             <CWButton
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 try {
                   transact(this.signedTx.trim());

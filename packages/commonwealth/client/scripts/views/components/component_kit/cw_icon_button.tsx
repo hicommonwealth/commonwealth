@@ -21,12 +21,12 @@ export class CWIconButton extends ClassComponent<IconComponentAttrs> {
 
     return (
       <CWIcon
-        className={iconButtonTheme}
+        class={iconButtonTheme}
         componentType={componentType}
         disabled={disabled}
         iconName={iconName}
         iconSize={iconSize}
-        onclick={onclick}
+        onClick={onclick}
         selected={selected}
       />
     );

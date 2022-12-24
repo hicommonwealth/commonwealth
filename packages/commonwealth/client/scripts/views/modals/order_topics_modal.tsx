@@ -62,19 +62,19 @@ export class OrderTopicsModal extends ClassComponent {
 
   view() {
     return (
-      <div class="OrderTopicsModal">
-        <h3 class="compact-modal-title">Reorder Topics</h3>
-        <div class="compact-modal-body">
-          <div class="featured-topic-list">
+      <div className="OrderTopicsModal">
+        <h3 className="compact-modal-title">Reorder Topics</h3>
+        <div className="compact-modal-body">
+          <div className="featured-topic-list">
             {this.topics.map((t) => (
-              <div class="topic-row">
+              <div className="topic-row">
                 <CWText>{t.name}</CWText>
                 <CWIcon iconName="hamburger" />
               </div>
             ))}
           </div>
           <CWButton
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
               try {
                 app.topics.updateFeaturedOrder(this.topics);

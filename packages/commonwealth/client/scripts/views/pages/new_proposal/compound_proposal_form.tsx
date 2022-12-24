@@ -37,8 +37,8 @@ export class CompoundProposalForm extends ClassComponent {
     const { activeTabIndex, aaveProposalState } = this;
 
     return (
-      <div class="CompoundProposalForm">
-        <div class="row-with-label">
+      <div className="CompoundProposalForm">
+        <div className="row-with-label">
           <CWLabel label="Proposer (you)" />
           {render(User, {
             user: author,
@@ -61,13 +61,13 @@ export class CompoundProposalForm extends ClassComponent {
             this.description = e.target.value;
           }}
         />
-        <div class="tab-selector">
+        <div className="tab-selector">
           <CWTabBar>
             {aaveProposalState.map((_, index) => (
               <CWTab
                 label={`Call ${index + 1}`}
                 isSelected={activeTabIndex === index}
-                onclick={() => {
+                onClick={() => {
                   this.activeTabIndex = index;
                 }}
               />
@@ -131,7 +131,7 @@ export class CompoundProposalForm extends ClassComponent {
         />
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             this.proposer = app.user?.activeAccount?.address;

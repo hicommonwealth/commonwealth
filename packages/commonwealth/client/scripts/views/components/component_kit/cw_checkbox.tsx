@@ -44,7 +44,7 @@ export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
 
     return (
       <label
-        class={getClasses<CheckboxStyleAttrs>(
+        className={getClasses<CheckboxStyleAttrs>(
           {
             checked,
             disabled,
@@ -54,9 +54,9 @@ export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
           ComponentType.Checkbox
         )}
       >
-        <input class="checkbox-input" {...params} />
-        <div class="checkbox-control" />
-        <CWText className="checkbox-label">{label || value}</CWText>
+        <input className="checkbox-input" {...params} />
+        <div className="checkbox-control" />
+        <CWText class="checkbox-label">{label || value}</CWText>
       </label>
     );
   }
