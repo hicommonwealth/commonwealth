@@ -41,7 +41,7 @@ export class FundraisingSlide
           }}
           required
           tokenIconUrl={WethUrl}
-          value={vnode.attrs.form.threshold.toString()}
+          value={vnode.attrs.form.threshold?.toString()}
         />
         <CWDropdown
           options={[
