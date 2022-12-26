@@ -111,7 +111,7 @@ const LandingPage: m.Component<{}, IState> = {
         m(TokensCommunityComponent, { chains: vnode.state.chains }),
         m(TokensChainsComponent, {
           oncreateSlider: () => {
-            const glide = new (Glide as any)('.glide', {
+            return new (Glide as any)('.glide', {
               type: 'carousel',
               focusAt: 'center',
               perView: 3,
@@ -141,7 +141,6 @@ const LandingPage: m.Component<{}, IState> = {
                 },
               },
             });
-            glide.mount();
           },
           chains: vnode.state.chains,
         }),
@@ -280,28 +279,7 @@ const LandingPage: m.Component<{}, IState> = {
           ],
         }),
         m(JoinCommonWealthSection),
-        m(Footer, {
-          list: [
-            // { text:  'Use Cases' },
-            // { text:  'Crowdfunding' },
-            // { text:  'Developers' },
-            { text: 'About', redirectTo: '/whyCommonwealth' },
-            { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
-            {
-              text: 'Jobs',
-              externalLink: 'https://angel.co/company/commonwealth-labs/jobs',
-            },
-            { text: 'Terms', redirectTo: '/terms' },
-            { text: 'Privacy', redirectTo: '/privacy' },
-            { text: 'Docs', externalLink: 'https://docs.commonwealth.im' },
-            { text: 'Discord', externalLink: 'https://discord.gg/t9XscHdZrG' },
-            { text: 'Telegram', externalLink: 'https://t.me/HiCommonwealth' },
-            {
-              text: 'Twitter',
-              externalLink: 'https://twitter.com/hicommonwealth',
-            },
-          ],
-        }),
+        m(Footer),
         m('script', {
           src: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js',
           integrity:
