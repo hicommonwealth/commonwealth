@@ -199,20 +199,6 @@
     transition-delay: 0.3s;
   }
 
-  button.cui-button.cui-fluid {
-    width: fit-content;
-    border-radius: $border-radius-corners;
-    background-color: $purple-300;
-
-    &:hover {
-      background-color: $purple-400;
-    }
-
-    span {
-      padding-right: 0px;
-    }
-  }
-
   .bio-left {
     margin-right: 20px;
   }
@@ -228,18 +214,6 @@
 
   .bio-actions-right {
     margin: 16px 0;
-
-    .cui-button {
-      margin: 6px 16px 6px 0;
-      border-radius: $border-radius-corners;
-      padding: 5px 15px 5px 15px;
-      background: $white;
-      border: 1px solid $purple-400;
-      color: $purple-400;
-      font-weight: 500;
-      font-size: 18px;
-      text-transform: uppercase;
-    }
   }
 
   .ProfileHeader {
@@ -309,13 +283,13 @@
     }
   }
   .bio-actions {
+    align-items: center;
     display: flex;
     gap: 8px;
     margin-top: 12px;
 
     @include mediumSmallInclusive {
-      a.btn,
-      .cui-button {
+      a.btn {
         margin-right: 16px;
         border-radius: $border-radius-corners;
         padding: 5px 15px 5px 15px;
@@ -407,19 +381,6 @@
       }
       .space {
         flex: 1;
-      }
-      button.cui-button.cui-fluid {
-        width: fit-content;
-        border-radius: $border-radius-corners;
-        background-color: $purple-300;
-
-        &:hover {
-          background-color: $purple-400;
-        }
-
-        span {
-          padding-right: 0px;
-        }
       }
     }
 

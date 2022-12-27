@@ -3,7 +3,7 @@ import { Model, DataTypes } from 'sequelize';
 
 import { UserAttributes, UserInstance } from './user';
 import { ModelStatic, ModelInstance } from './types';
-import { AddressInstance } from './address';
+import { AddressAttributes, AddressInstance } from './address';
 
 export type ProfileAttributes = {
   id?: number;
@@ -20,6 +20,7 @@ export type ProfileAttributes = {
 
   // associations
   User?: UserAttributes;
+  Addresses?: AddressAttributes[];
 };
 
 export type ProfileInstance = ModelInstance<ProfileAttributes> & {

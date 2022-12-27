@@ -35,7 +35,7 @@
       .user-and-timestamp-container {
         align-items: center;
         display: flex;
-        flex-direction: row;
+        gap: 8px;
         height: 24px;
 
         .User {
@@ -48,17 +48,6 @@
 
         .chat-message-group-timestamp {
           color: $neutral-400;
-          margin-left: 8px;
-        }
-
-        .cui-icon-link {
-          color: $neutral-400;
-          cursor: pointer;
-          margin-left: 4px;
-
-          &:hover {
-            color: $neutral-600;
-          }
         }
       }
 

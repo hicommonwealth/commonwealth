@@ -118,7 +118,7 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
         </div>
         <CWText>
           A new channel will be added to the <b>{vnode.attrs.category}</b>{' '}
-          category
+          category. Upon submitting, refresh the browser window!
         </CWText>
         <CWTextInput
           label="*Channel Title"
