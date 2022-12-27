@@ -509,18 +509,23 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               <div class="connected-line">
                 {this.channelsLoaded && (
                   <CWDropdown
-                    inputOptions={this.snapshotChannels.map((channel) => {
+                    label={'I dunno'}
+                    options={this.snapshotChannels.map((channel) => {
                       return {
                         label: channel.name,
+                        value: channel.id,
                       };
                     })}
-                    initialValue={
-                      this.selectedSnapshotChannel?.name ?? 'Select a Channel'
-                    }
-                    onSelect={(optionLabel, index) => {
+                    initialValue={{
+                      value: this.selectedSnapshotChannel?.id ?? 'channel',
+                      label:
+                        this.selectedSnapshotChannel?.name ??
+                        'Select a Channel',
+                    }}
+                    onSelect={(item) => {
                       this.selectedSnapshotChannel = {
-                        id: this.snapshotChannels[index].id,
-                        name: optionLabel,
+                        id: item.value,
+                        name: item.label,
                       };
                       m.redraw();
                     }}
