@@ -6,9 +6,9 @@ import { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import { ChainAttributes } from 'commonwealth/server/models/chain';
 import { ProfileAttributes } from 'commonwealth/server/models/profile';
 import { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
-import { TopicAttributes } from "commonwealth/server/models/topic";
-import { RoleAttributes } from "commonwealth/server/models/role";
-import { RuleAttributes } from "commonwealth/server/models/rule";
+import { TopicAttributes } from 'commonwealth/server/models/topic';
+import { RoleAttributes } from 'commonwealth/server/models/role';
+import { RuleAttributes } from 'commonwealth/server/models/rule';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -65,7 +65,11 @@ export type GetCommunitiesReq = {
   page?: number;
 };
 
-export type PutCommunitiesReq = { community: ChainAttributes, token: string, admin_addresses: string[] };
+export type PutCommunitiesReq = {
+  community: ChainAttributes,
+  contract: { token_type: string, address: string },
+  admin_addresses: string[]
+};
 
 export type PutCommunitiesResp = { url: string, error?: string };
 
