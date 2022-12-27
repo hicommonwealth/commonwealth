@@ -1,11 +1,11 @@
 import axios from 'axios';
+import { Logger } from 'typescript-logging';
 import { StatsDController } from 'common-common/src/statsd';
 import { SnapshotNotification } from '../../../shared/types';
 import { DB } from '../../models';
-import {Logger} from "typescript-logging";
 
 export async function processSnapshotMessage(
-  this: { models: DB, log: Logger },
+  this: { models: DB; log: Logger },
   data: SnapshotNotification
 ) {
   // const log = factory.getLogger(formatFilename(__filename));
@@ -14,13 +14,23 @@ export async function processSnapshotMessage(
   this.log.info(`Processing snapshot message: ${JSON.stringify(data)}`);
 
   const eventType = data.event;
-  let proposal = await this.models.SnapshotProposal.findOne({
-    where: { id: data.id },
-  });
+  let proposal;
 
-  await this.models.SnapshotSpace.findOrCreate({
-    where: { snapshot_space: space },
-  });
+  try {
+    proposal = await this.models.SnapshotProposal.findOne({
+      where: { id: data.id },
+    });
+  } catch (e) {
+    this.log.error(`Error fetching proposal: ${e}`);
+  }
+
+  try {
+    await this.models.SnapshotSpace.findOrCreate({
+      where: { snapshot_space: space },
+    });
+  } catch (e) {
+    this.log.error(`Error creating snapshot space: ${e}`);
+  }
 
   if (eventType === 'proposal/created' && proposal) {
     this.log.info(`Proposal ${id} already exists`);
@@ -60,6 +70,10 @@ export async function processSnapshotMessage(
     await this.models.CommunitySnapshotSpaces.findAll({
       where: { snapshot_space_id: space },
     });
+
+  this.log.info(
+    `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `
+  );
 
   for (const community of associatedCommunities) {
     const communityId = community.chain_id;
