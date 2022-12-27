@@ -49,6 +49,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     } else {
       $tmpl('meta[name="author"]').remove();
     }
+    $tmpl('meta[property="og:type"]').attr('content', 'article');
     $tmpl('meta[name="twitter:title"]').attr('content', title);
     $tmpl('meta[name="twitter:description"]').attr('content', description);
     if (image) {
