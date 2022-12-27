@@ -20,13 +20,13 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
   }
   log.info('setupAppRoutes');
   // Development: serve everything through devMiddleware
-  if (DEV) {
-    app.get('*', (req, res, next) => {
-      req.url = '/build/';
-      devMiddleware(req, res, next);
-    });
-    return;
-  }
+  // if (DEV) {
+  //   app.get('*', (req, res, next) => {
+  //     req.url = '/build/';
+  //     devMiddleware(req, res, next);
+  //   });
+  //   return;
+  // }
 
   // Production: serve SEO-optimized routes where possible
   //
@@ -39,6 +39,8 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
  
   const renderWithMetaTags = (res, title, description, author, image) => {
     image = cleanMalformedUrl(image);
+    // add a dummy param onto the end of the url to force twitter to update the card
+    image = `${image}?foo=bar`;
 
     description = description || `${title}: a decentralized community on Commonwealth.im.`;
     const $tmpl = cheerio.load(templateFile);
@@ -67,6 +69,8 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
       /<meta name="twitter:image:src" content="(.*?)">/g,
       '<meta name="twitter:image" content="$1">'
     );
+
+    console.log('renderWithMetaTags', twitterSafeHtml);
 
     res.send(twitterSafeHtml);
   };
