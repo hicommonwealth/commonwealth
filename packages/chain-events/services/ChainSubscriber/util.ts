@@ -225,6 +225,8 @@ async function setupNewListeners(
       network = SupportedNetwork.Aave;
     else if (chain.network === ChainNetwork.Moloch)
       network = SupportedNetwork.Moloch;
+    else if (chain.network === ChainNetwork.CommonProtocol)
+      network = SupportedNetwork.Commonwealth;
 
     try {
       log.info(`Starting listener for: ${chain.id}`);

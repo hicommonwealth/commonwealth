@@ -119,9 +119,10 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
       fetcher = new AaveEvents.StorageFetcher(api);
       range.startBlock = 0;
     } else if (chainInstance.network === ChainNetwork.CommonProtocol) {
-      const contracts = await chainInstance.getContracts({
-        include: [{ model: models.ChainNode, required: true }],
-      });
+      const contracts = await fetchData(
+        `${CW_SERVER_URL}/api/getChainContracts`,
+        {chain_id: chain}
+      );
       const api = await CommonwealthEvents.createApi(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
         contracts[0].address
