@@ -1,17 +1,17 @@
 import axios from 'axios';
 import { StatsDController } from 'common-common/src/statsd';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { SnapshotNotification } from '../../../shared/types';
 import { DB } from '../../models';
+import {Logger} from "typescript-logging";
 
 export async function processSnapshotMessage(
-  this: { models: DB },
+  this: { models: DB, log: Logger },
   data: SnapshotNotification
 ) {
-  const log = factory.getLogger(formatFilename(__filename));
+  // const log = factory.getLogger(formatFilename(__filename));
   const { space, id, title, body, choices, start, expire } = data;
 
-  log.info(`Processing snapshot message: ${JSON.stringify(data)}`);
+  this.log.info(`Processing snapshot message: ${JSON.stringify(data)}`);
 
   const eventType = data.event;
   let proposal = await this.models.SnapshotProposal.findOne({
@@ -23,12 +23,12 @@ export async function processSnapshotMessage(
   });
 
   if (eventType === 'proposal/created' && proposal) {
-    log.info(`Proposal ${id} already exists`);
+    this.log.info(`Proposal ${id} already exists`);
     return;
   }
 
   if (!proposal) {
-    log.info(`Proposal ${id} does not exist, creating record`);
+    this.log.info(`Proposal ${id} does not exist, creating record`);
     proposal = await this.models.SnapshotProposal.create({
       id,
       title,
@@ -47,7 +47,7 @@ export async function processSnapshotMessage(
   });
 
   if (eventType === 'proposal/deleted') {
-    log.info(`Proposal deleted, deleting record`);
+    this.log.info(`Proposal deleted, deleting record`);
     await proposal.destroy();
 
     StatsDController.get().increment('cw.deleted_snapshot_proposal_record', 1, {
@@ -73,7 +73,7 @@ export async function processSnapshotMessage(
       if (config.snapshot_channel_id) {
         // Pass data to Discord bot
         try {
-          log.info(
+          this.log.info(
             `Sending snapshot notification to discord bot for community ${communityId} and snapshot space ${space} `
           );
           await axios.post(
@@ -101,7 +101,7 @@ export async function processSnapshotMessage(
           );
         } catch (e) {
           // TODO: should we NACK the message if sending to discord fails or just rollbar report it and continue?
-          log.error('Error sending snapshot notification to discord', e);
+          this.log.error('Error sending snapshot notification to discord', e);
           console.log('Error sending snapshot notification to discord bot', e);
         }
       }
