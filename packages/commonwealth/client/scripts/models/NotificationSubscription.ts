@@ -47,7 +47,6 @@ class NotificationSubscription {
     createdAt,
     immediateEmail,
     Chain?,
-    chainEntityId?,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT
   ) {
@@ -58,7 +57,6 @@ class NotificationSubscription {
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.Chain = Chain;
-    this.chainEntityId = chainEntityId;
     this.Comment = comment;
     this.Thread = thread;
   }
@@ -72,7 +70,6 @@ class NotificationSubscription {
       json.created_at,
       json.immediate_email,
       json.chain_id,
-      json.chain_entity_id,
       json.Comment || json.offchain_comment_id,
       json.Thread || json.offchain_thread_id
     );
@@ -88,7 +85,6 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     created_at,
     immediate_email,
     Chain,
-    chain_entity_id,
     Comment,
     Thread,
   } = subscription;
@@ -121,7 +117,6 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     created_at,
     immediate_email,
     Chain,
-    chain_entity_id,
     modeledComment,
     modeledThread
   );

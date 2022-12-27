@@ -68,7 +68,7 @@ export async function publishToCERoom(
   this: { server: Server },
   notification: ChainEventNotification
 ) {
-  this.server.to(notification.ChainEvent.ChainEventType.id).emit(
+  this.server.to(notification.ChainEvent.chain).emit(
     WebsocketMessageNames.ChainEventNotification,
     notification
   );

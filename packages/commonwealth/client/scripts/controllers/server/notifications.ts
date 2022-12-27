@@ -84,7 +84,6 @@ class NotificationsController {
     if (subscription) {
       return this.enableSubscriptions([subscription]);
     } else {
-      // TODO: Change to POST /subscription
       return post(
         '/createSubscription',
         {

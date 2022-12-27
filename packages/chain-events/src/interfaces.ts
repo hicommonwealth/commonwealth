@@ -20,6 +20,7 @@ import { Api as AaveApi } from './chains/aave/types';
 import { StorageFetcher } from "./chains/aave";
 import { Listener } from "./Listener";
 import {ChainEventInstance} from "../services/database/models/chain_event";
+import {ChainBase, ChainNetwork} from "common-common/src/types";
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -203,6 +204,30 @@ export interface IEventTitle {
 }
 
 export type TitlerFilter = (kind: IChainEventKind) => IEventTitle;
+
+/**
+ * This function takes the network and base attribute of our current chains model and returns the relevant chain-event
+ * network. The chain-event network is an instance of SupportedNetwork enum. This is NOT the same as the network on
+ * the commonwealth chains model. This function is useful for determining which SupportedNetwork listener a
+ * Commonwealth 'chain' should use. Throws if the given chainNetwork and chainBase don't  match a chain-event network
+ * i.e. SupportedNetwork.
+ * @param chainNetwork The network attribute of the Commonwealth chain model
+ * @param chainBase The base attribute of the Commonwealth chain model
+ */
+export function getChainEventNetwork(chainNetwork: string, chainBase: string): SupportedNetwork {
+  if (chainBase === ChainBase.Substrate)
+    return SupportedNetwork.Substrate;
+  else if (chainBase === ChainBase.CosmosSDK)
+    return SupportedNetwork.Cosmos;
+  else if (chainNetwork === ChainNetwork.Compound)
+    return SupportedNetwork.Compound;
+  else if (chainNetwork === ChainNetwork.Aave)
+    return SupportedNetwork.Aave;
+  else if (chainNetwork === ChainNetwork.Moloch)
+    return SupportedNetwork.Moloch;
+  else
+    throw new Error('No matching SupportedNetwork');
+}
 
 /**
  * Returns the key of the value that is unique to the entities chain and type i.e. the key whose associated value

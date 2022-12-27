@@ -59,16 +59,6 @@ export default async (
         });
         if (!comment) return next(new AppError(Errors.NoComment));
         obj = { offchain_comment_id: Number(p_id), chain_id: comment.chain };
-      } else {
-        if (!req.body.chain_id)
-          return next(new AppError(Errors.ChainRequiredForEntity));
-        const chainEntityMeta = await models.ChainEntityMeta.findOne({
-          where: {
-            ce_id: req.body.chain_entity_id
-          }
-        });
-        if (!chainEntityMeta) return next(new AppError(Errors.NoChainEntity));
-        obj = { chain_id: chainEntityMeta.chain, chain_entity_id: chainEntityMeta.ce_id };
       }
       break;
     }
@@ -81,14 +71,9 @@ export default async (
         },
       });
       if (!chain) return next(new AppError(Errors.InvalidChain));
-      const chainEntity = await models.ChainEntityMeta.findOne({
-        where: {
-          id: p_id,
-        },
-      });
-      if (!chainEntity) return next(new AppError(Errors.NoChainEntity));
-      // object_id = [chain]-[entity_id] e.g. edgeware-10
-      obj = { chain_id: p_entity, entity_id: p_id };
+
+      // object_id = req.body.object_id = [chain_id]_chainEvents
+      obj = { chain_id: p_entity };
       break;
     }
     default:

@@ -51,7 +51,18 @@ export async function initAppState(
   updateSelectedChain = true,
   customDomain = null
 ): Promise<void> {
-  return new Promise((resolve, reject) => {
+  const subscribedChainsPromise = new Promise<void>((resolve, reject) => {
+    $.post(`${app.serverUrl()}/getSubscribedChains`)
+      .then(async (data) => {
+        app.subscribedChains = data.result || [];
+        resolve();
+      }).catch((e) => {
+        console.log(`Subscribed chains failed to load. You will be unable to edit chain-event subscriptions`);
+        console.error(e);
+      });
+  });
+
+  const statusPromise = new Promise<void>((resolve, reject) => {
     $.get(`${app.serverUrl()}/status`)
       .then(async (data) => {
         app.config.chains.clear();
@@ -128,6 +139,8 @@ export async function initAppState(
         reject(err);
       });
   });
+
+  await Promise.all([statusPromise, subscribedChainsPromise]);
 }
 
 export async function deinitChainOrCommunity() {

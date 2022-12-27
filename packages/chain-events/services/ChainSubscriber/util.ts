@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import {
   createListener,
-  ErcLoggingHandler,
+  ErcLoggingHandler, getChainEventNetwork,
   LoggingHandler,
   SubstrateEvents,
   SubstrateTypes,
@@ -215,16 +215,15 @@ async function setupNewListeners(
 ) {
   for (const chain of newChains) {
     let network: SupportedNetwork;
-    if (chain.base === ChainBase.Substrate)
-      network = SupportedNetwork.Substrate;
-    else if (chain.base === ChainBase.CosmosSDK)
-      network = SupportedNetwork.Cosmos;
-    else if (chain.network === ChainNetwork.Compound)
-      network = SupportedNetwork.Compound;
-    else if (chain.network === ChainNetwork.Aave)
-      network = SupportedNetwork.Aave;
-    else if (chain.network === ChainNetwork.Moloch)
-      network = SupportedNetwork.Moloch;
+
+    try {
+      network = getChainEventNetwork(chain.base, chain.network);
+    } catch (e) {
+      log.error(`The given chain does not match any existing chain-event SupportedNetwork. Chain-events does not know \
+      which listener type to use so a listener will not be started for the following chain: ${JSON.stringify(chain)}`,
+      e);
+      continue;
+    }
 
     try {
       log.info(`Starting listener for: ${chain.id}`);

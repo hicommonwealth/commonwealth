@@ -1,5 +1,5 @@
 import { ChainStore, NodeStore } from 'stores';
-import { IChainAdapter, NotificationCategory } from 'models';
+import {ChainInfo, IChainAdapter, NotificationCategory} from 'models';
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
@@ -43,6 +43,7 @@ export const enum LoginState {
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
+  subscribedChains: ChainInfo[]
   chainEntities: ChainEntityController;
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
@@ -129,6 +130,7 @@ const roles = new RolesController(user);
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
+  subscribedChains: [],
   chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 

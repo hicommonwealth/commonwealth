@@ -16,6 +16,7 @@ import {
   sendImmediateNotificationEmail
 } from '../scripts/emails';
 import send, { WebhookContent } from '../webhookNotifier';
+import {SupportedNetwork} from "chain-events";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -48,7 +49,19 @@ export default async function emitNotifications(
   };
 
   // typeguard function to differentiate between chain event notifications as needed
-  const isChainEventData = (<IChainEventNotificationData>notification_data).chainEvent !== undefined;
+  let chainEvent: IChainEventNotificationData;
+  const isChainEventData = !!(
+    typeof (<any>notification_data).id === 'number'
+    && typeof (<any>notification_data).block_number === 'number'
+    && (<any>notification_data).event_data
+    && Object.values(SupportedNetwork).includes((<any>notification_data).network)
+    && (<any>notification_data).chain && typeof (<any>notification_data).chain === 'string'
+    && typeof (<any>notification_data).entity_id === 'number'
+  );
+
+  if (isChainEventData) {
+    chainEvent = <IChainEventNotificationData>notification_data;
+  }
 
   // retrieve distinct user ids given a set of addresses
   const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
@@ -94,7 +107,7 @@ export default async function emitNotifications(
   let notification: NotificationInstance;
   notification = await models.Notification.findOne(isChainEventData ? {
     where: {
-      chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id
+      chain_event_id: chainEvent.id
     }
   } : {
     where: {
@@ -105,14 +118,12 @@ export default async function emitNotifications(
   // if the notification does not yet exist create it here
   if (!notification) {
     if (isChainEventData) {
-      const event: any = (<IChainEventNotificationData>notification_data).chainEvent;
-      event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType;
-
       notification = await models.Notification.create({
-        notification_data: JSON.stringify(event),
-        chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
+        notification_data: JSON.stringify(chainEvent),
+        chain_event_id: chainEvent.id,
         category_id: 'chain-event',
-        chain_id: (<IChainEventNotificationData>notification_data).chain_id
+        chain_id: chainEvent.chain,
+        entity_id: chainEvent.entity_id
       });
     } else {
       notification = await models.Notification.create({
@@ -133,14 +144,6 @@ export default async function emitNotifications(
     console.trace(e);
   }
 
-  // create NotificationsRead instances
-  // await models.NotificationsRead.bulkCreate(subscribers.map((subscription) => ({
-  //   subscription_id: subscription.id,
-  //   notification_id: notification.id,
-  //   is_read: false,
-  //   user_id: subscription.subscriber_id
-  // })));
-
   let query = `INSERT INTO "NotificationsRead" VALUES `;
   const replacements = [];
   for (const subscription of subscriptions) {
@@ -154,7 +157,7 @@ export default async function emitNotifications(
           subscriber: `${subscription.subscriber_id}`,
         }
       );
-      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `;
+      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `
       replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
     } else {
       // TODO: rollbar reported issue originates from here
@@ -168,11 +171,11 @@ export default async function emitNotifications(
 
   // send emails
   for (const subscription of subscriptions) {
-    if (msg && isChainEventData && (<IChainEventNotificationData>notification_data).chainEventType?.chain) {
+    if (msg && isChainEventData && chainEvent.chain) {
       msg.dynamic_template_data.notification.path = `${
         SERVER_URL
       }/${
-        (<IChainEventNotificationData>notification_data).chainEventType.chain
+        chainEvent.chain
       }/notifications?id=${
         notification.id
       }`;
@@ -197,9 +200,9 @@ export default async function emitNotifications(
   )) {
     await send(models, {
       notificationCategory: category_id,
-      ...webhook_data as any
+      ...webhook_data as Required<WebhookContent>
     });
   }
 
   return notification;
-}
+};

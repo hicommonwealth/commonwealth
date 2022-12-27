@@ -1,7 +1,5 @@
 import {DB} from "../models";
 import {NextFunction, Request, Response} from "express";
-import {AppError} from "common-common/src/errors";
-import {CHAIN_EVENT_SERVICE_SECRET} from "../config";
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',
@@ -9,14 +7,6 @@ export const Errors = {
 }
 
 export const getSubscribedChains = async (models: DB, req: Request, res: Response, next: NextFunction) => {
-  if (!req.body.secret) {
-    return next(new AppError(Errors.NeedSecret));
-  }
-
-  if (req.body.secret != CHAIN_EVENT_SERVICE_SECRET) {
-    return next(new AppError(Errors.InvalidSecret));
-  }
-
   const chains = await models.Chain.findAll({
     where: { has_chain_events_listener: true }
   });
