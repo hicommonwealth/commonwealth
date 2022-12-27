@@ -3,6 +3,7 @@ import { Client } from 'pg';
 import BN from 'bn.js';
 import JobRunner from 'common-common/src/cacheJobRunner';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainNetwork } from 'common-common/src/types';
 
 import {
   BalanceProvider,
@@ -11,6 +12,7 @@ import {
   ICache,
   IChainNode,
   ITokenBalanceCache,
+  FetchTokenBalanceErrors,
   TokenBalanceResp,
 } from './types';
 import { TbcStatsDSender } from './tbcStatsDSender';
@@ -19,11 +21,11 @@ const log = factory.getLogger(formatFilename(__filename));
 
 async function queryChainNodesFromDB(lastQueryUnixTime: number): Promise<IChainNode[]> {
   const query = `SELECT * FROM "ChainNodes" WHERE updated_at >= to_timestamp (${lastQueryUnixTime})::date;`;
-  
+
   const DATABASE_URI =
-  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
-    ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
-    : process.env.DATABASE_URL;
+    !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+      ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
+      : process.env.DATABASE_URL;
 
   const db = new Client({
     connectionString: DATABASE_URI,
@@ -46,6 +48,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
   private _lastQueryTime: number = 0;
   private statsDSender: TbcStatsDSender = new TbcStatsDSender();
   private cacheContents = { zero: 0, nonZero: 0 };
+
   constructor(
     noBalancePruneTimeS: number = 5 * 60,
     private readonly _hasBalancePruneTimeS: number = 1 * 60 * 60,
@@ -55,7 +58,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     super({}, noBalancePruneTimeS);
 
     // if providers is set, init during constructor
-    if(providers != null) {
+    if (providers != null) {
       for (const provider of providers) {
         this._providers[provider.name] = provider;
       }
@@ -64,8 +67,8 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
 
   public async initBalanceProviders(providers: BalanceProvider[] = null) {
     // lazy load import to improve test speed
-    if(providers == null) {
-      const p = await import('./providers')
+    if (providers == null) {
+      const p = await import('./providers');
       providers = p.default;
     }
     for (const provider of providers) {
@@ -149,10 +152,10 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
       await this.access((async (c: ICache) => {
         c[cacheKey] = { balance, fetchedAt };
 
-        if(new BN(balance).eqn(0)) {
-          this.cacheContents['zero']++
+        if (new BN(balance).eqn(0)) {
+          this.cacheContents['zero']++;
         } else {
-          this.cacheContents['nonZero']++
+          this.cacheContents['nonZero']++;
         }
       }));
       return balance;
@@ -176,6 +179,55 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     }));
 
     return results;
+  }
+
+  // Backwards compatibility function to fetch a single user's token balance
+  // in a context where a chain node only has a single balance provider.
+  public async fetchUserBalance(
+    network: ChainNetwork,
+    nodeId: number,
+    userAddress: string,
+    contractAddress?: string
+  ): Promise<string> {
+    let bp: string;
+    try {
+      const providersResult = await this.getBalanceProviders(nodeId);
+      bp = providersResult[0].bp;
+    } catch (e) {
+      throw new Error(FetchTokenBalanceErrors.NoBalanceProvider);
+    }
+
+    // grab contract if provided, otherwise query native token
+    let opts = {};
+    if (contractAddress) {
+      if (network !== ChainNetwork.ERC20 && network !== ChainNetwork.ERC721) {
+        throw new Error(FetchTokenBalanceErrors.UnsupportedContractType);
+      }
+      opts = {
+        tokenAddress: contractAddress,
+        contractType: network,
+      };
+    }
+
+    let balancesResp: TokenBalanceResp;
+    try {
+      balancesResp = await this.getBalancesForAddresses(
+        nodeId,
+        [userAddress],
+        bp,
+        opts,
+      );
+    } catch (err) {
+      throw new Error('Query Failed');
+    }
+
+    if (balancesResp.balances[userAddress]) {
+      return balancesResp.balances[userAddress];
+    } else if (balancesResp.errors[userAddress]) {
+      throw new Error(`Error querying balance: ${balancesResp.errors[userAddress]}`);
+    } else {
+      throw new Error('Query failed');
+    }
   }
 
   private async _refreshNodes() {
@@ -202,7 +254,7 @@ export class TokenBalanceCache extends JobRunner<ICache> implements ITokenBalanc
     await this.access(async (cache) => {
       for (const key of Object.keys(cache)) {
         delete cache[key];
-        this.statsDSender.sendJobItemRemoved(key)
+        this.statsDSender.sendJobItemRemoved(key);
       }
     });
     return this.start();

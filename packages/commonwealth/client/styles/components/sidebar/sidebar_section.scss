@@ -112,7 +112,7 @@
   .unread-icon {
     align-items: center;
     background-color: $rorange-500;
-    border-radius: 1000px;
+    border-radius: $border-radius-round;
     color: $white;
     display: flex;
     height: 16px;

@@ -1,22 +1,21 @@
-import { ChainBase, ChainType } from 'common-common/src/types';
-import WebSocket from 'ws';
-import { SERVER_URL } from 'commonwealth/server/config';
-import {
-  createImmediateNotificationEmailObject,
-  sendImmediateNotificationEmail,
-} from 'commonwealth/server/scripts/emails';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import Sequelize, { QueryTypes } from 'sequelize';
 import {
   IChainEventNotificationData,
   IChatNotification,
   ICommunityNotificationData,
   IPostNotificationData
-} from 'commonwealth/shared/types';
-import { DB } from 'commonwealth/server/models';
-import send, { WebhookContent } from 'commonwealth/server/webhookNotifier';
-import { NotificationInstance } from 'commonwealth/server/models/notification';
-import Sequelize, { DataTypes, QueryTypes } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
+} from '../../shared/types';
+import { SERVER_URL } from '../config';
+import { DB } from '../models';
+import { NotificationInstance } from '../models/notification';
+import {
+  createImmediateNotificationEmailObject,
+  sendImmediateNotificationEmail
+} from '../scripts/emails';
+import send, { WebhookContent } from '../webhookNotifier';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -28,9 +27,8 @@ export default async function emitNotifications(
   object_id: string,
   notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
   webhook_data?: Partial<WebhookContent>,
-  wss?: WebSocket.Server,
   excludeAddresses?: string[],
-  includeAddresses?: string[]
+  includeAddresses?: string[],
 ): Promise<NotificationInstance> {
   // get subscribers to send notifications to
   StatsDController.get().increment(
@@ -50,7 +48,7 @@ export default async function emitNotifications(
   };
 
   // typeguard function to differentiate between chain event notifications as needed
-  const isChainEventData = (<IChainEventNotificationData>notification_data).chainEvent !== undefined
+  const isChainEventData = (<IChainEventNotificationData>notification_data).chainEvent !== undefined;
 
   // retrieve distinct user ids given a set of addresses
   const fetchUsersFromAddresses = async (addresses: string[]): Promise<number[]> => {
@@ -105,18 +103,17 @@ export default async function emitNotifications(
   });
 
   // if the notification does not yet exist create it here
-  // console.log((<IChainEventNotificationData>notification_data).chainEvent.toJSON())
   if (!notification) {
     if (isChainEventData) {
-      const event: any = (<IChainEventNotificationData>notification_data).chainEvent.toJSON();
-      event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType.toJSON();
+      const event: any = (<IChainEventNotificationData>notification_data).chainEvent;
+      event.ChainEventType = (<IChainEventNotificationData>notification_data).chainEventType;
 
       notification = await models.Notification.create({
         notification_data: JSON.stringify(event),
         chain_event_id: (<IChainEventNotificationData>notification_data).chainEvent.id,
         category_id: 'chain-event',
         chain_id: (<IChainEventNotificationData>notification_data).chain_id
-      })
+      });
     } else {
       notification = await models.Notification.create({
         notification_data: JSON.stringify(notification_data),
@@ -157,7 +154,7 @@ export default async function emitNotifications(
           subscriber: `${subscription.subscriber_id}`,
         }
       );
-      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `
+      query += `(?, ?, ?, ?, (SELECT COALESCE(MAX(id), 0) + 1 FROM "NotificationsRead" WHERE user_id = ?)), `;
       replacements.push(notification.id, subscription.id, false, subscription.subscriber_id, subscription.subscriber_id);
     } else {
       // TODO: rollbar reported issue originates from here
@@ -205,4 +202,4 @@ export default async function emitNotifications(
   }
 
   return notification;
-};
+}

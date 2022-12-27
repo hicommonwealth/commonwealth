@@ -3,177 +3,184 @@ import passport from 'passport';
 import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src';
+import { StatsDController } from 'common-common/src/statsd';
 
-import domain from 'commonwealth/server/routes/domain';
-import status from 'commonwealth/server/routes/status';
-import createAddress from 'commonwealth/server/routes/createAddress';
-import linkExistingAddressToChain from 'commonwealth/server/routes/linkExistingAddressToChain';
-import verifyAddress from 'commonwealth/server/routes/verifyAddress';
-import deleteAddress from 'commonwealth/server/routes/deleteAddress';
-import getAddressStatus from 'commonwealth/server/routes/getAddressStatus';
-import selectChain from 'commonwealth/server/routes/selectChain';
-import startEmailLogin from 'commonwealth/server/routes/startEmailLogin';
-import finishEmailLogin from 'commonwealth/server/routes/finishEmailLogin';
-import finishOAuthLogin from 'commonwealth/server/routes/finishOAuthLogin';
-import startOAuthLogin from 'commonwealth/server/routes/startOAuthLogin';
-import createComment from 'commonwealth/server/routes/createComment';
-import editComment from 'commonwealth/server/routes/editComment';
-import deleteComment from 'commonwealth/server/routes/deleteComment';
-import viewComments from 'commonwealth/server/routes/viewComments';
-import bulkComments from 'commonwealth/server/routes/bulkComments';
-import createReaction from 'commonwealth/server/routes/createReaction';
-import deleteReaction from 'commonwealth/server/routes/deleteReaction';
-import viewReactions from 'commonwealth/server/routes/viewReactions';
-import bulkReactions from 'commonwealth/server/routes/bulkReactions';
-import reactionsCounts from 'commonwealth/server/routes/reactionsCounts';
-import threadsUsersCountAndAvatars from 'commonwealth/server/routes/threadsUsersCountAndAvatars';
-import starCommunity from 'commonwealth/server/routes/starCommunity';
-import createChain from 'commonwealth/server/routes/createChain';
-import createContract from 'commonwealth/server/routes/contracts/createContract';
-import viewCount from 'commonwealth/server/routes/viewCount';
-import updateEmail from 'commonwealth/server/routes/updateEmail';
-import updateBanner from 'commonwealth/server/routes/updateBanner';
-import communityStats from 'commonwealth/server/routes/communityStats';
+import domain from '../routes/domain';
+import status from '../routes/status';
+import createAddress from '../routes/createAddress';
+import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
+import verifyAddress from '../routes/verifyAddress';
+import deleteAddress from '../routes/deleteAddress';
+import getAddressStatus from '../routes/getAddressStatus';
+import selectChain from '../routes/selectChain';
+import startEmailLogin from '../routes/startEmailLogin';
+import finishEmailLogin from '../routes/finishEmailLogin';
+import finishOAuthLogin from '../routes/finishOAuthLogin';
+import startOAuthLogin from '../routes/startOAuthLogin';
+import createComment from '../routes/createComment';
+import editComment from '../routes/editComment';
+import deleteComment from '../routes/deleteComment';
+import viewComments from '../routes/viewComments';
+import bulkComments from '../routes/bulkComments';
+import createReaction from '../routes/createReaction';
+import deleteReaction from '../routes/deleteReaction';
+import viewReactions from '../routes/viewReactions';
+import bulkReactions from '../routes/bulkReactions';
+import reactionsCounts from '../routes/reactionsCounts';
+import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
+import starCommunity from '../routes/starCommunity';
+import createChain from '../routes/createChain';
+import createContract from '../routes/contracts/createContract';
+import viewCount from '../routes/viewCount';
+import updateEmail from '../routes/updateEmail';
+import updateBanner from '../routes/updateBanner';
+import communityStats from '../routes/communityStats';
 
-import viewSubscriptions from 'commonwealth/server/routes/subscription/viewSubscriptions';
-import createSubscription from 'commonwealth/server/routes/subscription/createSubscription';
-import deleteSubscription from 'commonwealth/server/routes/subscription/deleteSubscription';
-import enableSubscriptions from 'commonwealth/server/routes/subscription/enableSubscriptions';
-import disableSubscriptions from 'commonwealth/server/routes/subscription/disableSubscriptions';
-import enableImmediateEmails from 'commonwealth/server/routes/subscription/enableImmediateEmails';
-import disableImmediateEmails from 'commonwealth/server/routes/subscription/disableImmediateEmails';
+import viewSubscriptions from '../routes/subscription/viewSubscriptions';
+import createSubscription from '../routes/subscription/createSubscription';
+import deleteSubscription from '../routes/subscription/deleteSubscription';
+import enableSubscriptions from '../routes/subscription/enableSubscriptions';
+import disableSubscriptions from '../routes/subscription/disableSubscriptions';
+import enableImmediateEmails from '../routes/subscription/enableImmediateEmails';
+import disableImmediateEmails from '../routes/subscription/disableImmediateEmails';
 import viewNotifications, {
   NotificationCategories,
-} from 'commonwealth/server/routes/viewNotifications';
-import viewUserActivity from 'commonwealth/server/routes/viewUserActivity';
-import viewChainActivity from 'commonwealth/server/routes/viewChainActivity';
-import viewGlobalActivity from 'commonwealth/server/routes/viewGlobalActivity';
-import markNotificationsRead from 'commonwealth/server/routes/markNotificationsRead';
-import clearReadNotifications from 'commonwealth/server/routes/clearReadNotifications';
-import clearNotifications from 'commonwealth/server/routes/clearNotifications';
-import bulkMembers from 'commonwealth/server/routes/bulkMembers';
-import bulkAddresses from 'commonwealth/server/routes/bulkAddresses';
-import createInvite from 'commonwealth/server/routes/createInvite';
-import acceptInvite from 'commonwealth/server/routes/acceptInvite';
-import addMember from 'commonwealth/server/routes/addMember';
-import upgradeMember from 'commonwealth/server/routes/upgradeMember';
-import deleteSocialAccount from 'commonwealth/server/routes/deleteSocialAccount';
-import getProfileOld from 'commonwealth/server/routes/getProfile';
+} from '../routes/viewNotifications';
+import viewUserActivity from '../routes/viewUserActivity';
+import viewGlobalActivity from '../routes/viewGlobalActivity';
+import markNotificationsRead from '../routes/markNotificationsRead';
+import clearReadNotifications from '../routes/clearReadNotifications';
+import clearNotifications from '../routes/clearNotifications';
+import bulkMembers from '../routes/bulkMembers';
+import bulkAddresses from '../routes/bulkAddresses';
+import createInvite from '../routes/createInvite';
+import acceptInvite from '../routes/acceptInvite';
+import addMember from '../routes/addMember';
+import upgradeMember from '../routes/upgradeMember';
+import deleteSocialAccount from '../routes/deleteSocialAccount';
+import getProfileOld from '../routes/getProfile';
 
-import createRole from 'commonwealth/server/routes/createRole';
-import deleteRole from 'commonwealth/server/routes/deleteRole';
-import setDefaultRole from 'commonwealth/server/routes/setDefaultRole';
+import createRole from '../routes/createRole';
+import deleteRole from '../routes/deleteRole';
+import setDefaultRole from '../routes/setDefaultRole';
 
-import getUploadSignature from 'commonwealth/server/routes/getUploadSignature';
-import activeThreads from 'commonwealth/server/routes/activeThreads';
-import createThread from 'commonwealth/server/routes/createThread';
-import editThread from 'commonwealth/server/routes/editThread';
-import createPoll from 'commonwealth/server/routes/createPoll';
-import getPolls from 'commonwealth/server/routes/getPolls';
-import updateThreadStage from 'commonwealth/server/routes/updateThreadStage';
-import updateThreadPrivacy from 'commonwealth/server/routes/updateThreadPrivacy';
-import updateThreadPinned from 'commonwealth/server/routes/updateThreadPinned';
-import updateThreadLinkedChainEntities from 'commonwealth/server/routes/updateThreadLinkedChainEntities';
-import updateThreadLinkedSnapshotProposal from 'commonwealth/server/routes/updateThreadLinkedSnapshotProposal';
-import updateVote from 'commonwealth/server/routes/updateVote';
-import viewVotes from 'commonwealth/server/routes/viewVotes';
-import fetchEntityTitle from 'commonwealth/server/routes/fetchEntityTitle';
-import fetchThreadForSnapshot from 'commonwealth/server/routes/fetchThreadForSnapshot';
-import updateChainEntityTitle from 'commonwealth/server/routes/updateChainEntityTitle';
-import updateLinkedThreads from 'commonwealth/server/routes/updateLinkedThreads';
-import deleteThread from 'commonwealth/server/routes/deleteThread';
-import addEditors from 'commonwealth/server/routes/addEditors';
-import deleteEditors from 'commonwealth/server/routes/deleteEditors';
-import bulkThreads from 'commonwealth/server/routes/bulkThreads';
-import getThreadsOld from 'commonwealth/server/routes/getThreads';
-import searchDiscussions from 'commonwealth/server/routes/searchDiscussions';
-import searchComments from 'commonwealth/server/routes/searchComments';
-import createDraft from 'commonwealth/server/routes/drafts/createDraft';
-import deleteDraft from 'commonwealth/server/routes/drafts/deleteDraft';
-import editDraft from 'commonwealth/server/routes/drafts/editDraft';
-import getDrafts from 'commonwealth/server/routes/drafts/getDrafts';
-import deleteChain from 'commonwealth/server/routes/deleteChain';
-import updateChain from 'commonwealth/server/routes/updateChain';
-import bulkProfiles from 'commonwealth/server/routes/bulkProfiles';
-import updateProfile from 'commonwealth/server/routes/updateProfile';
-import writeUserSetting from 'commonwealth/server/routes/writeUserSetting';
-import sendFeedback from 'commonwealth/server/routes/sendFeedback';
-import logout from 'commonwealth/server/routes/logout';
-import createTopic from 'commonwealth/server/routes/createTopic';
-import updateTopic from 'commonwealth/server/routes/updateTopic';
-import orderTopics from 'commonwealth/server/routes/orderTopics';
-import editTopic from 'commonwealth/server/routes/editTopic';
-import deleteTopic from 'commonwealth/server/routes/deleteTopic';
-import bulkTopics from 'commonwealth/server/routes/bulkTopics';
-import bulkOffchain from 'commonwealth/server/routes/bulkOffchain';
-import setTopicThreshold from 'commonwealth/server/routes/setTopicThreshold';
-import getChatMessages from 'commonwealth/server/routes/chat/getChatMessages';
-import getChatChannel from 'commonwealth/server/routes/chat/getChatChannel';
-import createChatChannel from 'commonwealth/server/routes/chat/createChatChannel';
-import deleteChatChannel from 'commonwealth/server/routes/chat/deleteChatChannel';
-import deleteChatCategory from 'commonwealth/server/routes/chat/deleteChatCategory';
-import editChatChannel from 'commonwealth/server/routes/chat/editChatChannel';
-import editChatCategory from 'commonwealth/server/routes/chat/editChatCategory';
+import getUploadSignature from '../routes/getUploadSignature';
+import activeThreads from '../routes/activeThreads';
+import createThread from '../routes/createThread';
+import editThread from '../routes/editThread';
+import createPoll from '../routes/createPoll';
+import getPolls from '../routes/getPolls';
+import updateThreadStage from '../routes/updateThreadStage';
+import updateThreadPrivacy from '../routes/updateThreadPrivacy';
+import updateThreadPinned from '../routes/updateThreadPinned';
+import updateThreadLinkedChainEntities from '../routes/updateThreadLinkedChainEntities';
+import updateThreadLinkedSnapshotProposal from '../routes/updateThreadLinkedSnapshotProposal';
+import updateVote from '../routes/updateVote';
+import viewVotes from '../routes/viewVotes';
+import fetchEntityTitle from '../routes/fetchEntityTitle';
+import fetchThreadForSnapshot from '../routes/fetchThreadForSnapshot';
+import updateChainEntityTitle from '../routes/updateChainEntityTitle';
+import updateLinkedThreads from '../routes/updateLinkedThreads';
+import deleteThread from '../routes/deleteThread';
+import addEditors from '../routes/addEditors';
+import deleteEditors from '../routes/deleteEditors';
+import bulkThreads from '../routes/bulkThreads';
+import getThreadsOld from '../routes/getThreads';
+import searchDiscussions from '../routes/searchDiscussions';
+import searchComments from '../routes/searchComments';
+import createDraft from '../routes/drafts/createDraft';
+import deleteDraft from '../routes/drafts/deleteDraft';
+import editDraft from '../routes/drafts/editDraft';
+import getDrafts from '../routes/drafts/getDrafts';
+import deleteChain from '../routes/deleteChain';
+import updateChain from '../routes/updateChain';
+import bulkProfiles from '../routes/bulkProfiles';
+import updateProfile from '../routes/updateProfile';
+import writeUserSetting from '../routes/writeUserSetting';
+import sendFeedback from '../routes/sendFeedback';
+import logout from '../routes/logout';
+import createTopic from '../routes/createTopic';
+import updateTopic from '../routes/updateTopic';
+import orderTopics from '../routes/orderTopics';
+import editTopic from '../routes/editTopic';
+import deleteTopic from '../routes/deleteTopic';
+import bulkTopics from '../routes/bulkTopics';
+import bulkOffchain from '../routes/bulkOffchain';
+import setTopicThreshold from '../routes/setTopicThreshold';
+import getChatMessages from '../routes/chat/getChatMessages';
+import getChatChannel from '../routes/chat/getChatChannel';
+import createChatChannel from '../routes/chat/createChatChannel';
+import deleteChatChannel from '../routes/chat/deleteChatChannel';
+import deleteChatCategory from '../routes/chat/deleteChatCategory';
+import editChatChannel from '../routes/chat/editChatChannel';
+import editChatCategory from '../routes/chat/editChatCategory';
 
-import createRule from 'commonwealth/server/routes/rules/createRule';
-import deleteRule from 'commonwealth/server/routes/rules/deleteRule';
-import getRuleTypes from 'commonwealth/server/routes/rules/getRuleTypes';
+import createRule from '../routes/rules/createRule';
+import deleteRule from '../routes/rules/deleteRule';
+import getRuleTypes from '../routes/rules/getRuleTypes';
 
-import createWebhook from 'commonwealth/server/routes/webhooks/createWebhook';
-import updateWebhook from 'commonwealth/server/routes/webhooks/updateWebhook';
-import deleteWebhook from 'commonwealth/server/routes/webhooks/deleteWebhook';
-import getWebhooks from 'commonwealth/server/routes/webhooks/getWebhooks';
-import ViewCountCache from 'commonwealth/server/util/viewCountCache';
-import IdentityFetchCache from 'commonwealth/server/util/identityFetchCache';
-import updateChainCategory from 'commonwealth/server/routes/updateChainCategory';
-import updateChainCustomDomain from 'commonwealth/server/routes/updateChainCustomDomain';
-import updateChainPriority from 'commonwealth/server/routes/updateChainPriority';
-import migrateEvent from 'commonwealth/server/routes/migrateEvent';
+import createWebhook from '../routes/webhooks/createWebhook';
+import updateWebhook from '../routes/webhooks/updateWebhook';
+import deleteWebhook from '../routes/webhooks/deleteWebhook';
+import getWebhooks from '../routes/webhooks/getWebhooks';
+import ViewCountCache from '../util/viewCountCache';
+import updateChainCategory from '../routes/updateChainCategory';
+import updateChainCustomDomain from '../routes/updateChainCustomDomain';
+import updateChainPriority from '../routes/updateChainPriority';
 
-import startSsoLogin from 'commonwealth/server/routes/startSsoLogin';
-import finishSsoLogin from 'commonwealth/server/routes/finishSsoLogin';
-import bulkEntities from 'commonwealth/server/routes/bulkEntities';
-import { getTokensFromLists } from 'commonwealth/server/routes/getTokensFromLists';
-import getTokenForum from 'commonwealth/server/routes/getTokenForum';
-import tokenBalance from 'commonwealth/server/routes/tokenBalance';
-import bulkBalances from 'commonwealth/server/routes/bulkBalances';
-import getSupportedEthChains from 'commonwealth/server/routes/getSupportedEthChains';
-import editSubstrateSpec from 'commonwealth/server/routes/editSubstrateSpec';
-import updateAddress from 'commonwealth/server/routes/updateAddress';
-import { DB } from 'commonwealth/server/models';
-import { sendMessage } from 'commonwealth/server/routes/snapshotAPI';
-import ipfsPin from 'commonwealth/server/routes/ipfsPin';
-import setAddressWallet from 'commonwealth/server/routes/setAddressWallet';
-import RuleCache from 'commonwealth/server/util/rules/ruleCache';
-import banAddress from 'commonwealth/server/routes/banAddress';
-import getBannedAddresses from 'commonwealth/server/routes/getBannedAddresses';
-import BanCache from 'commonwealth/server/util/banCheckCache';
-import authCallback from 'commonwealth/server/routes/authCallback';
+import startSsoLogin from '../routes/startSsoLogin';
+import finishSsoLogin from '../routes/finishSsoLogin';
+import getEntityMeta from '../routes/getEntityMeta';
+import { getTokensFromLists } from '../routes/getTokensFromLists';
+import getTokenForum from '../routes/getTokenForum';
+import tokenBalance from '../routes/tokenBalance';
+import bulkBalances from '../routes/bulkBalances';
+import getSupportedEthChains from '../routes/getSupportedEthChains';
+import editSubstrateSpec from '../routes/editSubstrateSpec';
+import updateAddress from '../routes/updateAddress';
+import { DB } from '../models';
+import { sendMessage } from '../routes/snapshotAPI';
+import ipfsPin from '../routes/ipfsPin';
+import setAddressWallet from '../routes/setAddressWallet';
+import setProjectChain from '../routes/setProjectChain';
+import RuleCache from '../util/rules/ruleCache';
+import banAddress from '../routes/banAddress';
+import getBannedAddresses from '../routes/getBannedAddresses';
+import BanCache from '../util/banCheckCache';
+import authCallback from '../routes/authCallback';
+import viewChainIcons from '../routes/viewChainIcons';
 
-import { StatsDController } from 'common-common/src/statsd';
 import { addExternalRoutes } from './external';
+import { getChainEventServiceData } from '../routes/getChainEventServiceData';
+import { getChain } from '../routes/getChain';
+import { getChainNode } from '../routes/getChainNode';
+import { getChainContracts } from '../routes/getChainContracts';
+import { getSubscribedChains } from '../routes/getSubscribedChains';
+import GlobalActivityCache from '../util/globalActivityCache';
+import DatabaseValidationService from '../middleware/databaseValidationService';
 
 function setupRouter(
   app: Express,
   models: DB,
   viewCountCache: ViewCountCache,
-  identityFetchCache: IdentityFetchCache,
   tokenBalanceCache: TokenBalanceCache,
   ruleCache: RuleCache,
-  banCache: BanCache // TODO: where is this needed?
+  banCache: BanCache,
+  globalActivityCache: GlobalActivityCache,
+  databaseValidationService: DatabaseValidationService
 ) {
   const router = express.Router();
 
   router.use((req, res, next) => {
-    StatsDController.get().increment('cw.path.called', { path: req.path.slice(1) });
+    StatsDController.get().increment('cw.path.called', {
+      path: req.path.slice(1),
+    });
     const start = Date.now();
     res.on('finish', () => {
       const latency = Date.now() - start;
-      StatsDController.get().histogram(
-        `cw.path.latency`,
-        latency,
-        { path: req.path.slice(1) }
-      );
+      StatsDController.get().histogram(`cw.path.latency`, latency, {
+        path: req.path.slice(1),
+      });
     });
     next();
   });
@@ -188,6 +195,7 @@ function setupRouter(
   router.post(
     '/ipfsPin',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     ipfsPin.bind(this, models)
   );
   router.post(
@@ -259,17 +267,20 @@ function setupRouter(
   router.post(
     '/createThread',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createThread.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.put(
     '/editThread',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     editThread.bind(this, models, banCache)
   );
 
   router.post(
     '/createPoll',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createPoll.bind(this, models)
   );
   router.get('/getPolls', getPolls.bind(this, models));
@@ -302,6 +313,7 @@ function setupRouter(
   router.post(
     '/updateVote',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     updateVote.bind(this, models, tokenBalanceCache, ruleCache)
   );
   router.get('/viewVotes', viewVotes.bind(this, models));
@@ -320,16 +332,19 @@ function setupRouter(
   router.post(
     '/updateLinkedThreads',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     updateLinkedThreads.bind(this, models)
   );
   router.post(
     '/addEditors',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     addEditors.bind(this, models)
   );
   router.post(
     '/deleteEditors',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteEditors.bind(this, models)
   );
   router.post(
@@ -349,17 +364,20 @@ function setupRouter(
   router.post(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createDraft.bind(this, models)
   );
   router.get('/drafts', getDrafts.bind(this, models));
   router.delete(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     deleteDraft.bind(this, models)
   );
   router.patch(
     '/drafts',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     editDraft.bind(this, models)
   );
 
@@ -369,11 +387,13 @@ function setupRouter(
   router.post(
     '/createComment',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createComment.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
     '/editComment',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     editComment.bind(this, models, banCache)
   );
   router.post(
@@ -421,6 +441,7 @@ function setupRouter(
   router.post(
     '/createReaction',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     createReaction.bind(this, models, tokenBalanceCache, ruleCache, banCache)
   );
   router.post(
@@ -476,6 +497,13 @@ function setupRouter(
   // fetch addresses (e.g. for mentions)
   router.get('/bulkAddresses', bulkAddresses.bind(this, models));
 
+  // projects related routes
+  router.get(
+    '/setProjectChain',
+    passport.authenticate('jwt', { session: false }),
+    setProjectChain.bind(this, models)
+  );
+
   // third-party webhooks
   router.post(
     '/createWebhook',
@@ -519,7 +547,7 @@ function setupRouter(
   router.post(
     '/updateProfile',
     passport.authenticate('jwt', { session: false }),
-    updateProfile.bind(this, models, identityFetchCache)
+    updateProfile.bind(this, models)
   );
   router.post('/bulkProfiles', bulkProfiles.bind(this, models));
 
@@ -590,8 +618,11 @@ function setupRouter(
     passport.authenticate('jwt', { session: false }),
     viewUserActivity.bind(this, models)
   );
-  router.post('/viewChainActivity', viewChainActivity.bind(this, models));
-  router.post('/viewGlobalActivity', viewGlobalActivity.bind(this, models));
+  router.post('/viewChainIcons', viewChainIcons.bind(this, models));
+  router.post(
+    '/viewGlobalActivity',
+    viewGlobalActivity.bind(this, models, globalActivityCache)
+  );
   router.post(
     '/markNotificationsRead',
     passport.authenticate('jwt', { session: false }),
@@ -620,6 +651,7 @@ function setupRouter(
   router.post(
     '/setAddressWallet',
     passport.authenticate('jwt', { session: false }),
+    databaseValidationService.validateAuthor,
     setAddressWallet.bind(this, models)
   );
 
@@ -716,7 +748,6 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
-  router.post('/migrateEvent', migrateEvent.bind(this, models));
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
@@ -789,11 +820,21 @@ function setupRouter(
   // logout
   router.get('/logout', logout.bind(this, models));
 
-  // TODO: Change to GET /entities
-  router.get('/bulkEntities', bulkEntities.bind(this, models));
+  router.get('/getEntityMeta', getEntityMeta.bind(this, models));
 
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
   router.get('/communityStats', communityStats.bind(this, models));
+
+  // These routes behave like get (fetch data) but use POST because a secret
+  // is passed in the request body -> passing the secret via query parameters is not safe
+  router.post(
+    '/getChainEventServiceData',
+    getChainEventServiceData.bind(this, models)
+  );
+  router.post('/getChain', getChain.bind(this, models));
+  router.post('/getChainNode', getChainNode.bind(this, models));
+  router.post('/getChainContracts', getChainContracts.bind(this, models));
+  router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
 
   // new API
   addExternalRoutes(router, app, models, tokenBalanceCache);

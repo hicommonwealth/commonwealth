@@ -7,14 +7,15 @@ import { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
 import { IUniqueId } from './interfaces';
 
 class NotificationSubscription {
-  public readonly id: number;
   public readonly category: string;
   public readonly objectId: string;
   public readonly createdAt: moment.Moment;
   public readonly Chain: ChainInfo;
-  public readonly ChainEventType: any;
   public readonly Comment: CommentT<IUniqueId>;
   public readonly Thread: ThreadT;
+
+  public readonly id?: number;
+  public readonly chainEventTypeId?: any;
 
   private _immediateEmail: boolean;
   public get immediateEmail() {
@@ -46,7 +47,7 @@ class NotificationSubscription {
     createdAt,
     immediateEmail,
     Chain?,
-    ChainEventType?,
+    ChainEventTypeId?,
     comment?: CommentT<IUniqueId>,
     thread?: ThreadT
   ) {
@@ -57,7 +58,7 @@ class NotificationSubscription {
     this.createdAt = moment(createdAt);
     this._immediateEmail = immediateEmail;
     this.Chain = Chain;
-    this.ChainEventType = ChainEventType;
+    this.chainEventTypeId = ChainEventTypeId;
     this.Comment = comment;
     this.Thread = thread;
   }
@@ -71,7 +72,7 @@ class NotificationSubscription {
       json.created_at,
       json.immediate_email,
       json.chain_id,
-      json.ChainEventType || json.chain_event_type_id,
+      json.chain_event_type_id,
       json.Comment || json.offchain_comment_id,
       json.Thread || json.offchain_thread_id
     );
@@ -87,7 +88,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     created_at,
     immediate_email,
     Chain,
-    ChainEventType,
+    chain_event_type_id,
     Comment,
     Thread,
   } = subscription;
@@ -120,7 +121,7 @@ export const modelFromServer = (subscription: SubscriptionInstance) => {
     created_at,
     immediate_email,
     Chain,
-    ChainEventType,
+    chain_event_type_id,
     modeledComment,
     modeledThread
   );

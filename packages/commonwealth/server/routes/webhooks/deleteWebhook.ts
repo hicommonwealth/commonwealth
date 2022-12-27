@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../../util/validateChain';
+import validateChain from '../../middleware/validateChain';
 import Errors from './errors';
-import { AppError, ServerError } from '../../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));

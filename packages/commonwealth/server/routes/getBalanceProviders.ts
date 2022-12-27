@@ -3,7 +3,7 @@ import {
   GetBalanceProvidersReq, GetBalanceProvidersResp,
 } from 'common-common/src/api/extApiTypes';
 import { TokenBalanceCache } from 'token-balance-cache/src';
-import { query, validationResult } from "express-validator";
+import { query, validationResult } from 'express-validator';
 import { failure, success, TypedRequestQuery, TypedResponse } from '../types';
 
 export const getBalanceProvidersValidation = [

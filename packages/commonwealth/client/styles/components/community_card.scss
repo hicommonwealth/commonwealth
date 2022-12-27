@@ -54,15 +54,11 @@ $small-chain-icon-size: 40px;
     }
 
     .card-description.Text {
-      text-align: center;
       color: $neutral-500;
-
-      -webkit-box-orient: vertical;
-      -webkit-line-clamp: 8;
-      display: -webkit-box;
-      overflow: hidden;
+      text-align: center;
       word-break: break-word;
 
+      @include multiline-text-ellipsis(8);
       @include smallInclusive {
         -webkit-line-clamp: 3;
         width: 88px;
