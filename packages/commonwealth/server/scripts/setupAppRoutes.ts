@@ -20,13 +20,13 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
   }
   log.info('setupAppRoutes');
   // Development: serve everything through devMiddleware
-  if (DEV) {
-    app.get('*', (req, res, next) => {
-      req.url = '/build/';
-      devMiddleware(req, res, next);
-    });
-    return;
-  }
+  // if (DEV) {
+  //   app.get('*', (req, res, next) => {
+  //     req.url = '/build/';
+  //     devMiddleware(req, res, next);
+  //   });
+  //   return;
+  // }
 
   // Production: serve SEO-optimized routes where possible
   //
@@ -54,7 +54,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     if (image) {
       $tmpl('meta[name="twitter:image"]').attr('content', image);
     }
-
+    $tmpl('meta[property="og:type"]').attr('content', 'article');
     $tmpl('meta[property="og:site_name"]').attr('content', 'Commonwealth');
     $tmpl('meta[property="og:title"]').attr('content', title);
     $tmpl('meta[property="og:description"]').attr('content', description);
