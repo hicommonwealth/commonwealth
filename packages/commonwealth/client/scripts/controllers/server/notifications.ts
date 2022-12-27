@@ -92,7 +92,7 @@ class NotificationsController {
           is_active: true,
         },
         (result) => {
-          const newSubscription = NotificationSubscription.fromJSON(result);
+          const newSubscription = modelFromServer(result);
           if (newSubscription.category === 'chain-event')
             app.socket.chainEventsNs.addChainEventSubscriptions([
               newSubscription,

@@ -80,13 +80,16 @@ export default async (
       return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
-  const subscription = await models.Subscription.create({
+  let subscription = (await models.Subscription.create({
     subscriber_id: req.user.id,
     category_id: req.body.category,
     object_id: req.body.object_id,
     is_active: !!req.body.is_active,
     ...obj,
-  });
+  })).toJSON();
 
-  return res.json({ status: 'Success', result: subscription.toJSON() });
+  subscription.Chain = chain.toJSON();
+  console.log(subscription);
+
+  return res.json({ status: 'Success', result: subscription });
 };
