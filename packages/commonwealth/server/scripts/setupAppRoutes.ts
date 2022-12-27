@@ -70,8 +70,8 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
       '<meta name="twitter:image" content="$1">'
     );
 
-    console.log('renderWithMetaTags', twitterSafeHtml);
 
+    log.info(`rendering metadata: ${twitterSafeHtml}`);
     res.send(twitterSafeHtml);
   };
 
