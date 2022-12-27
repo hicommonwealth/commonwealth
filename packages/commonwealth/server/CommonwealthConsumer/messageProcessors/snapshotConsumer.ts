@@ -1,8 +1,8 @@
 import axios from 'axios';
+import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SnapshotNotification } from '../../../shared/types';
 import { DB } from '../../models';
-import { StatsDController } from 'common-common/src/statsd';
 
 export async function processSnapshotMessage(
   this: { models: DB },
@@ -10,6 +10,8 @@ export async function processSnapshotMessage(
 ) {
   const log = factory.getLogger(formatFilename(__filename));
   const { space, id, title, body, choices, start, expire } = data;
+
+  log.info(`Processing snapshot message: ${JSON.stringify(data)}`);
 
   const eventType = data.event;
   let proposal = await this.models.SnapshotProposal.findOne({
@@ -26,6 +28,7 @@ export async function processSnapshotMessage(
   }
 
   if (!proposal) {
+    log.info(`Proposal ${id} does not exist, creating record`);
     proposal = await this.models.SnapshotProposal.create({
       id,
       title,
@@ -70,6 +73,9 @@ export async function processSnapshotMessage(
       if (config.snapshot_channel_id) {
         // Pass data to Discord bot
         try {
+          log.info(
+            `Sending snapshot notification to discord bot for community ${communityId} and snapshot space ${space} `
+          );
           await axios.post(
             `${process.env.DISCORD_BOT_URL}/send-snapshot-notification`,
             {
