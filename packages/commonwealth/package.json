@@ -50,7 +50,8 @@
     "dump-db-local": " pg_dump -U commonwealth --verbose --no-privileges --no-owner -f local_save.dump",
     "sync-entities": "ts-node server/scripts/enforceDataConsistency.ts run-as-script $(heroku config:get DATABASE_URL -a chain-events)",
     "sync-entities-local": "ts-node server/scripts/enforceDataConsistency.ts run-as-script 'postgresql://commonwealth:edgeware@localhost/commonwealth_chain_events'",
-    "compress-images": "npx ts-node -T ./scripts/compressImages.ts"
+    "compress-images": "npx ts-node -T ./scripts/compressImages.ts",
+    "swagger-gen": "npx ts-node -T scripts/swagger.ts"
   },
   "engines": {
     "node": "14.x"
@@ -229,6 +230,7 @@
     "stream-http": "^3.2.0",
     "style-loader": "^0.23.1",
     "superagent": "^5.2.2",
+    "swagger-autogen": "^2.22.0",
     "throttled-queue": "^1.0.7",
     "ts-mocha": "^6.0.0",
     "ts-node": "^8.6.2",
