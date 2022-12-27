@@ -745,7 +745,7 @@ function setupRouter(
     getBannedAddresses.bind(this, models)
   );
 
-  // Custom domain update routerouter.ts
+  // Custom domain update route
   router.post(
     '/updateChainCustomDomain',
     updateChainCustomDomain.bind(this, models)

@@ -73,7 +73,7 @@ const getDiscordChannels = async (
       },
     });
   } catch (e) {
-    console.log('Error sending snapshot notification to discord bot', e);
+    console.log('Error getting discord channel listing', e);
   }
 };
 
