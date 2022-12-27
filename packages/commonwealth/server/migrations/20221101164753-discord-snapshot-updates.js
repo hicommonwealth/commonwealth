@@ -49,10 +49,15 @@ module.exports = {
         { transaction: t }
       );
 
-      await queryInterface.addColumn('Subscriptions', 'snapshot_id', {
-        type: Sequelize.STRING,
-        allowNull: true,
-      });
+      await queryInterface.addColumn(
+        'Subscriptions',
+        'snapshot_id',
+        {
+          type: Sequelize.STRING,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
 
       await queryInterface.createTable(
         'SnapshotProposals',
@@ -95,6 +100,7 @@ module.exports = {
         },
         {
           timestamps: true,
+          underscored: true,
           indexes: [{ fields: ['id'] }],
         }
       );

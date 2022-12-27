@@ -20,12 +20,12 @@ export default (
     'SnapshotSpaces',
     {
       snapshot_space: {
-        type: Sequelize.STRING,
+        type: dataTypes.STRING,
         primaryKey: true,
         allowNull: false,
       },
-      created_at: { type: Sequelize.DATE, allowNull: false },
-      updated_at: { type: Sequelize.DATE, allowNull: false },
+      created_at: { type: dataTypes.DATE, allowNull: false },
+      updated_at: { type: dataTypes.DATE, allowNull: false },
     },
     {
       tableName: 'SnapshotSpaces',

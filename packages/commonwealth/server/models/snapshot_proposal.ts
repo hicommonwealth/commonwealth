@@ -28,41 +28,42 @@ export default (
     'SnapshotProposal',
     {
       id: {
-        type: Sequelize.STRING,
+        type: dataTypes.STRING,
         allowNull: false,
         primaryKey: true,
       },
       title: {
-        type: Sequelize.STRING,
+        type: dataTypes.STRING,
         allowNull: true,
       },
       body: {
-        type: Sequelize.TEXT,
+        type: dataTypes.TEXT,
         allowNull: true,
       },
       choices: {
-        type: Sequelize.ARRAY(Sequelize.STRING),
+        type: dataTypes.ARRAY(dataTypes.STRING),
         allowNull: true,
       },
       space: {
-        type: Sequelize.STRING,
+        type: dataTypes.STRING,
         allowNull: false,
       },
       event: {
-        type: Sequelize.STRING,
+        type: dataTypes.STRING,
         allowNull: true,
       },
       start: {
-        type: Sequelize.STRING,
+        type: dataTypes.STRING,
         allowNull: true,
       },
       expire: {
-        type: Sequelize.STRING,
+        type: dataTypes.STRING,
         allowNull: true,
       },
-      createdAt: { type: Sequelize.DATE, allowNull: false },
-      updatedAt: { type: Sequelize.DATE, allowNull: false },
-    }
+      createdAt: { type: dataTypes.DATE, allowNull: false },
+      updatedAt: { type: dataTypes.DATE, allowNull: false },
+    },
+    { underscored: true }
   );
 
   SnapshotProposal.associate = (models) => {
