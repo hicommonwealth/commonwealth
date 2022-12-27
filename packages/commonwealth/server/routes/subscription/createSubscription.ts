@@ -3,7 +3,7 @@ import proposalIdToEntity from '../../util/proposalIdToEntity';
 import Errors from './errors';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from "../../models";
+import { DB } from '../../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,7 +27,6 @@ export default async (
     return next(new AppError(Errors.InvalidNotificationCategory));
   }
 
-
   let obj;
   const parsed_object_id = req.body.object_id.split(/-|_/);
   const p_id = parsed_object_id[1];
@@ -49,7 +48,7 @@ export default async (
     case 'snapshot-proposal': {
       const proposal = await models.SnapshotProposal.findOne({
         where: {
-          id: Number(p_id),
+          id: +p_id,
         },
       });
       if (proposal) {
@@ -76,11 +75,14 @@ export default async (
           return next(new AppError(Errors.ChainRequiredForEntity));
         const chainEntityMeta = await models.ChainEntityMeta.findOne({
           where: {
-            ce_id: req.body.chain_entity_id
-          }
+            ce_id: req.body.chain_entity_id,
+          },
         });
         if (!chainEntityMeta) return next(new AppError(Errors.NoChainEntity));
-        obj = { chain_id: chainEntityMeta.chain, chain_entity_id: chainEntityMeta.ce_id };
+        obj = {
+          chain_id: chainEntityMeta.chain,
+          chain_entity_id: chainEntityMeta.ce_id,
+        };
       }
       break;
     }
@@ -99,7 +101,8 @@ export default async (
           id: req.body.object_id,
         },
       });
-      if (!chainEventType) return next(new AppError(Errors.InvalidChainEventId));
+      if (!chainEventType)
+        return next(new AppError(Errors.InvalidChainEventId));
       obj = { chain_id: p_entity, chain_event_type_id: req.body.object_id };
       break;
     }

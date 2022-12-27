@@ -14,7 +14,7 @@ import { AddressInstance } from 'server/models/address';
 import { ChainInstance } from 'server/models/chain';
 import { StarredCommunityAttributes } from 'server/models/starred_community';
 import { DiscussionDraftAttributes } from 'server/models/discussion_draft';
-import { TypedResponse, success } from '../types';
+import { TypedResponse, success, TypedRequestQuery } from '../types';
 import { JWT_SECRET } from '../config';
 import { DB } from '../models';
 import { sequelize } from '../database';
@@ -60,7 +60,7 @@ type StatusResp = {
 
 const status = async (
   models: DB,
-  req: Request,
+  req: TypedRequestQuery,
   res: TypedResponse<StatusResp>
 ) => {
   try {
