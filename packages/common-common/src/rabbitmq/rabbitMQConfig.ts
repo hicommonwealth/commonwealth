@@ -91,10 +91,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
             'type': 'topic',
             ...exchangeConfig
           },
-          [RascalExchanges.SnapshotListener]: {
-            'type': 'fanout',
-            ...exchangeConfig
-          },
         },
         'queues': {
           [RascalQueues.ChainEvents]: {
@@ -134,10 +130,6 @@ export function getRabbitMQConfig(rabbitmq_uri: string): Rascal.BrokerConfig {
           [RascalQueues.DeadLetter]: {
             ...queueConfig
           },
-          [RascalQueues.SnapshotListener]: {
-            ...queueConfig,
-            'options': queueOptions
-          }
         },
         'bindings': {
           [RascalBindings.ChainEvents]: {
