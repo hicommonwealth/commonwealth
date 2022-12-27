@@ -1,6 +1,5 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import fetch from 'node-fetch';
-import { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,6 +15,7 @@ export default async function fetchSnapshotBySpace(
       },
       body: JSON.stringify({
         query: `
+        query {
           proposals (
             first: 20,
             skip: 0,
@@ -40,12 +40,11 @@ export default async function fetchSnapshotBySpace(
           scores_updated
           author
           space {
-            id
-            name
+              id
+              name
+            }
           }
-  }
-}
-        `,
+        }`,
         variables: { space },
       }),
     });
