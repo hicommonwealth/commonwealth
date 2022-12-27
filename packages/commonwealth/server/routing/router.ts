@@ -158,6 +158,10 @@ import { getChainContracts } from '../routes/getChainContracts';
 import { getSubscribedChains } from '../routes/getSubscribedChains';
 import GlobalActivityCache from '../util/globalActivityCache';
 import DatabaseValidationService from '../middleware/databaseValidationService';
+import createDiscordBotConfig from '../routes/createDiscordBotConfig';
+import setDiscordBotConfig from '../routes/setDiscordBotConfig';
+import getDiscordChannels from '../routes/getDiscordChannels';
+import getSnapshotProposal from '../routes/getSnapshotProposal';
 
 function setupRouter(
   app: Express,
