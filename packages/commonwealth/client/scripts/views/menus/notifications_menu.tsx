@@ -221,22 +221,23 @@ export class NotificationsMenu extends ClassComponent {
 
 export class NotificationsMenuPopover extends ClassComponent {
   view() {
-    return m(PopoverMenu, {
-      closeOnContentClick: true,
-      closeOnOutsideClick: true,
-      hasArrow: false,
-      hoverCloseDelay: 0,
-      position: 'bottom-end',
-      transitionDuration: 0,
-      trigger:
-        app.user.notifications.numUnread > 0 ? (
-          <div class="unreads-icon">
-            <CWCustomIcon iconName="unreads" />
-          </div>
-        ) : (
-          <CWIconButton iconButtonTheme="black" iconName="bell" />
-        ),
-      content: <NotificationsMenu />,
-    });
+    return null;
+    // return m(PopoverMenu, {
+    //   closeOnContentClick: true,
+    //   closeOnOutsideClick: true,
+    //   hasArrow: false,
+    //   hoverCloseDelay: 0,
+    //   position: 'bottom-end',
+    //   transitionDuration: 0,
+    //   trigger:
+    //     app.user.notifications.numUnread > 0 ? (
+    //       <div class="unreads-icon">
+    //         <CWCustomIcon iconName="unreads" />
+    //       </div>
+    //     ) : (
+    //       <CWIconButton iconButtonTheme="black" iconName="bell" />
+    //     ),
+    //   content: <NotificationsMenu />,
+    // });
   }
 }
