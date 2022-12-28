@@ -3,7 +3,7 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import _ from 'lodash';
-import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
+import { Icon, Icons, Menu, MenuItem, Overlay } from '../component_kit/construct-kit';
 
 import 'components/sidebar/index.scss';
 

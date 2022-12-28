@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { SelectList, ListItem, Callout, Icons } from 'construct-ui';
+import { SelectList, ListItem, Callout, Icons } from './component_kit/construct-kit';
 
 import 'components/topic_selector.scss';
 

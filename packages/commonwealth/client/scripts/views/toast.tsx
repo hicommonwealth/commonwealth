@@ -2,9 +2,9 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { Toaster } from 'construct-ui';
-
 import app from 'state';
+import { Toaster } from './components/component_kit/construct-kit';
+
 
 export class AppToasts extends ClassComponent {
   view() {

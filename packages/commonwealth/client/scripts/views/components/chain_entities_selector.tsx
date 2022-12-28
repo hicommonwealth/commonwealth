@@ -3,13 +3,14 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import { uuidv4 } from 'lib/util';
-import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/chain_entities_selector.scss';
 
 import app from 'state';
 import { ChainEntity, Thread } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
+import { QueryList, ListItem } from './component_kit/construct-kit';
+
 
 type ChainEntitiesSelectorAttrs = {
   chainEntitiesToSet: Array<ChainEntity>;

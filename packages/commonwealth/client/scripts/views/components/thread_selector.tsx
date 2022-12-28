@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { ListItem, QueryList } from 'construct-ui';
+import { ListItem, QueryList } from './component_kit/construct-kit';
 
 import 'components/thread_selector.scss';
 

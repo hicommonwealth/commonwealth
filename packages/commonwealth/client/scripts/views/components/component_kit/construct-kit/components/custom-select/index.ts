@@ -1,0 +1,222 @@
+import m from 'mithril';
+import classnames from 'classnames';
+import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
+import { IOption, IAttrs, ISizeAttrs, Classes, safeCall, Keys, Option } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { SelectList } from 'client/scripts/views/components/component_kit/construct-kit/components/select-list';
+import { ListItem } from 'client/scripts/views/components/component_kit/construct-kit/components/list';
+import { Button, IButtonAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/button';
+import { Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+
+export interface ICustomSelectAttrs extends IAttrs, ISizeAttrs {
+  /** Initially selected value (uncontrolled mode) */
+  defaultValue?: string | number;
+
+  /**
+   * Array of list options
+   * @default []
+   */
+  options: Option[];
+
+  /** Value of the selected option */
+  value?: string | number;
+
+  /** Callback invoked when selection changes */
+  onSelect?: (option: Option) => void;
+
+  /** Testing  */
+  itemRender?: (item: Option, isSelected: boolean, index: number) => m.Vnode<any, any>;
+
+  /**
+   * Attrs passed through to trigger
+   * @default {}
+   */
+  triggerAttrs?: IButtonAttrs;
+
+  /** Name attr of hidden input (useful for HTML forms) */
+  name?: string;
+}
+
+export class CustomSelect extends AbstractComponent<ICustomSelectAttrs> {
+  private activeIndex: number = 0;
+  private selected?: Option;
+  private isOpen: boolean = false;
+
+  public getDefaultAttrs() {
+    return {
+      options: [],
+      triggerAttrs: {}
+    } as ICustomSelectAttrs;
+  }
+
+  public oninit(vnode: m.Vnode<ICustomSelectAttrs>) {
+    super.oninit(vnode);
+
+    this.setSelected();
+  }
+
+  public onbeforeupdate(vnode: m.Vnode<ICustomSelectAttrs>, old: m.VnodeDOM<ICustomSelectAttrs>) {
+    super.onbeforeupdate(vnode, old);
+
+    if (vnode.attrs.value !== old.attrs.value) {
+      this.setSelected();
+    }
+  }
+
+  public view() {
+    const { options, class: className, name, triggerAttrs, size } = this.attrs;
+
+    const classes = classnames(
+      Classes.CUSTOM_SELECT,
+      className
+    );
+
+    const hiddenContainer = m(`.${Classes.CUSTOM_SELECT_HIDDEN}`, [
+      m('input', {
+        class: Classes.CUSTOM_SELECT_INPUT,
+        value: this.selectedValue,
+        name
+      })
+    ]);
+
+    const trigger = m(Button, {
+      class: Classes.CUSTOM_SELECT_TRIGGER,
+      compact: true,
+      label: [
+        hiddenContainer,
+        this.selectedLabel
+      ],
+      iconRight: Icons.CHEVRON_DOWN,
+      size,
+      ...triggerAttrs,
+      onkeydown: this.handleTriggerKeyDown
+    });
+
+    const selectList = m(SelectList, {
+      filterable: false,
+      items: options,
+      checkmark: false,
+      itemRender: this.renderItem,
+      activeIndex: this.activeIndex,
+      closeOnSelect: false,
+      onActiveItemChange: this.handleActiveItemChange,
+      listAttrs: { size },
+      popoverAttrs: {
+        isOpen: this.isOpen,
+        hasArrow: false,
+        position: 'bottom',
+        inline: true,
+        boundariesEl: 'scrollParent',
+        transitionDuration: 0,
+        closeOnEscapeKey: true,
+        onInteraction: this.handlePopoverInteraction
+      },
+      onSelect: this.handleSelect,
+      trigger
+    });
+
+    return m('', { class: classes }, selectList);
+  }
+
+  private renderItem = (item: Option, index: number) => {
+    const label = typeof (item) === 'object' ? item.label : item;
+    const value = typeof (item) === 'object' ? item.value : item;
+    const attrs = typeof (item) === 'object' ? item : {};
+    const isSelected = this.selectedValue === value;
+
+    if (this.attrs.itemRender) {
+      return this.attrs.itemRender(item, isSelected, index);
+    }
+
+    return m(ListItem, {
+      ...attrs,
+      selected: isSelected,
+      label
+    });
+  }
+
+  private handleSelect = (item: Option) => {
+    if (!('value' in this.attrs)) {
+      this.selected = item;
+    }
+
+    safeCall(this.attrs.onSelect, item);
+    this.isOpen = false;
+  }
+
+  private handleActiveItemChange = (_activeItem: Option, index: number) => {
+    this.activeIndex = index;
+  }
+
+  private handleTriggerKeyDown = (e: KeyboardEvent) => {
+    const key = e.which;
+
+    if (key === Keys.ARROW_UP || key === Keys.ARROW_DOWN) {
+      e.preventDefault();
+      const { options } = this.attrs;
+      const index = this.attrs.options.indexOf(this.selected!);
+      const direction = key === Keys.ARROW_UP ? 'up' : 'down';
+      const nextIndex = getNextIndex(index, options, direction);
+      this.selected = options[nextIndex];
+      this.activeIndex = nextIndex;
+    }
+
+    if (key === Keys.SPACE) {
+      this.isOpen = true;
+    }
+
+    safeCall(this.attrs.triggerAttrs!.onkeydown, e);
+  }
+
+  private handlePopoverInteraction = (nextOpenState: boolean) => {
+    this.isOpen = nextOpenState;
+  }
+
+  private get selectedValue() {
+    const selected = this.selected;
+    return selected != null ? typeof selected === 'object' ? selected.value : selected : '';
+  }
+
+  private get selectedLabel() {
+    const selected = this.selected;
+    return selected != null ? typeof selected === 'object' ? selected.label : selected : '';
+  }
+
+  private setSelected() {
+    const { options, value, defaultValue } = this.attrs;
+
+    if (options.length) {
+      const firstOption = options[0];
+      const selectedValue = value || defaultValue;
+
+      this.selected = typeof firstOption === 'object'
+        ? (options as IOption[]).find(x => x.value === selectedValue)
+        : selectedValue;
+
+      const index = options.indexOf(this.selected!);
+      this.activeIndex = index;
+    }
+  }
+}
+
+type Direction = 'up' | 'down';
+
+// TODO: Combine with QueryList getNextIndex
+function getNextIndex(currentIndex: number, options: Option[], direction: Direction) {
+  const maxIndex = options.length - 1;
+  let index = currentIndex;
+  let flag = true;
+
+  while (flag) {
+    index = direction === 'up'
+      ? index === 0 ? maxIndex : index - 1
+      : index === maxIndex ? 0 : index + 1;
+
+    const option = options[index];
+
+    if (typeof option === 'object' && !option.disabled) {
+      flag = false;
+    }
+  }
+
+  return index;
+}

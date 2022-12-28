@@ -1,0 +1,62 @@
+import m from 'mithril';
+import { IconName, Intent, Size } from 'client/scripts/views/components/component_kit/construct-kit';
+import { IIconAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+
+export type Style = string | Partial<CSSStyleDeclaration>;
+
+export interface IAttrs {
+  /** Space delimited class list */
+  class?: string;
+
+  /** Inline styles */
+  style?: Style;
+}
+
+export interface IIntentAttrs {
+  /** Component color intent */
+  intent?: Intent;
+}
+
+export interface ISizeAttrs {
+  /** Component size */
+  size?: Size;
+}
+
+export interface IActionItemAttrs {
+  /** Toggles active state */
+  active?: boolean;
+
+  /** Disables interaction */
+  disabled?: boolean;
+
+  /** Inner text or children */
+  label?: m.Children;
+
+  /** Left-justified icon */
+  iconLeft?: IconName;
+
+  /** Attrs passed though to left-justified icon */
+  iconLeftAttrs?: Partial<IIconAttrs>;
+
+  /** Right-justified icon */
+  iconRight?: IconName;
+
+  /** Attrs passed though to right-justified icon */
+  iconRightAttrs?: Partial<IIconAttrs>;
+
+  /** Callback invoked on click */
+  onclick?: (e: Event) => void;
+}
+
+export interface IOption {
+  /** Disables interaction */
+  disabled?: boolean;
+
+  /** Inner text */
+  label?: string | number;
+
+  /** Value of option */
+  value?: string | number;
+}
+
+export type Option = IOption | string | number;

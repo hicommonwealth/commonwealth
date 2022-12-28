@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/snapshot_proposal_selector.scss';
 
@@ -12,6 +11,8 @@ import {
   loadMultipleSpacesData,
   SnapshotProposal,
 } from 'helpers/snapshot_utils';
+
+import { QueryList, ListItem } from './component_kit/construct-kit';
 
 type SnapshotProposalSelectorAttrs = {
   onSelect: (sn: SnapshotProposal) => void;

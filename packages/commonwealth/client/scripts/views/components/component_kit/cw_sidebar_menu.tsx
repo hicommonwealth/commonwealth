@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { ListItem, Icon, Icons } from 'construct-ui';
+import { ListItem, Icon, Icons } from './construct-kit';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 

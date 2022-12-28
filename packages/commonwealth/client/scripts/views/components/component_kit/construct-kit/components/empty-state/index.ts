@@ -1,0 +1,47 @@
+import classnames from 'classnames';
+import m from 'mithril';
+import { Classes, IAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Icon, IconName } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+
+export interface IEmptyStateAttrs extends IAttrs {
+  /** Icon name */
+  icon?: IconName | m.Children;
+
+  /** Header content */
+  header?: m.Children;
+
+  /** Main content */
+  content?: m.Children;
+
+  /**
+   * Fills the height/width of parent container
+   * @default true
+   */
+  fill?: boolean;
+
+  [htmlAttrs: string]: any;
+}
+
+export class EmptyState implements m.Component<IEmptyStateAttrs> {
+  public view({ attrs }: m.Vnode<IEmptyStateAttrs>) {
+    const { class: className, fill = true, icon, header, content, ...htmlAttrs } = attrs;
+
+    const classes = classnames(
+      Classes.EMPTY_STATE,
+      fill && Classes.EMPTY_STATE_FILL,
+      className
+    );
+
+    const container = [
+      icon && m(`.${Classes.EMPTY_STATE_ICON}`, [
+        typeof icon === 'string'
+          ? m(Icon, { name: icon as IconName })
+          : icon
+      ]),
+      header && m(`.${Classes.EMPTY_STATE_HEADER}`, header),
+      content && m(`.${Classes.EMPTY_STATE_CONTENT}`, content)
+    ];
+
+    return m('', { ...htmlAttrs, class: classes }, container);
+  }
+}

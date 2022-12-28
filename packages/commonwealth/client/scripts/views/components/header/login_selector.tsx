@@ -3,14 +3,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import {
-  MenuItem,
-  MenuDivider,
-  Button,
-  Icons,
-  ButtonGroup,
-  PopoverMenu,
-} from 'construct-ui';
+
 import _ from 'lodash';
 
 import 'components/header/login_selector.scss';
@@ -38,6 +31,14 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWToggle } from '../component_kit/cw_toggle';
+import {
+  MenuItem,
+  MenuDivider,
+  Button,
+  Icons,
+  ButtonGroup,
+  PopoverMenu,
+} from '../component_kit/construct-kit';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',

@@ -3,7 +3,6 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
 import { decodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
@@ -22,6 +21,8 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { ListItem, List, SelectList } from '../components/component_kit/construct-kit';
+
 
 type SearchParams = {
   chainScope?: string;

@@ -3,7 +3,6 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import { InputSelect, ListItem } from 'construct-ui';
 
 import 'components/address_input_typeahead.scss';
 
@@ -11,6 +10,8 @@ import app from 'state';
 import User from 'views/components/widgets/user';
 import { AddressInfo } from 'models';
 import { CWText } from './component_kit/cw_text';
+import { InputSelect, ListItem } from './component_kit/construct-kit';
+
 
 type AddressInputTypeaheadItem = {
   address: string;

@@ -2,7 +2,6 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
 
@@ -15,6 +14,9 @@ import {
   getDisplayedReactorsForPopup,
   onReactionClick,
 } from './helpers';
+
+import { Popover } from '../component_kit/construct-kit';
+
 
 type ThreadPreviewReactionButtonAttrs = {
   thread: Thread;

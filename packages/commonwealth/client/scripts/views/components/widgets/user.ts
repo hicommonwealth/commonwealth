@@ -4,7 +4,6 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { Tag, Popover } from 'construct-ui';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -14,6 +13,8 @@ import { formatAddressShort } from '../../../../../shared/utils';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
+import { Tag, Popover } from '../component_kit/construct-kit';
+
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
