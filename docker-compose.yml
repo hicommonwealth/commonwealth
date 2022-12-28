@@ -13,6 +13,7 @@ services:
       POSTGRES_DB: commonwealth
     volumes:
       - db:/var/lib/postgresql/data
+      - ./docker/pg_init.sql:/docker-entrypoint-initdb.d/pg_init.sql
     ports: 
       - '5432:5432'
   common-common:
