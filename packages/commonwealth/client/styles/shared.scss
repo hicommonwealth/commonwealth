@@ -12,6 +12,14 @@
 @import 'mixins/icons';
 @import 'mixins/text';
 
+@import '../scripts/views/components/component_kit/construct-kit/_shared/variables';
+@import '../scripts/views/components/component_kit/construct-kit/_shared/colors';
+@import '../scripts/views/components/component_kit/construct-kit/_shared/utility';
+@import '../scripts/views/components/component_kit/construct-kit/_shared/mixins';
+
+
+
+
 // layout & global nav parameters
 
 $sidebar-width: 232px;

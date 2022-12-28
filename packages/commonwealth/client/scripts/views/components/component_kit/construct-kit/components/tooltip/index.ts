@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import m from 'mithril';
-import { Classes, IAttrs, ISizeAttrs } from 'client/scripts/views/components/component_kit/construct-kit';
+import { Classes, IAttrs, ISizeAttrs } from '../..';
 import { Popover, IPopoverAttrs, PopoverPosition } from '../popover';
 
 export interface ITooltipAttrs extends IAttrs, ISizeAttrs {

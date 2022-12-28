@@ -28,7 +28,7 @@
   @include cui-tag-style(
     $cui-base-text-color,
     $cui-hover-color,
-    tint($blue-grey100, 10%)
+    tint(#cfd8dc, 10%)
   );
 
 	position: relative;

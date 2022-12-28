@@ -1,6 +1,6 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes } from 'client/scripts/views/components/component_kit/construct-kit';
+import { Classes } from '../..';
 import { IPopoverAttrs, Popover } from '../popover';
 import { IMenuAttrs, Menu } from '../menu';
 

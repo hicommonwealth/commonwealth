@@ -10,10 +10,10 @@
   align-items: center;
   justify-content: center;
 
-  @include cui-tabs-size($cui-base-padding, $cui-font-size);
+  @include cui-tabs-size(12px, 14px);
 
   &.cui-tabs-bordered { 
-    border-bottom: solid 1px $cui-base-border-color;
+    border-bottom: solid 1px shade(#cfd8dc, 5%);
   }
 
   &.cui-align-left {

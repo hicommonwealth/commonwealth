@@ -23,7 +23,7 @@ $cui-focus-outline-color: $blue300 !default;
 
 $cui-paragraph-margin-bottom:   1rem !default;
 $cui-text-muted: $blue-grey300 !default;
-$cui-text-disabled: $blue-grey100 !default;
+$cui-text-disabled: #cfd8dc !default;
 
 // Spacing
 
@@ -85,7 +85,7 @@ $cui-base-gradient:            linear-gradient(180deg, $white 10.5%, tint($blue-
 $cui-base-gradient-hover:      linear-gradient(180deg, $white  10.5%, tint($blue-grey50, 10%) 100%) !default;
 $cui-base-gradient-active:     linear-gradient(180deg, tint($blue-grey50, 15%)  10.5%, tint($blue-grey50, 15%) 100%) !default;
 $cui-base-bg-color-active:     $blue-grey50 !default;
-$cui-base-border-color:        shade($blue-grey100, 5%) !default;
+$cui-base-border-color:        shade(#cfd8dc, 5%) !default;
 $cui-base-border-color-hover:  $blue-grey200 !default;
 $cui-base-border-color-active: $blue-grey200 !default;
 $cui-base-box-shadow:          0px 1px 0px tint($blue-grey50, 10%) !default;
