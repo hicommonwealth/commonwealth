@@ -1,6 +1,6 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import PopperJS, { Boundary } from 'popper.js';
+import PopperJS, { Boundary } from '@popper.js';
 import { Classes, IAttrs, Style, safeCall, getClosest, elementIsOrContains } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
 import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
 import { IOverlayableAttrs, Overlay } from 'client/scripts/views/components/component_kit/construct-kit/components/overlay';

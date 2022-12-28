@@ -4,7 +4,6 @@ export * from 'client/scripts/views/components/component_kit/construct-kit/compo
 export * from 'client/scripts/views/components/component_kit/construct-kit/components/card';
 export * from 'client/scripts/views/components/component_kit/construct-kit/components/callout';
 export * from 'client/scripts/views/components/component_kit/construct-kit/components/checkbox';
-export * from 'client/scripts/views/components/component_kit/construct-kit/components/collapse';
 export * from 'client/scripts/views/components/component_kit/construct-kit/components/control-group';
 export * from 'client/scripts/views/components/component_kit/construct-kit/components/custom-select';
 export * from 'client/scripts/views/components/component_kit/construct-kit/components/dialog';
