@@ -62,8 +62,7 @@ export default (
       },
       createdAt: { type: dataTypes.DATE, allowNull: false },
       updatedAt: { type: dataTypes.DATE, allowNull: false },
-    },
-    { underscored: true }
+    }
   );
 
   SnapshotProposal.associate = (models) => {

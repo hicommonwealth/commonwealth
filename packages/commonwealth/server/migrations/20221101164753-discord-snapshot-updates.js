@@ -100,7 +100,6 @@ module.exports = {
         },
         {
           timestamps: true,
-          underscored: true,
           indexes: [{ fields: ['id'] }],
         }
       );
