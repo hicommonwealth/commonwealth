@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { Popover } from 'construct-ui';
+// import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
 
@@ -104,19 +104,20 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
     );
 
     return likes > 0
-      ? m(Popover, {
-          interactionType: 'hover',
-          content: (
-            <div class="reaction-button-tooltip-contents">
-              {getDisplayedReactorsForPopup({
-                likes,
-                reactors: this.reactors,
-              })}
-            </div>
-          ),
-          trigger: reactionButtonComponent,
-          hoverOpenDelay: 100,
-        })
+      ? null // @TODO @REACT FIX ME
+      // m(Popover, {
+      //     interactionType: 'hover',
+      //     content: (
+      //       <div class="reaction-button-tooltip-contents">
+      //         {getDisplayedReactorsForPopup({
+      //           likes,
+      //           reactors: this.reactors,
+      //         })}
+      //       </div>
+      //     ),
+      //     trigger: reactionButtonComponent,
+      //     hoverOpenDelay: 100,
+      //   })
       : reactionButtonComponent;
   }
 }

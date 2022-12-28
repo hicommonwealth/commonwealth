@@ -3,7 +3,7 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import { QueryList, ListItem } from 'construct-ui';
+// import { QueryList, ListItem } from 'construct-ui';
 
 import 'modals/edit_collaborators_modal.scss';
 
@@ -81,7 +81,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
         <div class="compact-modal-body">
           <div class="user-list-container">
             <CWLabel label="Users" />
-            {m(QueryList, {
+            {/* {m(QueryList, { // @TODO @REACT FIX ME
               checkmark: true,
               items,
               inputAttrs: {
@@ -135,7 +135,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   notifyInfo('Already an editor');
                 }
               },
-            })}
+            })} */}
           </div>
           {allCollaborators.length > 0 ? (
             <div class="selected-collaborators-section">

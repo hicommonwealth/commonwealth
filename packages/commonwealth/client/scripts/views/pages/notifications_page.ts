@@ -2,14 +2,21 @@
 import 'pages/notifications_page.scss';
 
 import m from 'mithril';
+
+// @ TODO: REACT REMOVE Infinite
 import Infinite from 'mithril-infinite';
-import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
+// @TODO: REACT CLEANUP
 
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+
+// TODO: FIX UI FOR THESE
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
+import { CWTag } from '../components/component_kit/cw_tag';
 
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
@@ -86,10 +93,8 @@ const NotificationsPage: m.Component<{}> = {
       return m(PageError, {
         title: [
           'Notifications ',
-          m(Tag, {
-            size: 'xs',
+          m(CWTag, {
             label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
           }),
         ],
         message: 'This page requires you to be logged in.',
@@ -131,13 +136,12 @@ const NotificationsPage: m.Component<{}> = {
       [
         m('.NotificationsPage', [
           m(
-            ButtonGroup,
+            '.ButtonGroup',
             {
               class: 'NotificationButtons',
-              outlined: true,
             },
             [
-              m(Button, {
+              m(CWButton, {
                 label: 'Previous Page',
                 onclick: (e) => {
                   e.preventDefault();
@@ -161,7 +165,7 @@ const NotificationsPage: m.Component<{}> = {
                   );
                 },
               }),
-              m(Button, {
+              m(CWButton, {
                 label: 'Next Page',
                 onclick: (e) => {
                   e.preventDefault();
@@ -193,7 +197,7 @@ const NotificationsPage: m.Component<{}> = {
                   );
                 },
               }),
-              m(Button, {
+              m(CWButton, {
                 label: 'Mark all as read',
                 onclick: (e) => {
                   e.preventDefault();
@@ -204,17 +208,15 @@ const NotificationsPage: m.Component<{}> = {
                     .then(() => m.redraw());
                 },
               }),
-              m(Popover, {
+              m(CWPopover, {
                 content: [
                   m(
                     'div',
                     { style: 'margin-bottom: 10px' },
                     'Clear all chain notifications?'
                   ),
-                  m(Button, {
+                  m(CWButton, {
                     label: 'Confirm',
-                    fluid: true,
-                    rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
                       if (
@@ -228,15 +230,9 @@ const NotificationsPage: m.Component<{}> = {
                     },
                   }),
                 ],
-                trigger: m(Button, {
+                trigger: m(CWButton, {
                   label: 'Clear chain events',
                 }),
-                transitionDuration: 0,
-                closeOnContentClick: true,
-                closeOnEscapeKey: true,
-                onClosed: () => {
-                  m.redraw();
-                },
               }),
             ]
           ),

@@ -2,8 +2,8 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import Infinite from 'mithril-infinite';
-import { Button, PopoverMenu } from 'construct-ui';
+// import Infinite from 'mithril-infinite';
+// import { Button, PopoverMenu } from 'construct-ui';
 
 import 'components/header/notifications_menu.scss';
 
@@ -89,7 +89,7 @@ export class NotificationsMenu extends ClassComponent {
     return (
       <div class="NotificationsMenu">
         <div class="NotificationsMenuHeader">
-          {m(Button, {
+          {/* {m(Button, { // @TODO @REACT FIX ME
             label:
               // discussionNotificationsCount
               //   ? `Discussions (${discussionNotificationsCount})`
@@ -112,29 +112,30 @@ export class NotificationsMenu extends ClassComponent {
             onclick: (e) => {
               e.preventDefault();
               e.stopPropagation();
-              this.selectedChainEvents = true;
+              this.selectedChainEvents = true; // @TODO @REACT FIX ME
             },
-          })}
+          })} */}
         </div>
         <div class="notification-list">
           {(() => {
             if (this.selectedChainEvents) {
               if (this.showingChainEventNotifications.length > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
-                  pageKey: () =>
-                    `${this.minChainEventsNotification} - ${
-                      this.minChainEventsNotification + MAX_NOTIFS
-                    }`,
-                  key:
-                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                    // sortedFilteredNotifications.length
-                    'chain',
-                  // TODO: add the length/num of total chain-events once
-                  // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
-                });
+                return null; // @TODO @REACT FIX ME
+                // return m(Infinite, { // @TODO @REACT FIX ME
+                //   maxPages: 1, // prevents rollover/repeat
+                //   pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
+                //   pageKey: () =>
+                //     `${this.minChainEventsNotification} - ${
+                //       this.minChainEventsNotification + MAX_NOTIFS
+                //     }`,
+                //   key:
+                //     // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+                //     // sortedFilteredNotifications.length
+                //     'chain',
+                //   // TODO: add the length/num of total chain-events once
+                //   // notifications and notifications read table are split
+                //   item: (data) => m(NotificationRow, { notifications: [data] }),
+                // });
               } else if (
                 app.user.notifications.chainEventNotifications.length === 0
               )
@@ -142,21 +143,22 @@ export class NotificationsMenu extends ClassComponent {
               else return 'No more chain notifications';
             } else {
               if (this.showingDiscussionNotifications.length > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
-                  pageKey: () =>
-                    `${this.minDiscussionNotification} - ${
-                      this.minDiscussionNotification + MAX_NOTIFS
-                    }`,
-                  key:
-                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                    // sortedFilteredNotifications.length
-                    'discussion',
-                  // TODO: add the length/num of total chain-events once
-                  // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
-                });
+                return null; // @TODO @REACT FIX ME
+                // return m(Infinite, { // @TODO @REACT FIX ME
+                //   maxPages: 1, // prevents rollover/repeat
+                //   pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
+                //   pageKey: () =>
+                //     `${this.minDiscussionNotification} - ${
+                //       this.minDiscussionNotification + MAX_NOTIFS
+                //     }`,
+                //   key:
+                //     // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+                //     // sortedFilteredNotifications.length
+                //     'discussion',
+                //   // TODO: add the length/num of total chain-events once
+                //   // notifications and notifications read table are split
+                //   item: (data) => m(NotificationRow, { notifications: [data] }),
+                // });
               } else if (
                 app.user.notifications.discussionNotifications.length === 0
               )
@@ -166,7 +168,7 @@ export class NotificationsMenu extends ClassComponent {
           })()}
         </div>
         <div class="NotificationsMenuFooter">
-          {m(Button, {
+          {/* {m(Button, { // @TODO @REACT FIX ME
             label: 'See all',
             onclick: () =>
               app.activeChainId()
@@ -210,7 +212,7 @@ export class NotificationsMenu extends ClassComponent {
               }
               this._nextPage(this.selectedChainEvents);
             },
-          })}
+          })} */}
         </div>
       </div>
     );

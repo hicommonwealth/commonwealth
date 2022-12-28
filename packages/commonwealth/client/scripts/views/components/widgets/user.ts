@@ -4,7 +4,7 @@ import 'components/widgets/user.scss';
 import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { Tag, Popover } from 'construct-ui';
+// import { Tag, Popover } from 'construct-ui';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -167,14 +167,14 @@ const User: m.Component<
           long ? `${friendlyChainName} Validator` : 'V'
         ),
       // role in commonwealth forum
-      showRole &&
-        role &&
-        m(Tag, {
-          class: 'role-tag',
-          label: role.permission,
-          rounded: true,
-          size: 'xs',
-        }),
+      // showRole &&
+      //   role &&
+      //   m(Tag, {
+      //     class: 'role-tag',
+      //     label: role.permission,
+      //     rounded: true,
+      //     size: 'xs',
+      //   }),
     ];
 
     const ghostAddress = app.user.addresses.some(
@@ -355,15 +355,16 @@ const User: m.Component<
     );
 
     return popover
-      ? m(Popover, {
-          interactionType: 'hover',
-          content: userPopover,
-          trigger: userFinal,
-          closeOnContentClick: true,
-          transitionDuration: 0,
-          hoverOpenDelay: 500,
-          key: profile?.address || '-',
-        })
+      ? null // @TODO @REACT FIX ME
+      // m(Popover, {
+      //     interactionType: 'hover',
+      //     content: userPopover,
+      //     trigger: userFinal,
+      //     closeOnContentClick: true,
+      //     transitionDuration: 0,
+      //     hoverOpenDelay: 500,
+      //     key: profile?.address || '-',
+      //   })
       : userFinal;
   },
 };

@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 import $ from 'jquery';
 import moment from 'moment';
 import _ from 'underscore';
-import { SelectList } from 'construct-ui';
+// import { SelectList } from 'construct-ui';
 
 import 'modals/poll_editor_modal.scss';
 
@@ -118,7 +118,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                 }}
                 value=""
               />
-              {m(SelectList, {
+              {/* {m(SelectList, { // @TODO @REACT FIX ME
                 filterable: false,
                 items: ['Infinite'].concat(
                   _.range(1, 31).map((n) => pluralize(Number(n), 'day'))
@@ -134,7 +134,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
                     label={this.customDuration || 'Infinite'}
                   />
                 ),
-              })}
+              })} */}
             </div>
           </div>
           <div class="buttons-row">

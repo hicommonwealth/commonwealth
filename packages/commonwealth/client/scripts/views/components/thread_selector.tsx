@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { ListItem, QueryList } from 'construct-ui';
+// import { ListItem, QueryList } from 'construct-ui';
 
 import 'components/thread_selector.scss';
 
@@ -23,22 +23,23 @@ const renderThreadPreview = (
   const selected = linkedThreads.some((lt) => +lt.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
-  return m(ListItem, {
-    label: (
-      <div class="thread-preview-row">
-        <CWText fontWeight="medium" noWrap>
-          {thread.title}
-        </CWText>
-        <CWText type="caption">
-          {author.name
-            ? `${author.name} • ${formatAddressShort(thread.author)}`
-            : thread.author}
-        </CWText>
-      </div>
-    ),
-    selected,
-    key: idx,
-  });
+    return m('@TODO @REACT PLEASE REMOVE ME')
+  // return m(ListItem, {
+  //   label: (
+  //     <div class="thread-preview-row">
+  //       <CWText fontWeight="medium" noWrap>
+  //         {thread.title}
+  //       </CWText>
+  //       <CWText type="caption">
+  //         {author.name
+  //           ? `${author.name} • ${formatAddressShort(thread.author)}`
+  //           : thread.author}
+  //       </CWText>
+  //     </div>
+  //   ),
+  //   selected,
+  //   key: idx,
+  // });
 };
 
 // The thread-to-thread relationship is comprised of linked and linking threads,
@@ -142,7 +143,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                 }, 250);
               }}
             />
-            {m(QueryList, {
+            {/* {m(QueryList, {
               filterable: false,
               checkmark: true,
               inputAttrs: {
@@ -182,7 +183,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                     });
                 }
               },
-            })}
+            })} */}
           </>
         )}
       </div>

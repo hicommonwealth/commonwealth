@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { SelectList, ListItem, Callout, Icons } from 'construct-ui';
+// import { SelectList, ListItem, Callout, Icons } from 'construct-ui';
 
 import 'components/topic_selector.scss';
 
@@ -36,10 +36,11 @@ export class TopicSelector extends ClassComponent<TopicSelectorAttrs> {
       .sort((a, b) => b.order - a.order);
 
     const itemRender = (topic) => {
-      return m(ListItem, {
-        label: topic.name,
-        selected: (selectedTopic as Topic)?.name === topic.name,
-      });
+      return m('.removeme', `${topic.name}`); // @TODO @REACT REMOVE ME
+      // return m(ListItem, {
+      //   label: topic.name,
+      //   selected: (selectedTopic as Topic)?.name === topic.name,
+      // });
     };
 
     const itemPredicate = (query: string, item: Topic) => {
@@ -68,41 +69,42 @@ export class TopicSelector extends ClassComponent<TopicSelectorAttrs> {
         );
     };
 
-    return m(SelectList, {
-      class: 'TopicSelector',
-      filterable: false,
-      checkmark: false,
-      closeOnSelect: true,
-      emptyContent:
-        // This appears if no topics are available because all require token thresholds
-        m(Callout, {
-          size: 'sm',
-          class: 'no-matching-topics',
-          icon: Icons.ALERT_TRIANGLE,
-          intent: 'negative',
-          content: 'Insufficient token balance.',
-        }),
-      itemPredicate,
-      itemRender,
-      items: sortTopics(topics),
-      oncreate,
-      onSelect,
-      popoverAttrs: {
-        transitionDuration: 0,
-        hasArrow: false,
-      },
-      trigger: (
-        <CWButton
-          buttonType="lg-secondary-blue"
-          iconName="chevronDown"
-          label={
-            isNotUndefined(selectedTopic)
-              ? selectedTopic.name
-              : 'Select a topic'
-          }
-          tabindex={tabindex}
-        />
-      ),
-    });
+    return null; // @TODO @REACT remove me please
+    // return m(SelectList, {
+    //   class: 'TopicSelector',
+    //   filterable: false,
+    //   checkmark: false,
+    //   closeOnSelect: true,
+    //   emptyContent:
+    //     // This appears if no topics are available because all require token thresholds
+    //     m(Callout, {
+    //       size: 'sm',
+    //       class: 'no-matching-topics',
+    //       icon: Icons.ALERT_TRIANGLE,
+    //       intent: 'negative',
+    //       content: 'Insufficient token balance.',
+    //     }),
+    //   itemPredicate,
+    //   itemRender,
+    //   items: sortTopics(topics),
+    //   oncreate,
+    //   onSelect,
+    //   popoverAttrs: {
+    //     transitionDuration: 0,
+    //     hasArrow: false,
+    //   },
+    //   trigger: (
+    //     <CWButton
+    //       buttonType="lg-secondary-blue"
+    //       iconName="chevronDown"
+    //       label={
+    //         isNotUndefined(selectedTopic)
+    //           ? selectedTopic.name
+    //           : 'Select a topic'
+    //       }
+    //       tabindex={tabindex}
+    //     />
+    //   ),
+    // });
   }
 }
