@@ -201,6 +201,7 @@
     "passport-local": "^1.0.0",
     "passport-magic": "^1.0.0",
     "path-browserify": "^1.0.1",
+    "popper.js": "^1.16.1",
     "prerender": "^5.6.0",
     "prerender-node": "^3.2.5",
     "prettier": "2.4.1",
