@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Card, RadioGroup, Switch, Size } from '@/';
+import { Card, RadioGroup, Switch, Size } from '../..';
 import { Example, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/card/examples/index.ts';

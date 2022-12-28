@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Classes, InputSelect, IInputSelectAttrs } from '@/';
+import { Classes, InputSelect, IInputSelectAttrs } from '../..';
 import { hasClass, TIMEOUT } from '@test-utils';
 
 const items = ['1', '2', '3'];

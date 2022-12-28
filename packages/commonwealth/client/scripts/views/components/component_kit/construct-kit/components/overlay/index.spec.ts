@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Overlay, IOverlayAttrs, Classes, Input, Keys } from '@/';
+import { Overlay, IOverlayAttrs, Classes, Input, Keys } from '../..';
 import { hasClass, TIMEOUT, triggerEvent } from '@test-utils';
 
 describe('overlay', () => {

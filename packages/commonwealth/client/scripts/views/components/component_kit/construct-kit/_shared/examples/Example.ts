@@ -1,6 +1,5 @@
 import m from 'mithril';
-import { Button, Icons, ResponsiveManager } from '../..';
-import { Drawer } from '@/';
+import { Drawer, Button, Icons, ResponsiveManager } from '../..';
 
 export interface IExampleAttrs {
   class?: string;

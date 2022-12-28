@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Table, ITableAttrs, Classes } from '@/';
+import { Table, ITableAttrs, Classes } from '../..';
 import { hasClass } from '@test-utils';
 
 describe('table', () => {

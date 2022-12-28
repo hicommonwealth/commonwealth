@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Checkbox, ICheckboxAttrs, Classes } from '@/';
+import { Checkbox, ICheckboxAttrs, Classes } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 
 describe('checkbox', () => {

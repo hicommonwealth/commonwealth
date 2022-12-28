@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Breadcrumb, BreadcrumbItem, Icon, Icons, Size } from '@/';
+import { Breadcrumb, BreadcrumbItem, Icon, Icons, Size } from '../..';
 import { SizeSelect, Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/breadcrumb/examples/index.ts';

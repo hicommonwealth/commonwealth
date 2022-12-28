@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Callout, Switch, Icons, Size, Intent } from '@/';
+import { Callout, Switch, Icons, Size, Intent } from '../..';
 import { SizeSelect, IntentSelect, Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/callout/examples/index.ts';

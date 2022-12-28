@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Menu, MenuItem, IMenuAttrs, IMenuItemAttrs, Classes, IPopoverAttrs, Icons } from '@/';
+import { Menu, MenuItem, IMenuAttrs, IMenuItemAttrs, Classes, IPopoverAttrs, Icons } from '../..';
 import { hasClass, hasChildClass, TIMEOUT } from '@test-utils';
 
 describe('menu', () => {

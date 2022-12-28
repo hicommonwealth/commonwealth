@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { ButtonGroup, Classes, IButtonGroupAttrs, Button } from '@/';
+import { ButtonGroup, Classes, IButtonGroupAttrs, Button } from '../..';
 import { hasClass } from '@test-utils';
 
 describe('button-group', () => {

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Card, Classes, ICardAttrs } from '@/';
+import { Card, Classes, ICardAttrs } from '../..';
 import { hasClass } from '@test-utils';
 
 describe('card', () => {

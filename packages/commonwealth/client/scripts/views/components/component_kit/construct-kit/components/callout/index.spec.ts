@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Callout, Classes, ICalloutAttrs, Icons } from '@/';
+import { Callout, Classes, ICalloutAttrs, Icons } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 
 describe('callout', () => {

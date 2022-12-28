@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Grid, IGridAttrs, Classes, Col, IColAttrs, IBreakpointMap } from '@/';
+import { Grid, IGridAttrs, Classes, Col, IColAttrs, IBreakpointMap } from '../..';
 import { hasClass, TIMEOUT } from '@test-utils';
 
 describe('grid', () => {

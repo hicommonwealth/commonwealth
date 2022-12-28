@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Col, Grid, Icon, Icons, Card, Input } from '@/';
+import { Col, Grid, Icon, Icons, Card, Input } from '../..';
 
 const iconNames = Object.keys(Icons).slice(1);
 

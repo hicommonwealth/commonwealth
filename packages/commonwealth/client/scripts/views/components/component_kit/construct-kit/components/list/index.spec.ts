@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { List, ListItem, IListAttrs, IListItemAttrs, Classes } from '@/';
+import { List, ListItem, IListAttrs, IListItemAttrs, Classes } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 
 describe('list', () => {

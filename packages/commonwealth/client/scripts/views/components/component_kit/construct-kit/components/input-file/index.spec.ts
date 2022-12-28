@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { InputFile, IInputFileAttrs, Classes, Tag, Icon, Icons } from '@/';
+import { InputFile, IInputFileAttrs, Classes, Tag, Icon, Icons } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 
 describe('input-file', () => {

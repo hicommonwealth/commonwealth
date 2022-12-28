@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Spinner, ISpinnerAttrs, Classes } from '@/';
+import { Spinner, ISpinnerAttrs, Classes } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 
 describe('spinner', () => {

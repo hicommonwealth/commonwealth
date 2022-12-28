@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Tag, TagInput, ITagInputAttrs, Classes, Keys } from '@/';
+import { Tag, TagInput, ITagInputAttrs, Classes, Keys } from '../..';
 import { hasClass, hasChildClass, keyboardEvent as simulateKeyDown } from '@shared/test/utils';
 import { Button } from '../button';
 

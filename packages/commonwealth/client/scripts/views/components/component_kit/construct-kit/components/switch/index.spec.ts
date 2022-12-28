@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Switch, Classes } from '@/';
+import { Switch, Classes } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 import { IControlAttrs } from '../base-control';
 

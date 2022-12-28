@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Classes, IPopoverMenuAttrs } from '@/';
+import { Classes, IPopoverMenuAttrs } from '../..';
 import { PopoverMenu } from '.';
 import { MenuItem } from '../menu';
 import { hasChildClass, hasClass } from '@shared/test/utils';

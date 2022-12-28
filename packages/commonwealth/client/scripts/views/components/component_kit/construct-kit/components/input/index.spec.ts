@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Input, IInputAttrs, Classes, Tag } from '@/';
+import { Input, IInputAttrs, Classes, Tag } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 
 describe('input', () => {

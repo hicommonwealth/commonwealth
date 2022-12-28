@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Icon, IIconAttrs, Classes, Icons } from '@/';
+import { Icon, IIconAttrs, Classes, Icons } from '../..';
 import { hasClass } from '@test-utils';
 
 describe('icon', () => {

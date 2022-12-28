@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Switch, Select, Icons, Intent, Size } from '@/';
+import { Switch, Select, Icons, Intent, Size } from '../..';
 import { Example, ContentSelect, IntentSelect, SizeSelect, ContentType, renderContent } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/select/examples/default.ts';

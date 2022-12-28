@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Tree, TreeNode, Classes } from '@/';
+import { Tree, TreeNode, Classes } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 import { ITreeAttrs } from './Tree';
 import { Tag } from '../tag';

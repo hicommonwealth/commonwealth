@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { EmptyState, IEmptyStateAttrs, Classes, Icons } from '@/';
+import { EmptyState, IEmptyStateAttrs, Classes, Icons } from '../..';
 import { hasChildClass, hasClass } from '@test-utils';
 
 describe('empty-state', () => {

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Form, IFormAttrs, Classes } from '@/';
+import { Form, IFormAttrs, Classes } from '../..';
 import { hasClass } from '@test-utils';
 
 // TODO: add FormGroup tests

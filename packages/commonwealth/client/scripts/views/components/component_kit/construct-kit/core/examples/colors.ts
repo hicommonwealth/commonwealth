@@ -1,6 +1,6 @@
 import m from 'mithril';
 import tinycolor from 'tinycolor2';
-import { Colors, Grid, Col } from '@/';
+import { Colors, Grid, Col } from '../..';
 
 const colors = Object.keys(Colors);
 

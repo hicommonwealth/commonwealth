@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Classes } from '@/';
+import { Classes } from '../..';
 import { hasClass } from '@test-utils';
 import { Tabs, ITabsAttrs } from './Tabs';
 import { TabItem, ITabItemAttrs } from './TabsItem';

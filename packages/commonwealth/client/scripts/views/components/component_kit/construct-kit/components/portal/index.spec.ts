@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Button, Portal, IPortalAttrs, Classes } from '@/';
+import { Button, Portal, IPortalAttrs, Classes } from '../..';
 import { hasClass, hasChildClass, TIMEOUT } from '@test-utils';
 
 describe('portal', () => {

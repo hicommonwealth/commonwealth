@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Dialog, IDialogAttrs, Classes } from '@/';
+import { Dialog, IDialogAttrs, Classes } from '../..';
 import { hasChildClass, hasClass } from '@test-utils';
 
 describe('dialog', () => {

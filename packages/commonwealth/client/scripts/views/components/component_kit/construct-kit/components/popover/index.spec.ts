@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Popover, Classes, IPopoverAttrs, Button, IButtonAttrs } from '@/';
+import { Popover, Classes, IPopoverAttrs, Button, IButtonAttrs } from '../..';
 import { hasClass, hasChildClass, triggerEvent } from '@test-utils';
 
 const triggerClass = 'TRIGGER';

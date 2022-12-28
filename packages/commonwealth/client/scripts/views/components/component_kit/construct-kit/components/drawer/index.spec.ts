@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Drawer, IDrawerAttrs, Classes } from '@/';
+import { Drawer, IDrawerAttrs, Classes } from '../..';
 import { hasChildClass, hasClass } from '@test-utils';
 
 describe('drawer', () => {

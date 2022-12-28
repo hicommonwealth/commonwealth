@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { ControlGroup, Classes, IControlGroupAttrs, Button, Input } from '@/';
+import { ControlGroup, Classes, IControlGroupAttrs, Button, Input } from '../..';
 import { hasClass } from '@test-utils';
 
 describe('control-group', () => {

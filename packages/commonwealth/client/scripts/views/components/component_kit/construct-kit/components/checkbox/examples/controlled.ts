@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Checkbox, Switch } from '@/';
+import { Checkbox, Switch } from '../..';
 import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/checkbox/examples/controlled.ts';

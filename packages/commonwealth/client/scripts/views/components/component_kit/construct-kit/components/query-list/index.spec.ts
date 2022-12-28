@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { QueryList, Classes, Tag, Keys, IQueryListAttrs } from '@/';
+import { QueryList, Classes, Tag, Keys, IQueryListAttrs } from '../..';
 import { hasClass, hasChildClass, TIMEOUT, keyboardEvent } from '@shared/test/utils';
 import { Icons } from '../icon';
 import { ListItem } from '../list';

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Select, Tag, ISelectAttrs, Classes, IOption } from '@/';
+import { Select, Tag, ISelectAttrs, Classes, IOption } from '../..';
 import { hasClass, hasChildClass } from '@test-utils';
 
 const options = ['1', '2'];

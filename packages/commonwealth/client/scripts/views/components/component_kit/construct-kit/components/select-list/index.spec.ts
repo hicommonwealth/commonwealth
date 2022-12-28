@@ -1,6 +1,6 @@
 import m from 'mithril';
 import assert from 'assert';
-import { Classes, SelectList, ISelectListAttrs, Button } from '@/';
+import { Classes, SelectList, ISelectListAttrs, Button } from '../..';
 import { hasClass, hasChildClass, TIMEOUT } from '@test-utils';
 
 const items = ['1', '2', '3'];
