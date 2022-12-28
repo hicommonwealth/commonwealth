@@ -1,11 +1,11 @@
-import { NextFunction } from 'express';
 import Web3 from 'web3';
+import { AbiItem } from 'web3-utils';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractType } from 'common-common/src/types';
-import { DB } from 'server/models';
-import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
-import { AbiItem } from 'web3-utils';
-import { ContractAttributes } from '../../models/contract';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { DB } from '../../models';
+import { parseAbiItemsFromABI } from '../../../shared/abi_utils';
+import { ContractAttributes, ContractInstance } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -51,8 +51,7 @@ export type CreateContractResp = {
 const createContract = async (
   models: DB,
   req: TypedRequestBody<CreateContractReq>,
-  res: TypedResponse<CreateContractResp>,
-  next: NextFunction
+  res: TypedResponse<CreateContractResp>
 ) => {
   const {
     community,
@@ -68,54 +67,54 @@ const createContract = async (
   } = req.body;
 
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    throw new AppError('Not logged in');
   }
   // require Admin privilege for creating Contract
   if (!req.user.isAdmin) {
-    return next(new Error(Errors.NotAdmin));
+    throw new AppError(Errors.NotAdmin);
+  }
+
+  if (!contractType || !contractType.trim()) {
+    throw new AppError(Errors.NoType);
+  }
+
+  if (!Web3.utils.isAddress(address)) {
+    throw new AppError(Errors.InvalidAddress);
+  }
+
+  if (decimals < 0 || decimals > 18) {
+    throw new AppError(Errors.InvalidDecimal);
+  }
+  if (!chain_node_id) {
+    throw new AppError(Errors.NoNodeUrl);
+  }
+  if (!balance_type) {
+    throw new AppError(Errors.InvalidBalanceType);
   }
 
   let abiAsRecord: Array<Record<string, unknown>>;
   if (abi) {
     if (!abiNickname) {
-      return next(new Error(Errors.NoAbiNickname));
+      throw new AppError(Errors.NoAbiNickname);
     }
 
     if ((Object.keys(abi) as Array<string>).length === 0) {
-      return next(new Error(Errors.InvalidABI));
+      throw new AppError(Errors.InvalidABI);
     }
 
     try {
       // Parse ABI to validate it as a properly formatted ABI
       abiAsRecord = JSON.parse(abi);
       if (!abiAsRecord) {
-        return next(new Error(Errors.InvalidABI));
+        throw new AppError(Errors.InvalidABI);
       }
       const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
       if (!abiItems) {
-        return next(new Error(Errors.InvalidABI));
+        throw new AppError(Errors.InvalidABI);
       }
     } catch {
-      return next(new Error(Errors.InvalidABI));
+      throw new AppError(Errors.InvalidABI);
     }
-  }
-
-  if (!contractType || !contractType.trim()) {
-    return next(new Error(Errors.NoType));
-  }
-
-  if (!Web3.utils.isAddress(address)) {
-    return next(new Error(Errors.InvalidAddress));
-  }
-
-  if (decimals < 0 || decimals > 18) {
-    return next(new Error(Errors.InvalidDecimal));
-  }
-  if (!chain_node_id) {
-    return next(new Error(Errors.NoNodeUrl));
-  }
-  if (!balance_type) {
-    return next(new Error(Errors.InvalidBalanceType));
   }
 
   const oldContract = await models.Contract.findOne({
@@ -124,20 +123,12 @@ const createContract = async (
 
   if (oldContract && oldContract.address === address) {
     // contract already exists so attempt to add it to the community if it's not already there
-    const communityContract = await models.CommunityContract.findOne({
+    await models.CommunityContract.findOrCreate({
       where: {
         chain_id: community,
         contract_id: oldContract.id,
-      },
+      }
     });
-    if (!communityContract) {
-      await models.CommunityContract.create({
-        chain_id: community,
-        contract_id: oldContract.id,
-      });
-    } else {
-      return next(new Error(Errors.ContractAddressExists));
-    }
     return success(res, { contract: oldContract.toJSON() });
   }
 
@@ -149,10 +140,10 @@ const createContract = async (
   });
 
   if (!node) {
-    return next(new Error(Errors.InvalidNodeUrl));
+    throw new AppError(Errors.InvalidNodeUrl);
   }
 
-  let contract;
+  let contract: ContractInstance;
   if (abi) {
     // transactionalize contract creation
     await models.sequelize.transaction(async (t) => {

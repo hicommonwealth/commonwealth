@@ -1,12 +1,9 @@
-import { NextFunction } from 'express';
-import Web3 from 'web3';
-import BN from 'bn.js';
-import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from 'server/models';
-import { ContractAbiAttributes } from 'server/models/contract_abi';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { AbiItem } from 'web3-utils';
-import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
+import { DB } from '../../models';
+import { ContractAbiAttributes } from '../../models/contract_abi';
+import { parseAbiItemsFromABI } from '../../../shared/abi_utils';
 import { ContractAttributes } from '../../models/contract';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
@@ -27,6 +24,7 @@ export const Errors = {
 export type CreateContractAbiReq = {
   contractId: number;
   abi: string;
+  nickname?: string;
 };
 
 export type CreateContractAbiResp = {
@@ -37,21 +35,20 @@ export type CreateContractAbiResp = {
 const createContractAbi = async (
   models: DB,
   req: TypedRequestBody<CreateContractAbiReq>,
-  res: TypedResponse<CreateContractAbiResp>,
-  next: NextFunction
+  res: TypedResponse<CreateContractAbiResp>
 ) => {
-  const { contractId, abi } = req.body;
+  const { contractId, abi, nickname } = req.body;
 
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    throw new AppError('Not logged in');
   }
 
   if (!contractId) {
-    return next(new Error(Errors.NoContractId));
+    throw new AppError(Errors.NoContractId);
   }
 
   if (!abi || abi === '') {
-    return next(new Error(Errors.NoAbi));
+    throw new AppError(Errors.NoAbi);
   }
 
   let abiAsRecord: Array<Record<string, unknown>>;
@@ -59,19 +56,20 @@ const createContractAbi = async (
     // Parse ABI to validate it as a properly formatted ABI
     abiAsRecord = JSON.parse(abi);
     if (!abiAsRecord) {
-      return next(new Error(Errors.InvalidABI));
+      throw new AppError(Errors.InvalidABI);
     }
     const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
     if (!abiItems) {
-      return next(new Error(Errors.InvalidABI));
+      throw new AppError(Errors.InvalidABI);
     }
   } catch {
-    return next(new Error(Errors.InvalidABI));
+    throw new AppError(Errors.InvalidABI);
   }
 
   try {
     const contract_abi = await models.ContractAbi.create({
       abi: abiAsRecord,
+      nickname,
     });
 
     const contract = await models.Contract.findOne({
@@ -95,8 +93,8 @@ const createContractAbi = async (
       contract,
     });
   } catch (err) {
-    console.log('Error creating contract abi: ', err);
-    return next(err);
+    log.error('Error creating contract abi: ', err.message);
+    throw new ServerError(err.message);
   }
 };
 

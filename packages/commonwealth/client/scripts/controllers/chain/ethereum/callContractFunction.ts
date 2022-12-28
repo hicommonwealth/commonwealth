@@ -1,6 +1,6 @@
 import { ChainBase } from 'common-common/src/types';
 import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
-import { parseAbiItemsFromABI } from 'helpers/abi_utils';
+import { parseAbiItemsFromABI } from 'abi_utils';
 import app from 'state';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core/types';

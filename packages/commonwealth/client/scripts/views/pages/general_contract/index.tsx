@@ -12,7 +12,7 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ChainBase } from 'common-common/src/types';
-import { parseFunctionsFromABI } from 'helpers/abi_utils';
+import { parseFunctionsFromABI } from 'abi_utils';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
 import { handleMappingAbiInputs, validateAbiInput } from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
