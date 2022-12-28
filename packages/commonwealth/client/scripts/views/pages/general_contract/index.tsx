@@ -12,45 +12,24 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ChainBase } from 'common-common/src/types';
-import { TransactionReceipt } from 'web3-core';
 import { parseFunctionsFromABI } from 'helpers/abi_utils';
-import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
-import {
-  handleMappingAbiInputs,
-  processAbiInputsToDataTypes,
-  validateAbiInput,
-} from 'helpers/abi_form_helpers';
+import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
+import { handleMappingAbiInputs, validateAbiInput } from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
-import { ChainFormState } from '../create_community/types';
 
-type CreateContractForm = {
-  functionNameToFunctionInputArgs: Map<string, Map<number, string>>;
-};
-
-type CreateContractState = ChainFormState & {
-  functionNameToFunctionOutput: Map<string, any[]>;
-  form: CreateContractForm;
-};
-class GeneralContractPage
-  extends ClassComponent<{ contractAddress?: string }>
-{
-  generalContractsController: GeneralContractsController;
-  private state: CreateContractState = {
-    message: '',
-    loaded: false,
-    loading: false,
-    saving: false,
-    status: undefined,
-    functionNameToFunctionOutput: new Map<string, any[]>(),
-    form: {
-      functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
-    },
+class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
+  private loaded = false;
+  private loading = false;
+  private saving = false;
+  private functionNameToFunctionOutput = new Map<string, any[]>();
+  private form = {
+    functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
   };
 
-  view(vnode) {
+  view(vnode: m.Vnode<{ contractAddress?: string }>) {
     const fetchContractAbi = async (contract: Contract) => {
       if (contract.abi === undefined) {
         // use the contract address to fetch the abi using controller
@@ -63,31 +42,23 @@ class GeneralContractPage
 
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       try {
-        this.state.loading = true;
-        // initialize daoFactory Controller
-        this.generalContractsController = new GeneralContractsController(
-          contractAddress
-        );
-
+        this.loading = true;
         // handle processing the forms inputs into their proper data types
-        const result: any[] = await this.generalContractsController.callContractFunction(
+        const result = await callContractFunction(
+          contractAddress,
           fn,
-          this.state.form.functionNameToFunctionInputArgs
+          this.form.functionNameToFunctionInputArgs
         );
 
-        this.state.functionNameToFunctionOutput.set(fn.name, result);
-        this.state.saving = false;
-        this.state.loaded = true;
-        this.state.loading = false;
-        m.redraw();
+        this.functionNameToFunctionOutput.set(fn.name, result);
+        this.saving = false;
+        this.loaded = true;
+        this.loading = false;
       } catch (err) {
         notifyError(
-          err.responseJSON?.error || `Calling Function ${fn.name} failed`
+          err.message || `Calling Function ${fn.name} failed`
         );
-        this.state.status = 'failure';
-        this.state.message = err.message;
-        this.state.loading = false;
-        m.redraw();
+        this.loading = false;
       }
     };
 
@@ -103,9 +74,7 @@ class GeneralContractPage
     if (app.contracts.getCommunityContracts().length > 0) {
       const contract: Contract = app.contracts.getByAddress(contractAddress);
       if (contract) {
-        this.state.loaded = true;
-        this.state.status = 'success';
-        this.state.message = 'Contract loaded';
+        this.loaded = true;
       }
       fetchContractAbi(contract);
     }
@@ -133,7 +102,7 @@ class GeneralContractPage
               <CWText>Outputs</CWText>
               <CWText>Call Function</CWText>
             </div>
-            {loadContractAbi().map((fn: AbiItem, fnIdx: number) => {
+            {loadContractAbi().map((fn: AbiItem) => {
               return (
                 <div class="function-row">
                   <CWText>{fn.name}</CWText>
@@ -156,10 +125,10 @@ class GeneralContractPage
                                   inputIdx,
                                   e.target.value,
                                   fn.name,
-                                  this.state.form
+                                  this.form
                                     .functionNameToFunctionInputArgs
                                 );
-                                this.state.loaded = true;
+                                this.loaded = true;
                               }}
                               inputValidationFn={(val) =>
                                 validateAbiInput(val, input.type)
@@ -173,7 +142,7 @@ class GeneralContractPage
                   <div class="functions-output-container">
                     {fn.outputs.map((output: AbiOutput, i) => {
                       const fnOutputArray =
-                        this.state.functionNameToFunctionOutput.get(fn.name);
+                        this.functionNameToFunctionOutput.get(fn.name);
                       return (
                         <div>
                           <div class="function-outputs">
@@ -182,7 +151,7 @@ class GeneralContractPage
                             <CWText>{output.name}</CWText>
                           </div>
                           <div>
-                            {this.state.loading && <CWSpinner />}
+                            {this.loading && <CWSpinner />}
                             <CWText>
                               {fnOutputArray && fnOutputArray[i].toString()
                                 ? fnOutputArray[i].toString()
@@ -196,19 +165,19 @@ class GeneralContractPage
                   <div class="function-call">
                     <CWButton
                       label="Submit"
-                      disabled={this.state.saving || !this.state.loaded}
+                      disabled={this.saving || !this.loaded}
                       onclick={() => {
                         notifySuccess('Submit Call button clicked!');
-                        this.state.saving = true;
+                        this.saving = true;
                         try {
                           callFunction(contractAddress, fn);
                         } catch (err) {
                           notifyError(
-                            err.responseJSON?.error ||
+                            err.message ||
                               'Submitting Function Call failed'
                           );
                         } finally {
-                          this.state.saving = false;
+                          this.saving = false;
                         }
                       }}
                     />
