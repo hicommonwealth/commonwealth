@@ -62,9 +62,13 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
       }
     };
 
-    const loadContractAbi = () => {
+    const loadContractAbi = (): AbiItem[] => {
       const { contractAddress } = vnode.attrs;
       const contract: Contract = app.contracts.getByAddress(contractAddress);
+      if (!contract || !contract.abi) {
+        // TODO: show screen for "no ABI found" -- or fetch data
+        return [];
+      }
       const abiFunctions = parseFunctionsFromABI(contract.abi);
       return abiFunctions;
     };
