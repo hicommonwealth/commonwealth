@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Checkbox, Switch, Size, Intent } from '@/';
-import { IntentSelect, Example, SizeSelect } from '@shared/examples';
+import { Checkbox, Switch, Size, Intent } from '../../index';
+import { IntentSelect, Example, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/checkbox/examples/default.ts';
 

@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Icon, Icons, ListItem, QueryList, Switch, Size } from '@/';
-import { Example, countries, ICountryModel, SizeSelect } from '@shared/examples';
+import { Icon, Icons, ListItem, QueryList, Switch, Size } from '../../index';
+import { Example, countries, ICountryModel, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/query-list/examples/default.ts';
 const countryQueryList = QueryList.ofType<ICountryModel>();

@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Checkbox } from '@/';
-import { Example } from '@shared/examples';
+import { Checkbox } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/checkbox/examples/indeterminate.ts';
 

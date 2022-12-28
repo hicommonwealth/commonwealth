@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { ListItem, SelectList, Button, Icons } from '@/';
-import { Example, countries, ICountryModel } from '@shared/examples';
+import { ListItem, SelectList, Button, Icons } from '../../index';
+import { Example, countries, ICountryModel } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/select-list/examples/multiple.ts';
 const CountryList = SelectList.ofType<ICountryModel>();

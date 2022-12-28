@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Example } from '@shared/examples';
-import { CustomSelect, ListItem, Icon, Icons, IOption } from '@/';
+import { Example } from '../../../_shared/examples';
+import { CustomSelect, ListItem, Icon, Icons, IOption } from '../../index';
 
 const EXAMPLE_SRC = 'components/custom-select/examples/itemRender.ts';
 const options = [

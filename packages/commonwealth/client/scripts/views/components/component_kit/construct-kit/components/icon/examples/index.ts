@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Switch, Icon, Intent, Icons, IconName, SelectList, ListItem, Button } from '@/';
-import { Example, IntentSelect } from '@shared/examples';
+import { Switch, Icon, Intent, Icons, IconName, SelectList, ListItem, Button } from '../../index';
+import { Example, IntentSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/icon/examples/index.ts';
 const iconNames = Object.keys(Icons).slice(1);

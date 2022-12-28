@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Classes, Button, Dialog, Input, Switch } from '@/';
-import { Example } from '@shared/examples';
+import { Classes, Button, Dialog, Input, Switch } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/dialog/examples/index.ts';
 

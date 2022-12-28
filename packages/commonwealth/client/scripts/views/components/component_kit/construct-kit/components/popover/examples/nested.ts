@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Popover, Switch, Button } from '@/';
-import { Example } from '@shared/examples';
+import { Popover, Switch, Button } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/popover/examples/nested.ts';
 

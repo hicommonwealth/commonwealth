@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Select, Button } from '@/';
-import { Example } from '@shared/examples';
+import { Select, Button } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/select/examples/controlled.ts';
 

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { Button, ButtonGroup, Icons, Switch, Size, Intent } from '@/';
-import { IntentSelect, SizeSelect, Example } from '@shared/examples';
+import { IntentSelect, SizeSelect, Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/button-group/examples/index.ts';
 

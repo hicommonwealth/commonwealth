@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Button, Drawer, DrawerPosition, Switch, Select } from '@/';
-import { Example } from '@shared/examples';
+import { Button, Drawer, DrawerPosition, Switch, Select } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/drawer/examples/index.ts';
 

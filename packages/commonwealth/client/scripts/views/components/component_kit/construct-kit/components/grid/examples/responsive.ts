@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Col, Grid, Table, Breakpoints } from '@/';
-import { Example } from '@shared/examples';
+import { Col, Grid, Table, Breakpoints } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/grid/examples/responsive.ts';
 const breakpoints = Object.keys(Breakpoints);

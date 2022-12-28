@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { RadioGroup } from '@/';
-import { Example } from '@shared/examples';
+import { RadioGroup } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/radio/examples/radio-group.ts';
 

@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { TransitionManager, Switch, Button, Popover, Tooltip, Dialog, Classes, ButtonGroup } from '@/';
-import { Example } from '@shared/examples';
+import { TransitionManager, Switch, Button, Popover, Tooltip, Dialog, Classes, ButtonGroup } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'utils/transition-manager/examples/index.ts';
 

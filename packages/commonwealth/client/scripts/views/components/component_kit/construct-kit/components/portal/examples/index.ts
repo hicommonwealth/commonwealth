@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Card, Portal, Button } from '@/';
-import { Example } from '@shared/examples';
+import { Card, Portal, Button } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/portal/examples/index.ts';
 

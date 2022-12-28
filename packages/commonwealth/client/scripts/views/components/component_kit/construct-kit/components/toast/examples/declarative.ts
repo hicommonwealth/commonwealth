@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Button, Toaster, Toast, Switch } from '@/';
-import { Example } from '@shared/examples';
+import { Button, Toaster, Toast, Switch } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/toast/examples/declarative.ts';
 

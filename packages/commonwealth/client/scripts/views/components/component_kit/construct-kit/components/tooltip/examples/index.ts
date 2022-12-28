@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Tooltip, PopoverPosition, Size, Switch } from '@/';
-import { Example, PopoverPositionSelect, SizeSelect } from '@shared/examples';
+import { Tooltip, PopoverPosition, Size, Switch } from '../../index';
+import { Example, PopoverPositionSelect, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/tooltip/examples/index.ts';
 

@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Switch, TagInput, Size, Intent, Tag, Icon, Icons } from '@/';
-import { IntentSelect, SizeSelect, Example } from '@shared/examples';
+import { Switch, TagInput, Size, Intent, Tag, Icon, Icons } from '../../index';
+import { IntentSelect, SizeSelect, Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/tag-input/examples/index.ts';
 const tags = ['First', 'Second', 'Third'];

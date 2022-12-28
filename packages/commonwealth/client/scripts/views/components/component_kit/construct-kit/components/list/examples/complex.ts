@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Button, Icon, Icons, List, ListItem, PopoverMenu, MenuItem } from '@/';
-import { Example } from '@shared/examples';
+import { Button, Icon, Icons, List, ListItem, PopoverMenu, MenuItem } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/list/examples/complex.ts';
 

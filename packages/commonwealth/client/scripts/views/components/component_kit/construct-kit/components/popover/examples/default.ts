@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Button, Classes, Popover, PopoverInteraction, PopoverPosition, Select, Switch, Tooltip, Icon, Icons } from '@/';
-import { Example, PopoverPositionSelect } from '@shared/examples';
+import { Button, Classes, Popover, PopoverInteraction, PopoverPosition, Select, Switch, Tooltip, Icon, Icons } from '../../index';
+import { Example, PopoverPositionSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/popover/examples/default.ts';
 

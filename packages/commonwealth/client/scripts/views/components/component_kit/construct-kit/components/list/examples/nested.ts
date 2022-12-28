@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { List, ListItem } from '@/';
-import { Example } from '@shared/examples';
+import { List, ListItem } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/list/examples/nested.ts';
 

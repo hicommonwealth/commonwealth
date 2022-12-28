@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Intent, Size, Spinner, Switch } from '@/';
-import { IntentSelect, SizeSelect, Example } from '@shared/examples';
+import { Intent, Size, Spinner, Switch } from '../../index';
+import { IntentSelect, SizeSelect, Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/spinner/examples/index.ts';
 

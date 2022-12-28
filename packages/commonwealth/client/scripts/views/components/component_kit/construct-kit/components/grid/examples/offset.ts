@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Col, Grid } from '@/';
-import { Example } from '@shared/examples';
+import { Col, Grid } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/grid/examples/offset.ts';
 

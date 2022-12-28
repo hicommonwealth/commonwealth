@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { List, ListItem, Size, Switch } from '@/';
-import { Example, SizeSelect } from '@shared/examples';
+import { List, ListItem, Size, Switch } from '../../index';
+import { Example, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/list/examples/simple.ts';
 

@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Form, FormGroup, Input, FormLabel, Icon, Icons, Button, CustomSelect, Classes } from '@/';
-import { Example } from '@shared/examples';
+import { Form, FormGroup, Input, FormLabel, Icon, Icons, Button, CustomSelect, Classes } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/form/examples/index.ts';
 

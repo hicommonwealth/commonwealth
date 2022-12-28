@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Size, Switch, Select, Align, Icon, Icons } from '@/';
-import { Example, SizeSelect } from '@shared/examples';
+import { Size, Switch, Select, Align, Icon, Icons } from '../../index';
+import { Example, SizeSelect } from '../../../_shared/examples';
 import { Tabs } from '../Tabs';
 import { TabItem } from '../TabsItem';
 

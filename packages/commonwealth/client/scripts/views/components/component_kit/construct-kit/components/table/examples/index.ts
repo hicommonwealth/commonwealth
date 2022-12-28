@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Table, Switch } from '@/';
-import { Example } from '@shared/examples';
+import { Table, Switch } from '../../index';
+import { Example } from '../../../_shared/examples;
 
 const EXAMPLE_SRC = 'components/table/examples/index.ts';
 

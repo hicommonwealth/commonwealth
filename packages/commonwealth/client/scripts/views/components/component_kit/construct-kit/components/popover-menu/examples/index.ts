@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Icons, MenuDivider, MenuItem, Size, PopoverMenu, Button, Switch } from '@/';
-import { Example, SizeSelect } from '@shared/examples';
+import { Icons, MenuDivider, MenuItem, Size, PopoverMenu, Button, Switch } from '../../index';
+import { Example, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/popover-menu/examples/index.ts';
 

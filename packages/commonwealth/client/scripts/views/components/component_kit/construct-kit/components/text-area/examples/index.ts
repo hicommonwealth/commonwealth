@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { TextArea, Switch, Size, Intent } from '@/';
-import { IntentSelect, SizeSelect, Example } from '@shared/examples';
+import { TextArea, Switch, Size, Intent } from '../../index';
+import { IntentSelect, SizeSelect, Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/text-area/examples/index.ts';
 

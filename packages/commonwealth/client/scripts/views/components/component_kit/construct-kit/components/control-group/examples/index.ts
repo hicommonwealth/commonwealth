@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { ControlGroup, Button, Input, Icon, Icons, Select, Spinner, CustomSelect } from '@/';
-import { Example } from '@shared/examples';
+import { ControlGroup, Button, Input, Icon, Icons, Select, Spinner, CustomSelect } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/control-group/examples/index.ts';
 const options = ['Option 1', 'Option 2'];

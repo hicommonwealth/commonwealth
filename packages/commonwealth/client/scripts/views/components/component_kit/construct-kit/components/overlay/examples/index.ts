@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Button, Card, Overlay, Switch } from '@/';
-import { Example } from '@shared/examples';
+import { Button, Card, Overlay, Switch } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/overlay/examples/index.ts';
 

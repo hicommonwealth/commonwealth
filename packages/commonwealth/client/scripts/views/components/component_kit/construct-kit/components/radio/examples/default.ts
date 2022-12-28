@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Radio, Switch, Intent, Size } from '@/';
-import { IntentSelect, Example, SizeSelect } from '@shared/examples';
+import { Radio, Switch, Intent, Size } from '../../index';
+import { IntentSelect, Example, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/radio/examples/default.ts';
 

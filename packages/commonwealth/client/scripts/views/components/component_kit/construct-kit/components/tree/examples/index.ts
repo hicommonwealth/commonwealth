@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Tree, TreeNode, ITreeNodeAttrs, Popover, Icons, Menu, MenuItem, Classes, Icon } from '@/';
-import { Example } from '@shared/examples';
+import { Tree, TreeNode, ITreeNodeAttrs, Popover, Icons, Menu, MenuItem, Classes, Icon } from '../../index';
+import { Example } from '../../../_shared/examples';
 import { data, IModel } from './data';
 
 const EXAMPLE_SRC = 'components/tree/examples/index.ts';

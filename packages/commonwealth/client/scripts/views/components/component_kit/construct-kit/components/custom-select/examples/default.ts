@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Example, SizeSelect } from '@shared/examples';
-import { CustomSelect, Size } from '@/';
+import { Example, SizeSelect } from '../../../_shared/examples';
+import { CustomSelect, Size } from '../../index';
 
 const EXAMPLE_SRC = 'components/custom-select/examples/index.ts';
 const options = [

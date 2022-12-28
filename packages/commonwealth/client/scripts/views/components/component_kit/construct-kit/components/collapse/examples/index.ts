@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Button, Collapse, Card } from '@/';
-import { Example } from '@shared/examples';
+import { Button, Collapse, Card } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/collapse/examples/index.ts';
 const SAMPLE_TEXT = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis interdum ex eu eros dictum.<br/><br/>';

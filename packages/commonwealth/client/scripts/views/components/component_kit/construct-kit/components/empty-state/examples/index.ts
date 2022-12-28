@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { EmptyState, Icons, Icon, Input, Switch } from '@/';
-import { Example } from '@shared/examples';
+import { EmptyState, Icons, Icon, Input, Switch } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/empty-state/examples/index.ts';
 

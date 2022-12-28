@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Button, Icons, Select, Switch, Toaster, ToasterPosition, Intent, Size } from '@/';
-import { IntentSelect, Example, SizeSelect } from '@shared/examples';
+import { Button, Icons, Select, Switch, Toaster, ToasterPosition, Intent, Size } from '../../index';
+import { IntentSelect, Example, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/toast/examples/default.ts';
 const AppToaster = new Toaster();

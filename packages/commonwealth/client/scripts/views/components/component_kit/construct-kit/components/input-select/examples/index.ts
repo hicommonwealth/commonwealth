@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { ListItem, InputSelect, Switch } from '@/';
-import { Example, countries, ICountryModel } from '@shared/examples';
+import { ListItem, InputSelect, Switch } from '../../index';
+import { Example, countries, ICountryModel } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/input-select/examples/index.ts';
 const countryInputSelect = InputSelect.ofType<ICountryModel>();

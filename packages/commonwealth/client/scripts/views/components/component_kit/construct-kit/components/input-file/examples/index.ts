@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Icons, InputFile, Switch, Size, Intent } from '@/';
-import { ContentSelect, IntentSelect, SizeSelect, ContentType, renderContent, Example } from '@shared/examples';
+import { Icons, InputFile, Switch, Size, Intent } from '../../index';
+import { ContentSelect, IntentSelect, SizeSelect, ContentType, renderContent, Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/input-file/examples/index.ts';
 

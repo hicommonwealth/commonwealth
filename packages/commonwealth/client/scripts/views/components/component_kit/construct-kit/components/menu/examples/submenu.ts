@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Icons, Menu, MenuDivider, MenuItem, Switch, MenuHeading } from '@/';
-import { Example } from '@shared/examples';
+import { Icons, Menu, MenuDivider, MenuItem, Switch, MenuHeading } from '../../index';
+import { Example } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/menu/examples/submenu.ts';
 

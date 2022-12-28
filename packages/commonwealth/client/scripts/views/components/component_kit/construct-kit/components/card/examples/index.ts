@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { Card, RadioGroup, Switch, Size } from '@/';
-import { Example, SizeSelect } from '@shared/examples';
+import { Example, SizeSelect } from '../../../_shared/examples';
 
 const EXAMPLE_SRC = 'components/card/examples/index.ts';
 const elevations = ['0', '1', '2', '3', '4'];
