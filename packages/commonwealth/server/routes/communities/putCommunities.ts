@@ -73,7 +73,7 @@ export async function putCommunities(
       const r: CreateAddressReq = { address, chain: community.id, community: community.id, wallet_id: null };
 
       const newAddress = await createAddressHelper(r, models, req.user, next);
-      await models.Role.update({ permission: 'admin' }, { where: { address_id: newAddress.id } });
+      await models.Role.update({ permission: 'admin' }, { where: { address_id: (newAddress as any).id } });
     }));
 
     transaction.commit();

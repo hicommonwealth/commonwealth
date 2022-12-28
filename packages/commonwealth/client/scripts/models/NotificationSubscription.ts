@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { SubscriptionInstance } from 'server/models/subscription/subscription';
+import { SubscriptionInstance } from 'server/models/subscription';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
