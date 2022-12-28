@@ -1,11 +1,11 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { IOption, IAttrs, ISizeAttrs, Classes, safeCall, Keys, Option } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { SelectList } from 'client/scripts/views/components/component_kit/construct-kit/components/select-list';
-import { ListItem } from 'client/scripts/views/components/component_kit/construct-kit/components/list';
-import { Button, IButtonAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/button';
-import { Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { AbstractComponent } from '../abstract-component';
+import { IOption, IAttrs, ISizeAttrs, Classes, safeCall, Keys, Option } from '../../_shared';
+import { SelectList } from '../select-list';
+import { ListItem } from '../list';
+import { Button, IButtonAttrs } from '../button';
+import { Icons } from '../icon';
 
 export interface ICustomSelectAttrs extends IAttrs, ISizeAttrs {
   /** Initially selected value (uncontrolled mode) */

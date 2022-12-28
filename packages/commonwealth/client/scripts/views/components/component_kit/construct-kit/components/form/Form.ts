@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Grid, IGridAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/grid';
+import { Classes, IAttrs } from '../../_shared';
+import { Grid, IGridAttrs } from '../grid';
 
 export interface IFormAttrs extends IAttrs, IGridAttrs {
   [htmlAttrs: string]: any;

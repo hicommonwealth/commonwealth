@@ -1,6 +1,6 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, ISizeAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Classes, IAttrs, ISizeAttrs } from '../../_shared';
 
 export interface IMenuAttrs extends IAttrs, ISizeAttrs {
   /** Toggles basic styling (no border)  */

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Classes, IAttrs } from '../../_shared';
 
 export interface IBreadcrumbItemAttrs extends IAttrs {
   [htmlAttrs: string]: any;

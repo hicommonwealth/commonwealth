@@ -1,12 +1,12 @@
 import m from 'mithril';
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { QueryList, IQueryableAttrs, IQueryListEvents } from 'client/scripts/views/components/component_kit/construct-kit/components/query-list';
-import { Popover, IPopoverAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/popover';
-import { Input, IInputAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/input';
-import { Spinner } from 'client/scripts/views/components/component_kit/construct-kit/components/spinner';
-import { safeCall, Classes, getClosest, Keys } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { AbstractComponent } from '../abstract-component';
+import { QueryList, IQueryableAttrs, IQueryListEvents } from '../query-list';
+import { Popover, IPopoverAttrs } from '../popover';
+import { Input, IInputAttrs } from '../input';
+import { Spinner } from '../spinner';
+import { safeCall, Classes, getClosest, Keys } from '../../_shared';
 
 export interface IInputSelectAttrs<T> extends IQueryableAttrs<T> {
   /**

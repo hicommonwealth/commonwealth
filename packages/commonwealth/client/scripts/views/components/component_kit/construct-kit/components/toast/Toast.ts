@@ -1,8 +1,8 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, ISizeAttrs, IIntentAttrs, safeCall } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { Icon, Icons, IconName } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { Classes, IAttrs, ISizeAttrs, IIntentAttrs, safeCall } from '../../_shared';
+import { AbstractComponent } from '../abstract-component';
+import { Icon, Icons, IconName } from '../icon';
 
 export interface IToastAttrs extends IAttrs, ISizeAttrs, IIntentAttrs {
   /** Left-justified icon */

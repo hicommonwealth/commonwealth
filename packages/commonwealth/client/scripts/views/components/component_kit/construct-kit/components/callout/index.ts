@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { IAttrs, ISizeAttrs, IIntentAttrs, Classes } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Icon, IconName, Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { IAttrs, ISizeAttrs, IIntentAttrs, Classes } from '../../_shared';
+import { Icon, IconName, Icons } from '../icon';
 
 export interface ICalloutAttrs extends IAttrs, ISizeAttrs, IIntentAttrs {
   /** Inner text content */

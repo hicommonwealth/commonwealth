@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Classes, Style } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Classes, Style } from '.';
 
 export function isFunction(value: any): value is Function {
   return typeof value === 'function';

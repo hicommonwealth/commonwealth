@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import m from 'mithril';
-import { Classes, IAttrs, ISizeAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Classes, IAttrs, ISizeAttrs } from '../../_shared';
 
 export interface IBreadcrumbAttrs extends IAttrs, ISizeAttrs {
   /** Element to display in between breadcrumb items */

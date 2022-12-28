@@ -1,5 +1,5 @@
 import m from 'mithril';
-import { Breakpoints } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Breakpoints } from '../../_shared';
 // @ts-ignore
 import ssm from 'simplestatemanager/dist/ssm.min.js';
 

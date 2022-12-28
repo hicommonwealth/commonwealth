@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, getClosest, safeCall } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
 import { isFunction } from 'util';
+import { Classes, IAttrs, getClosest, safeCall } from '../../_shared';
 
 export interface IListItemAttrs extends IAttrs {
   /** Toggles active state */

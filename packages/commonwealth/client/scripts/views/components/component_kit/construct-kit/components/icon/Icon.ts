@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, ISizeAttrs, IIntentAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { IconContents, Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon/generated';
+import { Classes, IAttrs, ISizeAttrs, IIntentAttrs } from '../../_shared';
+import { IconContents, Icons } from './generated';
 
 export type IconName = (typeof Icons)[keyof typeof Icons];
 

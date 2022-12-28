@@ -1,7 +1,7 @@
 import classnames from 'classnames';
 import m from 'mithril';
-import { Classes, IAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Icon, IconName } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { Classes, IAttrs } from '../../_shared';
+import { Icon, IconName } from '../icon';
 
 export interface IEmptyStateAttrs extends IAttrs {
   /** Icon name */

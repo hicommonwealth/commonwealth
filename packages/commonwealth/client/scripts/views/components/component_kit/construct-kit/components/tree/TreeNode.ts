@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, safeCall, getClosest, IAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Icon, Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { Classes, safeCall, getClosest, IAttrs } from '../../_shared';
+import { Icon, Icons } from '../icon';
 
 export interface ITreeNodeAttrs extends IAttrs {
   key: number | string;

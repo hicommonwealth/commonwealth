@@ -1,8 +1,8 @@
 import m from 'mithril';
 import classnames from 'classnames';
 import { Classes } from 'client/scripts/views/components/component_kit/construct-kit';
-import { IPopoverAttrs, Popover } from 'client/scripts/views/components/component_kit/construct-kit/components/popover';
-import { IMenuAttrs, Menu } from 'client/scripts/views/components/component_kit/construct-kit/components/menu';
+import { IPopoverAttrs, Popover } from '../popover';
+import { IMenuAttrs, Menu } from '../menu';
 
 export interface IPopoverMenuAttrs extends IPopoverAttrs {
   /** Attrs passed through to Menu component */

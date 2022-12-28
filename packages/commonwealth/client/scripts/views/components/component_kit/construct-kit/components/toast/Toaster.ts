@@ -1,9 +1,9 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, safeCall } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { IToastAttrs, Toast } from 'client/scripts/views/components/component_kit/construct-kit/components/toast/Toast';
-import { Overlay } from 'client/scripts/views/components/component_kit/construct-kit/components/overlay';
+import { Classes, IAttrs, safeCall } from '../../_shared';
+import { AbstractComponent } from '../abstract-component';
+import { IToastAttrs, Toast } from './Toast';
+import { Overlay } from '../overlay';
 
 export type IToastOptions = IToastAttrs & { key?: string };
 

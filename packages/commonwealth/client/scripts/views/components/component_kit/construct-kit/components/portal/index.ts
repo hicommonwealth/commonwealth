@@ -1,6 +1,6 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, safeCall, normalizeStyle } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Classes, IAttrs, safeCall, normalizeStyle } from '../../_shared';
 
 export interface IPortalAttrs extends IAttrs {
   /** Callback invoked when the component is mounted */

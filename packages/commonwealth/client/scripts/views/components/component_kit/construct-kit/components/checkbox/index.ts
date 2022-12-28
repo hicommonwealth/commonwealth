@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { Classes } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { BaseControl, IControlAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/base-control';
+import { Classes } from '../../_shared';
+import { BaseControl, IControlAttrs } from '../base-control';
 
 export interface ICheckboxAttrs extends IControlAttrs {
   /** Initially sets control to indeterminate state (uncontrolled mode)  */

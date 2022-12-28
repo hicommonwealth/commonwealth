@@ -1,10 +1,10 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { IAttrs, Classes, safeCall, getClosest } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Overlay, IOverlayableAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/overlay';
-import { Button } from 'client/scripts/views/components/component_kit/construct-kit/components/button';
-import { Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { AbstractComponent } from '../abstract-component';
+import { IAttrs, Classes, safeCall, getClosest } from '../../_shared';
+import { Overlay, IOverlayableAttrs } from '../overlay';
+import { Button } from '../button';
+import { Icons } from '../icon';
 
 export interface IDialogAttrs extends IOverlayableAttrs, IAttrs {
   /** Toggles basic styling (no header/footer border and background) */

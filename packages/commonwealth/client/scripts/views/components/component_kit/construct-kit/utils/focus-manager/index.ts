@@ -1,4 +1,4 @@
-import { Keys, Classes } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Keys, Classes } from '../../_shared';
 
 class FocusManager {
   /** Focus outline is shown only when tabbing through elements */

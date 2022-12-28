@@ -1,11 +1,11 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { IInputAttrs, Input } from 'client/scripts/views/components/component_kit/construct-kit/components/input';
-import { IButtonAttrs, Button } from 'client/scripts/views/components/component_kit/construct-kit/components/button';
-import { IPopoverAttrs, Popover } from 'client/scripts/views/components/component_kit/construct-kit/components/popover';
-import { TextArea } from 'client/scripts/views/components/component_kit/construct-kit/components/text-area';
-import { Classes, safeCall, Keys, getClosest } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { AbstractComponent } from '../abstract-component';
+import { IInputAttrs, Input } from '../input';
+import { IButtonAttrs, Button } from '../button';
+import { IPopoverAttrs, Popover } from '../popover';
+import { TextArea } from '../text-area';
+import { Classes, safeCall, Keys, getClosest } from '../../_shared';
 
 const HIGHLIGHT_TIMEOUT = 25;
 

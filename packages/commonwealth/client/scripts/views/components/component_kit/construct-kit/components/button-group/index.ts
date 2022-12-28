@@ -1,6 +1,6 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, ISizeAttrs, IIntentAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Classes, IAttrs, ISizeAttrs, IIntentAttrs } from '../../_shared';
 
 export interface IButtonGroupAttrs extends IAttrs, ISizeAttrs, IIntentAttrs {
   /** Toggles basic styling on children (no borders/background) */

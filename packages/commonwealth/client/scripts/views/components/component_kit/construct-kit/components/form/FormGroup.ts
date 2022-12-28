@@ -1,8 +1,8 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { FormLabel } from 'client/scripts/views/components/component_kit/construct-kit/components/form/FormLabel';
-import { IColAttrs, Col } from 'client/scripts/views/components/component_kit/construct-kit/components/grid';
+import { Classes } from '../../_shared';
+import { FormLabel } from '.';
+import { IColAttrs, Col } from '../grid';
 
 export interface IFormGroupAttrs extends IColAttrs {
   /** Text label */

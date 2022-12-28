@@ -1,9 +1,9 @@
 import classnames from 'classnames';
 import m from 'mithril';
-import { Classes, IAttrs, safeCall, Keys, getScrollbarWidth, hasScrollbar } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { Portal, IPortalAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/portal';
-import { TransitionManager } from 'client/scripts/views/components/component_kit/construct-kit/utils';
+import { Classes, IAttrs, safeCall, Keys, getScrollbarWidth, hasScrollbar } from '../../_shared';
+import { AbstractComponent } from '../abstract-component';
+import { Portal, IPortalAttrs } from '../portal';
+import { TransitionManager } from '../../utils';
 
 export interface IOverlayableAttrs {
   /** Class added to backdrop element */

@@ -1,8 +1,8 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { IAttrs, Classes, normalizeStyle } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { IColAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/grid/Col';
-import { ResponsiveManager } from 'client/scripts/views/components/component_kit/construct-kit/utils';
+import { IAttrs, Classes, normalizeStyle } from '../../_shared';
+import { IColAttrs } from './Col';
+import { ResponsiveManager } from '../../utils';
 
 ResponsiveManager.initialize();
 

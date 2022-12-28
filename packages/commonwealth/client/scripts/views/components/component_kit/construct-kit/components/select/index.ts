@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, ISizeAttrs, IIntentAttrs, updateElementGroupPadding, Option } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Icons, Icon } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { Classes, IAttrs, ISizeAttrs, IIntentAttrs, updateElementGroupPadding, Option } from '../../_shared';
+import { Icons, Icon } from '../icon';
 
 export interface ISelectAttrs extends IAttrs, ISizeAttrs, IIntentAttrs {
   /** Toggles basic styling (no borders/background) */

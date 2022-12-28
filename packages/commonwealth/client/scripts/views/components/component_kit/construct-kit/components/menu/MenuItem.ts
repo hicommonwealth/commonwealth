@@ -1,9 +1,9 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Button, IButtonAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/button';
-import { PopoverMenu, IPopoverMenuAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/popover-menu';
-import { Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { Classes } from '../../_shared';
+import { Button, IButtonAttrs } from '../button';
+import { PopoverMenu, IPopoverMenuAttrs } from '../popover-menu';
+import { Icons } from '../icon';
 
 export interface IMenuItemAttrs extends IButtonAttrs {
   /** Submenu (Menu component) */

@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { IAttrs, Classes } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Spinner } from 'client/scripts/views/components/component_kit/construct-kit/components/spinner';
+import { IAttrs, Classes } from '../../_shared';
+import { Spinner } from '../spinner';
 
 export interface ITabItemAttrs extends IAttrs {
   /** Toggles active state */

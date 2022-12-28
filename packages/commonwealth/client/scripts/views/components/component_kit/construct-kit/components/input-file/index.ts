@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, updateElementGroupPadding, IAttrs, ISizeAttrs, IIntentAttrs } from 'client/scripts/views/components/component_kit/construct-kit';
-import { Button } from 'client/scripts/views/components/component_kit/construct-kit/components/button';
+import { Classes, updateElementGroupPadding, IAttrs, ISizeAttrs, IIntentAttrs } from '../..';
+import { Button } from '../button';
 
 export interface IInputFileAttrs extends IAttrs, ISizeAttrs, IIntentAttrs {
   /** Left-justified content */

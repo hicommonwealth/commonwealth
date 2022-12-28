@@ -1,6 +1,6 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, ISizeAttrs, IIntentAttrs, updateElementGroupPadding } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Classes, IAttrs, ISizeAttrs, IIntentAttrs, updateElementGroupPadding } from '../../_shared';
 
 export interface IInputAttrs extends IAttrs, ISizeAttrs, IIntentAttrs {
   /** Toggles basic styling (only bottom border) */

@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, ISizeAttrs, IOption, Option } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Radio } from 'client/scripts/views/components/component_kit/construct-kit/components/radio/Radio';
+import { Classes, IAttrs, ISizeAttrs, IOption, Option } from '../../_shared';
+import { Radio } from './Radio';
 
 export interface IRadioGroupAttrs extends IAttrs, ISizeAttrs {
   /** Disables selection */

@@ -1,6 +1,6 @@
 import classnames from 'classnames';
 import m from 'mithril';
-import { Classes, IAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Classes, IAttrs } from '../../_shared';
 
 export interface ITableAttrs extends IAttrs {
   /** Toggles bordered styling */

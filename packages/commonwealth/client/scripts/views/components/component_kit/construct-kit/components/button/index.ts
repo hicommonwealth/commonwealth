@@ -1,8 +1,8 @@
 import classnames from 'classnames';
 import m from 'mithril';
-import { Icon } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
-import { Spinner } from 'client/scripts/views/components/component_kit/construct-kit/components/spinner';
-import { Classes, IActionItemAttrs, IAttrs, ISizeAttrs, IIntentAttrs, Align, isNullOrEmpty } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { Icon } from '../icon';
+import { Spinner } from '../spinner';
+import { Classes, IActionItemAttrs, IAttrs, ISizeAttrs, IIntentAttrs, Align, isNullOrEmpty } from '../../_shared';
 
 export interface IButtonAttrs extends IAttrs, IActionItemAttrs, ISizeAttrs, IIntentAttrs {
   /**

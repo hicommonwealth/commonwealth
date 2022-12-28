@@ -1,10 +1,10 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, safeCall } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Popover, IPopoverAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/popover';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { Spinner } from 'client/scripts/views/components/component_kit/construct-kit/components/spinner';
-import { QueryList, IQueryListAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/query-list';
+import { Classes, safeCall } from '../../_shared';
+import { Popover, IPopoverAttrs } from '../popover';
+import { AbstractComponent } from '../abstract-component';
+import { Spinner } from '../spinner';
+import { QueryList, IQueryListAttrs } from '../query-list';
 
 export interface ISelectListAttrs<T> extends IQueryListAttrs<T> {
   /**

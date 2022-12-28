@@ -1,6 +1,6 @@
 import m from 'mithril';
-import { IconName, Intent, Size } from 'client/scripts/views/components/component_kit/construct-kit';
-import { IIconAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { IconName, Intent, Size } from '../components';
+import { IIconAttrs } from '../components/icon';
 
 export type Style = string | Partial<CSSStyleDeclaration>;
 

@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, ISizeAttrs, IIntentAttrs } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { Icon, Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
+import { Classes, IAttrs, ISizeAttrs, IIntentAttrs } from '../../_shared';
+import { Icon, Icons } from '../icon';
 
 export interface ITagAttrs extends IAttrs, ISizeAttrs, IIntentAttrs {
   /** Text label */

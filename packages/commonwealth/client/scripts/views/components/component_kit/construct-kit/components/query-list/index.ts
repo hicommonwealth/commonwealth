@@ -4,12 +4,12 @@
 import m from 'mithril';
 import classnames from 'classnames';
 import debounce from 'lodash.debounce';
-import { Classes, isFunction, Keys, safeCall, IAttrs, getClosest } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { Icon, Icons } from 'client/scripts/views/components/component_kit/construct-kit/components/icon';
-import { List, IListAttrs, IListItemAttrs, ListItem } from 'client/scripts/views/components/component_kit/construct-kit/components/list';
-import { Input, IInputAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/input';
-import { ControlGroup, IControlGroupAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/control-group';
+import { Classes, isFunction, Keys, safeCall, IAttrs, getClosest } from '../../_shared';
+import { AbstractComponent } from '../abstract-component';
+import { Icon, Icons } from '../icon';
+import { List, IListAttrs, IListItemAttrs, ListItem } from '../list';
+import { Input, IInputAttrs } from '../input';
+import { ControlGroup, IControlGroupAttrs } from '../control-group';
 
 type Direction = 'up' | 'down';
 

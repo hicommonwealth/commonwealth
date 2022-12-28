@@ -1,6 +1,6 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { ISizeAttrs, IAttrs, Classes, Align } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
+import { ISizeAttrs, IAttrs, Classes, Align } from '../../_shared';
 
 export interface ITabsAttrs extends IAttrs, ISizeAttrs {
   /**

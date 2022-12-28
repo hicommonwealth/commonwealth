@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { IOverlayAttrs, Overlay } from 'client/scripts/views/components/component_kit/construct-kit/components/overlay';
+import { Classes } from '../../_shared';
+import { IOverlayAttrs, Overlay } from '../overlay';
 
 export const DrawerPosition = {
   TOP: 'top' as 'top',

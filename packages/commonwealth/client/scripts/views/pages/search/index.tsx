@@ -25,7 +25,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { PageNotFound } from '../404';
 import ErrorPage from '../error';
 import { CommunityLabel } from '../../components/community_label';
-import { ListItem, Select } from '../../components/component_kit/construct-kit';
+import { ListItem, Select } from '../../components/component_kit/construct-kit/components/index';
 
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query

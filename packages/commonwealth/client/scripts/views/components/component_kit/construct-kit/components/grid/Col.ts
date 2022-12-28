@@ -1,7 +1,7 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { Classes, IAttrs, Breakpoints } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { IBreakpointMap } from 'client/scripts/views/components/component_kit/construct-kit/components/grid/Grid';
+import { Classes, IAttrs, Breakpoints } from '../../_shared';
+import { IBreakpointMap } from '.';
 
 export interface IColAttrs extends IAttrs {
   /** Width of column; between 1-12 */

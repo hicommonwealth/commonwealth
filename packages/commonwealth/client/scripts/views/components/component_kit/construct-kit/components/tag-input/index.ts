@@ -1,9 +1,9 @@
 import m from 'mithril';
 import classnames from 'classnames';
-import { IAttrs, ISizeAttrs, IIntentAttrs, Classes, safeCall, Keys } from 'client/scripts/views/components/component_kit/construct-kit/_shared';
-import { ITagAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/tag';
-import { AbstractComponent } from 'client/scripts/views/components/component_kit/construct-kit/components/abstract-component';
-import { IInputAttrs } from 'client/scripts/views/components/component_kit/construct-kit/components/input';
+import { IAttrs, ISizeAttrs, IIntentAttrs, Classes, safeCall, Keys } from '../../_shared';
+import { ITagAttrs } from '../tag';
+import { AbstractComponent } from '../abstract-component';
+import { IInputAttrs } from '../input';
 
 export interface ITagInputAttrs extends IAttrs, ISizeAttrs, IIntentAttrs {
   /** Triggers onAdd when input loses focus  */
