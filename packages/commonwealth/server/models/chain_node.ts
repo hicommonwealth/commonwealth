@@ -5,7 +5,7 @@ import { ModelStatic, ModelInstance } from './types';
 
 export type ChainNodeAttributes = {
   url: string;
-  id?: number;
+  id: number;
   eth_chain_id?: number;
   alt_wallet_url?: string;
   private_url?: string;

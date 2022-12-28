@@ -1,6 +1,5 @@
-import { QueryTypes, Op, Sequelize } from 'sequelize';
+import { QueryTypes, Op } from 'sequelize';
 import jwt from 'jsonwebtoken';
-import _ from 'lodash';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { JWT_SECRET } from '../config';

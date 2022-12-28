@@ -21,7 +21,7 @@ export type ChainAttributes = {
   icon_url: string;
   active: boolean;
   type: ChainType;
-  id?: string;
+  id: string;
   description?: string;
   discord?: string;
   element?: string;

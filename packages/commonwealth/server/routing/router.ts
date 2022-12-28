@@ -158,6 +158,7 @@ import { getChainContracts } from '../routes/getChainContracts';
 import { getSubscribedChains } from '../routes/getSubscribedChains';
 import GlobalActivityCache from '../util/globalActivityCache';
 import DatabaseValidationService from '../middleware/databaseValidationService';
+import { addStatusRoutes } from './status';
 
 function setupRouter(
   app: Express,
@@ -838,6 +839,7 @@ function setupRouter(
 
   // new API
   addExternalRoutes(router, app, models, tokenBalanceCache);
+  addStatusRoutes(router, app, models);
 
   app.use('/api', router);
 }

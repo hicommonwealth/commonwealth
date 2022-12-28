@@ -6,6 +6,8 @@ import { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import { ChainAttributes } from 'commonwealth/server/models/chain';
 import { ProfileAttributes } from 'commonwealth/server/models/profile';
 import { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
+import { ChainNodeAttributes } from 'commonwealth/server/models/chain_node';
+import { RoleAttributes } from 'commonwealth/server/models/role';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -51,6 +53,7 @@ export type GetReactionsResp = { reactions?: ReactionAttributes[], count: number
 export type GetCommunitiesReq = {
   community_id?: string;
   network?: string;
+  is_active?: boolean;
   count_only?: boolean;
   limit?: number;
   page?: number;
@@ -67,11 +70,12 @@ export type GetProfilesReq = {
 export type GetProfilesResp = { profiles?: ProfileAttributes[], count: number };
 
 export type GetChainNodesReq = {
-  chain_node_ids?: number[],
+  community_id: string;
+  chain_node_ids?: number[];
   names?: string[];
 } & IPagination;
 
-export type GetChainNodesResp = { chain_nodes: ChainNodeResp[], count: number };
+export type GetChainNodesResp = { chain_nodes: ChainNodeResp[] | ChainNodeAttributes[], count?: number };
 
 export type GetBalanceProvidersReq = {
   chain_node_ids: number[]
@@ -85,5 +89,13 @@ export type GetTokenBalanceReq = {
   balance_provider: string,
   opts: Record<string, string | undefined>
 };
+
+export type GetRolesReq = {
+  community_id: string;
+  addresses?: string[];
+  count_only?: boolean;
+} & IPagination;
+
+export type GetRolesResp = { roles?: RoleAttributes[], count: number };
 
 export const needParamErrMsg = 'Please provide a parameter to query by';

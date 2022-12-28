@@ -9,7 +9,12 @@ import { CollaborationAttributes } from 'server/models/collaboration';
 import { ReactionAttributes } from 'server/models/reaction';
 import { ChainNodeAttributes } from 'server/models/chain_node';
 import { TopicAttributes } from 'server/models/topic';
-import { ProfileAttributes } from '../../../../server/models/profile';
+import { ProfileAttributes } from '../../../server/models/profile';
+import { NotificationCategoryAttributes } from '../../../server/models/notification_category';
+import { ChainCategoryTypeAttributes } from '../../../server/models/chain_category_type';
+import { ChainCategoryAttributes } from '../../../server/models/chain_category';
+import { InviteCodeAttributes } from '../../../server/models/invite_code';
+import { RoleAttributes } from '../../../server/models/role';
 
 const Op = Sequelize.Op;
 
@@ -23,6 +28,11 @@ export let testReactions: ReactionAttributes[];
 export let testChainNodes: ChainNodeAttributes[];
 export let testTopics: TopicAttributes[];
 export let testProfiles: ProfileAttributes[];
+export let testNotificationCategories: NotificationCategoryAttributes[];
+export let testChainCategoryTypes: ChainCategoryTypeAttributes[];
+export let testChainCategories: ChainCategoryAttributes[];
+export let testInviteCodes: InviteCodeAttributes[];
+export let testRoles: RoleAttributes[];
 
 before(async () => {
   await models.Topic.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
@@ -32,8 +42,14 @@ before(async () => {
   await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Chain.destroy({ where: { chain_node_id: { [Op.lt]: 0 } }, force: true });
   await models.Profile.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.NotificationCategory.destroy({ where: { name: 'test-category' }, force: true });
+  await models.ChainCategoryType.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.ChainCategory.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.InviteCode.destroy({ where: { id: 'test' }, force: true });
+  await models.Role.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Chain.destroy({ where: { chain_node_id: { [Op.lt]: 0 } }, force: true });
+  await models.ChainNode.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
 
   testUsers = await Promise.all([...Array(2).keys()].map(
     async (i) => (await models.User.findOrCreate({
@@ -82,6 +98,7 @@ before(async () => {
       network: 'cmntest',
       type: 'offchain',
       default_symbol: 'cmntest',
+      active: true,
     }
   }))[0],
     (await models.Chain.findOrCreate({
@@ -92,6 +109,7 @@ before(async () => {
         network: 'cmntest',
         type: 'offchain',
         default_symbol: 'cmntest2',
+        active: true,
       }
     }).catch(e => console.log(e)))[0]
   ];
@@ -202,6 +220,53 @@ before(async () => {
         chain: 'cmntest',
       }
     }))[0])));
+
+  testNotificationCategories = [
+    (await models.NotificationCategory.findOrCreate({
+      where: {
+        name: 'test-category',
+        description: 'test-category',
+      }
+    }))[0]
+  ]
+
+  testChainCategoryTypes = [
+    (await models.ChainCategoryType.findOrCreate({
+      where: {
+        id: -1,
+        category_name: 'test-category',
+      }
+    }))[0]
+  ]
+
+  testChainCategories = await Promise.all([...Array(2).keys()].map(
+    async (i) => (await models.ChainCategory.findOrCreate({
+      where: {
+        id: -i - 1,
+        chain_id: `cmntest`,
+        category_type_id: 2,
+      }
+    }))[0]));
+
+  testInviteCodes = [
+    (await models.InviteCode.findOrCreate({
+      where: {
+        id: 'test',
+        creator_id: -1,
+        chain_id: 'cmntest'
+      }
+    }))[0]
+  ]
+
+  testRoles = [
+    (await models.Role.findOrCreate({
+      where: {
+        id: -1,
+        address_id: -1,
+        chain_id: 'cmntest'
+      }
+    }))[0]
+  ]
 });
 
 after(async () => {
@@ -212,7 +277,12 @@ after(async () => {
   await models.Thread.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Comment.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Address.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.Profile.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.NotificationCategory.destroy({ where: { name: 'test-category' }, force: true });
+  await models.ChainCategoryType.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.ChainCategory.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
+  await models.InviteCode.destroy({ where: { id: 'test' }, force: true });
+  await models.Role.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
   await models.Chain.destroy({ where: { chain_node_id: { [Op.lt]: 0 } }, force: true });
   await models.ChainNode.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
-  await models.Profile.destroy({ where: { id: { [Op.lt]: 0 } }, force: true });
 });

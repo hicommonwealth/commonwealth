@@ -1,9 +1,9 @@
 import { GetBalanceProvidersReq } from 'common-common/src/api/extApiTypes';
 import models from 'server/database';
 import { req, res } from 'test/unit/unitHelpers';
-import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import chai from 'chai';
 import { getBalanceProviders } from 'server/routes/getBalanceProviders';
+import { tokenBalanceCache } from '../../hooks/cacheHooks.spec';
 
 describe('getTokenBalance Tests', async () => {
   it('returns correct token balance', async () => {

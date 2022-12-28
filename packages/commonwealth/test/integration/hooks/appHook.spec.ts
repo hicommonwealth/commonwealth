@@ -7,9 +7,10 @@ import { SESSION_SECRET } from 'server/config';
 import models from 'server/database';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import { addExternalRoutes } from 'server/routing/external';
-import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
+import { tokenBalanceCache } from 'test/integration/hooks/cacheHooks.spec';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
+import { addStatusRoutes } from '../../../server/routing/status';
 
 chai.use(chaiHttp);
 
@@ -30,6 +31,7 @@ const sessionParser = session({
 });
 
 export const app = express();
+
 before(async () => {
   app.use('/static', express.static('static'));
 
@@ -41,7 +43,10 @@ before(async () => {
   app.use(passport.session());
 
   const router = express.Router();
+
   addExternalRoutes(router, app, models, tokenBalanceCache);
+  addStatusRoutes(router, app, models);
+
   app.use('/api', router);
 });
 

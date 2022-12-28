@@ -4,8 +4,8 @@ import { GetProfilesReq } from 'common-common/src/api/extApiTypes';
 import {
   testAddresses,
   testProfiles
-} from 'test/integration/api/external/dbEntityHooks.spec';
-import { get } from './appHook.spec';
+} from '../../hooks/dbEntityHooks.spec';
+import { get } from '../../hooks/appHook.spec';
 
 describe('getProfiles Tests', () => {
   it('should return profiles with specified profile_id correctly', async () => {

@@ -1,8 +1,8 @@
 import { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
 import BN from 'bn.js';
-import { tokenBalanceCache, tokenProvider } from 'test/integration/api/external/cacheHooks.spec';
 import chai from 'chai';
-import { get } from './appHook.spec';
+import { tokenBalanceCache, tokenProvider } from '../../hooks/cacheHooks.spec';
+import { get } from '../../hooks/appHook.spec';
 
 describe('getTokenBalance Tests', async () => {
   it('returns correct token balance', async () => {

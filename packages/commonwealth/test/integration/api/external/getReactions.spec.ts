@@ -1,9 +1,9 @@
 import 'chai/register-should';
 import chai from 'chai';
 import { GetReactionsReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
-import { testComments, testReactions } from 'test/integration/api/external/dbEntityHooks.spec';
 import { ReactionAttributes } from 'server/models/reaction';
-import { get } from './appHook.spec';
+import { testComments, testReactions } from '../../hooks/dbEntityHooks.spec';
+import { get } from '../../hooks/appHook.spec';
 
 describe('getReactions Tests', () => {
   it('should return reactions with specified community_id correctly', async () => {

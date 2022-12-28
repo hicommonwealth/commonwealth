@@ -1,18 +1,17 @@
-import { GetCommunitiesReq, GetCommunitiesResp, needParamErrMsg } from 'common-common/src/api/extApiTypes';
-import { oneOf, query, validationResult } from 'express-validator';
+import { GetCommunitiesReq, GetCommunitiesResp } from 'common-common/src/api/extApiTypes';
+import { query, validationResult } from 'express-validator';
 import { formatPaginationNoSort } from '../../util/queries';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 
 export const getCommunitiesValidation = [
-  oneOf([
-    query('community_id').exists().isString().trim(),
-    query('network').exists().isString().trim(),
-    query('comment_id').exists().toInt(),
-    query('address_ids').exists().toArray(),
-    query('addresses').exists().toArray(),
-  ], `${needParamErrMsg} (community_id, network, comment_id, address_ids, addresses)`),
+  query('community_id').optional().exists().isString().trim(),
+  query('network').optional().exists().isString().trim(),
+  query('comment_id').optional().exists().toInt(),
+  query('address_ids').optional().exists().toArray(),
+  query('addresses').optional().exists().toArray(),
   query('count_only').optional().isBoolean().toBoolean(),
+  query('is_active').optional().isBoolean().toBoolean(),
 ];
 
 const getCommunities = async (
@@ -24,18 +23,19 @@ const getCommunities = async (
   if (errors.length !== 0) {
     return failure(res.status(400), errors);
   }
-  const { community_id, network, count_only } = req.query;
+  const { community_id, network, is_active, count_only } = req.query;
 
-  let where;
-  if (community_id) where = { id: community_id };
+  let where = {};
+  if (community_id) where['id'] = community_id;
   if (network) where = { network };
+  if (is_active) where['active'] = true;
 
   let communities, count;
   if (!count_only) {
-    ({ rows: communities, count } = await models.Chain.findAndCountAll({
+    communities = await models.Chain.findAll({
       where,
       ...formatPaginationNoSort(req.query)
-    }));
+    });
   } else {
     count = await models.Chain.count({
       where,

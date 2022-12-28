@@ -1,8 +1,8 @@
 import 'chai/register-should';
 import chai from 'chai';
 import { GetChainNodesReq } from 'common-common/src/api/extApiTypes';
-import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
-import { get } from './appHook.spec';
+import { tokenBalanceCache } from '../../hooks/cacheHooks.spec';
+import { get } from '../../hooks/appHook.spec';
 
 describe('getChainNodes Tests', () => {
   it('should return chainNodes with specified chain_node_ids correctly', async () => {
