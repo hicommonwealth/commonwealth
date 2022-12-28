@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import m from 'mithril';
-import $ from 'jquery';
 import ClassComponent from 'class_component';
 
 import 'pages/create_community.scss';
@@ -18,136 +17,113 @@ import { CWValidationText } from 'views/components/component_kit/cw_validation_t
 
 import { ethChainRows } from '../create_community/chain_input_rows';
 
-import {
-  ChainFormIdFields,
-  ChainFormState,
-  EthChainAttrs,
-  EthFormFields,
-} from '../create_community/types';
-
-type ContractFormFields = {
-  contractNickname: string;
-  chain_node_id: number;
-  abiNickname: string;
-  abi: string;
-  contractType: ContractType;
-  decimals: number;
-  token_name: string;
-};
-
-type CreateContractForm = ChainFormIdFields &
-  EthFormFields &
-  ContractFormFields;
-
-type CreateContractState = ChainFormState & { form: CreateContractForm };
+import { EthChainAttrs } from '../create_community/types';
 
 export class AddContractForm extends ClassComponent<EthChainAttrs> {
-  private state: CreateContractState = {
-    message: '',
-    loaded: false,
-    loading: false,
-    saving: false,
-    status: undefined,
-    form: {
-      address: '',
-      chainString: 'Ethereum Mainnet',
-      // For Now we hard code the chain node id until we have a better way to distinguish between chains
-      chain_node_id: 37,
-      name: '',
-      abiNickname: '',
-      abi: '',
-      contractNickname: '',
-      contractType: ContractType.ERC20,
-      nodeUrl: '',
-      symbol: '',
-      token_name: '',
-      decimals: 0,
-    },
+  private message = '';
+  private loaded = false;
+  private loading = false;
+  private saving = false;
+  private status = undefined;
+  private form = {
+    address: '',
+    chainString: 'Ethereum Mainnet',
+    // For Now we hard code the chain node id until we have a better way to distinguish between chains
+    chain_node_id: 37,
+    name: '',
+    abiNickname: '',
+    abi: '',
+    contractNickname: '',
+    contractType: ContractType.ERC20,
+    nodeUrl: '',
+    symbol: '',
+    token_name: '',
+    decimals: 0,
   };
 
   oninit(vnode: m.Vnode<EthChainAttrs>) {
-    this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
+    this.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
   view(vnode: m.Vnode<EthChainAttrs>) {
-    const validAddress = isAddress(this.state.form.address);
+    const validAddress = isAddress(this.form.address);
     let validAbiNickname;
-    if (this.state.form.abi.length > 0) {
-      validAbiNickname = this.state.form.abiNickname.length > 0;
+    if (this.form.abi.length > 0) {
+      validAbiNickname = this.form.abiNickname.length > 0;
     } else {
       validAbiNickname = true;
     }
 
     return (
       <div class="CreateCommunityForm">
-        {...ethChainRows(vnode.attrs, this.state.form)}
+        {...ethChainRows(vnode.attrs, this.form)}
         <InputRow
           title="Contract Nickname"
-          value={this.state.form.contractNickname}
+          value={this.form.contractNickname}
           placeholder="Optional: Enter a nickname for this contract"
           onChangeHandler={(v) => {
-            this.state.form.contractNickname = v;
+            this.form.contractNickname = v;
           }}
         />
         <SelectRow
           title="Contract Type"
           options={Object.values(ContractType)}
-          value={this.state.form.contractType}
+          value={this.form.contractType}
           onchange={(value) => {
-            this.state.form.contractType = value;
-            this.state.loaded = false;
+            this.form.contractType = value;
+            this.loaded = false;
           }}
         />
         <InputRow
           title="Abi Nickname"
-          value={this.state.form.abiNickname}
+          value={this.form.abiNickname}
           placeholder="Required: Enter a nickname for this abi"
           onChangeHandler={(v) => {
-            this.state.form.abiNickname = v;
+            this.form.abiNickname = v;
           }}
         />
         <InputRow
           title="Abi"
-          value={this.state.form.abi}
+          value={this.form.abi}
           placeholder="Optional: Paste ABI here"
           onChangeHandler={(value) => {
-            this.state.form.abi = value;
-            this.state.loaded = false;
+            this.form.abi = value;
+            this.loaded = false;
           }}
           textarea
         />
         <InputRow
           title="Token Name"
-          value={this.state.form.token_name}
+          value={this.form.token_name}
           placeholder="Optional: Enter a token name for this contract"
           onChangeHandler={(v) => {
-            this.state.form.token_name = v;
+            this.form.token_name = v;
           }}
         />
         <InputRow
           title="Symbol"
-          value={this.state.form.symbol}
+          value={this.form.symbol}
           placeholder="Optional: Enter token symbol"
           onChangeHandler={(v) => {
-            this.state.form.symbol = v;
+            this.form.symbol = v;
           }}
         />
         <InputRow
           title="Decimals"
-          value={this.state.form.decimals}
+          value={this.form.decimals}
           placeholder="Optional: Enter Decimals"
           onChangeHandler={(v) => {
-            this.state.form.decimals = v;
+            this.form.decimals = v;
           }}
         />
         <CWButton
           label="Save Contract"
           disabled={
-            this.state.saving ||
+            this.saving ||
             !validAddress ||
             !validAbiNickname ||
-            !this.state.form.chain_node_id ||
-            this.state.loading
+            !this.form.chain_node_id ||
+            this.loading
           }
           onclick={async () => {
             const {
@@ -161,8 +137,8 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
               decimals,
               contractNickname,
               abiNickname,
-            } = this.state.form;
-            this.state.saving = true;
+            } = this.form;
+            this.saving = true;
             try {
               const res = await app.contracts.add({
                 community: app.activeChainId(),
@@ -179,9 +155,9 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
                 abiNickname: (abiNickname !== '' ? abiNickname : undefined),
               });
               if (res) {
-                this.state.status = 'success';
-                this.state.message = `Contract with Address ${res.address} saved successfully`;
-                this.state.loading = false;
+                this.status = 'success';
+                this.message = `Contract with Address ${res.address} saved successfully`;
+                this.loading = false;
                 m.redraw();
               }
             } catch (err) {
@@ -190,15 +166,15 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
                   `Creating new contract with community ${app.activeChainId()} failed`
               );
             } finally {
-              this.state.saving = false;
+              this.saving = false;
               m.redraw();
             }
           }}
         />
-        {this.state.message && (
+        {this.message && (
           <CWValidationText
-            message={this.state.message}
-            status={this.state.status}
+            message={this.message}
+            status={this.status}
           />
         )}
       </div>

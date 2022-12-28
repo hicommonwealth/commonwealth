@@ -1,4 +1,5 @@
 import { AbiInput, AbiItem } from 'web3-utils';
+import { AbiCoder } from 'web3-eth-abi';
 import { BigNumber, ethers } from 'ethers';
 import { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
@@ -8,6 +9,13 @@ export function validateAbiInput(
   val: string,
   inputType: string
 ): [ValidationStatus, string] {
+  const coder = new AbiCoder();
+  try {
+    coder.encodeParameter(inputType, val);
+    return ['success', ''];
+  } catch (e) {
+    return ['failure', e.message];
+  }
   // TODO Array Validation will be complex. Check what cases we want to cover here
   // Cases not covered yet:
   // - Array of Arrays
