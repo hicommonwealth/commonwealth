@@ -1,3 +1,4 @@
+import Web3 from 'web3';
 import { AbiInput, AbiItem } from 'web3-utils';
 import { AbiCoder } from 'web3-eth-abi';
 import { BigNumber, ethers } from 'ethers';
@@ -9,9 +10,13 @@ export function validateAbiInput(
   val: string,
   inputType: string
 ): [ValidationStatus, string] {
-  const coder = new AbiCoder();
+  const coder = (new Web3()).eth.abi;
   try {
-    coder.encodeParameter(inputType, val);
+    if (inputType.slice(-2) === '[]') {
+      coder.encodeParameter(inputType, JSON.parse(val));
+    } else {
+      coder.encodeParameter(inputType, val);
+    }
     return ['success', ''];
   } catch (e) {
     return ['failure', e.message];
