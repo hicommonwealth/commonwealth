@@ -247,7 +247,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       //     }),
       //   ]
       // );
-
+      return null; // @TODO @REACT Fix me
       // return (
       //   <>
       //     {m(Icon, {
