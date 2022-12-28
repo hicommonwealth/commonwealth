@@ -4,7 +4,7 @@ import 'pages/notifications_page.scss';
 import m from 'mithril';
 
 // @ TODO: REACT REMOVE Infinite
-import Infinite from 'mithril-infinite';
+// import Infinite from 'mithril-infinite';
 // @TODO: REACT CLEANUP
 
 import app from 'state';
@@ -253,22 +253,23 @@ const NotificationsPage: m.Component<{}> = {
 
               const totalLength = allNotifications.length;
               if (totalLength > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  key: totalLength,
-                  pageData: () => {
-                    return allNotifications;
-                  },
-                  pageKey: () => {
-                    return pageKey;
-                  },
-                  item: (data, opts, index) => {
-                    return m(NotificationRow, {
-                      notifications: [data],
-                      onListPage: true,
-                    });
-                  },
-                });
+                return null; // @TODO @REACT FIX ME
+                // return m(Infinite, {
+                //   maxPages: 1, // prevents rollover/repeat
+                //   key: totalLength,
+                //   pageData: () => {
+                //     return allNotifications;
+                //   },
+                //   pageKey: () => {
+                //     return pageKey;
+                //   },
+                //   item: (data, opts, index) => {
+                //     return m(NotificationRow, {
+                //       notifications: [data],
+                //       onListPage: true,
+                //     });
+                //   },
+                // });
               } else return m('.no-notifications', 'No Notifications');
             })(),
           ]),
