@@ -1,6 +1,5 @@
 /* @jsx jsx */
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import jdenticon from 'jdenticon';
 

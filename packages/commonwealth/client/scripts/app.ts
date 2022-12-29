@@ -516,6 +516,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     const redirectRoute = (path: string | Function) => ({
       render: (vnode) => {
+        console.log(vnode);
         setRoute(
           typeof path === 'string' ? path : path(vnode.attrs),
           {},
@@ -565,7 +566,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped
             : scoped
             ? // true => scope is derived from path
-              vnode.attrs.scope?.toString() || customDomain
+              vnode.attrs?.scope?.toString() || customDomain
             : // false => scope is null
               null;
 
@@ -574,7 +575,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         // same "/:scope/proposal/:type/:id" route.
         let deferChain = attrs.deferChain;
         const isDiscussion =
-          vnode.attrs.type === 'discussion' ||
+          vnode.attrs?.type === 'discussion' ||
           pathIsDiscussion(scope, window.location.pathname);
         if (path === 'views/pages/view_proposal/index' && isDiscussion) {
           deferChain = true;
