@@ -6,11 +6,19 @@ dotenv.config();
 
 const log = factory.getLogger(formatFilename(__filename));
 
-export default async function fetchNewSnapshotProposal(id: string) {
+export default async function fetchNewSnapshotProposal(
+  id: string,
+  eventType: string
+) {
   try {
     const environment = process.env.NODE_ENV || "development";
 
     if (environment === "development") {
+      if (eventType === "deleted") {
+        console.log("Proposal deleted, returning null");
+        return { data: { proposal: null } };
+      }
+
       const dummyProposal = {
         data: {
           proposal: {

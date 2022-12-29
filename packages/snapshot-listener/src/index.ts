@@ -39,14 +39,14 @@ app.post("/snapshot", async (req: Request, res: Response) => {
 
     const parsedId = event.id.replace(/.*\//, "");
     const eventType = event.event.split("/")[1];
-    const response = await fetchNewSnapshotProposal(parsedId);
+    const response = await fetchNewSnapshotProposal(parsedId, eventType);
     event.id = parsedId;
-    event.title = response.data.proposal.title ?? "";
-    event.body = response.data.proposal.body;
-    event.choices = response.data.proposal.choices;
-    event.space = response.data.proposal.space.id;
-    event.start = response.data.proposal.start;
-    event.expire = response.data.proposal.end;
+    event.title = response.data.proposal?.title ?? null;
+    event.body = response.data.proposal?.body ?? null;
+    event.choices = response.data.proposal?.choices ?? null;
+    event.space = response.data.proposal?.space.id ?? null;
+    event.start = response.data.proposal?.start ?? null;
+    event.expire = response.data.proposal?.end ?? null;
 
     await controller.publish(event, RascalPublications.SnapshotListener);
 

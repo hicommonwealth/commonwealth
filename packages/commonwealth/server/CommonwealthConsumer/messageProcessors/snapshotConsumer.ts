@@ -8,8 +8,17 @@ export async function processSnapshotMessage(
   this: { models: DB; log: Logger },
   data: SnapshotNotification
 ) {
-  // const log = factory.getLogger(formatFilename(__filename));
   const { space, id, title, body, choices, start, expire } = data;
+
+  let snapshotNotificationData = {
+    space,
+    id,
+    title,
+    body,
+    choices,
+    start,
+    expire,
+  };
 
   this.log.info(`Processing snapshot message: ${JSON.stringify(data)}`);
 
@@ -24,9 +33,33 @@ export async function processSnapshotMessage(
     this.log.error(`Error fetching proposal: ${e}`);
   }
 
+  if (eventType === 'proposal/deleted') {
+    if (!proposal) {
+      return;
+    }
+
+    this.log.info(`Proposal deleted, deleting record`);
+
+    // Pull data from DB (not included in the webhook event)
+    snapshotNotificationData = {
+      space: proposal.space,
+      id: proposal.id,
+      title: proposal.title,
+      body: proposal.body,
+      choices: proposal.choices,
+      start: proposal.start,
+      expire: proposal.expire,
+    };
+
+    StatsDController.get().increment('cw.deleted_snapshot_proposal_record', 1, {
+      event: eventType,
+      space,
+    });
+  }
+
   try {
     await this.models.SnapshotSpace.findOrCreate({
-      where: { snapshot_space: space },
+      where: { snapshot_space: space ?? proposal.space },
     });
   } catch (e) {
     this.log.error(`Error creating snapshot space: ${e}`);
@@ -37,7 +70,7 @@ export async function processSnapshotMessage(
     return;
   }
 
-  if (!proposal) {
+  if (!proposal && eventType !== 'proposal/deleted') {
     this.log.info(`Proposal ${id} does not exist, creating record`);
     proposal = await this.models.SnapshotProposal.create({
       id,
@@ -56,24 +89,19 @@ export async function processSnapshotMessage(
     space,
   });
 
-  if (eventType === 'proposal/deleted') {
-    this.log.info(`Proposal deleted, deleting record`);
-    await proposal.destroy();
-
-    StatsDController.get().increment('cw.deleted_snapshot_proposal_record', 1, {
-      event: eventType,
-      space,
-    });
-  }
-
   const associatedCommunities =
     await this.models.CommunitySnapshotSpaces.findAll({
-      where: { snapshot_space_id: space },
+      where: { snapshot_space_id: proposal?.space },
     });
 
   this.log.info(
     `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `
   );
+
+  // Delete the proposal
+  if (eventType === 'proposal/deleted') {
+    await proposal?.destroy();
+  }
 
   for (const community of associatedCommunities) {
     const communityId = community.chain_id;
@@ -93,15 +121,7 @@ export async function processSnapshotMessage(
           await axios.post(
             `${process.env.DISCORD_BOT_URL}/send-snapshot-notification`,
             {
-              snapshotNotificationData: {
-                space,
-                id,
-                title,
-                body,
-                choices,
-                start,
-                expire,
-              },
+              snapshotNotificationData,
               guildId: config.guild_id,
               channelId: config.snapshot_channel_id,
               eventType,
