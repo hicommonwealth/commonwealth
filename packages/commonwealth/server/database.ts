@@ -25,7 +25,6 @@ import ContractAbiFactory from './models/contract_abi';
 import DiscussionDraftFactory from './models/discussion_draft';
 import IdentityCacheFactory from './models/identity_cache';
 import InviteCodeFactory from './models/invite_code';
-import IpfsPinsFactory from './models/ipfs_pins';
 import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
@@ -64,14 +63,10 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           log.trace(msg);
         },
   dialectOptions:
-    process.env.NODE_ENV !== 'production'
-      ? {
-          requestTimeout: 40000,
-        }
-      : {
-          requestTimeout: 40000,
-          ssl: { rejectUnauthorized: false },
-        },
+    process.env.NODE_ENV !== 'production' ? { requestTimeout: 40000 } :
+    DATABASE_URI === "postgresql://commonwealth:edgeware@localhost/commonwealth" ?
+    { requestTimeout: 40000, ssl: false } :
+    { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
   pool: {
     max: 10,
     min: 0,
@@ -110,7 +105,6 @@ const models: Models = {
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),

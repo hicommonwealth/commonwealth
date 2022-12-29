@@ -14,7 +14,7 @@ import moment from 'moment';
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
 import {
   notifyError,
@@ -24,7 +24,7 @@ import {
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
-import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
@@ -32,7 +32,7 @@ import { isWindowMediumSmallInclusive } from './views/components/component_kit/h
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
-import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
+// import(/* webpackPrefetch: true */ 'views/pages/why_commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 import(/* webpackPrefetch: true */ 'views/pages/view_thread');
@@ -331,15 +331,6 @@ export async function selectChain(
       )
     ).default;
     newChain = new Solana(chain, app);
-  } else if (chain.network === ChainNetwork.Commonwealth) {
-    const Commonwealth = (
-      await import(
-        /* webpackMode: "lazy" */
-        /* webpackChunkName: "commonwealth-main" */
-        './controllers/chain/ethereum/commonwealth/adapter'
-      )
-    ).default;
-    newChain = new Commonwealth(chain, app);
   } else if (
     chain.base === ChainBase.Ethereum &&
     chain.type === ChainType.Offchain
@@ -620,11 +611,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
-      '/about': importRoute('views/pages/commonwealth', {
+      '/about': importRoute('views/pages/why_commonwealth', {
         scoped: false,
       }),
-      '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
-      '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
+      '/terms': importRoute('views/pages/terms', { scoped: false }),
+      '/privacy': importRoute('views/pages/privacy', { scoped: false }),
       '/components': importRoute('views/pages/components', {
         scoped: false,
         hideSidebar: true,
@@ -654,17 +645,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            // CMN
-            '/projects': importRoute('views/pages/commonwealth/projects', {
-              scoped: true,
-            }),
-            '/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
-            '/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
-              { scoped: true }
-            ),
             // NEAR
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {
               scoped: true,
@@ -868,7 +848,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
-            '/communities': importRoute('views/pages/community_cards', {
+            '/communities': importRoute('views/pages/communities', {
               scoped: false,
               hideSidebar: false,
             }),
@@ -876,7 +856,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            '/whyCommonwealth': importRoute('views/pages/commonwealth', {
+            '/whyCommonwealth': importRoute('views/pages/why_commonwealth', {
               scoped: false,
               hideSidebar: true,
             }),
@@ -907,18 +887,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/notification-settings': importRoute(
               'views/pages/notification_settings',
               { scoped: true, deferChain: true }
-            ),
-            // CMN
-            '/:scope/projects': importRoute(
-              'views/pages/commonwealth/projects',
-              { scoped: true }
-            ),
-            '/:scope/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
-            '/:scope/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
-              { scoped: true }
             ),
             // NEAR
             '/:scope/finishNearLogin': importRoute(

@@ -1,11 +1,13 @@
 import Sequelize from 'sequelize';
 import { NotificationCategories } from 'common-common/src/types';
-import validateChain, { ValidateChainParams } from '../util/validateChain';
+import { AppError } from 'common-common/src/errors';
+import { SubscriptionAttributes } from '../models/subscription';
+import validateChain, {
+  ValidateChainParams,
+} from '../middleware/validateChain';
 import { DB } from '../models';
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { AppError } from 'common-common/src/errors';
 import { RoleAttributes } from '../models/role';
-import { SubscriptionAttributes } from '../models/subscription';
 import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {
@@ -27,7 +29,7 @@ type CreateRoleResp = {
 const createRole = async (
   models: DB,
   req: TypedRequestBody<CreateRoleReq>,
-  res: TypedResponse<CreateRoleResp>,
+  res: TypedResponse<CreateRoleResp>
 ) => {
   const [chain, error] = await validateChain(models, req.body);
 
@@ -39,24 +41,27 @@ const createRole = async (
     where: {
       id: req.body.address_id,
       user_id: req.user.id,
-      verified: { [Sequelize.Op.ne]: null }
-    }
+      verified: { [Sequelize.Op.ne]: null },
+    },
   });
   if (!validAddress?.id) throw new AppError(Errors.InvalidAddress);
 
   const role = await _createRole(models, validAddress.id, chain.id);
 
-  const [ subscription ] = await models.Subscription.findOrCreate({
+  const [subscription] = await models.Subscription.findOrCreate({
     where: {
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewThread,
       chain_id: chain.id,
       object_id: chain.id,
       is_active: true,
-    }
+    },
   });
 
-  return success(res, { role: role.toJSON(), subscription: subscription.toJSON() });
+  return success(res, {
+    role: role.toJSON(),
+    subscription: subscription.toJSON(),
+  });
 };
 
 export default createRole;

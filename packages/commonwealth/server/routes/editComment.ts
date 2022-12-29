@@ -1,15 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { NotificationCategories } from 'common-common/src/types';
-import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText } from '../../shared/utils';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from 'common-common/src/errors';
+import validateChain from '../middleware/validateChain';
+import {
+  getProposalUrl,
+  getProposalUrlWithoutObject,
+  renderQuillDeltaToText,
+} from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -18,15 +22,21 @@ export const Errors = {
   NoProposal: 'No matching proposal found',
 };
 
-const editComment = async (models: DB, banCache: BanCache, req: Request, res: Response, next: NextFunction) => {
+const editComment = async (
+  models: DB,
+  banCache: BanCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
 
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));
   }
+
+  const author = req.address;
 
   // check if banned
   const [canInteract, banError] = await banCache.checkBan({
@@ -38,7 +48,10 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
   }
 
   const attachFiles = async () => {
-    if (req.body['attachments[]'] && typeof req.body['attachments[]'] === 'string') {
+    if (
+      req.body['attachments[]'] &&
+      typeof req.body['attachments[]'] === 'string'
+    ) {
       await models.Attachment.create({
         attachable: 'comment',
         attachment_id: req.body.id,
@@ -46,17 +59,23 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
         description: 'image',
       });
     } else if (req.body['attachments[]']) {
-      await Promise.all(req.body['attachments[]'].map((u) => models.Attachment.create({
-        attachable: 'comment',
-        attachment_id: req.body.id,
-        url: u,
-        description: 'image',
-      })));
+      await Promise.all(
+        req.body['attachments[]'].map((u) =>
+          models.Attachment.create({
+            attachable: 'comment',
+            attachment_id: req.body.id,
+            url: u,
+            description: 'image',
+          })
+        )
+      );
     }
   };
 
   try {
-    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (await req.user.getAddresses())
+      .filter((addr) => !!addr.verified)
+      .map((addr) => addr.id);
     const comment = await models.Comment.findOne({
       where: {
         id: req.body.id,
@@ -73,7 +92,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     if (decodeURIComponent(req.body.body) !== latestVersion) {
       const recentEdit = {
         timestamp: moment(),
-        body: decodeURIComponent(req.body.body)
+        body: decodeURIComponent(req.body.body),
       };
       const arr = comment.version_history;
       arr.unshift(JSON.stringify(recentEdit));
@@ -82,7 +101,9 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     comment.text = req.body.body;
     comment.plaintext = (() => {
       try {
-        return renderQuillDeltaToText(JSON.parse(decodeURIComponent(req.body.body)));
+        return renderQuillDeltaToText(
+          JSON.parse(decodeURIComponent(req.body.body))
+        );
       } catch (e) {
         return decodeURIComponent(req.body.body);
       }
@@ -98,25 +119,37 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     const [prefix, id] = comment.root_id.split('_');
     if (prefix === 'discussion') {
       proposal = await models.Thread.findOne({
-        where: { id }
+        where: { id },
       });
-    } else if (prefix.includes('proposal') || prefix.includes('referendum') || prefix.includes('motion')) {
+    } else if (
+      prefix.includes('proposal') ||
+      prefix.includes('referendum') ||
+      prefix.includes('motion')
+    ) {
       // TODO: better check for on-chain proposal types
       proposal = id;
     } else {
-      log.error(`No matching proposal of thread for root_id ${comment.root_id}`);
+      log.error(
+        `No matching proposal of thread for root_id ${comment.root_id}`
+      );
     }
     if (!proposal) {
       throw new AppError(Errors.NoProposal);
     }
 
-    const cwUrl = typeof proposal === 'string'
-      ? getProposalUrlWithoutObject(prefix, comment.chain, proposal, finalComment)
-      : getProposalUrl(prefix, proposal, comment);
-    const root_title = typeof proposal === 'string' ? '' : (proposal.title || '');
+    const cwUrl =
+      typeof proposal === 'string'
+        ? getProposalUrlWithoutObject(
+            prefix,
+            comment.chain,
+            proposal,
+            finalComment
+          )
+        : getProposalUrl(prefix, proposal, comment);
+    const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
     // dispatch notifications to subscribers of the comment/thread
-    models.Subscription.emitNotifications(
+    emitNotifications(
       models,
       NotificationCategories.CommentEdit,
       '',
@@ -138,17 +171,22 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
         title: proposal.title || '',
         chain: finalComment.chain,
       },
-      [ finalComment.Address.address ],
+      [finalComment.Address.address]
     );
 
     let mentions;
     try {
       const previousDraftMentions = parseUserMentions(latestVersion);
-      const currentDraftMentions = parseUserMentions(decodeURIComponent(req.body.body));
+      const currentDraftMentions = parseUserMentions(
+        decodeURIComponent(req.body.body)
+      );
       mentions = currentDraftMentions.filter((addrArray) => {
         let alreadyExists = false;
         previousDraftMentions.forEach((addrArray_) => {
-          if (addrArray[0] === addrArray_[0] && addrArray[1] === addrArray_[1]) {
+          if (
+            addrArray[0] === addrArray_[0] &&
+            addrArray[1] === addrArray_[1]
+          ) {
             alreadyExists = true;
           }
         });
@@ -161,20 +199,22 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     // grab mentions to notify tagged users
     let mentionedAddresses;
     if (mentions?.length > 0) {
-      mentionedAddresses = await Promise.all(mentions.map(async (mention) => {
-        try {
-          const user = await models.Address.findOne({
-            where: {
-              chain: mention[0],
-              address: mention[1],
-            },
-            include: [ models.User, models.RoleAssignment ]
-          });
-          return user;
-        } catch (err) {
-          return next(new ServerError(err));
-        }
-      }));
+      mentionedAddresses = await Promise.all(
+        mentions.map(async (mention) => {
+          try {
+            const user = await models.Address.findOne({
+              where: {
+                chain: mention[0],
+                address: mention[1],
+              },
+              include: [models.User, models.RoleAssignment],
+            });
+            return user;
+          } catch (err) {
+            return next(new ServerError(err));
+          }
+        })
+      );
       // filter null results
       mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
@@ -183,7 +223,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
     if (mentionedAddresses?.length > 0) {
       mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
-        models.Subscription.emitNotifications(
+        emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,
@@ -206,7 +246,7 @@ const editComment = async (models: DB, banCache: BanCache, req: Request, res: Re
             chain: finalComment.chain,
             body: finalComment.text,
           },
-          [ finalComment.Address.address ],
+          [finalComment.Address.address]
         );
       });
     }

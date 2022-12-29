@@ -17,9 +17,11 @@ import logger from 'morgan';
 import prerenderNode from 'prerender-node';
 import {factory, formatFilename} from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq';
+import { StatsDController } from 'common-common/src/statsd';
+import {BrokerConfig} from "rascal";
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
-import {RabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq';
 import ViewCountCache from './server/util/viewCountCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
@@ -29,17 +31,15 @@ import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
-import {sendBatchedNotificationEmails} from './server/scripts/emails';
-import setupAPI from './server/router';
+import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import setupAPI from './server/routing/router';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupEntityProxy from './server/util/entitiesProxy';
 import setupIpfsProxy from './server/util/ipfsProxy';
 import setupPassport from './server/passport';
-import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import { StatsDController } from 'common-common/src/statsd';
-import {BrokerConfig} from "rascal";
 import GlobalActivityCache from './server/util/globalActivityCache';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -58,32 +58,19 @@ async function main() {
 
   const NO_TOKEN_BALANCE_CACHE =
     process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+  const NO_GLOBAL_ACTIVITY_CACHE =
+    process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' ||
     SHOULD_SEND_EMAILS ||
     SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
-  // CLI parameters used to configure specific tasks
-  const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
-
   const tokenBalanceCache = new TokenBalanceCache();
+  await tokenBalanceCache.initBalanceProviders();
   const ruleCache = new RuleCache();
   let rc = null;
   if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
-  } else if (FLAG_MIGRATION) {
-    log.info('Started migrating councillor and validator flags into the DB');
-    try {
-      await migrateCouncillorValidatorFlags(models);
-      log.info('Finished migrating councillor and validator flags into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error(
-        'Failed migrating councillor and validator flags into the DB: ',
-        e.message
-      );
-      rc = 1;
-    }
   }
 
   // exit if we have performed a one-off event
@@ -246,8 +233,14 @@ async function main() {
   await ruleCache.start();
   const banCache = new BanCache(models);
   const globalActivityCache = new GlobalActivityCache(models);
+
   // TODO: should we await this? it will block server startup -- but not a big deal locally
-  await globalActivityCache.start();
+  if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
+
+  // Declare Validation Middleware Service
+  // middleware to use for all requests
+  const dbValidationService: DatabaseValidationService = new DatabaseValidationService(models);
+
   setupAPI(
     app,
     models,
@@ -256,6 +249,7 @@ async function main() {
     ruleCache,
     banCache,
     globalActivityCache,
+    dbValidationService,
   );
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);

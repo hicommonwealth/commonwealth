@@ -285,6 +285,10 @@
     top: -0.5em;
   }
 
+  mark {
+    background-color: $primary-50;
+  }
+
   // miscellaneous
   .twitter-tweet {
     margin: 25px 0 28px !important;
