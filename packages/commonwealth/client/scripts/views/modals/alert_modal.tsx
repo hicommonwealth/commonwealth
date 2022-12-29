@@ -4,11 +4,11 @@
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
 
 import 'modals/alert_modal.scss';
 
 import app from 'state';
+import { CWButton } from '../components/component_kit/cw_button';
 
 const AlertModal = {
   confirmExit: async () => true,
@@ -31,22 +31,17 @@ const AlertModal = {
         <div className="compact-modal-body">
           <h3>{alertText}</h3>
         </div>
-        <div className="compact-modal-actions">
-          {render(Button, {
-            intent: 'primary',
-            rounded: true,
-            onclick: (e) => {
+        <div class="compact-modal-actions">
+          <CWButton
+            onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {
                 $(e.target).trigger('modalexit');
               }, 0);
-            },
-            oncreate: (vvnode) => {
-              $(vvnode.dom).focus();
-            },
-            label: primaryButton,
-          })}
+            }}
+            label={primaryButton}
+          />
         </div>
       </div>
     );

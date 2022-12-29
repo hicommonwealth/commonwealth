@@ -3,7 +3,7 @@
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import { InputSelect, ListItem } from 'construct-ui';
+// import { InputSelect, ListItem } from 'construct-ui';
 
 import 'components/address_input_typeahead.scss';
 
@@ -68,66 +68,66 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
           redraw();
         });
     }
-
-    return render(InputSelect, {
-      class: 'AddressInputTypeahead',
-      cacheItems: true,
-      checkmark: false,
-      closeOnSelect: true,
-      itemRender: (item: AddressInputTypeaheadItem) =>
-        render(ListItem, {
-          label: (
-            <div className="item-container">
-              {render(User, {
-                user: new AddressInfo(null, item.address, item.chain, null),
-                avatarOnly: true,
-                avatarSize: 18,
-              })}
-              {item.name ? (
-                <div className="item-and-address">
-                  <CWText noWrap type="caption" fontWeight="medium">
-                    {item.name}
-                  </CWText>
-                  <CWText noWrap type="caption" class="address-text">
-                    {item.address}
-                  </CWText>
-                </div>
-              ) : (
-                <CWText noWrap type="caption" fontWeight="medium">
-                  {item.address}
-                </CWText>
-              )}
-            </div>
-          ),
-          selected:
-            this.selectedItem && this.selectedItem.address === item.address,
-        }),
-      itemPredicate: (query: string, item: AddressInputTypeaheadItem) => {
-        return (
-          item.address.toLowerCase().includes(query.toLowerCase()) ||
-          item.name?.toLowerCase().includes(query.toLowerCase())
-        );
-      },
-      onSelect: (item: AddressInputTypeaheadItem) => {
-        this.selectedItem = item;
-        if (oninput) oninput(item);
-        redraw();
-      },
-      inputAttrs: {
-        fluid: options.fluid,
-        placeholder: options.placeholder,
-        autocomplete: 'xyz123',
-      },
-      popoverAttrs: {
-        hasArrow: false,
-        class: 'AddressInputTypeaheadPopover',
-        portalAttrs: {
-          class: 'AddressInputTypeaheadPopoverPortal',
-        },
-      },
-      value: this.selectedItem?.address,
-      items: this.typeaheadAddresses,
-      loading: this.loading,
-    });
+    return null;
+    // return render(InputSelect, {
+    //   class: 'AddressInputTypeahead',
+    //   cacheItems: true,
+    //   checkmark: false,
+    //   closeOnSelect: true,
+    //   itemRender: (item: AddressInputTypeaheadItem) =>
+    //     render(ListItem, {
+    //       label: (
+    //         <div class="item-container">
+    //           {render(User, {
+    //             user: new AddressInfo(null, item.address, item.chain, null),
+    //             avatarOnly: true,
+    //             avatarSize: 18,
+    //           })}
+    //           {item.name ? (
+    //             <div class="item-and-address">
+    //               <CWText noWrap type="caption" fontWeight="medium">
+    //                 {item.name}
+    //               </CWText>
+    //               <CWText noWrap type="caption" className="address-text">
+    //                 {item.address}
+    //               </CWText>
+    //             </div>
+    //           ) : (
+    //             <CWText noWrap type="caption" fontWeight="medium">
+    //               {item.address}
+    //             </CWText>
+    //           )}
+    //         </div>
+    //       ),
+    //       selected:
+    //         this.selectedItem && this.selectedItem.address === item.address,
+    //     }),
+    //   itemPredicate: (query: string, item: AddressInputTypeaheadItem) => {
+    //     return (
+    //       item.address.toLowerCase().includes(query.toLowerCase()) ||
+    //       item.name?.toLowerCase().includes(query.toLowerCase())
+    //     );
+    //   },
+    //   onSelect: (item: AddressInputTypeaheadItem) => {
+    //     this.selectedItem = item;
+    //     if (oninput) oninput(item);
+    //     redraw();
+    //   },
+    //   inputAttrs: {
+    //     fluid: options.fluid,
+    //     placeholder: options.placeholder,
+    //     autocomplete: 'xyz123',
+    //   },
+    //   popoverAttrs: {
+    //     hasArrow: false,
+    //     class: 'AddressInputTypeaheadPopover',
+    //     portalAttrs: {
+    //       class: 'AddressInputTypeaheadPopoverPortal',
+    //     },
+    //   },
+    //   value: this.selectedItem?.address,
+    //   items: this.typeaheadAddresses,
+    //   loading: this.loading,
+    // });
   }
 }

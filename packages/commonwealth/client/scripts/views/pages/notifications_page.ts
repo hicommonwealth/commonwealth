@@ -1,16 +1,22 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import 'pages/notifications_page.scss';
 
-
-import Infinite from 'mithril-infinite';
-import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+
+// @ TODO: REACT REMOVE Infinite
+// import Infinite from 'mithril-infinite';
+// @TODO: REACT CLEANUP
 
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+
+// TODO: FIX UI FOR THESE
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
+import { CWTag } from '../components/component_kit/cw_tag';
 
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
@@ -87,10 +93,8 @@ const NotificationsPage: Component<{}> = {
       return render(PageError, {
         title: [
           'Notifications ',
-          render(Tag, {
-            size: 'xs',
+          render(CWTag, {
             label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
           }),
         ],
         message: 'This page requires you to be logged in.',
@@ -132,13 +136,12 @@ const NotificationsPage: Component<{}> = {
       [
         render('.NotificationsPage', [
           render(
-            ButtonGroup,
+            '.ButtonGroup',
             {
               class: 'NotificationButtons',
-              outlined: true,
             },
             [
-              render(Button, {
+              render(CWButton, {
                 label: 'Previous Page',
                 onclick: (e) => {
                   e.preventDefault();
@@ -162,7 +165,7 @@ const NotificationsPage: Component<{}> = {
                   );
                 },
               }),
-              render(Button, {
+              render(CWButton, {
                 label: 'Next Page',
                 onclick: (e) => {
                   e.preventDefault();
@@ -194,7 +197,7 @@ const NotificationsPage: Component<{}> = {
                   );
                 },
               }),
-              render(Button, {
+              render(CWButton, {
                 label: 'Mark all as read',
                 onclick: (e) => {
                   e.preventDefault();
@@ -205,17 +208,15 @@ const NotificationsPage: Component<{}> = {
                     .then(() => redraw());
                 },
               }),
-              render(Popover, {
+              render(CWPopover, {
                 content: [
                   render(
                     'div',
                     { style: 'margin-bottom: 10px' },
                     'Clear all chain notifications?'
                   ),
-                  render(Button, {
+                  render(CWButton, {
                     label: 'Confirm',
-                    fluid: true,
-                    rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
                       if (
@@ -229,15 +230,9 @@ const NotificationsPage: Component<{}> = {
                     },
                   }),
                 ],
-                trigger: render(Button, {
+                trigger: render(CWButton, {
                   label: 'Clear chain events',
                 }),
-                transitionDuration: 0,
-                closeOnContentClick: true,
-                closeOnEscapeKey: true,
-                onClosed: () => {
-                  redraw();
-                },
               }),
             ]
           ),
@@ -258,22 +253,23 @@ const NotificationsPage: Component<{}> = {
 
               const totalLength = allNotifications.length;
               if (totalLength > 0) {
-                return render(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  key: totalLength,
-                  pageData: () => {
-                    return allNotifications;
-                  },
-                  pageKey: () => {
-                    return pageKey;
-                  },
-                  item: (data, opts, index) => {
-                    return render(NotificationRow, {
-                      notifications: [data],
-                      onListPage: true,
-                    });
-                  },
-                });
+                return null; // @TODO @REACT FIX ME
+                // return render(Infinite, {
+                //   maxPages: 1, // prevents rollover/repeat
+                //   key: totalLength,
+                //   pageData: () => {
+                //     return allNotifications;
+                //   },
+                //   pageKey: () => {
+                //     return pageKey;
+                //   },
+                //   item: (data, opts, index) => {
+                //     return render(NotificationRow, {
+                //       notifications: [data],
+                //       onListPage: true,
+                //     });
+                //   },
+                // });
               } else return render('.no-notifications', 'No Notifications');
             })(),
           ]),

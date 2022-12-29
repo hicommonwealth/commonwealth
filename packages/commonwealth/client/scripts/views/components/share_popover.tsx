@@ -1,16 +1,15 @@
 /* @jsx jsx */
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import { int } from 'aws-sdk/clients/datapipeline';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
-type SharePopoverAttrs = { commentId?: int };
+type SharePopoverAttrs = { commentId?: number; trigger?: ResultNode };
 
-export class SharePopover extends ClassComponent<{ commentId?: int }> {
+export class SharePopover extends ClassComponent<SharePopoverAttrs> {
   view(vnode: ResultNode<SharePopoverAttrs>) {
+    const { commentId, trigger } = vnode.attrs;
     const domain = document.location.origin;
 
     return (
@@ -22,13 +21,13 @@ export class SharePopover extends ClassComponent<{ commentId?: int }> {
             onclick: async () => {
               const currentRouteSansCommentParam = getRoute()
                 .split('?comment=')[0];
-              if (!vnode.attrs.commentId) {
+              if (!commentId) {
                 await navigator.clipboard.writeText(
                   `${domain}${currentRouteSansCommentParam}`
                 );
               } else {
                 await navigator.clipboard.writeText(
-                  `${domain}${currentRouteSansCommentParam}?comment=${vnode.attrs.commentId}`
+                  `${domain}${currentRouteSansCommentParam}?comment=${commentId}`
                 );
               }
             },
@@ -37,23 +36,21 @@ export class SharePopover extends ClassComponent<{ commentId?: int }> {
             iconLeft: 'twitter',
             label: 'Share on Twitter',
             onclick: async () => {
-              if (!vnode.attrs.commentId) {
+              if (!commentId) {
                 await window.open(
                   `https://twitter.com/intent/tweet?text=${domain}${getRoute()}`,
                   '_blank'
                 );
               } else {
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}${getRoute()}?comment=${
-                    vnode.attrs.commentId
-                  }`,
+                  `https://twitter.com/intent/tweet?text=${domain}${getRoute()}?comment=${commentId}`,
                   '_blank'
                 );
               }
             },
           },
         ]}
-        trigger={<CWIconButton iconName="share" iconSize="small" />}
+        trigger={trigger || <CWIconButton iconName="share" iconSize="small" />}
       />
     );
   }

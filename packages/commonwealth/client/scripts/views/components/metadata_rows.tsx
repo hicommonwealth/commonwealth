@@ -1,8 +1,6 @@
 /* @jsx jsx */
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import { Select } from 'construct-ui';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
@@ -94,32 +92,6 @@ export class ToggleRow extends ClassComponent<ToggleRowAttrs> {
           />
           {caption && <CWText type="caption">{caption(this.checked)}</CWText>}
         </div>
-      </div>
-    );
-  }
-}
-
-type SelectRowAttrs = {
-  onchange: (e) => void;
-  options: string[];
-  title: string;
-  value: string;
-};
-
-export class SelectRow extends ClassComponent<SelectRowAttrs> {
-  view(vnode: ResultNode<SelectRowAttrs>) {
-    const { onchange, options, title, value } = vnode.attrs;
-
-    return (
-      <div className="SelectRow">
-        <CWLabel label={title} />
-        {render(Select, {
-          options,
-          onchange: (e) => {
-            onchange((e.currentTarget as HTMLInputElement).value);
-          },
-          defaultValue: value,
-        })}
       </div>
     );
   }

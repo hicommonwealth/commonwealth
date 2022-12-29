@@ -1,6 +1,5 @@
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
+// import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
 import { uuidv4 } from 'lib/util';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelErrorCaptureEvent } from 'analytics/types';
@@ -23,18 +22,18 @@ export class ToastStore {
 
   public createSuccess(message) {
     const key = uuidv4();
-    const toast = render(Toast, {
-      key,
-      message,
-      onDismiss: this.remove.bind(this, key),
-      timeout,
-      icon: Icons.CHECK_CIRCLE,
-      intent: Intent.POSITIVE,
-      size: Size.DEFAULT,
-      position: ToasterPosition.BOTTOM,
-    });
-    toast['_message'] = message;
-    this._toasts.push(toast);
+    // const toast = render(Toast, {
+    //   key,
+    //   message,
+    //   onDismiss: this.remove.bind(this, key),
+    //   timeout,
+    //   icon: Icons.CHECK_CIRCLE,
+    //   intent: Intent.POSITIVE,
+    //   size: Size.DEFAULT,
+    //   position: ToasterPosition.BOTTOM,
+    // });
+    // toast['_message'] = message;
+    // this._toasts.push(toast);
     redraw();
   }
   public createError(message) {
@@ -45,34 +44,34 @@ export class ToastStore {
       event: MixpanelErrorCaptureEvent.ERROR_CAPTURED,
     });
     const key = uuidv4();
-    const toast = render(Toast, {
-      key,
-      message,
-      onDismiss: this.remove.bind(this, key),
-      timeout,
-      icon: Icons.ALERT_TRIANGLE,
-      intent: Intent.NEGATIVE,
-      size: Size.DEFAULT,
-      position: ToasterPosition.BOTTOM,
-    });
-    toast['_message'] = message;
-    this._toasts.push(toast);
+    // const toast = render(Toast, {
+    //   key,
+    //   message,
+    //   onDismiss: this.remove.bind(this, key),
+    //   timeout,
+    //   icon: Icons.ALERT_TRIANGLE,
+    //   intent: Intent.NEGATIVE,
+    //   size: Size.DEFAULT,
+    //   position: ToasterPosition.BOTTOM,
+    // });
+    // toast['_message'] = message;
+    // this._toasts.push(toast);
     redraw();
   }
   public createInfo(message) {
     const key = uuidv4();
-    const toast = render(Toast, {
-      key,
-      message,
-      onDismiss: this.remove.bind(this, key),
-      timeout,
-      icon: Icons.INFO,
-      intent: Intent.NONE,
-      size: Size.DEFAULT,
-      position: ToasterPosition.BOTTOM,
-    });
-    toast['_message'] = message;
-    this._toasts.push(toast);
+    // const toast = render(Toast, {
+    //   key,
+    //   message,
+    //   onDismiss: this.remove.bind(this, key),
+    //   timeout,
+    //   icon: Icons.INFO,
+    //   intent: Intent.NONE,
+    //   size: Size.DEFAULT,
+    //   position: ToasterPosition.BOTTOM,
+    // });
+    // toast['_message'] = message;
+    // this._toasts.push(toast);
     redraw();
   }
 

@@ -3,7 +3,7 @@
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
-import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
+// import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
 import 'components/sidebar/index.scss';
 
@@ -183,13 +183,14 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
 
     // ---------- Build Section Props ---------- //
 
-    const sectionAdminButton: ResultNode = render(Icon, {
-      name: Icons.PLUS_CIRCLE,
-      onclick: (e) => {
-        e.stopPropagation();
-        this.adminModals['CreateCategory'] = true;
-      },
-    });
+    // @TODO @REACT FIX ME
+    // const sectionAdminButton: m.Vnode = m(Icon, {
+    //   name: Icons.PLUS_CIRCLE,
+    //   onclick: (e) => {
+    //     e.stopPropagation();
+    //     this.adminModals['CreateCategory'] = true;
+    //   },
+    // });
 
     const categoryAdminButton = (category: string): ResultNode => {
       const handleMouseout = () => {
@@ -214,49 +215,50 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         handleMouseout();
       };
 
-      const menuComponent = render(
-        Menu,
-        {
-          class: 'admin-menu',
-          onmouseenter: handleMouseover,
-          onmouseleave: handleMouseout,
-        },
-        [
-          render(MenuItem, {
-            iconLeft: Icons.PLUS_CIRCLE,
-            label: 'Add Channel',
-            onclick: (e) => {
-              handleMenuClick(e, 'CreateChannel');
-            },
-          }),
-          render(MenuItem, {
-            iconLeft: Icons.EDIT_2,
-            label: 'Rename Category',
-            onclick: (e) => {
-              handleMenuClick(e, 'RenameCategory');
-            },
-          }),
-          render(MenuItem, {
-            iconLeft: Icons.DELETE,
-            label: 'Delete Category',
-            onclick: (e) => {
-              handleMenuClick(e, 'DeleteCategory');
-            },
-          }),
-        ]
-      );
-
-      return (
-        <>
-          {render(Icon, {
-            name: Icons.EDIT,
-            onmouseenter: handleMouseover,
-            onmouseleave: handleMouseout,
-          })}
-          {this.menuToggleTree['children'][category]['toggledState'] &&
-            menuComponent}
-        </>
-      );
+      // @TODO @REACT FIX ME
+      // const menuComponent = m(
+      //   Menu,
+      //   {
+      //     class: 'admin-menu',
+      //     onmouseenter: handleMouseover,
+      //     onmouseleave: handleMouseout,
+      //   },
+      //   [
+      //     m(MenuItem, {
+      //       iconLeft: Icons.PLUS_CIRCLE,
+      //       label: 'Add Channel',
+      //       onclick: (e) => {
+      //         handleMenuClick(e, 'CreateChannel');
+      //       },
+      //     }),
+      //     m(MenuItem, {
+      //       iconLeft: Icons.EDIT_2,
+      //       label: 'Rename Category',
+      //       onclick: (e) => {
+      //         handleMenuClick(e, 'RenameCategory');
+      //       },
+      //     }),
+      //     m(MenuItem, {
+      //       iconLeft: Icons.DELETE,
+      //       label: 'Delete Category',
+      //       onclick: (e) => {
+      //         handleMenuClick(e, 'DeleteCategory');
+      //       },
+      //     }),
+      //   ]
+      // );
+      return null; // @TODO @REACT Fix me
+      // return (
+      //   <>
+      //     {m(Icon, {
+      //       name: Icons.EDIT,
+      //       onmouseenter: handleMouseover,
+      //       onmouseleave: handleMouseout,
+      //     })}
+      //     {this.menuToggleTree['children'][category]['toggledState'] &&
+      //       menuComponent}
+      //   </>
+      // );
     };
 
     const channelRightIcon = (channel: IChannel) => {
@@ -294,46 +296,48 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         handleMouseout();
       };
 
-      const menuComponent = render(
-        Menu,
-        {
-          class: 'admin-menu',
-          onmouseenter: handleMouseover,
-          onmouseleave: handleMouseout,
-        },
-        [
-          render(MenuItem, {
-            iconLeft: Icons.EDIT_2,
-            label: 'Rename Channel',
-            onclick: (e) => {
-              handleMenuClick(e, 'RenameChannel');
-            },
-          }),
-          render(MenuItem, {
-            iconLeft: Icons.DELETE,
-            label: 'Delete Channel',
-            onclick: (e) => {
-              handleMenuClick(e, 'DeleteChannel');
-            },
-          }),
-        ]
-      );
+      // @TODO @REACT FIX ME
+      // const menuComponent = m(
+      //   Menu,
+      //   {
+      //     class: 'admin-menu',
+      //     onmouseenter: handleMouseover,
+      //     onmouseleave: handleMouseout,
+      //   },
+      //   [
+      //     m(MenuItem, {
+      //       iconLeft: Icons.EDIT_2,
+      //       label: 'Rename Channel',
+      //       onclick: (e) => {
+      //         handleMenuClick(e, 'RenameChannel');
+      //       },
+      //     }),
+      //     m(MenuItem, {
+      //       iconLeft: Icons.DELETE,
+      //       label: 'Delete Channel',
+      //       onclick: (e) => {
+      //         handleMenuClick(e, 'DeleteChannel');
+      //       },
+      //     }),
+      //   ]
+      // );
 
-      return (
-        <>
-          {channel.unread > 0 && (
-            <div className="unread-icon">{channel.unread}</div>
-          )}
-          {render(Icon, {
-            name: Icons.EDIT,
-            onmouseenter: handleMouseover,
-            onmouseleave: handleMouseout,
-          })}
-          {this.menuToggleTree['children'][channel.category]['children'][
-            channel.name
-          ]['toggledState'] && menuComponent}
-        </>
-      );
+      return null; // @TODO @REACT FIX ME
+      // return (
+      //   <>
+      //     {channel.unread > 0 && (
+      //       <div class="unread-icon">{channel.unread}</div>
+      //     )}
+      //     {m(Icon, {
+      //       name: Icons.EDIT,
+      //       onmouseenter: handleMouseover,
+      //       onmouseleave: handleMouseout,
+      //     })}
+      //     {this.menuToggleTree['children'][channel.category]['children'][
+      //       channel.name
+      //     ]['toggledState'] && menuComponent}
+      //   </>
+      // );
     };
 
     const channelToSubSectionProps = (channel: IChannel): SubSectionAttrs => {
@@ -418,14 +422,14 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       },
       displayData: channelData,
       isActive: false,
-      rightIcon: isAdmin && sectionAdminButton,
-      extraComponents: render(Overlay, {
-        class: 'chatAdminOverlay',
-        isOpen: Object.values(this.adminModals).some(Boolean),
-        onClose: closeOverlay,
-        closeOnOutsideClick: true,
-        content: overlayContent,
-      }),
+      // rightIcon: isAdmin && sectionAdminButton, // @TODO @REACT FIX ME
+      // extraComponents: m(Overlay, {
+      //   class: 'chatAdminOverlay',
+      //   isOpen: Object.values(this.adminModals).some(Boolean),
+      //   onClose: closeOverlay,
+      //   closeOnOutsideClick: true,
+      //   content: overlayContent,
+      // }),
     };
 
     return <SidebarSectionGroup {...sidebarSectionData} />;

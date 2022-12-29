@@ -112,7 +112,7 @@ const LandingPage: Component<{}, IState> = {
         render(TokensCommunityComponent, { chains: vnode.state.chains }),
         render(TokensChainsComponent, {
           oncreateSlider: () => {
-            const glide = new (Glide as any)('.glide', {
+            return new (Glide as any)('.glide', {
               type: 'carousel',
               focusAt: 'center',
               perView: 3,
@@ -142,7 +142,6 @@ const LandingPage: Component<{}, IState> = {
                 },
               },
             });
-            glide.mount();
           },
           chains: vnode.state.chains,
         }),

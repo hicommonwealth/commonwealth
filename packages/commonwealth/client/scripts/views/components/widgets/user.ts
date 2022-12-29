@@ -4,7 +4,6 @@ import 'components/widgets/user.scss';
 
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { Tag, Popover } from 'construct-ui';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
@@ -24,6 +23,7 @@ export interface IAddressDisplayOptions {
   maxCharLength?: number;
 }
 
+/* @FIXME @REACT need to refactor this state */
 const User: Component<
   {
     user: Account | AddressInfo | Profile;
@@ -42,6 +42,7 @@ const User: Component<
     identityWidgetLoading: boolean;
   }
 > = {
+  identityWidgetLoading: false,
   view: (vnode) => {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
@@ -168,14 +169,14 @@ const User: Component<
           long ? `${friendlyChainName} Validator` : 'V'
         ),
       // role in commonwealth forum
-      showRole &&
-        role &&
-        render(Tag, {
-          class: 'role-tag',
-          label: role.permission,
-          rounded: true,
-          size: 'xs',
-        }),
+      // showRole &&
+      //   role &&
+      //   m(Tag, {
+      //     class: 'role-tag',
+      //     label: role.permission,
+      //     rounded: true,
+      //     size: 'xs',
+      //   }),
     ];
 
     const ghostAddress = app.user.addresses.some(
@@ -356,15 +357,16 @@ const User: Component<
     );
 
     return popover
-      ? render(Popover, {
-          interactionType: 'hover',
-          content: userPopover,
-          trigger: userFinal,
-          closeOnContentClick: true,
-          transitionDuration: 0,
-          hoverOpenDelay: 500,
-          key: profile?.address || '-',
-        })
+      ? null // @TODO @REACT FIX ME
+      // m(Popover, {
+      //     interactionType: 'hover',
+      //     content: userPopover,
+      //     trigger: userFinal,
+      //     closeOnContentClick: true,
+      //     transitionDuration: 0,
+      //     hoverOpenDelay: 500,
+      //     key: profile?.address || '-',
+      //   })
       : userFinal;
   },
 };
@@ -509,8 +511,7 @@ export const AnonymousUser: Component<
     hideAvatar?: boolean;
     showAsDeleted?: boolean;
     distinguishingKey: string; // To distinguish user from other anonymous users
-  },
-  {}
+  }
 > = {
   view: (vnode) => {
     const {

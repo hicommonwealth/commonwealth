@@ -2,7 +2,6 @@
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import { Tag } from 'construct-ui';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
@@ -13,12 +12,6 @@ import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
-
-const getNewTag = (labelCount?: number) => {
-  const label = !labelCount ? 'New' : `${labelCount} new`;
-
-  return render(Tag, { label, size: 'xs', rounded: true, intent: 'primary' });
-};
 
 type CommunityPreviewCardAttrs = {
   chain: ChainInfo;
@@ -63,8 +56,14 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
             </CWText>
             {isMember && (
               <>
-                {app.isLoggedIn() && !visitedChain && getNewTag()}
-                {updatedThreads > 0 && getNewTag(updatedThreads)}
+                {app.isLoggedIn() && !visitedChain && (
+                  <CWText className="new-activity-tag">New</CWText>
+                )}
+                {updatedThreads > 0 && (
+                  <CWText className="new-activity-tag">
+                    {updatedThreads} new
+                  </CWText>
+                )}
               </>
             )}
           </>

@@ -14,7 +14,6 @@ import User from 'views/components/widgets/user';
 import { WebsocketMessageNames } from 'types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';
-import { Icons, Icon } from 'construct-ui';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { isActiveAddressPermitted } from 'controllers/server/roles';
 
@@ -22,6 +21,7 @@ import { QuillEditorComponent } from '../quill/quill_editor_component';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { renderQuillTextBody } from '../quill/helpers';
 import { QuillEditor } from '../quill/quill_editor';
+import { CWIconButton } from '../component_kit/cw_icon_button';
 
 // how long a wait before visually separating multiple messages sent by the same person
 const MESSAGE_GROUPING_DELAY = 300;
@@ -179,9 +179,10 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                 <div className="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>
-                {render(Icon, {
-                  name: Icons.LINK,
-                  onclick: async () => {
+                <CWIconButton
+                  iconName="copy"
+                  iconSize="small"
+                  onclick={() => async () => {
                     const route = app.socket.chatNs.getRouteToMessage(
                       grp.messages[0].chat_channel_id,
                       grp.messages[0].id,
@@ -198,8 +199,8 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                         notifyError('Could not copy link to keyboard')
                       );
                     this.shouldScroll = false;
-                  },
-                })}
+                  }}
+                />
               </div>
               <div className="clear" />
               {grp.messages.map((msg) => (

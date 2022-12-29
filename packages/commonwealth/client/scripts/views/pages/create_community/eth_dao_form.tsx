@@ -17,7 +17,7 @@ import { isAddress } from 'web3-utils';
 
 import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { notifyError } from 'controllers/app/notifications';
-import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
+import { IdRow, InputRow } from 'views/components/metadata_rows';
 import CompoundAPI, {
   GovernorTokenType,
   GovernorType,
@@ -41,6 +41,7 @@ import {
   EthChainAttrs,
   EthFormFields,
 } from 'views/pages/create_community/types';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
@@ -140,12 +141,16 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
     return (
       <div className="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
-        <SelectRow
-          title="DAO Type"
-          options={[ChainNetwork.Aave, ChainNetwork.Compound]}
-          value={this.state.form.network}
-          onchange={(value) => {
-            this.state.form.network = value;
+        <CWDropdown
+          label="DAO Type"
+          options={[
+            { label: ChainNetwork.Aave, value: ChainNetwork.Aave },
+            { label: ChainNetwork.Compound, value: ChainNetwork.Compound },
+          ]}
+          onSelect={(o) => {
+            this.state.form.network = o.value as
+              | ChainNetwork.Aave
+              | ChainNetwork.Compound;
             this.state.loaded = false;
           }}
         />

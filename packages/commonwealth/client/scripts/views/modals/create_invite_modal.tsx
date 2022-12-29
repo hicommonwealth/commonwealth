@@ -3,7 +3,7 @@
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import { ListItem, List, SelectList } from 'construct-ui';
+// import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
 import { decodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
@@ -103,30 +103,31 @@ const getMemberPreview = (
 
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
 
-  return render(ListItem, {
-    tabIndex,
-    label: (
-      <a className="search-results-item">
-        {render(UserBlock, {
-          user: profile,
-          searchTerm,
-          avatarSize: 24,
-          showAddressWithDisplayName: true,
-          showChainName,
-        })}
-      </a>
-    ),
-    onclick: () => {
-      enterAddressFn(addr.address);
-      closeResultsFn();
-    },
-    onkeyup: (e) => {
-      if (e.key === 'Enter') {
-        enterAddressFn(addr.address);
-        closeResultsFn();
-      }
-    },
-  });
+  return null; // @TODO @REACT FIX ME
+  // return m(ListItem, {
+  //   tabIndex,
+  //   label: (
+  //     <a class="search-results-item">
+  //       {m(UserBlock, {
+  //         user: profile,
+  //         searchTerm,
+  //         avatarSize: 24,
+  //         showAddressWithDisplayName: true,
+  //         showChainName,
+  //       })}
+  //     </a>
+  //   ),
+  //   onclick: () => {
+  //     enterAddressFn(addr.address);
+  //     closeResultsFn();
+  //   },
+  //   onkeyup: (e) => {
+  //     if (e.key === 'Enter') {
+  //       enterAddressFn(addr.address);
+  //       closeResultsFn();
+  //     }
+  //   },
+  // });
 };
 
 const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
@@ -449,7 +450,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
           <div className="community-and-address-row">
             <div className="community-select-container">
               <CWLabel label="Community" />
-              {render(SelectList, {
+              {/* {m(SelectList, { // @TODO @REACT FIX ME
                 closeOnSelect: true,
                 items: chainInfo
                   ? [{ label: chainInfo.name, value: chainInfo.id }]
@@ -492,7 +493,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
                   placeholder: 'Search Community...',
                 },
                 checkmark: false,
-              })}
+              })} */}
             </div>
             <CWTextInput
               label="Address"
@@ -530,29 +531,31 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
           </div>
           {searchAddressTerm?.length > 3 &&
             !this.hideResults &&
-            render(List, [
-              !results || results?.length === 0
-                ? app.searchAddressCache[searchAddressTerm]?.loaded
-                  ? render(ListItem, {
-                      label: (
-                        <div className="no-addresses">
-                          <CWText fontWeight="medium">
-                            {searchAddressTerm}
-                          </CWText>
-                          <CWText type="caption">No addresses found</CWText>
-                        </div>
-                      ),
-                      onclick: () => {
-                        if (searchAddressTerm.length < 4) {
-                          notifyError('Query must be at least 4 characters');
-                        }
-                      },
-                    })
-                  : render(ListItem, { label: <CWSpinner size="small" /> })
-                : this.isTyping
-                ? render(ListItem, { label: <CWSpinner size="small" /> })
-                : results,
-            ])}
+            null // @TODO @REACT FIX ME
+            // m(List, [
+            //   !results || results?.length === 0
+            //     ? app.searchAddressCache[searchAddressTerm]?.loaded
+            //       ? m(ListItem, {
+            //           label: (
+            //             <div class="no-addresses">
+            //               <CWText fontWeight="medium">
+            //                 {searchAddressTerm}
+            //               </CWText>
+            //               <CWText type="caption">No addresses found</CWText>
+            //             </div>
+            //           ),
+            //           onclick: () => {
+            //             if (searchAddressTerm.length < 4) {
+            //               notifyError('Query must be at least 4 characters');
+            //             }
+            //           },
+            //         })
+            //       : m(ListItem, { label: <CWSpinner size="small" /> })
+            //     : this.isTyping
+            //     ? m(ListItem, { label: <CWSpinner size="small" /> })
+            //     : results,
+            // ])
+            }
           <InviteButton
             selection="address"
             disabled={!this.isAddressValid}

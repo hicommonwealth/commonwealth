@@ -3,7 +3,7 @@
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import { QueryList, ListItem } from 'construct-ui';
+// import { QueryList, ListItem } from 'construct-ui';
 
 import 'modals/edit_collaborators_modal.scss';
 
@@ -81,7 +81,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
         <div className="compact-modal-body">
           <div className="user-list-container">
             <CWLabel label="Users" />
-            {render(QueryList, {
+            {/* {m(QueryList, { // @TODO @REACT FIX ME
               checkmark: true,
               items,
               inputAttrs: {
@@ -135,7 +135,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   notifyInfo('Already an editor');
                 }
               },
-            })}
+            })} */}
           </div>
           {allCollaborators.length > 0 ? (
             <div className="selected-collaborators-section">

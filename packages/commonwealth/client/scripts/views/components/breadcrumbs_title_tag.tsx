@@ -3,8 +3,6 @@
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
-import { Tag } from 'construct-ui';
-
 type BreadcrumbsTitleTagAttrs = {
   title: string;
 };
@@ -16,11 +14,7 @@ export class BreadcrumbsTitleTag extends ClassComponent<BreadcrumbsTitleTagAttrs
     return (
       <>
         {title}
-        {render(Tag, {
-          size: 'xs',
-          label: 'Beta',
-          style: 'position: relative; top: -2px; margin-left: 6px',
-        })}
+        {/* something will eventually go here once we get breadcrumbs working */}
       </>
     );
   }

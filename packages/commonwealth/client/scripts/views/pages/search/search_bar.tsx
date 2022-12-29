@@ -107,8 +107,6 @@ export class SearchBar extends ClassComponent {
       goToSearchPage(this.searchQuery);
     };
 
-    console.log(this.searchResults);
-
     return (
       <div className="SearchBar">
         <div className="search-and-icon-container">
