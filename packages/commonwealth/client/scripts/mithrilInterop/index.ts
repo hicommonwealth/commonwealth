@@ -47,29 +47,15 @@ export const jsx = createElement;
 
 export type ResultNode<A = {}> = { attrs: A, children: Children };
 
-const REACT_INTERNAL_PROPS = [
-  'props',
-  'context',
-  'refs',
-  'updater',
-  '_reactInternals',
-  '_reactInternalInstance',
-  'state',
-  'surveyDelayTriggered',
-  'surveyReadyForDisplay',
-  'escapeHandler',
-  'hideForeverChecked',
-  'surveyLocked',
-]
-
 export abstract class ClassComponent<A = {}> extends ReactComponent<A & { children?: Children }> {
   protected readonly __props: A;
+  private _isMounted = false;
 
   constructor(props) {
     super(props);
     return new Proxy(this, {
       set(obj, prop, value) {
-        if (Object.keys(obj).includes(prop as string)) {
+        if (obj._isMounted && Object.keys(obj).includes(prop as string)) {
           obj.setState({ ...obj.state, [prop]: value })
           // console.log(prop);
         }
@@ -81,6 +67,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
 
   public componentDidMount() {
     this.oninit({ attrs: this.props, children: this.props.children });
+    this._isMounted = true;
   }
 
   public componentDidUpdate(prevProps: A) {
@@ -89,6 +76,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
 
   public componentWillUnmount() {
     this.onremove({ attrs: this.props, children: this.props.children });
+    this._isMounted = false;
   }
 
   render() {

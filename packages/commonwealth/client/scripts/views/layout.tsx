@@ -55,7 +55,6 @@ export class Layout extends ClassComponent<LayoutAttrs> {
   }
 
   view(vnode: ResultNode<LayoutAttrs>) {
-    console.log(vnode, app);
     const { scope, deferChain } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
