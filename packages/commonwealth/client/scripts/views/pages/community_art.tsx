@@ -44,7 +44,7 @@ class CommunityArtPage extends ClassComponent {
                 });
                 console.log('The res', res);
 
-                this.rawImg = res.result.raw;
+                // this.rawImg = URL.createObjectURL(res.result.raw);
                 this.imageUrl = res.result.imageUrl;
                 m.redraw();
               } catch (e) {
