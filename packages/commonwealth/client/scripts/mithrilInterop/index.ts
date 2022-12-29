@@ -103,12 +103,12 @@ export function redraw(sync = false) {
 }
 
 // DOM FUNCTIONS
-export function rootRender(el: Element, vnodes: Children) {
-  return rootRender(el, render('div', {}, vnodes));
-}
-
 export function rootMount(element: Element, component?: any | null) {
   return createRoot(element).render(component);
+}
+
+export function rootRender(el: Element, vnodes: Children) {
+  return rootMount(el, render('div', {}, vnodes));
 }
 
 // ROUTING FUNCTIONS

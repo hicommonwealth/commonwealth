@@ -29,7 +29,8 @@ import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import DiscussionPage from 'views/pages/discussions';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -513,80 +514,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       notifyError(`${errorMsg}`);
       return false;
     };
-
-    const redirectRoute = (path: string | Function) => ({
-      render: (vnode) => {
-        console.log(vnode);
-        setRoute(
-          typeof path === 'string' ? path : path(vnode.attrs),
-          {},
-          { replace: true }
-        );
-        return render(Layout);
-      },
-    });
-
-    interface RouteAttrs {
-      scoped: string | boolean;
-      hideSidebar?: boolean;
-      deferChain?: boolean;
-    }
-
-    let hasCompletedSuccessfulPageLoad = false;
-    const importRoute = (path: string, attrs: RouteAttrs) => ({
-      onmatch: async () => {
-        return import(
-          /* webpackMode: "lazy" */
-          /* webpackChunkName: "route-[request]" */
-          `./${path}`
-        )
-          .then((p) => {
-            hasCompletedSuccessfulPageLoad = true;
-            return p.default;
-          })
-          .catch((err) => {
-            // handle import() error
-            console.error(err);
-            if (err.name === 'ChunkLoadError') {
-              alertModalWithText(
-                APPLICATION_UPDATE_MESSAGE,
-                APPLICATION_UPDATE_ACTION
-              )();
-            }
-            // return to the last page, if it was on commonwealth
-            // eslint-disable-next-line no-restricted-globals
-            if (hasCompletedSuccessfulPageLoad) history.back();
-          });
-      },
-      render: (vnode) => {
-        const { scoped, hideSidebar } = attrs;
-        const scope =
-          typeof scoped === 'string'
-            ? // string => scope is defined by route
-              scoped
-            : scoped
-            ? // true => scope is derived from path
-              vnode.attrs?.scope?.toString() || customDomain
-            : // false => scope is null
-              null;
-
-        // Special case to defer chain loading specifically for viewing an offchain thread. We need
-        // a special case because Threads and on-chain proposals are all viewed through the
-        // same "/:scope/proposal/:type/:id" route.
-        let deferChain = attrs.deferChain;
-        const isDiscussion =
-          vnode.attrs?.type === 'discussion' ||
-          pathIsDiscussion(scope, window.location.pathname);
-        if (path === 'views/pages/view_proposal/index' && isDiscussion) {
-          deferChain = true;
-        }
-        if (app.chain?.meta.type === ChainType.Token) {
-          deferChain = false;
-        }
-        return render(Layout, { scope, deferChain, hideSidebar }, [vnode]);
-      },
-    });
-
+    /*
     const isCustomDomain = !!customDomain;
     const { activeAccount } = app.user;
     const routes: {[route: string]: {
@@ -1038,15 +966,21 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             ),
           }),
     };
-    const reactRouter = createBrowserRouter(
-      Object.entries(routes).map(
-        ([path, { onmatch, render: renderFunc }]) => ({
-          path, element: renderFunc({}), loader: onmatch,
-        })
-      )
-    );
+
+
+            '/:scope/discussions': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+    */
+    const reactRouter = createBrowserRouter([
+      {
+        path: '/:scope/discussions',
+        element: render(Layout, { scoped: true, deferChain: true }, [DiscussionPage])
+      }
+    ]);
     rootRender(
-      document.getElementById("root"), render(RouterProvider, { router: reactRouter })
+      document.body, render(RouterProvider, { router: reactRouter })
     );
 
     const script = document.createElement('noscript');
@@ -1084,9 +1018,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       // (we call toString() because getRouteParam() returns booleans, even though the types don't reflect this)
       // handle param-based redirect after email login
 
-      /* If we are creating a new account, then we alias to create a new mixpanel user
-       else we identify to associate mixpanel events
-    */
+      // If we are creating a new account, then we alias to create a new mixpanel user
+      // else we identify to associate mixpanel events
       if (getRouteParam('new') && getRouteParam('new').toString() === 'true') {
         console.log('creating account');
 
