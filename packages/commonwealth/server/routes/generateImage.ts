@@ -1,16 +1,16 @@
-import axios, { Method } from 'axios';
 import AWS from 'aws-sdk';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import fetch, { Blob } from 'node-fetch';
 
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { DB } from '../../../chain-events/services/database/database';
+import { DB } from '../models';
 import { AppError } from '../../../common-common/src/errors';
 
 type generateImageReq = {
   description: string;
   chainId: string;
+  userAddress: string;
 };
 
 type generateImageResp = {
@@ -21,7 +21,7 @@ const generateImage = async (
   req: TypedRequestBody<generateImageReq>,
   res: TypedResponse<generateImageResp>
 ) => {
-  const { description, chainId } = req.body;
+  const { description, chainId, userAddress } = req.body;
 
   if (!description) {
     throw new AppError('No description provided');
@@ -88,7 +88,11 @@ const generateImage = async (
   const trimmedURL = imageUrl.slice(0, imageUrl.indexOf('?'));
 
   try {
-    await models.CommunityImages.create({});
+    await models.CommunityImages.create({
+      community_id: chainId,
+      image_url: trimmedURL,
+      creator_address: userAddress,
+    });
   } catch (e) {
     console.log(e);
     throw new AppError('Unable to save to DB!');

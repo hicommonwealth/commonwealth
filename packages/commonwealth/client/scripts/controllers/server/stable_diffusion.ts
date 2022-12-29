@@ -9,6 +9,7 @@ export class StableDiffusionController {
       const res = await $.post(`${app.serverUrl()}/generateImage`, {
         description,
         chainId: communityId,
+        userAddress: app.user.activeAccount.address,
         jwt: app.user.jwt,
       });
 
