@@ -1,4 +1,6 @@
 /* jsx jsx */
+
+import React from 'react';
 /* eslint-disable @typescript-eslint/ban-types */
 
 import '../styles/normalize.css'; // reset
@@ -16,7 +18,6 @@ import app, { ApiStatus, LoginState } from 'state';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, rootRender, jsx } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
-
 import {
   notifyError,
   notifyInfo,
@@ -25,15 +26,15 @@ import {
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
-import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
+// import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
-import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
-import DiscussionPage from 'views/pages/discussions';
 import DiscussionsPage from 'views/pages/discussions';
 import { createRoutesFromElements, Route } from 'react-router';
+import { createRoot } from 'react-dom/client';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -150,6 +151,7 @@ export async function deinitChainOrCommunity() {
   document.title = 'Commonwealth';
 }
 
+/*
 export async function handleInviteLinkRedirect() {
   const inviteMessage = getRouteParam('invitemessage');
   if (inviteMessage) {
@@ -178,6 +180,7 @@ export async function handleInviteLinkRedirect() {
     }
   }
 }
+*/
 
 export async function handleUpdateEmailConfirmation() {
   if (getRouteParam('confirmation')) {
@@ -385,7 +388,7 @@ export async function selectChain(
   }
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
-  handleInviteLinkRedirect();
+  // handleInviteLinkRedirect();
 
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
@@ -976,19 +979,20 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
     */
-   const createRouter = () => {
+   const createRouter = (initFn) => {
     console.log('creating router...');
+    const LayoutComponent =
+      <Layout deferChain={true} initFn={initFn}>
+        <DiscussionsPage />
+      </Layout>;
     const reactRouter = createBrowserRouter(
       createRoutesFromElements(
-        <Route path='/:scope/discussions' element={
-          <Layout deferChain={true}><DiscussionPage /></Layout>
-        } />
+        <Route path='/:scope/discussions' element={LayoutComponent} />
       )
     );
-    rootRender(
-      document.body, <RouterProvider router={reactRouter} />
-    );
-
+    createRoot(document.body).render(<RouterProvider router={reactRouter} />);
+    return LayoutComponent;
+    /*
     const script = document.createElement('noscript');
     // eslint-disable-next-line max-len
     rootRender(
@@ -998,8 +1002,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       )
     );
     document.body.insertBefore(script, document.body.firstChild);
+    */
    }
     // initialize mixpanel, before adding an alias or tracking identity
+    /*
     try {
       if (
         document.location.host.startsWith('localhost') ||
@@ -1077,25 +1083,12 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       notifyError('Could not log in');
       console.error(getRouteParam('loginerror'));
     }
+    */
 
     // initialize the app
-    initAppState(true, customDomain)
-      .then(async () => {
-        if (app.loginState === LoginState.LoggedIn) {
-          // refresh notifications once
-          // grab all discussion drafts
-          app.user.discussionDrafts.refreshAll().then(() => redraw());
-        }
-
-        handleInviteLinkRedirect();
-        // If the user updates their email
-        handleUpdateEmailConfirmation();
-
-        createRouter();
-      })
-      .catch(() => {
-        redraw();
-      });
+    createRouter(async () => {
+      return initAppState(true, customDomain);
+    });
   }
 );
 

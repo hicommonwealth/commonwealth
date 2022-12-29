@@ -39,6 +39,7 @@ type LayoutAttrs = {
   deferChain?: boolean;
   hideSidebar?: boolean;
   scope?: string;
+  initFn?: Function;
 };
 
 export class Layout extends ClassComponent<LayoutAttrs> {
@@ -47,9 +48,10 @@ export class Layout extends ClassComponent<LayoutAttrs> {
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
 
-  render() {
-    console.log(this, app);
-    return super.render();
+  oninit(vnode: ResultNode<LayoutAttrs>) {
+    if (vnode.attrs.initFn) {
+      vnode.attrs.initFn().then(() => this.redraw());
+    }
   }
 
   view(vnode: ResultNode<LayoutAttrs>) {
