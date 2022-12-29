@@ -21,6 +21,12 @@ import { UserSurveyPopup } from './components/user_survey_popup';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
+import { useParams } from "react-router-dom";
+
+export const withRouter = (WrappedComponent) => (props) => {
+  const params = useParams();
+  return <WrappedComponent {...props} params={params} />;
+};
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -41,9 +47,10 @@ type LayoutAttrs = {
   hideSidebar?: boolean;
   scope?: string;
   initFn?: Function;
+  params?;
 };
 
-export class Layout extends ClassComponent<LayoutAttrs> {
+class LayoutComponent extends ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
   private surveyDelayTriggered = false;
@@ -56,7 +63,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
   }
 
   view(vnode: ResultNode<LayoutAttrs>) {
-    const { scope, deferChain } = vnode.attrs;
+    const { deferChain, params: { scope } } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
@@ -146,3 +153,5 @@ export class Layout extends ClassComponent<LayoutAttrs> {
     );
   }
 }
+
+export const Layout = withRouter(LayoutComponent);

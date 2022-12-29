@@ -46,7 +46,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       this.fetchingThreads = true;
       await app.threads.loadNextPage({ topicName, stageName });
       this.fetchingThreads = false;
-      redraw();
+      this.redraw();
     }
   }
 
@@ -83,7 +83,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       this.initializing = true;
       app.threads.loadNextPage({ topicName, stageName }).then(() => {
         this.initializing = false;
-        redraw();
+        this.redraw();
       });
     }
 
