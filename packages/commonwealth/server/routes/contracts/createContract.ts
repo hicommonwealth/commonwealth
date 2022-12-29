@@ -70,6 +70,7 @@ const createContract = async (
     throw new AppError('Not logged in');
   }
   // require Admin privilege for creating Contract
+  // TODO: should be admin role, not JUST site admin
   if (!req.user.isAdmin) {
     throw new AppError(Errors.NotAdmin);
   }
