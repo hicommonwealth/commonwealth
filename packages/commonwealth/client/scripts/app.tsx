@@ -1,3 +1,4 @@
+/* jsx jsx */
 /* eslint-disable @typescript-eslint/ban-types */
 
 import '../styles/normalize.css'; // reset
@@ -12,7 +13,7 @@ import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, rootRender } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, rootRender, jsx } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
@@ -31,6 +32,8 @@ import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
 import { createBrowserRouter, RouterProvider } from "react-router-dom"
 import DiscussionPage from 'views/pages/discussions';
+import DiscussionsPage from 'views/pages/discussions';
+import { createRoutesFromElements, Route } from 'react-router';
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
@@ -974,14 +977,16 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             }),
     */
    const createRouter = () => {
-    const reactRouter = createBrowserRouter([
-      {
-        path: '/:scope/discussions',
-        element: render(Layout, { scoped: true, deferChain: true }, [DiscussionPage])
-      }
-    ]);
+    console.log('creating router...');
+    const reactRouter = createBrowserRouter(
+      createRoutesFromElements(
+        <Route path='/:scope/discussions' element={
+          <Layout deferChain={true}><DiscussionPage /></Layout>
+        } />
+      )
+    );
     rootRender(
-      document.body, render(RouterProvider, { router: reactRouter })
+      document.body, <RouterProvider router={reactRouter} />
     );
 
     const script = document.createElement('noscript');

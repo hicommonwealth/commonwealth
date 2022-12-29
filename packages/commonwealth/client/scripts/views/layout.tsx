@@ -38,7 +38,7 @@ class LoadingLayout extends ClassComponent {
 type LayoutAttrs = {
   deferChain?: boolean;
   hideSidebar?: boolean;
-  scope: string;
+  scope?: string;
 };
 
 export class Layout extends ClassComponent<LayoutAttrs> {
@@ -47,7 +47,13 @@ export class Layout extends ClassComponent<LayoutAttrs> {
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
 
+  render() {
+    console.log(this, app);
+    return super.render();
+  }
+
   view(vnode: ResultNode<LayoutAttrs>) {
+    console.log(vnode, app);
     const { scope, deferChain } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
