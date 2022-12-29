@@ -370,6 +370,7 @@ export async function selectChain(
   } else {
     app.chain = newChain;
   }
+  console.log('init api');
   if (initApi) {
     await app.chain.initApi(); // required for loading NearAccounts
   }
@@ -377,10 +378,12 @@ export async function selectChain(
   app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
+  console.log('update active addrs');
   await updateActiveAddresses(chain);
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
+    console.log('select user chain');
     await app.user.selectChain({
       chain: chain.id,
     });
@@ -392,12 +395,14 @@ export async function selectChain(
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
   redraw();
+  console.log('done selectChain')
   return true;
 }
 
 // Initializes a selected chain. Requires `app.chain` to be defined and valid
 // and not already initialized.
 export async function initChain(): Promise<void> {
+  console.log('initChain');
   if (!app.chain || !app.chain.meta || app.chain.loaded) return;
   if (!app.chain.apiInitialized) {
     await app.chain.initApi();
