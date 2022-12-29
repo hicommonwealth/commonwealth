@@ -15,7 +15,7 @@ export default async function fetchNewSnapshotProposal(
 
     if (environment === "development") {
       if (eventType === "deleted") {
-        console.log("Proposal deleted, returning null");
+        log.info("Proposal deleted, returning null");
         return { data: { proposal: null } };
       }
 

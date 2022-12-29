@@ -95,6 +95,11 @@ module.exports = {
             type: Sequelize.STRING,
             allowNull: true,
           },
+          is_upstream_deleted: {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+          },
           createdAt: { type: Sequelize.DATE, allowNull: false },
           updatedAt: { type: Sequelize.DATE, allowNull: false },
         },

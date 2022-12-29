@@ -34,11 +34,12 @@ export async function processSnapshotMessage(
   }
 
   if (eventType === 'proposal/deleted') {
-    if (!proposal) {
+    if (!proposal || proposal?.is_upstream_deleted) {
+      this.log.info(`Proposal ${id} does not exist, skipping`);
       return;
     }
 
-    this.log.info(`Proposal deleted, deleting record`);
+    this.log.info(`Proposal deleted, marking as deleted in DB`);
 
     // Pull data from DB (not included in the webhook event)
     snapshotNotificationData = {
@@ -50,6 +51,9 @@ export async function processSnapshotMessage(
       start: proposal.start,
       expire: proposal.expire,
     };
+
+    proposal.is_upstream_deleted = true;
+    await proposal.save();
 
     StatsDController.get().increment('cw.deleted_snapshot_proposal_record', 1, {
       event: eventType,
@@ -65,7 +69,11 @@ export async function processSnapshotMessage(
     this.log.error(`Error creating snapshot space: ${e}`);
   }
 
-  if (eventType === 'proposal/created' && proposal) {
+  if (
+    eventType === 'proposal/created' &&
+    proposal &&
+    !proposal.is_upstream_deleted
+  ) {
     this.log.info(`Proposal ${id} already exists`);
     return;
   }
@@ -81,6 +89,7 @@ export async function processSnapshotMessage(
       start,
       expire,
       event: eventType,
+      is_upstream_deleted: false,
     });
   }
 
@@ -97,11 +106,6 @@ export async function processSnapshotMessage(
   this.log.info(
     `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `
   );
-
-  // Delete the proposal
-  if (eventType === 'proposal/deleted') {
-    await proposal?.destroy();
-  }
 
   for (const community of associatedCommunities) {
     const communityId = community.chain_id;

@@ -11,6 +11,7 @@ export type SnapshotProposalAttributes = {
   event: string;
   start?: string;
   expire: string;
+  is_upstream_deleted?: boolean;
 };
 
 export type SnapshotProposalInstance =
@@ -59,6 +60,11 @@ export default (
       expire: {
         type: dataTypes.STRING,
         allowNull: true,
+      },
+      is_upstream_deleted: {
+        type: dataTypes.STRING,
+        allowNull: false,
+        defaultValue: false,
       },
       createdAt: { type: dataTypes.DATE, allowNull: false },
       updatedAt: { type: dataTypes.DATE, allowNull: false },
