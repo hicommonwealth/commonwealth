@@ -16,14 +16,14 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 
 type ThreadsFilterMenuItemAttrs = {
-  iconRight?: m.Vnode;
+  iconRight?: ResultNode;
   isSelected: boolean;
   label: string;
   onClick: (e: any) => void;
 };
 
 export class ThreadsFilterMenuItem extends ClassComponent<ThreadsFilterMenuItemAttrs> {
-  view(vnode: m.Vnode<ThreadsFilterMenuItemAttrs>) {
+  view(vnode: ResultNode<ThreadsFilterMenuItemAttrs>) {
     const { iconRight, isSelected, label, onClick } = vnode.attrs;
 
     return (

@@ -43,7 +43,7 @@ export class CWCosmosEvmMetamask extends ClassComponent<CustomIconAttrs> {
 }
 
 export class CWInvites extends ClassComponent<CustomIconAttrs> {
-  view(vnode: m.Vnode<CustomIconAttrs>) {
+  view(vnode: ResultNode<CustomIconAttrs>) {
     const { componentType, iconSize, ...otherAttrs } = vnode.attrs;
     return (
       <svg
@@ -58,9 +58,9 @@ export class CWInvites extends ClassComponent<CustomIconAttrs> {
         {' '}
         <path
           fill="#342E37"
-          fill-rule="evenodd"
+          fillRule="evenodd"
           d="M5 5a3 3 0 00-3 3v16a3 3 0 003 3h22a3 3 0 003-3V8a3 3 0 00-3-3H5zM4 8.414V24a1 1 0 001 1h22a1 1 0 001-1V8.414l-9.879 9.879a3 3 0 01-4.242 0L4 8.414zM26.586 7H5.414l9.879 9.879a1 1 0 001.414 0L26.586 7z"
-          clip-rule="evenodd"
+          clipRule="evenodd"
         ></path>
         <circle cx="28" cy="9.333" r="4" fill="#EC79DE"></circle>
       </svg>

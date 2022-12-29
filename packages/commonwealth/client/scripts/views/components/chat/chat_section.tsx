@@ -184,7 +184,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
     // ---------- Build Section Props ---------- //
 
     // @TODO @REACT FIX ME
-    // const sectionAdminButton: m.Vnode = m(Icon, {
+    // const sectionAdminButton: ResultNode = m(Icon, {
     //   name: Icons.PLUS_CIRCLE,
     //   onClick: (e) => {
     //     e.stopPropagation();

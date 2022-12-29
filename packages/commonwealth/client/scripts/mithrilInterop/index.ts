@@ -54,7 +54,12 @@ const REACT_INTERNAL_PROPS = [
   'updater',
   '_reactInternals',
   '_reactInternalInstance',
-  'state'
+  'state',
+  'surveyDelayTriggered',
+  'surveyReadyForDisplay',
+  'escapeHandler',
+  'hideForeverChecked',
+  'surveyLocked',
 ]
 
 export abstract class ClassComponent<A = {}> extends ReactComponent<A & { children?: Children }> {
@@ -66,6 +71,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
       set(obj, prop, value) {
         if (!REACT_INTERNAL_PROPS.includes(prop as string)) {
           obj.setState({ ...obj.state, [prop]: value })
+          console.log(prop);
         }
         // @ts-ignore
         return Reflect.set(...arguments);

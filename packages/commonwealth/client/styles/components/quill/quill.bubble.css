@@ -176,7 +176,7 @@
   fill: none;
 }
 .ql-bubble .ql-even {
-  fill-rule: evenodd;
+  fillRule: evenodd;
 }
 .ql-bubble .ql-thin,
 .ql-bubble .ql-stroke.ql-thin {

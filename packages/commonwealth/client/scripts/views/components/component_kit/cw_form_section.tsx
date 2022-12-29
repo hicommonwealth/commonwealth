@@ -11,7 +11,7 @@ import { CWDivider } from './cw_divider';
 type FormSectionAttrs = {
   description: string;
   title: string;
-  topRightElement?: m.Vnode;
+  topRightElement?: ResultNode;
 };
 
 export class CWFormSection extends ClassComponent<FormSectionAttrs> {

@@ -50,6 +50,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   }
 
   oncreate() {
+    console.log(app);
     const storedScrollYPos =
       localStorage[`${app.activeChainId()}-discussions-scrollY`];
 
@@ -61,6 +62,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   }
 
   view(vnode: ResultNode<DiscussionPageAttrs>) {
+    console.log(app);
     if (!app.chain || !app.chain.serverLoaded) {
       return <PageLoading />;
     }
