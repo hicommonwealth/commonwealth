@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import $ from 'jquery';
 
@@ -591,7 +592,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           body={
             <div className="thread-content">
               {this.isEditingBody ? (
-                <>
+                <React.Fragment>
                   {reactionsAndReplyButtons}
                   <EditBody
                     thread={thread}
@@ -600,16 +601,16 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     setIsEditing={setIsEditingBody}
                     title={this.title}
                   />
-                </>
+                </React.Fragment>
               ) : (
-                <>
+                <React.Fragment>
                   <CollapsibleThreadBody thread={thread} />
                   {thread.readOnly ? (
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
                   ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
-                    <>
+                    <React.Fragment>
                       {reactionsAndReplyButtons}
                       <CreateComment
                         updatedCommentsCallback={updatedCommentsCallback}
@@ -618,9 +619,9 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                         parentComment={null}
                         rootProposal={thread}
                       />
-                    </>
+                    </React.Fragment>
                   ) : null}
-                </>
+                </React.Fragment>
               )}
             </div>
           }

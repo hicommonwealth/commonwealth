@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -12,10 +13,10 @@ export class BreadcrumbsTitleTag extends ClassComponent<BreadcrumbsTitleTagAttrs
     const { title } = vnode.attrs;
 
     return (
-      <>
+      <React.Fragment>
         {title}
         {/* something will eventually go here once we get breadcrumbs working */}
-      </>
+      </React.Fragment>
     );
   }
 }

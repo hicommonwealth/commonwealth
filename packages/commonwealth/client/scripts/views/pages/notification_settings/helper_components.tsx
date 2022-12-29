@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -28,7 +29,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
     );
 
     return (
-      <>
+      <React.Fragment>
         <div className="header-row" onClick={() => setRoute(threadUrl)}>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -52,7 +53,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
             hideFormatting: true,
           })}
         </CWText>
-      </>
+      </React.Fragment>
     );
   } else if (subscription.Comment) {
     // TODO Gabe 9/7/22 - comment headers should link to comments
@@ -68,7 +69,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
     //   subscription.Chain.id
     // );
     return (
-      <>
+      <React.Fragment>
         <div className="header-row">
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -104,7 +105,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
             hideFormatting: true,
           })}
         </CWText>
-      </>
+      </React.Fragment>
     );
   } else if (
     !subscription.Thread &&

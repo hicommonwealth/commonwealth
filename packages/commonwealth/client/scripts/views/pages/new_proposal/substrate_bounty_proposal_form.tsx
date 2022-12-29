@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -30,7 +31,7 @@ export class SubstrateBountyProposalForm extends ClassComponent {
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWTextInput
           placeholder="Bounty title (stored on chain)"
           label="Title"
@@ -77,7 +78,7 @@ export class SubstrateBountyProposalForm extends ClassComponent {
             return createTXModal(createFunc(args));
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

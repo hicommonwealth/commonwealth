@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -205,7 +206,7 @@ class CouncilPage extends ClassComponent {
               app.user.activeAccount &&
               app.user.activeAccount instanceof SubstrateAccount &&
               app.chain.networkStatus === ApiStatus.Connected && (
-                <>
+                <React.Fragment>
                   <CWButton
                     onClick={(e) => {
                       e.preventDefault();
@@ -233,7 +234,7 @@ class CouncilPage extends ClassComponent {
                         : 'Run for council'
                     }
                   />
-                </>
+                </React.Fragment>
               )
             }
           />

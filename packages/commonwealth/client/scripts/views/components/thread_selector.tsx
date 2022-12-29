@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -91,7 +92,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
         {this.loading ? (
           <CWSpinner />
         ) : (
-          <>
+          <React.Fragment>
             <CWTextInput
               placeholder="Search thread titles..."
               iconRightonClick={() => {
@@ -183,7 +184,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                 }
               },
             })} */}
-          </>
+          </React.Fragment>
         )}
       </div>
     );

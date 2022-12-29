@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import 'components/sidebar/sidebar_section.scss';
 

@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, Children } from 'mithrilInterop';
 
@@ -161,7 +162,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     }
 
     return (
-      <>
+      <React.Fragment>
         <div
           className="trigger-wrapper"
           ref="trigger-wrapper-ref"
@@ -215,7 +216,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
             </div>
           </CWPortal>
         ) : null}
-      </>
+      </React.Fragment>
     );
   }
 }

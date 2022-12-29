@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import $ from 'jquery';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -296,11 +297,11 @@ class AdminPage extends ClassComponent {
         <Sublayout>
           <div className="AdminPage">
             {app.chain ? (
-              <>
+              <React.Fragment>
                 <AdminActions />
                 <SudoForm />
                 <ChainStats />
-              </>
+              </React.Fragment>
             ) : null}
           </div>
         </Sublayout>

@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -27,7 +28,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
           const isCurrent = k === breadcrumbs.length - 1;
 
           return (
-            <>
+            <React.Fragment>
               <CWText
                 type="caption"
                 fontWeight="medium"
@@ -45,7 +46,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
                   /
                 </CWText>
               )}
-            </>
+            </React.Fragment>
           );
         })}
       </div>

@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -31,7 +32,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWTextInput
           title="Beneficiary"
           placeholder="Beneficiary of proposal"
@@ -92,7 +93,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
             );
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -61,7 +62,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
     const formState = { module: '', function: '', args: [] };
 
     return (
-      <>
+      <React.Fragment>
         <CWDropdown
           label="Motion"
           options={motions.map((m_) => ({
@@ -103,7 +104,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
           )}
         {this.councilMotionType === 'createFastTrack' ||
           (this.councilMotionType === 'createExternalProposalDefault' && (
-            <>
+            <React.Fragment>
               <CWTextInput
                 label="Voting Period"
                 placeholder="Blocks (minimum enforced)"
@@ -118,7 +119,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
                   this.enactmentDelay = +e.target.value;
                 }}
               />
-            </>
+            </React.Fragment>
           ))}
 
         {this.councilMotionType === 'createEmergencyCancellation' && (
@@ -260,7 +261,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
             return createTXModal(createFunc(args));
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

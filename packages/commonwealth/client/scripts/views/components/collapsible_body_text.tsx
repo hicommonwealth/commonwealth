@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -56,14 +57,14 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
         : null;
 
       return author ? (
-        <>
+        <React.Fragment>
           {render(User, {
             user: author,
             hideAvatar: true,
             hideIdentityIcon: true,
           })}{' '}
           created this thread
-        </>
+        </React.Fragment>
       ) : (
         'Created this thread'
       );

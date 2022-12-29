@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -50,7 +51,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWDropdown
           label="Module"
           options={(app.chain as Substrate).chain
@@ -137,7 +138,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
             ? blake2AsHex(EdgewareFunctionPicker.getMethod(vnode.attrs).toHex())
             : ''}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

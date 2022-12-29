@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -42,7 +43,7 @@ export class SputnikProposalForm extends ClassComponent {
 
   view() {
     return (
-      <>
+      <React.Fragment>
         <CWDropdown
           label="Proposal Type"
           defaultValue={sputnikProposalOptions[0]}
@@ -134,7 +135,7 @@ export class SputnikProposalForm extends ClassComponent {
               .catch((err) => notifyError(err.message));
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

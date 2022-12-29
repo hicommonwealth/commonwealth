@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -58,7 +59,7 @@ export const getActionSection = (
     );
   } else if (bounty.isApproved) {
     return (
-      <>
+      <React.Fragment>
         <CWButton label="Waiting for funding" disabled />
         {bounty.value && (
           <CWText>Bounty amount: {formatCoin(bounty.value)}</CWText>
@@ -74,11 +75,11 @@ export const getActionSection = (
             '--'
           )}
         </CWText>
-      </>
+      </React.Fragment>
     );
   } else if (bounty.isFunded) {
     return (
-      <>
+      <React.Fragment>
         <CWButton
           label="Motion to assign curator"
           disabled={!isCouncillor}
@@ -92,11 +93,11 @@ export const getActionSection = (
         {bounty.value && (
           <CWText>Bounty amount: {formatCoin(bounty.value)}</CWText>
         )}
-      </>
+      </React.Fragment>
     );
   } else if (bounty.isCuratorProposed) {
     return (
-      <>
+      <React.Fragment>
         <CWButton
           label={
             isCurator ? 'Accept curator role' : 'Waiting for curator to accept'
@@ -127,11 +128,11 @@ export const getActionSection = (
           })}
         </div>
         {bounty.fee && <CWText>Curator fee: {formatCoin(bounty.fee)}</CWText>}
-      </>
+      </React.Fragment>
     );
   } else if (bounty.isActive) {
     return (
-      <>
+      <React.Fragment>
         <CWButton
           label="Payout to recipient"
           disabled={!isCurator}
@@ -163,29 +164,29 @@ export const getActionSection = (
           })}
         </div>
         {bounty.fee && (
-          <>
+          <React.Fragment>
             <CWText>Curator fee: {formatCoin(bounty.fee)}</CWText>
             <CWText>
               Curator deposit: {formatCoin(bounty.curatorDeposit)}
             </CWText>
-          </>
+          </React.Fragment>
         )}
         {bounty.updateDue ? (
-          <>
+          <React.Fragment>
             <CWText>Must renew within: </CWText>
             <CountdownUntilBlock
               block={bounty.updateDue}
               includeSeconds={false}
             />
-          </>
+          </React.Fragment>
         ) : (
           <CWText>Renewal period just extended</CWText>
         )}
-      </>
+      </React.Fragment>
     );
   } else if (bounty.isPendingPayout) {
     return (
-      <>
+      <React.Fragment>
         <CWText>Payout pending</CWText>
         {bounty.value && (
           <CWText>Bounty amount: {formatCoin(bounty.value)}</CWText>
@@ -194,11 +195,11 @@ export const getActionSection = (
           <CWText>Can be claimed in: </CWText>
           <CountdownUntilBlock block={bounty.unlockAt} includeSeconds={false} />
         </div>
-      </>
+      </React.Fragment>
     );
   } else if (!bounty.isPendingPayout) {
     return (
-      <>
+      <React.Fragment>
         <CWButton
           label={isRecipient ? 'Claim payout' : 'Payout ready to claim'}
           disabled={!isRecipient}
@@ -233,7 +234,7 @@ export const getActionSection = (
           <CWText>Review period ends at: </CWText>
           <CountdownUntilBlock block={bounty.unlockAt} includeSeconds={false} />
         </div>
-      </>
+      </React.Fragment>
     );
   } else {
     return null;

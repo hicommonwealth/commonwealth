@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -35,7 +36,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWLabel label="Finder" />,
         {render(User, {
           user: author,
@@ -85,7 +86,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
             );
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -90,7 +91,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             // const commentsCount = app.comments.nComments(thread);
 
             return (
-              <>
+              <React.Fragment>
                 <div
                   className={getClasses<{ isPinned?: boolean }>(
                     { isPinned: thread.pinned },
@@ -217,7 +218,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                   </div>
                 </div>
                 {idx !== topFiveSortedThreads.length - 1 && <CWDivider />}
-              </>
+              </React.Fragment>
             );
           })}
         </div>

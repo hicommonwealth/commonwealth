@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -126,7 +127,7 @@ export class NewTopicModal extends ClassComponent {
             }}
           />
           {app.activeChainId() && (
-            <>
+            <React.Fragment>
               <CWLabel
                 label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
               />
@@ -137,7 +138,7 @@ export class NewTopicModal extends ClassComponent {
                   this.form.tokenThreshold = newValue;
                 }}
               />
-            </>
+            </React.Fragment>
           )}
           <div className="checkboxes">
             <CWCheckbox

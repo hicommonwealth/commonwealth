@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
@@ -35,7 +36,7 @@ export class CosmosProposalForm extends ClassComponent {
     return !cosmos.governance.initialized ? (
       <CWSpinner />
     ) : (
-      <>
+      <React.Fragment>
         <CWLabel label="Proposal Type" />
         <CWRadioGroup
           name="cosmos-proposal-type"
@@ -127,7 +128,7 @@ export class CosmosProposalForm extends ClassComponent {
               .catch((err) => notifyError(err.message));
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

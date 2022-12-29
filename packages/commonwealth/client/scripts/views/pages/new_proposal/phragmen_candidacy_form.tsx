@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
@@ -28,7 +29,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWText>
           Becoming a candidate requires a deposit of
           {formatCoin(substrate.phragmenElections.candidacyBond)}. It will be
@@ -58,7 +59,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
             );
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

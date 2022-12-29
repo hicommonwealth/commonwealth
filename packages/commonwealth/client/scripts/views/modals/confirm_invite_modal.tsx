@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
@@ -154,7 +155,7 @@ export class ConfirmInviteModal extends ClassComponent {
             ) : this.rejected.includes(location) ? (
               <CWText type="h5">You've already deleted this invite!</CWText>
             ) : (
-              <>
+              <React.Fragment>
                 <div className="invite-addresses">{addresses}</div>
                 {addresses.length > 0 && (
                   <div className="invite-actions">
@@ -276,7 +277,7 @@ export class ConfirmInviteModal extends ClassComponent {
                     Connect a new address
                   </a>
                 )}
-              </>
+              </React.Fragment>
             )}
           </div>
         ) : (

@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -100,7 +101,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
           {app.chain && this.spacesMetadata && (
             <CardsCollection
               content={
-                <>
+                <React.Fragment>
                   {this.spacesMetadata.map((data) => (
                     <SnapshotSpaceCard
                       space={data.space}
@@ -109,7 +110,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
                       proposal={redirectOptions.proposal}
                     />
                   ))}
-                </>
+                </React.Fragment>
               }
             />
           )}

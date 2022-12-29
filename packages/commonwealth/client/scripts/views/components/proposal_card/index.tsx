@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -86,10 +87,10 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
             )}
         </div>
         {injectedContent ? (
-          <>
+          <React.Fragment>
             <CWDivider />
             <div className="proposal-injected">{injectedContent}</div>
-          </>
+          </React.Fragment>
         ) : proposal.isPassing !== 'none' ? (
           <CWText
             fontWeight="medium"

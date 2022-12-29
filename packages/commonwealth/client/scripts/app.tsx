@@ -13,7 +13,6 @@ import mixpanel from 'mixpanel-browser';
 import $ from 'jquery';
 import moment from 'moment';
 
-import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, rootRender, jsx } from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';

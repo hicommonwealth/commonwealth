@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 // Modals are Mithril components rendered within the Layout system,
 // which manages a stack of currently displayed modals on the screen.

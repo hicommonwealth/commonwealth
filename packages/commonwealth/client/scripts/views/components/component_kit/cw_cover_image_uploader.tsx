@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
 

@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -50,12 +51,12 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
         <CWText className="card-subtext">{chain.description}</CWText>
         {/* if no recently active threads, hide this module altogether */}
         {!!monthlyThreadCount && (
-          <>
+          <React.Fragment>
             <CWText className="card-subtext" type="b2" fontWeight="medium">
               {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
             </CWText>
             {isMember && (
-              <>
+              <React.Fragment>
                 {app.isLoggedIn() && !visitedChain && (
                   <CWText className="new-activity-tag">New</CWText>
                 )}
@@ -64,9 +65,9 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
                     {updatedThreads} new
                   </CWText>
                 )}
-              </>
+              </React.Fragment>
             )}
-          </>
+          </React.Fragment>
         )}
       </CWCard>
     );

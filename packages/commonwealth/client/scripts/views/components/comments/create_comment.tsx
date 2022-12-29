@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -160,7 +161,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
             </a>
           </CWText>
         ) : (
-          <>
+          <React.Fragment>
             <div className="attribution-row">
               <div className="attribution-left-content">
                 <CWText type="caption">
@@ -192,10 +193,10 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                 {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
                 {app.chain.meta.default_symbol}.{' '}
                 {userBalance && app.user.activeAccount && (
-                  <>
+                  <React.Fragment>
                     You have {weiToTokens(userBalance.toString(), decimals)}{' '}
                     {app.chain.meta.default_symbol}.
-                  </>
+                  </React.Fragment>
                 )}
               </CWText>
             )}
@@ -230,7 +231,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                 />
               </div>
             </div>
-          </>
+          </React.Fragment>
         )}
       </div>
     );

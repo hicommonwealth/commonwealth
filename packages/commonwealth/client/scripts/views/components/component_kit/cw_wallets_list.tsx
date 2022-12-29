@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -373,7 +374,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
               <CWTooltip
                 interactionType="click"
                 tooltipContent={
-                  <>
+                  <React.Fragment>
                     <CWText type="caption">
                       If you don’t see your wallet then make sure:
                     </CWText>
@@ -383,7 +384,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                     <CWText type="caption">
                       • Your wallet chrome extension active?
                     </CWText>
-                  </>
+                  </React.Fragment>
                 }
                 tooltipType="solidArrow"
                 trigger={

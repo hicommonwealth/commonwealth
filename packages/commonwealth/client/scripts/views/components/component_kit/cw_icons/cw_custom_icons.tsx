@@ -1,5 +1,6 @@
 /* eslint-disable max-classes-per-file */
 /* @jsx jsx */
+import React from 'react';
 
 /* eslint-disable max-len */
 

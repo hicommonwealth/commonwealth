@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -114,7 +115,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
 
         if (isLivingCommentTree(comment, children)) {
           return (
-            <>
+            <React.Fragment>
               <Comment
                 comment={comment}
                 handleIsReplying={handleIsReplying}
@@ -135,7 +136,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
                   updatedCommentsCallback={updatedCommentsCallback}
                 />
               )}
-            </>
+            </React.Fragment>
           );
         } else {
           return null;

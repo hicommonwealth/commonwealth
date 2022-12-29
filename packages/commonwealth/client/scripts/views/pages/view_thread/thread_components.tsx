@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -45,7 +46,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
           linkify: true,
         })}
         {thread.collaborators?.length > 0 && (
-          <>
+          <React.Fragment>
             <CWText type="caption">and</CWText>
             <CWPopover
               interactionType="hover"
@@ -65,7 +66,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
                 </CWText>
               }
             />
-          </>
+          </React.Fragment>
         )}
       </div>
     );

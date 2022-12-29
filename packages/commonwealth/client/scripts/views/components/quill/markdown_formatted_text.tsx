@@ -1,4 +1,5 @@
 /* @jsx jsx */
+import React from 'react';
 /* eslint-disable no-useless-escape */
 
 
@@ -177,7 +178,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
       const results = render.trust(sanitized);
 
       return (
-        <>
+        <React.Fragment>
           <div
             className={getClasses<{ collapsed?: boolean }>(
               { collapsed: !!collapse },
@@ -194,7 +195,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
               </div>
             </div>
           )}
-        </>
+        </React.Fragment>
       );
     }
   }
