@@ -1,21 +1,21 @@
-import { ChainBase, ChainType } from 'common-common/src/types';
-import { SERVER_URL } from 'commonwealth/server/config';
-import {
-  createImmediateNotificationEmailObject,
-  sendImmediateNotificationEmail,
-} from 'commonwealth/server/scripts/emails';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import Sequelize, { QueryTypes } from 'sequelize';
 import {
   IChainEventNotificationData,
   IChatNotification,
   ICommunityNotificationData,
   IPostNotificationData
-} from 'commonwealth/shared/types';
-import { DB } from 'commonwealth/server/models';
-import send, { WebhookContent } from 'commonwealth/server/webhookNotifier';
-import { NotificationInstance } from 'commonwealth/server/models/notification';
-import Sequelize, { QueryTypes } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
+} from '../../shared/types';
+import { SERVER_URL } from '../config';
+import { DB } from '../models';
+import { NotificationInstance } from '../models/notification';
+import {
+  createImmediateNotificationEmailObject,
+  sendImmediateNotificationEmail
+} from '../scripts/emails';
+import send, { WebhookContent } from '../webhookNotifier';
 
 const log = factory.getLogger(formatFilename(__filename));
 

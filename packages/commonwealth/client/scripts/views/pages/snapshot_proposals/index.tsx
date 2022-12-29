@@ -3,7 +3,6 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import moment from 'moment';
-import { Button } from 'construct-ui';
 
 import 'pages/snapshot_proposals.scss';
 
@@ -17,6 +16,7 @@ import { SnapshotProposalCard } from './snapshot_proposal_card';
 import { CardsCollection } from '../../components/cards_collection';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/cw_button';
 
 export const ALL_PROPOSALS_KEY = 'COMMONWEALTH_ALL_PROPOSALS';
 
@@ -37,23 +37,19 @@ class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBar
     return (
       <div class="SnapshotProposalStagesBar">
         {Object.values(SnapshotProposalFilter).map(
-          (option: SnapshotProposalFilter) =>
-            m(Button, {
-              rounded: true,
-              compact: true,
-              size: 'sm',
-              disabled:
+          (option: SnapshotProposalFilter) => (
+            <CWButton
+              disabled={
                 option === SnapshotProposalFilter.Core ||
-                option === SnapshotProposalFilter.Community,
-              class: `discussions-stage ${
-                vnode.attrs.selected === option ? 'active' : ''
-              }`,
-              onclick: (e) => {
+                option === SnapshotProposalFilter.Community
+              }
+              onclick={(e) => {
                 e.preventDefault();
                 vnode.attrs.onChangeFilter(option);
-              },
-              label: option,
-            })
+              }}
+              label={option}
+            />
+          )
         )}
       </div>
     );

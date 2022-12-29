@@ -1,12 +1,9 @@
-import { aggregatePermissions } from 'shared/utils';
 import { assert } from 'chai';
 import {
-  addPermission,
-  Action,
-  isPermitted,
+  Action, addPermission, isPermitted
 } from 'common-common/src/permissions';
 import { Permission } from 'server/models/role';
-import { chain } from 'lodash';
+import { aggregatePermissions } from '../../../shared/utils';
 
 describe('aggregatePermissions() unit tests', () => {
   let base_permission;
