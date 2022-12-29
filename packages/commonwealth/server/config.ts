@@ -61,10 +61,15 @@ export const DISCORD_OAUTH_CALLBACK =
 export const DISCORD_OAUTH_SCOPES =
   process.env.DISCORD_OAUTH_SCOPES?.split(' ');
 
-export const DATABASE_URI =
-  !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
+export const DATABASE_URI = (() => {
+  if (process.env.NODE_ENV ==='docker-development') {
+    return 'postgres://commonwealth:edgeware@db/commonwealth';
+  } else {
+    return !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'
     ? 'postgresql://commonwealth:edgeware@localhost/commonwealth'
     : process.env.DATABASE_URL;
+  }
+})();
 
 export const VULTR_IP = process.env.VULTR_IP;
 

@@ -5,7 +5,7 @@ builder:
 	docker compose --file=docker-compose.init.yml build
 
 build-dev:
-	docker compose up --build 
+	docker compose up --build
 
 dev:
 	docker compose up
@@ -27,16 +27,21 @@ into-db:
 
 # DB Commands
 #
-# N.B. If your DB is ever broken, run these commands in order to reconstruct:
+# N.B. If your DB is ever broken, run these commands against the running 
+# commonwealth container in order to reconstruct:
 # 1. make reset-db
-# 2. make load-db
-# 3. make migrate-db
+# 2. make migrate-db
+# 3. make load-db
+# 4. make migrate-db
 
 reset-db:
-	docker exec -it commonwealth-commonwealth-1 sh -c "psql -h db -d postgres -U commonwealth -c 'DROP DATABASE commonwealth WITH (FORCE);' && npx sequelize db:create"
+	docker exec -it commonwealth-commonwealth-1 sh -c "psql -h db -d postgres -U commonwealth -c 'DROP DATABASE commonwealth WITH (FORCE);'"
+
+create-db:
+	docker exec -it commonwealth-commonwealth-1 sh -c "psql -h db -d postgres -U commonwealth -c 'CREATE DATABASE commonwealth;'"
 
 load-db:
-	docker exec -it commonwealth-commonwealth-1 sh -c "psql -h db -d commonwealth -U commonwealth -W -f latest.dump"
+	docker exec -it commonwealth-commonwealth-1 sh -c "psql -h db -d commonwealth -U commonwealth -W -f ./packages/commonwealth/latest.dump"
 
 migrate-db:
 	docker exec -it commonwealth-commonwealth-1 sh -c "yarn migrate-db"

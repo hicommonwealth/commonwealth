@@ -13,7 +13,6 @@ services:
       POSTGRES_DB: commonwealth
     volumes:
       - db:/var/lib/postgresql/data
-      - ./docker/pg_init.sql:/docker-entrypoint-initdb.d/pg_init.sql
     ports: 
       - '5432:5432'
   common-common:
@@ -31,12 +30,12 @@ services:
     ports: 
       - "8080:8080"
     volumes:
-      - ./:/app
+      - .:/commonwealth
     depends_on:
       - db
     links:
       - db
-    command: sh -c "wait && yarn start"
+    command: sh -c "wait && yarn start" --reload
     env_file: ./.env
 volumes:
   db:
