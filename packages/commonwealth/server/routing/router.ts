@@ -158,6 +158,10 @@ import { getChainContracts } from '../routes/getChainContracts';
 import { getSubscribedChains } from '../routes/getSubscribedChains';
 import GlobalActivityCache from '../util/globalActivityCache';
 import DatabaseValidationService from '../middleware/databaseValidationService';
+import createDiscordBotConfig from '../routes/createDiscordBotConfig';
+import setDiscordBotConfig from '../routes/setDiscordBotConfig';
+import getDiscordChannels from '../routes/getDiscordChannels';
+import getSnapshotProposal from '../routes/getSnapshotProposal';
 
 function setupRouter(
   app: Express,
@@ -747,6 +751,19 @@ function setupRouter(
     updateChainCustomDomain.bind(this, models)
   );
 
+  // Discord Bot
+  router.post(
+    '/createDiscordBotConfig',
+    passport.authenticate('jwt', { session: false }),
+    createDiscordBotConfig.bind(this, models)
+  );
+  router.post('/setDiscordBotConfig', setDiscordBotConfig.bind(this, models));
+  router.post(
+    '/getDiscordChannels',
+    passport.authenticate('jwt', { session: false }),
+    getDiscordChannels.bind(this, models)
+  );
+
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
 
   // login
@@ -822,7 +839,10 @@ function setupRouter(
 
   router.get('/getEntityMeta', getEntityMeta.bind(this, models));
 
+  // snapshotAPI
   router.post('/snapshotAPI/sendMessage', sendMessage.bind(this));
+  // snapshot-commonwealth
+  router.get('/snapshot', getSnapshotProposal.bind(this, models));
   router.get('/communityStats', communityStats.bind(this, models));
 
   // These routes behave like get (fetch data) but use POST because a secret
