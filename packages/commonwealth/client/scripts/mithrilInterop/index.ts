@@ -102,6 +102,10 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
   public oncreate(v: ResultNode<A>) {};
 
   abstract view(v: ResultNode<A>): Children | null;
+
+  public redraw(sync = false) {
+    this.forceUpdate();
+  }
 }
 
 export function redraw(sync = false) {

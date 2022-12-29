@@ -973,6 +973,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
     */
+   const createRouter = () => {
     const reactRouter = createBrowserRouter([
       {
         path: '/:scope/discussions',
@@ -992,7 +993,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       )
     );
     document.body.insertBefore(script, document.body.firstChild);
-
+   }
     // initialize mixpanel, before adding an alias or tracking identity
     try {
       if (
@@ -1085,7 +1086,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
         // If the user updates their email
         handleUpdateEmailConfirmation();
 
-        redraw();
+        createRouter();
       })
       .catch(() => {
         redraw();
