@@ -4,18 +4,10 @@ import { AddressModelStatic } from './models/address';
 import { AttachmentModelStatic } from './models/attachment';
 import { BanModelStatic } from './models/ban';
 import { ChainModelStatic } from './models/chain';
-import {
-  ChainCategoryModelStatic
-} from './models/chain_category';
-import {
-  ChainCategoryTypeModelStatic
-} from './models/chain_category_type';
-import {
-  ChainEntityMetaModelStatic
-} from './models/chain_entity_meta';
-import {
-  ChainEventTypeModelStatic
-} from './models/chain_event_type';
+import { ChainCategoryModelStatic } from './models/chain_category';
+import { ChainCategoryTypeModelStatic } from './models/chain_category_type';
+import { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
+import { ChainEventTypeModelStatic } from './models/chain_event_type';
 import { ChainNodeModelStatic } from './models/chain_node';
 import { ChatChannelModelStatic } from './models/chat_channel';
 import { ChatMessageModelStatic } from './models/chat_message';
@@ -23,6 +15,7 @@ import { CollaborationModelStatic } from './models/collaboration';
 import { CommentModelStatic } from './models/comment';
 import { CommunityBannerModelStatic } from './models/community_banner';
 import { CommunityContractModelStatic } from './models/community_contract';
+import { CommunityImagesModelStatic } from './models/community_images';
 import { CommunityRoleModelStatic } from './models/community_role';
 import { ContractModelStatic } from './models/contract';
 import { ContractAbiModelStatic } from './models/contract_abi';
@@ -69,6 +62,7 @@ export type Models = {
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
+  CommunityImages: CommunityImagesModelStatic;
   CommunityRole: CommunityRoleModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;

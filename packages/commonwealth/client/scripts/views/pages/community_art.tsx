@@ -36,20 +36,13 @@ class CommunityArtPage extends ClassComponent {
           <CWButton
             label="generate"
             onclick={async () => {
-              console.log('Okay..');
-              try {
-                const res = await $.post(`${app.serverUrl()}/generateImage`, {
-                  description: 'A guy standing up on a mountain',
-                  jwt: app.user.jwt,
-                });
-                console.log('The res', res);
-
-                // this.rawImg = URL.createObjectURL(res.result.raw);
-                this.imageUrl = res.result.imageUrl;
-                m.redraw();
-              } catch (e) {
-                console.log(e);
-              }
+              console.log('Generating..');
+              const url = await app.communityImages?.generateImage(
+                'A dude staring at a cow',
+                app.user.jwt
+              );
+              this.imageUrl = url;
+              m.redraw();
             }}
           />
           <div

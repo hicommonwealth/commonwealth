@@ -10,18 +10,18 @@ import { AppError } from '../../../common-common/src/errors';
 
 type generateImageReq = {
   description: string;
+  chainId: string;
 };
 
 type generateImageResp = {
   imageUrl: string;
-  raw: any;
 };
 const generateImage = async (
   models: DB,
   req: TypedRequestBody<generateImageReq>,
   res: TypedResponse<generateImageResp>
 ) => {
-  const { description } = req.body;
+  const { description, chainId } = req.body;
 
   if (!description) {
     throw new AppError('No description provided');
@@ -53,15 +53,11 @@ const generateImage = async (
     imageResp = await fetch('https://dezgo.p.rapidapi.com/text2image', options);
     image = await imageResp.blob();
 
-    console.log('blog', image);
-
     console.log('End Image Generation', Date.now());
   } catch (e) {
     console.log(e);
-    throw new AppError('Problem!');
+    throw new AppError('Problem Generating Image!');
   }
-
-  console.log('here');
 
   const s3 = new AWS.S3();
   const params = {
@@ -71,18 +67,11 @@ const generateImage = async (
     ContentType: 'image/png',
   };
 
-  console.log('here2');
-
   let imageUrl = '';
   try {
     console.log('Starting Image Upload', Date.now());
     imageUrl = await s3.getSignedUrl('putObject', params);
 
-    // await axios.put(imageUrl, image, {
-    //   headers: {
-    //     'Content-Type': image.type,
-    //   },
-    // });
     await fetch(imageUrl, {
       method: 'PUT',
       body: image,
@@ -95,13 +84,17 @@ const generateImage = async (
     console.log(e);
     throw new AppError('Problem!');
   }
-  console.log(imageUrl);
 
   const trimmedURL = imageUrl.slice(0, imageUrl.indexOf('?'));
-  // const trimmedURL = URL.createObjectURL(image);
 
-  console.log('here3');
-  return success(res, { imageUrl: trimmedURL, raw: image });
+  try {
+    await models.CommunityImages.create({});
+  } catch (e) {
+    console.log(e);
+    throw new AppError('Unable to save to DB!');
+  }
+
+  return success(res, { imageUrl: trimmedURL });
 };
 
 export default generateImage;

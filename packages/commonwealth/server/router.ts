@@ -757,7 +757,7 @@ function setupRouter(
 
   router.post(
     '/generateImage',
-    // passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     generateImage.bind(this, models)
   );
 
