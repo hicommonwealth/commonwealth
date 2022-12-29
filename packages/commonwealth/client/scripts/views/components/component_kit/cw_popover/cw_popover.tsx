@@ -9,7 +9,6 @@ import { CWPortal } from '../cw_portal';
 import {
   applyArrowStyles,
   cursorInBounds,
-  findRef,
   getPosition,
 } from './helpers';
 import { ComponentType } from '../types';
@@ -48,7 +47,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     this.arrowId = `${this.contentId}-arrow`;
     this.isOpen = false;
     this.isRendered = true;
-    this.triggerRef = findRef(vnode.dom, 'trigger-wrapper-ref');
+    // this.triggerRef = vnode.dom.matches(`[ref=trigger-wrapper-ref]`) ? vnode.dom : vnode.dom.querySelector(`[ref=trigger-wrapper-ref]`);
   }
 
   onupdate(vnode: ResultNode<PopoverAttrs>) {

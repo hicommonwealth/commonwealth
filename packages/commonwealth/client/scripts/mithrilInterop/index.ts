@@ -96,7 +96,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
   }
 }
 
-export function redraw(sync = false, component: any) {
+export function redraw(sync = false, component?: any) {
   // TODO
   if (component) {
     console.log(component)
