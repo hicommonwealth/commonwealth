@@ -34,6 +34,32 @@ class RoleInfo {
     this.deny = deny;
     this.is_user_default = is_user_default;
   }
+
+  public static fromJSON(json) {
+    const {
+      id,
+      address_id,
+      address,
+      address_chain,
+      chain_id,
+      permission,
+      allow,
+      deny,
+      is_user_default
+    } = json;
+
+    return new RoleInfo(
+      id,
+      address_id,
+      address,
+      address_chain,
+      chain_id,
+      permission,
+      allow,
+      deny,
+      is_user_default
+    );
+  }
 }
 
 export default RoleInfo;

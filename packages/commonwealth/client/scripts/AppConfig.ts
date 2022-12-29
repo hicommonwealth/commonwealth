@@ -1,18 +1,18 @@
 import axios from 'axios';
 import { NotificationCategory } from './models/index';
 import { InviteCodeAttributes } from '../../shared/types';
-import { ChainCategoryAttributes } from '../../server/models/chain_category';
 import { ChainCategoryTypeAttributes } from '../../server/models/chain_category_type';
-import IdStore from './stores/IdStore';
-import { ChainAttributes } from '../../server/models/chain';
 import { ChainNodeAttributes } from '../../server/models/chain_node';
-import { RoleAttributes } from '../../server/models/role';
+import ChainEntity from './models/ChainEntity';
+import RoleInfo from './models/RoleInfo';
+import { ChainCategoryAttributes } from '../../server/models/chain_category';
+import ChainInfo from './models/ChainInfo';
 
 // This class's responsibility is to abstract away the server calls to app state. The current implementation
 // lazily loads data from the server when called
 export class AppConfig {
   private serverUrl: string;
-  private chains = new IdStore<ChainAttributes>();
+  private chains: Map<string, ChainInfo> = new Map(); // maps chainId to chain
   private nodes: Map<string, ChainNodeAttributes[]> = new Map(); // maps chainId to ChainNodes
   private notificationCategories: NotificationCategory[];
   private chainCategories: ChainCategoryAttributes[];
@@ -22,23 +22,23 @@ export class AppConfig {
     this.serverUrl = serverUrl;
   }
 
-  public async getChains(): Promise<ChainAttributes[]> {
+  public async getChains(): Promise<ChainInfo[]> {
     const resp = await axios.get(
       `${this.serverUrl}/communities`,
       { params: { is_active: true } }
     );
 
-    return resp.data.result.communities;
+    return resp.data.result.communities.map(e => ChainEntity.fromJSON(e));
   }
 
-  public async getChain(id: string): Promise<ChainAttributes> {
-    if (this.chains.getById(id)) {
-      return this.chains.getById(id);
+  public async getChain(id: string): Promise<ChainInfo> {
+    if (this.chains.get(id)) {
+      return this.chains.get(id);
     }
 
-    (await this.getChains()).forEach(c => this.chains.add(c));
+    (await this.getChains()).forEach(c => this.chains.set(c.id, c));
 
-    return this.chains.getById(id);
+    return this.chains.get(id);
   }
 
   public async getThreadCount(chain: string): Promise<number> {
@@ -52,14 +52,14 @@ export class AppConfig {
     return threadCount.data.result.count;
   }
 
-  public async getRoles(chain: string): Promise<RoleAttributes[]> {
-    const threadCount = await axios.get(`${this.serverUrl}/roles`, {
+  public async getRoles(chain: string): Promise<RoleInfo[]> {
+    const roles = await axios.get(`${this.serverUrl}/roles`, {
       params: {
         community_id: chain
       }
     });
 
-    return threadCount.data.result.roles;
+    return roles.data.result.roles.map(r => RoleInfo.fromJSON(r));
   }
 
   // TODO: All methods below query entities that don't update frequently so should be cached server side via Redis

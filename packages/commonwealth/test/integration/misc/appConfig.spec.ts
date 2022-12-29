@@ -24,7 +24,6 @@ describe('AppConfig Tests', () => {
     const chains = await appState.getChain(testChains[0].id);
 
     chai.assert.equal(chains.id, testChains[0].id)
-    chai.assert.equal(chains.name, testChains[0].name)
   });
 
   it('getChainNodes works correctly', async () => {
