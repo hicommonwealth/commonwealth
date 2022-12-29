@@ -121,14 +121,14 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
         this.deferred = deferChain;
         selectChain(scopeMatchesChain, deferChain).then((response) => {
           if (!deferChain && response) {
-            initChain();
+            initChain().then(() => this.redraw())
           }
         });
         return <LoadingLayout />;
       }
     } else if (scope && this.deferred && !deferChain) {
       this.deferred = false;
-      initChain();
+      initChain().then(() => this.redraw())
       return <LoadingLayout />;
     } else if (!scope && app.chain && app.chain.network) {
       // Handle the case where we unload the network or community, if we're

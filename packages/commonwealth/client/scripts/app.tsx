@@ -413,9 +413,6 @@ export async function initChain(): Promise<void> {
 
   // Instantiate (again) to create chain-specific Account<> objects
   await updateActiveAddresses(chain);
-
-  // Finish redraw to remove loading dialog
-  redraw();
 }
 
 export async function initNewTokenChain(address: string) {

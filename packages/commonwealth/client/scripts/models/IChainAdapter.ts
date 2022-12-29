@@ -58,11 +58,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // If user is no longer on the initializing chain, abort initialization
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
-    if (
-      this.meta.id !== (this.app.customDomainId() || getRouteParam('scope'))
-    ) {
-      return false;
-    }
+    // if (
+    //   this.meta.id !== (this.app.customDomainId() || getRouteParam('scope'))
+    // ) {
+    //   console.log(this.meta.id, getRouteParam('scope'));
+    //   return false;
+    // }
 
     const {
       pinnedThreads,
