@@ -534,7 +534,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               </div>
 
               <CWButton
-                label="Save settings"
+                label="Save Commonbot Settings"
                 className="save-snapshot"
                 buttonType="primary-black"
                 onclick={async () => {
