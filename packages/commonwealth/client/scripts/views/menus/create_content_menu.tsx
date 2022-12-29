@@ -47,7 +47,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
     topics.map((t) => ({
       label: `New ${t.name} Thread`,
       iconLeft: 'write',
-      onclick: () => {
+      onClick: () => {
         // TODO Graham 7-19-22: Let's find a non-localStorage solution
         localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
         if (t.defaultOffchainTemplate) {
@@ -69,7 +69,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
       ? [
           {
             label: 'New On-Chain Proposal',
-            onclick: () => navigateToSubpage('/new/proposal'),
+            onClick: () => navigateToSubpage('/new/proposal'),
             iconLeft: 'star',
           },
         ]
@@ -80,7 +80,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
       ? [
           {
             label: 'New Sputnik proposal',
-            onclick: () => navigateToSubpage('/new/proposal'),
+            onClick: () => navigateToSubpage('/new/proposal'),
             iconLeft: 'democraticProposal',
           },
         ]
@@ -91,7 +91,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
       ? [
           {
             label: 'New treasury proposal',
-            onclick: () =>
+            onClick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryProposal,
               }),
@@ -99,7 +99,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           },
           {
             label: 'New democracy proposal',
-            onclick: () =>
+            onClick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateDemocracyProposal,
               }),
@@ -109,7 +109,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
             ? [
                 {
                   label: 'New council motion',
-                  onclick: () =>
+                  onClick: () =>
                     navigateToSubpage('/new/proposal/:type', {
                       type: ProposalType.SubstrateCollectiveProposal,
                     }),
@@ -119,7 +119,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
             : []) as MenuItem[]),
           {
             label: 'New bounty proposal',
-            onclick: () =>
+            onClick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateBountyProposal,
               }),
@@ -127,7 +127,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           },
           {
             label: 'New tip',
-            onclick: () =>
+            onClick: () =>
               navigateToSubpage('/new/proposal/:type', {
                 type: ProposalType.SubstrateTreasuryTip,
               }),
@@ -142,7 +142,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           {
             label: 'New Snapshot Proposal',
             iconLeft: 'democraticProposal',
-            onclick: () => {
+            onClick: () => {
               const snapshotSpaces = app.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
                 navigateToSubpage('/multiple-snapshots', {
@@ -160,14 +160,14 @@ const getCreateContentMenuItems = (): MenuItem[] => {
     // {
     //   label: 'New Crowdfund',
     //   iconLeft: 'wallet',
-    //   onclick: () => {
+    //   onClick: () => {
 
     //   }
     // },
     {
       label: 'New Community',
       iconLeft: 'people',
-      onclick: (e) => {
+      onClick: (e) => {
         e.preventDefault();
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
@@ -183,7 +183,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
     {
       label: 'Gate your Discord',
       iconLeft: 'discord',
-      onclick: (e) => {
+      onClick: (e) => {
         e.preventDefault();
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
@@ -214,7 +214,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
           } as MenuItem,
           {
             label: 'New Thread',
-            onclick: () => {
+            onClick: () => {
               navigateToSubpage('/new/discussion');
             },
             iconLeft: 'write',
@@ -238,10 +238,10 @@ export class CreateContentSidebar extends ClassComponent {
   view() {
     return (
       <CWSidebarMenu
-        class="CreateContentSidebar"
+        className="CreateContentSidebar"
         menuHeader={{
           label: 'Create',
-          onclick: async () => {
+          onClick: async () => {
             const sidebar = document.getElementsByClassName(
               'CreateContentSidebar'
             );
@@ -263,10 +263,10 @@ export class CreateContentMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
-        class="CreateContentMenu"
+        className="CreateContentMenu"
         menuHeader={{
           label: 'Create',
-          onclick: () => {
+          onClick: () => {
             app.mobileMenu = 'MainMenu';
           },
         }}

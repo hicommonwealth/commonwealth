@@ -37,13 +37,13 @@ const getDiscussionResult = (thread, searchTerm) => {
 
   return (
     <div
-      class="search-result-row"
-      onclick={() => {
+      className="search-result-row"
+      onClick={() => {
         setRoute(`/${chain}/discussion/${proposalId}`);
       }}
     >
       <CWIcon iconName="feedback" />
-      <div class="inner-container">
+      <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
           {`discussion - ${thread.chain}`}
         </CWText>
@@ -57,7 +57,7 @@ const getDiscussionResult = (thread, searchTerm) => {
               null
             ),
           })}
-          <CWText class="created-at">
+          <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
           </CWText>
         </div>
@@ -81,8 +81,8 @@ const getCommentResult = (comment, searchTerm) => {
 
   return (
     <div
-      class="search-result-row"
-      onclick={() => {
+      className="search-result-row"
+      onClick={() => {
         setRoute(
           `/${chain}/discussion/${proposalId.split('_')[0]}/${
             proposalId.split('_')[1]
@@ -91,14 +91,14 @@ const getCommentResult = (comment, searchTerm) => {
       }}
     >
       <CWIcon iconName="feedback" />
-      <div class="inner-container">
+      <div className="inner-container">
         <CWText fontWeight="medium">{`comment - ${
           comment.chain || comment.community
         }`}</CWText>
-        {/* <div class="search-results-thread-title">
+        {/* <div className="search-results-thread-title">
           {decodeURIComponent(comment.title)}
         </div> */}
-        <div class="search-results-thread-subtitle">
+        <div className="search-results-thread-subtitle">
           {render(User, {
             user: new AddressInfo(
               comment.address_id,
@@ -140,7 +140,7 @@ const getCommunityResult = (community) => {
   };
 
   return (
-    <div class="community-result-row" onclick={onSelect}>
+    <div className="community-result-row" onClick={onSelect}>
       <CommunityLabel {...params} />
     </div>
   );
@@ -153,7 +153,7 @@ const getMemberResult = (addr) => {
   if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
 
   return (
-    <div class="member-result-row">
+    <div className="member-result-row">
       {render(User, {
         user: profile,
         showRole: true,
@@ -319,8 +319,8 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                   {scope && !app.isCustomDomain() && (
                     <a
                       href="#"
-                      class="search-all-communities"
-                      onclick={() => {
+                      className="search-all-communities"
+                      onClick={() => {
                         searchQuery.chainScope = undefined;
                         setRoute(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
@@ -333,7 +333,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                   )}
                 </CWText>
                 {tabScopedListing.length > 0 && this.activeTab === 'Threads' && (
-                  <div class="search-results-filters">
+                  <div className="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
                     <CWDropdown
                       label=""

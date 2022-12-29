@@ -84,20 +84,20 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
         <div className="interaction-counts">
           {viewCount && viewCount > 0 && (
             <div className="icon-and-count">
-              <CWIcon iconName="views" class="count-icon" />
-              <CWText class="count-text">{viewCount}</CWText>
+              <CWIcon iconName="views" className="count-icon" />
+              <CWText className="count-text">{viewCount}</CWText>
             </div>
           )}
           {likeCount && likeCount > 0 && (
             <div className="icon-and-count">
-              <CWIcon iconName="heartFilled" class="count-icon" />
-              <CWText class="count-text">{likeCount}</CWText>
+              <CWIcon iconName="heartFilled" className="count-icon" />
+              <CWText className="count-text">{likeCount}</CWText>
             </div>
           )}
           {commentCount && commentCount > 0 && (
             <div className="icon-and-count">
-              <CWIcon iconName="feedback" class="count-icon" />
-              <CWText class="count-text">{commentCount}</CWText>
+              <CWIcon iconName="feedback" className="count-icon" />
+              <CWText className="count-text">{commentCount}</CWText>
             </div>
           )}
         </div>

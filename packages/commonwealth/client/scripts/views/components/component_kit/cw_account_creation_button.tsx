@@ -12,18 +12,18 @@ import { CWText } from './cw_text';
 
 type AccountCreationButtonAttrs = {
   creationType?: 'newAccount' | 'linkAccount';
-  onclick: () => void;
+  onClick: () => void;
 };
 
 export class CWAccountCreationButton extends ClassComponent<AccountCreationButtonAttrs> {
   view(vnode: ResultNode<AccountCreationButtonAttrs>) {
-    const { creationType = 'newAccount', onclick } = vnode.attrs;
+    const { creationType = 'newAccount', onClick } = vnode.attrs;
 
     return (
       <CWCard
-        class={ComponentType.AccountCreationButton}
+        className={ComponentType.AccountCreationButton}
         elevation="elevation-3"
-        onClick={onclick}
+        onClick={onClick}
       >
         <CWIcon
           iconName={creationType === 'newAccount' ? 'plusCircle' : 'link'}

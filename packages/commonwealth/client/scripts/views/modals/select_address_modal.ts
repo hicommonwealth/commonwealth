@@ -4,7 +4,7 @@ import 'modals/select_address_modal.scss';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import { Tag, Button } from 'construct-ui';
+// import { Tag, Button } from 'construct-ui';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
@@ -146,7 +146,7 @@ const SelectAddressModal: Component<
                       render(CWIcon, {
                         iconName: 'close',
                         iconSize: 'small',
-                        onclick: deleteRole.bind(this, index),
+                        onClick: deleteRole.bind(this, index),
                       }),
                     ]),
                   ])
@@ -159,7 +159,7 @@ const SelectAddressModal: Component<
                     {
                       class:
                         vnode.state.selectedIndex === index ? 'selected' : '',
-                      onclick: async (e) => {
+                      onClick: async (e) => {
                         e.preventDefault();
                         vnode.state.selectedIndex = index;
                       },
@@ -219,7 +219,7 @@ const SelectAddressModal: Component<
             disabled:
               typeof vnode.state.selectedIndex !== 'number' ||
               vnode.state.loading,
-            onclick: createRole.bind(this),
+            onClick: createRole.bind(this),
           }),
       ]),
     ]);

@@ -35,7 +35,7 @@ const ListedCardWithImage: Component<IAttrs, {}> = {
               class: `rounded-2xl p-5 text-left w-full focus:outline-none transition transition-all duration-500 ${
                 vnode.attrs.isTabHoverActive ? `${vnode.attrs.tabHoverColorClick}` : ''
               }  ${vnode.attrs.variant}`,
-              onclick: vnode.attrs.handleClick,
+              onClick: vnode.attrs.handleClick,
               id: vnode.attrs.buttonId,
             },
             [

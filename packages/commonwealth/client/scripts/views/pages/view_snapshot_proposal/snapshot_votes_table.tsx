@@ -48,20 +48,20 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
             Votes
           </CWText>
           <div className="vote-count">
-            <CWText class="vote-count-text" fontWeight="medium">
+            <CWText className="vote-count-text" fontWeight="medium">
               {voters.length}
             </CWText>
           </div>
         </div>
         <div className="votes-container">
           <div className="column-header-row">
-            <CWText type="h5" class="column-header-text">
+            <CWText type="h5" className="column-header-text">
               User
             </CWText>
-            <CWText type="h5" class="column-header-text">
+            <CWText type="h5" className="column-header-text">
               Vote
             </CWText>
-            <CWText type="h5" class="column-header-text">
+            <CWText type="h5" className="column-header-text">
               Power
             </CWText>
           </div>
@@ -77,16 +77,16 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
                 linkify: true,
                 popover: true,
               })}
-              <CWText class="column-text" noWrap>
+              <CWText className="column-text" noWrap>
                 {choices[vote.choice - 1]}
               </CWText>
-              <CWText class="column-text" noWrap>
+              <CWText className="column-text" noWrap>
                 {formatNumberLong(vote.balance)} {symbol}
               </CWText>
             </div>
           ))}
           <div className="view-more-footer" onClick={toggleExpandedVoterList}>
-            <CWText class="view-more-text" fontWeight="medium">
+            <CWText className="view-more-text" fontWeight="medium">
               View More
             </CWText>
           </div>

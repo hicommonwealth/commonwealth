@@ -123,13 +123,13 @@ export class Comment extends ClassComponent<CommentAttrs> {
           <div className="comment-header">
             <CommentAuthor comment={comment} />
             {/* don't need this distinction yet since we aren't showing "edited at" */}
-            {/* <CWText type="caption" class="published-text">
+            {/* <CWText type="caption" className="published-text">
               published on
             </CWText> */}
             <CWText
               type="caption"
               fontWeight="medium"
-              class="published-text"
+              className="published-text"
             >
               {moment(comment.createdAt).format('l')}
             </CWText>
@@ -144,7 +144,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
             />
           ) : (
             <>
-              <CWText class="comment-text">
+              <CWText className="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
               {!comment.deleted && (
@@ -159,7 +159,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                         }}
                       >
                         <CWIcon iconName="feedback" iconSize="small" />
-                        <CWText type="caption" class="menu-buttons-text">
+                        <CWText type="caption" className="menu-buttons-text">
                           Reply
                         </CWText>
                       </div>
@@ -179,7 +179,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                           {
                             label: 'Edit',
                             iconLeft: 'write',
-                            onclick: async (e) => {
+                            onClick: async (e) => {
                               e.preventDefault();
                               this.savedEdits = localStorage.getItem(
                                 `${app.activeChainId()}-edit-comment-${
@@ -204,7 +204,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                           {
                             label: 'Delete',
                             iconLeft: 'trash',
-                            onclick: () => {
+                            onClick: () => {
                               app.comments.delete(comment).then(() => {
                                 redraw();
                               });

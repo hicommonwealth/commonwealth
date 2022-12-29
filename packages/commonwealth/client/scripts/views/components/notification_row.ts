@@ -371,7 +371,7 @@ const NotificationRow: Component<
               !vnode.attrs.onListPage &&
                 render(CWIconButton, {
                   iconName: 'close',
-                  onclick: (e) => {
+                  onClick: (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     vnode.state.scrollOrStop = true;
@@ -446,7 +446,7 @@ const NotificationRow: Component<
                 render(
                   '.comment-body-mark-as-read',
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       vnode.state.markingRead = true;
@@ -542,7 +542,7 @@ const NotificationRow: Component<
                 render(
                   '.comment-body-mark-as-read',
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
                       e.stopPropagation();
                       vnode.state.markingRead = true;
@@ -571,7 +571,7 @@ const NotificationRow: Component<
           class: notification.isRead ? '' : 'unread',
           key: notification.id,
           id: notification.id,
-          onclick: (e) => {
+          onClick: (e) => {
             // Graham TODO 22.10.05: Temporary fix while we wait for full
             // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
             // array

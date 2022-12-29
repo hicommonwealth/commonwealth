@@ -79,7 +79,7 @@ const HeaderLandingPage: Component<IAttrs, IState> = {
           //   iconSize: 'xxl',
           //   alt: 'Commonwealth',
           //   style: getRoute() === '/' ? '' : 'cursor:pointer',
-          //   onclick: () => redirectClick('/'),
+          //   onClick: () => redirectClick('/'),
           // }),
           render('img', {
             src: 'static/img/commonLogoWithText.svg',
@@ -98,7 +98,7 @@ const HeaderLandingPage: Component<IAttrs, IState> = {
                     'a',
                     {
                       class: 'text-2xl lg:text-base text-gray-500 leading-none',
-                      onclick: () => redirectClick(nav.redirectTo),
+                      onClick: () => redirectClick(nav.redirectTo),
                     },
                     nav.text
                   )
@@ -113,7 +113,7 @@ const HeaderLandingPage: Component<IAttrs, IState> = {
                     class:
                       ' block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline',
                     style: 'padding: 8px 16px',
-                    onclick: () =>
+                    onClick: () =>
                       app.modals.create({
                         modal: NewLoginModal,
                         data: {
@@ -143,7 +143,7 @@ const HeaderLandingPage: Component<IAttrs, IState> = {
             'button',
             {
               class: 'menuButton lg:hidden',
-              onclick: () => triggerMenu(),
+              onClick: () => triggerMenu(),
             },
             [
               render('img', {

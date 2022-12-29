@@ -36,7 +36,7 @@ export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChai
       >
         <CWCommunityAvatar community={chain} />
         <div className="chain-event-text-container">
-          <CWText class="row-top-text">
+          <CWText className="row-top-text">
             <b>{label.heading}</b>
             <span>in</span>
             <a

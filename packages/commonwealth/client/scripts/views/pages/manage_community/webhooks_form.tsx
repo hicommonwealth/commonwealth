@@ -99,11 +99,11 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                 <div className="webhook-info">
                   <CWText>{smartTruncate(webhook.url, 25)}</CWText>
                   {label && (
-                    <CWText type="caption" class="webhook-tag-text">
+                    <CWText type="caption" className="webhook-tag-text">
                       {label}
                     </CWText>
                   )}
-                  <CWText type="caption" class="webhook-tag-text">
+                  <CWText type="caption" className="webhook-tag-text">
                     {pluralize(webhook.categories.length, 'event')}
                   </CWText>
                 </div>
@@ -184,7 +184,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
           })}
         </div>
         {webhooks.length === 0 && (
-          <CWText class="no-webhooks-text">
+          <CWText className="no-webhooks-text">
             No webhooks yet. Slack, Discord, and Telegram webhooks are
             supported. For more information and examples for setting these up,
             please view our

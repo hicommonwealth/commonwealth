@@ -130,7 +130,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h5"
                   fontWeight="medium"
-                  class="inner-body-text"
+                  className="inner-body-text"
                 >
                   Linking
                 </CWText>
@@ -138,7 +138,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h5"
                   fontWeight="medium"
-                  class="inner-body-text"
+                  className="inner-body-text"
                 >
                   to your Profile
                 </CWText>
@@ -181,7 +181,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h5"
                   fontWeight="medium"
-                  class="inner-body-text"
+                  className="inner-body-text"
                 >
                   You have sucessfully linked
                 </CWText>
@@ -189,7 +189,7 @@ export class LoginMobile extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h5"
                   fontWeight="medium"
-                  class="inner-body-text"
+                  className="inner-body-text"
                 >
                   to your Profile
                 </CWText>

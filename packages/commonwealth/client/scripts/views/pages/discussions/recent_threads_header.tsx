@@ -80,14 +80,14 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
         {isUndefined(topic) && (
           <>
             <div className="header-row">
-              <CWText type="h3" fontWeight="semiBold" class="header-text">
+              <CWText type="h3" fontWeight="semiBold" className="header-text">
                 All Discussions
               </CWText>
               <div className="count-and-button">
                 <CWText
                   type="caption"
                   fontWeight="medium"
-                  class="thread-count-text"
+                  className="thread-count-text"
                 >
                   {totalThreadCount} Threads
                 </CWText>
@@ -111,7 +111,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
                 )}
               </div>
             </div>
-            <CWText class="subheader-text">
+            <CWText className="subheader-text">
               This section is for the community to discuss how to manage the
               community treasury and spending on contributor grants, community
               initiatives, liquidity mining and other programs.

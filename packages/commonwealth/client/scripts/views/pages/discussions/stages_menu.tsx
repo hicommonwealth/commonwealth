@@ -19,20 +19,20 @@ type ThreadsFilterMenuItemAttrs = {
   iconRight?: m.Vnode;
   isSelected: boolean;
   label: string;
-  onclick: (e: any) => void;
+  onClick: (e: any) => void;
 };
 
 export class ThreadsFilterMenuItem extends ClassComponent<ThreadsFilterMenuItemAttrs> {
   view(vnode: m.Vnode<ThreadsFilterMenuItemAttrs>) {
-    const { iconRight, isSelected, label, onclick } = vnode.attrs;
+    const { iconRight, isSelected, label, onClick } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ isSelected: boolean }>(
+        className={getClasses<{ isSelected: boolean }>(
           { isSelected },
           'ThreadsFilterMenuItem'
         )}
-        onclick={onclick}
+        onClick={onClick}
       >
         {isSelected && <CWIcon iconName="check" iconSize="small" />}
         {label}
@@ -66,11 +66,11 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
           />
         }
         content={
-          <div class="threads-filter-menu-items">
+          <div className="threads-filter-menu-items">
             <ThreadsFilterMenuItem
               label="All Stages"
               isSelected={!stage}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 navigateToSubpage('/discussions');
               }}
@@ -79,7 +79,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
             {stages.map((targetStage) => (
               <ThreadsFilterMenuItem
                 isSelected={stage === targetStage}
-                onclick={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   navigateToSubpage(`/discussions?stage=${targetStage}`);
                 }}

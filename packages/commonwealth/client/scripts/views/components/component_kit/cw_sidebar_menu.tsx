@@ -2,7 +2,7 @@
 
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import { ListItem, Icon, Icons } from 'construct-ui';
+// import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
@@ -22,11 +22,11 @@ const renderCommunity = (item: ChainInfo) => {
 
   return (
     <div
-      class={getClasses<{ isSelected: boolean }>(
+      className={getClasses<{ isSelected: boolean }>(
         { isSelected: app.activeChainId() === item.id },
         'SidebarMenuItem community'
       )}
-      onclick={(e) => {
+      onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
         app.sidebarToggled = false;
@@ -36,7 +36,7 @@ const renderCommunity = (item: ChainInfo) => {
     >
       <CommunityLabel community={item} />
       {app.isLoggedIn() && roles.length > 0 && (
-        <div class="roles-and-star">
+        <div className="roles-and-star">
           {roles.map((role) => {
             return render(User, {
               avatarSize: 18,
@@ -50,10 +50,10 @@ const renderCommunity = (item: ChainInfo) => {
             });
           })}
           <div
-            class={
+            className={
               app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
             }
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.stopPropagation();
               await app.communities.setStarred(item.id);
               redraw();
@@ -68,7 +68,7 @@ const renderCommunity = (item: ChainInfo) => {
 class CWSidebarMenuItem extends ClassComponent<MenuItem> {
   view(vnode: ResultNode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
-      const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
+      const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
         vnode.attrs;
 
       return (
@@ -78,7 +78,7 @@ class CWSidebarMenuItem extends ClassComponent<MenuItem> {
             'SidebarMenuItem default'
           )}
           onClick={(e) => {
-            if (onclick) onclick(e);
+            if (onClick) onClick(e);
           }}
         >
           <div className="sidebar-menu-item-left">
@@ -102,7 +102,7 @@ class CWSidebarMenuItem extends ClassComponent<MenuItem> {
 
 type SidebarMenuAttrs = {
   className?: string;
-  menuHeader?: { label: string; onclick: (e) => void };
+  menuHeader?: { label: string; onClick: (e) => void };
   menuItems: Array<MenuItem>;
 };
 
@@ -119,7 +119,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
       >
         <div className="sidebar-top">
           {menuHeader && (
-            <div className="sidebar-menu-header" onClick={menuHeader.onclick}>
+            <div className="sidebar-menu-header" onClick={menuHeader.onClick}>
               <CWIcon iconName="chevronLeft" />
               <CWText type="h5" fontWeight="medium">
                 {menuHeader.label}
@@ -140,7 +140,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               type: 'default',
               label: 'Explore communities',
               iconLeft: 'compass',
-              onclick: () => {
+              onClick: () => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
                 setRoute('/communities');
@@ -150,7 +150,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               type: 'default',
               label: 'Notification settings',
               iconLeft: 'person',
-              onclick: () => {
+              onClick: () => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
                 setRoute('/notification-settings');
@@ -160,7 +160,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               type: 'default',
               label: 'Account settings',
               iconLeft: 'bell',
-              onclick: () => {
+              onClick: () => {
                 if (app.activeChainId()) {
                   navigateToSubpage('/settings');
                 } else {

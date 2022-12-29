@@ -46,11 +46,11 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
           />
         }
         content={
-          <div class="threads-filter-menu-items">
+          <div className="threads-filter-menu-items">
             <ThreadsFilterMenuItem
               label="All Topics"
               isSelected={getRoute() === `/${app.activeChainId()}` || !topic}
-              onclick={() => {
+              onClick={() => {
                 navigateToSubpage('/discussions');
               }}
             />
@@ -78,7 +78,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                     <ThreadsFilterMenuItem
                       label={name}
                       isSelected={active}
-                      onclick={(e) => {
+                      onClick={(e) => {
                         e.preventDefault();
                         navigateToSubpage(`/discussions/${name}`);
                       }}
@@ -89,7 +89,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                           <CWIconButton
                             iconName="write"
                             iconSize="small"
-                            onclick={(e) => {
+                            onClick={(e) => {
                               e.preventDefault();
                               app.modals.create({
                                 modal: EditTopicModal,

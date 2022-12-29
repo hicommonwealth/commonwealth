@@ -59,7 +59,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             <CWText
               type="h4"
               fontWeight="semiBold"
-              class="topic-name-text"
+              className="topic-name-text"
               onClick={(e) => {
                 e.preventDefault();
                 setRoute(
@@ -72,7 +72,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             <CWText
               type="caption"
               fontWeight="medium"
-              class="threads-count-text"
+              className="threads-count-text"
             >
               {monthlyThreads.length} Threads
             </CWText>
@@ -109,11 +109,11 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                         avatarSize: 24,
                         linkify: true,
                       })}
-                      <CWText class="last-updated-text">•</CWText>
+                      <CWText className="last-updated-text">•</CWText>
                       <CWText
                         type="caption"
                         fontWeight="medium"
-                        class="last-updated-text"
+                        className="last-updated-text"
                       >
                         {moment(getLastUpdated(thread)).format('l')}
                       </CWText>
@@ -129,8 +129,8 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                   <CWText type="b2" fontWeight="bold">
                     {thread.title}
                   </CWText>
-                  <div class="row-bottom">
-                    <div class="comments-and-users">
+                  <div className="row-bottom">
+                    <div className="comments-and-users">
                       <CWText type="caption" className="thread-preview">
                         {thread.plaintext}
                       </CWText>
@@ -171,7 +171,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                               {
                                 label: 'Delete',
                                 iconLeft: 'trash',
-                                onclick: async (e) => {
+                                onClick: async (e) => {
                                   e.preventDefault();
 
                                   const confirmed =
@@ -191,7 +191,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                                   ? 'Unlock thread'
                                   : 'Lock thread',
                                 iconLeft: 'lock',
-                                onclick: (e) => {
+                                onClick: (e) => {
                                   e.preventDefault();
                                   app.threads
                                     .setPrivacy({

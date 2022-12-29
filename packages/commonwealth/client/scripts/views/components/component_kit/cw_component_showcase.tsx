@@ -186,7 +186,7 @@ export class ComponentShowcase extends ClassComponent {
                 label: 'Report',
                 iconLeft: 'cautionCircle',
                 isSecondary: true,
-                onclick: () => console.log('clicked'),
+                onClick: () => console.log('clicked'),
               },
             ]}
           />

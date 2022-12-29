@@ -70,7 +70,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
               onUsernameChangeHandler((e.target as any).value);
             }}
           />
-          <CWText type="caption" class="abbreviated-address">
+          <CWText type="caption" className="abbreviated-address">
             {formatAddressShort(address)}
           </CWText>
         </div>

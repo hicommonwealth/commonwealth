@@ -103,7 +103,7 @@ export class AaveProposalForm extends ClassComponent {
               {
                 iconLeft: 'write',
                 label: 'Add',
-                onclick: () => {
+                onClick: () => {
                   this.tabCount++;
                   this.activeTabIndex = this.tabCount - 1;
                   this.aaveProposalState.push(defaultStateItem);
@@ -113,7 +113,7 @@ export class AaveProposalForm extends ClassComponent {
                 iconLeft: 'trash',
                 label: 'Delete',
                 disabled: this.activeTabIndex === 0,
-                onclick: () => {
+                onClick: () => {
                   this.tabCount--;
                   this.activeTabIndex = this.tabCount - 1;
                   this.aaveProposalState.pop();

@@ -119,10 +119,10 @@ export class EmailSection extends ClassComponent {
             <div className="verification-row">
               <CWIcon
                 iconName={emailVerified ? 'check' : 'cautionCircle'}
-                class="verification-icon"
+                className="verification-icon"
               />
               <CWText
-                class={getClasses<{ emailVerified?: boolean }>(
+                className={getClasses<{ emailVerified?: boolean }>(
                   { emailVerified },
                   'verification-text'
                 )}

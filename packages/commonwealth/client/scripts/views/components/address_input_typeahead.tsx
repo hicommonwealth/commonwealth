@@ -77,14 +77,14 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
     //   itemRender: (item: AddressInputTypeaheadItem) =>
     //     render(ListItem, {
     //       label: (
-    //         <div class="item-container">
+    //         <div className="item-container">
     //           {render(User, {
     //             user: new AddressInfo(null, item.address, item.chain, null),
     //             avatarOnly: true,
     //             avatarSize: 18,
     //           })}
     //           {item.name ? (
-    //             <div class="item-and-address">
+    //             <div className="item-and-address">
     //               <CWText noWrap type="caption" fontWeight="medium">
     //                 {item.name}
     //               </CWText>

@@ -114,12 +114,12 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
             {author}
             {typeof createdAt === 'number' ||
               (moment.isMoment(createdAt) && createdAt.isValid() && (
-                <CWText type="caption" class="header-text">
+                <CWText type="caption" className="header-text">
                   published on {moment(createdAt).format('l')}
                 </CWText>
               ))}
             {!!viewCount && (
-              <CWText type="caption" class="header-text">
+              <CWText type="caption" className="header-text">
                 {pluralize(viewCount, 'view')}
               </CWText>
             )}
@@ -200,7 +200,7 @@ export class CWContentPageCard extends ClassComponent<ContentPageCardAttrs> {
     const { content, header } = vnode.attrs;
 
     return (
-      <CWCard class="ContentPageCard">
+      <CWCard className="ContentPageCard">
         <div className="header-container">
           <CWText type="h5" fontWeight="semiBold">
             {header}

@@ -71,10 +71,10 @@ export class ExploreCommunitiesSidebar extends ClassComponent {
 
     return (
       <CWSidebarMenu
-        class="ExploreCommunitiesSidebar"
+        className="ExploreCommunitiesSidebar"
         menuHeader={{
           label: 'Explore',
-          onclick: async () => {
+          onClick: async () => {
             const sidebar = document.getElementsByClassName(
               'ExploreCommunitiesSidebar'
             );

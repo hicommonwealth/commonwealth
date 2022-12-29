@@ -161,7 +161,7 @@ const TokensCommunityComponent: Component<IAttrs, IState> = {
                           class:
                             'btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36',
                           style: 'padding: 8px 16px;',
-                          onclick: () => {
+                          onClick: () => {
                             initiateFullSearch(vnode.state.inputTokenValue);
                           },
                         },

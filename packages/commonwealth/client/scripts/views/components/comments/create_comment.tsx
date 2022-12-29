@@ -139,7 +139,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
     return (
       <div className="CreateComment">
         {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
-          <CWText type="h5" class="callout-text">
+          <CWText type="h5" className="callout-text">
             You haven't set a display name yet.
             <a
               href={`/${app.activeChainId()}/account/${
@@ -171,7 +171,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                 <CWText
                   type="caption"
                   fontWeight="medium"
-                  class="user-link-text"
+                  className="user-link-text"
                 >
                   {render(User, { user: author, hideAvatar: true, linkify: true })}
                 </CWText>
@@ -187,7 +187,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
               imageUploader
             />
             {tokenPostingThreshold && tokenPostingThreshold.gt(new BN(0)) && (
-              <CWText class="token-req-text">
+              <CWText className="token-req-text">
                 Commenting in {activeTopicName} requires{' '}
                 {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
                 {app.chain.meta.default_symbol}.{' '}

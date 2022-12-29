@@ -18,7 +18,7 @@ export class CWAddress extends ClassComponent<AddressAttrs> {
     const { address, darkMode } = vnode.attrs;
     return (
       <div className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'Address')}>
-        <CWText type="caption" class="address-text">
+        <CWText type="caption" className="address-text">
           {address}
         </CWText>
       </div>

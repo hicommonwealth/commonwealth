@@ -55,11 +55,11 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
     const { activeAddressesWithRole, nAccountsWithoutRole } = vnode.attrs;
 
     return (
-      <div class="LoginSelectorMenu">
+      <div className="LoginSelectorMenu">
         {activeAddressesWithRole.map((account) => (
           <div
-            class="login-menu-item"
-            onclick={async () => {
+            className="login-menu-item"
+            onClick={async () => {
               await setActiveAccount(account);
               redraw();
             }}
@@ -76,8 +76,8 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         {activeAddressesWithRole.length > 0 && <CWDivider />}
         {activeAddressesWithRole.length > 0 && app.activeChainId() && (
           <div
-            class="login-menu-item"
-            onclick={() => {
+            className="login-menu-item"
+            onClick={() => {
               const pf = app.user.activeAccount.profile;
               if (app.chain) {
                 navigateToSubpage(`/account/${pf.address}`);
@@ -89,8 +89,8 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         )}
         {activeAddressesWithRole.length > 0 && app.activeChainId() && (
           <div
-            class="login-menu-item"
-            onclick={(e) => {
+            className="login-menu-item"
+            onClick={(e) => {
               e.preventDefault();
               app.modals.create({
                 modal: EditProfileModal,
@@ -105,8 +105,8 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
           </div>
         )}
         <div
-          class="login-menu-item"
-          onclick={() => {
+          className="login-menu-item"
+          onClick={() => {
             if (nAccountsWithoutRole > 0) {
               app.modals.create({
                 modal: SelectAddressModal,
@@ -140,16 +140,16 @@ export class LoginSelectorMenuRight extends ClassComponent {
     const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
     return (
-      <div class="LoginSelectorMenu">
+      <div className="LoginSelectorMenu">
         <div
-          class="login-menu-item"
-          onclick={() => setRoute('/notification-settings')}
+          className="login-menu-item"
+          onClick={() => setRoute('/notification-settings')}
         >
           <CWText type="caption">Notification settings</CWText>
         </div>
         <div
-          class="login-menu-item"
-          onclick={() =>
+          className="login-menu-item"
+          onClick={() =>
             app.activeChainId()
               ? navigateToSubpage('/settings')
               : setRoute('/settings')
@@ -157,7 +157,7 @@ export class LoginSelectorMenuRight extends ClassComponent {
         >
           <CWText type="caption">Account settings</CWText>
         </div>
-        <div class="login-menu-item">
+        <div className="login-menu-item">
           <CWToggle
             checked={isDarkModeOn}
             onchange={(e) => {
@@ -180,14 +180,14 @@ export class LoginSelectorMenuRight extends ClassComponent {
         </div>
         <CWDivider />
         <div
-          class="login-menu-item"
-          onclick={() => app.modals.create({ modal: FeedbackModal })}
+          className="login-menu-item"
+          onClick={() => app.modals.create({ modal: FeedbackModal })}
         >
           <CWText type="caption">Send feedback</CWText>
         </div>
         <div
-          class="login-menu-item"
-          onclick={() => {
+          className="login-menu-item"
+          onClick={() => {
             $.get(`${app.serverUrl()}/logout`)
               .then(async () => {
                 await initAppState();
@@ -221,7 +221,7 @@ class TOSModal extends ClassComponent<TOSModalAttrs> {
             iconButtonTheme="primary"
             iconName="close"
             iconSize="small"
-            class="close-icon"
+            className="close-icon"
             onClick={() => $('.TOSModal').trigger('modalexit')}
           />
         </div>
@@ -229,7 +229,7 @@ class TOSModal extends ClassComponent<TOSModalAttrs> {
           <CWText>
             By clicking accept you agree to the community's Terms of Service
           </CWText>
-          <CWButton onclick={vnode.attrs.onAccept} label="Accept" />
+          <CWButton onClick={vnode.attrs.onAccept} label="Accept" />
         </div>
       </div>
     );
@@ -242,12 +242,12 @@ export class LoginSelector extends ClassComponent {
   view() {
     if (!app.isLoggedIn()) {
       return (
-        <div class="LoginSelector">
+        <div className="LoginSelector">
           <CWButton
             buttonType="tertiary-black"
             iconLeft="person"
             label="Log in"
-            onclick={() => {
+            onClick={() => {
               app.modals.create({
                 modal: NewLoginModal,
                 data: {
@@ -460,15 +460,15 @@ export class LoginSelector extends ClassComponent {
     }
 
     return (
-      <div class="LoginSelector">
+      <div className="LoginSelector">
         {app.chain &&
           !app.chainPreloading &&
           this.profileLoadComplete &&
           !app.user.activeAccount && (
-            <div class="join-button-container">
+            <div className="join-button-container">
               <CWButton
                 buttonType="tertiary-black"
-                onclick={async () => {
+                onClick={async () => {
                   if (hasTermsOfService) {
                     app.modals.create({
                       modal: TOSModal,
@@ -501,7 +501,7 @@ export class LoginSelector extends ClassComponent {
           app.user.activeAccount && (
             <CWPopover
               trigger={
-                <div class="left-button">
+                <div className="left-button">
                   {render(User, {
                     user: app.user.activeAccount,
                     hideIdentityIcon: true,
@@ -518,7 +518,7 @@ export class LoginSelector extends ClassComponent {
           )}
         <CWPopover
           trigger={
-            <div class="right-button">
+            <div className="right-button">
               <CWIconButton iconName="person" iconButtonTheme="black" />
             </div>
           }

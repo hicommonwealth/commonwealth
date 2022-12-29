@@ -60,7 +60,7 @@ export class CWDropdown extends ClassComponent<DropdownAttrs> {
                     }
                   }}
                 >
-                  <CWText class="dropdown-item-text">{item.label}</CWText>
+                  <CWText className="dropdown-item-text">{item.label}</CWText>
                 </div>
               );
             })}

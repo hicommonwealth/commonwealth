@@ -15,18 +15,18 @@ export class CWIconButton extends ClassComponent<IconComponentAttrs> {
       iconButtonTheme = 'neutral',
       iconName,
       iconSize = 'medium',
-      onclick,
+      onClick,
       selected = false,
     } = vnode.attrs;
 
     return (
       <CWIcon
-        class={iconButtonTheme}
+        className={iconButtonTheme}
         componentType={componentType}
         disabled={disabled}
         iconName={iconName}
         iconSize={iconSize}
-        onClick={onclick}
+        onClick={onClick}
         selected={selected}
       />
     );

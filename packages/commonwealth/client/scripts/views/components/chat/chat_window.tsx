@@ -182,7 +182,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                 <CWIconButton
                   iconName="copy"
                   iconSize="small"
-                  onclick={() => async () => {
+                  onClick={() => async () => {
                     const route = app.socket.chatNs.getRouteToMessage(
                       grp.messages[0].chat_channel_id,
                       grp.messages[0].id,

@@ -57,7 +57,7 @@ class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
           }
         }}
       >
-        <CWText class={getClasses<{ clickable?: boolean }>({ clickable })}>
+        <CWText className={getClasses<{ clickable?: boolean }>({ clickable })}>
           {dao.name}
         </CWText>
         <CWText>{amountString}</CWText>

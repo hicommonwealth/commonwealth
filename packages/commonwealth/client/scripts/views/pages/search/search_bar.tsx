@@ -164,7 +164,7 @@ export class SearchBar extends ClassComponent {
                           <div className="section-header">
                             <CWText
                               type="caption"
-                              class="section-header-text"
+                              className="section-header-text"
                             >
                               Threads
                             </CWText>
@@ -184,7 +184,7 @@ export class SearchBar extends ClassComponent {
                           <div className="section-header">
                             <CWText
                               type="caption"
-                              class="section-header-text"
+                              className="section-header-text"
                             >
                               Comments
                             </CWText>
@@ -204,7 +204,7 @@ export class SearchBar extends ClassComponent {
                           <div className="section-header">
                             <CWText
                               type="caption"
-                              class="section-header-text"
+                              className="section-header-text"
                             >
                               Communities
                             </CWText>
@@ -221,7 +221,7 @@ export class SearchBar extends ClassComponent {
                           <div className="section-header">
                             <CWText
                               type="caption"
-                              class="section-header-text"
+                              className="section-header-text"
                             >
                               Members
                             </CWText>
@@ -238,7 +238,7 @@ export class SearchBar extends ClassComponent {
                   })}
                 </div>
               ) : (
-                <CWText type="caption" class="no-results-text">
+                <CWText type="caption" className="no-results-text">
                   No Results
                 </CWText>
               )}
@@ -247,7 +247,7 @@ export class SearchBar extends ClassComponent {
                   <CWText
                     type="caption"
                     fontWeight="medium"
-                    class="search-history-header"
+                    className="search-history-header"
                   >
                     Search History
                   </CWText>

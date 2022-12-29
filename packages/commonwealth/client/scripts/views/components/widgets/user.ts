@@ -34,7 +34,7 @@ const User: Component<
     showAddressWithDisplayName?: boolean; // show address inline with the display name
     addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
     linkify?: boolean;
-    onclick?: any;
+    onClick?: any;
     popover?: boolean;
     showRole?: boolean;
   },
@@ -282,7 +282,7 @@ const User: Component<
     const userPopover = render(
       '.UserPopover',
       {
-        onclick: (e) => {
+        onClick: (e) => {
           e.stopPropagation();
         },
       },
@@ -343,7 +343,7 @@ const User: Component<
         loggedInUserIsAdmin &&
           render('.ban-wrapper', [
             render(CWButton, {
-              onclick: () => {
+              onClick: () => {
                 app.modals.create({
                   modal: BanUserModal,
                   data: { profile },

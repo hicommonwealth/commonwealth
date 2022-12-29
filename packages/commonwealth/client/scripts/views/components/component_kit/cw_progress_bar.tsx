@@ -34,18 +34,18 @@ export class CWProgressBar extends ClassComponent<ProgressBarAttrs> {
                 <CWIcon
                   iconName={iconName}
                   iconSize="small"
-                  class="button-icon"
+                  className="button-icon"
                 />
               )}
               <CWText>{label}</CWText>
             </div>
             {subtext && (
-              <CWText class="subtext-text" type="caption">
+              <CWText className="subtext-text" type="caption">
                 {subtext}
               </CWText>
             )}
           </div>
-          <CWText class="progress-percentage-text" type="caption">
+          <CWText className="progress-percentage-text" type="caption">
             {`${Math.min(100, Math.floor(progress * 1000) / 1000)}%`}
           </CWText>
         </div>

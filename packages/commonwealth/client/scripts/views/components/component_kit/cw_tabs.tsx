@@ -16,12 +16,12 @@ type TabStyleAttrs = {
 
 type TabAttrs = {
   label: string;
-  onclick: () => void;
+  onClick: () => void;
 } & TabStyleAttrs;
 
 export class CWTab extends ClassComponent<TabAttrs> {
   view(vnode: ResultNode<TabAttrs>) {
-    const { disabled, isSelected, label, onclick } = vnode.attrs;
+    const { disabled, isSelected, label, onClick } = vnode.attrs;
 
     return (
       <div
@@ -29,11 +29,11 @@ export class CWTab extends ClassComponent<TabAttrs> {
           { isSelected, disabled },
           ComponentType.Tab
         )}
-        onClick={onclick}
+        onClick={onClick}
       >
         <CWText
           type="h4"
-          class="tab-label-text"
+          className="tab-label-text"
           fontWeight={isSelected ? 'bold' : 'semiBold'}
         >
           {label}

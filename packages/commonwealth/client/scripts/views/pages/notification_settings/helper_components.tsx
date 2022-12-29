@@ -32,7 +32,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
         <div className="header-row" onClick={() => setRoute(threadUrl)}>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-            class="attribution-text"
+            className="attribution-text"
             noWrap
           >
             {getNotificationTypeText(subscription.category)}
@@ -41,12 +41,12 @@ const getTextRows = (subscription: NotificationSubscription) => {
             type="b2"
             fontWeight="bold"
             noWrap
-            class="thread-title-text"
+            className="thread-title-text"
           >
             {subscription.Thread.title}
           </CWText>
         </div>
-        <CWText type="caption" class="subscription-body-text" noWrap>
+        <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Thread.body, {
             collapse: true,
             hideFormatting: true,
@@ -72,7 +72,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
         <div className="header-row">
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-            class="attribution-text"
+            className="attribution-text"
           >
             {getNotificationTypeText(subscription.category)}
           </CWText>
@@ -93,12 +93,12 @@ const getTextRows = (subscription: NotificationSubscription) => {
           </CWText>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-            class="attribution-text"
+            className="attribution-text"
           >
             comment
           </CWText>
         </div>
-        <CWText type="caption" class="subscription-body-text" noWrap>
+        <CWText type="caption" className="subscription-body-text" noWrap>
           {renderQuillTextBody(subscription.Comment.text, {
             collapse: true,
             hideFormatting: true,
@@ -118,7 +118,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
-          class="attribution-text"
+          className="attribution-text"
         >
           New Threads in
         </CWText>
@@ -170,7 +170,7 @@ export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
             label: 'Unsubscribe',
             iconLeft: 'close',
             isSecondary: true,
-            onclick: () =>
+            onClick: () =>
               app.user.notifications
                 .deleteSubscription(subscription)
                 .then(() => {

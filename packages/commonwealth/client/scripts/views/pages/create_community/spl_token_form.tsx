@@ -83,7 +83,7 @@ export class SplTokenForm extends ClassComponent {
     };
 
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <CWDropdown
           label="Cluster"
           options={[

@@ -25,7 +25,7 @@ const renderThreadPreview = (
     return render('@TODO @REACT PLEASE REMOVE ME')
   // return m(ListItem, {
   //   label: (
-  //     <div class="thread-preview-row">
+  //     <div className="thread-preview-row">
   //       <CWText fontWeight="medium" noWrap>
   //         {thread.title}
   //       </CWText>

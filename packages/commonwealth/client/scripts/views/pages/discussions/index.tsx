@@ -28,7 +28,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
     return document.getElementsByClassName('Body')[0];
   }
 
-  async onscroll() {
+  async onScroll() {
     localStorage[`${app.activeChainId()}-discussions-scrollY`] =
       this.scrollEle.scrollTop;
 
@@ -108,7 +108,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
         description={
           app.topics.getByName(this.topicName, app.activeChainId()) || ''
         }
-        onScroll={debounce(this.onscroll.bind(this), 400)}
+        onScroll={debounce(this.onScroll.bind(this), 400)}
       >
         <div className="DiscussionsPage">
           <RecentThreadsHeader
@@ -129,7 +129,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
                 stageName,
               }) && (
                 <div className="listing-scroll">
-                  <CWText class="thread-count-text">
+                  <CWText className="thread-count-text">
                     {`Showing ${totalThreadCount} of ${pluralize(
                       totalThreadCount,
                       'thread'
@@ -139,7 +139,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
               )}
             </div>
           ) : (
-            <CWText class="no-threads-text">
+            <CWText className="no-threads-text">
               {isNotUndefined(topicName)
                 ? 'There are no threads matching your filter.'
                 : 'There are no threads here yet.'}

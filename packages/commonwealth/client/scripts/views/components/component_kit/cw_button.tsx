@@ -39,7 +39,7 @@ export type ButtonAttrs = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label: string | ResultNode;
-  onclick?: (e?: MouseEvent) => void;
+  onClick?: (e?: MouseEvent) => void;
 } & ButtonStyleAttrs;
 
 const getTextType = (buttonType: ButtonType) => {
@@ -61,7 +61,7 @@ export class CWButton extends ClassComponent<ButtonAttrs> {
       iconLeft,
       iconRight,
       label,
-      onclick,
+      onClick,
     } = vnode.attrs;
     return (
       <button
@@ -73,24 +73,24 @@ export class CWButton extends ClassComponent<ButtonAttrs> {
           },
           ComponentType.Button
         )}
-        onClick={onclick}
+        onClick={onClick}
         disabled={disabled}
       >
         {!!iconLeft && (
           <CWIcon
             iconName={iconLeft}
             iconSize="small"
-            class="button-icon"
+            className="button-icon"
           />
         )}
-        <CWText type={getTextType(buttonType)} class="button-text" noWrap>
+        <CWText type={getTextType(buttonType)} className="button-text" noWrap>
           {label}
         </CWText>
         {!!iconRight && (
           <CWIcon
             iconName={iconRight}
             iconSize="small"
-            class="button-icon"
+            className="button-icon"
           />
         )}
       </button>

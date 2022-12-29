@@ -46,9 +46,9 @@ class Councillor extends ClassComponent<CouncillorAttrs> {
       .filter((v) => v.votes.includes(account.address));
 
     return (
-      <CWCard class="CouncillorCard">
+      <CWCard className="CouncillorCard">
         {render(User, { user: account, popover: true, hideIdentityIcon: true })}
-        <CWText class="councillor-status-text">
+        <CWText className="councillor-status-text">
           {election.isMember(account)
             ? `${election.backing(account).format(true)} from ${pluralize(
                 votes?.length || 0,

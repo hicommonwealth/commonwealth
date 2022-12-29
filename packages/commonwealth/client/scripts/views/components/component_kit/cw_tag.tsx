@@ -31,12 +31,12 @@ export class CWTag extends ClassComponent<TagAttrs> {
 
     return (
       <div
-        class={getClasses<{ type?: TagType }>({ type }, ComponentType.Tag)}
+        className={getClasses<{ type?: TagType }>({ type }, ComponentType.Tag)}
       >
         {!!iconName && (
-          <CWIcon iconName={iconName} iconSize="small" class="tag-icon" />
+          <CWIcon iconName={iconName} iconSize="small" className="tag-icon" />
         )}
-        <CWText type="caption" fontWeight="medium" class="tag-text" noWrap>
+        <CWText type="caption" fontWeight="medium" className="tag-text" noWrap>
           {label}
         </CWText>
       </div>

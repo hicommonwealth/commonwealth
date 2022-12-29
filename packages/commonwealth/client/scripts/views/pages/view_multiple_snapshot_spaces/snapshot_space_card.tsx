@@ -53,7 +53,7 @@ export class SnapshotSpaceCard extends ClassComponent<SnapshotSpaceCardAttrs> {
       <CWCard
         elevation="elevation-2"
         interactive
-        class="SnapshotSpaceCard"
+        className="SnapshotSpaceCard"
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();

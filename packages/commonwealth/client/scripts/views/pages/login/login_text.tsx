@@ -37,7 +37,7 @@ export class LoginText extends ClassComponent<LoginTextAttrs> {
             }
             fontWeight="semiBold"
             isCentered={isMobile}
-            class="header-text"
+            className="header-text"
           >
             {headerText}
           </CWText>
@@ -45,7 +45,7 @@ export class LoginText extends ClassComponent<LoginTextAttrs> {
         <CWText
           type={isMobile ? 'h5' : 'b2'}
           isCentered={isMobile}
-          class={getClasses<{ isMobile?: boolean }>(
+          className={getClasses<{ isMobile?: boolean }>(
             { isMobile },
             'body-text'
           )}

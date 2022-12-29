@@ -29,7 +29,7 @@ export class CWGrowl extends ClassComponent<GrowlAttrs> {
             ComponentType.Growl
           )}
         >
-          <CWCard class="growl-card" elevation="elevation-3" interactive>
+          <CWCard className="growl-card" elevation="elevation-3" interactive>
             {vnode.children}
           </CWCard>
         </div>

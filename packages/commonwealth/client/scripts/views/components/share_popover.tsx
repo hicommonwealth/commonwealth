@@ -18,7 +18,7 @@ export class SharePopover extends ClassComponent<SharePopoverAttrs> {
           {
             iconLeft: 'copy',
             label: 'Copy URL',
-            onclick: async () => {
+            onClick: async () => {
               const currentRouteSansCommentParam = getRoute()
                 .split('?comment=')[0];
               if (!commentId) {
@@ -35,7 +35,7 @@ export class SharePopover extends ClassComponent<SharePopoverAttrs> {
           {
             iconLeft: 'twitter',
             label: 'Share on Twitter',
-            onclick: async () => {
+            onClick: async () => {
               if (!commentId) {
                 await window.open(
                   `https://twitter.com/intent/tweet?text=${domain}${getRoute()}`,

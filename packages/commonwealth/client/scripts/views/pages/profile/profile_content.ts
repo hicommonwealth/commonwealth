@@ -24,7 +24,7 @@ const ProfileContent: Component<
   },
   {
     previousContent: any;
-    onscroll;
+    onScroll;
   }
 > = {
   // TODO: Add typeguards to ProposalComments so we can avoid the dirty indexing here

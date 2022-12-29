@@ -57,7 +57,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         isActive: getRoute().includes('/manage'),
         isVisible: true,
         isUpdated: false,
-        onclick: (e, toggle: boolean) => {
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
           handleRedirectClicks(e, `/manage`, app.activeChainId(), () => {
             setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
@@ -72,7 +72,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         isActive: getRoute().includes('/analytics'),
         isVisible: true,
         isUpdated: false,
-        onclick: (e, toggle: boolean) => {
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
           handleRedirectClicks(e, `/analytics`, app.activeChainId(), () => {
             setAdminToggleTree(`children.analytics.toggledState`, toggle);
@@ -87,7 +87,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         displayData: null,
         isUpdated: false,
         hasDefaultToggle: false,
-        onclick: (e) => {
+        onClick: (e) => {
           e.preventDefault();
           this.newTopicModalActive = true;
           app.modals.create({
@@ -107,7 +107,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         displayData: null,
         isUpdated: false,
         hasDefaultToggle: false,
-        onclick: (e) => {
+        onClick: (e) => {
           e.preventDefault();
           this.orderTopicsModalActive = true;
           app.modals.create({
@@ -127,7 +127,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         displayData: null,
         isUpdated: false,
         hasDefaultToggle: false,
-        onclick: (e) => {
+        onClick: (e) => {
           e.preventDefault();
           this.editTopicThresholdsModalActive = true;
           app.modals.create({
@@ -165,7 +165,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
       title: 'Admin Capabilities',
       className: 'AdminSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setAdminToggleTree('toggledState', toggle);
       },

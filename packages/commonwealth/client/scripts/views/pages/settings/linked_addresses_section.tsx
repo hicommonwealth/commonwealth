@@ -20,7 +20,7 @@ import { getClasses } from '../../components/component_kit/helpers';
 
 type AccountRowAttrs = {
   account: AddressInfo;
-  onclick?: (e: Event) => any;
+  onClick?: (e: Event) => any;
 };
 
 class AccountRow extends ClassComponent<AccountRowAttrs> {
@@ -40,7 +40,7 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
           'AccountRow'
         )}
         key={`${account.chain.id}#${account.address}`}
-        onClick={vnode.attrs.onclick}
+        onClick={vnode.attrs.onClick}
       >
         {render(User, {
           user: account,
@@ -56,12 +56,12 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
             linkify: true,
             popover: true,
           })}
-          <CWText class="address-text" type="caption">
+          <CWText className="address-text" type="caption">
             {formatAddressShort(account.address)} -{' '}
             {app.config.chains.getById(account.chain.id)?.name}
           </CWText>
           {account.walletId === WalletId.Magic && (
-            <CWText class="address-text" type="caption">
+            <CWText className="address-text" type="caption">
               Magically linked to {app.user.email}
             </CWText>
           )}

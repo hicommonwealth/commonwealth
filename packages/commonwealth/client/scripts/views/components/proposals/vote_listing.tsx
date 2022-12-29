@@ -58,7 +58,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
     return (
       <div className="VoteListing">
         {sortedVotes.length === 0 ? (
-          <CWText class="no-votes">No votes</CWText>
+          <CWText className="no-votes">No votes</CWText>
         ) : (
           votes.map((vote) => {
             let balance;

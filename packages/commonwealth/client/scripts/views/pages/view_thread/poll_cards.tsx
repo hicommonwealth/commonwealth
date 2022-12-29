@@ -31,7 +31,7 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
         } offchain poll to this
         thread?`}
         content={
-          <div class="PollEditorCard">
+          <div className="PollEditorCard">
             <CWButton
               buttonType="mini-black"
               label="Create poll"

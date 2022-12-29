@@ -31,7 +31,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
               <CWText
                 type="caption"
                 fontWeight="medium"
-                class={isCurrent ? 'current-text' : 'parent-text'}
+                className={isCurrent ? 'current-text' : 'parent-text'}
                 onClick={isCurrent ? undefined : () => setRoute(b.path)}
               >
                 {b.label}
@@ -40,7 +40,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
                 <CWText
                   type="caption"
                   fontWeight="medium"
-                  class="separator-text"
+                  className="separator-text"
                 >
                   /
                 </CWText>

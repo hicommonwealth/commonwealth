@@ -147,7 +147,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                   const candidate = candidateTuple[0];
                   const address = candidateTuple[0].address;
 
-                  const onclick = (e) => {
+                  const onClick = (e) => {
                     e.preventDefault();
 
                     const index = this.votes.indexOf(address);
@@ -160,10 +160,10 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                   };
 
                   return (
-                    <div className="candidate-row" onClick={onclick}>
+                    <div className="candidate-row" onClick={onClick}>
                       <CWCheckbox
                         checked={this.votes.indexOf(address) !== -1}
-                        onchange={onclick}
+                        onchange={onClick}
                         label=""
                         value=""
                       />

@@ -15,7 +15,7 @@ import { ComponentType, MenuItem } from './types';
 class CWMobileMenuItem extends ClassComponent<MenuItem> {
   view(vnode: ResultNode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
-      const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
+      const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
         vnode.attrs;
 
       return (
@@ -27,7 +27,7 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
           onClick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
-            onclick(e);
+            onClick(e);
           }}
         >
           <div className="mobile-menu-item-left">
@@ -44,7 +44,7 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
         </div>
       );
     } else if (vnode.attrs.type === 'notification') {
-      const { hasUnreads, iconLeft, iconRight, label, onclick } = vnode.attrs;
+      const { hasUnreads, iconLeft, iconRight, label, onClick } = vnode.attrs;
 
       return (
         <div
@@ -52,7 +52,7 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
           onClick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
             app.mobileMenu = null;
-            onclick(e);
+            onClick(e);
           }}
         >
           <div className="mobile-menu-item-left">
@@ -73,7 +73,7 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
 
 type MobileMenuAttrs = {
   className?: string;
-  menuHeader?: { label: string; onclick: (e) => void };
+  menuHeader?: { label: string; onClick: (e) => void };
   menuItems: Array<MenuItem>;
 };
 
@@ -89,7 +89,7 @@ export class CWMobileMenu extends ClassComponent<MobileMenuAttrs> {
         )}
       >
         {menuHeader && (
-          <div className="mobile-menu-header" onClick={menuHeader.onclick}>
+          <div className="mobile-menu-header" onClick={menuHeader.onClick}>
             <CWIcon iconName="chevronLeft" />
             <CWText type="h5" fontWeight="medium">
               {menuHeader.label}

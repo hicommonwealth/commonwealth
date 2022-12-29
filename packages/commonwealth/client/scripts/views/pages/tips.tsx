@@ -38,12 +38,12 @@ class Tip extends ClassComponent<TipAttrs> {
           <CWText
             fontWeight="medium"
             type="caption"
-            class="reason-header-text"
+            className="reason-header-text"
           >
             Reason
           </CWText>
           <CWText
-            class="reason-text"
+            className="reason-text"
             type="caption"
             title={proposal.data.reason}
           >
@@ -54,7 +54,7 @@ class Tip extends ClassComponent<TipAttrs> {
           <CWText
             fontWeight="medium"
             type="caption"
-            class="reason-header-text"
+            className="reason-header-text"
           >
             Beneficiary
           </CWText>

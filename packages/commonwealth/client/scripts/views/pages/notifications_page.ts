@@ -143,7 +143,7 @@ const NotificationsPage: Component<{}> = {
             [
               render(CWButton, {
                 label: 'Previous Page',
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   pageKey -= 1;
                   console.log(
@@ -167,7 +167,7 @@ const NotificationsPage: Component<{}> = {
               }),
               render(CWButton, {
                 label: 'Next Page',
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   pageKey += 1;
 
@@ -199,7 +199,7 @@ const NotificationsPage: Component<{}> = {
               }),
               render(CWButton, {
                 label: 'Mark all as read',
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   app.user.notifications
                     .markAsRead(
@@ -217,7 +217,7 @@ const NotificationsPage: Component<{}> = {
                   ),
                   render(CWButton, {
                     label: 'Confirm',
-                    onclick: async (e) => {
+                    onClick: async (e) => {
                       e.preventDefault();
                       if (
                         app.user.notifications.chainEventNotifications

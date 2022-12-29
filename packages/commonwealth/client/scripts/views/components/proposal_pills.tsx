@@ -20,7 +20,7 @@ export class ActiveProposalPill extends ClassComponent<ActiveProposalPillAttrs> 
         <CWText type="caption">
           Ends in {formatTimestamp(moment(+proposalEnd * 1000))}
         </CWText>
-        <CWText type="caption" fontWeight="medium" class="active-text">
+        <CWText type="caption" fontWeight="medium" className="active-text">
           Active
         </CWText>
       </div>
@@ -36,7 +36,7 @@ export class ClosedProposalPill extends ClassComponent<ClosedProposalPillAttrs> 
 
     return (
       <div className="ClosedProposalPill">
-        <CWText type="caption" fontWeight="semiBold" class="closed-text">
+        <CWText type="caption" fontWeight="semiBold" className="closed-text">
           {proposalState}
         </CWText>
       </div>

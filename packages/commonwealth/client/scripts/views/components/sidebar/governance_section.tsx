@@ -250,7 +250,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       isActive:
         onMembersPage(getRoute()) &&
         (app.chain ? app.chain.serverLoaded : true),
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         handleRedirectClicks(e, '/members', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Members.toggledState', toggle);
         });
@@ -268,7 +268,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       isVisible: showSnapshotOptions,
       isActive: onSnapshotProposal(getRoute()),
       isUpdated: true,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
         // Check if we have multiple snapshots for conditional redirect
@@ -310,7 +310,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showProposals
         ? toggleTreeState['children']['Proposals']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/proposals', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Proposals.toggledState', toggle);
@@ -329,7 +329,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showTreasury
         ? toggleTreeState['children']['Treasury']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/treasury', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Treasury.toggledState', toggle);
@@ -347,7 +347,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showBounties
         ? toggleTreeState['children']['Bounties']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/bounties', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Bounties.toggledState', toggle);
@@ -365,7 +365,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showReferenda
         ? toggleTreeState['children']['Referenda']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/referenda', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Referenda.toggledState', toggle);
@@ -383,7 +383,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showTips
         ? toggleTreeState['children']['Tips']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/tips', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Tips.toggledState', toggle);
@@ -401,7 +401,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showCouncillors
         ? toggleTreeState['children']['Councillors']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/council', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Councillors.toggledState', toggle);
@@ -419,7 +419,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showValidators
         ? toggleTreeState['children']['Validators']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/validators', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Validators.toggledState', toggle);
@@ -441,7 +441,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       isVisible: showCompoundOptions,
       isUpdated: true,
       isActive: getRoute() === `/${app.activeChainId()}/delegate`,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         handleRedirectClicks(e, '/delegate', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Delegate.toggledState', toggle);
@@ -469,7 +469,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       title: 'Governance',
       className: 'GovernanceSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('toggledState', toggle);
       },

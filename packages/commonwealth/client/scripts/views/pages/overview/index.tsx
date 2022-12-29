@@ -76,7 +76,7 @@ class OverviewPage extends ClassComponent {
                 Overview
               </CWText>
               <CWButton
-                class="latest-button"
+                className="latest-button"
                 buttonType="mini-black"
                 label="Latest Threads"
                 iconName="home"
@@ -108,7 +108,7 @@ class OverviewPage extends ClassComponent {
             <CWText
               type="h5"
               fontWeight="semiBold"
-              class="threads-header-row-text"
+              className="threads-header-row-text"
             >
               Topic
             </CWText>
@@ -116,7 +116,7 @@ class OverviewPage extends ClassComponent {
               <CWText
                 type="h5"
                 fontWeight="semiBold"
-                class="threads-header-row-text"
+                className="threads-header-row-text"
               >
                 Recent threads
               </CWText>

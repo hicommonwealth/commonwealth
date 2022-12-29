@@ -17,7 +17,7 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
       disabled = false,
       iconName,
       iconSize = 'medium',
-      onclick,
+      onClick,
       selected,
       ...otherAttrs
     } = vnode.attrs;
@@ -26,11 +26,11 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
 
     return (
       <Icon
-        class={className}
+        className={className}
         componentType={componentType}
         disabled={disabled}
         iconSize={iconSize}
-        onClick={onclick}
+        onClick={onClick}
         selected={selected}
         {...otherAttrs}
       />

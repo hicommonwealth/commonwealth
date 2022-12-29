@@ -24,7 +24,7 @@ export class TXSigningTransactionBox extends ClassComponent<TXSigningTransaction
       <div className="TXSigningTransactionBox">
         <CWText fontWeight="medium">Status</CWText>
         <CWText
-          class={getClasses<{ success?: boolean }>(
+          className={getClasses<{ success?: boolean }>(
             { success },
             'status-text'
           )}

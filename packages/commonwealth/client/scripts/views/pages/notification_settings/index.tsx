@@ -44,10 +44,10 @@ class NotificationSettingsPage extends ClassComponent {
       // title={<BreadcrumbsTitleTag title="Notification Settings" />}
       >
         <div className="NotificationSettingsPage">
-          <CWText type="h3" fontWeight="semiBold" class="page-header-text">
+          <CWText type="h3" fontWeight="semiBold" className="page-header-text">
             Notification Management
           </CWText>
-          <CWText class="page-subheader-text">
+          <CWText className="page-subheader-text">
             Notification settings for all new threads, comments, mentions,
             likes, and chain events in the following communities.
           </CWText>
@@ -55,21 +55,21 @@ class NotificationSettingsPage extends ClassComponent {
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
-              class="column-header-text"
+              className="column-header-text"
             >
               Community
             </CWText>
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
-              class="column-header-text"
+              className="column-header-text"
             >
               Email
             </CWText>
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
-              class="last-column-header-text"
+              className="last-column-header-text"
             >
               In-App
             </CWText>
@@ -84,7 +84,7 @@ class NotificationSettingsPage extends ClassComponent {
                 <CWCollapsible
                   headerContent={
                     <div className="notification-row-header">
-                      <div class="left-content-container">
+                      <div className="left-content-container">
                         <div className="avatar-and-name">
                           <CWCommunityAvatar
                             size="medium"
@@ -94,7 +94,7 @@ class NotificationSettingsPage extends ClassComponent {
                             {chainInfo?.name}
                           </CWText>
                         </div>
-                        <CWText type="b2" class="subscriptions-count-text">
+                        <CWText type="b2" className="subscriptions-count-text">
                           {subs.length} subscriptions
                         </CWText>
                       </div>
@@ -138,19 +138,19 @@ class NotificationSettingsPage extends ClassComponent {
                       <div className="subscriptions-list-header">
                         <CWText
                           type="caption"
-                          class="subscription-list-header-text"
+                          className="subscription-list-header-text"
                         >
                           Title
                         </CWText>
                         <CWText
                           type="caption"
-                          class="subscription-list-header-text"
+                          className="subscription-list-header-text"
                         >
                           Subscribed
                         </CWText>
                         <CWText
                           type="caption"
-                          class="subscription-list-header-text"
+                          className="subscription-list-header-text"
                         >
                           Author
                         </CWText>
@@ -214,7 +214,7 @@ class NotificationSettingsPage extends ClassComponent {
                                 {getTimeStamp() && (
                                   <CWText
                                     type="caption"
-                                    class="subscription-list-header-text"
+                                    className="subscription-list-header-text"
                                   >
                                     subscribed
                                   </CWText>
@@ -222,7 +222,7 @@ class NotificationSettingsPage extends ClassComponent {
                                 <CWText
                                   type="caption"
                                   fontWeight="medium"
-                                  class="subscription-list-header-text"
+                                  className="subscription-list-header-text"
                                 >
                                   {getTimeStamp()}
                                 </CWText>

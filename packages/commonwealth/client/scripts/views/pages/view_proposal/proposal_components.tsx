@@ -125,7 +125,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
 
     return (
       <div className="ProposalSubheader">
-        <CWText class={`onchain-status-text ${getStatusClass(proposal)}`}>
+        <CWText className={`onchain-status-text ${getStatusClass(proposal)}`}>
           {getStatusText(proposal)}
         </CWText>
         {(proposal['blockExplorerLink'] ||

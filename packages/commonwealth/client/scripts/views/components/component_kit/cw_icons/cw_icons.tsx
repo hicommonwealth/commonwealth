@@ -21,7 +21,7 @@ import { IconAttrs, IconStyleAttrs } from './types';
 //     For instance:
 //       - "fill-rule" over "fillRule"
 //       - "clip-rule" over "clipRule"
-//       - "onclick" over "onClick"
+//       - "onClick" over "onClick"
 //       - "viewBox" over "view-box"
 // (5) Remove all "fill" properties from path tags, to allow SCSS coloration
 // (6) Icons must be added to the cw_icon_lookup.ts registry

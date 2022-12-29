@@ -124,7 +124,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
             onClick={() => onVoteCast()}
           />
         )}
-        <CWText class="time-remaining-text" type="caption">
+        <CWText className="time-remaining-text" type="caption">
           {timeRemaining}
         </CWText>
       </div>
@@ -156,11 +156,11 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
               <CWIcon
                 iconName="check"
                 iconSize="small"
-                class="vote-check-icon"
+                className="vote-check-icon"
               />
               <CWText type="caption">{voteDirectionString}</CWText>
             </div>
-            <CWText class="time-remaining-text" type="caption">
+            <CWText className="time-remaining-text" type="caption">
               {timeRemaining}
             </CWText>
           </>
@@ -172,7 +172,7 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
               <CWText
                 type="caption"
                 fontWeight="medium"
-                class="direction-text"
+                className="direction-text"
               >
                 {voteDirectionString}
               </CWText>
@@ -241,7 +241,7 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
             </CWText>
             <CWText
               type="caption"
-              class={getClasses<{ clickable?: boolean }>({
+              className={getClasses<{ clickable?: boolean }>({
                 clickable: onResultsClick && hasVotes,
               })}
               onClick={
@@ -290,7 +290,7 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
             })}
         </div>
         {isPreview && numOptionsBeyondPreview > 0 && (
-          <CWText type="caption" class="more-options">
+          <CWText type="caption" className="more-options">
             {`+ ${numOptionsBeyondPreview} more option${
               numOptionsBeyondPreview === 1 ? '' : 's'
             }`}
@@ -371,8 +371,8 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
     };
 
     return (
-      <CWCard class="PollCard">
-        <CWText type="b2" class="poll-title-text">
+      <CWCard className="PollCard">
+        <CWText type="b2" className="poll-title-text">
           {proposalTitle}
         </CWText>
         <div className="poll-voting-section">

@@ -41,7 +41,7 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
       <CWCard
         elevation="elevation-2"
         interactive
-        class="ProposalCard"
+        className="ProposalCard"
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
@@ -69,12 +69,12 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
             {proposal.title}
           </CWText>
           {proposal instanceof SubstrateTreasuryProposal && (
-            <CWText class="proposal-amount-text">
+            <CWText className="proposal-amount-text">
               {proposal.value?.format(true)}
             </CWText>
           )}
           {proposal instanceof SubstrateDemocracyReferendum && (
-            <CWText class="proposal-amount-text">
+            <CWText className="proposal-amount-text">
               {proposal.threshold}
             </CWText>
           )}
@@ -93,13 +93,13 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
         ) : proposal.isPassing !== 'none' ? (
           <CWText
             fontWeight="medium"
-            class={`proposal-status-text ${getStatusClass(proposal)}`}
+            className={`proposal-status-text ${getStatusClass(proposal)}`}
           >
             {getStatusText(proposal)}
           </CWText>
         ) : null}
         {proposal.threadId && (
-          <CWText type="caption" class="proposal-thread-link-text">
+          <CWText type="caption" className="proposal-thread-link-text">
             <a
               href={getProposalUrlPath(
                 ProposalType.Thread,

@@ -43,7 +43,7 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
       <CWCard
         elevation="elevation-2"
         interactive
-        class="community-card"
+        className="community-card"
         onClick={redirectFunction}
       >
         <div className="top-content">
@@ -51,7 +51,7 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
           <CWText
             type="h4"
             fontWeight="semiBold"
-            class="chain-name"
+            className="chain-name"
             title={chain.name}
             noWrap
           >
@@ -60,7 +60,7 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
         </div>
         <div className="bottom-content">
           <CWText
-            class="card-description"
+            className="card-description"
             type="caption"
             title={prettyDescription}
           >
@@ -85,7 +85,7 @@ export class NewCommunityCard extends ClassComponent {
       <CWCard
         elevation="elevation-2"
         interactive={true}
-        class="new-community-card"
+        className="new-community-card"
         onClick={(e) => {
           e.preventDefault();
           document.location =
@@ -96,11 +96,11 @@ export class NewCommunityCard extends ClassComponent {
           <CWText
             type="h3"
             fontWeight="semiBold"
-            class="new-community-header"
+            className="new-community-header"
           >
             Create a new community
           </CWText>
-          <CWText class="new-community">
+          <CWText className="new-community">
             Launch and grow your decentralized community on Commonwealth
           </CWText>
           <a className="learn-more" href="#">

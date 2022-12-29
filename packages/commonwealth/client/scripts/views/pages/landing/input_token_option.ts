@@ -17,7 +17,7 @@ const InputTokenOptionComponent: Component<IAttrs, {}> = {
       tokenImage = render('.TokenIcon', [
         render('.token-icon.no-image', {
           style: 'width: 1.5rem; height: 1.5rem; margin-right: 1rem;',
-          onclick
+          onClick
         }, [
           render('span', {
             style: 'font-size: 1.25rem;'
@@ -37,7 +37,7 @@ const InputTokenOptionComponent: Component<IAttrs, {}> = {
         'button',
         {
           type: 'button',
-          onclick: (e) => {
+          onClick: (e) => {
             if (vnode.attrs.route === 'placeholder') {
               e.preventDefault();
               window.location.href = ADD_TOKEN_LINK;

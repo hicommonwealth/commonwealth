@@ -24,7 +24,7 @@ export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
           'LoginBoilerplate'
         )}
       >
-        <CWText type="caption" class="boilerplate-text" isCentered>
+        <CWText type="caption" className="boilerplate-text" isCentered>
           By connecting to Common, you agree to our{' '}
           <a
             className="link"

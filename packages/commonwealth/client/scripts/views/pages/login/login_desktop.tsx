@@ -83,7 +83,7 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
-                  class="header-text"
+                  className="header-text"
                   isCentered
                 >
                   Looks like this address hasn't been connected before.
@@ -94,7 +94,7 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h5"
                   fontWeight="semiBold"
-                  class="select-text"
+                  className="select-text"
                   isCentered
                 >
                   Select Account Type
@@ -108,7 +108,7 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
-                  class="header-text"
+                  className="header-text"
                   isCentered
                 >
                   Connect With Email?
@@ -143,12 +143,12 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h3"
                   fontWeight="bold"
-                  class="header-text"
+                  className="header-text"
                   isCentered
                 >
                   Welcome to Common!
                 </CWText>
-                <CWText type="b2" class="subheader-text" isCentered>
+                <CWText type="b2" className="subheader-text" isCentered>
                   Use a generated username and photo to edit later, or edit now
                 </CWText>
               </div>
@@ -171,12 +171,12 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
-                  class="header-text-eth"
+                  className="header-text-eth"
                   isCentered
                 >
                   Select an Ethereum Wallet
                 </CWText>
-                <CWText type="caption" class="subheader-text" isCentered>
+                <CWText type="caption" className="subheader-text" isCentered>
                   Manage your profiles, addresses and communities under one
                   account.
                 </CWText>
@@ -195,12 +195,12 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
-                  class="header-text"
+                  className="header-text"
                   isCentered
                 >
                   Select a Previously Linked Address
                 </CWText>
-                <CWText type="caption" class="subheader-text" isCentered>
+                <CWText type="caption" className="subheader-text" isCentered>
                   Manage your profiles, addresses and communities under one
                   account.
                 </CWText>
@@ -226,7 +226,7 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h3"
                   fontWeight="bold"
-                  class="header-text"
+                  className="header-text"
                   isCentered
                 >
                   Select Profile
@@ -249,7 +249,7 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 <CWText
                   type="h3"
                   fontWeight="bold"
-                  class="header-text"
+                  className="header-text"
                   isCentered
                 >
                   You’re All Set!

@@ -14,11 +14,11 @@ const gethelpMenuItems = (): Array<MenuItem> => {
   return [
     {
       label: 'Send Feedback',
-      onclick: () => app.modals.create({ modal: FeedbackModal }),
+      onClick: () => app.modals.create({ modal: FeedbackModal }),
     },
     {
       label: 'Help',
-      onclick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
+      onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
     },
   ];
 };
@@ -27,10 +27,10 @@ export class HelpMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
-        class="HelpMenu"
+        className="HelpMenu"
         menuHeader={{
           label: 'Help',
-          onclick: () => {
+          onClick: () => {
             app.mobileMenu = 'MainMenu';
           },
         }}

@@ -21,35 +21,35 @@ export class ExternalLinksModule extends ClassComponent {
         {discord && (
           <CWIcon
             iconName="discord"
-            class="discord-link"
+            className="discord-link"
             onClick={() => window.open(discord)}
           />
         )}
         {element && (
           <CWIcon
             iconName="element"
-            class="element-link"
+            className="element-link"
             onClick={() => window.open(element)}
           />
         )}
         {telegram && (
           <CWIcon
             iconName="telegram"
-            class="telegram-link"
+            className="telegram-link"
             onClick={() => window.open(telegram)}
           />
         )}
         {github && (
           <CWIcon
             iconName="github"
-            class="github-link"
+            className="github-link"
             onClick={() => window.open(github)}
           />
         )}
         {website && (
           <CWIcon
             iconName="website"
-            class="website-link"
+            className="website-link"
             onClick={() => window.open(website)}
           />
         )}

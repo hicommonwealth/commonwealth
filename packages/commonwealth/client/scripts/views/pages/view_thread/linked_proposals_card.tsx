@@ -130,7 +130,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
                   )}
                 </div>
               ) : (
-                <CWText type="b2" class="no-proposals-text">
+                <CWText type="b2" className="no-proposals-text">
                   There are currently no linked proposals.
                 </CWText>
               )}

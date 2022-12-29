@@ -33,7 +33,7 @@ export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAtt
       <CWCard
         elevation="elevation-2"
         interactive={true}
-        class="ProposalCard"
+        className="ProposalCard"
         onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();

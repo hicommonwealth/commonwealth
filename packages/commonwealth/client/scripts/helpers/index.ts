@@ -58,7 +58,7 @@ export function externalLink(selector, target, children) {
       href: target,
       target: '_blank',
       rel: 'noopener noreferrer',
-      onclick: (e) => {
+      onClick: (e) => {
         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         if (target.startsWith(`${document.location.origin}/`)) {
           // don't open a new window if the link is on Commonwealth
@@ -83,7 +83,7 @@ export function link(
 ) {
   const attrs = {
     href: target,
-    onclick: (e) => {
+    onClick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       if (e.target.target === '_blank') return;
 

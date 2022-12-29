@@ -142,7 +142,6 @@
     "clipboard-polyfill": "^2.8.6",
     "compression": "^1.7.4",
     "connect-session-sequelize": "^7.1.1",
-    "construct-ui": "^0.3.0",
     "cookie-parser": "^1.4.4",
     "copy-webpack-plugin": "^4.6.0",
     "crypto-browserify": "^3.12.0",

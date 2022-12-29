@@ -13,24 +13,24 @@ import { CWText } from './cw_text';
 
 type CommunityAvatarAttrs = {
   community: ChainInfo;
-  onclick?: () => void;
+  onClick?: () => void;
   size?: IconSize;
 };
 
 export class CWCommunityAvatar extends ClassComponent<CommunityAvatarAttrs> {
   view(vnode: ResultNode<CommunityAvatarAttrs>) {
-    const { community, onclick, size = 'large' } = vnode.attrs;
+    const { community, onClick, size = 'large' } = vnode.attrs;
 
     const sizeIsAboveLarge =
       size !== 'small' && size !== 'medium' && size !== 'large';
 
     return (
       <div
-        className={getClasses<{ onclick: boolean; size: IconSize }>(
-          { onclick: !!onclick, size },
+        className={getClasses<{ onClick: boolean; size: IconSize }>(
+          { onClick: !!onClick, size },
           ComponentType.CommunityAvatar
         )}
-        onClick={onclick}
+        onClick={onClick}
       >
         {community.iconUrl ? (
           <img className="community-image" src={community.iconUrl} />
@@ -38,7 +38,7 @@ export class CWCommunityAvatar extends ClassComponent<CommunityAvatarAttrs> {
           <div className={getClasses<{ size: IconSize }>({ size }, 'no-image')}>
             <CWText
               type={sizeIsAboveLarge ? 'h5' : 'caption'}
-              class="avatar-no-image-letter"
+              className="avatar-no-image-letter"
               fontWeight="medium"
             >
               {community.name?.slice(0, 1)}

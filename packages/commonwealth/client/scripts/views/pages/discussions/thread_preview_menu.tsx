@@ -51,7 +51,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
 
                       app.threads
@@ -66,7 +66,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
 
                       app.threads
@@ -84,7 +84,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
                       app.modals.create({
                         modal: ChangeTopicModal,
@@ -105,7 +105,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
                       app.modals.create({
                         modal: UpdateProposalStatusModal,
@@ -126,7 +126,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onclick: async (e) => {
+                    onClick: async (e) => {
                       e.preventDefault();
 
                       const confirmed = await confirmationModalWithText(

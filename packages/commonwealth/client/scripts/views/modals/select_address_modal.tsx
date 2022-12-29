@@ -157,7 +157,7 @@ export class SelectAddressModal extends ClassComponent {
                         <CWIcon
                           iconName="close"
                           iconSize="small"
-                          onclick={deleteRole.bind(this)}
+                          onClick={deleteRole.bind(this)}
                         />
                       </div>
                     </div>
@@ -171,7 +171,7 @@ export class SelectAddressModal extends ClassComponent {
                         { isSelected: this.selectedIndex === index },
                         'select-address-option'
                       )}
-                      onclick={async (e) => {
+                      onClick={async (e) => {
                         e.preventDefault();
                         this.selectedIndex = index;
                       }}
@@ -220,7 +220,7 @@ export class SelectAddressModal extends ClassComponent {
             <CWButton
               label="Join community with address"
               disabled={typeof this.selectedIndex !== 'number' || this.loading}
-              onclick={createRole.bind(this)}
+              onClick={createRole.bind(this)}
             />
           )}
         </div>

@@ -170,7 +170,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
             </div>
           ) : (
             <div className="no-collaborators">
-              <CWText class="no-collaborators-text">
+              <CWText className="no-collaborators-text">
                 No collaborators selected
               </CWText>
             </div>

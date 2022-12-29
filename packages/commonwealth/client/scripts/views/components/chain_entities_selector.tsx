@@ -61,14 +61,14 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
           //     return m(ListItem, {
           //       disabled: ce.threadId && ce.threadId !== thread.id,
           //       label: (
-          //         <div class="chain-entity">
-          //           <div class="chain-entity-text">
+          //         <div className="chain-entity">
+          //           <div className="chain-entity-text">
           //             {chainEntityTypeToProposalName(ce.type) +
           //               (ce.typeId.startsWith('0x')
           //                 ? ` ${ce.typeId.slice(0, 6)}...`
           //                 : ` #${ce.typeId}`)}
           //           </div>
-          //           <div class="chain-entity-subtext">
+          //           <div className="chain-entity-subtext">
           //             {ce.threadTitle !== 'undefined'
           //               ? decodeURIComponent(ce.threadTitle)
           //               : 'No thread title'}

@@ -27,7 +27,7 @@ class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
 
     return (
       <div className="SnapshotInfoRow">
-        <CWText type="caption" class="snapshot-info-row-label">
+        <CWText type="caption" className="snapshot-info-row-label">
           {label}
         </CWText>
         <CWText noWrap>{value}</CWText>
@@ -44,11 +44,11 @@ class SnapshotInfoLinkRow extends ClassComponent<SnapshotInfoLinkRowAttrs> {
 
     return (
       <div className="SnapshotInfoRow">
-        <CWText type="caption" class="snapshot-info-row-label">
+        <CWText type="caption" className="snapshot-info-row-label">
           {label}
         </CWText>
         <a href={url} target="_blank">
-          <CWText class="snapshot-link" noWrap>
+          <CWText className="snapshot-link" noWrap>
             {value}
           </CWText>
           <CWIcon iconName="externalLink" iconSize="small" />
@@ -75,7 +75,7 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
       <CWContentPageCard
         header="Information"
         content={
-          <div class="SnapshotInformationCard">
+          <div className="SnapshotInformationCard">
             <div className="info-rows-container">
               <SnapshotInfoRow
                 label="Author"

@@ -18,7 +18,7 @@ import { SublayoutHeader } from './sublayout_header';
 type SublayoutAttrs = {
   hideFooter?: boolean;
   hideSearch?: boolean;
-  onscroll?: () => void; // lazy loading for page content
+  onScroll?: () => void; // lazy loading for page content
 };
 
 class Sublayout extends ClassComponent<SublayoutAttrs> {
@@ -48,7 +48,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
   }
 
   view(vnode: ResultNode<SublayoutAttrs>) {
-    const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
+    const { hideFooter = false, hideSearch, onScroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
@@ -82,7 +82,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
               {this.isWindowSmallInclusive && app.mobileMenu ? (
                 <AppMobileMenus />
               ) : (
-                <div className="Body" onScroll={onscroll}>
+                <div className="Body" onScroll={onScroll}>
                   {vnode.children}
                   {!app.isCustomDomain() && !hideFooter && <Footer />}
                 </div>

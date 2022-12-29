@@ -20,7 +20,7 @@ class SubSection extends ClassComponent<SubSectionAttrs> {
       isActive,
       isUpdated,
       isVisible,
-      onclick,
+      onClick,
       rightIcon,
       rowIcon,
       title,
@@ -31,7 +31,7 @@ class SubSection extends ClassComponent<SubSectionAttrs> {
     }
 
     const clickHandler = (e) => {
-      onclick(e);
+      onClick(e);
     };
 
     let titleTextClass = '';
@@ -73,7 +73,7 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
       isActive,
       isUpdated,
       isVisible,
-      onclick,
+      onClick,
       rightIcon,
       title,
     } = vnode.attrs;
@@ -89,7 +89,7 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
 
       app.sidebarToggled = false;
 
-      onclick(e, this.toggled);
+      onClick(e, this.toggled);
     };
 
     const carat = this.toggled ? (
@@ -146,7 +146,7 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
           ) : (
             <div className="no-carat" />
           )}
-          <CWText type="b2" class={`title-text ${titleTextClass}`}>
+          <CWText type="b2" className={`title-text ${titleTextClass}`}>
             {title}
           </CWText>
           {rightIcon && <div className="right-icon">{rightIcon}</div>}
@@ -178,7 +178,7 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
     const {
       displayData,
       extraComponents,
-      onclick,
+      onClick,
       rightIcon,
       title,
       toggleDisabled,
@@ -200,7 +200,7 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
         this.hoverColor = 'none';
       }
 
-      onclick(e, this.toggled);
+      onClick(e, this.toggled);
     };
 
     const mouseEnterHandler = (e) => {

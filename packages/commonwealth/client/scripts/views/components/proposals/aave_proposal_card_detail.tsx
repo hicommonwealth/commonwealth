@@ -22,7 +22,7 @@ export class AaveInfoRow extends ClassComponent<AaveInfoRowAttrs> {
 
     return (
       <div className="AaveInfoRow">
-        <CWText type="h5" fontWeight="semiBold" class="aave-num-text">
+        <CWText type="h5" fontWeight="semiBold" className="aave-num-text">
           {roundVote(aaveNum * 100)}%
         </CWText>
         <CWText noWrap>{aaveText}</CWText>

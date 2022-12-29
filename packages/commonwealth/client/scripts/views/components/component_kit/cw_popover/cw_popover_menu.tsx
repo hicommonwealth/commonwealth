@@ -15,30 +15,30 @@ export class CWPopoverMenuItem extends ClassComponent<MenuItem> {
   view(vnode: ResultNode<MenuItem>) {
     if (vnode.attrs.type === 'header') {
       return (
-        <CWText class="menu-section-header-text" type="caption">
+        <CWText className="menu-section-header-text" type="caption">
           {vnode.attrs.label}
         </CWText>
       );
     } else if (vnode.attrs.type === 'divider') {
       return <div className="menu-section-divider" />;
     } else if (vnode.attrs.type === 'default') {
-      const { disabled, isSecondary, iconLeft, label, onclick } = vnode.attrs;
+      const { disabled, isSecondary, iconLeft, label, onClick } = vnode.attrs;
       return (
         <div
           className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
             { disabled, isSecondary },
             'PopoverMenuItem'
           )}
-          onClick={onclick}
+          onClick={onClick}
         >
           {iconLeft && (
             <CWIcon
-              class="menu-item-icon"
+              className="menu-item-icon"
               iconName={iconLeft}
               iconSize="small"
             />
           )}
-          <CWText type="b2" class="menu-item-text">
+          <CWText type="b2" className="menu-item-text">
             {label}
           </CWText>
         </div>

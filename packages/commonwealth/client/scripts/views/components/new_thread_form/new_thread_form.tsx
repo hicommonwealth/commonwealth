@@ -356,7 +356,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
             )}
             {this.form.kind === ThreadKind.Discussion && (
               <>
-                {!!fromDraft && <CWText class="draft-text">Draft</CWText>}
+                {!!fromDraft && <CWText className="draft-text">Draft</CWText>}
                 <div className="topics-and-title-row">
                   {hasTopics && (
                     <TopicSelector
@@ -604,7 +604,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                 <CWText
                   type="h5"
                   fontWeight="semiBold"
-                  class="drafts-list-title-text"
+                  className="drafts-list-title-text"
                 >
                   Drafts
                 </CWText>
@@ -662,7 +662,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                               collapse: true,
                             })}
                           <CWText
-                            class="draft-delete-text"
+                            className="draft-delete-text"
                             onClick={async (e) => {
                               e.preventDefault();
                               e.stopPropagation();

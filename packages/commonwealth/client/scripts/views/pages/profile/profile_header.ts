@@ -88,7 +88,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               src: '/static/img/copy_default.svg',
               alt: '',
               class: 'cursor-pointer',
-              onclick: (e) => {
+              onClick: (e) => {
                 window.navigator.clipboard
                   .writeText(account.address)
                   .then(() => notifySuccess('Copied address to clipboard'));
@@ -113,7 +113,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         account.profile &&
           account.profile.bio &&
           render(CWButton, {
-            onclick: () => {
+            onClick: () => {
               alertModalWithText(account.profile.bio, 'Close')();
             },
             label: 'View Bio',
@@ -121,7 +121,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
           render(CWButton, {
-            onclick: () => {
+            onClick: () => {
               app.modals.create({
                 modal: BanUserModal,
                 data: { profile: account.profile },
@@ -134,7 +134,7 @@ const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           onOwnProfile
             ? showJoinCommunityButton && app.activeChainId()
             : render(CWButton, {
-                onclick: async () => {
+                onClick: async () => {
                   if (onLinkedProfile) {
                     vnode.state.loading = true;
                     try {

@@ -37,7 +37,7 @@ class MembersPage extends ClassComponent {
   private membersLoaded: MemberInfo[];
   private membersRequested: boolean;
   private numProfilesLoaded: number;
-  private onscroll: any;
+  private onScroll: any;
   private profilesFinishedLoading: boolean;
   private profilesLoaded: ProfileInfo[];
   private totalMembersCount: number;
@@ -156,7 +156,7 @@ class MembersPage extends ClassComponent {
       }, 100);
     }
 
-    this.onscroll = _.debounce(() => {
+    this.onScroll = _.debounce(() => {
       const scrollHeight = $(document).height();
 
       const scrollPos = $(window).height() + $(window).scrollTop();
@@ -196,7 +196,7 @@ class MembersPage extends ClassComponent {
     return (
       <Sublayout
         title={<BreadcrumbsTitleTag title="Members" />}
-        onScroll={this.onscroll}
+        onScroll={this.onScroll}
       >
         <div className="MembersPage">
           <CWText type="h3" fontWeight="medium">
@@ -232,7 +232,7 @@ class MembersPage extends ClassComponent {
           </div>
           <div className="infinite-scroll-wrapper">
             {profilesFinishedLoading ? (
-              <CWText class="infinite-scroll-reached-end-text">
+              <CWText className="infinite-scroll-reached-end-text">
                 Showing all {membersLoaded.length} community members
               </CWText>
             ) : (

@@ -5,7 +5,7 @@ export type BaseSidebarAttrs = {
   isActive?: boolean; // Is this the current page
   isUpdated?: boolean; // Does this page have updates (relevant for chat, less so for other sections)
   isVisible?: boolean; // Is this section shown as an option
-  onclick?: any;
+  onClick?: any;
   onhover?: () => void;
   rightIcon?: ResultNode;
   title?: string;

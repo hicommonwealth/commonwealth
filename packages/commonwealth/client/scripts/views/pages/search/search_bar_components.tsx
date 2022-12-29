@@ -16,24 +16,24 @@ import { CommunityLabel } from '../../components/community_label';
 type SearchChipAttrs = {
   isActive: boolean;
   label: string;
-  onclick: () => void;
+  onClick: () => void;
 };
 
 export class SearchChip extends ClassComponent<SearchChipAttrs> {
   view(vnode: ResultNode<SearchChipAttrs>) {
-    const { isActive, label, onclick } = vnode.attrs;
+    const { isActive, label, onClick } = vnode.attrs;
 
     return (
       <CWText
         type="b2"
         fontWeight="medium"
-        class={getClasses<{ isActive: boolean }>(
+        className={getClasses<{ isActive: boolean }>(
           {
             isActive,
           },
           'SearchChip'
         )}
-        onClick={onclick}
+        onClick={onClick}
       >
         {label}
       </CWText>
@@ -68,8 +68,8 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
               null
             ),
           })}
-          <CWText class="last-updated-text">•</CWText>
-          <CWText type="caption" class="last-updated-text">
+          <CWText className="last-updated-text">•</CWText>
+          <CWText type="caption" className="last-updated-text">
             {moment(searchResult.created_at).format('l')}
           </CWText>
           {/* <CWText type="caption">{searchResult.chain}</CWText> */}
@@ -77,7 +77,7 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
         <CWText type="b2" fontWeight="bold">
           {decodeURIComponent(searchResult.title)}
         </CWText>
-        <CWText type="caption" class="excerpt-text" fontWeight="medium">
+        <CWText type="caption" className="excerpt-text" fontWeight="medium">
           {renderQuillTextBody(searchResult.body, {
             hideFormatting: true,
             collapse: true,
@@ -104,14 +104,14 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
           );
         }}
       >
-        <CWText type="caption" class="last-updated-text">
+        <CWText type="caption" className="last-updated-text">
           {moment(searchResult.created_at).format('l')}
         </CWText>
         {/* <CWText type="caption">{searchResult.chain}</CWText> */}
         {/* <CWText type="b2" fontWeight="medium">
           {decodeURIComponent(searchResult.title)}
         </CWText> */}
-        <CWText type="caption" class="excerpt-text">
+        <CWText type="caption" className="excerpt-text">
           {renderQuillTextBody(searchResult.text, {
             hideFormatting: true,
             collapse: true,

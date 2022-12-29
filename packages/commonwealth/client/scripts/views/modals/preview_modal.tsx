@@ -14,7 +14,7 @@ class PreviewModalEmptyState extends ClassComponent {
   view() {
     return (
       <div className="empty-state-container">
-        <CWText type="h5" fontWeight="semiBold" class="empty-text">
+        <CWText type="h5" fontWeight="semiBold" className="empty-text">
           Nothing to preview
         </CWText>
       </div>

@@ -87,8 +87,8 @@ export class NotificationsMenu extends ClassComponent {
       );
 
     return (
-      <div class="NotificationsMenu">
-        <div class="NotificationsMenuHeader">
+      <div className="NotificationsMenu">
+        <div className="NotificationsMenuHeader">
           {/* {m(Button, { // @TODO @REACT FIX ME
             label:
               // discussionNotificationsCount
@@ -96,7 +96,7 @@ export class NotificationsMenu extends ClassComponent {
               //   : 'Discussions'
               'Discussions',
             active: !this.selectedChainEvents,
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = false;
@@ -109,7 +109,7 @@ export class NotificationsMenu extends ClassComponent {
               //   : 'Chain events'
               'Chain events',
             active: !!this.selectedChainEvents,
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = true; // @TODO @REACT FIX ME
@@ -167,17 +167,17 @@ export class NotificationsMenu extends ClassComponent {
             }
           })()}
         </div>
-        <div class="NotificationsMenuFooter">
+        <div className="NotificationsMenuFooter">
           {/* {m(Button, { // @TODO @REACT FIX ME
             label: 'See all',
-            onclick: () =>
+            onClick: () =>
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
                 : setRoute('/notifications'),
           })}
           {render(Button, {
             label: 'Mark all read',
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               // e.stopPropagation();
               const typeNotif = this.selectedChainEvents
@@ -191,7 +191,7 @@ export class NotificationsMenu extends ClassComponent {
           })}
           {render(Button, {
             label: '<',
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               this._previousPage(this.selectedChainEvents);
@@ -199,7 +199,7 @@ export class NotificationsMenu extends ClassComponent {
           })}
           {render(Button, {
             label: '>',
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               // necessary since page refresh loads the first set of notifications for both but the min may not be set
@@ -231,7 +231,7 @@ export class NotificationsMenuPopover extends ClassComponent {
     //   transitionDuration: 0,
     //   trigger:
     //     app.user.notifications.numUnread > 0 ? (
-    //       <div class="unreads-icon">
+    //       <div className="unreads-icon">
     //         <CWCustomIcon iconName="unreads" />
     //       </div>
     //     ) : (

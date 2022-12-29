@@ -60,11 +60,11 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
           //     // like any set proposal title, the creator, or other metadata
           //     return m(ListItem, {
           //       label: (
-          //         <div class="chain-entity">
-          //           <div class="chain-entity-text" title={sn.title}>
+          //         <div className="chain-entity">
+          //           <div className="chain-entity-text" title={sn.title}>
           //             {sn.title}
           //           </div>
-          //           <div class="chain-entity-subtext" title={sn.id}>
+          //           <div className="chain-entity-subtext" title={sn.id}>
           //             Hash: ${sn.id}
           //           </div>
           //         </div>

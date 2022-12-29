@@ -108,7 +108,7 @@ export const renderQuillDelta = (
                       target: openLinksInNewTab ? '_blank' : '',
                       noreferrer: 'noreferrer',
                       noopener: 'noopener',
-                      onclick: (e) => {
+                      onClick: (e) => {
                         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey)
                           return;
                         if (
@@ -192,7 +192,7 @@ export const renderQuillDelta = (
             result = render(
               'span.mention',
               {
-                onclick: (e) => {
+                onClick: (e) => {
                   // alert(child.insert.mention.id)
                 },
               },
@@ -206,7 +206,7 @@ export const renderQuillDelta = (
                 target: '_blank',
                 noreferrer: 'noreferrer',
                 noopener: 'noopener',
-                onclick: (e) => {
+                onClick: (e) => {
                   if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
                   if (
                     child.attributes.link.startsWith(

@@ -15,7 +15,7 @@ export class LoginEthAlert extends ClassComponent {
         <CWText
           type="h4"
           fontWeight="semiBold"
-          class="login-eth-alert-text"
+          className="login-eth-alert-text"
         >
           This Community requires an Ethereum wallet
         </CWText>

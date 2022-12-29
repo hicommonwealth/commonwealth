@@ -107,7 +107,7 @@ const getMemberPreview = (
   // return m(ListItem, {
   //   tabIndex,
   //   label: (
-  //     <a class="search-results-item">
+  //     <a className="search-results-item">
   //       {m(UserBlock, {
   //         user: profile,
   //         searchTerm,
@@ -117,7 +117,7 @@ const getMemberPreview = (
   //       })}
   //     </a>
   //   ),
-  //   onclick: () => {
+  //   onClick: () => {
   //     enterAddressFn(addr.address);
   //     closeResultsFn();
   //   },
@@ -537,14 +537,14 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
             //     ? app.searchAddressCache[searchAddressTerm]?.loaded
             //       ? m(ListItem, {
             //           label: (
-            //             <div class="no-addresses">
+            //             <div className="no-addresses">
             //               <CWText fontWeight="medium">
             //                 {searchAddressTerm}
             //               </CWText>
             //               <CWText type="caption">No addresses found</CWText>
             //             </div>
             //           ),
-            //           onclick: () => {
+            //           onClick: () => {
             //             if (searchAddressTerm.length < 4) {
             //               notifyError('Query must be at least 4 characters');
             //             }
@@ -670,7 +670,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //           type: 'submit',
 //           intent: 'primary',
 //           rounded: true,
-//           onclick: (e) => {
+//           onClick: (e) => {
 //             e.preventDefault();
 //             // TODO: Change to POST /inviteLink
 //             $.post(`${app.serverUrl()}/createInviteLink`, {
@@ -706,7 +706,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //           src: 'static/img/copy_default.svg',
 //           alt: '',
 //           class: 'mx-auto',
-//           onclick: (e) => {
+//           onClick: (e) => {
 //             const copyText = document.getElementById(
 //               'invite-link-pastebin'
 //             ) as HTMLInputElement;

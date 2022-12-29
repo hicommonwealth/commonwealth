@@ -4,7 +4,7 @@ import 'modals/confirm_invite_modal.scss';
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
-import { Button } from 'construct-ui';
+// import { Button } from 'construct-ui';
 
 import { orderAccountsByAddress } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -25,7 +25,7 @@ const SideMenu: Component<{ invites; onChangeHandler; location }, {}> = {
           '.inviteTitle',
           {
             class: location === index ? 'selected' : '',
-            onclick: () => {
+            onClick: () => {
               vnode.attrs.onChangeHandler(index);
             },
           },
@@ -73,7 +73,7 @@ const ConfirmInviteModal: Component<
               : isMobile
               ? 'mobile'
               : '',
-          onclick: (e) => {
+          onClick: (e) => {
             e.preventDefault();
             vnode.state.selectedAddress = account.address;
           },
@@ -155,7 +155,7 @@ const ConfirmInviteModal: Component<
                         disabled:
                           vnode.state.accepted.includes(location) ||
                           !vnode.state.selectedAddress,
-                        onclick: (e) => {
+                        onClick: (e) => {
                           e.preventDefault();
                           const communityName =
                             invites[location].community_name;
@@ -199,7 +199,7 @@ const ConfirmInviteModal: Component<
                         intent: 'negative',
                         rounded: true,
                         disabled: vnode.state.accepted.includes(location),
-                        onclick: async (e) => {
+                        onClick: async (e) => {
                           e.preventDefault();
                           const confirmed = await confirmationModalWithText(
                             'Reject this invite? You will need to be invited again.'
@@ -231,7 +231,7 @@ const ConfirmInviteModal: Component<
                       'a.btn.add-account',
                       {
                         href: '#',
-                        onclick: (e) => {
+                        onClick: (e) => {
                           e.preventDefault();
 
                           // set defaults for the web3 login modal

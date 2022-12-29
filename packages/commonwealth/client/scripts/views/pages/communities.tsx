@@ -189,7 +189,7 @@ class CommunitiesPage extends ClassComponent {
             <CWText
               type="h3"
               fontWeight="semiBold"
-              class="communities-count"
+              className="communities-count"
             >
               {totalCommunitiesString}
             </CWText>

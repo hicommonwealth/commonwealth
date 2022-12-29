@@ -12,7 +12,7 @@ import { breakpointFnValidator, getClasses } from './helpers';
 import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
-  onclick: (
+  onClick: (
     spec: any,
     confirmExit: () => void,
     exitCallback: () => void
@@ -76,7 +76,7 @@ export class CWModal extends ClassComponent<ModalAttrs> {
   }
 
   view(vnode: ResultNode<ModalAttrs>) {
-    const { onclick, spec } = vnode.attrs;
+    const { onClick, spec } = vnode.attrs;
 
     const exitCallback = spec.exitCallback || (() => undefined);
     const confirmExit = spec.modal.confirmExit || (() => true);
@@ -85,7 +85,7 @@ export class CWModal extends ClassComponent<ModalAttrs> {
       <div className={ComponentType.Modal}>
         <div
           className="modal-overlay"
-          onClick={() => onclick(spec, confirmExit, exitCallback)}
+          onClick={() => onClick(spec, confirmExit, exitCallback)}
         >
           <div
             className={getClasses<{ isFullScreen: boolean }>(

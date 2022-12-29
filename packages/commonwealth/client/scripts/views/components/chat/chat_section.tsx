@@ -186,7 +186,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
     // @TODO @REACT FIX ME
     // const sectionAdminButton: m.Vnode = m(Icon, {
     //   name: Icons.PLUS_CIRCLE,
-    //   onclick: (e) => {
+    //   onClick: (e) => {
     //     e.stopPropagation();
     //     this.adminModals['CreateCategory'] = true;
     //   },
@@ -227,21 +227,21 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       //     m(MenuItem, {
       //       iconLeft: Icons.PLUS_CIRCLE,
       //       label: 'Add Channel',
-      //       onclick: (e) => {
+      //       onClick: (e) => {
       //         handleMenuClick(e, 'CreateChannel');
       //       },
       //     }),
       //     m(MenuItem, {
       //       iconLeft: Icons.EDIT_2,
       //       label: 'Rename Category',
-      //       onclick: (e) => {
+      //       onClick: (e) => {
       //         handleMenuClick(e, 'RenameCategory');
       //       },
       //     }),
       //     m(MenuItem, {
       //       iconLeft: Icons.DELETE,
       //       label: 'Delete Category',
-      //       onclick: (e) => {
+      //       onClick: (e) => {
       //         handleMenuClick(e, 'DeleteCategory');
       //       },
       //     }),
@@ -308,14 +308,14 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       //     m(MenuItem, {
       //       iconLeft: Icons.EDIT_2,
       //       label: 'Rename Channel',
-      //       onclick: (e) => {
+      //       onClick: (e) => {
       //         handleMenuClick(e, 'RenameChannel');
       //       },
       //     }),
       //     m(MenuItem, {
       //       iconLeft: Icons.DELETE,
       //       label: 'Delete Channel',
-      //       onclick: (e) => {
+      //       onClick: (e) => {
       //         handleMenuClick(e, 'DeleteChannel');
       //       },
       //     }),
@@ -326,7 +326,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       // return (
       //   <>
       //     {channel.unread > 0 && (
-      //       <div class="unread-icon">{channel.unread}</div>
+      //       <div className="unread-icon">{channel.unread}</div>
       //     )}
       //     {m(Icon, {
       //       name: Icons.EDIT,
@@ -350,7 +350,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         isVisible: true,
         isActive: onChannelPage(getRoute()),
         isUpdated: channel.unread > 0,
-        onclick: (e) => {
+        onClick: (e) => {
           handleRedirectClicks(
             e,
             `/chat/${channel.id}`,
@@ -373,7 +373,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         isVisible: true,
         isActive: false, // TODO: if any child is active
         isUpdated: false, // TODO: is collapsed and children has unread
-        onclick: (e) => {
+        onClick: (e) => {
           e.preventDefault();
         },
         displayData: this.channels[category].map(channelToSubSectionProps),
@@ -416,7 +416,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       title: 'Chat',
       className: 'ChatSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setToggleTree('toggledState', toggle);
       },

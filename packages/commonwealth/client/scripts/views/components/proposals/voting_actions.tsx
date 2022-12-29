@@ -539,7 +539,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
 
     return (
       <div className="VotingActions">
-        <CWText type="h4" class="voting-actions-header">
+        <CWText type="h4" className="voting-actions-header">
           Cast Your Vote
         </CWText>
         {votingActionObj}

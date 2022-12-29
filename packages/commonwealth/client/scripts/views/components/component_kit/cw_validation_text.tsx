@@ -22,7 +22,7 @@ export class CWValidationText extends ClassComponent<ValidationTextAttrs> {
       <CWText
         type="caption"
         fontWeight="medium"
-        class={`${ComponentType.ValidationText} ${status}`}
+        className={`${ComponentType.ValidationText} ${status}`}
       >
         {message}
       </CWText>

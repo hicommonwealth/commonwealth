@@ -17,7 +17,7 @@ type WalletOptionRowStyleAttrs = {
 };
 
 type WalletOptionRowAttrs = {
-  onclick?: () => void;
+  onClick?: () => void;
   walletName: CustomIconName;
   walletLabel?: string;
 } & WalletOptionRowStyleAttrs;
@@ -27,7 +27,7 @@ export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
     const {
       disabled = false,
       darkMode,
-      onclick,
+      onClick,
       walletName,
       walletLabel,
     } = vnode.attrs;
@@ -40,13 +40,13 @@ export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
           },
           ComponentType.WalletOptionRow
         )}
-        onClick={onclick}
+        onClick={onClick}
       >
         <CWCustomIcon size={32} iconName={walletName} iconSize="large" />
         <CWText
           type="h5"
           fontWeight="semiBold"
-          class="wallet-option-text"
+          className="wallet-option-text"
           noWrap
         >
           {walletLabel}

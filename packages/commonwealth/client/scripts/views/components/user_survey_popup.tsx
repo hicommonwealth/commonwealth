@@ -30,11 +30,11 @@ class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
       <CWGrowl position="bottom-right" disabled={disabled}>
         <div className="UserSurveyPopup">
           <div className="survey-svg-header"></div>
-          <CWIcon iconName="close" class="close-icon" onClick={onClose} />
-          <CWText type="h3" fontWeight="bold" class="header-text">
+          <CWIcon iconName="close" className="close-icon" onClick={onClose} />
+          <CWText type="h3" fontWeight="bold" className="header-text">
             Want a Milk Carton NFT?
           </CWText>
-          <CWText type="b1" class="body-text">
+          <CWText type="b1" className="body-text">
             Take a quick survey to help us improve Common and get a special NFT
             dropped to your ETH address!
           </CWText>
@@ -55,7 +55,7 @@ class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
             checked={checked}
             label="Please don't show this again"
             onchange={onCheckboxClick}
-            class="checkbox"
+            className="checkbox"
           />
         </div>
       </CWGrowl>

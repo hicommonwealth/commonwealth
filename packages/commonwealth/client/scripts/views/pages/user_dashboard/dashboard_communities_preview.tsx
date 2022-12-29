@@ -33,7 +33,7 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
 
     return (
       <CWCard
-        class="CommunityPreviewCard"
+        className="CommunityPreviewCard"
         elevation="elevation-1"
         interactive
         onClick={(e) => {
@@ -47,11 +47,11 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
             {chain.name}
           </CWText>
         </div>
-        <CWText class="card-subtext">{chain.description}</CWText>
+        <CWText className="card-subtext">{chain.description}</CWText>
         {/* if no recently active threads, hide this module altogether */}
         {!!monthlyThreadCount && (
           <>
-            <CWText class="card-subtext" type="b2" fontWeight="medium">
+            <CWText className="card-subtext" type="b2" fontWeight="medium">
               {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
             </CWText>
             {isMember && (

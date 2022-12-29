@@ -32,17 +32,17 @@ export class InvitesMenu extends ClassComponent {
   view() {
     return (
       <CWMobileMenu
-        class="InvitesMenu"
+        className="InvitesMenu"
         menuHeader={{
           label: 'Invites',
-          onclick: () => {
+          onClick: () => {
             app.mobileMenu = 'MainMenu';
           },
         }}
         menuItems={[
           {
             label: `Show ${pluralize(app.config.invites?.length, 'invite')}...`,
-            onclick: () => app.modals.create({ modal: ConfirmInviteModal }),
+            onClick: () => app.modals.create({ modal: ConfirmInviteModal }),
           },
         ]}
       />
@@ -54,15 +54,15 @@ export class InvitesMenuPopover extends ClassComponent {
   view() {
     return app.config.invites?.length > 0 ? (
       <div
-        class="unreads-icon"
-        onclick={() => app.modals.create({ modal: ConfirmInviteModal })}
+        className="unreads-icon"
+        onClick={() => app.modals.create({ modal: ConfirmInviteModal })}
       >
         <CWCustomIcon iconName="invites" />
       </div>
     ) : (
       <CWIconButton
         iconName="mail"
-        onclick={() => app.modals.create({ modal: ConfirmInviteModal })}
+        onClick={() => app.modals.create({ modal: ConfirmInviteModal })}
       />
     );
   }

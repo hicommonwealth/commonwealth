@@ -64,7 +64,7 @@ export class CWFilterMenu extends ClassComponent<FilterMenuAttrs> {
             label="Filter"
             buttonType="mini-white"
             iconRight="chevronDown"
-            class={getClasses<{ someChecked: boolean }>({
+            className={getClasses<{ someChecked: boolean }>({
               someChecked: selectedItems.length > 0,
             })}
           />

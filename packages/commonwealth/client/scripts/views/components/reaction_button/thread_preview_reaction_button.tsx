@@ -107,7 +107,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
       // m(Popover, {
       //     interactionType: 'hover',
       //     content: (
-      //       <div class="reaction-button-tooltip-contents">
+      //       <div className="reaction-button-tooltip-contents">
       //         {getDisplayedReactorsForPopup({
       //           likes,
       //           reactors: this.reactors,

@@ -60,7 +60,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
                 </div>
               }
               trigger={
-                <CWText type="caption" class="trigger-text">
+                <CWText type="caption" className="trigger-text">
                   {pluralize(thread.collaborators?.length, 'other')}
                 </CWText>
               }
@@ -79,7 +79,7 @@ export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
     return (
       <CWText
         type="caption"
-        class={getClasses<{ stage: 'negative' | 'positive' }>(
+        className={getClasses<{ stage: 'negative' | 'positive' }>(
           {
             stage:
               thread.stage === ThreadStageType.ProposalInReview

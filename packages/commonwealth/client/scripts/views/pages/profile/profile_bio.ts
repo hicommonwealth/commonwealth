@@ -30,7 +30,7 @@ const editIdentityAction = (
     render(CWButton, {
       // wait for info to load before making it clickable
       disabled: vnode.state.chainLoading,
-      onclick: async () => {
+      onClick: async () => {
         if (app.activeChainId() !== chainObj.id) {
           let confirmed = false;
           const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
@@ -168,7 +168,7 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   width: '20px',
 
                   class: !account.ghostAddress ? 'cursor-pointer' : '',
-                  onclick: (e) => {
+                  onClick: (e) => {
                     if (!account.ghostAddress) {
                       window.navigator.clipboard
                         .writeText(account.address)
@@ -188,7 +188,7 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ? [
               editIdentityAction(account, vnode.state.identity, vnode),
               render(CWButton, {
-                onclick: () => {
+                onClick: () => {
                   app.modals.create({
                     modal: EditProfileModal,
                     data: { account, refreshCallback },
@@ -199,7 +199,7 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             ]
           : showJoinCommunityButton && app.activeChainId()
           ? render(CWButton, {
-              onclick: async () => {
+              onClick: async () => {
                 if (onLinkedProfile) {
                   vnode.state.loading = true;
                   try {
@@ -243,7 +243,7 @@ const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             alt: '',
             width: '20px',
             class: !account.ghostAddress ? 'cursor-pointer' : '',
-            onclick: (e) => {
+            onClick: (e) => {
               if (!account.ghostAddress) {
                 window.navigator.clipboard
                   .writeText(account.address)

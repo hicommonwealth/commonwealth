@@ -81,7 +81,7 @@ function oncreate(spec, confirmExit, completeCallback, exitCallback, vnode) {
     });
 }
 
-async function onclickoverlay(spec, confirmExit, exitCallback) {
+async function onClickoverlay(spec, confirmExit, exitCallback) {
   const confirmedExit = await confirmExit();
   if (confirmedExit) {
     app.modals.remove(spec);
@@ -114,7 +114,7 @@ export class AppModals extends ClassComponent {
           spec={spec}
           key={spec.id || '-'}
           oncreatemodal={oncreate}
-          onClick={onclickoverlay}
+          onClick={onClickoverlay}
           modalType={spec.data?.modalType}
           breakpointFn={spec.data?.breakpointFn}
         >

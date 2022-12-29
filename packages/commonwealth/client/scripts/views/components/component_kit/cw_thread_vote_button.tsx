@@ -57,7 +57,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
               ? handleVoteChange(this.initialVoteCount)
               : handleVoteChange(voteCount + 1);
           }}
-          class="upvote-button"
+          className="upvote-button"
           onmouseenter={() => {
             this.isHoveringUpvote = true;
           }}
@@ -68,7 +68,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
         <CWText
           type="caption"
           fontWeight="medium"
-          class="vote-count"
+          className="vote-count"
           title={voteCount}
         >
           {formatNumberShort(voteCount)}
@@ -87,7 +87,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
           onmouseleave={() => {
             this.isHoveringDownvote = false;
           }}
-          class="downvote-button"
+          className="downvote-button"
         />
       </div>
     );

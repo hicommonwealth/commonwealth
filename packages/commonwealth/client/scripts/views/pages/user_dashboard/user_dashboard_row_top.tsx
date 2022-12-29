@@ -64,7 +64,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
       hideIdentityIcon: false,
       linkify: true,
       avatarSize: 16,
-      onclick: (e: any) => {
+      onClick: (e: any) => {
         e.preventDefault();
         e.stopPropagation();
         setRoute(`/${author_chain}/account/${author_address}`);
@@ -74,7 +74,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
     if (vnode.attrs.category === 'new-comment-creation') {
       return (
         <div className="UserDashboardRowTop">
-          <CWText class="row-top-text">
+          <CWText className="row-top-text">
             {actorName}
             <span>
               {numericalCommentCount > 1 &&
@@ -102,7 +102,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
     } else if (vnode.attrs.category === 'new-thread-creation') {
       return (
         <div className="UserDashboardRowTop">
-          <CWText class="row-top-text">
+          <CWText className="row-top-text">
             {actorName}
             <span>created new thread</span>
             <b>{titleText}</b>

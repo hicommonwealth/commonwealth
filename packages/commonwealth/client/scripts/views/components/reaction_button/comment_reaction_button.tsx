@@ -89,7 +89,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
     };
 
     const countsComponent = (
-      <CWText class="menu-buttons-text" type="caption" fontWeight="medium">
+      <CWText className="menu-buttons-text" type="caption" fontWeight="medium">
         {likes}
       </CWText>
     );

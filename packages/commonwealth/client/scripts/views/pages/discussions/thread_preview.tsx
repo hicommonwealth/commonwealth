@@ -135,12 +135,12 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 hideIdentityIcon: true,
               })}
               {!this.isWindowSmallInclusive && (
-                <CWText class="last-updated-text">•</CWText>
+                <CWText className="last-updated-text">•</CWText>
               )}
               <CWText
                 type="caption"
                 fontWeight="medium"
-                class="last-updated-text"
+                className="last-updated-text"
               >
                 {moment(thread.createdAt).format('l')}
               </CWText>

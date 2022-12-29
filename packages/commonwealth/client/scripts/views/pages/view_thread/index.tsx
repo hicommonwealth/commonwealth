@@ -425,7 +425,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Edit',
                 iconLeft: 'write' as const,
-                onclick: async (e) => {
+                onClick: async (e) => {
                   e.preventDefault();
                   this.savedEdits = localStorage.getItem(
                     `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
@@ -450,7 +450,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Edit collaborators',
                 iconLeft: 'write' as const,
-                onclick: async (e) => {
+                onClick: async (e) => {
                   e.preventDefault();
                   app.modals.create({
                     modal: EditCollaboratorsModal,
@@ -467,7 +467,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Change topic',
                 iconLeft: 'write' as const,
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   app.modals.create({
                     modal: ChangeTopicModal,
@@ -488,7 +488,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Delete',
                 iconLeft: 'trash' as const,
-                onclick: async (e) => {
+                onClick: async (e) => {
                   e.preventDefault();
 
                   const confirmed = await confirmationModalWithText(
@@ -509,7 +509,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                 iconLeft: 'lock' as const,
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   app.threads
                     .setPrivacy({
@@ -529,7 +529,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Snapshot proposal from thread',
                 iconLeft: 'democraticProposal' as const,
-                onclick: () => {
+                onClick: () => {
                   const snapshotSpaces = app.chain.meta.snapshot;
 
                   if (snapshotSpaces.length > 1) {
@@ -605,7 +605,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                 <>
                   <CollapsibleThreadBody thread={thread} />
                   {thread.readOnly ? (
-                    <CWText type="h5" class="callout-text">
+                    <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
                   ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (

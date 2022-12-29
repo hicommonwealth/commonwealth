@@ -184,7 +184,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
           <CWText
             type="h5"
             fontWeight="semiBold"
-            class="mode-switcher"
+            className="mode-switcher"
             title="Switch to RichText mode"
             onClick={(e) => {
               this.activeMode = 'richText';
@@ -198,7 +198,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
           <CWText
             type="h5"
             fontWeight="semiBold"
-            class="mode-switcher"
+            className="mode-switcher"
             title="Switch to Markdown mode"
             onClick={async () => {
               // Confirm before removing formatting and switching to Markdown mode.

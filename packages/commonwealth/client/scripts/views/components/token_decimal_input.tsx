@@ -83,7 +83,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
                 }
               }}
             />
-            <CWText type="caption" class="toggle-caption-text">
+            <CWText type="caption" className="toggle-caption-text">
               {this.switchCaption}
             </CWText>
           </div>

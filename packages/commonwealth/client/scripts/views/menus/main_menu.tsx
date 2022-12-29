@@ -15,7 +15,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
     //   label: 'Search',
     //   iconName: 'search',
     //   mobileCaret: true,
-    //   onclick: () => {
+    //   onClick: () => {
     //     setRoute('/search');
     //   },
     // },
@@ -25,7 +25,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             label: 'Create',
             iconLeft: 'plusCircle',
             iconRight: 'chevronRight',
-            onclick: () => {
+            onClick: () => {
               app.mobileMenu = 'CreateContentMenu';
             },
           },
@@ -35,7 +35,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       label: 'Help',
       iconLeft: 'help',
       iconRight: 'chevronRight',
-      onclick: () => {
+      onClick: () => {
         app.mobileMenu = 'HelpMenu';
       },
     },
@@ -47,7 +47,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             iconRight: 'chevronRight',
             type: 'notification',
             hasUnreads: !!app.user?.notifications.numUnread,
-            onclick: () => {
+            onClick: () => {
               app.mobileMenu = 'NotificationsMenu';
             },
           },
@@ -58,6 +58,6 @@ export const getMainMenuItems = (): Array<MenuItem> => {
 
 export class MainMenu extends ClassComponent {
   view() {
-    return <CWMobileMenu class="MainMenu" menuItems={getMainMenuItems()} />;
+    return <CWMobileMenu className="MainMenu" menuItems={getMainMenuItems()} />;
   }
 }

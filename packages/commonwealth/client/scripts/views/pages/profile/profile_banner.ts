@@ -61,7 +61,7 @@ const ProfileBanner: Component<
       render(CWButton, {
         label: 'Join community',
         disabled: vnode.state.loading,
-        onclick: createRole.bind(this),
+        onClick: createRole.bind(this),
       }),
     ]);
   },

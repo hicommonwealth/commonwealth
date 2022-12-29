@@ -31,9 +31,9 @@ const AlertModal = {
         <div className="compact-modal-body">
           <h3>{alertText}</h3>
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {

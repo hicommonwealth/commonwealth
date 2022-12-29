@@ -137,7 +137,7 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
         isVisible: true,
         isUpdated: true,
         isActive: onAllDiscussionPage(getRoute()),
-        onclick: (e, toggle: boolean) => {
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
           handleRedirectClicks(e, `/discussions`, app.activeChainId(), () => {
             setDiscussionsToggleTree(`children.All.toggledState`, toggle);
@@ -152,7 +152,7 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
         isVisible: true,
         isUpdated: true,
         isActive: onOverviewDiscussionPage(getRoute()),
-        onclick: (e, toggle: boolean) => {
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
           handleRedirectClicks(e, `/overview`, app.activeChainId(), () => {
             setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
@@ -169,7 +169,7 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
         isActive:
           onSputnikDaosPage(getRoute()) &&
           (app.chain ? app.chain.serverLoaded : true),
-        onclick: (e, toggle: boolean) => {
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
           handleRedirectClicks(e, `/sputnik-daos`, app.activeChainId(), () => {
             setDiscussionsToggleTree(
@@ -192,7 +192,7 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
           isUpdated: true,
           isActive: onFeaturedDiscussionPage(getRoute(), topic.name),
           // eslint-disable-next-line no-loop-func
-          onclick: (e, toggle: boolean) => {
+          onClick: (e, toggle: boolean) => {
             e.preventDefault();
             handleRedirectClicks(
               e,
@@ -216,7 +216,7 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
       title: discussionsLabel,
       className: 'DiscussionSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setDiscussionsToggleTree('toggledState', toggle);
       },

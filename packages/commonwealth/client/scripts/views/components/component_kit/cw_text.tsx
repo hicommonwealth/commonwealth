@@ -45,7 +45,7 @@ type TextStyleAttrs = {
 };
 
 type TextAttrs = {
-  onclick?: (e?: MouseEvent) => void;
+  onClick?: (e?: MouseEvent) => void;
   title?: string | number;
 } & TextStyleAttrs;
 
@@ -66,7 +66,7 @@ export class CWText extends ClassComponent<TextAttrs> {
       disabled = false,
       isCentered,
       fontStyle,
-      onclick,
+      onClick,
       noWrap = false,
       title,
       type = 'b1',
@@ -75,21 +75,21 @@ export class CWText extends ClassComponent<TextAttrs> {
 
     return (
       <div
-        className={getClasses<TextStyleAttrs & { onclick?: boolean }>(
+        className={getClasses<TextStyleAttrs & { onClick?: boolean }>(
           {
             type,
             fontWeight,
             disabled,
             fontStyle,
             noWrap,
-            onclick: !!onclick,
+            onClick: !!onClick,
             isCentered,
             className,
           },
           ComponentType.Text
         )}
         title={title}
-        onClick={onclick}
+        onClick={onClick}
       >
         {vnode.children}
       </div>

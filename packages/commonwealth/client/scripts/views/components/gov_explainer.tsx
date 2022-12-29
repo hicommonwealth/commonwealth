@@ -42,7 +42,7 @@ export class GovExplainer extends ClassComponent<GovExplainerAttrs> {
           <div className="stats-container">
             {stats.map((s) => (
               <div className="stat">
-                <CWText type="b1" fontWeight="medium" class="stat-text">
+                <CWText type="b1" fontWeight="medium" className="stat-text">
                   {s.statHeading}
                 </CWText>
                 <CWText type="b1" fontWeight="medium">

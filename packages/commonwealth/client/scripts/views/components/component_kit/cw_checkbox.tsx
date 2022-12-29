@@ -56,7 +56,7 @@ export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
       >
         <input className="checkbox-input" {...params} />
         <div className="checkbox-control" />
-        <CWText class="checkbox-label">{label || value}</CWText>
+        <CWText className="checkbox-label">{label || value}</CWText>
       </label>
     );
   }

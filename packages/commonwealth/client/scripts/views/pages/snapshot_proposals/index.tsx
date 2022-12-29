@@ -43,7 +43,7 @@ class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBar
                 option === SnapshotProposalFilter.Core ||
                 option === SnapshotProposalFilter.Community
               }
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 vnode.attrs.onChangeFilter(option);
               }}
@@ -134,7 +134,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
                 ))}
               />
             ) : (
-              <CWText class="no-proposals-text">
+              <CWText className="no-proposals-text">
                 No {this.selectedFilter.toLowerCase()} proposals found.
               </CWText>
             )}

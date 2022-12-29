@@ -105,7 +105,7 @@ export class PollEditorModal extends ClassComponent<PollEditorAttrs> {
             </div>
           </div>
           <div className="duration-row">
-            <CWText type="caption" class="poll-duration-text">
+            <CWText type="caption" className="poll-duration-text">
               {getPollDurationCopy(customDuration, customDurationEnabled)}
             </CWText>
             <div className="duration-row-actions">

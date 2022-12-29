@@ -37,7 +37,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
   private globalCount: number;
   private globalNotifications: DashboardActivityNotification[];
   private loadingData: boolean;
-  private onscroll;
+  private onScroll;
 
   // Helper to load activity conditional on the selected tab
   handleToggle = () => {
@@ -118,7 +118,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     }
 
     // Scroll
-    this.onscroll = _.debounce(async () => {
+    this.onScroll = _.debounce(async () => {
       if (this.activePage === DashboardViews.ForYou) {
         if (!notificationsRemaining(fyNotifications.length, this.fyCount))
           return;
@@ -152,7 +152,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     }, 400);
 
     return (
-      <Sublayout onScroll={this.onscroll}>
+      <Sublayout onScroll={this.onScroll}>
         <div className="UserDashboard">
           <div className="dashboard-column">
             <div className="dashboard-header">

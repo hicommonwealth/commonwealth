@@ -68,7 +68,7 @@ const ProfileProposal: Component<
                   target: '_blank',
                   noopener: 'noopener',
                   noreferrer: 'noreferrer',
-                  onclick: (e) => {
+                  onClick: (e) => {
                     e.preventDefault();
                     lity(attachment.url);
                   },

@@ -83,7 +83,7 @@ export class SubstrateForm extends ClassComponent {
         />
         <CWButton
           label="Test Connection"
-          class="button-margin-bottom"
+          className="button-margin-bottom"
           onClick={async () => {
             // deinit substrate API if one exists
             if (app.chain?.apiInitialized) {

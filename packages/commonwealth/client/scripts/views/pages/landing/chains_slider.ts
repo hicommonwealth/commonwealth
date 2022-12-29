@@ -18,7 +18,7 @@ const chainToTag = (chain, index: number) => {
       id: `card_${index}`,
       class: 'glide__slide mt-4 pb-8',
 
-      onclick: (e) => {
+      onClick: (e) => {
         e.preventDefault();
         setRoute(`/${chain.id}`);
         localStorage['home-scrollY'] = window.scrollY;

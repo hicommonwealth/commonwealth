@@ -16,12 +16,12 @@ type ProfileRowStyleAttrs = {
 
 export type ProfileRowAttrs = {
   name: string;
-  onclick?: () => void;
+  onClick?: () => void;
 } & ProfileRowStyleAttrs;
 
 export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
   view(vnode: ResultNode<ProfileRowAttrs>) {
-    const { darkMode, isSelected, onclick, name } = vnode.attrs;
+    const { darkMode, isSelected, onClick, name } = vnode.attrs;
 
     return (
       <div
@@ -29,14 +29,14 @@ export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
           { darkMode, isSelected },
           'ProfileRow'
         )}
-        onClick={onclick}
+        onClick={onClick}
       >
         <div className="avatar-and-name">
           <div className="avatar" />
           <CWText
             type="b1"
             fontWeight="bold"
-            class="profile-row-text"
+            className="profile-row-text"
             noWrap
           >
             {name ?? 'Your Profile'}
@@ -50,13 +50,13 @@ export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
 
 type ProfilesListAttrs = {
   darkMode?: boolean;
-  onclick?: () => void;
+  onClick?: () => void;
   profiles: Array<ProfileRowAttrs>;
 };
 
 export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
   view(vnode: ResultNode<ProfilesListAttrs>) {
-    const { darkMode, onclick, profiles } = vnode.attrs;
+    const { darkMode, onClick, profiles } = vnode.attrs;
 
     return (
       <div
@@ -73,7 +73,7 @@ export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
               darkMode={darkMode}
               isSelected={profile.isSelected}
               name={profile.name}
-              onClick={onclick}
+              onClick={onClick}
             />
           ))}
         </div>

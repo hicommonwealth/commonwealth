@@ -73,7 +73,7 @@ export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs
         )}
         {sidebarType === 'newOrReturning' && (
           <div className="new-or-returning">
-            <CWText type="h4" fontWeight="semiBold" class="header-text">
+            <CWText type="h4" fontWeight="semiBold" className="header-text">
               New or Returning?
             </CWText>
             <CWAccountCreationButton onClick={createNewAccountCallback} />
@@ -85,10 +85,10 @@ export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs
         )}
         {sidebarType === 'communityWalletOptions' && (
           <div className="eth-wallet">
-            <CWText type="h4" fontWeight="semiBold" class="header-text">
+            <CWText type="h4" fontWeight="semiBold" className="header-text">
               {generateText(wallets)}
             </CWText>
-            <CWText type="b2" class="sidebar-body-text">
+            <CWText type="b2" className="sidebar-body-text">
               Many communities require different wallets based on the chain they
               are built on and the types of tokens members hold.
             </CWText>

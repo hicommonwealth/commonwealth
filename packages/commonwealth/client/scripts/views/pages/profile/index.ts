@@ -105,7 +105,7 @@ interface IProfilePageState {
   loading: boolean;
   refreshProfile: boolean;
   tabSelected: number;
-  onscroll: any;
+  onScroll: any;
   allContentCount: number;
   proposalsContentCount: number;
   commentsContentCount: number;
@@ -373,7 +373,7 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
       }
     }
 
-    const onscroll = _.debounce(() => {
+    const onScroll = _.debounce(() => {
       const tab = vnode.state.tabSelected;
       if (tab === 0) {
         if (!postsRemaining(allContent.length, vnode.state.allContentCount))
@@ -436,7 +436,7 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
     return render(
       Sublayout,
       {
-        onscroll,
+        onScroll,
       },
       [
         render('.ProfilePage', [
@@ -459,21 +459,21 @@ const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
               render(CWTabBar, [
                 render(CWTab, {
                   label: allTabTitle,
-                  onclick: () => {
+                  onClick: () => {
                     vnode.state.tabSelected = 0;
                   },
                   isSelected: vnode.state.tabSelected === 0,
                 }),
                 render(CWTab, {
                   label: threadsTabTitle,
-                  onclick: () => {
+                  onClick: () => {
                     vnode.state.tabSelected = 1;
                   },
                   isSelected: vnode.state.tabSelected === 1,
                 }),
                 render(CWTab, {
                   label: commentsTabTitle,
-                  onclick: () => {
+                  onClick: () => {
                     vnode.state.tabSelected = 2;
                   },
                   isSelected: vnode.state.tabSelected === 2,

@@ -18,7 +18,7 @@ type CardStyleAttrs = {
 };
 
 type CardAttrs = {
-  onclick?: (e?: MouseEvent) => void;
+  onClick?: (e?: MouseEvent) => void;
   onmouseover?: (e?: MouseEvent) => void;
   onmouseenter?: (e?: MouseEvent) => void;
   onmouseleave?: (e?: MouseEvent) => void;
@@ -31,7 +31,7 @@ export class CWCard extends ClassComponent<CardAttrs> {
       elevation,
       fullWidth,
       interactive = false,
-      onclick,
+      onClick,
       onmouseenter,
       onmouseleave,
       onmouseover,
@@ -48,7 +48,7 @@ export class CWCard extends ClassComponent<CardAttrs> {
           },
           ComponentType.Card
         )}
-        onClick={onclick}
+        onClick={onClick}
         onmouseover={onmouseover}
         onmouseenter={onmouseenter}
         onmouseleave={onmouseleave}
