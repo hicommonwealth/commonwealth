@@ -67,12 +67,11 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
 
   constructor(props) {
     super(props);
-    console.log(props, this);
     return new Proxy(this, {
       set(obj, prop, value) {
-        if (!REACT_INTERNAL_PROPS.includes(prop as string)) {
+        if (Object.keys(obj).includes(prop as string)) {
           obj.setState({ ...obj.state, [prop]: value })
-          console.log(prop);
+          // console.log(prop);
         }
         // @ts-ignore
         return Reflect.set(...arguments);

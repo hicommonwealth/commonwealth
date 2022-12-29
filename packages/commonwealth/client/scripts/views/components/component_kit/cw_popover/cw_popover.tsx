@@ -24,7 +24,7 @@ export type SharedPopoverAttrs = {
   persistOnHover?: boolean;
   tooltipType?: TooltipType;
   toSide?: boolean;
-  trigger: ResultNode;
+  trigger: Children;
 };
 
 type PopoverAttrs = {
