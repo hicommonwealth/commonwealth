@@ -9,8 +9,6 @@ import { AppError } from '../../../common-common/src/errors';
 
 type generateImageReq = {
   description: string;
-  chainId: string;
-  userAddress: string;
 };
 
 type generateImageResp = {
@@ -21,11 +19,7 @@ const generateImage = async (
   req: TypedRequestBody<generateImageReq>,
   res: TypedResponse<generateImageResp>
 ) => {
-  const { description, chainId, userAddress } = req.body;
-
-  console.log('description', description);
-  console.log('chainId', chainId);
-  console.log('userAddress', userAddress);
+  const { description } = req.body;
 
   if (!description) {
     throw new AppError('No description provided');
@@ -90,17 +84,6 @@ const generateImage = async (
   }
 
   const trimmedURL = imageUrl.slice(0, imageUrl.indexOf('?'));
-
-  try {
-    await models.CommunityImages.create({
-      community_id: chainId,
-      image_url: trimmedURL,
-      creator_address: userAddress,
-    });
-  } catch (e) {
-    console.log(e);
-    throw new AppError('Unable to save to DB!');
-  }
 
   return success(res, { imageUrl: trimmedURL });
 };

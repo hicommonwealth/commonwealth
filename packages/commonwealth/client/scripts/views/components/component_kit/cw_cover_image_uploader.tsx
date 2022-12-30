@@ -10,12 +10,16 @@ import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { CWSpinner } from './cw_spinner';
 import { getClasses } from './helpers';
-import { MessageRow } from './cw_text_input';
+import { CWTextInput, MessageRow } from './cw_text_input';
 import { ValidationStatus } from './cw_validation_text';
+import { CWButton } from './cw_button';
+import { CWIconButton } from './cw_icon_button';
 
 type CoverImageUploaderAttrs = {
   headerText?: string;
   subheaderText?: string;
+  enableGenerativeAI?: boolean;
+  generatedImageCallback?: CallableFunction;
   uploadCompleteCallback: CallableFunction;
 };
 
@@ -24,6 +28,9 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;
+  private prompt: string;
+  private isPrompting: boolean;
+  private isGenerating: boolean;
 
   async uploadImage(file: File): Promise<[string, ValidationStatus]> {
     try {
@@ -53,10 +60,26 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     }
   }
 
+  async generateImage(prompt: string) {
+    try {
+      const res = await $.post(`${app.serverUrl()}/generateImage`, {
+        description: prompt,
+        jwt: app.user.jwt,
+      });
+
+      this.imageURL = res.result.imageUrl;
+      m.redraw();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
   oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
+
+    this.isPrompting = false;
 
     // Drag'n'Drop helper function
     const handleDragEvent = (event, hoverAttachZone?: boolean) => {
@@ -124,8 +147,20 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
   }
 
   view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
-    const { imageURL, isUploading, uploadStatus } = this;
-    const { headerText, subheaderText } = vnode.attrs;
+    const {
+      imageURL,
+      isUploading,
+      uploadStatus,
+      prompt,
+      isPrompting,
+      isGenerating,
+    } = this;
+    const {
+      headerText,
+      subheaderText,
+      enableGenerativeAI,
+      generatedImageCallback,
+    } = vnode.attrs;
 
     return (
       <div class="CoverImageUploader">
@@ -159,11 +194,62 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
           )}
           style={`background-image: url(${imageURL})`}
         >
-          <input
-            type="file"
-            accept="image/jpeg, image/jpg, image/png"
-            id="pseudo-input"
-          />
+          {isPrompting && (
+            <div
+              class="cover-image-overlay"
+              onclick={(e) => e.stopPropagation()}
+            >
+              <div class="icon-button-wrapper">
+                <CWIconButton
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    this.isPrompting = false;
+                    this.isGenerating = false;
+                  }}
+                  iconName="close"
+                  iconSize="small"
+                />
+              </div>
+              {this.isGenerating ? (
+                <CWSpinner />
+              ) : (
+                <>
+                  <CWTextInput
+                    label="Prompt"
+                    size="small"
+                    value={this.prompt}
+                    placeholder="type a description here"
+                    oninput={(e) => {
+                      this.prompt = e.target.value;
+                    }}
+                    iconRight="trash"
+                    iconRightonclick={() => {
+                      this.prompt = '';
+                    }}
+                  />
+                  <CWButton
+                    label="Generate"
+                    buttonType="mini-black"
+                    className="generate-btn"
+                    onclick={async (e) => {
+                      this.isGenerating = true;
+                      await this.generateImage(this.prompt);
+                      this.isPrompting = false;
+                      this.isGenerating = false;
+                    }}
+                  />
+                </>
+              )}
+            </div>
+          )}
+          {!isPrompting && (
+            <input
+              type="file"
+              accept="image/jpeg, image/jpg, image/png"
+              id="pseudo-input"
+              class="pseudo-input"
+            />
+          )}
           {this.isUploading && <CWSpinner active="true" size="large" />}
           <div class="attach-btn">
             {!this.isUploading && (
@@ -172,6 +258,17 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
             <CWText type="caption" fontWeight="medium">
               Drag or upload your image here
             </CWText>
+            {enableGenerativeAI && (
+              <CWButton
+                buttonType="mini-white"
+                label="Generate Image"
+                className="generate-btn"
+                onclick={(e) => {
+                  e.stopPropagation();
+                  this.isPrompting = true;
+                }}
+              />
+            )}
           </div>
         </div>
       </div>

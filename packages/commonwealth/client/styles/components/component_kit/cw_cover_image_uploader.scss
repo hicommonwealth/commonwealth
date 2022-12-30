@@ -26,6 +26,8 @@
     background-repeat: no-repeat;
     background-position: center;
 
+    position: relative;
+
     &.hovered {
       border: 1px solid $primary-500;
     }
@@ -42,7 +44,7 @@
       cursor: default;
     }
 
-    input {
+    .pseudo-input {
       max-height: 0;
       max-width: 0;
     }
@@ -64,6 +66,31 @@
       .Text {
         color: inherit;
       }
+    }
+
+    .cover-image-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+
+      position: absolute;
+      height: 100%;
+      width: 100%;
+
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(5px);
+      border-radius: $border-radius-corners;
+    }
+
+    .generate-btn {
+      margin-top: 16px;
+    }
+
+    .icon-button-wrapper {
+      position: absolute;
+      top: 8px;
+      right: 8px;
     }
   }
 }
