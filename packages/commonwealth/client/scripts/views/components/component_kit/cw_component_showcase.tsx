@@ -97,16 +97,6 @@ export class ComponentShowcase extends ClassComponent {
     // console.log(this.checkboxGroupSelected);
     return (
       <div class="ComponentShowcase">
-        <CWCoverImageUploader
-          uploadCompleteCallback={(url: string) => {
-            notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
-          }}
-          generatedImageCallback={(url: string) => {
-            notifySuccess(`Generated Image uploaded to ${url.slice(0, 18)}...`);
-          }}
-          subheaderText="Upload or Generate"
-          enableGenerativeAI={true}
-        />
         {/* <div class="basic-gallery">
           <CWText type="h4">Filter Menu</CWText>
           <CWFilterMenu
@@ -471,6 +461,18 @@ export class ComponentShowcase extends ClassComponent {
               notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
             }}
           /> */}
+          <CWCoverImageUploader
+            uploadCompleteCallback={(url: string) => {
+              console.log(url);
+            }}
+            generatedImageCallback={(url: string) => {
+              notifySuccess(
+                `Generated Image uploaded to ${url.slice(0, 18)}...`
+              );
+            }}
+            subheaderText="Upload or Generate"
+            enableGenerativeAI={true}
+          />
         </div>
         <div class="button-gallery">
           <CWText type="h3">Buttons</CWText>

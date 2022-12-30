@@ -31,6 +31,7 @@ const generateImage = async (
   encodedParams.append('steps', '30');
   encodedParams.append('sampler', 'dpm');
   encodedParams.append('guidance', '8');
+  encodedParams.append('width', '768');
   encodedParams.append('prompt', description);
 
   const options = {
