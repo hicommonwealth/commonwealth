@@ -39,7 +39,9 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
   }
 
   public getChainId() {
-    return this._chainInfo.node.ethChainId || 1;
+    // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
+    // and node? because the chain might not have a node provided
+    return this._chainInfo.node?.ethChainId || 1;
   }
 
   public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
@@ -78,14 +80,12 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       // Create WalletConnect Provider
       this._chainInfo =
         app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-      const chainId = this._chainInfo.node.ethChainId || 1;
+      const chainId = this._chainInfo.node?.ethChainId || 1;
+
 
       // use alt wallet url if available
-      const rpc = {
-        [chainId]:
-          this._chainInfo.node.altWalletUrl || this._chainInfo.node.url,
-      };
-
+      const chainUrl = this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
+      const rpc = chainUrl ? { [chainId]: chainUrl } : {};
       this._provider = new WalletConnectProvider({ rpc, chainId });
 
       // destroy pre-existing session if exists
