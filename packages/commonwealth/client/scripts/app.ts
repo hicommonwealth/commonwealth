@@ -69,7 +69,7 @@ export async function initAppState(
             delete chain.chain.ChainNode;
             return app.config.chains.add(
               ChainInfo.fromJSON({
-                ChainNode: app.config.nodes.getById(chain.chain_node_id),
+                ChainNode: app.config.nodes.getById(chain.chain.chain_node_id),
                 snapshot: chain.snapshot,
                 ...chain.chain,
               })
