@@ -104,7 +104,7 @@ class Account {
     this._sessionPublicAddress = sessionPublicAddress;
   }
 
-  public async validate(signature: string) {
+  public async validate(signature: string, chainId: string | number) {
     if (!this._validationToken && !this._validationBlockInfo) {
       throw new Error('no validation token found');
     }
@@ -119,9 +119,7 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
-      session_public_address: app.sessions.getAddress(
-        this.chain.base, this.chain.node?.ethChainId || 1
-      ),
+      session_public_address: await app.sessions.getOrCreateAddress(this.chain.base, chainId),
       session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);

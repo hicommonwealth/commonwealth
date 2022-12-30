@@ -26,6 +26,7 @@ import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
+import { NumberList } from 'aws-sdk/clients/iot';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -37,7 +38,7 @@ type LoginModalAttrs = {
 
 async function signWithWallet<T extends { address: string }>(wallet: IWebWallet<T>, account: Account) {
   const chainId = wallet.getChainId();
-  const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, chainId)
+  const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, chainId);
 
   const canvasMessage = constructCanvasMessage(
     chainBasetoCanvasChain(wallet.chain),
@@ -62,8 +63,10 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private selectedWallet: IWebWallet<any>;
   private selectedLinkingWallet: IWebWallet<any>;
   private cachedWalletSignature: string;
+  private cachedChainId: string | number;
   private primaryAccount: Account;
   private secondaryLinkAccount: Account;
+  private secondaryChainId: string | number;
   private currentlyInCommunityPage: boolean;
   private magicLoading: boolean;
   private showMobile: boolean;
@@ -225,7 +228,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       // Handle Logged in and joining community of different chain base
       if (this.currentlyInCommunityPage && app.isLoggedIn()) {
         const signature = await signWithWallet(this.selectedWallet, account);
-        await account.validate(signature);
+        await account.validate(signature, this.selectedWallet.getChainId());
         await logInWithAccount(account, true);
         return;
       }
@@ -245,6 +248,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           return;
         }
         this.secondaryLinkAccount = account;
+        this.secondaryChainId = this.selectedWallet.getChainId();
         this.profiles = [account.profile]; // TODO: Update when User -> Many Profiles goes in
       }
 
@@ -252,7 +256,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       if (!newlyCreated && !linking) {
         try {
           const signature = await signWithWallet(this.selectedWallet, account);
-          await account.validate(signature);
+          await account.validate(signature, this.selectedWallet.getChainId());
           await logInWithAccount(account, true);
         } catch (e) {
           console.log(e);
@@ -262,6 +266,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           try {
             const signature = await signWithWallet(this.selectedWallet, account);
             this.cachedWalletSignature = signature;
+            this.cachedChainId = this.selectedWallet.getChainId();
           } catch (e) {
             console.log(e);
           }
@@ -279,7 +284,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     const createNewAccountCallback = async () => {
       try {
         if (this.selectedWallet.chain !== 'near') {
-          await this.primaryAccount.validate(this.cachedWalletSignature);
+          await this.primaryAccount.validate(this.cachedWalletSignature, this.cachedChainId);
         }
         await logInWithAccount(this.primaryAccount, false);
       } catch (e) {
@@ -307,8 +312,8 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       try {
         const signature = await signWithWallet(
           this.selectedLinkingWallet, this.secondaryLinkAccount);
-        await this.secondaryLinkAccount.validate(signature);
-        await this.primaryAccount.validate(this.cachedWalletSignature);
+        await this.secondaryLinkAccount.validate(signature, this.secondaryChainId);
+        await this.primaryAccount.validate(this.cachedWalletSignature, this.cachedChainId);
         await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);
