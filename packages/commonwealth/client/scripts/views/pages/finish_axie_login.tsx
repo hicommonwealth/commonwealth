@@ -34,43 +34,9 @@ const validate = async (
     return `Login Error: ${e.responseText}`;
   }
   if (result.status === 'Success') {
-    // Generate Canvas session key
-    const canvasMessage = {
-      loginTo: "/commonwealth",
-      registerSessionAddress: result.user.Addresses[0].address,
-      registerSessionDuration: 86400 * 1000,
-      timestamp: Math.floor((new Date()).getTime() / 1000)
-    };
-
-    // Ask ronin wallet to sign canvas message
-    const signature = await new Promise((resolve, reject) => {
-      // @ts-ignore
-      window.ronin.provider.sendAsync(
-        {
-          method: "eth_sign",
-          id: 0,
-          jsonrpc: '2.0',
-          params: [
-            result.user.Addresses[0].address,
-            JSON.stringify(canvasMessage)
-          ]
-        },
-        (error, response) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(response);
-          }
-        }
-      );
-    });
-    // Save the signature somewhere
-    // Call app.sessions.updateSessionPayload with the payload and signature
-
     await initAppState();
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
     await updateActiveAddresses(selectedChainMeta);
-
     console.log('Navigating to axie infinite community');
     m.route.set('/axie-infinity');
   } else {
