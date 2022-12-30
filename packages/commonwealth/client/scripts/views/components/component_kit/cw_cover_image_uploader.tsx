@@ -265,6 +265,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
                     buttonType="mini-black"
                     className="generate-btn"
                     onclick={async () => {
+                      if (this.prompt.length < 1) return;
                       this.isGenerating = true;
                       try {
                         await this.generateImage(this.prompt, vnode);
