@@ -16,13 +16,15 @@ module.exports = {
           updated_at: new Date(),
         };
       });
-      await queryInterface.bulkInsert(
-        'Topics',
-        [
-          ...topics,
-        ],
-        { transaction }
-      );
+      if(topics.length !== 0) {
+        await queryInterface.bulkInsert(
+          'Topics',
+          [
+            ...topics,
+          ],
+          {transaction}
+        );
+      }
     });
   },
 

@@ -14,6 +14,7 @@ import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -178,7 +179,7 @@ const editThread = async (
     });
 
     // dispatch notifications to subscribers of the given chain
-    models.Subscription.emitNotifications(
+    emitNotifications(
       models,
       NotificationCategories.ThreadEdit,
       '',
@@ -244,7 +245,7 @@ const editThread = async (
       mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-        models.Subscription.emitNotifications(
+        emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,

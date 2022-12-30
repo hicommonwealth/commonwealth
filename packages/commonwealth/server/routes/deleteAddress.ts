@@ -4,8 +4,6 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
-const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   NotLoggedIn: 'Not logged in',
   NeedAddress: 'Must provide address',
