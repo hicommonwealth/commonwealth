@@ -108,7 +108,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const sessionWallet = sessionKeyring.addFromUri(mnemonicGenerate(), {}, 'ed25519');
     const chain_id = ChainNetwork.Edgeware
     const timestamp = 1665083987891
-    const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, timestamp, TEST_BLOCK_INFO_STRING);
+    const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
 
     const signature = keyPair.sign(stringToU8a(JSON.stringify(message)))
 
@@ -117,7 +117,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .agent(app)
       .post('/api/verifyAddress')
       .set('Accept', 'application/json')
-      .send({ address, chain, signature, wallet_id, timestamp });
+      .send({ address, chain, signature, wallet_id });
     const user_id = res.body.result.user.id;
     const email = res.body.result.user.email;
     return { address_id, address, user_id, email };
