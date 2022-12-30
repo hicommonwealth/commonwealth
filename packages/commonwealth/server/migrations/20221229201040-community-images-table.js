@@ -24,7 +24,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      creator_addess: {
+      creator_address: {
         type: Sequelize.STRING,
         allowNull: false,
       },

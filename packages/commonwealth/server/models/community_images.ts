@@ -36,7 +36,7 @@ export default (
         type: Sequelize.STRING,
         allowNull: false,
       },
-      creator_addess: {
+      creator_address: {
         type: Sequelize.STRING,
         allowNull: false,
       },
@@ -46,7 +46,7 @@ export default (
 
   CommunityImages.associate = (models) => {
     models.CommunityImages.belongsTo(models.Chain, {
-      foreignKey: 'chain_id',
+      foreignKey: 'community_id',
       targetKey: 'id',
     });
   };

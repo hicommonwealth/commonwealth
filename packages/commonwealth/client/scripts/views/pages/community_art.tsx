@@ -9,14 +9,16 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import Sublayout from '../sublayout';
 import { PageLoading } from './loading';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 
 class CommunityArtPage extends ClassComponent {
   private imageUrl: string;
-  private rawImg: string;
+  private prompt: string;
+  private generatingImage: boolean;
 
   oninit() {
     this.imageUrl = '';
-    this.rawImg = '';
+    this.generatingImage = false;
   }
 
   view() {
@@ -32,23 +34,36 @@ class CommunityArtPage extends ClassComponent {
     return (
       <Sublayout>
         <div class="CommunityArtPage">
-          <CWTextInput />
+          <CWTextInput
+            placeholder="Enter a prompt"
+            oninput={(e) => {
+              this.prompt = e.target.value;
+            }}
+          />
           <CWButton
             label="generate"
             onclick={async () => {
-              console.log('Generating..');
-              const url = await app.communityImages?.generateImage(
-                'A dude staring at a cow',
-                app.user.jwt
-              );
-              this.imageUrl = url;
-              m.redraw();
+              if (this.prompt.length === 0) return;
+              try {
+                this.generatingImage = true;
+                const imageUrl = await app.communityImages?.generateImage(
+                  this.prompt,
+                  app.activeChainId()
+                );
+                this.imageUrl = imageUrl;
+                m.redraw();
+              } catch (e) {
+                console.log(e);
+              }
+              this.generatingImage = false;
             }}
           />
+          {this.generatingImage && <CWSpinner />}
           <div
-            style={`background-image: url(${this.imageUrl}); height: 500px;`}
+            style={`background-image: url(${this.imageUrl}); background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center; height: 500px; width: 500px`}
           ></div>
-          <img src={this.rawImg} style={'height: 500px;'}></img>
         </div>
       </Sublayout>
     );

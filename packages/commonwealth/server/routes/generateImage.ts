@@ -23,6 +23,10 @@ const generateImage = async (
 ) => {
   const { description, chainId, userAddress } = req.body;
 
+  console.log('description', description);
+  console.log('chainId', chainId);
+  console.log('userAddress', userAddress);
+
   if (!description) {
     throw new AppError('No description provided');
   }

@@ -13,7 +13,7 @@ export class StableDiffusionController {
         jwt: app.user.jwt,
       });
 
-      return res.imageUrl;
+      return res.result.imageUrl;
     } catch (e) {
       console.log(e);
     }

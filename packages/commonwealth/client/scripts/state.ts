@@ -170,6 +170,8 @@ const app: IApp = {
   snapshot: new SnapshotController(),
   wallets: new WebWalletController(),
 
+  communityImages: new StableDiffusionController(),
+
   // User
   user,
   roles,
