@@ -45,7 +45,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public getChainId() {
-    return app.chain?.meta.node.ethChainId || 1;
+    // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
+    // and node? because the chain might not have a node provided
+    return app.chain?.meta.node?.ethChainId || 1;
   }
 
   public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
