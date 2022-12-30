@@ -162,7 +162,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
-import generateImage from './routes/generateImage';
+import generateImage from '../routes/generateImage';
 
 function setupRouter(
   app: Express,
