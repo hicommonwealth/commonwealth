@@ -68,7 +68,6 @@ describe('API Tests', () => {
           wallet_id,
           session_public_address: sessionWallet.address,
           session_block_data: TEST_BLOCK_INFO_STRING,
-          timestamp,
         });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');

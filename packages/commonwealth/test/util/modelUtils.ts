@@ -84,7 +84,6 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
         wallet_id,
         session_public_address: sessionWallet.address,
         session_block_data: TEST_BLOCK_INFO_STRING,
-        timestamp
       });
     console.log(JSON.stringify(res.body));
     const user_id = res.body.result.user.id;

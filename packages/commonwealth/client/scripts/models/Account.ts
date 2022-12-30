@@ -120,7 +120,7 @@ class Account {
       signature,
       wallet_id: this.walletId,
       session_public_address: app.sessions.getAddress(
-        this.chain.node?.ethChainId || 1
+        this.chain.base, this.chain.node?.ethChainId || 1
       ),
       session_block_data: this.validationBlockInfo,
     };

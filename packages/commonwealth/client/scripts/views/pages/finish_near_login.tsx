@@ -22,7 +22,7 @@ import { ChainBase, WalletId } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
-import { getCurrentTimestampSeconds, NewLoginModal } from '../modals/login_modal';
+import { NewLoginModal } from '../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -107,14 +107,11 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         null
       );
 
-      const timestamp = getCurrentTimestampSeconds()
-
       const canvasMessage = constructCanvasMessage(
         "near" as Chain,
         chainId,
         acct.address,
         sessionPublicAddress,
-        timestamp,
         null
       );
 
@@ -128,7 +125,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
 
       const signature = await acct.signMessage(JSON.stringify(canvasMessage));
 
-      await acct.validate(signature, timestamp);
+      await acct.validate(signature);
       if (!app.isLoggedIn()) {
         await initAppState();
         await updateActiveAddresses(chain);
