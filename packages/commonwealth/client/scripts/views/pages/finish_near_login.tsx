@@ -125,7 +125,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
 
       const signature = await acct.signMessage(JSON.stringify(canvasMessage));
 
-      await acct.validate(signature);
+      await acct.validate(signature, chainId);
       if (!app.isLoggedIn()) {
         await initAppState();
         await updateActiveAddresses(chain);
