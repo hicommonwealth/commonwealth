@@ -26,18 +26,21 @@ export const constructCanvasMessage = (
   sessionPublicAddress: string,
   validationBlockInfoString: string
 ): CanvasData => {
-  const placeholderMultihash = '/commonwealth'; // TODO
+  const placeholderMultihash = '/commonwealth';
   const validationBlockInfo = JSON.parse(validationBlockInfoString)
 
-  // use the block timestamp as the message timestamp, since the block should
-  // have been requested recently
+  // Not all data here is used. For chains without block data
+  // like Solana/Polkadot, timestamp is left blank in session login.
+  //
+  // This in cleaned up in the next PR which reconciles
+  // Commonwealth to use the updated Canvas signing payload.
   const payload: SessionPayload = {
     from: fromAddress,
     spec: placeholderMultihash,
     address: sessionPublicAddress,
     duration: 86400 * 1000,
-    timestamp: validationBlockInfo.timestamp,
-    blockhash: validationBlockInfo.hash,
+    timestamp: validationBlockInfo?.timestamp,
+    blockhash: validationBlockInfo?.hash,
     chain: chain,
     chainId: chainId
   };
@@ -45,8 +48,8 @@ export const constructCanvasMessage = (
   return {
     loginTo: payload.spec,
     registerSessionAddress: payload.address,
-    registerSessionDuration: payload.duration.toString(),
-    timestamp: payload.timestamp.toString(),
+    registerSessionDuration: payload?.duration?.toString() ?? null,
+    timestamp: payload?.timestamp?.toString() ?? null,
   };
 }
 

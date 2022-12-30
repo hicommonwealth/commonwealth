@@ -78,7 +78,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       // Create WalletConnect Provider
       this._chainInfo =
         app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-      const chainId = this._chainInfo.node.ethChainId;
+      const chainId = this._chainInfo.node.ethChainId || 1;
 
       // use alt wallet url if available
       const rpc = {
