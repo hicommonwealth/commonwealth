@@ -15,7 +15,6 @@ import { CollaborationModelStatic } from './models/collaboration';
 import { CommentModelStatic } from './models/comment';
 import { CommunityBannerModelStatic } from './models/community_banner';
 import { CommunityContractModelStatic } from './models/community_contract';
-import { CommunityImagesModelStatic } from './models/community_images';
 import { CommunityRoleModelStatic } from './models/community_role';
 import { ContractModelStatic } from './models/contract';
 import { ContractAbiModelStatic } from './models/contract_abi';
@@ -62,7 +61,6 @@ export type Models = {
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
-  CommunityImages: CommunityImagesModelStatic;
   CommunityRole: CommunityRoleModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;

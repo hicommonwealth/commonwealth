@@ -18,7 +18,6 @@ import { AdminSection } from './admin_section';
 import { SidebarQuickSwitcher } from './sidebar_quick_switcher';
 import { ExploreCommunitiesSidebar } from './explore_sidebar';
 import { CreateContentSidebar } from '../../menus/create_content_menu';
-import { FunSection } from './fun_section';
 
 export type SidebarMenuName =
   | 'default'
@@ -52,7 +51,6 @@ export class Sidebar extends ClassComponent {
                 <AdminSection />
                 <DiscussionSection />
                 <GovernanceSection />
-                <FunSection />
                 {app.socket && !hideChat && <ChatSection />}
                 <ExternalLinksModule />
                 <div class="buttons-container">

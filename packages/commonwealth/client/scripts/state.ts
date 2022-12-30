@@ -27,7 +27,6 @@ import PollsController from './controllers/server/polls';
 import { MobileMenuName } from './views/app_mobile_menus';
 import ChainEntityController from 'controllers/server/chain_entities';
 import { SidebarMenuName } from './views/components/sidebar';
-import { StableDiffusionController } from './controllers/server/stable_diffusion';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -80,9 +79,6 @@ export interface IApp {
   recentActivity: RecentActivityController;
   profiles: ProfilesController;
   sessions: SessionsController;
-
-  // AI Images
-  communityImages: StableDiffusionController;
 
   // Web3
   wallets: WebWalletController;
@@ -169,8 +165,6 @@ const app: IApp = {
   // Web3
   snapshot: new SnapshotController(),
   wallets: new WebWalletController(),
-
-  communityImages: new StableDiffusionController(),
 
   // User
   user,
