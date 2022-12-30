@@ -54,7 +54,7 @@
     "compress-images": "npx ts-node -T ./scripts/compressImages.ts"
   },
   "engines": {
-    "node": "14.x"
+    "node": "16.x"
   },
   "repository": {
     "type": "git",
