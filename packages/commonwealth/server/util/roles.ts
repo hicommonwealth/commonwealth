@@ -396,23 +396,23 @@ export async function checkReadPermitted(
     );
 
     if (activeAddressInstance) {
-      const permission_error = await isAddressPermitted(
+      const permissionError = await isAddressPermitted(
         models,
         activeAddressInstance.id,
         chain_id,
         action
       );
 
-      if (permission_error) {
-        throw new AppError(permission_error);
+      if (permissionError) {
+        throw new AppError(permissionError);
       }
       return;
     }
   }
 
-  const permission_error = await isAnyonePermitted(models, chain_id, action);
+  const permissionError = await isAnyonePermitted(models, chain_id, action);
 
-  if (permission_error) {
-    throw new AppError(permission_error);
+  if (permissionError) {
+    throw new AppError(permissionError);
   }
 }
