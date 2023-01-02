@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
+import { Action } from 'common-common/src/permissions';
 import { Sequelize } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { checkReadPermitted } from '../util/roles';
 import { DB } from '../models';
 import { ReactionInstance } from '../models/reaction';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -16,15 +18,28 @@ The reduce function goes through each result returned by query that counts
 and checks whether there's a match between thread/comment/proposal ids
  */
 
-// TODO Graham 4/24/22: Rename file + fn to getReactionCount
 const reactionsCounts = async (
   models: DB,
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const { active_address, thread_ids, comment_ids, proposal_ids } = req.body;
+  const {
+    active_address,
+    thread_ids,
+    comment_ids,
+    proposal_ids,
+    chain_id,
+  } = req.body;
+
   try {
+    await checkReadPermitted(
+      models,
+      chain_id,
+      Action.VIEW_REACTIONS,
+      req.user?.id
+    );
+
     if (thread_ids || comment_ids || proposal_ids) {
       let countField = 'thread_id';
       if (comment_ids) {

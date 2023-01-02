@@ -1,6 +1,8 @@
 import Sequelize, {} from 'sequelize';
 import { query, validationResult } from 'express-validator';
 import { GetReactionsReq, GetReactionsResp } from 'common-common/src/api/extApiTypes';
+import { Action } from 'common-common/src/permissions';
+import { checkReadPermitted } from '../../util/roles';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
@@ -25,9 +27,15 @@ const getReactions = async (
   if (errors.length !== 0) {
     return failure(res.status(400), errors);
   }
-  const { community_id, comment_id, addresses, count_only } = req.query;
+  const { community_id, addresses } = req.query;
 
   const where = { chain: community_id };
+  await checkReadPermitted(
+      models,
+      req.query.community_id,
+      Action.VIEW_REACTIONS,
+      req.user?.id
+    );
 
   const include = [];
   if (addresses) include.push({

@@ -6,6 +6,7 @@ import {
   ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
+import { Action, PermissionError } from 'common-common/src/permissions';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -17,11 +18,10 @@ import {
 } from '../../shared/utils';
 import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 import {
   MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
-import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
@@ -53,6 +53,16 @@ const createReaction = async (
   if (error) return next(new AppError(error));
 
   const author = req.address;
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.CREATE_REACTION
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } =
     req.body;

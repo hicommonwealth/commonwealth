@@ -1,31 +1,95 @@
-export enum Action {
-  INVITE_MEMBERS = 0,
-  BAN_MEMBERS = 1,
-  MANAGE_COMMUNITY = 2,
-  ADMINISTRATOR = 3,
-  MANAGE_ROLES = 4,
-  MANAGE_WEBHOOKS = 5,
-  MANAGE_TOPICS = 6,
-  MANAGE_CHAT_CHANNELS = 7,
-  VIEW_COMMUNITY_INSIGHTS = 8,
-  MANAGE_INVITES = 9,
-  VIEW_TOPIC = 10,
-  VIEW_CHAT_CHANNELS = 11,
-  CREATE_THREAD = 12,
-  MANAGE_THREADS = 13,
-  CREATE_CHAT = 14,
-  CREATE_REACTION = 15,
-  CREATE_COMMENT = 16,
-  CREATE_POLL = 17,
-  VOTE_ON_POLLS = 18,
-  MANAGE_POLLS = 19,
-}
-
 export type Permissions = bigint;
+
+export type Permission = 'admin' | 'moderator' | 'member';
 
 export enum PermissionError {
   NOT_PERMITTED = 'Action not permitted',
 }
+
+export enum Action {
+  CREATE_CHAT = 0,
+  CREATE_REACTION = 1,
+  VIEW_REACTIONS = 2,
+  DELETE_REACTION = 3,
+  CREATE_COMMENT = 4,
+  VIEW_COMMENTS = 5,
+  EDIT_COMMENT = 6,
+  DELETE_COMMENT = 7,
+  CREATE_POLL = 8,
+  VIEW_POLLS = 9,
+  VOTE_ON_POLLS = 10,
+  VIEW_CHAT_CHANNELS = 11,
+  CREATE_THREAD = 12,
+  VIEW_THREADS = 13,
+  EDIT_THREAD = 14,
+  DELETE_THREAD = 15,
+  LINK_THREAD_TO_THREAD = 16,
+  LINK_PROPOSAL_TO_THREAD = 17,
+  CREATE_TOPIC = 18,
+  VIEW_TOPICS = 19,
+  EDIT_TOPIC = 20,
+  DELETE_TOPIC = 21,
+}
+
+export const BASE_PERMISSIONS: Permissions =
+  BigInt(1) << BigInt(Action.VIEW_REACTIONS) |
+  BigInt(1) << BigInt(Action.CREATE_REACTION) |
+  BigInt(1) << BigInt(Action.DELETE_REACTION) |
+  BigInt(1) << BigInt(Action.CREATE_THREAD) |
+  BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS) |
+  BigInt(1) << BigInt(Action.VIEW_THREADS);
+
+
+const ALLOW_IMPLICIT_PERMISSIONS_BY_ACTION = {
+  // Chat Subtree
+  [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
+  // View Subtree
+  [Action.VIEW_TOPICS]: [Action.VIEW_THREADS],
+  [Action.VIEW_THREADS]: [Action.VIEW_POLLS],
+  [Action.VIEW_POLLS]: [Action.VIEW_COMMENTS],
+  [Action.VIEW_COMMENTS]: [Action.VIEW_REACTIONS],
+  // Create Subtree
+  [Action.CREATE_TOPIC]: [
+    Action.CREATE_THREAD, 
+    Action.EDIT_TOPIC, 
+    Action.DELETE_TOPIC, 
+    Action.VIEW_TOPICS
+  ],
+  [Action.CREATE_THREAD]: [
+    Action.CREATE_POLL, 
+    Action.EDIT_THREAD, 
+    Action.DELETE_THREAD, 
+    Action.VIEW_TOPICS
+  ],
+  [Action.CREATE_POLL]: [
+    Action.CREATE_COMMENT, 
+    Action.VOTE_ON_POLLS, 
+    Action.VIEW_TOPICS
+  ],
+  [Action.CREATE_COMMENT]: [
+    Action.CREATE_REACTION, 
+    Action.EDIT_COMMENT, 
+    Action.DELETE_COMMENT, 
+    Action.VIEW_TOPICS
+  ],
+  [Action.CREATE_REACTION]: [
+    Action.DELETE_REACTION, 
+    Action.VIEW_TOPICS
+  ],
+  // Voting Subtree
+  [Action.VOTE_ON_POLLS]: [Action.VIEW_POLLS],
+  // Delete Subtree
+  [Action.DELETE_TOPIC]: [Action.DELETE_THREAD],
+  [Action.DELETE_THREAD]: [Action.DELETE_COMMENT],
+  [Action.DELETE_COMMENT]: [Action.DELETE_REACTION],
+  // Edit Subtree
+  [Action.EDIT_TOPIC]: [Action.EDIT_THREAD],
+  [Action.EDIT_THREAD]: [
+    Action.LINK_THREAD_TO_THREAD, 
+    Action.LINK_PROPOSAL_TO_THREAD, 
+    Action.EDIT_COMMENT
+  ],
+};
 
 export function addPermission(
   permission: Permissions,
@@ -47,14 +111,9 @@ export function removePermission(
   return result;
 }
 
-export const BASE_PERMISSIONS: Permissions =
-  addPermission(BigInt(0), Action.CREATE_THREAD) |
-  addPermission(BigInt(0), Action.VIEW_CHAT_CHANNELS);
-
 export function isPermitted(permission: Permissions, action: number): boolean {
   const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
-  const hasAction: boolean =
-    (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
+  const hasAction: boolean = (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
   return hasAction;
 }
 

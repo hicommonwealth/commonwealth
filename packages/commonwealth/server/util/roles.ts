@@ -293,7 +293,7 @@ export async function createRole(
 }
 
 // Permissions Helpers for Roles
-/// ////////////////////////////////////////////////////////////////////////////////////////////
+// //////////////////////////////
 
 export async function isAddressPermitted(
   models: DB,
@@ -369,13 +369,14 @@ export async function isAnyonePermitted(
   if (!chain) {
     throw new Error('Chain not found');
   }
+
   const permission = computePermissions(BASE_PERMISSIONS, [
     {
       allow: chain.default_allow_permissions,
       deny: chain.default_deny_permissions,
     },
   ]);
-  // check if action is permitted
+
   if (!isPermitted(permission, action)) {
     return PermissionError.NOT_PERMITTED;
   }
@@ -388,7 +389,6 @@ export async function checkReadPermitted(
   user_id?: number,
 ) {
   if (user_id) {
-    // get active address
     const activeAddressInstance = await getActiveAddress(
       models,
       user_id,
@@ -396,20 +396,22 @@ export async function checkReadPermitted(
     );
 
     if (activeAddressInstance) {
-      // check if the user has permission to view the channel
       const permission_error = await isAddressPermitted(
         models,
         activeAddressInstance.id,
         chain_id,
         action
       );
+
       if (permission_error) {
         throw new AppError(permission_error);
       }
       return;
     }
   }
+
   const permission_error = await isAnyonePermitted(models, chain_id, action);
+
   if (permission_error) {
     throw new AppError(permission_error);
   }

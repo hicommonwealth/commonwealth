@@ -1,11 +1,10 @@
 /* eslint-disable dot-notation */
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../middleware/validateChain';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
+import { Action } from 'common-common/src/permissions';
 import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
+import validateChain from '../middleware/validateChain';
+import { DB } from '../models';
+import { checkReadPermitted } from '../util/roles';
 
 export const Errors = {
   NoCommentOrThreadId: 'Must provide a comment or thread ID',
@@ -20,6 +19,17 @@ const viewReactions = async (
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new AppError(error));
 
+  try{
+    await checkReadPermitted(
+        models,
+        chain.id,
+        Action.VIEW_REACTIONS,
+        req.user?.id,
+      );
+  } catch(err) {
+    return next(new ServerError(err));
+  }
+  
   if (!req.query.thread_id && !req.query.comment_id) {
     return next(new AppError(Errors.NoCommentOrThreadId));
   }

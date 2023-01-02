@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
+import { Action, PermissionError } from 'common-common/src/permissions';
+import { ServerError, AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -22,7 +24,11 @@ const deleteReaction = async (models: DB, banCache: BanCache, req: Request, res:
   }
 
   try {
-    const userOwnedAddressIds = (await req.user.getAddresses()).filter((addr) => !!addr.verified).map((addr) => addr.id);
+    const userOwnedAddressIds = (
+      await req.user.getAddresses()).filter((addr) => !!addr.verified).map(
+        (addr) => addr.id
+      );
+
     const reaction = await models.Reaction.findOne({
       where: {
         id: req.body.reaction_id,
@@ -30,6 +36,16 @@ const deleteReaction = async (models: DB, banCache: BanCache, req: Request, res:
       },
       include: [ models.Address ],
     });
+
+      const permission_error = await isAddressPermitted(
+        models,
+        reaction.Address.id,
+        reaction.chain,
+        Action.DELETE_REACTION,
+      );
+      if (permission_error === PermissionError.NOT_PERMITTED) {
+        return next(new ServerError(PermissionError.NOT_PERMITTED));
+      }
 
     // check if author can delete react
     if (reaction) {
