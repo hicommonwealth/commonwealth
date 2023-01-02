@@ -59,6 +59,7 @@ class Thread implements IUniqueId {
   public readonly polls: Poll[];
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
+  private numberOfComments: number;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -89,6 +90,7 @@ class Thread implements IUniqueId {
     hasPoll,
     lastCommentedOn,
     linkedThreads,
+    numberOfComments,
   }: {
     author: string;
     title: string;
@@ -114,6 +116,7 @@ class Thread implements IUniqueId {
     hasPoll: boolean;
     linkedThreads: LinkedThreadRelation[];
     polls?: Poll[];
+    numberOfComments?: number;
   }) {
     this.author = author;
     this.title = title;
@@ -150,6 +153,7 @@ class Thread implements IUniqueId {
     this.snapshotProposal = snapshotProposal;
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
+    this.numberOfComments = numberOfComments || 0;
   }
 }
 

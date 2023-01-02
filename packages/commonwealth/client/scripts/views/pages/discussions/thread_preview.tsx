@@ -158,7 +158,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
           </div>
           <div class="title-row">
             <CWText type="h5" fontWeight="semiBold">
-              {thread.title}
+              {(thread as unknown as any).numberOfComments}: {thread.title}
             </CWText>
             {thread.hasPoll && <CWTag label="Poll" type="poll" />}
 
