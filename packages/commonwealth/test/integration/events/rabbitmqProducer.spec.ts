@@ -2,7 +2,7 @@ import {BrokerConfig} from 'rascal';
 import {assert} from 'chai';
 import {CWEvent} from 'chain-events/src';
 import {RabbitMqHandler} from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/rabbitMQ';
-import {getRabbitMQConfig} from 'common-common/src/rabbitmq/RabbitMQConfig';
+import {getRabbitMQConfig} from 'common-common/src/rabbitmq/rabbitMQConfig';
 import {RascalPublications, RascalSubscriptions} from "common-common/src/rabbitmq";
 
 describe.skip('RabbitMQ producer integration tests', () => {
