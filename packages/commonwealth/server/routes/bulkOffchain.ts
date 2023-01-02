@@ -111,11 +111,34 @@ const bulkOffchain = async (
           attributes: { exclude: ['version_history'] },
         });
 
-        resolve(
-          rawPinnedThreads.map((t) => {
-            return t.toJSON();
-          })
-        );
+        const threads = rawPinnedThreads.map((t) => {
+          return t.toJSON();
+        });
+
+        const rootIds = threads.map((thread) => `${thread.kind}_${thread.id}`);
+
+        const commentsCount = await models.Comment.count({
+          attributes: ['root_id'],
+          where: {
+            chain: chain.id,
+            root_id: { [Op.in]: rootIds },
+            deleted_at: null,
+          },
+          group: 'root_id',
+        });
+
+        const threadsWithComments = threads.map((thread) => {
+          const numberOfComment = commentsCount.find(
+            (el) => el.root_id === `${thread.kind}_${thread.id}`
+          );
+
+          return {
+            ...thread,
+            numberOfComments: numberOfComment?.count || 0,
+          };
+        });
+
+        resolve(threadsWithComments);
       } catch (e) {
         console.log(e);
         reject(
