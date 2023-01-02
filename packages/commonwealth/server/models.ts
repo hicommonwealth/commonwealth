@@ -4,18 +4,10 @@ import { AddressModelStatic } from './models/address';
 import { AttachmentModelStatic } from './models/attachment';
 import { BanModelStatic } from './models/ban';
 import { ChainModelStatic } from './models/chain';
-import {
-  ChainCategoryModelStatic
-} from './models/chain_category';
-import {
-  ChainCategoryTypeModelStatic
-} from './models/chain_category_type';
-import {
-  ChainEntityMetaModelStatic
-} from './models/chain_entity_meta';
-import {
-  ChainEventTypeModelStatic
-} from './models/chain_event_type';
+import { ChainCategoryModelStatic } from './models/chain_category';
+import { ChainCategoryTypeModelStatic } from './models/chain_category_type';
+import { ChainEntityMetaModelStatic } from './models/chain_entity_meta';
+import { ChainEventTypeModelStatic } from './models/chain_event_type';
 import { ChainNodeModelStatic } from './models/chain_node';
 import { ChatChannelModelStatic } from './models/chat_channel';
 import { ChatMessageModelStatic } from './models/chat_message';
@@ -54,6 +46,10 @@ import { ViewCountModelStatic } from './models/viewcount';
 import { VoteModelStatic } from './models/vote';
 import { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
 import { WebhookModelStatic } from './models/webhook';
+import { SnapshotProposalModelStatic } from './models/snapshot_proposal';
+import { SnapshotSpaceModelStatic } from './models/snapshot_spaces';
+import { CommunitySnapshotSpaceModelStatic } from './models/community_snapshot_spaces';
+import { DiscordBotConfigModelStatic } from './models/discord_bot_config';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -70,9 +66,11 @@ export type Models = {
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
   CommunityRole: CommunityRoleModelStatic;
+  CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;
   CommunityBanner: CommunityBannerModelStatic;
   DiscussionDraft: DiscussionDraftModelStatic;
+  DiscordBotConfig: DiscordBotConfigModelStatic;
   IdentityCache: IdentityCacheStatic;
   InviteCode: InviteCodeModelStatic;
   LinkedThread: LinkedThreadModelStatic;
@@ -96,7 +94,9 @@ export type Models = {
   SocialAccount: SocialAccountModelStatic;
   SsoToken: SsoTokenModelStatic;
   StarredCommunity: StarredCommunityModelStatic;
+  SnapshotProposal: SnapshotProposalModelStatic;
   Subscription: SubscriptionModelStatic;
+  SnapshotSpace: SnapshotSpaceModelStatic;
   Token: TokenModelStatic;
   TaggedThread: TaggedThreadModelStatic;
   User: UserModelStatic;

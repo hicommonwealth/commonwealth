@@ -94,7 +94,7 @@ Make sure you have python installed in your Rosetta Terminal path. See: `https:/
 
 ## Environment Variables
 
-You should create a `.env` file in the root of the repository
+You should create a `.env` file at the `package/commonwealth` level
 to store environment variables like session secrets.
 
 Environment variables used for external services include:
