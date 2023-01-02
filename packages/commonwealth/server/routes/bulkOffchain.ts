@@ -4,23 +4,21 @@
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import { factory, formatFilename } from 'common-common/src/logging';
 import { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import { CommunityRoleInstance } from 'server/models/community_role';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { CommunityBannerInstance } from '../models/community_banner';
 import { ContractInstance } from '../models/contract';
-import { RoleInstance } from '../models/role';
 import { RuleInstance } from '../models/rule';
 import { ThreadInstance } from '../models/thread';
 import { TopicInstance } from '../models/topic';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
 import validateChain from '../middleware/validateChain';
+import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 
-const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
@@ -115,30 +113,13 @@ const bulkOffchain = async (
           return t.toJSON();
         });
 
-        const rootIds = threads.map((thread) => `${thread.kind}_${thread.id}`);
-
-        const commentsCount = await models.Comment.count({
-          attributes: ['root_id'],
-          where: {
-            chain: chain.id,
-            root_id: { [Op.in]: rootIds },
-            deleted_at: null,
-          },
-          group: 'root_id',
+        const threadsWithCommentsCount = await getThreadsWithCommentCount({
+          threads,
+          models,
+          chainId: chain.id,
         });
 
-        const threadsWithComments = threads.map((thread) => {
-          const numberOfComment = commentsCount.find(
-            (el) => el.root_id === `${thread.kind}_${thread.id}`
-          );
-
-          return {
-            ...thread,
-            numberOfComments: numberOfComment?.count || 0,
-          };
-        });
-
-        resolve(threadsWithComments);
+        resolve(threadsWithCommentsCount);
       } catch (e) {
         console.log(e);
         reject(

@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
+import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
@@ -58,29 +58,10 @@ const activeThreads = async (
         return t.toJSON();
       });
 
-      const rootIds = recentTopicThreads.map(
-        (thread) => `${thread.kind}_${thread.id}`
-      );
-
-      const commentsCount = await models.Comment.count({
-        attributes: ['root_id'],
-        where: {
-          chain: chain.id,
-          root_id: { [Op.in]: rootIds },
-          deleted_at: null,
-        },
-        group: 'root_id',
-      });
-
-      const threadsWithCommentsCount = recentTopicThreads.map((thread) => {
-        const numberOfComment = commentsCount.find(
-          (el) => el.root_id === `${thread.kind}_${thread.id}`
-        );
-
-        return {
-          ...thread,
-          numberOfComments: numberOfComment?.count || 0,
-        };
+      const threadsWithCommentsCount = await getThreadsWithCommentCount({
+        threads: recentTopicThreads,
+        models,
+        chainId: chain.id,
       });
 
       // In absence of X threads with recent activity (comments),
