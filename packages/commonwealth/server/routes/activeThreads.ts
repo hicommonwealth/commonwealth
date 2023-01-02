@@ -42,7 +42,7 @@ const activeThreads = async (
 
   await Promise.all(
     communityTopics.map(async (topic) => {
-      const recentTopicThreads = await models.Thread.findAll({
+      const recentTopicThreadsRaw = await models.Thread.findAll({
         where: {
           topic_id: topic.id,
         },
@@ -52,6 +52,35 @@ const activeThreads = async (
           ['created_at', 'DESC'],
           ['last_commented_on', 'DESC'],
         ],
+      });
+
+      const recentTopicThreads = recentTopicThreadsRaw.map((t) => {
+        return t.toJSON();
+      });
+
+      const rootIds = recentTopicThreads.map(
+        (thread) => `${thread.kind}_${thread.id}`
+      );
+
+      const commentsCount = await models.Comment.count({
+        attributes: ['root_id'],
+        where: {
+          chain: chain.id,
+          root_id: { [Op.in]: rootIds },
+          deleted_at: null,
+        },
+        group: 'root_id',
+      });
+
+      const threadsWithCommentsCount = recentTopicThreads.map((thread) => {
+        const numberOfComment = commentsCount.find(
+          (el) => el.root_id === `${thread.kind}_${thread.id}`
+        );
+
+        return {
+          ...thread,
+          numberOfComments: numberOfComment?.count || 0,
+        };
       });
 
       // In absence of X threads with recent activity (comments),
@@ -72,7 +101,7 @@ const activeThreads = async (
       //   recentTopicThreads.push(...(commentlessTopicThreads || []));
       // }
 
-      allThreads.push(...(recentTopicThreads || []));
+      allThreads.push(...(threadsWithCommentsCount || []));
     })
   ).catch((err) => {
     return next(new ServerError(err));
@@ -80,7 +109,7 @@ const activeThreads = async (
 
   return res.json({
     status: 'Success',
-    result: allThreads.map((c) => c.toJSON()),
+    result: allThreads,
   });
 };
 

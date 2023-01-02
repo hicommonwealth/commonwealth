@@ -3,7 +3,7 @@ import { Topic, AbridgedThread, Profile, Thread } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
-import ChainEntityController from "controllers/server/chain_entities";
+import ChainEntityController from 'controllers/server/chain_entities';
 
 export interface IAbridgedThreadFromServer {
   id: number;
@@ -77,9 +77,9 @@ class RecentActivityController {
       threads_per_topic: 3,
     };
 
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/activeThreads`, params),
-      app.chainEntities.refresh(params.chain)
+      app.chainEntities.refresh(params.chain),
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);

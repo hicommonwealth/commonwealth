@@ -59,7 +59,7 @@ class Thread implements IUniqueId {
   public readonly polls: Poll[];
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
-  private numberOfComments: number;
+  public numberOfComments: number;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
