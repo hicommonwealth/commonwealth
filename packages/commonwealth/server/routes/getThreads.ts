@@ -1,7 +1,9 @@
+import { Action } from 'common-common/src/permissions';
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
+import { checkReadPermitted } from 'server/util/roles';
 import { DB } from '../models';
 
 const getThreads = async (
@@ -15,6 +17,12 @@ const getThreads = async (
 
   let threads;
   try {
+    await checkReadPermitted(
+      models,
+      req.query.community_id,
+      Action.VIEW_THREADS,
+      req.user?.id
+    );
     threads = await models.Thread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
