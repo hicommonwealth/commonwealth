@@ -1,9 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import validateChain from '../middleware/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action } from 'common-common/src/permissions';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { getLastEdited } from '../util/getLastEdited';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { checkReadPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -19,6 +21,13 @@ const viewComments = async (
 ) => {
   const [chain, error] = await validateChain(models, req.query);
   if (error) return next(new AppError(error));
+
+  await checkReadPermitted(
+    models,
+    chain.id,
+    Action.VIEW_COMMENTS,
+    req.user?.id,
+  );
 
   if (!req.query.root_id) {
     return next(new AppError(Errors.NoRootId));

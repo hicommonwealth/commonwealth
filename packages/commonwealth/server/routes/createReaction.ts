@@ -6,9 +6,12 @@ import {
   ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
-import { Action, PermissionError } from 'common-common/src/permissions';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import {
+  Action,
+  PermissionError,
+} from 'common-common/src/permissions';
 import { AppError, ServerError } from 'common-common/src/errors';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import validateChain from '../middleware/validateChain';
@@ -18,14 +21,14 @@ import {
 } from '../../shared/utils';
 import { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import { findAllRoles, isAddressPermitted } from '../util/roles';
 import {
   MixpanelCommunityInteractionEvent,
+  MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -52,17 +55,8 @@ const createReaction = async (
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
 
-  const author = req.address;
 
-  const permission_error = await isAddressPermitted(
-    models,
-    author.id,
-    chain.id,
-    Action.CREATE_REACTION
-  );
-  if (permission_error === PermissionError.NOT_PERMITTED) {
-    return next(new AppError(PermissionError.NOT_PERMITTED));
-  }
+  const author = req.address;
 
   const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } =
     req.body;
@@ -72,6 +66,17 @@ const createReaction = async (
   }
   if (!reaction) {
     return next(new AppError(Errors.NoReaction));
+  }
+
+  const permissionError = await isAddressPermitted(
+    models,
+    req.body.address_id,
+    chain_entity_id,
+    Action.CREATE_REACTION
+  )
+
+  if (permissionError === PermissionError.NOT_PERMITTED) {
+    return next(new ServerError(PermissionError.NOT_PERMITTED));
   }
 
   let thread;
@@ -246,7 +251,7 @@ const createReaction = async (
     ? `discussion_${thread_id}`
     : proposal_id || `comment-${comment_id}`;
 
-  emitNotifications(
+  models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewReaction,
     location,

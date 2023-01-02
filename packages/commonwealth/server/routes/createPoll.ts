@@ -1,11 +1,12 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
 import { getNextPollEndingTime } from '../../shared/utils';
 import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { findOneRole } from '../util/roles';
+import { findOneRole, isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -28,6 +29,18 @@ const createPoll = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
+
+  const author = req.address;
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.CREATE_POLL
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { thread_id, prompt, options } = req.body;
   let { custom_duration } = req.body;

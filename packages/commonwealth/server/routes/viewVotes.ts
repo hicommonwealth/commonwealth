@@ -3,6 +3,8 @@ import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { VoteAttributes } from '../models/vote';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
+import { checkReadPermitted } from '../util/roles';
+import { Action } from '../../../common-common/src/permissions';
 
 export const Errors = {
   NoPollSpecified: 'No poll has been specified',
@@ -28,6 +30,13 @@ const viewVotes = async (
     console.log('It throws an AppError');
     throw new AppError(error);
   }
+
+  await checkReadPermitted(
+    models,
+    chain.id,
+    Action.VIEW_POLLS,
+    req.user?.id,
+  );
 
   if (!req.query.poll_id) {
     throw new AppError(Errors.NoPollSpecified);

@@ -8,6 +8,8 @@ import {
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from 'common-common/src/errors';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
@@ -27,9 +29,7 @@ import { SENDGRID_API_KEY } from '../config';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { findAllRoles } from '../util/roles';
-import emitNotifications from '../util/emitNotifications';
+import { findAllRoles, isAddressPermitted } from '../util/roles';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -59,8 +59,17 @@ const createComment = async (
 ) => {
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-
   const author = req.address;
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.CREATE_COMMENT
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { parent_id, root_id, chain_entity_id, text } = req.body;
 
@@ -339,7 +348,7 @@ const createComment = async (
   excludedAddrs.push(finalComment.Address.address);
 
   // dispatch notifications to root thread
-  emitNotifications(
+  models.Subscription.emitNotifications(
     models,
     NotificationCategories.NewComment,
     root_id,
@@ -367,7 +376,7 @@ const createComment = async (
 
   // if child comment, dispatch notification to parent author
   if (parent_id && parentComment) {
-    emitNotifications(
+    models.Subscription.emitNotifications(
       models,
       NotificationCategories.NewComment,
       `comment-${parent_id}`,
@@ -403,7 +412,7 @@ const createComment = async (
 
       const shouldNotifyMentionedUser = true;
       if (shouldNotifyMentionedUser)
-        emitNotifications(
+        models.Subscription.emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,

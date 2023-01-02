@@ -1,19 +1,20 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
-import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
+import { NotificationCategories } from 'common-common/src/types';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import emitNotifications from '../util/emitNotifications';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { Action, PermissionError } from 'common-common/src/permissions';
+import { isAddressPermitted } from '../../server/util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -32,11 +33,21 @@ const editComment = async (
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
 
+  const author = req.address;
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.EDIT_COMMENT
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
+
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));
   }
-
-  const author = req.address;
 
   // check if banned
   const [canInteract, banError] = await banCache.checkBan({
@@ -149,7 +160,7 @@ const editComment = async (
     const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
     // dispatch notifications to subscribers of the comment/thread
-    emitNotifications(
+    models.Subscription.emitNotifications(
       models,
       NotificationCategories.CommentEdit,
       '',
@@ -223,7 +234,7 @@ const editComment = async (
     if (mentionedAddresses?.length > 0) {
       mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
-        emitNotifications(
+        models.Subscription.emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,

@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { Action, PermissionError } from 'common-common/src/permissions';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { findAllRoles, findOneRole } from '../util/roles';
+import { findAllRoles, findOneRole, isAddressPermitted } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -39,6 +40,16 @@ const deleteComment = async (
       },
       include: [models.Address],
     });
+
+    const permission_error = await isAddressPermitted(
+      models,
+      comment.Address.id,
+      comment.chain,
+      Action.DELETE_COMMENT
+    );
+    if (permission_error === PermissionError.NOT_PERMITTED) {
+      return next(new AppError(PermissionError.NOT_PERMITTED));
+    }
 
     // check if author can delete post
     if (comment) {

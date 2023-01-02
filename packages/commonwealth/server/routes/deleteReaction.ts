@@ -37,13 +37,13 @@ const deleteReaction = async (models: DB, banCache: BanCache, req: Request, res:
       include: [ models.Address ],
     });
 
-      const permission_error = await isAddressPermitted(
+      const permissionError = await isAddressPermitted(
         models,
         reaction.Address.id,
         reaction.chain,
         Action.DELETE_REACTION,
       );
-      if (permission_error === PermissionError.NOT_PERMITTED) {
+      if (permissionError === PermissionError.NOT_PERMITTED) {
         return next(new ServerError(PermissionError.NOT_PERMITTED));
       }
 

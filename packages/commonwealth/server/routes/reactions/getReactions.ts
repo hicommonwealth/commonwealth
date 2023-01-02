@@ -30,12 +30,17 @@ const getReactions = async (
   const { community_id, addresses } = req.query;
 
   const where = { chain: community_id };
-  await checkReadPermitted(
-      models,
-      req.query.community_id,
-      Action.VIEW_REACTIONS,
-      req.user?.id
-    );
+
+  try {
+    await checkReadPermitted(
+        models,
+        req.query.community_id,
+        Action.VIEW_REACTIONS,
+        req.user?.id
+      );
+  } catch (err) {
+    return failure(res.status(403), err);
+  }
 
   const include = [];
   if (addresses) include.push({
