@@ -17,13 +17,13 @@ class NewProfile {
   get slug() { return this._slug; }
   get socials() { return this._socials; }
 
-  constructor({profile_name, email, website, bio, is_default, avatarUrl, slug, socials}) {
+  constructor({profile_name, email, website, bio, is_default, avatar_url, slug, socials}) {
     this._name = profile_name;
     this._email = email;
     this._website = website;
     this._bio = bio;
     this._isDefault = is_default;
-    this._avatarUrl = avatarUrl;
+    this._avatarUrl = avatar_url;
     this._slug = slug;
     this._socials = socials;
   }

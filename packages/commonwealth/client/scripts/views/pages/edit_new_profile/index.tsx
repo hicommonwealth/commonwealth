@@ -10,7 +10,7 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
-import { NewProfile as Profile } from '../../../models';
+import { NewProfile as Profile, Account, Profile as OldProfile } from '../../../models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { AvatarUpload } from '../../components/avatar_upload';
@@ -221,6 +221,25 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       );
     }
 
+    const oldProfile = new OldProfile(
+      app.user.addresses[0].profile.name,
+      app.user.addresses[0].profile.address,
+    );
+
+    oldProfile.initialize(
+      this.username,
+      null,
+      this.bio,
+      this.avatarUrl,
+      null,
+    );
+
+    const account = new Account({
+      chain: app.user.addresses[0].chain,
+      address: app.user.addresses[0].address,
+      profile: oldProfile,
+    });
+
     return (
       <Sublayout class="Homepage">
         <div class="EditProfilePage">
@@ -268,27 +287,19 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <CWText type="caption" fontWeight="medium">Profile Image</CWText>
                 <CWText type="caption" className="description">Select an image from your files to upload</CWText>
                 <div className="image-upload">
-                  <div
-                    className={
-                      this.profileUpdate?.avatarUrl
-                        ? 'profile-image hide'
-                        : 'profile-image'
-                    }
-                  >
-                    <img src={this.profile?.avatarUrl} />
-                  </div>
                   <AvatarUpload
-                    scope="community"
+                    scope="user"
+                    account={account}
                     uploadStartedCallback={() => {
                       this.imageUploading = true;
                       m.redraw();
                     }}
-                    uploadCompleteBallback={(files) => {
+                    uploadCompleteCallback={(files) => {
                       this.imageUploading = false;
                       files.forEach((f) => {
                         if (!f.uploadURL) return;
                         const url = f.uploadURL.replace(/\?.*/, '').trim();
-                        this.profileUpdate.avatarUrl = url;
+                        this.avatarUrl = url;
                       });
                       m.redraw();
                     }}
