@@ -135,4 +135,20 @@ describe('processAbiInputsToDataTypes() unit tests', () => {
     expect(processedArgs).to.deep.equal([BigNumber.from(123)]);
   });
 
+  it('should return empty array', () => {
+    const inputIndex = 0;
+    const input = '123';
+    const functionName = 'testFunction';
+    const inputMap = new Map<string, Map<number, string>>();
+    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+
+    const functionInputs = [];
+    const processedArgs = processAbiInputsToDataTypes(
+      functionName,
+      functionInputs,
+      inputMap
+    );
+    expect(processedArgs).to.deep.equal([]);
+  });
+
 });

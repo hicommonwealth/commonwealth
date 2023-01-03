@@ -17,6 +17,9 @@ async function decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
       sender,
       ChainBase.Ethereum
     );
+    if (!signingWallet.api) {
+      throw new Error('Web3 Api Not Initialized');
+    }
     const web3: Web3 = signingWallet.api;
     const decodedTxMap = web3.eth.abi.decodeParameters(
       fn.outputs.map((output) => output.type),
@@ -27,6 +30,7 @@ async function decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
     return result;
   } catch (error) {
     console.error('Failed to decode transaction data', error);
+    throw new Error(`Transaction Data Decoding Failed: ${error}`);
   }
 }
 
