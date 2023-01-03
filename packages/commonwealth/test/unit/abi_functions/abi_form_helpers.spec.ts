@@ -49,6 +49,28 @@ describe('validateAbiInput() unit tests', () => {
     const [validation_status, message] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'success');
   });
+
+  it('should fail to validate incorrect address args', () => {
+    const input = '0x000000000000000000000000000000000000000';
+    const inputType = 'address';
+
+    const [validation_status, message] = validateAbiInput(input, inputType);
+    assert.equal(validation_status, 'failure');
+  });
+  it('should fail to validate incorrect uint args', () => {
+    const input = '123.5';
+    const inputType = 'uint256';
+
+    const [validation_status, message] = validateAbiInput(input, inputType);
+    assert.equal(validation_status, 'failure');
+  });
+  it('should fail to validate incorrect bool args', () => {
+    const input = 'maybe';
+    const inputType = 'bool';
+
+    const [validation_status, message] = validateAbiInput(input, inputType);
+    assert.equal(validation_status, 'failure');
+  });
 });
 
 describe('handleMappingAbiInputs() unit tests', () => {
@@ -100,12 +122,16 @@ describe('processAbiInputsToDataTypes() unit tests', () => {
     handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
 
     const functionInputs = [
-        {
-            name: 'test',
-            type: 'uint256',
-        },
+      {
+        name: 'test',
+        type: 'uint256',
+      },
     ];
-    const processedArgs = processAbiInputsToDataTypes(functionName, functionInputs, inputMap);
+    const processedArgs = processAbiInputsToDataTypes(
+      functionName,
+      functionInputs,
+      inputMap
+    );
     expect(processedArgs).to.deep.equal([BigNumber.from(123)]);
   });
 
