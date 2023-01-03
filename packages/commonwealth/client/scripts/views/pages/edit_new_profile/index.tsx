@@ -18,7 +18,6 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { IconName } from '../../components/component_kit/cw_icons/cw_icon_lookup';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWForm } from '../../components/component_kit/cw_form';
@@ -80,6 +79,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private socials: string[];
   private username: string;
   private bio: QuillEditor;
+  private avatarUrl: string;
 
   private getProfile = async (address: string) => {
     this.loading = true;
@@ -101,6 +101,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     this.username = this.profile.name;
     this.email = this.profile.email;
     this.socials = this.profile.socials;
+    this.avatarUrl = this.profile.avatarUrl;
     this.loading = false;
     m.redraw();
   };
@@ -162,8 +163,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
         this.profileUpdate.bio = this.bio.textContentsAsString;
       else delete this.profileUpdate.bio;
 
-      if (value.length > 0 && value !== this.profile?.avatarUrl)
-        this.profileUpdate.avatarUrl = value;
+      if (this.avatarUrl?.length > 0 && this.avatarUrl !== this.profile?.avatarUrl)
+        this.profileUpdate.avatarUrl = this.avatarUrl;
       else delete this.profileUpdate.avatarUrl;
 
       if (this.socials.filter((v) => v.trim().length > 0).length > 0 && this.socials !== this.profile?.socials)
@@ -280,6 +281,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                     scope="community"
                     uploadStartedCallback={() => {
                       this.imageUploading = true;
+                      m.redraw();
                     }}
                     uploadCompleteBallback={(files) => {
                       this.imageUploading = false;

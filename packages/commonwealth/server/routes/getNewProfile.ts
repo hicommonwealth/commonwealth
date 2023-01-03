@@ -66,11 +66,23 @@ const getNewProfile = async (
     include: [{ model: models.Address, as: 'Address' }],
   });
 
+  const commentThreadIds = [...new Set<number>(comments.map((c) =>
+    parseInt(c.root_id.replace('discussion_', ''), 10)
+  ))];
+  const commentThreads = await models.Thread.findAll({
+    where: {
+      id: {
+        [Op.in]: commentThreadIds,
+      },
+    },
+  })
+
   return res.status(200).json({
     profile,
     addresses: addresses.map((a) => a.toJSON()),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON()),
+    commentThreads: commentThreads.map((c) => c.toJSON()),
     chains: chains.map((c) => c.toJSON()),
   });
 };

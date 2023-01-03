@@ -57,7 +57,14 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
 
       this.profile = new Profile(response.profile);
       this.threads = response.threads.map((t) => modelThreadFromServer(t));
-      this.comments = response.comments.map((c) => modelCommentFromServer(c));
+      const comments = response.comments.map((c) => modelCommentFromServer(c));
+      const commentsWithThread = comments.map((c) => {
+        const thread = response.commentThreads.find(
+          (t) => t.id === parseInt(c.rootProposal.replace('discussion_', ''), 10)
+        );
+        return { ...c, thread };
+      })
+      this.comments = commentsWithThread;
       this.chains = response.chains.map((c) => new ChainInfo(c));
       this.addresses = response.addresses.map(
         (a) =>

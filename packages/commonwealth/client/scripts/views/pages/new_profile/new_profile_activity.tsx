@@ -42,8 +42,12 @@ type NewProfileActivityContentAttrs = {
   threadCharLimit: number;
 };
 
+type CommentWithAssociatedThread = Comment<IUniqueId> & {
+  thread: Thread;
+}
+
 type NewProfileActivityRowAttrs = {
-  activity: Comment<IUniqueId> | Thread;
+  activity: CommentWithAssociatedThread | Thread;
   address: string;
   charLimit: number;
 };
@@ -53,6 +57,7 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
     const { activity, address, charLimit } = vnode.attrs;
     const { chain, createdAt, plaintext, author, title } = activity;
     const isThread = (activity as Thread).kind;
+    const comment = activity as CommentWithAssociatedThread;
 
     // force redraw or on initial load comments don't render
     // m.redraw();
@@ -79,7 +84,9 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
               ? link('a', `/${activity.chain}/discussion/${activity.id}`, [
                   `${title}`,
                 ])
-              : `${title}`
+              : link('a',`/${comment.chain}/discussion/${comment.thread.id}`,[
+                `${decodeURIComponent(comment.thread.title)}`,
+              ])
             }
           </CWText>
         </CWText>
