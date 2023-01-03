@@ -6,6 +6,11 @@ import { ValidationStatus } from '../views/components/component_kit/cw_validatio
 
 const Bytes32 = ethers.utils.formatBytes32String;
 
+export function encodeFunctionSignature(abi: AbiItem): string {
+  const coder = (new Web3()).eth.abi;
+  return coder.encodeFunctionSignature(abi);
+}
+
 export function validateAbiInput(
   val: string,
   inputType: string

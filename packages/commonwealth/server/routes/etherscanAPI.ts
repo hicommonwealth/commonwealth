@@ -1,12 +1,12 @@
 import axios from 'axios';
 import { AppError, ServerError } from 'common-common/src/errors';
+import { AbiItem } from 'web3-utils';
+import { parseAbiItemsFromABI } from '../../shared/abi_utils';
 import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ETHERSCAN_JS_API_KEY } from '../config';
 import { ContractAttributes } from '../models/contract';
 import { ContractAbiAttributes } from '../models/contract_abi';
-import { parseAbiItemsFromABI } from 'shared/abi_utils';
-import { AbiItem } from 'web3-utils';
 
 export enum Network {
   Mainnet = 'Mainnet',
@@ -86,7 +86,7 @@ const fetchEtherscanContract = async (
   try {
     const response = await axios.get(url, { timeout: 3000 });
     if (response.status === 200) {
-      // check if etherscan abi is available by calling the fetchEtherscanContract api route
+      // Checks if etherscan abi is available by calling the fetchEtherscanContract api route
       const etherscanContract = response.data.result[0];
       if (etherscanContract && etherscanContract['ABI'] !== '') {
         const abiString = etherscanContract['ABI'];
@@ -100,9 +100,10 @@ const fetchEtherscanContract = async (
           throw new AppError(Errors.InvalidABI);
         }
         const nickname = etherscanContract['ContractName'];
-        // create new ABI
+        // Create new ABI
+        // If source code fetch from etherscan is successful, then the abi is a verified one
         const [contract_abi] = await models.ContractAbi.findOrCreate({
-          where: { nickname, abi: abiString, verified: true }, // TODO: verified correct here?
+          where: { nickname, abi: abiString, verified: true },
         });
         // update contract with new ABI
         contract.abi_id = contract_abi.id;

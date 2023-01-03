@@ -1,15 +1,15 @@
 import { ChainBase } from 'common-common/src/types';
-import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
+import {
+  encodeFunctionSignature,
+  processAbiInputsToDataTypes,
+} from 'helpers/abi_form_helpers';
 import { parseAbiItemsFromABI } from 'abi_utils';
 import app from 'state';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core/types';
 import { AbiItem } from 'web3-utils';
 
-async function decodeTransactionData(
-  fn: AbiItem,
-  tx: any
-): Promise<any[]> {
+async function decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
   try {
     const sender = app.user.activeAccount;
     // get querying wallet
@@ -64,10 +64,11 @@ export async function callContractFunction(
   }
   const web3: Web3 = signingWallet.api;
 
-  const methodSignature = `${fn.name}(${fn.inputs
-    .map((input) => input.type)
-    .join(',')})`;
+  // const methodSignature = `${fn.name}(${fn.inputs
+  //   .map((input) => input.type)
+  //   .join(',')})`;
 
+  const methodSignature = encodeFunctionSignature(fn);
   let functionContract;
   try {
     functionContract = new web3.eth.Contract(
@@ -82,7 +83,11 @@ export async function callContractFunction(
   const functionTx = functionContract.methods[methodSignature](
     ...processedArgs
   );
-  if ((fn.stateMutability !== 'view' && fn.stateMutability !== 'pure') && fn.constant !== true) {
+  if (
+    fn.stateMutability !== 'view' &&
+    fn.stateMutability !== 'pure' &&
+    fn.constant !== true
+  ) {
     // Sign Tx with PK if this is write function
     const tx: TransactionConfig = {
       from: signingWallet.accounts[0],
@@ -94,7 +99,10 @@ export async function callContractFunction(
   } else {
     // send call transaction
     try {
-      const tx: TransactionConfig = { to: contract.address, data: functionTx.encodeABI() };
+      const tx: TransactionConfig = {
+        to: contract.address,
+        data: functionTx.encodeABI(),
+      };
       const txResult = await web3.givenProvider.request({
         method: 'eth_call',
         params: [tx, 'latest'],
