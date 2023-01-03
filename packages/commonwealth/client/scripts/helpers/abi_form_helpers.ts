@@ -1,13 +1,31 @@
+import Web3 from 'web3';
 import { AbiInput, AbiItem } from 'web3-utils';
+import { AbiCoder } from 'web3-eth-abi';
 import { BigNumber, ethers } from 'ethers';
 import { ValidationStatus } from '../views/components/component_kit/cw_validation_text';
 
 const Bytes32 = ethers.utils.formatBytes32String;
 
+export function encodeFunctionSignature(abi: AbiItem): string {
+  const coder = (new Web3()).eth.abi;
+  return coder.encodeFunctionSignature(abi);
+}
+
 export function validateAbiInput(
   val: string,
   inputType: string
 ): [ValidationStatus, string] {
+  const coder = (new Web3()).eth.abi;
+  try {
+    if (inputType.slice(-2) === '[]') {
+      coder.encodeParameter(inputType, JSON.parse(val));
+    } else {
+      coder.encodeParameter(inputType, val);
+    }
+    return ['success', ''];
+  } catch (e) {
+    return ['failure', e.message];
+  }
   // TODO Array Validation will be complex. Check what cases we want to cover here
   // Cases not covered yet:
   // - Array of Arrays

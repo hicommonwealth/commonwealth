@@ -55,7 +55,7 @@ class ContractsStore extends IdStore<Contract> {
       return contractFactories;
     } else {
       console.log('No contract found with isFactory: ', true);
-      return null;
+      return [];
     }
   }
 

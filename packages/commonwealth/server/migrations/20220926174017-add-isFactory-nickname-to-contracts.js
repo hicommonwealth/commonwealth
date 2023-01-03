@@ -10,8 +10,8 @@ module.exports = {
      */
     await queryInterface.addColumn('Contracts', 'is_factory', {
       type: Sequelize.BOOLEAN,
-      allowNull: true,
-      defaultValue: 'false',
+      allowNull: false,
+      defaultValue: false,
     });
 
     await queryInterface.addColumn('Contracts', 'nickname', {
