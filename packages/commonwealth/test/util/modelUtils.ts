@@ -12,11 +12,16 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceType } from 'common-common/src/types';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
+import {
+  Action,
+} from 'common-common/src/permissions';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
-import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-import { Action } from '../../../common-common/src/permissions';
+import {
+  constructTypedMessage,
+  TEST_BLOCK_INFO_STRING,
+} from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -27,11 +32,11 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
-export async function addAllowDenyPermissions(
+export async function addAllowDenyPermissionsForCommunityRole(
   role_name: Permission,
   chain_id: string,
-  allow_permission: number,
-  deny_permission: number
+  allow_permission: number | undefined,
+  deny_permission: number | undefined
 ) {
   // get community role object from the database
   const communityRole = await models.CommunityRole.findOne({
@@ -40,12 +45,55 @@ export async function addAllowDenyPermissions(
       name: role_name,
     },
   });
-  // update allow permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.allow = BigInt(communityRole.allow) | BigInt(1) << BigInt(allow_permission);
-  // update deny permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.deny = BigInt(communityRole.deny) | BigInt(1) << BigInt(deny_permission);
+  let denyPermission;
+  let allowPermission;
+  if (deny_permission) {
+    denyPermission = addDenyPermission(
+      BigInt(communityRole?.deny || 0),
+      deny_permission
+    );
+    communityRole.deny = denyPermission;
+  }
+  if (allow_permission) {
+    allowPermission = addAllowPermission(
+      BigInt(communityRole?.allow || 0),
+      allow_permission
+    );
+    communityRole.allow = allowPermission;
+  }
+  // save community role object to the database
+  await communityRole.save();
+}
+
+export async function removeAllowDenyPermissionsForCommunityRole(
+  role_name: Permission,
+  chain_id: string,
+  allow_permission: number | undefined,
+  deny_permission: number | undefined
+) {
+  // get community role object from the database
+  const communityRole = await models.CommunityRole.findOne({
+    where: {
+      chain_id,
+      name: role_name,
+    },
+  });
+  let denyPermission;
+  let allowPermission;
+  if (deny_permission) {
+    denyPermission = removeDenyPermission(
+      BigInt(communityRole?.deny || 0),
+      deny_permission
+    );
+    communityRole.deny = denyPermission;
+  }
+  if (allow_permission) {
+    allowPermission = removeAllowPermission(
+      BigInt(communityRole?.allow || 0),
+      allow_permission
+    );
+    communityRole.allow = allowPermission;
+  }
   // save community role object to the database
   await communityRole.save();
 }
@@ -62,8 +110,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
-    const sessionWallet = ethers.Wallet.createRandom()
-    const data = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+    const sessionWallet = ethers.Wallet.createRandom();
+    const data = await constructTypedMessage(
+      address,
+      chain_id,
+      sessionWallet.address,
+      TEST_BLOCK_INFO_STRING
+    );
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -188,6 +241,7 @@ export interface CommentArgs {
   parentCommentId?: any;
   root_id?: any;
 }
+
 export const createComment = async (args: CommentArgs) => {
   const { chain, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request
@@ -231,6 +285,117 @@ export const editComment = async (args: EditCommentArgs) => {
       jwt,
       chain: community ? undefined : chain,
       community,
+    });
+  return res.body;
+};
+
+export interface CreateReactionArgs {
+  author_chain: string;
+  chain: string;
+  address: string;
+  reaction: string;
+  jwt: string;
+  comment_id: number;
+}
+
+export const createReaction = async (args: CreateReactionArgs) => {
+  const { chain, address, jwt, author_chain, reaction, comment_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/createReaction')
+    .set('Accept', 'application/json')
+    .send({
+      chain,
+      address,
+      reaction,
+      comment_id,
+      author_chain,
+      jwt,
+    });
+  return res.body;
+};
+
+export interface ViewReactionArgs {
+  chain: string;
+  jwt: string;
+  comment_id: number;
+  user?: any;
+}
+
+export const viewReactions = async (args: ViewReactionArgs) => {
+  const { chain, jwt, comment_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .get('/api/viewReactions')
+    .set('Accept', 'application/json')
+    .query({
+      chain,
+      jwt,
+      comment_id,
+    });
+  return res.body;
+};
+
+export interface ReactionCountArgs {
+  thread_ids: number[];
+  active_address: string;
+  chain_id: string;
+  jwt: string;
+}
+
+export const reactionsCounts = async (args: ReactionCountArgs) => {
+  const { thread_ids, active_address, chain_id, jwt } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/reactionsCounts')
+    .set('Accept', 'application/json')
+    .send({
+      thread_ids,
+      active_address,
+      chain_id,
+      jwt,
+    });
+  return res.body;
+};
+
+export interface DeleteReactionArgs {
+  jwt: string;
+  reaction_id: number;
+}
+
+export const deleteReaction = async (args: DeleteReactionArgs) => {
+  const { jwt, reaction_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/deleteReaction')
+    .set('Accept', 'application/json')
+    .send({
+      jwt,
+      reaction_id,
+    });
+  return res.body;
+};
+
+export interface BulkReactionArgs {
+  thread_id?: number;
+  comment_id?: number;
+  proposal_id?: number;
+  chain_id: string;
+  jwt: string;
+}
+
+export const bulkReactions = async (args: BulkReactionArgs) => {
+  const { thread_id, comment_id, proposal_id, chain_id, jwt } = args;
+  const res = await chai.request
+    .agent(app)
+    .get('/api/bulkReactions')
+    .set('Accept', 'application/json')
+    .query({
+      thread_id,
+      comment_id,
+      proposal_id,
+      chain_id,
+      jwt,
     });
   return res.body;
 };
@@ -407,7 +572,10 @@ export const createInvite = async (args: InviteArgs) => {
 };
 
 // always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
+export class MockTokenBalanceProvider extends BalanceProvider<{
+  tokenAddress: string;
+  contractType: string;
+}> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
@@ -419,7 +587,7 @@ export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: st
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: { tokenAddress: string, contractType: string }
+    opts: { tokenAddress: string; contractType: string }
   ): Promise<string> {
     if (this.balanceFn) {
       const bal = await this.balanceFn(opts.tokenAddress, address);

@@ -5,7 +5,7 @@ import {
   isPermitted,
   PermissionError,
   BASE_PERMISSIONS,
-} from 'common-common/src/permissions';
+} from './permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
