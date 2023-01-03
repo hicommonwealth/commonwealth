@@ -59,6 +59,9 @@ export async function callContractFunction(
     sender,
     ChainBase.Ethereum
   );
+  if (!signingWallet.api) {
+    throw new Error('Web3 Api Not Initialized');
+  }
   const web3: Web3 = signingWallet.api;
 
   const methodSignature = `${fn.name}(${fn.inputs
@@ -72,7 +75,8 @@ export async function callContractFunction(
       contract.address
     );
   } catch (error) {
-    console.error('Failed to create DaoFactory controller', error);
+    console.error('Failed to initialize Web3 Contract Instance', error);
+    throw new Error(`Web3 Contract Instance Failed with ${error}`);
   }
 
   const functionTx = functionContract.methods[methodSignature](
@@ -98,6 +102,7 @@ export async function callContractFunction(
       return decodeTransactionData(fn, txResult);
     } catch (error) {
       console.log(error);
+      throw new Error(`Contract Call Tx Failed with ${error}`);
     }
   }
 }
