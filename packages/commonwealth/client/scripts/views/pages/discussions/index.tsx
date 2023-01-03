@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { debounce } from 'lodash';
 
 import 'pages/discussions/index.scss';
@@ -25,47 +34,51 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   private stageName: string;
   private topicName: string;
 
-  get scrollEle() {
-    return document.getElementsByClassName('Body')[0];
-  }
+  // get scrollEle() {
+  //   return document.getElementsByClassName('Body')[0];
+  // }
 
-  async onScroll() {
-    localStorage[`${app.activeChainId()}-discussions-scrollY`] =
-      this.scrollEle.scrollTop;
+  // async onScroll() {
+    // localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+    //   this.scrollEle.scrollTop;
+    //
+    // const { fetchingThreads, topicName, stageName } = this;
+    //
+    // if (
+    //   !fetchingThreads &&
+    //   !app.threads.listingStore.isDepleted({
+    //     topicName,
+    //     stageName,
+    //   }) &&
+    //   !(this.scrollEle.scrollHeight - 1000 >= this.scrollEle.scrollTop)
+    // ) {
+    //   this.fetchingThreads = true;
+    //   await app.threads.loadNextPage({ topicName, stageName });
+    //   this.fetchingThreads = false;
+    //   // this.redraw();
+    // }
+  // }
 
-    const { fetchingThreads, topicName, stageName } = this;
-
-    if (
-      !fetchingThreads &&
-      !app.threads.listingStore.isDepleted({
-        topicName,
-        stageName,
-      }) &&
-      !(this.scrollEle.scrollHeight - 1000 >= this.scrollEle.scrollTop)
-    ) {
-      this.fetchingThreads = true;
-      await app.threads.loadNextPage({ topicName, stageName });
-      this.fetchingThreads = false;
-      this.redraw();
-    }
-  }
-
-  oncreate() {
-    console.log(app);
-    const storedScrollYPos =
-      localStorage[`${app.activeChainId()}-discussions-scrollY`];
-
-    if (app.lastNavigatedBack() && storedScrollYPos) {
-      setTimeout(() => {
-        this.scrollEle.scrollTo(0, Number(storedScrollYPos));
-      }, 100);
-    }
-  }
+  // oncreate() {
+    // console.log('does it work here????@@@');
+    // console.log(app);
+    // const storedScrollYPos =
+    //   localStorage[`${app.activeChainId()}-discussions-scrollY`];
+    //
+    // if (app.lastNavigatedBack() && storedScrollYPos) {
+    //   setTimeout(() => {
+    //     this.scrollEle.scrollTo(0, Number(storedScrollYPos));
+    //   }, 100);
+    // }
+  // }
 
   view(vnode: ResultNode<DiscussionPageAttrs>) {
-    console.log(app);
+    // console.log('does it work here????');
+    // console.log(app);
+    // console.log('app', app);
     if (!app.chain || !app.chain.serverLoaded) {
-      return <PageLoading />;
+      // console.log('loading');
+      return <PageLoading message="please wait here" />;
     }
 
     this.topicName = vnode.attrs.topic;
@@ -83,7 +96,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       this.initializing = true;
       app.threads.loadNextPage({ topicName, stageName }).then(() => {
         this.initializing = false;
-        this.redraw();
+        // this.redraw();
       });
     }
 
@@ -104,52 +117,55 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
     const subpage = topicName || stageName;
 
     return this.initializing ? (
-      <PageLoading />
+      <div>
+        <h1>loading</h1>
+      </div>
     ) : (
-      <Sublayout
-        title="Discussions"
-        description={
-          app.topics.getByName(this.topicName, app.activeChainId()) || ''
-        }
-        onScroll={debounce(this.onScroll.bind(this), 400)}
-      >
-        <div className="DiscussionsPage">
-          <RecentThreadsHeader
-            topic={this.topicName}
-            stage={this.stageName}
-            totalThreadCount={totalThreadCount}
-          />
-          {totalThreadCount > 0 ? (
-            <div className="RecentThreads">
-              {pinnedThreads.map((t) => (
-                <ThreadPreview thread={t} />
-              ))}
-              {unpinnedThreads.map((t) => (
-                <ThreadPreview thread={t} />
-              ))}
-              {app.threads.listingStore.isDepleted({
-                topicName,
-                stageName,
-              }) && (
-                <div className="listing-scroll">
-                  <CWText className="thread-count-text">
-                    {`Showing ${totalThreadCount} of ${pluralize(
-                      totalThreadCount,
-                      'thread'
-                    )}${subpage ? ` under the subpage '${subpage}'` : ''}`}
-                  </CWText>
-                </div>
-              )}
-            </div>
-          ) : (
-            <CWText className="no-threads-text">
-              {isNotUndefined(topicName)
-                ? 'There are no threads matching your filter.'
-                : 'There are no threads here yet.'}
-            </CWText>
-          )}
-        </div>
-      </Sublayout>
+      // <Sublayout
+      // title="Discussions"
+      // description={
+      //   app.topics.getByName(this.topicName, app.activeChainId()) || ''
+      // }
+      // onScroll={() => debounce(this.onScroll.bind(this), 400)}
+      // >
+      <div className="DiscussionsPage">
+        <h1>hi</h1>
+        <RecentThreadsHeader
+          topic={this.topicName}
+          stage={this.stageName}
+          totalThreadCount={totalThreadCount}
+        />
+        {totalThreadCount > 0 ? (
+          <div className="RecentThreads">
+            {pinnedThreads.map((t) => (
+              <ThreadPreview thread={t} />
+            ))}
+            {unpinnedThreads.map((t) => (
+              <ThreadPreview thread={t} />
+            ))}
+            {app.threads.listingStore.isDepleted({
+              topicName,
+              stageName,
+            }) && (
+              <div className="listing-scroll">
+                <CWText className="thread-count-text">
+                  {`Showing ${totalThreadCount} of ${pluralize(
+                    totalThreadCount,
+                    'thread'
+                  )}${subpage ? ` under the subpage '${subpage}'` : ''}`}
+                </CWText>
+              </div>
+            )}
+          </div>
+        ) : (
+          <CWText className="no-threads-text">
+            {isNotUndefined(topicName)
+              ? 'There are no threads matching your filter.'
+              : 'There are no threads here yet.'}
+          </CWText>
+        )}
+      </div>
+      // {/*</Sublayout>*/}
     );
   }
 }

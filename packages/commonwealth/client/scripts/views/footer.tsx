@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'footer.scss';
 
@@ -46,11 +55,17 @@ export class Footer extends ClassComponent {
                   e.preventDefault();
                   redirectClick(item.redirectTo);
                 }}
+                key={item.text}
               >
                 {item.text}
               </a>
             ) : (
-              <a className="footer-link" href={item.externalLink} target="_blank">
+              <a
+                className="footer-link"
+                key={item.text}
+                href={item.externalLink}
+                target="_blank"
+              >
                 {item.text}
               </a>
             );

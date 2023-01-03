@@ -14,7 +14,18 @@ import $ from 'jquery';
 import moment from 'moment';
 
 import app, { ApiStatus, LoginState } from 'state';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, rootRender, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  rootRender,
+  jsx,
+} from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 import {
@@ -30,7 +41,7 @@ import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import DiscussionsPage from 'views/pages/discussions';
 import { createRoutesFromElements, Route } from 'react-router';
 import { createRoot } from 'react-dom/client';
@@ -197,6 +208,7 @@ export async function selectChain(
   deferred = false
 ): Promise<boolean> {
   // Select the default node, if one wasn't provided
+  console.log('select chain@@')
   if (!chain) {
     if (app.user.selectedChain) {
       chain = app.user.selectedChain;
@@ -395,7 +407,7 @@ export async function selectChain(
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
   redraw();
-  console.log('done selectChain')
+  console.log('done selectChain');
   return true;
 }
 
@@ -980,19 +992,25 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               deferChain: true,
             }),
     */
-   const createRouter = (initFn) => {
-    console.log('creating router...');
-    const LayoutComponent =
-      <Layout deferChain={true} initFn={initFn}>
-        <DiscussionsPage />
-      </Layout>;
-    const reactRouter = createBrowserRouter(
-      createRoutesFromElements(
-        <Route path='/:scope/discussions' element={LayoutComponent} />
-      )
-    );
-    createRoot(document.body).render(<RouterProvider router={reactRouter} />);
-    return LayoutComponent;
+    // const createRouter = (initFn) => {
+    //   console.log('creating router...');
+    //   const LayoutComponent = (
+    //     <Layout deferChain={true} initFn={initFn}>
+    //       <DiscussionsPage />
+    //     </Layout>
+    //   );
+    //   const reactRouter = createBrowserRouter(
+    //     createRoutesFromElements(
+    //       <Route path="/:scope/discussions" element={LayoutComponent} />
+    //     )
+    //   );
+    // const rootElement = document.getElementById('react');
+    // const root = createRoot(rootElement);
+
+    // root.render(<div>hello there</div>);
+
+    // createRoot(document.body).render(<RouterProvider router={reactRouter} />);
+    // return LayoutComponent;
     /*
     const script = document.createElement('noscript');
     // eslint-disable-next-line max-len
@@ -1004,7 +1022,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     );
     document.body.insertBefore(script, document.body.firstChild);
     */
-   }
+    // };
     // initialize mixpanel, before adding an alias or tracking identity
     /*
     try {
@@ -1087,9 +1105,9 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     */
 
     // initialize the app
-    createRouter(async () => {
-      return initAppState(true, customDomain);
-    });
+    // createRouter(async () => {
+    //   return initAppState(true, customDomain);
+    // });
   }
 );
 

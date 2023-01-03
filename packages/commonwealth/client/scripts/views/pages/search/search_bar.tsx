@@ -96,7 +96,7 @@ export class SearchBar extends ClassComponent {
     };
 
     const handleGoToSearchPage = () => {
-      if (this.searchTerm.length < 3) {
+      if (this.searchTerm?.length < 3) {
         return;
       } else {
         this.searchQuery = new SearchQuery(this.searchTerm, {
@@ -116,7 +116,7 @@ export class SearchBar extends ClassComponent {
           </div>
           <input
             className={getClasses<{ isClearable: boolean }>({
-              isClearable: this.searchTerm.length > 0,
+              isClearable: this.searchTerm?.length > 0,
             })}
             placeholder="Search Common"
             defaultValue={getRouteParam('q') || this.searchTerm}
@@ -134,7 +134,7 @@ export class SearchBar extends ClassComponent {
             oninput={(e) => {
               this.searchTerm = e.target.value?.toLowerCase();
 
-              if (this.searchTerm.length > 3) {
+              if (this.searchTerm?.length > 3) {
                 handleGetSearchPreview();
               }
             }}
@@ -144,7 +144,7 @@ export class SearchBar extends ClassComponent {
               }
             }}
           />
-          {this.searchTerm.length > 0 && (
+          {this.searchTerm?.length > 0 && (
             <div className="clear-icon">
               <CWIconButton
                 iconName="close"

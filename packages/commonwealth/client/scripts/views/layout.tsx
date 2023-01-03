@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
@@ -21,7 +30,7 @@ import { UserSurveyPopup } from './components/user_survey_popup';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
-import { useParams } from "react-router-dom";
+import { useParams } from 'react-router-dom';
 
 export const withRouter = (WrappedComponent) => (props) => {
   const params = useParams();
@@ -35,7 +44,7 @@ class LoadingLayout extends ClassComponent {
         <div className="spinner-container">
           <CWSpinner size="xl" />
         </div>
-        <AppModals />
+        {/*<AppModals />*/}
         <AppToasts />
       </div>
     );
@@ -63,7 +72,7 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
   }
 
   view(vnode: ResultNode<LayoutAttrs>) {
-    const { deferChain, params: { scope } } = vnode.attrs;
+    const { deferChain, params: { scope } = {} } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
@@ -88,7 +97,7 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
               </div>
             }
           />
-          <AppModals />
+          {/*<AppModals />*/}
           <AppToasts />
         </div>
       );
@@ -105,7 +114,7 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       return (
         <div className="Layout">
           <PageNotFound />
-          <AppModals />
+          {/*<AppModals />*/}
           <AppToasts />
         </div>
       );
@@ -121,9 +130,8 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
         this.deferred = deferChain;
         selectChain(scopeMatchesChain, deferChain).then((response) => {
           if (!deferChain && response) {
-            initChain().then(() => this.redraw())
+            initChain().then(() => this.redraw());
           } else {
-            console.log('redrawing...');
             this.redraw();
           }
         });
@@ -131,7 +139,7 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
       }
     } else if (scope && this.deferred && !deferChain) {
       this.deferred = false;
-      initChain().then(() => this.redraw())
+      initChain().then(() => this.redraw());
       return <LoadingLayout />;
     } else if (!scope && app.chain && app.chain.network) {
       // Handle the case where we unload the network or community, if we're
@@ -149,12 +157,13 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
     return (
       <div className="Layout">
         {vnode.children}
-        <AppModals />
+        {/*<AppModals />*/}
         <AppToasts />
-        <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
+        {/*<UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />*/}
       </div>
     );
   }
 }
 
-export const Layout = withRouter(LayoutComponent);
+export const Layout = LayoutComponent;
+// export const Layout = withRouter(LayoutComponent);

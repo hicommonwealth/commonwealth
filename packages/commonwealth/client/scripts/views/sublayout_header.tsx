@@ -76,7 +76,8 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
           </div>
           <div className="DesktopMenuContainer">
             <CreateContentPopover />
-            <HelpMenuPopover />
+              {/*Cannot update during existing sate transition => probably event handlers callback are written in wrong way*/}
+            {/*<HelpMenuPopover />*/}
             {app.isLoggedIn() && <NotificationsMenuPopover />}
             {app.isLoggedIn() && app.config.invites?.length > 0 && (
               <InvitesMenuPopover />

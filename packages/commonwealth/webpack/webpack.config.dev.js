@@ -7,7 +7,7 @@ module.exports = merge(common, {
   entry: {
     app: [
       'webpack-hot-middleware/client?path=/__webpack_hmr&reload=true',
-      'app.tsx',
+      'app.new.tsx',
     ],
   },
   mode: 'development',
