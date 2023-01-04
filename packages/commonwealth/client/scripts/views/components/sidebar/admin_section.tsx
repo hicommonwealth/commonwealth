@@ -139,21 +139,6 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
           });
         },
       },
-      {
-        title: 'Rules',
-        containsChildren: false,
-        displayData: null,
-        hasDefaultToggle: false,
-        isActive: m.route.get().includes('/rules'),
-        isVisible: true,
-        isUpdated: false,
-        onclick: (e, toggle: boolean) => {
-          e.preventDefault();
-          handleRedirectClicks(e, `/rules`, app.activeChainId(), () => {
-            setAdminToggleTree(`children.rules.toggledState`, toggle);
-          });
-        },
-      },
     ];
 
     // Build Toggle Tree

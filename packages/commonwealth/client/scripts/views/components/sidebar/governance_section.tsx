@@ -55,6 +55,14 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         // app.chain.network === ChainNetwork.CommonProtocol ||
         app.chain.meta.snapshot?.length);
 
+    const isAdmin =
+      app.user.isSiteAdmin ||
+      app.roles.isAdminOfEntity({
+        chain: app.activeChainId(),
+      });
+
+    const showRules = app.chain.meta.rulesEnabled || isAdmin;
+
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
     const showCompoundOptions =
@@ -116,6 +124,12 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
           toggledState: false,
           children: {},
         },
+        ...(showRules && {
+          Rules: {
+            toggledState: false,
+            children: {},
+          },
+        }),
         ...(showSnapshotOptions && {
           Snapshots: {
             toggledState: false,
@@ -236,6 +250,8 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       p.startsWith(`/${app.activeChainId()}/members`) ||
       p.startsWith(`/${app.activeChainId()}/account/`);
 
+    const onRulesPage = (p) => p.startsWith(`/${app.activeChainId()}/rules`);
+
     if (onNotificationsPage(m.route.get())) return;
 
     // ---------- Build Section Props ---------- //
@@ -256,6 +272,22 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         });
       },
       displayData: null,
+    };
+
+    const rulesData: SectionGroupAttrs = {
+      title: 'Rules',
+      containsChildren: false,
+      displayData: null,
+      hasDefaultToggle: false,
+      isActive: onRulesPage(m.route.get()),
+      isVisible: showRules,
+      isUpdated: false,
+      onclick: (e, toggle: boolean) => {
+        e.preventDefault();
+        handleRedirectClicks(e, `/rules`, app.activeChainId(), () => {
+          setGovernanceToggleTree(`children.Rules.toggledState`, toggle);
+        });
+      },
     };
 
     // Snapshots
@@ -452,6 +484,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
 
     let governanceGroupData: SectionGroupAttrs[] = [
       membersData,
+      rulesData,
       snapshotData,
       delegateData,
       treasuryData,
@@ -463,7 +496,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       validatorsData,
     ];
 
-    if (!hasProposals) governanceGroupData = [membersData];
+    if (!hasProposals) governanceGroupData = [membersData, rulesData];
 
     const sidebarSectionData: SidebarSectionAttrs = {
       title: 'Governance',

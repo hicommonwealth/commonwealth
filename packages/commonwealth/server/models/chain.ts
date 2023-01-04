@@ -31,6 +31,7 @@ export type ChainAttributes = {
   github?: string;
   ss58_prefix?: number;
   stages_enabled?: boolean;
+  rules_enabled?: boolean;
   custom_stages?: string;
   custom_domain?: string;
   block_explorer_ids?: string;
@@ -108,6 +109,11 @@ export default (
         type: dataTypes.BOOLEAN,
         allowNull: true,
         defaultValue: true,
+      },
+      rules_enabled: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
       },
       custom_stages: { type: dataTypes.STRING, allowNull: true },
       custom_domain: { type: dataTypes.STRING, allowNull: true },

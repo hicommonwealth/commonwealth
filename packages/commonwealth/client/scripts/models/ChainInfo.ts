@@ -29,6 +29,7 @@ class ChainInfo {
   public telegram: string;
   public github: string;
   public stagesEnabled: boolean;
+  public rulesEnabled: boolean;
   public customStages: string;
   public customDomain: string;
   public snapshot: string[];
@@ -68,6 +69,7 @@ class ChainInfo {
     telegram,
     github,
     stagesEnabled,
+    rulesEnabled,
     customStages,
     customDomain,
     snapshot,
@@ -104,6 +106,7 @@ class ChainInfo {
     this.github = github;
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
+    this.rulesEnabled = rulesEnabled;
     this.customDomain = customDomain;
     this.terms = terms;
     this.snapshot = snapshot;
@@ -139,6 +142,7 @@ class ChainInfo {
     telegram,
     github,
     stages_enabled,
+    rules_enabled,
     custom_stages,
     custom_domain,
     snapshot,
@@ -186,6 +190,7 @@ class ChainInfo {
       telegram,
       github,
       stagesEnabled: stages_enabled,
+      rulesEnabled: rules_enabled,
       customStages: custom_stages,
       customDomain: custom_domain,
       snapshot,
@@ -280,6 +285,7 @@ class ChainInfo {
     telegram,
     github,
     stagesEnabled,
+    rulesEnabled,
     customStages,
     customDomain,
     terms,
@@ -300,6 +306,7 @@ class ChainInfo {
       telegram,
       github,
       stages_enabled: stagesEnabled,
+      rules_enabled: rulesEnabled,
       custom_stages: customStages,
       custom_domain: customDomain,
       default_allow_permissions,
@@ -319,6 +326,7 @@ class ChainInfo {
     this.telegram = updatedChain.telegram;
     this.github = updatedChain.github;
     this.stagesEnabled = updatedChain.stages_enabled;
+    this.rulesEnabled = updatedChain.rules_enabled;
     this.customStages = updatedChain.custom_stages;
     this.customDomain = updatedChain.custom_domain;
     this.snapshot = updatedChain.snapshot;

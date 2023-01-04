@@ -61,6 +61,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   stagesEnabled: boolean;
   customStages: string;
   chatEnabled: boolean;
+  rulesEnabled: boolean;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
   customDomain: string;
@@ -93,6 +94,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.telegram = chain.telegram;
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
+    this.rulesEnabled = chain.rulesEnabled;
     this.customStages = chain.customStages;
     this.chatEnabled = !isPermitted(
       chain.defaultDenyPermissions,
@@ -253,6 +255,16 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               : 'Enable chat feature for this community '
           }
         />
+        <ToggleRow
+          title="Public Rules"
+          defaultValue={this.rulesEnabled}
+          onToggle={(checked) => {
+            this.rulesEnabled = checked;
+          }}
+          caption={(checked) =>
+            checked ? 'Enable public rules page' : 'Disable public rules page  '
+          }
+        />
         <InputRow
           title="Custom Stages"
           value={this.customStages}
@@ -360,6 +372,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               telegram,
               github,
               stagesEnabled,
+              rulesEnabled,
               customStages,
               customDomain,
               default_deny_permissions,
@@ -432,6 +445,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 telegram,
                 github,
                 stagesEnabled,
+                rulesEnabled,
                 customStages,
                 customDomain,
                 snapshot,

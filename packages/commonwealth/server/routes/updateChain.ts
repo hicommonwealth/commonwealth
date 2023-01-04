@@ -80,6 +80,7 @@ const updateChain = async (
     github,
     hide_projects,
     stages_enabled,
+    rules_enabled,
     custom_stages,
     custom_domain,
     default_allow_permissions,
@@ -181,6 +182,7 @@ const updateChain = async (
   if (github) chain.github = github;
   if (hide_projects) chain.hide_projects = hide_projects;
   if (stages_enabled) chain.stages_enabled = stages_enabled;
+  if (rules_enabled) chain.rules_enabled = rules_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
   // Set default allow/deny permissions
