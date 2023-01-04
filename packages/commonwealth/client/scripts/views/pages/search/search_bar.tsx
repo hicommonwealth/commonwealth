@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, setRoute, getRouteParam, jsx } from 'mithrilInterop';
 
 import 'pages/search/search_bar.scss';
 
@@ -52,8 +52,6 @@ const getSearchPreview = async (searchQuery: SearchQuery, state) => {
   );
 
   app.search.addToHistory(searchQuery);
-
-  redraw();
 };
 
 export class SearchBar extends ClassComponent {
@@ -62,9 +60,7 @@ export class SearchBar extends ClassComponent {
   private searchQuery: SearchQuery;
   private searchTerm: Lowercase<string>;
 
-  oninit() {
-    this.searchTerm = '';
-  }
+  state = { searchTerm: '' };
 
   view() {
     // const historyList = app.search.getHistory().map((previousQuery) => (
@@ -87,7 +83,7 @@ export class SearchBar extends ClassComponent {
     // ));
 
     const handleGetSearchPreview = () => {
-      this.searchQuery = new SearchQuery(this.searchTerm, {
+      this.searchQuery = new SearchQuery(this.state.searchTerm, {
         isSearchPreview: true,
         chainScope: app.activeChainId(),
       });
@@ -99,7 +95,7 @@ export class SearchBar extends ClassComponent {
       if (this.searchTerm?.length < 3) {
         return;
       } else {
-        this.searchQuery = new SearchQuery(this.searchTerm, {
+        this.searchQuery = new SearchQuery(this.state.searchTerm, {
           isSearchPreview: false,
           chainScope: app.activeChainId(),
         });
@@ -116,40 +112,39 @@ export class SearchBar extends ClassComponent {
           </div>
           <input
             className={getClasses<{ isClearable: boolean }>({
-              isClearable: this.searchTerm?.length > 0,
+              isClearable: this.state.searchTerm?.length > 0,
             })}
             placeholder="Search Common"
-            defaultValue={getRouteParam('q') || this.searchTerm}
-            value={this.searchTerm}
-            autocomplete="off"
-            onfocus={() => {
+            defaultValue={getRouteParam('q') || this.state.searchTerm}
+            value={this.state.searchTerm}
+            autoComplete="off"
+            onFocus={() => {
               this.showDropdown = true;
             }}
-            onblur={() => {
+            onBlur={() => {
               setTimeout(() => {
                 this.showDropdown = false;
-                redraw();
               }, 500); // hack to prevent the dropdown closing too quickly on click
             }}
-            oninput={(e) => {
-              this.searchTerm = e.target.value?.toLowerCase();
+            onInput={(e) => {
+              this.setState({ searchTerm: e.target.value?.toLowerCase() });
 
-              if (this.searchTerm?.length > 3) {
+              if (this.state.searchTerm?.length > 3) {
                 handleGetSearchPreview();
               }
             }}
-            onkeyup={(e) => {
+            onKeyUp={(e) => {
               if (e.key === 'Enter') {
                 handleGoToSearchPage();
               }
             }}
           />
-          {this.searchTerm?.length > 0 && (
+          {this.state.searchTerm?.length > 0 && (
             <div className="clear-icon">
               <CWIconButton
                 iconName="close"
                 onClick={() => {
-                  this.searchTerm = '';
+                  this.setState({ searchTerm: '' });
                 }}
               />
             </div>
@@ -161,7 +156,7 @@ export class SearchBar extends ClassComponent {
                   {Object.entries(this.searchResults).map(([k, v]) => {
                     if (k === SearchScope.Threads && v.length > 0) {
                       return (
-                        <div className="preview-section">
+                        <div className="preview-section" key={k}>
                           <div className="section-header">
                             <CWText
                               type="caption"
@@ -181,7 +176,7 @@ export class SearchBar extends ClassComponent {
                       );
                     } else if (k === SearchScope.Replies && v.length > 0) {
                       return (
-                        <div className="preview-section">
+                        <div className="preview-section" key={k}>
                           <div className="section-header">
                             <CWText
                               type="caption"
@@ -201,7 +196,7 @@ export class SearchBar extends ClassComponent {
                       );
                     } else if (k === SearchScope.Communities && v.length > 0) {
                       return (
-                        <div className="preview-section">
+                        <div className="preview-section" key={k}>
                           <div className="section-header">
                             <CWText
                               type="caption"
@@ -218,7 +213,7 @@ export class SearchBar extends ClassComponent {
                       );
                     } else if (k === SearchScope.Members && v.length > 0) {
                       return (
-                        <div className="preview-section">
+                        <div className="preview-section" key={k}>
                           <div className="section-header">
                             <CWText
                               type="caption"

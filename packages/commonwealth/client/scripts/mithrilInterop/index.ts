@@ -51,19 +51,21 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
   protected readonly __props: A;
   private _isMounted = false;
 
-  constructor(props) {
-    super(props);
-    return new Proxy(this, {
-      set(obj, prop, value) {
-        if (obj._isMounted && Object.keys(obj).includes(prop as string)) {
-          obj.setState({ ...obj.state, [prop]: value })
-          // console.log(prop);
-        }
-        // @ts-ignore
-        return Reflect.set(...arguments);
-      }
-    })
-  }
+  // commented out as this was trigerring rerenders all over again
+
+  // constructor(props) {
+  //   super(props);
+  //   return new Proxy(this, {
+  //     set(obj, prop, value) {
+  //       if (obj._isMounted && Object.keys(obj).includes(prop as string)) {
+  //         obj.setState({ ...obj.state, [prop]: value })
+  //         // console.log(prop);
+  //       }
+  //       // @ts-ignore
+  //       return Reflect.set(...arguments);
+  //     }
+  //   })
+  // }
 
   public componentDidMount() {
     this.oninit({ attrs: this.props, children: this.props.children });

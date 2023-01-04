@@ -1,8 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
 
 import 'components/code_block.scss';
 
@@ -14,17 +13,25 @@ type CodeBlockAttrs = {
 };
 
 export class CodeBlock extends ClassComponent<CodeBlockAttrs> {
+  constructor(props) {
+    super(props);
+    this.codeBlockRef = React.createRef();
+  }
+
   view(vnode: ResultNode<CodeBlockAttrs>) {
     const { clickToSelect } = vnode.attrs;
 
     return (
-      <div className={getClasses<CodeBlockAttrs>({ clickToSelect }, 'CodeBlock')}>
+      <div
+        ref={this.codeBlockRef}
+        className={getClasses<CodeBlockAttrs>({ clickToSelect }, 'CodeBlock')}
+      >
         <CWLabel label="Use subkey to sign this transaction" />
         <pre
           onClick={(e) => {
             e.preventDefault();
 
-            const element = vnode.dom;
+            const element = this.codeBlockRef.current;
 
             if (window.getSelection) {
               const sel = window.getSelection();

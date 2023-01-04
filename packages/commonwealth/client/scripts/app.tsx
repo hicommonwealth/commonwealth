@@ -208,7 +208,6 @@ export async function selectChain(
   deferred = false
 ): Promise<boolean> {
   // Select the default node, if one wasn't provided
-  console.log('select chain@@')
   if (!chain) {
     if (app.user.selectedChain) {
       chain = app.user.selectedChain;

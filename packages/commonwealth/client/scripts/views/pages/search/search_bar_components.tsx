@@ -1,7 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
@@ -10,7 +16,7 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import User from '../../components/widgets/user';
+import User from '../../components/widgets/user_testing';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CommunityLabel } from '../../components/community_label';
 

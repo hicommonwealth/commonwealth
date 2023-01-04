@@ -1,10 +1,10 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
-
+import React from 'react';
 
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import { render, redraw, Component } from 'mithrilInterop';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -153,6 +153,7 @@ const User: Component<
       profile.isCouncillor &&
         !hideIdentityIcon &&
         render(
+          // todo this is not valid for react.createElement
           '.role-icon.role-icon-councillor',
           {
             class: long ? 'long' : '',

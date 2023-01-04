@@ -1,8 +1,13 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  setRoute,
+  redraw,
+  jsx,
+} from 'mithrilInterop';
 
 import 'sublayout_header.scss';
 
@@ -76,7 +81,6 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
           </div>
           <div className="DesktopMenuContainer">
             <CreateContentPopover />
-              {/*Cannot update during existing sate transition => probably event handlers callback are written in wrong way*/}
             {/*<HelpMenuPopover />*/}
             {app.isLoggedIn() && <NotificationsMenuPopover />}
             {app.isLoggedIn() && app.config.invites?.length > 0 && (
