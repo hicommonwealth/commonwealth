@@ -1,13 +1,12 @@
 /* @jsx m */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
 
 import 'modals/alert_modal.scss';
 
 import app from 'state';
+import { CWButton } from '../components/component_kit/cw_button';
 
 const AlertModal = {
   confirmExit: async () => true,
@@ -31,21 +30,16 @@ const AlertModal = {
           <h3>{alertText}</h3>
         </div>
         <div class="compact-modal-actions">
-          {m(Button, {
-            intent: 'primary',
-            rounded: true,
-            onclick: (e) => {
+          <CWButton
+            onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {
                 $(e.target).trigger('modalexit');
               }, 0);
-            },
-            oncreate: (vvnode) => {
-              $(vvnode.dom).focus();
-            },
-            label: primaryButton,
-          })}
+            }}
+            label={primaryButton}
+          />
         </div>
       </div>
     );

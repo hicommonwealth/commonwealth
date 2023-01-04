@@ -108,7 +108,9 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
-      session_public_address: app.sessions.getAddress(this.chain.node.ethChainId || 1),
+      session_public_address: app.sessions.getAddress(
+        this.chain.node?.ethChainId || 1
+      ),
       session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);

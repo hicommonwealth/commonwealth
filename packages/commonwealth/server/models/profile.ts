@@ -3,7 +3,7 @@ import { Model, DataTypes } from 'sequelize';
 
 import { UserAttributes, UserInstance } from './user';
 import { ModelStatic, ModelInstance } from './types';
-import { AddressInstance } from './address';
+import { AddressAttributes, AddressInstance } from './address';
 
 export type ProfileAttributes = {
   id?: number;
@@ -20,22 +20,29 @@ export type ProfileAttributes = {
 
   // associations
   User?: UserAttributes;
-}
+  Addresses?: AddressAttributes[];
+};
 
 export type ProfileInstance = ModelInstance<ProfileAttributes> & {
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getAddresses: Sequelize.HasManyGetAssociationsMixin<AddressInstance>;
-}
+};
 
 export type ProfileModelStatic = ModelStatic<ProfileInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: typeof DataTypes
 ): ProfileModelStatic => {
   const Profile = <ProfileModelStatic>sequelize.define(
-    'Profile', {
-      id: { type: dataTypes.INTEGER, autoIncrement: true, allowNull: false, primaryKey: true },
+    'Profile',
+    {
+      id: {
+        type: dataTypes.INTEGER,
+        autoIncrement: true,
+        allowNull: false,
+        primaryKey: true,
+      },
       user_id: { type: dataTypes.INTEGER, allowNull: false },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
@@ -43,23 +50,29 @@ export default (
       email: { type: dataTypes.STRING, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       bio: { type: dataTypes.TEXT, allowNull: true },
-      is_default: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-      avatar_url: { type: dataTypes.STRING, allowNull: true},
-      slug: { type: dataTypes.STRING, allowNull: true},
-    }, {
+      is_default: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      avatar_url: { type: dataTypes.STRING, allowNull: true },
+      slug: { type: dataTypes.STRING, allowNull: true },
+    },
+    {
       tableName: 'Profiles',
       underscored: true,
       timestamps: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [
-        { fields: ['user_id'] },
-      ],
+      indexes: [{ fields: ['user_id'] }],
     }
   );
 
   Profile.associate = (models) => {
-    models.Profile.belongsTo(models.User, { foreignKey: 'user_id', targetKey: 'id' });
+    models.Profile.belongsTo(models.User, {
+      foreignKey: 'user_id',
+      targetKey: 'id',
+    });
     models.Profile.hasMany(models.Address, { foreignKey: 'profile_id' });
   };
 

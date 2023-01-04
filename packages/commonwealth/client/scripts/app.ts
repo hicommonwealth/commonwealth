@@ -14,7 +14,7 @@ import moment from 'moment';
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory, Contract } from 'models';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
 import {
   notifyError,
@@ -24,7 +24,7 @@ import {
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
-import ConfirmInviteModal from 'views/modals/confirm_invite_modal';
+import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
@@ -32,7 +32,7 @@ import { isWindowMediumSmallInclusive } from './views/components/component_kit/h
 
 // Prefetch commonly used pages
 import(/* webpackPrefetch: true */ 'views/pages/landing');
-import(/* webpackPrefetch: true */ 'views/pages/commonwealth');
+// import(/* webpackPrefetch: true */ 'views/pages/why_commonwealth');
 import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
 import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
 import(/* webpackPrefetch: true */ 'views/pages/view_thread');
@@ -58,39 +58,45 @@ export async function initAppState(
         app.config.nodes.clear();
         app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
-        data.nodes
+        data.result.nodes
           .sort((a, b) => a.id - b.id)
           .map((node) => {
             return app.config.nodes.add(NodeInfo.fromJSON(node));
           });
-        data.chains
-          .filter((chain) => chain.active)
-          .map((chain) => {
-            delete chain.ChainNode;
+        data.result.chainsWithSnapshots
+          .filter((chainsWithSnapshots) => chainsWithSnapshots.chain.active)
+          .map((chainsWithSnapshots) => {
+            delete chainsWithSnapshots.chain.ChainNode;
             return app.config.chains.add(
               ChainInfo.fromJSON({
-                ChainNode: app.config.nodes.getById(chain.chain_node_id),
-                ...chain,
+                ChainNode: app.config.nodes.getById(
+                  chainsWithSnapshots.chain.chain_node_id
+                ),
+                snapshot: chainsWithSnapshots.snapshot,
+                ...chainsWithSnapshots.chain,
               })
             );
           });
-        app.roles.setRoles(data.roles);
-        app.config.notificationCategories = data.notificationCategories.map(
-          (json) => NotificationCategory.fromJSON(json)
-        );
-        app.config.invites = data.invites;
-        app.config.chainCategories = data.chainCategories;
-        app.config.chainCategoryTypes = data.chainCategoryTypes;
+        app.roles.setRoles(data.result.roles);
+        app.config.notificationCategories =
+          data.result.notificationCategories.map((json) =>
+            NotificationCategory.fromJSON(json)
+          );
+        app.config.invites = data.result.invites;
+        app.config.chainCategories = data.result.chainCategories;
+        app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 
         // add recentActivity
-        const { recentThreads } = data;
+        const { recentThreads } = data.result;
         recentThreads.forEach(({ chain, count }) => {
           app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
         // update the login status
-        updateActiveUser(data.user);
-        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+        updateActiveUser(data.result.user);
+        app.loginState = data.result.user
+          ? LoginState.LoggedIn
+          : LoginState.LoggedOut;
 
         if (app.loginState == LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
@@ -106,13 +112,17 @@ export async function initAppState(
         }
 
         app.user.setStarredCommunities(
-          data.user ? data.user.starredCommunities : []
+          data.result.user ? data.result.user.starredCommunities : []
         );
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
-        if (updateSelectedChain && data.user && data.user.selectedChain) {
+        if (
+          updateSelectedChain &&
+          data.result.user &&
+          data.result.user.selectedChain
+        ) {
           app.user.setSelectedChain(
-            ChainInfo.fromJSON(data.user.selectedChain)
+            ChainInfo.fromJSON(data.result.user.selectedChain)
           );
         }
 
@@ -611,11 +621,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     const { activeAccount } = app.user;
     m.route(document.body, '/', {
       // Sitewide pages
-      '/about': importRoute('views/pages/commonwealth', {
+      '/about': importRoute('views/pages/why_commonwealth', {
         scoped: false,
       }),
-      '/terms': importRoute('views/pages/landing/terms', { scoped: false }),
-      '/privacy': importRoute('views/pages/landing/privacy', { scoped: false }),
+      '/terms': importRoute('views/pages/terms', { scoped: false }),
+      '/privacy': importRoute('views/pages/privacy', { scoped: false }),
       '/components': importRoute('views/pages/components', {
         scoped: false,
         hideSidebar: true,
@@ -645,17 +655,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            // CMN
-            '/projects': importRoute('views/pages/commonwealth/projects', {
-              scoped: true,
-            }),
-            '/backers': importRoute('views/pages/commonwealth/backers', {
-              scoped: true,
-            }),
-            '/collectives': importRoute(
-              'views/pages/commonwealth/collectives',
-              { scoped: true }
-            ),
             // NEAR
             '/finishNearLogin': importRoute('views/pages/finish_near_login', {
               scoped: true,
@@ -859,7 +858,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
-            '/communities': importRoute('views/pages/community_cards', {
+            '/communities': importRoute('views/pages/communities', {
               scoped: false,
               hideSidebar: false,
             }),
@@ -867,7 +866,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               deferChain: true,
             }),
-            '/whyCommonwealth': importRoute('views/pages/commonwealth', {
+            '/whyCommonwealth': importRoute('views/pages/why_commonwealth', {
               scoped: false,
               hideSidebar: true,
             }),

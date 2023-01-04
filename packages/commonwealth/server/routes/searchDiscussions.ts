@@ -1,7 +1,6 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
@@ -20,6 +19,8 @@ const searchDiscussions = async (
 ) => {
   let bind = {};
 
+  const chain = req.chain;
+
   if (!req.query.search) {
     return next(new AppError(Errors.QueryMissing));
   }
@@ -31,8 +32,6 @@ const searchDiscussions = async (
     if (!req.query.chain) {
       return next(new AppError(Errors.NoChain));
     }
-    const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new AppError(error));
     const encodedSearchTerm = encodeURIComponent(req.query.search);
     const params = {
       chain: chain.id,
@@ -71,8 +70,6 @@ const searchDiscussions = async (
   // Community-scoped search
   let communityOptions = '';
   if (req.query.chain) {
-    const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new AppError(error));
 
     // set up query parameters
     communityOptions = `AND "Threads".chain = $chain `;

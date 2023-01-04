@@ -132,14 +132,13 @@ export class ComponentShowcase extends ClassComponent {
         <div class="form-gallery">
           <CWText type="h4">Dropdown</CWText>
           <CWDropdown
-            inputOptions={[
-              { label: 'Dropdown Option 1' },
-              { label: 'Dropdown Option 2' },
-              { label: 'Dropdown Option 3' },
+            label="Dropdown"
+            options={[
+              { label: 'Dropdown Option 1', value: 'dropdownOption1' },
+              { label: 'Dropdown Option 2', value: 'dropdownOption2' },
+              { label: 'Dropdown Option 3', value: 'dropdownOption3' },
             ]}
-            onSelect={(optionLabel) =>
-              console.log('Selected option: ', optionLabel)
-            }
+            onSelect={(item) => console.log('Selected option: ', item.label)}
           />
         </div>
         <div class="basic-gallery">
@@ -160,9 +159,9 @@ export class ComponentShowcase extends ClassComponent {
         <div class="basic-gallery">
           <CWText type="h3">Tag</CWText>
           <CWTag label="Ref #90" />
-          <CWTag label="Passed" status="passed" />
-          <CWTag label="Failed" status="failed" />
-          <CWTag label="Active" status="active" />
+          <CWTag label="Passed" type="passed" />
+          <CWTag label="Failed" type="failed" />
+          <CWTag label="Active" type="active" />
           <CWTag label="Poll" type="poll" />
           <CWTag label="Prop #52" type="proposal" />
           <CWTag label="Ref #90" type="referendum" />

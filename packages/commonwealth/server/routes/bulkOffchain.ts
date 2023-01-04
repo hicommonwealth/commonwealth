@@ -4,23 +4,20 @@
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import { factory, formatFilename } from 'common-common/src/logging';
 import { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
 import { CommunityRoleInstance } from 'server/models/community_role';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { CommunityBannerInstance } from '../models/community_banner';
 import { ContractInstance } from '../models/contract';
-import { RoleInstance } from '../models/role';
 import { RuleInstance } from '../models/rule';
 import { ThreadInstance } from '../models/thread';
 import { TopicInstance } from '../models/topic';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
-import validateChain from '../middleware/validateChain';
+import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 
-const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
@@ -30,9 +27,7 @@ const bulkOffchain = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
-
+  const chain = req.chain;
   // globally shared SQL replacements
   const communityOptions = 'chain = :chain';
   const replacements = { chain: chain.id };
@@ -111,11 +106,17 @@ const bulkOffchain = async (
           attributes: { exclude: ['version_history'] },
         });
 
-        resolve(
-          rawPinnedThreads.map((t) => {
-            return t.toJSON();
-          })
-        );
+        const threads = rawPinnedThreads.map((t) => {
+          return t.toJSON();
+        });
+
+        const threadsWithCommentsCount = await getThreadsWithCommentCount({
+          threads,
+          models,
+          chainId: chain.id,
+        });
+
+        resolve(threadsWithCommentsCount);
       } catch (e) {
         console.log(e);
         reject(

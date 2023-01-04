@@ -1,7 +1,7 @@
 import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
+import { DataTypes } from 'sequelize';
 import { SubscriptionAttributes } from './subscription';
+import { ModelStatic, ModelInstance } from './types';
 import { NotificationAttributes } from './notification';
 
 export type NotificationsReadAttributes = {

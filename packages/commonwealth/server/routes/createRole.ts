@@ -1,13 +1,13 @@
 import Sequelize from 'sequelize';
 import { NotificationCategories } from 'common-common/src/types';
-import validateChain, {
+import { AppError } from 'common-common/src/errors';
+import { SubscriptionAttributes } from '../models/subscription';
+import {
   ValidateChainParams,
 } from '../middleware/validateChain';
 import { DB } from '../models';
 import { success, TypedRequestBody, TypedResponse } from '../types';
-import { AppError } from 'common-common/src/errors';
 import { RoleAttributes } from '../models/role';
-import { SubscriptionAttributes } from '../models/subscription';
 import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {
@@ -31,9 +31,7 @@ const createRole = async (
   req: TypedRequestBody<CreateRoleReq>,
   res: TypedResponse<CreateRoleResp>
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-
-  if (error) throw new AppError(error);
+  const chain = req.chain;
   if (!req.user) throw new AppError(Errors.NotLoggedIn);
   if (!req.body.address_id) throw new AppError(Errors.InvalidAddress);
 

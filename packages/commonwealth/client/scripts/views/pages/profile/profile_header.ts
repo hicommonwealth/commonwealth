@@ -1,73 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
-import { Button } from 'construct-ui';
 
-import { initChain } from 'app';
 import app from 'state';
-import { Account } from 'models';
 
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
-import EditIdentityModal from 'views/modals/edit_identity_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
-import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
-
-const editIdentityAction = (
-  account: Account,
-  currentIdentity: SubstrateIdentity,
-  vnode
-) => {
-  const chainObj = app.config.chains.getById(account.chain.id);
-  if (!chainObj) return;
-
-  // TODO: look up the chainObj's chain base
-  return (
-    (account.chain.id.indexOf('edgeware') !== -1 ||
-      account.chain.id.indexOf('kusama') !== -1) &&
-    m(Button, {
-      intent: 'primary',
-      // wait for info to load before making it clickable
-      disabled: vnode.state.chainLoading,
-      rounded: true,
-      onclick: async () => {
-        if (app.activeChainId() !== chainObj.id) {
-          let confirmed = false;
-          const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
-          confirmed = await confirmationModalWithText(msg)();
-          if (confirmed) {
-            m.route.set(`/${chainObj.id}/account/${account.address}`, {
-              setIdentity: true,
-            });
-          }
-        } else if (!app.chain?.loaded) {
-          vnode.state.chainLoading = true;
-          initChain()
-            .then(() => {
-              vnode.state.chainLoading = false;
-              app.modals.create({
-                modal: EditIdentityModal,
-                data: { account, currentIdentity },
-              });
-            })
-            .catch((err) => {
-              vnode.state.chainLoading = false;
-            });
-        } else {
-          app.modals.create({
-            modal: EditIdentityModal,
-            data: { account, currentIdentity },
-          });
-        }
-      },
-      loading: !!vnode.state.chainLoading,
-      label: currentIdentity?.exists ? 'Edit identity' : 'Set identity',
-    })
-  );
-};
 
 export interface IProfileHeaderAttrs {
   account;
@@ -177,24 +119,20 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           }),
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
-          m('.ban-wrapper', [
-            m(CWButton, {
-              onclick: () => {
-                app.modals.create({
-                  modal: BanUserModal,
-                  data: { profile: account.profile },
-                });
-              },
-              label: 'Ban User',
-              buttonType: 'primary-red',
-            }),
-          ]),
+          m(CWButton, {
+            onclick: () => {
+              app.modals.create({
+                modal: BanUserModal,
+                data: { profile: account.profile },
+              });
+            },
+            label: 'Ban User',
+            buttonType: 'primary-red',
+          }),
         m('', [
           onOwnProfile
             ? showJoinCommunityButton && app.activeChainId()
-            : m(Button, {
-                intent: 'primary',
-                rounded: true,
+            : m(CWButton, {
                 onclick: async () => {
                   if (onLinkedProfile) {
                     vnode.state.loading = true;
