@@ -1,9 +1,15 @@
 import SequelizeMock from 'sequelize-mock';
 import { Sequelize, DataTypes } from 'sequelize';
+import { DB } from 'server/models';
 
-const dbMock = new SequelizeMock();
+export const sequelizeMock = new SequelizeMock();
 
-export const UserMock = dbMock.define(
+const fakeSequelize = new Sequelize('database', 'username', 'password', {
+  host: 'localhost',
+  dialect: 'postgres'
+});
+
+export const UserMock = sequelizeMock.define(
   'user',
   {
     firstName: 'Jane',
@@ -80,8 +86,9 @@ const models = {
   Webhook: null,
 };
 
-export const db = {
-  sequelize: Sequelize,
-  Sequelize: dbMock,
+// The fields sequelize and Sequelize are required for the DB interface, but for mocking we don't need to use them
+export const mockDb: DB = {
+  sequelize: fakeSequelize,
+  Sequelize: sequelizeMock,
   ...models,
 };
