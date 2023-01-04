@@ -20,6 +20,7 @@ import { SharePopover } from '../../components/share_popover';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { renderQuillTextBody } from '../../components/quill/helpers';
+import { EditComment } from '../../components/comments/edit_comment';
 
 enum ProfileActivity {
   Addresses,
@@ -54,14 +55,19 @@ type NewProfileActivityRowAttrs = {
 };
 
 class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
+  private isEditing: boolean;
+  private currentActivity: CommentWithAssociatedThread | Thread;
+
+  oninit(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
+    this.isEditing = false;
+    this.currentActivity = vnode.attrs.activity;
+  }
+
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
     const { activity, address, charLimit } = vnode.attrs;
-    const { chain, createdAt, plaintext, author, title, text } = activity;
+    const { chain, createdAt, plaintext, author, title, id } = activity;
     const isThread = (activity as Thread).kind;
-    const comment = activity as CommentWithAssociatedThread;
-
-    // force redraw or on initial load comments don't render
-    // m.redraw();
+    const comment = this.currentActivity as CommentWithAssociatedThread;
 
     return (
       <div className="activity">
@@ -82,21 +88,41 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
             : 'Commented on the thread'}
           <CWText fontWeight="semiBold" className="link">
             &nbsp;{isThread
-              ? link('a', `/${activity.chain}/discussion/${activity.id}`, [
+              ? link('a', `/${chain}/discussion/${id}`, [
                   `${title}`,
                 ])
-              : link('a',`/${comment.chain}/discussion/${comment.thread.id}`,[
+              : link('a',`/${chain}/discussion/${comment.thread.id}`,[
                 `${decodeURIComponent(comment.thread.title)}`,
               ])
             }
           </CWText>
         </CWText>
-        <CWText type="b2" className="gray-text">
-          {renderQuillTextBody(text)}
-        </CWText>
+        { this.isEditing ? (
+          <EditComment
+            comment={comment}
+            setIsEditing={(status: boolean) => {
+              this.isEditing = status
+            }}
+            shouldRestoreEdits={false}
+            updatedCommentsCallback={() => {
+              this.currentActivity = {
+                ...app.comments
+                  .getById(comment.id),
+                thread: comment.thread,
+              };
+              this.isEditing = false;
+              m.redraw();
+            }}
+          />
+        ) : (
+          <CWText type="b2" className="gray-text">
+            {isThread ? (
+              plaintext
+            ) : renderQuillTextBody(comment.text)}
+          </CWText>
+        )}
         <div className="actions">
-          <SharePopover />
-
+          <SharePopover commentId={id}/>
           {app.user.addresses
             .map((addressInfo) => addressInfo.address)
             .includes(address) && (
@@ -105,8 +131,22 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
                 <CWIconButton iconName="dotsVertical" iconSize="small" />
               }
               menuItems={[
-                { label: 'Edit', iconLeft: 'write' },
-                { label: 'Delete', iconLeft: 'trash' },
+                {
+                  label: 'Edit',
+                  iconLeft: 'write',
+                  onclick: () => {
+                    this.isEditing = true;
+                  }
+                },
+                {
+                  label: 'Delete',
+                  iconLeft: 'trash',
+                  onclick: () => {
+                    app.comments.delete(comment).then(() => {
+                      m.redraw();
+                    });
+                  },
+                },
               ]}
             />
           )}
