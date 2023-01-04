@@ -29,9 +29,13 @@ enum ProfileActivity {
   Threads,
 }
 
+type CommentWithAssociatedThread = Comment<IUniqueId> & {
+  thread: Thread;
+}
+
 type NewProfileActivityAttrs = {
   addresses: Array<AddressInfo>;
-  comments: Array<Comment<IUniqueId>>;
+  comments: Array<CommentWithAssociatedThread>;
   chains: Array<ChainInfo>;
   threads: Array<Thread>;
 };
@@ -43,10 +47,6 @@ type NewProfileActivityContentAttrs = {
   option: ProfileActivity;
   threadCharLimit: number;
 };
-
-type CommentWithAssociatedThread = Comment<IUniqueId> & {
-  thread: Thread;
-}
 
 type NewProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
@@ -131,13 +131,14 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
                 <CWIconButton iconName="dotsVertical" iconSize="small" />
               }
               menuItems={[
-                {
-                  label: 'Edit',
-                  iconLeft: 'write',
-                  onclick: () => {
-                    this.isEditing = true;
-                  }
-                },
+                // TODO: add edit functionality
+                // {
+                //   label: 'Edit',
+                //   iconLeft: 'write',
+                //   onclick: () => {
+                //     this.isEditing = true;
+                //   }
+                // },
                 {
                   label: 'Delete',
                   iconLeft: 'trash',
@@ -161,16 +162,6 @@ class ActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
     const { option, attrs, commentCharLimit, threadCharLimit, address } =
       vnode.attrs;
 
-    if (option === ProfileActivity.Comments) {
-      return attrs.comments.map((comment) => (
-        <ActivityRow
-          activity={comment as CommentWithAssociatedThread}
-          charLimit={commentCharLimit}
-          address={address}
-        />
-      ));
-    }
-
     if (option === ProfileActivity.Threads) {
       return attrs.threads.map((thread) => (
         <ActivityRow
@@ -180,6 +171,20 @@ class ActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
         />
       ));
     }
+
+    const allActivities: Array<CommentWithAssociatedThread | Thread> = [...attrs.comments, ...attrs.threads].sort(
+      (a, b) => +b.createdAt - +a.createdAt
+    );
+
+    return allActivities.map((activity) => {
+      return (
+        <ActivityRow
+          activity={activity}
+          charLimit={commentCharLimit}
+          address={address}
+        />
+      );
+    });
   }
 }
 
