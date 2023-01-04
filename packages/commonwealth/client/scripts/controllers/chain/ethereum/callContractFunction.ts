@@ -7,9 +7,15 @@ import { parseAbiItemsFromABI } from 'abi_utils';
 import app from 'state';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core/types';
-import { AbiItem } from 'web3-utils';
+import { AbiItem, AbiOutput } from 'web3-utils';
 
-async function decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
+/**
+ * Uses the tx hash and function outputs to decodes the transaction data from the hash.
+ */
+async function decodeTransactionData(
+  abiOutputs: AbiOutput[],
+  tx: any
+): Promise<any[]> {
   try {
     const sender = app.user.activeAccount;
     // get querying wallet
@@ -22,14 +28,14 @@ async function decodeTransactionData(fn: AbiItem, tx: any): Promise<any[]> {
     }
     const web3: Web3 = signingWallet.api;
     const decodedTxMap = web3.eth.abi.decodeParameters(
-      fn.outputs.map((output) => output.type),
+      abiOutputs.map((output) => output.type),
       tx
     );
     // complex return type
     const result = Array.from(Object.values(decodedTxMap));
     return result;
   } catch (error) {
-    console.error('Failed to decode transaction data', error);
+    console.error('Transaction Data Decoding Failed:', error);
     throw new Error(`Transaction Data Decoding Failed: ${error}`);
   }
 }
@@ -68,10 +74,6 @@ export async function callContractFunction(
   }
   const web3: Web3 = signingWallet.api;
 
-  // const methodSignature = `${fn.name}(${fn.inputs
-  //   .map((input) => input.type)
-  //   .join(',')})`;
-
   const methodSignature = encodeFunctionSignature(fn);
   let functionContract;
   try {
@@ -80,29 +82,29 @@ export async function callContractFunction(
       contract.address
     );
   } catch (error) {
-    console.error('Failed to initialize Web3 Contract Instance', error);
-    throw new Error(`Web3 Contract Instance Failed with ${error}`);
+    console.error('Failed to initialize Web3 Contract Instance: ', error);
+    throw new Error(`Failed to initialize Web3 Contract Instance: ${error}`);
   }
 
   const functionTx = functionContract.methods[methodSignature](
     ...processedArgs
   );
-  if (
-    fn.stateMutability !== 'view' &&
-    fn.stateMutability !== 'pure' &&
-    fn.constant !== true
-  ) {
-    // Sign Tx with PK if this is write function
-    const tx: TransactionConfig = {
-      from: signingWallet.accounts[0],
-      to: contract.address,
-      data: functionTx.encodeABI(),
-    };
-    const txReceipt = await web3.eth.sendTransaction(tx);
-    return decodeTransactionData(fn, txReceipt);
-  } else {
-    // send call transaction
-    try {
+  try {
+    if (
+      fn.stateMutability !== 'view' &&
+      fn.stateMutability !== 'pure' &&
+      fn.constant !== true
+    ) {
+      // Sign Tx with PK if this is write function
+      const tx: TransactionConfig = {
+        from: signingWallet.accounts[0],
+        to: contract.address,
+        data: functionTx.encodeABI(),
+      };
+      const txReceipt = await web3.eth.sendTransaction(tx);
+      return decodeTransactionData(fn.outputs, txReceipt);
+    } else {
+      // send call transaction
       const tx: TransactionConfig = {
         to: contract.address,
         data: functionTx.encodeABI(),
@@ -111,10 +113,10 @@ export async function callContractFunction(
         method: 'eth_call',
         params: [tx, 'latest'],
       });
-      return decodeTransactionData(fn, txResult);
-    } catch (error) {
-      console.log(error);
-      throw new Error(`Contract Call Tx Failed with ${error}`);
+      return decodeTransactionData(fn.outputs, txResult);
     }
+  } catch (error) {
+    console.log(error);
+    throw new Error(`Contract Call Tx Failed with ${error}`);
   }
 }
