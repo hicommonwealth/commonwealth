@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'components/comments/comment.scss';
@@ -21,13 +22,12 @@ import User, { AnonymousUser } from '../widgets/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
 
-class CommentAuthor
-  implements
-    m.Component<{
-      comment: CommentType<any>;
-    }>
-{
-  view(vnode) {
+type CommentAuthorAttrs = {
+  comment: CommentType<any>;
+};
+
+class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
+  view(vnode: m.Vnode<CommentAuthorAttrs>) {
     const { comment } = vnode.attrs;
 
     // Check for accounts on forums that originally signed up on a different base chain,
@@ -61,7 +61,7 @@ class CommentAuthor
 type CommentAttrs = {
   comment: CommentType<any>;
   handleIsReplying: (isReplying: boolean, id?: number) => void;
-  isGloballyEditing: boolean;
+  isGloballyEditing?: boolean;
   isLast: boolean;
   isLocked: boolean;
   setIsGloballyEditing: (status: boolean) => void;
@@ -69,12 +69,12 @@ type CommentAttrs = {
   updatedCommentsCallback?: () => void;
 };
 
-export class Comment implements m.ClassComponent<CommentAttrs> {
+export class Comment extends ClassComponent<CommentAttrs> {
   private isEditingComment: boolean;
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
 
-  view(vnode) {
+  view(vnode: m.Vnode<CommentAttrs>) {
     const {
       comment,
       handleIsReplying,

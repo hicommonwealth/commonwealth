@@ -16,7 +16,7 @@ export type ReactionAttributes = {
   updated_at?: Date;
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-}
+};
 
 export type ReactionInstance = ModelInstance<ReactionAttributes>;
 

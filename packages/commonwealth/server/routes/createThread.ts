@@ -4,19 +4,23 @@ import {
   NotificationCategories,
   ProposalType,
   ChainType,
+  ChainNetwork,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
+import { Action, PermissionError } from 'common-common/src/permissions';
+import {
+  findAllRoles,
+  isAddressPermitted,
+} from 'commonwealth/server/util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ThreadInstance } from '../models/thread';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
@@ -25,7 +29,7 @@ import {
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { findAllRoles } from '../util/roles';
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -140,7 +144,7 @@ const dispatchHooks = async (
   excludedAddrs.push(finalThread.Address.address);
 
   // dispatch notifications to subscribers of the given chain
-  models.Subscription.emitNotifications(
+  emitNotifications(
     models,
     NotificationCategories.NewThread,
     location,
@@ -163,7 +167,6 @@ const dispatchHooks = async (
       chain: finalThread.chain,
       body: finalThread.body,
     },
-    req.wss,
     excludedAddrs
   );
 
@@ -173,7 +176,7 @@ const dispatchHooks = async (
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
       // dispatch notification emitting
-      return models.Subscription.emitNotifications(
+      return emitNotifications(
         models,
         NotificationCategories.NewMention,
         `user-${mentionedAddress.User.id}`,
@@ -195,7 +198,6 @@ const dispatchHooks = async (
           chain: finalThread.chain,
           body: finalThread.body,
         },
-        req.wss,
         [finalThread.Address.address]
       );
     });
@@ -210,11 +212,19 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
+  const chain = req.chain
 
-  if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+  const author = req.address;
+
+  const permission_error = await isAddressPermitted(
+    models,
+    author.id,
+    chain.id,
+    Action.CREATE_THREAD
+  );
+  if (permission_error === PermissionError.NOT_PERMITTED) {
+    return next(new AppError(PermissionError.NOT_PERMITTED));
+  }
 
   const { topic_name, title, body, kind, stage, url, readOnly } = req.body;
   let { topic_id } = req.body;
@@ -317,7 +327,11 @@ const createThread = async (
       }
     }
 
-    if (chain && chain.type === ChainType.Token) {
+    if (
+      chain &&
+      (chain.type === ChainType.Token ||
+        chain.network === ChainNetwork.Ethereum)
+    ) {
       // skip check for admins
       const isAdmin = await findAllRoles(
         models,

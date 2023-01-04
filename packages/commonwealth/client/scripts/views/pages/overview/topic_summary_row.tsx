@@ -1,33 +1,35 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+// import { navigateToSubpage } from 'app';
 import { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
+import { pluralize } from 'helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
-import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+// import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { getLastUpdated, isHot } from '../discussions/helpers';
 import { SharePopover } from '../../components/share_popover';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
+// import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+// import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { getClasses } from '../../components/component_kit/helpers';
 
 type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;
   topic: Topic;
 };
 
-export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
-  view(vnode: m.VnodeDOM<TopicSummaryRowAttrs, this>) {
+export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
+  view(vnode: m.Vnode<TopicSummaryRowAttrs>) {
     const { monthlyThreads, topic } = vnode.attrs;
 
     const topFiveSortedThreads = monthlyThreads
@@ -38,18 +40,18 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
       })
       .slice(0, 5);
 
-    const isAdmin =
-      app.roles.isRoleOfCommunity({
-        role: 'admin',
-        chain: app.activeChainId(),
-      }) || app.user.isSiteAdmin;
+    // const isAdmin =
+    //   app.roles.isRoleOfCommunity({
+    //     role: 'admin',
+    //     chain: app.activeChainId(),
+    //   }) || app.user.isSiteAdmin;
 
-    const isAdminOrMod =
-      isAdmin ||
-      app.roles.isRoleOfCommunity({
-        role: 'moderator',
-        chain: app.activeChainId(),
-      });
+    // const isAdminOrMod =
+    //   isAdmin ||
+    //   app.roles.isRoleOfCommunity({
+    //     role: 'moderator',
+    //     chain: app.activeChainId(),
+    //   });
 
     return (
       <div class="TopicSummaryRow">
@@ -86,11 +88,20 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
             );
 
             const user = app.chain.accounts.get(thread.author);
-            const commentsCount = app.comments.nComments(thread);
+            // const commentsCount = app.comments.nComments(thread);
 
             return (
               <>
-                <div class="recent-thread-row">
+                <div
+                  class={getClasses<{ isPinned?: boolean }>(
+                    { isPinned: thread.pinned },
+                    'recent-thread-row'
+                  )}
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    m.route.set(discussionLink);
+                  }}
+                >
                   <div class="row-top">
                     <div class="user-and-date-row">
                       {m(User, {
@@ -116,32 +127,22 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                       {thread.pinned && <CWIcon iconName="pin" />}
                     </div>
                   </div>
-                  <CWText
-                    type="b2"
-                    fontWeight="bold"
-                    className="thread-title-text"
-                    onclick={(e) => {
-                      e.stopPropagation();
-                      m.route.set(discussionLink);
-                    }}
-                  >
+
+                  <CWText type="b2" fontWeight="bold">
                     {thread.title}
                   </CWText>
-                  <CWText
-                    className="comment-preview-text"
-                    type="caption"
-                    noWrap
-                  >
-                    {renderQuillTextBody(thread.body, {
-                      hideFormatting: true,
-                      collapse: true,
-                    })}
+
+                  <CWText type="caption" className="thread-preview">
+                    {thread.plaintext}
                   </CWText>
+
                   <div class="row-bottom">
                     <div class="comments-and-users">
                       <div class="comments-count">
                         <CWIcon iconName="feedback" iconSize="small" />
-                        <CWText type="caption">{commentsCount} comments</CWText>
+                        <CWText type="caption">
+                          {pluralize(thread.numberOfComments, 'comment')}
+                        </CWText>
                       </div>
                       {/* TODO Gabe 10/3/22 - user gallery blocked by changes to user model */}
                       {/* <div class="user-gallery">
@@ -152,54 +153,71 @@ export class TopicSummaryRow implements m.ClassComponent<TopicSummaryRowAttrs> {
                       </div> */}
                     </div>
                     <div class="row-bottom-menu">
-                      <SharePopover />
-                      {isAdminOrMod && (
-                        <CWPopoverMenu
-                          menuItems={[
-                            {
-                              label: 'Delete',
-                              iconLeft: 'trash',
-                              onclick: async (e) => {
-                                e.preventDefault();
+                      <div
+                        onclick={(e) => {
+                          // prevent clicks from propagating to discussion row
+                          e.preventDefault();
+                          e.stopPropagation();
+                        }}
+                      >
+                        <SharePopover />
+                      </div>
+                      {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
+                      {/* {isAdminOrMod && (
+                        <div
+                          onclick={(e) => {
+                            // prevent clicks from propagating to discussion row
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }}
+                        >
+                          <CWPopoverMenu
+                            menuItems={[
+                              {
+                                label: 'Delete',
+                                iconLeft: 'trash',
+                                onclick: async (e) => {
+                                  e.preventDefault();
 
-                                const confirmed =
-                                  await confirmationModalWithText(
-                                    'Delete this entire thread?'
-                                  )();
+                                  const confirmed =
+                                    await confirmationModalWithText(
+                                      'Delete this entire thread?'
+                                    )();
 
-                                if (!confirmed) return;
+                                  if (!confirmed) return;
 
-                                app.threads.delete(thread).then(() => {
-                                  navigateToSubpage('/overview');
-                                });
-                              },
-                            },
-                            {
-                              label: thread.readOnly
-                                ? 'Unlock thread'
-                                : 'Lock thread',
-                              iconLeft: 'lock',
-                              onclick: (e) => {
-                                e.preventDefault();
-                                app.threads
-                                  .setPrivacy({
-                                    threadId: thread.id,
-                                    readOnly: !thread.readOnly,
-                                  })
-                                  .then(() => {
-                                    m.redraw();
+                                  app.threads.delete(thread).then(() => {
+                                    navigateToSubpage('/overview');
                                   });
+                                },
                               },
-                            },
-                          ]}
-                          trigger={
-                            <CWIconButton
-                              iconSize="small"
-                              iconName="dotsVertical"
-                            />
-                          }
-                        />
-                      )}
+                              {
+                                label: thread.readOnly
+                                  ? 'Unlock thread'
+                                  : 'Lock thread',
+                                iconLeft: 'lock',
+                                onclick: (e) => {
+                                  e.preventDefault();
+                                  app.threads
+                                    .setPrivacy({
+                                      threadId: thread.id,
+                                      readOnly: !thread.readOnly,
+                                    })
+                                    .then(() => {
+                                      m.redraw();
+                                    });
+                                },
+                              },
+                            ]}
+                            trigger={
+                              <CWIconButton
+                                iconSize="small"
+                                iconName="dotsVertical"
+                              />
+                            }
+                          />
+                        </div>
+                      )} */}
                     </div>
                   </div>
                 </div>

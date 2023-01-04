@@ -1,9 +1,11 @@
 import { ChainAttributes } from '../server/models/chain';
-import { ChainEventAttributes } from '../server/models/chain_event';
-import moment from 'moment';
+import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
+import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
+  SnapshotProposalNotification = 'snapshot-proposal-notification',
+  SnapshotListener = 'snapshot-listener',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
   ChatMessage = 'chat-message',
@@ -11,20 +13,43 @@ export enum WebsocketMessageNames {
   LeaveChatChannel = 'leave-chat-channel',
   Error = 'exception',
 }
-
-export type ChainEventNotification = {
+export type SnapshotProposalNotification = {
   id: string;
-  notification_data: '';
-  chain_event_id: string;
-  category_id: 'chain-event';
+  category_id: 'snapshot-proposal';
   chain_id: string;
-  updated_at: moment.Moment;
-  created_at: moment.Moment;
-  ChainEvent: ChainEventAttributes;
+  SnapshotProposal: SnapshotProposalAttributes;
 };
 
+export type ChainEventNotification = {
+  id: number;
+  notification_data: string;
+  chain_event_id: number;
+  category_id: 'chain-event';
+  chain_id: string;
+  updated_at: Date;
+  created_at: Date;
+  ChainEvent: ChainEventAttributes;
+}
+
+export interface SnapshotNotification {
+  id?: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space?: string;
+  event?: string;
+  start?: string;
+  expire?: string;
+}
+
+export interface INotification {
+  kind: ChainEventNotification | SnapshotNotification;
+}
+
 export enum WebsocketNamespaces {
+  SnapshotProposals = 'snapshot-proposals',
   ChainEvents = 'chain-events',
+  SnapshotListener = 'snapshot-listener',
   Chat = 'chat',
 }
 
@@ -75,6 +100,13 @@ export interface IChainEventNotificationData {
   chain_id: string;
 }
 
+export interface ISnapshotNotificationData {
+  created_at: Date;
+  snapshot_id: string;
+  chain_id: string;
+  snapshotEventType: string;
+}
+
 export interface IChatNotification {
   message_id: string | number;
   channel_id: string | number;
@@ -121,6 +153,29 @@ export type TokenResponse = {
   logoURI?: string;
 };
 
-export enum RedisNamespaces {
-  Chat_Socket = 'chat_socket',
-}
+export type SnapshotGraphQLResponse = {
+  data?: {
+    proposal: {
+      id: string;
+      title: string;
+      body: string;
+      choices: string[];
+      start: number;
+      end: number;
+      snapshot: number;
+      author: string;
+      created: number;
+      scores: number[];
+      scores_by_strategy: number[][];
+      scores_total: number;
+      scores_updated: number;
+      plugins: any;
+      network: string;
+      strategies: any;
+      space: {
+        id: string;
+        name: string;
+      };
+    };
+  };
+};

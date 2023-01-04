@@ -1,9 +1,8 @@
 /* eslint-disable no-restricted-syntax */
 import { Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
-import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -13,9 +12,13 @@ export const Errors = {
   DeleteFail: 'Could not delete topic',
 };
 
-const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+const deleteTopic = async (
+  models: DB,
+  req,
+  res: Response,
+  next: NextFunction
+) => {
+  const chain = req.chain;
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
@@ -39,11 +42,14 @@ const deleteTopic = async (models: DB, req, res: Response, next: NextFunction) =
     type: QueryTypes.UPDATE,
   });
 
-  topic.destroy().then(() => {
-    res.json({ status: 'Success' });
-  }).catch((e) => {
-    next(new ServerError(Errors.DeleteFail));
-  });
+  topic
+    .destroy()
+    .then(() => {
+      res.json({ status: 'Success' });
+    })
+    .catch((e) => {
+      next(new ServerError(Errors.DeleteFail));
+    });
 };
 
 export default deleteTopic;

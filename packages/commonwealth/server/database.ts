@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { Sequelize, DataTypes } from 'sequelize';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DATABASE_URI } from './config';
@@ -10,8 +10,7 @@ import BanFactory from './models/ban';
 import ChainFactory from './models/chain';
 import ChainCategoryFactory from './models/chain_category';
 import ChainCategoryTypeFactory from './models/chain_category_type';
-import ChainEntityFactory from './models/chain_entity';
-import ChainEventFactory from './models/chain_event';
+import ChainEntityMetaFactory from './models/chain_entity_meta';
 import ChainEventTypeFactory from './models/chain_event_type';
 import ChainNodeFactory from './models/chain_node';
 import ChatChannelFactory from './models/chat_channel';
@@ -21,12 +20,13 @@ import CommentFactory from './models/comment';
 import CommunityBannerFactory from './models/community_banner';
 import CommunityContractFactory from './models/community_contract';
 import CommunityRoleFactory from './models/community_role';
+import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
+import SnapshotSpaceFactory from './models/snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscussionDraftFactory from './models/discussion_draft';
 import IdentityCacheFactory from './models/identity_cache';
 import InviteCodeFactory from './models/invite_code';
-import IpfsPinsFactory from './models/ipfs_pins';
 import LinkedThread from './models/linked_thread';
 import LoginTokenFactory from './models/login_token';
 import NotificationFactory from './models/notification';
@@ -52,6 +52,8 @@ import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
+import SnapshotProposalFactory from './models/snapshot_proposal';
+import DiscordBotConfigFactory from './models/discord_bot_config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -65,14 +67,10 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           log.trace(msg);
         },
   dialectOptions:
-    process.env.NODE_ENV !== 'production'
-      ? {
-          requestTimeout: 40000,
-        }
-      : {
-          requestTimeout: 40000,
-          ssl: { rejectUnauthorized: false },
-        },
+    process.env.NODE_ENV !== 'production' ? { requestTimeout: 40000 } :
+    DATABASE_URI === "postgresql://commonwealth:edgeware@localhost/commonwealth" ?
+    { requestTimeout: 40000, ssl: false } :
+    { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
   pool: {
     max: 10,
     min: 0,
@@ -88,11 +86,10 @@ const models: Models = {
   Chain: ChainFactory(sequelize, DataTypes),
   ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
   ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
-  ChainEntity: ChainEntityFactory(sequelize, DataTypes),
-  ChainEvent: ChainEventFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChainNode: ChainNodeFactory(sequelize, DataTypes),
   ChatChannel: ChatChannelFactory(sequelize, DataTypes),
+  ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
+  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
   ChatMessage: ChatMessageFactory(sequelize, DataTypes),
   Collaboration: CollaborationFactory(sequelize, DataTypes),
   Contract: ContractFactory(sequelize, DataTypes),
@@ -100,10 +97,11 @@ const models: Models = {
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
+  CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
+  DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  IpfsPins: IpfsPinsFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
   LoginToken: LoginTokenFactory(sequelize, DataTypes),
   Notification: NotificationFactory(sequelize, DataTypes),
@@ -125,6 +123,8 @@ const models: Models = {
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
+  SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
+  SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),

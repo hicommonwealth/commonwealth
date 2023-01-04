@@ -4,23 +4,20 @@
 // because it's easy to miss catching errors inside the promise executor, but we use it in this file
 // because the bulk offchain queries are heavily optimized so communities can load quickly.
 //
-import { contracts } from '@polkadot/types/interfaces/definitions';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { NextFunction, Request, Response } from 'express';
 import { Op, QueryTypes } from 'sequelize';
+import { CommunityRoleInstance } from 'server/models/community_role';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { ChatChannelInstance } from '../models/chat_channel';
 import { CommunityBannerInstance } from '../models/community_banner';
 import { ContractInstance } from '../models/contract';
-import { RoleInstance } from '../models/role';
 import { RuleInstance } from '../models/rule';
 import { ThreadInstance } from '../models/thread';
 import { TopicInstance } from '../models/topic';
-import { AppError, ServerError } from '../util/errors';
 import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
-import validateChain from '../util/validateChain';
+import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 
-const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {};
 
 // Topics, comments, reactions, members+admins, threads
@@ -30,9 +27,7 @@ const bulkOffchain = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
-
+  const chain = req.chain;
   // globally shared SQL replacements
   const communityOptions = 'chain = :chain';
   const replacements = { chain: chain.id };
@@ -48,6 +43,7 @@ const bulkOffchain = async (
     rules,
     communityBanner,
     contracts,
+    communityRoles,
   ] = await (<
     Promise<
       [
@@ -59,7 +55,8 @@ const bulkOffchain = async (
         ChatChannelInstance[],
         RuleInstance[],
         CommunityBannerInstance,
-        ContractInstance[]
+        ContractInstance[],
+        CommunityRoleInstance[]
       ]
     >
   >Promise.all([
@@ -87,7 +84,8 @@ const bulkOffchain = async (
               as: 'topic',
             },
             {
-              model: models.ChainEntity,
+              model: models.ChainEntityMeta,
+              as: 'chain_entity_meta',
             },
             {
               model: models.LinkedThread,
@@ -108,11 +106,17 @@ const bulkOffchain = async (
           attributes: { exclude: ['version_history'] },
         });
 
-        resolve(
-          rawPinnedThreads.map((t) => {
-            return t.toJSON();
-          })
-        );
+        const threads = rawPinnedThreads.map((t) => {
+          return t.toJSON();
+        });
+
+        const threadsWithCommentsCount = await getThreadsWithCommentCount({
+          threads,
+          models,
+          chainId: chain.id,
+        });
+
+        resolve(threadsWithCommentsCount);
       } catch (e) {
         console.log(e);
         reject(
@@ -213,6 +217,7 @@ const bulkOffchain = async (
         reject(new ServerError('Could not fetch contracts'));
       }
     }),
+    models.CommunityRole.findAll({ where: { chain_id: chain.id } }),
   ]));
 
   const numVotingThreads = threadsInVoting.filter(
@@ -231,6 +236,7 @@ const bulkOffchain = async (
       rules: rules.map((r) => r.toJSON()),
       communityBanner: communityBanner?.banner_text || '',
       contracts: contracts.map((c) => c.toJSON()),
+      communityRoles: communityRoles.map((r) => r.toJSON()),
     },
   });
 };

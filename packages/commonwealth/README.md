@@ -2,8 +2,6 @@
 
 Discussions and governance for blockchain networks.
 
-[![CircleCI](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master.svg?style=svg&circle-token=5fa7d1ea8b272bb5e508b933e7a0854366dca1fd)](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master)
-
 ## Quickstart
 
 ### Install dependencies:
@@ -11,7 +9,7 @@ Discussions and governance for blockchain networks.
 ```bash
 brew install node yarn postgresql
 brew services start postgresql
-psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth CREATEDB;"
+psql postgres -c "CREATE ROLE commonwealth WITH LOGIN PASSWORD 'edgeware'; ALTER ROLE commonwealth SUPERUSER;"
 psql postgres -h 127.0.0.1 -U commonwealth -c "CREATE DATABASE commonwealth;"
 ```
 
@@ -85,7 +83,7 @@ If errors occur try these steps:
 - Make sure homebrew is installed in the /opt/ directory
 - If `yarn` stalls out at node-sass, like such:
 
-```node
+```bash
   env: python: No such file or directory
   make: *** [Release/sass.a] Error 127
   gyp ERR! build error 
@@ -96,7 +94,7 @@ Make sure you have python installed in your Rosetta Terminal path. See: `https:/
 
 ## Environment Variables
 
-You should create a `.env` file in the root of the repository
+You should create a `.env` file at the `package/commonwealth` level
 to store environment variables like session secrets.
 
 Environment variables used for external services include:
@@ -119,6 +117,8 @@ Environment variables used for external services include:
 - DISCORD_CLIENT_ID: for Discord OAuth login
 - DISCORD_CLIENT_SECRET: for Discord OAuth login
 - DISCORD_OAUTH_SCOPES: scopes (usually just 'identify')
+- PGPASSWORD: [OPTIONAL] avoids the password prompt for all local database commands
+- ETH_ALCHEMY_API_KEY: [OPTIONAL] if set, the load-db commands will replace production Alchemy urls with their locally supported variants
 
 We also use certain environment variables to configure the application itself:
 
@@ -184,10 +184,10 @@ A number of migrations for loading the latest on-chain data are
 defined in server.ts and package.json. To run these migrations on
 Heroku, some special syntax is needed.
 
-For example, to run the councillor/validator flags migration:
+For example, to run the chain events migration:
 
 ```
-FLAG_MIGRATION=true ts-node --log-error --project tsconfig.json server.ts
+CHAIN_ID=dydx yarn migrate-events
 ```
 
 ## Production Logs

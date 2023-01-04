@@ -16,6 +16,7 @@ import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
 import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
+import { Action } from '../../../common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -25,6 +26,29 @@ export const generateEthAddress = () => {
   const address = Web3.utils.toChecksumAddress(lowercaseAddress);
   return { keypair, address };
 };
+
+export async function addAllowDenyPermissions(
+  role_name: Permission,
+  chain_id: string,
+  allow_permission: number,
+  deny_permission: number
+) {
+  // get community role object from the database
+  const communityRole = await models.CommunityRole.findOne({
+    where: {
+      chain_id,
+      name: role_name,
+    },
+  });
+  // update allow permission on community role object
+  // eslint-disable-next-line no-bitwise
+  communityRole.allow = BigInt(communityRole.allow) | BigInt(1) << BigInt(allow_permission);
+  // update deny permission on community role object
+  // eslint-disable-next-line no-bitwise
+  communityRole.deny = BigInt(communityRole.deny) | BigInt(1) << BigInt(deny_permission);
+  // save community role object to the database
+  await communityRole.save();
+}
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
   if (chain === 'ethereum' || chain === 'alex') {
@@ -384,11 +408,11 @@ export const createInvite = async (args: InviteArgs) => {
 
 // always prune both token and non-token holders asap
 export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
-  public name = 'eth-token'
+  public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
     contractType: 'string',
-  }
+  };
   public validBases = [BalanceType.Ethereum];
   public balanceFn: (tokenAddress: string, userAddress: string) => Promise<BN>;
 

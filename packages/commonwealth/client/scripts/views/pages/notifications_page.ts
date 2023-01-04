@@ -98,14 +98,14 @@ const NotificationsPage: m.Component = {
     const activeEntity = app.chain;
     if (!activeEntity)
       return m(PageLoading, {
-        title: [
-          'Notifications ',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
+        // title: [
+        //   'Notifications ',
+        //   m(Tag, {
+        //     size: 'xs',
+        //     label: 'Beta',
+        //     style: 'position: relative; top: -2px; margin-left: 6px',
+        //   }),
+        // ],
       });
 
     const discussionNotifications =
@@ -118,16 +118,16 @@ const NotificationsPage: m.Component = {
 
     return m(
       Sublayout,
-      {
-        title: [
-          'Notifications ',
-          m(Tag, {
-            size: 'xs',
-            label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
-          }),
-        ],
-      },
+      // {
+      //   title: [
+      //     'Notifications ',
+      //     m(Tag, {
+      //       size: 'xs',
+      //       label: 'Beta',
+      //       style: 'position: relative; top: -2px; margin-left: 6px',
+      //     }),
+      //   ],
+      // },
       [
         m('.NotificationsPage', [
           m(
@@ -217,7 +217,11 @@ const NotificationsPage: m.Component = {
                     rounded: true,
                     onclick: async (e) => {
                       e.preventDefault();
-                      if (app.user.notifications.chainEventNotifications.length === 0) return;
+                      if (
+                        app.user.notifications.chainEventNotifications
+                          .length === 0
+                      )
+                        return;
                       app.user.notifications
                         .delete(app.user.notifications.chainEventNotifications)
                         .then(() => m.redraw());
@@ -259,7 +263,9 @@ const NotificationsPage: m.Component = {
                   pageData: () => {
                     return allNotifications;
                   },
-                  pageKey: () => {return pageKey},
+                  pageKey: () => {
+                    return pageKey;
+                  },
                   item: (data, opts, index) => {
                     return m(NotificationRow, {
                       notifications: [data],

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_tag.scss';
 
@@ -10,29 +11,32 @@ import { getClasses } from './helpers';
 import { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
 
-type TagStatus = 'passed' | 'failed' | 'active';
+type TagType =
+  | 'passed'
+  | 'failed'
+  | 'active'
+  | 'poll'
+  | 'proposal'
+  | 'referendum';
 
 export type TagAttrs = {
   iconName?: IconName;
   label: string;
-  status?: TagStatus;
+  type?: TagType;
 };
 
-export class CWTag implements m.ClassComponent<TagAttrs> {
-  view(vnode) {
-    const { iconName, label, status } = vnode.attrs;
+export class CWTag extends ClassComponent<TagAttrs> {
+  view(vnode: m.Vnode<TagAttrs>) {
+    const { iconName, label, type } = vnode.attrs;
 
     return (
       <div
-        className={getClasses<{ status?: TagStatus }>(
-          { status },
-          ComponentType.Tag
-        )}
+        className={getClasses<{ type?: TagType }>({ type }, ComponentType.Tag)}
       >
         {!!iconName && (
           <CWIcon iconName={iconName} iconSize="small" className="tag-icon" />
         )}
-        <CWText type="caption" fontWeight="medium" className="tag-text">
+        <CWText type="caption" fontWeight="medium" className="tag-text" noWrap>
           {label}
         </CWText>
       </div>

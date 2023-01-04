@@ -19,12 +19,15 @@ import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddress
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
+import DiscordController from 'controllers/server/discord';
 import SessionsController from './controllers/server/sessions';
 import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import { MobileMenuName } from './views/app_mobile_menus';
+import ChainEntityController from 'controllers/server/chain_entities';
+import { SidebarMenuName } from './views/components/sidebar';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -41,6 +44,7 @@ export const enum LoginState {
 export interface IApp {
   socket: WebSocketController;
   chain: IChainAdapter<any, any>;
+  chainEntities: ChainEntityController;
   // XXX: replace this with some app.chain helper
   activeChainId(): string;
 
@@ -70,6 +74,9 @@ export interface IApp {
   // Contracts
   contracts: ContractsController;
 
+  // Discord
+  discord: DiscordController;
+
   // User
   user: UserController;
   roles: RolesController;
@@ -83,7 +90,11 @@ export interface IApp {
 
   toasts: ToastStore;
   modals: ModalStore;
+
   mobileMenu: MobileMenuName;
+  sidebarMenu: SidebarMenuName;
+  sidebarToggled: boolean;
+
   loginState: LoginState;
   // stored on server-side
   config: {
@@ -122,6 +133,7 @@ const roles = new RolesController(user);
 const app: IApp = {
   socket: new WebSocketController(),
   chain: null,
+  chainEntities: new ChainEntityController(),
   activeChainId: () => app.chain?.id,
 
   chainPreloading: false,
@@ -150,6 +162,9 @@ const app: IApp = {
   // Contracts
   contracts: new ContractsController(),
 
+  // Discord
+  discord: new DiscordController(),
+
   // Search
   search: new SearchController(),
   searchAddressCache: {},
@@ -164,11 +179,16 @@ const app: IApp = {
   recentActivity: new RecentActivityController(),
   profiles: new ProfilesController(),
   sessions: new SessionsController(),
+  loginState: LoginState.NotLoaded,
+
+  // Global nav state
+  mobileMenu: null,
+  sidebarMenu: 'default',
+  sidebarToggled: false,
 
   toasts: getToastStore(),
   modals: getModalStore(),
-  mobileMenu: null,
-  loginState: LoginState.NotLoaded,
+
   config: {
     chains: new ChainStore(),
     nodes: new NodeStore(),

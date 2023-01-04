@@ -18,6 +18,12 @@ export const SERVER_URL =
     ? 'https://commonwealth.im'
     : 'http://localhost:8080');
 
+export const ENTITIES_URL =
+  process.env.ENTITIES_URL ||
+  (process.env.NODE_ENV === 'production'
+    ? 'https://chain-events.herokuapp.com/api'
+    : 'http://localhost:8081/api')
+
 export const SESSION_SECRET = process.env.SESSION_SECRET || 'my secret';
 export const JWT_SECRET = process.env.JWT_SECRET || 'jwt secret';
 
@@ -70,17 +76,28 @@ export const RABBITMQ_URI = (() => {
       process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
     ) {
       return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`;
-    } else return 'amqp://guest:guest@localhost:5672';
+    } else return 'amqp://localhost';
   } else return process.env.CLOUDAMQP_URL;
 })();
 
-// if REDIS_URL exists use that (production or local redis instance) otherwise if
-// the Vultr server info is given then use that. Undefined otherwise.
-export const REDIS_URL = process.env.REDIS_URL
-  ? process.env.REDIS_URL
-  : process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT
-  ? `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`
-  : undefined;
+export const RABBITMQ_API_URI = (() => {
+  if (process.env.VULTR_RABBITMQ_CONTAINER_PORT && process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT)
+    return `http://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT}/api`
+  else return 'http://guest:guest@localhost:15672/api'
+})();
+
+
+// if a tls redis url is provided then that takes priority over everything else
+// then if a normal non-tls url is provided that is the second best option (local/staging)
+// finally, if no redis url is specified we use the Vultr redis instance (vultr)
+export const REDIS_URL = (() => {
+  if (process.env.REDIS_TLS_URL) return process.env.REDIS_TLS_URL; // staging + production
+  if (process.env.REDIS_URL) return process.env.REDIS_URL; // local + staging
+  if (process.env.VULTR_IP && process.env.VULTR_REDIS_CONTAINER_PORT) // vultr
+    return `redis://${process.env.VULTR_IP}:${process.env.VULTR_REDIS_CONTAINER_PORT}`
+
+  return undefined;
+})();
 
 // limit logins in the last 5 minutes
 // increased because of chain waitlist registrations
@@ -106,3 +123,5 @@ export const WEBSOCKET_ADMIN_PASSWORD = process.env.WEBSOCKET_ADMIN_PASSWORD;
 
 export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
+
+export const CHAIN_EVENT_SERVICE_SECRET = process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';

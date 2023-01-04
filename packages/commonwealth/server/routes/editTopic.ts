@@ -1,12 +1,11 @@
 /* eslint-disable no-restricted-syntax */
 import { NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../util/validateChain';
 import validateRoles from '../util/validateRoles';
 import { DB } from '../models';
 import { TopicAttributes } from '../models/topic';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -47,8 +46,7 @@ const editTopic = async (
   res: TypedResponse<EditTopicResp>,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   if (!req.body.id) {
     return next(new AppError(Errors.NoTopicId));
   }

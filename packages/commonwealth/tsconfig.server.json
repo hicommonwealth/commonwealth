@@ -1,6 +1,6 @@
 {
   "extends": "./tsconfig.json",
-  "compilerOptions": {
-    "skipLibCheck": true
-  }
+  "include": [
+    "server.ts"
+  ]
 }

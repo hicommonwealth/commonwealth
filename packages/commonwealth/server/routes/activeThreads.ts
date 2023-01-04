@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import { AppError, ServerError } from 'common-common/src/errors';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 
 const MIN_THREADS_PER_TOPIC = 0;
 const MAX_THREADS_PER_TOPIC = 10;
@@ -13,9 +13,6 @@ const activeThreads = async (
   res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
-
   let { threads_per_topic } = req.query;
   if (
     !threads_per_topic ||
@@ -25,6 +22,8 @@ const activeThreads = async (
   ) {
     threads_per_topic = 3;
   }
+
+  const chain = req.chain;
 
   const allThreads = [];
   const communityWhere = { chain_id: chain.id };
@@ -37,12 +36,12 @@ const activeThreads = async (
     { model: models.Address, as: 'collaborators' },
     { model: models.Topic, as: 'topic', required: true },
     { model: models.LinkedThread, as: 'linked_threads' },
-    { model: models.ChainEntity },
+    { model: models.ChainEntityMeta, as: 'chain_entity_meta' },
   ];
 
   await Promise.all(
     communityTopics.map(async (topic) => {
-      const recentTopicThreads = await models.Thread.findAll({
+      const recentTopicThreadsRaw = await models.Thread.findAll({
         where: {
           topic_id: topic.id,
         },
@@ -52,6 +51,16 @@ const activeThreads = async (
           ['created_at', 'DESC'],
           ['last_commented_on', 'DESC'],
         ],
+      });
+
+      const recentTopicThreads = recentTopicThreadsRaw.map((t) => {
+        return t.toJSON();
+      });
+
+      const threadsWithCommentsCount = await getThreadsWithCommentCount({
+        threads: recentTopicThreads,
+        models,
+        chainId: chain.id,
       });
 
       // In absence of X threads with recent activity (comments),
@@ -72,7 +81,7 @@ const activeThreads = async (
       //   recentTopicThreads.push(...(commentlessTopicThreads || []));
       // }
 
-      allThreads.push(...(recentTopicThreads || []));
+      allThreads.push(...(threadsWithCommentsCount || []));
     })
   ).catch((err) => {
     return next(new ServerError(err));
@@ -80,7 +89,7 @@ const activeThreads = async (
 
   return res.json({
     status: 'Success',
-    result: allThreads.map((c) => c.toJSON()),
+    result: allThreads,
   });
 };
 

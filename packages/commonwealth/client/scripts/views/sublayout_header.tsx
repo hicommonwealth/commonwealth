@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'sublayout_header.scss';
 
@@ -10,27 +11,24 @@ import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
 import { LoginSelector } from './components/header/login_selector';
-import { SearchBar } from './components/search_bar';
 import { CreateContentPopover } from './menus/create_content_menu';
 import { HelpMenuPopover } from './menus/help_menu';
 import { InvitesMenuPopover } from './menus/invites_menu';
 import { NotificationsMenuPopover } from './menus/notifications_menu';
+import { SearchBar } from './pages/search/search_bar';
 
 type SublayoutHeaderAttrs = {
   hideSearch?: boolean;
-  isSidebarToggleable: boolean;
-  isSidebarToggled: boolean;
-  toggleSidebar: () => void;
+  onMobile: boolean;
 };
 
-export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
-  view(vnode) {
-    const { hideSearch, isSidebarToggleable, isSidebarToggled, toggleSidebar } =
-      vnode.attrs;
+export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
+  view(vnode: m.Vnode<SublayoutHeaderAttrs>) {
+    const { hideSearch, onMobile } = vnode.attrs;
 
     return (
       <div class="SublayoutHeader">
-        <div class="sidebar-left">
+        <div class="header-left">
           <CWIconButton
             iconName="commonLogo"
             iconButtonTheme="black"
@@ -46,32 +44,32 @@ export class SublayoutHeader implements m.ClassComponent<SublayoutHeaderAttrs> {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {!isSidebarToggled && app.activeChainId() && (
+          {!app.sidebarToggled && app.activeChainId() && (
             <CWCommunityAvatar size="large" community={app.chain.meta} />
           )}
-          {isSidebarToggleable && (
+          {onMobile && app.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
-              iconName={isSidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'}
+              iconName={
+                app.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'
+              }
               onclick={() => {
-                toggleSidebar();
-                localStorage.setItem(
-                  `${app.activeChainId()}-sidebar-toggle`,
-                  (!isSidebarToggled).toString()
-                );
+                app.sidebarToggled = !app.sidebarToggled;
                 m.redraw();
               }}
             />
           )}
         </div>
         {!hideSearch && <SearchBar />}
-        <div class="sidebar-right">
+        <div class="header-right">
           <div class="MobileMenuContainer">
             <CWIconButton
               iconName="dotsVertical"
               iconButtonTheme="black"
               onclick={() => {
+                app.sidebarToggled = false;
                 app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
+                m.redraw();
               }}
             />
           </div>

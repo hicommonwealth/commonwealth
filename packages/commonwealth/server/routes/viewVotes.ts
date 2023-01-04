@@ -1,6 +1,5 @@
-import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { VoteAttributes } from '../models/vote';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 
@@ -18,16 +17,7 @@ const viewVotes = async (
 ) => {
   // TODO: runtime validation based on params
   //   maybe something like https://www.npmjs.com/package/runtime-typescript-checker
-  let chain, error;
-  try {
-    [chain, error] = await validateChain(models, req.query);
-  } catch (err) {
-    throw new AppError(err);
-  }
-  if (error) {
-    console.log('It throws an AppError');
-    throw new AppError(error);
-  }
+  const chain = req.chain;
 
   if (!req.query.poll_id) {
     throw new AppError(Errors.NoPollSpecified);

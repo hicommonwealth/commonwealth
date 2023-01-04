@@ -1,7 +1,8 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { Label as ChainEventLabel, CWEvent } from 'chain-events/src';
+import { CWEvent } from 'chain-events/src/interfaces';
+import { Label as ChainEventLabel } from 'chain-events/src/util';
 
 import { NotificationCategories } from 'common-common/src/types';
 import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
@@ -89,7 +90,12 @@ const getFilteredContent = (content, address) => {
 const send = async (models, content: WebhookContent) => {
   let address;
   try {
-    address = await models.Address.findOne({ where: { address: content.user, chain: content.author_chain } });
+    address = await models.Address.findOne({
+      where: {
+        address: content.user,
+        chain: content.author_chain
+      }
+    });
   } catch (err) {
     // pass nothing if no matching address is found
   }
@@ -115,8 +121,17 @@ const send = async (models, content: WebhookContent) => {
   });
 
   const {
-    community, actor, action, actedOn, actedOnLink, notificationTitlePrefix, notificationExcerpt, notificationPreviewImageUrl, // forum events
-    title, chainEventLink, fulltext // chain events
+    community,
+    actor,
+    action,
+    actedOn,
+    actedOnLink,
+    notificationTitlePrefix,
+    notificationExcerpt,
+    notificationPreviewImageUrl, // forum events
+    title,
+    chainEventLink,
+    fulltext // chain events
   } = getFilteredContent(content, address);
   const isChainEvent = !!chainEventLink;
 

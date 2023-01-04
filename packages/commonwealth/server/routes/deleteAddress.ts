@@ -2,9 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

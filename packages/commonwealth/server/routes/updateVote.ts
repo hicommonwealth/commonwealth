@@ -5,16 +5,11 @@ import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';
 import { sequelize } from '../database';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { TypedRequestBody, TypedResponse, success } from '../types';
-import {
-  VoteAttributes,
-  VoteInstance,
-} from '../models/vote';
+import { VoteAttributes, VoteInstance } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',
@@ -44,11 +39,9 @@ const updateVote = async (
   res: TypedResponse<UpdateVoteResp>,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (!author) return next(new AppError(Errors.InvalidUser));
-  if (authorError) return next(new AppError(authorError));
+  const chain = req.chain;
+
+  const author = req.address;
 
   const { poll_id, address, author_chain, option } = req.body;
 
@@ -91,7 +84,12 @@ const updateVote = async (
     attributes: ['rule_id'],
   });
   if (topic?.rule_id) {
-    const passesRules = await checkRule(ruleCache, models, topic.rule_id, author.address);
+    const passesRules = await checkRule(
+      ruleCache,
+      models,
+      topic.rule_id,
+      author.address
+    );
     if (!passesRules) {
       return next(new AppError(Errors.RuleCheckFailed));
     }

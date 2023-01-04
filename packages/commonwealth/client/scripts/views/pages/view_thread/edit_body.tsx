@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/view_thread/edit_body.scss';
 
@@ -16,16 +17,18 @@ import { QuillEditor } from '../../components/quill/quill_editor';
 import { clearEditingLocalStorage } from '../../components/comments/helpers';
 
 type EditBodyAttrs = {
-  thread: Thread;
+  savedEdits: string;
   setIsEditing: (status: boolean) => void;
+  shouldRestoreEdits: boolean;
+  thread: Thread;
   title: string;
 };
 
-export class EditBody implements m.ClassComponent<EditBodyAttrs> {
+export class EditBody extends ClassComponent<EditBodyAttrs> {
   private quillEditorState: QuillEditor;
   private saving: boolean;
 
-  view(vnode) {
+  view(vnode: m.Vnode<EditBodyAttrs>) {
     const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } =
       vnode.attrs;
 

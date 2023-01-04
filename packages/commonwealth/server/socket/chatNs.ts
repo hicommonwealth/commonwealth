@@ -1,10 +1,12 @@
 import { Server } from 'socket.io';
 import moment from 'moment';
 import { Op } from 'sequelize';
+import { Action } from 'common-common/src/permissions';
 import { addPrefix, factory } from 'common-common/src/logging';
-import { NotificationCategories } from 'common-common/src/types';
+import { RedisCache } from 'common-common/src/redisCache';
+import emitNotifications from '../util/emitNotifications';
+import { NotificationCategories, RedisNamespaces } from 'common-common/src/types';
 import {
-    RedisNamespaces,
     WebsocketEngineEvents,
     WebsocketMessageNames,
     WebsocketNamespaces,
@@ -12,7 +14,7 @@ import {
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
-import { RedisCache } from '../util/redisCache';
+import { checkReadPermitted } from '../util/roles';
 
 
 const log = factory.getLogger(addPrefix(__filename));
@@ -47,7 +49,7 @@ const handleMentions = async (models: DB, socket: any, message: any, id: number,
           mentionedAddresses.map(async (mentionedAddress) => {
             // some Addresses may be missing users, e.g. if the user removed the address
             if (!mentionedAddress.User) return;
-            await models.Subscription.emitNotifications(
+            await emitNotifications(
                 models,
                 NotificationCategories.NewChatMention,
                 `user-${mentionedAddress.User.id}`,
@@ -87,6 +89,20 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
               },
             },
           });
+
+          try {
+            if (channels?.length > 0) {
+              await checkReadPermitted(
+                models,
+                channels[0].chain_id,
+                Action.VIEW_CHAT_CHANNELS,
+                (<any>socket)?.user?.id
+              );
+            }
+          } catch (e) {
+            console.log('Not permitted to join chat channel');
+            return;
+          }
 
           for (let i = 1; i < channels.length; i++) {
             if (channels[i - 1].chain_id != channels[i].chain_id) {

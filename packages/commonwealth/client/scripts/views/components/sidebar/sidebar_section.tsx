@@ -3,6 +3,7 @@
 import 'components/sidebar/sidebar_section.scss';
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import {
@@ -13,8 +14,8 @@ import {
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 
-class SubSection implements m.ClassComponent<SubSectionAttrs> {
-  view(vnode) {
+class SubSection extends ClassComponent<SubSectionAttrs> {
+  view(vnode: m.Vnode<SubSectionAttrs>) {
     const {
       isActive,
       isUpdated,
@@ -55,17 +56,17 @@ class SubSection implements m.ClassComponent<SubSectionAttrs> {
     );
   }
 }
-class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
+class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<SectionGroupAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SectionGroupAttrs>) {
     const {
       containsChildren,
       displayData,
@@ -86,7 +87,7 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
         this.toggled = !this.toggled;
       }
 
-      localStorage.setItem(`${app.activeChainId()}-sidebar-toggle`, 'false');
+      app.sidebarToggled = false;
 
       onclick(e, this.toggled);
     };
@@ -162,20 +163,18 @@ class SubSectionGroup implements m.ClassComponent<SectionGroupAttrs> {
   }
 }
 
-export class SidebarSectionGroup
-  implements m.ClassComponent<SidebarSectionAttrs>
-{
+export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
   private toggled: boolean;
   private hoverColor: string;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
     this.hoverColor = 'none';
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<SidebarSectionAttrs>) {
     const {
       displayData,
       extraComponents,

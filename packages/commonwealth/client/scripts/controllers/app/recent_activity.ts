@@ -76,7 +76,10 @@ class RecentActivityController {
       threads_per_topic: 3,
     };
 
-    const response = await $.get(`${app.serverUrl()}/activeThreads`, params);
+    const [response] = await Promise.all([
+      $.get(`${app.serverUrl()}/activeThreads`, params),
+      app.chainEntities.refresh(params.chain),
+    ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful: ${response.status}`);
     }

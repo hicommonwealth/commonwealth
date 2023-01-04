@@ -1,9 +1,10 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
-// import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
-// import { CodeResult } from 'near-api-js/lib/providers/provider';
+import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
+import { CodeResult } from 'near-api-js/lib/providers/provider';
 
 import 'pages/create_community.scss';
 
@@ -13,9 +14,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 
-import {
-  MixpanelCommunityCreationEvent,
-} from 'analytics/types';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { initChainForm, defaultChainRows } from './chain_input_rows';
@@ -29,7 +28,7 @@ type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 
 type CreateSputnikState = ChainFormState & { form: CreateSputnikForm };
 
-export class SputnikForm implements m.ClassComponent {
+export class SputnikForm extends ClassComponent {
   private state: CreateSputnikState = {
     saving: false,
     form: {
@@ -39,7 +38,7 @@ export class SputnikForm implements m.ClassComponent {
     },
   };
 
-  view(vnode) {
+  view() {
     return (
       <div class="CreateCommunityForm">
         <InputRow
@@ -54,7 +53,7 @@ export class SputnikForm implements m.ClassComponent {
           title="Network"
           defaultValue={this.state.form.isMainnet}
           onToggle={(checked) => {
-            vnode.state.isMainnet = checked;
+            this.state.form.isMainnet = checked;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
               chainBase: ChainBase.CosmosSDK,
@@ -81,9 +80,16 @@ export class SputnikForm implements m.ClassComponent {
 
             const isMainnet = this.state.form.isMainnet;
 
+            // slice name if has sputnik-dao or sputnikv2 appened or keep name if otherwise
+            const daoName = name.includes('sputnik-dao')
+              ? name.slice(0, name.indexOf('sputnik-dao') - 1)
+              : name.includes('sputnikv2')
+              ? name.slice(0, name.indexOf('sputnikv2') - 1)
+              : name;
+
             const id = isMainnet
-              ? `${name}.sputnik-dao.near`
-              : `${name}.sputnikv2.testnet`;
+              ? `${daoName}.sputnik-dao.near`
+              : `${daoName}.sputnikv2.testnet`;
 
             const url = isMainnet
               ? 'https://rpc.mainnet.near.org'
@@ -97,7 +103,7 @@ export class SputnikForm implements m.ClassComponent {
               name: id,
               network: ChainNetwork.Sputnik,
               node_url: url,
-              symbol: isMainnet ? 'NEAR' : 'tNEAR',
+              default_symbol: isMainnet ? 'NEAR' : 'tNEAR',
               type: ChainType.DAO,
               ...this.state.form,
             };
@@ -109,32 +115,30 @@ export class SputnikForm implements m.ClassComponent {
             });
 
             try {
-              // Gabe 2/14/22 Commenting this bit out because it isn't actually used, but maybe it will be someday?
-              //
               // verify the DAO exists
-              //   const config: ConnectConfig = {
-              //     networkId: isMainnet ? 'mainnet' : 'testnet',
-              //     nodeUrl: url,
-              //     keyStore: new keyStores.BrowserLocalStorageKeyStore(
-              //       localStorage
-              //     ),
-              //   };
-              //   const api = await nearConnect(config);
+              const config: ConnectConfig = {
+                networkId: isMainnet ? 'mainnet' : 'testnet',
+                nodeUrl: url,
+                keyStore: new keyStores.BrowserLocalStorageKeyStore(
+                  localStorage
+                ),
+              };
+              const api = await nearConnect(config);
 
-              //   const rawResult = await api.connection.provider.query<CodeResult>(
-              //     {
-              //       request_type: 'call_function',
-              //       account_id: id,
-              //       method_name: 'get_last_proposal_id',
-              //       args_base64: Buffer.from(JSON.stringify({})).toString(
-              //         'base64'
-              //       ),
-              //       finality: 'optimistic',
-              //     }
-              //   );
-              //   const _validResponse = JSON.parse(
-              //     Buffer.from(rawResult.result).toString()
-              //   );
+              const rawResult = await api.connection.provider.query<CodeResult>(
+                {
+                  request_type: 'call_function',
+                  account_id: id,
+                  method_name: 'get_last_proposal_id',
+                  args_base64: Buffer.from(JSON.stringify({})).toString(
+                    'base64'
+                  ),
+                  finality: 'optimistic',
+                }
+              );
+              const _validResponse = JSON.parse(
+                Buffer.from(rawResult.result).toString()
+              );
 
               // POST object
               const res = await $.post(

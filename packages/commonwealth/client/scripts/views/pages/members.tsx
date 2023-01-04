@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -30,7 +31,7 @@ type ProfileInfo = {
   profile: Profile;
 };
 
-class MembersPage implements m.ClassComponent {
+class MembersPage extends ClassComponent {
   private initialProfilesLoaded: boolean;
   private initialScrollFinished: boolean;
   private membersLoaded: MemberInfo[];

@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import lookupAddressIsOwnedByUser from '../../util/lookupAddressIsOwnedByUser';
-import validateChain from '../../util/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from '../../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -19,10 +17,6 @@ const deleteDraft = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
 
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));

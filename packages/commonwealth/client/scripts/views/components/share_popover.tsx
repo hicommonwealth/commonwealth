@@ -1,13 +1,16 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { int } from 'aws-sdk/clients/datapipeline';
+import ClassComponent from 'class_component';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
-export class SharePopover implements m.ClassComponent<{ commentId?: int }> {
-  view(vnode) {
+type SharePopoverAttrs = { commentId?: number; trigger?: m.Vnode };
+
+export class SharePopover extends ClassComponent<SharePopoverAttrs> {
+  view(vnode: m.Vnode<SharePopoverAttrs>) {
+    const { commentId, trigger } = vnode.attrs;
     const domain = document.location.origin;
 
     return (
@@ -20,13 +23,13 @@ export class SharePopover implements m.ClassComponent<{ commentId?: int }> {
               const currentRouteSansCommentParam = m.route
                 .get()
                 .split('?comment=')[0];
-              if (!vnode.attrs.commentId) {
+              if (!commentId) {
                 await navigator.clipboard.writeText(
                   `${domain}${currentRouteSansCommentParam}`
                 );
               } else {
                 await navigator.clipboard.writeText(
-                  `${domain}${currentRouteSansCommentParam}?comment=${vnode.attrs.commentId}`
+                  `${domain}${currentRouteSansCommentParam}?comment=${commentId}`
                 );
               }
             },
@@ -35,23 +38,21 @@ export class SharePopover implements m.ClassComponent<{ commentId?: int }> {
             iconLeft: 'twitter',
             label: 'Share on Twitter',
             onclick: async () => {
-              if (!vnode.attrs.commentId) {
+              if (!commentId) {
                 await window.open(
                   `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}`,
                   '_blank'
                 );
               } else {
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}?comment=${
-                    vnode.attrs.commentId
-                  }`,
+                  `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}?comment=${commentId}`,
                   '_blank'
                 );
               }
             },
           },
         ]}
-        trigger={<CWIconButton iconName="share" iconSize="small" />}
+        trigger={trigger || <CWIconButton iconName="share" iconSize="small" />}
       />
     );
   }

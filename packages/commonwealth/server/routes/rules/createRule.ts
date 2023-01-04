@@ -1,6 +1,5 @@
-import validateChain from '../../util/validateChain';
 import { DB } from '../../models';
-import { AppError, ServerError } from '../../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { TypedResponse, success, TypedRequestBody } from '../../types';
 import { RuleAttributes } from '../../models/rule';
 
@@ -13,7 +12,7 @@ export const Errors = {
   InvalidRule: 'Rule is not valid',
 };
 
-type CreateRuleReq = { chain_id: string; rule: string; };
+type CreateRuleReq = { chain_id: string; rule: string };
 type CreateRuleResp = RuleAttributes;
 
 const createRule = async (
@@ -21,14 +20,6 @@ const createRule = async (
   req: TypedRequestBody<CreateRuleReq>,
   res: TypedResponse<CreateRuleResp>
 ) => {
-  try {
-    const [, error] = await validateChain(models, req.body);
-    if (error) {
-      throw new AppError(error);
-    }
-  } catch (err) {
-    throw new AppError(err);
-  }
 
   // validate rule
   if (!req.body.rule) {
@@ -48,10 +39,7 @@ const createRule = async (
       chain_id: req.body.chain_id,
       rule: santizedResult,
     });
-    return success(
-      res,
-      ruleInstance.toJSON(),
-    );
+    return success(res, ruleInstance.toJSON());
   } catch (err) {
     throw new ServerError(err);
   }

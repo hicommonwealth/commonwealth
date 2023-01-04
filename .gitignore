@@ -1,4 +1,8 @@
 node_modules/
-.DS_Store
+*/build
+*/dist
 */.DS_Store
+*.env
 *.log
+*/build/
+.idea

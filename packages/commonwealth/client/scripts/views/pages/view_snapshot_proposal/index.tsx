@@ -1,8 +1,9 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
-import 'pages/snapshot/index.scss';
+// import 'pages/snapshot/index.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';
@@ -35,7 +36,7 @@ type ViewProposalPageAttrs = {
   snapshotId: string;
 };
 
-class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
+class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private fetchedPower: boolean;
   private proposal: SnapshotProposal;
   private scores: Array<number>;
@@ -47,7 +48,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
   private validatedAgainstStrategies: boolean;
   private votes: Array<SnapshotProposalVote>;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ViewProposalPageAttrs>) {
     this.fetchedPower = false;
     this.proposal = null;
     this.scores = [];
@@ -115,7 +116,7 @@ class ViewProposalPage implements m.ClassComponent<ViewProposalPageAttrs> {
     }
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     return !this.votes || !this.totals || !this.proposal ? (

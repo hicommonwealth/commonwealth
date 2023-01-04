@@ -1,11 +1,9 @@
-import { SubstrateEvents } from 'chain-events/src';
 import session from 'express-session';
 import express from 'express';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
 import fs from 'fs';
-
 import Rollbar from 'rollbar';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
@@ -16,39 +14,46 @@ import { redirectToHTTPS } from 'express-http-to-https';
 import favicon from 'serve-favicon';
 import logger from 'morgan';
 import prerenderNode from 'prerender-node';
-import { ChainBase } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import {
+  RabbitMQController,
+  getRabbitMQConfig,
+} from 'common-common/src/rabbitmq';
+import { StatsDController } from 'common-common/src/statsd';
+import { BrokerConfig } from 'rascal';
 import devWebpackConfig from './webpack/webpack.config.dev.js';
 import prodWebpackConfig from './webpack/webpack.config.prod.js';
-const log = factory.getLogger(formatFilename(__filename));
-
 import ViewCountCache from './server/util/viewCountCache';
-import IdentityFetchCache, {
-  IdentityFetchCacheNew,
-} from './server/util/identityFetchCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
-import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
+import {
+  RABBITMQ_URI,
+  ROLLBAR_SERVER_TOKEN,
+  SESSION_SECRET,
+} from './server/config';
 import models from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
-import setupErrorHandlers from './server/scripts/setupErrorHandlers';
+import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import setupPrerenderServer from './server/scripts/setupPrerenderService';
 import { sendBatchedNotificationEmails } from './server/scripts/emails';
-import setupAPI from './server/router';
+import setupAPI from './server/routing/router';
 import setupCosmosProxy from './server/util/cosmosProxy';
+import setupEntityProxy from './server/util/entitiesProxy';
+import setupIpfsProxy from './server/util/ipfsProxy';
 import setupPassport from './server/passport';
-import setupChainEventListeners from './server/scripts/setupChainEventListeners';
-import migrateIdentities from './server/scripts/migrateIdentities';
-import migrateCouncillorValidatorFlags from './server/scripts/migrateCouncillorValidatorFlags';
 import expressStatsdInit from './server/scripts/setupExpressStats';
-import StatsDController from './server/util/statsd';
+import GlobalActivityCache from './server/util/globalActivityCache';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 // set up express async error handling hack
 require('express-async-errors');
 
 const app = express();
+
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
 
@@ -57,97 +62,20 @@ async function main() {
   const SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS =
     process.env.SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS === 'true';
 
-  const NO_TOKEN_BALANCE_CACHE =
-    process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+  const NO_TOKEN_BALANCE_CACHE = process.env.NO_TOKEN_BALANCE_CACHE === 'true';
+  const NO_GLOBAL_ACTIVITY_CACHE =
+    process.env.NO_GLOBAL_ACTIVITY_CACHE === 'true';
   const NO_CLIENT_SERVER =
     process.env.NO_CLIENT === 'true' ||
     SHOULD_SEND_EMAILS ||
     SHOULD_ADD_MISSING_DECIMALS_TO_TOKENS;
 
-  // CLI parameters used to configure specific tasks
-  const SKIP_EVENT_CATCHUP = process.env.SKIP_EVENT_CATCHUP === 'true';
-  const IDENTITY_MIGRATION = process.env.IDENTITY_MIGRATION;
-  const FLAG_MIGRATION = process.env.FLAG_MIGRATION;
-  const CHAIN_EVENTS = process.env.CHAIN_EVENTS;
-  const RUN_AS_LISTENER = process.env.RUN_AS_LISTENER === 'true';
-  const USE_NEW_IDENTITY_CACHE = process.env.USE_NEW_IDENTITY_CACHE === 'true';
-
-  // if running in old mode then use old identityCache but if running with dbNode.ts use the new db identityCache
-  let identityFetchCache: IdentityFetchCacheNew | IdentityFetchCache;
-  if (!USE_NEW_IDENTITY_CACHE) {
-    identityFetchCache = new IdentityFetchCache(10 * 60);
-  } else {
-    identityFetchCache = new IdentityFetchCacheNew();
-  }
-
   const tokenBalanceCache = new TokenBalanceCache();
+  await tokenBalanceCache.initBalanceProviders();
   const ruleCache = new RuleCache();
-  const listenChainEvents = async () => {
-    try {
-      // configure chain list from events
-      let chains: string[] | 'all' | 'none' = 'all';
-      if (CHAIN_EVENTS === 'none' || CHAIN_EVENTS === 'all') {
-        chains = CHAIN_EVENTS;
-      } else if (CHAIN_EVENTS) {
-        chains = CHAIN_EVENTS.split(',');
-      }
-      const subscribers = await setupChainEventListeners(
-        null,
-        chains,
-        SKIP_EVENT_CATCHUP
-      );
-      // construct storageFetchers needed for the identity cache
-      const fetchers = {};
-      for (const [chain, subscriber] of subscribers) {
-        if (chain.base === ChainBase.Substrate) {
-          fetchers[chain.id] = new SubstrateEvents.StorageFetcher(
-            subscriber.api
-          );
-        }
-      }
-      await (<IdentityFetchCache>identityFetchCache).start(models, fetchers);
-      return 0;
-    } catch (e) {
-      console.error(`Chain event listener setup failed: ${e.message}`);
-      return 1;
-    }
-  };
   let rc = null;
-  if (RUN_AS_LISTENER) {
-    // hack to keep process running indefinitely
-    process.stdin.resume();
-    listenChainEvents().then((retcode) => {
-      if (retcode) {
-        process.exit(retcode);
-      }
-      // if recode === 0, continue indefinitely
-    });
-    return;
-  } else if (SHOULD_SEND_EMAILS) {
+  if (SHOULD_SEND_EMAILS) {
     rc = await sendBatchedNotificationEmails(models);
-  } else if (IDENTITY_MIGRATION) {
-    log.info('Started migrating chain identities into the DB');
-    try {
-      await migrateIdentities(models);
-      log.info('Finished migrating chain identities into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error('Failed migrating chain identities into the DB: ', e.message);
-      rc = 1;
-    }
-  } else if (FLAG_MIGRATION) {
-    log.info('Started migrating councillor and validator flags into the DB');
-    try {
-      await migrateCouncillorValidatorFlags(models);
-      log.info('Finished migrating councillor and validator flags into the DB');
-      rc = 0;
-    } catch (e) {
-      log.error(
-        'Failed migrating councillor and validator flags into the DB: ',
-        e.message
-      );
-      rc = 1;
-    }
   }
 
   // exit if we have performed a one-off event
@@ -158,7 +86,9 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV ? webpack(devWebpackConfig as any) : webpack(prodWebpackConfig as any);
+  const compiler = DEV
+    ? webpack(devWebpackConfig as any)
+    : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const devMiddleware =
     DEV && !NO_CLIENT_SERVER
@@ -248,7 +178,6 @@ async function main() {
     app.use(favicon(`${__dirname}/favicon.ico`));
     app.use('/static', express.static('static'));
 
-
     // add other middlewares
     app.use(logger('dev'));
     app.use(expressStatsdInit(StatsDController.get()));
@@ -282,21 +211,6 @@ async function main() {
   setupMiddleware();
   setupPassport(models);
 
-  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
-  await ruleCache.start();
-  const banCache = new BanCache(models);
-  setupAPI(
-    app,
-    models,
-    viewCountCache,
-    <any>identityFetchCache,
-    tokenBalanceCache,
-    ruleCache,
-    banCache,
-  );
-  setupCosmosProxy(app, models);
-  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
-
   const rollbar = new Rollbar({
     accessToken: ROLLBAR_SERVER_TOKEN,
     environment: process.env.NODE_ENV,
@@ -304,18 +218,62 @@ async function main() {
     captureUnhandledRejections: true,
   });
 
+  let rabbitMQController: RabbitMQController;
+  try {
+    rabbitMQController = new RabbitMQController(
+      <BrokerConfig>getRabbitMQConfig(RABBITMQ_URI)
+    );
+    await rabbitMQController.init();
+  } catch (e) {
+    console.warn(
+      'The main service RabbitMQController failed to initialize!',
+      e
+    );
+    rollbar.critical(
+      'The main service RabbitMQController failed to initialize!',
+      e
+    );
+  }
+
+  if (!rabbitMQController.initialized) {
+    console.warn(
+      'The RabbitMQController is not initialized! Some services may be unavailable e.g. (Create/Delete chain and Websocket notifications'
+    );
+    rollbar.critical('The main service RabbitMQController is not initialized!');
+    // TODO: this requires an immediate response if in production
+  }
+
+  if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
+  await ruleCache.start();
+  const banCache = new BanCache(models);
+  const globalActivityCache = new GlobalActivityCache(models);
+
+  // TODO: should we await this? it will block server startup -- but not a big deal locally
+  if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
+
+  // Declare Validation Middleware Service
+  // middleware to use for all requests
+  const dbValidationService: DatabaseValidationService =
+    new DatabaseValidationService(models);
+
+  setupAPI(
+    app,
+    models,
+    viewCountCache,
+    tokenBalanceCache,
+    ruleCache,
+    banCache,
+    globalActivityCache,
+    dbValidationService
+  );
+  setupCosmosProxy(app, models);
+  setupIpfsProxy(app);
+  setupEntityProxy(app);
+  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+
   setupErrorHandlers(app, rollbar);
 
-  if (CHAIN_EVENTS) {
-    const exitCode = await listenChainEvents();
-    console.log(`setup chain events listener with code: ${exitCode}`);
-    if (exitCode) {
-      await models.sequelize.close();
-      await closeMiddleware();
-      process.exit(exitCode);
-    }
-  }
-  setupServer(app, rollbar, models);
+  setupServer(app, rollbar, models, rabbitMQController);
 }
 
 main();

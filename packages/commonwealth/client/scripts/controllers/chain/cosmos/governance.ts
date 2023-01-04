@@ -155,7 +155,7 @@ class CosmosGovernance extends ProposalModule<
       const { proposal } = await this._Chain.api.gov.proposal(proposalId);
       cosmosProposals = [ new CosmosProposal(this._Chain, this._Accounts, this, msgToIProposal(proposal)) ];
     }
-    await Promise.all(cosmosProposals.map((p) => p.init()));
+    Promise.all(cosmosProposals.map((p) => p.init()));
   }
 
   public createTx(

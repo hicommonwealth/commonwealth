@@ -1,27 +1,34 @@
 // Use https://admin.socket.io/#/ to monitor
-
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 import { Server, Socket } from 'socket.io';
-import { instrument } from '@socket.io/admin-ui';
-import { BrokerConfig } from 'rascal';
 import * as jwt from 'jsonwebtoken';
 import { ExtendedError } from 'socket.io/dist/namespace';
 import * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
+import { createChatNamespace } from './createChatNamespace';
 import {
   ConnectionTimeoutError,
   createClient,
-  ReconnectStrategyError, SocketClosedUnexpectedlyError
-} from "redis";
-import Rollbar from 'rollbar';
-import { createCeNamespace, publishToCERoom } from './chainEventsNs';
-import { RabbitMQController } from '../util/rabbitmq/rabbitMQController';
-import RabbitMQConfig from '../util/rabbitmq/RabbitMQConfig';
-import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
+  ReconnectStrategyError,
+  SocketClosedUnexpectedlyError,
+} from 'redis';
+import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { createChatNamespace } from './chatNs';
+import {
+  getRabbitMQConfig,
+  RabbitMQController,
+  RascalSubscriptions,
+} from 'common-common/src/rabbitmq';
+import Rollbar from 'rollbar';
+import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import { WebsocketNamespaces } from '../../shared/types';
+import {
+  createNamespace,
+  publishToChainEventsRoom,
+  publishToSnapshotRoom,
+} from './createNamespace';
+import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import { DB } from '../models';
-import { RedisCache, redisRetryStrategy } from '../util/redisCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -50,7 +57,8 @@ export const authenticate = (
 export async function setupWebSocketServer(
   httpServer: http.Server,
   rollbar: Rollbar,
-  models: DB
+  models: DB,
+  rabbitMQController: RabbitMQController
 ) {
   // since the websocket servers are not linked with the main Commonwealth server we do not send the socket.io client
   // library to the user since we already import it + disable http long-polling to avoid sticky session issues
@@ -65,12 +73,14 @@ export async function setupWebSocketServer(
   io.use(authenticate);
 
   io.on('connection', (socket) => {
+    StatsDController.get().increment('cw.socket.connections');
     log.trace(
       `Socket connected: socket_id = ${socket.id}, user_id = ${
         (<any>socket).user.id
       }`
     );
     socket.on('disconnect', () => {
+      StatsDController.get().decrement('cw.socket.connections');
       log.trace(
         `Socket disconnected: socket_id = ${socket.id}, user_id = ${
           (<any>socket).user.id
@@ -80,10 +90,6 @@ export async function setupWebSocketServer(
   });
 
   io.engine.on('connection_error', (err) => {
-    // log.error(err.req);      // the request object
-    // console.log(err.code);     // the error code, for example 1
-    // console.log(err.message);  // the error message, for example "Session ID unknown"
-    // console.log(err.context);  // some additional error context
     log.error('A WebSocket connection error has occurred', err);
   });
 
@@ -118,6 +124,7 @@ export async function setupWebSocketServer(
   const subClient = pubClient.duplicate();
 
   pubClient.on('error', (err) => {
+    StatsDController.get().increment('cw.socket.pub_errors', { name: err.name });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis pub-client connection to ${REDIS_URL} timed out!`
@@ -140,15 +147,16 @@ export async function setupWebSocketServer(
     }
   });
   pubClient.on('ready', () => {
-    log.info("Redis pub-client ready");
-  })
+    log.info('Redis pub-client ready');
+  });
   pubClient.on('reconnecting', () => {
-    log.info("Redis pub-client reconnecting");
-  })
+    log.info('Redis pub-client reconnecting');
+  });
   pubClient.on('end', () => {
     log.info('Redis pub-client disconnected');
-  })
+  });
   subClient.on('error', (err) => {
+    StatsDController.get().increment('cw.socket.sub_errors', { name: err.name });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis sub-client connection to ${REDIS_URL} timed out!`
@@ -171,14 +179,14 @@ export async function setupWebSocketServer(
     }
   });
   subClient.on('ready', () => {
-    log.info("Redis sub-client ready");
-  })
+    log.info('Redis sub-client ready');
+  });
   subClient.on('reconnecting', () => {
-    log.info("Redis sub-client reconnecting");
-  })
+    log.info('Redis sub-client reconnecting');
+  });
   subClient.on('end', () => {
     log.info('Redis sub-client disconnected');
-  })
+  });
 
   await Promise.all([pubClient.connect(), subClient.connect()]);
 
@@ -187,22 +195,31 @@ export async function setupWebSocketServer(
 
   const redisCache = new RedisCache();
   console.log('Initializing Redis Cache for WebSockets...');
-  await redisCache.init();
+  await redisCache.init(REDIS_URL, VULTR_IP);
   console.log('Redis Cache initialized!');
 
-  // create the chain-events namespace
-  const ceNamespace = createCeNamespace(io);
+  const chainEventsNamespace = createNamespace(
+    io,
+    WebsocketNamespaces.ChainEvents
+  );
+  const snapshotProposalNamespace = createNamespace(
+    io,
+    WebsocketNamespaces.SnapshotProposals
+  );
+
   const chatNamespace = createChatNamespace(io, models, redisCache);
 
   try {
-    const rabbitController = new RabbitMQController(
-      <BrokerConfig>RabbitMQConfig
+    await rabbitMQController.startSubscription(
+      publishToChainEventsRoom,
+      RascalSubscriptions.ChainEventNotifications,
+      {server: chainEventsNamespace}
     );
 
-    await rabbitController.init();
-    await rabbitController.startSubscription(
-      publishToCERoom.bind(ceNamespace),
-      'ChainEventsNotificationsSubscription'
+    await rabbitMQController.startSubscription(
+      publishToSnapshotRoom,
+      RascalSubscriptions.SnapshotProposalNotifications,
+      {server: snapshotProposalNamespace}
     );
   } catch (e) {
     log.error(
