@@ -1,11 +1,19 @@
+@import 'shared';
+
 .SnapshotProposalsPage {
   display: flex;
   flex: 1;
   flex-direction: column;
-  padding: 0 24px;
+  gap: 16px;
+  padding: 24px;
 
-  .no-proposals {
+  .SnapshotProposalStagesBar {
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .no-proposals-text.Text {
+    color: $neutral-500;
   }
 }

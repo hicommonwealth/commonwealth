@@ -2,16 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { NotificationCategories } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from 'common-common/src/errors';
+import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {
@@ -146,7 +148,7 @@ const editComment = async (
     const root_title = typeof proposal === 'string' ? '' : proposal.title || '';
 
     // dispatch notifications to subscribers of the comment/thread
-    models.Subscription.emitNotifications(
+    emitNotifications(
       models,
       NotificationCategories.CommentEdit,
       '',
@@ -220,7 +222,7 @@ const editComment = async (
     if (mentionedAddresses?.length > 0) {
       mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
-        models.Subscription.emitNotifications(
+        emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,

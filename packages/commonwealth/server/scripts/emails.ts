@@ -173,8 +173,7 @@ export const sendImmediateNotificationEmail = async (
     console.log(`sending immediate notification email to ${emailObject.to}`);
     await sgMail.send(emailObject);
   } catch (e) {
-    console.log('Failed to send immediate notification email', e?.response?.body?.errors);
-    log.error(e);
+    log.error('Failed to send immediate notification email', e?.response?.body?.errors);
   }
 };
 
