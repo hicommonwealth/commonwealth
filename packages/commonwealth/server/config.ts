@@ -75,7 +75,7 @@ export const RABBITMQ_URI = (() => {
       process.env.VULTR_RABBITMQ_MANAGEMENT_CONTAINER_PORT
     ) {
       return `amqp://guest:guest@${process.env.VULTR_IP}:${process.env.VULTR_RABBITMQ_CONTAINER_PORT}`;
-    } else return 'amqp://guest:guest@localhost:5672';
+    } else return 'amqp://localhost';
   } else return process.env.CLOUDAMQP_URL;
 })();
 

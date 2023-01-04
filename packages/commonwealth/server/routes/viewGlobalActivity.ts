@@ -7,7 +7,7 @@ const viewGlobalActivity = async (
   models: DB,
   globalActivityCache: GlobalActivityCache,
   req: TypedRequestBody<Record<string, never>>,
-  res: TypedResponse<GlobalActivity>,
+  res: TypedResponse<GlobalActivity>
 ) => {
   const activity = await globalActivityCache.globalActivity();
   return success(res, activity);

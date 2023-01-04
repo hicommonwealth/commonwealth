@@ -24,14 +24,16 @@ import {
 } from '@polkadot/types/interfaces';
 import {
   Option,
-  bool,
   Vec,
+  Compact,
+} from '@polkadot/types/codec';
+import {
+  bool,
   u32,
   u64,
-  Compact,
   StorageKey,
   Bytes,
-} from '@polkadot/types';
+} from '@polkadot/types/primitive';
 import { Codec, AnyTuple } from '@polkadot/types/types';
 import { hexToString } from '@polkadot/util';
 import { filter } from 'lodash';

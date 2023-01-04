@@ -169,6 +169,9 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
               />
             )}
           </div>
+          <CWText type="caption" className="thread-preview">
+            {thread.plaintext}
+          </CWText>
           {thread.chainEntities?.length > 0 && (
             <div class="tags-row">
               {thread.chainEntities
