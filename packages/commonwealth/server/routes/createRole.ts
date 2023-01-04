@@ -1,9 +1,14 @@
 import Sequelize from 'sequelize';
-import { Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
 import { NotificationCategories } from 'common-common/src/types';
+import { AppError } from 'common-common/src/errors';
+import { SubscriptionAttributes } from '../models/subscription';
+import validateChain, {
+  ValidateChainParams,
+} from '../middleware/validateChain';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import { success, TypedRequestBody, TypedResponse } from '../types';
+import { RoleAttributes } from '../models/role';
+import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {
   InvalidChainComm: 'Invalid chain or community',
@@ -12,43 +17,51 @@ export const Errors = {
   RoleAlreadyExists: 'Role already exists',
 };
 
+type CreateRoleReq = {
+  address_id: number;
+} & ValidateChainParams;
+
+type CreateRoleResp = {
+  role: RoleAttributes;
+  subscription: SubscriptionAttributes;
+};
+
 const createRole = async (
   models: DB,
-  req,
-  res: Response,
-  next: NextFunction
+  req: TypedRequestBody<CreateRoleReq>,
+  res: TypedResponse<CreateRoleResp>
 ) => {
   const [chain, error] = await validateChain(models, req.body);
 
-  if (error) return next(new AppError(error));
-  if (!req.user) return next(new AppError(Errors.NotLoggedIn));
-  if (!req.body.address_id) return next(new AppError(Errors.InvalidAddress));
+  if (error) throw new AppError(error);
+  if (!req.user) throw new AppError(Errors.NotLoggedIn);
+  if (!req.body.address_id) throw new AppError(Errors.InvalidAddress);
 
   const validAddress = await models.Address.findOne({
     where: {
       id: req.body.address_id,
       user_id: req.user.id,
-      verified: { [Sequelize.Op.ne]: null }
-    }
+      verified: { [Sequelize.Op.ne]: null },
+    },
   });
-  if (!validAddress) return next(new AppError(Errors.InvalidAddress));
+  if (!validAddress?.id) throw new AppError(Errors.InvalidAddress);
 
-  const [ role ] = await models.Role.findOrCreate({ where: {
-    address_id: validAddress.id,
-    chain_id: chain.id,
-  }});
+  const role = await _createRole(models, validAddress.id, chain.id);
 
-  const [ subscription ] = await models.Subscription.findOrCreate({
+  const [subscription] = await models.Subscription.findOrCreate({
     where: {
       subscriber_id: req.user.id,
       category_id: NotificationCategories.NewThread,
       chain_id: chain.id,
       object_id: chain.id,
       is_active: true,
-    }
+    },
   });
 
-  return res.json({ status: 'Success', result: { role: role.toJSON(), subscription: subscription.toJSON() } });
+  return success(res, {
+    role: role.toJSON(),
+    subscription: subscription.toJSON(),
+  });
 };
 
 export default createRole;

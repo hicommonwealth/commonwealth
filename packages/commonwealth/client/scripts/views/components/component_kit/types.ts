@@ -1,3 +1,4 @@
+import { ChainInfo } from 'models';
 import { IconName } from './cw_icons/cw_icon_lookup';
 
 export enum ComponentType {
@@ -18,6 +19,9 @@ export enum ComponentType {
   Divider = 'Divider',
   EngagementButton = 'EngagementButton',
   ExternalLink = 'ExternalLink',
+  Form = 'Form',
+  FormSection = 'FormSection',
+  FilterMenu = 'FilterMenu',
   GradientButton = 'GradientButton',
   Growl = 'Growl',
   Icon = 'Icon',
@@ -32,6 +36,7 @@ export enum ComponentType {
   RadioButton = 'RadioButton',
   RadioGroup = 'RadioGroup',
   RuleCard = 'RuleCard',
+  SidebarMenu = 'SidebarMenu',
   Spinner = 'Spinner',
   Tab = 'Tab',
   TabBar = 'TabBar',
@@ -50,23 +55,38 @@ export type StyleAttrs = {
   className?: string;
 };
 
+export type DividerMenuItem = { type?: 'divider' };
+
+type HeaderMenuItem = { type?: 'header'; label?: string };
+
+export type DefaultMenuItem = {
+  disabled?: boolean;
+  iconLeft?: IconName;
+  iconRight?: IconName;
+  isSecondary?: boolean;
+  label?: string;
+  onclick?: (e?: Event) => void;
+  type?: 'default';
+};
+
+type NotificationMenuItem = {
+  hasUnreads?: boolean;
+  iconLeft?: IconName;
+  iconRight?: IconName;
+  label?: string;
+  onclick?: (e?: MouseEvent) => void;
+  type?: 'notification';
+};
+
+export type CommunityMenuItem = {
+  community?: ChainInfo;
+  label?: string;
+  type?: 'community';
+};
+
 export type MenuItem =
-  | { type: 'divider' }
-  | { type: 'header'; label: string }
-  | {
-      disabled?: boolean;
-      iconLeft?: IconName;
-      iconRight?: IconName;
-      isSecondary?: boolean;
-      label: string;
-      onclick: () => void;
-      type?: 'default';
-    }
-  | {
-      hasUnreads: boolean;
-      iconLeft?: IconName;
-      iconRight?: IconName;
-      label: string;
-      onclick: () => void;
-      type: 'notification';
-    };
+  | DividerMenuItem
+  | HeaderMenuItem
+  | DefaultMenuItem
+  | NotificationMenuItem
+  | CommunityMenuItem;

@@ -1,13 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import {
-  Button,
-  Icons,
-  PopoverMenu,
-  MenuItem,
-  MenuDivider,
-} from 'construct-ui';
+import ClassComponent from 'class_component';
 
 import 'pages/discussions/stages_menu.scss';
 
@@ -15,66 +9,86 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ThreadStage } from 'models';
 import { threadStageToLabel } from 'helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
+import { getClasses } from '../../components/component_kit/helpers';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWDivider } from '../../components/component_kit/cw_divider';
 
-type StagesMenuAttrs = {
-  disabled: boolean;
-  selectedStage: ThreadStage;
-  stage: string;
-  stages: ThreadStage[];
+type ThreadsFilterMenuItemAttrs = {
+  iconRight?: m.Vnode;
+  isSelected: boolean;
+  label: string;
+  onclick: (e: any) => void;
 };
 
-export class StagesMenu implements m.ClassComponent<StagesMenuAttrs> {
-  view(vnode) {
-    const { disabled, selectedStage, stage, stages } = vnode.attrs;
+export class ThreadsFilterMenuItem extends ClassComponent<ThreadsFilterMenuItemAttrs> {
+  view(vnode: m.Vnode<ThreadsFilterMenuItemAttrs>) {
+    const { iconRight, isSelected, label, onclick } = vnode.attrs;
+
     return (
-      <PopoverMenu
+      <div
+        class={getClasses<{ isSelected: boolean }>(
+          { isSelected },
+          'ThreadsFilterMenuItem'
+        )}
+        onclick={onclick}
+      >
+        {isSelected && <CWIcon iconName="check" iconSize="small" />}
+        {label}
+        {iconRight}
+      </div>
+    );
+  }
+}
+
+type StagesMenuAttrs = {
+  selectedStage: ThreadStage;
+  stage: string;
+  stages: Array<ThreadStage>;
+};
+
+export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
+  view(vnode: m.Vnode<StagesMenuAttrs>) {
+    const { selectedStage, stage, stages } = vnode.attrs;
+
+    return (
+      <CWPopover
         trigger={
-          <Button
-            rounded={true}
-            compact={true}
+          <CWButton
+            buttonType="mini-white"
             label={
               selectedStage
                 ? `Stage: ${threadStageToLabel(selectedStage)}`
                 : 'All Stages'
             }
-            iconRight={Icons.CHEVRON_DOWN}
-            size="sm"
-            disabled={disabled}
+            iconRight="chevronDown"
           />
         }
-        hasArrow={false}
-        transitionDuration={0}
-        closeOnContentClick={true}
         content={
-          <div class="stage-items">
-            <MenuItem
+          <div class="threads-filter-menu-items">
+            <ThreadsFilterMenuItem
+              label="All Stages"
+              isSelected={!stage}
               onclick={(e) => {
                 e.preventDefault();
-                navigateToSubpage('/');
+                navigateToSubpage('/discussions');
               }}
-              active={!stage}
-              iconLeft={!stage ? Icons.CHECK : null}
-              label="All Stages"
             />
-            <MenuDivider />
+            <CWDivider />
             {stages.map((targetStage) => (
-              <MenuItem
-                active={stage === targetStage}
-                iconLeft={stage === targetStage ? Icons.CHECK : null}
+              <ThreadsFilterMenuItem
+                isSelected={stage === targetStage}
                 onclick={(e) => {
                   e.preventDefault();
-                  navigateToSubpage(`/?stage=${targetStage}`);
+                  navigateToSubpage(`/discussions?stage=${targetStage}`);
                 }}
-                label={
-                  <div class="stages-item">
-                    {threadStageToLabel(targetStage)}
-                    {targetStage === ThreadStage.Voting && (
-                      <div class="discussions-stage-count">
-                        {app.threads.numVotingThreads}
-                      </div>
-                    )}
-                  </div>
-                }
+                label={`
+                    ${threadStageToLabel(targetStage)} ${
+                  targetStage === ThreadStage.Voting
+                    ? app.threads.numVotingThreads
+                    : ''
+                }`}
               />
             ))}
           </div>

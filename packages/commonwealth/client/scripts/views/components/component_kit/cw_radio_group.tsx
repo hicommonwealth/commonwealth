@@ -1,20 +1,21 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_radio_group.scss';
 
-import { CWRadioButton, RadioButton } from './cw_radio_button';
+import { CWRadioButton, RadioButtonType } from './cw_radio_button';
 import { ComponentType } from './types';
 
 type RadioGroupAttrs = {
   name: string;
   onchange: (e?: any) => void;
-  options: Array<RadioButton>;
-  toggledOption: string;
+  options: Array<RadioButtonType>;
+  toggledOption?: string;
 };
-export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
-  view(vnode) {
+export class CWRadioGroup extends ClassComponent<RadioGroupAttrs> {
+  view(vnode: m.Vnode<RadioGroupAttrs>) {
     const { options, onchange, name, toggledOption } = vnode.attrs;
 
     return (
@@ -26,9 +27,7 @@ export class CWRadioGroup implements m.ClassComponent<RadioGroupAttrs> {
               label={o.label}
               checked={o.value === toggledOption}
               groupName={name}
-              onchange={(e) => {
-                onchange(e);
-              }}
+              onchange={onchange}
               disabled={o.disabled}
             />
           );

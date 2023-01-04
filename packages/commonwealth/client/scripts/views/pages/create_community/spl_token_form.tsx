@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import * as solw3 from '@solana/web3.js';
 
@@ -11,13 +12,14 @@ import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
+import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 type SplTokenFormFields = {
   cluster: solw3.Cluster;
@@ -29,7 +31,7 @@ type CreateERC20Form = ChainFormFields & SplTokenFormFields;
 
 type CreateSplTokenState = ChainFormState & { form: CreateERC20Form };
 
-export class SplTokenForm implements m.ClassComponent {
+export class SplTokenForm extends ClassComponent {
   private state: CreateSplTokenState = {
     message: '',
     loaded: false,
@@ -82,12 +84,15 @@ export class SplTokenForm implements m.ClassComponent {
 
     return (
       <div class="CreateCommunityForm">
-        <SelectRow
-          title="Cluster"
-          options={['mainnet-beta', 'testnet', 'devnet']}
-          value={this.state.form.cluster}
-          onchange={(value) => {
-            this.state.form.cluster = value;
+        <CWDropdown
+          label="Cluster"
+          options={[
+            { label: 'mainnet-beta', value: 'mainnet-beta' },
+            { label: 'testnet', value: 'testnet' },
+            { label: 'devnet', value: 'devnet' },
+          ]}
+          onSelect={(o) => {
+            this.state.form.cluster = o.value as solw3.Cluster;
             this.state.loaded = false;
           }}
         />

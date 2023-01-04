@@ -1,7 +1,7 @@
+import { AppError } from 'common-common/src/errors';
 import { success, TypedRequestBody, TypedResponse } from '../../types';
 import { DB } from '../../models';
 import RuleCache from '../../util/rules/ruleCache';
-import { AppError } from '../../util/errors';
 import checkRule from '../../util/rules/checkRule';
 
 export const CheckRuleErrors = {

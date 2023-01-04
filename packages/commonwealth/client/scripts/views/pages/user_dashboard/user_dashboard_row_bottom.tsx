@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Icons, MenuItem, PopoverMenu } from 'construct-ui';
+import ClassComponent from 'class_component';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
@@ -11,6 +11,7 @@ import { subscribeToThread } from './helpers';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
+import { SharePopover } from '../../components/share_popover';
 
 type UserDashboardRowBottomAttrs = {
   commentCount: number;
@@ -20,10 +21,8 @@ type UserDashboardRowBottomAttrs = {
   viewCount: number;
 };
 
-export class UserDashboardRowBottom
-  implements m.ClassComponent<UserDashboardRowBottomAttrs>
-{
-  view(vnode) {
+export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBottomAttrs> {
+  view(vnode: m.Vnode<UserDashboardRowBottomAttrs>) {
     const { path, threadId, viewCount, likeCount, commentCount } = vnode.attrs;
 
     const adjustedId = `discussion_${threadId}`;
@@ -48,12 +47,12 @@ export class UserDashboardRowBottom
         <div class="buttons-row">
           <CWButton
             label="Discuss"
-            iconName="plus"
+            iconLeft="plus"
             buttonType="secondary-blue"
           />
           <CWButton
             label={bothActive ? 'Unsubscribe' : 'Subscribe'}
-            iconName="bell"
+            iconLeft="bell"
             buttonType="secondary-blue"
             onclick={(e) => {
               e.stopPropagation();
@@ -71,36 +70,11 @@ export class UserDashboardRowBottom
               e.stopPropagation();
             }}
           >
-            <PopoverMenu
-              transitionDuration={0}
-              closeOnOutsideClick
-              closeOnContentClick
-              menuAttrs={{ size: 'default' }}
-              content={
-                <>
-                  <MenuItem
-                    iconLeft={Icons.COPY}
-                    label="Copy URL"
-                    onclick={async () => {
-                      await navigator.clipboard.writeText(path);
-                    }}
-                  />
-                  <MenuItem
-                    iconLeft={Icons.TWITTER}
-                    label="Share on Twitter"
-                    onclick={async () => {
-                      await window.open(
-                        `https://twitter.com/intent/tweet?text=${path}`,
-                        '_blank'
-                      );
-                    }}
-                  />
-                </>
-              }
+            <SharePopover
               trigger={
                 <CWButton
                   label="Share"
-                  iconName="share"
+                  iconLeft="share"
                   buttonType="secondary-blue"
                 />
               }

@@ -3,13 +3,14 @@
 
 import m from 'mithril';
 import $ from 'jquery';
+import ClassComponent from 'class_component';
 
 import 'components/rules/rule_modal.scss';
 
 import app from 'state';
 import { RuleMetadata } from 'server/util/rules/ruleTypes';
 import { CWCard } from '../component_kit/cw_card';
-import { CWDropdown } from '../component_kit/cw_dropdown';
+import { CWDropdown, DropdownItemType } from '../component_kit/cw_dropdown';
 import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWRuleTable } from './rule_table';
 import { CWButton } from '../component_kit/cw_button';
@@ -18,18 +19,18 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 type RuleEditSectionAttrs = {
   internalBuiltRule: Record<string, unknown>;
-  ruleArgument: Array<{
+  ruleArgument: {
     name: string;
     description: string;
     type: string;
-  }>;
+  };
   ruleTypeIdentifier: string;
   argumentIdx: number;
   isNested: boolean;
 };
 
 // Handles the details of displaying a rule
-class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
+class RuleEditSection extends ClassComponent<RuleEditSectionAttrs> {
   private subRuleResolved: boolean;
   private subRules: Array<RuleMetadata | any>;
   private subRuleEditState: Array<boolean>;
@@ -117,10 +118,7 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
                     this.subRuleEditState[idx] = false;
                   }}
                   rule={subRule}
-                  onCancel={(
-                    internalRule: Record<string, unknown>,
-                    ruleValid: boolean
-                  ) => {
+                  onCancel={(internalRule, ruleValid) => {
                     if (Object.keys(internalRule).length > 0 && ruleValid) {
                       this.subRuleEditState[idx] = false;
                     } else {
@@ -181,7 +179,7 @@ class RuleEditSection implements m.ClassComponent<RuleEditSectionAttrs> {
               }}
               label="add subrule"
               iconName="plus"
-              buttonType="mini"
+              buttonType="mini-black"
             />
           </div>
         </div>
@@ -196,10 +194,13 @@ type RuleModalAttrs = {
   isNested?: boolean;
   rule?: Record<string, unknown>;
   className?: string;
-  onCancel?: () => void;
+  onCancel?: (
+    internalRule: Record<string, unknown>,
+    ruleValid: boolean
+  ) => void;
 };
 
-class RuleModal implements m.ClassComponent<RuleModalAttrs> {
+class RuleModal extends ClassComponent<RuleModalAttrs> {
   private editingRule: boolean;
   private showSelectRule: boolean;
   private showRuleOptions: boolean;
@@ -232,7 +233,7 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
     const { onFinish, isNested, onCancel } = vnode.attrs;
 
     const ruleOptions = Object.keys(app.rules.ruleTypes).map((ruleType) => {
-      return { label: ruleType };
+      return { label: ruleType, value: ruleType };
     });
 
     return (
@@ -242,7 +243,7 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
       >
         <div className="top-section">
           <div class="title-section">
-            <CWText type="h3" fontStyle="semiBold">
+            <CWText type="h3" style="semiBold">
               {this.ruleMetadata && !this.readyForReview
                 ? this.ruleMetadata.name
                 : this.readyForReview
@@ -255,11 +256,11 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
           </div>
           {this.showSelectRule && (
             <CWDropdown
-              inputOptions={ruleOptions}
-              onSelect={(optionLabel: string) => {
+              options={ruleOptions}
+              onSelect={(item: DropdownItemType) => {
                 // Clear out the internal built rule in event of switch
                 this.internalBuiltRule = {};
-                this.ruleMetadata = app.rules.ruleTypes[optionLabel];
+                this.ruleMetadata = app.rules.ruleTypes[item.label];
                 this.readyForReview = false;
                 this.readyForSubmit = false;
 
@@ -280,12 +281,16 @@ class RuleModal implements m.ClassComponent<RuleModalAttrs> {
                     ruleValue.push([]);
                   }
                 }
-                this.internalBuiltRule[optionLabel] = ruleValue;
+                this.internalBuiltRule[item.label] = ruleValue;
 
                 this.showRuleOptions = true;
                 m.redraw();
               }}
-              initialValue="Select Rule Type"
+              initialValue={{
+                label: 'Select Rule Type',
+                value: 'Select Rule Type',
+              }}
+              label=""
             />
           )}
           {this.showRuleOptions &&

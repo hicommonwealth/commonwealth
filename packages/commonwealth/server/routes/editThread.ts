@@ -4,12 +4,17 @@ import moment from 'moment';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl, renderQuillDeltaToText, validURL } from '../../shared/utils';
+import validateChain from '../middleware/validateChain';
+import {
+  getProposalUrl,
+  renderQuillDeltaToText,
+  validURL,
+} from '../../shared/utils';
 import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { findOneRole } from '../util/roles';
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -43,8 +48,8 @@ const editThread = async (
   }
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+
+  const author = req.address;
 
   const attachFiles = async () => {
     if (
@@ -79,17 +84,16 @@ const editThread = async (
   const collaboration = await models.Collaboration.findOne({
     where: {
       thread_id,
-      address_id: { [Op.in]: userOwnedAddressIds }
-    }
-  });
-
-  const admin = await models.Role.findOne({
-    where: {
-      chain_id: chain.id,
       address_id: { [Op.in]: userOwnedAddressIds },
-      permission: 'admin',
     },
   });
+
+  const admin = await findOneRole(
+    models,
+    { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
+    chain.id,
+    ['admin']
+  );
 
   // check if banned
   if (!admin) {
@@ -175,7 +179,7 @@ const editThread = async (
     });
 
     // dispatch notifications to subscribers of the given chain
-    models.Subscription.emitNotifications(
+    emitNotifications(
       models,
       NotificationCategories.ThreadEdit,
       '',
@@ -190,7 +194,6 @@ const editThread = async (
       },
       // don't send webhook notifications for edits
       null,
-      req.wss,
       [userOwnedAddresses[0].address]
     );
 
@@ -225,7 +228,7 @@ const editThread = async (
                 chain: mention[0],
                 address: mention[1],
               },
-              include: [models.User, models.Role],
+              include: [models.User, models.RoleAssignment],
             });
             return user;
           } catch (err) {
@@ -242,7 +245,7 @@ const editThread = async (
       mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-        models.Subscription.emitNotifications(
+        emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,
@@ -264,7 +267,6 @@ const editThread = async (
             chain: finalThread.chain,
             body: finalThread.body,
           },
-          req.wss,
           [finalThread.Address.address]
         );
       });

@@ -1,8 +1,8 @@
-import { AppError } from '../../util/errors';
-import validateChain from '../../util/validateChain';
+import { AppError } from 'common-common/src/errors';
 import { RuleAttributes } from '../../models/rule';
 import { success, TypedRequestBody, TypedResponse } from '../../types';
 import { DB } from '../../models';
+import validateChain from '../../middleware/validateChain';
 
 const GetRulesError = {
   NoChain: 'No Chain specified',

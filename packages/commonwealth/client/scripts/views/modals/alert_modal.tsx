@@ -1,17 +1,16 @@
 /* @jsx m */
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import m from 'mithril';
 import $ from 'jquery';
-import { Button } from 'construct-ui';
 
 import 'modals/alert_modal.scss';
 
 import app from 'state';
+import { CWButton } from '../components/component_kit/cw_button';
 
 const AlertModal = {
   confirmExit: async () => true,
-  view(vnode) {
+  view(vnode: m.Vnode<{ text: string; primaryButton?: string }>) {
     const alertText = vnode.attrs.text;
     const primaryButton = vnode.attrs.primaryButton || 'Continue';
 
@@ -31,18 +30,13 @@ const AlertModal = {
           <h3>{alertText}</h3>
         </div>
         <div class="compact-modal-actions">
-          <Button
-            intent="primary"
-            rounded={true}
+          <CWButton
             onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {
                 $(e.target).trigger('modalexit');
               }, 0);
-            }}
-            oncreate={(vvnode) => {
-              $(vvnode.dom).focus();
             }}
             label={primaryButton}
           />

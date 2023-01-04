@@ -1,9 +1,9 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
 import $ from 'jquery';
-import { Spinner } from 'construct-ui';
 
 import 'pages/user_dashboard/index.scss';
 
@@ -16,6 +16,7 @@ import { DashboardCommunitiesPreview } from './dashboard_communities_preview';
 import { UserDashboardRow } from './user_dashboard_row';
 import { fetchActivity, notificationsRemaining } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export enum DashboardViews {
   ForYou = 'For You',
@@ -23,7 +24,11 @@ export enum DashboardViews {
   Chain = 'Chain',
 }
 
-class UserDashboard implements m.ClassComponent<{ type: string }> {
+type UserDashboardAttrs = {
+  type: string;
+};
+
+class UserDashboard extends ClassComponent<UserDashboardAttrs> {
   private activePage: DashboardViews;
   private chainEventCount: number;
   private chainEvents: DashboardActivityNotification[];
@@ -42,10 +47,9 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
     if (tab === DashboardViews.ForYou) {
       if (this.fyNotifications.length === 0) this.loadingData = true;
       fetchActivity(tab).then((activity) => {
-        this.fyNotifications = activity.result
-          .map((notification) =>
-            DashboardActivityNotification.fromJSON(notification)
-          );
+        this.fyNotifications = activity.result.map((notification) =>
+          DashboardActivityNotification.fromJSON(notification)
+        );
         this.loadingData = false;
         m.redraw();
       });
@@ -81,7 +85,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
     this.chainEvents = [];
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<UserDashboardAttrs>) {
     const {
       activePage,
       fyNotifications,
@@ -187,7 +191,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                   }}
                 />
               </CWTabBar>
-              {loadingData && <Spinner active />}
+              {loadingData && <CWSpinner />}
             </div>
             {!loadingData && (
               <>
@@ -201,7 +205,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                         {notificationsRemaining(
                           fyNotifications.length,
                           this.fyCount
-                        ) && <Spinner active />}
+                        ) && <CWSpinner />}
                       </>
                     ) : (
                       <CWText>Join some communities to see Activity!</CWText>
@@ -219,7 +223,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                       {notificationsRemaining(
                         globalNotifications.length,
                         this.globalCount
-                      ) && <Spinner active />}
+                      ) && <CWSpinner />}
                     </>
                   ) : (
                     <CWText>No Activity</CWText>
@@ -237,7 +241,7 @@ class UserDashboard implements m.ClassComponent<{ type: string }> {
                         {notificationsRemaining(
                           chainEvents.length,
                           this.chainEventCount
-                        ) && <Spinner active />}
+                        ) && <CWSpinner />}
                       </>
                     ) : (
                       <CWText>

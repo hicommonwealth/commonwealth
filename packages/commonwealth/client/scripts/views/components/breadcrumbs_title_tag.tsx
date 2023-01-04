@@ -1,23 +1,20 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
-import { Tag } from 'construct-ui';
+type BreadcrumbsTitleTagAttrs = {
+  title: string;
+};
 
-export class BreadcrumbsTitleTag
-  implements m.ClassComponent<{ title: string }>
-{
-  view(vnode) {
+export class BreadcrumbsTitleTag extends ClassComponent<BreadcrumbsTitleTagAttrs> {
+  view(vnode: m.Vnode<BreadcrumbsTitleTagAttrs>) {
     const { title } = vnode.attrs;
 
     return (
       <>
         {title}
-        <Tag
-          size="xs"
-          label="Beta"
-          style="position: relative; top: -2px; margin-left: 6px"
-        />
+        {/* something will eventually go here once we get breadcrumbs working */}
       </>
     );
   }

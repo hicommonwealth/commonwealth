@@ -48,10 +48,12 @@ describe('Any rule tests', () => {
   });
 
   it('should pass any rule on admin subRule', async () => {
-    await models['Role'].create({
+    const communityRole = await models.CommunityRole.findOne({
+        where: { chain_id: chain, name: 'admin' },
+    });
+    await models['RoleAssignment'].create({
       address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'admin',
+      community_role_id: communityRole.id,
     });
     const rule = { AnyRule: [ [
       {
@@ -66,10 +68,12 @@ describe('Any rule tests', () => {
   });
 
   it('should pass any rule on allowList subRule', async () => {
-    await models['Role'].create({
+    const communityRole = await models.CommunityRole.findOne({
+        where: { chain_id: chain, name: 'member' },
+    });
+    await models['RoleAssignment'].create({
       address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'member',
+      community_role_id: communityRole.id,
     });
     const rule = { AnyRule: [ [
       {
@@ -84,10 +88,12 @@ describe('Any rule tests', () => {
   });
 
   it('should fail all rule', async () => {
-    await models['Role'].create({
+    const communityRole = await models.CommunityRole.findOne({
+        where: { chain_id: chain, name: 'member' },
+    });
+    await models['RoleAssignment'].create({
       address_id: loggedInAddrId,
-      chain_id: chain,
-      permission: 'member',
+      community_role_id: communityRole.id,
     });
     const rule = { AnyRule: [ [
       {

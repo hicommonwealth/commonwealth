@@ -1,9 +1,9 @@
 /* eslint-disable no-use-before-define */
 /* @jsx m */
 
-import Rule from 'client/scripts/models/Rule';
 import m from 'mithril';
 import moment from 'moment';
+import ClassComponent from 'class_component';
 
 import 'components/rules/cw_rule_card.scss';
 
@@ -25,15 +25,15 @@ type RuleDisplaySectionAttrs = {
   ruleCreatedAt: number;
   ruleUpdatedAt: number;
   ruleTypeIdentifier: string;
-  ruleArgument: Array<{
+  ruleArgument: {
     name: string;
     description: string;
     type: string;
-  }>;
+  };
   argumentIdx: number;
 };
 
-class RuleDisplaySection implements m.ClassComponent<RuleDisplaySectionAttrs> {
+class RuleDisplaySection extends ClassComponent<RuleDisplaySectionAttrs> {
   view(vnode) {
     const {
       rule,
@@ -96,15 +96,15 @@ type RulesCardAttrs = {
   rule: Record<string, unknown>;
   ruleId: number;
   chainId: string;
-  ruleCreatedAt: number;
-  ruleUpdatedAt: number;
+  ruleCreatedAt: Date;
+  ruleUpdatedAt: Date;
   ruleTypeIdentifier: string;
   adminView: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
 };
 
-export class CWRuleCard implements m.ClassComponent<RulesCardAttrs> {
+export class CWRuleCard extends ClassComponent<RulesCardAttrs> {
   private ruleMetadata: RuleMetadata;
 
   oninit(vnode) {
@@ -134,7 +134,7 @@ export class CWRuleCard implements m.ClassComponent<RulesCardAttrs> {
         <div class="header-section">
           <div class="top-section">
             <div class="title-section">
-              <CWText fontWeight={600} type="bold">
+              <CWText fontWeight="bold" type="b1">
                 {this.ruleMetadata.name}
               </CWText>
               {!isNested && (

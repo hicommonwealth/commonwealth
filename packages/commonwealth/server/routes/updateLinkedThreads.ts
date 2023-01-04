@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
+import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { AppError, ServerError } from '../util/errors';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { findAllRoles } from '../util/roles';
 
 export const Errors = {
   InsufficientPermissions:
@@ -30,9 +30,6 @@ const updateLinkedThreads = async (
     return next(new AppError(Errors.MustHaveLinkingThreadId));
   }
 
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
-
   const userOwnedAddresses = await req.user.getAddresses();
   const userOwnedAddressIds = userOwnedAddresses
     .filter((addr) => !!addr.verified)
@@ -53,12 +50,14 @@ const updateLinkedThreads = async (
         },
       });
       if (!collaboration) {
-        const requesterIsAdminOrMod = await models.Role.findAll({
-          where: {
-            address_id: { [Op.in]: userOwnedAddressIds },
-            permission: ['admin', 'moderator'],
+        const requesterIsAdminOrMod = await findAllRoles(
+          models,
+          {
+            where: { address_id: { [Op.in]: userOwnedAddressIds } },
           },
-        });
+          chain.id,
+          ['admin', 'moderator']
+        );
         if (!requesterIsAdminOrMod) {
           return next(new AppError(Errors.InsufficientPermissions));
         }
@@ -106,7 +105,8 @@ const updateLinkedThreads = async (
           as: 'topic',
         },
         {
-          model: models.ChainEntity,
+          model: models.ChainEntityMeta,
+          as: 'chain_entity_meta',
         },
         {
           model: models.Reaction,

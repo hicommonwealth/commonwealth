@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "allowJs": true,
+    "target": "esnext",
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "../build",
+    "baseUrl": ".",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "downlevelIteration": true,
+    "traceResolution": false,
+    "paths": {
+      "common-common": ["../../packages/common-common"],
+      "common-common/*": ["../../packages/common-common/*"],
+      "chain-events": ["../../packages/chain-events"],
+      "chain-events/*": ["../../packages/chain-events/*"]
+      "snapshot-listener/*": ["../../packages/snapshot-listener/*"]
+    }
+  "extends": "../../tsconfig.json",
+  "include": [
+    "src",
+  ],
+  "exclude": [
+    "./node_modules",
+    "node_modules",
+    "./test",
+    "build",
+    "dist",
+  ]
+}

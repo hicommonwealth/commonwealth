@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/rules/rule_table.scss';
 import { CWText } from '../component_kit/cw_text';
@@ -13,13 +14,13 @@ type RuleTableAttrs = {
   maxResults?: number;
 };
 
-export class CWRuleTable implements m.ClassComponent<RuleTableAttrs> {
+export class CWRuleTable extends ClassComponent<RuleTableAttrs> {
   view(vnode) {
     const { title, data, maxResults, onDelete } = vnode.attrs;
 
     return (
       <div class="RuleTable">
-        <CWText className="title" fontStyle="regular" type="caption">
+        <CWText className="title" style="regular" type="caption">
           {title}
         </CWText>
         <div class="table-section">

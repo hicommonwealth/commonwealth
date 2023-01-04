@@ -1,11 +1,7 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "jsx": "preserve",
-    "allowJs": true,
-    "target": "es6",
-    "moduleResolution": "node",
-    "module": "esnext",
-    "allowSyntheticDefaultImports": true,
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
@@ -25,9 +21,11 @@
   "include": [
     "./client",
     "./client/scripts",
-    "./shared/adapters",
+    "./shared",
     "./test",
-    "./globals.d.ts"
+    "./globals.d.ts",
+    "./server",
+    "./server.ts"
   ],
   "exclude": ["./node_modules"]
 }

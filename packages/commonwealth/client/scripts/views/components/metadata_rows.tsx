@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Select } from 'construct-ui';
+import ClassComponent from 'class_component';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
@@ -10,7 +10,7 @@ import { CWToggle } from './component_kit/cw_toggle';
 import { CWText } from './component_kit/cw_text';
 
 type InputRowAttrs = {
-  value: string;
+  value: string | number;
   disabled?: boolean;
   maxlength?: number;
   onChangeHandler: (e) => void;
@@ -19,8 +19,8 @@ type InputRowAttrs = {
   title: string;
 };
 
-export class InputRow implements m.ClassComponent<InputRowAttrs> {
-  view(vnode) {
+export class InputRow extends ClassComponent<InputRowAttrs> {
+  view(vnode: m.Vnode<InputRowAttrs>) {
     const {
       value,
       disabled,
@@ -69,14 +69,14 @@ type ToggleRowAttrs = {
   title: string;
 };
 
-export class ToggleRow implements m.ClassComponent<ToggleRowAttrs> {
+export class ToggleRow extends ClassComponent<ToggleRowAttrs> {
   checked: boolean;
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<ToggleRowAttrs>) {
     this.checked = vnode.attrs.defaultValue;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<ToggleRowAttrs>) {
     const { caption, disabled, onToggle, title } = vnode.attrs;
 
     return (
@@ -98,36 +98,10 @@ export class ToggleRow implements m.ClassComponent<ToggleRowAttrs> {
   }
 }
 
-type SelectRowAttrs = {
-  onchange: (e) => void;
-  options: string[];
-  title: string;
-  value: string;
-};
-
-export class SelectRow implements m.ClassComponent<SelectRowAttrs> {
-  view(vnode) {
-    const { onchange, options, title, value } = vnode.attrs;
-
-    return (
-      <div class="SelectRow">
-        <CWLabel label={title} />
-        <Select
-          options={options}
-          onchange={(e) => {
-            onchange((e.currentTarget as HTMLInputElement).value);
-          }}
-          defaultValue={value}
-        />
-      </div>
-    );
-  }
-}
-
 type IdRowAttrs = { id: string };
 
-export class IdRow implements m.ClassComponent<IdRowAttrs> {
-  view(vnode) {
+export class IdRow extends ClassComponent<IdRowAttrs> {
+  view(vnode: m.Vnode<IdRowAttrs>) {
     const { id } = vnode.attrs;
 
     return (

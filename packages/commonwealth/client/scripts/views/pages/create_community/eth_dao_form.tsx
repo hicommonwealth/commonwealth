@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import Web3 from 'web3';
 
@@ -16,7 +17,7 @@ import { isAddress } from 'web3-utils';
 
 import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
 import { notifyError } from 'controllers/app/notifications';
-import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
+import { IdRow, InputRow } from 'views/components/metadata_rows';
 import CompoundAPI, {
   GovernorTokenType,
   GovernorType,
@@ -40,7 +41,7 @@ import {
   EthChainAttrs,
   EthFormFields,
 } from 'views/pages/create_community/types';
-
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Aave | ChainNetwork.Compound;
@@ -51,7 +52,7 @@ type CreateEthDaoForm = ChainFormFields & EthFormFields & EthDaoFormFields;
 
 type CreateEthDaoState = ChainFormState & { form: CreateEthDaoForm };
 
-export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
+export class EthDaoForm extends ClassComponent<EthChainAttrs> {
   private state: CreateEthDaoState = {
     message: '',
     loaded: false,
@@ -72,11 +73,11 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode) {
+  oninit(vnode: m.Vnode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
@@ -140,12 +141,16 @@ export class EthDaoForm implements m.ClassComponent<EthChainAttrs> {
     return (
       <div class="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
-        <SelectRow
-          title="DAO Type"
-          options={[ChainNetwork.Aave, ChainNetwork.Compound]}
-          value={this.state.form.network}
-          onchange={(value) => {
-            this.state.form.network = value;
+        <CWDropdown
+          label="DAO Type"
+          options={[
+            { label: ChainNetwork.Aave, value: ChainNetwork.Aave },
+            { label: ChainNetwork.Compound, value: ChainNetwork.Compound },
+          ]}
+          onSelect={(o) => {
+            this.state.form.network = o.value as
+              | ChainNetwork.Aave
+              | ChainNetwork.Compound;
             this.state.loaded = false;
           }}
         />

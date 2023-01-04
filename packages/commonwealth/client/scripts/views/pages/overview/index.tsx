@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/overview/index.scss';
 
@@ -16,7 +17,28 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
 
-class OverviewPage implements m.ClassComponent {
+class OverviewPage extends ClassComponent {
+  private isWindowExtraSmall: boolean;
+
+  onResize() {
+    this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
+    m.redraw();
+  }
+
+  oninit() {
+    this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
+
+    window.addEventListener('resize', () => {
+      this.onResize();
+    });
+  }
+
+  onremove() {
+    window.removeEventListener('resize', () => {
+      this.onResize();
+    });
+  }
+
   view() {
     const allMonthlyThreads = app.threads.overviewStore.getAll();
 
@@ -54,16 +76,16 @@ class OverviewPage implements m.ClassComponent {
                 Overview
               </CWText>
               <CWButton
-                  className='latest-button'
-                  buttonType="mini"
-                  label="Latest Threads"
-                  iconName="home"
-                  onclick={() => {
-                    navigateToSubpage('/discussions');
-                  }}
-                />
+                className="latest-button"
+                buttonType="mini-black"
+                label="Latest Threads"
+                iconName="home"
+                onclick={() => {
+                  navigateToSubpage('/discussions');
+                }}
+              />
             </div>
-            {isWindowExtraSmall(window.innerWidth) ? (
+            {this.isWindowExtraSmall ? (
               <CWIconButton
                 iconName="plusCircle"
                 iconButtonTheme="black"
@@ -73,7 +95,7 @@ class OverviewPage implements m.ClassComponent {
               />
             ) : (
               <CWButton
-                buttonType="mini"
+                buttonType="mini-black"
                 label="Create Thread"
                 iconName="plus"
                 onclick={() => {

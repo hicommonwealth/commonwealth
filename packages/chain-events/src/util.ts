@@ -9,11 +9,9 @@ import {
   IEventLabel,
   IChainEventKind,
 } from './interfaces';
-import {
-  Listener as SubstrateListener,
-  Title as SubstrateTitle,
-  Label as SubstrateLabel,
-} from './chains/substrate';
+import { Listener as SubstrateListener } from './chains/substrate/Listener';
+import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
+import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
 import {
   Listener as MolochListener,
   Title as MolochTitle,
@@ -51,6 +49,7 @@ import {
 } from './chains/cosmos';
 import { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
+import { RegisteredTypes } from "@polkadot/types/types";
 
 export function Title(
   network: SupportedNetwork,
@@ -119,7 +118,7 @@ export async function createListener(
     skipCatchup?: boolean;
     startBlock?: number;
     archival?: boolean;
-    spec?: Record<string, unknown>;
+    spec?: RegisteredTypes;
     url?: string;
     enricherConfig?: any;
     pollTime?: number;

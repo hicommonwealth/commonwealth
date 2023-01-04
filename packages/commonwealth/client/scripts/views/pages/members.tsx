@@ -1,8 +1,8 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import _ from 'lodash';
-import { Spinner } from 'construct-ui';
 import $ from 'jquery';
 
 import 'pages/members.scss';
@@ -15,6 +15,7 @@ import Sublayout from 'views/sublayout';
 import { Profile } from 'models';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;
@@ -30,7 +31,7 @@ type ProfileInfo = {
   profile: Profile;
 };
 
-class MembersPage implements m.ClassComponent {
+class MembersPage extends ClassComponent {
   private initialProfilesLoaded: boolean;
   private initialScrollFinished: boolean;
   private membersLoaded: MemberInfo[];
@@ -235,7 +236,7 @@ class MembersPage implements m.ClassComponent {
                 Showing all {membersLoaded.length} community members
               </CWText>
             ) : (
-              <Spinner active size="lg" />
+              <CWSpinner size="large" />
             )}
           </div>
         </div>

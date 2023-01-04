@@ -1,13 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 
 import 'pages/manage_community/manage_roles.scss';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
-import { AddressInfo } from 'models';
+import { AddressInfo, RoleInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -15,13 +16,14 @@ import { CWLabel } from '../../components/component_kit/cw_label';
 
 type ManageRoleRowAttrs = {
   label: string;
-  onRoleUpdate?: () => void;
-  roledata?: any;
+  onRoleUpdate: (oldRole: RoleInfo, newRole: RoleInfo) => void;
+  roledata?: Array<RoleInfo>;
 };
 
-export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
-  view(vnode) {
+export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
+  view(vnode: m.Vnode<ManageRoleRowAttrs>) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
+
     const chainOrCommObj = { chain: app.activeChainId() };
     const communityMeta = app.chain.meta;
 
@@ -34,21 +36,20 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
 
             const isSelf =
               role.Address.address === app.user.activeAccount?.address &&
-              role.Address.chain === app.user.activeAccount?.chain.id;
+              role.chain_id === app.user.activeAccount?.chain.id;
 
             const roleBelongsToUser = !!app.user.addresses.filter(
               (addr_) => addr_.id === (role.address_id || role.Address.id)
             ).length;
-
             return (
               <div class="role-row">
                 {m(User, {
                   user: new AddressInfo(
                     addr.id,
                     addr.address,
-                    addr.chain,
+                    role.chain_id,
                     null,
-                    addr.wallet_id
+                    addr.walletId
                   ), // role.Address, // make AddressInfo?
                   popover: true,
                   linkify: false,
@@ -62,12 +63,14 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
                     const adminsAndMods = await communityMeta.getMembers(
                       app.activeChainId()
                     );
+
                     const userAdminsAndMods = adminsAndMods.filter((role_) => {
                       const belongsToUser = !!app.user.addresses.filter(
                         (addr_) => addr_.id === role_.address_id
                       ).length;
                       return belongsToUser;
                     });
+
                     // if (role.permission === 'admin') {
                     //   const admins = (adminsAndMods || []).filter((r) => r.permission === 'admin');
                     //   if (admins.length < 2) {
@@ -75,13 +78,16 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
                     //     return;
                     //   }
                     // }
+
                     const onlyModsRemaining = () => {
                       const modCount = userAdminsAndMods.filter(
                         (r) => r.permission === 'moderator'
                       ).length;
+
                       const remainingRoleCount = userAdminsAndMods.length - 1;
                       return modCount === remainingRoleCount;
                     };
+
                     const isLosingAdminPermissions =
                       (userAdminsAndMods.length === 1 && isSelf) ||
                       (roleBelongsToUser &&
@@ -105,6 +111,7 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
                       )();
                       if (!confirmed) return;
                     }
+
                     try {
                       const res = await $.post(
                         `${app.serverUrl()}/upgradeMember`,
@@ -115,11 +122,13 @@ export class ManageRoles implements m.ClassComponent<ManageRoleRowAttrs> {
                           jwt: app.user.jwt,
                         }
                       );
+
                       if (res.status !== 'Success') {
                         throw new Error(
                           `Got unsuccessful status: ${res.status}`
                         );
                       }
+
                       const newRole = res.result;
                       vnode.attrs.onRoleUpdate(role, newRole);
 

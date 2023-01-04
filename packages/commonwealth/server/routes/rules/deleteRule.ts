@@ -1,5 +1,5 @@
+import { AppError, ServerError } from 'common-common/src/errors';
 import { DB } from '../../models';
-import { AppError, ServerError } from '../../util/errors';
 import validateRoles from '../../util/validateRoles';
 import { TypedResponse, success, TypedRequestBody } from '../../types';
 
@@ -8,7 +8,7 @@ export const Errors = {
   NoRuleFound: 'No rule was found with specified id',
 };
 
-type DeleteRuleReq = { rule_id: number; chain_id: string; };
+type DeleteRuleReq = { rule_id: number; chain_id: string };
 type DeleteRuleResp = Record<string, never>;
 
 const deleteRule = async (
@@ -16,22 +16,24 @@ const deleteRule = async (
   req: TypedRequestBody<DeleteRuleReq>,
   res: TypedResponse<DeleteRuleResp>
 ) => {
-  const isAdmin = await validateRoles(models, req.user, 'admin', req.body.chain_id);
+  const isAdmin = await validateRoles(
+    models,
+    req.user,
+    'admin',
+    req.body.chain_id
+  );
   if (!isAdmin) {
     throw new AppError(Errors.AdminOnly);
   }
 
   try {
     const nRowsDeleted = await models.Rule.destroy({
-      where: { id: req.body.rule_id }
+      where: { id: req.body.rule_id },
     });
     if (nRowsDeleted === 0) {
-      throw new AppError(Errors.NoRuleFound)
+      throw new AppError(Errors.NoRuleFound);
     }
-    return success(
-      res,
-      {},
-    );
+    return success(res, {});
   } catch (err) {
     throw new ServerError(err);
   }

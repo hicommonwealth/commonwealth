@@ -65,23 +65,40 @@ $font-family-neue-haas-unica: neue-haas-unica, 'Segoe UI', sans-serif,
   }
 }
 
-@mixin header {
-  font-family: $fonts;
-  font-style: normal;
-  font-weight: 500;
+@mixin contentPadding {
+  padding: 56px;
+
+  @include medium {
+    padding: 40px;
+  }
+
+  @include mediumSmall {
+    padding: 32px;
+  }
+
+  @include smallInclusive {
+    padding: 24px;
+  }
 }
 
-h1 {
-  @include header;
-  font-size: 48px;
-}
-
-h2 {
-  @include header;
-  font-size: 32px;
-}
-
-h3 {
-  @include header;
-  font-size: 24px;
+@mixin flame($size: medium) {
+  @if $size == small {
+    .flame::after {
+      content: '\1F525';
+      display: block;
+      font-size: 14px;
+    }
+  } @else if $size == medium {
+    .flame::after {
+      content: '\1F525';
+      display: block;
+      font-size: 22px;
+    }
+  } @else if $size == large {
+    .flame::after {
+      content: '\1F525';
+      display: block;
+      font-size: 30px;
+    }
+  }
 }

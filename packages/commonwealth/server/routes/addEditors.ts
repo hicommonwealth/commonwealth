@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
-import { getProposalUrl } from '../../shared/utils';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import { AppError } from 'common-common/src/errors';
+import { findOneRole } from '../util/roles';
+import validateChain from '../middleware/validateChain';
+import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
-import { AppError, ServerError } from '../util/errors';
+import emitNotifications from '../util/emitNotifications';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -32,8 +33,7 @@ const addEditors = async (
   }
   const [chain, error] = await validateChain(models, req.body);
   if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+  const author = req.address;
 
   const userOwnedAddressIds = (await req.user.getAddresses())
     .filter((addr) => !!addr.verified)
@@ -50,7 +50,7 @@ const addEditors = async (
     Object.values(editors).map((editor: any) => {
       return models.Address.findOne({
         where: { id: editor.id },
-        include: [models.Role, models.User],
+        include: [models.RoleAssignment, models.User],
       });
     })
   );
@@ -71,12 +71,15 @@ const addEditors = async (
     });
     await Promise.all(
       uniqueCollaborators.map(async (collaborator) => {
-        if (!collaborator.Roles || !collaborator.User) {
+        if (!collaborator.RoleAssignments || !collaborator.User) {
           return null;
         }
-        const isMember = collaborator.Roles.find(
-          (role) => role.chain_id === chain.id
+        const isMember = await findOneRole(
+          models,
+          { where: { address_id: collaborator.id } },
+          chain.id
         );
+
         if (!isMember) throw new AppError(Errors.InvalidEditor);
 
         await models.Collaboration.findOrCreate({
@@ -122,7 +125,7 @@ const addEditors = async (
     collaborators.map((collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-      models.Subscription.emitNotifications(
+      emitNotifications(
         models,
         NotificationCategories.NewCollaboration,
         `user-${collaborator.User.id}`,
@@ -144,12 +147,10 @@ const addEditors = async (
           chain: thread.chain,
           body: thread.body,
         },
-        req.wss,
         [author.address]
       );
     });
   }
-
 
   const finalCollaborations = await models.Collaboration.findAll({
     where: { thread_id: thread.id },

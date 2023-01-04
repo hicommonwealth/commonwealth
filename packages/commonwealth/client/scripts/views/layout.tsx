@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { EmptyState, Icons, Spinner } from 'construct-ui';
+import ClassComponent from 'class_component';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
@@ -17,12 +17,17 @@ import { AppToasts } from 'views/toast';
 import { PageNotFound } from 'views/pages/404';
 import { AppModals } from './app_modals';
 import { UserSurveyPopup } from './components/user_survey_popup';
+import { CWSpinner } from './components/component_kit/cw_spinner';
+import { CWEmptyState } from './components/component_kit/cw_empty_state';
+import { CWText } from './components/component_kit/cw_text';
 
-class LoadingLayout implements m.ClassComponent {
+class LoadingLayout extends ClassComponent {
   view() {
     return (
       <div class="Layout">
-        <Spinner active={true} fill={true} size="xl" />
+        <div class="spinner-container">
+          <CWSpinner size="xl" />
+        </div>
         <AppModals />
         <AppToasts />
       </div>
@@ -36,14 +41,14 @@ type LayoutAttrs = {
   scope: string;
 };
 
-export class Layout implements m.ClassComponent<LayoutAttrs> {
+export class Layout extends ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
 
-  view(vnode) {
-    const { scope, deferChain, hideSidebar } = vnode.attrs;
+  view(vnode: m.Vnode<LayoutAttrs>) {
+    const { scope, deferChain } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
@@ -59,17 +64,16 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
     if (app.loadingError) {
       return (
         <div class="Layout">
-          <EmptyState
-            fill={true}
-            icon={Icons.ALERT_TRIANGLE}
+          <CWEmptyState
+            iconName="cautionTriangle"
             content={
               <div class="loading-error">
-                <p>Application error: {app.loadingError}</p>
-                <p>Please try again later</p>
+                <CWText>Application error: {app.loadingError}</CWText>
+                <CWText>Please try again later</CWText>
               </div>
             }
           />
-          <AppModals />,
+          <AppModals />
           <AppToasts />
         </div>
       );
@@ -125,7 +129,7 @@ export class Layout implements m.ClassComponent<LayoutAttrs> {
       return <LoadingLayout />;
     }
     return (
-      <div class={`Layout${hideSidebar ? ' hide-sidebar' : ''}`}>
+      <div class="Layout">
         {vnode.children}
         <AppModals />
         <AppToasts />

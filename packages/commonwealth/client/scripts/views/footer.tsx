@@ -1,12 +1,14 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'footer.scss';
 
 import { isNotUndefined } from '../helpers/typeGuards';
 
 const footercontents = [
+  { text: 'About', redirectTo: '/whyCommonwealth' },
   { text: 'Blog', externalLink: 'https://blog.commonwealth.im' },
   {
     text: 'Jobs',
@@ -25,7 +27,7 @@ const footercontents = [
   },
 ];
 
-export class Footer implements m.ClassComponent {
+export class Footer extends ClassComponent {
   view() {
     const redirectClick = (route) => {
       m.route.set(route);

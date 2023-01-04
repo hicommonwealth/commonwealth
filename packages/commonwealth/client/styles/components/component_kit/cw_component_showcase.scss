@@ -1,42 +1,38 @@
 @import 'shared';
 
-$margin-bottom: 32px;
 $width: 360px;
 
 .ComponentShowcase {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
   padding: 24px;
   width: 100%;
-
-  h1 {
-    margin-bottom: 16px;
-  }
 
   .progress-gallery {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-bottom: $margin-bottom;
+    gap: 8px;
     width: 400px;
   }
 
   .basic-gallery {
     display: flex;
     flex-direction: column;
-    margin-bottom: $margin-bottom;
-    gap: 16px;
+    gap: 8px;
+    width: $width;
   }
 
   .tooltip-gallery {
     display: flex;
     flex-direction: column;
-    margin-bottom: $margin-bottom;
+    gap: 8px;
 
     .tooltip-row {
       align-items: center;
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      margin-bottom: 8px;
       width: 240px;
 
       .Icon {
@@ -49,7 +45,7 @@ $width: 360px;
     display: flex;
     flex-direction: column;
     gap: 16px;
-    margin-bottom: $margin-bottom;
+    margin-bottom: 32px;
     width: 700px;
   }
 
@@ -75,7 +71,6 @@ $width: 360px;
   .icon-gallery {
     display: flex;
     flex-direction: column;
-    margin-bottom: $margin-bottom;
     width: 100%;
 
     .all-icons-container {
@@ -115,10 +110,7 @@ $width: 360px;
   .icon-button-gallery {
     display: flex;
     flex-direction: column;
-
-    .icon-button-subheader {
-      margin-bottom: 8px;
-    }
+    gap: 8px;
 
     .icon-button-row {
       align-items: center;
@@ -135,42 +127,41 @@ $width: 360px;
   }
 
   .button-gallery {
-    align-items: center;
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     gap: 8px;
-    margin-bottom: $margin-bottom;
+
+    .button-row {
+      align-items: center;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
   }
 
   .choice-gallery {
     display: flex;
     flex-direction: column;
-    margin-bottom: 24px;
-
-    .RadioButton,
-    .Checkbox {
-      margin-bottom: 8px;
-    }
+    gap: 8px;
   }
 
   .card-gallery {
     display: flex;
     flex-direction: column;
-    margin-bottom: $margin-bottom;
+    gap: 8px;
     width: 100%;
 
     .top-card-row {
       display: flex;
       flex-direction: row;
       justify-content: space-between;
-      margin-bottom: 16px;
     }
   }
 
   .form-gallery {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 8px;
     width: $width;
   }
 }

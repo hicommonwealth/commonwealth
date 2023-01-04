@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'pages/terms_banner.scss';
 
@@ -8,8 +9,10 @@ import app from 'state';
 import { CWBanner } from './component_kit/cw_banner';
 import { CWText } from './component_kit/cw_text';
 
-export class TermsBanner implements m.ClassComponent<{ terms: string }> {
-  view(vnode) {
+type TermsBannerAttrs = { terms: string };
+
+export class TermsBanner extends ClassComponent<TermsBannerAttrs> {
+  view(vnode: m.Vnode<TermsBannerAttrs>) {
     const { terms } = vnode.attrs;
 
     return (

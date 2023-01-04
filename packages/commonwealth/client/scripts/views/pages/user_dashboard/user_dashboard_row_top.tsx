@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -18,10 +19,8 @@ type UserDashboardRowTopAttrs = {
   category: string;
 };
 
-export class UserDashboardRowTop
-  implements m.ClassComponent<UserDashboardRowTopAttrs>
-{
-  view(vnode) {
+export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs> {
+  view(vnode: m.Vnode<UserDashboardRowTopAttrs>) {
     const { commentCount } = vnode.attrs.activityData;
 
     const {

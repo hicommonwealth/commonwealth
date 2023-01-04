@@ -4,3 +4,6 @@ src/eth/cache
 
 # Ethereum contracts
 contractbase/eth/build
+
+.env
+.DS_Store

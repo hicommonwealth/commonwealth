@@ -12,6 +12,9 @@ class Account {
 
   // validation token sent by server
   private _validationToken?: string;
+  // block that the client is signing, in order to validate login to the server
+  private _validationBlockInfo?: string;
+
   private _addressId?: number;
   private _walletId?: WalletId;
 
@@ -27,6 +30,7 @@ class Account {
     addressId,
     walletId,
     validationToken,
+    validationBlockInfo,
     profile,
     ignoreProfile,
   }: {
@@ -38,6 +42,7 @@ class Account {
     addressId?: number;
     walletId?: WalletId;
     validationToken?: string;
+    validationBlockInfo?: string;
     profile?: Profile;
 
     // flags
@@ -51,6 +56,7 @@ class Account {
     this._addressId = addressId;
     this._walletId = walletId;
     this._validationToken = validationToken;
+    this._validationBlockInfo = validationBlockInfo;
     this.ghostAddress = !!ghostAddress;
     if (profile) {
       this._profile = profile;
@@ -80,8 +86,15 @@ class Account {
     this._validationToken = token;
   }
 
+  get validationBlockInfo() {
+    return this._validationBlockInfo;
+  }
+  public setValidationBlockInfo(token: string) {
+    this._validationBlockInfo = token;
+  }
+
   public async validate(signature: string) {
-    if (!this._validationToken) {
+    if (!this._validationToken && !this._validationBlockInfo) {
       throw new Error('no validation token found');
     }
     if (!signature) {
@@ -95,6 +108,10 @@ class Account {
       jwt: app.user.jwt,
       signature,
       wallet_id: this.walletId,
+      session_public_address: app.sessions.getAddress(
+        this.chain.node?.ethChainId || 1
+      ),
+      session_block_data: this.validationBlockInfo,
     };
     const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {

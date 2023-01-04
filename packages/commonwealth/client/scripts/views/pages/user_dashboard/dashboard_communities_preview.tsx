@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Tag } from 'construct-ui';
+import ClassComponent from 'class_component';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
@@ -13,14 +13,12 @@ import { CWCommunityAvatar } from '../../components/component_kit/cw_community_a
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 
-const getNewTag = (labelCount?: number) => {
-  const label = !labelCount ? 'New' : `${labelCount} new`;
-
-  return <Tag label={label} size="xs" rounded intent="primary" />;
+type CommunityPreviewCardAttrs = {
+  chain: ChainInfo;
 };
 
-class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
-  view(vnode) {
+class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
+  view(vnode: m.Vnode<CommunityPreviewCardAttrs>) {
     const { chain } = vnode.attrs;
     const { unseenPosts } = app.user;
     const visitedChain = !!unseenPosts[chain.id];
@@ -58,8 +56,14 @@ class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
             </CWText>
             {isMember && (
               <>
-                {app.isLoggedIn() && !visitedChain && getNewTag()}
-                {updatedThreads > 0 && getNewTag(updatedThreads)}
+                {app.isLoggedIn() && !visitedChain && (
+                  <CWText className="new-activity-tag">New</CWText>
+                )}
+                {updatedThreads > 0 && (
+                  <CWText className="new-activity-tag">
+                    {updatedThreads} new
+                  </CWText>
+                )}
               </>
             )}
           </>
@@ -69,7 +73,7 @@ class CommunityPreviewCard implements m.ClassComponent<{ chain: ChainInfo }> {
   }
 }
 
-export class DashboardCommunitiesPreview implements m.ClassComponent {
+export class DashboardCommunitiesPreview extends ClassComponent {
   view() {
     const sortedChains = app.config.chains
       .getAll()

@@ -71,6 +71,7 @@ export const iconLookup = {
   trash: Icons.CWTrash,
   treasuryProposal: Icons.CWTreasuryProposal,
   twitter: Icons.CWTwitter,
+  unsubscribe: Icons.CWUnsubscribe,
   upvote: Icons.CWUpvote,
   views: Icons.CWViews,
   wallet: Icons.CWWallet,
@@ -81,6 +82,7 @@ export const iconLookup = {
 export const customIconLookup = {
   'keplr-ethereum': CustomIcons.CWKeplr,
   'cosm-metamask': CustomIcons.CWCosmosEvmMetamask,
+  invites: CustomIcons.CWInvites,
   keplr: CustomIcons.CWKeplr,
   magic: CustomIcons.CWMagic,
   metamask: CustomIcons.CWMetaMask,
@@ -88,9 +90,10 @@ export const customIconLookup = {
   phantom: CustomIcons.CWPhantom,
   polkadot: CustomIcons.CWPolkadot,
   ronin: CustomIcons.CWRonin,
-  terrastation: CustomIcons.CWTerraStation,
+  terrastation: CustomIcons.CWTerraStation2,
   unreads: CustomIcons.CWUnreads,
   walletconnect: CustomIcons.CWWalletConnect,
+  'terra-walletconnect': CustomIcons.CWWalletConnect,
 };
 
 export type IconName = keyof typeof iconLookup;

@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 import app from 'state';
 import { handleRedirectClicks } from 'helpers';
 import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
@@ -28,7 +29,7 @@ function setAdminToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class AdminSection implements m.ClassComponent<SidebarSectionAttrs> {
+export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
   private editTopicThresholdsModalActive: boolean;
   private orderTopicsModalActive: boolean;
   private newTopicModalActive: boolean;

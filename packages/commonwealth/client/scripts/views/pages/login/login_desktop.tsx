@@ -1,7 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
-import { Spinner } from 'construct-ui';
+import ClassComponent from 'class_component';
 
 import 'pages/login/login_desktop.scss';
 
@@ -20,9 +20,10 @@ import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
 import { LoginAttrs } from './types';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
-export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
-  view(vnode) {
+export class LoginDesktop extends ClassComponent<LoginAttrs> {
+  view(vnode: m.Vnode<LoginAttrs>) {
     const {
       address,
       bodyType,
@@ -122,7 +123,7 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                   onenterkey={handleEmailLoginCallback}
                 />
               ) : (
-                <Spinner active={true} size="xl" position="inherit" />
+                <CWSpinner />
               )}
               <div class="buttons-row">
                 <CWButton
@@ -181,10 +182,6 @@ export class LoginDesktop implements m.ClassComponent<LoginAttrs> {
                 </CWText>
               </div>
               <CWWalletsList
-                connectAnotherWayOnclick={() => {
-                  // sidebarType = 'ethWallet';
-                  // bodyType = 'connectWithEmail';
-                }}
                 setSelectedWallet={setSelectedWallet}
                 hasNoWalletsLink={false}
                 wallets={wallets}

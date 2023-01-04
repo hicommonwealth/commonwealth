@@ -1,14 +1,15 @@
 /* @jsx m */
 
 import m from 'mithril';
+import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_wallet_option_row.scss';
 
-import { WalletId } from 'common-common/src/types';
 import { ComponentType } from './types';
 import { CWText } from './cw_text';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
 import { getClasses } from './helpers';
+import { CustomIconName } from './cw_icons/cw_icon_lookup';
 
 type WalletOptionRowStyleAttrs = {
   disabled?: boolean;
@@ -17,19 +18,19 @@ type WalletOptionRowStyleAttrs = {
 
 type WalletOptionRowAttrs = {
   onclick?: () => void;
-  walletName: string;
-  walletLabel: string;
+  walletName: CustomIconName;
+  walletLabel?: string;
 } & WalletOptionRowStyleAttrs;
 
-const getWalletKeyFromValue = (value: string) => {
-  return Object.entries(WalletId).find(([_, val]) => val === value)?.[0];
-};
-
-export class CWWalletOptionRow
-  implements m.ClassComponent<WalletOptionRowAttrs>
-{
-  view(vnode) {
-    const { disabled = false, darkMode, onclick, walletName, walletLabel } = vnode.attrs;
+export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
+  view(vnode: m.Vnode<WalletOptionRowAttrs>) {
+    const {
+      disabled = false,
+      darkMode,
+      onclick,
+      walletName,
+      walletLabel,
+    } = vnode.attrs;
     return (
       <div
         class={getClasses<WalletOptionRowStyleAttrs>(
