@@ -3,6 +3,7 @@ import { oneOf, query, validationResult } from "express-validator";
 import { formatPaginationNoSort } from '../../util/queries';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
+import { paginationValidation } from '../../util/helperValidations';
 
 export const getCommunitiesValidation = [
   oneOf([
@@ -13,6 +14,7 @@ export const getCommunitiesValidation = [
     query('addresses').exists().toArray(),
   ], `${needParamErrMsg} (community_id, network, comment_id, address_ids, addresses)`),
   query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
 ];
 
 const getCommunities = async (

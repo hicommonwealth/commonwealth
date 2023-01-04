@@ -1,8 +1,13 @@
-import { body } from "express-validator";
+import { body, query } from 'express-validator';
 
 export const onlyIds = [
   body('ids').exists().isArray(),
   body('ids.*').exists().toInt()
+];
+
+export const paginationValidation = [
+  query('limit').optional().isNumeric(),
+  query('page').optional().isNumeric(),
 ];
 
 export const putCommentsValidation = [

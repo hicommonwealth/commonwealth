@@ -3,10 +3,12 @@ import { query, validationResult } from 'express-validator';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
+import { paginationValidation } from '../../util/helperValidations';
 
 export const getTopicsValidation = [
   query('community_id').isString().trim(),
-  query('count_only').optional().isBoolean().toBoolean()
+  query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
 ];
 
 export const getTopics = async (
@@ -30,7 +32,7 @@ export const getTopics = async (
       ...formatPagination(req.query)
     }));
   } else {
-    count = <any>await models.Topic.count({
+    count = await models.Topic.count({
       where,
       ...formatPagination(req.query)
     });

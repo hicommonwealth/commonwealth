@@ -4,13 +4,15 @@ import { query, validationResult } from 'express-validator';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
+import { paginationValidation } from '../../util/helperValidations';
 
 const { Op } = Sequelize;
 
 export const getRolesValidation = [
   query('community_id').isString().trim(),
   query('addresses').optional().toArray(),
-  query('count_only').optional().isBoolean().toBoolean()
+  query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
 ];
 
 export const getRoles = async (
@@ -42,7 +44,7 @@ export const getRoles = async (
       ...formatPagination(req.query)
     }));
   } else {
-    count = <any>await models.Role.count({
+    count = await models.Role.count({
       where,
       include,
       ...formatPagination(req.query)

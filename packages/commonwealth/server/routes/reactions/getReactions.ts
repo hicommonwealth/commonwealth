@@ -4,6 +4,7 @@ import { GetReactionsReq, GetReactionsResp } from 'common-common/src/api/extApiT
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
+import { paginationValidation } from '../../util/helperValidations';
 
 const { Op } = Sequelize;
 
@@ -14,6 +15,7 @@ export const getReactionsValidation = [
   query('address_ids').optional().toArray(),
   query('addresses').optional().toArray(),
   query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
 ];
 
 const getReactions = async (
@@ -28,6 +30,7 @@ const getReactions = async (
   const { community_id, comment_id, addresses, count_only } = req.query;
 
   const where = { chain: community_id };
+  if (comment_id) where['comment_id'] = comment_id;
 
   const include = [];
   if (addresses) include.push({
@@ -38,14 +41,25 @@ const getReactions = async (
 
   const pagination = formatPagination(req.query);
 
-  const { rows: reactions, count } = await models.Reaction.findAndCountAll({
-      where,
-      include,
-      ...pagination
-    }
-  );
+  let reactions, count;
 
-  return success(res, { reactions: reactions.map((c) => c.toJSON()), count });
+  if (!count_only) {
+    ({ rows: reactions, count } = await models.Reaction.findAndCountAll({
+        where,
+        include,
+        ...pagination
+      }
+    ));
+  } else {
+    count = await models.Reaction.count({
+        where,
+        include,
+        ...pagination
+      }
+    );
+  }
+
+  return success(res, { reactions, count });
 };
 
 export default getReactions;

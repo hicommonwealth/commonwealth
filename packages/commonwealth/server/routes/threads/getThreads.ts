@@ -4,18 +4,19 @@ import { query, validationResult } from 'express-validator';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
+import { paginationValidation } from '../../util/helperValidations';
 
 const { Op } = Sequelize;
 
 export const getThreadsValidation = [
   query('community_id').isString().trim(),
   query('topic_id').optional().isNumeric(),
-  query('count_only').optional().isBoolean().toBoolean(),
   query('address_ids').optional().toArray(),
   query('addresses').optional().toArray(),
   query('no_body').optional().isBoolean().toBoolean(),
   query('include_comments').optional().isBoolean().toBoolean(),
   query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
 ];
 
 export const getThreads = async (
@@ -59,7 +60,7 @@ export const getThreads = async (
       ...pagination
     }));
   } else {
-    count = <any>await models.Thread.count({
+    count = await models.Thread.count({
       where,
       include,
       attributes,
