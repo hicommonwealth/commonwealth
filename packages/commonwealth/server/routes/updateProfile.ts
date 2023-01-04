@@ -6,7 +6,6 @@ import {
   PROFILE_NAME_MIN_CHARS,
 } from '../../shared/types';
 import { DB } from '../models';
-import validateChain from '../util/validateChain';
 import { AppError } from 'common-common/src/errors';
 
 export const Errors = {
@@ -21,13 +20,14 @@ export const Errors = {
 };
 
 const updateProfile = async (
-  models: DB, req: Request, res: Response, next: NextFunction
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new AppError(Errors.MissingParams));
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
 
   let unpackedData;
   try {
@@ -59,9 +59,15 @@ const updateProfile = async (
   // enforce max chars
   if (unpackedData.name && unpackedData.name.length > PROFILE_NAME_MAX_CHARS) {
     return next(new AppError(Errors.NameTooLong));
-  } else if (unpackedData.headline && unpackedData.headline.length > PROFILE_HEADLINE_MAX_CHARS) {
+  } else if (
+    unpackedData.headline &&
+    unpackedData.headline.length > PROFILE_HEADLINE_MAX_CHARS
+  ) {
     return next(new AppError(Errors.HeadlineTooLong));
-  } else if (unpackedData.bio && unpackedData.bio.length > PROFILE_BIO_MAX_CHARS) {
+  } else if (
+    unpackedData.bio &&
+    unpackedData.bio.length > PROFILE_BIO_MAX_CHARS
+  ) {
     return next(new AppError(Errors.BioTooLong));
   }
 
@@ -69,7 +75,7 @@ const updateProfile = async (
   let profile = await models.OffchainProfile.findOne({
     where: {
       address_id: address.id,
-    }
+    },
   });
 
   if (!profile) {
@@ -83,16 +89,22 @@ const updateProfile = async (
   }
 
   if (unpackedData.name) {
-    await models.Address.update({
-      name: unpackedData.name
-    }, {
-      where: {
-        id: address.id,
+    await models.Address.update(
+      {
+        name: unpackedData.name,
+      },
+      {
+        where: {
+          id: address.id,
+        },
       }
-    });
+    );
   }
 
-  return res.json({ status: 'Success', result: { profile, updatedProfileAddress: address } });
+  return res.json({
+    status: 'Success',
+    result: { profile, updatedProfileAddress: address },
+  });
 };
 
 export default updateProfile;

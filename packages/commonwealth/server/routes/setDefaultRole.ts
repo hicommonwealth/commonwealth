@@ -1,6 +1,5 @@
 import Sequelize, { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
@@ -17,8 +16,7 @@ const setDefaultRole = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.address || !req.body.author_chain)
     return next(new AppError(Errors.InvalidAddress));
@@ -45,7 +43,7 @@ const setDefaultRole = async (
       address_id: validAddress.id,
       community_role_id: existingRole.toJSON().community_role_id,
     },
-  })
+  });
 
   validAddress.last_active = new Date();
   await validAddress.save();

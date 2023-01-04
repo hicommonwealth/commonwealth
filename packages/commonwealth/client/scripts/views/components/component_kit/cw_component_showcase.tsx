@@ -13,10 +13,9 @@ import { CWTextInput } from './cw_text_input';
 import { iconLookup, IconName } from './cw_icons/cw_icon_lookup';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
-import { CWRadioButton } from './cw_radio_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import { CWCheckbox } from './cw_checkbox';
+import { CheckboxType, CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
 import { ValidationStatus } from './cw_validation_text';
@@ -29,9 +28,11 @@ import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
 import { CWBreadcrumbs } from './cw_breadcrumbs';
 import { CWTag } from './cw_tag';
+import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import CWCoverImageUploader from './cw_cover_image_uploader';
+import { RadioButtonType, CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
 
 const displayIcons = (icons) => {
@@ -45,15 +46,39 @@ const displayIcons = (icons) => {
   });
 };
 
-const radioGroupOptions = [
+const radioGroupOptions: Array<RadioButtonType> = [
   { label: 'This', value: 'This' },
   { label: 'Is', value: 'Is' },
   { label: 'A', value: 'A' },
   { label: 'Radio', value: 'Radio' },
   { label: 'Group', value: 'Group' },
 ];
+
+const checkboxGroupOptions: Array<CheckboxType> = [
+  {
+    label: 'Discussion',
+    value: 'discussion',
+  },
+  {
+    label: 'Pre Voting',
+    value: 'preVoting',
+  },
+  {
+    label: 'In Voting',
+    value: 'inVoting',
+  },
+  {
+    label: 'Passed',
+    value: 'passed',
+  },
+  {
+    label: 'Failed',
+    value: 'failed',
+  },
+];
 export class ComponentShowcase extends ClassComponent {
   private checkboxChecked: boolean;
+  private checkboxGroupSelected: Array<string>;
   private radioButtonChecked: boolean;
   private radioGroupSelection: string;
   private selectedIconButton: number;
@@ -65,11 +90,34 @@ export class ComponentShowcase extends ClassComponent {
     this.radioGroupSelection = radioGroupOptions[2].value;
     this.selectedTab = 1;
     this.voteCount = 0;
+    this.checkboxGroupSelected = [];
   }
 
   view() {
+    // console.log(this.checkboxGroupSelected);
     return (
       <div class="ComponentShowcase">
+        {/* <div class="basic-gallery">
+          <CWText type="h4">Filter Menu</CWText>
+          <CWFilterMenu
+            header="Stages"
+            filterMenuItems={checkboxGroupOptions}
+            selectedItems={this.checkboxGroupSelected}
+            onchange={(e) => {
+              const itemValue = e.target.value;
+              // console.log(itemValue);
+              if (this.checkboxGroupSelected.indexOf(itemValue) === -1) {
+                this.checkboxGroupSelected.push(itemValue);
+                // m.redraw();
+              } else {
+                this.checkboxGroupSelected = this.checkboxGroupSelected.filter(
+                  (item) => item !== itemValue
+                );
+                // m.redraw();
+              }
+            }}
+          />
+        </div> */}
         <div class="basic-gallery">
           <CWText type="h4">Content Page Card</CWText>
           <CWContentPageCard
@@ -81,17 +129,16 @@ export class ComponentShowcase extends ClassComponent {
             }
           />
         </div>
-        <h1>Dropdown</h1>
         <div class="form-gallery">
+          <CWText type="h4">Dropdown</CWText>
           <CWDropdown
-            inputOptions={[
-              { label: 'Dropdown Option 1' },
-              { label: 'Dropdown Option 2' },
-              { label: 'Dropdown Option 3' },
+            label="Dropdown"
+            options={[
+              { label: 'Dropdown Option 1', value: 'dropdownOption1' },
+              { label: 'Dropdown Option 2', value: 'dropdownOption2' },
+              { label: 'Dropdown Option 3', value: 'dropdownOption3' },
             ]}
-            onSelect={(optionLabel) =>
-              console.log('Selected option: ', optionLabel)
-            }
+            onSelect={(item) => console.log('Selected option: ', item.label)}
           />
         </div>
         <div class="basic-gallery">
@@ -112,9 +159,12 @@ export class ComponentShowcase extends ClassComponent {
         <div class="basic-gallery">
           <CWText type="h3">Tag</CWText>
           <CWTag label="Ref #90" />
-          <CWTag label="Passed" status="passed" />
-          <CWTag label="Failed" status="failed" />
-          <CWTag label="Active" status="active" />
+          <CWTag label="Passed" type="passed" />
+          <CWTag label="Failed" type="failed" />
+          <CWTag label="Active" type="active" />
+          <CWTag label="Poll" type="poll" />
+          <CWTag label="Prop #52" type="proposal" />
+          <CWTag label="Ref #90" type="referendum" />
           <CWTag label="12 days" iconName="clock" />
         </div>
         <div class="basic-gallery">
@@ -385,8 +435,8 @@ export class ComponentShowcase extends ClassComponent {
             placeholder="Type here"
           />
           <CWTextInput
-            label="Text field with icon"
-            name="Text field with icon"
+            label="Text field with icons"
+            name="Text field with icons"
             placeholder="Type here"
             iconRight="write"
           />
@@ -555,18 +605,37 @@ export class ComponentShowcase extends ClassComponent {
           <div class="button-row">
             <CWButton
               iconName="person"
-              buttonType="mini"
+              buttonType="mini-black"
               label="Mini with icon"
               onclick={() => notifySuccess('Button clicked!')}
             />
             <CWButton
               label="Mini"
-              buttonType="mini"
+              buttonType="mini-black"
               onclick={() => notifySuccess('Button clicked!')}
             />
             <CWButton
               label="Mini Disabled"
-              buttonType="mini"
+              buttonType="mini-black"
+              disabled
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+          </div>
+          <div class="button-row">
+            <CWButton
+              iconLeft="person"
+              buttonType="mini-white"
+              label="Mini white with icons"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Mini white"
+              buttonType="mini-white"
+              onclick={() => notifySuccess('Button clicked!')}
+            />
+            <CWButton
+              label="Mini white disabled"
+              buttonType="mini-white"
               disabled
               onclick={() => notifySuccess('Button clicked!')}
             />

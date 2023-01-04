@@ -1,5 +1,5 @@
 import chai from 'chai';
-import {ServiceConsumer} from "common-common/src/ServiceConsumer";
+import {ServiceConsumer} from "common-common/src/serviceConsumer";
 import {getQueueStats, publishRmqMsg} from "common-common/src/rabbitmq/util";
 import {
   RascalExchanges,
@@ -144,7 +144,8 @@ describe("Tests for the commonwealth-app consumer", () => {
     const entity: RmqEntityCUD.RmqMsgType = {
       ce_id: maxEntityId + 1,
       chain_id: 'aave',
-      cud: 'create'
+      cud: 'create',
+      entity_type_id: '123',
     }
 
     const publishJson = await publishRmqMsg(

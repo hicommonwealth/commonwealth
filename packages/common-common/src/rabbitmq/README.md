@@ -1,6 +1,29 @@
 # Using RabbitMQ
+
+## Locally via Docker
+- Simply run `yarn start-rmq` from the root of the repo. This will download and run a rabbitmq image on your local machine inside a docker container. Make sure you have docker installed locally before running and that rabbitmq, as configured below, is NOT running simultaneously.
+
 ## Locally
 ### Installation
+
+- You can install and run RabbitMQ with just one command:
+
+Prerequisite: Docker installed and running. 
+
+Then run 
+```
+docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management
+```
+This will install and run RabbitMQ in a docker container, exposing it on your local port `15672`.
+Running this command a second time will not reinstall it, but just spin up the container. 
+
+To check its running you can go to `http://localhost:15672` in your browser. 
+Login to the dasboard with username: `guest` password: `guest`
+
+NB: If running with docker, the instance running on your machine is at `amqp://localhost`
+
+If not using Docker, follow the steps below:
+
 - Follow instructions at https://www.rabbitmq.com/install-debian.html#apt to install Erlang and RabbitMQ make sure to install for the correct linux distribution!
 
 ### RabbitMQ Server Commands (stops erlang + rabbitmq)

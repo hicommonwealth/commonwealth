@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../util/validateChain';
 import { DB } from '../models';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
@@ -20,8 +18,7 @@ const updateLinkedThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   const { linked_thread_id, linking_thread_id, remove_link } = req.body;
   if (!linked_thread_id) {
@@ -30,9 +27,6 @@ const updateLinkedThreads = async (
   if (!linking_thread_id) {
     return next(new AppError(Errors.MustHaveLinkingThreadId));
   }
-
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
 
   const userOwnedAddresses = await req.user.getAddresses();
   const userOwnedAddressIds = userOwnedAddresses
@@ -110,7 +104,7 @@ const updateLinkedThreads = async (
         },
         {
           model: models.ChainEntityMeta,
-          as: 'chain_entity_meta'
+          as: 'chain_entity_meta',
         },
         {
           model: models.Reaction,

@@ -21,6 +21,7 @@ export enum ComponentType {
   ExternalLink = 'ExternalLink',
   Form = 'Form',
   FormSection = 'FormSection',
+  FilterMenu = 'FilterMenu',
   GradientButton = 'GradientButton',
   Growl = 'Growl',
   Icon = 'Icon',

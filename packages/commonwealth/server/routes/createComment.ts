@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { Request, Response, NextFunction } from 'express';
 import {
+  ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
@@ -11,8 +12,6 @@ import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 
-import validateChain from '../util/validateChain';
-import lookupAddressIsOwnedByUser from '../util/lookupAddressIsOwnedByUser';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
@@ -29,6 +28,7 @@ import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
+import emitNotifications from '../util/emitNotifications';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -56,10 +56,9 @@ const createComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-  const [author, authorError] = await lookupAddressIsOwnedByUser(models, req);
-  if (authorError) return next(new AppError(authorError));
+  const chain = req.chain;
+
+  const author = req.address;
 
   const { parent_id, root_id, chain_entity_id, text } = req.body;
 
@@ -136,7 +135,10 @@ const createComment = async (
     }
   }
 
-  if (chain && chain.type === ChainType.Token) {
+  if (
+    chain &&
+    (chain.type === ChainType.Token || chain.network === ChainNetwork.Ethereum)
+  ) {
     // skip check for admins
     const isAdmin = await findAllRoles(
       models,
@@ -335,7 +337,7 @@ const createComment = async (
   excludedAddrs.push(finalComment.Address.address);
 
   // dispatch notifications to root thread
-  models.Subscription.emitNotifications(
+  emitNotifications(
     models,
     NotificationCategories.NewComment,
     root_id,
@@ -363,7 +365,7 @@ const createComment = async (
 
   // if child comment, dispatch notification to parent author
   if (parent_id && parentComment) {
-    models.Subscription.emitNotifications(
+    emitNotifications(
       models,
       NotificationCategories.NewComment,
       `comment-${parent_id}`,
@@ -399,7 +401,7 @@ const createComment = async (
 
       const shouldNotifyMentionedUser = true;
       if (shouldNotifyMentionedUser)
-        models.Subscription.emitNotifications(
+        emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,

@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { AppError, ServerError } from 'common-common/src/errors';
-import validateChain from '../util/validateChain';
 import { DB } from '../models';
 
 const getThreads = async (
@@ -10,15 +9,14 @@ const getThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   let threads;
   try {
     threads = await models.Thread.findAll({
       where: {
         id: { [Op.in]: req.query.ids },
-        chain: chain.id
+        chain: chain.id,
       },
       include: [
         {
@@ -36,7 +34,7 @@ const getThreads = async (
         },
         {
           model: models.ChainEntityMeta,
-          as: 'chain_entity_meta'
+          as: 'chain_entity_meta',
         },
         {
           model: models.Reaction,
@@ -57,7 +55,7 @@ const getThreads = async (
     });
   } catch (e) {
     console.log(e);
-    throw new ServerError(error)
+    throw new ServerError(e);
   }
 
   return threads.length

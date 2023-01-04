@@ -18,6 +18,16 @@ module.exports = {
         process.env.MAGIC_PUBLISHABLE_KEY || 'pk_live_EF89AABAFB87D6F4'
       ),
     }),
+    new webpack.DefinePlugin({
+      'process.env.DISCORD_CLIENT_ID': JSON.stringify(
+        process.env.DISCORD_CLIENT_ID || '1034502265664454776'
+      ),
+    }),
+    new webpack.DefinePlugin({
+      'process.env.DISCORD_UI_URL': JSON.stringify(
+        process.env.DISCORD_UI_URL || 'http://localhost:3000'
+      ),
+    }),
     new CopyWebpackPlugin([
       { from: path.resolve(__dirname, '../static'), to: 'static' },
     ]),
@@ -30,7 +40,7 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
       process: 'process/browser',
-      Buffer: ['buffer', 'Buffer']
+      Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
   ],
@@ -44,7 +54,7 @@ module.exports = {
           chunks: 'all',
         },
         ethereum: {
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject)[\\/]/,
+          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject|ethereumjs-abi|web3-eth-accounts|)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
@@ -53,8 +63,13 @@ module.exports = {
           name: 'near',
           chunks: 'all',
         },
+        terra: {
+          test: /[\\/]node_modules[\\/](@terra-money|terra-proto|legacy-proto)[\\/]/,
+          name: 'terra',
+          chunks: 'all',
+        },
         cosmos: {
-          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
+          test: /[\\/]node_modules[\\/](cosmjs-types|@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
           chunks: 'all',
         },
@@ -73,11 +88,6 @@ module.exports = {
           name: 'snapshot',
           chunks: 'all',
         },
-        vendor: {
-          test: /[\\/]node_modules[\\/](?!(mithril|jquery|moment|lodash|mixpanel-browser|construct-ui|quill|bn|@snapshot-labs|@apollo|@tendermint|amino-js|supercop\.js|tendermint|@audius|ethers|@walletconnect|@ethersproject).*)/,
-          name: 'vendors',
-          chunks: 'all',
-        },
       },
     },
   },
@@ -91,21 +101,24 @@ module.exports = {
       '../node_modules', // global node modules
     ],
     alias: {
-      "common-common": path.resolve(__dirname, '../../common-common'),
-      "chain-events": path.resolve(__dirname, '../../chain-events'),
-      "token-balance-cache": path.resolve(__dirname, '../../token-balance-cache'),
+      'common-common': path.resolve(__dirname, '../../common-common'),
+      'chain-events': path.resolve(__dirname, '../../chain-events'),
+      'token-balance-cache': path.resolve(
+        __dirname,
+        '../../token-balance-cache'
+      ),
     },
     fallback: {
       fs: false,
       net: false,
-      crypto: require.resolve("crypto-browserify"),
-      http: require.resolve("stream-http"),
-      https: require.resolve("https-browserify"),
-      os: require.resolve("os-browserify/browser"),
-      vm: require.resolve("vm-browserify"),
-      path: require.resolve("path-browserify"),
-      stream: require.resolve("stream-browserify"),
-    }
+      crypto: require.resolve('crypto-browserify'),
+      http: require.resolve('stream-http'),
+      https: require.resolve('https-browserify'),
+      os: require.resolve('os-browserify/browser'),
+      vm: require.resolve('vm-browserify'),
+      path: require.resolve('path-browserify'),
+      stream: require.resolve('stream-browserify'),
+    },
   },
   module: {
     rules: [

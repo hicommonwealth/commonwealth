@@ -17,15 +17,17 @@ import {
 } from 'common-common/src/types';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
-import {ROLLBAR_SERVER_TOKEN, SESSION_SECRET} from './server/config';
-import setupAPI from './server/router'; // performance note: this takes 15 seconds
+import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
+import setupAPI from 'server/routing/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
 import models from './server/database';
 import ViewCountCache from './server/util/viewCountCache';
 import BanCache from './server/util/banCheckCache';
+import GlobalActivityCache from './server/util/globalActivityCache';
 import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
 
 require('express-async-errors');
 
@@ -34,12 +36,11 @@ const SequelizeStore = SessionSequelizeStore(session.Store);
 // set cache TTL to 1 second to test invalidation
 const viewCountCache = new ViewCountCache(1, 10 * 60);
 const mockTokenBalanceProvider = new MockTokenBalanceProvider();
-const tokenBalanceCache = new TokenBalanceCache(
-  0,
-  0,
-  [ mockTokenBalanceProvider ],
-);
+const tokenBalanceCache = new TokenBalanceCache(0, 0, [
+  mockTokenBalanceProvider,
+]);
 const ruleCache = new RuleCache();
+const databaseValidationService = new DatabaseValidationService(models);
 let server;
 
 const sessionStore = new SequelizeStore({
@@ -105,7 +106,9 @@ const resetServer = (debug = false): Promise<void> => {
             url,
             name,
             eth_chain_id: eth_chain_id ? +eth_chain_id : null,
-            balance_type: eth_chain_id ? BalanceType.Ethereum : BalanceType.Substrate,
+            balance_type: eth_chain_id
+              ? BalanceType.Ethereum
+              : BalanceType.Substrate,
           })
         )
       );
@@ -158,7 +161,7 @@ const resetServer = (debug = false): Promise<void> => {
       const alexCommunityContract = await models.CommunityContract.create({
         chain_id: alex.id,
         contract_id: alexContract.id,
-      })
+      });
       const yearn = await models.Chain.create({
         id: 'yearn',
         network: ChainNetwork.ERC20,
@@ -274,24 +277,24 @@ const resetServer = (debug = false): Promise<void> => {
       });
       await models.NotificationCategory.create({
         name: NotificationCategories.ThreadEdit,
-        description: 'someone edited a thread'
-      })
+        description: 'someone edited a thread',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.CommentEdit,
-        description: 'someoned edited a comment'
-      })
+        description: 'someoned edited a comment',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.NewRoleCreation,
-        description: 'someone created a role'
-      })
+        description: 'someone created a role',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.EntityEvent,
-        description: 'an entity-event as occurred'
-      })
+        description: 'an entity-event as occurred',
+      });
       await models.NotificationCategory.create({
         name: NotificationCategories.NewChatMention,
-        description: 'someone mentions a user in chat'
-      })
+        description: 'someone mentions a user in chat',
+      });
 
       // Admins need to be subscribed to mentions and collaborations
       await models.Subscription.create({
@@ -305,6 +308,18 @@ const resetServer = (debug = false): Promise<void> => {
         category_id: NotificationCategories.NewCollaboration,
         object_id: `user-${drew.id}`,
         is_active: true,
+      });
+      await models.SnapshotProposal.create({
+        id: '1',
+        title: 'Test Snapshot Proposal',
+        body: 'This is a test proposal',
+        choices: ['Yes', 'No'],
+        space: 'test space',
+        event: 'proposal/created',
+        start: new Date().toString(),
+        expire: new Date(
+          new Date().getTime() + 100 * 24 * 60 * 60 * 1000
+        ).toString(),
       });
 
       if (debug) console.log('Database reset!');
@@ -352,9 +367,20 @@ const setupServer = () => {
 };
 
 const banCache = new BanCache(models);
+const globalActivityCache = new GlobalActivityCache(models);
+globalActivityCache.start();
 setupPassport(models);
 // TODO: mock RabbitMQController
-setupAPI(app, models, viewCountCache, tokenBalanceCache, ruleCache, banCache);
+setupAPI(
+  app,
+  models,
+  viewCountCache,
+  tokenBalanceCache,
+  ruleCache,
+  banCache,
+  globalActivityCache,
+  databaseValidationService
+);
 
 const rollbar = new Rollbar({
   accessToken: ROLLBAR_SERVER_TOKEN,

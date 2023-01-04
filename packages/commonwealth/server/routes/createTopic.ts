@@ -1,6 +1,5 @@
 import { Op } from 'sequelize';
 import { Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
@@ -20,8 +19,7 @@ const createTopic = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
 
   const name = req.body.name.trim();
@@ -49,7 +47,6 @@ const createTopic = async (
   if (!req.user.isAdmin && adminRoles.length === 0) {
     return next(new AppError(Errors.MustBeAdmin));
   }
-
 
   const isNumber = /^\d+$/.test(req.body.token_threshold);
   if (!isNumber) {

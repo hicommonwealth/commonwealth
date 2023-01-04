@@ -19,13 +19,14 @@ import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddress
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
+import DiscordController from 'controllers/server/discord';
 import SessionsController from './controllers/server/sessions';
 import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
 import { MobileMenuName } from './views/app_mobile_menus';
-import ChainEntityController from "controllers/server/chain_entities";
+import ChainEntityController from 'controllers/server/chain_entities';
 import { SidebarMenuName } from './views/components/sidebar';
 
 export enum ApiStatus {
@@ -72,6 +73,9 @@ export interface IApp {
 
   // Contracts
   contracts: ContractsController;
+
+  // Discord
+  discord: DiscordController;
 
   // User
   user: UserController;
@@ -158,6 +162,9 @@ const app: IApp = {
   // Contracts
   contracts: new ContractsController(),
 
+  // Discord
+  discord: new DiscordController(),
+
   // Search
   search: new SearchController(),
   searchAddressCache: {},
@@ -177,7 +184,7 @@ const app: IApp = {
   // Global nav state
   mobileMenu: null,
   sidebarMenu: 'default',
-  sidebarToggled: true,
+  sidebarToggled: false,
 
   toasts: getToastStore(),
   modals: getModalStore(),

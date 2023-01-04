@@ -1,6 +1,5 @@
 import { QueryTypes, Op } from 'sequelize';
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../util/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
@@ -11,8 +10,7 @@ const communityStats = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   if (!req.user) {
     return next(new AppError('Not logged in'));

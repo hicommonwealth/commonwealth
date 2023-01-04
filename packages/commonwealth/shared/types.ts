@@ -1,8 +1,11 @@
 import { ChainAttributes } from '../server/models/chain';
 import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
+import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
+  SnapshotProposalNotification = 'snapshot-proposal-notification',
+  SnapshotListener = 'snapshot-listener',
   NewSubscriptions = 'new-subscriptions',
   DeleteSubscriptions = 'delete-subscriptions',
   ChatMessage = 'chat-message',
@@ -10,6 +13,12 @@ export enum WebsocketMessageNames {
   LeaveChatChannel = 'leave-chat-channel',
   Error = 'exception',
 }
+export type SnapshotProposalNotification = {
+  id: string;
+  category_id: 'snapshot-proposal';
+  chain_id: string;
+  SnapshotProposal: SnapshotProposalAttributes;
+};
 
 export type ChainEventNotification = {
   id: number;
@@ -20,10 +29,27 @@ export type ChainEventNotification = {
   updated_at: Date;
   created_at: Date;
   ChainEvent: ChainEventAttributes;
-};
+}
+
+export interface SnapshotNotification {
+  id?: string;
+  title?: string;
+  body?: string;
+  choices?: string[];
+  space?: string;
+  event?: string;
+  start?: string;
+  expire?: string;
+}
+
+export interface INotification {
+  kind: ChainEventNotification | SnapshotNotification;
+}
 
 export enum WebsocketNamespaces {
+  SnapshotProposals = 'snapshot-proposals',
   ChainEvents = 'chain-events',
+  SnapshotListener = 'snapshot-listener',
   Chat = 'chat',
 }
 
@@ -74,6 +100,13 @@ export interface IChainEventNotificationData {
   chain_id: string;
 }
 
+export interface ISnapshotNotificationData {
+  created_at: Date;
+  snapshot_id: string;
+  chain_id: string;
+  snapshotEventType: string;
+}
+
 export interface IChatNotification {
   message_id: string | number;
   channel_id: string | number;
@@ -118,4 +151,31 @@ export type TokenResponse = {
   symbol: string;
   decimals: number;
   logoURI?: string;
+};
+
+export type SnapshotGraphQLResponse = {
+  data?: {
+    proposal: {
+      id: string;
+      title: string;
+      body: string;
+      choices: string[];
+      start: number;
+      end: number;
+      snapshot: number;
+      author: string;
+      created: number;
+      scores: number[];
+      scores_by_strategy: number[][];
+      scores_total: number;
+      scores_updated: number;
+      plugins: any;
+      network: string;
+      strategies: any;
+      space: {
+        id: string;
+        name: string;
+      };
+    };
+  };
 };

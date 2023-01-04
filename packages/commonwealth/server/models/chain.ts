@@ -1,6 +1,7 @@
+import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+
 import { RegisteredTypes } from '@polkadot/types/types';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { DataTypes } from 'sequelize';
 import { AddressAttributes, AddressInstance } from './address';
 import { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
@@ -39,10 +40,11 @@ export type ChainAttributes = {
   default_summary_view?: boolean;
   terms?: string;
   admin_only_polling?: boolean;
-  snapshot?: string[];
   bech32_prefix?: string;
+  hide_projects?: boolean;
   token_name?: string;
   ce_verbose?: boolean;
+  discord_config_id?: number;
   default_allow_permissions: bigint;
   default_deny_permissions: bigint;
 
@@ -88,6 +90,7 @@ export default (
       id: { type: dataTypes.STRING, primaryKey: true },
       chain_node_id: { type: dataTypes.INTEGER, allowNull: true }, // only null if starter community
       name: { type: dataTypes.STRING, allowNull: false },
+      discord_config_id: { type: dataTypes.INTEGER, allowNull: true }, // null if no bot enabled
       description: { type: dataTypes.STRING, allowNull: true },
       token_name: { type: dataTypes.STRING, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
@@ -122,10 +125,7 @@ export default (
         defaultValue: false,
       },
       default_summary_view: { type: dataTypes.BOOLEAN, allowNull: true },
-      snapshot: {
-        type: dataTypes.ARRAY(dataTypes.STRING),
-        allowNull: true,
-      },
+      hide_projects: { type: dataTypes.BOOLEAN, allowNull: true },
       terms: { type: dataTypes.STRING, allowNull: true },
       bech32_prefix: { type: dataTypes.STRING, allowNull: true },
       admin_only_polling: { type: dataTypes.BOOLEAN, allowNull: true },
@@ -165,7 +165,7 @@ export default (
     models.Chain.belongsToMany(models.Contract, {
       through: models.CommunityContract,
     });
-    models.Chain.hasMany(models.ChainEntityMeta, { foreignKey: 'chain' })
+    models.Chain.hasMany(models.ChainEntityMeta, { foreignKey: 'chain' });
   };
 
   return Chain;

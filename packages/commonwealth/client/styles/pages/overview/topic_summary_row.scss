@@ -48,22 +48,27 @@
     flex-direction: column;
     width: 100%;
 
-    @include large {
-      max-width: 720px;
-    }
-
-    @include mediumInclusive {
-      max-width: 520px;
-    }
-
     .recent-thread-row {
+      cursor: pointer;
       display: flex;
       flex-direction: column;
       gap: 12px;
       padding: 16px;
 
+      &.isPinned {
+        background: $neutral-100;
+
+        &:hover {
+          background: $neutral-200;
+        }
+      }
+
+      &:hover {
+        background: $neutral-50;
+      }
+
       @include mediumSmallInclusive {
-        padding: 16px 0;
+        padding: 16px 8px;
       }
 
       .row-top {
@@ -96,17 +101,7 @@
           display: flex;
           gap: 4px;
 
-          .flame::after {
-            content: '\1F525';
-            display: block;
-            font-size: 22px;
-          }
-        }
-      }
-
-      .thread-title-text.Text {
-        &:hover {
-          text-decoration: underline;
+          @include flame;
         }
       }
 
@@ -114,8 +109,9 @@
         color: $neutral-500;
       }
 
-      .MarkdownFormattedText {
-        position: unset;
+      .thread-preview {
+        @include multiline-text-ellipsis(2);
+        word-break: break-word;
       }
 
       .row-bottom {
@@ -161,6 +157,7 @@
         .row-bottom-menu {
           display: flex;
           gap: 16px;
+          margin-left: 8px;
         }
       }
     }

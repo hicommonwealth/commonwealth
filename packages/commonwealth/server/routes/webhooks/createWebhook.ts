@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../../util/validateChain';
 import Errors from './errors';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -13,8 +12,7 @@ const createWebhook = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   // if chain is present we know we are dealing with a chain first community
 
   // only admins should be able to get webhooks

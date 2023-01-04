@@ -9,14 +9,14 @@ import { ComponentType } from './types';
 import { CWText } from './cw_text';
 import { CWDivider } from './cw_divider';
 
-type FormAttrs = {
+type FormSectionAttrs = {
   description: string;
   title: string;
   topRightElement?: m.Vnode;
 };
 
-export class CWFormSection extends ClassComponent<FormAttrs> {
-  view(vnode: m.Vnode<FormAttrs>) {
+export class CWFormSection extends ClassComponent<FormSectionAttrs> {
+  view(vnode: m.Vnode<FormSectionAttrs>) {
     const {  description, title } = vnode.attrs;
 
     return (
