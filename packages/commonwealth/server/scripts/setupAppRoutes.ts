@@ -38,7 +38,9 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
 
  
   const renderWithMetaTags = (res, title, description, author, image) => {
-    image = cleanMalformedUrl(image);
+    if (image) {
+      image = cleanMalformedUrl(image);
+    }
 
     description = description || `${title}: a decentralized community on Commonwealth.im.`;
     const $tmpl = cheerio.load(templateFile);
