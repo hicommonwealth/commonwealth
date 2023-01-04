@@ -58,39 +58,45 @@ export async function initAppState(
         app.config.nodes.clear();
         app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
-        data.nodes
+        data.result.nodes
           .sort((a, b) => a.id - b.id)
           .map((node) => {
             return app.config.nodes.add(NodeInfo.fromJSON(node));
           });
-        data.chains
-          .filter((chain) => chain.active)
-          .map((chain) => {
-            delete chain.ChainNode;
+        data.result.chainsWithSnapshots
+          .filter((chainsWithSnapshots) => chainsWithSnapshots.chain.active)
+          .map((chainsWithSnapshots) => {
+            delete chainsWithSnapshots.chain.ChainNode;
             return app.config.chains.add(
               ChainInfo.fromJSON({
-                ChainNode: app.config.nodes.getById(chain.chain_node_id),
-                ...chain,
+                ChainNode: app.config.nodes.getById(
+                  chainsWithSnapshots.chain.chain_node_id
+                ),
+                snapshot: chainsWithSnapshots.snapshot,
+                ...chainsWithSnapshots.chain,
               })
             );
           });
-        app.roles.setRoles(data.roles);
-        app.config.notificationCategories = data.notificationCategories.map(
-          (json) => NotificationCategory.fromJSON(json)
-        );
-        app.config.invites = data.invites;
-        app.config.chainCategories = data.chainCategories;
-        app.config.chainCategoryTypes = data.chainCategoryTypes;
+        app.roles.setRoles(data.result.roles);
+        app.config.notificationCategories =
+          data.result.notificationCategories.map((json) =>
+            NotificationCategory.fromJSON(json)
+          );
+        app.config.invites = data.result.invites;
+        app.config.chainCategories = data.result.chainCategories;
+        app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 
         // add recentActivity
-        const { recentThreads } = data;
+        const { recentThreads } = data.result;
         recentThreads.forEach(({ chain, count }) => {
           app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
         // update the login status
-        updateActiveUser(data.user);
-        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+        updateActiveUser(data.result.user);
+        app.loginState = data.result.user
+          ? LoginState.LoggedIn
+          : LoginState.LoggedOut;
 
         if (app.loginState == LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
@@ -106,13 +112,17 @@ export async function initAppState(
         }
 
         app.user.setStarredCommunities(
-          data.user ? data.user.starredCommunities : []
+          data.result.user ? data.result.user.starredCommunities : []
         );
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
-        if (updateSelectedChain && data.user && data.user.selectedChain) {
+        if (
+          updateSelectedChain &&
+          data.result.user &&
+          data.result.user.selectedChain
+        ) {
           app.user.setSelectedChain(
-            ChainInfo.fromJSON(data.user.selectedChain)
+            ChainInfo.fromJSON(data.result.user.selectedChain)
           );
         }
 

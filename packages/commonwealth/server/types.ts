@@ -9,7 +9,7 @@ export type TypedRequestQuery<
   user?: Express.User & UserInstance;
   address?: AddressInstance;
   query: Q;
-}
+};
 
 export type TypedRequestBody<
   B extends Record<string, unknown> = Record<string, unknown>
@@ -17,7 +17,7 @@ export type TypedRequestBody<
   user?: Express.User & UserInstance;
   address?: AddressInstance;
   body: B;
-}
+};
 
 export type TypedRequest<
   B extends Record<string, unknown> = Record<string, unknown>,
@@ -27,9 +27,11 @@ export type TypedRequest<
   address?: AddressInstance;
   body?: B;
   query?: Q;
-}
+};
 
-export type TypedResponse<T> = Response<{ result: T | ValidationError[] } & { status: 'Success' | 'Failure' | number }>;
+export type TypedResponse<T> = Response<
+  { result: T | ValidationError[] } & { status: 'Success' | 'Failure' | number }
+>;
 
 export function success<T>(res: TypedResponse<T>, result: T) {
   return res.json({

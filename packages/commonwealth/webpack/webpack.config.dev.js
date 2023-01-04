@@ -10,6 +10,14 @@ module.exports = merge(common, {
       'app.ts',
     ],
   },
+  ignoreWarnings: [
+    { module: /client\/styles\/construct.scss/ },
+    { module: /node_modules\/magic-sdk\/dist\/es\/index.mjs/ }
+  ],
+  stats: {
+    assets: false,
+    modules: false,
+  },
   mode: 'development',
   target: 'web',
   devtool: 'eval-cheap-source-map',

@@ -48,6 +48,7 @@ class ChainInfo {
   public substrateSpec: RegisteredTypes;
   public adminOnlyPolling: boolean;
   public communityBanner?: string;
+  public discordConfigId?: string;
   public communityRoles: CommunityRole[];
 
   public get node() {
@@ -86,7 +87,8 @@ class ChainInfo {
     ChainNode,
     tokenName,
     adminOnlyPolling,
-    communityRoles
+    discord_config_id,
+    communityRoles,
   }) {
     this.id = id;
     this.network = network;
@@ -103,7 +105,6 @@ class ChainInfo {
     this.stagesEnabled = stagesEnabled;
     this.customStages = customStages;
     this.customDomain = customDomain;
-    this.snapshot = snapshot;
     this.terms = terms;
     this.snapshot = snapshot;
     this.blockExplorerIds = blockExplorerIds;
@@ -121,6 +122,7 @@ class ChainInfo {
     this.tokenName = tokenName;
     this.adminOnlyPolling = adminOnlyPolling;
     this.communityBanner = null;
+    this.discordConfigId = discord_config_id;
     this.communityRoles = communityRoles;
   }
 
@@ -156,7 +158,8 @@ class ChainInfo {
     Contracts,
     ChainNode,
     admin_only_polling,
-    community_roles
+    discord_config_id,
+    community_roles,
   }) {
     let blockExplorerIdsParsed;
     try {
@@ -202,7 +205,8 @@ class ChainInfo {
       tokenName: token_name,
       ChainNode,
       adminOnlyPolling: admin_only_polling,
-      communityRoles: community_roles
+      discord_config_id,
+      communityRoles: community_roles,
     });
   }
 
@@ -306,7 +310,7 @@ class ChainInfo {
       default_summary_view: defaultOverview,
       jwt: app.user.jwt,
     });
-    const updatedChain: ChainInstance = r.result;
+    const updatedChain = r.result;
     this.name = updatedChain.name;
     this.description = updatedChain.description;
     this.website = updatedChain.website;
