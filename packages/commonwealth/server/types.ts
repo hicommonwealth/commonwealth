@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { ValidationError } from 'express-validator';
 import { AddressInstance } from './models/address';
 import { UserInstance } from './models/user';
 
@@ -8,7 +9,7 @@ export type TypedRequestQuery<
   user?: Express.User & UserInstance;
   address?: AddressInstance;
   query: Q;
-}
+};
 
 export type TypedRequestBody<
   B extends Record<string, unknown> = Record<string, unknown>
@@ -16,7 +17,7 @@ export type TypedRequestBody<
   user?: Express.User & UserInstance;
   address?: AddressInstance;
   body: B;
-}
+};
 
 export type TypedRequest<
   B extends Record<string, unknown> = Record<string, unknown>,
@@ -26,13 +27,22 @@ export type TypedRequest<
   address?: AddressInstance;
   body?: B;
   query?: Q;
-}
+};
 
-export type TypedResponse<T> = Response<{ result: T } & { status: 'Success' | 'Failure' | number }>;
+export type TypedResponse<T> = Response<
+  { result: T | ValidationError[] } & { status: 'Success' | 'Failure' | number }
+>;
 
 export function success<T>(res: TypedResponse<T>, result: T) {
   return res.json({
     status: 'Success',
+    result,
+  });
+}
+
+export function failure<T>(res: TypedResponse<any>, result: T) {
+  return res.json({
+    status: 'Failure',
     result,
   });
 }

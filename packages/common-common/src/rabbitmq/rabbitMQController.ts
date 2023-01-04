@@ -1,11 +1,16 @@
 import * as Rascal from 'rascal';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {RascalPublications, RascalSubscriptions, RmqMsgFormatError, TRmqMessages} from "./types";
-import {Sequelize} from "sequelize";
-import {ChainEntityModelStatic} from "chain-events/services/database/models/chain_entity";
-import {ChainEventModelStatic} from "chain-events/services/database/models/chain_event";
-import {ChainEventTypeModelStatic} from "chain-events/services/database/models/chain_event_type";
-import Rollbar from "rollbar";
+import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  RascalPublications,
+  RascalSubscriptions,
+  RmqMsgFormatError,
+  TRmqMessages,
+} from './types';
+import Rollbar from 'rollbar';
+import {Sequelize} from 'sequelize';
+import {ChainEntityModelStatic} from 'chain-events/services/database/models/chain_entity';
+import {ChainEventModelStatic} from 'chain-events/services/database/models/chain_event';
+import {ChainEventTypeModelStatic} from 'chain-events/services/database/models/chain_event_type';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -63,10 +68,13 @@ export class RabbitMQController {
       Rascal.withDefaultConfig(this._rabbitMQConfig)
     );
 
-    this.broker.on('error', (err, {vhost, connectionUrl}) => {
-      log.error(`Broker error on vhost: ${vhost} using url: ${connectionUrl}`, err)
+    this.broker.on('error', (err, { vhost, connectionUrl }) => {
+      log.error(
+        `Broker error on vhost: ${vhost} using url: ${connectionUrl}`,
+        err
+      );
     });
-    this.broker.on('vhost_initialized', ({vhost, connectionUrl}) => {
+    this.broker.on('vhost_initialized', ({ vhost, connectionUrl }) => {
       log.info(
         `Vhost: ${vhost} was initialised using connection: ${connectionUrl}`
       );
@@ -98,44 +106,55 @@ export class RabbitMQController {
     msgProcessorContext?: { [key: string]: any }
   ): Promise<any> {
     if (!this._initialized) {
-      throw new RabbitMQControllerError('RabbitMQController is not initialized!')
+      throw new RabbitMQControllerError(
+        "RabbitMQController is not initialized!"
+      );
     }
 
     let subscription: Rascal.SubscriberSessionAsPromised;
     if (!this.subscribers.includes(subscriptionName))
-      throw new RabbitMQControllerError('Subscription does not exist');
+      throw new RabbitMQControllerError("Subscription does not exist");
 
     try {
       log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
-      subscription.on('message', (message, content, ackOrNack) => {
-        messageProcessor.call({rmqController: this, ...msgProcessorContext}, content)
+
+      subscription.on("message", (message, content, ackOrNack) => {
+        messageProcessor
+          .call({ rmqController: this, ...msgProcessorContext }, content)
           .then(() => {
+            console.log("Message Acked");
             ackOrNack();
           })
           .catch((e) => {
-            const errorMsg = `Failed to process message: ${JSON.stringify(content)} with processor function ${messageProcessor.name} and context ${JSON.stringify(msgProcessorContext)}`
+            const errorMsg = `
+            Failed to process message: ${JSON.stringify(content)} 
+            with processor function ${messageProcessor.name} and context 
+            ${JSON.stringify(msgProcessorContext)}
+            `;
             // if the message processor throws because of a message formatting error then we immediately deadLetter the
             // message to avoid re-queuing the message multiple times
             if (e instanceof RmqMsgFormatError) {
               log.error(`Invalid Message Format Error - ${errorMsg}`, e);
-              this.rollbar?.warn(`Invalid Message Format - ${errorMsg}`, e)
-              ackOrNack(e, {strategy: 'nack'});
+              this.rollbar?.warn(`Invalid Message Format - ${errorMsg}`, e);
+              ackOrNack(e, { strategy: "nack" });
+            } else {
+              log.error(`Unknown Error - ${errorMsg}`, e);
+              this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e);
+              ackOrNack(e, [
+                { strategy: "republish", defer: 2000, attempts: 3 },
+                { strategy: "nack" },
+              ]);
             }
-            else {
-              log.error(`Unknown Error - ${errorMsg}`, e)
-              this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e)
-              ackOrNack(e, [{strategy: 'republish', defer: 2000, attempts: 3}, {strategy: 'nack'}]);
-            }
-          })
+          });
       });
-      subscription.on('error', (err) => {
+      subscription.on("error", (err) => {
         log.error(`Subscriber error: ${err}`);
         this.rollbar?.warn(`Subscriber error: ${err}`);
       });
-      subscription.on('invalid_content', (err, message, ackOrNack) => {
+      subscription.on("invalid_content", (err, message, ackOrNack) => {
         log.error(`Invalid content`, err);
-        ackOrNack(err, {strategy: 'nack'});
+        ackOrNack(err, { strategy: "nack" });
         this.rollbar?.warn(`Invalid content`, err);
       });
     } catch (err) {
@@ -146,25 +165,34 @@ export class RabbitMQController {
 
   // TODO: add a class property that takes an object from publisherName => callback function
   //      if a message is successfully published to a particular queue then the callback is executed
-  public async publish(data: TRmqMessages, publisherName: RascalPublications): Promise<any> {
+  public async publish(
+    data: TRmqMessages,
+    publisherName: RascalPublications
+  ): Promise<any> {
     if (!this._initialized) {
-      throw new RabbitMQControllerError('RabbitMQController is not initialized!')
+      throw new RabbitMQControllerError(
+        "RabbitMQController is not initialized!"
+      );
     }
 
     if (!this.publishers.includes(publisherName))
-      throw new RabbitMQControllerError('Publisher is not defined');
+      throw new RabbitMQControllerError("Publisher is not defined");
 
     let publication;
     try {
       publication = await this.broker.publish(publisherName, data);
-      publication.on('error', (err, messageId) => {
+
+      publication.on("error", (err, messageId) => {
         log.error(`Publisher error ${messageId}`, err);
         this.rollbar?.warn(`Publisher error ${messageId}`, err);
         throw new PublishError(err.message);
       });
     } catch (err) {
       if (err instanceof PublishError) throw err;
-      else throw new RabbitMQControllerError(`Rascal config error: ${err.message}`)
+      else
+        throw new RabbitMQControllerError(
+          `Rascal config error: ${err.message}`
+        );
     }
   }
 

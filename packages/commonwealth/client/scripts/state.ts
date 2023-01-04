@@ -19,6 +19,7 @@ import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddress
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
+import DiscordController from 'controllers/server/discord';
 import SessionsController from './controllers/server/sessions';
 import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
@@ -72,6 +73,9 @@ export interface IApp {
 
   // Contracts
   contracts: ContractsController;
+
+  // Discord
+  discord: DiscordController;
 
   // User
   user: UserController;
@@ -158,6 +162,9 @@ const app: IApp = {
 
   // Contracts
   contracts: new ContractsController(),
+
+  // Discord
+  discord: new DiscordController(),
 
   // Search
   search: new SearchController(),
