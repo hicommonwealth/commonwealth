@@ -31,6 +31,7 @@ import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
 import createChain from '../routes/createChain';
 import createContract from '../routes/contracts/createContract';
+import createContractAbi from '../routes/contractAbis/createContractAbi';
 import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
 import updateBanner from '../routes/updateBanner';
@@ -162,6 +163,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import startSsoLogin from '../routes/startSsoLogin';
 
 function setupRouter(
   app: Express,

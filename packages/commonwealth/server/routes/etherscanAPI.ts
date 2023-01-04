@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 import { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI } from '../../shared/abi_utils';
 import { DB } from '../models';
@@ -26,9 +26,10 @@ export const networkIdToName = {
 
 export const Errors = {
   NoEtherscanApiKey: 'Etherscan API key not found',
-  NoContractFound: 'Contract not found.',
+  NoContractFound: 'Contract Instance not found',
   EtherscanResponseFailed: 'Etherscan Response failed',
   InvalidABI: 'Invalid ABI',
+  InvalidChainNode: 'Invalid Chain Node',
 };
 
 type FetchEtherscanContractReq = {
@@ -46,7 +47,7 @@ const fetchEtherscanContract = async (
   res: TypedResponse<FetchEtherscanContractResp>
 ) => {
   if (!ETHERSCAN_JS_API_KEY) {
-    throw new ServerError(Errors.NoEtherscanApiKey);
+    throw new AppError(Errors.NoEtherscanApiKey);
   }
 
   const { address } = req.body;
@@ -60,10 +61,6 @@ const fetchEtherscanContract = async (
     throw new AppError(Errors.NoContractFound);
   }
 
-  if (contract.abi_id !== null) {
-    throw new AppError('Contract already has an abi entry in the database');
-  }
-
   // get chain node of contract from DB
   const chainNode = await models.ChainNode.findOne({
     where: { id: contract.chain_node_id },
@@ -73,7 +70,7 @@ const fetchEtherscanContract = async (
     !chainNode.eth_chain_id ||
     !networkIdToName[chainNode.eth_chain_id]
   ) {
-    return new AppError('Invalid chain node');
+    return new AppError(Errors.InvalidChainNode);
   }
 
   const network = networkIdToName[chainNode.eth_chain_id];
@@ -117,7 +114,7 @@ const fetchEtherscanContract = async (
       throw new AppError(Errors.EtherscanResponseFailed);
     }
   } catch (error) {
-    throw new ServerError(error.message);
+    throw new AppError(error.message);
   }
 };
 

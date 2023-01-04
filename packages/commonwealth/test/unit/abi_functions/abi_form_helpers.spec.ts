@@ -51,6 +51,7 @@ describe('validateAbiInput() unit tests', () => {
   });
 
   it('should fail to validate incorrect address args', () => {
+    // Incorrect address length
     const input = '0x000000000000000000000000000000000000000';
     const inputType = 'address';
 
@@ -70,6 +71,13 @@ describe('validateAbiInput() unit tests', () => {
 
     const [validation_status, message] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
+  });
+  it('should validate string args with mix of numeric and non-numeric characters', () => {
+    const input = '123hello##@4--asdf';
+    const inputType = 'string';
+
+    const [validation_status, message] = validateAbiInput(input, inputType);
+    assert.equal(validation_status, 'success');
   });
 });
 
@@ -111,6 +119,28 @@ describe('handleMappingAbiInputs() unit tests', () => {
     assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
     assert.equal(inputMap.get(functionName2).get(inputIndex3), input3);
   });
+
+  it('should handle abi inputs that are a mix of numeric and string types', () => {
+    const inputIndex = 0;
+    const input = '123hello';
+    const functionName = 'testFunction';
+    const inputMap = new Map<string, Map<number, string>>();
+    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+    const inputIndex2 = 1;
+    const input2 = 'hello-world432x0x0123';
+    handleMappingAbiInputs(inputIndex2, input2, functionName, inputMap);
+    assert.equal(inputMap.get(functionName).get(inputIndex), input);
+    assert.equal(inputMap.get(functionName).get(inputIndex2), input2);
+  });
+
+  it('should handle abi input that is a special characters with multiple calls', () => {
+    const inputIndex = 0;
+    const input = '123';
+    const functionName = '$$%asdjfkl;12';
+    const inputMap = new Map<string, Map<number, string>>();
+    handleMappingAbiInputs(inputIndex, input, functionName, inputMap);
+    assert.equal(inputMap.get(functionName).get(inputIndex), input);
+  });
 });
 
 describe('processAbiInputsToDataTypes() unit tests', () => {
@@ -135,7 +165,7 @@ describe('processAbiInputsToDataTypes() unit tests', () => {
     expect(processedArgs).to.deep.equal([BigNumber.from(123)]);
   });
 
-  it('should return empty array', () => {
+  it('should return empty array if inputs array is empty', () => {
     const inputIndex = 0;
     const input = '123';
     const functionName = 'testFunction';
