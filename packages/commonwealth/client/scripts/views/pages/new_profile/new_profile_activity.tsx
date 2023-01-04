@@ -19,6 +19,7 @@ import { CWTag } from '../../components/component_kit/cw_tag';
 import { SharePopover } from '../../components/share_popover';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 
 enum ProfileActivity {
   Addresses,
@@ -55,12 +56,14 @@ type NewProfileActivityRowAttrs = {
 class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
     const { activity, address, charLimit } = vnode.attrs;
-    const { chain, createdAt, plaintext, author, title } = activity;
+    const { chain, createdAt, plaintext, author, title, text } = activity;
     const isThread = (activity as Thread).kind;
     const comment = activity as CommentWithAssociatedThread;
 
     // force redraw or on initial load comments don't render
     // m.redraw();
+
+    console.log('text', text);
 
     return (
       <div className="activity">
@@ -91,9 +94,7 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
           </CWText>
         </CWText>
         <CWText type="b2" className="gray-text">
-          {plaintext.length > charLimit
-            ? `${plaintext.slice(0, charLimit)}...`
-            : plaintext}
+          {renderQuillTextBody(text)}
         </CWText>
         <div className="actions">
           <SharePopover />
