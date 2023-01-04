@@ -54,7 +54,7 @@ module.exports = {
           chunks: 'all',
         },
         ethereum: {
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject)[\\/]/,
+          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject|ethereumjs-abi|web3-eth-accounts|)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
@@ -63,8 +63,13 @@ module.exports = {
           name: 'near',
           chunks: 'all',
         },
+        terra: {
+          test: /[\\/]node_modules[\\/](@terra-money|terra-proto|legacy-proto)[\\/]/,
+          name: 'terra',
+          chunks: 'all',
+        },
         cosmos: {
-          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
+          test: /[\\/]node_modules[\\/](cosmjs-types|@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
           chunks: 'all',
         },
@@ -81,11 +86,6 @@ module.exports = {
         snapshot: {
           test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
           name: 'snapshot',
-          chunks: 'all',
-        },
-        vendor: {
-          test: /[\\/]node_modules[\\/](?!(mithril|jquery|moment|lodash|mixpanel-browser|construct-ui|quill|bn|@snapshot-labs|@apollo|@tendermint|amino-js|supercop\.js|tendermint|@audius|ethers|@walletconnect|@ethersproject).*)/,
-          name: 'vendors',
           chunks: 'all',
         },
       },
