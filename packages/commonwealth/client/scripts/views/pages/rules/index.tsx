@@ -59,7 +59,7 @@ export default class RulesPage implements m.ClassComponent<RulesPageAttrs> {
                 <CWText type="caption">{`${this.rules.length} Rules in Use`}</CWText>
                 <CWButton
                   iconName="plus"
-                  buttonType="mini"
+                  buttonType="mini-black"
                   label="Create Rule"
                   onclick={() => {
                     app.modals.create({
