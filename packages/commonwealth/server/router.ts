@@ -286,11 +286,6 @@ function setupRouter(
     databaseValidationService.validateChain,
     editThread.bind(this, models, banCache)
   );
-  router.put('/editThread', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    editThread.bind(this, models, banCache),
-  ]);
-
   router.post(
     '/createPoll',
     passport.authenticate('jwt', { session: false }),
@@ -306,10 +301,8 @@ function setupRouter(
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
-    [
-      databaseValidationService.validateAuthor.bind(databaseValidationService),
-      updateThreadStage.bind(this, models),
-    ]
+    databaseValidationService.validateAuthor,
+    updateThreadStage.bind(this, models)
   );
   router.post(
     '/updateThreadPrivacy',
@@ -366,15 +359,9 @@ function setupRouter(
     databaseValidationService.validateChain,
     updateLinkedThreads.bind(this, models)
   );
-  router.post(
-    '/addEditors',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
-    addEditors.bind(this, models)
-  );
   router.post('/addEditors', passport.authenticate('jwt', { session: false }), [
-    databaseValidationService.validateAuthor.bind(databaseValidationService),
-    databaseValidationService.validateChain.bind(databaseValidationService),
+    databaseValidationService.validateAuthor,
+    databaseValidationService.validateChain,
     addEditors.bind(this, models),
   ]);
   router.post(
@@ -396,7 +383,7 @@ function setupRouter(
   );
   router.get(
     '/activeThreads',
-    databaseValidationService.validateChain.bind(databaseValidationService),
+    databaseValidationService.validateChain,
     activeThreads.bind(this, models)
   );
   router.get('/getThreads', getThreadsOld.bind(this, models));
@@ -470,7 +457,7 @@ function setupRouter(
   );
   router.get(
     '/bulkComments',
-    databaseValidationService.validateChain.bind(databaseValidationService),
+    databaseValidationService.validateChain,
     bulkComments.bind(this, models)
   );
 
@@ -560,7 +547,7 @@ function setupRouter(
   router.post(
     '/addMember',
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain.bind(databaseValidationService),
+    databaseValidationService.validateChain,
     addMember.bind(this, models)
   );
   router.post(
@@ -588,7 +575,7 @@ function setupRouter(
   // fetch addresses (e.g. for mentions)
   router.get(
     '/bulkAddresses',
-    databaseValidationService.validateChain.bind(databaseValidationService),
+    databaseValidationService.validateChain,
     bulkAddresses.bind(this, models)
   );
 
@@ -837,7 +824,7 @@ function setupRouter(
   router.post(
     '/banAddress',
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain.bind(databaseValidationService),
+    databaseValidationService.validateChain,
     banAddress.bind(this, models)
   );
 
