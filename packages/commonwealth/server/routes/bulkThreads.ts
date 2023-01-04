@@ -3,7 +3,6 @@ import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../middleware/validateChain';
 import { getLastEdited } from '../util/getLastEdited';
 import { DB } from '../models';
 import { ThreadInstance } from '../models/thread';
@@ -16,8 +15,7 @@ const bulkThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   const { cutoff_date, topic_id, stage } = req.query;
 
   const bind = { chain: chain.id };
@@ -42,7 +40,7 @@ const bulkThreads = async (
         thread_chain, thread_created, threads.kind,
         threads.read_only, threads.body, threads.stage, threads.snapshot_proposal,
         threads.has_poll, threads.plaintext,
-        threads.url, threads.pinned, topics.id AS topic_id, topics.name AS topic_name,
+        threads.url, threads.pinned, threads.number_of_comments, topics.id AS topic_id, topics.name AS topic_name,
         topics.description AS topic_description, topics.chain_id AS topic_chain,
         topics.telegram AS topic_telegram,
         collaborators, chain_entity_meta, linked_threads
@@ -50,7 +48,7 @@ const bulkThreads = async (
       RIGHT JOIN (
         SELECT t.id AS thread_id, t.title AS thread_title, t.address_id, t.last_commented_on,
           t.created_at AS thread_created,
-          t.chain AS thread_chain, t.read_only, t.body,
+          t.chain AS thread_chain, t.read_only, t.body, comments.number_of_comments,
           t.has_poll,
           t.plaintext,
           t.stage, t.snapshot_proposal, t.url, t.pinned, t.topic_id, t.kind, ARRAY_AGG(DISTINCT
@@ -77,12 +75,19 @@ const bulkThreads = async (
         ON collaborations.address_id = editors.id
         LEFT JOIN "ChainEntityMeta" AS entity_meta
         ON t.id = entity_meta.thread_id
+        LEFT JOIN (
+            SELECT root_id, COUNT(*) AS number_of_comments
+            FROM "Comments"
+            WHERE deleted_at IS NULL
+            GROUP BY root_id
+        ) comments
+        ON CONCAT(t.kind, '_', t.id) = comments.root_id
         WHERE t.deleted_at IS NULL
           AND t.chain = $chain 
           ${topicOptions}
           AND COALESCE(t.last_commented_on, t.created_at) < $created_at
           AND t.pinned = false
-          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at))
+          GROUP BY (t.id, COALESCE(t.last_commented_on, t.created_at), comments.number_of_comments)
           ORDER BY COALESCE(t.last_commented_on, t.created_at) DESC LIMIT 20
         ) threads
       ON threads.address_id = addr.id
@@ -137,6 +142,7 @@ const bulkThreads = async (
           address: t.addr_address,
           chain: t.addr_chain,
         },
+        numberOfComments: t.number_of_comments,
       };
       if (t.topic_id) {
         data['topic'] = {

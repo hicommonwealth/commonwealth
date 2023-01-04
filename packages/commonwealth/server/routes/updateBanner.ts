@@ -2,7 +2,6 @@ import { Response, NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
 import { success, TypedRequestBody } from '../types';
 import { DB } from '../models';
-import validateChain from '../middleware/validateChain';
 import validateRoles from '../util/validateRoles';
 import { CommunityBannerInstance } from '../models/community_banner';
 
@@ -21,8 +20,7 @@ const updateBanner = async (
   req: TypedRequestBody<UpdateBannerReq>,
   res: Response
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) throw new AppError(UpdateBannerErrors.NoChain);
+  const chain = req.chain
   const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) throw new AppError(UpdateBannerErrors.NoPermission);
 
