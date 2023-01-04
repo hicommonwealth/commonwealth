@@ -974,7 +974,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/:scope/delegate': importRoute('views/pages/delegate', {
               scoped: true,
             }),
-
             '/:scope/proposal/:type/:identifier': importRoute(
               'views/pages/view_proposal/index',
               { scoped: true }

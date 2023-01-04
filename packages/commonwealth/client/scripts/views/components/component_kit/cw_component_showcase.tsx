@@ -456,11 +456,6 @@ export class ComponentShowcase extends ClassComponent {
             label="Text area"
             placeholder="Type here"
           />
-          {/* <CWCoverImageUploader
-            uploadCompleteCallback={(url: string) => {
-              notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
-            }}
-          /> */}
           <CWCoverImageUploader
             uploadCompleteCallback={(url: string) => {
               console.log(url);
