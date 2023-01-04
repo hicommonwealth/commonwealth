@@ -1,6 +1,10 @@
 import $ from 'jquery';
 import app from 'state';
 
+type getChannelsResp = {
+  selectedChannel: { id: string; name: string };
+  channels: { id: string; name: string }[];
+};
 class DiscordController {
   public async createConfig(verification_token: string) {
     try {
@@ -28,10 +32,7 @@ class DiscordController {
     }
   }
 
-  public async getChannels(chain_id: string): Promise<{
-    selectedChannel: { id: string; name: string };
-    channels: { id: string; name: string }[];
-  }> {
+  public async getChannels(chain_id: string): Promise<getChannelsResp> {
     try {
       const discordBotConfig = await $.post(
         `${app.serverUrl()}/getDiscordChannels`,
