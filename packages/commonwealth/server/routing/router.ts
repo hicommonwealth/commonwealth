@@ -358,11 +358,12 @@ function setupRouter(
     databaseValidationService.validateChain,
     updateLinkedThreads.bind(this, models)
   );
-  router.post('/addEditors', passport.authenticate('jwt', { session: false }), [
+  router.post('/addEditors',
+    passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
     addEditors.bind(this, models),
-  ]);
+  );
   router.post(
     '/deleteEditors',
     passport.authenticate('jwt', { session: false }),
