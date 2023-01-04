@@ -63,8 +63,6 @@ class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
     // force redraw or on initial load comments don't render
     // m.redraw();
 
-    console.log('text', text);
-
     return (
       <div className="activity">
         <div className="chain-info">
@@ -126,7 +124,7 @@ class ActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
     if (option === ProfileActivity.Comments) {
       return attrs.comments.map((comment) => (
         <ActivityRow
-          activity={comment}
+          activity={comment as CommentWithAssociatedThread}
           charLimit={commentCharLimit}
           address={address}
         />

@@ -30,7 +30,7 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
   }
 
   oninit(vnode: m.Vnode<SocialsAttrs>) {
-    this.socials = vnode.attrs.socials || [];
+    this.socials = [...vnode.attrs.socials] || [];
   }
 
   view(vnode: m.Vnode<SocialsAttrs>) {

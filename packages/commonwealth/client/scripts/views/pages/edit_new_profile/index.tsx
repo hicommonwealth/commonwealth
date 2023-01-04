@@ -3,6 +3,7 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
+import _ from 'underscore';
 
 import 'pages/edit_new_profile.scss';
 
@@ -151,23 +152,23 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   };
 
   checkForUpdates = () => {
-      if (this.email.length > 0 && this.email !== this.profile?.email)
+      if (!_.isEqual(this.email, this.profile?.email))
         this.profileUpdate.email = this.email;
       else delete this.profileUpdate.email;
 
-      if (this.username.length > 0 && this.username !== this.profile?.name)
+      if (!_.isEqual(this.username, this.profile?.name))
         this.profileUpdate.name = this.username;
       else delete this.profileUpdate.name;
 
-      if (this.bio.text.length > 0 && this.bio.textContentsAsString !== this.profile?.bio)
+      if (!_.isEqual(this.bio.textContentsAsString, this.profile?.bio))
         this.profileUpdate.bio = this.bio.textContentsAsString;
       else delete this.profileUpdate.bio;
 
-      if (this.avatarUrl?.length > 0 && this.avatarUrl !== this.profile?.avatarUrl)
+      if (!_.isEqual(this.avatarUrl, this.profile?.avatarUrl))
         this.profileUpdate.avatarUrl = this.avatarUrl;
       else delete this.profileUpdate.avatarUrl;
 
-      if (this.socials.filter((v) => v.trim().length > 0).length > 0 && this.socials !== this.profile?.socials)
+      if (this.socials.filter((v) => v.trim().length > 0).length > 0 && !_.isEqual(this.socials, this.profile?.socials))
         this.profileUpdate.socials = this.socials;
       else delete this.profileUpdate.socials;
   };
