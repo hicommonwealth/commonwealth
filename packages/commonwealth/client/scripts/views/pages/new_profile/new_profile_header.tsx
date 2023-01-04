@@ -49,22 +49,24 @@ class SocialAccounts extends ClassComponent<{profile: Profile}> {
 
     if (!profile) return;
 
-    const { email, website, socials } = profile;
+    const { email, socials } = profile;
 
     return (
       <div className="social-accounts">
         {email && <SocialAccount link={`mailto:${email}`} iconName="mail" />}
         {socials.map((social) => {
+          const link = `https://${social}`;
           if (social.includes('twitter')) {
-            return <SocialAccount link={social} iconName="twitter" />
+            return <SocialAccount link={link} iconName="twitter" />
           } else if (social.includes('discord')) {
-            return <SocialAccount link={social} iconName="discord" />
+            return <SocialAccount link={link} iconName="discord" />
           } else if (social.includes('telegram')) {
-            return <SocialAccount link={social} iconName="telegram" />
+            return <SocialAccount link={link} iconName="telegram" />
           } else if (social.includes('github')) {
-            return <SocialAccount link={social} iconName="github" />
+            return <SocialAccount link={link} iconName="github" />
+          } else {
+            return <SocialAccount link={link} iconName="website" />
           }
-          return <SocialAccount link={website} iconName="website" />
         })}
       </div>
     );
