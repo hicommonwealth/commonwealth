@@ -7,7 +7,7 @@ export class TbcStatsDSender {
 
   // Log requests per provider + node + contract
   sendProviderInfo(bps: BalanceProvider[], nodeId?: number) {
-    bps.forEach(bp => {
+    bps.forEach((bp) => {
       const tags = {
         name: bp.name,
         nodeId: nodeId.toString(),
@@ -15,7 +15,7 @@ export class TbcStatsDSender {
         project: ProjectTag.TokenBalanceCache,
       };
 
-      this.statsD.increment(`tbc.provider_requests`, tags)
+      this.statsD.increment(`tbc.provider_requests`, tags);
     });
   }
 
