@@ -20,7 +20,7 @@ module.exports = merge(common, {
   },
   mode: 'development',
   target: 'web',
-  devtool: 'source-map',
+  devtool: 'eval-cheap-source-map',
   output: {
     publicPath: '/build',
     path: path.join(__dirname, '../build'),
