@@ -13,7 +13,7 @@ export class ServerError extends Error {
   constructor(message: string, error?: any) {
     super(message);
     this.status = 500;
-    this.name = "ServerError";
+    this.name = 'ServerError';
     this.error = error;
   }
 }
@@ -23,8 +23,6 @@ export class AppError extends Error {
   constructor(message: string) {
     super(message);
     this.status = 400;
-    this.name = "AppError";
+    this.name = 'AppError';
   }
 }
-
-

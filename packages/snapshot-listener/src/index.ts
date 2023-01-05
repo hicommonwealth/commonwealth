@@ -1,14 +1,14 @@
-import express, { Request, Response } from "express";
-import { ISnapshotNotification } from "common-common/src/types";
+import express, { Request, Response } from 'express';
+import { ISnapshotNotification } from 'common-common/src/types';
 import {
   RascalPublications,
   RabbitMQController,
   getRabbitMQConfig,
-} from "common-common/src/rabbitmq";
-import { factory, formatFilename } from "common-common/src/logging";
-import fetchNewSnapshotProposal from "./utils/fetchSnapshot";
-import { DEFAULT_PORT, RABBITMQ_URI } from "./config";
-import { StatsDController } from "common-common/src/statsd";
+} from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
+import fetchNewSnapshotProposal from './utils/fetchSnapshot';
+import { DEFAULT_PORT, RABBITMQ_URI } from './config';
+import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -18,26 +18,26 @@ app.use(express.json());
 
 let controller: RabbitMQController;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("OK!");
+app.get('/', (req: Request, res: Response) => {
+  res.send('OK!');
 });
 
-app.post("/snapshot", async (req: Request, res: Response) => {
+app.post('/snapshot', async (req: Request, res: Response) => {
   try {
     const event: ISnapshotNotification = req.body;
     if (!event) {
-      log.error("No event found in request body");
-      res.status(500).send("Error sending snapshot event");
+      log.error('No event found in request body');
+      res.status(500).send('Error sending snapshot event');
     }
 
-    if (process.env.LOG_LEVEL === "debug") {
+    if (process.env.LOG_LEVEL === 'debug') {
       const eventLog = JSON.stringify(event);
-      log.info("snapshot received");
+      log.info('snapshot received');
       log.info(eventLog);
     }
 
-    const parsedId = event.id.replace(/.*\//, "");
-    const eventType = event.event.split("/")[1];
+    const parsedId = event.id.replace(/.*\//, '');
+    const eventType = event.event.split('/')[1];
     const response = await fetchNewSnapshotProposal(parsedId, eventType);
     event.id = parsedId;
     event.title = response.data.proposal?.title ?? null;
@@ -50,7 +50,7 @@ app.post("/snapshot", async (req: Request, res: Response) => {
     await controller.publish(event, RascalPublications.SnapshotListener);
 
     StatsDController.get().increment(
-      "snapshot_listener.received_snapshot_event",
+      'snapshot_listener.received_snapshot_event',
       1,
       {
         event: eventType,
@@ -58,10 +58,10 @@ app.post("/snapshot", async (req: Request, res: Response) => {
       }
     );
 
-    res.status(200).send({ message: "Snapshot event received", event });
+    res.status(200).send({ message: 'Snapshot event received', event });
   } catch (err) {
-    log.error("Error sending snapshot event", err);
-    res.status(500).send("error: " + err);
+    log.error('Error sending snapshot event', err);
+    res.status(500).send('error: ' + err);
   }
 });
 
@@ -72,7 +72,7 @@ app.listen(port, async () => {
   try {
     controller = new RabbitMQController(getRabbitMQConfig(RABBITMQ_URI));
     await controller.init();
-    log.info("Connected to RabbitMQ");
+    log.info('Connected to RabbitMQ');
   } catch (err) {
     log.error(`Error starting server: ${err}`);
   }
