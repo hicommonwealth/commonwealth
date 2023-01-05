@@ -11,7 +11,7 @@ import Comment from 'client/scripts/models/Comment';
 import AddressInfo from 'client/scripts/models/AddressInfo';
 import { IUniqueId } from 'client/scripts/models/interfaces';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { ActivityContent } from './new_profile_activity_content';
+import { NewProfileActivityContent } from './new_profile_activity_content';
 
 enum ProfileActivity {
   Addresses,
@@ -91,8 +91,8 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
             /> */}
           </CWTabBar>
         </div>
-        <div className="activity-section">
-          <ActivityContent
+        <div className="activity-content">
+          <NewProfileActivityContent
             option={this.selectedActivity}
             commentCharLimit={this.commentCharLimit}
             threadCharLimit={this.threadCharLimit}

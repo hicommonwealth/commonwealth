@@ -3,12 +3,10 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-import 'pages/new_profile/new_profile_activity.scss';
-
 import Thread from 'client/scripts/models/Thread';
 import Comment from 'client/scripts/models/Comment';
 import { IUniqueId } from 'client/scripts/models/interfaces';
-import { ActivityRow } from './new_profile_activity_row';
+import { NewProfileActivityRow } from './new_profile_activity_row';
 
 enum ProfileActivity {
   Addresses,
@@ -30,7 +28,7 @@ type NewProfileActivityContentAttrs = {
   comments: CommentWithAssociatedThread[];
 };
 
-export class ActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
+export class NewProfileActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
   private threads: Thread[];
   private comments: CommentWithAssociatedThread[];
   private hasReceivedParentAttrs: boolean;
@@ -61,7 +59,7 @@ export class ActivityContent extends ClassComponent<NewProfileActivityContentAtt
 
     if (option === ProfileActivity.Threads) {
       return this.threads.sort(((a, b) => +b.createdAt - +a.createdAt)).map((thread) => (
-        <ActivityRow
+        <NewProfileActivityRow
           activity={thread}
           charLimit={threadCharLimit}
           address={address}
@@ -76,7 +74,7 @@ export class ActivityContent extends ClassComponent<NewProfileActivityContentAtt
 
     return allActivities.map((activity) => {
       return (
-        <ActivityRow
+        <NewProfileActivityRow
           activity={activity}
           charLimit={commentCharLimit}
           address={address}

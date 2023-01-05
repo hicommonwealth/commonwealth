@@ -4,7 +4,7 @@ import m from 'mithril';
 import moment from 'moment';
 import ClassComponent from 'class_component';
 
-import 'pages/new_profile/new_profile_activity.scss';
+import 'pages/new_profile/new_profile_activity_row.scss';
 
 import app from 'state';
 import { link } from 'helpers';
@@ -20,19 +20,18 @@ import { CommentWithAssociatedThread } from './new_profile_activity';
 type NewProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
   address: string;
-  charLimit: number;
   deleteCallback: (activity: CommentWithAssociatedThread | Thread) => void;
 };
 
-export class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
+export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
-    const { activity, address, charLimit, deleteCallback } = vnode.attrs;
+    const { activity, address, deleteCallback } = vnode.attrs;
     const { chain, createdAt, author, title, id, body } = activity;
     const isThread = !!(activity as Thread).kind;
     const comment = activity as CommentWithAssociatedThread;
 
     return (
-      <div className="activity">
+      <div className="ProfileActivityRow">
         <div className="chain-info">
           <CWText fontWeight="semiBold">{chain}</CWText>
           <div className="dot">.</div>
