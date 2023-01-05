@@ -1,6 +1,15 @@
 /**
  * Determines which chain entities each event affects and updates state accordingly.
  */
+
+import { addPrefix, factory } from 'common-common/src/logging';
+import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import {
+  RascalPublications, RmqEntityCUD,
+} from 'common-common/src/rabbitmq/types';
+
+import { DB } from '../../database/database';
+
 import {
   CWEvent,
   EntityEventKind,
@@ -11,13 +20,6 @@ import {
   IEventHandler,
   SubstrateTypes,
 } from 'chain-events/src';
-
-import { addPrefix, factory } from 'common-common/src/logging';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import {
-  RascalPublications, RmqEntityCUD,
-} from 'common-common/src/rabbitmq/types';
-import { DB } from '../../database/database';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';

@@ -1,15 +1,16 @@
-import {
-  CWEvent,
-  IChainEventData,
-  IChainEventKind,
-  IEventHandler,
-} from 'chain-events/src';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import {RascalPublications, RmqCENotificationCUD} from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
 import { ChainEventAttributes } from '../../database/models/chain_event';
 import { DB } from '../../database/database';
+
+import {
+  CWEvent,
+  IChainEventData,
+  IChainEventKind,
+  IEventHandler,
+} from 'chain-events/src';
 
 export default class extends IEventHandler {
   public readonly name = 'Notification Producer';

@@ -1,3 +1,5 @@
+import {Logger} from "typescript-logging";
+
 import {
   IEventHandler,
   IChainEventKind,
@@ -10,7 +12,6 @@ import {
   SupportedNetwork,
 } from './interfaces';
 import { addPrefix, factory } from './logging';
-import {Logger} from "typescript-logging";
 
 let log;
 

@@ -29,4 +29,7 @@ module.exports = {
       }
     },
   },
+  rules: {
+    "import/named": "off"
+  }
 }

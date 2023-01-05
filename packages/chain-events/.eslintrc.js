@@ -1,6 +1,8 @@
-{
+const path = require('path');
+
+module.exports = {
   "extends": [
-    "../../.eslintrc.js"
+    path.resolve(__dirname, "../../.eslintrc.js")
   ],
   "ignorePatterns": ["contractTypes", "eth", "dist"],
   "rules": {

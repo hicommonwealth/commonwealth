@@ -1,18 +1,9 @@
 import chai from 'chai';
-import { setupChainEventConsumer } from '../../../services/ChainEventsConsumer/chainEventsConsumer';
 import {
   RascalExchanges,
   RascalQueues,
   RascalRoutingKeys, RmqCENotificationCUD, RmqCETypeCUD, RmqEntityCUD,
 } from 'common-common/src/rabbitmq';
-import { CWEvent, SupportedNetwork } from '../../../src';
-import * as AaveTypes from '../../../src/chains/aave/types';
-import {
-  EventKind,
-  IProposalCreated,
-  ITransfer,
-} from '../../../src/chains/aave/types';
-import models from '../../../services/database/database';
 import { ServiceConsumer } from 'common-common/src/ServiceConsumer';
 import {
   getQueueStats,
@@ -21,6 +12,16 @@ import {
 } from 'common-common/src/rabbitmq/util';
 import { v4 as uuidv4 } from 'uuid';
 import { QueryTypes } from 'sequelize';
+
+import { setupChainEventConsumer } from '../../../services/ChainEventsConsumer/chainEventsConsumer';
+import { CWEvent, SupportedNetwork } from '../../../src';
+import * as AaveTypes from '../../../src/chains/aave/types';
+import {
+  EventKind,
+  IProposalCreated,
+  ITransfer,
+} from '../../../src/chains/aave/types';
+import models from '../../../services/database/database';
 import { RABBITMQ_API_URI } from '../../../services/config';
 
 const { expect } = chai;

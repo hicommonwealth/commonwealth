@@ -1,10 +1,11 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError } from 'common-common/src/errors';
+import {NextFunction, Request, Response} from "express";
+
 import { DB } from '../../database/database';
 import {
   runEntityMigrations,
 } from '../../../scripts/migrateChainEntities';
-import {NextFunction, Request, Response} from "express";
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,4 +1,5 @@
 import { BuildOptions, Model } from 'sequelize';
+
 import { DB } from '../database';
 
 export type ModelInstance<Attrs extends Record<string, unknown>> = Model<

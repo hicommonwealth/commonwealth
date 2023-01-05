@@ -1,6 +1,5 @@
 {
   "extends": "./tsconfig.json",
-  "skipLibCheck": true,
   "include": [
     "server/CommonwealthConsumer/CommonwealthConsumer.ts",
   ]

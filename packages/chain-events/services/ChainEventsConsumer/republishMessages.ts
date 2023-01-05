@@ -28,7 +28,7 @@ export class RepublishMessages extends RepublishFailedMessages<DB> {
     });
 
     // TODO
-    if (result.length > 100) {}
+    // if (result.length > 100) {}
 
     for (const eventType of result) {
       const publishData: RmqCETypeCUD.RmqMsgType = {

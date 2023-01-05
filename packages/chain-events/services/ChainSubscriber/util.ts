@@ -1,4 +1,9 @@
 import _ from 'underscore';
+import {ChainBase, ChainNetwork} from 'common-common/src/types';
+import {factory, formatFilename} from 'common-common/src/logging';
+import Rollbar from 'rollbar';
+
+import {RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers';
 import {
   createListener,
   ErcLoggingHandler,
@@ -7,12 +12,9 @@ import {
   SubstrateTypes,
   SupportedNetwork,
 } from '../../src';
-import {ChainBase, ChainNetwork} from 'common-common/src/types';
-import {ChainAttributes, IListenerInstances} from './types';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers';
-import Rollbar from 'rollbar';
 import models, {DB} from '../database/database';
+
+import {ChainAttributes, IListenerInstances} from './types';
 import {handleFatalListenerError} from "./chainSubscriber";
 
 const log = factory.getLogger(formatFilename(__filename));

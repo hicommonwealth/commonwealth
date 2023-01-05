@@ -3,7 +3,7 @@ node_modules
 *.github
 *.env
 *node_modules
-*.eslintrc.json
+packages/chain-events/.eslintrc.js
 *.mocharc.json
 *.nycrc
 *.stylelintrc

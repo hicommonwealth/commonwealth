@@ -1,3 +1,8 @@
+import { Sequelize, DataTypes } from 'sequelize';
+import { factory, formatFilename } from 'common-common/src/logging';
+
+import { DATABASE_URI } from '../config';
+
 import ChainEntityFactory, {
   ChainEntityModelStatic,
 } from './models/chain_entity';
@@ -5,9 +10,7 @@ import ChainEventFactory, { ChainEventModelStatic } from './models/chain_event';
 import ChainEventTypeFactory, {
   ChainEventTypeModelStatic,
 } from './models/chain_event_type';
-import { Sequelize, DataTypes } from 'sequelize';
-import { DATABASE_URI } from '../config';
-import { factory, formatFilename } from 'common-common/src/logging';
+
 
 export type Models = {
   ChainEntity: ChainEntityModelStatic;

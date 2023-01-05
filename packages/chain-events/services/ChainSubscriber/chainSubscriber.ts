@@ -6,8 +6,12 @@ import {
   RascalPublications,
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
-import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import { factory, formatFilename } from 'common-common/src/logging';
+import Rollbar from 'rollbar';
+import fetch from "node-fetch";
+import { StatsDController } from "common-common/src/statsd";
+
+import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import {
   CHAIN_EVENT_SERVICE_SECRET,
   CW_DATABASE_URI, CW_SERVER_URL,
@@ -17,15 +21,14 @@ import {
   ROLLBAR_SERVER_TOKEN,
   CHAIN_SUBSCRIBER_INDEX,
 } from '../config';
+
 import {
   getListenerNames,
   manageErcListeners,
   manageRegularListeners,
 } from './util';
 import { ChainAttributes, IListenerInstances } from './types';
-import Rollbar from 'rollbar';
-import fetch from "node-fetch";
-import { StatsDController } from "common-common/src/statsd";
+
 
 const log = factory.getLogger(formatFilename(__filename));
 

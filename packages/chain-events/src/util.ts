@@ -1,3 +1,5 @@
+import { RegisteredTypes } from "@polkadot/types/types";
+
 import {
   IDisconnectedRange,
   IEventProcessor,
@@ -49,7 +51,6 @@ import {
 } from './chains/cosmos';
 import { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
-import { RegisteredTypes } from "@polkadot/types/types";
 
 export function Title(
   network: SupportedNetwork,

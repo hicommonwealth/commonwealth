@@ -1,8 +1,10 @@
 import { Request, Response, Router } from 'express';
 import passport from 'passport';
+
+import { DB } from '../database/database';
+
 import entities from './routes/entities';
 import eventActivity from './routes/eventActivity';
-import { DB } from '../database/database';
 import migrateEvent from "./routes/migrateEvent";
 
 /**

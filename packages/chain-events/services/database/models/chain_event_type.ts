@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { Model, DataTypes } from 'sequelize';
+
 import { ChainEventAttributes } from './chain_event';
 import { ModelStatic, ModelInstance } from './types';
 

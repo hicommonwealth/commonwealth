@@ -3,23 +3,27 @@ import {
   RabbitMQSubscription,
   ServiceConsumer,
 } from 'common-common/src/serviceConsumer';
-import EventStorageHandler from './ChainEventHandlers/storage';
-import NotificationsHandler from './ChainEventHandlers/notification';
-import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
   getRabbitMQConfig,
   RascalSubscriptions,
 } from 'common-common/src/rabbitmq';
+import Rollbar from 'rollbar';
+
 import models from '../database/database';
 import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
+import { SubstrateTypes } from '../../src';
+
+import EventStorageHandler from './ChainEventHandlers/storage';
+import NotificationsHandler from './ChainEventHandlers/notification';
+import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import {
   Ithis as ChainEventsProcessorContextType,
   processChainEvents,
 } from './MessageProcessors/ChainEventsQueue';
-import { SubstrateTypes } from '../../src';
-import Rollbar from 'rollbar';
+
+
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -88,7 +92,7 @@ export async function setupChainEventConsumer() {
     msgProcessorContext: chainEventsProcessorContext,
   };
 
-  let subscriptions: RabbitMQSubscription[] = [chainEventsProcessorRmqSub];
+  const subscriptions: RabbitMQSubscription[] = [chainEventsProcessorRmqSub];
 
   const serviceConsumer = new ServiceConsumer(
     'ChainEventsConsumer',

@@ -1,5 +1,6 @@
 import { Logger } from 'typescript-logging';
 import {StatsDController} from "common-common/src/statsd";
+
 import { CWEvent, IEventHandler } from '../../../src';
 
 export type Ithis = {

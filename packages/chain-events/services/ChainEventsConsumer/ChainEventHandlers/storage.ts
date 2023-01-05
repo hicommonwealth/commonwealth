@@ -1,12 +1,6 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import {
-  CWEvent,
-  IChainEventKind,
-  IEventHandler,
-  SubstrateTypes,
-} from 'chain-events/src';
 import * as Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import {
@@ -16,10 +10,17 @@ import {
 } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
+import {StatsDController} from "common-common/src/statsd";
 
 import { DB } from '../../database/database';
 import { ChainEventInstance } from '../../database/models/chain_event';
-import {StatsDController} from "common-common/src/statsd";
+
+import {
+  CWEvent,
+  IChainEventKind,
+  IEventHandler,
+  SubstrateTypes,
+} from 'chain-events/src';
 
 const log = factory.getLogger(formatFilename(__filename));
 
