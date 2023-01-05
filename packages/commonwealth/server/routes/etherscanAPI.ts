@@ -1,13 +1,11 @@
 import axios from 'axios';
 import { AppError } from 'common-common/src/errors';
-import { AbiItem } from 'web3-utils';
-import { parseAbiItemsFromABI } from '../../shared/abi_utils';
 import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ETHERSCAN_JS_API_KEY } from '../config';
 import { ContractAttributes } from '../models/contract';
 import { ContractAbiAttributes } from '../models/contract_abi';
-import validateAbi from 'server/util/abiValidation';
+import validateAbi from '../util/abiValidation';
 
 export enum Network {
   Mainnet = 'Mainnet',
