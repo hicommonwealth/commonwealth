@@ -1,10 +1,83 @@
 [
-  { "blockNumber": 7650576, "data": {"who": "jcXrF5ECRfdeZEptnaD7Mp5kRmdxVV9DTnweVKN1jmwi76N", "kind": "democracy-voted", "isAye": true, "balance": "2561457655600000000000000", "conviction": 6, "referendumIndex": 47} },
-  { "blockNumber": 7712547, "data": {"who": "hX8eTbsDWPsEtoWBSjMBmRg3xXkhd2zxVAoBfGjhp57VPtm", "kind": "democracy-voted", "isAye": true, "balance": "2538504540681351067999971", "conviction": 1, "referendumIndex": 47} },
-  { "blockNumber": 7732800, "data": {"kind": "democracy-passed", "dispatchBlock": 7747200, "referendumIndex": 47} },
-  { "blockNumber": 7632000, "data": {"kind": "democracy-started", "endBlock": 7732800, "proposalHash": "0xd11b31ea6ed52d44a7a62ef6a19a1fd4eda47740b94494074876a3f55b5e859f", "voteThreshold": "Supermajorityapproval", "referendumIndex": 47} },
-  { "blockNumber": 7632220, "data": {"who": "jA7pLH65zgRNA4UgwqHEWWRxTgg51wuAUgfzmZoYWM2dMVS", "kind": "democracy-voted", "isAye": true, "balance": "100000000000000000000000", "conviction": 6, "referendumIndex": 47} },
-  { "blockNumber": 7641491, "data": {"who": "mn1dVN9mhJLEgJjev37AKWxMe7JbdsZbneDueRwcKu7WGxR", "kind": "democracy-voted", "isAye": true, "balance": "625515055700000000000000", "conviction": 6, "referendumIndex": 47} },
-  { "blockNumber": 7677139, "data": {"who": "nn1FWM6Wj5EFJtpXBJkFM4FCtrUcs4Ps3YSMm9QLLQi2eB7", "kind": "democracy-voted", "isAye": true, "balance": "628861754300000000000000", "conviction": 4, "referendumIndex": 47} },
-  { "blockNumber": 7747200, "data": {"kind": "democracy-executed", "executionOk": true, "referendumIndex": 47} }
+  {
+    "blockNumber": 7650576,
+    "data": {
+      "who": "jcXrF5ECRfdeZEptnaD7Mp5kRmdxVV9DTnweVKN1jmwi76N",
+      "kind": "democracy-voted",
+      "isAye": true,
+      "balance": "2561457655600000000000000",
+      "conviction": 6,
+      "referendumIndex": 47
+    }
+  },
+  {
+    "blockNumber": 7712547,
+    "data": {
+      "who": "hX8eTbsDWPsEtoWBSjMBmRg3xXkhd2zxVAoBfGjhp57VPtm",
+      "kind": "democracy-voted",
+      "isAye": true,
+      "balance": "2538504540681351067999971",
+      "conviction": 1,
+      "referendumIndex": 47
+    }
+  },
+  {
+    "blockNumber": 7732800,
+    "data": {
+      "kind": "democracy-passed",
+      "dispatchBlock": 7747200,
+      "referendumIndex": 47
+    }
+  },
+  {
+    "blockNumber": 7632000,
+    "data": {
+      "kind": "democracy-started",
+      "endBlock": 7732800,
+      "proposalHash": "0xd11b31ea6ed52d44a7a62ef6a19a1fd4eda47740b94494074876a3f55b5e859f",
+      "voteThreshold": "Supermajorityapproval",
+      "referendumIndex": 47
+    }
+  },
+  {
+    "blockNumber": 7632220,
+    "data": {
+      "who": "jA7pLH65zgRNA4UgwqHEWWRxTgg51wuAUgfzmZoYWM2dMVS",
+      "kind": "democracy-voted",
+      "isAye": true,
+      "balance": "100000000000000000000000",
+      "conviction": 6,
+      "referendumIndex": 47
+    }
+  },
+  {
+    "blockNumber": 7641491,
+    "data": {
+      "who": "mn1dVN9mhJLEgJjev37AKWxMe7JbdsZbneDueRwcKu7WGxR",
+      "kind": "democracy-voted",
+      "isAye": true,
+      "balance": "625515055700000000000000",
+      "conviction": 6,
+      "referendumIndex": 47
+    }
+  },
+  {
+    "blockNumber": 7677139,
+    "data": {
+      "who": "nn1FWM6Wj5EFJtpXBJkFM4FCtrUcs4Ps3YSMm9QLLQi2eB7",
+      "kind": "democracy-voted",
+      "isAye": true,
+      "balance": "628861754300000000000000",
+      "conviction": 4,
+      "referendumIndex": 47
+    }
+  },
+  {
+    "blockNumber": 7747200,
+    "data": {
+      "kind": "democracy-executed",
+      "executionOk": true,
+      "referendumIndex": 47
+    }
+  }
 ]

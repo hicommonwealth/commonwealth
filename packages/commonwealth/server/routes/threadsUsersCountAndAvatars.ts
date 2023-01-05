@@ -34,7 +34,7 @@ const fetchUniqueAddressesByRootIds = async (
       bind: {
         root_ids: formattedIds,
         chain,
-      }
+      },
     }
   );
 };

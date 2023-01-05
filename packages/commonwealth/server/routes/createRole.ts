@@ -2,9 +2,7 @@ import Sequelize from 'sequelize';
 import { NotificationCategories } from 'common-common/src/types';
 import { AppError } from 'common-common/src/errors';
 import { SubscriptionAttributes } from '../models/subscription';
-import {
-  ValidateChainParams,
-} from '../middleware/validateChain';
+import { ValidateChainParams } from '../middleware/validateChain';
 import { DB } from '../models';
 import { success, TypedRequestBody, TypedResponse } from '../types';
 import { RoleAttributes } from '../models/role';

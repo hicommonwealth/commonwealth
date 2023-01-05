@@ -5,13 +5,13 @@ import {
   Thread,
   Comment,
   Proposal,
-  AbridgedThread
+  AbridgedThread,
 } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
 enum PostType {
   discussion = 'discussion',
-  comment = 'comment'
+  comment = 'comment',
 }
 
 class ReactionStore extends IdStore<Reaction<any>> {
@@ -20,7 +20,10 @@ class ReactionStore extends IdStore<Reaction<any>> {
   public add(reaction: Reaction<any>) {
     // TODO: Remove this once we start enforcing an ordering in stores
     const identifier = this.getPostIdentifier(reaction);
-    const reactionAlreadyInStore = (this._storePost[identifier] || []).filter((rxn) => rxn.id === reaction.id).length > 0;
+    const reactionAlreadyInStore =
+      (this._storePost[identifier] || []).filter(
+        (rxn) => rxn.id === reaction.id
+      ).length > 0;
     if (!reactionAlreadyInStore) {
       super.add(reaction);
       this.getAll().sort(byAscendingCreationDate);
@@ -62,23 +65,37 @@ class ReactionStore extends IdStore<Reaction<any>> {
     return this;
   }
 
-  public getByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>): Array<Reaction<any>> {
+  public getByPost(
+    post: Thread | AbridgedThread | AnyProposal | Comment<any>
+  ): Array<Reaction<any>> {
     const identifier = this.getPostIdentifier(post);
     return this._storePost[identifier] || [];
   }
 
-  public getPostIdentifier(rxnOrPost: Reaction<any> | Thread | AbridgedThread | AnyProposal | Comment<any>) {
+  public getPostIdentifier(
+    rxnOrPost:
+      | Reaction<any>
+      | Thread
+      | AbridgedThread
+      | AnyProposal
+      | Comment<any>
+  ) {
     if (rxnOrPost instanceof Reaction) {
       const { threadId, commentId, proposalId } = rxnOrPost;
       return threadId
         ? `discussion-${threadId}`
         : proposalId
-          ? `${proposalId}`
-          : `comment-${commentId}`;
-    } else if (rxnOrPost instanceof Thread || rxnOrPost instanceof AbridgedThread) {
+        ? `${proposalId}`
+        : `comment-${commentId}`;
+    } else if (
+      rxnOrPost instanceof Thread ||
+      rxnOrPost instanceof AbridgedThread
+    ) {
       return `discussion-${rxnOrPost.id}`;
     } else if (rxnOrPost instanceof Proposal) {
-      return `${(rxnOrPost as AnyProposal).slug}_${(rxnOrPost as AnyProposal).identifier}`;
+      return `${(rxnOrPost as AnyProposal).slug}_${
+        (rxnOrPost as AnyProposal).identifier
+      }`;
     } else if (rxnOrPost instanceof Comment) {
       return `comment-${rxnOrPost.id}`;
     }

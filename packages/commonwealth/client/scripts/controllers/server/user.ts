@@ -206,9 +206,7 @@ export class UserController {
   public setSelectedChain(selectedChain: ChainInfo): void {
     this._setSelectedChain(selectedChain);
   }
-  public selectChain(options: {
-    chain: string;
-  }): JQueryPromise<void> {
+  public selectChain(options: { chain: string }): JQueryPromise<void> {
     return $.post(`${app.serverUrl()}/selectChain`, {
       chain: options.chain,
       auth: true,

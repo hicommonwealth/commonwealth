@@ -3,7 +3,9 @@ import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 export default class MolochAPI extends ContractApi<Moloch1> {
   private _token: ERC20;
-  public get token() { return this._token; }
+  public get token() {
+    return this._token;
+  }
 
   public async init(): Promise<void> {
     await super.init();

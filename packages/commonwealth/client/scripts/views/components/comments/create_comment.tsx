@@ -123,10 +123,15 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
     const userFailsThreshold =
-      tokenPostingThreshold?.gtn(0) && userBalance?.gtn(0) && userBalance.lt(tokenPostingThreshold);
+      tokenPostingThreshold?.gtn(0) &&
+      userBalance?.gtn(0) &&
+      userBalance.lt(tokenPostingThreshold);
 
     const disabled =
-      this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress || userFailsThreshold;
+      this.quillEditorState?.isBlank() ||
+      sendingComment ||
+      uploadsInProgress ||
+      userFailsThreshold;
 
     const decimals = app.chain?.meta?.decimals
       ? app.chain.meta.decimals

@@ -17,7 +17,6 @@ const deleteDraft = async (
   res: Response,
   next: NextFunction
 ) => {
-
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));
   }

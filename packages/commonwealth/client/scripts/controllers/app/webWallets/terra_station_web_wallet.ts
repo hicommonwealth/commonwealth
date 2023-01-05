@@ -3,8 +3,8 @@ import { Account, IWebWallet } from 'models';
 import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
 
 type TerraAddress = {
-  address: string
-}
+  address: string;
+};
 
 class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;

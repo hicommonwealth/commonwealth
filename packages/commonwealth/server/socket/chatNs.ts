@@ -5,82 +5,102 @@ import { Action } from 'common-common/src/permissions';
 import { addPrefix, factory } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
 import emitNotifications from '../util/emitNotifications';
-import { NotificationCategories, RedisNamespaces } from 'common-common/src/types';
 import {
-    WebsocketEngineEvents,
-    WebsocketMessageNames,
-    WebsocketNamespaces,
+  NotificationCategories,
+  RedisNamespaces,
+} from 'common-common/src/types';
+import {
+  WebsocketEngineEvents,
+  WebsocketMessageNames,
+  WebsocketNamespaces,
 } from '../../shared/types';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
 import { DB } from '../models';
 import { checkReadPermitted } from '../util/roles';
 
-
 const log = factory.getLogger(addPrefix(__filename));
 
-const handleMentions = async (models: DB, socket: any, message: any, id: number, chain_id: string) => {
-    // process mentions
-    const bodyText = decodeURIComponent(message.message);
-    let mentionedAddresses;
-    try {
-        const mentions = parseUserMentions(bodyText);
-        if (mentions && mentions.length > 0) {
-            mentionedAddresses = await Promise.all(
-                mentions.map(async (mention) => {
-                const user = await models.Address.findOne({
-                    where: {
-                    chain: mention[0] || null,
-                    address: mention[1],
-                    },
-                    include: [models.User, models.RoleAssignment],
-                });
-                return user;
-                })
-            );
-            mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
-        }
-    } catch (e) {
-        return socket.emit('Error: Failed to parse mentions', e);
+const handleMentions = async (
+  models: DB,
+  socket: any,
+  message: any,
+  id: number,
+  chain_id: string
+) => {
+  // process mentions
+  const bodyText = decodeURIComponent(message.message);
+  let mentionedAddresses;
+  try {
+    const mentions = parseUserMentions(bodyText);
+    if (mentions && mentions.length > 0) {
+      mentionedAddresses = await Promise.all(
+        mentions.map(async (mention) => {
+          const user = await models.Address.findOne({
+            where: {
+              chain: mention[0] || null,
+              address: mention[1],
+            },
+            include: [models.User, models.RoleAssignment],
+          });
+          return user;
+        })
+      );
+      mentionedAddresses = mentionedAddresses.filter((addr) => !!addr);
     }
+  } catch (e) {
+    return socket.emit('Error: Failed to parse mentions', e);
+  }
 
-    if (mentionedAddresses?.length > 0) {
-        await Promise.all(
-          mentionedAddresses.map(async (mentionedAddress) => {
-            // some Addresses may be missing users, e.g. if the user removed the address
-            if (!mentionedAddress.User) return;
-            await emitNotifications(
-                models,
-                NotificationCategories.NewChatMention,
-                `user-${mentionedAddress.User.id}`,
-                {
-                    message_id: id,
-                    channel_id: message.chat_channel_id,
-                    chain_id,
-                    author_address: message.address,
-                    created_at: new Date(),
-                }
-            );
-          })
+  if (mentionedAddresses?.length > 0) {
+    await Promise.all(
+      mentionedAddresses.map(async (mentionedAddress) => {
+        // some Addresses may be missing users, e.g. if the user removed the address
+        if (!mentionedAddress.User) return;
+        await emitNotifications(
+          models,
+          NotificationCategories.NewChatMention,
+          `user-${mentionedAddress.User.id}`,
+          {
+            message_id: id,
+            channel_id: message.chat_channel_id,
+            chain_id,
+            author_address: message.address,
+            created_at: new Date(),
+          }
         );
-      }
-}
+      })
+    );
+  }
+};
 
-export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCache) {
-    const ChatNs = io.of(`/${WebsocketNamespaces.Chat}`);
-    ChatNs.use(authenticate)
+export function createChatNamespace(
+  io: Server,
+  models: DB,
+  redisCache?: RedisCache
+) {
+  const ChatNs = io.of(`/${WebsocketNamespaces.Chat}`);
+  ChatNs.use(authenticate);
 
   ChatNs.on('connection', (socket) => {
-    log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} connected to Chat`);
+    log.info(
+      `socket_id = ${socket.id}, user_id = ${
+        (<any>socket).user.id
+      } connected to Chat`
+    );
 
     socket.on('disconnect', () => {
-      log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} disconnected from Chat`);
+      log.info(
+        `socket_id = ${socket.id}, user_id = ${
+          (<any>socket).user.id
+        } disconnected from Chat`
+      );
     });
 
     socket.on(
       WebsocketMessageNames.JoinChatChannel,
       async (chatChannelIds: string[]) => {
-        console.log("Joining chat channels:", chatChannelIds);
+        console.log('Joining chat channels:', chatChannelIds);
         if (chatChannelIds.length > 0) {
           const channels = await models.ChatChannel.findAll({
             where: {
@@ -115,16 +135,25 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
             }
           }
 
-        log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} joining ${JSON.stringify(chatChannelIds)}`);
-        for (const channel of chatChannelIds) socket.join(channel);
+          log.info(
+            `socket_id = ${socket.id}, user_id = ${
+              (<any>socket).user.id
+            } joining ${JSON.stringify(chatChannelIds)}`
+          );
+          for (const channel of chatChannelIds) socket.join(channel);
+        }
       }
-    });
+    );
 
     socket.on(
       WebsocketMessageNames.LeaveChatChannel,
       (chatChannelIds: string[]) => {
         if (chatChannelIds.length > 0) {
-          log.info(`socket_id = ${socket.id}, user_id = ${(<any>socket).user.id} leaving ${JSON.stringify(chatChannelIds)}`);
+          log.info(
+            `socket_id = ${socket.id}, user_id = ${
+              (<any>socket).user.id
+            } leaving ${JSON.stringify(chatChannelIds)}`
+          );
           for (const channel of chatChannelIds) socket.leave(channel);
         }
       }
@@ -134,7 +163,10 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
       try {
         const { message, chat_channel_id, address } = _message;
         const now_date = moment(moment().toISOString()).toDate();
-        const redisAddress = await redisCache.getKey(RedisNamespaces.Chat_Socket, (<any>socket).user.id);
+        const redisAddress = await redisCache.getKey(
+          RedisNamespaces.Chat_Socket,
+          (<any>socket).user.id
+        );
         let finalAddress = redisAddress;
 
         // if the cached address and the address in the message don't match then either the user has switched addresses,
@@ -145,52 +177,76 @@ export function createChatNamespace(io: Server, models: DB, redisCache?: RedisCa
             attributes: ['user_id'],
             where: {
               address,
-              user_id: (<any>socket).user.id
+              user_id: (<any>socket).user.id,
             },
           });
 
           if (!userId) {
-            socket.emit(WebsocketMessageNames.Error, "WARNING: Authentication failed! Cannot send messages from an" +
-              "address you do not own!");
+            socket.emit(
+              WebsocketMessageNames.Error,
+              'WARNING: Authentication failed! Cannot send messages from an' +
+                'address you do not own!'
+            );
             return;
           }
 
-          const redisResult = await redisCache.setKey(RedisNamespaces.Chat_Socket, (<any>socket).user.id, address)
+          const redisResult = await redisCache.setKey(
+            RedisNamespaces.Chat_Socket,
+            (<any>socket).user.id,
+            address
+          );
           if (!redisResult) {
-            socket.emit(WebsocketMessageNames.Error, "Redis address update failed!");
+            socket.emit(
+              WebsocketMessageNames.Error,
+              'Redis address update failed!'
+            );
           }
 
           finalAddress = address;
         }
 
-        const isInRoom = ChatNs.adapter.socketRooms(socket.id).has(String(chat_channel_id));
+        const isInRoom = ChatNs.adapter
+          .socketRooms(socket.id)
+          .has(String(chat_channel_id));
         if (!isInRoom) {
-          socket.emit(WebsocketMessageNames.Error, "WARNING: You cannot send a message to a chat channel that you are not in!");
+          socket.emit(
+            WebsocketMessageNames.Error,
+            'WARNING: You cannot send a message to a chat channel that you are not in!'
+          );
           return;
         }
 
-        const {id, created_at} = await models.ChatMessage.create({
+        const { id, created_at } = await models.ChatMessage.create({
           address: finalAddress,
           message,
           chat_channel_id,
           created_at: now_date,
           updated_at: now_date,
-        })
-
-        ChatNs.to(`${chat_channel_id}`).emit(WebsocketMessageNames.ChatMessage, {
-          id,
-          address: finalAddress,
-          message,
-          chat_channel_id,
-          created_at,
         });
 
-        const channel = await models.ChatChannel.findOne({where: { id: chat_channel_id }});
+        ChatNs.to(`${chat_channel_id}`).emit(
+          WebsocketMessageNames.ChatMessage,
+          {
+            id,
+            address: finalAddress,
+            message,
+            chat_channel_id,
+            created_at,
+          }
+        );
+
+        const channel = await models.ChatChannel.findOne({
+          where: { id: chat_channel_id },
+        });
         await handleMentions(models, socket, _message, id, channel.chain_id);
       } catch (e) {
-        log.error(`An error occurred upon receiving a chat message: ${JSON.stringify(_message)}`, e);
+        log.error(
+          `An error occurred upon receiving a chat message: ${JSON.stringify(
+            _message
+          )}`,
+          e
+        );
       }
-
     });
   });
 

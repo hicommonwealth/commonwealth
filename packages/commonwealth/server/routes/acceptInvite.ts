@@ -62,12 +62,7 @@ const acceptInvite = async (
     return next(new AppError(Errors.NoCommunityFound(code.chain_id)));
   }
 
-  const role = await createRole(
-    models,
-    addressObj.id,
-    chain?.id,
-    'member'
-  );
+  const role = await createRole(models, addressObj.id, chain?.id, 'member');
 
   if (!role) return next(new ServerError(Errors.RoleCreationFailure));
 

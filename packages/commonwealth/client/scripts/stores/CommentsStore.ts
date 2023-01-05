@@ -30,16 +30,24 @@ class CommentsStore extends IdStore<Comment<any>> {
 
     const authorIndex = this._storeAuthor[comment.author].indexOf(comment);
     if (authorIndex === -1) {
-      console.error('Attempting to remove a comment that was not found in the authors store');
+      console.error(
+        'Attempting to remove a comment that was not found in the authors store'
+      );
     }
     this._storeAuthor[comment.author].splice(authorIndex, 1);
 
     if (comment.proposal) {
-      const proposalIndex = this._storeProposal[comment.proposal.uniqueIdentifier].indexOf(comment);
+      const proposalIndex =
+        this._storeProposal[comment.proposal.uniqueIdentifier].indexOf(comment);
       if (comment.proposal && proposalIndex === -1) {
-        console.error('Attempting to remove a comment that was not found in the proposals store');
+        console.error(
+          'Attempting to remove a comment that was not found in the proposals store'
+        );
       }
-      this._storeProposal[comment.proposal.uniqueIdentifier].splice(proposalIndex, 1);
+      this._storeProposal[comment.proposal.uniqueIdentifier].splice(
+        proposalIndex,
+        1
+      );
     }
     return this;
   }
@@ -73,8 +81,9 @@ class CommentsStore extends IdStore<Comment<any>> {
 
   public nComments<T extends IUniqueId>(proposal: T): number {
     if (this._storeProposal[proposal.uniqueIdentifier]) {
-      return this._storeProposal[proposal.uniqueIdentifier]
-        .filter((c) => !c.deleted).length;
+      return this._storeProposal[proposal.uniqueIdentifier].filter(
+        (c) => !c.deleted
+      ).length;
     } else {
       return 0;
     }

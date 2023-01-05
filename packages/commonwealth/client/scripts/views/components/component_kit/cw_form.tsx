@@ -23,7 +23,9 @@ export class CWForm extends ClassComponent<FormAttrs> {
       <div className={ComponentType.Form}>
         <div className="header">
           <div>
-            <CWText type="h3" fontWeight="medium">{title}</CWText>
+            <CWText type="h3" fontWeight="medium">
+              {title}
+            </CWText>
             <CWText type="b1">{description}</CWText>
           </div>
           {vnode.attrs.topRightElement && (
@@ -33,9 +35,7 @@ export class CWForm extends ClassComponent<FormAttrs> {
           )}
         </div>
         <CWDivider />
-        <div className="content">
-          {vnode.children}
-        </div>
+        <div className="content">{vnode.children}</div>
       </div>
     );
   }

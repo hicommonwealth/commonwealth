@@ -608,7 +608,9 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
-                  ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
+                  ) : !this.isGloballyEditing &&
+                    canComment &&
+                    app.isLoggedIn() ? (
                     <>
                       {reactionsAndReplyButtons}
                       <CreateComment

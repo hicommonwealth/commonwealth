@@ -44,11 +44,11 @@ export type AddressAttributes = {
 
 export type AddressInstance = ModelInstance<AddressAttributes> & {
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
-	getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
-	getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
-	getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
-	getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
-	getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
+  getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
+  getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;
+  getProfile: Sequelize.BelongsToGetAssociationMixin<ProfileInstance>;
+  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
+  getSsoToken: Sequelize.HasOneGetAssociationMixin<SsoTokenInstance>;
 };
 
 export type AddressModelStatic = ModelStatic<AddressInstance>;

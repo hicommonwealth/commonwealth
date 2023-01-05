@@ -62,7 +62,7 @@ const ipfsPin = async (
     if (e instanceof ServerError || e instanceof AppError) {
       throw e;
     } else {
-      throw new AppError(Errors.PinFailed)
+      throw new AppError(Errors.PinFailed);
     }
   }
 };

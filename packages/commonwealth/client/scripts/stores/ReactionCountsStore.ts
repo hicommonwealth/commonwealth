@@ -70,10 +70,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
       | AnyProposal
       | Comment<any>
   ) {
-    if (
-      rxnOrPost instanceof Thread ||
-      rxnOrPost instanceof AbridgedThread
-    ) {
+    if (rxnOrPost instanceof Thread || rxnOrPost instanceof AbridgedThread) {
       return `discussion-${rxnOrPost.id}`;
     } else if (rxnOrPost instanceof Proposal) {
       return `${(rxnOrPost as AnyProposal).slug}_${

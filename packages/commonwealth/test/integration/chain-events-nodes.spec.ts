@@ -377,7 +377,10 @@ setTimeout(async () => {
         'database'
     );
   await clearDB(pool);
-  await clearQueues(["ChainEventsHandlersQueue", "SubstrateIdentityEventsQueue"]);
+  await clearQueues([
+    'ChainEventsHandlersQueue',
+    'SubstrateIdentityEventsQueue',
+  ]);
   await prepareDB(client);
 
   describe('Tests for single chain per node', () => {
@@ -398,7 +401,7 @@ setTimeout(async () => {
                 ...process.env,
                 TESTING: 'true',
                 WORKER_NUMBER: String(chainIndex),
-                NUM_WORKERS: String(chains.length)
+                NUM_WORKERS: String(chains.length),
               },
             }
           );

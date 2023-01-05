@@ -18,14 +18,14 @@ import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
 import { addAllowDenyPermissions } from 'commonwealth/test/util/modelUtils';
 import { Action } from '../../../../common-common/src/permissions';
-import { markdownComment } from "../../util/fixtures/markdownComment";
+import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
 const { expect } = chai;
 
 describe('Thread Tests', () => {
   const chain = 'ethereum';
-  const chain2 = 'alex'
+  const chain2 = 'alex';
   // The createThread util uses the chainId parameter to determine
   // author_chain, which is required for authorship lookup.
   // Therefore, a valid chain MUST be included alongside
@@ -83,7 +83,7 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    addAllowDenyPermissions('member', chain2, 0, Action.CREATE_THREAD );
+    addAllowDenyPermissions('member', chain2, 0, Action.CREATE_THREAD);
   });
 
   describe('/createThread', () => {
@@ -280,7 +280,7 @@ describe('Thread Tests', () => {
         jwt: userJWT2,
       });
       expect(res2.status).not.to.be.equal('Success');
-    })
+    });
   });
 
   describe('/bulkThreads', () => {

@@ -49,7 +49,9 @@ export default class CommonwealthGovernance extends ProposalModule<
   //   return ((Date.now() / 1000) - this.summoningTime.toNumber()) / this.periodDuration.toNumber();
   // }
 
-  public get api() { return this._api; }
+  public get api() {
+    return this._api;
+  }
 
   // INIT / DEINIT
   constructor(app: IApp) {

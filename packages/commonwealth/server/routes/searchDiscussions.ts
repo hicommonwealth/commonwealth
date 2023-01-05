@@ -70,7 +70,6 @@ const searchDiscussions = async (
   // Community-scoped search
   let communityOptions = '';
   if (req.query.chain) {
-
     // set up query parameters
     communityOptions = `AND "Threads".chain = $chain `;
     bind = { chain: chain.id };

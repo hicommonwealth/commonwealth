@@ -12,7 +12,7 @@ module.exports = merge(common, {
   },
   ignoreWarnings: [
     { module: /client\/styles\/construct.scss/ },
-    { module: /node_modules\/magic-sdk\/dist\/es\/index.mjs/ }
+    { module: /node_modules\/magic-sdk\/dist\/es\/index.mjs/ },
   ],
   stats: {
     assets: false,

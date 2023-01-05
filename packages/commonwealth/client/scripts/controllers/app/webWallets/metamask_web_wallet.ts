@@ -44,13 +44,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async getRecentBlock(): Promise<BlockInfo> {
-    const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
+    const block = await this._web3.givenProvider.request({
+      method: 'eth_getBlockByNumber',
+      params: ['latest', false],
+    });
 
     return {
       number: hexToNumber(block.number),
       hash: block.hash,
       timestamp: hexToNumber(block.timestamp),
-    }
+    };
   }
 
   public async signMessage(message: string): Promise<string> {
@@ -62,12 +65,14 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const sessionPublicAddress = app.sessions.getOrCreateAddress(app.chain?.meta.node.ethChainId || 1);
+    const sessionPublicAddress = app.sessions.getOrCreateAddress(
+      app.chain?.meta.node.ethChainId || 1
+    );
     const msgParams = await constructTypedMessage(
       this.accounts[0],
       app.chain?.meta.node.ethChainId || 1,
       sessionPublicAddress,
-      validationBlockInfo,
+      validationBlockInfo
     );
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
@@ -77,11 +82,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
+    const webWalletSignature = await this.signLoginToken(
+      account.validationBlockInfo
+    );
     return webWalletSignature;
   }
 
-  public async validateWithAccount(account: Account, walletSignature: string): Promise<void> {
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
     return account.validate(walletSignature);
   }
 

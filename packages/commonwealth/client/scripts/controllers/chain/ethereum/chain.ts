@@ -8,7 +8,7 @@ import {
   ITXModalData,
   ITXData,
   IChainModule,
-  ChainInfo
+  ChainInfo,
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumAccount from './account';
@@ -24,7 +24,12 @@ export interface IEthereumTXData extends ITXData {
 }
 
 class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
-  public createTXModalData(author: EthereumAccount, txFunc: any, txName: string, objName: string): ITXModalData {
+  public createTXModalData(
+    author: EthereumAccount,
+    txFunc: any,
+    txName: string,
+    objName: string
+  ): ITXModalData {
     throw new Error('Method not implemented.');
   }
 
@@ -42,7 +47,9 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;
@@ -55,8 +62,12 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   private _api: Web3;
   private _metadataInitialized = false;
   private _totalbalance: EthereumCoin;
-  public get metadataInitialized() { return this._metadataInitialized; }
-  public get totalbalance() { return this._totalbalance; }
+  public get metadataInitialized() {
+    return this._metadataInitialized;
+  }
+  public get totalbalance() {
+    return this._totalbalance;
+  }
 
   public async initApi(node?: NodeInfo): Promise<Web3> {
     this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
@@ -87,8 +98,10 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
       for (let n = 0; n < nHeadersForBlocktime; n++) {
         const prevBlockNumber = blockNumber - 1 - n;
         if (prevBlockNumber > 0) {
-          const prevHeader = await this._api.eth.getBlock(`${blockNumber - 1 - n}`);
-          const duration = lastBlockTime -+prevHeader.timestamp;
+          const prevHeader = await this._api.eth.getBlock(
+            `${blockNumber - 1 - n}`
+          );
+          const duration = lastBlockTime - +prevHeader.timestamp;
           lastBlockTime = +prevHeader.timestamp;
           totalDuration += duration;
         } else {

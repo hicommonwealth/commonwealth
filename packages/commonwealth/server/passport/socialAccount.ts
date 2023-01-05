@@ -6,8 +6,13 @@ import { Request } from 'express';
 import '../types';
 import { DB } from '../models';
 import {
-  GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GITHUB_OAUTH_CALLBACK,
-  DISCORD_CLIENT_ID, DISCORD_CLIENT_SECRET, DISCORD_OAUTH_CALLBACK, DISCORD_OAUTH_SCOPES
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GITHUB_OAUTH_CALLBACK,
+  DISCORD_CLIENT_ID,
+  DISCORD_CLIENT_SECRET,
+  DISCORD_OAUTH_CALLBACK,
+  DISCORD_OAUTH_SCOPES,
 } from '../config';
 import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -83,7 +88,7 @@ async function authenticateSocialAccount(
   models: DB
 ) {
   const account = await models.SocialAccount.findOne({
-    where: { provider, provider_userid: profile.id }
+    where: { provider, provider_userid: profile.id },
   });
 
   // Existing account. If there is already a user logged-in,
@@ -97,16 +102,18 @@ async function authenticateSocialAccount(
     // LoginToken to get a new login session.
     if ((req as any).loginTokenForRedirect) {
       const tokenObj = await models.LoginToken.findOne({
-        where: {id: (req as any).loginTokenForRedirect}
+        where: { id: (req as any).loginTokenForRedirect },
       });
       tokenObj.social_account = account.id;
       await tokenObj.save();
     }
 
     // Update profile data on the SocialAccount.
-    if (accessToken !== account.access_token
-        || refreshToken !== account.refresh_token
-        || profile.username !== account.provider_username) {
+    if (
+      accessToken !== account.access_token ||
+      refreshToken !== account.refresh_token ||
+      profile.username !== account.provider_username
+    ) {
       account.access_token = accessToken;
       account.refresh_token = refreshToken;
       account.provider_username = profile.username;
@@ -116,7 +123,9 @@ async function authenticateSocialAccount(
     // Check associations and log in the correct user.
     const user = await account.getUser();
     if (req.user === null && user === null) {
-      const newUser = await models.User.createWithProfile(models, { email: null });
+      const newUser = await models.User.createWithProfile(models, {
+        email: null,
+      });
       await account.setUser(newUser);
       return cb(null, newUser);
     } else if (req.user && req.user !== user) {
@@ -150,7 +159,7 @@ async function authenticateSocialAccount(
   // LoginToken to get a new login session.
   if ((req as any).loginTokenForRedirect) {
     const tokenObj = await models.LoginToken.findOne({
-      where: {id: (req as any).loginTokenForRedirect}
+      where: { id: (req as any).loginTokenForRedirect },
     });
     tokenObj.social_account = newAccount.id;
     await tokenObj.save();
@@ -160,7 +169,9 @@ async function authenticateSocialAccount(
     await newAccount.setUser(req.user);
     return cb(null, req.user);
   } else {
-    const newUser = await models.User.createWithProfile(models, { email: null });
+    const newUser = await models.User.createWithProfile(models, {
+      email: null,
+    });
     await models.Subscription.create({
       subscriber_id: newUser.id,
       category_id: NotificationCategories.NewMention,
@@ -187,26 +198,55 @@ async function authenticateSocialAccount(
 export function useSocialAccountAuth(models: DB) {
   // allow user to authenticate with Github
   // create stub user without email
-  if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET && GITHUB_OAUTH_CALLBACK) passport.use(new GithubStrategy({
-    clientID: GITHUB_CLIENT_ID,
-    clientSecret: GITHUB_CLIENT_SECRET,
-    callbackURL: GITHUB_OAUTH_CALLBACK,
-    passReqToCallback: true,
-    store: true
-  }, async (req: Request, accessToken, refreshToken, profile, cb) => {
-    await authenticateSocialAccount(Providers.GITHUB, req, accessToken, refreshToken, profile, cb, models)
-  }));
+  if (GITHUB_CLIENT_ID && GITHUB_CLIENT_SECRET && GITHUB_OAUTH_CALLBACK)
+    passport.use(
+      new GithubStrategy(
+        {
+          clientID: GITHUB_CLIENT_ID,
+          clientSecret: GITHUB_CLIENT_SECRET,
+          callbackURL: GITHUB_OAUTH_CALLBACK,
+          passReqToCallback: true,
+          store: true,
+        },
+        async (req: Request, accessToken, refreshToken, profile, cb) => {
+          await authenticateSocialAccount(
+            Providers.GITHUB,
+            req,
+            accessToken,
+            refreshToken,
+            profile,
+            cb,
+            models
+          );
+        }
+      )
+    );
 
-  if (DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET && DISCORD_OAUTH_CALLBACK) passport.use(new DiscordStrategy({
-    clientID: DISCORD_CLIENT_ID,
-    clientSecret: DISCORD_CLIENT_SECRET,
-    scope: DISCORD_OAUTH_SCOPES,
-    passReqToCallback: true,
-    authorizationURL: 'https://discord.com/api/oauth2/authorize?prompt=none',
-    callbackURL: DISCORD_OAUTH_CALLBACK,
-    store: true
-    // pass in the 'verify' callback
-  }, async (req: Request, accessToken, refreshToken, profile, cb) => {
-    await authenticateSocialAccount(Providers.DISCORD,  req, accessToken, refreshToken, profile, cb, models)
-  }))
+  if (DISCORD_CLIENT_ID && DISCORD_CLIENT_SECRET && DISCORD_OAUTH_CALLBACK)
+    passport.use(
+      new DiscordStrategy(
+        {
+          clientID: DISCORD_CLIENT_ID,
+          clientSecret: DISCORD_CLIENT_SECRET,
+          scope: DISCORD_OAUTH_SCOPES,
+          passReqToCallback: true,
+          authorizationURL:
+            'https://discord.com/api/oauth2/authorize?prompt=none',
+          callbackURL: DISCORD_OAUTH_CALLBACK,
+          store: true,
+          // pass in the 'verify' callback
+        },
+        async (req: Request, accessToken, refreshToken, profile, cb) => {
+          await authenticateSocialAccount(
+            Providers.DISCORD,
+            req,
+            accessToken,
+            refreshToken,
+            profile,
+            cb,
+            models
+          );
+        }
+      )
+    );
 }

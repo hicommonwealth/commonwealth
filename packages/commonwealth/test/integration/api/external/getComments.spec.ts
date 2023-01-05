@@ -1,7 +1,10 @@
 import 'chai/register-should';
 import chai from 'chai';
 import 'chai/register-should';
-import { GetCommentsReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
+import {
+  GetCommentsReq,
+  OrderByOptions,
+} from 'common-common/src/api/extApiTypes';
 import 'test/integration/api/external/dbEntityHooks.spec';
 import { testComments } from 'test/integration/api/external/dbEntityHooks.spec';
 import { CommentAttributes } from 'server/models/comment';
@@ -12,14 +15,20 @@ chai.use(chaiHttp);
 
 describe('getComments Tests', () => {
   it('should return comments with specified community_id correctly', async () => {
-    const r: GetCommentsReq = { community_id: testComments[0].chain, count_only: 'false' as any };
+    const r: GetCommentsReq = {
+      community_id: testComments[0].chain,
+      count_only: 'false' as any,
+    };
     const resp = await get('/api/comments', r);
 
     chai.assert.lengthOf(resp.result.comments, 5);
   });
 
   it('should return count only when specified correctly', async () => {
-    const r: GetCommentsReq = { community_id: testComments[0].chain, count_only: true };
+    const r: GetCommentsReq = {
+      community_id: testComments[0].chain,
+      count_only: true,
+    };
     const resp = await get('/api/comments', r);
 
     chai.assert.equal(resp.result.count, 5);
@@ -27,7 +36,10 @@ describe('getComments Tests', () => {
   });
 
   it('should return comments with specified addresses correctly', async () => {
-    const r: GetCommentsReq = { community_id: testComments[0].chain, addresses: ['testAddress-1'] };
+    const r: GetCommentsReq = {
+      community_id: testComments[0].chain,
+      addresses: ['testAddress-1'],
+    };
 
     let resp = await get('/api/comments', r);
 
@@ -40,7 +52,11 @@ describe('getComments Tests', () => {
   });
 
   it('should paginate correctly', async () => {
-    const r: GetCommentsReq = { community_id: testComments[0].chain, addresses: ['testAddress-2'], limit: 2 };
+    const r: GetCommentsReq = {
+      community_id: testComments[0].chain,
+      addresses: ['testAddress-2'],
+      limit: 2,
+    };
     let resp = await get('/api/comments', r);
 
     chai.assert.lengthOf(resp.result.comments, 2);
@@ -60,7 +76,7 @@ describe('getComments Tests', () => {
     const r: GetCommentsReq = {
       community_id: testComments[0].chain,
       addresses: ['testAddress-2'],
-      sort: OrderByOptions.CREATED
+      sort: OrderByOptions.CREATED,
     };
     let resp = await get('/api/comments', r);
 
@@ -68,7 +84,8 @@ describe('getComments Tests', () => {
     chai.assert.deepEqual(
       resp.result.comments,
       ([...resp.result.comments] as CommentAttributes[]).sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
     );
 
@@ -79,7 +96,8 @@ describe('getComments Tests', () => {
     chai.assert.deepEqual(
       resp.result.comments,
       ([...resp.result.comments] as CommentAttributes[]).sort(
-        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
     );
   });
@@ -91,7 +109,11 @@ describe('getComments Tests', () => {
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
     chai.assert.equal(resp.result[0].param, 'community_id');
 
-    resp = await get('/api/comments', { community_id: testComments[0].chain, count_only: 3 }, true);
+    resp = await get(
+      '/api/comments',
+      { community_id: testComments[0].chain, count_only: 3 },
+      true
+    );
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

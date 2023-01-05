@@ -8,7 +8,12 @@ import { AppError, ServerError } from 'common-common/src/errors';
 const Op = Sequelize.Op;
 const log = factory.getLogger(formatFilename(__filename));
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
@@ -24,7 +29,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   }
 
   const subscriptions = await models.Subscription.findAll({
-    where: { id: idOptions }
+    where: { id: idOptions },
   });
 
   if (subscriptions.find((s) => s.subscriber_id !== req.user.id)) {
@@ -32,10 +37,12 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   }
 
   await sequelize.transaction(async (t) => {
-    await Promise.all(subscriptions.map((s) => {
-      s.is_active = false;
-      return s.save({ transaction: t });
-    }));
+    await Promise.all(
+      subscriptions.map((s) => {
+        s.is_active = false;
+        return s.save({ transaction: t });
+      })
+    );
   });
 
   return res.json({ status: 'Success', result: 'Disabled subscriptions' });

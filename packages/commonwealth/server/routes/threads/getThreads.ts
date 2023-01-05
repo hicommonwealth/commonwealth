@@ -1,7 +1,15 @@
-import Sequelize, {} from 'sequelize';
-import { GetThreadsReq, GetThreadsResp } from 'common-common/src/api/extApiTypes';
+import Sequelize from 'sequelize';
+import {
+  GetThreadsReq,
+  GetThreadsResp,
+} from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
+import {
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+  failure,
+} from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 
@@ -21,14 +29,22 @@ export const getThreadsValidation = [
 export const getThreads = async (
   models: DB,
   req: TypedRequestQuery<GetThreadsReq>,
-  res: TypedResponse<GetThreadsResp>,
+  res: TypedResponse<GetThreadsResp>
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
     return failure(res.status(400), errors);
   }
 
-  const { community_id, topic_id, address_ids, no_body, include_comments, addresses, count_only } = req.query;
+  const {
+    community_id,
+    topic_id,
+    address_ids,
+    no_body,
+    include_comments,
+    addresses,
+    count_only,
+  } = req.query;
 
   const pagination = formatPagination(req.query);
 
@@ -39,16 +55,18 @@ export const getThreads = async (
     include.push({
       model: models.Address,
       where: { address: { [Op.in]: addresses } },
-      as: 'Address'
+      as: 'Address',
     });
   }
 
   let attributes;
 
-  if (no_body) attributes = { exclude: ['body', 'plaintext', 'version_history'] };
+  if (no_body)
+    attributes = { exclude: ['body', 'plaintext', 'version_history'] };
   if (topic_id) where['topic_id'] = topic_id;
-  if (address_ids) where['address_id'] = { [Op.in]: address_ids, };
-  if (include_comments) include.push({ model: models.Comment, required: false, });
+  if (address_ids) where['address_id'] = { [Op.in]: address_ids };
+  if (include_comments)
+    include.push({ model: models.Comment, required: false });
 
   let threads, count;
   if (!count_only) {
@@ -57,7 +75,7 @@ export const getThreads = async (
       where,
       include,
       attributes,
-      ...pagination
+      ...pagination,
     }));
   } else {
     count = <any>await models.Thread.count({
@@ -65,7 +83,7 @@ export const getThreads = async (
       where,
       include,
       attributes,
-      ...pagination
+      ...pagination,
     });
   }
 

@@ -11,7 +11,7 @@ module.exports = {
           type: Sequelize.STRING,
           allowNull: true,
         },
-        { transaction: t },
+        { transaction: t }
       );
       await queryInterface.addColumn(
         'OffchainProfiles',
@@ -20,23 +20,19 @@ module.exports = {
           type: Sequelize.JSONB,
           allowNull: true,
         },
-        { transaction: t },
+        { transaction: t }
       );
     });
   },
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn(
-        'OffchainProfiles',
-        'identity',
-        { transaction: t },
-      );
-      await queryInterface.removeColumn(
-        'OffchainProfiles',
-        'judgements',
-        { transaction: t },
-      );
+      await queryInterface.removeColumn('OffchainProfiles', 'identity', {
+        transaction: t,
+      });
+      await queryInterface.removeColumn('OffchainProfiles', 'judgements', {
+        transaction: t,
+      });
     });
-  }
+  },
 };

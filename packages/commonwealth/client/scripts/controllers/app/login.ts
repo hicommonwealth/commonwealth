@@ -246,14 +246,14 @@ export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
   chain: string,
-  validationBlockInfo?: BlockInfo,
+  validationBlockInfo?: BlockInfo
 ): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
     address,
     chain,
     jwt: app.user.jwt,
     wallet_id: walletId,
-    block_info: JSON.stringify(validationBlockInfo)
+    block_info: JSON.stringify(validationBlockInfo),
   });
   const id = response.result.id;
   const chainInfo = app.config.chains.getById(chain);

@@ -161,10 +161,7 @@ class RecentListingStore extends IdStore<Thread> {
 
   // Filter function to determine inclusion of threads on listing page
 
-  private _isBeforeCutoff(
-    params: IListingParams,
-    thread: Thread
-  ): boolean {
+  private _isBeforeCutoff(params: IListingParams, thread: Thread): boolean {
     const { topicName, stageName, pinned } = params;
     const listingCutoff = topicName
       ? this._fetchState.topicCutoffDate[topicName]

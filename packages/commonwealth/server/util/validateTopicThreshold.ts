@@ -1,5 +1,8 @@
 import BN from 'bn.js';
-import { TokenBalanceCache, FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
+import {
+  TokenBalanceCache,
+  FetchTokenBalanceErrors,
+} from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DB } from '../models';
@@ -21,12 +24,14 @@ const validateTopicThreshold = async (
           model: models.Chain,
           required: true,
           as: 'chain',
-          include: [{
-            model: models.ChainNode,
-            required: true,
-          }]
+          include: [
+            {
+              model: models.ChainNode,
+              required: true,
+            },
+          ],
         },
-      ]
+      ],
     });
     if (!topic?.chain?.ChainNode?.id) {
       // if we have no node, always approve
@@ -54,7 +59,7 @@ const validateTopicThreshold = async (
         communityContracts?.Contract?.address
       );
 
-      return (new BN(balance)).gte(threshold);
+      return new BN(balance).gte(threshold);
     } catch (e) {
       if (e.message === FetchTokenBalanceErrors.NoBalanceProvider) {
         return true;
@@ -63,10 +68,11 @@ const validateTopicThreshold = async (
       }
     }
   } catch (err) {
-    log.warn(`Could not validate topic threshold for ${topicId}: ${err.message}`);
+    log.warn(
+      `Could not validate topic threshold for ${topicId}: ${err.message}`
+    );
     return false;
   }
-
 };
 
 export default validateTopicThreshold;

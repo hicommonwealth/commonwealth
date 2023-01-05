@@ -6,7 +6,6 @@ import { ThreadAttributes } from '../models/thread';
 import { success, TypedRequestQuery, TypedResponse } from '../types';
 import { DB } from '../models';
 
-
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -15,12 +14,12 @@ export const Errors = {
   NoAddressFound: 'No address found',
 };
 
-type GetProfileReq = { chain: string, address: string };
+type GetProfileReq = { chain: string; address: string };
 type GetProfileResp = {
-  account: AddressAttributes,
-  threads: ThreadAttributes[],
-  comments: CommentAttributes[],
-}
+  account: AddressAttributes;
+  threads: ThreadAttributes[];
+  comments: CommentAttributes[];
+};
 
 const getProfile = async (
   models: DB,
@@ -36,7 +35,7 @@ const getProfile = async (
       address,
       chain,
     },
-    include: [ models.OffchainProfile, ],
+    include: [models.OffchainProfile],
   });
   if (!addressModel) throw new AppError(Errors.NoAddressFound);
 
@@ -44,7 +43,7 @@ const getProfile = async (
     where: {
       address_id: addressModel.id,
     },
-    include: [ { model: models.Address, as: 'Address' } ],
+    include: [{ model: models.Address, as: 'Address' }],
   });
 
   const comments = await models.Comment.findAll({
@@ -56,8 +55,8 @@ const getProfile = async (
   return success(res, {
     account: addressModel.toJSON(),
     threads: threads.map((t) => t.toJSON()),
-    comments: comments.map((c) => c.toJSON())
-  })
+    comments: comments.map((c) => c.toJSON()),
+  });
 };
 
 export default getProfile;

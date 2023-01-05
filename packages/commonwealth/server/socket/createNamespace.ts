@@ -85,18 +85,16 @@ export async function publishToChainEventsRoom(
   this: { server: Server },
   notification: ChainEventNotification
 ) {
-  this.server.to(notification.ChainEvent.ChainEventType.id).emit(
-    WebsocketMessageNames.ChainEventNotification,
-    notification
-  );
+  this.server
+    .to(notification.ChainEvent.ChainEventType.id)
+    .emit(WebsocketMessageNames.ChainEventNotification, notification);
 }
 
 export async function publishToSnapshotRoom(
   this: { server: Server },
   notification: SnapshotProposalNotification
 ) {
-  this.server.to(notification.SnapshotProposal.id).emit(
-    WebsocketMessageNames.SnapshotProposalNotification,
-    notification
-  );
+  this.server
+    .to(notification.SnapshotProposal.id)
+    .emit(WebsocketMessageNames.SnapshotProposalNotification, notification);
 }

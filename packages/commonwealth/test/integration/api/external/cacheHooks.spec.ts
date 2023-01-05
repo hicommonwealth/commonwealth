@@ -1,8 +1,15 @@
-import { BalanceProvider, IChainNode, TokenBalanceCache } from 'token-balance-cache/src';
+import {
+  BalanceProvider,
+  IChainNode,
+  TokenBalanceCache,
+} from 'token-balance-cache/src';
 import { BalanceType } from 'common-common/src/types';
 import BN from 'bn.js';
 
-class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
+class MockTokenBalanceProvider extends BalanceProvider<{
+  tokenAddress: string;
+  contractType: string;
+}> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
@@ -14,7 +21,7 @@ class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, c
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: { tokenAddress: string, contractType: string }
+    opts: { tokenAddress: string; contractType: string }
   ): Promise<string> {
     if (this.balanceFn) {
       const bal = await this.balanceFn(opts.tokenAddress, address);
@@ -28,14 +35,16 @@ class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, c
 export let tokenBalanceCache: TokenBalanceCache;
 export let tokenProvider: MockTokenBalanceProvider;
 before(async () => {
-  const node: IChainNode[] = [{
-    balance_type: BalanceType.Ethereum,
-    id: -1,
-    name: 'testNode',
-    url: '',
-    description: '',
-    bech32: ''
-  }];
+  const node: IChainNode[] = [
+    {
+      balance_type: BalanceType.Ethereum,
+      id: -1,
+      name: 'testNode',
+      url: '',
+      description: '',
+      bech32: '',
+    },
+  ];
 
   tokenProvider = new MockTokenBalanceProvider();
   tokenBalanceCache = new TokenBalanceCache(

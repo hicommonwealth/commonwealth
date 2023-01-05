@@ -10,10 +10,12 @@ import { Account, IWebWallet } from 'models';
 // TODO: ensure this only opens on mobile
 
 type TerraAddress = {
-  address: string
-}
+  address: string;
+};
 
-class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> {
+class TerraWalletConnectWebWalletController
+  implements IWebWallet<TerraAddress>
+{
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: TerraAddress[];
@@ -41,7 +43,9 @@ class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> 
 
   public async signWithAccount(account: Account): Promise<string> {
     try {
-      const result = await this._wallet.signBytes(Buffer.from(account.validationToken));
+      const result = await this._wallet.signBytes(
+        Buffer.from(account.validationToken)
+      );
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');
       }
@@ -90,17 +94,19 @@ class TerraWalletConnectWebWalletController implements IWebWallet<TerraAddress> 
 
       let subscription;
       this._wallet = await new Promise((resolve, reject) => {
-        subscription = this._controller.connectedWallet().subscribe((connectedWallet) => {
-          if (connectedWallet) {
-            resolve(connectedWallet)
-          }
-        })
+        subscription = this._controller
+          .connectedWallet()
+          .subscribe((connectedWallet) => {
+            if (connectedWallet) {
+              resolve(connectedWallet);
+            }
+          });
       });
       if (subscription?.unsubscribe) {
         subscription.unsubscribe();
       }
 
-      this._accounts = [ { address: this._wallet.terraAddress } ];
+      this._accounts = [{ address: this._wallet.terraAddress }];
       this._enabled = true;
       this._enabling = false;
     } catch (error) {

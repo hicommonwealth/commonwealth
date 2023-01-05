@@ -1,5 +1,5 @@
 import { Response, NextFunction, Request } from 'express';
-import {AppError} from "common-common/src/errors";
+import { AppError } from 'common-common/src/errors';
 import { WhereOptions } from 'sequelize/types';
 import { ChainEntityMetaAttributes } from 'server/models/chain_entity_meta';
 import { DB } from '../models';
@@ -9,13 +9,18 @@ export const Errors = {
   InvalidChain: 'Invalid chain',
 };
 
-const getEntityMeta = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const getEntityMeta = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.query.chain) {
     return next(new AppError(Errors.NeedChain));
   }
 
   const chain = await models.Chain.findOne({
-    where: { id: req.query.chain }
+    where: { id: req.query.chain },
   });
 
   if (!chain) {
@@ -37,10 +42,13 @@ const getEntityMeta = async (models: DB, req: Request, res: Response, next: Next
       {
         model: models.Thread,
         attributes: ['title'],
-      }
+      },
     ],
   });
-  return res.json({ status: 'Success', result: entityMeta.map((e) => e.toJSON()) });
+  return res.json({
+    status: 'Success',
+    result: entityMeta.map((e) => e.toJSON()),
+  });
 };
 
 export default getEntityMeta;

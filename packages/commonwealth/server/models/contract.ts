@@ -1,9 +1,11 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { DataTypes } from 'sequelize';
 import { ChainNodeAttributes, ChainNodeInstance } from './chain_node';
-import { CommunityContractAttributes, CommunityContractInstance } from './community_contract';
+import {
+  CommunityContractAttributes,
+  CommunityContractInstance,
+} from './community_contract';
 import { ModelStatic, ModelInstance } from './types';
-
 
 export type ContractAttributes = {
   id: number;
@@ -21,8 +23,8 @@ export type ContractAttributes = {
 };
 
 export type ContractInstance = ModelInstance<ContractAttributes> & {
-    getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
-    getCommunityContract: Sequelize.BelongsToGetAssociationMixin<CommunityContractInstance>;
+  getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
+  getCommunityContract: Sequelize.BelongsToGetAssociationMixin<CommunityContractInstance>;
 };
 
 export type ContractModelStatic = ModelStatic<ContractInstance>;
@@ -47,9 +49,11 @@ export default (
     },
     {
       tableName: 'Contracts',
-      indexes: [{
-        fields: ['address'],
-      }],
+      indexes: [
+        {
+          fields: ['address'],
+        },
+      ],
       timestamps: true,
       underscored: true,
       createdAt: 'created_at',
@@ -58,9 +62,17 @@ export default (
   );
 
   Contract.associate = (models) => {
-    models.Contract.belongsToMany(models.Chain, { through: models.CommunityContract });
-    models.Contract.belongsTo(models.ChainNode, { foreignKey: 'chain_node_id', targetKey: 'id' });
-    models.Contract.belongsTo(models.ContractAbi, { foreignKey: 'abi_id', targetKey: 'id'  });
+    models.Contract.belongsToMany(models.Chain, {
+      through: models.CommunityContract,
+    });
+    models.Contract.belongsTo(models.ChainNode, {
+      foreignKey: 'chain_node_id',
+      targetKey: 'id',
+    });
+    models.Contract.belongsTo(models.ContractAbi, {
+      foreignKey: 'abi_id',
+      targetKey: 'id',
+    });
   };
 
   return Contract;

@@ -2,11 +2,12 @@ import { IChainEntityKind } from 'chain-events/src';
 
 import { ChainEntity } from '../models';
 import Store from './Store';
-import {proposalSlugToChainEntityType} from "identifiers";
-import {ProposalType} from "common-common/src/types";
+import { proposalSlugToChainEntityType } from 'identifiers';
+import { ProposalType } from 'common-common/src/types';
 
 class ChainEntityStore extends Store<ChainEntity> {
-  private _storeType: { [type: string]: { [stringId: string]: ChainEntity } } = { };
+  private _storeType: { [type: string]: { [stringId: string]: ChainEntity } } =
+    {};
 
   public get(entity: ChainEntity) {
     return this._store.find((e) => e.eq(entity));
@@ -30,7 +31,10 @@ class ChainEntityStore extends Store<ChainEntity> {
 
   public remove(entity: ChainEntity) {
     super.remove(entity, (e) => e.eq(entity));
-    if (this._storeType[entity.type] && this._storeType[entity.type][entity.stringId]) {
+    if (
+      this._storeType[entity.type] &&
+      this._storeType[entity.type][entity.stringId]
+    ) {
       delete this._storeType[entity.type][entity.stringId];
     }
     return this;
@@ -43,7 +47,9 @@ class ChainEntityStore extends Store<ChainEntity> {
 
   public getByType(type: IChainEntityKind, keepEmpty = false) {
     if (this._storeType[type]) {
-      return Object.values(this._storeType[type]).filter((e) => keepEmpty || e.chainEvents.length > 0);
+      return Object.values(this._storeType[type]).filter(
+        (e) => keepEmpty || e.chainEvents.length > 0
+      );
     } else {
       return [];
     }
@@ -71,7 +77,11 @@ class ChainEntityStore extends Store<ChainEntity> {
     return this.getByUniqueData(chain, type, type_id);
   }
 
-  public getByUniqueData(chain: string, type: IChainEntityKind, type_id: string) {
+  public getByUniqueData(
+    chain: string,
+    type: IChainEntityKind,
+    type_id: string
+  ) {
     const entities = this.getByType(type, true);
     for (const entity of entities) {
       if (entity.chain === chain && entity.typeId === type_id) {

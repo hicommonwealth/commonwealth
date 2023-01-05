@@ -1,17 +1,23 @@
-import {DB} from '../models';
-import {AppError} from "common-common/src/errors";
+import { DB } from '../models';
+import { AppError } from 'common-common/src/errors';
 import { Response, NextFunction, Request } from 'express';
-import {CHAIN_EVENT_SERVICE_SECRET} from "../config";
-import {QueryTypes} from "sequelize";
+import { CHAIN_EVENT_SERVICE_SECRET } from '../config';
+import { QueryTypes } from 'sequelize';
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',
   InvalidSecret: 'Must provide a valid secret to use this route',
   NoNumChainSubscribers: 'Must provide the number of chain-event subscribers',
-  NoChainSubscriberIndex: 'Must provide the index of the chain-event subscriber'
-}
+  NoChainSubscriberIndex:
+    'Must provide the index of the chain-event subscriber',
+};
 
-export const getChainEventServiceData = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+export const getChainEventServiceData = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   console.log(`${JSON.stringify(req.body)}`);
   if (!req.body.secret) {
     return next(new AppError(Errors.NeedSecret));
@@ -30,7 +36,7 @@ export const getChainEventServiceData = async (models: DB, req: Request, res: Re
   }
 
   const numChainSubs = req.body.num_chain_subscribers;
-  const chainSubIndex = req.body.chain_subscriber_index
+  const chainSubIndex = req.body.chain_subscriber_index;
 
   const query = `
       WITH allChains AS (SELECT "Chains".id,
@@ -65,9 +71,10 @@ export const getChainEventServiceData = async (models: DB, req: Request, res: Re
       WHERE MOD(allChains.index, ${numChainSubs}) = ${chainSubIndex};
   `;
 
-  const result = await models.sequelize.query(
-    query, {type: QueryTypes.SELECT, raw: true}
-  );
+  const result = await models.sequelize.query(query, {
+    type: QueryTypes.SELECT,
+    raw: true,
+  });
 
   return res.json({ status: 'Success', result });
-}
+};

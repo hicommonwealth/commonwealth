@@ -14,8 +14,8 @@ function setupEntityProxy(app: Express) {
       const entitiesUrl = `${ENTITIES_URL}/entities${search}`;
       const response = await axios.get(entitiesUrl, {
         headers: {
-          origin: 'https://commonwealth.im'
-        }
+          origin: 'https://commonwealth.im',
+        },
       });
       return res.send(response.data);
     } catch (err) {

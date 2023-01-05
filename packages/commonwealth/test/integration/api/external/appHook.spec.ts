@@ -45,12 +45,18 @@ before(async () => {
   app.use('/api', router);
 });
 
-export async function get(path: string, val: Record<string, unknown> = null, expectError = false) {
-  const res = <any>await chai
-    .request(app)
-    .get(path)
-    .set('Accept', 'application/json')
-    .query(val);
+export async function get(
+  path: string,
+  val: Record<string, unknown> = null,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .get(path)
+      .set('Accept', 'application/json')
+      .query(val)
+  );
 
   if (!expectError) assert.equal(res.statusCode, 200);
 

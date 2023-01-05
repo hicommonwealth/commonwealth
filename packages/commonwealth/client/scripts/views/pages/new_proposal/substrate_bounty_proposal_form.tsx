@@ -62,14 +62,15 @@ export class SubstrateBountyProposalForm extends ClassComponent {
               throw new Error('Invalid value');
             }
 
-            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-              (a) => {
-                return (
-                  proposalSlugToClass().get(
-                    ProposalType.SubstrateBountyProposal
-                  ) as ProposalModule<any, any, any>
-                ).createTx(...a);
-              };
+            let createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.SubstrateBountyProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
 
             const args = [author, this.value, this.title];
 

@@ -1,5 +1,5 @@
 import models from '../database';
-import {QueryTypes} from "sequelize";
+import { QueryTypes } from 'sequelize';
 
 /**
  * This script is meant as the worst case scenario recovery tool or as a method of ensuring consistency without a trace
@@ -26,8 +26,10 @@ export async function enforceDataConsistency(
 ) {
   // if the function is called with run-as-script i.e. yarn runEnforceDataConsistency ensure that CONFIRM=true is passed
   if (process.argv[2] === 'run-as-script' && process.env.CONFIRM != 'true') {
-    console.warn("This script makes changes to the database specified by the given database URI. If you are sure " +
-      "you want to do this run this script again with the env var 'CONFIRM=true'");
+    console.warn(
+      'This script makes changes to the database specified by the given database URI. If you are sure ' +
+        "you want to do this run this script again with the env var 'CONFIRM=true'"
+    );
     process.exit(0);
   }
 
@@ -54,18 +56,20 @@ export async function enforceDataConsistency(
 
   await models.sequelize.transaction(async (t) => {
     if (enforceEventTypes) {
-      const result = await models.sequelize.query(
-        chainEventTypeSyncQuery,
-        {type: QueryTypes.INSERT, raw: true, transaction: t}
-      );
-      console.log("ChainEventTypes synced:", result);
+      const result = await models.sequelize.query(chainEventTypeSyncQuery, {
+        type: QueryTypes.INSERT,
+        raw: true,
+        transaction: t,
+      });
+      console.log('ChainEventTypes synced:', result);
     }
     if (enforceEntities) {
-      const result = await models.sequelize.query(
-        chainEntitySyncQuery,
-        {type: QueryTypes.INSERT, raw: true, transaction: t}
-      );
-      console.log("ChainEventEntities synced:", result)
+      const result = await models.sequelize.query(chainEntitySyncQuery, {
+        type: QueryTypes.INSERT,
+        raw: true,
+        transaction: t,
+      });
+      console.log('ChainEventEntities synced:', result);
     }
   });
 }
@@ -74,12 +78,11 @@ export async function enforceDataConsistency(
 if (process.argv[2] == 'run-as-script') {
   enforceDataConsistency(process.argv[3])
     .then(() => {
-      console.log("Successfully synced the databases");
+      console.log('Successfully synced the databases');
       process.exit(0);
     })
     .catch((e) => {
       console.error(e);
       process.exit(1);
-    })
+    });
 }
-

@@ -53,7 +53,7 @@ export default (
       },
       category: {
         type: Sequelize.STRING(255),
-        allowNull: false
+        allowNull: false,
       },
       rule_id: {
         type: Sequelize.INTEGER,
@@ -82,7 +82,7 @@ export default (
       foreignKey: 'chat_channel_id',
     });
     models.ChatChannel.belongsTo(models.Chain, {
-        onDelete: 'CASCADE'
+      onDelete: 'CASCADE',
     });
     models.ChatChannel.belongsTo(models.Rule, {
       foreignKey: 'rule_id',

@@ -20,7 +20,7 @@ const updateBanner = async (
   req: TypedRequestBody<UpdateBannerReq>,
   res: Response
 ) => {
-  const chain = req.chain
+  const chain = req.chain;
   const isAdmin = await validateRoles(models, req.user, 'admin', chain.id);
   if (!isAdmin) throw new AppError(UpdateBannerErrors.NoPermission);
 

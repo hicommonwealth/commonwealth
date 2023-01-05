@@ -70,7 +70,10 @@ export default (
     models.CommunityRole.hasMany(models.RoleAssignment, {
       foreignKey: 'community_role_id',
     });
-    models.CommunityRole.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
+    models.CommunityRole.belongsTo(models.Chain, {
+      foreignKey: 'chain_id',
+      targetKey: 'id',
+    });
   };
 
   return CommunityRole;

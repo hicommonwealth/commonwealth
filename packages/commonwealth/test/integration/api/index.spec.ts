@@ -7,7 +7,10 @@ import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from '../../util/modelUtils';
-import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
+import {
+  constructTypedMessage,
+  TEST_BLOCK_INFO_STRING,
+} from '../../../shared/adapters/chain/ethereum/keys';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -19,7 +22,8 @@ describe('API Tests', () => {
 
   describe('address tests', () => {
     it('should call the /api/status route', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .get('/api/status')
         .set('Accept', 'application/json');
       expect(res.body).to.not.be.null;
@@ -30,10 +34,16 @@ describe('API Tests', () => {
       const address = `0x${keypair.getAddress().toString('hex')}`;
       const chain = 'ethereum';
       const wallet_id = 'metamask';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
-        .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+        .send({
+          address,
+          chain,
+          wallet_id,
+          block_info: TEST_BLOCK_INFO_STRING,
+        });
       expect(res.body).to.not.be.null;
       expect(res.body.status).to.equal('Success');
       expect(res.body.result).to.be.not.null;
@@ -46,17 +56,33 @@ describe('API Tests', () => {
       const { keypair, address } = modelUtils.generateEthAddress();
       const chain = 'ethereum';
       const wallet_id = 'metamask';
-      let res = await chai.request(app)
+      let res = await chai
+        .request(app)
         .post('/api/createAddress')
         .set('Accept', 'application/json')
-        .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+        .send({
+          address,
+          chain,
+          wallet_id,
+          block_info: TEST_BLOCK_INFO_STRING,
+        });
       const token = res.body.result.verification_token;
-      const chain_id = 1;   // use ETH mainnet for testing
-      const sessionWallet = ethers.Wallet.createRandom()
-      const data = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+      const chain_id = 1; // use ETH mainnet for testing
+      const sessionWallet = ethers.Wallet.createRandom();
+      const data = await constructTypedMessage(
+        address,
+        chain_id,
+        sessionWallet.address,
+        TEST_BLOCK_INFO_STRING
+      );
       const privateKey = keypair.getPrivateKey();
-      const signature = signTypedData({ privateKey, data, version: SignTypedDataVersion.V4 });
-      res = await chai.request(app)
+      const signature = signTypedData({
+        privateKey,
+        data,
+        version: SignTypedDataVersion.V4,
+      });
+      res = await chai
+        .request(app)
         .post('/api/verifyAddress')
         .set('Accept', 'application/json')
         .send({

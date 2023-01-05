@@ -167,14 +167,15 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               throw new Error('Invalid threshold');
             }
 
-            let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
-              (a) => {
-                return (
-                  proposalSlugToClass().get(
-                    ProposalType.SubstrateCollectiveProposal
-                  ) as ProposalModule<any, any, any>
-                ).createTx(...a);
-              };
+            let createFunc: (
+              ...args
+            ) => ITXModalData | Promise<ITXModalData> = (a) => {
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.SubstrateCollectiveProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
+            };
 
             let args = [];
 

@@ -324,7 +324,14 @@ const finishSsoLogin = async (
         { transaction: t }
       );
 
-      await createRole(models, newAddress.id, AXIE_INFINITY_CHAIN_ID, 'member', false, t)
+      await createRole(
+        models,
+        newAddress.id,
+        AXIE_INFINITY_CHAIN_ID,
+        'member',
+        false,
+        t
+      );
 
       // Automatically create subscription to their own mentions
       await models.Subscription.create(

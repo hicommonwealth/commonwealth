@@ -5,16 +5,12 @@ import moment from 'moment';
 import app from 'state';
 import { uniqueIdToProposal } from 'identifiers';
 import { CommentsStore } from 'stores';
-import {
-  Comment,
-  Attachment,
-  IUniqueId,
-} from 'models';
+import { Comment, Attachment, IUniqueId } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
-import { ProposalType } from "common-common/src/types";
-import proposalIdToEntity from "helpers/proposalIdToEntity";
+import { ProposalType } from 'common-common/src/types';
+import proposalIdToEntity from 'helpers/proposalIdToEntity';
 
 // tslint:disable: object-literal-key-quotes
 
@@ -165,7 +161,10 @@ class CommentsController {
       prefix.includes('referendum') ||
       prefix.includes('motion')
     ) {
-      chainEntity = app.chainEntities.store.getByUniqueId(app.activeChainId(), proposalIdentifier);
+      chainEntity = app.chainEntities.store.getByUniqueId(
+        app.activeChainId(),
+        proposalIdentifier
+      );
     }
     try {
       const res = await $.post(`${app.serverUrl()}/createComment`, {

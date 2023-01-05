@@ -14,7 +14,13 @@ export const Errors = {
   InvalidThread: 'Invalid thread',
 };
 
-const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
+const viewCount = async (
+  models: DB,
+  cache: ViewCountCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body.object_id) {
     return next(new AppError(Errors.NoObjectId));
   }
@@ -22,7 +28,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
     return next(new AppError(Errors.NoChainOrComm));
   }
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain || null }
+    where: { id: req.body.chain || null },
   });
   if (!chain) {
     return next(new AppError(Errors.InvalidChainOrComm));
@@ -33,7 +39,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
     where: {
       chain: req.body.chain,
       object_id: req.body.object_id,
-    }
+    },
   });
   if (!count) {
     return next(new AppError(Errors.InvalidThread));

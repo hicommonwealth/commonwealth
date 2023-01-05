@@ -30,7 +30,7 @@ import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 import emitNotifications from '../util/emitNotifications';
 
-import sgMail from "@sendgrid/mail";
+import sgMail from '@sendgrid/mail';
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));

@@ -9,7 +9,7 @@ export type TypedRequestQuery<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
-  chain?: ChainInstance
+  chain?: ChainInstance;
   query: Q;
 };
 
@@ -18,7 +18,7 @@ export type TypedRequestBody<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
-  chain?: ChainInstance
+  chain?: ChainInstance;
   body: B;
 };
 
@@ -28,7 +28,7 @@ export type TypedRequest<
 > = Express.Request & {
   user?: Express.User & UserInstance;
   address?: AddressInstance;
-  chain?: ChainInstance
+  chain?: ChainInstance;
   body?: B;
   query?: Q;
 };

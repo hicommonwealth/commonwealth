@@ -14,7 +14,10 @@ import { CompoundTypes } from 'chain-events/src';
 import CompoundChain from './chain';
 import CompoundGovernance from './governance';
 
-export default class Compound extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Compound extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public chain: CompoundChain;
   public accounts: EthereumAccounts;
@@ -32,7 +35,8 @@ export default class Compound extends IChainAdapter<EthereumCoin, EthereumAccoun
     try {
       await this.chain.init(this.meta);
       // TODO: Fix the global eth block height setting
-      this.block.height = await this.chain.compoundApi.Provider.getBlockNumber();
+      this.block.height =
+        await this.chain.compoundApi.Provider.getBlockNumber();
       await super.initApi();
     } catch (e) {
       this._failed = true;

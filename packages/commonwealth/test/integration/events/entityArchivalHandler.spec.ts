@@ -4,24 +4,22 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { EventEmitter } from 'events';
-import {
-  CWEvent,
-  SubstrateTypes,
-  SupportedNetwork,
-} from 'chain-events/src';
+import { CWEvent, SubstrateTypes, SupportedNetwork } from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';
 import models from 'chain-events/services/database/database';
 import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
 import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
-import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
-import {BrokerConfig} from "rascal";
-import {getRabbitMQConfig} from "common-common/src/rabbitmq";
+import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
+import { BrokerConfig } from 'rascal';
+import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
 
 chai.use(chaiHttp);
 const { assert } = chai;
 
-const rmqController = new MockRabbitMQController(<BrokerConfig>getRabbitMQConfig('localhost'));
+const rmqController = new MockRabbitMQController(
+  <BrokerConfig>getRabbitMQConfig('localhost')
+);
 
 const setupDbEvent = async (event: CWEvent) => {
   const storageHandler = new StorageHandler(models, rmqController, 'edgeware');
@@ -43,13 +41,17 @@ describe('Edgeware Archival Event Handler Tests', () => {
         endBlock: 100,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
-      }
+      },
     };
 
     const dbEvent = await setupDbEvent(event);
     const dbEventType = await dbEvent.getChainEventType();
 
-    const eventHandler = new EntityArchivalHandler(models, rmqController, 'edgeware');
+    const eventHandler = new EntityArchivalHandler(
+      models,
+      rmqController,
+      'edgeware'
+    );
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -60,7 +62,10 @@ describe('Edgeware Archival Event Handler Tests', () => {
     assert.equal(entity.type, SubstrateTypes.EntityKind.DemocracyReferendum);
     assert.equal(entity.type_id, '3');
     const events = await entity.getChainEvents();
-    assert.deepEqual(events.map((e) => e.toJSON()), [ handledDbEvent.toJSON() ]);
+    assert.deepEqual(
+      events.map((e) => e.toJSON()),
+      [handledDbEvent.toJSON()]
+    );
   });
 
   it('should update chain entity from event', async () => {
@@ -115,11 +120,21 @@ describe('Edgeware Archival Event Handler Tests', () => {
     //   }
     //   nEmissions++;
     // });
-    const eventHandler = new EntityArchivalHandler(models, rmqController, 'edgeware');
+    const eventHandler = new EntityArchivalHandler(
+      models,
+      rmqController,
+      'edgeware'
+    );
 
     // process event
-    const handleCreateEvent = await eventHandler.handle(createEvent, createDbEvent);
-    const handleUpdateEvent = await eventHandler.handle(updateEvent, updateDbEvent);
+    const handleCreateEvent = await eventHandler.handle(
+      createEvent,
+      createDbEvent
+    );
+    const handleUpdateEvent = await eventHandler.handle(
+      updateEvent,
+      updateDbEvent
+    );
 
     // verify outputs
     const entity = await handleCreateEvent.getChainEntity();
@@ -129,7 +144,10 @@ describe('Edgeware Archival Event Handler Tests', () => {
     assert.equal(entity.type, SubstrateTypes.EntityKind.TreasuryProposal);
     assert.equal(entity.type_id, '5');
     const events = await entity.getChainEvents();
-    assert.sameDeepMembers(events.map((e) => e.toJSON()), [ createDbEvent.toJSON(), updateDbEvent.toJSON() ]);
+    assert.sameDeepMembers(
+      events.map((e) => e.toJSON()),
+      [createDbEvent.toJSON(), updateDbEvent.toJSON()]
+    );
   });
 
   it('should ignore unrelated events', async () => {
@@ -140,7 +158,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
         kind: SubstrateTypes.EventKind.Slash,
         validator: '5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty',
         amount: '10000',
-      }
+      },
     };
 
     const dbEvent = await setupDbEvent(event);
@@ -150,7 +168,11 @@ describe('Edgeware Archival Event Handler Tests', () => {
     // mockWssServer.on(WebsocketMessageNames.ChainEntity, (payload) => {
     //   assert.fail('should not emit event');
     // });
-    const eventHandler = new EntityArchivalHandler(models, rmqController, 'edgeware');
+    const eventHandler = new EntityArchivalHandler(
+      models,
+      rmqController,
+      'edgeware'
+    );
 
     // process event
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -170,11 +192,15 @@ describe('Edgeware Archival Event Handler Tests', () => {
         endBlock: 100,
         proposalHash: 'hash',
         voteThreshold: 'Supermajorityapproval',
-      }
+      },
     };
 
     const dbEvent = await setupDbEvent(event);
-    const eventHandler = new EntityArchivalHandler(models, rmqController, 'edgeware');
+    const eventHandler = new EntityArchivalHandler(
+      models,
+      rmqController,
+      'edgeware'
+    );
 
     // process event twice
     const handledDbEvent = await eventHandler.handle(event, dbEvent);
@@ -186,7 +212,7 @@ describe('Edgeware Archival Event Handler Tests', () => {
       where: {
         chain: 'edgeware',
         type_id: '6',
-      }
+      },
     });
     assert.lengthOf(chainEntities, 1);
     const entity = await handledDbEvent.getChainEntity();

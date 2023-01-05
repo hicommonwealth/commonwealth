@@ -9,9 +9,7 @@ import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {
   const attachments = draft.Attachments
-    ? draft.Attachments.map(
-        (a) => new Attachment(a.url, a.description)
-      )
+    ? draft.Attachments.map((a) => new Attachment(a.url, a.description))
     : [];
   return new DiscussionDraft(
     draft.Address.address,

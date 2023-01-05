@@ -13,7 +13,7 @@ import { WalletId } from 'common-common/src/types';
 import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
-import sgMail from "@sendgrid/mail";
+import sgMail from '@sendgrid/mail';
 sgMail.setApiKey(SENDGRID_API_KEY);
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -8,7 +8,7 @@ type GetRuleTypesResp = { [name: string]: RuleMetadata };
 const getRuleTypes = async (
   models: DB,
   req: TypedRequestQuery<Record<string, never>>,
-  res: TypedResponse<GetRuleTypesResp>,
+  res: TypedResponse<GetRuleTypesResp>
 ) => {
   const results: GetRuleTypesResp = {};
   for (const [ruleId, ruleObj] of Object.entries(RuleTypes)) {

@@ -2,7 +2,7 @@ import { DB } from '../models';
 
 export default async function deleteThread(
   models: DB,
-  thread_id: number,
+  thread_id: number
 ): Promise<void> {
   models.Subscription.destroy({
     where: {
@@ -12,7 +12,7 @@ export default async function deleteThread(
 
   await models.Thread.destroy({
     where: {
-      id: thread_id
-    }
+      id: thread_id,
+    },
   });
 }

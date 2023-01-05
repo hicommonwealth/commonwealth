@@ -5,8 +5,12 @@ import { StatsD } from 'hot-shots';
 import { Request, Response, NextFunction } from 'express';
 import { ProjectTag } from 'common-common/src/statsd';
 
-export default function expressStatsdInit (client: StatsD) {
-  return function expressStatsd (req: Request, res: Response, next: NextFunction) {
+export default function expressStatsdInit(client: StatsD) {
+  return function expressStatsd(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ) {
     const startTime = new Date().getTime();
 
     // Function called on response finish that sends stats to statsd

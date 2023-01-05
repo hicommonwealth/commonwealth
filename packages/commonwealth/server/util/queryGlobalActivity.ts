@@ -1,16 +1,18 @@
 import { DB } from '../models';
 
 export type GlobalActivity = Array<{
-  category_id: string,
-  comment_count: string,
-  last_activity: string,
-  notification_data: string, // actually object but stringified
-  reaction_count: string,
-  thread_id: string,
-  view_count: number,
+  category_id: string;
+  comment_count: string;
+  last_activity: string;
+  notification_data: string; // actually object but stringified
+  reaction_count: string;
+  thread_id: string;
+  view_count: number;
 }>;
 
-export default async function queryGlobalActivity(models: DB): Promise<GlobalActivity> {
+export default async function queryGlobalActivity(
+  models: DB
+): Promise<GlobalActivity> {
   const query = `
     SELECT nt.thread_id, nts.created_at as last_activity, nts.notification_data, nts.category_id,
       MAX(ovc.view_count) as view_count,

@@ -12,7 +12,7 @@ export type ChainNodeAttributes = {
   balance_type: BalanceType;
   name: string;
   description?: string;
-}
+};
 
 export type ChainNodeInstance = ModelInstance<ChainNodeAttributes>;
 
@@ -46,15 +46,13 @@ export default (
       underscored: true,
       defaultScope: {
         attributes: {
-          exclude: [
-            'private_url'
-          ],
-        }
+          exclude: ['private_url'],
+        },
       },
       scopes: {
-        withPrivateData: {}
-      }
-    },
+        withPrivateData: {},
+      },
+    }
   );
 
   ChainNode.associate = (models) => {

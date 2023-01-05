@@ -27,7 +27,7 @@ type bulkBalanceReq = {
   profileId: number;
   token: string;
   chainNodes: {
-    [nodeId: number]: Array<{ address: string, tokenType: string }>;
+    [nodeId: number]: Array<{ address: string; tokenType: string }>;
   };
 };
 
@@ -86,10 +86,10 @@ const bulkBalances = async (
     SELECT DISTINCT(c.base) FROM "Addresses" addr 
       LEFT JOIN "Chains" c ON addr.chain = c.id 
       WHERE addr.profile_id = ${profileId};`;
-  const basesRaw: string[] = <any>(await sequelize.query(baseQuery, {
+  const basesRaw: string[] = <any>await sequelize.query(baseQuery, {
     raw: true,
     type: QueryTypes.SELECT,
-  }));
+  });
 
   const bases = basesRaw.map((b) => b['base']);
 
@@ -112,13 +112,20 @@ const bulkBalances = async (
     if (!contracts || contracts.length === 0) {
       let balanceTotal = new BN(0);
       try {
-        const balanceResults = await tokenBalanceCache.getBalancesForAddresses(nodeId, profileWalletAddresses, bp, {});
+        const balanceResults = await tokenBalanceCache.getBalancesForAddresses(
+          nodeId,
+          profileWalletAddresses,
+          bp,
+          {}
+        );
         for (const balance of Object.values(balanceResults.balances)) {
           balanceTotal = balanceTotal.add(new BN(balance));
         }
         balances[nodeId] = balanceTotal.toString();
       } catch (e) {
-        log.info(`Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`);
+        log.info(
+          `Couldn't get balances for chainNodeId ${nodeId}: ${e.message}`
+        );
       }
     } else {
       // this is for Ethereum / Solana Bases
@@ -128,10 +135,16 @@ const bulkBalances = async (
       for (const contract of contracts) {
         let balanceTotal = new BN(0);
         try {
-          const balanceResults = await tokenBalanceCache.getBalancesForAddresses(nodeId, profileWalletAddresses, bp, {
-            contractType: contract.tokenType,
-            tokenAddress: contract.address,
-          });
+          const balanceResults =
+            await tokenBalanceCache.getBalancesForAddresses(
+              nodeId,
+              profileWalletAddresses,
+              bp,
+              {
+                contractType: contract.tokenType,
+                tokenAddress: contract.address,
+              }
+            );
           for (const balance of Object.values(balanceResults.balances)) {
             balanceTotal = balanceTotal.add(new BN(balance));
           }
@@ -150,7 +163,7 @@ const bulkBalances = async (
     }
   }
 
-  return success(res, {balances, bases});
+  return success(res, { balances, bases });
 };
 
 export default bulkBalances;

@@ -5,7 +5,7 @@ class SessionsController {
   // TODO: store expiration time on wallets[]
 
   constructor() {
-    this.wallets = {}
+    this.wallets = {};
   }
 
   public getAddress(chainId: number): string {

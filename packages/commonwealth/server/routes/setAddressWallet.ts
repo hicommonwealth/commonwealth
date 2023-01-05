@@ -1,4 +1,4 @@
-import {  DB } from '../models';
+import { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import { TypedResponse, success, TypedRequestBody } from '../types';
 import { WalletId } from 'common-common/src/types';
@@ -10,7 +10,7 @@ export const Errors = {
 };
 
 type SetAddressWalletReq = {
-  address: string,
+  address: string;
   wallet_id: WalletId;
   author_chain: string;
   jwt: string;
@@ -19,7 +19,7 @@ type SetAddressWalletReq = {
 const setAddressWallet = async (
   models: DB,
   req: TypedRequestBody<SetAddressWalletReq>,
-  res: TypedResponse<Record<string, never>>,
+  res: TypedResponse<Record<string, never>>
 ) => {
   const author = req.address;
   if (author.wallet_id) throw new AppError(Errors.AddressAlreadyHasWalletId);

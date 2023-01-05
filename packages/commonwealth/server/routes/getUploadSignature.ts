@@ -9,7 +9,7 @@ import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
 
 AWS.config.update({
-  signatureVersion: 'v4'
+  signatureVersion: 'v4',
 });
 
 export const Errors = {
@@ -18,7 +18,12 @@ export const Errors = {
   ImageType: 'Can only upload JPG, PNG, GIF, and WEBP images',
 };
 
-const getUploadSignature = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const getUploadSignature = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
@@ -28,7 +33,11 @@ const getUploadSignature = async (models: DB, req: Request, res: Response, next:
   const extension = req.body.name.split('.').pop();
   const filename = `${uuidv4()}.${extension}`;
   const contentType = req.body.mimetype;
-  if (['image/gif', 'image/png', 'image/jpeg', 'image/webp'].indexOf(contentType) === -1) {
+  if (
+    ['image/gif', 'image/png', 'image/jpeg', 'image/webp'].indexOf(
+      contentType
+    ) === -1
+  ) {
     return next(new AppError(Errors.ImageType));
   }
 

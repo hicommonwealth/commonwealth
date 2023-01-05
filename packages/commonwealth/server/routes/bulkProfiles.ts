@@ -5,11 +5,16 @@ import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
-const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const bulkProfiles = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   let chains;
   let addrs;
   if (req.body['chains[]'] && typeof req.body['chains[]'] === 'string') {
-    chains = [ req.body['chains[]'] ];
+    chains = [req.body['chains[]']];
   } else if (req.body['chains[]']) {
     chains = req.body['chains[]'];
   } else {
@@ -17,7 +22,7 @@ const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextF
   }
 
   if (req.body['addresses[]'] && typeof req.body['addresses[]'] === 'string') {
-    addrs = [ req.body['addresses[]'] ];
+    addrs = [req.body['addresses[]']];
   } else if (req.body['addresses[]']) {
     addrs = req.body['addresses[]'];
   } else {
@@ -25,7 +30,9 @@ const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextF
   }
 
   if (chains.length !== addrs.length) {
-    return next(new AppError('Must specify exactly one address for each one chain'));
+    return next(
+      new AppError('Must specify exactly one address for each one chain')
+    );
   }
 
   let addrObjs;
@@ -35,7 +42,7 @@ const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextF
       where: {
         chain: chains[0],
         address: addrs,
-      }
+      },
     });
   } else {
     let query;
@@ -46,7 +53,7 @@ const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextF
           where: {
             chain: chains[chain],
             address: addrs,
-          }
+          },
         });
         addrObjs.push(query);
       }
@@ -56,12 +63,12 @@ const bulkProfiles = async (models: DB, req: Request, res: Response, next: NextF
 
   const profiles = await models.OffchainProfile.findAll({
     where: { address_id: addrObjs.map((obj) => obj.id) },
-    include: [ models.Address ]
+    include: [models.Address],
   });
 
   return res.json({
     status: 'Success',
-    result: profiles.map((profile) => profile.toJSON())
+    result: profiles.map((profile) => profile.toJSON()),
   });
 };
 

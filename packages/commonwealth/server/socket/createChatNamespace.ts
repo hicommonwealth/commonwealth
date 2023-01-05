@@ -2,7 +2,10 @@ import { Server } from 'socket.io';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { addPrefix, factory } from 'common-common/src/logging';
-import {NotificationCategories, RedisNamespaces} from 'common-common/src/types';
+import {
+  NotificationCategories,
+  RedisNamespaces,
+} from 'common-common/src/types';
 import {
   WebsocketEngineEvents,
   WebsocketMessageNames,

@@ -15,8 +15,8 @@ import {
   AbridgedThread,
 } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import { ProposalType } from "common-common/src/types";
-import proposalIdToEntity from "helpers/proposalIdToEntity";
+import { ProposalType } from 'common-common/src/types';
+import proposalIdToEntity from 'helpers/proposalIdToEntity';
 
 export const modelFromServer = (reaction) => {
   return new Reaction(
@@ -37,9 +37,7 @@ class ReactionsController {
     return this._store;
   }
 
-  public getByPost(
-    post: Thread | AbridgedThread | AnyProposal | Comment<any>
-  ) {
+  public getByPost(post: Thread | AbridgedThread | AnyProposal | Comment<any>) {
     return this._store.getByPost(post);
   }
 
@@ -66,8 +64,12 @@ class ReactionsController {
       // TODO: is the below assumptions valid?
       // this only works if we assume that all chain-entities for the specific
       // chain are loaded when the reaction is created
-      const chainEntity = proposalIdToEntity(app, app.activeChainId(), options['proposal_id']);
-      options['chain_entity_id'] = chainEntity?.id
+      const chainEntity = proposalIdToEntity(
+        app,
+        app.activeChainId(),
+        options['proposal_id']
+      );
+      options['chain_entity_id'] = chainEntity?.id;
     } else if (post instanceof Comment) {
       options['comment_id'] = (post as Comment<any>).id;
     }
@@ -86,8 +88,7 @@ class ReactionsController {
   public async refresh(post: any, chainId: string) {
     const options = { chain: chainId };
     // TODO: ensure identifier vs id use is correct; see also create method
-    if (post instanceof Thread)
-      options['thread_id'] = (post as Thread).id;
+    if (post instanceof Thread) options['thread_id'] = (post as Thread).id;
     else if (post instanceof Proposal) {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier

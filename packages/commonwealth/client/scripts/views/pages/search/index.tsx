@@ -72,9 +72,7 @@ const getCommunityResult = (community) => {
 
   const onSelect = () => {
     if (params.community) {
-      m.route.set(
-        params.community.id ? `/${params.community.id}` : '/'
-      );
+      m.route.set(params.community.id ? `/${params.community.id}` : '/');
     } else {
       m.route.set(community.id ? `/${community.id}` : '/');
     }

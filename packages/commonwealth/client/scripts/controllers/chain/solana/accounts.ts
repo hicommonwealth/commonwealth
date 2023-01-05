@@ -7,13 +7,19 @@ import SolanaAccount from './account';
 import SolanaChain from './chain';
 import { SolanaToken } from './types';
 
-export default class SolanaAccounts implements IAccountsModule<SolanaToken, SolanaAccount> {
+export default class SolanaAccounts
+  implements IAccountsModule<SolanaToken, SolanaAccount>
+{
   private _initialized = false;
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   // STORAGE
   private _store: AccountsStore<SolanaAccount> = new AccountsStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _Chain: SolanaChain;
 
@@ -22,7 +28,9 @@ export default class SolanaAccounts implements IAccountsModule<SolanaToken, Sola
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;

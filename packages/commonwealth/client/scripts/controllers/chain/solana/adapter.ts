@@ -12,10 +12,7 @@ class Solana extends IChainAdapter<SolanaToken, SolanaAccount> {
   public accounts: SolanaAccounts;
   public readonly base = ChainBase.Solana;
 
-  constructor(
-    meta: ChainInfo,
-    app: IApp,
-  ) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new SolanaChain(this.app);
     this.accounts = new SolanaAccounts(this.app);

@@ -1,14 +1,14 @@
 import chai from 'chai';
-import { getFileSizeBytes, Errors } from "../../server/routes/createChain";
+import { getFileSizeBytes, Errors } from '../../server/routes/createChain';
 
 describe('ChainIconSizeLimit tests', () => {
-  it('should fail if the url provided doesn\'t exist', async () => {
+  it("should fail if the url provided doesn't exist", async () => {
     let errorCaught = false;
     try {
       await getFileSizeBytes('badUrl');
     } catch (e) {
       errorCaught = true;
-      chai.assert.equal(e.message, Errors.ImageDoesntExist)
+      chai.assert.equal(e.message, Errors.ImageDoesntExist);
     }
 
     chai.assert.isTrue(errorCaught);

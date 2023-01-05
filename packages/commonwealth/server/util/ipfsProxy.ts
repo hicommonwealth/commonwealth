@@ -9,11 +9,14 @@ function setupIpfsProxy(app: Express) {
   app.get('/api/ipfsProxy', async function cosmosProxy(req, res, next) {
     try {
       const hash = req.query.hash;
-      const response = await axios.get(`https://cloudflare-ipfs.com/ipfs/${hash}#x-ipfs-companion-no-redirect`, {
-        headers: {
-          origin: 'https://commonwealth.im'
+      const response = await axios.get(
+        `https://cloudflare-ipfs.com/ipfs/${hash}#x-ipfs-companion-no-redirect`,
+        {
+          headers: {
+            origin: 'https://commonwealth.im',
+          },
         }
-      });
+      );
       return res.send(response.data);
     } catch (err) {
       res.status(500).json({ message: err.message });

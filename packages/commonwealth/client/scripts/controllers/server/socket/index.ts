@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 import { ChainEventsNamespace } from 'controllers/server/socket/chainEventsNs';
-import { ChatNamespace } from "controllers/server/socket/chatNs";
+import { ChatNamespace } from 'controllers/server/socket/chatNs';
 
 export class WebSocketController {
   private _socket;

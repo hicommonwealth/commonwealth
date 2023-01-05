@@ -522,7 +522,7 @@ class ThreadsController {
     linkingThreadId: number,
     linkedThreadId: number
   ) {
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.post(`${app.serverUrl()}/updateLinkedThreads`, {
         chain: app.activeChainId(),
         linking_thread_id: linkingThreadId,
@@ -531,7 +531,7 @@ class ThreadsController {
         author_chain: app.user.activeAccount.chain.id,
         jwt: app.user.jwt,
       }),
-    ])
+    ]);
     if (response.status !== 'Success') {
       throw new Error();
     }
@@ -542,7 +542,7 @@ class ThreadsController {
     linkingThreadId: number,
     linkedThreadId: number
   ) {
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.post(`${app.serverUrl()}/updateLinkedThreads`, {
         chain: app.activeChainId(),
         linking_thread_id: linkingThreadId,
@@ -552,7 +552,7 @@ class ThreadsController {
         remove_link: true,
         jwt: app.user.jwt,
       }),
-    ])
+    ]);
     if (response.status !== 'Success') {
       throw new Error();
     }
@@ -581,10 +581,10 @@ class ThreadsController {
       chain: app.activeChainId(),
       ids,
     };
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/getThreads`, params),
-      app.chainEntities.refreshRawEntities(app.activeChainId())
-    ])
+      app.chainEntities.refreshRawEntities(app.activeChainId()),
+    ]);
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
@@ -655,9 +655,9 @@ class ThreadsController {
     if (stageName) params['stage'] = stageName;
 
     // fetch threads and refresh entities so we can join them together
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/bulkThreads`, params),
-      app.chainEntities.refreshRawEntities(chain)
+      app.chainEntities.refreshRawEntities(chain),
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);

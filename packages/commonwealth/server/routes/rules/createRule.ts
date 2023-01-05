@@ -20,7 +20,6 @@ const createRule = async (
   req: TypedRequestBody<CreateRuleReq>,
   res: TypedResponse<CreateRuleResp>
 ) => {
-
   // validate rule
   if (!req.body.rule) {
     throw new AppError(Errors.NoRuleSpecified);

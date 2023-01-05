@@ -17,7 +17,7 @@ type FormSectionAttrs = {
 
 export class CWFormSection extends ClassComponent<FormSectionAttrs> {
   view(vnode: m.Vnode<FormSectionAttrs>) {
-    const {  description, title } = vnode.attrs;
+    const { description, title } = vnode.attrs;
 
     return (
       <div className={ComponentType.FormSection}>
@@ -31,13 +31,9 @@ export class CWFormSection extends ClassComponent<FormSectionAttrs> {
         </div>
         <div className="columns">
           <div className="left-side">
-            <CWText type="b1">
-              {description}
-            </CWText>
+            <CWText type="b1">{description}</CWText>
           </div>
-          <div className="right-side">
-            {vnode.children}
-          </div>
+          <div className="right-side">{vnode.children}</div>
         </div>
         <CWDivider />
       </div>

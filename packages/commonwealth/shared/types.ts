@@ -29,7 +29,7 @@ export type ChainEventNotification = {
   updated_at: Date;
   created_at: Date;
   ChainEvent: ChainEventAttributes;
-}
+};
 
 export interface SnapshotNotification {
   id?: string;

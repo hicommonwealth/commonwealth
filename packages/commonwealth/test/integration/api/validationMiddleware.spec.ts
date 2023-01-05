@@ -30,7 +30,7 @@ describe('DatabaseValidationService Tests', () => {
   let user2Address;
   let user2JWT;
   let user2Id;
-  let databaseValidationService
+  let databaseValidationService;
 
   before(async function () {
     this.timeout(300000);

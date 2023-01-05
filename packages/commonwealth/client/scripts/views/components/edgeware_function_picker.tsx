@@ -133,9 +133,13 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
         <CWTextInput
           label="Proposal Hash"
           disabled
-          value={EdgewareFunctionPicker.getMethod(vnode.attrs)
-            ? blake2AsHex(EdgewareFunctionPicker.getMethod(vnode.attrs).toHex())
-            : ''}
+          value={
+            EdgewareFunctionPicker.getMethod(vnode.attrs)
+              ? blake2AsHex(
+                  EdgewareFunctionPicker.getMethod(vnode.attrs).toHex()
+                )
+              : ''
+          }
         />
       </>
     );

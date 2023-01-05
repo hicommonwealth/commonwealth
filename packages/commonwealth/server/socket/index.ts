@@ -124,7 +124,9 @@ export async function setupWebSocketServer(
   const subClient = pubClient.duplicate();
 
   pubClient.on('error', (err) => {
-    StatsDController.get().increment('cw.socket.pub_errors', { name: err.name });
+    StatsDController.get().increment('cw.socket.pub_errors', {
+      name: err.name,
+    });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis pub-client connection to ${REDIS_URL} timed out!`
@@ -156,7 +158,9 @@ export async function setupWebSocketServer(
     log.info('Redis pub-client disconnected');
   });
   subClient.on('error', (err) => {
-    StatsDController.get().increment('cw.socket.sub_errors', { name: err.name });
+    StatsDController.get().increment('cw.socket.sub_errors', {
+      name: err.name,
+    });
     if (err instanceof ConnectionTimeoutError) {
       log.error(
         `Socket.io Redis sub-client connection to ${REDIS_URL} timed out!`
@@ -213,13 +217,13 @@ export async function setupWebSocketServer(
     await rabbitMQController.startSubscription(
       publishToChainEventsRoom,
       RascalSubscriptions.ChainEventNotifications,
-      {server: chainEventsNamespace}
+      { server: chainEventsNamespace }
     );
 
     await rabbitMQController.startSubscription(
       publishToSnapshotRoom,
       RascalSubscriptions.SnapshotProposalNotifications,
-      {server: snapshotProposalNamespace}
+      { server: snapshotProposalNamespace }
     );
   } catch (e) {
     log.error(

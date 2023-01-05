@@ -34,7 +34,7 @@ const validateChain = async (
       {
         model: models.ChainNode,
         required: true,
-      }
+      },
     ],
   });
   // searching for chain that doesn't exist

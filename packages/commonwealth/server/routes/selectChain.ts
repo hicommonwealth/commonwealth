@@ -11,7 +11,12 @@ export const Errors = {
   ChainNF: 'Chain not found',
 };
 
-const selectChain = async (models: DB, req: Request, res: Response, next: NextFunction) => {
+const selectChain = async (
+  models: DB,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }

@@ -30,13 +30,15 @@ class ContractsController {
     }
     contracts.forEach((contract) => {
       try {
-        this._store.add(Contract.fromJSON({
-          ...contract
-        }));
+        this._store.add(
+          Contract.fromJSON({
+            ...contract,
+          })
+        );
       } catch (e) {
         console.error(e);
       }
-    })
+    });
 
     this._initialized = true;
   }

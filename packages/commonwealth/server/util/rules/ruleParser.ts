@@ -21,14 +21,16 @@ function validateArg(type: RuleArgumentType, arg: unknown, depth = 0): void {
         if (ruleKeys.length !== 1) {
           throw new Error('Rule must have exactly one key');
         }
-        const [ ruleKey ] = ruleKeys;
+        const [ruleKey] = ruleKeys;
         const subRuleDefn = RuleTypes[ruleKey];
         if (!subRuleDefn) {
           throw new Error('Invalid rule name');
         }
 
         // fetch types of sub rules from global list + ensure provided arguments match
-        const subRuleArgTypes = subRuleDefn.metadata.arguments.map(({ type: argType }) => argType);
+        const subRuleArgTypes = subRuleDefn.metadata.arguments.map(
+          ({ type: argType }) => argType
+        );
         const subRuleArgs = ruleArg[ruleKey];
         if (!Array.isArray(subRuleArgs)) {
           throw new Error('sub rule args must be array');
@@ -39,21 +41,23 @@ function validateArg(type: RuleArgumentType, arg: unknown, depth = 0): void {
         for (let i = 0; i < subRuleArgs.length; i++) {
           validateArg(subRuleArgTypes[i], subRuleArgs[i], depth + 1);
         }
-      })
+      });
       break;
     }
     case 'balance[]': {
       if (!Array.isArray(arg)) {
         throw new Error('Argument must be array');
       }
-      arg.forEach((balanceArg) => validateArg('balance', balanceArg, depth + 1));
+      arg.forEach((balanceArg) =>
+        validateArg('balance', balanceArg, depth + 1)
+      );
       break;
     }
     case 'balance': {
       if (typeof arg !== 'string') throw new Error('Balance must be string');
       const isNumeric = /^\d+$/.test(arg);
       if (!isNumeric) {
-        throw new Error(`Balance must be numeric: ${arg}`)
+        throw new Error(`Balance must be numeric: ${arg}`);
       }
       break;
     }
@@ -78,7 +82,7 @@ function validateArg(type: RuleArgumentType, arg: unknown, depth = 0): void {
 // TODO: take db and chain and check address formats
 // check run at rule creation to validate that it was written properly
 export function validateRule(ruleSchema: any): DefaultSchemaT {
-  const [ ruleId ] = Object.keys(ruleSchema);
+  const [ruleId] = Object.keys(ruleSchema);
   const ruleDef = RuleTypes[ruleId];
   if (!ruleSchema || !ruleSchema[ruleId] || !ruleDef) {
     throw new Error('Invalid identifier');

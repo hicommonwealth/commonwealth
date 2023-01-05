@@ -212,7 +212,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const chain = req.chain
+  const chain = req.chain;
 
   const author = req.address;
 

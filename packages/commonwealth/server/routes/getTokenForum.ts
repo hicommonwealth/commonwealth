@@ -7,27 +7,30 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { createDefaultCommunityRoles } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
-const getTokenForum = async (
-  models: DB,
-  req: Request,
-  res: Response,
-) => {
+const getTokenForum = async (models: DB, req: Request, res: Response) => {
   const address = req.query.address;
   if (!address) {
-    return res.json({ status: 'Failure', message: 'Must provide token address' });
+    return res.json({
+      status: 'Failure',
+      message: 'Must provide token address',
+    });
   }
 
   // default to mainnet
   const chain_id = +req.query.chain_id || 1;
   // default to ERC20
-  const chain_network = req.query.chain_network? req.query.chain_network : ChainNetwork.ERC20;
+  const chain_network = req.query.chain_network
+    ? req.query.chain_network
+    : ChainNetwork.ERC20;
   const token = await models.Token.findOne({
     where: {
       address: { [Op.iLike]: address },
       chain_id,
-    }
+    },
   });
-  const node = await models.ChainNode.scope('withPrivateData').findOne({ where: { eth_chain_id: chain_id }});
+  const node = await models.ChainNode.scope('withPrivateData').findOne({
+    where: { eth_chain_id: chain_id },
+  });
   let url = node?.url;
   if (!url) {
     url = req.query.url;
@@ -41,17 +44,25 @@ const getTokenForum = async (
   }
 
   try {
-    const provider = new Web3.providers.WebsocketProvider(node?.private_url || url);
+    const provider = new Web3.providers.WebsocketProvider(
+      node?.private_url || url
+    );
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(address);
     provider.disconnect(1000, 'finished');
     if (code === '0x') {
       // Account returns 0x, Smart contract returns bytecode
-      return res.json({ status: 'Failure', message: 'Must provide valid contract address' });
+      return res.json({
+        status: 'Failure',
+        message: 'Must provide valid contract address',
+      });
     }
     if (req.query.autocreate) {
       if (!node) {
-        return res.json({ status: 'Failure', message: 'Cannot autocreate custom node' });
+        return res.json({
+          status: 'Failure',
+          message: 'Cannot autocreate custom node',
+        });
       }
       const [chain, success] = await models.Chain.findOrCreate({
         where: { id: token.id },
@@ -84,7 +95,7 @@ const getTokenForum = async (
           decimals: token.decimals,
           symbol: token.symbol,
           type: chain.network, // TODO: Make better query param and validation for this
-        }
+        },
       });
       await models.CommunityContract.create({
         chain_id: chain.id,
@@ -94,14 +105,23 @@ const getTokenForum = async (
 
       const nodeJSON = node.toJSON();
       delete nodeJSON.private_url;
-      return res.json({ status: 'Success', result: { chain: chain.toJSON(), node: nodeJSON }});
+      return res.json({
+        status: 'Success',
+        result: { chain: chain.toJSON(), node: nodeJSON },
+      });
     } else {
       // only return token data if we do not autocreate
-      return res.json({ status: 'Success', token: token ? token.toJSON() : {} });
+      return res.json({
+        status: 'Success',
+        token: token ? token.toJSON() : {},
+      });
     }
   } catch (e) {
     log.error(e.message);
-    return res.json({ status: 'Failure', message: 'Failed to find or create chain' });
+    return res.json({
+      status: 'Failure',
+      message: 'Failed to find or create chain',
+    });
   }
 };
 

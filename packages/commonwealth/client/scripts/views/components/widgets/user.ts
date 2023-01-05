@@ -178,7 +178,8 @@ const User: m.Component<
     ];
 
     const ghostAddress = app.user.addresses.some(
-      ({ address, ghostAddress }) => { // eslint-disable-line
+      ({ address, ghostAddress }) => {
+        // eslint-disable-line
         if (this !== undefined) account.address === address && ghostAddress;
       }
     );

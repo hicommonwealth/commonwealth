@@ -6,13 +6,17 @@ import 'chai/register-should';
 import BN from 'bn.js';
 import jwt from 'jsonwebtoken';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { resetDatabase, getTokenBalanceCache, getMockBalanceProvider } from '../../../server-test';
+import {
+  resetDatabase,
+  getTokenBalanceCache,
+  getMockBalanceProvider,
+} from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-import { markdownComment } from "../../util/fixtures/markdownComment";
+import { markdownComment } from '../../util/fixtures/markdownComment';
 
 describe('Token Forum tests', () => {
   const chain = 'alex';

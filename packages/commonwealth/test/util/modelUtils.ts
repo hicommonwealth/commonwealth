@@ -15,7 +15,10 @@ import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
-import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
+import {
+  constructTypedMessage,
+  TEST_BLOCK_INFO_STRING,
+} from '../../shared/adapters/chain/ethereum/keys';
 import { Action } from '../../../common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -42,10 +45,12 @@ export async function addAllowDenyPermissions(
   });
   // update allow permission on community role object
   // eslint-disable-next-line no-bitwise
-  communityRole.allow = BigInt(communityRole.allow) | BigInt(1) << BigInt(allow_permission);
+  communityRole.allow =
+    BigInt(communityRole.allow) | (BigInt(1) << BigInt(allow_permission));
   // update deny permission on community role object
   // eslint-disable-next-line no-bitwise
-  communityRole.deny = BigInt(communityRole.deny) | BigInt(1) << BigInt(deny_permission);
+  communityRole.deny =
+    BigInt(communityRole.deny) | (BigInt(1) << BigInt(deny_permission));
   // save community role object to the database
   await communityRole.save();
 }
@@ -62,8 +67,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
-    const sessionWallet = ethers.Wallet.createRandom()
-    const data = await constructTypedMessage(address, chain_id, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+    const sessionWallet = ethers.Wallet.createRandom();
+    const data = await constructTypedMessage(
+      address,
+      chain_id,
+      sessionWallet.address,
+      TEST_BLOCK_INFO_STRING
+    );
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -407,7 +417,10 @@ export const createInvite = async (args: InviteArgs) => {
 };
 
 // always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
+export class MockTokenBalanceProvider extends BalanceProvider<{
+  tokenAddress: string;
+  contractType: string;
+}> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',
@@ -419,7 +432,7 @@ export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: st
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: { tokenAddress: string, contractType: string }
+    opts: { tokenAddress: string; contractType: string }
   ): Promise<string> {
     if (this.balanceFn) {
       const bal = await this.balanceFn(opts.tokenAddress, address);

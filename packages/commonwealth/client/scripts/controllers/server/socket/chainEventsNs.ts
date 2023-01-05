@@ -26,8 +26,7 @@ export class ChainEventsNamespace {
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs
-        .filter((x) => !!x.chainEventTypeId)
+      const eventTypes = subs.filter((x) => !!x.chainEventTypeId);
       const roomsToJoin = [];
       for (const eventType of eventTypes) {
         if (!this.subscriptionRoomsJoined.has(eventType)) {
@@ -46,8 +45,7 @@ export class ChainEventsNamespace {
 
   public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const eventTypes = subs
-        .filter((x) => !!x.chainEventTypeId)
+      const eventTypes = subs.filter((x) => !!x.chainEventTypeId);
       const roomsToLeave = [];
       for (const eventType of eventTypes) {
         if (this.subscriptionRoomsJoined.has(eventType)) {

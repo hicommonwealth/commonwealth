@@ -14,7 +14,10 @@ import MolochMembers from './members';
 import MolochAPI from './api';
 import MolochGovernance from './governance';
 
-export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Moloch extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public chain: MolochChain;
   public ethAccounts: EthereumAccounts;
@@ -38,7 +41,11 @@ export default class Moloch extends IChainAdapter<EthereumCoin, EthereumAccount>
       throw new Error('No Mol contracts found');
     }
     const molContract = molContracts[0];
-    const api = new MolochAPI(Moloch1__factory.connect, molContract.address, this.chain.api.currentProvider as any);
+    const api = new MolochAPI(
+      Moloch1__factory.connect,
+      molContract.address,
+      this.chain.api.currentProvider as any
+    );
     await api.init();
     this.chain.molochApi = api;
     await this.accounts.init(api);

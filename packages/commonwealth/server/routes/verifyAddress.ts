@@ -68,7 +68,7 @@ const verifySignature = async (
   user_id: number,
   signatureString: string,
   sessionPublicAddress: string | null, // used when signing a block to login, currently eth only
-  sessionBlockInfo: string | null,     // used when signing a block to login, currently eth only
+  sessionBlockInfo: string | null // used when signing a block to login, currently eth only
 ): Promise<boolean> => {
   if (!chain) {
     log.error('no chain provided to verifySignature');
@@ -259,7 +259,9 @@ const verifySignature = async (
         addressModel.block_info
       );
       if (addressModel.block_info !== sessionBlockInfo) {
-        throw new Error(`Eth verification failed for ${addressModel.address}: signed a different block than expected`)
+        throw new Error(
+          `Eth verification failed for ${addressModel.address}: signed a different block than expected`
+        );
       }
       const address = recoverTypedSignature({
         data: typedMessage,
@@ -366,7 +368,7 @@ const processAddress = async (
   signature: string,
   user: Express.User,
   sessionPublicAddress: string | null,
-  sessionBlockInfo: string | null,
+  sessionBlockInfo: string | null
 ): Promise<void> => {
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
@@ -474,7 +476,7 @@ const verifyAddress = async (
     req.body.signature,
     req.user,
     req.body.session_public_address,
-    req.body.session_block_data,
+    req.body.session_block_data
   );
 
   if (req.user) {

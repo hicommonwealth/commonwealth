@@ -65,7 +65,7 @@ const deleteComment = async (
       };
       const requesterIsAdminOrMod = await findOneRole(
         models,
-        { where: { address_id: {[Op.in]: userOwnedAddressIds }} },
+        { where: { address_id: { [Op.in]: userOwnedAddressIds } } },
         comment?.Chain?.id,
         ['admin', 'moderator']
       );

@@ -1,7 +1,8 @@
 import { Logger } from 'typescript-logging';
 import { NotificationCategories } from 'common-common/src/types';
 import {
-  RascalPublications, RmqCENotificationCUD
+  RascalPublications,
+  RmqCENotificationCUD,
 } from 'common-common/src/rabbitmq/types';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import { ChainEventNotification } from 'types';
@@ -46,7 +47,8 @@ export async function processChainEventNotificationsCUD(
     this.log.error(
       `Failed to generate notification: ${e.message}\nevent: ${JSON.stringify(
         data.event
-      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`, e
+      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`,
+      e
     );
     return;
   }
@@ -67,7 +69,8 @@ export async function processChainEventNotificationsCUD(
     this.log.error(
       `Failed to publish notification: ${e.message}\nevent: ${JSON.stringify(
         data.event
-      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`, e
+      )}\ndbEvent: ${JSON.stringify(data.ChainEvent)}\n`,
+      e
     );
   }
 }

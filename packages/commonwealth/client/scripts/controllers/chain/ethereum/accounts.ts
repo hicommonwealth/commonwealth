@@ -8,13 +8,19 @@ import EthereumAccount from './account';
 
 // NOTE: this is just a boilerplate class; not verified to work yet.
 // TODO: hook this up to rest of the application and verify that it works
-class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount> {
+class EthereumAccounts
+  implements IAccountsModule<EthereumCoin, EthereumAccount>
+{
   private _initialized = false;
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   // STORAGE
   protected _store: AccountsStore<EthereumAccount> = new AccountsStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _Chain: EthereumChain;
 
@@ -23,7 +29,9 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;

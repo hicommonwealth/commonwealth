@@ -1,9 +1,9 @@
-import {NextFunction} from 'express';
-import {Op} from 'sequelize';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {AppError} from 'common-common/src/errors';
-import {TypedRequestBody, TypedResponse, success} from '../types';
-import {DB} from '../models';
+import { NextFunction } from 'express';
+import { Op } from 'sequelize';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError } from 'common-common/src/errors';
+import { TypedRequestBody, TypedResponse, success } from '../types';
+import { DB } from '../models';
 import { findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -81,7 +81,7 @@ const deleteChain = async (
     await models.sequelize.transaction(async (t) => {
       // TODO: need a parallel API call to chain-events to destroy chain-entities there too
       await models.ChainEntityMeta.destroy({
-        where: { chain : chain.id },
+        where: { chain: chain.id },
         transaction: t,
       });
 
@@ -103,7 +103,7 @@ const deleteChain = async (
       });
 
       await models.Comment.destroy({
-        where: { chain : chain.id },
+        where: { chain: chain.id },
         transaction: t,
       });
 
@@ -113,22 +113,22 @@ const deleteChain = async (
       });
 
       await models.Role.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
       await models.InviteCode.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
       await models.Subscription.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
       await models.Webhook.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
@@ -141,20 +141,20 @@ const deleteChain = async (
         transaction: t,
       });
 
-    await models.LinkedThread.destroy({
-       where: {
-         linked_thread: { [Op.in]: threads.map((thread) => thread.id) },
-       },
-      transaction: t,
-    });
+      await models.LinkedThread.destroy({
+        where: {
+          linked_thread: { [Op.in]: threads.map((thread) => thread.id) },
+        },
+        transaction: t,
+      });
 
       await models.Vote.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
       await models.Poll.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
@@ -164,13 +164,13 @@ const deleteChain = async (
       });
 
       await models.StarredCommunity.destroy({
-        where: { chain : chain.id },
+        where: { chain: chain.id },
         transaction: t,
       });
 
-    const addresses = await models.Address.findAll({
-           where: { chain: chain.id },
-         });
+      const addresses = await models.Address.findAll({
+        where: { chain: chain.id },
+      });
 
       await models.OffchainProfile.destroy({
         where: { address_id: { [Op.in]: addresses.map((a) => a.id) } },
@@ -178,24 +178,24 @@ const deleteChain = async (
       });
 
       await models.ChainCategory.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
       await models.CommunityBanner.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
       // TODO: delete chain-event-types in chain-events
       await models.ChainEventType.destroy({
-        where: { id : {[Op.like]: `%${chain.id}%`} },
+        where: { id: { [Op.like]: `%${chain.id}%` } },
         transaction: t,
       });
 
       // notifications + notifications_read (cascade)
       await models.Notification.destroy({
-        where: { chain_id : chain.id },
+        where: { chain_id: chain.id },
         transaction: t,
       });
 
@@ -205,7 +205,7 @@ const deleteChain = async (
       });
 
       await models.Address.destroy({
-        where: { chain : chain.id },
+        where: { chain: chain.id },
         transaction: t,
       });
 

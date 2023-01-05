@@ -12,7 +12,10 @@ import CommonwealthChain from './chain';
 import CommonwealthAPI from './api';
 import CommonwealthGovernance from './governance';
 
-export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAccount> {
+export default class Commonwealth extends IChainAdapter<
+  EthereumCoin,
+  EthereumAccount
+> {
   public readonly base = ChainBase.Ethereum;
   public chain: CommonwealthChain;
   public accounts: EthereumAccounts;
@@ -29,12 +32,18 @@ export default class Commonwealth extends IChainAdapter<EthereumCoin, EthereumAc
     await this.chain.resetApi(this.meta);
     await this.chain.initMetadata();
     await this.accounts.init(this.chain);
-    const commonContracts = this.app.contracts.getByType(ContractType.COMMONPROTOCOL);
+    const commonContracts = this.app.contracts.getByType(
+      ContractType.COMMONPROTOCOL
+    );
     if (!commonContracts || !commonContracts.length) {
       throw new Error('No Common contracts found');
     }
     const commonContract = commonContracts[0];
-    const api = new CommonwealthAPI(() => null, commonContract.address, this.chain.api.currentProvider as any);
+    const api = new CommonwealthAPI(
+      () => null,
+      commonContract.address,
+      this.chain.api.currentProvider as any
+    );
     await api.init();
     this.chain.commonwealthApi = api;
     await super.initApi();
