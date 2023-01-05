@@ -52,6 +52,5 @@ describe('Cosmos Event Subscriber Tests', () => {
   });
 
   xit('should callback with historical event data', async () => {});
-
   xit('should fail gracefully on inaccessible old blocks', () => {});
 });

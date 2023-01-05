@@ -4,9 +4,10 @@ module.exports = {
   "extends": [
     path.resolve(__dirname, "../../.eslintrc.js")
   ],
-  "ignorePatterns": ["contractTypes", "eth", "dist"],
+  "ignorePatterns": ["contractTypes", "eth", "dist", "migrations"],
   "rules": {
     "@typescript-eslint/interface-name-prefix": "off",
+    "@typescript-eslint/no-empty-function": "off",
     "import/prefer-default-export": 0,
     "import/extensions": 0,
     "import/no-cycle": 0,

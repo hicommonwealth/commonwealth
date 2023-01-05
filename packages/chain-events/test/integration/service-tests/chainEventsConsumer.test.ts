@@ -4,7 +4,7 @@ import {
   RascalQueues,
   RascalRoutingKeys, RmqCENotificationCUD, RmqCETypeCUD, RmqEntityCUD,
 } from 'common-common/src/rabbitmq';
-import { ServiceConsumer } from 'common-common/src/ServiceConsumer';
+import { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import {
   getQueueStats,
   getRmqMessage,

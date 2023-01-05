@@ -362,6 +362,7 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       return [];
     }
     this.log.info('Migrating preimages...');
+    // eslint-disable-next-line
     // @ts-ignore
     const hashCodecs = hashes.map((hash) => this._api.createType('Hash', hash));
     const preimages = await this._api.derive.democracy.preimages(hashCodecs);
