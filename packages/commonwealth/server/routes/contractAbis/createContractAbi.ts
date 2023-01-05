@@ -1,13 +1,10 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from 'common-common/src/errors';
-import { AbiItem } from 'web3-utils';
 import { DB } from '../../models';
 import { ContractAbiAttributes } from '../../models/contract_abi';
-import { parseAbiItemsFromABI } from '../../../shared/abi_utils';
 import { ContractAttributes } from '../../models/contract';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-
-const log = factory.getLogger(formatFilename(__filename));
+import validateAbi from '../../util/abiValidation';
 
 export const Errors = {
   NoContractId: 'Must provide contract id',
@@ -51,15 +48,7 @@ const createContractAbi = async (
     throw new AppError(Errors.NoAbi);
   }
 
-  // Parse ABI to validate it as a properly formatted ABI
-  const abiAsRecord: Array<Record<string, unknown>> = JSON.parse(abi);
-  if (!abiAsRecord) {
-    throw new AppError(Errors.InvalidABI);
-  }
-  const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-  if (!abiItems) {
-    throw new AppError(Errors.InvalidABI);
-  }
+  const abiAsRecord = validateAbi(abi);
 
   const contract_abi = await models.ContractAbi.create({
     abi: abiAsRecord,

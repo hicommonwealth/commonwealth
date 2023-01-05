@@ -1,13 +1,11 @@
 import Web3 from 'web3';
-import { AbiItem } from 'web3-utils';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { ContractType } from 'common-common/src/types';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { DB } from '../../models';
-import { parseAbiItemsFromABI } from '../../../shared/abi_utils';
 import { ContractAttributes, ContractInstance } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
+import validateAbi from '../../util/abiValidation';
 
 export const Errors = {
   NoType: 'Must provide contract type',
@@ -101,15 +99,7 @@ const createContract = async (
       throw new AppError(Errors.InvalidABI);
     }
 
-    // Parse ABI to validate it as a properly formatted ABI
-    abiAsRecord = JSON.parse(abi);
-    if (!abiAsRecord) {
-      throw new AppError(Errors.InvalidABI);
-    }
-    const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-    if (!abiItems) {
-      throw new AppError(Errors.InvalidABI);
-    }
+    abiAsRecord = validateAbi(abi);
   }
 
   const oldContract = await models.Contract.findOne({

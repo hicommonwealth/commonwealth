@@ -7,6 +7,7 @@ import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ETHERSCAN_JS_API_KEY } from '../config';
 import { ContractAttributes } from '../models/contract';
 import { ContractAbiAttributes } from '../models/contract_abi';
+import validateAbi from 'server/util/abiValidation';
 
 export enum Network {
   Mainnet = 'Mainnet',
@@ -86,15 +87,7 @@ const fetchEtherscanContract = async (
     const etherscanContract = response.data.result[0];
     if (etherscanContract && etherscanContract['ABI'] !== '') {
       const abiString = etherscanContract['ABI'];
-      // Parse ABI to validate it as a properly formatted ABI
-      const abiAsRecord: Array<Record<string, unknown>> = JSON.parse(abiString);
-      if (!abiAsRecord) {
-        throw new AppError(Errors.InvalidABI);
-      }
-      const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-      if (!abiItems) {
-        throw new AppError(Errors.InvalidABI);
-      }
+      validateAbi(abiString);
 
       const nickname = etherscanContract['ContractName'];
       // Create new ABI
