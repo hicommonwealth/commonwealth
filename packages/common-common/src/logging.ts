@@ -1,5 +1,4 @@
 import {
-  LoggerFactory,
   LoggerFactoryOptions,
   LFService,
   LogGroupRule,

@@ -1,4 +1,3 @@
-// @ts-ignore
 import crypto from "crypto";
 import { addPrefix, factory, formatFilename } from "./logging";
 import { RabbitMQController, RascalSubscriptions, TRmqMessages } from "./rabbitmq";

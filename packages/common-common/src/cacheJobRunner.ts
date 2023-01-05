@@ -18,7 +18,7 @@ export default abstract class JobRunner<CacheT> {
   ) {
   }
 
-  public start(...args) {
+  public start() {
     if (this._jobTimeS > 0) {
       this._timeoutHandle = global.setInterval(() => this.run(), this._jobTimeS * 1000);
     }
