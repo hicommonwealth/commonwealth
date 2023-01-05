@@ -1,5 +1,6 @@
 import { DB } from '../models';
-export type AccessLevel = "admin" | "moderator" | "member";
+
+export type AccessLevel = "admin" | "moderator" | "member" |"chain"| "none";
 
 export enum PermissionError {
   NOT_PERMITTED = "Action not permitted",
@@ -25,12 +26,13 @@ export enum Action {
   LINK_THREAD_TO_THREAD = 16,
   LINK_PROPOSAL_TO_THREAD = 17,
   CREATE_TOPIC = 18,
-  VIEW_TOPICS = 19,
-  EDIT_TOPIC = 20,
-  DELETE_TOPIC = 21,
+  MANAGE_TOPIC = 19,
+  VIEW_TOPICS = 20,
+  EDIT_TOPIC = 21,
+  DELETE_TOPIC = 22,
 }
 
-const permissionsTree = {
+const allowImplicitActions = {
   // Chat Subtree
   [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
   // View Subtree
@@ -78,6 +80,27 @@ const permissionsTree = {
   ],
 };
 
+const denyImplicitActions = {
+  // Chat Subtree
+  [Action.VIEW_CHAT_CHANNELS]: [Action.CREATE_CHAT],
+  // View Subtree
+  [Action.VIEW_REACTIONS]: [Action.VIEW_COMMENTS, Action.CREATE_REACTION],
+  [Action.VIEW_COMMENTS]: [Action.VIEW_THREADS, Action.CREATE_COMMENT],
+  [Action.VIEW_POLLS]: [Action.VOTE_ON_POLLS],
+  [Action.VIEW_THREADS]: [Action.CREATE_THREAD],
+  // Create Subtree
+  [Action.CREATE_REACTION]: [Action.CREATE_COMMENT],
+  [Action.CREATE_COMMENT]: [Action.EDIT_COMMENT, Action.CREATE_THREAD],
+  [Action.CREATE_THREAD]: [Action.EDIT_THREAD],
+  [Action.MANAGE_TOPIC]: [Action.DELETE_TOPIC],
+  // Voting Subtree
+  [Action.VOTE_ON_POLLS]: [Action.CREATE_POLL],
+  // Edit Subtree
+  [Action.EDIT_COMMENT]: [Action.DELETE_COMMENT],
+  [Action.EDIT_THREAD]: [Action.DELETE_THREAD]
+};
+
+
 const defaultPermissions: bigint =
   (BigInt(1) << BigInt(Action.VIEW_REACTIONS)) |
   (BigInt(1) << BigInt(Action.CREATE_REACTION)) |
@@ -90,47 +113,38 @@ export class PermissionManager {
   private models: DB;
   private permissions: bigint;
   private action: Action;
-  private implicitPermissions: { [key: number]: Array<Action> };
-  private log: Logger;
+  private allowImplicitActions: { [key: number]: Array<Action> };
+  private denyImplicitActions: { [key: number]: Array<Action> };
 
   constructor(_models: DB) {
     this.models = _models;
-    this.implicitPermissions = permissionsTree;
+    this.allowImplicitActions = allowImplicitActions;
+    this.denyImplicitActions = denyImplicitActions;
     this.permissions = defaultPermissions;
       }
 
-  public addPermission(access: AccessLevel) {
-    switch (access) {
-      case "admin":
-        this.permissions |= BigInt(2) ** BigInt(Action.CREATE_CHAT) - BigInt(1);
-        break;
-      case "moderator":
-        this.permissions |=
-          BigInt(2) ** BigInt(Action.CREATE_TOPIC) - BigInt(1);
-        break;
-      case "member":
-        this.permissions |= defaultPermissions;
-        break;
-      default:
-        break;
-    }
+  public addAllowImplicitPermission(allowPermission: bigint, actionNumber: number): bigint {
+    const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
+    const newAllowPermission: bigint = allowPermission | actionAsBigInt;
+    return newAllowPermission;
   }
 
-  public removePermission(access: AccessLevel) {
-    switch (access) {
-      case "admin":
-        this.permissions &= BigInt(2) ** BigInt(Action.CREATE_CHAT) - BigInt(1);
-        break;
-      case "moderator":
-        this.permissions &=
-          BigInt(2) ** BigInt(Action.CREATE_TOPIC) - BigInt(1);
-        break;
-      case "member":
-        this.permissions &= ~defaultPermissions;
-        break;
-      default:
-        break;
-    }
+  public removeAllowImplicitPermission(allowPermission: bigint, actionNumber: number): bigint {
+    const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
+    const newAllowPermission: bigint = allowPermission & ~actionAsBigInt;
+    return newAllowPermission;
+  }
+
+  public addDenyImplicitPermission(denyPermission: bigint, actionNumber: number): bigint {
+    const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
+    const newDenyPermission: bigint = denyPermission | actionAsBigInt;
+    return newDenyPermission;
+  }
+
+  public removeDenyImplicitPermission(denyPermission: bigint, actionNumber: number): bigint {
+    const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
+    const newDenyPermission: bigint = denyPermission & ~actionAsBigInt;
+    return newDenyPermission;
   }
 
   public isPermitted(action: Action): boolean {
