@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 
-import validateChain from '../../middleware/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from 'common-common/src/errors';
 const log = factory.getLogger(formatFilename(__filename));
@@ -15,8 +14,7 @@ const createDraft = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   const { title, body, topic } = req.body;
 
   const author = req.address;

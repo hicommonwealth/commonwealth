@@ -29,8 +29,7 @@ const editComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   if (!req.body.id) {
     return next(new AppError(Errors.NoId));
