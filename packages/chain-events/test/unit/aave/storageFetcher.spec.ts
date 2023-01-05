@@ -21,7 +21,7 @@ const constructEvent = (blockNumber: number, data): RawEvent => {
 };
 
 const makeApi = (proposals: Proposal[]) => {
-  const governance = ({
+  const governance = {
     provider: {
       getBlockNumber: async () => 200,
       getBlock: async () => ({ number: 200 }),
@@ -72,7 +72,7 @@ const makeApi = (proposals: Proposal[]) => {
       ProposalQueued: () => 'ProposalQueued',
       ProposalExecuted: () => 'ProposalExecuted',
     },
-  } as unknown) as AaveGovernanceV2;
+  } as unknown as AaveGovernanceV2;
   return { governance };
 };
 

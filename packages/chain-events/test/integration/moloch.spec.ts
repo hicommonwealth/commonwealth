@@ -154,13 +154,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should create moloch1 proposal', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     const summonTime = await api.summoningTime();
     await submitProposal(provider, api, token, member, applicant);
@@ -186,13 +181,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should create moloch1 vote', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     await submitProposal(provider, api, token, member, applicant);
 
@@ -219,13 +209,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should process moloch1 proposal', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     await submitProposal(provider, api, token, member, applicant);
 
@@ -276,13 +261,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should abort moloch1 proposal', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     await submitProposal(provider, api, token, member, applicant);
 
@@ -315,13 +295,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should ragequit moloch1 member', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     await submitProposal(provider, api, token, member, applicant);
 
@@ -378,13 +353,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should migrate past proposal started/processed/aborted events', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant1, applicant2] = addresses;
     const summonTime = +(await api.summoningTime());
     const periodDuration = +(await api.periodDuration());

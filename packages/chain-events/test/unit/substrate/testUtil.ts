@@ -9,15 +9,15 @@ import { IdentityJudgement as JudgementEnum } from '../../../src/chains/substrat
 
 export function constructOption<T extends Codec>(value?: T): Option<T> {
   if (value) {
-    return ({
+    return {
       isSome: true,
       isNone: false,
       isEmpty: false,
       value,
       unwrap: () => value,
-    } as unknown) as Option<T>;
+    } as unknown as Option<T>;
   }
-  return ({
+  return {
     isSome: false,
     isNone: true,
     isEmpty: true,
@@ -25,7 +25,7 @@ export function constructOption<T extends Codec>(value?: T): Option<T> {
     unwrap: () => {
       throw new Error('option is null');
     },
-  } as unknown) as Option<T>;
+  } as unknown as Option<T>;
 }
 
 export function constructIdentityJudgement(
@@ -65,7 +65,7 @@ export function constructIdentityJudgement(
     default:
       break;
   }
-  return (obj as unknown) as IdentityJudgement;
+  return obj as unknown as IdentityJudgement;
 }
 
 export function constructAccountVote(
@@ -77,7 +77,7 @@ export function constructAccountVote(
   if (isSplit) {
     return { isSplit: true, asSplit: {}, isStandard: false } as AccountVote;
   }
-  return ({
+  return {
     isSplit: false,
     isStandard: true,
     asStandard: {
@@ -90,7 +90,7 @@ export function constructAccountVote(
         },
       },
     },
-  } as unknown) as AccountVote;
+  } as unknown as AccountVote;
 }
 
 export function constructFakeApi(callOverrides: {
@@ -170,7 +170,7 @@ export function constructFakeApi(callOverrides: {
   };
   tips.keys = callOverrides['tipsKeys'];
 
-  return ({
+  return {
     createType: (name, value) => value,
     queryMulti: (queries) => {
       return Promise.all(
@@ -292,5 +292,5 @@ export function constructFakeApi(callOverrides: {
         proposals: callOverrides['councilProposalsDerive'],
       },
     },
-  } as unknown) as ApiPromise;
+  } as unknown as ApiPromise;
 }

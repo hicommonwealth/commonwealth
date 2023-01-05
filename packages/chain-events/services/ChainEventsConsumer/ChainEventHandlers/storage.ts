@@ -91,17 +91,15 @@ export default class extends IEventHandler {
     }
 
     // locate event type and add event (and event type if needed) to database
-    const [
-      dbEventType,
-      created,
-    ] = await this._models.ChainEventType.findOrCreate({
-      where: {
-        id: `${chain}-${event.data.kind.toString()}`,
-        chain,
-        event_network: event.network,
-        event_name: event.data.kind.toString(),
-      },
-    });
+    const [dbEventType, created] =
+      await this._models.ChainEventType.findOrCreate({
+        where: {
+          id: `${chain}-${event.data.kind.toString()}`,
+          chain,
+          event_network: event.network,
+          event_name: event.data.kind.toString(),
+        },
+      });
 
     if (created) {
       const publishData: RmqCETypeCUD.RmqMsgType = {

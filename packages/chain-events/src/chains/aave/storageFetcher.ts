@@ -41,7 +41,8 @@ export class StorageFetcher extends IStorageFetcher<Api> {
   private _currentBlock: number;
 
   public async fetchOne(id: string): Promise<CWEvent<IEntityEventData>[]> {
-    this._currentBlock = +(await this._api.governance.provider.getBlockNumber());
+    this._currentBlock =
+      +(await this._api.governance.provider.getBlockNumber());
     this.log.info(`Current block: ${this._currentBlock}.`);
     if (!this._currentBlock) {
       this.log.error('Failed to fetch current block! Aborting fetch.');

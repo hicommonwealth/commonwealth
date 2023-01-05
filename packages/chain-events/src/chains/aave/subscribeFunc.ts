@@ -57,7 +57,8 @@ export async function createApi(
         // TODO: ensure that all governance contracts have a valid strategy
         //   i.e. with these specific tokens -- we may want to take the token addresses
         //   directly rather than fetch from the contract.
-        const strategyAddress = await governanceContract.getGovernanceStrategy();
+        const strategyAddress =
+          await governanceContract.getGovernanceStrategy();
         const strategy = GovernanceStrategyFactory.connect(
           strategyAddress,
           provider
@@ -124,14 +125,8 @@ export const subscribeEvents: SubscribeFunc<
   RawEvent,
   ISubscribeOptions<Api>
 > = async (options) => {
-  const {
-    chain,
-    api,
-    handlers,
-    skipCatchup,
-    discoverReconnectRange,
-    verbose,
-  } = options;
+  const { chain, api, handlers, skipCatchup, discoverReconnectRange, verbose } =
+    options;
   const log = factory.getLogger(
     addPrefix(__filename, [SupportedNetwork.Aave, chain])
   );

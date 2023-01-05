@@ -27,14 +27,14 @@ const constructFakeBlock = (
   extrinsics = []
 ) => {
   return {
-    header: ({
+    header: {
       hash: blockNumber,
       number: blockNumber,
-    } as unknown) as Header,
+    } as unknown as Header,
     events: events.map((event) => {
       const phase = { ...event.phase };
       delete event.phase;
-      return ({ event, phase } as unknown) as EventRecord;
+      return { event, phase } as unknown as EventRecord;
     }),
     versionNumber: 10,
     versionName: 'edgeware',

@@ -100,14 +100,8 @@ export const subscribeEvents: SubscribeFunc<
   RawEvent,
   ISubscribeOptions<Api>
 > = async (options) => {
-  const {
-    chain,
-    api,
-    handlers,
-    skipCatchup,
-    discoverReconnectRange,
-    verbose,
-  } = options;
+  const { chain, api, handlers, skipCatchup, discoverReconnectRange, verbose } =
+    options;
   const log = factory.getLogger(
     addPrefix(__filename, [SupportedNetwork.Commonwealth, chain])
   );

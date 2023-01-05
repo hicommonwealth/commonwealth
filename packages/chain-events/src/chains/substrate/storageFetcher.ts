@@ -80,17 +80,17 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const blockNumber = +(await this._api.rpc.chain.getHeader()).number;
 
     // fetch all identities and registrars from chain
-    const identities: Option<
-      Registration
-    >[] = await this._api.query.identity.identityOf.multi(addresses);
+    const identities: Option<Registration>[] =
+      await this._api.query.identity.identityOf.multi(addresses);
     const registrars = await this._api.query.identity.registrars();
 
     // construct events
     const cwEvents: CWEvent<IIdentitySet>[] = _.zip(addresses, identities)
       .map(
-        ([address, id]: [string, Option<Registration>]): CWEvent<
-          IIdentitySet
-        > => {
+        ([address, id]: [
+          string,
+          Option<Registration>
+        ]): CWEvent<IIdentitySet> => {
           // if no identity found, do nothing
           if (!id.isSome) return null;
           const { info, judgements } = id.unwrap();
@@ -257,11 +257,10 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       };
     };
     if (id === undefined) {
-      const deposits: Array<Option<
-        [BalanceOf, Vec<AccountId>] & Codec
-      >> = await this._api.queryMulti(
-        publicProps.map(([idx]) => [this._api.query.democracy.depositOf, idx])
-      );
+      const deposits: Array<Option<[BalanceOf, Vec<AccountId>] & Codec>> =
+        await this._api.queryMulti(
+          publicProps.map(([idx]) => [this._api.query.democracy.depositOf, idx])
+        );
       const proposedEvents = _.zip(publicProps, deposits)
         .map(([prop, depositOpt]) => constructEvent(prop, depositOpt))
         .filter((e) => !!e);
@@ -302,7 +301,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     }
 
     this.log.info('Migrating democracy referenda...');
-    const activeReferenda = await this._api.derive.democracy.referendumsActive();
+    const activeReferenda =
+      await this._api.derive.democracy.referendumsActive();
     const startEvents = activeReferenda.map((r) => {
       return {
         kind: EventKind.DemocracyStarted,
@@ -445,9 +445,8 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
     const proposedEvents = proposalIds
       .map((idx, index) => {
         if (!proposals[index] || !proposals[index].isSome) return null;
-        const { proposer, value, beneficiary, bond } = proposals[
-          index
-        ].unwrap();
+        const { proposer, value, beneficiary, bond } =
+          proposals[index].unwrap();
         return {
           kind: EventKind.TreasuryProposed,
           proposalIndex: +idx,
@@ -785,9 +784,10 @@ export class StorageFetcher extends IStorageFetcher<ApiPromise> {
       Vec<[Hash, BlockNumber] & Codec>
     >();
     // in "completed" phase
-    const completedProposals = await this._api.query.signaling.completedProposals<
-      Vec<[Hash, BlockNumber] & Codec>
-    >();
+    const completedProposals =
+      await this._api.query.signaling.completedProposals<
+        Vec<[Hash, BlockNumber] & Codec>
+      >();
     const proposalHashes = [
       ...inactiveProposals,
       ...activeProposals,
