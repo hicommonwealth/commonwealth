@@ -133,8 +133,8 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
     return (
       <div
         className="SubSectionGroup"
-        onmouseenter={(e) => mouseEnterHandler(e)}
-        onmouseleave={() => mouseLeaveHandler()}
+        onMouseEnter={(e) => mouseEnterHandler(e)}
+        onMouseLeave={() => mouseLeaveHandler()}
       >
         <div
           className={`sub-section-group-title ${
@@ -224,8 +224,8 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
     return (
       <div
         className="SidebarSectionGroup"
-        onmouseenter={(e) => mouseEnterHandler(e)}
-        onmouseleave={() => mouseLeaveHandler()}
+        onMouseEnter={(e) => mouseEnterHandler(e)}
+        onMouseLeave={() => mouseLeaveHandler()}
       >
         <div
           className="section-group-title-container"

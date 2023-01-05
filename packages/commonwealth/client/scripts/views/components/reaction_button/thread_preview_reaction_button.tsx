@@ -87,7 +87,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
 
     const reactionButtonComponent = (
       <div
-        onmouseenter={async () => {
+        onMouseEnter={async () => {
           this.reactors = await fetchReactionsByPost(thread);
         }}
         onClick={async (e) => onReactionClick(e, hasReacted, dislike, like)}

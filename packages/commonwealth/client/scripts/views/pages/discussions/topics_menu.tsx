@@ -67,7 +67,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                   featuredInSidebar,
                   featuredInNewPost,
                   defaultOffchainTemplate,
-                }) => {
+                }, i) => {
                   const active =
                     getRoute() ===
                       `/${app.activeChainId()}/discussions/${encodeURI(
@@ -77,6 +77,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
 
                   return (
                     <ThreadsFilterMenuItem
+                      key={`${i}`}
                       label={name}
                       isSelected={active}
                       onClick={(e) => {

@@ -190,7 +190,7 @@ class User extends ClassComponent<
             key: profile?.address || '-',
           },
           !profile
-            ? null
+            ? []
             : profile.avatarUrl
             ? profile.getAvatar(avatarSize)
             : profile.getAvatar(avatarSize - 4)
@@ -202,12 +202,12 @@ class User extends ClassComponent<
             className: linkify ? 'linkified' : '',
           },
           [
-            /*
             showAvatar &&
               render(
                 '.user-avatar',
                 {
-                  style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
+                  key: profile?.address || '-',
+                  STYLE: `width: ${avatarSize}px; height: ${avatarSize}px;`,
                 },
                 [ profile && profile.getAvatar(avatarSize) ]
               ),
@@ -275,11 +275,9 @@ class User extends ClassComponent<
                       style: 'display: inline-block',
                     }),
                 ],
-                */
           ]
         );
 
-/*
     const userPopover = render(
       '.UserPopover',
       {
@@ -356,7 +354,7 @@ class User extends ClassComponent<
           ]),
       ]
     );
-*/
+
     return popover
       ? null // @TODO @REACT FIX ME
       // m(Popover, {

@@ -221,8 +221,8 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       //   Menu,
       //   {
       //     class: 'admin-menu',
-      //     onmouseenter: handleMouseover,
-      //     onmouseleave: handleMouseout,
+      //     onMouseEnter: handleMouseover,
+      //     onMouseLeave: handleMouseout,
       //   },
       //   [
       //     m(MenuItem, {
@@ -253,8 +253,8 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       //   <React.Fragment>
       //     {m(Icon, {
       //       name: Icons.EDIT,
-      //       onmouseenter: handleMouseover,
-      //       onmouseleave: handleMouseout,
+      //       onMouseEnter: handleMouseover,
+      //       onMouseLeave: handleMouseout,
       //     })}
       //     {this.menuToggleTree['children'][category]['toggledState'] &&
       //       menuComponent}
@@ -302,8 +302,8 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       //   Menu,
       //   {
       //     class: 'admin-menu',
-      //     onmouseenter: handleMouseover,
-      //     onmouseleave: handleMouseout,
+      //     onMouseEnter: handleMouseover,
+      //     onMouseLeave: handleMouseout,
       //   },
       //   [
       //     m(MenuItem, {
@@ -331,8 +331,8 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       //     )}
       //     {m(Icon, {
       //       name: Icons.EDIT,
-      //       onmouseenter: handleMouseover,
-      //       onmouseleave: handleMouseout,
+      //       onMouseEnter: handleMouseover,
+      //       onMouseLeave: handleMouseout,
       //     })}
       //     {this.menuToggleTree['children'][channel.category]['children'][
       //       channel.name

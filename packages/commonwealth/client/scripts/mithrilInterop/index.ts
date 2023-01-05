@@ -22,17 +22,18 @@ export type Children = ReactNode | ReactNode[];
 
 export const render = (tag: string | React.ComponentType, attrs: any = {}, ...children: any[]) => {
   // console.log(tag, attrs, children);
+  let className = attrs?.className;
   if (typeof tag === 'string' && tag[0] === '.') {
-    if (attrs.className) {
-      attrs.className = `${attrs.className} ${tag.slice(1)}`;
+    if (className) {
+      className = `${className} ${tag.slice(1)}`;
     } else {
-      attrs.className = tag.slice(1);
+      className = tag.slice(1);
     }
     tag = `div`;
   }
   // handle children without attrs
   if (Array.isArray(attrs) || typeof attrs !== 'object') {
-    return createElement(tag, ...attrs);
+    return createElement(tag, { children: attrs, className }, attrs);
   }
 
   // ensure vnode.children exists

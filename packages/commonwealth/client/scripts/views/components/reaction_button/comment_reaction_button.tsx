@@ -101,7 +101,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
           { disabled: this.loading },
           'CommentReactionButton'
         )}
-        onmouseenter={async () => {
+        onMouseEnter={async () => {
           this.reactors = await fetchReactionsByPost(comment);
         }}
       >

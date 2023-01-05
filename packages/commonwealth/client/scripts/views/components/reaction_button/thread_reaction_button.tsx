@@ -100,7 +100,7 @@ export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAtt
           { disabled: this.loading },
           'CommentReactionButton'
         )}
-        onmouseenter={async () => {
+        onMouseEnter={async () => {
           this.reactors = await fetchReactionsByPost(thread);
         }}
       >

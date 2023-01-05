@@ -170,7 +170,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
               this.togglePopOver(onToggle);
             }
           }}
-          onmouseenter={() => {
+          onMouseEnter={() => {
             if (interactionType === 'hover') {
               this.handleHoverEnter(hoverOpenDelay, onToggle);
             }
@@ -187,7 +187,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
                   this.togglePopOver(onToggle);
                 }
               }}
-              onmousemove={(e: MouseEvent) => {
+              onMouseMove={(e: MouseEvent) => {
                 if (interactionType === 'hover') {
                   this.handleHoverExit(e, onToggle, vnode);
                 }
@@ -202,10 +202,10 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
                 )}
                 ref="popover-container-ref"
                 id={this.contentId}
-                onmouseenter={() => {
+                onMouseEnter={() => {
                   this.isOverContent = true;
                 }}
-                onmouseleave={() => {
+                onMouseLeave={() => {
                   this.isOverContent = false;
                 }}
               >

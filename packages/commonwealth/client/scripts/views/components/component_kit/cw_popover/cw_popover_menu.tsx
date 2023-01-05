@@ -60,8 +60,8 @@ export class CWPopoverMenu extends ClassComponent<PopoverMenuAttrs> {
       <CWPopover
         content={
           <div className={ComponentType.PopoverMenu}>
-            {menuItems.map((item) => (
-              <CWPopoverMenuItem type={item.type || 'default'} {...item} />
+            {menuItems.map((item, i) => (
+              <CWPopoverMenuItem key={`${i}`} type={item.type || 'default'} {...item} />
             ))}
           </div>
         }

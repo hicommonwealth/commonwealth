@@ -208,10 +208,10 @@ class MembersPage extends ClassComponent {
             <CWText type="h5">Posts / Month</CWText>
           </div>
           <div className="members-container">
-            {profilesLoaded.map((profileInfo) => {
+            {profilesLoaded.map((profileInfo, i) => {
               const { address, chain } = profileInfo.profile;
               return (
-                <div className="member-row" key={address}>
+                <div className="member-row" key={i}>
                   <a
                     href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
                     onClick={(e) => {

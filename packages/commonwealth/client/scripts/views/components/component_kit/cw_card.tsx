@@ -21,8 +21,8 @@ type CardStyleAttrs = {
 type CardAttrs = {
   onClick?: (e?: MouseEvent) => void;
   onmouseover?: (e?: MouseEvent) => void;
-  onmouseenter?: (e?: MouseEvent) => void;
-  onmouseleave?: (e?: MouseEvent) => void;
+  onMouseEnter?: (e?: MouseEvent) => void;
+  onMouseLeave?: (e?: MouseEvent) => void;
 } & CardStyleAttrs;
 
 export class CWCard extends ClassComponent<CardAttrs> {
@@ -33,8 +33,8 @@ export class CWCard extends ClassComponent<CardAttrs> {
       fullWidth,
       interactive = false,
       onClick,
-      onmouseenter,
-      onmouseleave,
+      onMouseEnter,
+      onMouseLeave,
       onmouseover,
     } = vnode.attrs;
 
@@ -51,8 +51,8 @@ export class CWCard extends ClassComponent<CardAttrs> {
         )}
         onClick={onClick}
         onmouseover={onmouseover}
-        onmouseenter={onmouseenter}
-        onmouseleave={onmouseleave}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         {vnode.children}
       </div>

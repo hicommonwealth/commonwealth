@@ -137,11 +137,11 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
         />
         {totalThreadCount > 0 ? (
           <div className="RecentThreads">
-            {pinnedThreads.map((t) => (
-              <ThreadPreview thread={t} />
+            {pinnedThreads.map((t, i) => (
+              <ThreadPreview thread={t} key={`${i}`} />
             ))}
-            {unpinnedThreads.map((t) => (
-              <ThreadPreview thread={t} />
+            {unpinnedThreads.map((t, i) => (
+              <ThreadPreview thread={t} key={`${i}`} />
             ))}
             {app.threads.listingStore.isDepleted({
               topicName,

@@ -116,7 +116,7 @@ export class SearchBar extends ClassComponent {
             })}
             placeholder="Search Common"
             defaultValue={getRouteParam('q') || this.state.searchTerm}
-            value={this.state.searchTerm}
+            // value={this.state.searchTerm}
             autoComplete="off"
             onFocus={() => {
               this.showDropdown = true;
