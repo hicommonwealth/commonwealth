@@ -14,6 +14,7 @@ module.exports = {
         "import/extensions": "off",
         "import/no-unresolved": "off",
         "import/no-cycle": "off",
+        "import/named": "off",
         "no-underscore-dangle": 0,
         "no-param-reassign": 0,
         "no-console": 0,
