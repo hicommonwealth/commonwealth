@@ -13,6 +13,7 @@ module.exports = {
     "tsconfigRootDir": __dirname,
     project: ["./packages/*/tsconfig.json"]
   },
+  // indicates this is the parent eslint so eslint will stop searching further up for eslint configs
   root: true,
   settings: {
     "import/parsers": {
@@ -28,9 +29,4 @@ module.exports = {
       }
     },
   },
-  rules: {
-    "@typescript-eslint/no-explicit-any": "off",
-    "import/namespace": "off",
-    "import/default": "off"
-  }
 }

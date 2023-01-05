@@ -12,21 +12,25 @@
     "downlevelIteration": true,
     "traceResolution": false,
     "paths": {
-      "common-common": ["../../packages/common-common"],
-      "common-common/*": ["../../packages/common-common/*"],
-      "chain-events": ["../../packages/chain-events"],
-      "chain-events/*": ["../../packages/chain-events/*"]
-      "snapshot-listener/*": ["../../packages/snapshot-listener/*"]
+      "chain-events": [
+        "../../packages/chain-events"
+      ],
+      "chain-events/*": [
+        "../../packages/chain-events/*"
+      ],
+      "snapshot-listener/*": [
+        "../../packages/snapshot-listener/*"
+      ]
     }
+  },
   "extends": "../../tsconfig.json",
   "include": [
-    "src",
+    "src"
   ],
   "exclude": [
     "./node_modules",
-    "node_modules",
     "./test",
     "build",
-    "dist",
+    "dist"
   ]
 }
