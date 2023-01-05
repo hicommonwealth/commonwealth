@@ -23,8 +23,6 @@ import {
   processChainEvents,
 } from './MessageProcessors/ChainEventsQueue';
 
-
-
 const log = factory.getLogger(formatFilename(__filename));
 
 /**

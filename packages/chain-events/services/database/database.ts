@@ -11,7 +11,6 @@ import ChainEventTypeFactory, {
   ChainEventTypeModelStatic,
 } from './models/chain_event_type';
 
-
 export type Models = {
   ChainEntity: ChainEntityModelStatic;
   ChainEvent: ChainEventModelStatic;

@@ -1,4 +1,4 @@
-import {Logger} from "typescript-logging";
+import { Logger } from 'typescript-logging';
 
 import {
   IEventHandler,
@@ -124,7 +124,9 @@ export abstract class Listener<
 
   public abstract getLatestBlockNumber(): Promise<number>;
 
-  public async processOfflineRange(log: Logger): Promise<{startBlock: number, endBlock: number} | undefined> {
+  public async processOfflineRange(
+    log: Logger
+  ): Promise<{ startBlock: number; endBlock: number } | undefined> {
     log.info(`Detected offline time, polling missed blocks...`);
 
     if (!this.discoverReconnectRange) {
@@ -136,12 +138,13 @@ export abstract class Listener<
     // fetch the block number of the last event from database
     let offlineRange = await this.discoverReconnectRange(this._chain);
 
-    if (this._lastCachedBlockNumber && (
-      !offlineRange.startBlock ||
-      offlineRange.startBlock < this._lastCachedBlockNumber)
+    if (
+      this._lastCachedBlockNumber &&
+      (!offlineRange.startBlock ||
+        offlineRange.startBlock < this._lastCachedBlockNumber)
     ) {
       log.info(`Using cached block number ${this._lastCachedBlockNumber}`);
-      offlineRange = {startBlock: this._lastCachedBlockNumber}
+      offlineRange = { startBlock: this._lastCachedBlockNumber };
     }
 
     // do nothing if we don't have an existing event in the database/cache
@@ -166,7 +169,7 @@ export abstract class Listener<
       offlineRange.startBlock = offlineRange.endBlock - 500;
     }
 
-    return <{startBlock: number, endBlock: number}>offlineRange;
+    return <{ startBlock: number; endBlock: number }>offlineRange;
   }
 
   public abstract isConnected(): Promise<boolean>;

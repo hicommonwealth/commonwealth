@@ -1,9 +1,9 @@
 import _ from 'underscore';
-import {ChainBase, ChainNetwork} from 'common-common/src/types';
-import {factory, formatFilename} from 'common-common/src/logging';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { factory, formatFilename } from 'common-common/src/logging';
 import Rollbar from 'rollbar';
 
-import {RabbitMqHandler} from '../ChainEventsConsumer/ChainEventHandlers';
+import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import {
   createListener,
   ErcLoggingHandler,
@@ -12,10 +12,10 @@ import {
   SubstrateTypes,
   SupportedNetwork,
 } from '../../src';
-import models, {DB} from '../database/database';
+import models, { DB } from '../database/database';
 
-import {ChainAttributes, IListenerInstances} from './types';
-import {handleFatalListenerError} from "./chainSubscriber";
+import { ChainAttributes, IListenerInstances } from './types';
+import { handleFatalListenerError } from './chainSubscriber';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -373,9 +373,7 @@ async function discoverReconnectRange(this: DB, chain: string) {
     ).map((x) => x.id);
 
     if (eventTypes.length === 0) {
-      log.info(
-        `[${chain}]: No event types exist in the database`
-      );
+      log.info(`[${chain}]: No event types exist in the database`);
       return { startBlock: null };
     }
 

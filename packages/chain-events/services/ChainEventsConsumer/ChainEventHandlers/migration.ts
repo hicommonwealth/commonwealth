@@ -4,7 +4,9 @@
 import { WhereOptions } from 'sequelize';
 import {
   RabbitMQController,
-  RascalPublications, RmqCENotificationCUD, RmqCETypeCUD,
+  RascalPublications,
+  RmqCENotificationCUD,
+  RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
 

@@ -1,5 +1,5 @@
-import {ApiPromise} from '@polkadot/api';
-import {RegisteredTypes} from '@polkadot/types/types';
+import { ApiPromise } from '@polkadot/api';
+import { RegisteredTypes } from '@polkadot/types/types';
 
 import {
   CWEvent,
@@ -7,10 +7,10 @@ import {
   IEventPoller,
   SupportedNetwork,
 } from '../../interfaces';
-import {Listener as BaseListener} from '../../Listener';
-import {addPrefix, factory} from '../../logging';
+import { Listener as BaseListener } from '../../Listener';
+import { addPrefix, factory } from '../../logging';
 
-import {Block, EventKind, ISubstrateListenerOptions} from './types';
+import { Block, EventKind, ISubstrateListenerOptions } from './types';
 
 import {
   createApi,
@@ -22,11 +22,13 @@ import {
 } from './index';
 
 // TODO: archival support
-export class Listener extends BaseListener<ApiPromise,
+export class Listener extends BaseListener<
+  ApiPromise,
   StorageFetcher,
   Processor,
   Subscriber,
-  EventKind> {
+  EventKind
+> {
   private readonly _options: ISubstrateListenerOptions;
 
   private _poller: IEventPoller<ApiPromise, Block>;
@@ -107,8 +109,7 @@ export class Listener extends BaseListener<ApiPromise,
     // processed blocks missed blocks in the background while the subscription is active
     if (!this.options.skipCatchup) {
       await this.processMissedBlocks();
-    }
-    else this.log.info(`Skipping event catchup on startup!`);
+    } else this.log.info(`Skipping event catchup on startup!`);
 
     try {
       this.log.info(
@@ -126,13 +127,16 @@ export class Listener extends BaseListener<ApiPromise,
     const offlineRange = await this.processOfflineRange(this.log);
     if (!offlineRange) return;
 
-    this.log.info(`Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
+    this.log.info(
+      `Missed blocks: ${offlineRange.startBlock} to ${offlineRange.endBlock}`
+    );
     try {
       const maxBlocksPerPoll = 100;
       let startBlock = offlineRange.startBlock;
       let endBlock;
 
-      if (startBlock + maxBlocksPerPoll < offlineRange.endBlock) endBlock = startBlock + maxBlocksPerPoll;
+      if (startBlock + maxBlocksPerPoll < offlineRange.endBlock)
+        endBlock = startBlock + maxBlocksPerPoll;
       else endBlock = offlineRange.endBlock;
 
       while (endBlock <= offlineRange.endBlock) {
@@ -145,7 +149,8 @@ export class Listener extends BaseListener<ApiPromise,
         if (endBlock === offlineRange.endBlock) break;
 
         startBlock = endBlock + 1;
-        if (endBlock + maxBlocksPerPoll <= offlineRange.endBlock) endBlock += maxBlocksPerPoll;
+        if (endBlock + maxBlocksPerPoll <= offlineRange.endBlock)
+          endBlock += maxBlocksPerPoll;
         else endBlock = offlineRange.endBlock;
       }
     } catch (error) {
@@ -154,7 +159,9 @@ export class Listener extends BaseListener<ApiPromise,
         error
       );
     }
-    this.log.info(`Successfully processed block ${offlineRange.startBlock} to ${offlineRange.endBlock}`);
+    this.log.info(
+      `Successfully processed block ${offlineRange.startBlock} to ${offlineRange.endBlock}`
+    );
   }
 
   public async getBlocks(
@@ -162,7 +169,7 @@ export class Listener extends BaseListener<ApiPromise,
     endBlock?: number
   ): Promise<Block[]> {
     this.log.info(`Polling blocks ${startBlock} to ${endBlock}`);
-    return this._poller.poll({startBlock, endBlock});
+    return this._poller.poll({ startBlock, endBlock });
   }
 
   public async updateSpec(spec: RegisteredTypes): Promise<void> {
@@ -185,7 +192,10 @@ export class Listener extends BaseListener<ApiPromise,
   protected async processBlock(block: Block): Promise<void> {
     // cache block number if needed for disconnection purposes
     const blockNumber = +block.header.number;
-    if (!this._lastCachedBlockNumber || blockNumber > this._lastCachedBlockNumber) {
+    if (
+      !this._lastCachedBlockNumber ||
+      blockNumber > this._lastCachedBlockNumber
+    ) {
       this._lastCachedBlockNumber = blockNumber;
     }
 

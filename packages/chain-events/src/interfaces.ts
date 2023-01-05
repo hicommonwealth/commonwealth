@@ -4,7 +4,7 @@
 
 import { ApiPromise as SubstrateApi } from '@polkadot/api';
 
-import {ChainEventInstance} from "../services/database/models/chain_event";
+import { ChainEventInstance } from '../services/database/models/chain_event';
 
 import * as SubstrateTypes from './chains/substrate/types';
 import * as MolochTypes from './chains/moloch/types';
@@ -15,14 +15,13 @@ import * as AaveTypes from './chains/aave/types';
 import * as CommonwealthTypes from './chains/commonwealth/types';
 import * as CosmosTypes from './chains/cosmos/types';
 import { Api as MolochApi } from './chains/moloch/types';
-import { IErc721Contracts as ERC721Api } from "./chains/erc721/types";
-import { IErc20Contracts as ERC20Api } from "./chains/erc20/types";
+import { IErc721Contracts as ERC721Api } from './chains/erc721/types';
+import { IErc20Contracts as ERC20Api } from './chains/erc20/types';
 import { Api as CompoundApi } from './chains/compound/types';
 import { Api as CommonwealthApi } from './chains/commonwealth/types';
 import { Api as AaveApi } from './chains/aave/types';
-import { StorageFetcher } from "./chains/aave";
-import { Listener } from "./Listener";
-
+import { StorageFetcher } from './chains/aave';
+import { Listener } from './Listener';
 
 // add other events here as union types
 export type IChainEntityKind =
@@ -58,7 +57,13 @@ export type IAPIs =
   | CompoundApi
   | CommonwealthApi
   | AaveApi;
-export type IAnyListener = Listener<IAPIs, IStorageFetcher<IAPIs>, IEventProcessor<IAPIs, any>, IEventSubscriber<IAPIs, any>, IChainEventKind>
+export type IAnyListener = Listener<
+  IAPIs,
+  IStorageFetcher<IAPIs>,
+  IEventProcessor<IAPIs, any>,
+  IEventSubscriber<IAPIs, any>,
+  IChainEventKind
+>;
 
 export const ChainEventKinds = [
   ...SubstrateTypes.EventKinds,
@@ -103,7 +108,9 @@ export interface CWEvent<IEventData = IChainEventData> {
 }
 
 // handles individual events by sending them off to storage/notifying
-export abstract class IEventHandler<DBEventType = IChainEventData | ChainEventInstance> {
+export abstract class IEventHandler<
+  DBEventType = IChainEventData | ChainEventInstance
+> {
   name?: any;
 
   // throws on error, returns a db event, or void

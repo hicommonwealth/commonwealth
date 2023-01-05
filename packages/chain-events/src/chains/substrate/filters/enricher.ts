@@ -22,18 +22,8 @@ import {
   BountyIndex,
   BalanceOf,
 } from '@polkadot/types/interfaces';
-import {
-  Option,
-  Vec,
-  Compact,
-} from '@polkadot/types/codec';
-import {
-  bool,
-  u32,
-  u64,
-  StorageKey,
-  Bytes,
-} from '@polkadot/types/primitive';
+import { Option, Vec, Compact } from '@polkadot/types/codec';
+import { bool, u32, u64, StorageKey, Bytes } from '@polkadot/types/primitive';
 import { Codec, AnyTuple } from '@polkadot/types/types';
 import { hexToString } from '@polkadot/util';
 import { filter } from 'lodash';

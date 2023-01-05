@@ -1,4 +1,4 @@
-import { RegisteredTypes } from "@polkadot/types/types";
+import { RegisteredTypes } from '@polkadot/types/types';
 
 import {
   IDisconnectedRange,

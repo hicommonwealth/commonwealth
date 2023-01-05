@@ -1,5 +1,5 @@
 /* eslint-disable no-shadow */
-import {Web3Provider} from "@ethersproject/providers";
+import { Web3Provider } from '@ethersproject/providers';
 
 import {
   IProjectBaseFactory,

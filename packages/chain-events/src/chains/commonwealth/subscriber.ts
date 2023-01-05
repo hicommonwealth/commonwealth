@@ -131,13 +131,21 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
 
     // create subscription for factory
     this._api.factory.on('*', (args) =>
-      this._listener(this._api.factory.address, CommonContractType.Factory, args)
+      this._listener(
+        this._api.factory.address,
+        CommonContractType.Factory,
+        args
+      )
     );
 
     // create subscriptions for all projects
     for (const project of this._api.projects) {
       project.project.on('*', (args) =>
-        this._listener(project.project.address, CommonContractType.Project, args)
+        this._listener(
+          project.project.address,
+          CommonContractType.Project,
+          args
+        )
       );
     }
   }

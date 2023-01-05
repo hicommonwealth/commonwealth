@@ -1,5 +1,8 @@
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import {RascalPublications, RmqCENotificationCUD} from 'common-common/src/rabbitmq/types';
+import {
+  RascalPublications,
+  RmqCENotificationCUD,
+} from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
 import { ChainEventAttributes } from '../../database/models/chain_event';
