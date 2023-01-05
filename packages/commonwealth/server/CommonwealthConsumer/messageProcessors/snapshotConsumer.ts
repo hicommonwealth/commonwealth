@@ -10,6 +10,14 @@ export async function processSnapshotMessage(
 ) {
   const { space, id, title, body, choices, start, expire } = data;
 
+  const eventType = data.event;
+
+  if (!space && eventType !== 'proposal/deleted') {
+    // Catch for snapshot misfiring events- if we don't have a space, we can't do anything useful with the information
+    this.log.info('Event received with invalid proposal, skipping');
+    return;
+  }
+
   let snapshotNotificationData = {
     space,
     id,
@@ -22,7 +30,6 @@ export async function processSnapshotMessage(
 
   this.log.info(`Processing snapshot message: ${JSON.stringify(data)}`);
 
-  const eventType = data.event;
   let proposal;
 
   try {
@@ -62,9 +69,11 @@ export async function processSnapshotMessage(
   }
 
   try {
-    await this.models.SnapshotSpace.findOrCreate({
-      where: { snapshot_space: space ?? proposal.space },
-    });
+    if (space || proposal.space) {
+      await this.models.SnapshotSpace.findOrCreate({
+        where: { snapshot_space: space ?? proposal.space },
+      });
+    }
   } catch (e) {
     this.log.error(`Error creating snapshot space: ${e}`);
   }
@@ -80,6 +89,7 @@ export async function processSnapshotMessage(
 
   if (!proposal && eventType !== 'proposal/deleted') {
     this.log.info(`Proposal ${id} does not exist, creating record`);
+    // TODO: fix here
     proposal = await this.models.SnapshotProposal.create({
       id,
       title,
