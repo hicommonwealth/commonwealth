@@ -60,7 +60,6 @@ describe('lookupAddressIsOwnedByUser() unit tests', () => {
     request.user = { id: 2 };
 
     const [author, error] = await lookupAddressIsOwnedByUser(mockDb, request);
-    console.log(author)
     assert.equal(author, null);
     assert.equal(error, 'Invalid public key/chain');
   })

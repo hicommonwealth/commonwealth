@@ -2,6 +2,7 @@ import SequelizeMock from 'sequelize-mock';
 import { Sequelize, DataTypes } from 'sequelize';
 import { DB } from 'server/models';
 import { MockAddress } from './mock_address';
+import { MockChain } from './mock_chain';
 
 const sequelizeMock = new SequelizeMock();
 
@@ -26,11 +27,12 @@ const UserMock = sequelizeMock.define(
 );
 
 const AddressMock = new MockAddress(sequelizeMock).getModel();
+const ChainMock = new MockChain(sequelizeMock).getModel();
 
 const models = {
   Address: AddressMock,
   Ban: null,
-  Chain: null,
+  Chain: ChainMock,
   ChainCategory: null,
   ChainCategoryType: null,
   ChainNode: null,
@@ -86,3 +88,13 @@ export const mockDb: DB = {
   Sequelize: sequelizeMock,
   ...models,
 };
+
+// TODO: figure out how to mock associations
+
+// setup associations
+// get only non null models using Object.keys
+// Object.keys(models).filter((modelName) => !!models[modelName]).forEach((modelName) => {
+//   if ('associate' in mockDb[modelName]) {
+//     mockDb[modelName].associate(mockDb);
+//   }
+// });
