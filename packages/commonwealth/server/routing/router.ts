@@ -388,7 +388,11 @@ function setupRouter(
     databaseValidationService.validateChain,
     activeThreads.bind(this, models)
   );
-  router.get('/getThreads', getThreadsOld.bind(this, models));
+  router.get(
+    '/getThreads',
+    databaseValidationService.validateChain,
+    getThreadsOld.bind(this, models)
+  );
   router.get(
     '/searchDiscussions',
     databaseValidationService.validateChain,
