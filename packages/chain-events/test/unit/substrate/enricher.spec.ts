@@ -421,6 +421,8 @@ const api = constructFakeApi({
     const eraPoints = registry.createType('EraRewardPoints', {
       individual: new Map<AccountId, RewardPoint>(
         individual
+          // eslint-disable-next-line
+          // @ts-ignore
           .map((points) => registry.createType('RewardPoint', points))
           .map((points, index): [AccountId, RewardPoint] => [
             (validators[index] as unknown) as AccountId,
@@ -610,6 +612,8 @@ const api = constructFakeApi({
   identityOf: async (addr) =>
     constructOption(({
       info: {
+        // eslint-disable-next-line
+        // @ts-ignore
         display: new Data(new TypeRegistry(), {
           Raw: stringToHex(`${addr}-display-name`),
         }),
