@@ -4,6 +4,7 @@
     "jsx": "preserve",
     "outDir": "./build",
     "baseUrl": ".",
+    "skipLibCheck": true,
     "paths": {
       "common-common": ["../../packages/common-common"],
       "common-common/*": ["../../packages/common-common/*"],
@@ -13,10 +14,6 @@
       "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
     },
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "traceResolution": false
   },
   "include": [
     "./client",
