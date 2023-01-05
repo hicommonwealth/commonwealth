@@ -6,3 +6,4 @@ src/eth/cache
 contractbase/eth/build
 
 .env
+.DS_Store

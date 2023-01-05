@@ -112,4 +112,46 @@ describe('DatabaseValidationService Tests', () => {
       expect(request.address).to.be.undefined;
     });
   });
+
+  describe('validateChain', () => {
+    it('should successfully validate chain id if chain exists', async () => {
+      const request = new MockExpressRequest();
+
+      const resBody = {
+        address: userAddress,
+        author_chain: chain,
+        chain,
+        title,
+        topic,
+        body,
+        jwt: userJWT,
+      };
+      request.body = resBody;
+      request.user = { id: userId };
+      expect(
+        databaseValidationService.validateChain(models, request, null, () => {
+          return null;
+        })
+      ).to.not.throw;
+    });
+
+    it('should fail if no chain is given', async () => {
+      const request = new MockExpressRequest();
+
+      const resBody = {
+        address: userAddress,
+        author_chain: null,
+        title,
+        topic,
+        body,
+        jwt: userJWT,
+      };
+      request.body = resBody;
+      request.user = { id: userId };
+      databaseValidationService.validateChain(models, request, resBody, () => {
+        return null;
+      });
+      expect(request.chain).to.be.undefined;
+    });
+  });
 });

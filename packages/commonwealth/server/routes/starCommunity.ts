@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
@@ -13,8 +12,7 @@ const starCommunity = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   try {
     const [star, created] = await models.StarredCommunity.findOrCreate({

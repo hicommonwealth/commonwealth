@@ -4,11 +4,12 @@ import { WebhookContent } from '../webhookNotifier';
 import { UserAttributes } from './user';
 import { DB } from '../models';
 import { NotificationCategoryAttributes } from './notification_category';
-import {ModelInstance, ModelStatic} from './types';
+import { ModelInstance, ModelStatic } from './types';
 import {
-  IPostNotificationData,
   ICommunityNotificationData,
   IChainEventNotificationData,
+  ISnapshotNotificationData,
+  IPostNotificationData,
   IChatNotification,
 } from '../../shared/types';
 import { ChainAttributes } from './chain';
@@ -36,6 +37,7 @@ export type SubscriptionAttributes = {
   offchain_comment_id?: number;
   chain_event_type_id?: string;
   chain_entity_id?: number;
+  snapshot_id?: string;
 
   User?: UserAttributes;
   NotificationCategory?: NotificationCategoryAttributes;
@@ -43,41 +45,62 @@ export type SubscriptionAttributes = {
   Chain?: ChainAttributes;
   Thread?: ThreadAttributes;
   Comment?: CommentAttributes;
-}
+};
 
 export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
   getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
-}
+};
 
-export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & { emitNotifications?: (
-  models: DB,
-  category_id: string,
-  object_id: string,
-  notification_data: IPostNotificationData | ICommunityNotificationData | IChainEventNotificationData | IChatNotification,
-  webhook_data?: Partial<WebhookContent>,
-  excludeAddresses?: string[],
-  includeAddresses?: string[],
-) => Promise<NotificationInstance> };
+export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
+  emitNotifications?: (
+    models: DB,
+    category_id: string,
+    object_id: string,
+    notification_data:
+      | IPostNotificationData
+      | ICommunityNotificationData
+      | IChainEventNotificationData
+      | IChatNotification
+      | ISnapshotNotificationData,
+    webhook_data?: Partial<WebhookContent>,
+    excludeAddresses?: string[],
+    includeAddresses?: string[]
+  ) => Promise<NotificationInstance>;
+};
 
 export default (
   sequelize: Sequelize.Sequelize,
-  dataTypes: typeof DataTypes,
+  dataTypes: typeof DataTypes
 ): SubscriptionModelStatic => {
   const Subscription = <SubscriptionModelStatic>sequelize.define(
-    'Subscription', {
+    'Subscription',
+    {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       subscriber_id: { type: dataTypes.INTEGER, allowNull: false },
       category_id: { type: dataTypes.STRING, allowNull: false },
       object_id: { type: dataTypes.STRING, allowNull: false },
-      is_active: { type: dataTypes.BOOLEAN, defaultValue: true, allowNull: false },
-      immediate_email: { type: dataTypes.BOOLEAN, defaultValue: false, allowNull: false },
+      is_active: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: true,
+        allowNull: false,
+      },
+      immediate_email: {
+        type: dataTypes.BOOLEAN,
+        defaultValue: false,
+        allowNull: false,
+      },
       // TODO: change allowNull to false once subscription refactor is implemented
       chain_id: { type: dataTypes.STRING, allowNull: true },
       offchain_thread_id: { type: dataTypes.INTEGER, allowNull: true },
       offchain_comment_id: { type: dataTypes.INTEGER, allowNull: true },
       chain_event_type_id: { type: dataTypes.STRING, allowNull: true },
       chain_entity_id: { type: dataTypes.INTEGER, allowNull: true },
-    }, {
+      snapshot_id: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+    },
+    {
       tableName: 'Subscriptions',
       underscored: true,
       createdAt: 'created_at',
@@ -91,14 +114,38 @@ export default (
   );
 
   Subscription.associate = (models) => {
-    models.Subscription.belongsTo(models.User, { foreignKey: 'subscriber_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.NotificationCategory, { foreignKey: 'category_id', targetKey: 'name' });
-    models.Subscription.hasMany(models.NotificationsRead, { foreignKey: 'subscription_id', onDelete: 'cascade' });
-    models.Subscription.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.Thread, { foreignKey: 'offchain_thread_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.ChainEventType, { foreignKey: 'chain_event_type_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.ChainEntityMeta, { foreignKey: 'chain_entity_id', targetKey: 'id' });
-    models.Subscription.belongsTo(models.Comment, { foreignKey: 'offchain_comment_id', targetKey: 'id'});
+    models.Subscription.belongsTo(models.User, {
+      foreignKey: 'subscriber_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.NotificationCategory, {
+      foreignKey: 'category_id',
+      targetKey: 'name',
+    });
+    models.Subscription.hasMany(models.NotificationsRead, {
+      foreignKey: 'subscription_id',
+      onDelete: 'cascade',
+    });
+    models.Subscription.belongsTo(models.Chain, {
+      foreignKey: 'chain_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.Thread, {
+      foreignKey: 'offchain_thread_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.ChainEventType, {
+      foreignKey: 'chain_event_type_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.ChainEntityMeta, {
+      foreignKey: 'chain_entity_id',
+      targetKey: 'id',
+    });
+    models.Subscription.belongsTo(models.Comment, {
+      foreignKey: 'offchain_comment_id',
+      targetKey: 'id',
+    });
   };
 
   return Subscription;
