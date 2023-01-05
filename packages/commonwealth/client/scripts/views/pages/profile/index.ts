@@ -327,7 +327,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       }
     }
   },
-  oncreate: async (vnode) => {},
+  oncreate: async (vnode) => {}, // eslint-disable-line
   view: (vnode) => {
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;

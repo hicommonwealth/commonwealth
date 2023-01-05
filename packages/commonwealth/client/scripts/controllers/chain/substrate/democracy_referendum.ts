@@ -43,6 +43,7 @@ export const convictionToSubstrate = (
   chain: SubstrateChain,
   c: DemocracyConviction
 ): Conviction => {
+  // eslint-disable-next-line
   // @ts-ignore
   return chain.createType('Conviction', c);
 };

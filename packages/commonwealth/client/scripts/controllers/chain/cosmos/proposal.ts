@@ -131,7 +131,7 @@ export class CosmosProposal extends Proposal<
             : api.gov.tally(this.data.identifier),
         ]);
         if (depositResp?.deposits) {
-          for (const deposit of depositResp?.deposits) {
+          for (const deposit of depositResp.deposits) {
             if (deposit.amount && deposit.amount[0]) {
               this.data.state.depositors.push([ deposit.depositor, new BN(deposit.amount[0].amount) ]);
             }

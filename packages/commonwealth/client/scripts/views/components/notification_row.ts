@@ -487,14 +487,15 @@ const NotificationRow: m.Component<
       const notificationData = notifications.map((notif) =>
         typeof notif.data === 'string' ? JSON.parse(notif.data) : notif.data
       );
-      let {
+      const result = getBatchNotificationFields(category, notificationData);
+      const {
         authorInfo,
         createdAt,
         notificationHeader,
         notificationBody,
-        path,
         pageJump,
-      } = getBatchNotificationFields(category, notificationData);
+      } = result;
+      let { path } = result;
 
       if (app.isCustomDomain()) {
         if (

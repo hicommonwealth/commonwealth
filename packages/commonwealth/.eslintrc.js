@@ -11,6 +11,7 @@ module.exports = {
     rules: {
         "@typescript-eslint/interface-name-prefix": "off",
         "@typescript-eslint/camelcase": "off",
+        "@typescript-eslint/ban-types": "off",
         "import/extensions": "off",
         "import/no-unresolved": "off",
         "import/no-cycle": "off",

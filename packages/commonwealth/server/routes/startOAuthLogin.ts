@@ -15,7 +15,7 @@ const startOAuthLogin = async (
   next: NextFunction,
 ) => {
   console.log("Auth info startOAuthLogin:", req.authInfo);
-  let successRedirect = '/';
+  const successRedirect = '/';
 
   // custom domain OAuth2.0 login logic. OAuth2.0 login is currently disabled for custom domains.
   // const hostname = (<AuthInfoExtended>req.authInfo)?.state?.hostname

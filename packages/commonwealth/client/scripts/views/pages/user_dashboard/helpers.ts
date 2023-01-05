@@ -100,7 +100,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       return {status: 'Failure', result: []}
     }
 
-    let chains: any = new Set();
+    const chains: any = new Set();
     for (const event of events) {
       chains.add(event.chain)
     }

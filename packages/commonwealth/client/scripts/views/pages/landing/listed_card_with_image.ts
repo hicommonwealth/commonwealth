@@ -16,7 +16,7 @@ interface IAttrs {
   variant?: string
 }
 
-const ListedCardWithImage: m.Component<IAttrs, {}> = {
+const ListedCardWithImage: m.Component<IAttrs> = {
   view: (vnode) => {
     return m(
       'li',

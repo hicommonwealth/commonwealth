@@ -1,12 +1,13 @@
 // const fetch = require('node-fetch');
-const syncRequest = require('sync-request');
+import syncRequest from "sync-request";
 import fetch from 'node-fetch';
-const {syncPerformanceTester, asyncPerformanceTester} = require("./util");
+import {syncPerformanceTester} from "./util";
+
 
 const jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIxMTMsImVtYWlsIjpudWxsLCJpYXQiOjE2NTI2NzA4MDR9.WN5vxIaAcAzpNvTJiCeelm071yErhRtcEgXbA5iS-wA";
-let url = 'http://localhost:8080/api/createThread';
+const url = 'http://localhost:8080/api/createThread';
 
-let options = {
+const options = {
     headers: {
         'Content-Type': 'application/json',
         Authorization: `jwt ${jwt}`,

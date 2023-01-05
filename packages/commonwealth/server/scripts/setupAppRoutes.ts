@@ -36,7 +36,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     throw new Error('Template not found, cannot start production server');
   }
 
- 
+
   const renderWithMetaTags = (res, title, description, author, image) => {
     image = cleanMalformedUrl(image);
 

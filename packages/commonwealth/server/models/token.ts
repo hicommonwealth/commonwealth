@@ -12,10 +12,7 @@ export type TokenAttributes = {
   icon_url?: string;
 }
 
-export type TokenInstance = ModelInstance<TokenAttributes> & {
-
-}
-
+export type TokenInstance = ModelInstance<TokenAttributes>
 export type TokenModelStatic = ModelStatic<TokenInstance>;
 
 export default (

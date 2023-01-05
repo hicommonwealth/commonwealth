@@ -1,9 +1,9 @@
 import { BaseMixpanelPayload } from '../../shared/analytics/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
+import Mixpanel from 'mixpanel'
 
-var Mixpanel = require('mixpanel');
-var mixpanelNode;
+let mixpanelNode;
 
 if (process.env.NODE_ENV === 'production') {
   mixpanelNode = Mixpanel.init(process.env.MIXPANEL_PROD_TOKEN); //TODO: Swap with prod token when tested

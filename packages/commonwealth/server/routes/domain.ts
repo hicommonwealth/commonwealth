@@ -10,7 +10,9 @@ const domain = async (models: DB, req: Request, res: Response, next: NextFunctio
     if (chain) {
       return res.json({ customDomain: chain.id });
     }
-  } catch (e) {}
+  } catch (e) {
+    // do nothing
+  }
 
   // otherwise, return false
   return res.json({ customDomain: null });

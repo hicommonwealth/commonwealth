@@ -13,9 +13,7 @@ export type ViewCountAttributes = {
   Thread?: ThreadAttributes;
 }
 
-export type ViewCountInstance = ModelInstance<ViewCountAttributes> & {
-
-}
+export type ViewCountInstance = ModelInstance<ViewCountAttributes>
 
 export type ViewCountModelStatic = ModelStatic<ViewCountInstance>;
 

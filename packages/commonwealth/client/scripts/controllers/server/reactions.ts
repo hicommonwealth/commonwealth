@@ -123,7 +123,7 @@ class ReactionsController {
   }
 
   public async delete(reaction) {
-    const _this = this;
+    const _this = this; // eslint-disable-line
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /reaction
       $.post(`${app.serverUrl()}/deleteReaction`, {

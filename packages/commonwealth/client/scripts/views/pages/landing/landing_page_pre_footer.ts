@@ -1,6 +1,6 @@
 import m from 'mithril';
 
-const JoinCommonWealthSection: m.Component<{}, {}> = {
+const JoinCommonWealthSection: m.Component = {
   view: (vnode) => {
     return m(
       'section.JoinCommonWealthSection',

@@ -93,7 +93,7 @@ class ReactionCountController {
 
   public async delete(reaction, reactionCount: ReactionCount<any>) {
     // TODO Graham 4/24/22: Investigate necessity of this duplication
-    const _this = this;
+    const _this = this; // eslint-disable-line
     try {
       await $.post(`${app.serverUrl()}/deleteReaction`, {
         jwt: app.user.jwt,
