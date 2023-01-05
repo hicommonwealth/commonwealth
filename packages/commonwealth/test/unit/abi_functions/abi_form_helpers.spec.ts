@@ -58,6 +58,7 @@ describe('validateAbiInput() unit tests', () => {
     const [validation_status, message] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
   });
+
   it('should fail to validate incorrect uint args', () => {
     const input = '123.5';
     const inputType = 'uint256';
@@ -65,6 +66,7 @@ describe('validateAbiInput() unit tests', () => {
     const [validation_status, message] = validateAbiInput(input, inputType);
     assert.equal(validation_status, 'failure');
   });
+
   it('should fail to validate incorrect bool args', () => {
     const input = 'maybe';
     const inputType = 'bool';

@@ -45,6 +45,9 @@ async function decodeTransactionData(
  *
  * We may want to consider moving this into the `IChainModule` class, as it requires
  * a loaded to chain to render the corresponding view.
+ *
+ * @throw Error if the contract is not found, or if the web3 api is not initialized or
+ * if there is a web3 api calls are misconfigured or fail.
  */
 export async function callContractFunction(
   contractAddress: string,
@@ -75,48 +78,38 @@ export async function callContractFunction(
   const web3: Web3 = signingWallet.api;
 
   const methodSignature = encodeFunctionSignature(fn);
-  let functionContract;
-  try {
-    functionContract = new web3.eth.Contract(
-      parseAbiItemsFromABI(contract.abi),
-      contract.address
-    );
-  } catch (error) {
-    console.error('Failed to initialize Web3 Contract Instance: ', error);
-    throw new Error(`Failed to initialize Web3 Contract Instance: ${error}`);
-  }
+  const functionContract = new web3.eth.Contract(
+    parseAbiItemsFromABI(contract.abi),
+    contract.address
+  );
 
   const functionTx = functionContract.methods[methodSignature](
     ...processedArgs
   );
-  try {
-    if (
-      fn.stateMutability !== 'view' &&
-      fn.stateMutability !== 'pure' &&
-      fn.constant !== true
-    ) {
-      // Sign Tx with PK if this is write function
-      const tx: TransactionConfig = {
-        from: signingWallet.accounts[0],
-        to: contract.address,
-        data: functionTx.encodeABI(),
-      };
-      const txReceipt = await web3.eth.sendTransaction(tx);
-      return decodeTransactionData(fn.outputs, txReceipt);
-    } else {
-      // send call transaction
-      const tx: TransactionConfig = {
-        to: contract.address,
-        data: functionTx.encodeABI(),
-      };
-      const txResult = await web3.givenProvider.request({
-        method: 'eth_call',
-        params: [tx, 'latest'],
-      });
-      return decodeTransactionData(fn.outputs, txResult);
-    }
-  } catch (error) {
-    console.log(error);
-    throw new Error(`Contract Call Tx Failed with ${error}`);
+
+  if (
+    fn.stateMutability !== 'view' &&
+    fn.stateMutability !== 'pure' &&
+    fn.constant !== true
+  ) {
+    // Sign Tx with PK if this is write function
+    const tx: TransactionConfig = {
+      from: signingWallet.accounts[0],
+      to: contract.address,
+      data: functionTx.encodeABI(),
+    };
+    const txReceipt = await web3.eth.sendTransaction(tx);
+    return decodeTransactionData(fn.outputs, txReceipt);
+  } else {
+    // send call transaction
+    const tx: TransactionConfig = {
+      to: contract.address,
+      data: functionTx.encodeABI(),
+    };
+    const txResult = await web3.givenProvider.request({
+      method: 'eth_call',
+      params: [tx, 'latest'],
+    });
+    return decodeTransactionData(fn.outputs, txResult);
   }
 }
