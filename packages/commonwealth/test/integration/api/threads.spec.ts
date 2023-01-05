@@ -18,10 +18,10 @@ import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
 import { addAllowDenyPermissions } from 'commonwealth/test/util/modelUtils';
 import { Action } from '../../../../common-common/src/permissions';
+import { markdownComment } from "../../util/fixtures/markdownComment";
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownComment = require('../../util/fixtures/markdownComment');
 
 describe('Thread Tests', () => {
   const chain = 'ethereum';
