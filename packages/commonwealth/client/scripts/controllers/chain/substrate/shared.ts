@@ -354,9 +354,9 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     // chainProps needs to be set first so calls to coins() correctly populate the denom
     if (chainProps) {
       const { ss58Format, tokenDecimals, tokenSymbol } = chainProps;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
       this.registry.setChainProperties(
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         this.createType('ChainProperties', { ...chainProps, ss58Format })
       );
       this._ss58Format = +ss58Format.unwrapOr(42);
