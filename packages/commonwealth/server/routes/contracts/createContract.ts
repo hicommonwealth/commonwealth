@@ -9,8 +9,6 @@ import { ContractAttributes, ContractInstance } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
 
-const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   NoType: 'Must provide contract type',
   NoBase: 'Must provide chain base',
@@ -103,17 +101,13 @@ const createContract = async (
       throw new AppError(Errors.InvalidABI);
     }
 
-    try {
-      // Parse ABI to validate it as a properly formatted ABI
-      abiAsRecord = JSON.parse(abi);
-      if (!abiAsRecord) {
-        throw new AppError(Errors.InvalidABI);
-      }
-      const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-      if (!abiItems) {
-        throw new AppError(Errors.InvalidABI);
-      }
-    } catch {
+    // Parse ABI to validate it as a properly formatted ABI
+    abiAsRecord = JSON.parse(abi);
+    if (!abiAsRecord) {
+      throw new AppError(Errors.InvalidABI);
+    }
+    const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
+    if (!abiItems) {
       throw new AppError(Errors.InvalidABI);
     }
   }
@@ -128,7 +122,7 @@ const createContract = async (
       where: {
         chain_id: community,
         contract_id: oldContract.id,
-      }
+      },
     });
     return success(res, { contract: oldContract.toJSON() });
   }

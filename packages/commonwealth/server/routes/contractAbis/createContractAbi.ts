@@ -51,51 +51,41 @@ const createContractAbi = async (
     throw new AppError(Errors.NoAbi);
   }
 
-  let abiAsRecord: Array<Record<string, unknown>>;
-  try {
-    // Parse ABI to validate it as a properly formatted ABI
-    abiAsRecord = JSON.parse(abi);
-    if (!abiAsRecord) {
-      throw new AppError(Errors.InvalidABI);
-    }
-    const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-    if (!abiItems) {
-      throw new AppError(Errors.InvalidABI);
-    }
-  } catch {
+  // Parse ABI to validate it as a properly formatted ABI
+  const abiAsRecord: Array<Record<string, unknown>> = JSON.parse(abi);
+  if (!abiAsRecord) {
+    throw new AppError(Errors.InvalidABI);
+  }
+  const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
+  if (!abiItems) {
     throw new AppError(Errors.InvalidABI);
   }
 
-  try {
-    const contract_abi = await models.ContractAbi.create({
-      abi: abiAsRecord,
-      nickname,
-    });
+  const contract_abi = await models.ContractAbi.create({
+    abi: abiAsRecord,
+    nickname,
+  });
 
-    const contract = await models.Contract.findOne({
-      where: { id: contractId },
-    });
+  const contract = await models.Contract.findOne({
+    where: { id: contractId },
+  });
 
-    if (!contract) {
-      return success(res, {
-        contractAbi: contract_abi.toJSON(),
-        contract: null,
-      });
-    }
-
-    if (contract && contract_abi) {
-      contract.abi_id = contract_abi.id;
-      await contract.save();
-    }
-
+  if (!contract) {
     return success(res, {
       contractAbi: contract_abi.toJSON(),
-      contract,
+      contract: null,
     });
-  } catch (err) {
-    log.error('Error creating contract abi: ', err.message);
-    throw new ServerError(err.message);
   }
+
+  if (contract && contract_abi) {
+    contract.abi_id = contract_abi.id;
+    await contract.save();
+  }
+
+  return success(res, {
+    contractAbi: contract_abi.toJSON(),
+    contract,
+  });
 };
 
 export default createContractAbi;

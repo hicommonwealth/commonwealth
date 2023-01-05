@@ -42,7 +42,7 @@ class ContractsController {
       jwt: app.user.jwt,
       contractId: contract.id,
       abi,
-      nickname
+      nickname,
     });
     const resultContract = response['result']['contract'];
     const resultAbi = response['result']['contractAbi'];
@@ -51,22 +51,17 @@ class ContractsController {
   }
 
   public async checkFetchEtherscanForAbi(address: string) {
-    try {
-      const response: Response = await $.post(
-        `${app.serverUrl()}/etherscanAPI/fetchEtherscanContract`,
-        {
-          address,
-          jwt: app.user.jwt,
-        }
-      );
-      console.log(response);
-      const resultContract = response['result']['contract'];
-      const resultAbi = response['result']['contractAbi'];
-      this.update(resultAbi.abi, resultContract);
-    } catch (err) {
-      console.log('Failed to fetch abi from etherscan', err);
-      throw new Error(err);
-    }
+    const response: Response = await $.post(
+      `${app.serverUrl()}/etherscanAPI/fetchEtherscanContract`,
+      {
+        address,
+        jwt: app.user.jwt,
+      }
+    );
+    console.log(response);
+    const resultContract = response['result']['contract'];
+    const resultAbi = response['result']['contractAbi'];
+    this.update(resultAbi.abi, resultContract);
   }
 
   public async update(
@@ -135,45 +130,40 @@ class ContractsController {
     decimals: number;
     nickname: string;
   }) {
-    try {
-      const response = await $.post(`${app.serverUrl()}/createContract`, {
-        community,
-        balance_type,
-        chain_node_id,
-        jwt: app.user.jwt,
-        node_url,
-        address,
-        abi,
-        contractType,
-        symbol,
-        token_name,
-        decimals,
-        nickname,
-        abiNickname,
-      });
-      const responseContract = response['result']['contract'];
-      const { id, type, is_factory } = responseContract;
-      const result = new Contract({
-        id,
-        address,
-        chainNodeId: chain_node_id,
-        type,
-        decimals,
-        tokenName: token_name,
-        symbol,
-        abi: (abi !== undefined ? JSON.parse(abi) : abi),
-        isFactory: is_factory,
-        nickname,
-      });
-      if (this._store.getById(result.id)) {
-        this._store.remove(this._store.getById(result.id));
-      }
-      this._store.add(result);
-      return result;
-    } catch (err) {
-      console.log('Failed to create and add contract', err);
-      throw new Error(err);
+    const response = await $.post(`${app.serverUrl()}/createContract`, {
+      community,
+      balance_type,
+      chain_node_id,
+      jwt: app.user.jwt,
+      node_url,
+      address,
+      abi,
+      contractType,
+      symbol,
+      token_name,
+      decimals,
+      nickname,
+      abiNickname,
+    });
+    const responseContract = response['result']['contract'];
+    const { id, type, is_factory } = responseContract;
+    const result = new Contract({
+      id,
+      address,
+      chainNodeId: chain_node_id,
+      type,
+      decimals,
+      tokenName: token_name,
+      symbol,
+      abi: abi !== undefined ? JSON.parse(abi) : abi,
+      isFactory: is_factory,
+      nickname,
+    });
+    if (this._store.getById(result.id)) {
+      this._store.remove(this._store.getById(result.id));
     }
+    this._store.add(result);
+    return result;
   }
   public addToStore(contract: Contract) {
     return this._store.add(contract);

@@ -80,41 +80,38 @@ const fetchEtherscanContract = async (
   // eslint-disable-next-line max-len
   const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${ETHERSCAN_JS_API_KEY}`;
 
-  try {
-    const response = await axios.get(url, { timeout: 3000 });
-    if (response.status === 200) {
-      // Checks if etherscan abi is available by calling the fetchEtherscanContract api route
-      const etherscanContract = response.data.result[0];
-      if (etherscanContract && etherscanContract['ABI'] !== '') {
-        const abiString = etherscanContract['ABI'];
-        // Parse ABI to validate it as a properly formatted ABI
-        const abiAsRecord = JSON.parse(abiString);
-        if (!abiAsRecord) {
-          throw new AppError(Errors.InvalidABI);
-        }
-        const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-        if (!abiItems) {
-          throw new AppError(Errors.InvalidABI);
-        }
-        const nickname = etherscanContract['ContractName'];
-        // Create new ABI
-        // If source code fetch from etherscan is successful, then the abi is a verified one
-        const [contract_abi] = await models.ContractAbi.findOrCreate({
-          where: { nickname, abi: abiString, verified: true },
-        });
-        // update contract with new ABI
-        contract.abi_id = contract_abi.id;
-        await contract.save();
-        return success(res, {
-          contractAbi: contract_abi.toJSON(),
-          contract: contract.toJSON(),
-        });
+  const response = await axios.get(url, { timeout: 3000 });
+  if (response.status === 200) {
+    // Checks if etherscan abi is available by calling the fetchEtherscanContract api route
+    const etherscanContract = response.data.result[0];
+    if (etherscanContract && etherscanContract['ABI'] !== '') {
+      const abiString = etherscanContract['ABI'];
+      // Parse ABI to validate it as a properly formatted ABI
+      const abiAsRecord: Array<Record<string, unknown>> = JSON.parse(abiString);
+      if (!abiAsRecord) {
+        throw new AppError(Errors.InvalidABI);
       }
-    } else {
-      throw new AppError(Errors.EtherscanResponseFailed);
+      const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
+      if (!abiItems) {
+        throw new AppError(Errors.InvalidABI);
+      }
+
+      const nickname = etherscanContract['ContractName'];
+      // Create new ABI
+      // If source code fetch from etherscan is successful, then the abi is a verified one
+      const [contract_abi] = await models.ContractAbi.findOrCreate({
+        where: { nickname, abi: abiString, verified: true },
+      });
+      // update contract with new ABI
+      contract.abi_id = contract_abi.id;
+      await contract.save();
+      return success(res, {
+        contractAbi: contract_abi.toJSON(),
+        contract: contract.toJSON(),
+      });
     }
-  } catch (error) {
-    throw new AppError(error.message);
+  } else {
+    throw new AppError(Errors.EtherscanResponseFailed);
   }
 };
 

@@ -14,7 +14,10 @@ import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { ChainBase } from 'common-common/src/types';
 import { parseFunctionsFromABI } from 'abi_utils';
 import { callContractFunction } from 'controllers/chain/ethereum/callContractFunction';
-import { handleMappingAbiInputs, validateAbiInput } from 'helpers/abi_form_helpers';
+import {
+  handleMappingAbiInputs,
+  validateAbiInput,
+} from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
@@ -32,11 +35,17 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
   view(vnode: m.Vnode<{ contractAddress?: string }>) {
     const fetchContractAbi = async (contract: Contract) => {
       if (contract.abi === undefined) {
-        // use the contract address to fetch the abi using controller
-        await app.contracts.checkFetchEtherscanForAbi(contract.address);
-        // TODO The UI Should In One Go show the abi form after successfully fetching the abi
-        // from etherscan, which it does not do rn
-        m.redraw();
+        try {
+          // use the contract address to fetch the abi using controller
+          await app.contracts.checkFetchEtherscanForAbi(contract.address);
+          // TODO The UI Should In One Go show the abi form after successfully fetching the abi
+          // from etherscan, which it does not do rn
+          m.redraw();
+        } catch (err) {
+          notifyError(
+            err.message || `Fetching ABI for ${contract.address} failed: ${err}`
+          );
+        }
       }
     };
 
@@ -55,9 +64,7 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
         this.loaded = true;
         this.loading = false;
       } catch (err) {
-        notifyError(
-          err.message || `Calling Function ${fn.name} failed`
-        );
+        notifyError(err.message || `Calling Function ${fn.name} failed`);
         this.loading = false;
       }
     };
@@ -129,8 +136,7 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
                                   inputIdx,
                                   e.target.value,
                                   fn.name,
-                                  this.form
-                                    .functionNameToFunctionInputArgs
+                                  this.form.functionNameToFunctionInputArgs
                                 );
                                 this.loaded = true;
                               }}
@@ -177,8 +183,7 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
                           callFunction(contractAddress, fn);
                         } catch (err) {
                           notifyError(
-                            err.message ||
-                              'Submitting Function Call failed'
+                            err.message || 'Submitting Function Call failed'
                           );
                         } finally {
                           this.saving = false;
