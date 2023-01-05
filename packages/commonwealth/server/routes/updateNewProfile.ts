@@ -28,7 +28,7 @@ const updateNewProfile = async (
     !req.body.avatarUrl &&
     !req.body.socials
   ) {
-    return next(new Error(Errors.InvalidUpdate, req.body));
+    return next(new Error(Errors.InvalidUpdate));
   }
 
   const { address, email, slug, name, bio, website, avatarUrl, socials } = req.body;
