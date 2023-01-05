@@ -6,39 +6,34 @@ export const sequelizeMock = new SequelizeMock();
 
 const fakeSequelize = new Sequelize('database', 'username', 'password', {
   host: 'localhost',
-  dialect: 'postgres'
+  dialect: 'postgres',
 });
 
 export const UserMock = sequelizeMock.define(
   'user',
   {
-    firstName: 'Jane',
-    lastName: 'Doe',
     email: 'test@example.com',
+    isAdmin: false,
   },
   {
     instanceMethods: {
-      getFullName() {
-        return `${this.get('firstName')} ${this.get('lastName')}`;
+      getEmail() {
+        return `${this.email}`;
       },
     },
   }
 );
 
-// From there we can start using it like a normal model
-UserMock.findOne({
-  where: {
-    username: 'my-user',
-  },
-}).then(function (user) {
-  // `user` is a Sequelize Model-like object
-  console.log(user.get('id')); // Auto-Incrementing ID available on all Models
-  user.get('email'); // 'email@example.com'; Pulled from default values
-  user.get('username'); // 'my-user'; Pulled from the `where` in the query
+export const AddressMock = sequelizeMock.define('address', {
+  user_id: 1,
+  chain: 'ethereum',
+  address: '0x123',
+  verified: true,
+  name: 'test-user',
 });
 
 const models = {
-  Address: null,
+  Address: AddressMock,
   Ban: null,
   Chain: null,
   ChainCategory: null,
@@ -84,6 +79,10 @@ const models = {
   User: UserMock,
   WaitlistRegistration: null,
   Webhook: null,
+  CommunitySnapshotSpaces: undefined,
+  DiscordBotConfig: undefined,
+  SnapshotProposal: undefined,
+  SnapshotSpace: undefined,
 };
 
 // The fields sequelize and Sequelize are required for the DB interface, but for mocking we don't need to use them

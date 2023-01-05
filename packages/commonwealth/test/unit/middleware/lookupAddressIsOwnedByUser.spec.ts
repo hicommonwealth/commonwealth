@@ -3,18 +3,67 @@ import { Sequelize, DataTypes } from 'sequelize';
 
 import MockExpressRequest from 'mock-express-request';
 import lookupAddressIsOwnedByUser from '../../../server/middleware/lookupAddressIsOwnedByUser';
-import { db } from '../../../server/models/mocks/mockDatabase';
+import { mockDb } from '../../../server/models/mocks/mockDatabase';
 
 describe('lookupAddressIsOwnedByUser() unit tests', () => {
-  it('should return highest role', async () => {
+
+
+  it('should look up address of logged in user successfully', async () => {
+    const request = new MockExpressRequest();
+
+    const resBody = {
+      author_chain: 'ethereum',
+      address: '0x123',
+    };
+    request.body = resBody;
+    request.user = { id: 1 };
+
+    const [author] = await lookupAddressIsOwnedByUser(mockDb, request);
+    assert.equal(author.name, 'test-user');
+  });
+
+  it('should return null if user is not logged in', async () => {
+    const request = new MockExpressRequest();
+
+    const resBody = {
+      author_chain: 'ethereum',
+      address: '0x123',
+    };
+    request.body = resBody;
+
+    const [author, error] = await lookupAddressIsOwnedByUser(mockDb, request);
+    assert.equal(author, null);
+    assert.equal(error, 'Not logged in');
+  });
+
+  it('should return null if body does not define author_chain', async () => {
     const request = new MockExpressRequest();
 
     const resBody = {
       address: '0x123',
     };
     request.body = resBody;
-    request.user = { id: 0 };
+    request.user = { id: 1 };
 
-    const [role] = await lookupAddressIsOwnedByUser(db, request);
-  });
+    const [author, error] = await lookupAddressIsOwnedByUser(mockDb, request);
+    assert.equal(author, null);
+    assert.equal(error, 'Invalid public key/chain');
+  })
+
+  it('should return null if address instance returned does not exist', async () => {
+    const request = new MockExpressRequest();
+
+    const resBody = {
+      author_chain: 'ethereum',
+      address: '0x456',
+    };
+    request.body = resBody;
+    request.user = { id: 2 };
+
+    const [author, error] = await lookupAddressIsOwnedByUser(mockDb, request);
+    console.log(author)
+    assert.equal(author, null);
+    assert.equal(error, 'Invalid public key/chain');
+  })
+
 });
