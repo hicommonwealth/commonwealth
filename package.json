@@ -12,9 +12,9 @@
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
     "start-rmq": "sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management",
-    "format": "prettier --write .",
+    "format": "prettier --check .",
     "lint": "./scripts/lint-new-work.sh",
-    "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint ./packages/common-common/**/*.ts",
+    "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/chain-events/**/*.ts'",
     "lint-branch": "./scripts/lint-branch.sh",
     "stylelint": "stylelint packages/commonwealth/client/styles/*"
   },
@@ -51,12 +51,11 @@
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.42.1",
     "@typescript-eslint/parser": "^5.42.1",
+    "concurrently": "^7.6.0",
     "eslint": "^8.27.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-import-resolver-webpack": "^0.13.2",
-    "eslint-plugin-import": "^2.26.0",
-    "prettier": "2.7.1",
-    "concurrently": "^7.6.0"
+    "prettier": "2.7.1"
   }
 }

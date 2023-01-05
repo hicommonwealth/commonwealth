@@ -1,7 +1,8 @@
 module.exports = {
   extends: [
     "eslint:recommended",
-    "plugin:import/recommended",
+    // re-enable later -> currently bugged when paired with webpack
+    // "plugin:import/recommended",
     "plugin:@typescript-eslint/recommended",
     "prettier"
   ],
@@ -31,6 +32,8 @@ module.exports = {
     },
   },
   rules: {
-    "import/named": "off"
+    // this rule has not been updated to ESLint 8 so it is incompatible with our ESLint setup
+    // Error: Rules with suggestions must set the `meta.hasSuggestions` property to `true`. `meta.docs.suggestion` is ignored by ESLint.
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

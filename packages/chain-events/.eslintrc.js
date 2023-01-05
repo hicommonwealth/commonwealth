@@ -8,15 +8,6 @@ module.exports = {
   "rules": {
     "@typescript-eslint/interface-name-prefix": "off",
     "@typescript-eslint/no-empty-function": "off",
-    "import/prefer-default-export": 0,
-    "import/extensions": 0,
-    "import/no-cycle": 0,
-    "import/order": [
-      "error",
-      {
-        "newlines-between": "always"
-      }
-    ],
     "max-classes-per-file": "off",
     "no-await-in-loop": "off",
     "no-import-cycles": "off",
@@ -27,6 +18,15 @@ module.exports = {
     "no-underscore-dangle": "off",
     "no-useless-constructor": "off",
     "class-methods-use-this": "off",
-    "import/no-extraneous-dependencies": "off"
+    // "import/no-extraneous-dependencies": "off",
+    // "import/prefer-default-export": 0,
+    // "import/extensions": 0,
+    // "import/no-cycle": 0,
+    // "import/order": [
+    //   "error",
+    //   {
+    //     "newlines-between": "always"
+    //   }
+    // ],
   }
 }
