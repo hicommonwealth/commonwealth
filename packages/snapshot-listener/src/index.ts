@@ -6,9 +6,8 @@ import {
   getRabbitMQConfig,
 } from "common-common/src/rabbitmq";
 import { factory, formatFilename } from "common-common/src/logging";
-import { RABBITMQ_URI } from "./config";
 import fetchNewSnapshotProposal from "./utils/fetchSnapshot";
-import { DEFAULT_PORT } from "./config";
+import { DEFAULT_PORT, RABBITMQ_URI } from "./config";
 import { StatsDController } from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));

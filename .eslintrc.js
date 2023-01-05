@@ -11,7 +11,7 @@ module.exports = {
   parser: "@typescript-eslint/parser",
   parserOptions: {
     "tsconfigRootDir": __dirname,
-    project: ["./packages/*/tsconfig.json"]
+    project: ["./packages/*/tsconfig.json", "./packages/*/tsconfig.test.json"]
   },
   // indicates this is the parent eslint so eslint will stop searching further up for eslint configs
   root: true,
@@ -24,7 +24,8 @@ module.exports = {
       typescript: {
         project: [
           "./tsconfig.json",
-          "./packages/*/tsconfig.json"
+          "./packages/*/tsconfig.json",
+          "./packages/*/tsconfig.test.json"
         ]
       }
     },
