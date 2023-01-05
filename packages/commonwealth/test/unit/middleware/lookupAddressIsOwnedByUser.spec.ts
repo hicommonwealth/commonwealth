@@ -3,10 +3,9 @@ import { Sequelize, DataTypes } from 'sequelize';
 
 import MockExpressRequest from 'mock-express-request';
 import lookupAddressIsOwnedByUser from '../../../server/middleware/lookupAddressIsOwnedByUser';
-import { mockDb } from '../../../server/models/mocks/mockDatabase';
+import { mockDb } from '../../../server/models/mocks/mock_database';
 
 describe('lookupAddressIsOwnedByUser() unit tests', () => {
-
 
   it('should look up address of logged in user successfully', async () => {
     const request = new MockExpressRequest();
@@ -55,7 +54,7 @@ describe('lookupAddressIsOwnedByUser() unit tests', () => {
 
     const resBody = {
       author_chain: 'ethereum',
-      address: '0x456',
+      address: 'not-found',
     };
     request.body = resBody;
     request.user = { id: 2 };

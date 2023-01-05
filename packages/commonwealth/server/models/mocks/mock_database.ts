@@ -1,15 +1,16 @@
 import SequelizeMock from 'sequelize-mock';
 import { Sequelize, DataTypes } from 'sequelize';
 import { DB } from 'server/models';
+import { MockAddress } from './mock_address';
 
-export const sequelizeMock = new SequelizeMock();
+const sequelizeMock = new SequelizeMock();
 
 const fakeSequelize = new Sequelize('database', 'username', 'password', {
   host: 'localhost',
   dialect: 'postgres',
 });
 
-export const UserMock = sequelizeMock.define(
+const UserMock = sequelizeMock.define(
   'user',
   {
     email: 'test@example.com',
@@ -24,13 +25,7 @@ export const UserMock = sequelizeMock.define(
   }
 );
 
-export const AddressMock = sequelizeMock.define('address', {
-  user_id: 1,
-  chain: 'ethereum',
-  address: '0x123',
-  verified: true,
-  name: 'test-user',
-});
+const AddressMock = new MockAddress(sequelizeMock).getModel();
 
 const models = {
   Address: AddressMock,
