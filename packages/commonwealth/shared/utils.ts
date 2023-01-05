@@ -74,7 +74,7 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
   );
 };
 
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable */
 export const getProposalUrl = (type, proposal, comment?) => {
   const aId = proposal.chain;
   const tId = proposal.type_id || proposal.id;

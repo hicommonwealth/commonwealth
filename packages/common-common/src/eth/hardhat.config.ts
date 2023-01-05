@@ -1,4 +1,4 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+// eslint-disable-next-line
 import 'hardhat-typechain';
 import '@nomiclabs/hardhat-ethers';
 import { HardhatUserConfig } from 'hardhat/types';

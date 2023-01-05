@@ -25,7 +25,7 @@ export class SubstrateCoin extends Coin {
     denom: string,
     n: number | u128 | BN | SubstrateCoin | Compact<u128>,
     dollar: BN,
-    inDollars: boolean = false,
+    inDollars = false,
   ) {
     if (n instanceof SubstrateCoin) {
       super(denom, n.asBN, inDollars, dollar);

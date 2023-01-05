@@ -43,7 +43,7 @@ export class RabbitMQController {
   public readonly subscribers: string[];
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
-  protected _initialized: boolean = false;
+  protected _initialized = false;
   protected rollbar: Rollbar;
 
   constructor(

@@ -42,7 +42,7 @@ before(async () => {
     0,
     0,
     [tokenProvider],
-    (_: number) => new Promise((res, _) => res(node))
+    (_: number) => new Promise((res) => res(node))
   );
   await tokenBalanceCache.start();
 });

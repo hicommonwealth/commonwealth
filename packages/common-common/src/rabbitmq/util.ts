@@ -52,7 +52,7 @@ export async function getQueueStats(
   rabbitMQUri: string,
   queueName: RascalQueues
 ): Promise<any> {
-  let result = await fetch(`${rabbitMQUri}/queues/%2f/${queueName}`);
+  const result = await fetch(`${rabbitMQUri}/queues/%2f/${queueName}`);
   return await result.json();
 }
 

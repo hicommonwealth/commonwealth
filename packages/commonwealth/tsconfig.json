@@ -22,7 +22,8 @@
     "./test",
     "./globals.d.ts",
     "./server",
-    "./server.ts"
+    "./server.ts",
+    "./scripts"
   ],
   "exclude": ["./node_modules"]
 }

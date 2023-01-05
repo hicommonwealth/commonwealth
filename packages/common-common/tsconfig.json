@@ -10,6 +10,6 @@
       "snapshot-listener/*": ["../../packages/snapshot-listener/*"]
     }
   },
-  "include": ["src"],
-  "exclude": ["./node_modules", "./test", "build", "dist"]
+  "include": ["src", "test"],
+  "exclude": ["./node_modules", "build", "dist"]
 }

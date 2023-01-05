@@ -12,7 +12,7 @@ import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-const markdownComment = require('../../util/fixtures/markdownComment');
+import { markdownComment } from "../../util/fixtures/markdownComment";
 
 describe('Token Forum tests', () => {
   const chain = 'alex';

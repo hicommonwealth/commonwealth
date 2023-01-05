@@ -12,7 +12,7 @@ import { get } from 'test/integration/api/external/appHook.spec';
 describe('getThreads Tests', () => {
   it('should return threads with specified community_id correctly', async () => {
     const r: GetThreadsReq = { community_id: testThreads[0].chain };
-    let resp = await get('/api/threads', r);
+    const resp = await get('/api/threads', r);
 
     chai.assert.lengthOf(resp.result.threads, 5);
   });
