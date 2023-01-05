@@ -4,7 +4,7 @@ import { Coin } from 'adapters/currency';
 import { IIdentifiable, ICompletable } from 'adapters/shared';
 
 export class CosmosToken extends Coin {
-  constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {
+  constructor(denom: string, n: number | string | BN, inDollars = false) {
     if (typeof n === 'string') {
       n = parseInt(n, 10);
     }

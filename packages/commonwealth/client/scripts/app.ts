@@ -1106,13 +1106,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     */
       if (m.route.param('new') && m.route.param('new').toString() === 'true') {
         console.log('creating account');
-
-        try {
-        } catch (err) {
-          // Don't do anything... Just identify if there is an error
-          // mixpanel.identify(m.route.param('email').toString());
-        }
-      } else {
       }
       m.route.set(m.route.param('path'), {}, { replace: true });
     } else if (

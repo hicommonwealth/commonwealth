@@ -12,8 +12,8 @@ class SnapshotController {
   private _proposals: SnapshotProposal[];
   public get proposals() { return this._proposals; }
 
-  private _initializing: boolean = false;
-  private _initialized: boolean = false;
+  private _initializing = false;
+  private _initialized = false;
   public get initialized() { return this._initialized; }
 
   // private _votes = new Store<SnapshotVote>();

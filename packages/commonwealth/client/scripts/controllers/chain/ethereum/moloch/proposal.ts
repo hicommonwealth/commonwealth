@@ -108,8 +108,8 @@ export default class MolochProposal extends Proposal<
   private _Members: MolochMembers;
   private _Gov: MolochGovernance;
 
-  private _yesShares: number = 0;
-  private _noShares: number = 0;
+  private _yesShares = 0;
+  private _noShares = 0;
 
   public get shortIdentifier() { return `MGP-${this.data.identifier}`; }
   public get title(): string {

@@ -172,8 +172,8 @@ export async function getVersion(): Promise<string> {
 }
 
 export async function getSpace(space: string): Promise<SnapshotSpace> {
-  const client = await getApolloClient();
-  const spaceObj = await client.query({
+  await getApolloClient();
+  const spaceObj = await apolloClient.query({
     query: SPACE_QUERY,
     variables: {
       space,
@@ -183,8 +183,8 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
 }
 
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {
-  const client = await getApolloClient();
-  const proposalsObj = await client.query({
+  await getApolloClient();
+  const proposalsObj = await apolloClient.query({
     query: PROPOSALS_QUERY,
     variables: {
       space,
@@ -200,8 +200,8 @@ export async function getProposals(space: string): Promise<SnapshotProposal[]> {
 export async function getVotes(
   proposalHash: string
 ): Promise<SnapshotProposalVote[]> {
-  const client = await getApolloClient();
-  const response = await client.query({
+  await getApolloClient();
+  const response = await apolloClient.query({
     query: PROPOSAL_VOTES_QUERY,
     variables: {
       proposalHash,

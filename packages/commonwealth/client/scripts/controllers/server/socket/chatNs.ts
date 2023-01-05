@@ -27,8 +27,6 @@ export class ChatNamespace {
     public channels: Record<string, IChannel> = {};
     public activeChannel: string;
 
-    constructor() {}
-
     public async init() {
         this.chatNs = io(`/${WebsocketNamespaces.Chat}`, {
             transports: ['websocket'],

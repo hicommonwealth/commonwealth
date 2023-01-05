@@ -78,8 +78,8 @@ export function link(
   children,
   extraAttrs?: object,
   saveScrollPositionAs?: string,
-  beforeRouteSet?: Function,
-  afterRouteSet?: Function
+  beforeRouteSet?: () => void,
+  afterRouteSet?: () => void
 ) {
   const attrs = {
     href: target,

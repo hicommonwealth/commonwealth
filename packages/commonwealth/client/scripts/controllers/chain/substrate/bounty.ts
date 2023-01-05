@@ -82,10 +82,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
-  private _awarded: boolean = false;
+  private _awarded = false;
   get awarded() { return this._awarded; }
 
-  private _active: boolean = false;
+  private _active = false;
   get active() { return this._active; }
 
   public readonly _value: SubstrateCoin;

@@ -270,7 +270,7 @@ export class CosmosProposal extends Proposal<
     this.addOrUpdateVote(vote);
   }
 
-  public submitVoteTx(vote: CosmosVote, memo: string = '', cb?): ITXModalData {
+  public submitVoteTx(vote: CosmosVote, memo = '', cb?): ITXModalData {
     throw new Error('unsupported');
   }
 }

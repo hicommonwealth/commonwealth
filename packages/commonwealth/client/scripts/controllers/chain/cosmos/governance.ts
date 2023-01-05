@@ -159,7 +159,7 @@ class CosmosGovernance extends ProposalModule<
   }
 
   public createTx(
-    sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo: string = ''
+    sender: CosmosAccount, title: string, description: string, initialDeposit: CosmosToken, memo = ''
   ): ITXModalData {
     throw new Error('unsupported');
   }

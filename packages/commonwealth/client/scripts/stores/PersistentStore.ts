@@ -13,7 +13,7 @@ interface IStorageItem<T> {
 // defaults will clear all items in every PersistentStore older than 10 minutes
 // this will NOT clear items from the internal stores of active PersistentStores, it ONLY
 //   removes items from localStorage -- for safety, only run this function before stores are queried.
-export function clearLocalStorage(prefix: string = 'cwstore', maxAge: number = 10 * 60 * 1000) {
+export function clearLocalStorage(prefix = 'cwstore', maxAge: number = 10 * 60 * 1000) {
   if (!localStorage) {
     throw new Error('cannot clear localStorage, not found!');
   }

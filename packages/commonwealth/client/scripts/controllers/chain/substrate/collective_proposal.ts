@@ -75,7 +75,7 @@ export class SubstrateCollectiveProposal extends Proposal<
   }
   public title: string;
   private readonly _call;
-  private _approved: boolean = false;
+  private _approved = false;
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;

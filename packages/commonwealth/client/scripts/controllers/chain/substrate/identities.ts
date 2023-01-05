@@ -33,12 +33,12 @@ export type IdentityInfoProps = {
 };
 
 class SubstrateIdentities implements StorageModule {
-  private _initialized: boolean = false;
+  private _initialized = false;
   public get initialized() { return this._initialized; }
-  private _initializing: boolean = false;
+  private _initializing = false;
   public get initializing() { return this._initializing; }
 
-  protected _disabled: boolean = false;
+  protected _disabled = false;
   public get disabled() { return this._disabled; }
   public disable() { this._disabled = true; }
 

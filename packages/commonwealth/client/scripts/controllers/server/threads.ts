@@ -88,7 +88,7 @@ export const modelFromServer = (thread) => {
     });
   }
 
-  let chainEntitiesProcessed: ChainEntity[] = [];
+  const chainEntitiesProcessed: ChainEntity[] = [];
   if (chain_entity_meta) {
     for (const meta of chain_entity_meta) {
       const full_entity = app.chainEntities.store.getById(meta.ce_id);

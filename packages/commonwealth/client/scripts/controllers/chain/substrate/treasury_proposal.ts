@@ -42,7 +42,7 @@ export class SubstrateTreasuryProposal
 
   public title: string;
 
-  private _awarded: boolean = false;
+  private _awarded = false;
   get awarded() { return this._awarded; }
 
   public readonly value: SubstrateCoin;

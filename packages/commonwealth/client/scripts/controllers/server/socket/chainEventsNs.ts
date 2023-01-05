@@ -12,8 +12,6 @@ export class ChainEventsNamespace {
   private _isConnected = false;
   private subscriptionRoomsJoined = new Set();
 
-  constructor() {}
-
   public async init() {
     this.ceNs = io(`/${WebsocketNamespaces.ChainEvents}`, {
       transports: ['websocket'],
