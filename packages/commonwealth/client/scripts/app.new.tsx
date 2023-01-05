@@ -6,6 +6,7 @@ import { initAppState } from 'app';
 import DiscussionsPage from 'views/pages/discussions';
 import WhyCommonwealthPage from 'views/pages/why_commonwealth';
 import { PageNotFound } from 'views/pages/404';
+import MembersPage from './views/pages/members';
 
 // TODO: This file is POC for now but this hook below and components should be placed in separate file
 const useInitApp = () => {
@@ -38,6 +39,14 @@ const App = () => {
         element={
           <Layout params={{ scope: 'ethereum' }}>
             <DiscussionsPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/:scope/members"
+        element={
+          <Layout params={{ scope: 'ethereum' }}>
+            <MembersPage />
           </Layout>
         }
       />

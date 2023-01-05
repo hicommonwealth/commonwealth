@@ -15,15 +15,26 @@ import {
   // eslint-disable-next-line import/no-unresolved
   Component as ReactComponent,
 } from 'react';
-import {
-  matchPath,
-} from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
 // RENDERING FUNCTIONS
 export type Children = ReactNode | ReactNode[];
 
 export const render = (tag: string | React.ComponentType, attrs: any = {}, ...children: any[]) => {
+  // console.log(tag, attrs, children);
+  if (typeof tag === 'string' && tag[0] === '.') {
+    if (attrs.className) {
+      attrs.className = `${attrs.className} ${tag.slice(1)}`;
+    } else {
+      attrs.className = tag.slice(1);
+    }
+    tag = `div`;
+  }
+  // handle children without attrs
+  if (Array.isArray(attrs) || typeof attrs !== 'object') {
+    return createElement(tag, ...attrs);
+  }
+
   // ensure vnode.children exists
   attrs.children = children;
   if (typeof tag === 'string') {
@@ -47,25 +58,49 @@ export const jsx = createElement;
 
 export type ResultNode<A = {}> = { attrs: A, children: Children };
 
+const IGNORED_PROPS = [
+  'props',
+  'state',
+  '_isMounted',
+  '_seenProps',
+  'context',
+]
+
 export abstract class ClassComponent<A = {}> extends ReactComponent<A & { children?: Children }> {
   protected readonly __props: A;
   private _isMounted = false;
+  private _seenProps = [];
 
   // commented out as this was trigerring rerenders all over again
 
-  // constructor(props) {
-  //   super(props);
-  //   return new Proxy(this, {
-  //     set(obj, prop, value) {
-  //       if (obj._isMounted && Object.keys(obj).includes(prop as string)) {
-  //         obj.setState({ ...obj.state, [prop]: value })
-  //         // console.log(prop);
-  //       }
-  //       // @ts-ignore
-  //       return Reflect.set(...arguments);
-  //     }
-  //   })
-  // }
+  constructor(props) {
+    super(props);
+    return new Proxy(this, {
+      set(obj, prop, value) {
+        if (
+          // do not update if not yet mounted
+          obj._isMounted
+
+          // do not update on reserved keyword changes
+          && !IGNORED_PROPS.includes(prop as string)
+
+          // do not update if the prop is inherited = internal to React
+          && Object.keys(obj).includes(prop as string)
+
+          // do not update if the value doesn't change
+          && obj[prop] !== value
+
+          // do not update if the value is a function (not sure if necessary)
+          && typeof value !== 'function') {
+          obj.setState({ ...obj.state, [prop]: value })
+          obj._seenProps.push(prop);
+          console.log(prop, value);
+        }
+        // @ts-ignore
+        return Reflect.set(...arguments);
+      }
+    })
+  }
 
   public componentDidMount() {
     this.oninit({ attrs: this.props, children: this.props.children });

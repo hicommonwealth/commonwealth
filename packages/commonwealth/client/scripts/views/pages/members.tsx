@@ -89,7 +89,7 @@ class MembersPage extends ClassComponent {
         this.membersLoaded = membersActive
           .concat(membersInactive)
           .sort((a, b) => b.count - a.count);
-        redraw();
+        this.redraw();
       });
     }
 
@@ -182,7 +182,7 @@ class MembersPage extends ClassComponent {
         }
 
         this.numProfilesLoaded += newBatchSize;
-        redraw();
+        this.redraw();
       }
     }, 400);
 
@@ -211,7 +211,7 @@ class MembersPage extends ClassComponent {
             {profilesLoaded.map((profileInfo) => {
               const { address, chain } = profileInfo.profile;
               return (
-                <div className="member-row">
+                <div className="member-row" key={address}>
                   <a
                     href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
                     onClick={(e) => {

@@ -21,7 +21,7 @@ export class CWAvatar extends ClassComponent<AvatarAttrs> {
     return (
       <div
         className={ComponentType.Avatar}
-        style={`width: ${size}px; height: ${size}px; background-image: url('${avatarUrl}');`}
+        STYLE={`width: ${size}px; height: ${size}px; background-image: url('${avatarUrl}');`}
       />
     );
   }
@@ -38,13 +38,15 @@ export class CWJdenticon extends ClassComponent<JdenticonAttrs> {
       <svg
         width={size}
         height={size}
+        key={address.toString()}
         data-address={address.toString()}
-        oncreate={(vvnode) => {
-          jdenticon.update(vvnode.dom as HTMLElement, address);
-        }}
-        onupdate={(vvnode) => {
-          jdenticon.update(vvnode.dom as HTMLElement, address);
-        }}
+        // @REACT TODO
+        // oncreate={(vvnode) => {
+        //   jdenticon.update(vvnode.dom as HTMLElement, address);
+        // }}
+        // onupdate={(vvnode) => {
+        //   jdenticon.update(vvnode.dom as HTMLElement, address);
+        // }}
       />
     );
   }

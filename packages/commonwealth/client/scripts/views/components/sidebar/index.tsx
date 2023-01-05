@@ -52,7 +52,7 @@ export class Sidebar extends ClassComponent {
                 <AdminSection />
                 <DiscussionSection />
                 <GovernanceSection />
-                {app.socket && !hideChat && <ChatSection />}
+                {/* app.socket && !hideChat && <ChatSection /> */}
                 <ExternalLinksModule />
                 <div className="buttons-container">
                   {app.isLoggedIn() && app.chain && (

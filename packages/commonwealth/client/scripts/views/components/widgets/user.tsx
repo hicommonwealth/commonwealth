@@ -4,7 +4,7 @@ import React from 'react';
 
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { render, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, render, redraw, Component } from 'mithrilInterop';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -24,7 +24,7 @@ export interface IAddressDisplayOptions {
 }
 
 /* @FIXME @REACT need to refactor this state */
-const User: Component<
+class User extends ClassComponent<
   {
     user: Account | AddressInfo | Profile;
     avatarSize?: number;
@@ -37,13 +37,10 @@ const User: Component<
     onClick?: any;
     popover?: boolean;
     showRole?: boolean;
-  },
-  {
-    identityWidgetLoading: boolean;
   }
-> = {
-  identityWidgetLoading: false,
-  view: (vnode) => {
+> {
+  private identityWidgetLoading = false;
+  view(vnode) {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
       avatarOnly,
@@ -88,17 +85,17 @@ const User: Component<
 
     if (
       app.chain?.base === ChainBase.Substrate &&
-      !vnode.state.identityWidgetLoading &&
+      !this.identityWidgetLoading &&
       !app.cachedIdentityWidget
     ) {
-      vnode.state.identityWidgetLoading = true;
+      this.identityWidgetLoading = true;
       import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "substrate-identity-widget" */
         './substrate_identity'
       ).then((mod) => {
         app.cachedIdentityWidget = mod.default;
-        vnode.state.identityWidgetLoading = false;
+        this.identityWidgetLoading = false;
         redraw();
       });
     }
@@ -156,7 +153,7 @@ const User: Component<
           // todo this is not valid for react.createElement
           '.role-icon.role-icon-councillor',
           {
-            class: long ? 'long' : '',
+            className: long ? 'long' : '',
           },
           long ? `${friendlyChainName} Councillor` : 'C'
         ),
@@ -165,7 +162,7 @@ const User: Component<
         render(
           '.role-icon.role-icon-validator',
           {
-            class: long ? 'long' : '',
+            className: long ? 'long' : '',
           },
           long ? `${friendlyChainName} Validator` : 'V'
         ),
@@ -173,7 +170,7 @@ const User: Component<
       // showRole &&
       //   role &&
       //   m(Tag, {
-      //     class: 'role-tag',
+      //     className: 'role-tag',
       //     label: role.permission,
       //     rounded: true,
       //     size: 'xs',
@@ -202,16 +199,17 @@ const User: Component<
           '.User',
           {
             key: profile?.address || '-',
-            class: linkify ? 'linkified' : '',
+            className: linkify ? 'linkified' : '',
           },
           [
+            /*
             showAvatar &&
               render(
                 '.user-avatar',
                 {
                   style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
                 },
-                profile && profile.getAvatar(avatarSize)
+                [ profile && profile.getAvatar(avatarSize) ]
               ),
             app.chain &&
             app.chain.base === ChainBase.Substrate &&
@@ -277,9 +275,11 @@ const User: Component<
                       style: 'display: inline-block',
                     }),
                 ],
+                */
           ]
         );
 
+/*
     const userPopover = render(
       '.UserPopover',
       {
@@ -356,7 +356,7 @@ const User: Component<
           ]),
       ]
     );
-
+*/
     return popover
       ? null // @TODO @REACT FIX ME
       // m(Popover, {
@@ -369,8 +369,8 @@ const User: Component<
       //     key: profile?.address || '-',
       //   })
       : userFinal;
-  },
-};
+  }
+}
 
 export const UserBlock: Component<{
   user: Account | AddressInfo | Profile;
@@ -457,7 +457,7 @@ export const UserBlock: Component<{
         render(
           '.user-block-address',
           {
-            class: profile?.address ? '' : 'no-address',
+            className: profile?.address ? '' : 'no-address',
           },
           [
             render(
@@ -498,7 +498,7 @@ export const UserBlock: Component<{
       : render(
           '.UserBlock',
           {
-            class: compact ? 'compact' : '',
+            className: compact ? 'compact' : '',
           },
           children
         );

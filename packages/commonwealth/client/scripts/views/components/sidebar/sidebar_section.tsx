@@ -233,7 +233,7 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
         >
           {carat}
           <CWText>{title}</CWText>
-          {rightIcon && <div className="right-icon">{rightIcon}</div>}
+          { /* rightIcon && <div className="right-icon">{rightIcon}</div> */}
         </div>
         {this.toggled && (
           <div className="sections-container">
