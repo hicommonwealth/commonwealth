@@ -68,6 +68,10 @@
 
         .trigger-wrapper {
           margin-right: 24px;
+
+          &:last-child {
+            margin-right: 0;
+          }
         }
       }
 

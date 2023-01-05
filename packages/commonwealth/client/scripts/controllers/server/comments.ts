@@ -236,16 +236,22 @@ class CommentsController {
         comment_id: comment.id,
       })
         .then((result) => {
-          const existing = this._store.getById(comment.id);
-          const revisedComment: any = Object.assign(existing, {
-            deleted: true,
-            text: '[deleted]',
-            plaintext: '[deleted]',
-            versionHistory: [],
-          });
-          const softDeletion = new Comment(revisedComment);
-          this._store.remove(existing);
-          this._store.add(softDeletion);
+          // TODO: find another solution to delete
+          // comments from new profile page
+          try {
+            const existing = this._store.getById(comment.id);
+            const revisedComment: any = Object.assign(existing, {
+              deleted: true,
+              text: '[deleted]',
+              plaintext: '[deleted]',
+              versionHistory: [],
+            });
+            const softDeletion = new Comment(revisedComment);
+            this._store.remove(existing);
+            this._store.add(softDeletion);
+          } catch (e) {
+            console.error(e);
+          }
           resolve(result);
         })
         .catch((e) => {

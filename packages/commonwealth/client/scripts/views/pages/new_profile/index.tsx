@@ -9,11 +9,9 @@ import 'pages/new_profile/index.scss';
 import app from 'state';
 import {
   Thread,
-  IUniqueId,
   ChainInfo,
   AddressInfo,
   NewProfile as Profile,
-  Comment,
 } from 'models';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
@@ -21,10 +19,9 @@ import { modelFromServer as modelCommentFromServer } from 'controllers/server/co
 import { NewProfileHeader } from './new_profile_header';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { NewProfileActivity } from './new_profile_activity';
+import { CommentWithAssociatedThread, NewProfileActivity } from './new_profile_activity';
 
 enum ProfileError {
-  InsufficientProfileData, // when does this get used?
   None,
   NoAddressFound,
   NoProfileFound,
@@ -39,16 +36,16 @@ const NoProfileFoundError = 'No profile found';
 
 export default class NewProfile extends ClassComponent<NewProfileAttrs> {
   private address: string;
-  private addresses: Array<AddressInfo>;
-  private chains: Array<ChainInfo>;
+  private addresses: AddressInfo[];
+  private chains: ChainInfo[];
   private content: m.Vnode;
-  private comments: Array<Comment<IUniqueId>>;
+  private comments: CommentWithAssociatedThread[];
   private error: ProfileError;
   private loading: boolean;
   private profile: Profile;
-  private threads: Array<Thread>;
+  private threads: Thread[];
 
-  private _getProfileData = async (address: string) => {
+  private getProfileData = async (address: string) => {
     try {
       const response = await $.get(`${app.serverUrl()}/profile/v2`, {
         address,
@@ -100,7 +97,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
     this.error = ProfileError.None;
     this.comments = [];
     this.threads = [];
-    this._getProfileData(this.address);
+    this.getProfileData(this.address);
     this.loading = false;
   }
 
