@@ -13,7 +13,8 @@
   "scripts": {
     "test": "ts-mocha --config ./.mocharc.json ./test/*.spec.ts",
     "check-types": "tsc --noEmit",
-    "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write ."
+    "format": "prettier --ignore-path ../../.prettierignore --config ../../.prettierrc.json --write .",
+    "lint-all": "eslint ./**/*.ts"
   },
   "dependencies": {},
   "devDependencies": {

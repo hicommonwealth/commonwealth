@@ -53,7 +53,7 @@ export class TokenBalanceCache
 {
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider } = {};
-  private _lastQueryTime: number = 0;
+  private _lastQueryTime = 0;
   private statsDSender: TbcStatsDSender = new TbcStatsDSender();
   private cacheContents = { zero: 0, nonZero: 0 };
 
