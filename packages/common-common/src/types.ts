@@ -55,7 +55,7 @@ export enum ContractType {
   SPL = 'spl',
   MOLOCH1 = 'moloch1', // unused
   MOLOCH2 = 'moloch2', // unused
-  COMMONPROTOCOL = 'common-protocol'
+  COMMONPROTOCOL = 'common-protocol',
 }
 
 export enum ChainType {

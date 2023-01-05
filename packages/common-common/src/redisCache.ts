@@ -1,4 +1,9 @@
-import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
+import {
+  ConnectionTimeoutError,
+  createClient,
+  ReconnectStrategyError,
+  SocketClosedUnexpectedlyError,
+} from 'redis';
 import { factory, formatFilename } from './logging';
 import { RedisNamespaces } from './types';
 import Rollbar from 'rollbar';
@@ -11,7 +16,7 @@ export function redisRetryStrategy(retries: number) {
   }
   // timetable: 0, 1000, 8000, 27000, 64000, 125000, 216000, 343000, 512000, 729000, 1000000
   // from 1 sec to 16.67 minutes
-  return (retries * 10) ** 3
+  return (retries * 10) ** 3;
 }
 
 /**
@@ -43,7 +48,8 @@ export class RedisCache {
     }
     log.info(`Connecting to Redis at: ${redis_url}`);
 
-    const localRedis = redis_url.includes('localhost') || redis_url.includes('127.0.0.1');
+    const localRedis =
+      redis_url.includes('localhost') || redis_url.includes('127.0.0.1');
     const vultrRedis = redis_url.includes(vultr_ip);
 
     if (!this.client) {
@@ -54,11 +60,11 @@ export class RedisCache {
         redisOptions['socket'] = {
           tls: true,
           rejectUnauthorized: false,
-          reconnectStrategy: redisRetryStrategy
+          reconnectStrategy: redisRetryStrategy,
         };
       } else {
         redisOptions['socket'] = {
-          reconnectStrategy: redisRetryStrategy
+          reconnectStrategy: redisRetryStrategy,
         };
       }
 
@@ -67,9 +73,7 @@ export class RedisCache {
 
     this.client.on('error', (err) => {
       if (err instanceof ConnectionTimeoutError) {
-        log.error(
-          `RedisCache connection to ${redis_url} timed out!`
-        );
+        log.error(`RedisCache connection to ${redis_url} timed out!`);
       } else if (err instanceof ReconnectStrategyError) {
         log.error(`RedisCache max connection retries exceeded!`);
         if (!localRedis && !vultrRedis)
@@ -86,14 +90,14 @@ export class RedisCache {
     });
 
     this.client.on('ready', () => {
-      log.info("RedisCache connection ready");
-    })
+      log.info('RedisCache connection ready');
+    });
     this.client.on('reconnecting', () => {
-      log.info("RedisCache reconnecting");
-    })
+      log.info('RedisCache reconnecting');
+    });
     this.client.on('end', () => {
       log.info('RedisCache disconnected');
-    })
+    });
 
     if (!this.client.isOpen) {
       await this.client.connect();

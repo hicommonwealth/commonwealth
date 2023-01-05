@@ -1,6 +1,5 @@
-import { RmqMsgFormatError, RmqMsgNamespace } from "common-common/src/rabbitmq";
-import { ISnapshotNotification } from '../../types' 
-
+import { RmqMsgFormatError, RmqMsgNamespace } from 'common-common/src/rabbitmq';
+import { ISnapshotNotification } from '../../types';
 
 export const RmqSnapshotNotification: RmqMsgNamespace<ISnapshotNotification> = {
   getInvalidFormatError(notif: any): RmqMsgFormatError {
@@ -14,12 +13,15 @@ export const RmqSnapshotNotification: RmqMsgNamespace<ISnapshotNotification> = {
   isValidMsgFormat(data: any): data is ISnapshotNotification {
     return !!(
       data.id &&
-      typeof data.id === "string" &&
+      typeof data.id === 'string' &&
       data.title &&
-      typeof data.title === "string" &&
-      data.body && typeof data.body === "string" &&
-      data.choices && Array.isArray(data.choices) &&
-      data.space && typeof data.space === "string"
+      typeof data.title === 'string' &&
+      data.body &&
+      typeof data.body === 'string' &&
+      data.choices &&
+      Array.isArray(data.choices) &&
+      data.space &&
+      typeof data.space === 'string'
     );
   },
 

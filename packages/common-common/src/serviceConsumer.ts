@@ -1,8 +1,12 @@
-import crypto from "crypto";
-import { addPrefix, factory, formatFilename } from "./logging";
-import { RabbitMQController, RascalSubscriptions, TRmqMessages } from "./rabbitmq";
-import Rollbar from "rollbar";
-import { Logger } from "typescript-logging";
+import crypto from 'crypto';
+import { addPrefix, factory, formatFilename } from './logging';
+import {
+  RabbitMQController,
+  RascalSubscriptions,
+  TRmqMessages,
+} from './rabbitmq';
+import Rollbar from 'rollbar';
+import { Logger } from 'typescript-logging';
 
 export type RabbitMQSubscription = {
   messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>;
@@ -34,7 +38,7 @@ export class ServiceConsumer {
   ) {
     this.serviceName = _serviceName;
     // TODO: make this deterministic somehow
-    this.serviceId = crypto.randomBytes(10).toString("hex");
+    this.serviceId = crypto.randomBytes(10).toString('hex');
     this.subscriptions = _subscriptions;
 
     // setup logger
@@ -55,8 +59,8 @@ export class ServiceConsumer {
       try {
         await this.rabbitMQController.init();
       } catch (e) {
-        this.log.error("Failed to initialize the RabbitMQ Controller", e);
-        this.rollbar?.error("Failed to initialize the RabbitMQ Controller", e);
+        this.log.error('Failed to initialize the RabbitMQ Controller', e);
+        this.rollbar?.error('Failed to initialize the RabbitMQ Controller', e);
       }
     }
 
@@ -68,7 +72,7 @@ export class ServiceConsumer {
           sub.subscriptionName,
           sub.msgProcessorContext
         );
-        console.log("subscribed to", sub.subscriptionName);
+        console.log('subscribed to', sub.subscriptionName);
       } catch (e) {
         this.log.error(
           `Failed to start the '${sub.subscriptionName}' subscription with the '${sub.messageProcessor}' ` +
@@ -94,7 +98,7 @@ export class ServiceConsumer {
       `Service Consumer ${this.serviceName}:${this.serviceId} shutting down...`
     );
     if (this.rabbitMQController.initialized) {
-      this.log.info("Attempting to shutdown RabbitMQ Broker...");
+      this.log.info('Attempting to shutdown RabbitMQ Broker...');
       await this.rabbitMQController.shutdown();
     }
 

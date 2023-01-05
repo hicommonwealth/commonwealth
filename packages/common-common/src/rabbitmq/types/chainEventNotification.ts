@@ -1,5 +1,5 @@
-import {RmqMsgFormatError, RmqMsgNamespace} from "common-common/src/rabbitmq";
-import {ChainEventNotification} from "commonwealth/shared/types";
+import { RmqMsgFormatError, RmqMsgNamespace } from 'common-common/src/rabbitmq';
+import { ChainEventNotification } from 'commonwealth/shared/types';
 
 /**
  * This object is merged with the namespace with the same name below so that within one object we have the invalid
@@ -15,7 +15,9 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
    */
   getInvalidFormatError(notification: any): RmqMsgFormatError {
     return new RmqMsgFormatError(
-      `The following notification is improperly formatted: ${JSON.stringify(notification)}`
+      `The following notification is improperly formatted: ${JSON.stringify(
+        notification
+      )}`
     );
   },
 
@@ -29,31 +31,39 @@ export const RmqCENotification: RmqMsgNamespace<ChainEventNotification> = {
    */
   isValidMsgFormat(data: any): data is ChainEventNotification {
     return !!(
-      data.id && typeof data.id === 'string'
-      && data.notification_data && typeof data.notification_data === 'string'
-      && data.chain_event_id && typeof data.chain_event_id === 'string'
-      && data.category_id === 'chain-event'
-      && data.chain_id && typeof data.chain_id === 'string'
-      && data.updated_at
-      && data.created_at
-      && typeof data.ChainEvent.chain_event_type_id === 'string'
-      && typeof data.ChainEvent.block_number === 'string'
+      data.id &&
+      typeof data.id === 'string' &&
+      data.notification_data &&
+      typeof data.notification_data === 'string' &&
+      data.chain_event_id &&
+      typeof data.chain_event_id === 'string' &&
+      data.category_id === 'chain-event' &&
+      data.chain_id &&
+      typeof data.chain_id === 'string' &&
+      data.updated_at &&
+      data.created_at &&
+      typeof data.ChainEvent.chain_event_type_id === 'string' &&
+      typeof data.ChainEvent.block_number === 'string'
     );
   },
 
   /**
    * This function combines the isValidMsgFormat and getInvalidFormatError functions. Essentially this function will
-  * check the given data format and throw the RmqMsgFormatError if the format is invalid.
+   * check the given data format and throw the RmqMsgFormatError if the format is invalid.
    * @param data The raw message from RabbitMQ
    */
   checkMsgFormat(data: any): void {
     const valid = this.isValidMsgFormat(data);
     if (!valid) {
-      console.log(`The following notification is improperly formatted: ${JSON.stringify(data)}`);
+      console.log(
+        `The following notification is improperly formatted: ${JSON.stringify(
+          data
+        )}`
+      );
       throw this.getInvalidFormatError(data);
     }
-  }
-}
+  },
+};
 
 // merged with the above object
 export namespace RmqCENotification {
