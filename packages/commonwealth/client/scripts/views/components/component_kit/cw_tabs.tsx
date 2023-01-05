@@ -15,7 +15,7 @@ type TabStyleAttrs = {
 };
 
 type TabAttrs = {
-  label: string;
+  label: string | m.Vnode;
   onclick: () => void;
 } & TabStyleAttrs;
 

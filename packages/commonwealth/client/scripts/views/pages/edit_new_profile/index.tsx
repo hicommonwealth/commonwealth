@@ -36,37 +36,6 @@ const NoProfileFoundError = 'No profile found';
 
 type EditNewProfileAttrs = { placeholder?: string };
 
-type AddressAttrs = {
-  address: string;
-}
-
-class Address extends ClassComponent<AddressAttrs> {
-  view(vnode: m.Vnode<AddressAttrs>) {
-    const { address } = vnode.attrs;
-
-    return (
-      <div className="address">
-        <CWTag
-          label={address}
-          icon="ethereum"
-          iconSize="small"
-          iconColor="white"
-          iconBackgroundColor="primary"
-        />
-        <CWPopoverMenu
-          trigger={
-            <CWIconButton iconName="dotsVertical" iconSize="small" />
-          }
-          menuItems={[
-            { label: 'Edit', iconLeft: 'write' },
-            { label: 'Delete', iconLeft: 'trash' },
-          ]}
-        />
-      </div>
-    )
-  }
-}
-
 export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
   private address: string;
   private email: string;
@@ -151,7 +120,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
   };
 
-  checkForUpdates = () => {
+  private checkForUpdates = () => {
       if (!_.isEqual(this.email, this.profile?.email))
         this.profileUpdate.email = this.email;
       else delete this.profileUpdate.email;
@@ -173,12 +142,14 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       else delete this.profileUpdate.socials;
   };
 
-  handleSaveProfile = (vnode) => {
+  private handleSaveProfile = (vnode: m.Vnode<EditNewProfileAttrs>) => {
+    this.loading = true;
     this.checkForUpdates();
     if (Object.keys(this.profileUpdate).length > 0) {
       this.updateProfile();
     } else {
       this.failed = true;
+      this.loading = false;
       setTimeout(
         () => {
           this.failed = false;
@@ -190,7 +161,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
   };
 
-  oninit(vnode) {
+  oninit() {
     this.address = m.route.param('address');
     this.error = EditProfileError.None;
     this.getProfile(this.address);
@@ -211,13 +182,15 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     this.imageUploading = false;
   }
 
-  view(vnode) {
+  view(vnode: m.Vnode<EditNewProfileAttrs>) {
     if (this.error !== EditProfileError.None) return;
 
     if (this.loading) {
       return (
-        <div class="EditProfilePage">
-          <CWSpinner />
+        <div class="EditProfilePage full-height">
+          <div class="loading-spinner">
+            <CWSpinner />
+          </div>
         </div>
       );
     }
@@ -253,7 +226,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <CWButton
                   label="Delete profile"
                   onclick={() => {
-                    this.handleSaveProfile(vnode);
+                    // TODO: handle delete profile
                   }}
                   className={this.saved ? 'save-button confirm' : 'save-button'}
                   buttonType="secondary-black"
@@ -268,7 +241,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 />
                 </div>
                 <div className="status">
-                  {(this.saved || this.imageUploading) && <CWSpinner />}
                   <div
                     className={
                       this.failed ? 'save-button-message show' : 'save-button-message'
@@ -370,7 +342,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 />
               </div>
             </CWFormSection>
-            <CWFormSection
+            {/* TODO: Add back in when we have a way to manage addresses */}
+            {/* <CWFormSection
               title="Linked Addresses"
               description="Transfer, Edit and Delete addresses connected to this profile."
             >
@@ -382,12 +355,12 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 </div>
                 <CWButton
                   iconName="plus"
-                  buttonType="mini"
+                  buttonType="mini-black"
                   label="Connect a New Address"
                   onclick={() => {}}
                 />
               </div>
-            </CWFormSection>
+            </CWFormSection> */}
           </CWForm>
         </div>
       </Sublayout>

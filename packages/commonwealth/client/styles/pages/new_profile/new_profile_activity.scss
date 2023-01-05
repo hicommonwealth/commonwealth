@@ -20,6 +20,23 @@
         background: $neutral-100;
         margin: 0;
       }
+
+      .tab-header {
+        display: flex;
+
+        .count {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          height: 24px;
+          width: 24px;
+          border-radius: 50%;
+          background: $neutral-50;
+          color: $neutral-500;
+          font-size: 12px;
+          margin-left: 8px;
+        }
+      }
     }
 
     .activity-nav-option {

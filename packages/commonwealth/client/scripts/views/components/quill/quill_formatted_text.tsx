@@ -45,6 +45,11 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
     }
   }
 
+  onupdate(vnode: m.Vnode<QuillFormattedTextAttrs>) {
+    this.oninit(vnode);
+    m.redraw();
+  }
+
   view(vnode: m.Vnode<QuillFormattedTextAttrs>) {
     const {
       doc,

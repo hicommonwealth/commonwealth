@@ -4,6 +4,17 @@
 .EditProfilePage {
   padding: 50px;
 
+  &.full-height {
+    height: 100%;
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
   .buttons-container {
     .buttons {
       display: flex;

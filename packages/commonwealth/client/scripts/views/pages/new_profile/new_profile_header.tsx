@@ -55,17 +55,16 @@ class SocialAccounts extends ClassComponent<{profile: Profile}> {
       <div className="social-accounts">
         {email && <SocialAccount link={`mailto:${email}`} iconName="mail" />}
         {socials.map((social) => {
-          const link = `https://${social}`;
           if (social.includes('twitter')) {
-            return <SocialAccount link={link} iconName="twitter" />
+            return <SocialAccount link={social} iconName="twitter" />
           } else if (social.includes('discord')) {
-            return <SocialAccount link={link} iconName="discord" />
+            return <SocialAccount link={social} iconName="discord" />
           } else if (social.includes('telegram')) {
-            return <SocialAccount link={link} iconName="telegram" />
+            return <SocialAccount link={social} iconName="telegram" />
           } else if (social.includes('github')) {
-            return <SocialAccount link={link} iconName="github" />
+            return <SocialAccount link={social} iconName="github" />
           } else {
-            return <SocialAccount link={link} iconName="website" />
+            return <SocialAccount link={social} iconName="website" />
           }
         })}
       </div>
@@ -81,9 +80,7 @@ class Bio extends ClassComponent<NewProfileBioAttrs> {
     //   return `${bio.slice(0, maxBioCharCount)}...`;
     // }
 
-    return renderQuillTextBody(bio, {
-      collapse: true,
-    });
+    return renderQuillTextBody(bio);
   }
 }
 
@@ -99,6 +96,8 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
   view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
     const { profile, address } = vnode.attrs;
     const bio = profile?.bio;
+
+    if (!bio) return;
 
     return (
       <div class="ProfileHeader">
@@ -119,14 +118,15 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
             {profile?.name}
           </CWText>
           <div class="buttons">
-            <CWButton label="Delegate" buttonType="mini" onClick={() => {}} />
-            <CWButton label="Follow" buttonType="mini" onClick={() => {}} />
+            {/* TODO: Add delegate and follow buttons */}
+            {/* <CWButton label="Delegate" buttonType="mini-black" onClick={() => {}} />
+            <CWButton label="Follow" buttonType="mini-black" onClick={() => {}} /> */}
             {app.isLoggedIn() && app.user.addresses
               .map((addressInfo) => addressInfo.address)
               .includes(address) && (
                 <CWButton
                   label="Edit"
-                  buttonType="mini"
+                  buttonType="mini-black"
                   onclick={() =>
                     m.route.set(`/profile/${m.route.param('address')}/edit`)
                   }

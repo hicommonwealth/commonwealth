@@ -89,7 +89,6 @@ export class ActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
                         deleteCallback(comment);
                       });
                     }
-                    m.redraw();
                   },
                 },
               ]}

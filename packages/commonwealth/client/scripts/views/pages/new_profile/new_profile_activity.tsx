@@ -54,7 +54,7 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
     return (
       <div className="ProfileActivity">
         <div className="activity-nav">
-          <CWTabBar className="tab-bar">
+          <CWTabBar>
             <CWTab
               label="All Activity"
               onclick={() => {
@@ -63,7 +63,11 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
               isSelected={this.selectedActivity === ProfileActivity.Comments}
             />
             <CWTab
-              label="Threads"
+              label={
+                <div className="tab-header">Threads
+                  <div className="count">{vnode.attrs.threads.length}</div>
+                </div>
+              }
               onclick={() => {
                 this.selectedActivity = ProfileActivity.Threads;
               }}
