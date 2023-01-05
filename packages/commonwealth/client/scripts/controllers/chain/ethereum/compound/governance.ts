@@ -1,7 +1,8 @@
 import BN from 'bn.js';
 import { ProposalModule, ITXModalData } from 'models';
 import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { CompoundEvents, CompoundTypes } from 'chain-events/src';
+import { CompoundTypes } from 'chain-events/src/types';
+import { CompoundEvents } from 'chain-events/src';
 import { IApp } from 'state';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
 import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
