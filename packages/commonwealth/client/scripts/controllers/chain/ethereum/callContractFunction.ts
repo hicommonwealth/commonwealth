@@ -1,4 +1,6 @@
 import { ChainBase } from 'common-common/src/types';
+import abiDecoder from 'abi-decoder'; // NodeJS
+
 import {
   encodeFunctionSignature,
   processAbiInputsToDataTypes,
@@ -83,6 +85,10 @@ export async function callContractFunction(
     contract.address
   );
 
+  console.log('contract.abi', contract.abi)
+  abiDecoder.addABI(contract.abi);
+  console.log(abiDecoder.getABIs())
+
   const functionTx = functionContract.methods[methodSignature](
     ...processedArgs
   );
@@ -110,6 +116,13 @@ export async function callContractFunction(
       method: 'eth_call',
       params: [tx, 'latest'],
     });
+    try {
+      const decodedData = abiDecoder.decodeMethod(txResult);
+      console.log(txResult)
+      console.log('decodedData', decodedData)
+    } catch (error) {
+      console.error('Transaction Data Decoding Failed:', error);
+    }
     return decodeTransactionData(fn.outputs, txResult);
   }
 }
