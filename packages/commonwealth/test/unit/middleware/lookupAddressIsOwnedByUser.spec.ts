@@ -1,9 +1,8 @@
 import { assert } from 'chai';
-import { Sequelize, DataTypes } from 'sequelize';
 
 import MockExpressRequest from 'mock-express-request';
 import lookupAddressIsOwnedByUser from '../../../server/middleware/lookupAddressIsOwnedByUser';
-import { mockDb } from '../../../server/models/mocks/mock_database';
+import models from '../../../server/database';
 
 describe('lookupAddressIsOwnedByUser() unit tests', () => {
 
@@ -17,7 +16,7 @@ describe('lookupAddressIsOwnedByUser() unit tests', () => {
     request.body = resBody;
     request.user = { id: 1 };
 
-    const [author] = await lookupAddressIsOwnedByUser(mockDb, request);
+    const [author] = await lookupAddressIsOwnedByUser(models, request);
     assert.equal(author.name, 'test-user');
   });
 
@@ -30,7 +29,7 @@ describe('lookupAddressIsOwnedByUser() unit tests', () => {
     };
     request.body = resBody;
 
-    const [author, error] = await lookupAddressIsOwnedByUser(mockDb, request);
+    const [author, error] = await lookupAddressIsOwnedByUser(models, request);
     assert.equal(author, null);
     assert.equal(error, 'Not logged in');
   });
@@ -44,7 +43,7 @@ describe('lookupAddressIsOwnedByUser() unit tests', () => {
     request.body = resBody;
     request.user = { id: 1 };
 
-    const [author, error] = await lookupAddressIsOwnedByUser(mockDb, request);
+    const [author, error] = await lookupAddressIsOwnedByUser(models, request);
     assert.equal(author, null);
     assert.equal(error, 'Invalid public key/chain');
   })
@@ -59,7 +58,7 @@ describe('lookupAddressIsOwnedByUser() unit tests', () => {
     request.body = resBody;
     request.user = { id: 2 };
 
-    const [author, error] = await lookupAddressIsOwnedByUser(mockDb, request);
+    const [author, error] = await lookupAddressIsOwnedByUser(models, request);
     assert.equal(author, null);
     assert.equal(error, 'Invalid public key/chain');
   })

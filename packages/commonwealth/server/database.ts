@@ -1,8 +1,5 @@
 import { Sequelize, DataTypes } from 'sequelize';
 
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DATABASE_URI } from './config';
-
 import type { DB, Models } from './models';
 import AddressFactory from './models/address';
 import AttachmentFactory from './models/attachment';
@@ -55,95 +52,83 @@ import WebhookFactory from './models/webhook';
 import SnapshotProposalFactory from './models/snapshot_proposal';
 import DiscordBotConfigFactory from './models/discord_bot_config';
 
-const log = factory.getLogger(formatFilename(__filename));
-
-export const sequelize = new Sequelize(DATABASE_URI, {
-  // disable string operators (https://github.com/sequelize/sequelize/issues/8417)
-  // operatorsAliases: false,
-  logging:
-    process.env.NODE_ENV === 'test'
-      ? false
-      : (msg) => {
-          log.trace(msg);
-        },
-  dialectOptions:
-    process.env.NODE_ENV !== 'production' ? { requestTimeout: 40000 } :
-    DATABASE_URI === "postgresql://commonwealth:edgeware@localhost/commonwealth" ?
-    { requestTimeout: 40000, ssl: false } :
-    { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
-  pool: {
-    max: 10,
-    min: 0,
-    acquire: 40000,
-    idle: 40000,
-  },
-});
-
-export const Address = AddressFactory(sequelize, DataTypes);
-const models: Models = {
-  Address: AddressFactory(sequelize, DataTypes),
-  Ban: BanFactory(sequelize, DataTypes),
-  Chain: ChainFactory(sequelize, DataTypes),
-  ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
-  ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
-  ChainNode: ChainNodeFactory(sequelize, DataTypes),
-  ChatChannel: ChatChannelFactory(sequelize, DataTypes),
-  ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
-  ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
-  ChatMessage: ChatMessageFactory(sequelize, DataTypes),
-  Collaboration: CollaborationFactory(sequelize, DataTypes),
-  Contract: ContractFactory(sequelize, DataTypes),
-  ContractAbi: ContractAbiFactory(sequelize, DataTypes),
-  CommunityContract: CommunityContractFactory(sequelize, DataTypes),
-  CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
-  CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
-  CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
-  DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
-  DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
-  IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
-  InviteCode: InviteCodeFactory(sequelize, DataTypes),
-  LinkedThread: LinkedThread(sequelize, DataTypes),
-  LoginToken: LoginTokenFactory(sequelize, DataTypes),
-  Notification: NotificationFactory(sequelize, DataTypes),
-  NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
-  NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
-  Attachment: AttachmentFactory(sequelize, DataTypes),
-  Comment: CommentFactory(sequelize, DataTypes),
-  Poll: PollFactory(sequelize, DataTypes),
-  OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
-  Reaction: ReactionFactory(sequelize, DataTypes),
-  Thread: ThreadFactory(sequelize, DataTypes),
-  Topic: TopicFactory(sequelize, DataTypes),
-  ViewCount: ViewCountFactory(sequelize, DataTypes),
-  Vote: VoteFactory(sequelize, DataTypes),
-  Profile: ProfileFactory(sequelize, DataTypes),
-  Role: RoleFactory(sequelize, DataTypes),
-  RoleAssignment: RoleAssignmentFactory(sequelize, DataTypes),
-  Rule: RuleFactory(sequelize, DataTypes),
-  SocialAccount: SocialAccountFactory(sequelize, DataTypes),
-  SsoToken: SsoTokenFactory(sequelize, DataTypes),
-  StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
-  SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
-  SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
-  Subscription: SubscriptionFactory(sequelize, DataTypes),
-  Token: TokenFactory(sequelize, DataTypes),
-  TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
-  User: UserModelFactory(sequelize, DataTypes),
-  WaitlistRegistration: WaitlistRegistrationFactory(sequelize, DataTypes),
-  Webhook: WebhookFactory(sequelize, DataTypes),
+// db is exported => { db: <something> }
+// then, we set <something> to the correct data once initialized
+const db = {
+  db: {
+    sequelize: null,
+    Sequelize,
+  } as DB
 };
 
-const db: DB = {
-  sequelize,
-  Sequelize,
-  ...models,
-};
+export function initDb(connectFn: () => Sequelize) {
+  const sequelize = connectFn();
+  const models: Models = {
+    Address: AddressFactory(sequelize, DataTypes),
+    Ban: BanFactory(sequelize, DataTypes),
+    Chain: ChainFactory(sequelize, DataTypes),
+    ChainCategory: ChainCategoryFactory(sequelize, DataTypes),
+    ChainCategoryType: ChainCategoryTypeFactory(sequelize, DataTypes),
+    ChainNode: ChainNodeFactory(sequelize, DataTypes),
+    ChatChannel: ChatChannelFactory(sequelize, DataTypes),
+    ChainEntityMeta: ChainEntityMetaFactory(sequelize, DataTypes),
+    ChainEventType: ChainEventTypeFactory(sequelize, DataTypes),
+    ChatMessage: ChatMessageFactory(sequelize, DataTypes),
+    Collaboration: CollaborationFactory(sequelize, DataTypes),
+    Contract: ContractFactory(sequelize, DataTypes),
+    ContractAbi: ContractAbiFactory(sequelize, DataTypes),
+    CommunityContract: CommunityContractFactory(sequelize, DataTypes),
+    CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
+    CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
+    CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
+    DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
+    DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
+    IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
+    InviteCode: InviteCodeFactory(sequelize, DataTypes),
+    LinkedThread: LinkedThread(sequelize, DataTypes),
+    LoginToken: LoginTokenFactory(sequelize, DataTypes),
+    Notification: NotificationFactory(sequelize, DataTypes),
+    NotificationCategory: NotificationCategoryFactory(sequelize, DataTypes),
+    NotificationsRead: NotificationsReadFactory(sequelize, DataTypes),
+    Attachment: AttachmentFactory(sequelize, DataTypes),
+    Comment: CommentFactory(sequelize, DataTypes),
+    Poll: PollFactory(sequelize, DataTypes),
+    OffchainProfile: OffchainProfileFactory(sequelize, DataTypes),
+    Reaction: ReactionFactory(sequelize, DataTypes),
+    Thread: ThreadFactory(sequelize, DataTypes),
+    Topic: TopicFactory(sequelize, DataTypes),
+    ViewCount: ViewCountFactory(sequelize, DataTypes),
+    Vote: VoteFactory(sequelize, DataTypes),
+    Profile: ProfileFactory(sequelize, DataTypes),
+    Role: RoleFactory(sequelize, DataTypes),
+    RoleAssignment: RoleAssignmentFactory(sequelize, DataTypes),
+    Rule: RuleFactory(sequelize, DataTypes),
+    SocialAccount: SocialAccountFactory(sequelize, DataTypes),
+    SsoToken: SsoTokenFactory(sequelize, DataTypes),
+    StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
+    SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
+    SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
+    Subscription: SubscriptionFactory(sequelize, DataTypes),
+    Token: TokenFactory(sequelize, DataTypes),
+    TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
+    User: UserModelFactory(sequelize, DataTypes),
+    WaitlistRegistration: WaitlistRegistrationFactory(sequelize, DataTypes),
+    Webhook: WebhookFactory(sequelize, DataTypes),
+  };
 
-// setup associations
-Object.keys(models).forEach((modelName) => {
-  if ('associate' in db[modelName]) {
-    db[modelName].associate(db);
-  }
-});
+  // setup associations
+  Object.keys(models).forEach((modelName) => {
+    if ('associate' in models[modelName]) {
+      models[modelName].associate(models);
+    }
+  });
+
+  db.db = {
+    sequelize,
+    Sequelize,
+    ...models,
+  } as DB;
+}
+
 
 export default db;

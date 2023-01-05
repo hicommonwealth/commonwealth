@@ -15,21 +15,25 @@ import {
   ChainType,
   BalanceType,
 } from 'common-common/src/types';
+import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
-import setupAPI from 'server/routing/router'; // performance note: this takes 15 seconds
+import setupAPI from './server/routing/router'; // performance note: this takes 15 seconds
 import setupPassport from './server/passport';
-import models from './server/database';
+import db, { initDb } from './server/database';
 import ViewCountCache from './server/util/viewCountCache';
 import BanCache from './server/util/banCheckCache';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
+import connect from './server/mock_connection';
 
 require('express-async-errors');
+
+initDb(connect);
+const models = db.db;
 
 const app = express();
 const SequelizeStore = SessionSequelizeStore(session.Store);
@@ -76,7 +80,7 @@ const resetServer = (debug = false): Promise<void> => {
   if (debug) console.log('Resetting database...');
   return new Promise(async (resolve) => {
     try {
-      await models.sequelize.sync({ force: true });
+      // await models.sequelize.sync({ force: true });
       console.log('done syncing.');
       if (debug) console.log('Initializing default models...');
       const drew = await models.User.create({

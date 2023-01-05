@@ -9,7 +9,7 @@ import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import Rollbar from "rollbar";
 import {RABBITMQ_URI, ROLLBAR_SERVER_TOKEN} from '../config';
 import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
-import models from '../database';
+// import models from '../database';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 import {processChainEventTypeCUD} from "./messageProcessors/chainEventTypeCUDQueue";
 import {processSnapshotMessage} from "./messageProcessors/snapshotConsumer";
@@ -39,7 +39,7 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
     throw e;
   }
   const context = {
-    models,
+    models: {},
     log,
   };
 

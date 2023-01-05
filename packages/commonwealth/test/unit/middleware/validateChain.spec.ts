@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import validateChain from '../../../server/middleware/validateChain';
-import { mockDb } from '../../../server/models/mocks/mock_database';
+import models from '../../../server/database';
 
 describe('validateChain() unit tests', () => {
 
@@ -10,7 +10,7 @@ describe('validateChain() unit tests', () => {
       chain: 'ethereum',
     };
 
-    const [chain] = await validateChain(mockDb, chainParams);
+    const [chain] = await validateChain(models, chainParams);
     assert.equal(chain.id, 'ethereum');
   });
 

@@ -32,7 +32,7 @@ import {
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
 } from './server/config';
-import models from './server/database';
+import models, { initDb } from './server/database';
 import setupAppRoutes from './server/scripts/setupAppRoutes';
 import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
@@ -46,6 +46,7 @@ import setupPassport from './server/passport';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
+import connect from './server/db_connection';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -55,6 +56,8 @@ require('express-async-errors');
 const app = express();
 
 async function main() {
+  initDb(connect);
+
   const DEV = process.env.NODE_ENV !== 'production';
 
   // CLI parameters for which task to run
@@ -107,7 +110,7 @@ async function main() {
   };
 
   const sessionStore = new SequelizeStore({
-    db: models.sequelize,
+    db: models.db.sequelize,
     tableName: 'Sessions',
     checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
     expiration: 7 * 24 * 60 * 60 * 1000, // Set session expiration to 7 days
@@ -209,7 +212,7 @@ async function main() {
   }
 
   setupMiddleware();
-  setupPassport(models);
+  setupPassport(models.db);
 
   const rollbar = new Rollbar({
     accessToken: ROLLBAR_SERVER_TOKEN,
@@ -245,8 +248,8 @@ async function main() {
 
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   await ruleCache.start();
-  const banCache = new BanCache(models);
-  const globalActivityCache = new GlobalActivityCache(models);
+  const banCache = new BanCache(models.db);
+  const globalActivityCache = new GlobalActivityCache(models.db);
 
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
@@ -254,11 +257,11 @@ async function main() {
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
-    new DatabaseValidationService(models);
+    new DatabaseValidationService(models.db);
 
   setupAPI(
     app,
-    models,
+    models.db,
     viewCountCache,
     tokenBalanceCache,
     ruleCache,
@@ -266,14 +269,14 @@ async function main() {
     globalActivityCache,
     dbValidationService
   );
-  setupCosmosProxy(app, models);
+  setupCosmosProxy(app, models.db);
   setupIpfsProxy(app);
   setupEntityProxy(app);
-  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+  setupAppRoutes(app, models.db, devMiddleware, templateFile, sendFile);
 
   setupErrorHandlers(app, rollbar);
 
-  setupServer(app, rollbar, models, rabbitMQController);
+  setupServer(app, rollbar, models.db, rabbitMQController);
 }
 
 main();
