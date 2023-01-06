@@ -6,26 +6,22 @@ import ClassComponent from 'class_component';
 
 import 'pages/new_profile/new_profile_activity_row.scss';
 
-import app from 'state';
 import { link } from 'helpers';
 import Thread from 'client/scripts/models/Thread';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTag } from '../../components/component_kit/cw_tag';
 import { SharePopover } from '../../components/share_popover';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CommentWithAssociatedThread } from './new_profile_activity';
 
 type NewProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
   address: string;
-  deleteCallback: (activity: CommentWithAssociatedThread | Thread) => void;
 };
 
 export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowAttrs> {
   view(vnode: m.Vnode<NewProfileActivityRowAttrs>) {
-    const { activity, address, deleteCallback } = vnode.attrs;
+    const { activity } = vnode.attrs;
     const { chain, createdAt, author, title, id, body } = activity;
     const isThread = !!(activity as Thread).kind;
     const comment = activity as CommentWithAssociatedThread;
@@ -65,34 +61,6 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
         </CWText>
         <div className="actions">
           <SharePopover commentId={id}/>
-          {app.user.addresses
-            .map((addressInfo) => addressInfo.address)
-            .includes(address) && (
-            <CWPopoverMenu
-              trigger={
-                <CWIconButton iconName="dotsVertical" iconSize="small" />
-              }
-              menuItems={[
-                {
-                  label: 'Delete',
-                  iconLeft: 'trash',
-                  onclick: () => {
-                    if (isThread) {
-                      app.threads.delete(activity).then(() => {
-                        console.log('thread being deleted', activity)
-                        deleteCallback(activity);
-                      });
-                    } else {
-                      app.comments.delete(comment).then(() => {
-                        console.log('comment being deleted', comment)
-                        deleteCallback(comment);
-                      });
-                    }
-                  },
-                },
-              ]}
-            />
-          )}
         </div>
       </div>
     );

@@ -357,18 +357,12 @@ class ThreadsController {
         chain_id: app.activeChainId(),
       })
         .then((result) => {
-          // TODO: find another solution to delete
-          // threads from new profile page
-          try {
-            // Deleted posts are removed from all stores containing them
-            this.store.remove(proposal);
-            this._listingStore.remove(proposal);
-            this._overviewStore.remove(proposal);
-            m.redraw();
-            resolve(result);
-          } catch (e) {
-            console.error(e);
-          }
+          // Deleted posts are removed from all stores containing them
+          this.store.remove(proposal);
+          this._listingStore.remove(proposal);
+          this._overviewStore.remove(proposal);
+          m.redraw();
+          resolve(result);
         })
         .catch((e) => {
           console.error(e);
