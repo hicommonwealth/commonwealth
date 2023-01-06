@@ -131,17 +131,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.svg$/,
-        include: [
-          path.resolve(__dirname, '../node_modules/quill-2.0-dev/assets/icons'),
-        ],
-        use: [
-          {
-            loader: 'html-loader',
-          },
-        ],
-      },
-      {
         // ignore ".spec.ts" test files in build
         test: /^(?!.*\.spec\.ts$).*(?:\.ts)$/,
         include: [
@@ -167,35 +156,7 @@ module.exports = {
         },
       },
       {
-        test: /\.(js)$/,
-        include: [
-          path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared'),
-          path.resolve(__dirname, '../../common-common'),
-          path.resolve(__dirname, '../../chain-events'),
-          path.resolve(__dirname, '../../token-balance-cache'),
-        ],
-        exclude: /\/node_modules\//,
-        use: {
-          loader: 'babel-loader',
-        },
-      },
-      {
-        test: /\.mjs$/,
-        include: /node_modules/,
-        type: 'javascript/auto',
-      },
-      {
-        test: /mithril-infinite\.mjs$|magic-sdk\/provider\/dist\/modern\/index.mjs$|polkadot\/util\/logger.js$/,
-        resolve: {
-          fullySpecified: false,
-        },
-      },
-      {
         test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
-        exclude: [
-          path.resolve(__dirname, '../node_modules/quill-2.0-dev/assets/icons'),
-        ],
         type: 'asset',
       },
       {

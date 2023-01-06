@@ -25,4 +25,22 @@ module.exports = merge(common, {
       statsOptions: { source: false },
     }),
   ],
+  module: {
+    rules: [
+      {
+        test: /\.(js)$/,
+        include: [
+          path.resolve(__dirname, '../client'),
+          path.resolve(__dirname, '../shared'),
+          path.resolve(__dirname, '../../common-common'),
+          path.resolve(__dirname, '../../chain-events'),
+          path.resolve(__dirname, '../../token-balance-cache'),
+        ],
+        exclude: /\/node_modules\//,
+        use: {
+          loader: 'babel-loader',
+        },
+      },
+    ]
+  }
 });
