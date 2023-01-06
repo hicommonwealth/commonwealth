@@ -196,12 +196,7 @@ module.exports = {
         exclude: [
           path.resolve(__dirname, '../node_modules/quill-2.0-dev/assets/icons'),
         ],
-        use: {
-          loader: 'file-loader',
-          options: {
-            name: '[path][name].[ext]',
-          },
-        },
+        type: 'asset',
       },
       {
         test: /\.s?css$/i,
