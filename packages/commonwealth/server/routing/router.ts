@@ -130,7 +130,6 @@ import updateChainCustomDomain from '../routes/updateChainCustomDomain';
 import updateChainPriority from '../routes/updateChainPriority';
 
 import fetchEtherscanContract from '../routes/etherscanAPI';
-import startSsoLogin from '../routes/startSsoLogin';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getEntityMeta from '../routes/getEntityMeta';
 import { getTokensFromLists } from '../routes/getTokensFromLists';
@@ -164,6 +163,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import startSsoLogin from '../routes/startSsoLogin';
 
 function setupRouter(
   app: Express,

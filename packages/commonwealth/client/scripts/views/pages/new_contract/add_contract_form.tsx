@@ -93,23 +93,6 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
             this.form.abi = value;
             this.loaded = false;
           }}
-        />
-        <InputRow
-          title="Abi Nickname"
-          value={this.form.abiNickname}
-          placeholder="Required: Enter a nickname for this abi"
-          onChangeHandler={(v) => {
-            this.form.abiNickname = v;
-          }}
-        />
-        <InputRow
-          title="Abi"
-          value={this.form.abi}
-          placeholder="Optional: Paste ABI here"
-          onChangeHandler={(value) => {
-            this.form.abi = value;
-            this.loaded = false;
-          }}
           textarea
         />
         <InputRow
