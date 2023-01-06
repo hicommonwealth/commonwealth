@@ -48,8 +48,8 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
               ? link('a', `/${chain}/discussion/${id}`, [
                   `${title}`,
                 ])
-              : link('a',`/${chain}/discussion/${comment.thread.id}`,[
-                `${decodeURIComponent(comment.thread.title)}`,
+              : link('a',`/${chain}/discussion/${comment.thread?.id}`,[
+                `${decodeURIComponent(comment.thread?.title)}`,
               ])
             }
           </CWText>

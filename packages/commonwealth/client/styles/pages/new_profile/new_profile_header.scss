@@ -30,7 +30,10 @@
     .buttons {
       display: flex;
       justify-content: center;
-      margin-bottom: 24px;
+      
+      &.hasMargin {
+        margin-bottom: 24px;
+      }
 
       > :not(last-child) {
         margin-right: 8px;
@@ -38,8 +41,13 @@
     }
 
     .name {
-      margin-bottom: 24px;
       justify-content: center;
+      word-break: break-word;
+      text-align: center;
+
+      &.hasMargin {
+        margin-bottom: 24px;
+      }
     }
 
     .read-more {

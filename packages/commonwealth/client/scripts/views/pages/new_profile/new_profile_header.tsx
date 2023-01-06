@@ -31,6 +31,10 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
     if (!profile) return;
     const bio = profile.bio;
 
+    const isCurrentUser = app.isLoggedIn() && app.user.addresses
+      .map((addressInfo) => addressInfo.address)
+      .includes(address);
+
     return (
       <div class="ProfileHeader">
         <div class="profile-image">
@@ -44,18 +48,15 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
             />
           )}
         </div>
-
         <div class="profile-name-and-bio">
-          <CWText type="h3" className="name">
-            {profile.name}
+          <CWText type="h3" className={profile.name ? 'name hasMargin' : 'name'}>
+            {profile.name ? profile.name : address}
           </CWText>
-          <div class="buttons">
+          <div class={isCurrentUser ? 'buttons hasMargin' : 'buttons'}>
             {/* TODO: Add delegate and follow buttons */}
             {/* <CWButton label="Delegate" buttonType="mini-black" onClick={() => {}} />
             <CWButton label="Follow" buttonType="mini-black" onClick={() => {}} /> */}
-            {app.isLoggedIn() && app.user.addresses
-              .map((addressInfo) => addressInfo.address)
-              .includes(address) && (
+            {isCurrentUser && (
                 <CWButton
                   label="Edit"
                   buttonType="mini-black"
@@ -67,10 +68,14 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
             }
           </div>
           <SocialAccounts profile={profile} />
-          <CWText type="h4">Bio</CWText>
-          <CWText className="bio">
-            {renderQuillTextBody(bio)}
-          </CWText>
+          {bio && (
+            <div>
+              <CWText type="h4">Bio</CWText>
+              <CWText className="bio">
+                {renderQuillTextBody(bio)}
+              </CWText>
+            </div>
+          )}
         </div>
       </div>
     );

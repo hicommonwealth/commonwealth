@@ -41,9 +41,9 @@ export class SocialAccounts extends ClassComponent<NewProfileSocialAccountsAttrs
     return (
       <div className="SocialAccounts">
         {email && <SocialAccount link={`mailto:${email}`} iconName="mail" />}
-        {socials.map((social) => {
+        {socials?.map((social) => {
           if (social.includes('twitter')) {
-            return <SocialAccount link={social} iconName="twitter" />
+          return <SocialAccount link={social} iconName="twitter" />
           } else if (social.includes('discord')) {
             return <SocialAccount link={social} iconName="discord" />
           } else if (social.includes('telegram')) {
