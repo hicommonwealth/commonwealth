@@ -3,6 +3,7 @@ import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, 
 import $ from 'jquery';
 import _ from 'lodash';
 import { addressSwapper } from 'commonwealth/shared/utils';
+import { EventEmitter } from 'events';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
@@ -24,6 +25,9 @@ class ProfilesController {
     return this._unfetched.length === 0;
   }
 
+  public isFetched = new EventEmitter();
+
+  // @REACT TODO: batch the profiles we need, make one query, await then redraw
   public constructor() {
     this._unfetched = [];
     this._fetchNewProfiles = _.debounce(() => {
@@ -40,7 +44,6 @@ class ProfilesController {
     this._store.add(profile);
     this._unfetched.push(profile);
     this._fetchNewProfiles();
-    redraw();
     return profile;
   }
 
@@ -149,7 +152,8 @@ class ProfilesController {
         }
       })
     );
-    redraw();
+    console.log('emitting redraw');
+    this.isFetched.emit('redraw');
     return _.flatten(ps);
   }
 }

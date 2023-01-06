@@ -115,6 +115,12 @@ class User extends ClassComponent<
       }
 
       profile = app.profiles.getProfile(chainId.id, address);
+      const isInitialized = profile.initialized;
+      app.profiles.isFetched.once('redraw', () => {
+        if (!isInitialized && profile.initialized) {
+          this.redraw();
+        }
+      });
 
       role = adminsAndMods.find(
         (r) => r.address === address && r.address_chain === chainId.id
@@ -294,36 +300,25 @@ class User extends ClassComponent<
             : profile.getAvatar(32),
         ]),
         render('.user-name', [
-          app.chain &&
-          app.chain.base === ChainBase.Substrate &&
-          app.cachedIdentityWidget
-            ? render(app.cachedIdentityWidget, {
-                account,
-                linkify: true,
-                profile,
-                hideIdentityIcon,
-                addrShort,
-                showAddressWithDisplayName: false,
-              })
-            : link(
-                'a.user-display-name',
-                profile
-                  ? `/${app.activeChainId() || profile.chain}/account/${
-                      profile.address
-                    }?base=${profile.chain}`
-                  : 'javascript:',
-                !profile
-                  ? addrShort
-                  : !showAddressWithDisplayName
-                  ? profile.displayName
-                  : [
-                      profile.displayName,
-                      render(
-                        '.id-short',
-                        formatAddressShort(profile.address, profile.chain)
-                      ),
-                    ]
-              ),
+          link(
+            'a.user-display-name',
+            profile
+              ? `/${app.activeChainId() || profile.chain}/account/${
+                  profile.address
+                }?base=${profile.chain}`
+              : 'javascript:',
+            !profile
+              ? addrShort
+              : !showAddressWithDisplayName
+              ? profile.displayName
+              : [
+                  profile.displayName,
+                  render(
+                    '.id-short',
+                    formatAddressShort(profile.address, profile.chain)
+                  ),
+                ]
+          ),
         ]),
         profile?.address &&
           render(

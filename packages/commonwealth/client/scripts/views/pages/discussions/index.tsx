@@ -121,15 +121,14 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
         <h1>loading</h1>
       </div>
     ) : (
-      // <Sublayout
-      // title="Discussions"
-      // description={
-      //   app.topics.getByName(this.topicName, app.activeChainId()) || ''
-      // }
-      // onScroll={() => debounce(this.onScroll.bind(this), 400)}
-      // >
+      <Sublayout
+        title="Discussions"
+        description={
+          app.topics.getByName(this.topicName, app.activeChainId()) || ''
+        }
+        onScroll={() => debounce(this.onScroll.bind(this), 400)}
+      >
       <div className="DiscussionsPage">
-        <h1>hi</h1>
         <RecentThreadsHeader
           topic={this.topicName}
           stage={this.stageName}
@@ -165,7 +164,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
           </CWText>
         )}
       </div>
-      // {/*</Sublayout>*/}
+      </Sublayout>
     );
   }
 }

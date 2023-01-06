@@ -33,7 +33,8 @@ export const render = (tag: string | React.ComponentType, attrs: any = {}, ...ch
   }
   // handle children without attrs
   if (Array.isArray(attrs) || typeof attrs !== 'object') {
-    return createElement(tag, { children: attrs, className }, attrs);
+    children = attrs;
+    attrs = { className };
   }
 
   // ensure vnode.children exists
@@ -71,8 +72,6 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
   protected readonly __props: A;
   private _isMounted = false;
   private _seenProps = [];
-
-  // commented out as this was trigerring rerenders all over again
 
   constructor(props) {
     super(props);

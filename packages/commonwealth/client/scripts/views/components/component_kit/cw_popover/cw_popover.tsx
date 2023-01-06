@@ -1,7 +1,7 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, Children } from 'mithrilInterop';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, Component, jsx, Children } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
@@ -35,6 +35,10 @@ type PopoverAttrs = {
 const defaultHoverCloseDelay = 100;
 
 export class CWPopover extends ClassComponent<PopoverAttrs> {
+  view() { return <div /> }
+}
+
+export class CWPopoverOld extends ClassComponent<PopoverAttrs> {
   private arrowId: string;
   private contentId: string;
   private isOpen: boolean;
@@ -67,7 +71,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     this.isOpen = newIsOpen;
     this.isRendered = false;
 
-    redraw();
+    this.redraw();
   }
 
   applyPopoverPosition(vnode: ResultNode<PopoverAttrs>) {
@@ -97,7 +101,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     } catch (e) {
       console.log(e);
     }
-    redraw();
+    this.redraw();
   }
 
   handleHoverExit(

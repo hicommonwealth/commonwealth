@@ -111,6 +111,11 @@ class MembersPage extends ClassComponent {
       this.initialScrollFinished = false;
       this.initialProfilesLoaded = true;
 
+      // TODO: expand into controller
+      app.profiles.isFetched.on('redraw', () => {
+        this.redraw();
+      });
+
       // Set initial number loaded (contingent on navigation)
       if (navigatedFromAccount) {
         this.numProfilesLoaded = Number(
