@@ -38,7 +38,9 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
 
  
   const renderWithMetaTags = (res, title, description, author, image) => {
-    image = cleanMalformedUrl(image);
+    if (image) {
+      image = cleanMalformedUrl(image);
+    }
 
     description = description || `${title}: a decentralized community on Commonwealth.im.`;
     const $tmpl = cheerio.load(templateFile);
@@ -49,6 +51,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     } else {
       $tmpl('meta[name="author"]').remove();
     }
+    $tmpl('meta[property="og:type"]').attr('content', 'article');
     $tmpl('meta[name="twitter:title"]').attr('content', title);
     $tmpl('meta[name="twitter:description"]').attr('content', description);
     if (image) {

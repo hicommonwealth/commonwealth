@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import bs58 from 'bs58';
 import { Op } from 'sequelize';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
@@ -19,9 +18,14 @@ const updateThreadLinkedSnapshotProposal = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-  if (!chain?.snapshot) {
+  const chain = req.chain;
+
+  const snapshotSpaces = await models.CommunitySnapshotSpaces.findAll({
+    where: {
+      chain_id: chain.id,
+    },
+  });
+  if (snapshotSpaces.length < 1) {
     return next(new AppError(Errors.MustBeSnapshotChain));
   }
   // ensure snapshot proposal is a bs58-encoded sha256 hash

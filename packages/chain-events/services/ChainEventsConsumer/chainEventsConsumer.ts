@@ -2,7 +2,7 @@ import { BrokerConfig } from 'rascal';
 import {
   RabbitMQSubscription,
   ServiceConsumer,
-} from 'common-common/src/ServiceConsumer';
+} from 'common-common/src/serviceConsumer';
 import EventStorageHandler from './ChainEventHandlers/storage';
 import NotificationsHandler from './ChainEventHandlers/notification';
 import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
