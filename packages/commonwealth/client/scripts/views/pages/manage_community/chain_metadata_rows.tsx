@@ -16,7 +16,7 @@ import {
   ContractsViewable,
 } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
+import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo, RoleInfo } from 'models';
 import {
@@ -240,13 +240,14 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               : 'Discussion listing defaults to latest activity view'
           }
         />
-        <SelectRow
-          title="Contract Viewable Settings"
-          options={[
-            ContractsViewable.Off,
-            ContractsViewable.AdminOnly,
-            ContractsViewable.AllUsers,
-          ]}
+        <CWDropdown
+          label="Contract Viewable Settings"
+          options={Object.values(ContractsViewable).map((contractsViewable) => {
+            return {
+              label: contractsViewable,
+              value: contractsViewable,
+            };
+          })}
           value={this.contractsViewable}
           onchange={(value) => {
             this.contractsViewable = value;
