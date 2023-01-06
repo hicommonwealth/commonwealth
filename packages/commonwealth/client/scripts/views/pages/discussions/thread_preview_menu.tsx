@@ -37,6 +37,8 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
       app.user.activeAccount &&
       thread.author === app.user.activeAccount.address;
 
+    if (!isAuthor && !hasAdminPermissions) return;
+
     return (
       <div
         class="ThreadPreviewMenu"
@@ -44,6 +46,18 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
           // prevent clicks from propagating to discussion row
           e.preventDefault();
           e.stopPropagation();
+          console.log({ isAuthor, hasAdminPermissions });
+          console.log(
+            app.user.activeAccount,
+            app.roles.isRoleOfCommunity({
+              role: 'admin',
+              chain: app.activeChainId(),
+            }),
+            app.roles.isRoleOfCommunity({
+              role: 'moderator',
+              chain: app.activeChainId(),
+            })
+          );
         }}
       >
         <CWPopoverMenu
