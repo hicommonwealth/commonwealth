@@ -242,15 +242,16 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         />
         <CWDropdown
           label="Contract Viewable Settings"
-          options={Object.values(ContractsViewable).map((contractsViewable) => {
+          options={Object.keys(ContractsViewable).map((contractsViewableKey) => {
             return {
-              label: contractsViewable,
-              value: contractsViewable,
+              label: ContractsViewable[contractsViewableKey],
+              value: contractsViewableKey,
             };
           })}
           value={this.contractsViewable}
-          onchange={(value) => {
-            this.contractsViewable = value;
+          onSelect={(o) => {
+            // get the contracts viewable enum that corresponds to the selected option
+            this.contractsViewable = ContractsViewable[o.value];
           }}/>
         <ToggleRow
           title="Chat Enabled"
