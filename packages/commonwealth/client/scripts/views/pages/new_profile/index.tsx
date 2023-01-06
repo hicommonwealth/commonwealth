@@ -63,7 +63,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
         return { ...c, thread };
       })
       this.comments = commentsWithAssociatedThread;
-      this.chains = response.chains.map((c) => new ChainInfo(c));
+      this.chains = response.chains.map((c) => ({ ...new ChainInfo(c), iconUrl: c.icon_url }));
       this.addresses = response.addresses.map(
         (a) =>
           new AddressInfo(

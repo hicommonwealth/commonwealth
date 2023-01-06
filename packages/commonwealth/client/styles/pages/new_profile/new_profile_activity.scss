@@ -6,6 +6,7 @@
   border-radius: 16px;
   height: fit-content;
   width: 60vw;
+  flex: none;
 
   @include mediumInclusive {
     width: 50vw;
@@ -13,6 +14,7 @@
 
   @include smallInclusive {
     width: 100%;
+    flex: auto;
   }
 
   .activity-nav {

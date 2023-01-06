@@ -25,10 +25,10 @@ export type CommentWithAssociatedThread = Comment<IUniqueId> & {
 }
 
 type NewProfileActivityAttrs = {
-  addresses: Array<AddressInfo>;
-  comments: Array<CommentWithAssociatedThread>;
-  chains: Array<ChainInfo>;
-  threads: Array<Thread>;
+  addresses: AddressInfo[];
+  comments: CommentWithAssociatedThread[];
+  chains: ChainInfo[];
+  threads: Thread[];
 };
 
 export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
@@ -87,6 +87,7 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
             address={this.address}
             threads={vnode.attrs.threads}
             comments={vnode.attrs.comments}
+            chains={vnode.attrs.chains}
           />
         </div>
       </div>

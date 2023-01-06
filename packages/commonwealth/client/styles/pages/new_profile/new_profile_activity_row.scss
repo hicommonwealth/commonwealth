@@ -26,6 +26,13 @@
     align-items: center;
     margin-bottom: 8px;
 
+    img {
+      width: 24px;
+      height: 24px;
+      margin-right: 8px;
+      border-radius: 50%;
+    }
+
     .date {
       .Text {
         color: $neutral-500;
@@ -49,9 +56,9 @@
 
   .title {
     margin-bottom: 8px;
+  }
 
-    .link a {
-      color: $neutral-800;
-    }
+  .link a {
+    color: $neutral-800;
   }
 }
