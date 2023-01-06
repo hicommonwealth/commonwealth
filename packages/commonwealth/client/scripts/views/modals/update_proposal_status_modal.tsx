@@ -123,7 +123,6 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
               onclick={async (e) => {
                 const { thread } = vnode.attrs;
                 // set stage
-                console.log('what', app.user);
                 try {
                   await app.threads.setStage({
                     threadId: thread.id,
@@ -165,6 +164,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
                 );
 
                 $(e.target).trigger('modalexit');
+                m.redraw();
               }}
             />
           </div>

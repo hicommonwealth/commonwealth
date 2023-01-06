@@ -27,7 +27,6 @@ export class ChangeTopicModal extends ClassComponent<ChangeTopicModalAttrs> {
 
   view(vnode: m.Vnode<ChangeTopicModalAttrs>) {
     const { thread } = vnode.attrs;
-    console.log({ thread });
 
     return (
       <div class="ChangeTopicModal">
