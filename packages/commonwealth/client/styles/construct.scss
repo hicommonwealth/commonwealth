@@ -1,4 +1,7 @@
 @import 'shared.scss';
+@import '../../../../node_modules/construct-ui/src/utils/focus-manager/index.scss';
+@import '../../../../node_modules/construct-ui/src/components/index.scss';
+
 
 //
 // text sizing and typography
@@ -18,9 +21,6 @@ $cui-font-size: floor($cui-base-size * 1.4);
 //
 
 $cui-base-height: floor($cui-base-size * 2.8);
-
-@import 'construct-ui/src/utils/focus-manager/index.scss';
-@import 'construct-ui/src/components/index.scss';
 
 //
 // construct theme overrides

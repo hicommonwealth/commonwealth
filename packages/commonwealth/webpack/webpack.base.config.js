@@ -200,7 +200,7 @@ module.exports = {
       },
       {
         test: /\.s?css$/i,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
+        use: ['style-loader', 'css-loader', 'fast-sass-loader'],
       },
       {
         test: /\.m?js/,
