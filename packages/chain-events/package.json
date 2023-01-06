@@ -45,7 +45,7 @@
     "migrate-events": "NODE_OPTIONS='--max-old-space-size=460' ts-node --project tsconfig.json scripts/migrateChainEntities.ts run-as-script"
   },
   "engines": {
-    "node": ">=14"
+    "node": "18.x"
   },
   "repository": {
     "type": "git",

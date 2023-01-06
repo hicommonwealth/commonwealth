@@ -11,6 +11,9 @@
     "start": "ts-node-dev --max-old-space-size=4096 --respawn --transpile-only src/index.ts",
     "test": "ts-mocha -p tsconfig.json --exit src/**/*.spec.ts"
   },
+  "engines": {
+    "node": "18.x"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
