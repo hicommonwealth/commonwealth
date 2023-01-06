@@ -46,18 +46,6 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
           // prevent clicks from propagating to discussion row
           e.preventDefault();
           e.stopPropagation();
-          console.log({ isAuthor, hasAdminPermissions });
-          console.log(
-            app.user.activeAccount,
-            app.roles.isRoleOfCommunity({
-              role: 'admin',
-              chain: app.activeChainId(),
-            }),
-            app.roles.isRoleOfCommunity({
-              role: 'moderator',
-              chain: app.activeChainId(),
-            })
-          );
         }}
       >
         <CWPopoverMenu
@@ -68,9 +56,10 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                     onclick: (e) => {
                       e.preventDefault();
 
-                      app.threads
-                        .pin({ proposal: thread })
-                        .then(() => navigateToSubpage('/discussions'));
+                      app.threads.pin({ proposal: thread }).then(() => {
+                        navigateToSubpage('/discussions');
+                        m.redraw();
+                      });
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
                     iconLeft: 'pin' as const,
