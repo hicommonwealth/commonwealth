@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../middleware/validateChain';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -18,8 +17,7 @@ const bulkComments = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   if (req.query.offchain_threads_only && req.query.proposals_only) {
     return next(new AppError(Errors.MutuallyExclusive));

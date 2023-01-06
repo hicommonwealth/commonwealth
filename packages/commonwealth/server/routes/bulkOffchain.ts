@@ -16,7 +16,6 @@ import { RuleInstance } from '../models/rule';
 import { ThreadInstance } from '../models/thread';
 import { TopicInstance } from '../models/topic';
 import { findAllRoles, RoleInstanceWithPermission } from '../util/roles';
-import validateChain from '../middleware/validateChain';
 import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 
 export const Errors = {};
@@ -28,9 +27,7 @@ const bulkOffchain = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
-
+  const chain = req.chain;
   // globally shared SQL replacements
   const communityOptions = 'chain = :chain';
   const replacements = { chain: chain.id };

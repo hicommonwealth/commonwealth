@@ -4,11 +4,27 @@ import { StatsDController } from 'common-common/src/statsd';
 import { SnapshotNotification } from '../../../shared/types';
 import { DB } from '../../models';
 
+const enum SnapshotEventType {
+  Created = 'proposal/created',
+  Deleted = 'proposal/deleted',
+  Ended = 'proposal/end',
+  Started = 'proposal/start',
+}
 export async function processSnapshotMessage(
   this: { models: DB; log: Logger },
   data: SnapshotNotification
 ) {
   const { space, id, title, body, choices, start, expire } = data;
+
+  const eventType = data.event;
+
+  // Sometimes snapshot-listener will receive a webhook event from a
+  // proposal that no longer exists. In that event, we will receive null data
+  // from the listener. We can't do anything with that data, so we skip it.
+  if (!space && eventType !== SnapshotEventType.Deleted) {
+    this.log.info('Event received with invalid proposal, skipping');
+    return;
+  }
 
   let snapshotNotificationData = {
     space,
@@ -22,7 +38,6 @@ export async function processSnapshotMessage(
 
   this.log.info(`Processing snapshot message: ${JSON.stringify(data)}`);
 
-  const eventType = data.event;
   let proposal;
 
   try {
@@ -33,7 +48,7 @@ export async function processSnapshotMessage(
     this.log.error(`Error fetching proposal: ${e}`);
   }
 
-  if (eventType === 'proposal/deleted') {
+  if (eventType === SnapshotEventType.Deleted) {
     if (!proposal || proposal?.is_upstream_deleted) {
       this.log.info(`Proposal ${id} does not exist, skipping`);
       return;
@@ -62,15 +77,17 @@ export async function processSnapshotMessage(
   }
 
   try {
-    await this.models.SnapshotSpace.findOrCreate({
-      where: { snapshot_space: space ?? proposal.space },
-    });
+    if (space || proposal.space) {
+      await this.models.SnapshotSpace.findOrCreate({
+        where: { snapshot_space: space ?? proposal.space },
+      });
+    }
   } catch (e) {
     this.log.error(`Error creating snapshot space: ${e}`);
   }
 
   if (
-    eventType === 'proposal/created' &&
+    eventType === SnapshotEventType.Created &&
     proposal &&
     !proposal.is_upstream_deleted
   ) {
@@ -78,8 +95,9 @@ export async function processSnapshotMessage(
     return;
   }
 
-  if (!proposal && eventType !== 'proposal/deleted') {
+  if (!proposal && eventType !== SnapshotEventType.Deleted) {
     this.log.info(`Proposal ${id} does not exist, creating record`);
+    // TODO: fix here
     proposal = await this.models.SnapshotProposal.create({
       id,
       title,

@@ -1,5 +1,4 @@
 import { AppError } from 'common-common/src/errors';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { TypedRequestQuery, TypedResponse, success } from '../types';
 import { ChainEntityMetaAttributes } from '../models/chain_entity_meta';
@@ -19,12 +18,6 @@ const setProjectChain = async (
   res: TypedResponse<SetProjectChainResp>
 ) => {
   const { chain_id, project_id } = req.query;
-  try {
-    const [, error] = await validateChain(models, { chain: chain_id });
-    if (error) throw new AppError(error);
-  } catch (err) {
-    throw new AppError(err);
-  }
 
   // TODO: if we're getting projects from multiple chains, this provides no
   //   way of distinguishing -- we need to ensure we only listen for projects on
