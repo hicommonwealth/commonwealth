@@ -9,7 +9,7 @@ import { ChainEntity, ChainInfo, Project } from 'models';
 import { IProjectCreationData } from 'models/Project';
 import { IApp } from 'state';
 import { ChainNetwork } from 'common-common/src/types';
-import { getBaseUrl, getFetch } from 'helpers/getUrl';
+import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
 import { ContractReceipt } from 'ethers';
 import { formatBytes32String } from 'ethers/lib/utils';
 import { attachSigner } from './contractApi';
@@ -52,7 +52,7 @@ export default class ProjectsController {
       options.type_id = projectId;
     }
     const entityJSON = await getFetch(
-      `${getBaseUrl()}/entities`,
+      `${getBaseUrl(ServiceUrls.chainEvents)}/entities`,
       {
         chain: ChainNetwork.CommonProtocol,
         type_id: projectId
@@ -78,7 +78,7 @@ export default class ProjectsController {
 
     // entities contain the needed data, entityMeta contains source_chain
     const [entities, entityMetas] = await Promise.all([
-      getFetch(`${getBaseUrl()}/entities`, options),
+      getFetch(`${getBaseUrl(ServiceUrls.chainEvents)}/entities`, options),
       getFetch(`${getBaseUrl()}/getEntityMeta`, options),
     ]);
 

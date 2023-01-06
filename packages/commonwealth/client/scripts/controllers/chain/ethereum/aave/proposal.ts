@@ -314,7 +314,7 @@ export default class AaveProposal extends Proposal<
     }
 
     this._minVotingPowerNeeded = this._votingSupplyAtStart
-      .mul(this._Executor.minimumQuorum)
+      .mul(this._Executor?.minimumQuorum)
       .divn(ONE_HUNDRED_WITH_PRECISION);
 
     this._initialized = true;
