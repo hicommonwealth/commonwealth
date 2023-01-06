@@ -100,6 +100,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
       chain.defaultDenyPermissions,
       Action.VIEW_CHAT_CHANNELS
     );
+    this.contractsViewable = chain.contractsViewable;
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -139,7 +140,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     if (this.discordBotConnected && !this.channelsLoaded) {
       getChannels();
     }
-
     return (
       <div class="ChainMetadataRows">
         <div class="AvatarUploadRow">
@@ -242,17 +242,23 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         />
         <CWDropdown
           label="Contract Viewable Settings"
-          options={Object.keys(ContractsViewable).map((contractsViewableKey) => {
-            return {
-              label: ContractsViewable[contractsViewableKey],
-              value: contractsViewableKey,
-            };
-          })}
-          value={this.contractsViewable}
+          options={Object.keys(ContractsViewable).map(
+            (contractsViewableKey) => {
+              return {
+                label: ContractsViewable[contractsViewableKey],
+                value: contractsViewableKey,
+              };
+            }
+          )}
+          initialValue={{
+            value: this.contractsViewable,
+            label: this.contractsViewable,
+          }}
           onSelect={(o) => {
             // get the contracts viewable enum that corresponds to the selected option
             this.contractsViewable = ContractsViewable[o.value];
-          }}/>
+          }}
+        />
         <ToggleRow
           title="Chat Enabled"
           defaultValue={this.chatEnabled}
