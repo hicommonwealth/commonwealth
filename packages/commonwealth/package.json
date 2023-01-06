@@ -41,6 +41,7 @@
     "load-db": "chmod u+x scripts/load-db.sh && ./scripts/load-db.sh",
     "load-db-local": "psql -d commonwealth -U commonwealth -W -f local_save.dump",
     "migrate-db": "npx sequelize db:migrate",
+    "db-all": "yarn reset-db && yarn load-db && yarn migrate-db",
     "migrate-db-down": "npx sequelize db:migrate:undo",
     "create-migration": "npx sequelize migration:generate --name",
     "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get DATABASE_URL -a commonwealthapp) -a -f limited_dump.sql",
