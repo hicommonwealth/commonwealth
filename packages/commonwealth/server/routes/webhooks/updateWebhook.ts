@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../../middleware/validateChain';
 import Errors from './errors';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -13,8 +12,7 @@ const updateWebhook = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   // only admins should be able to update webhooks
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   const addresses = await req.user.getAddresses();
