@@ -1,13 +1,10 @@
 const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const common = require('./webpack.common.js');
+const common = require('./webpack.base.config.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = merge(common, {
-  entry: {
-    app: 'app.ts',
-  },
   mode: 'production',
   stats: 'errors-only',
   bail: true,
@@ -28,18 +25,4 @@ module.exports = merge(common, {
       statsOptions: { source: false },
     }),
   ],
-  module: {
-    rules: [
-      {
-        test: /\.s?css/i,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
-      },
-      {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false,
-        },
-      },
-    ],
-  },
 });

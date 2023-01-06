@@ -6,6 +6,9 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 require('dotenv').config();
 
 module.exports = {
+  entry: {
+    app: ['app.ts'],
+  },
   context: __dirname,
   devServer: {
     headers: {
@@ -193,6 +196,16 @@ module.exports = {
           options: {
             name: '[path][name].[ext]',
           },
+        },
+      },
+      {
+        test: /\.s?css$/i,
+        use: ['style-loader', 'css-loader', 'sass-loader'],
+      },
+      {
+        test: /\.m?js/,
+        resolve: {
+          fullySpecified: false,
         },
       },
     ],
