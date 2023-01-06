@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 require('dotenv').config();
 
@@ -46,6 +47,10 @@ module.exports = {
       Buffer: ['buffer', 'Buffer'],
     }),
     new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
+    new MiniCssExtractPlugin({
+      filename: "styles/[name].css",
+      ignoreOrder: true,
+    }),
   ],
   optimization: {
     splitChunks: {
@@ -200,7 +205,8 @@ module.exports = {
       },
       {
         test: /\.s?css$/i,
-        use: ['style-loader', 'css-loader', 'fast-sass-loader'],
+        use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'fast-sass-loader'],
+        sideEffects: true,
       },
       {
         test: /\.m?js/,
