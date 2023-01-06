@@ -56,6 +56,11 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
       return <PageNotFound title="Projects" />;
     }
 
+    // @TODO Remove admin toggles
+    if (!app.roles.isAdminOfEntity({ chain: app.chain?.id }) && !app.user.isSiteAdmin) {
+      return <PageNotFound />;
+    }
+
     if (!app.projects.initialized) return <PageLoading />;
 
     const projectId = identifier.split('-')[0];
