@@ -177,7 +177,7 @@ module.exports = {
         ],
         exclude: /\/node_modules\//,
         use: {
-          loader: 'swc-loader',
+          loader: 'babel-loader',
         },
       },
       {
