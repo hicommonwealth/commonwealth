@@ -16,6 +16,7 @@ export type ProfileAttributes = {
   bio?: string;
   is_default?: boolean;
   avatar_url?: string;
+  slug?: string;
   socials?: string[];
 
   // associations

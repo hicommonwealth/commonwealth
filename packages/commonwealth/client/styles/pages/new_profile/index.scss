@@ -5,35 +5,18 @@
   width: 100%;
   margin: 0 auto;
 
-  .heavy {
-    color: black;
-    font-weight: 600;
-  }
-
   .ProfilePageContainer {
     display: flex;
     flex-direction: row;
     margin: 80px 86px;
   }
 
-  .loading-spinner {
-    position: relative;
-    width: 100%;
-    min-height: 350px;
-    .cui-spinner.cui-spinner-active {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-  }
-
   .ErrorPage {
-    min-height: 240px;
     padding: 56px 0;
     text-align: center;
+
     h3 {
-      margin-bottom: 40px;
+      margin-bottom: 36px;
     }
   }
 }
@@ -49,7 +32,7 @@
 @media only screen and (max-width: $breakpoint-medium-small-max-px) {
   .ProfilePage {
     .ProfilePageContainer {
-      margin: 40px 42px;
+      margin: 40px 48px;
     }
   }
 }

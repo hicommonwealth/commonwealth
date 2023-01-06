@@ -204,8 +204,8 @@ class CommentsController {
     try {
       // TODO: Change to PUT /comment
       const response = await $.post(`${app.serverUrl()}/editComment`, {
-        address: app.user.activeAccount?.address || comment.author,
-        author_chain: app.user.activeAccount?.chain.id || comment.chain,
+        address: app.user.activeAccount.address,
+        author_chain: app.user.activeAccount.chain.id,
         id: comment.id,
         chain: comment.chain,
         body: encodeURIComponent(newBody),

@@ -28,7 +28,7 @@ class NewProfile {
     this._socials = socials;
   }
 
-  public initialize(name, email, website, bio, isDefault, avatarUrl, slug, socials) {
+  public initialize(name, email, website, bio, isDefault, avatarUrl, slug) {
     this._name = name;
     this._email = email;
     this._website = website;
@@ -36,7 +36,6 @@ class NewProfile {
     this._isDefault = isDefault;
     this._avatarUrl = avatarUrl;
     this._slug = slug;
-    this._socials = socials;
   }
 
   public static fromJSON(json) {

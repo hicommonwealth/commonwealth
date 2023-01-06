@@ -18,9 +18,6 @@ import { AvatarUpload } from '../../components/avatar_upload';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWTag } from '../../components/component_kit/cw_tag';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWForm } from '../../components/component_kit/cw_form';
 import { CWFormSection } from '../../components/component_kit/cw_form_section';
 import { CWSocials } from '../../components/component_kit/cw_socials';
@@ -41,11 +38,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private email: string;
   private error: EditProfileError;
   private failed: boolean;
-  private imageUploading: boolean;
   private loading: boolean;
   private profile: Profile;
   private profileUpdate: any;
-  private saved: boolean;
   private socials: string[];
   private username: string;
   private bio: QuillEditor;
@@ -79,21 +74,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private updateProfile = async () => {
     const response: any = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
       address: this.address,
-      ...('email' in this.profileUpdate && {
-        email: this.profileUpdate.email,
-      }),
-      ...('name' in this.profileUpdate && {
-        name: this.profileUpdate.name,
-      }),
-      ...('bio' in this.profileUpdate && {
-        bio: this.profileUpdate.bio,
-      }),
-      ...('avatarUrl' in this.profileUpdate && {
-        avatarUrl: this.profileUpdate.avatarUrl,
-      }),
-      ...('socials' in this.profileUpdate && {
-        socials: JSON.stringify(this.profileUpdate.socials),
-      }),
+      ...this.profileUpdate,
       jwt: app.user.jwt,
     }).catch(() => {
       this.error = EditProfileError.UpdateProfileFailed;
@@ -105,8 +86,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     });
 
     if (response?.status === 'Success') {
-      this.saved = true;
-      m.redraw();
       // Redirect
       setTimeout(() => {
         m.route.set(`/profile/${this.address}`);
@@ -136,7 +115,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       this.profileUpdate.avatarUrl = this.avatarUrl;
 
     if (!_.isEqual(this.socials, this.profile?.socials))
-      this.profileUpdate.socials = this.socials;
+      this.profileUpdate.socials = JSON.stringify(this.socials);
   };
 
   private handleSaveProfile = (vnode: m.Vnode<EditNewProfileAttrs>) => {
@@ -174,9 +153,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
 
     this.profileUpdate = {};
-    this.saved = false;
     this.failed = false;
-    this.imageUploading = false;
   }
 
   view(vnode: m.Vnode<EditNewProfileAttrs>) {
@@ -225,15 +202,15 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   onclick={() => {
                     // TODO: handle delete profile
                   }}
-                  className={this.saved ? 'save-button confirm' : 'save-button'}
+                  className="save-button"
                   buttonType="secondary-black"
                 />
                 <CWButton
-                  label={this.saved ? 'Saved!' : 'Save'}
+                  label="Save"
                   onclick={() => {
                     this.handleSaveProfile(vnode);
                   }}
-                  className={this.saved ? 'save-button confirm' : 'save-button'}
+                  className="save-button"
                   buttonType="primary-black"
                 />
                 </div>
@@ -260,12 +237,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   <AvatarUpload
                     scope="user"
                     account={account}
-                    uploadStartedCallback={() => {
-                      this.imageUploading = true;
-                      m.redraw();
-                    }}
                     uploadCompleteCallback={(files) => {
-                      this.imageUploading = false;
                       files.forEach((f) => {
                         if (!f.uploadURL) return;
                         const url = f.uploadURL.replace(/\?.*/, '').trim();
@@ -282,7 +254,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   name="username-form-field"
                   inputValidationFn={(val: string) => {
                     if (val.match(/[^A-Za-z0-9]/)) {
-                      return ['failure', 'Must enter characters A-Z'];
+                      return ['failure', 'Must enter characters A-Z, 0-9'];
                     } else {
                       return ['success', 'Input validated'];
                     }

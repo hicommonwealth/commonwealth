@@ -33,21 +33,11 @@ type NewProfileActivityAttrs = {
 
 export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> {
   private address: string;
-  private commentCharLimit: number;
   private selectedActivity: ProfileActivity;
-  private threadCharLimit: number;
 
   oninit() {
     this.address = m.route.param('address');
-    this.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
     this.selectedActivity = ProfileActivity.Comments;
-    this.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
-
-    // Handle text character limit
-    window.addEventListener('resize', () => {
-      this.commentCharLimit = window.innerWidth > 1024 ? 240 : 140;
-      this.threadCharLimit = window.innerWidth > 1024 ? 150 : 55;
-    });
   }
 
   view(vnode: m.Vnode<NewProfileActivityAttrs>) {
@@ -94,8 +84,6 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
         <div className="activity-content">
           <NewProfileActivityContent
             option={this.selectedActivity}
-            commentCharLimit={this.commentCharLimit}
-            threadCharLimit={this.threadCharLimit}
             address={this.address}
             threads={vnode.attrs.threads}
             comments={vnode.attrs.comments}

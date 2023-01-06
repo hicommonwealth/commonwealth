@@ -17,9 +17,10 @@ import { modelFromServer as modelThreadFromServer } from 'controllers/server/thr
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import { NewProfileHeader } from './new_profile_header';
+import { CommentWithAssociatedThread, NewProfileActivity } from './new_profile_activity';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CommentWithAssociatedThread, NewProfileActivity } from './new_profile_activity';
+import { CWText } from '../../components/component_kit/cw_text';
 
 enum ProfileError {
   None,
@@ -55,13 +56,13 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       this.profile = new Profile(response.profile);
       this.threads = response.threads.map((t) => modelThreadFromServer(t));
       const comments = response.comments.map((c) => modelCommentFromServer(c));
-      const commentsWithThread = comments.map((c) => {
+      const commentsWithAssociatedThread = comments.map((c) => {
         const thread = response.commentThreads.find(
           (t) => t.id === parseInt(c.rootProposal.replace('discussion_', ''), 10)
         );
         return { ...c, thread };
       })
-      this.comments = commentsWithThread;
+      this.comments = commentsWithAssociatedThread;
       this.chains = response.chains.map((c) => new ChainInfo(c));
       this.addresses = response.addresses.map(
         (a) =>
@@ -115,11 +116,10 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       this.content = (
         <div class="ProfilePage">
           <div class="ErrorPage">
-            <h3>Not on Commonwealth</h3>
-            <p>
-              If this is your address, sign in using your wallet to set up a
-              profile.
-            </p>
+            <CWText type="h3">Not on Commonwealth</CWText>
+            <CWText>
+              If this is your address, sign in using your wallet to set up a profile.
+            </CWText>
           </div>
         </div>
       );
@@ -128,8 +128,8 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       this.content = (
         <div class="ProfilePage">
           <div class="ErrorPage">
-            <h3>No profile found</h3>
-            <p>This address is not registered to Commonwealth.</p>
+            <CWText type="h3">No profile found</CWText>
+            <CWText>This address is not registered to Commonwealth.</CWText>
           </div>
         </div>
       );
@@ -151,6 +151,8 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
           </div>
         </div>
       );
+
+    if (!this.profile) return;
 
     return <Sublayout>{this.content}</Sublayout>;
   }

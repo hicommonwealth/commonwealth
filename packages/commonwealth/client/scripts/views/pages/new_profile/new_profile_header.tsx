@@ -27,15 +27,15 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
 
   view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
     const { profile, address } = vnode.attrs;
-    const bio = profile?.bio;
 
-    if (!bio) return;
+    if (!profile) return;
+    const bio = profile.bio;
 
     return (
       <div class="ProfileHeader">
         <div class="profile-image">
-          {profile?.avatarUrl ? (
-            <img src={profile?.avatarUrl} />
+          {profile.avatarUrl ? (
+            <img src={profile.avatarUrl} />
           ) : (
             <img
               src={`data:image/svg+xml;utf8,${encodeURIComponent(
@@ -47,7 +47,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
 
         <div class="profile-name-and-bio">
           <CWText type="h3" className="name">
-            {profile?.name}
+            {profile.name}
           </CWText>
           <div class="buttons">
             {/* TODO: Add delegate and follow buttons */}
