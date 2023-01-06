@@ -89,7 +89,7 @@ const threadsUsersCountAndAvatar = async (
     }
     return res.json([]);
   } catch (e) {
-    log.error(e);
+    log.error('Error fetching threads users count and avatar', e);
     console.log(e);
     res.json(e);
   }

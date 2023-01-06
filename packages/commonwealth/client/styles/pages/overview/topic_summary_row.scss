@@ -109,6 +109,11 @@
         color: $neutral-500;
       }
 
+      .thread-preview {
+        @include multiline-text-ellipsis(2);
+        word-break: break-word;
+      }
+
       .row-bottom {
         display: flex;
         justify-content: space-between;
@@ -116,11 +121,6 @@
         .comments-and-users {
           display: flex;
           gap: 16px;
-
-          .thread-preview {
-            @include multiline-text-ellipsis(2);
-            word-break: break-word;
-          }
 
           .comments-count {
             align-items: center;
