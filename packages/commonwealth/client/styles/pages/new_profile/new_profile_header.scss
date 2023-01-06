@@ -7,8 +7,12 @@
   border-radius: 16px;
   padding: 24px;
   height: fit-content;
-  width: 35%;
-  min-width: 0;
+  width: 100%;
+
+  @include smallInclusive {
+    margin-bottom: 16px;
+    margin-right: 0;
+  }
 
   .profile-image {
     display: flex;
@@ -17,7 +21,7 @@
     margin-bottom: 16px;
 
     img {
-      height: 160px;
+      max-height: 160px;
       border-radius: 50%;
     }
   }
@@ -57,14 +61,5 @@
         cursor: pointer;
       }
     }
-  }
-}
-
-@media only screen and (max-width: $breakpoint-small-max-px) {
-  .ProfileHeader {
-    width: 100%;
-    max-width: none;
-    margin-bottom: 16px;
-    margin-right: 0;
   }
 }

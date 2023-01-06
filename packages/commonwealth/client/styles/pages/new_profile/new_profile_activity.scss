@@ -4,12 +4,24 @@
 .ProfileActivity {
   border: 1px solid $neutral-200;
   border-radius: 16px;
-  width: 65%;
   height: fit-content;
+  width: 60vw;
+
+  @include mediumInclusive {
+    width: 50vw;
+  }
+
+  @include smallInclusive {
+    width: 100%;
+  }
 
   .activity-nav {
     display: flex;
     padding: 24px;
+
+    @include smallInclusive {
+      padding: 24px 24px 0 24px;
+    }
 
     .TabBar {
       align-items: center;
@@ -74,18 +86,8 @@
     >:last-child {
       border-bottom: none;
     }
-  }
-}
 
-@media only screen and (max-width: $breakpoint-small-max-px) {
-  .ProfileActivity {
-    width: 100%;
-
-    .activity-nav {
-      padding: 24px 24px 0 24px;
-    }
-
-    .activity-content {
+    @include smallInclusive {
       padding: 0 24px 24px 24px;
     }
   }

@@ -3,12 +3,14 @@
 .SocialAccounts {
   display: flex;
   max-width: 240px;
-  justify-content: space-evenly;
+  justify-content: center;
+  flex-wrap: wrap;
   margin: 0 auto 24px;
 
   .social-icon {
     fill: $neutral-500;
     transition: fill 0.2s ease-in-out;
+    margin: 0 8px 8px 8px;
 
     &:hover {
       fill: $neutral-700;

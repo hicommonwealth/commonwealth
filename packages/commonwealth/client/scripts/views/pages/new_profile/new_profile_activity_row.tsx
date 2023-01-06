@@ -56,8 +56,8 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
         </CWText>
         <CWText type="b2" className="gray-text">
           {isThread ? (
-            renderQuillTextBody(body)
-          ) : renderQuillTextBody(comment.text)}
+            renderQuillTextBody(body, { collapse: true })
+          ) : renderQuillTextBody(comment.text, { collapse: true })}
         </CWText>
         <div className="actions">
           <SharePopover commentId={id}/>

@@ -16,6 +16,11 @@
   }
 
   .buttons-container {
+    @include smallInclusive {
+      display: flex;
+      flex-direction: row;
+    }
+
     .buttons {
       display: flex;
 
@@ -41,6 +46,12 @@
       align-items: center;
       justify-content: flex-end;
       margin-top: 16px;
+
+      @include smallInclusive {
+        justify-content: flex-start;
+        margin-left: 16px;
+        margin-top: 0;
+      }
 
       .save-button-message {
         opacity: 0;
@@ -143,24 +154,6 @@
 
         svg, .Text {
           color: $neutral-600;
-        }
-      }
-    }
-  }
-}
-
-
-@media only screen and (max-width: $breakpoint-small-max-px) {
-  .EditProfilePage {
-    .header {
-      .buttons-container {
-        display: flex;
-        flex-direction: row;
-
-        .status {
-          justify-content: flex-start;
-          margin-left: 16px;
-          margin-top: 0;
         }
       }
     }
