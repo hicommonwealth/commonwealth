@@ -9,10 +9,10 @@ import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import { weiToTokens } from 'helpers';
+import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 import { CWAvatar } from '../../../components/component_kit/cw_avatar';
 import { ProjectRole } from '../types';
 import { getUserRoles } from '../helpers';
-import { IconName } from 'client/scripts/views/components/component_kit/cw_icons/cw_icon_lookup';
 
 type HeaderPanelAttrs = { project: Project };
 

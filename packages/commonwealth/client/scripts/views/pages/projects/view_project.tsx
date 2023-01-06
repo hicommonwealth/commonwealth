@@ -56,14 +56,12 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
       return <PageNotFound title="Projects" />;
     }
 
-    if (!app.projects.initialized) {
-      return <PageLoading />;
-    }
+    if (!app.projects.initialized) return <PageLoading />;
 
     const projectId = identifier.split('-')[0];
     this.project = app.projects.store.getById(projectId);
     if (!this.project) {
-      return <PageNotFound title="Projects" />;
+      if (app.projects.initializing) return <PageNotFound title="Projects" />;
     }
 
     const { project } = this;
@@ -90,11 +88,11 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
             </div>
             <div class="metadata-right">
               <CWTag
-                label={project.createdAt.format('MMMM D, YYYY').toString()}
+                label={`Created on: ${project.createdAt.format('MMMM D, YYYY').toString()}`}
               />
               <CWTag
                 label={
-                  `Ends at ${project.deadline} Blocks`
+                  `Ends at block: ${project.deadline}`
                 }
               />
             </div>
