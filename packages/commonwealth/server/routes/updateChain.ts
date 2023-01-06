@@ -1,3 +1,4 @@
+/* eslint-disable no-continue */
 import { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -9,6 +10,7 @@ import { ChainAttributes } from '../models/chain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
+import { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
@@ -35,7 +37,7 @@ type UpdateChainReq = ChainAttributes & {
   'snapshot[]'?: string[];
 };
 
-type UpdateChainResp = ChainAttributes;
+type UpdateChainResp = ChainAttributes & { snapshot: string[] };
 
 const updateChain = async (
   models: DB,
@@ -122,6 +124,51 @@ const updateChain = async (
     return next(new AppError(Errors.InvalidTerms));
   }
 
+  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
+    await models.CommunitySnapshotSpaces.findAll({
+      where: { chain_id: chain.id },
+      include: {
+        model: models.SnapshotSpace,
+        as: 'snapshot_space',
+      },
+    });
+
+  // Check if any snapshot spaces are being removed
+  const removedSpaces = snapshotSpaces.filter((space) => {
+    return !snapshot.includes(space.snapshot_space.snapshot_space);
+  });
+  const existingSpaces = snapshotSpaces.filter((space) => {
+    return snapshot.includes(space.snapshot_space.snapshot_space);
+  });
+  const existingSpaceNames = existingSpaces.map((space) => {
+    return space.snapshot_space.snapshot_space;
+  });
+
+  for (const spaceName of snapshot) {
+    // check if its in the mapping
+    if (!existingSpaceNames.includes(spaceName)) {
+      const spaceModelInstance = await models.SnapshotSpace.findOrCreate({
+        where: { snapshot_space: spaceName },
+      });
+
+      // if it isnt, create it
+      await models.CommunitySnapshotSpaces.create({
+        snapshot_space_id: spaceModelInstance[0].snapshot_space,
+        chain_id: chain.id,
+      });
+    }
+  }
+
+  // delete unwanted associations
+  for (const removedSpace of removedSpaces) {
+    await models.CommunitySnapshotSpaces.destroy({
+      where: {
+        snapshot_space_id: removedSpace.snapshot_space_id,
+        chain_id: chain.id,
+      },
+    });
+  }
+
   if (name) chain.name = name;
   if (description) chain.description = description;
   if (default_symbol) chain.default_symbol = default_symbol;
@@ -137,7 +184,6 @@ const updateChain = async (
   if (stages_enabled) chain.stages_enabled = stages_enabled;
   if (custom_stages) chain.custom_stages = custom_stages;
   if (terms) chain.terms = terms;
-  if (snapshot) chain.snapshot = snapshot;
   // Set default allow/deny permissions
   chain.default_allow_permissions = default_allow_permissions || BigInt(0);
   chain.default_deny_permissions = default_deny_permissions || BigInt(0);
@@ -161,7 +207,7 @@ const updateChain = async (
     return this.toString();
   };
 
-  return success(res, chain.toJSON());
+  return success(res, { ...chain.toJSON(), snapshot });
 };
 
 export default updateChain;

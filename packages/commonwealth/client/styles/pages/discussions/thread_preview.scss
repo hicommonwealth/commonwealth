@@ -69,6 +69,11 @@
       }
     }
 
+    .thread-preview {
+      @include multiline-text-ellipsis($max-lines: 2);
+      word-break: break-word;
+    }
+
     .title-row,
     .tags-row {
       display: flex;
@@ -80,10 +85,6 @@
     .row-bottom {
       display: flex;
       justify-content: space-between;
-
-      @include mediumAndUp { // hack to be removed on completion of discussion listings
-        margin-top: -28px;
-      }
 
       .comments-count {
         align-items: center;

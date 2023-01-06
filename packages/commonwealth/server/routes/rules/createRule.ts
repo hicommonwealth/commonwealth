@@ -1,4 +1,3 @@
-import validateChain from '../../middleware/validateChain';
 import { DB } from '../../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { TypedResponse, success, TypedRequestBody } from '../../types';
@@ -21,14 +20,6 @@ const createRule = async (
   req: TypedRequestBody<CreateRuleReq>,
   res: TypedResponse<CreateRuleResp>
 ) => {
-  try {
-    const [, error] = await validateChain(models, req.body);
-    if (error) {
-      throw new AppError(error);
-    }
-  } catch (err) {
-    throw new AppError(err);
-  }
 
   // validate rule
   if (!req.body.rule) {

@@ -1,12 +1,11 @@
 import axios from 'axios';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { AbiItem } from 'web3-utils';
-import { parseAbiItemsFromABI } from '../../shared/abi_utils';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { ETHERSCAN_JS_API_KEY } from '../config';
 import { ContractAttributes } from '../models/contract';
 import { ContractAbiAttributes } from '../models/contract_abi';
+import validateAbi from '../util/abiValidation';
 
 export enum Network {
   Mainnet = 'Mainnet',
@@ -26,9 +25,10 @@ export const networkIdToName = {
 
 export const Errors = {
   NoEtherscanApiKey: 'Etherscan API key not found',
-  NoContractFound: 'Contract not found.',
+  NoContractFound: 'Contract Instance not found',
   EtherscanResponseFailed: 'Etherscan Response failed',
   InvalidABI: 'Invalid ABI',
+  InvalidChainNode: 'Invalid Chain Node',
 };
 
 type FetchEtherscanContractReq = {
@@ -46,7 +46,7 @@ const fetchEtherscanContract = async (
   res: TypedResponse<FetchEtherscanContractResp>
 ) => {
   if (!ETHERSCAN_JS_API_KEY) {
-    throw new ServerError(Errors.NoEtherscanApiKey);
+    throw new AppError(Errors.NoEtherscanApiKey);
   }
 
   const { address } = req.body;
@@ -60,10 +60,6 @@ const fetchEtherscanContract = async (
     throw new AppError(Errors.NoContractFound);
   }
 
-  if (contract.abi_id !== null) {
-    throw new AppError('Contract already has an abi entry in the database');
-  }
-
   // get chain node of contract from DB
   const chainNode = await models.ChainNode.findOne({
     where: { id: contract.chain_node_id },
@@ -73,7 +69,7 @@ const fetchEtherscanContract = async (
     !chainNode.eth_chain_id ||
     !networkIdToName[chainNode.eth_chain_id]
   ) {
-    return new AppError('Invalid chain node');
+    return new AppError(Errors.InvalidChainNode);
   }
 
   const network = networkIdToName[chainNode.eth_chain_id];
@@ -83,41 +79,30 @@ const fetchEtherscanContract = async (
   // eslint-disable-next-line max-len
   const url = `https://${fqdn}.etherscan.io/api?module=contract&action=getsourcecode&address=${address}&apikey=${ETHERSCAN_JS_API_KEY}`;
 
-  try {
-    const response = await axios.get(url, { timeout: 3000 });
-    if (response.status === 200) {
-      // Checks if etherscan abi is available by calling the fetchEtherscanContract api route
-      const etherscanContract = response.data.result[0];
-      if (etherscanContract && etherscanContract['ABI'] !== '') {
-        const abiString = etherscanContract['ABI'];
-        // Parse ABI to validate it as a properly formatted ABI
-        const abiAsRecord = JSON.parse(abiString);
-        if (!abiAsRecord) {
-          throw new AppError(Errors.InvalidABI);
-        }
-        const abiItems: AbiItem[] = parseAbiItemsFromABI(abiAsRecord);
-        if (!abiItems) {
-          throw new AppError(Errors.InvalidABI);
-        }
-        const nickname = etherscanContract['ContractName'];
-        // Create new ABI
-        // If source code fetch from etherscan is successful, then the abi is a verified one
-        const [contract_abi] = await models.ContractAbi.findOrCreate({
-          where: { nickname, abi: abiString, verified: true },
-        });
-        // update contract with new ABI
-        contract.abi_id = contract_abi.id;
-        await contract.save();
-        return success(res, {
-          contractAbi: contract_abi.toJSON(),
-          contract: contract.toJSON(),
-        });
-      }
-    } else {
-      throw new AppError(Errors.EtherscanResponseFailed);
+  const response = await axios.get(url, { timeout: 3000 });
+  if (response.status === 200) {
+    // Checks if etherscan abi is available by calling the fetchEtherscanContract api route
+    const etherscanContract = response.data.result[0];
+    if (etherscanContract && etherscanContract['ABI'] !== '') {
+      const abiString = etherscanContract['ABI'];
+      validateAbi(abiString);
+
+      const nickname = etherscanContract['ContractName'];
+      // Create new ABI
+      // If source code fetch from etherscan is successful, then the abi is a verified one
+      const [contract_abi] = await models.ContractAbi.findOrCreate({
+        where: { nickname, abi: abiString, verified: true },
+      });
+      // update contract with new ABI
+      contract.abi_id = contract_abi.id;
+      await contract.save();
+      return success(res, {
+        contractAbi: contract_abi.toJSON(),
+        contract: contract.toJSON(),
+      });
     }
-  } catch (error) {
-    throw new ServerError(error.message);
+  } else {
+    throw new AppError(Errors.EtherscanResponseFailed);
   }
 };
 

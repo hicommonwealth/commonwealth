@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import { AppError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
-import validateChain from '../middleware/validateChain';
 import { getProposalUrl } from '../../shared/utils';
 import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import emitNotifications from '../util/emitNotifications';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',
@@ -30,8 +30,9 @@ const addEditors = async (
   } catch (e) {
     return next(new AppError(Errors.InvalidEditorFormat));
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+
+  const chain = req.chain;
+
   const author = req.address;
 
   const userOwnedAddressIds = (await req.user.getAddresses())
@@ -124,7 +125,7 @@ const addEditors = async (
     collaborators.map((collaborator) => {
       if (!collaborator.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-      models.Subscription.emitNotifications(
+      emitNotifications(
         models,
         NotificationCategories.NewCollaboration,
         `user-${collaborator.User.id}`,

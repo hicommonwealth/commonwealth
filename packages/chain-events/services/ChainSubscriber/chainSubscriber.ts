@@ -25,7 +25,7 @@ import {
 import { ChainAttributes, IListenerInstances } from './types';
 import Rollbar from 'rollbar';
 import fetch from "node-fetch";
-import {StatsDController} from "common-common/src/statsd";
+import { StatsDController } from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 

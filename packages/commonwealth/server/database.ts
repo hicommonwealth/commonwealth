@@ -20,6 +20,8 @@ import CommentFactory from './models/comment';
 import CommunityBannerFactory from './models/community_banner';
 import CommunityContractFactory from './models/community_contract';
 import CommunityRoleFactory from './models/community_role';
+import CommunitySnapshotSpaceFactory from './models/community_snapshot_spaces';
+import SnapshotSpaceFactory from './models/snapshot_spaces';
 import ContractFactory from './models/contract';
 import ContractAbiFactory from './models/contract_abi';
 import DiscussionDraftFactory from './models/discussion_draft';
@@ -50,6 +52,8 @@ import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
+import SnapshotProposalFactory from './models/snapshot_proposal';
+import DiscordBotConfigFactory from './models/discord_bot_config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -63,14 +67,10 @@ export const sequelize = new Sequelize(DATABASE_URI, {
           log.trace(msg);
         },
   dialectOptions:
-    process.env.NODE_ENV !== 'production'
-      ? {
-          requestTimeout: 40000,
-        }
-      : {
-          requestTimeout: 40000,
-          ssl: { rejectUnauthorized: false },
-        },
+    process.env.NODE_ENV !== 'production' ? { requestTimeout: 40000 } :
+    DATABASE_URI === "postgresql://commonwealth:edgeware@localhost/commonwealth" ?
+    { requestTimeout: 40000, ssl: false } :
+    { requestTimeout: 40000, ssl: { rejectUnauthorized: false } },
   pool: {
     max: 10,
     min: 0,
@@ -97,7 +97,9 @@ const models: Models = {
   CommunityContract: CommunityContractFactory(sequelize, DataTypes),
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
+  CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
+  DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),
   InviteCode: InviteCodeFactory(sequelize, DataTypes),
   LinkedThread: LinkedThread(sequelize, DataTypes),
@@ -121,6 +123,8 @@ const models: Models = {
   SocialAccount: SocialAccountFactory(sequelize, DataTypes),
   SsoToken: SsoTokenFactory(sequelize, DataTypes),
   StarredCommunity: StarredCommunityFactory(sequelize, DataTypes),
+  SnapshotProposal: SnapshotProposalFactory(sequelize, DataTypes),
+  SnapshotSpace: SnapshotSpaceFactory(sequelize, DataTypes),
   Subscription: SubscriptionFactory(sequelize, DataTypes),
   Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
