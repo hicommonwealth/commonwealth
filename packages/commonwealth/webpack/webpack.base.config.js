@@ -1,6 +1,5 @@
 const path = require('path');
 const webpack = require('webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
@@ -32,9 +31,6 @@ module.exports = {
         process.env.DISCORD_UI_URL || 'http://localhost:3000'
       ),
     }),
-    new CopyWebpackPlugin([
-      { from: path.resolve(__dirname, '../static'), to: 'static' },
-    ]),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
     }),

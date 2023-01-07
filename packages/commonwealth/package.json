@@ -143,7 +143,6 @@
     "connect-session-sequelize": "^7.1.1",
     "construct-ui": "^0.3.4",
     "cookie-parser": "^1.4.4",
-    "copy-webpack-plugin": "^4.6.0",
     "crypto-browserify": "^3.12.0",
     "crypto-js": "^4.1.1",
     "css-loader": "^2.1.0",
