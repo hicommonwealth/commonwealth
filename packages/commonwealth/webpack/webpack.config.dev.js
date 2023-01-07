@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
+const { DuplicatesPlugin } = require("inspectpack/plugin");
 
 module.exports = merge(common, {
   entry: {
@@ -37,6 +38,12 @@ module.exports = merge(common, {
       CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001'),
     }),
     new webpack.HotModuleReplacementPlugin(), // used for hot reloading
+    new DuplicatesPlugin({
+      // Emit compilation warning or error? (Default: `false`)
+      emitErrors: false,
+      // Display full duplicates information? (Default: `false`)
+      verbose: false
+    }),
   ],
   module: {
     rules: [

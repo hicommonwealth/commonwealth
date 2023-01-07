@@ -48,13 +48,25 @@ module.exports = {
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
-        bitcoin: {
-          test: /[\\/]node_modules[\\/](bip39)[\\/]/,
-          name: 'bitcoin',
+        bnjs: {
+          test: /[\\/]node_modules[\\/]bn.js[\\/]/,
+          name: 'bnjs',
+          chunks: 'all',
+          minSize: 0,
+        },
+        quill: {
+          test: /[\\/]node_modules[\\/]quill[\\/]/,
+          name: 'quilljs',
           chunks: 'all',
         },
+        secp256k1: {
+          test: /[\\/]node_modules[\\/]secp256k1[\\/]/,
+          name: 'secp256k1',
+          chunks: 'all',
+          minSize: 0,
+        },
         ethereum: {
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject|ethereumjs-abi|web3-eth-accounts|)[\\/]/,
+          test: /[\\/]node_modules[\\/](web3|ethers|@walletconnect|@ethersproject|ethereumjs-abi|web3-eth-accounts|)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
@@ -84,7 +96,7 @@ module.exports = {
           chunks: 'all',
         },
         snapshot: {
-          test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
+          test: /[\\/]node_modules[\\/](@apollo)[\\/]/,
           name: 'snapshot',
           chunks: 'all',
         },
