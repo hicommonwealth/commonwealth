@@ -1,5 +1,6 @@
 import { IdStore } from 'stores';
 import $ from 'jquery';
+import m from 'mithril';
 import {
   ICuratedProjectFactory__factory,
   ICuratedProject__factory,
@@ -52,7 +53,7 @@ export default class ProjectsController {
       options.type_id = projectId;
     }
     const entityJSON = await getFetch(
-      `${getBaseUrl(ServiceUrls.chainEvents)}/entities`,
+      `${getBaseUrl()}/entities`,
       {
         chain: ChainNetwork.CommonProtocol,
         type_id: projectId
@@ -78,7 +79,7 @@ export default class ProjectsController {
 
     // entities contain the needed data, entityMeta contains source_chain
     const [entities, entityMetas] = await Promise.all([
-      getFetch(`${getBaseUrl(ServiceUrls.chainEvents)}/entities`, options),
+      getFetch(`${getBaseUrl()}/entities`, options),
       getFetch(`${getBaseUrl()}/getEntityMeta`, options),
     ]);
 
@@ -116,6 +117,7 @@ export default class ProjectsController {
     }
     this._initialized = true;
     this._initializing = false;
+    m.redraw(); // force redraw to show projects @TODO Remove hack
   }
 
   public async create(

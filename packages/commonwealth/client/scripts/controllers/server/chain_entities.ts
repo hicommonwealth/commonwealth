@@ -94,8 +94,8 @@ class ChainEntityController {
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
-      getFetch(`${getBaseUrl(ServiceUrls.chainEvents)}/entities`, options),
-      getFetch(getBaseUrl() + '/getEntityMeta', options),
+      getFetch(`${getBaseUrl()}/entities`, options),
+      getFetch(`${getBaseUrl()}/getEntityMeta`, options),
     ]);
 
     if (Array.isArray(entities)) {
@@ -117,7 +117,7 @@ class ChainEntityController {
   }
 
   public async refreshRawEntities(chain: string) {
-    const entities = await getFetch(`${getBaseUrl(ServiceUrls.chainEvents)}/entities`, { chain });
+    const entities = await getFetch(`${getBaseUrl()}/entities`, { chain });
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);
