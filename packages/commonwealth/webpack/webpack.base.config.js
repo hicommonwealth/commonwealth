@@ -42,9 +42,9 @@ module.exports = {
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
-    new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
+    new webpack.IgnorePlugin({resourceRegExp: /\.md$/}),
     new MiniCssExtractPlugin({
-      filename: "styles/[name].[contenthash].css",
+      filename: 'styles/[name].[contenthash].css',
       ignoreOrder: true,
     }),
   ],
