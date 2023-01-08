@@ -21,7 +21,7 @@ import {
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
 import { StatsDController } from 'common-common/src/statsd';
-import { BrokerConfig } from 'rascal';
+import type { BrokerConfig } from 'rascal';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import ViewCountCache from './server/util/viewCountCache';

@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import {
   ChainNetwork,
   ChainType,
@@ -7,10 +7,10 @@ import {
   ProposalType,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 import {
   getProposalUrl,
@@ -24,8 +24,8 @@ import {
 } from '../../shared/analytics/types';
 import { SENDGRID_API_KEY } from '../config';
 import checkRule from '../util/rules/checkRule';
-import RuleCache from '../util/rules/ruleCache';
-import BanCache from '../util/banCheckCache';
+import type RuleCache from '../util/rules/ruleCache';
+import type BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 import emitNotifications from '../util/emitNotifications';

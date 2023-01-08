@@ -1,7 +1,7 @@
-import { Transaction } from 'sequelize/types';
+import type { Transaction } from 'sequelize/types';
 import { RuleType } from '../util/rules/ruleTypes';
 import { findOneRole } from '../util/roles';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 type SchemaT = { AdminOnlyRule: [] };
 

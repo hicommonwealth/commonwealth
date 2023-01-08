@@ -4,7 +4,7 @@ import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
 import 'pages/landing/tokens_community_hero.scss';
-import { Chain, Token } from './index';
+import type { Chain, Token } from './index';
 
 export const placeholderChain = {
   img: 'static/img/add.svg',

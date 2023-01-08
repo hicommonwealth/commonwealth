@@ -1,7 +1,8 @@
 import IdStore from './IdStore';
+import type {
+  AnyProposal} from '../models';
 import {
   Reaction,
-  AnyProposal,
   Thread,
   Comment,
   Proposal,

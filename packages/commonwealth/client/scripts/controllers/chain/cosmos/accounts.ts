@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import { IApp } from 'state';
-import CosmosChain from 'controllers/chain/cosmos/chain';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
-import { IAccountsModule } from 'models';
+import type { IApp } from 'state';
+import type CosmosChain from 'controllers/chain/cosmos/chain';
+import type { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 import CosmosAccount from './account';
 

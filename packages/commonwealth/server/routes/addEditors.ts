@@ -1,10 +1,10 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { AppError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 import { getProposalUrl } from '../../shared/utils';
-import { DB } from '../models';
+import type { DB } from '../models';
 import emitNotifications from '../util/emitNotifications';
 
 export const Errors = {

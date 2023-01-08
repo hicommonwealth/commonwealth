@@ -1,4 +1,4 @@
-import { Server } from 'socket.io';
+import type { Server } from 'socket.io';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { addPrefix, factory } from 'common-common/src/logging';
@@ -10,8 +10,8 @@ import {
 } from '../../shared/types';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
-import { DB } from '../models';
-import { RedisCache } from 'common-common/src/redisCache';
+import type { DB } from '../models';
+import type { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(addPrefix(__filename));
 

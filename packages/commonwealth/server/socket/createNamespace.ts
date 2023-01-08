@@ -1,11 +1,12 @@
-import { Server } from 'socket.io';
+import type { Server } from 'socket.io';
 import { addPrefix, factory } from 'common-common/src/logging';
-import {
+import type {
   SnapshotProposalNotification,
   ChainEventNotification,
+  WebsocketNamespaces} from '../../shared/types';
+import {
   WebsocketEngineEvents,
-  WebsocketMessageNames,
-  WebsocketNamespaces,
+  WebsocketMessageNames
 } from '../../shared/types';
 import { authenticate } from './index';
 

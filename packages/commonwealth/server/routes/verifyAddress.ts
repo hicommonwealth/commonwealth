@@ -1,13 +1,13 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 
 import { StargateClient } from '@cosmjs/stargate';
 import { bech32 } from 'bech32';
 import bs58 from 'bs58';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
-import { KeyringOptions } from '@polkadot/keyring/types';
+import type { KeyringOptions } from '@polkadot/keyring/types';
 import { stringToU8a, hexToU8a } from '@polkadot/util';
-import { KeypairType } from '@polkadot/util-crypto/types';
+import type { KeypairType } from '@polkadot/util-crypto/types';
 import * as ethUtil from 'ethereumjs-util';
 import {
   recoverTypedSignature,
@@ -15,11 +15,12 @@ import {
 } from '@metamask/eth-sig-util';
 
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import type {
+  StdSignDoc} from '@cosmjs/amino';
 import {
   pubkeyToAddress,
   serializeSignDoc,
-  decodeSignature,
-  StdSignDoc,
+  decodeSignature
 } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';
@@ -31,12 +32,12 @@ import {
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { addressSwapper } from '../../shared/utils';
-import { ChainInstance } from '../models/chain';
-import { ProfileAttributes } from '../models/profile';
-import { AddressInstance } from '../models/address';
+import type { ChainInstance } from '../models/chain';
+import type { ProfileAttributes } from '../models/profile';
+import type { AddressInstance } from '../models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { DynamicTemplate } from '../../shared/types';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';

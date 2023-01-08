@@ -1,5 +1,5 @@
 import IdStore from './IdStore';
-import { IHasId, ISerializable } from './interfaces';
+import type { IHasId, ISerializable } from './interfaces';
 
 function getLocalStorageKey(prefix: string, chain: string, name: string, id: string) {
   return `${prefix}_${chain}_${name}_${id}`;

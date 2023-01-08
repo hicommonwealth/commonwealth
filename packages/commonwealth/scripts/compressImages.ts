@@ -6,7 +6,8 @@
 import { Op } from 'sequelize';
 import fetch from 'node-fetch';
 import sharp from 'sharp';
-import AWS, { S3 } from 'aws-sdk';
+import type { S3 } from 'aws-sdk';
+import AWS from 'aws-sdk';
 import models, { sequelize } from '../server/database';
 
 const s3 = new AWS.S3();

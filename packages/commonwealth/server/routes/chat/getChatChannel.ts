@@ -1,9 +1,10 @@
 import { Action } from 'common-common/src/permissions';
 import { checkReadPermitted } from '../../util/roles';
-import { DB } from '../../models';
+import type { DB } from '../../models';
 import { AppError } from 'common-common/src/errors';
-import { success, TypedRequestQuery, TypedResponse } from '../../types';
-import { ChatChannelAttributes } from '../../models/chat_channel';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { success } from '../../types';
+import type { ChatChannelAttributes } from '../../models/chat_channel';
 
 export const Errors = {
   NoChannelId: 'No channel id given',

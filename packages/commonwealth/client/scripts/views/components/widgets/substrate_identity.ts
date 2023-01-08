@@ -6,10 +6,11 @@ import _ from 'lodash';
 import { link } from 'helpers';
 
 import app from 'state';
-import { Account, Profile } from 'models';
+import type { Account, Profile } from 'models';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/adapter';
-import SubstrateIdentity, {
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type SubstrateIdentity from 'controllers/chain/substrate/identity';
+import {
   IdentityQuality,
   getIdentityQuality,
 } from 'controllers/chain/substrate/identity';

@@ -7,16 +7,17 @@ import $ from 'jquery';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
+import type {
+  Profile,
+  ChainEntity,
+  Topic} from 'models';
 import {
   Thread,
   Attachment,
   ThreadStage,
   NodeInfo,
-  Profile,
-  ChainEntity,
   NotificationSubscription,
-  Poll,
-  Topic,
+  Poll
 } from 'models';
 import { NotificationCategories } from 'common-common/src/types';
 
@@ -24,7 +25,7 @@ import { notifyError } from 'controllers/app/notifications';
 import { updateLastVisited } from 'controllers/app/login';
 import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { LinkedThreadAttributes } from 'server/models/linked_thread';
+import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;

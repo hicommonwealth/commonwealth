@@ -1,4 +1,4 @@
-import { RuleType } from '../util/rules/ruleTypes';
+import type { RuleType } from '../util/rules/ruleTypes';
 import AdminOnlyRule from './adminOnly';
 import AllowListRule from './allowList';
 import AnyRule from './any';

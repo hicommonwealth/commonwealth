@@ -3,8 +3,10 @@ import moment from 'moment';
 import SearchStore from 'stores/SearchStore';
 import app from 'state';
 import { SearchContentType } from 'types';
-import { SearchScope, SearchParams } from '../../models/SearchQuery';
-import { Thread, SearchQuery } from '../../models';
+import type { SearchParams } from '../../models/SearchQuery';
+import { SearchScope } from '../../models/SearchQuery';
+import type { Thread} from '../../models';
+import { SearchQuery } from '../../models';
 import { modelFromServer } from './threads';
 
 const SEARCH_PREVIEW_SIZE = 6;

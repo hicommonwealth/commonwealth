@@ -1,10 +1,11 @@
 /* eslint-disable no-restricted-syntax */
-import { NextFunction } from 'express';
+import type { NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import validateRoles from '../util/validateRoles';
-import { DB } from '../models';
-import { TopicAttributes } from '../models/topic';
-import { TypedRequestBody, TypedResponse, success } from '../types';
+import type { DB } from '../models';
+import type { TopicAttributes } from '../models/topic';
+import type { TypedRequestBody, TypedResponse} from '../types';
+import { success } from '../types';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));

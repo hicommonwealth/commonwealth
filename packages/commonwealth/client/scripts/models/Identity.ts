@@ -1,5 +1,5 @@
-import { Coin } from 'adapters/currency';
-import { IHasId } from 'stores';
+import type { Coin } from 'adapters/currency';
+import type { IHasId } from 'stores';
 
 abstract class Identity<C extends Coin, Account> implements IHasId {
   public readonly account: Account;

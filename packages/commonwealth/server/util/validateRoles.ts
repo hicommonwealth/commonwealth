@@ -1,5 +1,5 @@
 import { Request } from 'express';
-import { Permission } from '../models/role';
+import type { Permission } from '../models/role';
 import { findOneRole } from './roles';
 
 // Roles hierarchically encompass the roles below them.

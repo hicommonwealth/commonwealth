@@ -2,37 +2,40 @@ import _ from 'underscore';
 import BN from 'bn.js';
 
 import { SubstrateTypes } from 'chain-events/src';
-import { ApiPromise } from '@polkadot/api';
-import { Vec } from '@polkadot/types';
-import { ITuple } from '@polkadot/types/types';
-import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
+import type { ApiPromise } from '@polkadot/api';
+import type { Vec } from '@polkadot/types';
+import type { ITuple } from '@polkadot/types/types';
+import type { AccountId, BalanceOf } from '@polkadot/types/interfaces';
 import { isFunction } from '@polkadot/util';
 
-import {
+import type {
   ISubstrateDemocracyProposal,
-  SubstrateCoin,
+  SubstrateCoin} from 'adapters/chain/substrate/types';
+import {
   formatCall,
 } from 'adapters/chain/substrate/types';
 import { formatProposalHashShort } from 'helpers';
 import { ChainBase, ProposalType } from 'common-common/src/types';
+import type {
+  ProposalEndTime,
+  Account,
+  ChainEntity,
+  ChainEvent} from 'models';
 import {
   Proposal,
   ProposalStatus,
-  ProposalEndTime,
   DepositVote,
   VotingType,
-  VotingUnit,
-  Account,
-  ChainEntity,
-  ChainEvent,
+  VotingUnit
 } from 'models';
 
 import { chainEntityTypeToProposalSlug } from 'identifiers';
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstrateDemocracyProposals from './democracy_proposals';
-import { SubstrateDemocracyReferendum } from './democracy_referendum';
-import Substrate from './adapter';
+import type SubstrateChain from './shared';
+import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './account';
+import type SubstrateDemocracyProposals from './democracy_proposals';
+import type { SubstrateDemocracyReferendum } from './democracy_referendum';
+import type Substrate from './adapter';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,

@@ -4,7 +4,7 @@ import 'components/widgets/user_gallery.scss';
 import m from 'mithril';
 import _ from 'lodash';
 
-import { Account, AddressInfo } from 'models';
+import type { Account, AddressInfo } from 'models';
 import app from 'state';
 import User, { AnonymousUser } from './user';
 

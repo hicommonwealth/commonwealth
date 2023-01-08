@@ -1,5 +1,5 @@
 import { NotificationCategories } from 'common-common/src/types';
-import { CWEvent } from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
 import models from '../../../../server/database';
 import ceModels from 'chain-events/services/database/database';
 import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';

@@ -1,8 +1,9 @@
 import Sequelize, {} from 'sequelize';
 import { query, validationResult } from 'express-validator';
-import { GetReactionsReq, GetReactionsResp } from 'common-common/src/api/extApiTypes';
-import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
-import { DB } from '../../models';
+import type { GetReactionsReq, GetReactionsResp } from 'common-common/src/api/extApiTypes';
+import type { TypedRequestQuery, TypedResponse} from '../../types';
+import { success, failure } from '../../types';
+import type { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;

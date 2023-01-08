@@ -1,8 +1,8 @@
 import moment from 'moment';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getNextPollEndingTime } from '../../shared/utils';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 

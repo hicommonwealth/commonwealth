@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 
 import app from 'state';
-import { NotificationSubscription, Thread } from 'models';
+import type { NotificationSubscription, Thread } from 'models';
 import { notifySuccess } from 'controllers/app/notifications';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
 

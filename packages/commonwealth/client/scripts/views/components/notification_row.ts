@@ -3,12 +3,14 @@ import 'components/notification_row.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
-import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
+import type { CWEvent} from 'chain-events/src';
+import { Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
-import { IPostNotificationData } from 'types';
+import type { IPostNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import { Notification, AddressInfo } from 'models';
+import type { Notification} from 'models';
+import { AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';

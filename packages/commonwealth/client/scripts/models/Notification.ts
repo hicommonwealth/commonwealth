@@ -1,6 +1,6 @@
 import moment from 'moment';
-import { ChainEventType } from 'models/index';
-import NotificationSubscription from './NotificationSubscription';
+import type { ChainEventType } from 'models/index';
+import type NotificationSubscription from './NotificationSubscription';
 import ChainEvent from './ChainEvent';
 
 class Notification {

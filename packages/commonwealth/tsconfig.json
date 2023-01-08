@@ -4,6 +4,7 @@
     "jsx": "preserve",
     "outDir": "./build",
     "baseUrl": ".",
+    "importsNotUsedAsValues": "error",
     "paths": {
       "common-common": ["../../packages/common-common"],
       "common-common/*": ["../../packages/common-common/*"],

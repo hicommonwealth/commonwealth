@@ -1,5 +1,5 @@
 import { NotificationCategories } from 'common-common/src/types';
-import { IPostNotificationData } from './types';
+import type { IPostNotificationData } from './types';
 import { getProposalUrl, renderQuillDeltaToText, smartTrim, formatAddressShort } from './utils';
 
 // forum notification format:

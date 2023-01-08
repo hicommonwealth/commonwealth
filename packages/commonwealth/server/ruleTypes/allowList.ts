@@ -1,4 +1,5 @@
-import { RuleType, RuleArgumentType } from '../util/rules/ruleTypes';
+import type { RuleArgumentType } from '../util/rules/ruleTypes';
+import { RuleType } from '../util/rules/ruleTypes';
 
 type SchemaT = { AllowListRule: [ string[] ] };
 

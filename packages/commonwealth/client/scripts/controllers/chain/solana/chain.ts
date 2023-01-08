@@ -1,12 +1,14 @@
-import { ITXModalData, NodeInfo, IChainModule, ChainInfo } from 'models';
-import { ApiStatus, IApp } from 'state';
+import type { ITXModalData, IChainModule, ChainInfo } from 'models';
+import { NodeInfo } from 'models';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
 import m from 'mithril';
 import moment from 'moment';
 import BN from 'bn.js';
 import * as solw3 from '@solana/web3.js';
 
 import { SolanaToken } from './types';
-import SolanaAccount from './account';
+import type SolanaAccount from './account';
 
 export default class SolanaChain implements IChainModule<SolanaToken, SolanaAccount> {
   private _denom: string;

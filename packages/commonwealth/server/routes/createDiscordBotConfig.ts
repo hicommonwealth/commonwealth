@@ -1,11 +1,12 @@
 import { AppError } from 'common-common/src/errors';
+import type {
+  TypedRequestBody,
+  TypedResponse} from '../types';
 import {
   success,
-  TypedRequestBody,
-  TypedRequestQuery,
-  TypedResponse,
+  TypedRequestQuery
 } from '../types';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { BanAttributes } from '../models/ban';
 import validateRoles from '../util/validateRoles';
 

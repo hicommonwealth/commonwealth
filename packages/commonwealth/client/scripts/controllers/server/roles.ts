@@ -1,23 +1,25 @@
 import $ from 'jquery';
 import app from 'state';
 
-import {
+import type {
   AddressInfo,
   RoleInfo,
-  Account,
-  RolePermission,
-  ChainInfo,
-} from 'models';
+  ChainInfo} from 'models';
 import {
+  Account,
+  RolePermission
+} from 'models';
+import type {
   Action,
+  Permissions} from 'common-common/src/permissions';
+import {
   BASE_PERMISSIONS,
   computePermissions,
   isPermitted,
-  PermissionError,
-  Permissions,
+  PermissionError
 } from 'common-common/src/permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
-import { UserController } from './user';
+import type { UserController } from './user';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {
   switch (permission) {

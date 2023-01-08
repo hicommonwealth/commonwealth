@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import ViewCountCache from '../util/viewCountCache';
+import type { Request, Response, NextFunction } from 'express';
+import type ViewCountCache from '../util/viewCountCache';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { sequelize } from '../database';
 import { AppError, ServerError } from 'common-common/src/errors';
 

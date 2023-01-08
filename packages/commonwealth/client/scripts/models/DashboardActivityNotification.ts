@@ -1,10 +1,11 @@
-import { IChainEventData, SupportedNetwork } from 'chain-events/src';
+import type { IChainEventData, SupportedNetwork } from 'chain-events/src';
+import type {
+  ChainEventType} from 'models';
 import {
   NodeInfo,
   Notification,
   ChainEvent,
-  NotificationSubscription,
-  ChainEventType,
+  NotificationSubscription
 } from 'models';
 import moment from 'moment';
 

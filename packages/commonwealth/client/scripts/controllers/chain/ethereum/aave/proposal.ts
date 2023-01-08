@@ -5,29 +5,31 @@ import $ from 'jquery';
 import bs58 from 'bs58';
 import { AaveTypes } from 'chain-events/src';
 import { ProposalType } from 'common-common/src/types';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
+import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { formatNumberLong } from 'adapters/currency';
 
-import {
-  Proposal,
+import type {
   IVote,
   ITXModalData,
-  VotingType,
-  VotingUnit,
-  ProposalStatus,
   ProposalEndTime,
   ChainEntity,
-  ChainEvent,
+  ChainEvent} from 'models';
+import {
+  Proposal,
+  VotingType,
+  VotingUnit,
+  ProposalStatus
 } from 'models';
 import { blocknumToTime } from 'helpers';
 
-import AaveAPI, { AaveExecutor } from './api';
-import AaveGovernance from './governance';
+import type { AaveExecutor } from './api';
+import type AaveAPI from './api';
+import type AaveGovernance from './governance';
 import { attachSigner } from '../contractApi';
-import AaveChain from './chain';
-import EthereumAccounts from '../accounts';
-import EthereumAccount from '../account';
+import type AaveChain from './chain';
+import type EthereumAccounts from '../accounts';
+import type EthereumAccount from '../account';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;

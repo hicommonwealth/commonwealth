@@ -1,6 +1,6 @@
 import Sequelize, { Op } from 'sequelize';
-import { Response, NextFunction } from 'express';
-import { DB } from '../models';
+import type { Response, NextFunction } from 'express';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 

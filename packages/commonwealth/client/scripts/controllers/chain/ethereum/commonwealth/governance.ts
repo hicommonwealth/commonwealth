@@ -1,16 +1,17 @@
-import { ProposalModule, ITXModalData } from 'models';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
 
 import { ERC20Token, EthereumCoin } from 'adapters/chain/ethereum/types';
 // import { ICommonwealthProposalResponse } from 'adapters/chain/moloch/types';
 
 // import { CommonwealthEvents } from 'chain-events/src';
 
-import { IApp } from 'state';
+import type { IApp } from 'state';
 
 // import CommonwealthProposal from './proposal';
-import CommonwealthAPI from './api';
+import type CommonwealthAPI from './api';
 import Commonwealth from './adapter';
-import CommonwealthChain from './chain';
+import type CommonwealthChain from './chain';
 
 export default class CommonwealthGovernance extends ProposalModule<
   any,

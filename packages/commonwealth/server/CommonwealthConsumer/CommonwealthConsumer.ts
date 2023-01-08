@@ -1,9 +1,10 @@
 import { RabbitMQController, getRabbitMQConfig } from 'common-common/src/rabbitmq';
+import type {
+  RabbitMQSubscription} from 'common-common/src/serviceConsumer';
 import {
-  RabbitMQSubscription,
   ServiceConsumer,
 } from 'common-common/src/serviceConsumer';
-import { BrokerConfig } from 'rascal';
+import type { BrokerConfig } from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import Rollbar from "rollbar";

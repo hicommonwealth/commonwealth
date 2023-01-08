@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import app from 'state';
 import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
-import {io, Socket} from 'socket.io-client';
+import type { Socket} from 'socket.io-client';
+import {io} from 'socket.io-client';
 import _ from 'lodash';
 import m from 'mithril';
 

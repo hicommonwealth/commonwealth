@@ -1,12 +1,12 @@
-import { Logger } from 'typescript-logging';
+import type { Logger } from 'typescript-logging';
 import { NotificationCategories } from 'common-common/src/types';
 import {
   RascalPublications, RmqCENotificationCUD
 } from 'common-common/src/rabbitmq/types';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import { ChainEventNotification } from 'types';
-import { DB } from '../../models';
-import { NotificationInstance } from '../../models/notification';
+import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import type { ChainEventNotification } from 'types';
+import type { DB } from '../../models';
+import type { NotificationInstance } from '../../models/notification';
 import emitNotifications from '../../util/emitNotifications';
 
 export type Ithis = {

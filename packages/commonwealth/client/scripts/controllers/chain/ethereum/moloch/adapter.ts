@@ -1,13 +1,14 @@
 import { Moloch1__factory } from 'common-common/src/eth/types';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import EthereumAccount from 'controllers/chain/ethereum/account';
+import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ContractType } from 'common-common/src/types';
-import { ChainInfo, IChainAdapter } from 'models';
+import type { ChainInfo} from 'models';
+import { IChainAdapter } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
-import { IApp } from 'state';
+import type { IApp } from 'state';
 
 import MolochChain from './chain';
 import MolochMembers from './members';

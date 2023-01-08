@@ -1,13 +1,14 @@
 import app from 'state';
 
-import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
-import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
+import type { SigningStargateClient} from '@cosmjs/stargate';
+import { StargateClient } from '@cosmjs/stargate';
+import type { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
 import { validationTokenToSignDoc } from 'adapters/chain/cosmos/keys';
-import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
-import { StdSignature } from '@cosmjs/amino';
+import type { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
+import type { StdSignature } from '@cosmjs/amino';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface

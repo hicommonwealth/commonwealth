@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { NotificationCategories } from 'common-common/src/types';
@@ -11,8 +11,8 @@ import {
   renderQuillDeltaToText,
 } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../models';
-import BanCache from '../util/banCheckCache';
+import type { DB } from '../models';
+import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));

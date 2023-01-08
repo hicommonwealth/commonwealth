@@ -1,34 +1,38 @@
 import moment from 'moment';
 import BN from 'bn.js';
 import { capitalize } from 'lodash';
-import { ContractTransaction, utils } from 'ethers';
-import { GovernorCompatibilityBravo, GovernorMock, GovernorMock__factory } from 'common-common/src/eth/types';
+import type { ContractTransaction} from 'ethers';
+import { utils } from 'ethers';
+import type { GovernorCompatibilityBravo} from 'common-common/src/eth/types';
+import { GovernorMock, GovernorMock__factory } from 'common-common/src/eth/types';
 
 import { CompoundTypes } from 'chain-events/src';
 import { ProposalType } from 'common-common/src/types';
 
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
+import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 
-import {
-  Proposal,
+import type {
   IVote,
   ITXModalData,
-  VotingType,
-  VotingUnit,
-  ProposalStatus,
   ProposalEndTime,
   ChainEntity,
-  ChainEvent,
+  ChainEvent} from 'models';
+import {
+  Proposal,
+  VotingType,
+  VotingUnit,
+  ProposalStatus
 } from 'models';
 import { blocknumToTime } from 'helpers';
 
-import CompoundAPI, { GovernorType } from './api';
-import CompoundGovernance from './governance';
+import type CompoundAPI from './api';
+import { GovernorType } from './api';
+import type CompoundGovernance from './governance';
 import { attachSigner } from '../contractApi';
-import EthereumAccount from '../account';
-import EthereumAccounts from '../accounts';
-import CompoundChain from './chain';
+import type EthereumAccount from '../account';
+import type EthereumAccounts from '../accounts';
+import type CompoundChain from './chain';
 
 export enum BravoVote {
   NO = 0,

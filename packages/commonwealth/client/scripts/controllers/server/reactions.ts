@@ -6,13 +6,14 @@ import _ from 'lodash';
 import app from 'state';
 
 import { ReactionStore } from 'stores';
+import type {
+  AnyProposal,
+  AbridgedThread} from 'models';
 import {
   Reaction,
-  AnyProposal,
   Comment,
   Thread,
-  Proposal,
-  AbridgedThread,
+  Proposal
 } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { ProposalType } from "common-common/src/types";

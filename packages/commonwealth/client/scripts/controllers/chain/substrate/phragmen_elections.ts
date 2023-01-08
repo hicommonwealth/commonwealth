@@ -1,15 +1,17 @@
-import { ProposalModule, ITXModalData } from 'models';
-import { ApiPromise } from '@polkadot/api';
-import {
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+import type { ApiPromise } from '@polkadot/api';
+import type {
   ISubstratePhragmenElection,
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
-import BN from 'bn.js';
-import { BalanceOf, AccountId } from '@polkadot/types/interfaces';
-import { Codec } from '@polkadot/types/types';
-import { Vec, u32 } from '@polkadot/types';
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
+import type BN from 'bn.js';
+import type { BalanceOf, AccountId } from '@polkadot/types/interfaces';
+import type { Codec } from '@polkadot/types/types';
+import type { Vec, u32 } from '@polkadot/types';
+import type SubstrateChain from './shared';
+import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './account';
 import { SubstratePhragmenElection } from './phragmen_election';
 
 type ElectionResultCodec = [ AccountId, BalanceOf ] & Codec;

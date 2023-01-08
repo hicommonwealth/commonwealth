@@ -1,7 +1,8 @@
-import { Response, NextFunction } from 'express';
-import { ChainCategoryInstance } from 'server/models/chain_category';
-import { success, TypedRequestBody } from '../types';
-import { DB } from '../models';
+import type { Response, NextFunction } from 'express';
+import type { ChainCategoryInstance } from 'server/models/chain_category';
+import type { TypedRequestBody } from '../types';
+import { success } from '../types';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 type UpdateChainCategoryReq = Omit<ChainCategoryInstance, 'id'> & {

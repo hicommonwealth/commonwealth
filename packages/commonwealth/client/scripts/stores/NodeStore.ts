@@ -1,5 +1,5 @@
 import IdStore from './IdStore';
-import { NodeInfo } from '../models';
+import type { NodeInfo } from '../models';
 
 class NodeStore extends IdStore<NodeInfo> {
 }

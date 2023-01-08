@@ -1,6 +1,6 @@
 import { AppError } from 'common-common/src/errors';
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
+import type { Request, Response, NextFunction } from 'express';
+import type { DB } from '../models';
 import lookupAddressIsOwnedByUser from './lookupAddressIsOwnedByUser';
 import validateChain from './validateChain';
 

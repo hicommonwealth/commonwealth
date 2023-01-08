@@ -1,9 +1,9 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
-import { ERC20Votes } from 'common-common/src/eth/types';
+import type { ERC20Votes } from 'common-common/src/eth/types';
 import { ContractType } from 'common-common/src/types';
-import { BigNumber } from 'ethers';
-import { ChainInfo } from 'models';
+import type { BigNumber } from 'ethers';
+import type { ChainInfo } from 'models';
 import EthereumChain from '../chain';
 import { attachSigner } from '../contractApi';
 import CompoundAPI, { GovernorTokenType } from './api';

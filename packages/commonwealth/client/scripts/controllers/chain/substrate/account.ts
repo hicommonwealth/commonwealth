@@ -1,21 +1,22 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
-import { ApiPromise } from '@polkadot/api';
+import type { ApiPromise } from '@polkadot/api';
 import { decodeAddress } from '@polkadot/keyring';
 import { KeyringPair } from '@polkadot/keyring/types';
-import {
+import type {
   Balance, BalanceLock, BalanceLockTo212, EraIndex,
   AccountId, Exposure, Conviction, StakingLedger,
 } from '@polkadot/types/interfaces';
-import { Vec } from '@polkadot/types';
+import type { Vec } from '@polkadot/types';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 
-import { IApp } from 'state';
+import type { IApp } from 'state';
 import { formatCoin } from 'adapters/currency';
-import { Account, IAccountsModule } from 'models';
+import type { IAccountsModule } from 'models';
+import { Account } from 'models';
 import { AccountsStore } from 'stores';
-import { Codec } from '@polkadot/types/types';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import type { Codec } from '@polkadot/types/types';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
 import SubstrateChain from './shared';
 

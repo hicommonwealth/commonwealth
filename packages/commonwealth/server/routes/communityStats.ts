@@ -1,6 +1,6 @@
 import { QueryTypes, Op } from 'sequelize';
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
+import type { Request, Response, NextFunction } from 'express';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 

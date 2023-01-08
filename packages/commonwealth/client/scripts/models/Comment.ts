@@ -1,7 +1,7 @@
-import moment from 'moment';
-import { VersionHistory } from '../controllers/server/threads';
-import { IUniqueId } from './interfaces';
-import Attachment from './Attachment';
+import type moment from 'moment';
+import type { VersionHistory } from '../controllers/server/threads';
+import type { IUniqueId } from './interfaces';
+import type Attachment from './Attachment';
 
 class Comment<T extends IUniqueId> {
   [x: string]: any;

@@ -1,12 +1,12 @@
-import { IApp } from 'state';
-import { Coin } from 'adapters/currency';
-import { IIdentifiable } from 'adapters/shared';
+import type { IApp } from 'state';
+import type { Coin } from 'adapters/currency';
+import type { IIdentifiable } from 'adapters/shared';
 import { ProposalStore } from '../stores';
-import { IVote, ITXModalData, IChainModule, IAccountsModule } from './interfaces';
-import Proposal from './Proposal';
+import type { IVote, ITXModalData, IChainModule, IAccountsModule } from './interfaces';
+import type Proposal from './Proposal';
 import StorageModule from './StorageModule';
-import ChainEntity from './ChainEntity';
-import ChainEvent from './ChainEvent';
+import type ChainEntity from './ChainEntity';
+import type ChainEvent from './ChainEvent';
 
 // Implemented by a chain's governance module, assuming it uses a proposal-based mechanism.
 export abstract class ProposalModule<

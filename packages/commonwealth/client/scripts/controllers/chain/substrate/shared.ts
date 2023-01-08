@@ -1,32 +1,37 @@
 import m from 'mithril';
-import { ApiStatus, IApp } from 'state';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
 import moment from 'moment';
 import BN from 'bn.js';
 
-import { WsProvider, SubmittableResult, Keyring, ApiPromise } from '@polkadot/api';
+import type { SubmittableResult} from '@polkadot/api';
+import { WsProvider, Keyring, ApiPromise } from '@polkadot/api';
 import { u8aToHex } from '@polkadot/util';
-import {
-  Balance,
-  Hash,
+import type {
   DispatchError,
   ActiveEraInfo,
   EraIndex,
   SessionIndex,
   Call
 } from '@polkadot/types/interfaces';
+import {
+  Balance,
+  Hash
+} from '@polkadot/types/interfaces';
 
-import { Compact } from '@polkadot/types/codec';
-import { ApiOptions, Signer, SubmittableExtrinsic, VoidFn } from '@polkadot/api/types';
+import type { Compact } from '@polkadot/types/codec';
+import type { ApiOptions, Signer, SubmittableExtrinsic, VoidFn } from '@polkadot/api/types';
 
 import { formatCoin } from 'adapters/currency';
 import { ChainNetwork } from 'common-common/src/types';
-import {
+import type {
   NodeInfo,
   ChainInfo,
   ITXModalData,
-  TransactionStatus,
   IChainModule,
-  ITXData,
+  ITXData} from 'models';
+import {
+  TransactionStatus
 } from 'models';
 
 import { SubstrateEvents } from 'chain-events/src';
@@ -34,11 +39,11 @@ import { EventEmitter } from 'events';
 
 import { notifySuccess, notifyError, notifyInfo } from 'controllers/app/notifications';
 import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { InterfaceTypes, CallFunction } from '@polkadot/types/types';
-import { u128 } from '@polkadot/types';
+import type { InterfaceTypes, CallFunction } from '@polkadot/types/types';
+import type { u128 } from '@polkadot/types';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
-import { SubstrateAccount } from './account';
+import type { SubstrateAccount } from './account';
 import { chainToEventNetwork } from '../../server/chain_entities';
 
 export interface ISubstrateTXData extends ITXData {

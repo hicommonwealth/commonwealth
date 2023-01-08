@@ -1,4 +1,4 @@
-import {
+import type {
   IFixedEndTime,
   IFixedBlockEndTime,
   IDynamicEndTime,
@@ -7,7 +7,7 @@ import {
   IQueuedEndTime,
   IUnavailableEndTime,
 } from './interfaces';
-import Proposal from './Proposal';
+import type Proposal from './Proposal';
 
 export enum ThreadKind {
   Discussion = 'discussion',

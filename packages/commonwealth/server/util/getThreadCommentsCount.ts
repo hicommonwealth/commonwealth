@@ -1,6 +1,6 @@
 import { Op } from 'sequelize';
-import { DB } from '../models';
-import { ThreadAttributes } from '../models/thread';
+import type { DB } from '../models';
+import type { ThreadAttributes } from '../models/thread';
 
 interface GetThreadsWithCommentCount {
   threads: ThreadAttributes[];

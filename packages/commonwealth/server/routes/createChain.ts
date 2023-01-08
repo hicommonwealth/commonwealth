@@ -1,8 +1,8 @@
-import {NextFunction} from 'express';
+import type {NextFunction} from 'express';
 import Web3 from 'web3';
 import fetch from 'node-fetch';
 import * as solw3 from '@solana/web3.js';
-import {Cluster} from '@solana/web3.js';
+import type {Cluster} from '@solana/web3.js';
 import {Tendermint34Client} from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
 import {Op} from 'sequelize';
@@ -10,16 +10,17 @@ import {factory, formatFilename} from 'common-common/src/logging';
 import {BalanceType,ChainBase, ChainType, NotificationCategories} from 'common-common/src/types';
 import {AppError, ServerError} from 'common-common/src/errors';
 import {urlHasValidHTTPPrefix} from '../../shared/utils';
-import {ChainAttributes} from '../models/chain';
-import {ChainNodeAttributes} from '../models/chain_node';
+import type {ChainAttributes} from '../models/chain';
+import type {ChainNodeAttributes} from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-import {DB} from '../models';
-import {success, TypedRequestBody, TypedResponse} from '../types';
+import type {DB} from '../models';
+import type { TypedRequestBody, TypedResponse} from '../types';
+import {success} from '../types';
 
-import {AddressInstance} from '../models/address';
+import type {AddressInstance} from '../models/address';
 import {mixpanelTrack} from '../util/mixpanelUtil';
 import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
-import {RoleAttributes, RoleInstance} from '../models/role';
+import type {RoleAttributes, RoleInstance} from '../models/role';
 
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));

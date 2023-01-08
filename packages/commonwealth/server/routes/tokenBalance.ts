@@ -1,11 +1,13 @@
+import type {
+  TokenBalanceCache} from 'token-balance-cache/src/index';
 import {
-  TokenBalanceCache,
   FetchTokenBalanceErrors,
 } from 'token-balance-cache/src/index';
 
 import { AppError, ServerError } from 'common-common/src/errors';
-import { DB } from '../models';
-import { TypedResponse, success, TypedRequestBody } from '../types';
+import type { DB } from '../models';
+import type { TypedResponse, TypedRequestBody } from '../types';
+import { success } from '../types';
 import { ChainInstance } from '../models/chain';
 
 export const Errors = {

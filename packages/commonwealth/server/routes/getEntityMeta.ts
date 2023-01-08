@@ -1,8 +1,8 @@
-import { Response, NextFunction, Request } from 'express';
+import type { Response, NextFunction, Request } from 'express';
 import {AppError} from "common-common/src/errors";
-import { WhereOptions } from 'sequelize/types';
-import { ChainEntityMetaAttributes } from 'server/models/chain_entity_meta';
-import { DB } from '../models';
+import type { WhereOptions } from 'sequelize/types';
+import type { ChainEntityMetaAttributes } from 'server/models/chain_entity_meta';
+import type { DB } from '../models';
 
 export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',

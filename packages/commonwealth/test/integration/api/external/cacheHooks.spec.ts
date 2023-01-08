@@ -1,6 +1,7 @@
-import { BalanceProvider, IChainNode, TokenBalanceCache } from 'token-balance-cache/src';
+import type { IChainNode} from 'token-balance-cache/src';
+import { BalanceProvider, TokenBalanceCache } from 'token-balance-cache/src';
 import { BalanceType } from 'common-common/src/types';
-import BN from 'bn.js';
+import type BN from 'bn.js';
 
 class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
   public name = 'eth-token';

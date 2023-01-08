@@ -1,4 +1,4 @@
-import m from 'mithril';
+import type m from 'mithril';
 
 export default abstract class ClassComponent<
   A extends Record<string, unknown> = Record<string, unknown>

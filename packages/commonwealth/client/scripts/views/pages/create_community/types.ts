@@ -1,4 +1,4 @@
-import { ValidationTextAttrs } from '../../components/component_kit/cw_validation_text';
+import type { ValidationTextAttrs } from '../../components/component_kit/cw_validation_text';
 
 export type ChainFormIdFields = {
   id?: string;

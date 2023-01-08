@@ -1,12 +1,14 @@
 import { ChainStore, NodeStore } from 'stores';
-import { IChainAdapter, NotificationCategory } from 'models';
+import type { IChainAdapter, NotificationCategory } from 'models';
 import { EventEmitter } from 'events';
-import { getToastStore, ToastStore } from 'controllers/app/toasts';
-import { getModalStore, ModalStore } from 'controllers/app/modals';
-import { InviteCodeAttributes } from 'types';
+import type { ToastStore } from 'controllers/app/toasts';
+import { getToastStore } from 'controllers/app/toasts';
+import type { ModalStore } from 'controllers/app/modals';
+import { getModalStore } from 'controllers/app/modals';
+import type { InviteCodeAttributes } from 'types';
 import { WebSocketController } from 'controllers/server/socket';
-import { ChainCategoryAttributes } from 'server/models/chain_category';
-import { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
+import type { ChainCategoryAttributes } from 'server/models/chain_category';
+import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 import RecentActivityController from './controllers/app/recent_activity';
 import ProfilesController from './controllers/server/profiles';
 import CommentsController from './controllers/server/comments';
@@ -25,9 +27,9 @@ import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
-import { MobileMenuName } from './views/app_mobile_menus';
+import type { MobileMenuName } from './views/app_mobile_menus';
 import ChainEntityController from 'controllers/server/chain_entities';
-import { SidebarMenuName } from './views/components/sidebar';
+import type { SidebarMenuName } from './views/components/sidebar';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',

@@ -1,6 +1,6 @@
 import moment from 'moment';
 
-import { IChainEntityKind } from 'chain-events/src';
+import type { IChainEntityKind } from 'chain-events/src';
 import ChainEvent from './ChainEvent';
 
 class ChainEntity {

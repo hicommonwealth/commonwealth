@@ -1,9 +1,10 @@
-import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import { Model } from 'sequelize';
 
-import { SubstrateTypes } from 'chain-events/src';
-import { AddressAttributes } from './address';
-import { ModelStatic, ModelInstance } from './types';
+import type { SubstrateTypes } from 'chain-events/src';
+import type { AddressAttributes } from './address';
+import type { ModelStatic, ModelInstance } from './types';
 
 export type OffchainProfileAttributes = {
   address_id: number;

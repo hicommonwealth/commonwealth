@@ -4,8 +4,9 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { EventEmitter } from 'events';
+import type {
+  CWEvent} from 'chain-events/src';
 import {
-  CWEvent,
   SubstrateTypes,
   SupportedNetwork,
 } from 'chain-events/src';
@@ -15,7 +16,7 @@ import models from 'chain-events/services/database/database';
 import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
 import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
 import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
-import {BrokerConfig} from "rascal";
+import type {BrokerConfig} from "rascal";
 import {getRabbitMQConfig} from "common-common/src/rabbitmq";
 
 chai.use(chaiHttp);

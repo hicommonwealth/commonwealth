@@ -1,8 +1,9 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { ChainAttributes } from './chain';
-import { ThreadAttributes } from './thread';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes} from 'sequelize';
+import { Model } from 'sequelize';
+import type { ModelStatic, ModelInstance } from './types';
+import type { ChainAttributes } from './chain';
+import type { ThreadAttributes } from './thread';
 
 export type ViewCountAttributes = {
   object_id: number;

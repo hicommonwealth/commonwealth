@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
+import type { Request, Response, NextFunction } from 'express';
+import type { DB } from '../models';
 
 interface AuthInfoExtended extends Express.AuthInfo {
   state?: {

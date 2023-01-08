@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
-import { DB } from '../models';
+import type { Request, Response, NextFunction } from 'express';
+import type { DB } from '../models';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from 'common-common/src/errors';
 

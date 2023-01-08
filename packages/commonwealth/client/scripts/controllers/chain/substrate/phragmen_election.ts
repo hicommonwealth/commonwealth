@@ -1,26 +1,28 @@
 import _ from 'underscore';
 import { ChainBase, ProposalType } from 'common-common/src/types';
+import type {
+  IVote,
+  Account,
+  IFixedBlockEndTime} from 'models';
 import {
   Proposal,
-  IVote,
   VotingType,
   VotingUnit,
-  Account,
-  ProposalStatus,
-  IFixedBlockEndTime,
+  ProposalStatus
 } from 'models';
-import { ApiPromise } from '@polkadot/api';
-import {
+import type { ApiPromise } from '@polkadot/api';
+import type {
   ISubstratePhragmenElection,
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
-import { BalanceOf, AccountId } from '@polkadot/types/interfaces';
-import { Codec } from '@polkadot/types/types';
-import { Vec, StorageKey } from '@polkadot/types';
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstratePhragmenElections from './phragmen_elections';
+import type { BalanceOf, AccountId } from '@polkadot/types/interfaces';
+import type { Codec } from '@polkadot/types/types';
+import type { Vec, StorageKey } from '@polkadot/types';
+import type SubstrateChain from './shared';
+import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './account';
+import type SubstratePhragmenElections from './phragmen_elections';
 
 // inheriting from Vote to satisfy submitVoteTx requirement,
 // but choice/conviction are unused

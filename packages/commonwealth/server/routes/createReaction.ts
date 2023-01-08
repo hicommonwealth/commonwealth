@@ -1,20 +1,20 @@
 /* eslint-disable prefer-const */
 /* eslint-disable dot-notation */
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { AppError, ServerError } from 'common-common/src/errors';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
@@ -22,8 +22,8 @@ import {
 } from '../../shared/analytics/types';
 import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
-import RuleCache from '../util/rules/ruleCache';
-import BanCache from '../util/banCheckCache';
+import type RuleCache from '../util/rules/ruleCache';
+import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));

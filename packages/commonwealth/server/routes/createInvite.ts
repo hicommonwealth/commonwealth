@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import sgMail from '@sendgrid/mail';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { SERVER_URL, SENDGRID_API_KEY } from '../config';
@@ -7,7 +7,7 @@ import { DynamicTemplate } from '../../shared/types';
 const log = factory.getLogger(formatFilename(__filename));
 import { AppError, ServerError } from 'common-common/src/errors';
 import { createRole, findAllRoles, findOneRole } from '../util/roles';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 

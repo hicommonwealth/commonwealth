@@ -1,16 +1,20 @@
 import chai from 'chai';
-import {ServiceConsumer} from "common-common/src/serviceConsumer";
+import type {ServiceConsumer} from "common-common/src/serviceConsumer";
 import {getQueueStats, publishRmqMsg} from "common-common/src/rabbitmq/util";
+import type { RmqCENotificationCUD, RmqEntityCUD
+} from "common-common/src/rabbitmq";
 import {
   RascalExchanges,
   RascalQueues,
-  RascalRoutingKeys, RmqCENotificationCUD, RmqEntityCUD
+  RascalRoutingKeys
 } from "common-common/src/rabbitmq";
 import {v4 as uuidv4} from 'uuid';
-import * as AaveTypes from "chain-events/src/chains/aave/types";
-import {EventKind, ITransfer} from "chain-events/src/chains/aave/types";
-import {CWEvent, SupportedNetwork} from "chain-events/src";
-import {ChainEventAttributes} from "chain-events/services/database/models/chain_event";
+import type * as AaveTypes from "chain-events/src/chains/aave/types";
+import type { ITransfer} from "chain-events/src/chains/aave/types";
+import {EventKind} from "chain-events/src/chains/aave/types";
+import type {CWEvent} from "chain-events/src";
+import { SupportedNetwork} from "chain-events/src";
+import type {ChainEventAttributes} from "chain-events/services/database/models/chain_event";
 import {setupCommonwealthConsumer} from "../../server/CommonwealthConsumer/CommonwealthConsumer";
 import {RABBITMQ_API_URI} from "../../server/config";
 import models from "../../server/database";

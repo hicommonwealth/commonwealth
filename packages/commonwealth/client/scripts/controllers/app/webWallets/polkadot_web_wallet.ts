@@ -4,12 +4,12 @@ import {
   web3FromAddress,
   isWeb3Injected,
 } from '@polkadot/extension-dapp';
-import { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import { Signer } from '@polkadot/api/types';
+import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
+import type { Signer } from '@polkadot/api/types';
 import { stringToHex } from '@polkadot/util';
-import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
 
 class PolkadotWebWalletController

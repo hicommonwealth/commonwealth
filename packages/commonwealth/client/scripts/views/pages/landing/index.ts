@@ -7,7 +7,7 @@ import app, { LoginState } from 'state';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
 import HeaderLandingPage from './landing_page_header';
 import JoinCommonWealthSection from './landing_page_pre_footer';
 import TokensCommunityComponent from './tokens_community_hero';

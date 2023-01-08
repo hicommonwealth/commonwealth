@@ -1,7 +1,7 @@
 import IdStore from './IdStore';
-import { Comment } from '../models';
+import type { Comment } from '../models';
 import { byAscendingCreationDate } from '../helpers';
-import { IUniqueId } from '../models/interfaces';
+import type { IUniqueId } from '../models/interfaces';
 
 class CommentsStore extends IdStore<Comment<any>> {
   private _storeAuthor: { [address: string]: Array<Comment<any>> } = {};

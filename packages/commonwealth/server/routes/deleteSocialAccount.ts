@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

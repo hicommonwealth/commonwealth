@@ -1,12 +1,13 @@
 import { ERC721Token } from 'adapters/chain/ethereum/types';
-import { ERC721, ERC721__factory } from 'common-common/src/eth/types';
+import type { ERC721} from 'common-common/src/eth/types';
+import { ERC721__factory } from 'common-common/src/eth/types';
 import Ethereum from 'controllers/chain/ethereum/adapter';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 
 import BN from 'bn.js';
 import { ContractType } from 'common-common/src/types';
-import { ChainInfo, ITokenAdapter } from 'models';
-import { IApp } from 'state';
+import type { ChainInfo, ITokenAdapter } from 'models';
+import type { IApp } from 'state';
 
 class NftApi extends ContractApi<ERC721> {}
 

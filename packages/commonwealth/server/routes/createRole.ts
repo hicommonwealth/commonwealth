@@ -1,13 +1,14 @@
 import Sequelize from 'sequelize';
 import { NotificationCategories } from 'common-common/src/types';
 import { AppError } from 'common-common/src/errors';
-import { SubscriptionAttributes } from '../models/subscription';
-import {
+import type { SubscriptionAttributes } from '../models/subscription';
+import type {
   ValidateChainParams,
 } from '../middleware/validateChain';
-import { DB } from '../models';
-import { success, TypedRequestBody, TypedResponse } from '../types';
-import { RoleAttributes } from '../models/role';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import type { RoleAttributes } from '../models/role';
 import { createRole as _createRole } from '../util/roles';
 
 export const Errors = {

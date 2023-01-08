@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import bs58 from 'bs58';
 import { Op } from 'sequelize';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 

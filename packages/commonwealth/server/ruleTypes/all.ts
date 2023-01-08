@@ -1,6 +1,7 @@
-import { Transaction } from 'sequelize/types';
-import { DB } from '../models';
-import { RuleType, RuleArgumentType, DefaultSchemaT } from '../util/rules/ruleTypes';
+import type { Transaction } from 'sequelize/types';
+import type { DB } from '../models';
+import type { RuleArgumentType, DefaultSchemaT } from '../util/rules/ruleTypes';
+import { RuleType } from '../util/rules/ruleTypes';
 import RuleTypes from './index';
 
 type SchemaT = { AllRule: [ Array<DefaultSchemaT> ] };

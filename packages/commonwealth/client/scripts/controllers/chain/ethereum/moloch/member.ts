@@ -1,14 +1,15 @@
 import BN from 'bn.js';
-import app, { IApp } from 'state';
+import type { IApp } from 'state';
+import app from 'state';
 
 import { MolochShares } from 'adapters/chain/ethereum/types';
-import { IMolochMember } from 'adapters/chain/moloch/types';
+import type { IMolochMember } from 'adapters/chain/moloch/types';
 
-import EthereumAccounts from 'controllers/chain/ethereum/accounts';
+import type EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import EthereumAccount from 'controllers/chain/ethereum/account';
-import EthereumChain from 'controllers/chain/ethereum/chain';
+import type EthereumChain from 'controllers/chain/ethereum/chain';
 
-import MolochMembers from './members';
+import type MolochMembers from './members';
 import { attachSigner } from '../contractApi';
 
 export default class MolochMember extends EthereumAccount {

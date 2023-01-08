@@ -3,7 +3,7 @@ import lity from 'lity';
 import { slugify } from 'utils';
 
 import app from 'state';
-import { Thread } from 'models';
+import type { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
 

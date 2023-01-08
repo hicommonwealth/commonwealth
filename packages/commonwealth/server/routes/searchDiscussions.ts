@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Op, QueryTypes } from 'sequelize';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 const Errors = {

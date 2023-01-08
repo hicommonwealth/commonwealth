@@ -2,7 +2,7 @@ import { assert } from 'chai';
 import {
   Action, addPermission, isPermitted
 } from 'common-common/src/permissions';
-import { Permission } from 'server/models/role';
+import type { Permission } from 'server/models/role';
 import { aggregatePermissions } from '../../../shared/utils';
 
 describe('aggregatePermissions() unit tests', () => {

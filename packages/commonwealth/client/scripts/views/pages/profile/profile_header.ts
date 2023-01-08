@@ -3,7 +3,7 @@ import m from 'mithril';
 
 import app from 'state';
 
-import SubstrateIdentity from 'controllers/chain/substrate/identity';
+import type SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';

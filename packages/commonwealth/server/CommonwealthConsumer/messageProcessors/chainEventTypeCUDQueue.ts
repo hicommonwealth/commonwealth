@@ -1,6 +1,6 @@
-import { Logger } from 'typescript-logging';
+import type { Logger } from 'typescript-logging';
 import {RmqCETypeCUD} from "common-common/src/rabbitmq/types/chainEventTypeCUD";
-import { DB } from '../../models';
+import type { DB } from '../../models';
 
 export type Ithis = {
   models: DB;

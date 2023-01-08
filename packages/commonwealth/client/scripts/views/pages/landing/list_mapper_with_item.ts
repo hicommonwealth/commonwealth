@@ -1,7 +1,7 @@
 import m from 'mithril';
 
 import { removeOrAddClasslistToAllElements } from 'helpers';
-import { ICardListItem } from 'models/interfaces';
+import type { ICardListItem } from 'models/interfaces';
 
 import ListedCardWithImage from './listed_card_with_image';
 import ListContainer from './list_container';

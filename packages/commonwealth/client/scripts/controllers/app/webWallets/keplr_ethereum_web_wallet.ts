@@ -1,13 +1,14 @@
 import app from 'state';
 
 import { StargateClient } from '@cosmjs/stargate';
-import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
+import type { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import {
+import type { Account, IWebWallet } from 'models';
+import type {
   Window as KeplrWindow,
-  ChainInfo,
+  ChainInfo} from '@keplr-wallet/types';
+import {
   EthSignType,
 } from '@keplr-wallet/types';
 

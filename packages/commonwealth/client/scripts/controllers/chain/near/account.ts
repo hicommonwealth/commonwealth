@@ -1,11 +1,12 @@
 /* eslint-disable no-use-before-define */
-import { Account, IAccountsModule } from 'models';
-import { NearToken } from 'adapters/chain/near/types';
-import { IApp } from 'state';
+import type { IAccountsModule } from 'models';
+import { Account } from 'models';
+import type { NearToken } from 'adapters/chain/near/types';
+import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 import { keyStores, Account as NearJsAccount } from 'near-api-js';
-import { AccountView } from 'near-api-js/lib/providers/provider';
-import NearChain from './chain';
+import type { AccountView } from 'near-api-js/lib/providers/provider';
+import type NearChain from './chain';
 
 // NOTE: this is the actual type of validators in the NodeStatus struct,
 //    the library is wrong, it's not just a string.

@@ -1,14 +1,17 @@
-import { Near as NearApi } from 'near-api-js';
+import type { Near as NearApi } from 'near-api-js';
 import BN from 'bn.js';
 import moment from 'moment';
-import { Proposal, ProposalEndTime, VotingType, VotingUnit, ProposalStatus, ITXModalData } from 'models';
-import { NearToken } from 'adapters/chain/near/types';
-import { NearAccount, NearAccounts } from 'controllers/chain/near/account';
-import NearChain from 'controllers/chain/near/chain';
+import type { ProposalEndTime, ITXModalData } from 'models';
+import { Proposal, VotingType, VotingUnit, ProposalStatus } from 'models';
+import type { NearToken } from 'adapters/chain/near/types';
+import type { NearAccount, NearAccounts } from 'controllers/chain/near/account';
+import type NearChain from 'controllers/chain/near/chain';
 import { ProposalType } from 'common-common/src/types';
-import NearSputnikDao from './dao';
-import {
+import type NearSputnikDao from './dao';
+import type {
   INearSputnikProposal,
+  VotePolicy} from './types';
+import {
   NearSputnikVote,
   NearSputnikProposalStatus,
   isAddMemberToRole,
@@ -16,7 +19,6 @@ import {
   isTransfer,
   isFunctionCall,
   getVotePolicy,
-  VotePolicy,
   WeightKind,
   isWeight,
   getUserRoles,

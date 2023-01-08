@@ -1,4 +1,4 @@
-import m from 'mithril';
+import type m from 'mithril';
 
 export type BaseSidebarAttrs = {
   isActive?: boolean; // Is this the current page

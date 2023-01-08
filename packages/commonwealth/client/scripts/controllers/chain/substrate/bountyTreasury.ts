@@ -1,14 +1,15 @@
-import { ApiPromise } from '@polkadot/api';
-import { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
-import { IApp } from 'state';
-import {
+import type { ApiPromise } from '@polkadot/api';
+import type { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
+import type { IApp } from 'state';
+import type {
   ISubstrateBounty,
   SubstrateCoin
 } from 'adapters/chain/substrate/types';
 import { ProposalModule } from 'models';
 import { SubstrateTypes } from 'chain-events/src';
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
+import type SubstrateChain from './shared';
+import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './account';
 import { SubstrateBounty } from './bounty';
 import { chainToEventNetwork } from '../../server/chain_entities';
 

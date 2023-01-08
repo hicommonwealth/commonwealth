@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
@@ -9,8 +9,8 @@ import {
   renderQuillDeltaToText,
   validURL,
 } from '../../shared/utils';
-import { DB } from '../models';
-import BanCache from '../util/banCheckCache';
+import type { DB } from '../models';
+import type BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 import emitNotifications from '../util/emitNotifications';

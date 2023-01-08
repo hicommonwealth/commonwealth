@@ -1,8 +1,9 @@
 import Sequelize, {} from 'sequelize';
-import { GetThreadsReq, GetThreadsResp } from 'common-common/src/api/extApiTypes';
+import type { GetThreadsReq, GetThreadsResp } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
-import { DB } from '../../models';
+import type { TypedRequestQuery, TypedResponse} from '../../types';
+import { success, failure } from '../../types';
+import type { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;

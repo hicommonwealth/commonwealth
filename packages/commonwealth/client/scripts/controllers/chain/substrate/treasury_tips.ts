@@ -1,13 +1,14 @@
-import { ApiPromise } from '@polkadot/api';
-import { AccountId } from '@polkadot/types/interfaces';
-import { Vec } from '@polkadot/types';
-import { ISubstrateTreasuryTip, SubstrateCoin } from 'adapters/chain/substrate/types';
+import type { ApiPromise } from '@polkadot/api';
+import type { AccountId } from '@polkadot/types/interfaces';
+import type { Vec } from '@polkadot/types';
+import type { ISubstrateTreasuryTip, SubstrateCoin } from 'adapters/chain/substrate/types';
 import { SubstrateTypes } from 'chain-events/src';
 import { ProposalModule } from 'models';
-import { IApp } from 'state';
+import type { IApp } from 'state';
 import { formatAddressShort } from 'utils';
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
+import type SubstrateChain from './shared';
+import type { SubstrateAccount } from './account';
+import type SubstrateAccounts from './account';
 import { SubstrateTreasuryTip } from './treasury_tip';
 import { chainToEventNetwork } from '../../server/chain_entities';
 

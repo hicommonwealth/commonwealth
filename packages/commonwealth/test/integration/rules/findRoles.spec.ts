@@ -8,7 +8,7 @@ import {
 } from 'server/util/roles';
 import models from 'server/database';
 import * as modelUtils from 'test/util/modelUtils';
-import { ChainInstance } from 'server/models/chain';
+import type { ChainInstance } from 'server/models/chain';
 import { Op } from 'sequelize';
 
 describe('findAllRoles and findOneRole tests', () => {

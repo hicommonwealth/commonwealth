@@ -1,9 +1,9 @@
 import assert from 'assert';
-import { IApp } from 'state';
-import { IAccountsModule } from 'models';
+import type { IApp } from 'state';
+import type { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import EthereumChain from './chain';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
+import type EthereumChain from './chain';
 import EthereumAccount from './account';
 
 // NOTE: this is just a boilerplate class; not verified to work yet.

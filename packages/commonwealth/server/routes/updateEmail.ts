@@ -1,11 +1,11 @@
 import Sequelize from 'sequelize';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import moment from 'moment';
 import { LOGIN_RATE_LIMIT_MINS, SERVER_URL, SENDGRID_API_KEY } from '../config';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DynamicTemplate } from '../../shared/types';
 import { WalletId } from 'common-common/src/types';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);

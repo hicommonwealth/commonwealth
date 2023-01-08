@@ -1,12 +1,12 @@
-import { Express } from 'express';
-import Router from 'express/lib/router/index';
+import type { Express } from 'express';
+import type Router from 'express/lib/router/index';
 import { getThreads, getThreadsValidation } from 'commonwealth/server/routes/threads/getThreads';
 import { getCommentsValidation, getComments } from 'commonwealth/server/routes/comments/getComments';
 import getReactions, { getReactionsValidation } from 'commonwealth/server/routes/reactions/getReactions';
 import getCommunities, { getCommunitiesValidation } from 'commonwealth/server/routes/communities/getCommunities';
 import getProfiles, { getProfilesValidation } from 'commonwealth/server/routes/profiles/getProfiles';
-import { DB } from 'commonwealth/server/models';
-import { TokenBalanceCache } from 'token-balance-cache/src';
+import type { DB } from 'commonwealth/server/models';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import { getChainNodes, getChainNodesValidation } from '../routes/getChainNodes';
 import { getBalanceProviders, getBalanceProvidersValidation } from '../routes/getBalanceProviders';
 import { getTokenBalance, getTokenBalanceValidation } from '../routes/getTokenBalance';

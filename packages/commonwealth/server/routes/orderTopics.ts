@@ -1,8 +1,8 @@
 /* eslint-disable quotes */
-import { Response, NextFunction } from 'express';
-import { TopicInstance } from 'server/models/topic';
+import type { Response, NextFunction } from 'express';
+import type { TopicInstance } from 'server/models/topic';
 import validateRoles from '../util/validateRoles';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 enum OrderTopicsErrors {

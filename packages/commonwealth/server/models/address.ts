@@ -1,16 +1,16 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { WalletId } from 'common-common/src/types';
-import { ModelStatic, ModelInstance } from './types';
-import { ChainAttributes, ChainInstance } from './chain';
-import { UserAttributes, UserInstance } from './user';
-import {
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { WalletId } from 'common-common/src/types';
+import type { ModelStatic, ModelInstance } from './types';
+import type { ChainAttributes, ChainInstance } from './chain';
+import type { UserAttributes, UserInstance } from './user';
+import type {
   OffchainProfileAttributes,
   OffchainProfileInstance,
 } from './offchain_profile';
-import { ProfileInstance } from './profile';
-import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
-import {
+import type { ProfileInstance } from './profile';
+import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
+import type {
   RoleAssignmentAttributes,
   RoleAssignmentInstance,
 } from './role_assignment';

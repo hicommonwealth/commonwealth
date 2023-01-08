@@ -3,9 +3,9 @@ import { bech32 } from 'bech32';
 declare let window: any;
 
 import Web3 from 'web3';
-import { provider } from 'web3-core';
+import type { provider } from 'web3-core';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
 import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
