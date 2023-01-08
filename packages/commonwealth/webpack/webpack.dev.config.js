@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
+const CircularDependencyPlugin = require('circular-dependency-plugin');
 
 module.exports = merge(common, {
   entry: {
@@ -36,5 +37,9 @@ module.exports = merge(common, {
       CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001'),
     }),
     new webpack.HotModuleReplacementPlugin(), // used for hot reloading
+    new CircularDependencyPlugin({
+      exclude: /node_modules/,
+      allowAsyncCycles: false,
+    }),
   ],
 });

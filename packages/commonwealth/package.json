@@ -138,6 +138,7 @@
     "buffer": "^6.0.3",
     "chart.js": "^2.8.0",
     "cheerio": "1.0.0-rc.3",
+    "circular-dependency-plugin": "^5.2.2",
     "clipboard-polyfill": "^2.8.6",
     "compression": "^1.7.4",
     "connect-session-sequelize": "^7.1.1",
