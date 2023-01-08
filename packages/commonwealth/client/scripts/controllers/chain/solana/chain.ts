@@ -42,15 +42,15 @@ export default class SolanaChain implements IChainModule<SolanaToken, SolanaAcco
     this._connection = new solw3.Connection(url, 'confirmed');
 
     // slots are approx equal to block heights
-    this.app.chain.block.height = await this._connection.getSlot();
-    this.app.chain.block.duration = await this._connection.getBlockTime(this.app.chain.block.height);
-    this.app.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
-    this.app.chain.networkStatus = ApiStatus.Connected;
+    this.chainState.chain.block.height = await this._connection.getSlot();
+    this.chainState.chain.block.duration = await this._connection.getBlockTime(this.chainState.chain.block.height);
+    this.chainState.chain.block.lastTime = moment(); // approx hack to get current slot timestamp
+    this.chainState.chain.networkStatus = ApiStatus.Connected;
     m.redraw();
   }
 
   public async deinit() {
-    this.app.chain.networkStatus = ApiStatus.Disconnected;
+    this.chainState.chain.networkStatus = ApiStatus.Disconnected;
     // no need to unsubscribe as it's HTTP RPC
     this._connection = null;
   }

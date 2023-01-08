@@ -89,7 +89,7 @@ export class SearchBar extends ClassComponent {
     const handleGetSearchPreview = () => {
       this.searchQuery = new SearchQuery(this.searchTerm, {
         isSearchPreview: true,
-        chainScope: app.activeChainId(),
+        chainScope: navState.activeChainId(),
       });
 
       getSearchPreview(this.searchQuery, this);
@@ -101,7 +101,7 @@ export class SearchBar extends ClassComponent {
       } else {
         this.searchQuery = new SearchQuery(this.searchTerm, {
           isSearchPreview: false,
-          chainScope: app.activeChainId(),
+          chainScope: navState.activeChainId(),
         });
       }
 

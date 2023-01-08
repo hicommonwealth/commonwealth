@@ -83,7 +83,7 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
                   user: new AddressInfo(
                     null,
                     proposal.author,
-                    app.activeChainId(),
+                    navState.activeChainId(),
                     null
                   ),
                   hideAvatar: true,

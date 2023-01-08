@@ -46,8 +46,8 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
       this.initialized = true;
       this.loading = true;
 
-      $.get(`${app.serverUrl()}/bulkMembers`, {
-        chain: app.activeChainId(),
+      $.get(`${navState.serverUrl()}/bulkMembers`, {
+        chain: navState.activeChainId(),
       })
         .then((response) => {
           this.typeaheadAddresses = response.result.map((role) => {

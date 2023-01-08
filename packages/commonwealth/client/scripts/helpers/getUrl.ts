@@ -1,4 +1,4 @@
-import app from "state";
+import navState from "../navigationState";
 
 export enum ServiceUrls {
   chainEvents = 'chain-events'
@@ -10,7 +10,7 @@ export function getBaseUrl(service?: ServiceUrls) {
       case ServiceUrls.chainEvents:
         return 'http://localhost:8081/api';
       default:
-        return 'http://localhost:8080' + app.serverUrl();
+        return 'http://localhost:8080' + navState.serverUrl();
     }
   } else {
     switch (service) {
@@ -18,7 +18,7 @@ export function getBaseUrl(service?: ServiceUrls) {
         return 'https://chain-events.herokuapp.com/api'
       default:
         // e.g. https://commonwealth.im/api
-        return window.location.origin + app.serverUrl();
+        return window.location.origin + navState.serverUrl();
     }
   }
 }

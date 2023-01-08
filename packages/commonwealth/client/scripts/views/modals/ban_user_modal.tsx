@@ -45,7 +45,7 @@ export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
                   await $.post('/api/banAddress', {
                     jwt: app.user.jwt,
                     address,
-                    chain_id: app.activeChainId(),
+                    chain_id: navState.activeChainId(),
                   });
                   exitModal();
                   notifySuccess('Banned Address');

@@ -61,7 +61,7 @@ export const fetchReactionsByPost = async (post: Post) => {
     comment_id = (post as Comment<any>).id;
   }
 
-  const { result = [] } = await $.get(`${app.serverUrl()}/bulkReactions`, {
+  const { result = [] } = await $.get(`${navState.serverUrl()}/bulkReactions`, {
     thread_id,
     comment_id,
     proposal_id,
@@ -93,7 +93,7 @@ export const onReactionClick = (
     const { address: userAddress, chain } = app.user.activeAccount;
 
     // if it's a community use the app.user.activeAccount.chain.id instead of author chain
-    const chainId = app.activeChainId();
+    const chainId = navState.activeChainId();
 
     if (hasReacted) {
       dislike(userAddress);

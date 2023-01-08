@@ -66,7 +66,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
         author.address,
         form.kind,
         stage,
-        app.activeChainId(),
+        navState.activeChainId(),
         form.title,
         form.topic,
         body,
@@ -95,7 +95,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.fromDraft = draft.id;
 
     localStorage.setItem(
-      `${app.activeChainId()}-new-discussion-storedTitle`,
+      `${navState.activeChainId()}-new-discussion-storedTitle`,
       draft.title
     );
 
@@ -136,14 +136,14 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     if (!this) throw new Error('no this');
     if (this.form.kind === ThreadKind.Discussion) {
       this.form.title = localStorage.getItem(
-        `${app.activeChainId()}-new-discussion-storedTitle`
+        `${navState.activeChainId()}-new-discussion-storedTitle`
       );
     } else if (this.form.kind === ThreadKind.Link) {
       this.form.url = localStorage.getItem(
-        `${app.activeChainId()}-new-link-storedLink`
+        `${navState.activeChainId()}-new-link-storedLink`
       );
       this.form.title = localStorage.getItem(
-        `${app.activeChainId()}-new-link-storedTitle`
+        `${navState.activeChainId()}-new-link-storedTitle`
       );
     }
   }
@@ -152,20 +152,20 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     if (this.form.kind === ThreadKind.Discussion) {
       if (this.form.title) {
         localStorage.setItem(
-          `${app.activeChainId()}-new-discussion-storedTitle`,
+          `${navState.activeChainId()}-new-discussion-storedTitle`,
           this.form.title
         );
       }
     } else if (this.form.kind === ThreadKind.Link) {
       if (this.form.url) {
         localStorage.setItem(
-          `${app.activeChainId()}-new-link-storedLink`,
+          `${navState.activeChainId()}-new-link-storedLink`,
           this.form.url
         );
       }
       if (this.form.title) {
         localStorage.setItem(
-          `${app.activeChainId()}-new-link-storedTitle`,
+          `${navState.activeChainId()}-new-link-storedTitle`,
           this.form.title
         );
       }
@@ -173,7 +173,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
   }
 
   private _updateTopicState(topic: Topic) {
-    localStorage.setItem(`${app.activeChainId()}-active-topic`, topic.name);
+    localStorage.setItem(`${navState.activeChainId()}-active-topic`, topic.name);
     this.activeTopic = topic;
     this.form.topic = topic;
   }
@@ -191,33 +191,33 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     try {
       this.activeTopic = isModal
         ? m.route.param('topic')
-        : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
-        ? app.lastNavigatedFrom().split('/')[
-            app.lastNavigatedFrom().split('/').indexOf('discussions') + 1
+        : navState.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
+        ? navState.lastNavigatedFrom().split('/')[
+            navState.lastNavigatedFrom().split('/').indexOf('discussions') + 1
           ]
         : undefined;
     } catch (e) {
       // couldn't extract activeTopic
     }
-    if (localStorage.getItem(`${app.activeChainId()}-from-draft`)) {
+    if (localStorage.getItem(`${navState.activeChainId()}-from-draft`)) {
       this.fromDraft = Number(
-        localStorage.getItem(`${app.activeChainId()}-from-draft`)
+        localStorage.getItem(`${navState.activeChainId()}-from-draft`)
       );
-      localStorage.removeItem(`${app.activeChainId()}-from-draft`);
+      localStorage.removeItem(`${navState.activeChainId()}-from-draft`);
     }
     if (this.form.kind === undefined) {
       this.form.kind = ThreadKind.Discussion;
     }
     if (this.form.kind === ThreadKind.Discussion) {
       this.form.title = localStorage.getItem(
-        `${app.activeChainId()}-new-discussion-storedTitle`
+        `${navState.activeChainId()}-new-discussion-storedTitle`
       );
     } else {
       this.form.url = localStorage.getItem(
-        `${app.activeChainId()}-new-link-storedLink`
+        `${navState.activeChainId()}-new-link-storedLink`
       );
       this.form.title = localStorage.getItem(
-        `${app.activeChainId()}-new-link-storedTitle`
+        `${navState.activeChainId()}-new-link-storedTitle`
       );
     }
   }
@@ -243,16 +243,16 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
         }
       }
       localStorage.removeItem(
-        `${app.activeChainId()}-new-discussion-storedTitle`
+        `${navState.activeChainId()}-new-discussion-storedTitle`
       );
       localStorage.removeItem(
-        `${app.activeChainId()}-new-discussion-storedText`
+        `${navState.activeChainId()}-new-discussion-storedText`
       );
-      localStorage.removeItem(`${app.activeChainId()}-active-topic`);
+      localStorage.removeItem(`${navState.activeChainId()}-active-topic`);
       localStorage.removeItem(
-        `${app.activeChainId()}-active-topic-default-template`
+        `${navState.activeChainId()}-active-topic-default-template`
       );
-      localStorage.removeItem(`${app.activeChainId()}-post-type`);
+      localStorage.removeItem(`${navState.activeChainId()}-post-type`);
     }
   }
 
@@ -260,7 +260,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     if (!app.chain) return;
     const { isModal, hasTopics } = vnode.attrs;
     const { fromDraft, saving, form } = this;
-    const chainId = app.activeChainId();
+    const chainId = navState.activeChainId();
     const author = app.user.activeAccount;
     const isAdmin = app.roles.isAdminOfEntity({ chain: chainId });
 

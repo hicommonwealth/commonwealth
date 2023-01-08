@@ -212,11 +212,11 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: null,
             });
             try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
+              const res = await $.post(`${navState.serverUrl()}/createChain`, {
                 base: ChainBase.Ethereum,
                 chain_string: chainString,
                 eth_chain_id: ethChainId,

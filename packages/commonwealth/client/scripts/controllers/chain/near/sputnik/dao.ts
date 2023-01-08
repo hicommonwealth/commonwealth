@@ -36,17 +36,17 @@ export default class NearSputnikDao extends ProposalModule<
     this._Chain = chain;
     this._Accounts = accounts;
     this._policy = await this._Chain.query(
-      this.app.activeChainId(),
+      this.navState.activeChainId(),
       'get_policy',
       {}
     );
     const state = await new NearApiAccount(
       this._Chain.api.connection,
-      this.app.activeChainId()
+      this.navState.activeChainId()
     ).state();
     this._tokenSupply = new BN(state.amount);
     const res: NearSputnikGetProposalResponse[] = await this._Chain.query(
-      this.app.activeChainId(),
+      this.navState.activeChainId(),
       'get_proposals',
       { from_index: 0, limit: 100 }
     );
@@ -58,7 +58,7 @@ export default class NearSputnikDao extends ProposalModule<
         })
     );
     this._nProposals = +(await this._Chain.query(
-      this.app.activeChainId(),
+      this.navState.activeChainId(),
       'get_last_proposal_id',
       {}
     ));
@@ -73,7 +73,7 @@ export default class NearSputnikDao extends ProposalModule<
   public async proposeTx(description: string, kind: NearSputnikProposalKind) {
     // TODO: user pre-checks
 
-    const contractId = this.app.activeChainId();
+    const contractId = this.navState.activeChainId();
     const methodName = 'add_proposal';
     const args = {
       proposal: {

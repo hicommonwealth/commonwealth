@@ -84,7 +84,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         )}
         {activeAddressesWithRole.length > 0 && m(MenuDivider)}
         {activeAddressesWithRole.length > 0 &&
-          app.activeChainId() &&
+          navState.activeChainId() &&
           m(MenuItem, {
             onclick: () => {
               const pf = app.user.activeAccount.profile;
@@ -100,7 +100,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             ),
           })}
         {activeAddressesWithRole.length > 0 &&
-          app.activeChainId() &&
+          navState.activeChainId() &&
           m(MenuItem, {
             onclick: (e) => {
               e.preventDefault();
@@ -173,7 +173,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
         })}
         {m(MenuItem, {
           onclick: () =>
-            app.activeChainId()
+            navState.activeChainId()
               ? navigateToSubpage('/settings')
               : m.route.set('/settings'),
           label: (
@@ -217,7 +217,7 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
         })}
         {m(MenuItem, {
           onclick: () => {
-            $.get(`${app.serverUrl()}/logout`)
+            $.get(`${navState.serverUrl()}/logout`)
               .then(async () => {
                 await initAppState();
                 notifySuccess('Logged out');
@@ -308,7 +308,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
       (account) => {
         return app.roles.getRoleInCommunity({
           account,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
         });
       }
     );
@@ -415,7 +415,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
               (a) => a.address === encodedAddress && a.chain.id === targetChain
             );
 
-            const account = app.chain.accounts.get(
+            const account = chainState.chain.accounts.get(
               encodedAddress,
               addressInfo.keytype
             );
@@ -450,7 +450,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
 
           // If token forum make sure has token and add to app.chain obj
           if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-            await app.chain.activeAddressHasToken(
+            await chainState.chain.activeAddressHasToken(
               app.user.activeAccount.address
             );
           }
@@ -466,7 +466,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
     async function performJoinCommunityLinking() {
       if (
         sameBaseAddressesRemoveDuplicates.length > 1 &&
-        app.activeChainId() !== 'axie-infinity'
+        navState.activeChainId() !== 'axie-infinity'
       ) {
         app.modals.create({
           modal: AccountSelector,
@@ -484,7 +484,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
         });
       } else if (
         sameBaseAddressesRemoveDuplicates.length === 1 &&
-        app.activeChainId() !== 'axie-infinity'
+        navState.activeChainId() !== 'axie-infinity'
       ) {
         await linkToCommunity(0);
       } else {

@@ -34,7 +34,7 @@ export class OrderTopicsModal extends ClassComponent {
 
   oninit() {
     this.topics = app.topics.store
-      .getByCommunity(app.chain.id)
+      .getByCommunity(chainState.chain.id)
       .filter((topic) => topic.featuredInSidebar)
       .map((topic) => ({ ...topic } as Topic));
     // If featured topics have not been re-ordered previously, they may lack

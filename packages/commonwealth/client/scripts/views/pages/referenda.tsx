@@ -20,10 +20,10 @@ import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { GovExplainer } from '../components/gov_explainer';
 
 function getModules() {
-  if (!app || !app.chain || !app.chain.loaded) {
+  if (!app || !app.chain || !chainState.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base === ChainBase.Substrate) {
+  if (chainState.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
 
     return [
@@ -40,23 +40,23 @@ function getModules() {
 class ReferendaPage extends ClassComponent {
   oncreate() {
     const returningFromThread =
-      app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
+      navState.lastNavigatedBack() && navState.lastNavigatedFrom().includes(`/proposal/`);
 
     if (
       returningFromThread &&
-      localStorage[`${app.activeChainId()}-proposals-scrollY`]
+      localStorage[`${navState.activeChainId()}-proposals-scrollY`]
     ) {
       setTimeout(() => {
         window.scrollTo(
           0,
-          Number(localStorage[`${app.activeChainId()}-proposals-scrollY`])
+          Number(localStorage[`${navState.activeChainId()}-proposals-scrollY`])
         );
       }, 100);
     }
   }
 
   view() {
-    if (!app.chain || !app.chain.loaded) {
+    if (!app.chain || !chainState.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut

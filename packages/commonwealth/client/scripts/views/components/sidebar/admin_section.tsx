@@ -13,7 +13,7 @@ import { verifyCachedToggleTree } from './helpers';
 
 function setAdminToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-admin-toggle-tree`]
+    localStorage[`${navState.activeChainId()}-admin-toggle-tree`]
   );
   const split = path.split('.');
   for (const field of split.slice(0, split.length - 1)) {
@@ -25,7 +25,7 @@ function setAdminToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
+  localStorage[`${navState.activeChainId()}-admin-toggle-tree`] =
     JSON.stringify(newTree);
 }
 
@@ -40,11 +40,11 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
     const isAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       });
     const isMod = app.roles.isRoleOfCommunity({
       role: 'moderator',
-      chain: app.activeChainId(),
+      chain: navState.activeChainId(),
     });
     if (!isAdmin && !isMod) return null;
 
@@ -59,7 +59,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         isUpdated: false,
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/manage`, app.activeChainId(), () => {
+          handleRedirectClicks(e, `/manage`, navState.activeChainId(), () => {
             setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
           });
         },
@@ -74,7 +74,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         isUpdated: false,
         onclick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/analytics`, app.activeChainId(), () => {
+          handleRedirectClicks(e, `/analytics`, navState.activeChainId(), () => {
             setAdminToggleTree(`children.analytics.toggledState`, toggle);
           });
         },
@@ -148,17 +148,17 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
     };
 
     // Check if an existing toggle tree is stored
-    if (!localStorage[`${app.activeChainId()}-admin-toggle-tree`]) {
-      localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
+    if (!localStorage[`${navState.activeChainId()}-admin-toggle-tree`]) {
+      localStorage[`${navState.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
         adminDefaultToggleTree
       );
     } else if (!verifyCachedToggleTree('admin', adminDefaultToggleTree)) {
-      localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
+      localStorage[`${navState.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
         adminDefaultToggleTree
       );
     }
     const toggleTreeState = JSON.parse(
-      localStorage[`${app.activeChainId()}-admin-toggle-tree`]
+      localStorage[`${navState.activeChainId()}-admin-toggle-tree`]
     );
 
     const sidebarSectionData: SidebarSectionAttrs = {

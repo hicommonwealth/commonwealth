@@ -58,7 +58,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
     mode?: QuillMode
   ) {
     const storedDoc: string = localStorage.getItem(
-      `${app.activeChainId()}-${editorNamespace}-storedText`
+      `${navState.activeChainId()}-${editorNamespace}-storedText`
     );
     const storedMode = localStorage.getItem(
       `${editorNamespace}-activeMode`
@@ -76,7 +76,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
         this.activeMode = 'richText';
       } catch (e) {
         contentsDoc = localStorage.getItem(
-          `${app.activeChainId()}-${editorNamespace}-storedText`
+          `${navState.activeChainId()}-${editorNamespace}-storedText`
         );
         this.activeMode = 'markdown';
       }

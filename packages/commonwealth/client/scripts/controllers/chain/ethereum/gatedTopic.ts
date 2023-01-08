@@ -8,9 +8,9 @@ export default class TopicGateCheck {
         if (ITokenAdapter.instanceOf(app.chain) && topicName) {
           const tokenPostingThreshold: BN = app.topics.getByName(
             topicName,
-            app.activeChainId()
+            navState.activeChainId()
           )?.tokenThreshold;
-          return tokenPostingThreshold && tokenPostingThreshold.gt(app.chain.tokenBalance);
+          return tokenPostingThreshold && tokenPostingThreshold.gt(chainState.chain.tokenBalance);
         }
         return false;
     }
@@ -19,7 +19,7 @@ export default class TopicGateCheck {
         if (ITokenAdapter.instanceOf(app.chain) && topicName) {
           return app.topics.getByName(
             topicName,
-            app.activeChainId()
+            navState.activeChainId()
           )?.tokenThreshold;
         }
         return new BN('0', 10);
@@ -27,7 +27,7 @@ export default class TopicGateCheck {
 
     public static getUserBalance(): BN {
         if (ITokenAdapter.instanceOf(app.chain)) {
-          return new BN(app.chain.tokenBalance, 10);
+          return new BN(chainState.chain.tokenBalance, 10);
         }
         return new BN('0', 10);
     }

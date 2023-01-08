@@ -43,7 +43,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
 
     this.currentStake = currentStake;
 
-    this.phragmenStakeAmount = app.chain.chain.coins(
+    this.phragmenStakeAmount = chainState.chain.chain.coins(
       parseFloat(String(currentStake)),
       true
     );
@@ -121,7 +121,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
           <div class="chooser">
             <CWText fontWeight="semiBold">
               Lock any amount of{' '}
-              {(app.chain && app.chain.chain && app.chain.chain.denom) ||
+              {(app.chain && chainState.chain.chain && chainState.chain.chain.denom) ||
                 'balance'}{' '}
               to vote. You may unlock at any time.
             </CWText>
@@ -135,7 +135,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
               value={String(this.currentStake)}
               placeholder="Amount to lock"
               oninput={(e) => {
-                this.phragmenStakeAmount = app.chain.chain.coins(
+                this.phragmenStakeAmount = chainState.chain.chain.coins(
                   parseFloat(e.target.value),
                   true
                 );

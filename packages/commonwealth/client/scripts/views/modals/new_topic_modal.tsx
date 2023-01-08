@@ -56,10 +56,10 @@ export class NewTopicModal extends ClassComponent {
     }
 
     const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
+      ? chainState.chain.meta.decimals
+      : chainState.chain.network === ChainNetwork.ERC721
       ? 0
-      : app.chain.base === ChainBase.CosmosSDK
+      : chainState.chain.base === ChainBase.CosmosSDK
       ? 6
       : 18;
 
@@ -81,7 +81,7 @@ export class NewTopicModal extends ClassComponent {
               let errorMsg;
 
               const currentCommunityTopicNames = app.topics
-                .getByCommunity(app.activeChainId())
+                .getByCommunity(navState.activeChainId())
                 .map((t) => t.name.toLowerCase());
 
               if (currentCommunityTopicNames.includes(text.toLowerCase())) {
@@ -125,7 +125,7 @@ export class NewTopicModal extends ClassComponent {
               this.form.description = (e.target as any).value;
             }}
           />
-          {app.activeChainId() && (
+          {navState.activeChainId() && (
             <>
               <CWLabel
                 label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}

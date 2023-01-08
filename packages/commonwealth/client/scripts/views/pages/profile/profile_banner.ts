@@ -5,6 +5,8 @@ import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { Account, AddressInfo } from 'models';
+import navState from 'navigationState';
+import chainState from 'chainState';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 
@@ -22,7 +24,7 @@ const ProfileBanner: m.Component<
     const createRole = async (e) => {
       vnode.state.loading = true;
 
-      const community = app.chain?.meta ? app.chain.meta.name : 'current';
+      const community = chainState.chain?.meta ? chainState.chain.meta.name : 'current';
       const confirmed = await confirmationModalWithText(
         `Join the ${community} community with this address?`
       )();
@@ -35,7 +37,7 @@ const ProfileBanner: m.Component<
       app.roles
         .createRole({
           address: addressInfo,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
         })
         .then(() => {
           vnode.state.loading = false;

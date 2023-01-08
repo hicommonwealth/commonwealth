@@ -1,4 +1,4 @@
-import app from 'state';
+import chainState from 'state';
 
 import { SigningStargateClient, StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
@@ -95,7 +95,7 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     try {
       // fetch chain id from URL using stargate client
       const url = `${window.location.origin}/cosmosAPI/${
-        app.chain?.id || this.defaultNetwork
+        chainState.chain?.id || this.defaultNetwork
       }`;
       const client = await StargateClient.connect(url);
       const chainId = await client.getChainId();
@@ -109,14 +109,14 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
         );
 
-        const bech32Prefix = app.chain.meta.bech32Prefix;
+        const bech32Prefix = chainState.chain.meta.bech32Prefix;
         const info: ChainInfo = {
           chainId: this._chainId,
-          chainName: app.chain.meta.name,
+          chainName: chainState.chain.meta.name,
           rpc: url,
           // Note that altWalletUrl on Cosmos chains should be the REST endpoint -- if not available, we
           // use the RPC url as hack, which will break some querying functionality but not signing.
-          rest: app.chain.meta.node.altWalletUrl || url,
+          rest: chainState.chain.meta.node.altWalletUrl || url,
           bip44: {
             coinType: 118,
           },
@@ -130,29 +130,29 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
           },
           currencies: [
             {
-              coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-              coinDecimals: app.chain.meta.decimals || 6,
+              coinDenom: chainState.chain.meta.default_symbol,
+              coinMinimalDenom: `u${chainState.chain.meta.default_symbol.toLowerCase()}`,
+              coinDecimals: chainState.chain.meta.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
-              coinDenom: app.chain.meta.default_symbol,
-              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-              coinDecimals: app.chain.meta.decimals || 6,
+              coinDenom: chainState.chain.meta.default_symbol,
+              coinMinimalDenom: `u${chainState.chain.meta.default_symbol.toLowerCase()}`,
+              coinDecimals: chainState.chain.meta.decimals || 6,
             },
           ],
           stakeCurrency: {
-            coinDenom: app.chain.meta.default_symbol,
-            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
-            coinDecimals: app.chain.meta.decimals || 6,
+            coinDenom: chainState.chain.meta.default_symbol,
+            coinMinimalDenom: `u${chainState.chain.meta.default_symbol.toLowerCase()}`,
+            coinDecimals: chainState.chain.meta.decimals || 6,
           },
           gasPriceStep: { low: 0, average: 0.025, high: 0.03 },
           features: ['stargate'],
         };
         await window.keplr.experimentalSuggestChain(info);
         await window.keplr.enable(this._chainId);
-        this._chain = app.chain.id;
+        this._chain = chainState.chain.id;
       }
       console.log(`Enabled web wallet for ${this._chainId}`);
 

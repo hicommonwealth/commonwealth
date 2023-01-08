@@ -50,7 +50,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
       return fullText;
     });
 
-    const chainOrCommObj = { chain: app.activeChainId() };
+    const chainOrCommObj = { chain: navState.activeChainId() };
 
     return (
       <div class="UpgradeRolesForm">
@@ -94,7 +94,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
               if (!user) return;
 
               if (!newRole) return;
-              $.post(`${app.serverUrl()}/upgradeMember`, {
+              $.post(`${navState.serverUrl()}/upgradeMember`, {
                 new_role: newRole,
                 address: user.Address.address,
                 ...chainOrCommObj,

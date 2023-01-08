@@ -22,7 +22,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
     app.user.activeAccount && !!app.chain?.meta.snapshot.length;
 
   const topics = app.topics
-    .getByCommunity(app.activeChainId())
+    .getByCommunity(navState.activeChainId())
     .reduce(
       (acc, current) => (current.featuredInNewPost ? [...acc, current] : acc),
       []
@@ -49,15 +49,15 @@ const getCreateContentMenuItems = (): MenuItem[] => {
       iconLeft: 'write',
       onclick: () => {
         // TODO Graham 7-19-22: Let's find a non-localStorage solution
-        localStorage.setItem(`${app.activeChainId()}-active-topic`, t.name);
+        localStorage.setItem(`${navState.activeChainId()}-active-topic`, t.name);
         if (t.defaultOffchainTemplate) {
           localStorage.setItem(
-            `${app.activeChainId()}-active-topic-default-template`,
+            `${navState.activeChainId()}-active-topic-default-template`,
             t.defaultOffchainTemplate
           );
         } else {
           localStorage.removeItem(
-            `${app.activeChainId()}-active-topic-default-template`
+            `${navState.activeChainId()}-active-topic-default-template`
           );
         }
         navigateToSubpage('/new/discussion');
@@ -143,7 +143,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
             label: 'New Snapshot Proposal',
             iconLeft: 'democraticProposal',
             onclick: () => {
-              const snapshotSpaces = app.chain.meta.snapshot;
+              const snapshotSpaces = chainState.chain.meta.snapshot;
               if (snapshotSpaces.length > 1) {
                 navigateToSubpage('/multiple-snapshots', {
                   action: 'create-proposal',
@@ -172,11 +172,11 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
           chainBase: null,
-          isCustomDomain: app.isCustomDomain(),
+          isCustomDomain: navState.isCustomDomain(),
           communityType: null,
         });
-        app.sidebarToggled = false;
-        app.sidebarMenu = 'default';
+        navState.sidebarToggled = false;
+        navState.sidebarMenu = 'default';
         m.route.set('/createCommunity');
       },
     },
@@ -188,11 +188,11 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         mixpanelBrowserTrack({
           event: MixpanelCommunityCreationEvent.CREATE_BUTTON_PRESSED,
           chainBase: null,
-          isCustomDomain: app.isCustomDomain(),
+          isCustomDomain: navState.isCustomDomain(),
           communityType: null,
         });
-        app.sidebarToggled = false;
-        app.sidebarMenu = 'default';
+        navState.sidebarToggled = false;
+        navState.sidebarMenu = 'default';
 
         window.open(
           `https://discord.com/oauth2/authorize?client_id=${
@@ -206,7 +206,7 @@ const getCreateContentMenuItems = (): MenuItem[] => {
   ];
 
   return [
-    ...(app.activeChainId()
+    ...(navState.activeChainId()
       ? [
           {
             type: 'header',
@@ -247,8 +247,8 @@ export class CreateContentSidebar extends ClassComponent {
             );
             sidebar[0].classList.add('onremove');
             setTimeout(() => {
-              app.sidebarToggled = false;
-              app.sidebarMenu = 'default';
+              navState.sidebarToggled = false;
+              navState.sidebarMenu = 'default';
               m.redraw();
             }, 200);
           },
@@ -267,7 +267,7 @@ export class CreateContentMenu extends ClassComponent {
         menuHeader={{
           label: 'Create',
           onclick: () => {
-            app.mobileMenu = 'MainMenu';
+            navState.mobileMenu = 'MainMenu';
           },
         }}
         menuItems={getCreateContentMenuItems()}
@@ -281,7 +281,7 @@ export class CreateContentPopover extends ClassComponent {
     if (
       !app.isLoggedIn() ||
       !app.chain ||
-      !app.activeChainId() ||
+      !navState.activeChainId() ||
       !app.user.activeAccount
     ) {
       return;

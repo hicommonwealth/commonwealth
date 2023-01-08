@@ -113,7 +113,7 @@ export class SputnikProposalForm extends ClassComponent {
               let amount: string;
               // treat NEAR as in dollars but tokens as whole #s
               if (!tokenId) {
-                amount = app.chain.chain
+                amount = chainState.chain.chain
                   .coins(+this.payoutAmount, true)
                   .asBN.toString();
               } else {

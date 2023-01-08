@@ -4,6 +4,8 @@
 import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
+import chainState from 'chainState';
+import navState from 'navigationState';
 import { isSameAccount } from 'helpers';
 
 import { initAppState } from 'app';
@@ -25,7 +27,7 @@ export function linkExistingAddressToChainOrCommunity(
   chain: string,
   originChain: string
 ) {
-  return $.post(`${app.serverUrl()}/linkExistingAddressToChain`, {
+  return $.post(`${navState.serverUrl()}/linkExistingAddressToChain`, {
     address,
     chain,
     originChain,
@@ -34,11 +36,11 @@ export function linkExistingAddressToChainOrCommunity(
 }
 
 export async function setActiveAccount(account: Account): Promise<void> {
-  const chain = app.activeChainId();
+  const chain = navState.activeChainId();
   const role = app.roles.getRoleInCommunity({ account, chain });
 
-  if (app.chain && ITokenAdapter.instanceOf(app.chain)) {
-    app.chain.activeAddressHasToken(account.address).then(() => m.redraw());
+  if (chainState.chain && ITokenAdapter.instanceOf(chainState.chain)) {
+    chainState.chain.activeAddressHasToken(account.address).then(() => m.redraw());
   }
 
   if (!role || role.is_user_default) {
@@ -53,7 +55,7 @@ export async function setActiveAccount(account: Account): Promise<void> {
   }
 
   try {
-    const response = await $.post(`${app.serverUrl()}/setDefaultRole`, {
+    const response = await $.post(`${navState.serverUrl()}/setDefaultRole`, {
       address: account.address,
       author_chain: account.chain.id,
       chain,
@@ -99,17 +101,17 @@ export async function completeClientLogin(account: Account) {
     }
 
     // link the address to the community
-    if (app.chain) {
+    if (chainState.chain) {
       try {
         if (
           !app.roles.getRoleInCommunity({
             account,
-            chain: app.activeChainId(),
+            chain: navState.activeChainId(),
           })
         ) {
           await app.roles.createRole({
             address: addressInfo,
-            chain: app.activeChainId(),
+            chain: navState.activeChainId(),
           });
         }
       } catch (e) {
@@ -144,7 +146,7 @@ export async function updateLastVisited(
     if (updateFrontend) {
       app.user.lastVisited[activeEntity.id] = new Date().toISOString();
     }
-    const response = await $.post(`${app.serverUrl()}/writeUserSetting`, {
+    const response = await $.post(`${navState.serverUrl()}/writeUserSetting`, {
       jwt: app.user.jwt,
       key: 'lastVisited',
       value,
@@ -160,7 +162,7 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
   app.user.setActiveAccounts(
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
-      .map((addr) => app.chain?.accounts.get(addr.address, addr.keytype))
+      .map((addr) => chainState.chain?.accounts.get(addr.address, addr.keytype))
       .filter((addr) => addr)
   );
 
@@ -248,7 +250,7 @@ export async function createUserWithAddress(
   chain: string,
   validationBlockInfo?: BlockInfo,
 ): Promise<{ account: Account; newlyCreated: boolean }> {
-  const response = await $.post(`${app.serverUrl()}/createAddress`, {
+  const response = await $.post(`${navState.serverUrl()}/createAddress`, {
     address,
     chain,
     jwt: app.user.jwt,
@@ -271,7 +273,7 @@ export async function createUserWithAddress(
 export async function unlinkLogin(account: AddressInfo) {
   const unlinkingCurrentlyActiveAccount = app.user.activeAccount === account;
   // TODO: Change to DELETE /address
-  await $.post(`${app.serverUrl()}/deleteAddress`, {
+  await $.post(`${navState.serverUrl()}/deleteAddress`, {
     address: account.address,
     chain: account.chain.id,
     auth: true,
@@ -298,7 +300,7 @@ export async function loginWithMagicLink(email: string) {
   const magic = new Magic(process.env.MAGIC_PUBLISHABLE_KEY, {});
   const didToken = await magic.auth.loginWithMagicLink({ email });
   const response = await $.post({
-    url: `${app.serverUrl()}/auth/magic`,
+    url: `${navState.serverUrl()}/auth/magic`,
     headers: {
       Authorization: `Bearer ${didToken}`,
     },
@@ -307,16 +309,16 @@ export async function loginWithMagicLink(email: string) {
     },
     data: {
       // send chain/community to request
-      chain: app.activeChainId(),
+      chain: navState.activeChainId(),
     },
   });
   if (response.status === 'Success') {
     // log in as the new user (assume all verification done server-side)
     await initAppState(false);
-    if (app.chain) {
+    if (chainState.chain) {
       const c = app.user.selectedChain
         ? app.user.selectedChain
-        : app.config.chains.getById(app.activeChainId());
+        : app.config.chains.getById(navState.activeChainId());
       await updateActiveAddresses(c);
     }
   } else {

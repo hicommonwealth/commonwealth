@@ -48,14 +48,14 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
       );
     }
 
-    if (!app.chain || !app.chain.loaded || !app.chain.meta) {
+    if (!app.chain || !chainState.chain.loaded || !chainState.chain.meta) {
       return <PageLoading />;
     }
 
     // infer proposal type if possible
     if (!this.typeEnum) {
       try {
-        this.typeEnum = chainToProposalSlug(app.chain.meta);
+        this.typeEnum = chainToProposalSlug(chainState.chain.meta);
       } catch (e) {
         return (
           <PageNotFound
@@ -74,7 +74,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
     >;
 
     if (!c.ready) {
-      app.chain.loadModules([c]);
+      chainState.chain.loadModules([c]);
       return <PageLoading />;
     }
 

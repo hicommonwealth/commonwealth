@@ -87,7 +87,7 @@ export class EmailSection extends ClassComponent {
                 if (!confirmed) return;
 
                 try {
-                  await $.post(`${app.serverUrl()}/updateEmail`, {
+                  await $.post(`${navState.serverUrl()}/updateEmail`, {
                     email: this.email,
                     jwt: app.user.jwt,
                   });
@@ -149,7 +149,7 @@ export class EmailSection extends ClassComponent {
             onclick={() => {
               if (githubAccount) {
                 $.ajax({
-                  url: `${app.serverUrl()}/githubAccount`,
+                  url: `${navState.serverUrl()}/githubAccount`,
                   data: { jwt: app.user.jwt },
                   type: 'DELETE',
                   success: () => {
@@ -169,7 +169,7 @@ export class EmailSection extends ClassComponent {
                     path: m.route.get(),
                   })
                 );
-                document.location = `${app.serverUrl()}/auth/github` as any;
+                document.location = `${navState.serverUrl()}/auth/github` as any;
                 m.redraw();
               }
             }}
@@ -180,7 +180,7 @@ export class EmailSection extends ClassComponent {
             onclick={() => {
               if (discordAccount) {
                 $.ajax({
-                  url: `${app.serverUrl()}/discordAccount`,
+                  url: `${navState.serverUrl()}/discordAccount`,
                   data: { jwt: app.user.jwt },
                   type: 'DELETE',
                   success: () => {
@@ -200,7 +200,7 @@ export class EmailSection extends ClassComponent {
                     path: m.route.get(),
                   })
                 );
-                document.location = `${app.serverUrl()}/auth/discord` as any;
+                document.location = `${navState.serverUrl()}/auth/discord` as any;
                 m.redraw();
               }
             }}

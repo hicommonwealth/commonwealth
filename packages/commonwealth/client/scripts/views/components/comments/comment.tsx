@@ -32,10 +32,10 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
 
     // Check for accounts on forums that originally signed up on a different base chain,
     // Render them as anonymous as the forum is unable to support them.
-    if (app.chain.meta.type === ChainType.Offchain) {
+    if (chainState.chain.meta.type === ChainType.Offchain) {
       if (
-        comment.authorChain !== app.chain.id &&
-        comment.authorChain !== app.chain.base
+        comment.authorChain !== chainState.chain.id &&
+        comment.authorChain !== chainState.chain.base
       ) {
         return m(AnonymousUser, {
           distinguishingKey: comment.author,
@@ -43,7 +43,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
       }
     }
 
-    const author: Account = app.chain.accounts.get(comment.author);
+    const author: Account = chainState.chain.accounts.get(comment.author);
 
     return comment.deleted ? (
       <span>[deleted]</span>
@@ -94,11 +94,11 @@ export class Comment extends ClassComponent<CommentAttrs> {
       app.user.isSiteAdmin ||
       app.roles.isRoleOfCommunity({
         role: 'admin',
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       }) ||
       app.roles.isRoleOfCommunity({
         role: 'moderator',
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       });
 
     const canReply =
@@ -182,7 +182,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                             onclick: async (e) => {
                               e.preventDefault();
                               this.savedEdits = localStorage.getItem(
-                                `${app.activeChainId()}-edit-comment-${
+                                `${navState.activeChainId()}-edit-comment-${
                                   comment.id
                                 }-storedText`
                               );

@@ -54,7 +54,7 @@ class MembersPage extends ClassComponent {
       );
 
     // get members once
-    const activeInfo = app.chain.meta;
+    const activeInfo = chainState.chain.meta;
 
     if (!this.membersRequested) {
       this.membersRequested = true;
@@ -101,9 +101,9 @@ class MembersPage extends ClassComponent {
       );
 
     const navigatedFromAccount =
-      app.lastNavigatedBack() &&
-      app.lastNavigatedFrom().includes(`/${app.activeChainId()}/account/`) &&
-      localStorage[`${app.activeChainId()}-members-scrollY`];
+      navState.lastNavigatedBack() &&
+      navState.lastNavigatedFrom().includes(`/${navState.activeChainId()}/account/`) &&
+      localStorage[`${navState.activeChainId()}-members-scrollY`];
 
     // Load default number of profiles on mount
     if (!this.initialProfilesLoaded) {
@@ -113,7 +113,7 @@ class MembersPage extends ClassComponent {
       // Set initial number loaded (contingent on navigation)
       if (navigatedFromAccount) {
         this.numProfilesLoaded = Number(
-          localStorage[`${app.activeChainId()}-members-numProfilesLoaded`]
+          localStorage[`${navState.activeChainId()}-members-numProfilesLoaded`]
         );
       } else {
         this.numProfilesLoaded = Math.min(
@@ -151,7 +151,7 @@ class MembersPage extends ClassComponent {
       setTimeout(() => {
         window.scrollTo(
           0,
-          Number(localStorage[`${app.activeChainId()}-members-scrollY`])
+          Number(localStorage[`${navState.activeChainId()}-members-scrollY`])
         );
       }, 100);
     }
@@ -212,13 +212,13 @@ class MembersPage extends ClassComponent {
               return (
                 <div class="member-row">
                   <a
-                    href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
+                    href={`/${navState.activeChainId()}/account/${address}?base=${chain}`}
                     onclick={(e) => {
                       e.preventDefault();
-                      localStorage[`${app.activeChainId()}-members-scrollY`] =
+                      localStorage[`${navState.activeChainId()}-members-scrollY`] =
                         window.scrollY;
                       localStorage[
-                        `${app.activeChainId()}-members-numProfilesLoaded`
+                        `${navState.activeChainId()}-members-numProfilesLoaded`
                       ] = numProfilesLoaded;
                       navigateToSubpage(`/account/${address}?base=${chain}`);
                     }}

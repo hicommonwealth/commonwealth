@@ -34,6 +34,7 @@ export default class MolochGovernance extends ProposalModule<
 
   private _api: MolochAPI;
   private _Members: MolochMembers;
+  chainState: any;
 
   // GETTERS
   public get proposalCount() { return this._proposalCount; }
@@ -74,7 +75,7 @@ export default class MolochGovernance extends ProposalModule<
 
     // fetch all proposals
     console.log('Fetching moloch proposals from backend.');
-    await this.app.chainEntities.refresh(this.app.chain.id);
+    await this.app.chainEntities.refresh(this.chainState.chain.id);
     const entities = this.app.chainEntities.store.getByType(MolochEvents.Types.EntityKind.Proposal);
     entities.map((p) => this._entityConstructor(p));
     this._proposalCount = new BN(this.store.getAll().length);

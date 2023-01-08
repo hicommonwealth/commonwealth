@@ -167,16 +167,16 @@ export class SubstrateAccount extends Account {
   ) {
     if (!app.isModuleReady) {
       // defer chain initialization
-      super({ chain: app.chain.meta, address });
+      super({ chain: chainState.chain.meta, address });
       app.chainModuleReady.once('ready', () => {
-        if (app.chain.chain instanceof SubstrateChain) {
-          this._Chain = app.chain.chain;
+        if (chainState.chain.chain instanceof SubstrateChain) {
+          this._Chain = chainState.chain.chain;
         } else {
           console.error('Did not successfully initialize account with chain');
         }
       });
     } else {
-      super({ chain: app.chain.meta, address });
+      super({ chain: chainState.chain.meta, address });
       this._Chain = ChainInfo;
     }
     this.isEd25519 = isEd25519;

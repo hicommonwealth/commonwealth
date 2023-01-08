@@ -54,7 +54,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
 
   oninit(vnode: m.Vnode<LoginModalAttrs>) {
     // Determine if in a community
-    this.currentlyInCommunityPage = app.activeChainId() !== undefined;
+    this.currentlyInCommunityPage = navState.activeChainId() !== undefined;
 
     if (this.currentlyInCommunityPage) {
       const chainbase = app.chain?.meta?.base;
@@ -185,7 +185,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         if (app.chain) {
           const chain =
             app.user.selectedChain ||
-            app.config.chains.getById(app.activeChainId());
+            app.config.chains.getById(navState.activeChainId());
           await updateActiveAddresses(chain);
         }
         if (exitOnComplete) {

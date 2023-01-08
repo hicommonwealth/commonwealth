@@ -10,7 +10,7 @@ import { PageLoading } from './loading';
 class DiscussionsRedirect extends ClassComponent {
   view() {
     if (app.chain) {
-      if (app.chain.meta.defaultOverview) {
+      if (chainState.chain.meta.defaultOverview) {
         navigateToSubpage('/overview');
       } else {
         navigateToSubpage('/discussions');

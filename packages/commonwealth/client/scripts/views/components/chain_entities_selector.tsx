@@ -24,12 +24,12 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
   view(vnode: m.Vnode<ChainEntitiesSelectorAttrs>) {
     const { thread, onSelect } = vnode.attrs;
 
-    if (!app.chain || !app.activeChainId()) return;
+    if (!app.chain || !navState.activeChainId()) return;
 
     if (!this.initialized) {
       this.initialized = true;
       app.chainEntities
-        ?.refresh(app.chain.id)
+        ?.refresh(chainState.chain.id)
         .then(() => {
           // refreshing loads the latest chain entities into app.chainEntities store
           this.chainEntitiesLoaded = true;

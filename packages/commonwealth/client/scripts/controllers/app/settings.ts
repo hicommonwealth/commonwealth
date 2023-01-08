@@ -2,12 +2,13 @@ import $ from 'jquery';
 import app from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
+import navState from 'navigationState';
 
 class SettingsController {
   public static async disableRichText(value: boolean) {
     if (!app.isLoggedIn()) return;
     return new Promise<void>((resolve, reject) => {
-      $.post(`${app.serverUrl()}/writeUserSetting`, {
+      $.post(`${navState.serverUrl()}/writeUserSetting`, {
         jwt: app.user.jwt,
         key: 'disableRichText',
         value: value ? 'true' : 'false',

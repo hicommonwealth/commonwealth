@@ -108,11 +108,11 @@ export class CosmosForm extends ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: null,
             });
             try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
+              const res = await $.post(`${navState.serverUrl()}/createChain`, {
                 alt_wallet_url: altWalletUrl,
                 base: ChainBase.CosmosSDK,
                 bech32_prefix: bech32Prefix,

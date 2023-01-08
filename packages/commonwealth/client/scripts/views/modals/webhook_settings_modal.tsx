@@ -122,7 +122,7 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
               e.preventDefault();
               const chainOrCommObj = { chain: webhook.chain_id };
               $.ajax({
-                url: `${app.serverUrl()}/updateWebhook`,
+                url: `${navState.serverUrl()}/updateWebhook`,
                 data: {
                   webhookId: webhook.id,
                   categories: this.selectedCategories,

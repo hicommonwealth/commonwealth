@@ -389,19 +389,19 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             }
 
             try {
-              $.post(`${app.serverUrl()}/updateBanner`, {
+              $.post(`${navState.serverUrl()}/updateBanner`, {
                 chain_id: chain.id,
                 banner_text: this.communityBanner,
                 auth: true,
                 jwt: app.user.jwt,
               }).then(() => {
-                app.chain.meta.setBanner(this.communityBanner);
+                chainState.chain.meta.setBanner(this.communityBanner);
 
                 if (
-                  localStorage.getItem(`${app.activeChainId()}-banner`) ===
+                  localStorage.getItem(`${navState.activeChainId()}-banner`) ===
                   'off'
                 ) {
-                  localStorage.setItem(`${app.activeChainId()}-banner`, 'on');
+                  localStorage.setItem(`${navState.activeChainId()}-banner`, 'on');
                 }
               });
             } catch (err) {
@@ -474,7 +474,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                         process.env.DISCORD_UI_URL
                       )}/callback&response_type=code&scope=bot&state=${encodeURI(
                         JSON.stringify({
-                          cw_chain_id: app.activeChainId(),
+                          cw_chain_id: navState.activeChainId(),
                           verification_token,
                         })
                       )}`
@@ -578,7 +578,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                         process.env.DISCORD_UI_URL
                       )}/callback&response_type=code&scope=bot&state=${encodeURI(
                         JSON.stringify({
-                          cw_chain_id: app.activeChainId(),
+                          cw_chain_id: navState.activeChainId(),
                           verification_token,
                         })
                       )}`

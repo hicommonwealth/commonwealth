@@ -98,7 +98,7 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
 
       const yesBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(yesBalance.toString())
-      )} ${app.chain.meta.default_symbol}`;
+      )} ${chainState.chain.meta.default_symbol}`;
 
       const noVotes: AaveProposalVote[] = votes.filter((v) => !v.choice);
 
@@ -109,7 +109,7 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
 
       const noBalanceString = `${formatNumberLong(
         +Web3.utils.fromWei(noBalance.toString())
-      )} ${app.chain.meta.default_symbol}`;
+      )} ${chainState.chain.meta.default_symbol}`;
 
       return (
         <AaveVotingResult
@@ -132,8 +132,8 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
 
         // TODO: move this marshalling into controller
         const formatCurrency = (n: BN) => {
-          const decimals = new BN(10).pow(new BN(app.chain.meta.decimals || 6));
-          const denom = app.chain.meta.default_symbol;
+          const decimals = new BN(10).pow(new BN(chainState.chain.meta.decimals || 6));
+          const denom = chainState.chain.meta.default_symbol;
           const coin = new Coin(denom, n, false, decimals);
           return coin.format();
         };

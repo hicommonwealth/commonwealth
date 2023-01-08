@@ -28,7 +28,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
   async uploadImage(file: File): Promise<[string, ValidationStatus]> {
     try {
       const signatureResponse = await $.post(
-        `${app.serverUrl()}/getUploadSignature`,
+        `${navState.serverUrl()}/getUploadSignature`,
         {
           name: file.name,
           mimetype: file.type,

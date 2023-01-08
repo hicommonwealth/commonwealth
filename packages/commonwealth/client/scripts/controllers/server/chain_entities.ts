@@ -32,7 +32,7 @@ export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
 }
 
 const get = (route, args, callback) => {
-  return $.get(app.serverUrl() + route, args)
+  return $.get(navState.serverUrl() + route, args)
     .then((resp) => {
       if (resp.status === 'Success') {
         callback(resp.result);
@@ -205,19 +205,19 @@ class ChainEntityController {
 
   public async updateEntityTitle(uniqueIdentifier: string, title: string) {
     const chainEntity = this.store.getByUniqueId(
-      app.activeChainId(),
+      navState.activeChainId(),
       uniqueIdentifier
     );
     if (!chainEntity)
       console.error('Cannot update title for non-existent entity');
     return $.ajax({
-      url: `${app.serverUrl()}/updateChainEntityTitle`,
+      url: `${navState.serverUrl()}/updateChainEntityTitle`,
       type: 'POST',
       data: {
         jwt: app.user.jwt,
         chain_entity_id: chainEntity.id,
         title,
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       },
       success: (response) => {
         chainEntity.title = title;

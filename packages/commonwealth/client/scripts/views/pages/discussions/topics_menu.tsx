@@ -49,7 +49,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
           <div class="threads-filter-menu-items">
             <ThreadsFilterMenuItem
               label="All Topics"
-              isSelected={m.route.get() === `/${app.activeChainId()}` || !topic}
+              isSelected={m.route.get() === `/${navState.activeChainId()}` || !topic}
               onclick={() => {
                 navigateToSubpage('/discussions');
               }}
@@ -69,7 +69,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                 }) => {
                   const active =
                     m.route.get() ===
-                      `/${app.activeChainId()}/discussions/${encodeURI(
+                      `/${navState.activeChainId()}/discussions/${encodeURI(
                         name.toString().trim()
                       )}` ||
                     (topic && topic === name);
@@ -84,7 +84,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                       }}
                       iconRight={
                         app.roles?.isAdminOfEntity({
-                          chain: app.activeChainId(),
+                          chain: navState.activeChainId(),
                         }) && (
                           <CWIconButton
                             iconName="write"

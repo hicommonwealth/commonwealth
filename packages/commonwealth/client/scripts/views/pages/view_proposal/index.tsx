@@ -21,6 +21,8 @@ import { Comment, Account, ProposalModule, AnyProposal } from 'models';
 import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
+import chainState from 'chainState';
+import navState from 'navigationState';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import User from '../../components/widgets/user';
@@ -64,7 +66,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   view(vnode: m.Vnode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
-    if (!app.chain?.meta) {
+    if (!chainState.chain?.meta) {
       return (
         <PageLoading
         // title="Loading..."
@@ -72,7 +74,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       );
     }
 
-    const type = vnode.attrs.type || chainToProposalSlug(app.chain.meta);
+    const type = vnode.attrs.type || chainToProposalSlug(chainState.chain.meta);
 
     const headerTitle = 'Proposals';
 
@@ -111,7 +113,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       try {
         this.proposal = idToProposal(proposalType, proposalId);
       } catch (e) {
-        if (!app.chain.loaded) {
+        if (!chainState.chain.loaded) {
           return (
             <PageLoading
             //  title={headerTitle}
@@ -133,10 +135,10 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         if (!c.ready) {
           // TODO: perhaps we should be able to load here without fetching ALL proposal data
           // load sibling modules too
-          if (app.chain.base === ChainBase.Substrate) {
-            const chain = app.chain as Substrate;
+          if (chainState.chain.base === ChainBase.Substrate) {
+            const chain = chainState.chain as Substrate;
 
-            app.chain.loadModules([
+            chainState.chain.loadModules([
               chain.council,
               chain.technicalCommittee,
               chain.treasury,
@@ -145,7 +147,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
               chain.tips,
             ]);
           } else {
-            app.chain.loadModules([c]);
+            chainState.chain.loadModules([c]);
           }
 
           return (
@@ -174,7 +176,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     // load comments
     if (!this.prefetch[proposalIdAndType]['commentsStarted']) {
       app.comments
-        .refresh(this.proposal, app.activeChainId())
+        .refresh(this.proposal, navState.activeChainId())
         .then(async () => {
           this.comments = app.comments
             .getByProposal(this.proposal)

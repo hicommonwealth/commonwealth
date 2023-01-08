@@ -24,6 +24,6 @@ export const clearEditingLocalStorage = (
   contentType: ContentType
 ) => {
   localStorage.removeItem(
-    `${app.activeChainId()}-edit-${contentType}-${id}-storedText`
+    `${navState.activeChainId()}-edit-${contentType}-${id}-storedText`
   );
 };

@@ -98,7 +98,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     const mixpanelTrack = () => {
       mixpanelBrowserTrack({
         event: MixpanelSnapshotEvents.SNAPSHOT_PROPOSAL_VIEWED,
-        isCustomDomain: app.isCustomDomain(),
+        isCustomDomain: navState.isCustomDomain(),
         space: app.snapshot.space.id,
       });
     };
@@ -134,7 +134,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
                 user: new AddressInfo(
                   null,
                   this.proposal.author,
-                  app.activeChainId(),
+                  navState.activeChainId(),
                   null
                 ),
                 showAddressWithDisplayName: true,

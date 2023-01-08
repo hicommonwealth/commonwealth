@@ -49,7 +49,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
       maxFilesize: 10, // MB
       // request a signed upload URL when a file is accepted from the user
       accept: (file, done) => {
-        $.post(`${app.serverUrl()}/getUploadSignature`, {
+        $.post(`${navState.serverUrl()}/getUploadSignature`, {
           name: file.name, // imageName.png
           mimetype: file.type, // image/png
           auth: true,

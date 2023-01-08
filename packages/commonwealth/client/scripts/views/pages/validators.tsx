@@ -72,7 +72,7 @@ class ValidatorsPage extends ClassComponent {
   private validatorsInitialized: boolean;
 
   view() {
-    if (!app.chain || !app.chain.loaded) {
+    if (!app.chain || !chainState.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut
@@ -95,7 +95,7 @@ class ValidatorsPage extends ClassComponent {
 
     if (
       app.chain?.base === ChainBase.Substrate &&
-      app.chain.apiInitialized &&
+      chainState.chain.apiInitialized &&
       !this.validatorsInitialized
     ) {
       (app.chain as Substrate).accounts.getValidators().then((result) => {

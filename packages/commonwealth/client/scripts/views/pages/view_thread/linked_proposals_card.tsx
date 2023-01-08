@@ -17,6 +17,8 @@ import {
   SnapshotProposal,
   SnapshotSpace,
 } from 'helpers/snapshot_utils';
+import chainState from 'chainState';
+import navState from 'navigationState';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';
@@ -35,7 +37,7 @@ class LinkedProposal extends ClassComponent<LinkedProposalAttrs> {
     const slug = chainEntityTypeToProposalSlug(chainEntity.type);
 
     const threadLink = `${
-      app.isCustomDomain() ? '' : `/${thread.chain}`
+      navState.isCustomDomain() ? '' : `/${thread.chain}`
     }${getProposalUrlPath(slug, chainEntity.typeId, true)}`;
 
     return (
@@ -70,7 +72,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
     if (!this.initialized && thread.snapshotProposal?.length > 0) {
       this.initialized = true;
 
-      loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+      loadMultipleSpacesData(chainState.chain.meta.snapshot).then((data) => {
         for (const { space, proposals } of data) {
           const matchingSnapshot = proposals.find(
             (sn) => sn.id === thread.snapshotProposal
@@ -93,7 +95,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
 
     if (this.space && this.snapshot) {
       snapshotUrl = `${
-        app.isCustomDomain() ? '' : `/${thread.chain}`
+        navState.isCustomDomain() ? '' : `/${thread.chain}`
       }/snapshot/${this.space.id}/${this.snapshot.id}`;
     }
 

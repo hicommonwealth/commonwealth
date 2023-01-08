@@ -87,7 +87,7 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
         id,
         description: form.description,
         name: form.name,
-        chain_id: app.activeChainId(),
+        chain_id: navState.activeChainId(),
         telegram: null,
         featured_in_sidebar: form.featuredInSidebar,
         featured_in_new_post: form.featuredInNewPost,
@@ -110,7 +110,7 @@ export class EditTopicModal extends ClassComponent<EditTopicModalAttrs> {
       const topicInfo = {
         id,
         name: form.name,
-        chainId: app.activeChainId(),
+        chainId: navState.activeChainId(),
       };
 
       await app.topics.remove(topicInfo);

@@ -123,7 +123,7 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
       // temporarily mark the user's profile as invalid, since they've potentially updated their
       // display name. this ensures that any identity display will fall back to the loaded identity.
       const profile = app.profiles.getProfile(
-        app.chain.id,
+        chainState.chain.id,
         app.user.activeAccount.address
       );
 

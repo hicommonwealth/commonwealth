@@ -66,14 +66,14 @@ class Councillor extends ClassComponent<CouncillorAttrs> {
 }
 
 const getCouncillors = () => {
-  if (app.chain.base !== ChainBase.Substrate) {
+  if (chainState.chain.base !== ChainBase.Substrate) {
     return null;
   }
 
   const councillors: SubstrateAccount[] =
     app.chain &&
     ((app.chain as Substrate).phragmenElections.members || [])
-      .map((a) => app.chain.accounts.get(a))
+      .map((a) => chainState.chain.accounts.get(a))
       .sort((a, b) => {
         const va = (app.chain as Substrate).phragmenElections.backing(a);
         const vb = (app.chain as Substrate).phragmenElections.backing(b);
@@ -85,7 +85,7 @@ const getCouncillors = () => {
 };
 
 const getCouncilCandidates = () => {
-  if (app.chain.base !== ChainBase.Substrate) {
+  if (chainState.chain.base !== ChainBase.Substrate) {
     return null;
   }
 
@@ -95,7 +95,7 @@ const getCouncilCandidates = () => {
       (app.chain as Substrate).phragmenElections.activeElection?.candidates ||
       []
     )
-      .map((s): [SubstrateAccount, number] => [app.chain.accounts.get(s), null])
+      .map((s): [SubstrateAccount, number] => [chainState.chain.accounts.get(s), null])
       .sort((a, b) => {
         const va = (app.chain as Substrate).phragmenElections.backing(a[0]);
         const vb = (app.chain as Substrate).phragmenElections.backing(b[0]);
@@ -107,11 +107,11 @@ const getCouncilCandidates = () => {
 };
 
 function getModules() {
-  if (!app || !app.chain || !app.chain.loaded) {
+  if (!app || !app.chain || !chainState.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
 
-  if (app.chain.base === ChainBase.Substrate) {
+  if (chainState.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
     return [chain.phragmenElections];
   } else {
@@ -121,7 +121,7 @@ function getModules() {
 
 class CouncilPage extends ClassComponent {
   view() {
-    if (!app.chain || !app.chain.loaded) {
+    if (!app.chain || !chainState.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut
@@ -204,7 +204,7 @@ class CouncilPage extends ClassComponent {
             statAction={
               app.user.activeAccount &&
               app.user.activeAccount instanceof SubstrateAccount &&
-              app.chain.networkStatus === ApiStatus.Connected && (
+              chainState.chain.networkStatus === ApiStatus.Connected && (
                 <>
                   <CWButton
                     onclick={(e) => {

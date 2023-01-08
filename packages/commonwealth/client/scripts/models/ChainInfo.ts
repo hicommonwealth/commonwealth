@@ -213,7 +213,7 @@ class ChainInfo {
   // TODO: get operation should not have side effects, and either way this shouldn't be here
   public async getMembers(id: string) {
     try {
-      const res = await $.get(`${app.serverUrl()}/bulkMembers`, { chain: id });
+      const res = await $.get(`${navState.serverUrl()}/bulkMembers`, { chain: id });
       this.setMembers(res.result);
       const roles = res.result.filter((r) => {
         return (
@@ -290,8 +290,8 @@ class ChainInfo {
     default_deny_permissions,
   }) {
     // TODO: Change to PUT /chain
-    const r = await $.post(`${app.serverUrl()}/updateChain`, {
-      id: app.activeChainId(),
+    const r = await $.post(`${navState.serverUrl()}/updateChain`, {
+      id: navState.activeChainId(),
       name,
       description,
       website,

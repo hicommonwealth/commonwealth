@@ -39,7 +39,7 @@ class SudoForm extends ClassComponent {
         <div class="admin-column">
           <CWText>Must be logged into admin account to use Sudo: </CWText>
           {m(User, {
-            user: app.chain.accounts.get(substrate.chain.sudoKey),
+            user: chainState.chain.accounts.get(substrate.chain.sudoKey),
           })}
         </div>
       );
@@ -108,32 +108,32 @@ class ChainStats extends ClassComponent {
         <CWText type="h5">ChainInfo</CWText>
         <div class="stat">
           <CWLabel label="Id" />
-          <CWText>{app.activeChainId()}</CWText>
+          <CWText>{navState.activeChainId()}</CWText>
         </div>
         <div class="stat">
           <CWLabel label="Name" />
-          <CWText>{app.chain.name?.toString()}</CWText>
+          <CWText>{chainState.chain.name?.toString()}</CWText>
         </div>
         <div class="stat">
           <CWLabel label="Version" />
-          <CWText>{app.chain.version?.toString()}</CWText>
+          <CWText>{chainState.chain.version?.toString()}</CWText>
         </div>
         <div class="stat">
           <CWLabel label="Runtime" />
-          <CWText>{app.chain.runtimeName?.toString()}</CWText>
+          <CWText>{chainState.chain.runtimeName?.toString()}</CWText>
         </div>
         <CWText type="h5">Block Production</CWText>
         <div class="stat">
           <CWLabel label="Current Block" />
-          <CWText>{app.chain.block?.height}</CWText>
+          <CWText>{chainState.chain.block?.height}</CWText>
         </div>
         <div class="stat">
           <CWLabel label="Last Block Created" />
-          <CWText>{app.chain.block?.lastTime.format('HH:mm:ss')}</CWText>
+          <CWText>{chainState.chain.block?.lastTime.format('HH:mm:ss')}</CWText>
         </div>
         <div class="stat">
           <CWLabel label="Target Block Time" />
-          <CWText>{app.chain.block?.duration} sec</CWText>
+          <CWText>{chainState.chain.block?.duration} sec</CWText>
         </div>
         <CWText type="h5">Balances</CWText>
         <div class="stat">
@@ -256,7 +256,7 @@ class AdminActions extends ClassComponent {
             e.preventDefault();
             this.inprogress = true;
             // TODO: Change to PUT /adminStatus
-            $.post(`${app.serverUrl()}/updateAdminStatus`, {
+            $.post(`${navState.serverUrl()}/updateAdminStatus`, {
               admin: app.user.activeAccount.address,
               address: this.selectedProfile, // the address to be changed
               role: this.role,

@@ -84,10 +84,10 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
   private async _validate(wallet: WalletConnection) {
     try {
       // TODO: do we need to do this every time, or only on first connect?
-      const acct: NearAccount = app.chain.accounts.get(wallet.getAccountId());
+      const acct: NearAccount = chainState.chain.accounts.get(wallet.getAccountId());
       const chain =
         app.user.selectedChain ||
-        app.config.chains.getById(app.activeChainId());
+        app.config.chains.getById(navState.activeChainId());
       const newAcct = await createUserWithAddress(
         acct.address,
         WalletId.NearWallet,
@@ -160,7 +160,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         // POST object
         const chainCreateArgs = JSON.parse(chainCreateArgString);
         const res = await $.post(
-          `${app.serverUrl()}/createChain`,
+          `${navState.serverUrl()}/createChain`,
           chainCreateArgs
         );
         await initAppState(false);
@@ -172,10 +172,10 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
   }
 
   public view() {
-    if (!app.chain || !app.chain.loaded || this.state.validating) {
+    if (!app.chain || !chainState.chain.loaded || this.state.validating) {
       return <PageLoading />;
     }
-    if (app.chain.base !== ChainBase.NEAR) {
+    if (chainState.chain.base !== ChainBase.NEAR) {
       return <PageNotFound />;
     }
     if (this.state.validationError) {

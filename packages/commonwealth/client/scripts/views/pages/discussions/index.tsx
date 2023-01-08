@@ -29,7 +29,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   }
 
   async onscroll() {
-    localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+    localStorage[`${navState.activeChainId()}-discussions-scrollY`] =
       this.scrollEle.scrollTop;
 
     const { fetchingThreads, topicName, stageName } = this;
@@ -51,9 +51,9 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
 
   oncreate() {
     const storedScrollYPos =
-      localStorage[`${app.activeChainId()}-discussions-scrollY`];
+      localStorage[`${navState.activeChainId()}-discussions-scrollY`];
 
-    if (app.lastNavigatedBack() && storedScrollYPos) {
+    if (navState.lastNavigatedBack() && storedScrollYPos) {
       setTimeout(() => {
         this.scrollEle.scrollTo(0, Number(storedScrollYPos));
       }, 100);
@@ -61,7 +61,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   }
 
   view(vnode: m.Vnode<DiscussionPageAttrs>) {
-    if (!app.chain || !app.chain.serverLoaded) {
+    if (!app.chain || !chainState.chain.serverLoaded) {
       return <PageLoading />;
     }
 
@@ -106,7 +106,7 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       <Sublayout
         title="Discussions"
         description={
-          app.topics.getByName(this.topicName, app.activeChainId()) || ''
+          app.topics.getByName(this.topicName, navState.activeChainId()) || ''
         }
         onscroll={debounce(this.onscroll.bind(this), 400)}
       >

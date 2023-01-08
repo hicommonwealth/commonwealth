@@ -13,6 +13,8 @@ import moment from 'moment';
 
 import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
+import chainState from 'chainState';
+import navState from 'navigationState';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
 
@@ -52,7 +54,7 @@ export async function initAppState(
   customDomain = null
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    $.get(`${app.serverUrl()}/status`)
+    $.get(`${navState.serverUrl()}/status`)
       .then(async (data) => {
         app.config.chains.clear();
         app.config.nodes.clear();
@@ -98,13 +100,13 @@ export async function initAppState(
           ? LoginState.LoggedIn
           : LoginState.LoggedOut;
 
-        if (app.loginState == LoginState.LoggedIn) {
+        if (app.loginState === LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => m.redraw());
         } else if (
-          app.loginState == LoginState.LoggedOut &&
+          app.loginState ===LoginState.LoggedOut &&
           app.socket.isConnected
         ) {
           // TODO: create global deinit function
@@ -127,7 +129,7 @@ export async function initAppState(
         }
 
         if (customDomain) {
-          app.setCustomDomain(customDomain);
+          navState.setCustomDomain(customDomain);
         }
 
         resolve();
@@ -142,12 +144,12 @@ export async function initAppState(
 
 export async function deinitChainOrCommunity() {
   app.isAdapterReady = false;
-  if (app.chain) {
-    app.chain.networkStatus = ApiStatus.Disconnected;
-    app.chain.deinitServer();
-    await app.chain.deinit();
+  if (chainState.chain) {
+    chainState.chain.networkStatus = ApiStatus.Disconnected;
+    chainState.chain.deinitServer();
+    await chainState.chain.deinit();
     console.log('Finished deinitializing chain');
-    app.chain = null;
+    chainState.chain = null;
   }
   app.user.setSelectedChain(null);
   app.user.setActiveAccounts([]);
@@ -212,7 +214,7 @@ export async function selectChain(
   }
 
   // Check for valid chain selection, and that we need to switch
-  if (app.chain && chain === app.chain.meta) {
+  if (chainState.chain && chain === chainState.chain.meta) {
     return;
   }
 
@@ -368,16 +370,16 @@ export async function selectChain(
   if (!finalizeInitialization) {
     console.log('Chain loading aborted');
     app.chainPreloading = false;
-    app.chain = null;
+    chainState.chain = null;
     return false;
   } else {
-    app.chain = newChain;
+    chainState.chain = newChain;
   }
   if (initApi) {
-    await app.chain.initApi(); // required for loading NearAccounts
+    await chainState.chain.initApi(); // required for loading NearAccounts
   }
   app.chainPreloading = false;
-  app.chain.deferred = deferred;
+  chainState.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
   await updateActiveAddresses(chain);
@@ -401,13 +403,13 @@ export async function selectChain(
 // Initializes a selected chain. Requires `app.chain` to be defined and valid
 // and not already initialized.
 export async function initChain(): Promise<void> {
-  if (!app.chain || !app.chain.meta || app.chain.loaded) return;
-  if (!app.chain.apiInitialized) {
-    await app.chain.initApi();
+  if (!chainState.chain || !chainState.chain.meta || chainState.chain.loaded) return;
+  if (!chainState.chain.apiInitialized) {
+    await chainState.chain.initApi();
   }
-  app.chain.deferred = false;
-  const chain = app.chain.meta;
-  await app.chain.initData();
+  chainState.chain.deferred = false;
+  const chain = chainState.chain.meta;
+  await chainState.chain.initData();
 
   // Emit chain as updated
   app.chainAdapterReady.emit('ready');
@@ -422,7 +424,7 @@ export async function initChain(): Promise<void> {
 }
 
 export async function initNewTokenChain(address: string) {
-  const chain_network = app.chain.network;
+  const chain_network = chainState.chain.network;
   const response = await $.getJSON('/api/getTokenForum', {
     address,
     chain_network,
@@ -447,16 +449,16 @@ export async function initNewTokenChain(address: string) {
 m.route.prefix = '';
 const _updateRoute = m.route.set;
 export const updateRoute = (...args) => {
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
+  navState._lastNavigatedBack = false;
+  navState._lastNavigatedFrom = m.route.get();
   if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
 };
 m.route.set = (...args) => {
   // set app params that maintain global state for:
   // - whether the user last clicked the back button
   // - the last page the user was on
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
+  navState._lastNavigatedBack = false;
+  navState._lastNavigatedFrom = m.route.get();
   // update route
   if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
   // reset scroll position
@@ -467,10 +469,10 @@ m.route.set = (...args) => {
 };
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
-  if (!app.isCustomDomain() && app.activeChainId()) {
-    args[0] = `/${app.activeChainId()}${args[0]}`;
+  if (!navState.isCustomDomain() && navState.activeChainId()) {
+    args[0] = `/${navState.activeChainId()}${args[0]}`;
   }
-  app.sidebarMenu = 'default';
+  navState.sidebarMenu = 'default';
   m.route.set.apply(this, args);
 };
 
@@ -489,8 +491,8 @@ m.redraw = redrawInstrumented;
 
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
-  app._lastNavigatedBack = true;
-  app._lastNavigatedFrom = m.route.get();
+  navState._lastNavigatedBack = true;
+  navState._lastNavigatedFrom = m.route.get();
   if (_onpopstate) _onpopstate.apply(this, args);
 };
 

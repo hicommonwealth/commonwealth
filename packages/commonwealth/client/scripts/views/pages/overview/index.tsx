@@ -8,6 +8,7 @@ import 'pages/overview/index.scss';
 import app from 'state';
 import { Thread, Topic } from 'models';
 import { navigateToSubpage } from 'app';
+import navState from 'navigationState';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { TopicSummaryRow } from './topic_summary_row';
@@ -42,7 +43,7 @@ class OverviewPage extends ClassComponent {
   view() {
     const allMonthlyThreads = app.threads.overviewStore.getAll();
 
-    const topics = app.topics.getByCommunity(app.activeChainId());
+    const topics = app.topics.getByCommunity(navState.activeChainId());
 
     const anyTopicsFeatured = topics.some((t) => t.featuredInSidebar);
 

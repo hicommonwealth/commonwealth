@@ -8,6 +8,7 @@ import 'pages/snapshot/snapshot_space_card.scss';
 import { Thread } from 'models';
 import app from 'state';
 import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import chainState from 'chainState';
 import { navigateToSubpage } from '../../../app';
 import { REDIRECT_ACTIONS } from '.';
 import { CWCard } from '../../components/component_kit/cw_card';
@@ -42,7 +43,7 @@ export class SnapshotSpaceCard extends ClassComponent<SnapshotSpaceCardAttrs> {
       } else if (redirectAction === REDIRECT_ACTIONS.NEW_FROM_THREAD) {
         app.snapshot.init(space.id).then(() => {
           navigateToSubpage(
-            `/new/snapshot/${app.chain.meta.snapshot}` +
+            `/new/snapshot/${chainState.chain.meta.snapshot}` +
               `?fromProposalType=${proposal.slug}&fromProposalId=${proposal.id}`
           );
         });

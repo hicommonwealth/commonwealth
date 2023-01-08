@@ -42,10 +42,10 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
           }}
         />
         <CWTextInput
-          label={`Amount (${app.chain.chain.denom})`}
+          label={`Amount (${chainState.chain.chain.denom})`}
           placeholder="Amount of proposal"
           oninput={(e) => {
-            this.amount = app.chain.chain.coins(
+            this.amount = chainState.chain.chain.coins(
               parseFloat(e.target.value),
               true
             );
@@ -53,7 +53,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
         />
         <CWText>
           Bond:{' '}
-          {app.chain.chain
+          {chainState.chain.chain
             .coins(
               Math.max(
                 (this.amount || 0) * substrate.treasury.bondPct,
@@ -84,7 +84,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
               throw new Error('Invalid beneficiary address');
             }
 
-            const beneficiary = app.chain.accounts.get(this.beneficiary);
+            const beneficiary = chainState.chain.accounts.get(this.beneficiary);
 
             const args = [author, this.amount, beneficiary];
 

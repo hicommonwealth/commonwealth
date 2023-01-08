@@ -29,7 +29,7 @@ export const setChainCategories = async (
       auth: true,
       jwt: app.user.jwt,
     };
-    $.post(`${app.serverUrl()}/updateChainCategory`, params)
+    $.post(`${navState.serverUrl()}/updateChainCategory`, params)
       .then((response) => {
         if (create && response?.result) {
           app.config.chainCategories = app.config.chainCategories.concat([

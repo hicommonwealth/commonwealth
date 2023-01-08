@@ -36,7 +36,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
     // token balance check if needed
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+      app.roles.isAdminOfEntity({ chain: navState.activeChainId() });
 
     let topicName = '';
 

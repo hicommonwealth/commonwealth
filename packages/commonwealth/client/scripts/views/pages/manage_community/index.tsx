@@ -22,27 +22,27 @@ class ManageCommunityPage extends ClassComponent {
   private webhooks: Array<Webhook>;
 
   view() {
-    if (!app.activeChainId()) {
+    if (!navState.activeChainId()) {
       return;
     }
 
     const isAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       });
 
     if (!isAdmin) {
       navigateToSubpage(``);
     }
 
-    const chainOrCommObj = { chain: app.activeChainId() };
+    const chainOrCommObj = { chain: navState.activeChainId() };
 
     const loadRoles = async () => {
       try {
         // TODO: Change to GET /members
         const bulkMembers = await $.get(
-          `${app.serverUrl()}/bulkMembers`,
+          `${navState.serverUrl()}/bulkMembers`,
           chainOrCommObj
         );
 
@@ -50,7 +50,7 @@ class ManageCommunityPage extends ClassComponent {
           throw new Error('Could not fetch members');
         }
         // TODO: Change to GET /webhooks
-        const webhooks = await $.get(`${app.serverUrl()}/getWebhooks`, {
+        const webhooks = await $.get(`${navState.serverUrl()}/getWebhooks`, {
           ...chainOrCommObj,
           auth: true,
           jwt: app.user.jwt,
@@ -103,7 +103,7 @@ class ManageCommunityPage extends ClassComponent {
       app.roles.addRole(newRole);
       app.roles.removeRole(predicate);
 
-      const { adminsAndMods } = app.chain.meta;
+      const { adminsAndMods } = chainState.chain.meta;
 
       if (
         oldRole.permission === 'admin' ||
@@ -151,7 +151,7 @@ class ManageCommunityPage extends ClassComponent {
         <div class="ManageCommunityPage">
           <ChainMetadataRows
             admins={admins}
-            chain={app.config.chains.getById(app.activeChainId())}
+            chain={app.config.chains.getById(navState.activeChainId())}
             mods={mods}
             onRoleUpdate={(oldRole, newRole) => onRoleUpdate(oldRole, newRole)}
             onSave={() => onSave()}

@@ -76,7 +76,7 @@ export default class CommonwealthGovernance extends ProposalModule<
     // TODO: fetch all proposals
     // if (this._usingServerChainEntities) {
     //   console.log('Fetching moloch proposals from backend.');
-    //   await this.app.chainEntities.refresh(this.app.chain.id);
+    //   await this.app.chainEntities.refresh(this.chainState.chain.id);
     //   const entities = this.app.chainEntities.store.getByType(CommonwealthEvents.Types.EntityKind.Proposal);
     //   entities.map((p) => this._entityConstructor(p));
     // } else {
@@ -86,11 +86,11 @@ export default class CommonwealthGovernance extends ProposalModule<
     //     1,
     //     new EthDater((this.app.chain as Commonwealth).chain.api)
     //   );
-    //   const subscriber = new CommonwealthEvents.Subscriber(api.Contract, this.app.chain.id);
+    //   const subscriber = new CommonwealthEvents.Subscriber(api.Contract, this.chainState.chain.id);
     //   const processor = new CommonwealthEvents.Processor(api.Contract, 1);
-    //   await this.app.chainEntities.fetchEntities(this.app.chain.id, () => fetcher.fetch());
+    //   await this.app.chainEntities.fetchEntities(this.chainState.chain.id, () => fetcher.fetch());
     //   await this.app.chainEntities.subscribeEntities(
-    //     this.app.chain.id,
+    //     this.chainState.chain.id,
     //     subscriber,
     //     processor,
     //   );

@@ -37,7 +37,7 @@ export class ChangeTopicModal extends ClassComponent<ChangeTopicModalAttrs> {
         <div class="compact-modal-body">
           <TopicSelector
             defaultTopic={this.activeTopic}
-            topics={app.topics.getByCommunity(app.activeChainId())}
+            topics={app.topics.getByCommunity(navState.activeChainId())}
             updateFormData={(topic: Topic) => {
               vnode.attrs.onChangeHandler(topic);
               this.activeTopic = topic;

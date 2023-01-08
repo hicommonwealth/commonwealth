@@ -31,12 +31,12 @@ export default class SolanaAccount extends Account {
   });
 
   constructor(app: IApp, ChainInfo: SolanaChain, Accounts: SolanaAccounts, address: string) {
-    super({ chain: app.chain.meta, address });
+    super({ chain: chainState.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {
-        if (app.chain.chain instanceof SolanaChain) {
-          this._Chain = app.chain.chain;
+        if (chainState.chain.chain instanceof SolanaChain) {
+          this._Chain = chainState.chain.chain;
         } else {
           console.error('Did not successfully initialize account with chain');
         }

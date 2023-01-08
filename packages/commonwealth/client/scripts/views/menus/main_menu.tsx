@@ -19,14 +19,14 @@ export const getMainMenuItems = (): Array<MenuItem> => {
     //     m.route.set('/search');
     //   },
     // },
-    ...((app.activeChainId()
+    ...((navState.activeChainId()
       ? [
           {
             label: 'Create',
             iconLeft: 'plusCircle',
             iconRight: 'chevronRight',
             onclick: () => {
-              app.mobileMenu = 'CreateContentMenu';
+              navState.mobileMenu = 'CreateContentMenu';
             },
           },
         ]
@@ -36,7 +36,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       iconLeft: 'help',
       iconRight: 'chevronRight',
       onclick: () => {
-        app.mobileMenu = 'HelpMenu';
+        navState.mobileMenu = 'HelpMenu';
       },
     },
     ...((app.isLoggedIn()
@@ -48,7 +48,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             type: 'notification',
             hasUnreads: !!app.user?.notifications.numUnread,
             onclick: () => {
-              app.mobileMenu = 'NotificationsMenu';
+              navState.mobileMenu = 'NotificationsMenu';
             },
           },
         ]

@@ -188,7 +188,7 @@ const searchMentionableAddresses = async (
 ) => {
   const { resultSize, communityScope, chainScope } = params;
   try {
-    const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+    const response = await $.get(`${navState.serverUrl()}/bulkAddresses`, {
       chain: chainScope,
       community: communityScope,
       limit: resultSize,
@@ -320,7 +320,7 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
 
           if (!chainOrCommunityObj) return;
 
-          $.post(app.serverUrl() + postType, {
+          $.post(navState.serverUrl() + postType, {
             address: app.user.activeAccount.address,
             ...chainOrCommunityObj,
             invitedAddress: selection === 'address' ? address : '',
@@ -670,7 +670,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //           onclick: (e) => {
 //             e.preventDefault();
 //             // TODO: Change to POST /inviteLink
-//             $.post(`${app.serverUrl()}/createInviteLink`, {
+//             $.post(`${navState.serverUrl()}/createInviteLink`, {
 //               ...chainOrCommunityObj,
 //               time: this.inviteTime,
 //               uses: this.inviteUses,
@@ -681,7 +681,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
 //                 ? 'commonwealth.im'
 //                 : 'localhost:8080';
 //               if (onChangeHandler) onChangeHandler(linkInfo);
-//               this.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${
+//               this.link = `${url}${navState.serverUrl()}/acceptInviteLink?id=${
 //                 linkInfo.id
 //               }`;
 //               m.redraw();

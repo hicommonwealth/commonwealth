@@ -41,7 +41,7 @@ const getProfileStatus = (account) => {
       .filter((account_) => {
         return app.roles.getRoleInCommunity({
           account: account_,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
         });
       })
       .filter((account_) => {
@@ -55,7 +55,7 @@ const getProfileStatus = (account) => {
   let isUnjoinedJoinableAddress;
   let currentAddressInfo;
   if (!onOwnProfile && !onLinkedProfile) {
-    const communityOptions = { chain: app.activeChainId() };
+    const communityOptions = { chain: navState.activeChainId() };
     const communityRoles = app.roles.getAllRolesInCommunity(communityOptions);
     const joinableAddresses = app.roles.getJoinableAddresses(communityOptions);
     const unjoinedJoinableAddresses =
@@ -135,7 +135,7 @@ const loadProfile = async (
   state: IProfilePageState
 ) => {
   const chain =
-    m.route.param('base') || app.customDomainId() || m.route.param('scope');
+    m.route.param('base') || navState.customDomainId() || m.route.param('scope');
   const { address } = attrs;
   const chainInfo = app.config.chains.getById(chain);
   let valid = false;
@@ -158,7 +158,7 @@ const loadProfile = async (
   state.initialized = true;
   try {
     const response = await $.ajax({
-      url: `${app.serverUrl()}/profile`,
+      url: `${navState.serverUrl()}/profile`,
       type: 'GET',
       data: {
         address,
@@ -290,7 +290,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
     const chain =
-      m.route.param('base') || app.customDomainId() || m.route.param('scope');
+      m.route.param('base') || navState.customDomainId() || m.route.param('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
     const baseSuffix = m.route.param('base');
@@ -487,7 +487,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${m.route.param('base')}-${navState.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 1 &&
                 m(ProfileContent, {
@@ -498,7 +498,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${m.route.param('base')}-${navState.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 2 &&
                 m(ProfileContent, {
@@ -509,7 +509,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${m.route.param('base')}-${navState.activeChainId()}-scrollY`,
                 }),
             ]),
             m('.xs-display-none .col-md-4', [

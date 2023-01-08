@@ -57,7 +57,7 @@ export class SputnikForm extends ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
               chainBase: ChainBase.CosmosSDK,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: CommunityType.SputnikDao,
             });
           }}
@@ -110,7 +110,7 @@ export class SputnikForm extends ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: null,
             });
 
@@ -142,7 +142,7 @@ export class SputnikForm extends ClassComponent {
 
               // POST object
               const res = await $.post(
-                `${app.serverUrl()}/createChain`,
+                `${navState.serverUrl()}/createChain`,
                 createChainArgs
               );
               if (res.result.admin_address) {

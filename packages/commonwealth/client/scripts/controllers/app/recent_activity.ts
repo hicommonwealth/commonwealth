@@ -1,6 +1,7 @@
 import moment from 'moment';
 import { Topic, AbridgedThread, Profile, Thread } from 'models';
 import app from 'state';
+import navState from 'navigationState';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 
@@ -72,12 +73,12 @@ class RecentActivityController {
 
   public async getRecentTopicActivity(id?: string): Promise<Thread[]> {
     const params = {
-      chain: id || app.activeChainId(),
+      chain: id || navState.activeChainId(),
       threads_per_topic: 3,
     };
 
     const [response] = await Promise.all([
-      $.get(`${app.serverUrl()}/activeThreads`, params),
+      $.get(`${navState.serverUrl()}/activeThreads`, params),
       app.chainEntities.refresh(params.chain),
     ]);
     if (response.status !== 'Success') {

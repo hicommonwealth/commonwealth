@@ -20,7 +20,7 @@ class NewThreadPage extends ClassComponent {
 
     if (!app.chain) return <PageLoading />;
 
-    const hasTopics = !!app.topics.getByCommunity(app.chain.id).length;
+    const hasTopics = !!app.topics.getByCommunity(chainState.chain.id).length;
 
     return (
       <Sublayout

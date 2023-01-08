@@ -84,7 +84,7 @@ export default class CompoundProposal extends Proposal<
   private _Gov: CompoundGovernance;
 
   public get shortIdentifier() {
-    return `${capitalize(this._Accounts?.app.activeChainId())}Proposal-${this.data.identifier}`;
+    return `${capitalize(this._Accounts?.navState.activeChainId())}Proposal-${this.data.identifier}`;
   }
   public get title(): string {
     try {
@@ -121,7 +121,7 @@ export default class CompoundProposal extends Proposal<
     // will be Expired if over grace period
     return this.state === CompoundTypes.ProposalState.Queued
       && this.data.eta
-      && this.data.eta <= this._Gov.app.chain.block.lastTime.unix();
+      && this.data.eta <= this._Gov.chainState.chain.block.lastTime.unix();
   }
 
   public get isPassing(): ProposalStatus {

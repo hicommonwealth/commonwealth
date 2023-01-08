@@ -89,11 +89,11 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
           if (`${type}` === 'Compact<BalanceOf>') {
             return (
               <CWTextInput
-                label={`${name} (${app.chain.currency})`}
-                placeholder={`${name} (${app.chain.currency})`}
+                label={`${name} (${chainState.chain.currency})`}
+                placeholder={`${name} (${chainState.chain.currency})`}
                 oninput={(e) => {
                   const result = (e.target as any).value;
-                  vnode.attrs.args[index] = app.chain.chain.coins(
+                  vnode.attrs.args[index] = chainState.chain.chain.coins(
                     parseFloat(result),
                     true
                   );

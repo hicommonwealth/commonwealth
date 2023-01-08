@@ -19,7 +19,7 @@ import { verifyCachedToggleTree } from './helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-governance-toggle-tree`]
+    localStorage[`${navState.activeChainId()}-governance-toggle-tree`]
   );
 
   const split = path.split('.');
@@ -36,7 +36,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 
   const newTree = currentTree;
 
-  localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
+  localStorage[`${navState.activeChainId()}-governance-toggle-tree`] =
     JSON.stringify(newTree);
 }
 
@@ -45,15 +45,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
     // Conditional Render Details
     const hasProposals =
       app.chain &&
-      (app.chain.base === ChainBase.CosmosSDK ||
-        app.chain.network === ChainNetwork.Sputnik ||
-        (app.chain.base === ChainBase.Substrate &&
-          app.chain.network !== ChainNetwork.Plasm) ||
-        app.chain.network === ChainNetwork.Moloch ||
-        app.chain.network === ChainNetwork.Compound ||
-        app.chain.network === ChainNetwork.Aave ||
-        // app.chain.network === ChainNetwork.CommonProtocol ||
-        app.chain.meta.snapshot?.length);
+      (chainState.chain.base === ChainBase.CosmosSDK ||
+        chainState.chain.network === ChainNetwork.Sputnik ||
+        (chainState.chain.base === ChainBase.Substrate &&
+          chainState.chain.network !== ChainNetwork.Plasm) ||
+        chainState.chain.network === ChainNetwork.Moloch ||
+        chainState.chain.network === ChainNetwork.Compound ||
+        chainState.chain.network === ChainNetwork.Aave ||
+        // chainState.chain.network === ChainNetwork.CommonProtocol ||
+        chainState.chain.meta.snapshot?.length);
 
     const isNotOffchain = app.chain?.meta.type !== ChainType.Offchain;
 
@@ -69,15 +69,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
     const showReferenda =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
-      app.chain.network !== ChainNetwork.Darwinia &&
-      app.chain.network !== ChainNetwork.HydraDX;
+      chainState.chain.network !== ChainNetwork.Darwinia &&
+      chainState.chain.network !== ChainNetwork.HydraDX;
 
     const showProposals =
       (isNotOffchain &&
         app.chain?.base === ChainBase.Substrate &&
-        app.chain.network !== ChainNetwork.Darwinia) ||
+        chainState.chain.network !== ChainNetwork.Darwinia) ||
       (app.chain?.base === ChainBase.CosmosSDK &&
-        app.chain.network !== ChainNetwork.Terra) ||
+        chainState.chain.network !== ChainNetwork.Terra) ||
       app.chain?.network === ChainNetwork.Sputnik ||
       app.chain?.network === ChainNetwork.Moloch ||
       app.chain?.network === ChainNetwork.Compound ||
@@ -89,18 +89,18 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
     const showTreasury =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
-      app.chain.network !== ChainNetwork.Centrifuge;
+      chainState.chain.network !== ChainNetwork.Centrifuge;
 
     const showBounties =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
-      app.chain.network !== ChainNetwork.Centrifuge &&
-      app.chain.network !== ChainNetwork.HydraDX;
+      chainState.chain.network !== ChainNetwork.Centrifuge &&
+      chainState.chain.network !== ChainNetwork.HydraDX;
 
     const showTips =
       isNotOffchain &&
       app.chain?.base === ChainBase.Substrate &&
-      app.chain.network !== ChainNetwork.Centrifuge;
+      chainState.chain.network !== ChainNetwork.Centrifuge;
 
     const showValidators =
       isNotOffchain &&
@@ -174,67 +174,67 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
     };
 
     // Check if an existing toggle tree is stored
-    if (!localStorage[`${app.activeChainId()}-governance-toggle-tree`]) {
-      localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
+    if (!localStorage[`${navState.activeChainId()}-governance-toggle-tree`]) {
+      localStorage[`${navState.activeChainId()}-governance-toggle-tree`] =
         JSON.stringify(governanceDefaultToggleTree);
     } else if (
       !verifyCachedToggleTree('governance', governanceDefaultToggleTree)
     ) {
-      localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
+      localStorage[`${navState.activeChainId()}-governance-toggle-tree`] =
         JSON.stringify(governanceDefaultToggleTree);
     }
 
     const toggleTreeState = JSON.parse(
-      localStorage[`${app.activeChainId()}-governance-toggle-tree`]
+      localStorage[`${navState.activeChainId()}-governance-toggle-tree`]
     );
 
     const onSnapshotProposal = (p) =>
-      p.startsWith(`/${app.activeChainId()}/snapshot`);
+      p.startsWith(`/${navState.activeChainId()}/snapshot`);
 
     const onProposalPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/proposals`) ||
+      p.startsWith(`/${navState.activeChainId()}/proposals`) ||
       p.startsWith(
-        `/${app.activeChainId()}/proposal/${
+        `/${navState.activeChainId()}/proposal/${
           ProposalType.SubstrateDemocracyProposal
         }`
       );
 
     const onReferendaPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/referenda`) ||
+      p.startsWith(`/${navState.activeChainId()}/referenda`) ||
       p.startsWith(
-        `/${app.activeChainId()}/proposal/${
+        `/${navState.activeChainId()}/proposal/${
           ProposalType.SubstrateDemocracyReferendum
         }`
       );
 
     const onTreasuryPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/treasury`) ||
+      p.startsWith(`/${navState.activeChainId()}/treasury`) ||
       p.startsWith(
-        `/${app.activeChainId()}/proposal/${
+        `/${navState.activeChainId()}/proposal/${
           ProposalType.SubstrateTreasuryProposal
         }`
       );
 
     const onBountiesPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/bounties`);
+      p.startsWith(`/${navState.activeChainId()}/bounties`);
 
     const onTipsPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/tips`) ||
+      p.startsWith(`/${navState.activeChainId()}/tips`) ||
       p.startsWith(
-        `/${app.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`
+        `/${navState.activeChainId()}/proposal/${ProposalType.SubstrateTreasuryTip}`
       );
 
     const onCouncilPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/council`);
+      p.startsWith(`/${navState.activeChainId()}/council`);
 
     const onValidatorsPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/validators`);
+      p.startsWith(`/${navState.activeChainId()}/validators`);
 
     const onNotificationsPage = (p) => p.startsWith('/notifications');
 
     const onMembersPage = (p) =>
-      p.startsWith(`/${app.activeChainId()}/members`) ||
-      p.startsWith(`/${app.activeChainId()}/account/`);
+      p.startsWith(`/${navState.activeChainId()}/members`) ||
+      p.startsWith(`/${navState.activeChainId()}/account/`);
 
     if (onNotificationsPage(m.route.get())) return;
 
@@ -249,9 +249,9 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       isUpdated: true,
       isActive:
         onMembersPage(m.route.get()) &&
-        (app.chain ? app.chain.serverLoaded : true),
+        (app.chain ? chainState.chain.serverLoaded : true),
       onclick: (e, toggle: boolean) => {
-        handleRedirectClicks(e, '/members', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/members', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Members.toggledState', toggle);
         });
       },
@@ -272,12 +272,12 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         e.preventDefault();
         setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
         // Check if we have multiple snapshots for conditional redirect
-        const snapshotSpaces = app.chain.meta.snapshot;
+        const snapshotSpaces = chainState.chain.meta.snapshot;
         if (snapshotSpaces.length > 1) {
           handleRedirectClicks(
             e,
             '/multiple-snapshots?action=select-space',
-            app.activeChainId(),
+            navState.activeChainId(),
             null
           );
         } else {
@@ -287,14 +287,14 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
               `/snapshot/${snapshotSpaces[0]
                 .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
                 .trim()}`,
-              app.activeChainId(),
+              navState.activeChainId(),
               null
             );
           } else {
             handleRedirectClicks(
               e,
               `/snapshot/${snapshotSpaces}`,
-              app.activeChainId(),
+              navState.activeChainId(),
               null
             );
           }
@@ -312,7 +312,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/proposals', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/proposals', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Proposals.toggledState', toggle);
         });
       },
@@ -331,7 +331,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/treasury', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/treasury', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Treasury.toggledState', toggle);
         });
       },
@@ -349,7 +349,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/bounties', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/bounties', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Bounties.toggledState', toggle);
         });
       },
@@ -367,7 +367,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/referenda', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/referenda', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Referenda.toggledState', toggle);
         });
       },
@@ -385,7 +385,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/tips', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/tips', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Tips.toggledState', toggle);
         });
       },
@@ -403,7 +403,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/council', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/council', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Councillors.toggledState', toggle);
         });
       },
@@ -421,7 +421,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/validators', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/validators', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Validators.toggledState', toggle);
         });
       },
@@ -440,10 +440,10 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       isVisible: showCompoundOptions,
       isUpdated: true,
-      isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
+      isActive: m.route.get() === `/${navState.activeChainId()}/delegate`,
       onclick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/delegate', app.activeChainId(), () => {
+        handleRedirectClicks(e, '/delegate', navState.activeChainId(), () => {
           setGovernanceToggleTree('children.Delegate.toggledState', toggle);
         });
       },

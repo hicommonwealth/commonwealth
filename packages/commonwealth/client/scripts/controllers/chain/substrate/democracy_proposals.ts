@@ -27,7 +27,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
   get minimumDeposit() { return this._minimumDeposit; }
 
   get nextLaunchBlock(): number {
-    return (Math.floor(this.app.chain.block.height / this.launchPeriod) + 1) * this.launchPeriod;
+    return (Math.floor(this.chainState.chain.block.height / this.launchPeriod) + 1) * this.launchPeriod;
   }
 
   private _lastTabledWasExternal: boolean = null;

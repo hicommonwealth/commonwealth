@@ -69,7 +69,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
         {m(EdgewareFunctionPicker, formState)}
         {this.toggleValue === 'proposal' && (
           <CWTextInput
-            label={`Deposit (${app.chain.currency})`}
+            label={`Deposit (${chainState.chain.currency})`}
             placeholder={`Min: ${substrate.democracyProposals.minimumDeposit.inDollars}`}
             defaultValue={substrate.democracyProposals.minimumDeposit.inDollars}
             oninput={(e) => {
@@ -94,7 +94,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
             let args = [];
 
             const deposit = this.deposit
-              ? app.chain.chain.coins(this.deposit, true)
+              ? chainState.chain.chain.coins(this.deposit, true)
               : substrate.democracyProposals.minimumDeposit;
 
             if (!EdgewareFunctionPicker.getMethod(formState)) {

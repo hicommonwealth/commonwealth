@@ -31,7 +31,7 @@ export class HelpMenu extends ClassComponent {
         menuHeader={{
           label: 'Help',
           onclick: () => {
-            app.mobileMenu = 'MainMenu';
+            navState.mobileMenu = 'MainMenu';
           },
         }}
         menuItems={gethelpMenuItems()}

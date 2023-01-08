@@ -28,7 +28,7 @@ class CommunitiesController {
         jwt: app.user.jwt,
       };
 
-      $.post(`${app.serverUrl()}/starCommunity`, params)
+      $.post(`${navState.serverUrl()}/starCommunity`, params)
         .then((response) => {
           if (!isAlreadyStarred) {
             const json = response.result;

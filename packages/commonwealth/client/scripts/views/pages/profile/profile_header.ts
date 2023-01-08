@@ -36,20 +36,20 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       });
 
     const joinCommunity = async () => {
-      if (!app.activeChainId() || onOwnProfile) return;
+      if (!navState.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
       const addressInfo = app.user.addresses.find(
         (a) =>
-          a.address === account.address && a.chain.id === app.activeChainId()
+          a.address === account.address && a.chain.id === navState.activeChainId()
       );
       try {
         await app.roles.createRole({
           address: addressInfo,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
@@ -102,7 +102,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             //   m(LoginWithWalletDropdown, {
             //     prepopulateAddress: account.address,
             //     loggingInWithAddress: !app.isLoggedIn(),
-            //     joiningChain: app.activeChainId(),
+            //     joiningChain: navState.activeChainId(),
             //     label: 'Claim address',
             //   }),
           ]),
@@ -131,7 +131,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           }),
         m('', [
           onOwnProfile
-            ? showJoinCommunityButton && app.activeChainId()
+            ? showJoinCommunityButton && navState.activeChainId()
             : m(CWButton, {
                 onclick: async () => {
                   if (onLinkedProfile) {

@@ -29,7 +29,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
 
   view(vnode: m.Vnode<WebhooksFormAttrs>) {
     const { webhooks } = vnode.attrs;
-    const chainOrCommObj = { chain: app.activeChainId() };
+    const chainOrCommObj = { chain: navState.activeChainId() };
 
     const createWebhook = () => {
       this.disabled = true;
@@ -37,7 +37,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
       this.failure = false;
 
       // TODO: Change to POST /webhook
-      $.post(`${app.serverUrl()}/createWebhook`, {
+      $.post(`${navState.serverUrl()}/createWebhook`, {
         ...chainOrCommObj,
         webhookUrl: this.webhookUrl,
         auth: true,
@@ -139,7 +139,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                       this.failure = false;
 
                       // TODO: Change to DELETE /webhook
-                      $.post(`${app.serverUrl()}/deleteWebhook`, {
+                      $.post(`${navState.serverUrl()}/deleteWebhook`, {
                         ...chainOrCommObj,
                         webhookUrl: webhook.url,
                         auth: true,

@@ -90,7 +90,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                       const result = (e.target as any).value;
                       setTipAmount(
                         result.length > 0
-                          ? app.chain.chain.coins(parseFloat(result), true)
+                          ? chainState.chain.chain.coins(parseFloat(result), true)
                           : undefined
                       );
                       m.redraw();
@@ -106,7 +106,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                       proposal.submitVoteTx(
                         new DepositVote(
                           app.user.activeAccount as IBalanceAccount<any>,
-                          app.chain.chain.coins(tipAmount)
+                          chainState.chain.chain.coins(tipAmount)
                         )
                       )
                     );

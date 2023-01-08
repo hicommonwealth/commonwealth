@@ -60,7 +60,7 @@ class CreateCommunity extends ClassComponent {
 
   oninit() {
     // query eth chains
-    $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(async (res) => {
+    $.get(`${navState.serverUrl()}/getSupportedEthChains`, {}).then(async (res) => {
       if (res.status === 'Success') {
         this.state.ethChains = res.result;
       }
@@ -136,7 +136,7 @@ class CreateCommunity extends ClassComponent {
                           event:
                             MixpanelCommunityCreationEvent.COMMUNITY_TYPE_CHOSEN,
                           chainBase: null,
-                          isCustomDomain: app.isCustomDomain(),
+                          isCustomDomain: navState.isCustomDomain(),
                           communityType: t,
                         });
                       }}

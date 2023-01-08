@@ -254,7 +254,7 @@ export class ConfirmInviteModal extends ClassComponent {
                         : { prev, next };
 
                       // redirect to /web3login to connect to the chain
-                      if (app.activeChainId()) {
+                      if (navState.activeChainId()) {
                         navigateToSubpage('/web3login', web3loginParams);
                       } else {
                         m.route.set(

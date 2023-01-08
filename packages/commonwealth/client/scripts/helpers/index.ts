@@ -297,9 +297,9 @@ export function renderMultilineText(text: string) {
  */
 
 export function blocknumToTime(blocknum: number): moment.Moment {
-  const currentBlocknum = app.chain.block.height;
-  const blocktime = app.chain.block.duration;
-  const lastBlockTime: moment.Moment = app.chain.block.lastTime.clone();
+  const currentBlocknum = chainState.chain.block.height;
+  const blocktime = chainState.chain.block.duration;
+  const lastBlockTime: moment.Moment = chainState.chain.block.lastTime.clone();
   return lastBlockTime.add((blocknum - currentBlocknum) * blocktime, 'seconds');
 }
 
@@ -308,7 +308,7 @@ export function blocknumToDuration(blocknum: number) {
 }
 
 export function blockperiodToDuration(blocknum: number) {
-  return moment.duration(blocknum * app.chain.block.duration, 'seconds');
+  return moment.duration(blocknum * chainState.chain.block.duration, 'seconds');
 }
 
 // loads remote scripts from a URI, e.g. Twitter widgets

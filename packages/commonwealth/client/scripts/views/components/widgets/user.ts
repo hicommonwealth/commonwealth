@@ -67,7 +67,7 @@ const User: m.Component<
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       });
     let role;
 
@@ -106,9 +106,9 @@ const User: m.Component<
       const address = vnode.attrs.user.address;
       if (!chainId || !address) return;
       // only load account if it's possible to, using the current chain
-      if (app.chain && app.chain.id === chainId.id) {
+      if (app.chain && chainState.chain.id === chainId.id) {
         try {
-          account = app.chain.accounts.get(address);
+          account = chainState.chain.accounts.get(address);
         } catch (e) {
           console.log('legacy account error, carry on');
           account = null;
@@ -123,9 +123,9 @@ const User: m.Component<
     } else if (vnode.attrs.user instanceof Profile) {
       profile = vnode.attrs.user;
       // only load account if it's possible to, using the current chain
-      if (app.chain && app.chain.id === profile.chain) {
+      if (app.chain && chainState.chain.id === profile.chain) {
         try {
-          account = app.chain.accounts.get(profile.address);
+          account = chainState.chain.accounts.get(profile.address);
         } catch (e) {
           console.error(e);
           account = null;
@@ -211,7 +211,7 @@ const User: m.Component<
                 profile && profile.getAvatar(avatarSize)
               ),
             app.chain &&
-            app.chain.base === ChainBase.Substrate &&
+            chainState.chain.base === ChainBase.Substrate &&
             app.cachedIdentityWidget
               ? // substrate name
                 m(app.cachedIdentityWidget, {
@@ -228,7 +228,7 @@ const User: m.Component<
                     ? link(
                         'a.user-display-name.username',
                         profile
-                          ? `/${app.activeChainId() || profile.chain}/account/${
+                          ? `/${navState.activeChainId() || profile.chain}/account/${
                               profile.address
                             }?base=${profile.chain}`
                           : 'javascript:',
@@ -294,7 +294,7 @@ const User: m.Component<
         ]),
         m('.user-name', [
           app.chain &&
-          app.chain.base === ChainBase.Substrate &&
+          chainState.chain.base === ChainBase.Substrate &&
           app.cachedIdentityWidget
             ? m(app.cachedIdentityWidget, {
                 account,
@@ -307,7 +307,7 @@ const User: m.Component<
             : link(
                 'a.user-display-name',
                 profile
-                  ? `/${app.activeChainId() || profile.chain}/account/${
+                  ? `/${navState.activeChainId() || profile.chain}/account/${
                       profile.address
                     }?base=${profile.chain}`
                   : 'javascript:',
@@ -484,7 +484,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${app.activeChainId() || profile.chain}/account/${
+      ? `/${navState.activeChainId() || profile.chain}/account/${
           profile.address
         }?base=${profile.chain}`
       : 'javascript:';

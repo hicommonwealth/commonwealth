@@ -24,7 +24,7 @@ export class TermsBanner extends ClassComponent<TermsBannerAttrs> {
           </CWText>
         }
         onClose={() =>
-          localStorage.setItem(`${app.activeChainId()}-tos`, 'off')
+          localStorage.setItem(`${navState.activeChainId()}-tos`, 'off')
         }
       />
     );

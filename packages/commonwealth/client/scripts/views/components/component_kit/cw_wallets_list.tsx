@@ -181,7 +181,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       address: string
     ) {
       if (app.isLoggedIn()) {
-        const { result } = await $.post(`${app.serverUrl()}/getAddressStatus`, {
+        const { result } = await $.post(`${navState.serverUrl()}/getAddressStatus`, {
           address:
             wallet.chain === ChainBase.Substrate
               ? addressSwapper({
@@ -192,7 +192,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                   ),
                 })
               : address,
-          chain: app.activeChainId() ?? wallet.chain,
+          chain: navState.activeChainId() ?? wallet.chain,
           jwt: app.user.jwt,
         });
         if (result.exists && result.belongsToUser) {
@@ -285,8 +285,8 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                       // Near Redirect Flow
                       const WalletAccount = (await import('near-api-js'))
                         .WalletAccount;
-                      if (!app.chain.apiInitialized) {
-                        await app.chain.initApi();
+                      if (!chainState.chain.apiInitialized) {
+                        await chainState.chain.initApi();
                       }
                       const nearWallet = new WalletAccount(
                         (app.chain as Near).chain.api,
@@ -295,10 +295,10 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                       if (nearWallet.isSignedIn()) {
                         nearWallet.signOut();
                       }
-                      const redirectUrl = !app.isCustomDomain()
+                      const redirectUrl = !navState.isCustomDomain()
                         ? `${
                             window.location.origin
-                          }/${app.activeChainId()}/finishNearLogin`
+                          }/${navState.activeChainId()}/finishNearLogin`
                         : `${window.location.origin}/finishNearLogin`;
                       nearWallet.requestSignIn({
                         contractId: (app.chain as Near).chain.isMainnet
@@ -310,7 +310,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                     } else if (wallet.defaultNetwork === 'axie-infinity') {
                       // Axie Redirect Flow
                       const result = await $.post(
-                        `${app.serverUrl()}/auth/sso`,
+                        `${navState.serverUrl()}/auth/sso`,
                         {
                           issuer: 'AxieInfinity',
                         }

@@ -30,6 +30,8 @@ export default class AaveGovernance extends ProposalModule<
   private _Accounts: EthereumAccounts;
   private _Chain: AaveChain;
   private _api: AaveApi;
+  chainState: any;
+  navState: any;
 
   // GETTERS
   public get api() { return this._api; }
@@ -108,7 +110,7 @@ export default class AaveGovernance extends ProposalModule<
 
     // load server proposals
     console.log('Fetching aave proposals from backend.');
-    await this.app.chainEntities.refresh(this.app.chain.id);
+    await this.app.chainEntities.refresh(this.chainState.chain.id);
     const entities = this.app.chainEntities.store.getByType(AaveTypes.EntityKind.Proposal);
     entities.forEach((e) => this._entityConstructor(e));
     console.log(`Found ${entities.length} proposals!`);
@@ -124,11 +126,11 @@ export default class AaveGovernance extends ProposalModule<
 
     // kick off listener
     const chainEventsContracts: AaveTypes.Api = { governance: this._api.Governance as any };
-    const subscriber = new AaveEvents.Subscriber(chainEventsContracts, this.app.chain.id);
+    const subscriber = new AaveEvents.Subscriber(chainEventsContracts, this.chainState.chain.id);
     const processor = new AaveEvents.Processor(chainEventsContracts);
     await this.app.chainEntities.subscribeEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
+      this.chainState.chain.id,
+      chainToEventNetwork(this.chainState.chain.meta),
       subscriber,
       processor,
     );

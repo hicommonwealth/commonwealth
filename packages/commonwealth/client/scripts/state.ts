@@ -1,5 +1,5 @@
 import { ChainStore, NodeStore } from 'stores';
-import { IChainAdapter, NotificationCategory } from 'models';
+import { NotificationCategory } from 'models';
 import { EventEmitter } from 'events';
 import { getToastStore, ToastStore } from 'controllers/app/toasts';
 import { getModalStore, ModalStore } from 'controllers/app/modals';
@@ -19,15 +19,13 @@ import ThreadUniqueAddressesCount from './controllers/server/threadUniqueAddress
 import TopicsController from './controllers/server/topics';
 import CommunitiesController from './controllers/server/communities';
 import ContractsController from './controllers/server/contracts';
-import DiscordController from 'controllers/server/discord';
+import DiscordController from './controllers/server/discord';
 import SessionsController from './controllers/server/sessions';
 import { UserController } from './controllers/server/user';
 import { RolesController } from './controllers/server/roles';
 import WebWalletController from './controllers/app/web_wallets';
 import PollsController from './controllers/server/polls';
-import { MobileMenuName } from './views/app_mobile_menus';
-import ChainEntityController from 'controllers/server/chain_entities';
-import { SidebarMenuName } from './views/components/sidebar';
+import ChainEntityController from './controllers/server/chain_entities';
 
 export enum ApiStatus {
   Disconnected = 'disconnected',
@@ -43,10 +41,9 @@ export const enum LoginState {
 
 export interface IApp {
   socket: WebSocketController;
-  chain: IChainAdapter<any, any>;
   chainEntities: ChainEntityController;
   // XXX: replace this with some app.chain helper
-  activeChainId(): string;
+  // activeChainId(): string;
 
   chainPreloading: boolean;
   chainAdapterReady: EventEmitter;
@@ -91,9 +88,9 @@ export interface IApp {
   toasts: ToastStore;
   modals: ModalStore;
 
-  mobileMenu: MobileMenuName;
-  sidebarMenu: SidebarMenuName;
-  sidebarToggled: boolean;
+  // mobileMenu: MobileMenuName;
+  // sidebarMenu: SidebarMenuName;
+  // sidebarToggled: boolean;
 
   loginState: LoginState;
   // stored on server-side
@@ -109,18 +106,18 @@ export interface IApp {
   loginStatusLoaded(): boolean;
   isLoggedIn(): boolean;
   isProduction(): boolean;
-  serverUrl(): string;
+  // serverUrl(): string;
   loadingError: string;
 
-  _customDomainId: string;
-  isCustomDomain(): boolean;
-  customDomainId(): string;
-  setCustomDomain(d: string): void;
+  // _customDomainId: string;
+  // isCustomDomain(): boolean;
+  // customDomainId(): string;
+  // setCustomDomain(d: string): void;
 
-  _lastNavigatedBack: boolean;
-  _lastNavigatedFrom: string;
-  lastNavigatedBack(): boolean;
-  lastNavigatedFrom(): string;
+  // _lastNavigatedBack: boolean;
+  // _lastNavigatedFrom: string;
+  // lastNavigatedBack(): boolean;
+  // lastNavigatedFrom(): string;
 
   cachedIdentityWidget: any; // lazy loaded substrate identity widget
 }
@@ -132,9 +129,8 @@ const roles = new RolesController(user);
 // INITIALIZE MAIN APP
 const app: IApp = {
   socket: new WebSocketController(),
-  chain: null,
   chainEntities: new ChainEntityController(),
-  activeChainId: () => app.chain?.id,
+  // activeChainId: () => app.chain?.id,
 
   chainPreloading: false,
   chainAdapterReady: new EventEmitter(),
@@ -181,10 +177,10 @@ const app: IApp = {
   sessions: new SessionsController(),
   loginState: LoginState.NotLoaded,
 
-  // Global nav state
-  mobileMenu: null,
-  sidebarMenu: 'default',
-  sidebarToggled: false,
+  // // Global nav state
+  // mobileMenu: null,
+  // sidebarMenu: 'default',
+  // sidebarToggled: false,
 
   toasts: getToastStore(),
   modals: getModalStore(),
@@ -200,23 +196,23 @@ const app: IApp = {
   isLoggedIn: () => app.loginState === LoginState.LoggedIn,
   isProduction: () =>
     document.location.origin.indexOf('commonwealth.im') !== -1,
-  serverUrl: () => '/api',
+  // serverUrl: () => '/api',
 
   loadingError: null,
 
-  _customDomainId: null,
-  isCustomDomain: () => app._customDomainId !== null,
-  customDomainId: () => {
-    return app._customDomainId;
-  },
-  setCustomDomain: (d) => {
-    app._customDomainId = d;
-  },
+  // _customDomainId: null,
+  // isCustomDomain: () => app._customDomainId !== null,
+  // customDomainId: () => {
+  //   return app._customDomainId;
+  // },
+  // setCustomDomain: (d) => {
+  //   app._customDomainId = d;
+  // },
 
-  _lastNavigatedFrom: null,
-  _lastNavigatedBack: false,
-  lastNavigatedBack: () => app._lastNavigatedBack,
-  lastNavigatedFrom: () => app._lastNavigatedFrom,
+  // _lastNavigatedFrom: null,
+  // _lastNavigatedBack: false,
+  // lastNavigatedBack: () => app._lastNavigatedBack,
+  // lastNavigatedFrom: () => app._lastNavigatedFrom,
 
   cachedIdentityWidget: null,
 };

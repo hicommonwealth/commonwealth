@@ -88,7 +88,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
 
           const scrollEle = document.getElementsByClassName('Body')[0];
 
-          localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+          localStorage[`${navState.activeChainId()}-discussions-scrollY`] =
             scrollEle.scrollTop;
 
           m.route.set(discussionLink);

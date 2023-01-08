@@ -25,10 +25,10 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 
 export const getModules = () => {
-  if (!app || !app.chain || !app.chain.loaded) {
+  if (!app || !app.chain || !chainState.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base === ChainBase.Substrate) {
+  if (chainState.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
     return [chain.bounties, chain.treasury, chain.phragmenElections];
   } else {
@@ -121,7 +121,7 @@ export const getActionSection = (
         <div class="action-info-row">
           <CWText>Proposed curator: </CWText>
           {m(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
+            user: new AddressInfo(null, bounty.curator, chainState.chain.id, null),
             linkify: true,
           })}
         </div>
@@ -157,7 +157,7 @@ export const getActionSection = (
         <div class="action-info-row">
           <CWText>Curator: </CWText>
           {m(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
+            user: new AddressInfo(null, bounty.curator, chainState.chain.id, null),
             linkify: true,
           })}
         </div>
@@ -217,14 +217,14 @@ export const getActionSection = (
         <div class="action-info-row">
           <CWText>Curator: </CWText>
           {m(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
+            user: new AddressInfo(null, bounty.curator, chainState.chain.id, null),
             linkify: true,
           })}
         </div>
         <div class="action-info-row">
           <CWText>Recipient: </CWText>
           {m(User, {
-            user: new AddressInfo(null, bounty.beneficiary, app.chain.id, null),
+            user: new AddressInfo(null, bounty.beneficiary, chainState.chain.id, null),
             linkify: true,
           })}
         </div>

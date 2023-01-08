@@ -11,7 +11,7 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 export class ExternalLinksModule extends ClassComponent {
   view() {
     if (!app.chain) return;
-    const meta = app.chain.meta;
+    const meta = chainState.chain.meta;
     const { website, discord, element, telegram, github } = meta;
 
     if (!website && !discord && !telegram && !github) return;

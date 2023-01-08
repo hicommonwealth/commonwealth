@@ -15,6 +15,7 @@ import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
+import chainState from 'chainState';
 import ErrorPage from './error';
 import User from '../components/widgets/user';
 import { CardsCollection } from '../components/cards_collection';
@@ -30,7 +31,7 @@ type TipAttrs = {
 class Tip extends ClassComponent<TipAttrs> {
   view(vnode: m.Vnode<TipAttrs>) {
     const { proposal } = vnode.attrs;
-    const beneficiary = app.chain.accounts.get(proposal.data.who);
+    const beneficiary = chainState.chain.accounts.get(proposal.data.who);
 
     return (
       <div class="TipDetail">
@@ -70,11 +71,11 @@ class Tip extends ClassComponent<TipAttrs> {
 }
 
 function getModules() {
-  if (!app || !app.chain || !app.chain.loaded) {
+  if (!app || !chainState.chain || !chainState.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base === ChainBase.Substrate) {
-    const chain = app.chain as Substrate;
+  if (chainState.chain.base === ChainBase.Substrate) {
+    const chain = chainState.chain as Substrate;
     return [chain.treasury, chain.tips];
   } else {
     throw new Error('invalid chain');
@@ -85,10 +86,10 @@ class TipsPage extends ClassComponent {
   view() {
     const activeAccount = app.user.activeAccount;
 
-    if (!app.chain || !app.chain.loaded) {
+    if (!chainState.chain || !chainState.chain.loaded) {
       if (
-        app.chain?.base === ChainBase.Substrate &&
-        (app.chain as Substrate).chain?.timedOut
+        chainState.chain?.base === ChainBase.Substrate &&
+        (chainState.chain as Substrate).chain?.timedOut
       ) {
         return (
           <ErrorPage
@@ -110,11 +111,11 @@ class TipsPage extends ClassComponent {
 
     if (modLoading) return modLoading;
 
-    const activeTips = (app.chain as Substrate).tips.store
+    const activeTips = (chainState.chain as Substrate).tips.store
       .getAll()
       .filter((p) => !p.completed);
 
-    const inactiveTips = (app.chain as Substrate).tips.store
+    const inactiveTips = (chainState.chain as Substrate).tips.store
       .getAll()
       .filter((p) => p.completed);
 
@@ -151,8 +152,8 @@ class TipsPage extends ClassComponent {
               {
                 statHeading: 'Treasury:',
                 stat:
-                  app.chain &&
-                  formatCoin((app.chain as Substrate).treasury.pot),
+                  chainState.chain &&
+                  formatCoin((chainState.chain as Substrate).treasury.pot),
               },
             ]}
             statAction={

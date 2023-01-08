@@ -5,9 +5,10 @@ import ClassComponent from 'class_component';
 
 import 'sublayout.scss';
 
-import app from 'state';
+import navState from 'navigationState';
 import { handleEmailInvites } from 'views/menus/invites_menu';
 import { Sidebar } from 'views/components/sidebar';
+import chainState from 'chainState';
 import { Footer } from './footer';
 import { SublayoutBanners } from './sublayout_banners';
 import { isWindowSmallInclusive } from './components/component_kit/helpers';
@@ -50,12 +51,12 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
   view(vnode: m.Vnode<SublayoutAttrs>) {
     const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
 
-    const chain = app.chain ? app.chain.meta : null;
-    const terms = app.chain ? chain.terms : null;
-    const banner = app.chain ? chain.communityBanner : null;
-    const tosStatus = localStorage.getItem(`${app.activeChainId()}-tos`);
-    const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
-    const showSidebar = app.sidebarToggled || !this.isWindowSmallInclusive;
+    const chain = chainState.chain ? chainState.chain.meta : null;
+    const terms = chainState.chain ? chain.terms : null;
+    const banner = chainState.chain ? chain.communityBanner : null;
+    const tosStatus = localStorage.getItem(`${navState.activeChainId()}-tos`);
+    const bannerStatus = localStorage.getItem(`${navState.activeChainId()}-banner`);
+    const showSidebar = navState.sidebarToggled || !this.isWindowSmallInclusive;
 
     if (m.route.param('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
@@ -79,12 +80,12 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
                 bannerStatus={bannerStatus}
               />
 
-              {this.isWindowSmallInclusive && app.mobileMenu ? (
+              {this.isWindowSmallInclusive && navState.mobileMenu ? (
                 <AppMobileMenus />
               ) : (
                 <div class="Body" onscroll={onscroll}>
                   {vnode.children}
-                  {!app.isCustomDomain() && !hideFooter && <Footer />}
+                  {!navState.isCustomDomain() && !hideFooter && <Footer />}
                 </div>
               )}
             </div>

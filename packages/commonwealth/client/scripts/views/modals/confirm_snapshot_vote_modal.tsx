@@ -99,7 +99,7 @@ export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVote
                   });
                   mixpanelBrowserTrack({
                     event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,
-                    isCustomDomain: app.isCustomDomain(),
+                    isCustomDomain: navState.isCustomDomain(),
                     space: app.snapshot.space.id,
                   });
                 } catch (err) {

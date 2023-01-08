@@ -29,10 +29,10 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
     }
 
     const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
+      ? chainState.chain.meta.decimals
+      : chainState.chain.network === ChainNetwork.ERC721
       ? 0
-      : app.chain.base === ChainBase.CosmosSDK
+      : chainState.chain.base === ChainBase.CosmosSDK
       ? 6
       : 18;
 
@@ -93,7 +93,7 @@ export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholds
   view(vnode: m.Vnode<EditTopicThresholdsModalAttrs>) {
     if (
       !app.user.isSiteAdmin &&
-      !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
+      !app.roles.isAdminOfEntity({ chain: navState.activeChainId() })
     )
       return null;
     const { id, name, description, tokenThreshold } = vnode.attrs;
@@ -102,7 +102,7 @@ export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholds
       this.form = { id, name, description, tokenThreshold };
     }
 
-    const topics = app.topics.getByCommunity(app.activeChainId());
+    const topics = app.topics.getByCommunity(navState.activeChainId());
 
     return (
       <div class="EditTopicThresholdsModal">

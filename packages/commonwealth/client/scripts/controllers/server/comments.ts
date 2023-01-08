@@ -165,10 +165,10 @@ class CommentsController {
       prefix.includes('referendum') ||
       prefix.includes('motion')
     ) {
-      chainEntity = app.chainEntities.store.getByUniqueId(app.activeChainId(), proposalIdentifier);
+      chainEntity = app.chainEntities.store.getByUniqueId(navState.activeChainId(), proposalIdentifier);
     }
     try {
-      const res = await $.post(`${app.serverUrl()}/createComment`, {
+      const res = await $.post(`${navState.serverUrl()}/createComment`, {
         author_chain: app.user.activeAccount.chain.id,
         chain,
         address,
@@ -203,7 +203,7 @@ class CommentsController {
     const newBody = body || comment.text;
     try {
       // TODO: Change to PUT /comment
-      const response = await $.post(`${app.serverUrl()}/editComment`, {
+      const response = await $.post(`${navState.serverUrl()}/editComment`, {
         address: app.user.activeAccount.address,
         author_chain: app.user.activeAccount.chain.id,
         id: comment.id,
@@ -231,7 +231,7 @@ class CommentsController {
   public async delete(comment) {
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /comment
-      $.post(`${app.serverUrl()}/deleteComment`, {
+      $.post(`${navState.serverUrl()}/deleteComment`, {
         jwt: app.user.jwt,
         comment_id: comment.id,
       })
@@ -260,7 +260,7 @@ class CommentsController {
     return new Promise<void>(async (resolve, reject) => {
       try {
         // TODO: Change to GET /comments
-        const response = await $.get(`${app.serverUrl()}/viewComments`, {
+        const response = await $.get(`${navState.serverUrl()}/viewComments`, {
           chain: chainId,
           root_id: encodeURIComponent(proposal.uniqueIdentifier),
         });

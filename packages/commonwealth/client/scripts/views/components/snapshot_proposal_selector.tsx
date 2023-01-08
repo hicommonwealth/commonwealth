@@ -27,13 +27,13 @@ export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSel
   view(vnode: m.Vnode<SnapshotProposalSelectorAttrs>) {
     const { onSelect } = vnode.attrs;
 
-    if (!app.chain || !app.activeChainId()) return;
+    if (!app.chain || !navState.activeChainId()) return;
 
     if (!this.initialized) {
       this.allProposals = [];
       this.initialized = true;
 
-      loadMultipleSpacesData(app.chain.meta.snapshot).then((data) => {
+      loadMultipleSpacesData(chainState.chain.meta.snapshot).then((data) => {
         for (const { proposals } of data) {
           this.allProposals = [...this.allProposals, ...proposals];
         }

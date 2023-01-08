@@ -43,7 +43,7 @@ export class FeedbackModal extends ClassComponent {
               const urlText = document.location.href;
 
               // send feedback
-              $.post(`${app.serverUrl()}/sendFeedback`, {
+              $.post(`${navState.serverUrl()}/sendFeedback`, {
                 text: this.feedbackText,
                 url: urlText,
               }).then(

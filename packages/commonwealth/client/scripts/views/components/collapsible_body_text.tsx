@@ -52,7 +52,7 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
 
     const getPlaceholder = () => {
       const author = app.chain
-        ? app.chain.accounts.get(vnode.attrs.thread.author)
+        ? chainState.chain.accounts.get(vnode.attrs.thread.author)
         : null;
 
       return author ? (

@@ -77,7 +77,7 @@ export class StarterCommunityForm extends ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
               chainBase: o.value,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: CommunityType.StarterCommunity,
             });
           }}
@@ -97,7 +97,7 @@ export class StarterCommunityForm extends ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: this.state.form.base,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: CommunityType.StarterCommunity,
             });
 
@@ -146,7 +146,7 @@ export class StarterCommunityForm extends ClassComponent {
               base,
             } = this.state.form;
             try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
+              const res = await $.post(`${navState.serverUrl()}/createChain`, {
                 jwt: app.user.jwt,
                 address: '',
                 type: ChainType.Offchain,

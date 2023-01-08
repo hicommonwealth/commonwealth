@@ -155,11 +155,11 @@ export class SplTokenForm extends ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: null,
             });
             try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
+              const res = await $.post(`${navState.serverUrl()}/createChain`, {
                 address: mint,
                 base: ChainBase.Solana,
                 icon_url: iconUrl,

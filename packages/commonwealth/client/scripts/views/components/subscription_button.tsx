@@ -14,9 +14,9 @@ export class SubscriptionButton extends ClassComponent {
     const communitySubscription = subscriptions.subscriptions.find(
       (v) =>
         v.category === NotificationCategories.NewThread &&
-        v.objectId === app.activeChainId()
+        v.objectId === navState.activeChainId()
     );
-    const communityOrChain = app.activeChainId();
+    const communityOrChain = navState.activeChainId();
 
     return (
       <CWButton

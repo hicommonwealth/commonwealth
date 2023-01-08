@@ -159,7 +159,7 @@ export default class QuillEditorInternal {
           // Save the entire updated text to localStorage
           const data = JSON.stringify(this._quill.getContents());
           localStorage.setItem(
-            `${app.activeChainId()}-${this._editorNamespace}-storedText`,
+            `${navState.activeChainId()}-${this._editorNamespace}-storedText`,
             data
           );
           this._unsavedChanges = new Delta();
@@ -1020,7 +1020,7 @@ export default class QuillEditorInternal {
         .appendChild(this._createSpinner());
       // TODO: Change to POST /uploadSignature
       // TODO: Reuse code since this is used in other places
-      $.post(`${app.serverUrl()}/getUploadSignature`, {
+      $.post(`${navState.serverUrl()}/getUploadSignature`, {
         name: file.name, // tokyo.png
         mimetype: file.type, // image/png
         auth: true,

@@ -32,7 +32,7 @@ export const loadSubstrateModules = (
         );
       }
 
-      app.chain.loadModules(modules);
+      chainState.chain.loadModules(modules);
 
       return (
         <PageLoading

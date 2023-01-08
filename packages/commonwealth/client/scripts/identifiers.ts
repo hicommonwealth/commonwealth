@@ -4,6 +4,8 @@ import { ProposalStore } from 'stores';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { requiresTypeSlug } from 'utils';
 import app from './state';
+import chainState from './chainState';
+import navState from './navigationState';
 import ThreadsController from './controllers/server/threads';
 
 export const pathIsDiscussion = (
@@ -32,10 +34,10 @@ export const getProposalUrlPath = (
   } else {
     basePath = `/proposal/${id}`;
   }
-  if (omitActiveId || (app.isCustomDomain() && !chainId)) {
+  if (omitActiveId || (navState.isCustomDomain() && !chainId)) {
     return basePath;
   } else {
-    return `/${chainId || app.activeChainId()}${basePath}`;
+    return `/${chainId || navState.activeChainId()}${basePath}`;
   }
 };
 
@@ -53,51 +55,51 @@ export const proposalSlugToClass = () => {
     string,
     ProposalModule<any, any, any> | ThreadsController
   >([[ProposalType.Thread, app.threads]]);
-  if (app.chain.base === ChainBase.Substrate) {
+  if (chainState.chain.base === ChainBase.Substrate) {
     mmap.set(
       ProposalType.SubstrateDemocracyReferendum,
-      (app.chain as any).democracy
+      (chainState.chain as any).democracy
     );
     mmap.set(
       ProposalType.SubstrateDemocracyProposal,
-      (app.chain as any).democracyProposals
+      (chainState.chain as any).democracyProposals
     );
     mmap.set(
       ProposalType.SubstrateCollectiveProposal,
-      (app.chain as any).council
+      (chainState.chain as any).council
     );
     mmap.set(
       ProposalType.PhragmenCandidacy,
-      (app.chain as any).phragmenElections
+      (chainState.chain as any).phragmenElections
     );
     mmap.set(
       ProposalType.SubstrateTreasuryProposal,
-      (app.chain as any).treasury
+      (chainState.chain as any).treasury
     );
-    mmap.set(ProposalType.SubstrateBountyProposal, (app.chain as any).bounties);
-    mmap.set(ProposalType.SubstrateTreasuryTip, (app.chain as any).tips);
-  } else if (app.chain.base === ChainBase.CosmosSDK) {
-    mmap.set(ProposalType.CosmosProposal, (app.chain as any).governance);
+    mmap.set(ProposalType.SubstrateBountyProposal, (chainState.chain as any).bounties);
+    mmap.set(ProposalType.SubstrateTreasuryTip, (chainState.chain as any).tips);
+  } else if (chainState.chain.base === ChainBase.CosmosSDK) {
+    mmap.set(ProposalType.CosmosProposal, (chainState.chain as any).governance);
   }
   if (
-    app.chain.network === ChainNetwork.Kusama ||
-    app.chain.network === ChainNetwork.Polkadot
+    chainState.chain.network === ChainNetwork.Kusama ||
+    chainState.chain.network === ChainNetwork.Polkadot
   ) {
     mmap.set(
       ProposalType.SubstrateTechnicalCommitteeMotion,
-      (app.chain as any).technicalCommittee
+      (chainState.chain as any).technicalCommittee
     );
   }
-  if (app.chain.network === ChainNetwork.Moloch) {
+  if (chainState.chain.network === ChainNetwork.Moloch) {
     mmap.set(ProposalType.MolochProposal, (app.chain as any).governance);
   }
-  if (app.chain.network === ChainNetwork.Compound) {
+  if (chainState.chain.network === ChainNetwork.Compound) {
     mmap.set(ProposalType.CompoundProposal, (app.chain as any).governance);
   }
-  if (app.chain.network === ChainNetwork.Aave) {
+  if (chainState.chain.network === ChainNetwork.Aave) {
     mmap.set(ProposalType.AaveProposal, (app.chain as any).governance);
   }
-  if (app.chain.network === ChainNetwork.Sputnik) {
+  if (chainState.chain.network === ChainNetwork.Sputnik) {
     mmap.set(ProposalType.SputnikProposal, (app.chain as any).dao);
   }
   return mmap;
@@ -159,19 +161,19 @@ export const chainEntityTypeToProposalSlug = (
   else if (t === SubstrateTypes.EntityKind.TipProposal)
     return ProposalType.SubstrateTreasuryTip;
   else if (t === 'proposal') {
-    if (app.chain.network === ChainNetwork.Sputnik) {
+    if (chainState.chain.network === ChainNetwork.Sputnik) {
       return ProposalType.SputnikProposal;
     }
-    if (app.chain.network === ChainNetwork.Moloch) {
+    if (chainState.chain.network === ChainNetwork.Moloch) {
       return ProposalType.MolochProposal;
     }
-    if (app.chain.network === ChainNetwork.Compound) {
+    if (chainState.chain.network === ChainNetwork.Compound) {
       return ProposalType.CompoundProposal;
     }
-    if (app.chain.network === ChainNetwork.Aave) {
+    if (chainState.chain.network === ChainNetwork.Aave) {
       return ProposalType.AaveProposal;
     }
-    if (app.chain.base === ChainBase.CosmosSDK) {
+    if (chainState.chain.base === ChainBase.CosmosSDK) {
       return ProposalType.CosmosProposal;
     }
   }
@@ -207,19 +209,19 @@ export const chainEntityTypeToProposalName = (t: IChainEntityKind): string => {
     return 'Bounty Proposal';
   else if (t === SubstrateTypes.EntityKind.TipProposal) return 'Treasury Tip';
   else if (t === 'proposal') {
-    if (app.chain.network === ChainNetwork.Sputnik) {
+    if (chainState.chain.network === ChainNetwork.Sputnik) {
       return 'Sputnik Proposal';
     }
-    if (app.chain.network === ChainNetwork.Moloch) {
+    if (chainState.chain.network === ChainNetwork.Moloch) {
       return 'Moloch Proposal';
     }
-    if (app.chain.network === ChainNetwork.Compound) {
+    if (chainState.chain.network === ChainNetwork.Compound) {
       return 'On-Chain Proposal';
     }
-    if (app.chain.network === ChainNetwork.Aave) {
+    if (chainState.chain.network === ChainNetwork.Aave) {
       return 'On-Chain Proposal';
     }
-    if (app.chain.base === ChainBase.CosmosSDK) {
+    if (chainState.chain.base === ChainBase.CosmosSDK) {
       return 'Proposal';
     }
   }

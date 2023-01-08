@@ -33,14 +33,14 @@ export class CreateCategory extends ClassComponent<ChannelAttrs> {
     const handleSubmit = async () => {
       await app.socket.chatNs.createChatChannel(
         this.channel,
-        app.activeChainId(),
+        navState.activeChainId(),
         this.category
       );
 
       mixpanelBrowserTrack({
         event: MixpanelChatEvents.NEW_CHANNEL_CREATED,
-        isCustomDomain: app.isCustomDomain(),
-        community: app.activeChainId(),
+        isCustomDomain: navState.isCustomDomain(),
+        community: navState.activeChainId(),
       });
 
       vnode.attrs.handleClose();
@@ -99,7 +99,7 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
     const handleSubmit = async () => {
       await app.socket.chatNs.createChatChannel(
         this.channel,
-        app.activeChainId(),
+        navState.activeChainId(),
         vnode.attrs.category
       );
 

@@ -47,7 +47,7 @@ class PollsController {
 
   public async fetchPolls(chainId: string, threadId: number) {
     await $.ajax({
-      url: `${app.serverUrl()}/getPolls`,
+      url: `${navState.serverUrl()}/getPolls`,
       type: 'GET',
       data: {
         chain: chainId,
@@ -86,10 +86,10 @@ class PollsController {
       args;
 
     await $.ajax({
-      url: `${app.serverUrl()}/createPoll`,
+      url: `${navState.serverUrl()}/createPoll`,
       type: 'POST',
       data: {
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
         thread_id: threadId,
         prompt,
         options: JSON.stringify(options),

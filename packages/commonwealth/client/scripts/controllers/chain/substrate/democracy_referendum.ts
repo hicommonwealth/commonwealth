@@ -290,7 +290,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
 
     // fetcher cannot generate "NotPassed" events
     if (
-      this._endBlock < this._Democracy.app.chain.block.height &&
+      this._endBlock < this._Democracy.chainState.chain.block.height &&
       !this.passed &&
       !this.completed
     ) {
@@ -382,7 +382,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
         this._endBlock = e.data.dispatchBlock; // fix timer if in dispatch queue
 
         // hack to complete proposals that didn't get an execution event for some reason
-        if (this._executionBlock < this._Democracy.app.chain.block.height) {
+        if (this._executionBlock < this._Democracy.chainState.chain.block.height) {
           if (!this.completed) this.complete();
         }
         break;

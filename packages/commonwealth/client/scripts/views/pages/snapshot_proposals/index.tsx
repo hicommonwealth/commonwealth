@@ -67,7 +67,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
   oncreate() {
     mixpanelBrowserTrack({
       event: MixpanelSnapshotEvents.SNAPSHOT_PAGE_VISIT,
-      isCustomDomain: app.isCustomDomain(),
+      isCustomDomain: navState.isCustomDomain(),
     });
   }
 

@@ -162,7 +162,7 @@ export class ChatNamespace {
     public async createChatChannel(name, chain_id, category) {
         // this call will fail unless its an admin
         try {
-            const res = await $.post(`${app.serverUrl()}/createChatChannel`, {
+            const res = await $.post(`${navState.serverUrl()}/createChatChannel`, {
                 jwt: app.user.jwt,
                 name,
                 chain_id,
@@ -185,10 +185,10 @@ export class ChatNamespace {
             throw new Error(ChatErrors.NOT_LOGGED_IN)
         }
         try {
-            const res = await $.get(`${app.serverUrl()}/getChatMessages`, {
+            const res = await $.get(`${navState.serverUrl()}/getChatMessages`, {
                 jwt: app.user.jwt,
                 address: app.user.activeAccount.address,
-                chain_id: app.activeChainId()
+                chain_id: navState.activeChainId()
             })
 
             if(res.status !== "200") {
@@ -205,10 +205,10 @@ export class ChatNamespace {
 
     public async getChannelData(channel_id: number) {
         try {
-            const res = await $.get(`${app.serverUrl()}/getChatChannel`, {
+            const res = await $.get(`${navState.serverUrl()}/getChatChannel`, {
                 jwt: app.user.jwt,
                 channel_id,
-                chain_id: app.activeChainId()
+                chain_id: navState.activeChainId()
             })
 
             if(res.status !== "200") {
@@ -226,10 +226,10 @@ export class ChatNamespace {
     public async deleteChatChannel(channel_id: number) {
         try {
             const response = await $.ajax({
-                url: `${app.serverUrl()}/deleteChatChannel`,
+                url: `${navState.serverUrl()}/deleteChatChannel`,
                 data: {
                     channel_id,
-                    chain_id: app.activeChainId(),
+                    chain_id: navState.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'DELETE'
@@ -250,10 +250,10 @@ export class ChatNamespace {
     public async deleteChatCategory(category: string) {
         try {
             const response = await $.ajax({
-                url: `${app.serverUrl()}/deleteChatCategory`,
+                url: `${navState.serverUrl()}/deleteChatCategory`,
                 data: {
                     category,
-                    chain_id: app.activeChainId(),
+                    chain_id: navState.activeChainId(),
                     jwt: app.user.jwt,
                 },
                 type: 'DELETE'
@@ -273,11 +273,11 @@ export class ChatNamespace {
     public async editChatCategory(category: string, new_category: string) {
         try {
             const response = await $.ajax({
-                url: `${app.serverUrl()}/editChatCategory`,
+                url: `${navState.serverUrl()}/editChatCategory`,
                 data: {
                     category,
                     new_category,
-                    chain_id: app.activeChainId(),
+                    chain_id: navState.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'PUT'
@@ -297,11 +297,11 @@ export class ChatNamespace {
     public async editChatChannel(channel_id: number, name: string) {
         try {
             const response = await $.ajax({
-                url: `${app.serverUrl()}/editChatChannel`,
+                url: `${navState.serverUrl()}/editChatChannel`,
                 data: {
                     channel_id,
                     name,
-                    chain_id: app.activeChainId(),
+                    chain_id: navState.activeChainId(),
                     jwt: app.user.jwt
                 },
                 type: 'PUT'

@@ -10,6 +10,7 @@ import {
   MsgUndelegateEncodeObject,
   MsgWithdrawDelegatorRewardEncodeObject,
 } from '@cosmjs/stargate';
+import chainState from 'chainState';
 import CosmosAccounts from './accounts';
 
 export default class CosmosAccount extends Account {
@@ -24,11 +25,11 @@ export default class CosmosAccount extends Account {
   public get balance() { return this.updateBalance().then(() => this._balance); }
 
   constructor(app: IApp, ChainInfo: CosmosChain, Accounts: CosmosAccounts, address: string) {
-    super({ chain: app.chain.meta, address });
+    super({ chain: chainState.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
       app.chainModuleReady.once('ready', () => {
-        if (app.chain.chain instanceof CosmosChain) this._Chain = app.chain.chain;
+        if (chainState.chain.chain instanceof CosmosChain) this._Chain = chainState.chain.chain;
         else console.error('Did not successfully initialize account with chain');
       });
     } else {

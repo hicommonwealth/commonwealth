@@ -39,7 +39,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
       <div class="TXSigningCLIOption">
         {this.calldata &&
         app.chain &&
-        app.chain.base === ChainBase.Substrate ? (
+        chainState.chain.base === ChainBase.Substrate ? (
           <>
             <CodeBlock clickToSelect>
               {`subkey ${

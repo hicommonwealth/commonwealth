@@ -169,7 +169,7 @@ export class NotificationsMenu extends ClassComponent {
           {m(Button, {
             label: 'See all',
             onclick: () =>
-              app.activeChainId()
+              navState.activeChainId()
                 ? navigateToSubpage('/notifications')
                 : m.route.set('/notifications'),
           })}

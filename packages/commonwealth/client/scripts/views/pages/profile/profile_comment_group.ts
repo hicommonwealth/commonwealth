@@ -21,7 +21,7 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
     const { slug, identifier } = proposal;
 
     // hide rows from communities that don't match
-    if (app.isCustomDomain() && proposal.chain !== app.customDomainId()) return;
+    if (navState.isCustomDomain() && proposal.chain !== navState.customDomainId()) return;
 
     return m('.ProfileCommentGroup', [
       m('.summary', [

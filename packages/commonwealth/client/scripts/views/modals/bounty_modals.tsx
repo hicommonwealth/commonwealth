@@ -85,7 +85,7 @@ export class ProposeCuratorModal extends ClassComponent<BountyModalAttrs> {
   view(vnode: m.Vnode<BountyModalAttrs>) {
     const { bountyId } = vnode.attrs;
     const { curator, fee, approvals } = this;
-    const feeCoins = app.chain.chain.coins(fee, true);
+    const feeCoins = chainState.chain.chain.coins(fee, true);
 
     return (
       <div class="ProposeCuratorModal">

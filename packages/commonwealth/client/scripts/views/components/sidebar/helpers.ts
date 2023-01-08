@@ -14,7 +14,7 @@ export function verifyCachedToggleTree(
   toggleTree: ToggleTree
 ) {
   const cachedTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-${treeName}-toggle-tree`]
+    localStorage[`${navState.activeChainId()}-${treeName}-toggle-tree`]
   );
   return _.isEqualWith(cachedTree, toggleTree, comparisonCustomizer);
 }

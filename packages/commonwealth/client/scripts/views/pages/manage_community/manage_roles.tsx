@@ -24,8 +24,8 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
   view(vnode: m.Vnode<ManageRoleRowAttrs>) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
 
-    const chainOrCommObj = { chain: app.activeChainId() };
-    const communityMeta = app.chain.meta;
+    const chainOrCommObj = { chain: navState.activeChainId() };
+    const communityMeta = chainState.chain.meta;
 
     return (
       <div class="ManageRoles">
@@ -61,7 +61,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                   iconSize="small"
                   onclick={async () => {
                     const adminsAndMods = await communityMeta.getMembers(
-                      app.activeChainId()
+                      navState.activeChainId()
                     );
 
                     const userAdminsAndMods = adminsAndMods.filter((role_) => {
@@ -114,7 +114,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
 
                     try {
                       const res = await $.post(
-                        `${app.serverUrl()}/upgradeMember`,
+                        `${navState.serverUrl()}/upgradeMember`,
                         {
                           ...chainOrCommObj,
                           new_role: 'member',
@@ -133,7 +133,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                       vnode.attrs.onRoleUpdate(role, newRole);
 
                       if (isLosingAdminPermissions) {
-                        m.route.set(`/${app.activeChainId()}`);
+                        m.route.set(`/${navState.activeChainId()}`);
                       }
                     } catch (err) {
                       const errMsg =

@@ -66,8 +66,8 @@ class SpecSettingsPage extends ClassComponent {
       // if on chain where user is not community admin, select first chain in list
       // where they are admin. otherwise, select current chain.
       this.chain =
-        app.chain.base === ChainBase.Substrate &&
-        (isAdmin || substrateAdminChainIds.includes(app.chain.id))
+        chainState.chain.base === ChainBase.Substrate &&
+        (isAdmin || substrateAdminChainIds.includes(chainState.chain.id))
           ? app.chain?.meta?.id
           : this.chains[0];
       this.spec = app.config.chains.getById(this.chain).substrateSpec || {};
@@ -125,12 +125,12 @@ class SpecSettingsPage extends ClassComponent {
               this.error = '';
 
               // deinit substrate API if one exists
-              if (app.chain.apiInitialized) {
-                await app.chain.deinit();
+              if (chainState.chain.apiInitialized) {
+                await chainState.chain.deinit();
               }
 
               // get URL as needed
-              const node = app.chain.meta.node;
+              const node = chainState.chain.meta.node;
               if (!node) {
                 this.error = 'Chain has no nodes!';
                 return;
@@ -174,7 +174,7 @@ class SpecSettingsPage extends ClassComponent {
               let response;
               try {
                 response = await $.post(
-                  `${app.serverUrl()}/editSubstrateSpec`,
+                  `${navState.serverUrl()}/editSubstrateSpec`,
                   {
                     jwt: app.user.jwt,
                     address: app.user.activeAccount.address,

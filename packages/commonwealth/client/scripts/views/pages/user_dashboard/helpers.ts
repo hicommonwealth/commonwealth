@@ -87,7 +87,7 @@ export const subscribeToThread = async (
 export const fetchActivity = async (requestType: DashboardViews) => {
   let activity;
   if (requestType === DashboardViews.ForYou) {
-    activity = await $.post(`${app.serverUrl()}/viewUserActivity`, {
+    activity = await $.post(`${navState.serverUrl()}/viewUserActivity`, {
       jwt: app.user.jwt,
     });
   } else if (requestType === DashboardViews.Chain) {
@@ -106,7 +106,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
     }
 
     const res: {result: { id: string, icon_url: string }[], status: boolean} = await $.post(
-      `${app.serverUrl()}/viewChainIcons`,
+      `${navState.serverUrl()}/viewChainIcons`,
       {chains: JSON.stringify(Array.from(chains))}
     );
 
@@ -124,7 +124,7 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       result: events
     }
   } else if (requestType === DashboardViews.Global) {
-    activity = await $.post(`${app.serverUrl()}/viewGlobalActivity`);
+    activity = await $.post(`${navState.serverUrl()}/viewGlobalActivity`);
   }
   return activity;
 };

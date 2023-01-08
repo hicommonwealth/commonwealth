@@ -31,10 +31,10 @@ import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getModules(): ProposalModule<any, any, any>[] {
-  if (!app || !app.chain || !app.chain.loaded) {
+  if (!app || !app.chain || !chainState.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base === ChainBase.Substrate) {
+  if (chainState.chain.base === ChainBase.Substrate) {
     const chain = app.chain as Substrate;
     return [
       chain.council,
@@ -43,7 +43,7 @@ function getModules(): ProposalModule<any, any, any>[] {
       chain.democracyProposals,
       chain.democracy,
     ];
-  } else if (app.chain.base === ChainBase.CosmosSDK) {
+  } else if (chainState.chain.base === ChainBase.CosmosSDK) {
     const chain = app.chain as Cosmos;
     return [chain.governance];
   } else {
@@ -54,22 +54,22 @@ function getModules(): ProposalModule<any, any, any>[] {
 class ProposalsPage extends ClassComponent {
   oncreate() {
     const returningFromThread =
-      app.lastNavigatedBack() && app.lastNavigatedFrom().includes('/proposal/');
+      navState.lastNavigatedBack() && navState.lastNavigatedFrom().includes('/proposal/');
     if (
       returningFromThread &&
-      localStorage[`${app.activeChainId()}-proposals-scrollY`]
+      localStorage[`${navState.activeChainId()}-proposals-scrollY`]
     ) {
       setTimeout(() => {
         window.scrollTo(
           0,
-          Number(localStorage[`${app.activeChainId()}-proposals-scrollY`])
+          Number(localStorage[`${navState.activeChainId()}-proposals-scrollY`])
         );
       }, 100);
     }
   }
 
   view() {
-    if (!app.chain || !app.chain.loaded) {
+    if (!app.chain || !chainState.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut
@@ -96,11 +96,11 @@ class ProposalsPage extends ClassComponent {
       );
     }
 
-    const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
-    const onMoloch = app.chain && app.chain.network === ChainNetwork.Moloch;
-    const onCompound = app.chain && app.chain.network === ChainNetwork.Compound;
-    const onAave = app.chain && app.chain.network === ChainNetwork.Aave;
-    const onSputnik = app.chain && app.chain.network === ChainNetwork.Sputnik;
+    const onSubstrate = app.chain && chainState.chain.base === ChainBase.Substrate;
+    const onMoloch = app.chain && chainState.chain.network === ChainNetwork.Moloch;
+    const onCompound = app.chain && chainState.chain.network === ChainNetwork.Compound;
+    const onAave = app.chain && chainState.chain.network === ChainNetwork.Aave;
+    const onSputnik = app.chain && chainState.chain.network === ChainNetwork.Sputnik;
 
     const modLoading = loadSubstrateModules('Proposals', getModules);
 
@@ -121,7 +121,7 @@ class ProposalsPage extends ClassComponent {
 
     const activeCosmosProposals =
       app.chain &&
-      app.chain.base === ChainBase.CosmosSDK &&
+      chainState.chain.base === ChainBase.CosmosSDK &&
       (app.chain as Cosmos).governance.store
         .getAll()
         .filter((p) => !p.completed)
@@ -220,7 +220,7 @@ class ProposalsPage extends ClassComponent {
 
     const inactiveCosmosProposals =
       app.chain &&
-      app.chain.base === ChainBase.CosmosSDK &&
+      chainState.chain.base === ChainBase.CosmosSDK &&
       (app.chain as Cosmos).governance.store
         .getAll()
         .filter((p) => p.completed)

@@ -61,7 +61,7 @@ class ProfilesController {
             })
           : account.address;
 
-      $.post(`${app.serverUrl()}/updateProfile`, {
+      $.post(`${navState.serverUrl()}/updateProfile`, {
         chain: account.chain.id,
         address: normalizedAddress,
         data: JSON.stringify(data),
@@ -104,7 +104,7 @@ class ProfilesController {
         const fetchedProfiles = chunk; // keep a list of the profiles we just fetched
         try {
           // TODO: Change to GET /profiles
-          const result = await $.post(`${app.serverUrl()}/bulkProfiles`, {
+          const result = await $.post(`${navState.serverUrl()}/bulkProfiles`, {
             'addresses[]': chunk.map((profile) => profile.address),
             'chains[]': chunk.map((profile) => profile.chain),
           });

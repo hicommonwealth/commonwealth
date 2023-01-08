@@ -110,7 +110,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
               IdentityQuality.Good ? '.verified' : ''
             }`,
             profile
-              ? `/${app.activeChainId()}/account/${profile.address}?base=${
+              ? `/${navState.activeChainId()}/account/${profile.address}?base=${
                   profile.chain
                 }`
               : 'javascript:',
@@ -129,7 +129,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
       ? link(
           'a.user-display-name.username',
           profile
-            ? `/${app.activeChainId()}/account/${profile.address}?base=${
+            ? `/${navState.activeChainId()}/account/${profile.address}?base=${
                 profile.chain
               }`
             : 'javascript:',
@@ -215,7 +215,7 @@ const SubstrateOfflineIdentityWidget: m.Component<
               IdentityQuality.Good ? '.verified' : ''
             }`,
             profile
-              ? `/${app.activeChainId()}/account/${profile.address}?base=${
+              ? `/${navState.activeChainId()}/account/${profile.address}?base=${
                   profile.chain
                 }`
               : 'javascript:',
@@ -234,7 +234,7 @@ const SubstrateOfflineIdentityWidget: m.Component<
       ? link(
           'a.user-display-name.username',
           profile
-            ? `/${app.activeChainId()}/account/${profile.address}?base=${
+            ? `/${navState.activeChainId()}/account/${profile.address}?base=${
                 profile.chain
               }`
             : 'javascript:',

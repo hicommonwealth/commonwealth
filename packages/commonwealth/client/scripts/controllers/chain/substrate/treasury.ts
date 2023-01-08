@@ -40,7 +40,7 @@ class SubstrateTreasury extends ProposalModule<
   get spendPeriod() { return this._spendPeriod; }
 
   get nextSpendBlock(): number {
-    return (Math.floor(this.app.chain.block.height / this.spendPeriod) + 1) * this.spendPeriod;
+    return (Math.floor(this.chainState.chain.block.height / this.spendPeriod) + 1) * this.spendPeriod;
   }
 
   public computeBond(amount: SubstrateCoin): SubstrateCoin {

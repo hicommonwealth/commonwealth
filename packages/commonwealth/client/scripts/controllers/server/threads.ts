@@ -249,7 +249,7 @@ class ThreadsController {
   ) {
     try {
       // TODO: Change to POST /thread
-      const response = await $.post(`${app.serverUrl()}/createThread`, {
+      const response = await $.post(`${navState.serverUrl()}/createThread`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         chain: chainId,
@@ -311,13 +311,13 @@ class ThreadsController {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
     await $.ajax({
-      url: `${app.serverUrl()}/editThread`,
+      url: `${navState.serverUrl()}/editThread`,
       type: 'PUT',
       data: {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
         address: app.user.activeAccount.address,
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
         thread_id: proposal.id,
         kind: proposal.kind,
         stage: proposal.stage,
@@ -351,10 +351,10 @@ class ThreadsController {
   public async delete(proposal) {
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /thread
-      $.post(`${app.serverUrl()}/deleteThread`, {
+      $.post(`${navState.serverUrl()}/deleteThread`, {
         jwt: app.user.jwt,
         thread_id: proposal.id,
-        chain_id: app.activeChainId(),
+        chain_id: navState.activeChainId(),
       })
         .then((result) => {
           // Deleted posts are removed from all stores containing them
@@ -374,10 +374,10 @@ class ThreadsController {
 
   public async setStage(args: { threadId: number; stage: ThreadStage }) {
     await $.ajax({
-      url: `${app.serverUrl()}/updateThreadStage`,
+      url: `${navState.serverUrl()}/updateThreadStage`,
       type: 'POST',
       data: {
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
         thread_id: args.threadId,
         stage: args.stage,
         jwt: app.user.jwt,
@@ -405,7 +405,7 @@ class ThreadsController {
 
   public async setPrivacy(args: { threadId: number; readOnly: boolean }) {
     return $.ajax({
-      url: `${app.serverUrl()}/updateThreadPrivacy`,
+      url: `${navState.serverUrl()}/updateThreadPrivacy`,
       type: 'POST',
       data: {
         jwt: app.user.jwt,
@@ -429,7 +429,7 @@ class ThreadsController {
 
   public async pin(args: { proposal: Thread }) {
     return $.ajax({
-      url: `${app.serverUrl()}/updateThreadPinned`,
+      url: `${navState.serverUrl()}/updateThreadPinned`,
       type: 'POST',
       data: {
         jwt: app.user.jwt,
@@ -454,10 +454,10 @@ class ThreadsController {
     snapshotProposal: string;
   }) {
     await $.ajax({
-      url: `${app.serverUrl()}/updateThreadLinkedSnapshotProposal`,
+      url: `${navState.serverUrl()}/updateThreadLinkedSnapshotProposal`,
       type: 'POST',
       data: {
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
         thread_id: args.threadId,
         snapshot_proposal: args.snapshotProposal,
         jwt: app.user.jwt,
@@ -485,10 +485,10 @@ class ThreadsController {
   }) {
     const { threadId, entities } = args;
     await $.ajax({
-      url: `${app.serverUrl()}/updateThreadLinkedChainEntities`,
+      url: `${navState.serverUrl()}/updateThreadLinkedChainEntities`,
       type: 'POST',
       data: {
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
         thread_id: threadId,
         chain_entity_id: entities.map((ce) => ce.id),
         jwt: app.user.jwt,
@@ -523,8 +523,8 @@ class ThreadsController {
     linkedThreadId: number
   ) {
     const [response,] = await Promise.all([
-      $.post(`${app.serverUrl()}/updateLinkedThreads`, {
-        chain: app.activeChainId(),
+      $.post(`${navState.serverUrl()}/updateLinkedThreads`, {
+        chain: navState.activeChainId(),
         linking_thread_id: linkingThreadId,
         linked_thread_id: linkedThreadId,
         address: app.user.activeAccount.address,
@@ -543,8 +543,8 @@ class ThreadsController {
     linkedThreadId: number
   ) {
     const [response,] = await Promise.all([
-      $.post(`${app.serverUrl()}/updateLinkedThreads`, {
-        chain: app.activeChainId(),
+      $.post(`${navState.serverUrl()}/updateLinkedThreads`, {
+        chain: navState.activeChainId(),
         linking_thread_id: linkingThreadId,
         linked_thread_id: linkedThreadId,
         address: app.user.activeAccount.address,
@@ -561,11 +561,11 @@ class ThreadsController {
 
   public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
     const response = await $.ajax({
-      url: `${app.serverUrl()}/fetchThreadForSnapshot`,
+      url: `${navState.serverUrl()}/fetchThreadForSnapshot`,
       type: 'GET',
       data: {
         snapshot: args.snapshot,
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       },
     });
     if (response.status === 'Failure') {
@@ -578,12 +578,12 @@ class ThreadsController {
     ids: Array<number | string>
   ): Promise<Thread[]> {
     const params = {
-      chain: app.activeChainId(),
+      chain: navState.activeChainId(),
       ids,
     };
     const [response,] = await Promise.all([
-      $.get(`${app.serverUrl()}/getThreads`, params),
-      app.chainEntities.refreshRawEntities(app.activeChainId())
+      $.get(`${navState.serverUrl()}/getThreads`, params),
+      app.chainEntities.refreshRawEntities(navState.activeChainId())
     ])
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
@@ -605,7 +605,7 @@ class ThreadsController {
   fetchReactionsCount = async (threads) => {
     const { result: reactionCounts } = await $.ajax({
       type: 'POST',
-      url: `${app.serverUrl()}/reactionsCounts`,
+      url: `${navState.serverUrl()}/reactionsCounts`,
       headers: {
         'content-type': 'application/json',
       },
@@ -642,7 +642,7 @@ class ThreadsController {
       return;
     }
     const { topicName, stageName } = options;
-    const chain = app.activeChainId();
+    const chain = navState.activeChainId();
     const params = {
       chain,
       cutoff_date: this.listingStore.isInitialized(options)
@@ -656,7 +656,7 @@ class ThreadsController {
 
     // fetch threads and refresh entities so we can join them together
     const [response,] = await Promise.all([
-      $.get(`${app.serverUrl()}/bulkThreads`, params),
+      $.get(`${navState.serverUrl()}/bulkThreads`, params),
       app.chainEntities.refreshRawEntities(chain)
     ]);
     if (response.status !== 'Success') {

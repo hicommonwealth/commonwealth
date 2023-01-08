@@ -40,9 +40,9 @@ class DelegateForm extends ClassComponent {
   }
 
   async getDelegate() {
-    if (app.chain.network === ChainNetwork.Compound) {
+    if (chainState.chain.network === ChainNetwork.Compound) {
       this.currentDelegate = await (app.chain as Compound).chain.getDelegate();
-    } else if (app.chain.network === ChainNetwork.Aave) {
+    } else if (chainState.chain.network === ChainNetwork.Aave) {
       // TODO: switch on delegation type
       this.currentDelegate = await (app.chain as Aave).chain.getDelegate(
         app.user.activeAccount.address,
@@ -54,12 +54,12 @@ class DelegateForm extends ClassComponent {
   }
 
   async setDelegate(address: string) {
-    if (app.chain.apiInitialized) {
+    if (chainState.chain.apiInitialized) {
       let delegationPromise: Promise<void>;
 
-      if (app.chain.network === ChainNetwork.Compound) {
+      if (chainState.chain.network === ChainNetwork.Compound) {
         delegationPromise = (app.chain as Compound).chain.setDelegate(address);
-      } else if (app.chain.network === ChainNetwork.Aave) {
+      } else if (chainState.chain.network === ChainNetwork.Aave) {
         delegationPromise = (app.chain as Aave).chain.setDelegate(address);
       }
 
@@ -78,7 +78,7 @@ class DelegateForm extends ClassComponent {
   view() {
     const { form, loading } = this;
 
-    const hasValue = app.chain.network === ChainNetwork.Compound;
+    const hasValue = chainState.chain.network === ChainNetwork.Compound;
 
     return (
       <div class="DelegateForm">
@@ -136,9 +136,9 @@ class DelegateForm extends ClassComponent {
 
 class DelegatePage extends ClassComponent {
   view() {
-    if (!app.chain || !app.chain.loaded) {
+    if (!app.chain || !chainState.chain.loaded) {
       // chain load failed
-      if (app.chain && app.chain.failed) {
+      if (app.chain && chainState.chain.failed) {
         return (
           <PageNotFound
             title="Wrong Ethereum Provider Network!"
@@ -150,9 +150,9 @@ class DelegatePage extends ClassComponent {
       // wrong chain loaded
       if (
         app.chain &&
-        app.chain.loaded &&
-        app.chain.network !== ChainNetwork.Compound &&
-        app.chain.network !== ChainNetwork.Aave
+        chainState.chain.loaded &&
+        chainState.chain.network !== ChainNetwork.Compound &&
+        chainState.chain.network !== ChainNetwork.Aave
       ) {
         return (
           <PageNotFound

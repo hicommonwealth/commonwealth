@@ -53,7 +53,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public get denom() {
-    return this.app.chain.currency;
+    return this.chainState.chain.currency;
   }
   private _decimals: BN;
   public coins(n: number | string | BN, inDollars = false) {
@@ -117,19 +117,19 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         this._nodeStatus.sync_info;
 
       // update block heights and times
-      this.app.chain.block.lastTime = moment(latest_block_time);
-      this.app.chain.block.height = latest_block_height;
+      this.chainState.chain.block.lastTime = moment(latest_block_time);
+      this.chainState.chain.block.height = latest_block_height;
       const prevBlock = await this._api.connection.provider.block(latest_block_height - 1)
       // TODO: check ms vs seconds here
-      this.app.chain.block.duration = +latest_block_time - prevBlock.header.timestamp;
-      if (this.app.chain.networkStatus !== ApiStatus.Connected) {
-        this.app.chain.networkStatus = ApiStatus.Connected;
+      this.chainState.chain.block.duration = +latest_block_time - prevBlock.header.timestamp;
+      if (this.chainState.chain.networkStatus !== ApiStatus.Connected) {
+        this.chainState.chain.networkStatus = ApiStatus.Connected;
         m.redraw();
       }
     } catch (e) {
-      if (this.app.chain.networkStatus !== ApiStatus.Disconnected) {
+      if (this.chainState.chain.networkStatus !== ApiStatus.Disconnected) {
         console.error(`failed to query NEAR status: ${JSON.stringify(e)}`);
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
+        this.chainState.chain.networkStatus = ApiStatus.Disconnected;
         m.redraw();
       }
     }
@@ -239,10 +239,10 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
       ? `${name}.sputnik-dao.near`
       : `${name}.sputnikv2.testnet`;
     let redirectUrl: string;
-    if (!this.app.isCustomDomain()) {
+    if (!this.navState.isCustomDomain()) {
       redirectUrl = `${
         window.location.origin
-      }/${this.app.activeChainId()}/finishNearLogin?chain_name=${id}`;
+      }/${this.navState.activeChainId()}/finishNearLogin?chain_name=${id}`;
     } else {
       redirectUrl = `${window.location.origin}/finishNearLogin?chain_name=${id}`;
     }
@@ -286,10 +286,10 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
     // redirect to generate access key for dao contract
     let redirectUrl;
-    if (!this.app.isCustomDomain()) {
+    if (!this.navState.isCustomDomain()) {
       redirectUrl = `${
         window.location.origin
-      }/${this.app.activeChainId()}/finishNearLogin`;
+      }/${this.navState.activeChainId()}/finishNearLogin`;
     } else {
       redirectUrl = `${window.location.origin}/finishNearLogin`;
     }
@@ -331,7 +331,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   public async deinit(): Promise<void> {
-    this.app.chain.networkStatus = ApiStatus.Disconnected;
+    this.chainState.chain.networkStatus = ApiStatus.Disconnected;
   }
 
   public createTXModalData(): ITXModalData {

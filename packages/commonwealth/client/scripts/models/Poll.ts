@@ -70,7 +70,7 @@ class Poll {
     if (!selectedOption) {
       notifyError('Invalid voting option');
     }
-    const response = await $.post(`${app.serverUrl()}/updateVote`, {
+    const response = await $.post(`${navState.serverUrl()}/updateVote`, {
       poll_id: this.id,
       chain_id: this.chainId,
       author_chain: authorChain,

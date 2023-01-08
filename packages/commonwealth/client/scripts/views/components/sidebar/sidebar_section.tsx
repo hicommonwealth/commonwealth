@@ -87,7 +87,7 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
         this.toggled = !this.toggled;
       }
 
-      app.sidebarToggled = false;
+      navState.sidebarToggled = false;
 
       onclick(e, this.toggled);
     };

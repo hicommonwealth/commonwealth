@@ -69,8 +69,8 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
 
     mixpanelBrowserTrack({
       event: MixpanelChatEvents.NEW_CHAT_SENT,
-      community: app.activeChainId(),
-      isCustomDomain: app.isCustomDomain(),
+      community: navState.activeChainId(),
+      isCustomDomain: navState.isCustomDomain(),
     });
   };
 
@@ -83,7 +83,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
 
   oninit(vnode: m.VnodeDOM<ChatWindowAttrs, this>) {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
-      chain: app.activeChainId(),
+      chain: navState.activeChainId(),
     });
     const currentChainInfo = app.chain?.meta;
     this.hideChat =
@@ -170,7 +170,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                   user: new AddressInfo(
                     null,
                     grp.address,
-                    app.activeChainId(),
+                    navState.activeChainId(),
                     null
                   ),
                   linkify: true,
@@ -186,7 +186,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                     const route = app.socket.chatNs.getRouteToMessage(
                       grp.messages[0].chat_channel_id,
                       grp.messages[0].id,
-                      app.chain.id
+                      chainState.chain.id
                     );
                     navigator.clipboard
                       .writeText(

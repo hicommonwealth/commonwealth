@@ -3,6 +3,7 @@ import { ChainNetwork, WalletId } from 'common-common/src/types';
 import m from 'mithril';
 import _ from 'lodash';
 import { ApiStatus, IApp } from 'state';
+import { IChainAppState } from 'chainState';
 import moment from 'moment';
 import BN from 'bn.js';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
@@ -58,10 +59,13 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _app: IApp;
+  private _chainState: IChainAppState;
+  public get chainState() { return this._chainState;}
   public get app() { return this._app; }
 
-  constructor(app: IApp) {
+  constructor(app: IApp, chainState?: IChainAppState) {
     this._app = app;
+    this._chainState = chainState;
   }
 
   public coins(n: number | BN, inDollars?: boolean) {
@@ -81,8 +85,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       setupStakingExtension,
       setupBankExtension,
     );
-    if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
-      this.app.chain.networkStatus = ApiStatus.Connecting;
+    if (this.chainState.chain.networkStatus === ApiStatus.Disconnected) {
+      this.chainState.chain.networkStatus = ApiStatus.Connecting;
     }
 
     // Poll for new block immediately
@@ -91,27 +95,27 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const { block: prevBlock } = await this._tmClient.block(height - 1);
     const time = moment.unix(block.header.time.valueOf() / 1000);
     // TODO: check if this is correctly seconds or milliseconds
-    this.app.chain.block.duration = block.header.time.valueOf() - prevBlock.header.time.valueOf();
-    this.app.chain.block.lastTime = time;
-    this.app.chain.block.height = height;
+    this.chainState.chain.block.duration = block.header.time.valueOf() - prevBlock.header.time.valueOf();
+    this.chainState.chain.block.lastTime = time;
+    this.chainState.chain.block.height = height;
 
     const { pool: { bondedTokens } } = await this._api.staking.pool();
     this._staked = this.coins(new BN(bondedTokens));
 
     const { params: { bondDenom } } = await this._api.staking.params();
     this._denom = bondDenom;
-    this.app.chain.networkStatus = ApiStatus.Connected;
+    this.chainState.chain.networkStatus = ApiStatus.Connected;
     m.redraw();
   }
 
   public async deinit(): Promise<void> {
-    this.app.chain.networkStatus = ApiStatus.Disconnected;
+    this.chainState.chain.networkStatus = ApiStatus.Disconnected;
   }
 
   public async sendTx(account: CosmosAccount, tx: EncodeObject): Promise<readonly Event[]> {
     // TODO: error handling
     // TODO: support multiple wallets
-    if (this._app.chain.network === ChainNetwork.Terra) {
+    if (this._chainState.chain.network === ChainNetwork.Terra) {
       throw new Error('Tx not yet supported on Terra');
     }
     const wallet = this.app.wallets.getByName(WalletId.Keplr) as KeplrWebWalletController;
@@ -119,7 +123,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (!wallet.enabled) {
       await wallet.enable();
     }
-    const client = await SigningStargateClient.connectWithSigner(this._app.chain.meta.node.url, wallet.offlineSigner);
+    const client = await SigningStargateClient.connectWithSigner(this._chainState.chain.meta.node.url, wallet.offlineSigner);
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?

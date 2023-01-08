@@ -28,7 +28,7 @@ export class NearAccount extends Account {
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
   constructor(app: IApp, Chain: NearChain, Accounts: NearAccounts, address: string) {
-    super({ chain: app.chain.meta, address });
+    super({ chain: chainState.chain.meta, address });
     this._walletConnection = new NearJsAccount(Chain.api.connection, address);
     this._Chain = Chain;
     this._Accounts = Accounts;

@@ -76,7 +76,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
 
     if (app.chain && !this.snapshotSpaces) {
       this.snapshotSpaces =
-        app.config.chains?.getById(app.activeChainId()).snapshot || [];
+        app.config.chains?.getById(navState.activeChainId()).snapshot || [];
       m.redraw();
     }
 

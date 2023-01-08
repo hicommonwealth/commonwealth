@@ -20,6 +20,8 @@ import { UserSurveyPopup } from './components/user_survey_popup';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
+import chainState from '../chainState';
+import navState from '../navigationState';
 
 class LoadingLayout extends ClassComponent {
   view() {
@@ -96,7 +98,7 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       );
     } else if (
       scope &&
-      scope !== app.activeChainId() &&
+      scope !== navState.activeChainId() &&
       scope !== this.loadingScope
     ) {
       // If we are supposed to load a new chain or community, we do so now
@@ -115,12 +117,12 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       this.deferred = false;
       initChain();
       return <LoadingLayout />;
-    } else if (!scope && app.chain && app.chain.network) {
+    } else if (!scope && chainState.chain && chainState.chain.network) {
       // Handle the case where we unload the network or community, if we're
       // going to a page that doesn't have one
       // Include this in if for isCustomDomain, scope gets unset on redirect
       // We don't need this to happen
-      if (!app.isCustomDomain()) {
+      if (!navState.isCustomDomain()) {
         deinitChainOrCommunity().then(() => {
           this.loadingScope = null;
           m.redraw();

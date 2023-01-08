@@ -109,7 +109,7 @@ export class RolesController {
     address: string;
     inviteCode: any;
   }): JQueryPromise<void> {
-    return $.post(`${app.serverUrl()}/acceptInvite`, {
+    return $.post(`${navState.serverUrl()}/acceptInvite`, {
       address: options.address,
       reject: false,
       inviteCode: options.inviteCode,
@@ -120,7 +120,7 @@ export class RolesController {
   }
 
   public rejectInvite(options: { inviteCode: any }) {
-    return $.post(`${app.serverUrl()}/acceptInvite`, {
+    return $.post(`${navState.serverUrl()}/acceptInvite`, {
       inviteCode: options.inviteCode,
       reject: true,
       jwt: app.user.jwt,
@@ -222,7 +222,7 @@ export class RolesController {
     const activeAccountsByRole = this.User.activeAccounts.map((account) => {
       const role = this.getRoleInCommunity({
         account,
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       });
       return [account, role];
     });

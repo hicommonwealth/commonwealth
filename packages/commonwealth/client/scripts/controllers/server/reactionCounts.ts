@@ -51,14 +51,14 @@ class ReactionCountController {
       options['proposal_id'] = `${(post as AnyProposal).slug}_${
         (post as AnyProposal).identifier
       }`;
-      const chainEntity = proposalIdToEntity(app, app.activeChainId(), options['proposal_id']);
+      const chainEntity = proposalIdToEntity(app, navState.activeChainId(), options['proposal_id']);
       options['chain_entity_id'] = chainEntity?.id
     } else if (post instanceof Comment) {
       options['comment_id'] = (post as Comment<any>).id;
     }
     try {
       const response = await $.post(
-        `${app.serverUrl()}/createReaction`,
+        `${navState.serverUrl()}/createReaction`,
         options
       );
       const { result } = response;
@@ -95,7 +95,7 @@ class ReactionCountController {
     // TODO Graham 4/24/22: Investigate necessity of this duplication
     const _this = this;
     try {
-      await $.post(`${app.serverUrl()}/deleteReaction`, {
+      await $.post(`${navState.serverUrl()}/deleteReaction`, {
         jwt: app.user.jwt,
         reaction_id: reaction.id,
       });

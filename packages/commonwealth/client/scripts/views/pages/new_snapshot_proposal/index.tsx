@@ -122,7 +122,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
 
     const clearLocalStorage = () => {
       localStorage.removeItem(
-        `${app.activeChainId()}-new-snapshot-proposal-name`
+        `${navState.activeChainId()}-new-snapshot-proposal-name`
       );
     };
 
@@ -179,7 +179,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
               this.form.name = e.target as any;
 
               localStorage.setItem(
-                `${app.activeChainId()}-new-snapshot-proposal-name`,
+                `${navState.activeChainId()}-new-snapshot-proposal-name`,
                 this.form.name
               );
             }}

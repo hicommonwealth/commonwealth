@@ -50,7 +50,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
 
     const { stagesEnabled, customStages } = app.chain?.meta;
 
-    const topics = app.topics.getByCommunity(app.activeChainId());
+    const topics = app.topics.getByCommunity(navState.activeChainId());
 
     const featuredTopics = topics
       .filter((t) => t.featuredInSidebar)

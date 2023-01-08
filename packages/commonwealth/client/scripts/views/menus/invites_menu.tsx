@@ -36,7 +36,7 @@ export class InvitesMenu extends ClassComponent {
         menuHeader={{
           label: 'Invites',
           onclick: () => {
-            app.mobileMenu = 'MainMenu';
+            navState.mobileMenu = 'MainMenu';
           },
         }}
         menuItems={[

@@ -77,7 +77,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
               ).createTx(...a);
             };
 
-            const beneficiary = app.chain.accounts.get(this.beneficiary);
+            const beneficiary = chainState.chain.accounts.get(this.beneficiary);
 
             const args = [author, this.description, beneficiary];
 

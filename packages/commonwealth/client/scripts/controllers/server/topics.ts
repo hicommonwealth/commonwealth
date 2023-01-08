@@ -31,7 +31,7 @@ class TopicsController {
   public async edit(topic: Topic, featuredOrder?: number) {
     try {
       // TODO: Change to PUT /topic
-      const response = await $.post(`${app.serverUrl()}/editTopic`, {
+      const response = await $.post(`${navState.serverUrl()}/editTopic`, {
         id: topic.id,
         chain: topic.chainId,
         name: topic.name,
@@ -62,7 +62,7 @@ class TopicsController {
 
   public async setTopicThreshold(topic: Topic, token_threshold: string) {
     try {
-      const response = await $.post(`${app.serverUrl()}/setTopicThreshold`, {
+      const response = await $.post(`${navState.serverUrl()}/setTopicThreshold`, {
         topic_id: topic.id,
         token_threshold,
         jwt: app.user.jwt,
@@ -84,7 +84,7 @@ class TopicsController {
 
   public async update(threadId: number, topicName: string, topicId?: number) {
     try {
-      const response = await $.post(`${app.serverUrl()}/updateTopic`, {
+      const response = await $.post(`${navState.serverUrl()}/updateTopic`, {
         jwt: app.user.jwt,
         thread_id: threadId,
         topic_id: topicId,
@@ -118,8 +118,8 @@ class TopicsController {
   ) {
     try {
       // TODO: Change to POST /topic
-      const response = await $.post(`${app.serverUrl()}/createTopic`, {
-        chain: app.activeChainId(),
+      const response = await $.post(`${navState.serverUrl()}/createTopic`, {
+        chain: navState.activeChainId(),
         name,
         description,
         telegram,
@@ -148,7 +148,7 @@ class TopicsController {
   public async remove(topic) {
     try {
       // TODO: Change to DELETE /topic
-      const response = await $.post(`${app.serverUrl()}/deleteTopic`, {
+      const response = await $.post(`${navState.serverUrl()}/deleteTopic`, {
         id: topic.id,
         chain: topic.chainId,
         jwt: app.user.jwt,
@@ -169,8 +169,8 @@ class TopicsController {
   public async refreshAll(chainId, reset = false) {
     try {
       // TODO: Change to GET /topics
-      const response = await $.get(`${app.serverUrl()}/bulkTopics`, {
-        chain: chainId || app.activeChainId(),
+      const response = await $.get(`${navState.serverUrl()}/bulkTopics`, {
+        chain: chainId || navState.activeChainId(),
       });
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
@@ -221,8 +221,8 @@ class TopicsController {
     const orderedIds = featuredTopics
       .sort((a, b) => a.order - b.order)
       .map((t) => t.id);
-    const response = await $.post(`${app.serverUrl()}/orderTopics`, {
-      chain: app.activeChainId(),
+    const response = await $.post(`${navState.serverUrl()}/orderTopics`, {
+      chain: navState.activeChainId(),
       'order[]': orderedIds,
       jwt: app.user.jwt,
     });

@@ -113,7 +113,7 @@ class Account {
       ),
       session_block_data: this.validationBlockInfo,
     };
-    const result = await $.post(`${app.serverUrl()}/verifyAddress`, params);
+    const result = await $.post(`${navState.serverUrl()}/verifyAddress`, params);
     if (result.status === 'Success') {
       // update ghost address for discourse users
       const hasGhostAddress = app.user.addresses.some(
@@ -124,7 +124,7 @@ class Account {
       );
       if (hasGhostAddress) {
         const { success, ghostAddressId } = await $.post(
-          `${app.serverUrl()}/updateAddress`,
+          `${navState.serverUrl()}/updateAddress`,
           params
         );
         if (success && ghostAddressId) {

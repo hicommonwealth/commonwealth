@@ -37,7 +37,7 @@ enum Errors {
 
 function setToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(
-    localStorage[`${app.activeChainId()}-chat-toggle-tree`]
+    localStorage[`${navState.activeChainId()}-chat-toggle-tree`]
   );
   const split = path.split('.');
   for (const field of split.slice(0, split.length - 1)) {
@@ -49,7 +49,7 @@ function setToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
+  localStorage[`${navState.activeChainId()}-chat-toggle-tree`] =
     JSON.stringify(newTree);
 }
 
@@ -72,7 +72,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
 
   async oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
     this.loaded = false;
-    this.chain = app.activeChainId();
+    this.chain = navState.activeChainId();
     this.activeChannel = null;
     app.socket.chatNs.activeChannel = null;
 
@@ -153,7 +153,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
     this.activeChannel = m.route.param()['channel'];
     app.socket.chatNs.activeChannel = String(this.activeChannel);
 
-    const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+    const isAdmin = app.roles.isAdminOfEntity({ chain: navState.activeChainId() });
     this.channels = {};
     Object.values(app.socket.chatNs.channels).forEach((c) => {
       const { ChatMessages, ...metadata } = c;
@@ -168,17 +168,17 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
     };
 
     // Check if an existing toggle tree is stored
-    if (!localStorage[`${app.activeChainId()}-chat-toggle-tree`]) {
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+    if (!localStorage[`${navState.activeChainId()}-chat-toggle-tree`]) {
+      localStorage[`${navState.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
         chatDefaultToggleTree
       );
     } else if (!verifyCachedToggleTree('chat', chatDefaultToggleTree)) {
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
+      localStorage[`${navState.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
         chatDefaultToggleTree
       );
     }
     const toggleTreeState = JSON.parse(
-      localStorage[`${app.activeChainId()}-chat-toggle-tree`]
+      localStorage[`${navState.activeChainId()}-chat-toggle-tree`]
     );
 
     // ---------- Build Section Props ---------- //
@@ -338,8 +338,8 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
 
     const channelToSubSectionProps = (channel: IChannel): SubSectionAttrs => {
       const onChannelPage = (p) =>
-        p.startsWith(`/${app.activeChainId()}/chat/${channel.id}`) ||
-        (app.isCustomDomain() && p.startsWith(`/chat/${channel.id}`));
+        p.startsWith(`/${navState.activeChainId()}/chat/${channel.id}`) ||
+        (navState.isCustomDomain() && p.startsWith(`/chat/${channel.id}`));
       return {
         title: channel.name,
         rowIcon: true,
@@ -350,7 +350,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
           handleRedirectClicks(
             e,
             `/chat/${channel.id}`,
-            app.activeChainId(),
+            navState.activeChainId(),
             () => {
               this.activeChannel = channel.id;
               app.socket.chatNs.activeChannel = String(channel.id);

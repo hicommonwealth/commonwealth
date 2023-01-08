@@ -6,12 +6,13 @@ import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
 
-import app from 'state';
 // import { navigateToSubpage } from 'app';
 import { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { pluralize } from 'helpers';
+import chainState from 'chainState';
+import navState from 'navigationState';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -43,14 +44,14 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
     // const isAdmin =
     //   app.roles.isRoleOfCommunity({
     //     role: 'admin',
-    //     chain: app.activeChainId(),
+    //     chain: navState.activeChainId(),
     //   }) || app.user.isSiteAdmin;
 
     // const isAdminOrMod =
     //   isAdmin ||
     //   app.roles.isRoleOfCommunity({
     //     role: 'moderator',
-    //     chain: app.activeChainId(),
+    //     chain: navState.activeChainId(),
     //   });
 
     return (
@@ -64,7 +65,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
               onclick={(e) => {
                 e.preventDefault();
                 m.route.set(
-                  `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
+                  `/${navState.activeChainId()}/discussions/${encodeURI(topic.name)}`
                 );
               }}
             >
@@ -87,7 +88,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
               `${thread.identifier}-${slugify(thread.title)}`
             );
 
-            const user = app.chain.accounts.get(thread.author);
+            const user = chainState.chain.accounts.get(thread.author);
             // const commentsCount = app.comments.nComments(thread);
 
             return (

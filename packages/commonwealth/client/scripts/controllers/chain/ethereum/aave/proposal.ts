@@ -283,7 +283,7 @@ export default class AaveProposal extends Proposal<
 
   public async init() {
     // fetch IPFS information
-    $.get(`${this._Gov.app.serverUrl()}/ipfsProxy?hash=${this._ipfsAddress}`)
+    $.get(`${this._Gov.navState.serverUrl()}/ipfsProxy?hash=${this._ipfsAddress}`)
       .then((ipfsData) => {
         if (typeof ipfsData === 'string') {
           this._ipfsData = JSON.parse(ipfsData);
@@ -480,7 +480,7 @@ export default class AaveProposal extends Proposal<
     return (
       this.state === AaveTypes.ProposalState.QUEUED &&
       this.data.executionTime &&
-      this.data.executionTime <= this._Gov.app.chain.block.lastTime.unix()
+      this.data.executionTime <= this._Gov.chainState.chain.block.lastTime.unix()
     );
   }
 

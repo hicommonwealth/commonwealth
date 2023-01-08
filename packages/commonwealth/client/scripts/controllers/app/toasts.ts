@@ -4,6 +4,7 @@ import { uuidv4 } from 'lib/util';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelErrorCaptureEvent } from 'analytics/types';
 import app from 'state';
+import navState from 'navigationState';
 
 const timeout = 3000;
 
@@ -39,8 +40,8 @@ export class ToastStore {
   public createError(message) {
     mixpanelBrowserTrack({
       message,
-      community: app.activeChainId(),
-      isCustomDomain: app.isCustomDomain(),
+      community: navState.activeChainId(),
+      isCustomDomain: navState.isCustomDomain(),
       event: MixpanelErrorCaptureEvent.ERROR_CAPTURED,
     });
     const key = uuidv4();

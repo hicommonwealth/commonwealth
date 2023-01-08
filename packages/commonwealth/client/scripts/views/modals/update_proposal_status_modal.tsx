@@ -42,7 +42,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
   view(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
     if (!app.chain?.meta) return;
 
-    const { customStages } = app.chain.meta;
+    const { customStages } = chainState.chain.meta;
 
     const stages = !customStages
       ? [
@@ -53,7 +53,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
           ThreadStage.Failed,
         ]
       : parseCustomStages(customStages);
-    const showSnapshot = !!app.chain.meta.snapshot?.length;
+    const showSnapshot = !!chainState.chain.meta.snapshot?.length;
 
     return (
       <div class="UpdateProposalStatusModal">

@@ -54,7 +54,7 @@ export class SubstrateTreasuryTip extends Proposal<
   public get slashed() { return this._slashed; }
 
   public get isClosing() { return !!this.data.closing; }
-  public get isClosable() { return this.data.closing &&  this.data.closing <= this._Tips.app.chain.block.height; }
+  public get isClosable() { return this.data.closing &&  this.data.closing <= this._Tips.chainState.chain.block.height; }
 
   // TODO: are these voting types correct?
   public readonly votingType = VotingType.SimpleYesApprovalVoting;
@@ -212,7 +212,7 @@ export class SubstrateTreasuryTip extends Proposal<
   }
 
   public closeTx(who: SubstrateAccount): ITXModalData {
-    if (!this.data.closing || this.data.closing > this._Tips.app.chain.block.height) {
+    if (!this.data.closing || this.data.closing > this._Tips.chainState.chain.block.height) {
       throw new Error('Tip not ready for closing.');
     }
     return this._Chain.createTXModalData(

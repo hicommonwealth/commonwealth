@@ -37,11 +37,11 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
     // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state
     if (!this.membersFetched) {
       this.membersFetched = true;
-      const chainOrCommObj = { chain: app.activeChainId() };
+      const chainOrCommObj = { chain: navState.activeChainId() };
 
       // TODO Graham 4/4/21: This needs pagination, search, or serializing.
       // The fetch time for large communities is getting unwieldy.
-      $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
+      $.get(`${navState.serverUrl()}/bulkMembers`, chainOrCommObj)
         .then((response) => {
           if (response.status !== 'Success')
             throw new Error('Could not fetch members');
@@ -194,11 +194,11 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   try {
                     // TODO Graham 4/4/22: Break off into proper controller methods
                     const response = await $.post(
-                      `${app.serverUrl()}/addEditors`,
+                      `${navState.serverUrl()}/addEditors`,
                       {
                         address: app.user.activeAccount.address,
                         author_chain: app.user.activeAccount.chain.id,
-                        chain: app.activeChainId(),
+                        chain: navState.activeChainId(),
                         thread_id: thread.id,
                         editors: JSON.stringify(this.addedEditors),
                         jwt: app.user.jwt,
@@ -223,11 +223,11 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                 if (!$.isEmptyObject(this.removedEditors)) {
                   try {
                     const response = await $.post(
-                      `${app.serverUrl()}/deleteEditors`,
+                      `${navState.serverUrl()}/deleteEditors`,
                       {
                         address: app.user.activeAccount.address,
                         author_chain: app.user.activeAccount.chain.id,
-                        chain: app.activeChainId(),
+                        chain: navState.activeChainId(),
                         thread_id: thread.id,
                         editors: JSON.stringify(this.removedEditors),
                         jwt: app.user.jwt,

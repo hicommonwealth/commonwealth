@@ -80,7 +80,7 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
       };
       try {
         console.log('Querying backend for token data');
-        const res = await $.get(`${app.serverUrl()}/getTokenForum`, args);
+        const res = await $.get(`${navState.serverUrl()}/getTokenForum`, args);
         if (res.status === 'Success') {
           if (res?.token?.name) {
             this.state.form.name = res.token.name || '';
@@ -202,11 +202,11 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: null,
             });
             try {
-              const res = await $.post(`${app.serverUrl()}/createChain`, {
+              const res = await $.post(`${navState.serverUrl()}/createChain`, {
                 alt_wallet_url: altWalletUrl,
                 base: ChainBase.Ethereum,
                 chain_string: chainString,

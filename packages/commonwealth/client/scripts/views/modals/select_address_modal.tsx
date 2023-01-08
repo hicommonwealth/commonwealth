@@ -43,7 +43,7 @@ export class SelectAddressModal extends ClassComponent {
       app.roles
         .createRole({
           address: addressInfo,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
         })
         .then(() => {
           this.loading = false;
@@ -92,7 +92,7 @@ export class SelectAddressModal extends ClassComponent {
       app.roles
         .deleteRole({
           address: addressInfo,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
         })
         .then(() => {
           this.loading = false;
@@ -112,7 +112,7 @@ export class SelectAddressModal extends ClassComponent {
 
     const chainbase = app.chain ? app.chain?.meta?.base : ChainBase.Ethereum;
 
-    const activeCommunityMeta = app.chain.meta;
+    const activeCommunityMeta = chainState.chain.meta;
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return (
@@ -125,7 +125,7 @@ export class SelectAddressModal extends ClassComponent {
           {activeAccountsByRole.length === 0 ? (
             <div class="select-address-placeholder">
               Connect{' '}
-              {chainbase && app.chain.network === ChainNetwork.Terra
+              {chainbase && chainState.chain.network === ChainNetwork.Terra
                 ? 'Terra'
                 : chainbase
                 ? chainbase[0].toUpperCase() + chainbase.slice(1)

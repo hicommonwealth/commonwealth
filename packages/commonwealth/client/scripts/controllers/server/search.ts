@@ -113,7 +113,7 @@ class SearchController {
   ) => {
     const { resultSize, chainScope, communityScope, sort } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
+      const response = await $.get(`${navState.serverUrl()}/searchDiscussions`, {
         chain: chainScope,
         community: communityScope,
         cutoff_date: null, // cutoffDate.toISOString(),
@@ -134,7 +134,7 @@ class SearchController {
   private searchComments = async (searchTerm: string, params: SearchParams) => {
     const { resultSize, chainScope, communityScope, sort } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/searchComments`, {
+      const response = await $.get(`${navState.serverUrl()}/searchComments`, {
         chain: chainScope,
         community: communityScope,
         cutoff_date: null, // cutoffDate.toISOString(),
@@ -158,7 +158,7 @@ class SearchController {
   ): Promise<Thread[]> => {
     const { resultSize, chainScope, communityScope } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/searchDiscussions`, {
+      const response = await $.get(`${navState.serverUrl()}/searchDiscussions`, {
         chain: chainScope,
         community: communityScope,
         search: searchTerm,
@@ -184,7 +184,7 @@ class SearchController {
   ) => {
     const { resultSize, communityScope, chainScope } = params;
     try {
-      const response = await $.get(`${app.serverUrl()}/bulkAddresses`, {
+      const response = await $.get(`${navState.serverUrl()}/bulkAddresses`, {
         chain: chainScope,
         community: communityScope,
         limit: resultSize,

@@ -17,8 +17,8 @@ class ChatPage extends ClassComponent {
   oncreate() {
     mixpanelBrowserTrack({
       event: MixpanelChatEvents.CHAT_PAGE_VISIT,
-      community: app.activeChainId(),
-      isCustomDomain: app.isCustomDomain(),
+      community: navState.activeChainId(),
+      isCustomDomain: navState.isCustomDomain(),
     });
   }
 

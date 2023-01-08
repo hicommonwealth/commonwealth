@@ -66,14 +66,14 @@ class ReactionsController {
       // TODO: is the below assumptions valid?
       // this only works if we assume that all chain-entities for the specific
       // chain are loaded when the reaction is created
-      const chainEntity = proposalIdToEntity(app, app.activeChainId(), options['proposal_id']);
+      const chainEntity = proposalIdToEntity(app, navState.activeChainId(), options['proposal_id']);
       options['chain_entity_id'] = chainEntity?.id
     } else if (post instanceof Comment) {
       options['comment_id'] = (post as Comment<any>).id;
     }
     try {
       const response = await $.post(
-        `${app.serverUrl()}/createReaction`,
+        `${navState.serverUrl()}/createReaction`,
         options
       );
       const { result } = response;
@@ -97,7 +97,7 @@ class ReactionsController {
 
     try {
       // TODO: Remove any verbs from these route names '/reactions'
-      const response = await $.get(`${app.serverUrl()}/viewReactions`, options);
+      const response = await $.get(`${navState.serverUrl()}/viewReactions`, options);
       if (response.status !== 'Success') {
         throw new Error(`got unsuccessful status: ${response.status}`);
       }
@@ -126,7 +126,7 @@ class ReactionsController {
     const _this = this;
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /reaction
-      $.post(`${app.serverUrl()}/deleteReaction`, {
+      $.post(`${navState.serverUrl()}/deleteReaction`, {
         jwt: app.user.jwt,
         reaction_id: reaction.id,
       })

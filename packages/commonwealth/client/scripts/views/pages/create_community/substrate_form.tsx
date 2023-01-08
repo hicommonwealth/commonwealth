@@ -87,7 +87,7 @@ export class SubstrateForm extends ClassComponent {
           onclick={async () => {
             // deinit substrate API if one exists
             if (app.chain?.apiInitialized) {
-              await app.chain.deinit();
+              await chainState.chain.deinit();
             }
 
             // create new API
@@ -120,7 +120,7 @@ export class SubstrateForm extends ClassComponent {
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,
-              isCustomDomain: app.isCustomDomain(),
+              isCustomDomain: navState.isCustomDomain(),
               communityType: null,
             });
             try {
@@ -130,7 +130,7 @@ export class SubstrateForm extends ClassComponent {
               return;
             }
             this.state.saving = true;
-            $.post(`${app.serverUrl()}/createChain`, {
+            $.post(`${navState.serverUrl()}/createChain`, {
               base: ChainBase.Substrate,
               icon_url: iconUrl,
               id: slugify(name),

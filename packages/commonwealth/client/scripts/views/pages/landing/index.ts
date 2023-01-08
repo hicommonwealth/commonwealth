@@ -4,6 +4,7 @@ import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';
 
 import app, { LoginState } from 'state';
+import navState from 'navigationState';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -52,7 +53,7 @@ const LandingPage: m.Component<{}, IState> = {
     if (!app.isLoggedIn()) {
       mixpanelBrowserTrack({
         event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
-        isCustomDomain: app.isCustomDomain(),
+        isCustomDomain: navState.isCustomDomain(),
       });
     }
   },

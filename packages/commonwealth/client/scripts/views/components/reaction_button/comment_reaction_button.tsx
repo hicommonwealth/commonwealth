@@ -38,7 +38,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
     // token balance check if needed
     const isAdmin =
       app.user.isSiteAdmin ||
-      app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+      app.roles.isAdminOfEntity({ chain: navState.activeChainId() });
 
     // post.rootProposal has typescript typedef number but in practice seems to be a string
     const parentThread = app.threads.getById(

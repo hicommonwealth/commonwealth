@@ -37,7 +37,7 @@ export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAtt
         onclick={(e) => {
           e.stopPropagation();
           e.preventDefault();
-          localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+          localStorage[`${navState.activeChainId()}-proposals-scrollY`] =
             window.scrollY;
           navigateToSubpage(proposalLink);
         }}

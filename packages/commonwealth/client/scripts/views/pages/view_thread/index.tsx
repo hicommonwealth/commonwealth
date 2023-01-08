@@ -27,6 +27,8 @@ import { PageLoading } from 'views/pages/loading';
 import { PageNotFound } from 'views/pages/404';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import navState from 'navigationState';
+import chainState from 'chainState';
 import { activeQuillEditorHasText } from './helpers';
 import {
   CWContentPage,
@@ -101,7 +103,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
   view(vnode: m.Vnode<ViewThreadPageAttrs>) {
     const { identifier } = vnode.attrs;
 
-    if (!app.chain?.meta) {
+    if (!chainState.chain?.meta) {
       return (
         <PageLoading
         // title="Loading..."
@@ -217,7 +219,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     // load comments
     if (!this.prefetch[threadIdAndType]['commentsStarted']) {
       app.comments
-        .refresh(thread, app.activeChainId())
+        .refresh(thread, navState.activeChainId())
         .then(async () => {
           this.comments = app.comments
             .getByProposal(thread)
@@ -226,7 +228,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
           // fetch reactions
           const { result: reactionCounts } = await $.ajax({
             type: 'POST',
-            url: `${app.serverUrl()}/reactionsCounts`,
+            url: `${navState.serverUrl()}/reactionsCounts`,
             headers: {
               'content-type': 'application/json',
             },
@@ -281,7 +283,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
     // load polls
     if (!this.prefetch[threadIdAndType]['pollsStarted']) {
-      app.polls.fetchPolls(app.activeChainId(), thread.id).catch(() => {
+      app.polls.fetchPolls(navState.activeChainId(), thread.id).catch(() => {
         notifyError('Failed to load comments');
         this.comments = [];
         m.redraw();
@@ -294,8 +296,8 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
     // load view count
     if (!this.prefetch[threadIdAndType]['viewCountStarted']) {
-      $.post(`${app.serverUrl()}/viewCount`, {
-        chain: app.activeChainId(),
+      $.post(`${navState.serverUrl()}/viewCount`, {
+        chain: navState.activeChainId(),
         object_id: thread.id,
       })
         .then((response) => {
@@ -368,14 +370,14 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     const isAdmin =
       app.roles.isRoleOfCommunity({
         role: 'admin',
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       }) || app.user.isSiteAdmin;
 
     const isAdminOrMod =
       isAdmin ||
       app.roles.isRoleOfCommunity({
         role: 'moderator',
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       });
 
     const showLinkedProposalOptions =
@@ -428,7 +430,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                 onclick: async (e) => {
                   e.preventDefault();
                   this.savedEdits = localStorage.getItem(
-                    `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
+                    `${navState.activeChainId()}-edit-thread-${thread.id}-storedText`
                   );
 
                   if (this.savedEdits) {
@@ -524,13 +526,13 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               },
             ]
           : []),
-        ...((isAuthor || isAdminOrMod) && !!app.chain?.meta.snapshot.length
+        ...((isAuthor || isAdminOrMod) && !!chainState.chain?.meta.snapshot.length
           ? [
               {
                 label: 'Snapshot proposal from thread',
                 iconLeft: 'democraticProposal' as const,
                 onclick: () => {
-                  const snapshotSpaces = app.chain.meta.snapshot;
+                  const snapshotSpaces = chainState.chain.meta.snapshot;
 
                   if (snapshotSpaces.length > 1) {
                     navigateToSubpage('/multiple-snapshots', {
@@ -649,7 +651,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                               ) => {
                                 thread.stage = stage;
                                 thread.chainEntities = chainEntities;
-                                if (app.chain?.meta.snapshot.length) {
+                                if (chainState.chain?.meta.snapshot.length) {
                                   thread.snapshotProposal =
                                     snapshotProposal[0]?.id;
                                 }
@@ -674,7 +676,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                   ]
                 : []),
               ...(this.polls?.length > 0 ||
-              (isAuthor && (!app.chain?.meta?.adminOnlyPolling || isAdmin))
+              (isAuthor && (!chainState.chain?.meta?.adminOnlyPolling || isAdmin))
                 ? [
                     {
                       label: 'Polls',
@@ -688,7 +690,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                             return <ThreadPollCard poll={poll} />;
                           })}
                           {isAuthor &&
-                            (!app.chain?.meta?.adminOnlyPolling || isAdmin) && (
+                            (!chainState.chain?.meta?.adminOnlyPolling || isAdmin) && (
                               <ThreadPollEditorCard
                                 thread={thread}
                                 threadAlreadyHasPolling={!this.polls?.length}

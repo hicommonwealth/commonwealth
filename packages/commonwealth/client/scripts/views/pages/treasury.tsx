@@ -15,16 +15,18 @@ import { ProposalCard } from 'views/components/proposal_card';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import ErrorPage from 'views/pages/error';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
+import chainState from 'chainState';
+import navState from 'navigationState';
 import { CardsCollection } from '../components/cards_collection';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { GovExplainer } from '../components/gov_explainer';
 
 function getModules() {
-  if (!app || !app.chain || !app.chain.loaded) {
+  if (!app || !chainState.chain || !chainState.chain.loaded) {
     throw new Error('secondary loading cmd called before chain load');
   }
-  if (app.chain.base === ChainBase.Substrate) {
-    const chain = app.chain as Substrate;
+  if (chainState.chain.base === ChainBase.Substrate) {
+    const chain = chainState.chain as Substrate;
     return [
       chain.council,
       chain.treasury,
@@ -39,25 +41,25 @@ function getModules() {
 class TreasuryPage extends ClassComponent {
   oncreate() {
     const returningFromThread =
-      app.lastNavigatedBack() && app.lastNavigatedFrom().includes(`/proposal/`);
+      navState.lastNavigatedBack() && navState.lastNavigatedFrom().includes(`/proposal/`);
     if (
       returningFromThread &&
-      localStorage[`${app.activeChainId()}-proposals-scrollY`]
+      localStorage[`${navState.activeChainId()}-proposals-scrollY`]
     ) {
       setTimeout(() => {
         window.scrollTo(
           0,
-          Number(localStorage[`${app.activeChainId()}-proposals-scrollY`])
+          Number(localStorage[`${navState.activeChainId()}-proposals-scrollY`])
         );
       }, 100);
     }
   }
 
   view() {
-    if (!app.chain || !app.chain.loaded) {
+    if (!chainState.chain || !chainState.chain.loaded) {
       if (
-        app.chain?.base === ChainBase.Substrate &&
-        (app.chain as Substrate).chain?.timedOut
+        chainState.chain?.base === ChainBase.Substrate &&
+        (chainState.chain as Substrate).chain?.timedOut
       ) {
         return (
           <ErrorPage
@@ -74,7 +76,7 @@ class TreasuryPage extends ClassComponent {
         />
       );
     }
-    const onSubstrate = app.chain && app.chain.base === ChainBase.Substrate;
+    const onSubstrate = chainState.chain && chainState.chain.base === ChainBase.Substrate;
 
     const modLoading = loadSubstrateModules('Treasury', getModules);
 
@@ -82,7 +84,7 @@ class TreasuryPage extends ClassComponent {
 
     const activeTreasuryProposals =
       onSubstrate &&
-      (app.chain as Substrate).treasury.store
+      (chainState.chain as Substrate).treasury.store
         .getAll()
         .filter((p) => !p.completed);
 
@@ -96,7 +98,7 @@ class TreasuryPage extends ClassComponent {
 
     const inactiveTreasuryProposals =
       onSubstrate &&
-      (app.chain as Substrate).treasury.store
+      (chainState.chain as Substrate).treasury.store
         .getAll()
         .filter((p) => p.completed);
 
@@ -125,13 +127,13 @@ class TreasuryPage extends ClassComponent {
               stats={[
                 {
                   statHeading: 'Treasury:',
-                  stat: formatCoin((app.chain as Substrate).treasury.pot),
+                  stat: formatCoin((chainState.chain as Substrate).treasury.pot),
                 },
                 {
                   statHeading: 'Next spend period:',
-                  stat: (app.chain as Substrate).treasury.nextSpendBlock ? (
+                  stat: (chainState.chain as Substrate).treasury.nextSpendBlock ? (
                     <CountdownUntilBlock
-                      block={(app.chain as Substrate).treasury.nextSpendBlock}
+                      block={(chainState.chain as Substrate).treasury.nextSpendBlock}
                       includeSeconds={false}
                     />
                   ) : (

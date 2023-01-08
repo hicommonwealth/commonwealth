@@ -29,7 +29,7 @@ const editIdentityAction = (
       // wait for info to load before making it clickable
       disabled: vnode.state.chainLoading,
       onclick: async () => {
-        if (app.activeChainId() !== chainObj.id) {
+        if (navState.activeChainId() !== chainObj.id) {
           let confirmed = false;
           const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
           confirmed = await confirmationModalWithText(msg)();
@@ -105,16 +105,16 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
     );
 
     const joinCommunity = async () => {
-      if (!app.activeChainId() || onOwnProfile) return;
+      if (!navState.activeChainId() || onOwnProfile) return;
       vnode.state.loading = true;
       const addressInfo = app.user.addresses.find(
         (a) =>
-          a.address === account.address && a.chain.id === app.activeChainId()
+          a.address === account.address && a.chain.id === navState.activeChainId()
       );
       try {
         await app.roles.createRole({
           address: addressInfo,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
@@ -195,7 +195,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 label: 'Edit',
               }),
             ]
-          : showJoinCommunityButton && app.activeChainId()
+          : showJoinCommunityButton && navState.activeChainId()
           ? m(CWButton, {
               onclick: async () => {
                 if (onLinkedProfile) {

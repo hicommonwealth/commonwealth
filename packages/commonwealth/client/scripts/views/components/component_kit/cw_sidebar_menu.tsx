@@ -24,12 +24,12 @@ const renderCommunity = (item: ChainInfo) => {
   return m(ListItem, {
     class: app.communities.isStarred(item.id) ? 'starred' : '',
     label: <CommunityLabel community={item} />,
-    selected: app.activeChainId() === item.id,
+    selected: navState.activeChainId() === item.id,
     onclick: (e) => {
       e.preventDefault();
       e.stopPropagation();
-      app.sidebarToggled = false;
-      app.sidebarMenu = 'default';
+      navState.sidebarToggled = false;
+      navState.sidebarMenu = 'default';
       m.route.set(item.id ? `/${item.id}` : '/');
     },
     contentRight: app.isLoggedIn() && roles.length > 0 && (
@@ -143,8 +143,8 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               label: 'Explore communities',
               iconLeft: 'compass',
               onclick: () => {
-                app.sidebarToggled = false;
-                app.sidebarMenu = 'default';
+                navState.sidebarToggled = false;
+                navState.sidebarMenu = 'default';
                 m.route.set('/communities');
               },
             },
@@ -153,8 +153,8 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               label: 'Notification settings',
               iconLeft: 'person',
               onclick: () => {
-                app.sidebarToggled = false;
-                app.sidebarMenu = 'default';
+                navState.sidebarToggled = false;
+                navState.sidebarMenu = 'default';
                 m.route.set('/notification-settings');
               },
             },
@@ -163,11 +163,11 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               label: 'Account settings',
               iconLeft: 'bell',
               onclick: () => {
-                if (app.activeChainId()) {
+                if (navState.activeChainId()) {
                   navigateToSubpage('/settings');
                 } else {
-                  app.sidebarToggled = false;
-                  app.sidebarMenu = 'default';
+                  navState.sidebarToggled = false;
+                  navState.sidebarMenu = 'default';
                   m.route.set('/settings');
                 }
               },

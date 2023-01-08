@@ -6,6 +6,8 @@ import ClassComponent from 'class_component';
 import 'sublayout_header.scss';
 
 import app from '../state';
+import navState from '../navigationState';
+import chainState from '../chainState';
 import { CWCommunityAvatar } from './components/component_kit/cw_community_avatar';
 import { CWDivider } from './components/component_kit/cw_divider';
 import { CWIconButton } from './components/component_kit/cw_icon_button';
@@ -34,7 +36,7 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
             iconButtonTheme="black"
             iconSize="xl"
             onclick={() => {
-              if (app.isCustomDomain()) {
+              if (navState.isCustomDomain()) {
                 m.route.set('/');
               } else {
                 m.route.set('/dashboard/for-you');
@@ -44,17 +46,17 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
           {isWindowSmallInclusive(window.innerWidth) && (
             <CWDivider isVertical />
           )}
-          {!app.sidebarToggled && app.activeChainId() && (
-            <CWCommunityAvatar size="large" community={app.chain.meta} />
+          {!navState.sidebarToggled && navState.activeChainId() && (
+            <CWCommunityAvatar size="large" community={chainState.chain.meta} />
           )}
-          {onMobile && app.activeChainId() && (
+          {onMobile && navState.activeChainId() && (
             <CWIconButton
               iconButtonTheme="black"
               iconName={
-                app.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'
+                navState.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'
               }
               onclick={() => {
-                app.sidebarToggled = !app.sidebarToggled;
+                navState.sidebarToggled = !navState.sidebarToggled;
                 m.redraw();
               }}
             />
@@ -67,8 +69,8 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
               iconName="dotsVertical"
               iconButtonTheme="black"
               onclick={() => {
-                app.sidebarToggled = false;
-                app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
+                navState.sidebarToggled = false;
+                navState.mobileMenu = navState.mobileMenu ? null : 'MainMenu';
                 m.redraw();
               }}
             />

@@ -69,7 +69,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
 
       this.quillEditorState.disable();
 
-      const chainId = app.activeChainId();
+      const chainId = navState.activeChainId();
 
       try {
         const res = await app.comments.create(
@@ -129,10 +129,10 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress || userFailsThreshold;
 
     const decimals = app.chain?.meta?.decimals
-      ? app.chain.meta.decimals
-      : app.chain.network === ChainNetwork.ERC721
+      ? chainState.chain.meta.decimals
+      : chainState.chain.network === ChainNetwork.ERC721
       ? 0
-      : app.chain.base === ChainBase.CosmosSDK
+      : chainState.chain.base === ChainBase.CosmosSDK
       ? 6
       : 18;
 
@@ -142,7 +142,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
           <CWText type="h5" className="callout-text">
             You haven't set a display name yet.
             <a
-              href={`/${app.activeChainId()}/account/${
+              href={`/${navState.activeChainId()}/account/${
                 app.user.activeAccount.address
               }?base=${app.user.activeAccount.chain.id}`}
               onclick={(e) => {
@@ -190,11 +190,11 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
               <CWText className="token-req-text">
                 Commenting in {activeTopicName} requires{' '}
                 {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
-                {app.chain.meta.default_symbol}.{' '}
+                {chainState.chain.meta.default_symbol}.{' '}
                 {userBalance && app.user.activeAccount && (
                   <>
                     You have {weiToTokens(userBalance.toString(), decimals)}{' '}
-                    {app.chain.meta.default_symbol}.
+                    {chainState.chain.meta.default_symbol}.
                   </>
                 )}
               </CWText>

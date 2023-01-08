@@ -40,9 +40,9 @@ export class SidebarQuickSwitcher extends ClassComponent {
                 e.preventDefault();
                 mixpanelBrowserTrack({
                   event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
-                  isCustomDomain: app.isCustomDomain(),
+                  isCustomDomain: navState.isCustomDomain(),
                 });
-                app.sidebarMenu = 'createContent';
+                navState.sidebarMenu = 'createContent';
               }}
             />
           )}
@@ -51,7 +51,7 @@ export class SidebarQuickSwitcher extends ClassComponent {
             iconButtonTheme="black"
             onclick={(e) => {
               e.preventDefault();
-              app.sidebarMenu = 'exploreCommunities';
+              navState.sidebarMenu = 'exploreCommunities';
             }}
           />
         </div>

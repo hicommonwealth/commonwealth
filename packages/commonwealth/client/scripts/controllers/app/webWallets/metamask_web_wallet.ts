@@ -9,6 +9,7 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, BlockInfo, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
+import chainState from 'chainState';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -110,9 +111,9 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       } catch (switchError) {
         // This error code indicates that the chain has not been added to MetaMask.
         if (switchError.code === 4902) {
-          const wsRpcUrl = new URL(app.chain.meta.node.url);
+          const wsRpcUrl = new URL(chainState.chain.meta.node.url);
           const rpcUrl =
-            app.chain.meta.node.altWalletUrl || `https://${wsRpcUrl.host}`;
+            chainState.chain.meta.node.altWalletUrl || `https://${wsRpcUrl.host}`;
 
           // TODO: we should cache this data!
           const chains = await $.getJSON('https://chainid.network/chains.json');
@@ -146,7 +147,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     } catch (error) {
       let errorMsg = `Failed to enable Metamask: ${error.message}`;
       if (error.code === 4902) {
-        errorMsg = `Failed to enable Metamask: Please add chain ID ${app.chain.meta.node.ethChainId}`;
+        errorMsg = `Failed to enable Metamask: Please add chain ID ${chainState.chain.meta.node.ethChainId}`;
       }
       console.error(errorMsg);
       this._enabling = false;

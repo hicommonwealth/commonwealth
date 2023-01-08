@@ -102,7 +102,7 @@ class SubstrateIdentities implements StorageModule {
     this._Chain = ChainInfo;
     this._Accounts = Accounts;
     this._store = new SubstrateIdentityStore(
-      this._app.chain.id,
+      this._chainState.chain.id,
       'identity',
       (s: ISubstrateIdentity) => {
         const id = new SubstrateIdentity(ChainInfo, Accounts, this, Accounts.fromAddress(s.address));

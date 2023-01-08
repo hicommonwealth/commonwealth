@@ -71,7 +71,7 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
                 user: new AddressInfo(
                   null,
                   vote.voter,
-                  app.activeChainId(),
+                  navState.activeChainId(),
                   null
                 ),
                 linkify: true,

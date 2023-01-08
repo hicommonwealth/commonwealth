@@ -34,7 +34,7 @@ class BountyDetail extends ClassComponent<BountyDetailAttrs> {
     const isCouncillor =
       app.chain &&
       ((app.chain as Substrate).phragmenElections.members || [])
-        .map((a) => app.chain.accounts.get(a))
+        .map((a) => chainState.chain.accounts.get(a))
         .find(
           (a) =>
             a.chain === app.user.activeAccount?.chain &&
@@ -93,7 +93,7 @@ class BountyDetail extends ClassComponent<BountyDetailAttrs> {
 
 class BountiesPage extends ClassComponent {
   view() {
-    if (!app.chain || !app.chain.loaded) {
+    if (!app.chain || !chainState.chain.loaded) {
       if (
         app.chain?.base === ChainBase.Substrate &&
         (app.chain as Substrate).chain?.timedOut

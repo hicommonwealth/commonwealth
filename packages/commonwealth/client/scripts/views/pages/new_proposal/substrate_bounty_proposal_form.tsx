@@ -40,10 +40,10 @@ export class SubstrateBountyProposalForm extends ClassComponent {
           }}
         />
         <CWTextInput
-          label={`Value (${app.chain.chain.denom})`}
+          label={`Value (${chainState.chain.chain.denom})`}
           placeholder="Amount allocated to bounty"
           oninput={(e) => {
-            this.value = app.chain.chain.coins(
+            this.value = chainState.chain.chain.coins(
               parseFloat(e.target.value),
               true
             );

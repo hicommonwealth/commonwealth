@@ -17,7 +17,7 @@ const ProfileProposal: m.Component<
     const { attachments, author, body, title, createdAt, chain } = proposal;
 
     // hide rows from communities that don't match
-    if (app.isCustomDomain() && chain !== app.customDomainId()) return;
+    if (navState.isCustomDomain() && chain !== navState.customDomainId()) return;
 
     return m('.ProfileProposal', [
       m('.summary', [

@@ -11,6 +11,8 @@ import {
 import { ChainInfo, ITokenAdapter } from '../models';
 import { isNonEmptyString } from '../helpers/typeGuards';
 import { TermsBanner } from './components/terms_banner';
+import navState from '../navigationState';
+import chainState from '../chainState';
 
 type SublayoutBannersAttrs = {
   banner?: string;
@@ -30,12 +32,12 @@ export class SublayoutBanners extends ClassComponent<SublayoutBannersAttrs> {
           <CWMessageBanner
             bannerContent={banner}
             onClose={() =>
-              localStorage.setItem(`${app.activeChainId()}-banner`, 'off')
+              localStorage.setItem(`${navState.activeChainId()}-banner`, 'off')
             }
           />
         )}
         {app.isLoggedIn() &&
-          ITokenAdapter.instanceOf(app.chain) &&
+          ITokenAdapter.instanceOf(chainState.chain) &&
           !app.user.activeAccount && (
             <CWBanner
               bannerContent={`Link an address that holds ${chain.default_symbol} to participate in governance.`}

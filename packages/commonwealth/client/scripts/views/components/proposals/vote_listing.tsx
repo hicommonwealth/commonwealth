@@ -78,7 +78,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   this.balancesCache[vote.account.address] = vote.format();
                   m.redraw();
                 } else if (vote instanceof CompoundProposalVote) {
-                  balance = formatCoin(app.chain.chain.coins(vote.power), true);
+                  balance = formatCoin(chainState.chain.chain.coins(vote.power), true);
                   this.balancesCache[vote.account.address] = balance;
                   m.redraw();
                 } else {

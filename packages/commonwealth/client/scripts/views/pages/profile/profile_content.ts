@@ -36,7 +36,7 @@ const ProfileContent: m.Component<
       m.redraw();
       const scrollY = localStorage[vnode.attrs.localStorageScrollYKey];
       setTimeout(() => {
-        if (app.lastNavigatedBack() && Number(scrollY)) {
+        if (navState.lastNavigatedBack() && Number(scrollY)) {
           window.scrollTo(0, Number(scrollY));
         }
       }, 10);

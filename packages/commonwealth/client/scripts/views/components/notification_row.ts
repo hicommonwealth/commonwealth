@@ -338,7 +338,7 @@ const NotificationRow: m.Component<
       };
       const chainName = app.config.chains.getById(chainId)?.name;
 
-      if (app.isCustomDomain() && chainId !== app.customDomainId()) return;
+      if (navState.isCustomDomain() && chainId !== navState.customDomainId()) return;
       const label = ChainEventLabel(chainId, chainEvent);
 
       if (vnode.state.scrollOrStop) {
@@ -496,16 +496,16 @@ const NotificationRow: m.Component<
         pageJump,
       } = getBatchNotificationFields(category, notificationData);
 
-      if (app.isCustomDomain()) {
+      if (navState.isCustomDomain()) {
         if (
-          path.indexOf(`https://commonwealth.im/${app.customDomainId()}/`) !==
+          path.indexOf(`https://commonwealth.im/${navState.customDomainId()}/`) !==
             0 &&
-          path.indexOf(`http://localhost:8080/${app.customDomainId()}/`) !== 0
+          path.indexOf(`http://localhost:8080/${navState.customDomainId()}/`) !== 0
         )
           return;
         path = path
-          .replace(`https://commonwealth.im/${app.customDomainId()}/`, '/')
-          .replace(`http://localhost:8080/${app.customDomainId()}/`, '/');
+          .replace(`https://commonwealth.im/${navState.customDomainId()}/`, '/')
+          .replace(`http://localhost:8080/${navState.customDomainId()}/`, '/');
       }
 
       return link(
@@ -574,7 +574,7 @@ const NotificationRow: m.Component<
             // Graham TODO 22.10.05: Temporary fix while we wait for full
             // conversion of NotificationsMenu to a Popover- and MobileMenu- friendly
             // array
-            app.mobileMenu = null;
+            navState.mobileMenu = null;
             m.redraw();
           },
         },

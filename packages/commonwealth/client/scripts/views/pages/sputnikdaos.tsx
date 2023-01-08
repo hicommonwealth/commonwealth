@@ -74,8 +74,8 @@ class SputnikDAOsPage extends ClassComponent {
   private daosRequested: boolean;
 
   view() {
-    if (app.activeChainId() && app.activeChainId() !== 'near')
-      m.route.set(`/${app.activeChainId()}`);
+    if (navState.activeChainId() && navState.activeChainId() !== 'near')
+      m.route.set(`/${navState.activeChainId()}`);
 
     const activeEntity = app.chain;
     const allCommunities = app.config.chains.getAll();
@@ -89,13 +89,13 @@ class SputnikDAOsPage extends ClassComponent {
       );
 
     if (
-      (app.activeChainId() === 'near' ||
-        app.activeChainId() === 'near-testnet') &&
+      (navState.activeChainId() === 'near' ||
+        navState.activeChainId() === 'near-testnet') &&
       !this.daosRequested
     ) {
       this.daosRequested = true;
       (app.chain as Near).chain.viewDaoList().then((daos) => {
-        const isMainnet = app.activeChainId() === 'near';
+        const isMainnet = navState.activeChainId() === 'near';
 
         this.daosList = daos;
 
@@ -124,8 +124,8 @@ class SputnikDAOsPage extends ClassComponent {
 
     if (!this.daosList) {
       if (
-        app.activeChainId() === 'near' ||
-        app.activeChainId() === 'near-testnet'
+        navState.activeChainId() === 'near' ||
+        navState.activeChainId() === 'near-testnet'
       ) {
         return (
           <PageLoading

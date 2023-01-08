@@ -26,7 +26,7 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
           )}
           onclick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
-            app.mobileMenu = null;
+            navState.mobileMenu = null;
             onclick(e);
           }}
         >
@@ -51,7 +51,7 @@ class CWMobileMenuItem extends ClassComponent<MenuItem> {
           class="MobileMenuItem"
           onclick={(e) => {
             // Graham TODO 22.10.06: Temporary solution as we transition Notifications
-            app.mobileMenu = null;
+            navState.mobileMenu = null;
             onclick(e);
           }}
         >

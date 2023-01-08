@@ -77,7 +77,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   private _tokenDecimals: number;
   private _tokenSymbol: string;
 
-  public get denom() { return this.app.chain.currency; }
+  public get denom() { return this.chainState.chain.currency; }
 
   private readonly _silencedEvents = { };
 
@@ -124,17 +124,17 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
 
     const connectedCb = () => {
       if (this.app.chain) {
-        this.app.chain.networkStatus = ApiStatus.Connected;
-        this.app.chain.networkError = null;
+        this.chainState.chain.networkStatus = ApiStatus.Connected;
+        this.chainState.chain.networkError = null;
         this._suppressAPIDisconnectErrors = false;
         this._connectTime = 0;
         m.redraw();
       }
     };
     const disconnectedCb = () => {
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta.node) {
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
-        this.app.chain.networkError = null;
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.chainState.chain.meta.node) {
+        this.chainState.chain.networkStatus = ApiStatus.Disconnected;
+        this.chainState.chain.networkError = null;
         this._suppressAPIDisconnectErrors = true;
         setTimeout(() => {
           this._suppressAPIDisconnectErrors = false;
@@ -145,14 +145,14 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const errorCb = (err) => {
       console.log(`api error; waited ${this._connectTime}ms`);
       this._connectTime += INTERVAL;
-      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.app.chain.meta.node) {
-        if (this.app.chain.networkStatus === ApiStatus.Connected) {
+      if (!this._suppressAPIDisconnectErrors && this.app.chain && node === this.chainState.chain.meta.node) {
+        if (this.chainState.chain.networkStatus === ApiStatus.Connected) {
           notifyInfo('Reconnecting to chain...');
         } else {
           notifyInfo('Connecting to chain...');
         }
-        this.app.chain.networkStatus = ApiStatus.Disconnected;
-        this.app.chain.networkError = err.message;
+        this.chainState.chain.networkStatus = ApiStatus.Disconnected;
+        this.chainState.chain.networkError = err.message;
         this._suppressAPIDisconnectErrors = true;
         setTimeout(() => {
           // this._suppressAPIDisconnectErrors = false;
@@ -225,8 +225,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const subscriber = new SubstrateEvents.Subscriber(this.api);
     const processor = new SubstrateEvents.Processor(this.api);
     return this._app.chainEntities.subscribeEntities(
-      this._app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
+      this._chainState.chain.id,
+      chainToEventNetwork(this.chainState.chain.meta),
       subscriber,
       processor,
     );
@@ -286,13 +286,13 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
     const existentialdeposit = this.api.consts.balances.existentialDeposit;
     const sudokey = this.api.query.sudo ? (await this.api.query.sudo.key()) : null;
     const chainProps = await this.api.rpc.system.properties();
-    this.app.chain.name = chainname.toString();
-    this.app.chain.version = chainversion.toString();
-    this.app.chain.runtimeName = chainruntimename.toString();
+    this.chainState.chain.name = chainname.toString();
+    this.chainState.chain.version = chainversion.toString();
+    this.chainState.chain.runtimeName = chainruntimename.toString();
 
-    this.app.chain.block.height = +blockNumber;
+    this.chainState.chain.block.height = +blockNumber;
     // TODO: this is still wrong on edgeware local -- fix chain spec to get 4s rather than 8s blocktimes
-    this.app.chain.block.duration = (+minimumperiod * 2) / 1000;
+    this.chainState.chain.block.duration = (+minimumperiod * 2) / 1000;
 
     // chainProps needs to be set first so calls to coins() correctly populate the denom
     if (chainProps) {
@@ -302,7 +302,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       this.registry.setChainProperties(this.createType('ChainProperties', { ...chainProps, ss58Format }));
       this._ss58Format = +ss58Format.unwrapOr(42);
       this._tokenDecimals = +tokenDecimals.unwrapOr([ 12 ])[0];
-      this._tokenSymbol = `${tokenSymbol.unwrapOr([ this.app.chain.currency ])[0]}`;
+      this._tokenSymbol = `${tokenSymbol.unwrapOr([ this.chainState.chain.currency ])[0]}`;
     }
 
     this._totalbalance = this.coins(totalbalance);
@@ -356,20 +356,20 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
       const block = signedBlock.block;
       const blockNumber = block.header.number;
       const timestamp = await this.api.query.timestamp.now();
-      this.app.chain.block.height = +blockNumber;
+      this.chainState.chain.block.height = +blockNumber;
 
       // update timestamp and handle stalling
       const blocktime = moment(+timestamp);
-      if (this.app.chain.block.lastTime) {
-        const computedDuration = blocktime.seconds() - this.app.chain.block.lastTime.seconds();
-        if (computedDuration > this.app.chain.block.duration * 1) {
+      if (this.chainState.chain.block.lastTime) {
+        const computedDuration = blocktime.seconds() - this.chainState.chain.block.lastTime.seconds();
+        if (computedDuration > this.chainState.chain.block.duration * 1) {
           // we should reset this flag if we receive regular blocktimes for e.g. 10 blocks in a row,
           // but for now it's not important
-          this.app.chain.block.isIrregular = true;
-          console.log(`Blocktime is irregular: took ${computedDuration}s, expected ${this.app.chain.block.duration}s.`);
+          this.chainState.chain.block.isIrregular = true;
+          console.log(`Blocktime is irregular: took ${computedDuration}s, expected ${this.chainState.chain.block.duration}s.`);
         }
       }
-      this.app.chain.block.lastTime = blocktime;
+      this.chainState.chain.block.lastTime = blocktime;
 
       // update events
       signedBlock.events.forEach((record) => {
@@ -464,8 +464,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                   notifySuccess(`Confirmed ${txName}`);
                   events.emit(TransactionStatus.Success.toString(), {
                     hash: status.isFinalized ? status.asFinalized.toHex() : status.asInBlock.toHex(),
-                    blocknum: this.app.chain.block.height,
-                    timestamp: this.app.chain.block.lastTime,
+                    blocknum: this.chainState.chain.block.height,
+                    timestamp: this.chainState.chain.block.lastTime,
                   });
                   if (unsubscribe) unsubscribe.then((u) => u());
                 } else if (this.api.events.system.ExtrinsicFailed.is(e.event)) {
@@ -486,8 +486,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                   notifyError(`Failed ${txName}: "${objName}"`);
                   events.emit(TransactionStatus.Failed.toString(), {
                     hash: status.isFinalized ? status.asFinalized.toHex() : status.asInBlock.toHex(),
-                    blocknum: this.app.chain.block.height,
-                    timestamp: this.app.chain.block.lastTime,
+                    blocknum: this.chainState.chain.block.height,
+                    timestamp: this.chainState.chain.block.lastTime,
                     err: errorInfo,
                   });
                   if (unsubscribe) unsubscribe.then((u) => u());

@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import { IApp } from 'state';
+import { IChainAppState } from 'chainState';
 import { Account } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import EthereumChain from './chain';
@@ -20,13 +21,13 @@ export default class EthereumAccount extends Account {
   private _Accounts: EthereumAccounts;
 
   // CONSTRUCTORS
-  constructor(app: IApp, ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
-    super({ chain: app.chain.meta, address });
+  constructor(app: IApp, chainState: IChainAppState, ChainInfo: EthereumChain, Accounts: EthereumAccounts, address: string) {
+    super({ chain: chainState.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization
-      app.chainModuleReady.once('ready', () => {
-        if (app.chain.chain instanceof EthereumChain) {
-          this._Chain = app.chain.chain;
+      chainState.chain.ModuleReady.once('ready', () => {
+        if (chainState.chain.chain instanceof EthereumChain) {
+          this._Chain = chainState.chain.chain;
         } else {
           console.error('Did not successfully initialize account with chain');
         }

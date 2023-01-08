@@ -7,6 +7,7 @@ import 'pages/view_thread/thread_components.scss';
 import 'pages/view_proposal/proposal_header_links.scss';
 
 import app from 'state';
+import chainState from 'chainState';
 import { navigateToSubpage } from 'app';
 import {
   externalLink,
@@ -34,7 +35,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
   view(vnode: m.Vnode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
-    const author: Account = app.chain.accounts.get(thread.author);
+    const author: Account = chainState.chain.accounts.get(thread.author);
 
     return (
       <div class="ThreadAuthor">

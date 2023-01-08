@@ -19,6 +19,7 @@ class Cosmos
   public governance: CosmosGovernance;
 
   public readonly base = ChainBase.CosmosSDK;
+  navState: any;
 
   constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
@@ -56,7 +57,7 @@ class Cosmos
     this.hasToken = false;
     const account = this.accounts.get(activeAddress);
 
-    const balanceResp = await $.post(`${this.app.serverUrl()}/tokenBalance`, {
+    const balanceResp = await $.post(`${this.navState.serverUrl()}/tokenBalance`, {
       chain: this.meta.id,
       address: account.address,
       author_chain: account.chain.id,

@@ -24,7 +24,7 @@ const validate = async (
   // verifyAddress against token, returns user if not logged in
   let result;
   try {
-    result = await $.post(`${app.serverUrl()}/auth/sso/callback`, {
+    result = await $.post(`${navState.serverUrl()}/auth/sso/callback`, {
       token,
       issuer: 'AxieInfinity',
       stateId,

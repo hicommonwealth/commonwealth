@@ -117,7 +117,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                 this.inputTimeout = setTimeout(async () => {
                   if (target.value?.trim().length > 4) {
                     const params: SearchParams = {
-                      chainScope: app.activeChainId(),
+                      chainScope: navState.activeChainId(),
                       resultSize: 20,
                     };
 

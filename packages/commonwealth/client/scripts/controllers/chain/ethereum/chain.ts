@@ -59,25 +59,25 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public get totalbalance() { return this._totalbalance; }
 
   public async initApi(node?: NodeInfo): Promise<Web3> {
-    this.app.chain.block.duration = ETHEREUM_BLOCK_TIME;
+    this.chainState.chain.block.duration = ETHEREUM_BLOCK_TIME;
     try {
       // TODO: support http?
       const provider = new Web3.providers.WebsocketProvider(node.url);
       this._api = new Web3(provider);
     } catch (error) {
       console.log(`Could not connect to Ethereum on ${node.url}`);
-      this.app.chain.networkStatus = ApiStatus.Disconnected;
+      this.chainState.chain.networkStatus = ApiStatus.Disconnected;
       throw error;
     }
 
-    this.app.chain.networkStatus = ApiStatus.Connected;
+    this.chainState.chain.networkStatus = ApiStatus.Connected;
     console.log('getting block #');
     const blockNumber = await this._api.eth.getBlockNumber();
     console.log(blockNumber);
     const headers = await this._api.eth.getBlock(`${blockNumber}`);
-    if (this.app.chain && this.app.chain.meta.node.ethChainId !== 1) {
-      this.app.chain.block.height = headers.number;
-      this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
+    if (this.app.chain && this.chainState.chain.meta.node.ethChainId !== 1) {
+      this.chainState.chain.block.height = headers.number;
+      this.chainState.chain.block.lastTime = moment.unix(+headers.timestamp);
 
       // compute the average block time
       // TODO: cache the average blocktime on server rather than computing it here every time
@@ -95,8 +95,8 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
           break;
         }
       }
-      this.app.chain.block.duration = totalDuration / nHeadersForBlocktime;
-      console.log(`Computed block duration: ${this.app.chain.block.duration}`);
+      this.chainState.chain.block.duration = totalDuration / nHeadersForBlocktime;
+      console.log(`Computed block duration: ${this.chainState.chain.block.duration}`);
       m.redraw();
     }
     return this._api;

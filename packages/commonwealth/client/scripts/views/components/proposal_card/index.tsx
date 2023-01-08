@@ -46,7 +46,7 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
           e.stopPropagation();
           e.preventDefault();
 
-          localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+          localStorage[`${navState.activeChainId()}-proposals-scrollY`] =
             window.scrollY;
 
           const path = getProposalUrlPath(
@@ -109,7 +109,7 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
                 e.stopPropagation();
                 e.preventDefault();
 
-                localStorage[`${app.activeChainId()}-proposals-scrollY`] =
+                localStorage[`${navState.activeChainId()}-proposals-scrollY`] =
                   window.scrollY;
 
                 navigateToSubpage(

@@ -27,7 +27,7 @@ export type SidebarMenuName =
 export class Sidebar extends ClassComponent {
   view() {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
-      chain: app.activeChainId(),
+      chain: navState.activeChainId(),
     });
 
     const currentChainInfo = app.chain?.meta;
@@ -43,7 +43,7 @@ export class Sidebar extends ClassComponent {
 
     return (
       <div class="Sidebar">
-        {app.sidebarMenu === 'default' && (
+        {navState.sidebarMenu === 'default' && (
           <div class="sidebar-default-menu">
             <SidebarQuickSwitcher />
             {app.chain && (
@@ -59,7 +59,7 @@ export class Sidebar extends ClassComponent {
                       <SubscriptionButton />
                     </div>
                   )}
-                  {app.isCustomDomain() && (
+                  {navState.isCustomDomain() && (
                     <div
                       class="powered-by"
                       onclick={() => {
@@ -72,8 +72,8 @@ export class Sidebar extends ClassComponent {
             )}
           </div>
         )}
-        {app.sidebarMenu === 'createContent' && <CreateContentSidebar />}
-        {app.sidebarMenu === 'exploreCommunities' && (
+        {navState.sidebarMenu === 'createContent' && <CreateContentSidebar />}
+        {navState.sidebarMenu === 'exploreCommunities' && (
           <ExploreCommunitiesSidebar />
         )}
       </div>

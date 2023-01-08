@@ -26,11 +26,11 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
       app.user.activeAccount &&
       (app.roles.isRoleOfCommunity({
         role: 'admin',
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
       }) ||
         app.roles.isRoleOfCommunity({
           role: 'moderator',
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
         }));
 
     const isAuthor =

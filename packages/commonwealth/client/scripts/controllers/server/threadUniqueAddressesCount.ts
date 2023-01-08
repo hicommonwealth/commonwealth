@@ -32,7 +32,7 @@ class ThreadUniqueAddressesCountController {
   }) => {
     const threadsUniqueAddressesCount = await $.ajax({
       type: 'POST',
-      url: `${app.serverUrl()}/threadsUsersCountAndAvatars`,
+      url: `${navState.serverUrl()}/threadsUsersCountAndAvatars`,
       headers: {
         'content-type': 'application/json',
       },

@@ -2,6 +2,8 @@ import { Account, IWebWallet } from 'models';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import app from 'state';
 import $ from 'jquery';
+import chainState from 'chainState';
+import navState from 'navigationState';
 import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
 import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
 import KeplrWebWalletController from './webWallets/keplr_web_wallet';
@@ -22,8 +24,8 @@ export default class WebWalletController {
 
   public availableWallets(chain?: ChainBase): IWebWallet<any>[] {
     // handle case like injective, axie, where we require a specific wallet
-    const specificChain = app.chain?.meta?.id;
-    if (app.chain?.meta?.id) {
+    const specificChain = chainState.chain?.meta?.id;
+    if (chainState.chain?.meta?.id) {
       const specificWallets = this._wallets.filter((w) => !!w.specificChains?.includes(specificChain));
       if (specificWallets.length > 0) return specificWallets.filter((w) => w.available);
     }
@@ -47,7 +49,7 @@ export default class WebWalletController {
 
     // do nothing on failure
     try {
-      await $.post(`${app.serverUrl()}/setAddressWallet`, {
+      await $.post(`${navState.serverUrl()}/setAddressWallet`, {
         address: account.address,
         author_chain: account.chain.id,
         wallet_id: wallet,

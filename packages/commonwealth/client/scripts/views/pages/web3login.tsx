@@ -9,6 +9,7 @@ import 'pages/web3login.scss';
 
 import { link } from 'helpers';
 import Sublayout from 'views/sublayout';
+import navState from 'navigationState';
 import { CWButton } from '../components/component_kit/cw_button';
 import { PageNotFound } from './404';
 import { CWText } from '../components/component_kit/cw_text';
@@ -22,7 +23,7 @@ class Web3LoginPage extends ClassComponent {
 
   view() {
     const token = m.route.param('connect');
-    if (app.isCustomDomain() || !token) {
+    if (navState.isCustomDomain() || !token) {
       // hide page if invalid arguments or via custom domain
       return <PageNotFound />;
     }
@@ -40,7 +41,7 @@ class Web3LoginPage extends ClassComponent {
       this.loading = true;
       try {
         const { status, result } = await $.get(
-          `${app.serverUrl()}/auth/callback`,
+          `${navState.serverUrl()}/auth/callback`,
           {
             jwt: app.user.jwt,
             token,
@@ -88,7 +89,7 @@ class Web3LoginPage extends ClassComponent {
               ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
               : link(
                   'a.web3login-go-home',
-                  app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,
+                  navState.isCustomDomain() ? '/' : `/${navState.activeChainId()}`,
                   'Go home'
                 )}
             {this.error && <CWText>{this.error}</CWText>}

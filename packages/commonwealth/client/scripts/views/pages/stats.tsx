@@ -21,11 +21,11 @@ class StatsPage extends ClassComponent {
   private requested: boolean;
 
   view() {
-    if (!this.requested && app.user && app.activeChainId()) {
+    if (!this.requested && app.user && navState.activeChainId()) {
       this.requested = true;
 
-      $.get(`${app.serverUrl()}/communityStats`, {
-        chain: app.activeChainId(),
+      $.get(`${navState.serverUrl()}/communityStats`, {
+        chain: navState.activeChainId(),
         jwt: app.user?.jwt,
       })
         .then(({ status, result }) => {

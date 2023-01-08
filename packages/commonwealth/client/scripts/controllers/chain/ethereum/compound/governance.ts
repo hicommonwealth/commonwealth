@@ -34,6 +34,7 @@ export default class CompoundGovernance extends ProposalModule<
   private _api: CompoundAPI;
   private _Chain: CompoundChain;
   private _Accounts: EthereumAccounts;
+  chainState: any;
 
   // GETTERS
   public get quorumVotes() { return this._quorumVotes; }
@@ -140,7 +141,7 @@ export default class CompoundGovernance extends ProposalModule<
 
     // load server proposals
     console.log('Fetching compound proposals from backend.');
-    await this.app.chainEntities.refresh(this.app.chain.id);
+    await this.app.chainEntities.refresh(this.chainState.chain.id);
     const entities = this.app.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
     console.log(`Found ${entities.length} proposals!`);
     entities.forEach((e) => this._entityConstructor(e));
@@ -158,11 +159,11 @@ export default class CompoundGovernance extends ProposalModule<
     );
 
     // kick off listener
-    const subscriber = new CompoundEvents.Subscriber(this._api.Contract as any, this.app.chain.id);
+    const subscriber = new CompoundEvents.Subscriber(this._api.Contract as any, this.chainState.chain.id);
     const processor = new CompoundEvents.Processor(this._api.Contract as any);
     await this.app.chainEntities.subscribeEntities(
-      this.app.chain.id,
-      chainToEventNetwork(this.app.chain.meta),
+      this.chainState.chain.id,
+      chainToEventNetwork(this.chainState.chain.meta),
       subscriber,
       processor
     );

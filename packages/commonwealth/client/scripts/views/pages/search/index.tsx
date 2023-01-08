@@ -33,7 +33,7 @@ const getMemberResult = (addr, searchTerm) => {
   const profile: Profile = app.profiles.getProfile(addr.chain, addr.address);
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
 
-  if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
+  if (navState.isCustomDomain() && navState.customDomainId() !== addr.chain) return;
 
   const scope = m.route.param('chain');
   const userLink = `/${scope || addr.chain}/account/${addr.address}?base=${
@@ -99,7 +99,7 @@ const getDiscussionResult = (thread, searchTerm) => {
   const proposalId = thread.proposalid;
   const chain = thread.chain;
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) return;
+  if (navState.isCustomDomain() && navState.customDomainId() !== chain) return;
 
   return m(ListItem, {
     allowOnContentClick: true,
@@ -142,7 +142,7 @@ const getCommentResult = (comment, searchTerm) => {
   const proposalId = comment.proposalid;
   const chain = comment.chain;
 
-  if (app.isCustomDomain() && app.customDomainId() !== chain) return;
+  if (navState.isCustomDomain() && navState.customDomainId() !== chain) return;
 
   return m(ListItem, {
     allowOnContentClick: true,
@@ -242,7 +242,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
     const searchQuery = SearchQuery.fromUrlParams(m.route.param());
 
     const { chainScope, searchTerm } = searchQuery;
-    const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
+    const scope = navState.isCustomDomain() ? navState.customDomainId() : chainScope;
 
     if (!app.search.isValidQuery(searchQuery)) {
       this.errorText =
@@ -312,7 +312,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
     const getCaptionScope = () => {
       if (scope) {
         return `in ${capitalize(scope)}.`;
-      } else if (app.isCustomDomain()) {
+      } else if (navState.isCustomDomain()) {
         return '';
       } else {
         return 'across all communities.';
@@ -342,7 +342,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                 <CWText isCentered className="search-results-caption">
                   <div>
                     {getSearchResultsCaption()}
-                    {scope && !app.isCustomDomain() && (
+                    {scope && !navState.isCustomDomain() && (
                       <a
                         href="#"
                         class="search-all-communities"

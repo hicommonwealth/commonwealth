@@ -10,7 +10,7 @@ import app from 'state';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
-  return $.post(app.serverUrl() + route, args)
+  return $.post(navState.serverUrl() + route, args)
     .then((resp) => {
       if (resp.status === 'Success') {
         callback(resp.result);
@@ -23,7 +23,7 @@ const post = (route, args, callback) => {
 
 const get = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
-  return $.get(app.serverUrl() + route, args)
+  return $.get(navState.serverUrl() + route, args)
     .then((resp) => {
       if (resp.status === 'Success') {
         callback(resp.result);
@@ -295,8 +295,8 @@ class NotificationsController {
       throw new Error('must be logged in to refresh notifications');
     }
 
-    const options: NotifOptions = app.isCustomDomain()
-      ? {chain_filter: app.activeChainId(), maxId: undefined}
+    const options: NotifOptions = navState.isCustomDomain()
+      ? {chain_filter: navState.activeChainId(), maxId: undefined}
       : {chain_filter: undefined, maxId: undefined};
 
     if (this._maxChainEventNotificationId !== Number.POSITIVE_INFINITY)
@@ -314,8 +314,8 @@ class NotificationsController {
     if (!app.user || !app.user.jwt) {
       throw new Error('must be logged in to refresh notifications');
     }
-    const options: NotifOptions = app.isCustomDomain()
-      ? {chain_filter: app.activeChainId(), maxId: undefined}
+    const options: NotifOptions = navState.isCustomDomain()
+      ? {chain_filter: navState.activeChainId(), maxId: undefined}
       : {chain_filter: undefined, maxId: undefined};
 
     if (this._maxDiscussionNotificationId !== Number.POSITIVE_INFINITY)

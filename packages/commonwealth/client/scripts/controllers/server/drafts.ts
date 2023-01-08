@@ -49,10 +49,10 @@ class DraftsController {
   public async create(params: DraftParams) {
     const { title, body, topicName, attachments } = params;
     try {
-      const response = await $.post(`${app.serverUrl()}/drafts`, {
+      const response = await $.post(`${navState.serverUrl()}/drafts`, {
         address: app.user.activeAccount.address,
         author_chain: app.user.activeAccount.chain.id,
-        chain: app.activeChainId(),
+        chain: navState.activeChainId(),
         title,
         body,
         topic: topicName,
@@ -78,12 +78,12 @@ class DraftsController {
       throw new Error('Must include id of draft being edited.');
     }
     try {
-      const response = await $.ajax(`${app.serverUrl()}/drafts`, {
+      const response = await $.ajax(`${navState.serverUrl()}/drafts`, {
         type: 'PATCH',
         data: {
           address: app.user.activeAccount.address,
           author_chain: app.user.activeAccount.chain.id,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
           id: existingDraftId,
           title,
           body,
@@ -109,12 +109,12 @@ class DraftsController {
 
   public async delete(id: number) {
     try {
-      const response = await $.ajax(`${app.serverUrl()}/drafts`, {
+      const response = await $.ajax(`${navState.serverUrl()}/drafts`, {
         type: 'DELETE',
         data: {
           address: app.user.activeAccount.address,
           author_chain: app.user.activeAccount.chain.id,
-          chain: app.activeChainId(),
+          chain: navState.activeChainId(),
           id,
           jwt: app.user.jwt,
         },
@@ -138,7 +138,7 @@ class DraftsController {
       throw new Error('must be logged in to refresh drafts');
     }
     try {
-      const response = await $.get(`${app.serverUrl()}/drafts`, {});
+      const response = await $.get(`${navState.serverUrl()}/drafts`, {});
       if (response.status !== 'Success') {
         throw new Error(`Unsuccessful refresh status: ${response.status}`);
       }

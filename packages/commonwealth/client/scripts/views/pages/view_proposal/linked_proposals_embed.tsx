@@ -86,7 +86,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                 <CWText>
                   Became referendum {proposal.getReferendum().identifier}
                 </CWText>
-                {app.activeChainId() && (
+                {navState.activeChainId() && (
                   <CWButton
                     buttonType="tertiary-blue"
                     onclick={(e) => {
@@ -110,7 +110,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                   Via {proposal.getProposalOrMotion(proposal.preimage).slug}{' '}
                   {proposal.getProposalOrMotion(proposal.preimage).identifier}
                 </CWText>
-                {app.activeChainId() && (
+                {navState.activeChainId() && (
                   <CWButton
                     buttonType="tertiary-blue"
                     onclick={(e) => {
@@ -183,7 +183,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                 {p.preimage?.method === 'rejectProposal' &&
                   'Rejects this proposal'}
               </CWText>
-              {app.activeChainId() && (
+              {navState.activeChainId() && (
                 <CWButton
                   buttonType="tertiary-blue"
                   onclick={(e) => {
@@ -206,7 +206,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                 {r.preimage?.method === 'rejectProposal' &&
                   'Rejects this proposal'}
               </CWText>
-              {app.activeChainId() && (
+              {navState.activeChainId() && (
                 <CWButton
                   buttonType="tertiary-blue"
                   onclick={(e) => {
@@ -231,7 +231,7 @@ export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAtt
                 {mo.call?.method === 'rejectProposal' &&
                   'Rejects this proposal'}
               </CWText>
-              {app.activeChainId() && (
+              {navState.activeChainId() && (
                 <CWButton
                   buttonType="tertiary-blue"
                   onclick={(e) => {

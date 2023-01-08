@@ -211,7 +211,7 @@ export default class NearSputnikProposal extends Proposal<
 
     // TODO: user pre-checks
 
-    const contractId = this._Dao.app.activeChainId();
+    const contractId = this._Dao.navState.activeChainId();
     const methodName = 'act_proposal';
     const args = {
       id: this.data.id,
