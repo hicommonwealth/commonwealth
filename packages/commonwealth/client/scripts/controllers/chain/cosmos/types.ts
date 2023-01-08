@@ -1,7 +1,7 @@
+import { Coin } from 'adapters/currency';
+import type { ICompletable, IIdentifiable } from 'adapters/shared';
 import type BN from 'bn.js';
 import type moment from 'moment';
-import { Coin } from 'adapters/currency';
-import type { IIdentifiable, ICompletable } from 'adapters/shared';
 
 export class CosmosToken extends Coin {
   constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {

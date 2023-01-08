@@ -1,36 +1,23 @@
 // Use https://admin.socket.io/#/ to monitor
+import { createAdapter } from '@socket.io/redis-adapter';
+import { factory, formatFilename } from 'common-common/src/logging';
+import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import { RascalSubscriptions, } from 'common-common/src/rabbitmq';
+import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
+import { StatsDController } from 'common-common/src/statsd';
+import type * as http from 'http';
+import * as jwt from 'jsonwebtoken';
+import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError, } from 'redis';
+import type Rollbar from 'rollbar';
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
 import type { Socket } from 'socket.io';
 import { Server } from 'socket.io';
-import * as jwt from 'jsonwebtoken';
 import type { ExtendedError } from 'socket.io/dist/namespace';
-import type * as http from 'http';
-import { createAdapter } from '@socket.io/redis-adapter';
-import { createChatNamespace } from './createChatNamespace';
-import {
-  ConnectionTimeoutError,
-  createClient,
-  ReconnectStrategyError,
-  SocketClosedUnexpectedlyError,
-} from 'redis';
-import { StatsDController } from 'common-common/src/statsd';
-import { factory, formatFilename } from 'common-common/src/logging';
-import type {
-  RabbitMQController} from 'common-common/src/rabbitmq';
-import {
-  getRabbitMQConfig,
-  RascalSubscriptions,
-} from 'common-common/src/rabbitmq';
-import type Rollbar from 'rollbar';
-import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
 import { WebsocketNamespaces } from '../../shared/types';
-import {
-  createNamespace,
-  publishToChainEventsRoom,
-  publishToSnapshotRoom,
-} from './createNamespace';
 import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
 import type { DB } from '../models';
+import { createChatNamespace } from './createChatNamespace';
+import { createNamespace, publishToChainEventsRoom, publishToSnapshotRoom, } from './createNamespace';
 
 const log = factory.getLogger(formatFilename(__filename));
 

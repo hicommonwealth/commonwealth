@@ -1,10 +1,11 @@
+import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
 import Web3 from 'web3';
 import type { DB } from '../models';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { createDefaultCommunityRoles } from '../util/roles';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const getTokenForum = async (

@@ -1,11 +1,5 @@
-import {
-  AccountId,
-  EraPoints,
-  EraRewardPoints,
-  EraIndex,
-  BlockHash,
-} from '@polkadot/types/interfaces';
 import { ApiPromise } from '@polkadot/api';
+import { AccountId, BlockHash, EraIndex, EraPoints, EraRewardPoints, } from '@polkadot/types/interfaces';
 
 import { AccountPoints } from '../types';
 

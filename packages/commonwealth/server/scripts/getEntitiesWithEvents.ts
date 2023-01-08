@@ -1,7 +1,7 @@
+import { EntityEventKind, eventToEntity, SupportedNetwork } from 'chain-events/src';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { QueryTypes } from 'sequelize';
 import models from '../database';
-import {QueryTypes} from "sequelize";
-import {EntityEventKind, eventToEntity, SupportedNetwork} from "chain-events/src";
-import {ChainBase, ChainNetwork} from 'common-common/src/types';
 
 async function main() {
   await models.sequelize.transaction(async (t) => {

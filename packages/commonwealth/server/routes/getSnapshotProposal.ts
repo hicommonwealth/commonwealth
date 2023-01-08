@@ -1,8 +1,7 @@
 import type { Response } from 'express';
 import type { DB } from '../models';
 import type { TypedRequestQuery } from '../types';
-import { success } from '../types';
-import fetchNewSnapshotProposal from '../util/fetchSnapshot'
+import fetchNewSnapshotProposal from '../util/fetchSnapshot';
 
 export const Errors = {
   NoId: 'No id was provided, cannot fetch snapshot proposal',

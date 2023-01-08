@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IGovernancePowerDelegationToken } from "../IGovernancePowerDelegationToken";
+import type { IGovernancePowerDelegationToken } from '../IGovernancePowerDelegationToken';
 
 export class IGovernancePowerDelegationToken__factory {
   static connect(

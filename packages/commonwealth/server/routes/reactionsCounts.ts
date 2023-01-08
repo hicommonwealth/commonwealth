@@ -1,9 +1,9 @@
-import type { Request, Response, NextFunction } from 'express';
-import { Sequelize } from 'sequelize';
+import { ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction, Request, Response } from 'express';
+import { Sequelize } from 'sequelize';
 import type { DB } from '../models';
 import type { ReactionInstance } from '../models/reaction';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,8 +1,8 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import models from '../../../server/database';
 import { resetDatabase } from '../../../server-test';
+import models from '../../../server/database';
 
 chai.use(chaiHttp);
 const { expect } = chai;

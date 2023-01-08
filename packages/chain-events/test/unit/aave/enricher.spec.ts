@@ -1,14 +1,9 @@
 import chai from 'chai';
 import { utils } from 'ethers';
-
-import {
-  EventKind,
-  RawEvent,
-  Api,
-  DelegationType,
-} from '../../../src/chains/aave/types';
 import { SupportedNetwork } from '../../../src';
 import { Enrich } from '../../../src/chains/aave/filters/enricher';
+
+import { Api, DelegationType, EventKind, RawEvent, } from '../../../src/chains/aave/types';
 
 const { assert } = chai;
 

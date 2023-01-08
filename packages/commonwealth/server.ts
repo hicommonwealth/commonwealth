@@ -1,51 +1,44 @@
-import session from 'express-session';
+import bodyParser from 'body-parser';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { getRabbitMQConfig, RabbitMQController, } from 'common-common/src/rabbitmq';
+import { StatsDController } from 'common-common/src/statsd';
+import compression from 'compression';
+import SessionSequelizeStore from 'connect-session-sequelize';
+import cookieParser from 'cookie-parser';
 import express from 'express';
+import { redirectToHTTPS } from 'express-http-to-https';
+import session from 'express-session';
+import fs from 'fs';
+import logger from 'morgan';
+import passport from 'passport';
+import prerenderNode from 'prerender-node';
+import type { BrokerConfig } from 'rascal';
+import Rollbar from 'rollbar';
+import favicon from 'serve-favicon';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
-import SessionSequelizeStore from 'connect-session-sequelize';
-import fs from 'fs';
-import Rollbar from 'rollbar';
-import passport from 'passport';
-import cookieParser from 'cookie-parser';
-import bodyParser from 'body-parser';
-import compression from 'compression';
 import webpackHotMiddleware from 'webpack-hot-middleware';
-import { redirectToHTTPS } from 'express-http-to-https';
-import favicon from 'serve-favicon';
-import logger from 'morgan';
-import prerenderNode from 'prerender-node';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import {
-  RabbitMQController,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { StatsDController } from 'common-common/src/statsd';
-import type { BrokerConfig } from 'rascal';
-import devWebpackConfig from './webpack/webpack.dev.config.js';
-import prodWebpackConfig from './webpack/webpack.prod.config.js';
-import ViewCountCache from './server/util/viewCountCache';
-import RuleCache from './server/util/rules/ruleCache';
-import BanCache from './server/util/banCheckCache';
-import {
-  RABBITMQ_URI,
-  ROLLBAR_SERVER_TOKEN,
-  SESSION_SECRET,
-} from './server/config';
-import models from './server/database';
-import setupAppRoutes from './server/scripts/setupAppRoutes';
-import setupServer from './server/scripts/setupServer';
 import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
-import setupPrerenderServer from './server/scripts/setupPrerenderService';
-import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN, SESSION_SECRET, } from './server/config';
+import models from './server/database';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
+import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
+import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import setupAppRoutes from './server/scripts/setupAppRoutes';
+import expressStatsdInit from './server/scripts/setupExpressStats';
+import setupPrerenderServer from './server/scripts/setupPrerenderService';
+import setupServer from './server/scripts/setupServer';
+import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupEntityProxy from './server/util/entitiesProxy';
-import setupIpfsProxy from './server/util/ipfsProxy';
-import setupPassport from './server/passport';
-import expressStatsdInit from './server/scripts/setupExpressStats';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import DatabaseValidationService from './server/middleware/databaseValidationService';
+import setupIpfsProxy from './server/util/ipfsProxy';
+import RuleCache from './server/util/rules/ruleCache';
+import ViewCountCache from './server/util/viewCountCache';
+import devWebpackConfig from './webpack/webpack.dev.config.js';
+import prodWebpackConfig from './webpack/webpack.prod.config.js';
 
 const log = factory.getLogger(formatFilename(__filename));
 

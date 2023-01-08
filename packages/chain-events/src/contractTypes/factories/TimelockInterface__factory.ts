@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { TimelockInterface } from "../TimelockInterface";
+import type { TimelockInterface } from '../TimelockInterface';
 
 export class TimelockInterface__factory {
   static connect(

@@ -1,13 +1,13 @@
 /* eslint-disable no-unused-expressions */
-import { ethers } from 'ethers';
+import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import wallet from 'ethereumjs-wallet';
-import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
+import { ethers } from 'ethers';
 import app, { resetDatabase } from '../../../server-test';
-import * as modelUtils from '../../util/modelUtils';
 import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../../shared/adapters/chain/ethereum/keys';
+import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;

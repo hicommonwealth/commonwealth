@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IGovernanceStrategy } from "../IGovernanceStrategy";
+import type { IGovernanceStrategy } from '../IGovernanceStrategy';
 
 export class IGovernanceStrategy__factory {
   static connect(

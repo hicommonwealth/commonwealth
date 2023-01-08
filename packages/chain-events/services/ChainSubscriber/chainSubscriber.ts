@@ -1,31 +1,25 @@
-import { Pool } from 'pg';
-import _ from 'underscore';
-import { BrokerConfig } from 'rascal';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import {
-  RascalPublications,
-  getRabbitMQConfig,
-} from 'common-common/src/rabbitmq';
-import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { getRabbitMQConfig, RascalPublications, } from 'common-common/src/rabbitmq';
+import { StatsDController } from 'common-common/src/statsd';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import fetch from 'node-fetch';
+import { Pool } from 'pg';
+import { BrokerConfig } from 'rascal';
+import Rollbar from 'rollbar';
+import _ from 'underscore';
+import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
 import {
   CHAIN_EVENT_SERVICE_SECRET,
-  CW_DATABASE_URI, CW_SERVER_URL,
+  CHAIN_SUBSCRIBER_INDEX,
+  CW_DATABASE_URI,
+  CW_SERVER_URL,
   NUM_CHAIN_SUBSCRIBERS,
   RABBITMQ_URI,
   REPEAT_TIME,
   ROLLBAR_SERVER_TOKEN,
-  CHAIN_SUBSCRIBER_INDEX,
 } from '../config';
-import {
-  getListenerNames,
-  manageErcListeners,
-  manageRegularListeners,
-} from './util';
 import { ChainAttributes, IListenerInstances } from './types';
-import Rollbar from 'rollbar';
-import fetch from "node-fetch";
-import { StatsDController } from "common-common/src/statsd";
+import { getListenerNames, manageErcListeners, manageRegularListeners, } from './util';
 
 const log = factory.getLogger(formatFilename(__filename));
 

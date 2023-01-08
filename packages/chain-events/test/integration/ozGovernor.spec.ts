@@ -1,20 +1,13 @@
 /* eslint-disable func-names */
 import '@nomiclabs/hardhat-ethers';
-import { EventEmitter } from 'events';
 
 import chai, { expect } from 'chai';
-import { ethers } from 'hardhat';
+import type { providers, Signer } from 'ethers';
 import { BigNumber, BigNumberish, utils } from 'ethers';
-import type { Signer, providers } from 'ethers';
-
-import {
-  GovernorMock,
-  GovernorMock__factory as GovernorMockFactory,
-  ERC20VotesMock,
-  ERC20VotesMock__factory as ERC20VotesMockFactory,
-  TimelockController,
-  TimelockController__factory as TimelockControllerFactory,
-} from '../../src/contractTypes';
+import { EventEmitter } from 'events';
+import { ethers } from 'hardhat';
+import { CWEvent, IChainEventData, IEventHandler } from '../../src';
+import { subscribeEvents } from '../../src/chains/compound';
 import {
   BravoSupport,
   EventKind,
@@ -26,8 +19,15 @@ import {
   IVoteCast,
   ProposalState,
 } from '../../src/chains/compound/types';
-import { subscribeEvents } from '../../src/chains/compound';
-import { CWEvent, IChainEventData, IEventHandler } from '../../src';
+
+import {
+  ERC20VotesMock,
+  ERC20VotesMock__factory as ERC20VotesMockFactory,
+  GovernorMock,
+  GovernorMock__factory as GovernorMockFactory,
+  TimelockController,
+  TimelockController__factory as TimelockControllerFactory,
+} from '../../src/contractTypes';
 
 const { assert } = chai;
 

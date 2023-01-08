@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IUniswapV2Pair } from "../IUniswapV2Pair";
+import type { IUniswapV2Pair } from '../IUniswapV2Pair';
 
 export class IUniswapV2Pair__factory {
   static connect(

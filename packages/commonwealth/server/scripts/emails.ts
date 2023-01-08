@@ -1,18 +1,14 @@
-import { Op } from 'sequelize';
-import moment from 'moment';
-import { capitalize } from 'lodash';
-import type { CWEvent, SupportedNetwork, IChainEventData
-} from 'chain-events/src';
-import {
-  Label as ChainEventLabel, IEventLabel
-} from 'chain-events/src';
+import type { CWEvent, IChainEventData, SupportedNetwork } from 'chain-events/src';
+import { Label as ChainEventLabel } from 'chain-events/src';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
-import { SENDGRID_API_KEY, } from '../config';
+import { capitalize } from 'lodash';
+import { Op } from 'sequelize';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
-import type { IPostNotificationData} from '../../shared/types';
+import type { IPostNotificationData } from '../../shared/types';
 import { DynamicTemplate } from '../../shared/types';
+import { SENDGRID_API_KEY, } from '../config';
 import type { DB } from '../models';
 import type { UserAttributes } from '../models/user';
 

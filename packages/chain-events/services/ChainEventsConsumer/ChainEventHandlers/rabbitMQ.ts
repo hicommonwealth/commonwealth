@@ -1,9 +1,6 @@
 import { CWEvent, IEventHandler } from 'chain-events/src';
+import { RabbitMQController, RascalPublications, } from 'common-common/src/rabbitmq';
 import Rascal from 'rascal';
-import {
-  RascalPublications,
-  RabbitMQController,
-} from 'common-common/src/rabbitmq';
 
 export class RabbitMqHandler extends RabbitMQController
   implements IEventHandler {

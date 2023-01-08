@@ -1,8 +1,4 @@
-import {
-  MsgSubmitProposal,
-  MsgDeposit,
-  MsgVote,
-} from 'cosmjs-types/cosmos/gov/v1beta1/tx';
+import { MsgDeposit, MsgSubmitProposal, MsgVote, } from 'cosmjs-types/cosmos/gov/v1beta1/tx';
 
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
 import { Api, coinToCoins, EventKind, IEventData, RawEvent } from '../types';

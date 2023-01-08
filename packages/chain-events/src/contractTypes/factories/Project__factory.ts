@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { Contract, ContractFactory, Overrides, Signer } from 'ethers';
 
-import type { Project } from "../Project";
+import type { Project } from '../Project';
 
 export class Project__factory extends ContractFactory {
   constructor(signer?: Signer) {

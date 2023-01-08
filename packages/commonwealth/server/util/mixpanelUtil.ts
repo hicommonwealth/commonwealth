@@ -1,5 +1,6 @@
-import type { BaseMixpanelPayload } from '../../shared/analytics/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { BaseMixpanelPayload } from '../../shared/analytics/types';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 var Mixpanel = require('mixpanel');

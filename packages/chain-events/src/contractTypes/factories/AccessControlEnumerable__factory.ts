@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { AccessControlEnumerable } from "../AccessControlEnumerable";
+import type { AccessControlEnumerable } from '../AccessControlEnumerable';
 
 export class AccessControlEnumerable__factory {
   static connect(

@@ -1,24 +1,24 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/proposals/proposal_extensions.scss';
-
-import app from 'state';
+import Cosmos from 'controllers/chain/cosmos/adapter';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { AnyProposal } from 'models';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/adapter';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import Cosmos from 'controllers/chain/cosmos/adapter';
+import m from 'mithril';
+import { AnyProposal } from 'models';
+
+import app from 'state';
+import { BalanceInfo } from 'views/components/proposals/balance_info';
 
 import { ConvictionsChooser } from 'views/components/proposals/convictions_chooser';
-import { BalanceInfo } from 'views/components/proposals/balance_info';
-import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWText } from '../component_kit/cw_text';
+import { CWTextInput } from '../component_kit/cw_text_input';
 
 type ProposalExtensionsAttrs = {
   proposal: AnyProposal;

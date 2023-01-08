@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IProposalValidator } from "../IProposalValidator";
+import type { IProposalValidator } from '../IProposalValidator';
 
 export class IProposalValidator__factory {
   static connect(

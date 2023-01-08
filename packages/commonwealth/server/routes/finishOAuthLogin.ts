@@ -1,16 +1,10 @@
-import type { Request, Response, NextFunction } from 'express';
-import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  redirectWithLoginSuccess,
-  redirectWithLoginError,
-} from './finishEmailLogin';
+import { NotificationCategories } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import { MixpanelLoginEvent, } from '../../shared/analytics/types';
 import type { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../shared/analytics/types';
+import { redirectWithLoginError, } from './finishEmailLogin';
 
 const log = factory.getLogger(formatFilename(__filename));
 const finishOAuthLogin = async (

@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { GovernorCountingSimple } from "../GovernorCountingSimple";
+import type { GovernorCountingSimple } from '../GovernorCountingSimple';
 
 export class GovernorCountingSimple__factory {
   static connect(

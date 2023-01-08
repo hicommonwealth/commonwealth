@@ -1,15 +1,9 @@
-import * as events from 'events';
-
 import * as chai from 'chai';
 import dotenv from 'dotenv';
+import * as events from 'events';
+import { contracts, networkUrls } from '../../../scripts/listenerUtils';
 
-import {
-  Processor,
-  StorageFetcher,
-  Subscriber,
-  Listener,
-} from '../../../src/chains/compound';
-import { networkUrls, contracts } from '../../../scripts/listenerUtils';
+import { Listener, Processor, StorageFetcher, Subscriber, } from '../../../src/chains/compound';
 import { TestHandler } from '../../util';
 
 dotenv.config();

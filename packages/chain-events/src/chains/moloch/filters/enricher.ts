@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Contract } from 'ethers';
-import { hexToNumberString, hexToNumber as web3HexToNumber } from 'web3-utils';
+import { hexToNumber as web3HexToNumber, hexToNumberString } from 'web3-utils';
+import { Moloch1 } from '../../../contractTypes';
 
 import { TypedEventFilter } from '../../../contractTypes/commons';
-import { Moloch1 } from '../../../contractTypes';
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { EventKind, RawEvent, IEventData, Api } from '../types';
+import { Api, EventKind, IEventData, RawEvent } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
 type GetArgType<

@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { formatAddressShort } from 'helpers';
 import $ from 'jquery';
+import m from 'mithril';
+import { RoleInfo, RolePermission } from 'models';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 
 import app from 'state';
-import { formatAddressShort } from 'helpers';
-import { RolePermission, RoleInfo } from 'models';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 

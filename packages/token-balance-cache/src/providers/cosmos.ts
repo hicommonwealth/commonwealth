@@ -1,13 +1,9 @@
-import {
-  QueryClient,
-  setupBankExtension,
-  setupStakingExtension,
-} from '@cosmjs/stargate';
 import { Bech32 } from '@cosmjs/encoding';
+import { QueryClient, setupBankExtension, setupStakingExtension, } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { BalanceType } from 'common-common/src/types';
 
-import { BalanceProvider, IChainNode } from "../types";
+import { BalanceProvider, IChainNode } from '../types';
 
 export default class CosmosBalanceProvider extends BalanceProvider {
   public name = 'cosmos';

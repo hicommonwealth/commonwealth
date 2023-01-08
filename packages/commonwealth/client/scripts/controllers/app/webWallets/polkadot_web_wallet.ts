@@ -1,16 +1,11 @@
-import {
-  web3Accounts,
-  web3Enable,
-  web3FromAddress,
-  isWeb3Injected,
-} from '@polkadot/extension-dapp';
-import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { Signer } from '@polkadot/api/types';
-import { stringToHex } from '@polkadot/util';
+import { isWeb3Injected, web3Accounts, web3Enable, web3FromAddress, } from '@polkadot/extension-dapp';
+import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+import { stringToHex } from '@polkadot/util';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
+import type { Account, IWebWallet } from 'models';
 
 class PolkadotWebWalletController
   implements IWebWallet<InjectedAccountWithMeta>

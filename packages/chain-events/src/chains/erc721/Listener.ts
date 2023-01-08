@@ -1,16 +1,11 @@
 import { CWEvent, SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
-
-import {
-  EventKind,
-  IErc721Contracts,
-  ListenerOptions as Erc721ListenerOptions,
-  RawEvent,
-} from './types';
-import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
+import { createApi } from './subscribeFunc';
 import { Subscriber } from './subscriber';
+
+import { EventKind, IErc721Contracts, ListenerOptions as Erc721ListenerOptions, RawEvent, } from './types';
 
 export class Listener extends BaseListener<
   IErc721Contracts,

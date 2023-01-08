@@ -1,14 +1,13 @@
 import { bech32 } from 'bech32';
-
-declare let window: any;
-
-import Web3 from 'web3';
-import type { provider } from 'web3-core';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-import app from 'state';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
+import type { Account, IWebWallet } from 'models';
+import app from 'state';
+import Web3 from 'web3';
+import type { provider } from 'web3-core';
+
+declare let window: any;
 
 function encodeEthAddress(bech32Prefix: string, address: string): string {
   return bech32.encode(

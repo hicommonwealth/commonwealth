@@ -1,33 +1,27 @@
 /* eslint-disable dot-notation */
-import http from 'http';
-import favicon from 'serve-favicon';
-import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import passport from 'passport';
-import session from 'express-session';
-import express from 'express';
+import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
+import { BalanceType, ChainBase, ChainNetwork, ChainType, NotificationCategories, } from 'common-common/src/types';
 import SessionSequelizeStore from 'connect-session-sequelize';
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import session from 'express-session';
+import http from 'http';
+import passport from 'passport';
 import Rollbar from 'rollbar';
-import {
-  ChainBase,
-  ChainNetwork,
-  NotificationCategories,
-  ChainType,
-  BalanceType,
-} from 'common-common/src/types';
+import favicon from 'serve-favicon';
+import setupAPI from 'server/routing/router'; // performance note: this takes 15 seconds
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
-import setupAPI from 'server/routing/router'; // performance note: this takes 15 seconds
-import setupPassport from './server/passport';
 import models from './server/database';
-import ViewCountCache from './server/util/viewCountCache';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
+import setupPassport from './server/passport';
 import BanCache from './server/util/banCheckCache';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
+import ViewCountCache from './server/util/viewCountCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
-import DatabaseValidationService from './server/middleware/databaseValidationService';
 
 require('express-async-errors');
 

@@ -4,7 +4,7 @@ import { Contract, utils } from 'ethers';
 import { GovernorCompatibilityBravo } from '../../../contractTypes';
 import { TypedEventFilter } from '../../../contractTypes/commons';
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { EventKind, RawEvent, IEventData, Api } from '../types';
+import { Api, EventKind, IEventData, RawEvent } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<infer Y, any> ? Y : never;
 type GetArgType<

@@ -1,5 +1,5 @@
+import { AaveTypes, CompoundTypes, MolochTypes, SubstrateTypes } from 'chain-events/src';
 import { ProposalType } from 'common-common/src/types';
-import { SubstrateTypes, MolochTypes, CompoundTypes, AaveTypes } from 'chain-events/src';
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts
 // fetch the corresponding chain entity from the database

@@ -1,49 +1,34 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import chai from 'chai';
-import BN from 'bn.js';
+import { DeriveBounties, DeriveDispatch, DeriveProposalImage, } from '@polkadot/api-derive/types';
+import { bool, Bytes, Data, Option, TypeRegistry, Vec } from '@polkadot/types';
 import {
   AccountId,
-  PropIndex,
-  Hash,
-  ReferendumInfoTo239,
-  ReferendumInfo,
-  Proposal,
-  TreasuryProposal,
-  Votes,
+  Bounty,
   Event,
   Extrinsic,
-  Registration,
-  RegistrarInfo,
-  Bounty,
-  RewardPoint,
+  Hash,
   OpenTip,
+  PropIndex,
+  Proposal,
+  ReferendumInfo,
+  ReferendumInfoTo239,
+  RegistrarInfo,
+  Registration,
+  RewardPoint,
+  TreasuryProposal,
+  Votes,
 } from '@polkadot/types/interfaces';
-import {
-  DeriveDispatch,
-  DeriveProposalImage,
-  DeriveBounties,
-} from '@polkadot/api-derive/types';
-import { Vec, bool, Data, TypeRegistry, Option, Bytes } from '@polkadot/types';
+import { OffenceDetails, ReportIdOf, } from '@polkadot/types/interfaces/offences';
 import { Codec, ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import {
-  OffenceDetails,
-  ReportIdOf,
-} from '@polkadot/types/interfaces/offences';
+import BN from 'bn.js';
+import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
 import { Enrich } from '../../../src/chains/substrate/filters/enricher';
-import {
-  EventKind,
-  IdentityJudgement,
-} from '../../../src/chains/substrate/types';
+import { EventKind, IdentityJudgement, } from '../../../src/chains/substrate/types';
 
-import {
-  constructFakeApi,
-  constructOption,
-  constructIdentityJudgement,
-  constructAccountVote,
-} from './testUtil';
+import { constructAccountVote, constructFakeApi, constructIdentityJudgement, constructOption, } from './testUtil';
 
 const { assert } = chai;
 const offenceDetails = [

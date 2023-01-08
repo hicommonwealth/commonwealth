@@ -1,9 +1,9 @@
-import BN from 'bn.js';
-import axios from 'axios';
-import { BalanceType } from 'common-common/src/types';
 import { Bech32 } from '@cosmjs/encoding';
+import axios from 'axios';
+import BN from 'bn.js';
+import { BalanceType } from 'common-common/src/types';
 
-import { BalanceProvider, IChainNode } from "../types";
+import { BalanceProvider, IChainNode } from '../types';
 
 export default class TerraBalanceProvider extends BalanceProvider {
   public name = 'terra';

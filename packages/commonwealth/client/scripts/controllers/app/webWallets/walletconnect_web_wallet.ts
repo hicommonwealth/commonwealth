@@ -1,11 +1,11 @@
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, ChainInfo, IWebWallet, BlockInfo } from 'models';
+import { setActiveAccount } from 'controllers/app/login';
+import type { Account, BlockInfo, ChainInfo, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;

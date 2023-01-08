@@ -1,16 +1,10 @@
-import * as events from 'events';
-
-import * as chai from 'chai';
 import { ApiPromise } from '@polkadot/api';
 
-import {
-  Poller,
-  Processor,
-  StorageFetcher,
-  Subscriber,
-  Listener,
-} from '../../../src/chains/substrate';
+import * as chai from 'chai';
+import * as events from 'events';
 import { networkUrls } from '../../../scripts/listenerUtils';
+
+import { Listener, Poller, Processor, StorageFetcher, Subscriber, } from '../../../src/chains/substrate';
 import { TestHandler } from '../../util';
 
 const { assert } = chai;

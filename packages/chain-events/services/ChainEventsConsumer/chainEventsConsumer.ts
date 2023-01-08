@@ -1,25 +1,15 @@
-import { BrokerConfig } from 'rascal';
-import {
-  RabbitMQSubscription,
-  ServiceConsumer,
-} from 'common-common/src/serviceConsumer';
-import EventStorageHandler from './ChainEventHandlers/storage';
-import NotificationsHandler from './ChainEventHandlers/notification';
-import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {
-  RabbitMQController,
-  getRabbitMQConfig,
-  RascalSubscriptions,
-} from 'common-common/src/rabbitmq';
-import models from '../database/database';
-import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
-import {
-  Ithis as ChainEventsProcessorContextType,
-  processChainEvents,
-} from './MessageProcessors/ChainEventsQueue';
-import { SubstrateTypes } from '../../src';
+import { getRabbitMQConfig, RabbitMQController, RascalSubscriptions, } from 'common-common/src/rabbitmq';
+import { RabbitMQSubscription, ServiceConsumer, } from 'common-common/src/serviceConsumer';
+import { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
+import { SubstrateTypes } from '../../src';
+import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
+import models from '../database/database';
+import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
+import NotificationsHandler from './ChainEventHandlers/notification';
+import EventStorageHandler from './ChainEventHandlers/storage';
+import { Ithis as ChainEventsProcessorContextType, processChainEvents, } from './MessageProcessors/ChainEventsQueue';
 
 const log = factory.getLogger(formatFilename(__filename));
 

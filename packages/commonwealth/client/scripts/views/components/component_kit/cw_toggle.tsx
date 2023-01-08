@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_toggle.scss';
+import m from 'mithril';
+import { getClasses } from './helpers';
 
 import { ComponentType, StyleAttrs } from './types';
-import { getClasses } from './helpers';
 
 type ToggleStyleAttrs = {
   checked?: boolean;

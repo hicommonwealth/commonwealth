@@ -1,15 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import app from 'state';
-import {
-  CWBanner,
-  CWMessageBanner,
-} from './components/component_kit/cw_banner';
-import { ChainInfo, ITokenAdapter } from '../models';
 import { isNonEmptyString } from '../helpers/typeGuards';
+import { ChainInfo, ITokenAdapter } from '../models';
+import { CWBanner, CWMessageBanner, } from './components/component_kit/cw_banner';
 import { TermsBanner } from './components/terms_banner';
 
 type SublayoutBannersAttrs = {

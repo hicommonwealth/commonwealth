@@ -1,7 +1,6 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
-// If a community is found, also check that the user is allowed to see it.
-import { Op } from 'sequelize';
 import JobRunner from 'common-common/src/cacheJobRunner';
+// If a community is found, also check that the user is allowed to see it.
 
 import type { DB } from '../models';
 

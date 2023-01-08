@@ -1,20 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
+import m from 'mithril';
 
 import { CWPortal } from '../cw_portal';
-import {
-  applyArrowStyles,
-  cursorInBounds,
-  findRef,
-  getPosition,
-} from './helpers';
-import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
 import { TooltipType } from './cw_tooltip';
+import { applyArrowStyles, cursorInBounds, findRef, getPosition, } from './helpers';
 
 export type PopoverInteractionType = 'click' | 'hover';
 

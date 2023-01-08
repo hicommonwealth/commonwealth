@@ -1,46 +1,34 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { initAppState } from 'app';
 import ClassComponent from 'class_component';
+
+import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
+import AaveApi from 'controllers/chain/ethereum/aave/api';
+import CompoundAPI, { GovernorTokenType, GovernorType, } from 'controllers/chain/ethereum/compound/api';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import $ from 'jquery';
-import Web3 from 'web3';
+import m from 'mithril';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { isAddress } from 'web3-utils';
-
-import { IAaveGovernanceV2__factory } from 'common-common/src/eth/types';
-import { notifyError } from 'controllers/app/notifications';
-import { IdRow, InputRow } from 'views/components/metadata_rows';
-import CompoundAPI, {
-  GovernorTokenType,
-  GovernorType,
-} from 'controllers/chain/ethereum/compound/api';
-import AaveApi from 'controllers/chain/ethereum/aave/api';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWValidationText } from 'views/components/component_kit/cw_validation_text';
+import { IdRow, InputRow } from 'views/components/metadata_rows';
 
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { defaultChainRows, ethChainRows, initChainForm, } from 'views/pages/create_community/chain_input_rows';
 
-import {
-  initChainForm,
-  defaultChainRows,
-  ethChainRows,
-} from 'views/pages/create_community/chain_input_rows';
-
-import {
-  ChainFormFields,
-  ChainFormState,
-  EthChainAttrs,
-  EthFormFields,
-} from 'views/pages/create_community/types';
+import { ChainFormFields, ChainFormState, EthChainAttrs, EthFormFields, } from 'views/pages/create_community/types';
+import Web3 from 'web3';
+import { isAddress } from 'web3-utils';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 type EthDaoFormFields = {

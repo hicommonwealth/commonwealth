@@ -1,24 +1,23 @@
+import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { NotificationCategories, WalletId } from 'common-common/src/types';
 import * as jwt from 'jsonwebtoken';
 import { isAddress, toChecksumAddress } from 'web3-utils';
-import { NotificationCategories, WalletId } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-
-import type { TypedRequestBody, TypedResponse} from '../types';
-import { success } from '../types';
-import { AXIE_SHARED_SECRET } from '../config';
-import type { DB } from '../models';
-import { sequelize } from '../database';
-import type { ProfileAttributes } from '../models/profile';
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
 import { DynamicTemplate } from '../../shared/types';
-
-import { AppError, ServerError } from 'common-common/src/errors';
-import type { UserAttributes } from '../models/user';
+import { AXIE_SHARED_SECRET } from '../config';
+import { sequelize } from '../database';
+import type { DB } from '../models';
 import type { AddressAttributes } from '../models/address';
+import type { ProfileAttributes } from '../models/profile';
+import type { UserAttributes } from '../models/user';
+
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { createRole } from '../util/roles';
 
 import { redirectWithLoginError } from './finishEmailLogin';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { createRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 

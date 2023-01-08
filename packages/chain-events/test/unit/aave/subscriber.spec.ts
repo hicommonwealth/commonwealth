@@ -1,6 +1,5 @@
-import { EventEmitter } from 'events';
-
 import chai from 'chai';
+import { EventEmitter } from 'events';
 
 import { Subscriber } from '../../../src/chains/aave/subscriber';
 import { Api, RawEvent } from '../../../src/chains/aave/types';

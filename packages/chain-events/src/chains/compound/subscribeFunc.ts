@@ -1,24 +1,18 @@
 import { providers } from 'ethers';
 import sleep from 'sleep-promise';
-
-import { createProvider } from '../../eth';
-import {
-  IDisconnectedRange,
-  CWEvent,
-  SubscribeFunc,
-  ISubscribeOptions,
-  SupportedNetwork,
-} from '../../interfaces';
-import { addPrefix, factory } from '../../logging';
 import {
   GovernorAlpha__factory as GovernorAlphaFactory,
   GovernorCompatibilityBravo__factory as GovernorCompatibilityBravoFactory,
 } from '../../contractTypes';
 
-import { Subscriber } from './subscriber';
+import { createProvider } from '../../eth';
+import { CWEvent, IDisconnectedRange, ISubscribeOptions, SubscribeFunc, SupportedNetwork, } from '../../interfaces';
+import { addPrefix, factory } from '../../logging';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
-import { IEventData, RawEvent, Api } from './types';
+
+import { Subscriber } from './subscriber';
+import { Api, IEventData, RawEvent } from './types';
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.

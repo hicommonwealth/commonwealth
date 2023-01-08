@@ -1,17 +1,12 @@
 import { CWEvent, SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
-
-import {
-  EventKind,
-  IErc20Contracts,
-  ListenerOptions as Erc20ListenerOptions,
-  RawEvent,
-} from './types';
-import { createApi } from './subscribeFunc';
-import { Processor } from './processor';
-import { Subscriber } from './subscriber';
 import { EnricherConfig } from './filters/enricher';
+import { Processor } from './processor';
+import { createApi } from './subscribeFunc';
+import { Subscriber } from './subscriber';
+
+import { EventKind, IErc20Contracts, ListenerOptions as Erc20ListenerOptions, RawEvent, } from './types';
 
 export class Listener extends BaseListener<
   IErc20Contracts,

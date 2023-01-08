@@ -2,7 +2,7 @@ import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/aave/processor';
-import { Api, RawEvent, EventKind } from '../../../src/chains/aave/types';
+import { Api, EventKind, RawEvent } from '../../../src/chains/aave/types';
 
 const { assert } = chai;
 

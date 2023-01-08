@@ -1,11 +1,10 @@
-import { v4 as uuidv4 } from 'uuid';
-
-import type { TypedRequestBody, TypedResponse} from '../types';
-import { success } from '../types';
 import { AppError, ServerError } from 'common-common/src/errors';
-import { Issuers } from './finishSsoLogin';
-import type { DB } from '../models';
+import { v4 as uuidv4 } from 'uuid';
 import { AXIE_SHARED_SECRET } from '../config';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import { Issuers } from './finishSsoLogin';
 
 const Errors = {
   InvalidIssuer: 'Invalid issuer',

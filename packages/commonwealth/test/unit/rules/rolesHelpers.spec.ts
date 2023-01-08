@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import { getHighestRoleFromCommunityRoles } from '../../../server/util/roles';
 import type { CommunityRoleAttributes } from '../../../server/models/community_role';
+import { getHighestRoleFromCommunityRoles } from '../../../server/util/roles';
 
 describe('getHighestRoleFromCommunityRoles() unit tests', () => {
   it('should return highest role', async () => {

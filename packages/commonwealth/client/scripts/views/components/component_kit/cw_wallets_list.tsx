@@ -1,28 +1,28 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import app from 'state';
-import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
 import 'components/component_kit/cw_wallets_list.scss';
-
-import { Account, AddressInfo, IWebWallet } from 'models';
-import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
+import { notifyInfo } from 'controllers/app/notifications';
+import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import Near from 'controllers/chain/near/adapter';
 import Substrate from 'controllers/chain/substrate/adapter';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
-import { addressSwapper } from 'commonwealth/shared/utils';
-import { CWText } from './cw_text';
-import { CWWalletOptionRow } from './cw_wallet_option_row';
-import { CWTooltip } from './cw_popover/cw_tooltip';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
+import $ from 'jquery';
+import m from 'mithril';
+
+import { Account, AddressInfo, IWebWallet } from 'models';
+import app from 'state';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
+import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWSpinner } from './cw_spinner';
+import { CWText } from './cw_text';
+import { CWWalletOptionRow } from './cw_wallet_option_row';
+import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow

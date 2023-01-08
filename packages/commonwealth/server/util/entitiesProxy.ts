@@ -4,6 +4,7 @@ import type { Express } from 'express';
 import url from 'url';
 
 import { ENTITIES_URL } from '../config';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 function setupEntityProxy(app: Express) {

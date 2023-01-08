@@ -1,16 +1,16 @@
-import type { ITXModalData } from 'models';
-import { ProposalModule } from 'models';
-import type { IApp } from 'state';
 import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
 import { AaveEvents, AaveTypes } from 'chain-events/src';
 import type { Executor } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
-
-import AaveProposal from './proposal';
-import type AaveChain from './chain';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+import type { IApp } from 'state';
+import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 import type AaveApi from './api';
-import type EthereumAccounts from '../accounts';
+import type AaveChain from './chain';
+
+import AaveProposal from './proposal';
 
 export interface AaveProposalArgs {
   executor: Executor | string,

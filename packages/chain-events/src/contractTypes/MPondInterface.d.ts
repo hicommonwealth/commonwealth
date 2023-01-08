@@ -2,21 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  ethers,
-  EventFilter,
-  Signer,
-  BigNumber,
-  BigNumberish,
-  PopulatedTransaction,
-  Contract,
-  ContractTransaction,
-  CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+import { FunctionFragment, Result } from '@ethersproject/abi';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
+import { BigNumber, BigNumberish, CallOverrides, Contract, ethers, PopulatedTransaction, Signer, } from 'ethers';
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons';
 
 interface MPondInterfaceInterface extends ethers.utils.Interface {
   functions: {

@@ -1,13 +1,9 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes} from 'sequelize';
-import { Model } from 'sequelize';
+import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
 import type { Permission } from './role';
-import type {
-  RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-} from './role_assignment';
-import type { ModelStatic, ModelInstance } from './types';
+import type { RoleAssignmentAttributes, RoleAssignmentInstance, } from './role_assignment';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityRoleAttributes = {
   name: Permission;

@@ -1,55 +1,31 @@
+import { RegisteredTypes } from '@polkadot/types/types';
+import { Label as AaveLabel, Listener as AaveListener, Title as AaveTitle, } from './chains/aave';
 import {
-  IDisconnectedRange,
-  IEventProcessor,
-  IEventSubscriber,
-  IStorageFetcher,
-  SupportedNetwork,
-  CWEvent,
-  IEventTitle,
-  IEventLabel,
-  IChainEventKind,
-} from './interfaces';
-import { Listener as SubstrateListener } from './chains/substrate/Listener';
-import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
-import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
-import {
-  Listener as MolochListener,
-  Title as MolochTitle,
-  Label as MolochLabel,
-} from './chains/moloch';
-import {
-  Listener as CompoundListener,
-  Title as CompoundTitle,
-  Label as CompoundLabel,
-} from './chains/compound';
-import {
-  Listener as Erc20Listener,
-  Title as Erc20Title,
-  Label as Erc20Label,
-} from './chains/erc20';
-import {
-  Listener as Erc721Listener,
-  Title as Erc721Title,
-  Label as Erc721Label,
-} from './chains/erc721';
-import {
-  Listener as AaveListener,
-  Title as AaveTitle,
-  Label as AaveLabel,
-} from './chains/aave';
-import {
+  Label as CommonwealthLabel,
   Listener as CommonwealthListener,
   Title as CommonwealthTitle,
-  Label as CommonwealthLabel,
 } from './chains/commonwealth';
+import { Label as CompoundLabel, Listener as CompoundListener, Title as CompoundTitle, } from './chains/compound';
+import { Label as CosmosLabel, Listener as CosmosListener, Title as CosmosTitle, } from './chains/cosmos';
+import { Label as Erc20Label, Listener as Erc20Listener, Title as Erc20Title, } from './chains/erc20';
+import { Label as Erc721Label, Listener as Erc721Listener, Title as Erc721Title, } from './chains/erc721';
+import { Label as MolochLabel, Listener as MolochListener, Title as MolochTitle, } from './chains/moloch';
+import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';
+import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
+import { Listener as SubstrateListener } from './chains/substrate/Listener';
 import {
-  Listener as CosmosListener,
-  Title as CosmosTitle,
-  Label as CosmosLabel,
-} from './chains/cosmos';
+  CWEvent,
+  IChainEventKind,
+  IDisconnectedRange,
+  IEventLabel,
+  IEventProcessor,
+  IEventSubscriber,
+  IEventTitle,
+  IStorageFetcher,
+  SupportedNetwork,
+} from './interfaces';
 import { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
-import { RegisteredTypes } from "@polkadot/types/types";
 
 export function Title(
   network: SupportedNetwork,

@@ -1,10 +1,10 @@
 import type { RegisteredTypes } from '@polkadot/types/types';
+import { CloverSpec } from './specs/clover';
+import { EdgewareSpec } from './specs/edgeware';
 
 import { HydraDXSpec } from './specs/hydraDX';
 import { KulupuSpec } from './specs/kulupu';
 import { StafiSpec } from './specs/stafi';
-import { CloverSpec } from './specs/clover';
-import { EdgewareSpec } from './specs/edgeware';
 
 export const networkUrls = {
   clover: 'wss://api.clover.finance',

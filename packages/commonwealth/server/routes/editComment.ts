@@ -1,19 +1,14 @@
-import type { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
-import moment from 'moment';
-import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError, ServerError } from 'common-common/src/errors';
-import validateChain from '../middleware/validateChain';
-import {
-  getProposalUrl,
-  getProposalUrlWithoutObject,
-  renderQuillDeltaToText,
-} from '../../shared/utils';
-import { parseUserMentions } from '../util/parseUserMentions';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { NotificationCategories } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import { Op } from 'sequelize';
+import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText, } from '../../shared/utils';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
+import { parseUserMentions } from '../util/parseUserMentions';
 
 const log = factory.getLogger(formatFilename(__filename));
 export const Errors = {

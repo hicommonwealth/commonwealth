@@ -1,50 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import chai from 'chai';
-import BN from 'bn.js';
+import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
+import { DeriveBounty } from '@polkadot/api-derive/types';
+import { Bytes, Data, TypeRegistry, Vec } from '@polkadot/types';
 import {
   AccountId,
   BalanceOf,
-  Registration,
-  RegistrarInfo,
-  TreasuryProposal,
-  Proposal,
-  Votes,
   Bounty,
   OpenTip,
+  Proposal,
+  RegistrarInfo,
+  Registration,
+  TreasuryProposal,
+  Votes,
 } from '@polkadot/types/interfaces';
-import { Vec, Data, TypeRegistry, Bytes } from '@polkadot/types';
 import { Codec } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
-import { DeriveBounty } from '@polkadot/api-derive/types';
+import BN from 'bn.js';
+import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
+import { StorageFetcher } from '../../../src/chains/substrate/storageFetcher';
 import {
   EventKind,
+  ICollectiveProposed,
+  ICollectiveVoted,
+  IDemocracyPassed,
   IDemocracyProposed,
   IDemocracyStarted,
-  IDemocracyPassed,
-  IPreimageNoted,
-  ITreasuryProposed,
-  ICollectiveProposed,
-  ISignalingNewProposal,
-  ISignalingVotingStarted,
-  ISignalingVotingCompleted,
-  ICollectiveVoted,
   IdentityJudgement,
-  ITreasuryBountyProposed,
-  ITreasuryBountyBecameActive,
   INewTip,
-  ITipVoted,
+  IPreimageNoted,
+  ISignalingNewProposal,
+  ISignalingVotingCompleted,
+  ISignalingVotingStarted,
   ITipClosing,
+  ITipVoted,
+  ITreasuryBountyBecameActive,
+  ITreasuryBountyProposed,
+  ITreasuryProposed,
 } from '../../../src/chains/substrate/types';
-import { StorageFetcher } from '../../../src/chains/substrate/storageFetcher';
 
-import {
-  constructFakeApi,
-  constructOption,
-  constructIdentityJudgement,
-} from './testUtil';
+import { constructFakeApi, constructIdentityJudgement, constructOption, } from './testUtil';
 
 const { assert } = chai;
 

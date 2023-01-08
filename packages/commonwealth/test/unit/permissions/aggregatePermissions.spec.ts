@@ -1,7 +1,5 @@
 import { assert } from 'chai';
-import {
-  Action, addPermission, isPermitted
-} from 'common-common/src/permissions';
+import { Action, addPermission, isPermitted } from 'common-common/src/permissions';
 import type { Permission } from 'server/models/role';
 import { aggregatePermissions } from '../../../shared/utils';
 

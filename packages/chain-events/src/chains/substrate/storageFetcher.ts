@@ -5,58 +5,53 @@
  * when converting from a client-based chain listener setup to a server-based one.
  */
 
-import _ from 'underscore';
 import { ApiPromise } from '@polkadot/api';
+import { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { Option, Vec } from '@polkadot/types';
 import {
-  BalanceOf,
   AccountId,
-  Hash,
+  BalanceOf,
   BlockNumber,
+  Hash,
+  OpenTip,
+  PropIndex,
+  Proposal,
   Registration,
   TreasuryProposal,
-  Proposal,
   Votes,
-  PropIndex,
-  OpenTip,
 } from '@polkadot/types/interfaces';
 import { Codec } from '@polkadot/types/types';
-import { DeriveProposalImage } from '@polkadot/api-derive/types';
-import { isFunction, hexToString } from '@polkadot/util';
+import { hexToString, isFunction } from '@polkadot/util';
+import _ from 'underscore';
 
-import {
-  CWEvent,
-  IChainEntityKind,
-  IStorageFetcher,
-  SupportedNetwork,
-} from '../../interfaces';
+import { CWEvent, IChainEntityKind, IStorageFetcher, SupportedNetwork, } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import {
+  EntityKind,
   EventKind,
-  IDemocracyProposed,
-  IDemocracyStarted,
-  IDemocracyPassed,
-  IPreimageNoted,
-  ITreasuryProposed,
-  ITreasuryBountyProposed,
   ICollectiveProposed,
   ICollectiveVoted,
-  ISignalingNewProposal,
-  ISignalingCommitStarted,
-  ISignalingVotingStarted,
-  ISignalingVotingCompleted,
+  IDemocracyPassed,
+  IDemocracyProposed,
+  IDemocracyStarted,
+  IdentityJudgement,
   IEventData,
   IIdentitySet,
-  parseJudgement,
-  IdentityJudgement,
-  ITreasuryBountyBecameActive,
-  ITreasuryBountyAwarded,
-  ITreasuryBountyEvents,
-  EntityKind,
   INewTip,
-  ITipVoted,
+  IPreimageNoted,
+  ISignalingCommitStarted,
+  ISignalingNewProposal,
+  ISignalingVotingCompleted,
+  ISignalingVotingStarted,
   ITipClosing,
+  ITipVoted,
+  ITreasuryBountyAwarded,
+  ITreasuryBountyBecameActive,
+  ITreasuryBountyEvents,
+  ITreasuryBountyProposed,
+  ITreasuryProposed,
+  parseJudgement,
 } from './types';
 
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {

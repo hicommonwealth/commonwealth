@@ -1,26 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'pages/view_proposal/proposal_components.scss';
-
-import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
-import { CWText } from '../../components/component_kit/cw_text';
-import {
-  getStatusClass,
-  getStatusText,
-} from '../../components/proposal_card/helpers';
-import {
-  ThreadLink,
-  BlockExplorerLink,
-  VotingInterfaceLink,
-} from './proposal_header_links';
+
+import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
+import m from 'mithril';
+
+import 'pages/view_proposal/proposal_components.scss';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
+import { getStatusClass, getStatusText, } from '../../components/proposal_card/helpers';
 import { cancelProposal } from '../../components/proposals/helpers';
+import { BlockExplorerLink, ThreadLink, VotingInterfaceLink, } from './proposal_header_links';
 
 type BaseCancelButtonAttrs = {
   onModalClose?: () => void;

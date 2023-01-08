@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import 'pages/notifications_page.scss';
+import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
 import m from 'mithril';
 import Infinite from 'mithril-infinite';
-import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
+import 'pages/notifications_page.scss';
 
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';
-import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;

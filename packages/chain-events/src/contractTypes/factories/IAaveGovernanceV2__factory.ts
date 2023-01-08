@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IAaveGovernanceV2 } from "../IAaveGovernanceV2";
+import type { IAaveGovernanceV2 } from '../IAaveGovernanceV2';
 
 export class IAaveGovernanceV2__factory {
   static connect(

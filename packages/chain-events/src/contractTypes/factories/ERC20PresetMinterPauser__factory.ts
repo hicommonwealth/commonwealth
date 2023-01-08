@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { Contract, ContractFactory, Overrides, Signer } from 'ethers';
 
-import type { ERC20PresetMinterPauser } from "../ERC20PresetMinterPauser";
+import type { ERC20PresetMinterPauser } from '../ERC20PresetMinterPauser';
 
 export class ERC20PresetMinterPauser__factory extends ContractFactory {
   constructor(signer?: Signer) {

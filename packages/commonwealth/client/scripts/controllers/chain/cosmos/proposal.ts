@@ -1,31 +1,24 @@
-import BN from 'bn.js';
 import type { MsgDepositEncodeObject, MsgVoteEncodeObject } from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queries/utils';
+import BN from 'bn.js';
+import { ProposalType } from 'common-common/src/types';
+import type {
+  CosmosProposalState,
+  CosmosToken,
+  CosmosVoteChoice,
+  ICosmosProposal
+} from 'controllers/chain/cosmos/types';
 import type {
   QueryDepositsResponse,
-  QueryVotesResponse,
-  QueryTallyResultResponse
+  QueryTallyResultResponse,
+  QueryVotesResponse
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import type {
-  ITXModalData,
-  ProposalEndTime,
-  IVote} from 'models';
-import {
-  Proposal,
-  ProposalStatus,
-  VotingUnit,
-  VotingType,
-  DepositVote
-} from 'models';
-import type {
-  ICosmosProposal, CosmosToken, CosmosVoteChoice, CosmosProposalState
-} from 'controllers/chain/cosmos/types';
+import type { ITXModalData, IVote, ProposalEndTime } from 'models';
+import { DepositVote, Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import moment from 'moment';
-import { ProposalType } from 'common-common/src/types';
 import CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
-import type { CosmosApiType } from './chain';
-import type CosmosChain from './chain';
+import type CosmosChain, { CosmosApiType } from './chain';
 import type CosmosGovernance from './governance';
 import { marshalTally } from './governance';
 

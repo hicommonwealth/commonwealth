@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { Contract, ContractFactory, Overrides, Signer } from 'ethers';
 
-import type { GuildBank2 } from "../GuildBank2";
+import type { GuildBank2 } from '../GuildBank2';
 
 export class GuildBank2__factory extends ContractFactory {
   constructor(signer?: Signer) {

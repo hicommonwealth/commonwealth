@@ -1,21 +1,16 @@
+import type { ProposalType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { uniqueIdToProposal } from 'identifiers';
 import $ from 'jquery';
 import _ from 'lodash';
+import type { IUniqueId } from 'models';
+import { Attachment, Comment } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import { uniqueIdToProposal } from 'identifiers';
 import { CommentsStore } from 'stores';
-import type {
-  IUniqueId} from 'models';
-import {
-  Comment,
-  Attachment
-} from 'models';
-import { notifyError } from 'controllers/app/notifications';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
-import type { ProposalType } from "common-common/src/types";
-import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 // tslint:disable: object-literal-key-quotes
 

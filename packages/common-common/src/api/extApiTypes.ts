@@ -1,10 +1,10 @@
 // contains types for external api
 
-import { ThreadAttributes } from 'commonwealth/server/models/thread';
-import { CommentAttributes } from 'commonwealth/server/models/comment';
-import { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import { ChainAttributes } from 'commonwealth/server/models/chain';
+import { CommentAttributes } from 'commonwealth/server/models/comment';
 import { ProfileAttributes } from 'commonwealth/server/models/profile';
+import { ReactionAttributes } from 'commonwealth/server/models/reaction';
+import { ThreadAttributes } from 'commonwealth/server/models/thread';
 import { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
 
 export enum OrderByOptions {

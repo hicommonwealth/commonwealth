@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { ERC20Pausable } from "../ERC20Pausable";
+import type { ERC20Pausable } from '../ERC20Pausable';
 
 export class ERC20Pausable__factory {
   static connect(

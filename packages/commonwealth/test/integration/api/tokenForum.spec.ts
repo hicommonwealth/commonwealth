@@ -1,12 +1,12 @@
 /* eslint-disable global-require */
+import BN from 'bn.js';
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import BN from 'bn.js';
 import jwt from 'jsonwebtoken';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { resetDatabase, getTokenBalanceCache, getMockBalanceProvider } from '../../../server-test';
+import { getMockBalanceProvider, getTokenBalanceCache, resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
 import * as modelUtils from '../../util/modelUtils';
 

@@ -2,16 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  Signer,
-  BigNumberish,
-  Contract,
-  ContractFactory,
-  Overrides,
-} from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { BigNumberish, Contract, ContractFactory, Overrides, Signer, } from 'ethers';
 
-import type { Moloch2 } from "../Moloch2";
+import type { Moloch2 } from '../Moloch2';
 
 export class Moloch2__factory extends ContractFactory {
   constructor(signer?: Signer) {

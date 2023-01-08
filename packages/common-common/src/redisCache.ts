@@ -1,7 +1,7 @@
-import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from "redis";
+import { ConnectionTimeoutError, createClient, ReconnectStrategyError, SocketClosedUnexpectedlyError } from 'redis';
+import Rollbar from 'rollbar';
 import { factory, formatFilename } from './logging';
 import { RedisNamespaces } from './types';
-import Rollbar from 'rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 

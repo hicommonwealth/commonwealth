@@ -1,9 +1,9 @@
 import chai from 'chai';
 import type { ChildProcess } from 'child_process';
 import { spawn } from 'child_process';
-import { Pool, Client } from 'pg';
-import format from 'pg-format';
 import fetch from 'node-fetch';
+import { Client, Pool } from 'pg';
+import format from 'pg-format';
 
 const { assert } = chai;
 

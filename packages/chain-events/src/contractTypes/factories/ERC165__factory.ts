@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { ERC165 } from "../ERC165";
+import type { ERC165 } from '../ERC165';
 
 export class ERC165__factory {
   static connect(address: string, signerOrProvider: Signer | Provider): ERC165 {

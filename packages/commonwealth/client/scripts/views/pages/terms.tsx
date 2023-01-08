@@ -1,14 +1,14 @@
 /* @jsx m */
 /* eslint-disable max-len */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
-import 'pages/privacy_and_terms.scss';
-
 import { renderMultilineText } from 'helpers';
-import Sublayout from '../sublayout';
+import m from 'mithril';
+
+import 'pages/privacy_and_terms.scss';
 import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from '../sublayout';
 
 const TermsOfService = `
 PLEASE READ THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT VERY CAREFULLY. THE BELOW GOVERNANCE PLATFORM SERVICES AGREEMENT IS A LEGALLY BINDING CONTRACT BETWEEN YOU AND COMMONWEALTH LABS THAT SETS FORTH AND DETERMINES, AMONG OTHER THINGS:

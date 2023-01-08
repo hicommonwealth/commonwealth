@@ -1,4 +1,4 @@
-import { JWE, JWK } from 'node-jose'
+import { JWE, JWK } from 'node-jose';
 
 // This utility is taken from discord-bot-ui and is used to encode/decode
 // discord user data for login/validation purposes.

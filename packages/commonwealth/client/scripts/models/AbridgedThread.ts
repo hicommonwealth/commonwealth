@@ -1,5 +1,5 @@
-import type moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
+import type moment from 'moment';
 import type { IUniqueId } from './interfaces';
 import type Topic from './Topic';
 

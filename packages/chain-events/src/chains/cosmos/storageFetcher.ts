@@ -1,27 +1,10 @@
-import {
-  Proposal,
-  ProposalStatus,
-  Deposit,
-  Vote,
-} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import {
-  QueryProposalsResponse,
-  QueryDepositsResponse,
-  QueryVotesResponse,
-} from 'cosmjs-types/cosmos/gov/v1beta1/query';
+import { Proposal, } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { QueryProposalsResponse, } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 
 import { CWEvent, IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import {
-  IEventData,
-  EventKind,
-  Api,
-  ISubmitProposal,
-  IDeposit,
-  IVote,
-  coinToCoins,
-} from './types';
+import { Api, coinToCoins, EventKind, IEventData, ISubmitProposal, } from './types';
 
 const dateToUnix = (d?: Date): number | undefined => {
   if (d) return Math.floor(d.getTime() / 1000);

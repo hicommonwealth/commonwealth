@@ -1,8 +1,7 @@
-import * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
-import { ThreadAttributes } from './thread';
+import * as Sequelize from 'sequelize';
 import type { PollAttributes } from './poll';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type VoteAttributes = {
   poll_id: number;

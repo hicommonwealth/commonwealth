@@ -1,11 +1,10 @@
 import {
-  LoggerFactory,
-  LoggerFactoryOptions,
+  getLogControl,
   LFService,
+  LoggerFactoryOptions,
+  LogGroupControlSettings,
   LogGroupRule,
   LogLevel,
-  getLogControl,
-  LogGroupControlSettings,
 } from 'typescript-logging';
 
 const options = new LoggerFactoryOptions()

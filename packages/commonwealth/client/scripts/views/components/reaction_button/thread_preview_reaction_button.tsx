@@ -1,20 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import { Popover } from 'construct-ui';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
+import { Popover } from 'construct-ui';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import m from 'mithril';
+import { ChainInfo, Thread } from 'models';
 
 import app from 'state';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { Thread, ChainInfo } from 'models';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import {
-  fetchReactionsByPost,
-  getDisplayedReactorsForPopup,
-  onReactionClick,
-} from './helpers';
+import { fetchReactionsByPost, getDisplayedReactorsForPopup, onReactionClick, } from './helpers';
 
 type ThreadPreviewReactionButtonAttrs = {
   thread: Thread;

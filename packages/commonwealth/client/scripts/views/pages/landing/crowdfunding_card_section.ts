@@ -1,9 +1,7 @@
-import 'pages/landing/crowdfunding_card_section.scss';
 import m from 'mithril';
 
 import type { ICardListItem } from 'models/interfaces';
-
-import LandingPageButton from './landing_page_button';
+import 'pages/landing/crowdfunding_card_section.scss';
 import ItemListsMapper from './list_mapper_with_item';
 
 const ChainsCrowdfundingComponent: m.Component<{ chains: ICardListItem[] }, {}> = {

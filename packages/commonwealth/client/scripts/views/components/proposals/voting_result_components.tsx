@@ -1,23 +1,18 @@
 /* @jsx m */
 /* eslint-disable max-classes-per-file */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/proposals/voting_result_components.scss';
+import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
+import AaveProposal, { AaveProposalVote, } from 'controllers/chain/ethereum/aave/proposal';
+import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
+import { NearSputnikVote, NearSputnikVoteString, } from 'controllers/chain/near/sputnik/types';
+import m from 'mithril';
 
 import { AnyProposal, IVote } from 'models';
-import {
-  NearSputnikVote,
-  NearSputnikVoteString,
-} from 'controllers/chain/near/sputnik/types';
-import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
-import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import AaveProposal, {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
-import { VoteListing } from './vote_listing';
 import { CWText } from '../component_kit/cw_text';
+import { VoteListing } from './vote_listing';
 
 type BaseVotingResultAttrs = {
   proposal: AnyProposal;

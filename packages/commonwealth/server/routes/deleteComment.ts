@@ -1,10 +1,10 @@
-import type { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
+import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { findAllRoles, findOneRole } from '../util/roles';
+import { findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));
 

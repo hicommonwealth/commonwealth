@@ -1,4 +1,4 @@
-import { StatsDController, ProjectTag } from 'common-common/src/statsd';
+import { ProjectTag, StatsDController } from 'common-common/src/statsd';
 import { BalanceProvider } from './types';
 
 // Class with Helper functions to send statsD

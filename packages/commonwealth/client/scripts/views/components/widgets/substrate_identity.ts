@@ -1,19 +1,15 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
-
-import m from 'mithril';
-import _ from 'lodash';
-import { link } from 'helpers';
-
-import app from 'state';
-import type { Account, Profile } from 'models';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
 import type SubstrateIdentity from 'controllers/chain/substrate/identity';
-import {
-  IdentityQuality,
-  getIdentityQuality,
-} from 'controllers/chain/substrate/identity';
+import { getIdentityQuality, IdentityQuality, } from 'controllers/chain/substrate/identity';
+import { link } from 'helpers';
+
+import m from 'mithril';
+import type { Account, Profile } from 'models';
+
+import app from 'state';
 import { formatAddressShort } from '../../../../../shared/utils';
 
 export interface ISubstrateIdentityAttrs {

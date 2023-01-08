@@ -1,18 +1,19 @@
-import * as fs from 'fs';
-import { IEventHandler, CWEvent } from 'chain-events/src';
-
-import ceModels, { sequelize } from '../services/database/database';
-import cwModels from '../../commonwealth/server/database';
+import { CWEvent, IEventHandler } from 'chain-events/src';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {ChainInstance} from 'commonwealth/server/models/chain';
-import {SubstrateTypes} from '../src'
+import { getRabbitMQConfig, MockRabbitMQController } from 'common-common/src/rabbitmq';
+import { ChainInstance } from 'commonwealth/server/models/chain';
+import * as fs from 'fs';
+import { BrokerConfig } from 'rascal';
+import cwModels from '../../commonwealth/server/database';
 import {
   EntityArchivalHandler,
-  NotificationHandler, StorageFilterConfig,
+  NotificationHandler,
+  StorageFilterConfig,
   StorageHandler
-} from "../services/ChainEventsConsumer/ChainEventHandlers";
-import {BrokerConfig} from "rascal";
-import {MockRabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq'
+} from '../services/ChainEventsConsumer/ChainEventHandlers';
+
+import ceModels, { sequelize } from '../services/database/database';
+import { SubstrateTypes } from '../src';
 
 
 const log = factory.getLogger(formatFilename(__filename));

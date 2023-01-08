@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IERC20Decimals } from "../IERC20Decimals";
+import type { IERC20Decimals } from '../IERC20Decimals';
 
 export class IERC20Decimals__factory {
   static connect(

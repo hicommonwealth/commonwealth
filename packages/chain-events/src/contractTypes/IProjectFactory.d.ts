@@ -2,22 +2,21 @@
 /* tslint:disable */
 /* eslint-disable */
 
+import { EventFragment, FunctionFragment, Result } from '@ethersproject/abi';
+import { BytesLike } from '@ethersproject/bytes';
+import { Listener, Provider } from '@ethersproject/providers';
 import {
-  ethers,
-  EventFilter,
-  Signer,
   BigNumber,
   BigNumberish,
-  PopulatedTransaction,
+  CallOverrides,
   Contract,
   ContractTransaction,
+  ethers,
   Overrides,
-  CallOverrides,
-} from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+  PopulatedTransaction,
+  Signer,
+} from 'ethers';
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons';
 
 interface IProjectFactoryInterface extends ethers.utils.Interface {
   functions: {

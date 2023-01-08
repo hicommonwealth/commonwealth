@@ -1,18 +1,18 @@
-import BN from 'bn.js';
-import type { ITXModalData } from 'models';
-import { ProposalModule } from 'models';
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import BN from 'bn.js';
 import { CompoundEvents, CompoundTypes } from 'chain-events/src';
-import type { IApp } from 'state';
+import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
 import type { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
-import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+import type { IApp } from 'state';
+import type EthereumAccounts from '../accounts';
+import { attachSigner } from '../contractApi';
 import type CompoundAPI from './api';
 import { GovernorType } from './api';
-import CompoundProposal from './proposal';
 import type CompoundChain from './chain';
-import { attachSigner } from '../contractApi';
-import type EthereumAccounts from '../accounts';
+import CompoundProposal from './proposal';
 
 export interface CompoundProposalArgs {
   targets: string[],

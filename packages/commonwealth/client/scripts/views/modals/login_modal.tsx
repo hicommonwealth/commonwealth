@@ -1,27 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import app from 'state';
-import $ from 'jquery';
-import _ from 'underscore';
-
 import { initAppState } from 'app';
-import {
-  completeClientLogin,
-  loginWithMagicLink,
-  updateActiveAddresses,
-} from 'controllers/app/login';
+import ClassComponent from 'class_component';
+import { ChainBase } from 'common-common/src/types';
+import { completeClientLogin, loginWithMagicLink, updateActiveAddresses, } from 'controllers/app/login';
+import { notifyError } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
-import { notifyError } from 'controllers/app/notifications';
+import $ from 'jquery';
+import m from 'mithril';
 import { Account, IWebWallet } from 'models';
-import { ChainBase } from 'common-common/src/types';
-import {
-  breakpointFnValidator,
-  isWindowMediumSmallInclusive,
-} from '../components/component_kit/helpers';
+import app from 'state';
+import _ from 'underscore';
 import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
+import { breakpointFnValidator, isWindowMediumSmallInclusive, } from '../components/component_kit/helpers';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import { LoginBodyType, LoginSidebarType } from '../pages/login/types';

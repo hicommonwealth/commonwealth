@@ -1,9 +1,9 @@
+import { notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
+import type { NotificationSubscription, Thread } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import type { NotificationSubscription, Thread } from 'models';
-import { notifySuccess } from 'controllers/app/notifications';
 import { NotificationCategories } from '../../../../../../common-common/src/types';
 
 export const getLastUpdated = (thread: Thread) => {

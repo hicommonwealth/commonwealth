@@ -1,7 +1,7 @@
-import { NextFunction, Request, Response } from 'express';
-import { DB } from '../../database/database';
 import { AppError } from 'common-common/src/errors';
+import { NextFunction, Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
+import { DB } from '../../database/database';
 
 export const Errors = {
   NeedLimit: 'Must provide limit to fetch events',

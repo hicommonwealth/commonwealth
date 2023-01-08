@@ -3,7 +3,7 @@ import { BigNumber } from 'ethers';
 
 import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/compound/processor';
-import { Api, RawEvent, EventKind } from '../../../src/chains/compound/types';
+import { Api, EventKind, RawEvent } from '../../../src/chains/compound/types';
 
 const { assert } = chai;
 

@@ -1,13 +1,10 @@
-import type { Request, Response, NextFunction } from 'express';
-import { NotificationCategories } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { StatsDController } from 'common-common/src/statsd';
+import { NotificationCategories } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import { MixpanelLoginEvent, } from '../../shared/analytics/types';
 import type { DB } from '../models';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../shared/analytics/types';
-import { StatsDController } from 'common-common/src/statsd';
 
 const log = factory.getLogger(formatFilename(__filename));
 

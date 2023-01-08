@@ -3,21 +3,17 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
+import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
+import models from 'chain-events/services/database/database';
 
-import type {
-  CWEvent} from 'chain-events/src';
-import {
-  SubstrateTypes,
-  SupportedNetwork,
-} from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
+import { SubstrateTypes, SupportedNetwork, } from 'chain-events/src';
+import { getRabbitMQConfig } from 'common-common/src/rabbitmq';
+import { MockRabbitMQController } from 'common-common/src/rabbitmq/mockRabbitMQController';
+import type { BrokerConfig } from 'rascal';
 
 import { resetDatabase } from '../../../server-test';
-import models from 'chain-events/services/database/database';
-import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
-import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
-import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
-import type {BrokerConfig} from "rascal";
-import {getRabbitMQConfig} from "common-common/src/rabbitmq";
 
 chai.use(chaiHttp);
 const { assert } = chai;

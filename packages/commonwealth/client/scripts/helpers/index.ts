@@ -1,12 +1,12 @@
+import BigNumber from 'bignumber.js';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import $ from 'jquery';
 import type { RouteOptions } from 'mithril';
 import m from 'mithril';
-import moment from 'moment';
-import BigNumber from 'bignumber.js';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import type { ICardListItem } from 'models/interfaces';
-import app from 'state';
 import { ThreadStage } from 'models';
+import type { ICardListItem } from 'models/interfaces';
+import moment from 'moment';
+import app from 'state';
 import { navigateToSubpage } from '../app';
 
 export async function sleep(msec) {

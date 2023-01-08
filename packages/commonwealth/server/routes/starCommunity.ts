@@ -1,6 +1,6 @@
-import type { Request, Response, NextFunction } from 'express';
+import { ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NoStarValue: 'Must pass isAlreadyStarred boolean to set starred status',

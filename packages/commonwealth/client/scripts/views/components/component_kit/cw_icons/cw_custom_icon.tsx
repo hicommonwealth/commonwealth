@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
+import m from 'mithril';
+import { ComponentType } from '../types';
 
 import { customIconLookup } from './cw_icon_lookup';
 import { CustomIconAttrs } from './types';
-import { ComponentType } from '../types';
 
 export class CWCustomIcon extends ClassComponent<CustomIconAttrs> {
   view(vnode: m.Vnode<CustomIconAttrs>) {

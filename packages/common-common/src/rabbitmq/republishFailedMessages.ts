@@ -1,5 +1,5 @@
-import {RabbitMQController} from "./rabbitMQController";
-import {factory, formatFilename} from "../logging";
+import { factory, formatFilename } from '../logging';
+import { RabbitMQController } from './rabbitMQController';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,5 +1,5 @@
+import { QueryTypes } from 'sequelize';
 import models from '../database';
-import {QueryTypes} from "sequelize";
 
 /**
  * This script is meant as the worst case scenario recovery tool or as a method of ensuring consistency without a trace

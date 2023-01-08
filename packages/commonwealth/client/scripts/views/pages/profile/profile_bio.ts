@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
 import type { Account } from 'models';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
-import User from '../../components/widgets/user';
 import { initChain } from '../../../app';
+import { setActiveAccount } from '../../../controllers/app/login';
 import type SubstrateIdentity from '../../../controllers/chain/substrate/identity';
 import app from '../../../state';
+import { CWButton } from '../../components/component_kit/cw_button';
+import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
+import User from '../../components/widgets/user';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditIdentityModal } from '../../modals/edit_identity_modal';
-import { setActiveAccount } from '../../../controllers/app/login';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
-import { CWButton } from '../../components/component_kit/cw_button';
 
 const editIdentityAction = (
   account: Account,

@@ -1,10 +1,10 @@
-import type {NextFunction} from 'express';
-import {Op} from 'sequelize';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {AppError} from 'common-common/src/errors';
-import type {TypedRequestBody, TypedResponse} from '../types';
-import { success} from '../types';
-import type {DB} from '../models';
+import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction } from 'express';
+import { Op } from 'sequelize';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 import { findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));

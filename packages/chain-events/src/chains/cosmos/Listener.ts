@@ -1,22 +1,12 @@
-import {
-  CWEvent,
-  IDisconnectedRange,
-  SupportedNetwork,
-} from '../../interfaces';
+import { CWEvent, IDisconnectedRange, SupportedNetwork, } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
-
-import {
-  Api,
-  EventKind,
-  IEventData,
-  ListenerOptions as CosmosListenerOptions,
-  RawEvent,
-} from './types';
-import { createApi } from './subscribeFunc';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
+import { createApi } from './subscribeFunc';
 import { Subscriber } from './subscriber';
+
+import { Api, EventKind, IEventData, ListenerOptions as CosmosListenerOptions, RawEvent, } from './types';
 
 export class Listener extends BaseListener<
   Api,

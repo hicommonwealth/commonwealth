@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { Proxy } from "../Proxy";
+import type { Proxy } from '../Proxy';
 
 export class Proxy__factory {
   static connect(address: string, signerOrProvider: Signer | Provider): Proxy {

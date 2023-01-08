@@ -1,9 +1,7 @@
 import { providers } from 'ethers';
 import Web3 from 'web3';
 
-import {
-  Token__factory as TokenFactory,
-} from '../types';
+import { Token__factory as TokenFactory, } from '../types';
 
 async function main() {
   // TODO: configure URL based on chain

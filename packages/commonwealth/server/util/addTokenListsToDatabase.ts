@@ -1,10 +1,11 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import fetch from 'node-fetch';
 import _ from 'underscore';
+import type { TokenResponse } from '../../shared/types';
 import { slugify } from '../../shared/utils';
 import type { DB } from '../models';
-import type { TokenResponse } from '../../shared/types';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { TokenAttributes } from '../models/token';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 async function addTokenListsToDatabase(models: DB): Promise<void> {

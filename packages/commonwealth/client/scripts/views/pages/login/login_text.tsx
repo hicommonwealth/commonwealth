@@ -1,15 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import 'pages/login/login_text.scss';
 
 import { CWText } from '../../components/component_kit/cw_text';
-import {
-  getClasses,
-  isWindowExtraSmall,
-} from '../../components/component_kit/helpers';
+import { getClasses, isWindowExtraSmall, } from '../../components/component_kit/helpers';
 
 type LoginTextAttrs = {
   bodyText: string;

@@ -1,8 +1,8 @@
 import chai from 'chai';
-import type {ServiceConsumer} from "common-common/src/serviceConsumer";
-import {setupCommonwealthConsumer} from "../../server/CommonwealthConsumer/CommonwealthConsumer";
-import {setupChainEventConsumer} from "chain-events/services/ChainEventsConsumer/chainEventsConsumer";
-import {chainEventsSubscriberInitializer} from "chain-events/services/ChainSubscriber/chainSubscriber";
+import { setupChainEventConsumer } from 'chain-events/services/ChainEventsConsumer/chainEventsConsumer';
+import { chainEventsSubscriberInitializer } from 'chain-events/services/ChainSubscriber/chainSubscriber';
+import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
+import { setupCommonwealthConsumer } from '../../server/CommonwealthConsumer/CommonwealthConsumer';
 
 
 const {expect} = chai;

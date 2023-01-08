@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text_area.scss';
+import m from 'mithril';
+import { BaseTextInputAttrs, MessageRow } from './cw_text_input';
+import { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import { ValidationStatus } from './cw_validation_text';
-import { MessageRow, BaseTextInputAttrs } from './cw_text_input';
 
 type TextAreaStyleAttrs = {
   disabled?: boolean;

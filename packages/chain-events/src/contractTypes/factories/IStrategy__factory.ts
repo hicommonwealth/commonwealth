@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IStrategy } from "../IStrategy";
+import type { IStrategy } from '../IStrategy';
 
 export class IStrategy__factory {
   static connect(

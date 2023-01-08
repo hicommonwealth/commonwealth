@@ -1,14 +1,8 @@
 import { AppError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
-import type {
-  TypedRequestBody,
-  TypedResponse} from '../types';
-import {
-  success,
-  TypedRequestQuery
-} from '../types';
 import type { DB } from '../models';
-import { BanAttributes } from '../models/ban';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 
 enum SetDiscordBotConfigErrors {
   NoChain = 'Must supply a chain ID',

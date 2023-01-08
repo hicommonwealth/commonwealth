@@ -1,6 +1,5 @@
-import _ from 'lodash';
-import type { IApp } from 'state';
 import type { IAccountsModule } from 'models';
+import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
 
 import SolanaAccount from './account';

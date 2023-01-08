@@ -1,9 +1,9 @@
 import chai from 'chai';
-import { utils, BigNumber } from 'ethers';
+import { BigNumber, utils } from 'ethers';
 
 import { SupportedNetwork } from '../../../src';
-import { EventKind, RawEvent, Api } from '../../../src/chains/compound/types';
 import { Enrich } from '../../../src/chains/compound/filters/enricher';
+import { Api, EventKind, RawEvent } from '../../../src/chains/compound/types';
 
 const { assert } = chai;
 

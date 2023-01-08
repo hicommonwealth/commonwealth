@@ -1,23 +1,16 @@
-import type { IApp } from 'state';
-import type { StorageModule } from 'models';
-import { PersistentStore } from 'stores';
-import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import type {
-  Call,
-  AccountId,
-  RegistrarInfo,
-  IdentityJudgement,
-  IdentityFields
-} from '@polkadot/types/interfaces';
-import type { Codec } from '@polkadot/types/types';
-import type { Data } from '@polkadot/types';
 import type { ApiPromise } from '@polkadot/api';
+import type { Data } from '@polkadot/types';
+import type { AccountId, Call, IdentityFields, IdentityJudgement, RegistrarInfo } from '@polkadot/types/interfaces';
+import type { Codec } from '@polkadot/types/types';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
-import type SubstrateAccounts from './account';
+import type { StorageModule } from 'models';
+import type { IApp } from 'state';
+import { PersistentStore } from 'stores';
+import type SubstrateAccounts, { SubstrateAccount } from './account';
 import type { ISubstrateIdentity } from './identity';
 import SubstrateIdentity from './identity';
+import type SubstrateChain from './shared';
 
 class SubstrateIdentityStore extends PersistentStore<ISubstrateIdentity, SubstrateIdentity> { }
 

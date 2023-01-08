@@ -1,10 +1,9 @@
-import * as events from 'events';
-
 import * as chai from 'chai';
 import dotenv from 'dotenv';
-
-import { Processor, Subscriber, Listener } from '../../../src/chains/erc20';
+import * as events from 'events';
 import { networkUrls } from '../../../scripts/listenerUtils';
+
+import { Listener, Processor, Subscriber } from '../../../src/chains/erc20';
 import { TestHandler } from '../../util';
 
 dotenv.config();

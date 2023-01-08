@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IChainlinkV3Aggregator } from "../IChainlinkV3Aggregator";
+import type { IChainlinkV3Aggregator } from '../IChainlinkV3Aggregator';
 
 export class IChainlinkV3Aggregator__factory {
   static connect(

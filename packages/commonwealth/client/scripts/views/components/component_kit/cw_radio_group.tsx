@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_radio_group.scss';
+import m from 'mithril';
 
 import { CWRadioButton, RadioButtonType } from './cw_radio_button';
 import { ComponentType } from './types';

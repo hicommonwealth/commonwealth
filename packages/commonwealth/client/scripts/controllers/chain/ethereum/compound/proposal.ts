@@ -1,38 +1,28 @@
-import moment from 'moment';
-import BN from 'bn.js';
-import { capitalize } from 'lodash';
-import type { ContractTransaction} from 'ethers';
-import { utils } from 'ethers';
-import type { GovernorCompatibilityBravo} from 'common-common/src/eth/types';
-import { GovernorMock, GovernorMock__factory } from 'common-common/src/eth/types';
-
-import { CompoundTypes } from 'chain-events/src';
-import { ProposalType } from 'common-common/src/types';
-
-import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 
-import type {
-  IVote,
-  ITXModalData,
-  ProposalEndTime,
-  ChainEntity,
-  ChainEvent} from 'models';
-import {
-  Proposal,
-  VotingType,
-  VotingUnit,
-  ProposalStatus
-} from 'models';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
+import BN from 'bn.js';
+
+import { CompoundTypes } from 'chain-events/src';
+import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
+import { GovernorMock__factory } from 'common-common/src/eth/types';
+import { ProposalType } from 'common-common/src/types';
+import type { ContractTransaction } from 'ethers';
+import { utils } from 'ethers';
 import { blocknumToTime } from 'helpers';
+import { capitalize } from 'lodash';
+
+import type { ChainEntity, ChainEvent, ITXModalData, IVote, ProposalEndTime } from 'models';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import moment from 'moment';
+import type EthereumAccount from '../account';
+import type EthereumAccounts from '../accounts';
+import { attachSigner } from '../contractApi';
 
 import type CompoundAPI from './api';
 import { GovernorType } from './api';
-import type CompoundGovernance from './governance';
-import { attachSigner } from '../contractApi';
-import type EthereumAccount from '../account';
-import type EthereumAccounts from '../accounts';
 import type CompoundChain from './chain';
+import type CompoundGovernance from './governance';
 
 export enum BravoVote {
   NO = 0,

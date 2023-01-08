@@ -1,12 +1,12 @@
 /**
  * Processes Cosmos events.
  */
-import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
+import { CWEvent, IEventProcessor, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
+import { Enrich } from './filters/enricher';
 
 import { ParseType } from './filters/type_parser';
-import { Enrich } from './filters/enricher';
-import { IEventData, RawEvent, Api } from './types';
+import { Api, IEventData, RawEvent } from './types';
 
 export class Processor extends IEventProcessor<Api, RawEvent> {
   constructor(protected _api: Api, protected readonly chain?: string) {

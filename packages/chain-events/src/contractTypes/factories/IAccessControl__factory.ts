@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IAccessControl } from "../IAccessControl";
+import type { IAccessControl } from '../IAccessControl';
 
 export class IAccessControl__factory {
   static connect(

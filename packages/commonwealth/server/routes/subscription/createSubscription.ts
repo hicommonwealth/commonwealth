@@ -1,9 +1,8 @@
-import type { Request, Response, NextFunction } from 'express';
-import proposalIdToEntity from '../../util/proposalIdToEntity';
-import Errors from './errors';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../../models';
+import Errors from './errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

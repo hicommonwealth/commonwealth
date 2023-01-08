@@ -1,10 +1,6 @@
-import $ from 'jquery';
-import _ from 'lodash';
+import { Contract } from 'models';
 
 import { ContractsStore } from 'stores';
-import { Contract } from 'models';
-import app from 'state';
-import BN from 'bn.js';
 
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();

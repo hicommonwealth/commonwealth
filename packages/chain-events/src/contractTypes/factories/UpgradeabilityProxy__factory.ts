@@ -2,16 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  Signer,
-  BytesLike,
-  Contract,
-  ContractFactory,
-  PayableOverrides,
-} from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { BytesLike, Contract, ContractFactory, PayableOverrides, Signer, } from 'ethers';
 
-import type { UpgradeabilityProxy } from "../UpgradeabilityProxy";
+import type { UpgradeabilityProxy } from '../UpgradeabilityProxy';
 
 export class UpgradeabilityProxy__factory extends ContractFactory {
   constructor(signer?: Signer) {

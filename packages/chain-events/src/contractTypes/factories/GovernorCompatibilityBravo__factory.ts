@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { GovernorCompatibilityBravo } from "../GovernorCompatibilityBravo";
+import type { GovernorCompatibilityBravo } from '../GovernorCompatibilityBravo';
 
 export class GovernorCompatibilityBravo__factory {
   static connect(

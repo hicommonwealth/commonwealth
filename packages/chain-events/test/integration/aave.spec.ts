@@ -1,42 +1,37 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { assert } from 'chai';
+
+import { BigNumber, providers, utils } from 'ethers';
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import { EventEmitter } from 'events';
-
-import { BigNumber, providers, utils } from 'ethers';
-import { assert } from 'chai';
-
-import {
-  AaveTokenV2Mock__factory as AaveTokenV2Factory,
-  AaveTokenV2Mock as AaveTokenV2,
-  GovernanceStrategy__factory as GovernanceStrategyFactory,
-  GovernanceStrategy,
-  Executor__factory as ExecutorFactory,
-  Executor,
-  AaveGovernanceV2__factory as AaveGovernanceV2Factory,
-} from '../../src/contractTypes';
-import {
-  Api,
-  IEventData,
-  EventKind,
-  IProposalCreated,
-  IProposalCanceled,
-  IVoteEmitted,
-  ProposalState,
-  IProposalQueued,
-  IProposalExecuted,
-  IDelegateChanged,
-  IDelegatedPowerChanged,
-  ITransfer,
-} from '../../src/chains/aave/types';
+import { StorageFetcher } from '../../src/chains/aave/storageFetcher';
 import { subscribeEvents } from '../../src/chains/aave/subscribeFunc';
 import {
-  IEventHandler,
-  CWEvent,
-  IChainEventData,
-  SupportedNetwork,
-} from '../../src/interfaces';
-import { StorageFetcher } from '../../src/chains/aave/storageFetcher';
+  Api,
+  EventKind,
+  IDelegateChanged,
+  IDelegatedPowerChanged,
+  IEventData,
+  IProposalCanceled,
+  IProposalCreated,
+  IProposalExecuted,
+  IProposalQueued,
+  ITransfer,
+  IVoteEmitted,
+  ProposalState,
+} from '../../src/chains/aave/types';
+
+import {
+  AaveGovernanceV2__factory as AaveGovernanceV2Factory,
+  AaveTokenV2Mock as AaveTokenV2,
+  AaveTokenV2Mock__factory as AaveTokenV2Factory,
+  Executor,
+  Executor__factory as ExecutorFactory,
+  GovernanceStrategy,
+  GovernanceStrategy__factory as GovernanceStrategyFactory,
+} from '../../src/contractTypes';
+import { CWEvent, IChainEventData, IEventHandler, SupportedNetwork, } from '../../src/interfaces';
 
 function getProvider(): providers.Web3Provider {
   const web3Provider = require('ganache-cli').provider({

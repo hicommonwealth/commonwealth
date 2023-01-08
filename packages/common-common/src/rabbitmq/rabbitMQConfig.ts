@@ -1,4 +1,4 @@
-import * as Rascal from "rascal";
+import * as Rascal from 'rascal';
 import {
   RascalBindings,
   RascalExchanges,
@@ -6,7 +6,7 @@ import {
   RascalQueues,
   RascalRoutingKeys,
   RascalSubscriptions
-} from "./types";
+} from './types';
 
 /**
  * This function builds and returns the configuration json required by Rascal to properly setup and use RabbitMQ.

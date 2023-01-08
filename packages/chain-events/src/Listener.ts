@@ -1,16 +1,16 @@
+import { Logger } from 'typescript-logging';
 import {
-  IEventHandler,
-  IChainEventKind,
-  IEventSubscriber,
-  IEventProcessor,
-  IChainEventData,
   CWEvent,
-  IStorageFetcher,
+  IChainEventData,
+  IChainEventKind,
   IDisconnectedRange,
+  IEventHandler,
+  IEventProcessor,
+  IEventSubscriber,
+  IStorageFetcher,
   SupportedNetwork,
 } from './interfaces';
 import { addPrefix, factory } from './logging';
-import {Logger} from "typescript-logging";
 
 let log;
 

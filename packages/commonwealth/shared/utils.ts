@@ -1,15 +1,7 @@
-import { isU8a, isHex } from '@polkadot/util';
-import {
-  checkAddress,
-  decodeAddress,
-  encodeAddress,
-} from '@polkadot/util-crypto';
-import type {
-  Permissions} from 'common-common/src/permissions';
-import {
-  BASE_PERMISSIONS,
-  computePermissions
-} from 'common-common/src/permissions';
+import { isHex, isU8a } from '@polkadot/util';
+import { checkAddress, decodeAddress, encodeAddress, } from '@polkadot/util-crypto';
+import type { Permissions } from 'common-common/src/permissions';
+import { BASE_PERMISSIONS, computePermissions } from 'common-common/src/permissions';
 
 import { ProposalType } from 'common-common/src/types';
 import type { Permission } from '../server/models/role';

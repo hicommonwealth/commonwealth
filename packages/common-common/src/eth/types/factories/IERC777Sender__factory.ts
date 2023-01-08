@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IERC777Sender } from "../IERC777Sender";
+import type { IERC777Sender } from '../IERC777Sender';
 
 export class IERC777Sender__factory {
   static connect(

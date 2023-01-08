@@ -1,10 +1,10 @@
-import m from 'mithril';
 import { notifyError } from 'controllers/app/notifications';
-import FindYourTokenInputComponent from './find_your_token_input';
-import InputTokensListComponent from './input_tokens_lists';
+import m from 'mithril';
 
 import 'pages/landing/tokens_community_hero.scss';
+import FindYourTokenInputComponent from './find_your_token_input';
 import type { Chain, Token } from './index';
+import InputTokensListComponent from './input_tokens_lists';
 
 export const placeholderChain = {
   img: 'static/img/add.svg',

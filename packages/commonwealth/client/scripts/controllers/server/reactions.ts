@@ -1,23 +1,14 @@
 /* eslint-disable dot-notation */
+import { notifyError } from 'controllers/app/notifications';
+import proposalIdToEntity from 'helpers/proposalIdToEntity';
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import _ from 'lodash';
+import type { AbridgedThread, AnyProposal } from 'models';
+import { Comment, Proposal, Reaction, Thread } from 'models';
 
 import app from 'state';
 
 import { ReactionStore } from 'stores';
-import type {
-  AnyProposal,
-  AbridgedThread} from 'models';
-import {
-  Reaction,
-  Comment,
-  Thread,
-  Proposal
-} from 'models';
-import { notifyError } from 'controllers/app/notifications';
-import { ProposalType } from "common-common/src/types";
-import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 export const modelFromServer = (reaction) => {
   return new Reaction(

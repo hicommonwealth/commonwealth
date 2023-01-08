@@ -1,16 +1,16 @@
-import moment from 'moment';
+import { AppError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
+import moment from 'moment';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-
-import validateTopicThreshold from '../util/validateTopicThreshold';
-import type { DB } from '../models';
 import { sequelize } from '../database';
-import type { TypedRequestBody, TypedResponse} from '../types';
-import { success } from '../types';
+import type { DB } from '../models';
 import type { VoteAttributes, VoteInstance } from '../models/vote';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
-import { AppError, ServerError } from 'common-common/src/errors';
+
+import validateTopicThreshold from '../util/validateTopicThreshold';
 
 export const Errors = {
   NoPoll: 'No corresponding poll found',

@@ -1,12 +1,12 @@
 /**
  * Processes ERC20 events.
  */
-import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
+import { CWEvent, IEventProcessor, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
+import { Enrich, EnricherConfig } from './filters/enricher';
 
 import { ParseType } from './filters/type_parser';
-import { Enrich, EnricherConfig } from './filters/enricher';
-import { IEventData, RawEvent, IErc20Contracts } from './types';
+import { IErc20Contracts, IEventData, RawEvent } from './types';
 
 export class Processor extends IEventProcessor<IErc20Contracts, RawEvent> {
   constructor(

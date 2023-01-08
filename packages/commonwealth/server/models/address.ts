@@ -1,19 +1,13 @@
+import type { WalletId } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { WalletId } from 'common-common/src/types';
-import type { ModelStatic, ModelInstance } from './types';
 import type { ChainAttributes, ChainInstance } from './chain';
-import type { UserAttributes, UserInstance } from './user';
-import type {
-  OffchainProfileAttributes,
-  OffchainProfileInstance,
-} from './offchain_profile';
+import type { OffchainProfileAttributes, OffchainProfileInstance, } from './offchain_profile';
 import type { ProfileInstance } from './profile';
+import type { RoleAssignmentAttributes, RoleAssignmentInstance, } from './role_assignment';
 import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
-import type {
-  RoleAssignmentAttributes,
-  RoleAssignmentInstance,
-} from './role_assignment';
+import type { ModelInstance, ModelStatic } from './types';
+import type { UserAttributes, UserInstance } from './user';
 
 export type AddressAttributes = {
   address: string;

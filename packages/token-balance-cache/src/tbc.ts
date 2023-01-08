@@ -1,21 +1,20 @@
-import { Client } from 'pg';
-
 import BN from 'bn.js';
 import JobRunner from 'common-common/src/cacheJobRunner';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNetwork } from 'common-common/src/types';
+import { Client } from 'pg';
+import { TbcStatsDSender } from './tbcStatsDSender';
 
 import {
   BalanceProvider,
   BalanceProviderResp,
   ChainNodeResp,
+  FetchTokenBalanceErrors,
   ICache,
   IChainNode,
   ITokenBalanceCache,
-  FetchTokenBalanceErrors,
   TokenBalanceResp,
 } from './types';
-import { TbcStatsDSender } from './tbcStatsDSender';
 
 const log = factory.getLogger(formatFilename(__filename));
 

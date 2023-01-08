@@ -1,9 +1,8 @@
-import BN from 'bn.js';
+import { ERC721 } from '../../../contractTypes';
+import { TypedEventFilter } from '../../../contractTypes/commons';
 
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { TypedEventFilter } from '../../../contractTypes/commons';
-import { ERC721 } from '../../../contractTypes';
-import { EventKind, RawEvent, IEventData, IErc721Contracts } from '../types';
+import { EventKind, IErc721Contracts, IEventData, RawEvent } from '../types';
 
 /**
  * This is an "enricher" function, whose goal is to augment the initial event data

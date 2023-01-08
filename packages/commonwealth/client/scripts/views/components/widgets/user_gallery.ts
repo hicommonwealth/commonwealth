@@ -2,7 +2,6 @@
 import 'components/widgets/user_gallery.scss';
 
 import m from 'mithril';
-import _ from 'lodash';
 
 import type { Account, AddressInfo } from 'models';
 import app from 'state';

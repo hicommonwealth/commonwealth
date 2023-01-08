@@ -1,20 +1,19 @@
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { ChainBase } from 'common-common/src/types';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import SubstrateAccounts from 'controllers/chain/substrate/account';
+import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
+import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
-import { SubstrateCouncil, SubstrateTechnicalCommittee } from 'controllers/chain/substrate/collective';
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
-import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
-import ChainEntityController from 'controllers/server/chain_entities';
-import type { ChainInfo} from 'models';
-import { IChainAdapter, NodeInfo } from 'models';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import type { ChainInfo } from 'models';
+import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
-import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import SubstratePhragmenElections from './phragmen_elections';
-import SubstrateTreasuryTips from './treasury_tips';
 import SubstrateIdentities from './identities';
+import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateChain from './shared';
+import SubstrateTreasuryTips from './treasury_tips';
 
 class Substrate extends IChainAdapter<SubstrateCoin, SubstrateAccount> {
   public chain: SubstrateChain;

@@ -1,6 +1,6 @@
-import { EventKind } from '../types';
-import { addPrefix, factory } from '../../../logging';
 import { SupportedNetwork } from '../../../interfaces';
+import { addPrefix, factory } from '../../../logging';
+import { EventKind } from '../types';
 
 /**
  * This is the Type Parser function, which takes a raw Event

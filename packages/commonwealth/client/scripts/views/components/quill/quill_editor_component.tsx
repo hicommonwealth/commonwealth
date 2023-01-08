@@ -1,19 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
+import $ from 'jquery';
+import m from 'mithril';
 
 import app from 'state';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { PreviewModal } from 'views/modals/preview_modal';
-import { QuillEditor } from './quill_editor';
-import { getClasses } from '../component_kit/helpers';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
-import { QuillTextContents, QuillActiveMode, QuillMode } from './types';
+import { getClasses } from '../component_kit/helpers';
+import { QuillEditor } from './quill_editor';
+import { QuillActiveMode, QuillMode, QuillTextContents } from './types';
 
 // Rich text and Markdown editor.
 //

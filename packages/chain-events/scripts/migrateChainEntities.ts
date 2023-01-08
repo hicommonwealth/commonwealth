@@ -4,23 +4,27 @@
  * from the chain, writing the results back into the database.
  */
 
-import {
-  AaveEvents, CommonwealthEvents, CompoundEvents,
-  CosmosEvents, IDisconnectedRange, IStorageFetcher, SubstrateEvents
-} from 'chain-events/src';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-
 import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/entityArchival';
 import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
 import ceModels from 'chain-events/services/database/database';
+import {
+  AaveEvents,
+  CommonwealthEvents,
+  CompoundEvents,
+  CosmosEvents,
+  IDisconnectedRange,
+  IStorageFetcher,
+  SubstrateEvents
+} from 'chain-events/src';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import { getRabbitMQConfig, RabbitMQController } from 'common-common/src/rabbitmq';
-import fetch from "node-fetch";
-import { BrokerConfig } from "rascal";
-import { RABBITMQ_URI } from "../../commonwealth/server/config";
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import fetch from 'node-fetch';
+import { BrokerConfig } from 'rascal';
+import { RABBITMQ_URI } from '../../commonwealth/server/config';
 import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
-import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from "../services/config";
+import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from '../services/config';
 
 const log = factory.getLogger(formatFilename(__filename));
 

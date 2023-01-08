@@ -1,8 +1,8 @@
 import {
-  Header,
+  Event,
   EventRecord,
   Extrinsic,
-  Event,
+  Header,
   IdentityJudgement as SubstrateJudgement,
 } from '@polkadot/types/interfaces';
 import { RegisteredTypes } from '@polkadot/types/types';

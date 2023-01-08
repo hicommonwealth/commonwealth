@@ -1,4 +1,3 @@
-import { Logger } from 'typescript-logging';
 import { RmqEntityCUD } from 'common-common/src/rabbitmq/types/chainEntityCUD';
 import type { DB } from '../../models';
 

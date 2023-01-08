@@ -1,10 +1,9 @@
+import BN from 'bn.js';
 import $ from 'jquery';
-import _ from 'lodash';
-
-import { TopicStore } from 'stores';
 import { Topic } from 'models';
 import app from 'state';
-import BN from 'bn.js';
+
+import { TopicStore } from 'stores';
 
 class TopicsController {
   private _store: TopicStore = new TopicStore();

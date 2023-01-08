@@ -1,11 +1,6 @@
 import events from 'events';
 
-import {
-  CWEvent,
-  IChainEventData,
-  IEventHandler,
-  ChainEventKinds,
-} from '../src';
+import { ChainEventKinds, CWEvent, IChainEventData, IEventHandler, } from '../src';
 
 export class TestHandler implements IEventHandler {
   private counter = 0;

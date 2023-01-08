@@ -1,19 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import { ListItem, QueryList } from 'construct-ui';
 
 import 'components/thread_selector.scss';
-
-import app from 'state';
+import { ListItem, QueryList } from 'construct-ui';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import m from 'mithril';
 import { Thread } from 'models';
 import { SearchParams } from 'models/SearchQuery';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+
+import app from 'state';
 import { formatAddressShort } from '../../../../shared/utils';
-import { CWTextInput } from './component_kit/cw_text_input';
-import { CWText } from './component_kit/cw_text';
 import { CWSpinner } from './component_kit/cw_spinner';
+import { CWText } from './component_kit/cw_text';
+import { CWTextInput } from './component_kit/cw_text_input';
 
 const renderThreadPreview = (
   linkedThreads: Array<Thread>,

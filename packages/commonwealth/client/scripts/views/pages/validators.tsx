@@ -1,25 +1,25 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
 import ClassComponent from 'class_component';
+import { ChainBase } from 'common-common/src/types';
+import Substrate from 'controllers/chain/substrate/adapter';
+import { externalLink, pluralize } from 'helpers';
+import m from 'mithril';
+import { AddressInfo } from 'models';
 
 import 'pages/validators.scss';
 
 import app from 'state';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { pluralize, externalLink } from 'helpers';
-import { ChainBase } from 'common-common/src/types';
-import { AddressInfo } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
-import Sublayout from 'views/sublayout';
 import User from 'views/components/widgets/user';
-import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
-import { CWCard } from '../components/component_kit/cw_card';
-import { CardsCollection } from '../components/cards_collection';
-import { GovExplainer } from '../components/gov_explainer';
-import { CWText } from '../components/component_kit/cw_text';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
+import { CardsCollection } from '../components/cards_collection';
+import { CWCard } from '../components/component_kit/cw_card';
+import { CWText } from '../components/component_kit/cw_text';
+import { GovExplainer } from '../components/gov_explainer';
 
 type ValidatorType = {
   chain: string;

@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { ProjectBaseFactory } from "../ProjectBaseFactory";
+import type { ProjectBaseFactory } from '../ProjectBaseFactory';
 
 export class ProjectBaseFactory__factory {
   static connect(

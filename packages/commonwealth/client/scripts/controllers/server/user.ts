@@ -1,20 +1,12 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 import $ from 'jquery';
-import app from 'state';
 
-import type {
-  AddressInfo,
-  SocialAccount,
-  Account,
-  StarredCommunity,
-  ChainInfo} from 'models';
-import {
-  RoleInfo
-} from 'models';
+import type { Account, AddressInfo, ChainInfo, SocialAccount, StarredCommunity } from 'models';
+import app from 'state';
+import DraftsController from './drafts';
 
 import NotificationsController from './notifications';
-import DraftsController from './drafts';
 
 export class UserController {
   private _activeAccount: Account;

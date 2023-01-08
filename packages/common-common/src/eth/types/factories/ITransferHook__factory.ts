@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { ITransferHook } from "../ITransferHook";
+import type { ITransferHook } from '../ITransferHook';
 
 export class ITransferHook__factory {
   static connect(

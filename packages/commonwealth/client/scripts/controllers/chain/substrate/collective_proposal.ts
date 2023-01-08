@@ -1,36 +1,20 @@
-import _ from 'underscore';
+import type { ApiPromise } from '@polkadot/api';
+import type { Option } from '@polkadot/types';
+import type { Votes } from '@polkadot/types/interfaces';
+
+import type { ISubstrateCollectiveProposal, SubstrateCoin } from 'adapters/chain/substrate/types';
+import { formatCall, } from 'adapters/chain/substrate/types';
 
 import { SubstrateTypes } from 'chain-events/src';
-import type { ApiPromise } from '@polkadot/api';
-import type { Votes } from '@polkadot/types/interfaces';
-import type { Option } from '@polkadot/types';
-
-import type {
-  ISubstrateCollectiveProposal,
-  SubstrateCoin} from 'adapters/chain/substrate/types';
-import {
-  formatCall,
-} from 'adapters/chain/substrate/types';
-import type {
-  ProposalEndTime,
-  ChainEntity,
-  ChainEvent} from 'models';
-import {
-  Proposal,
-  ProposalStatus,
-  BinaryVote,
-  VotingType,
-  VotingUnit
-} from 'models';
 import { ProposalType } from 'common-common/src/types';
-import { chainEntityTypeToProposalSlug } from 'identifiers';
-
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
-import type SubstrateAccounts from './account';
+import type { ChainEntity, ChainEvent, ProposalEndTime } from 'models';
+import { BinaryVote, Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import type SubstrateAccounts, { SubstrateAccount } from './account';
+import type Substrate from './adapter';
 import type SubstrateCollective from './collective';
 import type { SubstrateDemocracyReferendum } from './democracy_referendum';
-import type Substrate from './adapter';
+
+import type SubstrateChain from './shared';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(

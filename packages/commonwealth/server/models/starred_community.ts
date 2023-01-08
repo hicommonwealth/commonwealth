@@ -1,9 +1,8 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes} from 'sequelize';
-import { Model } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
-import type { UserAttributes } from './user';
+import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
+import type { ModelInstance, ModelStatic } from './types';
+import type { UserAttributes } from './user';
 
 export type StarredCommunityAttributes = {
   user_id: number;

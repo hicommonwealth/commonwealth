@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'pages/snapshot/snapshot_space_card.scss';
+import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import m from 'mithril';
 
 import { Thread } from 'models';
+
+import 'pages/snapshot/snapshot_space_card.scss';
 import app from 'state';
-import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
-import { navigateToSubpage } from '../../../app';
 import { REDIRECT_ACTIONS } from '.';
+import { navigateToSubpage } from '../../../app';
 import { CWCard } from '../../components/component_kit/cw_card';
 
 function countActiveProposals(proposals: SnapshotProposal[]): number {

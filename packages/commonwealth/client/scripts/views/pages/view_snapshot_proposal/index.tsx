@@ -1,34 +1,24 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelSnapshotEvents } from 'analytics/types';
 import ClassComponent from 'class_component';
+import { getPower, getResults, SnapshotProposal, SnapshotProposalVote, SnapshotSpace, } from 'helpers/snapshot_utils';
+import m from 'mithril';
+import { AddressInfo } from 'models';
 
 // import 'pages/snapshot/index.scss';
-
 import app from 'state';
-import { AddressInfo } from 'models';
-import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
-import {
-  SnapshotSpace,
-  SnapshotProposal,
-  SnapshotProposalVote,
-  getResults,
-  getPower,
-} from 'helpers/snapshot_utils';
-import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
-import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import { SnapshotInformationCard } from './snapshot_information_card';
-import { renderQuillTextBody } from '../../components/quill/helpers';
-import { SnapshotVotesTable } from './snapshot_votes_table';
-import {
-  ActiveProposalPill,
-  ClosedProposalPill,
-} from '../../components/proposal_pills';
 import { CWText } from '../../components/component_kit/cw_text';
+import { ActiveProposalPill, ClosedProposalPill, } from '../../components/proposal_pills';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 import User from '../../components/widgets/user';
+import { PageLoading } from '../loading';
+import { SnapshotInformationCard } from './snapshot_information_card';
+import { SnapshotPollCardContainer } from './snapshot_poll_card_container';
+import { SnapshotVotesTable } from './snapshot_votes_table';
 
 type ViewProposalPageAttrs = {
   identifier: string;

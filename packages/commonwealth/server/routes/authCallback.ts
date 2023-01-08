@@ -1,9 +1,9 @@
+import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { DISCORD_BOT_SUCCESS_URL } from '../config';
 import type { DB } from '../models';
-import type { TypedRequestQuery, TypedResponse} from '../types';
+import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { decryptWithJWE, encryptWithJWE } from '../util/jwe';
 
 const log = factory.getLogger(formatFilename(__filename));

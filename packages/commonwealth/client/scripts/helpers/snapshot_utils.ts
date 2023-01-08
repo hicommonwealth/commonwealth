@@ -1,7 +1,8 @@
-import gql from 'graphql-tag';
-import snapshot from '@snapshot-labs/snapshot.js';
 import { Web3Provider } from '@ethersproject/providers';
+import snapshot from '@snapshot-labs/snapshot.js';
+import gql from 'graphql-tag';
 import { notifyError } from '../controllers/app/notifications';
+
 const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
 const client = new snapshot.Client712(hub);
 

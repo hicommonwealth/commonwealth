@@ -1,4 +1,4 @@
-import app from "state";
+import app from 'state';
 
 export enum ServiceUrls {
   chainEvents = 'chain-events'

@@ -1,16 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { notifyError } from 'controllers/app/notifications';
+import { SnapshotProposal, SnapshotProposalVote, SnapshotSpace, } from 'helpers/snapshot_utils';
+import m from 'mithril';
 import moment from 'moment';
 
 import app from 'state';
-import {
-  SnapshotProposal,
-  SnapshotProposalVote,
-  SnapshotSpace,
-} from 'helpers/snapshot_utils';
-import { notifyError } from 'controllers/app/notifications';
 import { ConfirmSnapshotVoteModal } from '../../modals/confirm_snapshot_vote_modal';
 import { SnapshotPollCard } from './snapshot_poll_card';
 

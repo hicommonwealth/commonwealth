@@ -1,12 +1,12 @@
 /**
  * Processes ERC721 events.
  */
-import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
+import { CWEvent, IEventProcessor, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
+import { Enrich } from './filters/enricher';
 
 import { ParseType } from './filters/type_parser';
-import { Enrich } from './filters/enricher';
-import { IEventData, RawEvent, IErc721Contracts } from './types';
+import { IErc721Contracts, IEventData, RawEvent } from './types';
 
 export class Processor extends IEventProcessor<IErc721Contracts, RawEvent> {
   constructor(protected _api: IErc721Contracts) {

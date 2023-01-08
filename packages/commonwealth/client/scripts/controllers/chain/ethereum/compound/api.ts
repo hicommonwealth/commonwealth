@@ -1,19 +1,15 @@
-import type {
-  GovernorCompatibilityBravo,
-  GovernorAlpha,
-  MPond,
-  ERC20VotesComp} from 'common-common/src/eth/types';
-import {
-  GovernorCompatibilityBravo__factory,
-  GovernorAlpha__factory,
-  MPond__factory,
-  ERC20VotesComp__factory,
-} from 'common-common/src/eth/types';
 import type { ExternalProvider } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
-import { utils } from 'ethers';
+import type { ERC20VotesComp, GovernorAlpha, GovernorCompatibilityBravo, MPond } from 'common-common/src/eth/types';
+import {
+  ERC20VotesComp__factory,
+  GovernorAlpha__factory,
+  GovernorCompatibilityBravo__factory,
+  MPond__factory,
+} from 'common-common/src/eth/types';
 
 import type ContractApi from 'controllers/chain/ethereum/contractApi';
+import { utils } from 'ethers';
 
 export enum GovernorType {
   Alpha,

@@ -1,23 +1,22 @@
 /* eslint-disable no-unused-expressions */
-import chai from 'chai';
-import 'chai/register-should';
-import Web3 from 'web3';
-import { ethers } from 'ethers';
-import type BN from 'bn.js';
-import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
+import type BN from 'bn.js';
+import chai from 'chai';
+import 'chai/register-should';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceType } from 'common-common/src/types';
+import wallet from 'ethereumjs-wallet';
+import { ethers } from 'ethers';
+import { createRole, findOneRole } from 'server/util/roles';
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
+import Web3 from 'web3';
 import app from '../../server-test';
 import models from '../../server/database';
 import type { Permission } from '../../server/models/role';
 import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-import { Action } from '../../../common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 

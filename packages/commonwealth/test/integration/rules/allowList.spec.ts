@@ -1,6 +1,6 @@
 import { assert } from 'chai';
-import { validateRule } from '../../../server/util/rules/ruleParser';
 import AllowListRule from '../../../server/ruleTypes/allowList';
+import { validateRule } from '../../../server/util/rules/ruleParser';
 
 describe('AllowList rule tests', () => {
   it('should validate correct allowList rule', () => {

@@ -1,7 +1,7 @@
 import moment from 'moment';
-import IdStore from './IdStore';
 import type { Thread } from '../models';
 import { orderDiscussionsbyLastComment } from '../views/pages/discussions/helpers';
+import IdStore from './IdStore';
 
 interface IListingParams {
   topicName?: string;

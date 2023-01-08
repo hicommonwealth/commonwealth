@@ -3,11 +3,7 @@
  */
 import { ApiPromise } from '@polkadot/api';
 
-import {
-  IEventPoller,
-  IDisconnectedRange,
-  SupportedNetwork,
-} from '../../interfaces';
+import { IDisconnectedRange, IEventPoller, SupportedNetwork, } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import { Block } from './types';

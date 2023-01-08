@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_empty_state.scss';
+import m from 'mithril';
 
 import { CWIcon } from './cw_icons/cw_icon';
 import { IconName } from './cw_icons/cw_icon_lookup';

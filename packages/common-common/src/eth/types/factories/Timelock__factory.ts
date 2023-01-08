@@ -2,16 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  Signer,
-  BigNumberish,
-  Contract,
-  ContractFactory,
-  Overrides,
-} from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { BigNumberish, Contract, ContractFactory, Overrides, Signer, } from 'ethers';
 
-import type { Timelock } from "../Timelock";
+import type { Timelock } from '../Timelock';
 
 export class Timelock__factory extends ContractFactory {
   constructor(signer?: Signer) {

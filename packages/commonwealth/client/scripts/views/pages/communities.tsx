@@ -1,22 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { ChainBase, ChainCategoryType, ChainNetwork, } from 'common-common/src/types';
+import m from 'mithril';
+import { ChainInfo } from 'models';
 import numeral from 'numeral';
 
 import 'pages/communities.scss';
 
 import app from 'state';
-import { ChainInfo } from 'models';
-import {
-  ChainBase,
-  ChainCategoryType,
-  ChainNetwork,
-} from 'common-common/src/types';
-import { CWButton } from '../components/component_kit/cw_button';
-import Sublayout from '../sublayout';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';
+import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import Sublayout from '../sublayout';
 
 const buildCommunityString = (numCommunities: number) => {
   let numberString = numCommunities;

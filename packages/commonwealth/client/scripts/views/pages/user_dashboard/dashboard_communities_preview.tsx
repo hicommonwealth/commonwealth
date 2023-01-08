@@ -1,17 +1,17 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { pluralize } from 'helpers';
+import m from 'mithril';
+import { ChainInfo } from 'models';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
 import app from 'state';
-import { ChainInfo } from 'models';
-import { pluralize } from 'helpers';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
-import { CWButton } from '../../components/component_kit/cw_button';
 
 type CommunityPreviewCardAttrs = {
   chain: ChainInfo;

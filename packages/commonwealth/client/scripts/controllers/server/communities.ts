@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import app from 'state';
 import m from 'mithril';
 import { StarredCommunity } from 'models';
+import app from 'state';
 
 class CommunitiesController {
   public isStarred(chain: string) {

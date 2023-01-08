@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/ban-types */
+import { setActiveAccount } from 'controllers/app/login';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+
+import type SubstrateIdentity from 'controllers/chain/substrate/identity';
 import m from 'mithril';
 
 import app from 'state';
-
-import type SubstrateIdentity from 'controllers/chain/substrate/identity';
 import User from 'views/components/widgets/user';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setActiveAccount } from 'controllers/app/login';
-import { alertModalWithText } from '../../modals/alert_modal';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { alertModalWithText } from '../../modals/alert_modal';
 import { BanUserModal } from '../../modals/ban_user_modal';
 
 export interface IProfileHeaderAttrs {

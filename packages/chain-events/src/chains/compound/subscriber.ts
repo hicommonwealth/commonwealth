@@ -6,7 +6,7 @@ import { Listener } from '@ethersproject/providers';
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, Api } from './types';
+import { Api, RawEvent } from './types';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;

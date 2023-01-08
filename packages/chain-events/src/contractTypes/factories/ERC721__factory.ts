@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { Contract, ContractFactory, Overrides, Signer } from 'ethers';
 
-import type { ERC721 } from "../ERC721";
+import type { ERC721 } from '../ERC721';
 
 export class ERC721__factory extends ContractFactory {
   constructor(signer?: Signer) {

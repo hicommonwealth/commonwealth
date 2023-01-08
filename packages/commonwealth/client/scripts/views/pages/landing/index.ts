@@ -1,27 +1,27 @@
-import m from 'mithril';
-// Logged Out Homepage View
-import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';
-
-import app, { LoginState } from 'state';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import m from 'mithril';
 import type { ChainInfo } from 'models';
-import HeaderLandingPage from './landing_page_header';
-import JoinCommonWealthSection from './landing_page_pre_footer';
-import TokensCommunityComponent from './tokens_community_hero';
-import TokensCreatorComponent from './creators_card_section';
-import TokensChainsComponent from './chains_slider';
-import TokenHoldersComponent from './find_your_community_section';
-import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 
 // Logged In Homepage View
 import 'pages/landing/index.scss';
+// Logged Out Homepage View
+import 'pages/landing/landing_page.scss';
+
+import app, { LoginState } from 'state';
+import { Footer } from '../../footer';
 
 import { handleEmailInvites } from '../../menus/invites_menu';
 import UserDashboard from '../user_dashboard';
-import { Footer } from '../../footer';
+import TokensChainsComponent from './chains_slider';
+import TokensCreatorComponent from './creators_card_section';
+import ChainsCrowdfundingComponent from './crowdfunding_card_section';
+import TokenHoldersComponent from './find_your_community_section';
+import HeaderLandingPage from './landing_page_header';
+import JoinCommonWealthSection from './landing_page_pre_footer';
+import TokensCommunityComponent from './tokens_community_hero';
 
 export interface Chain {
   img: string;

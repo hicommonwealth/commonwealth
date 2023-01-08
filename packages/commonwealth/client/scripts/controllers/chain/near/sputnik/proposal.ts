@@ -1,30 +1,28 @@
-import type { Near as NearApi } from 'near-api-js';
-import BN from 'bn.js';
-import moment from 'moment';
-import type { ProposalEndTime, ITXModalData } from 'models';
-import { Proposal, VotingType, VotingUnit, ProposalStatus } from 'models';
 import type { NearToken } from 'adapters/chain/near/types';
+import BN from 'bn.js';
+import { ProposalType } from 'common-common/src/types';
 import type { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import type NearChain from 'controllers/chain/near/chain';
-import { ProposalType } from 'common-common/src/types';
+import type { ITXModalData, ProposalEndTime } from 'models';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import moment from 'moment';
+import type { Near as NearApi } from 'near-api-js';
 import type NearSputnikDao from './dao';
-import type {
-  INearSputnikProposal,
-  VotePolicy} from './types';
+import type { INearSputnikProposal, VotePolicy } from './types';
 import {
-  NearSputnikVote,
-  NearSputnikProposalStatus,
+  getTotalSupply,
+  getUserRoles,
+  getVotePolicy,
   isAddMemberToRole,
+  isChangeConfig,
+  isChangePolicy,
+  isFunctionCall,
   isRemoveMemberFromRole,
   isTransfer,
-  isFunctionCall,
-  getVotePolicy,
-  WeightKind,
   isWeight,
-  getUserRoles,
-  getTotalSupply,
-  isChangePolicy,
-  isChangeConfig,
+  NearSputnikProposalStatus,
+  NearSputnikVote,
+  WeightKind,
 } from './types';
 
 export default class NearSputnikProposal extends Proposal<

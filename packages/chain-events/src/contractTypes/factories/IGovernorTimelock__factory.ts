@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IGovernorTimelock } from "../IGovernorTimelock";
+import type { IGovernorTimelock } from '../IGovernorTimelock';
 
 export class IGovernorTimelock__factory {
   static connect(

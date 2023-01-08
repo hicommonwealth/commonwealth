@@ -1,21 +1,16 @@
+import BN from 'bn.js';
 import sleep from 'sleep-promise';
 import _ from 'underscore';
-import BN from 'bn.js';
+import { ERC20, ERC20__factory as ERC20Factory } from '../../contractTypes';
 
 import { createProvider } from '../../eth';
-import {
-  CWEvent,
-  SubscribeFunc,
-  ISubscribeOptions,
-  SupportedNetwork,
-} from '../../interfaces';
+import { CWEvent, ISubscribeOptions, SubscribeFunc, SupportedNetwork, } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
-import { ERC20__factory as ERC20Factory, ERC20 } from '../../contractTypes';
+import { EnricherConfig } from './filters/enricher';
+import { Processor } from './processor';
 
 import { Subscriber } from './subscriber';
-import { Processor } from './processor';
-import { IEventData, RawEvent, IErc20Contracts } from './types';
-import { EnricherConfig } from './filters/enricher';
+import { IErc20Contracts, IEventData, RawEvent } from './types';
 
 export interface IErc20SubscribeOptions
   extends ISubscribeOptions<IErc20Contracts> {

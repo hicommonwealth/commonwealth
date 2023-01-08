@@ -1,7 +1,7 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import 'pages/login/login_mobile.scss';
 
@@ -10,10 +10,7 @@ import { CWAddress } from '../../components/component_kit/cw_address';
 import { CWAvatarUsernameInput } from '../../components/component_kit/cw_avatar_username_input';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ModalExitButton } from '../../components/component_kit/cw_modal';
-import {
-  CWProfileRow,
-  CWProfilesList,
-} from '../../components/component_kit/cw_profiles_list';
+import { CWProfileRow, CWProfilesList, } from '../../components/component_kit/cw_profiles_list';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';

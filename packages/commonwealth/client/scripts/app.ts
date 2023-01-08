@@ -1,32 +1,28 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import '../styles/normalize.css'; // reset
-import '../styles/tailwind_reset.css'; // for the landing page
-import '../styles/shared.scss';
-import 'construct.scss';
-import 'lity/dist/lity.min.css';
-import mixpanel from 'mixpanel-browser';
-
-import m from 'mithril';
-import $ from 'jquery';
-import moment from 'moment';
-
-import './fragment-fix';
-import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
-
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-} from 'controllers/app/notifications';
+import 'construct.scss';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
+import { notifyError, notifyInfo, notifySuccess, } from 'controllers/app/notifications';
+import $ from 'jquery';
+import 'lity/dist/lity.min.css';
+
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import moment from 'moment';
+import app, { ApiStatus, LoginState } from 'state';
+
 import { Layout } from 'views/layout';
+import { alertModalWithText } from 'views/modals/alert_modal';
 import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
-import { alertModalWithText } from 'views/modals/alert_modal';
+import '../styles/normalize.css'; // reset
+import '../styles/shared.scss';
+import '../styles/tailwind_reset.css'; // for the landing page
+
+import './fragment-fix';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
 

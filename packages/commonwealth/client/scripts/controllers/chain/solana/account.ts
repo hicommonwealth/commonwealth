@@ -1,10 +1,10 @@
+import * as solw3 from '@solana/web3.js';
+import _ from 'lodash';
 import { Account } from 'models';
 import type { IApp } from 'state';
-import _ from 'lodash';
-import * as solw3 from '@solana/web3.js';
+import type SolanaAccounts from './accounts';
 
 import SolanaChain from './chain';
-import type SolanaAccounts from './accounts';
 import type { SolanaToken } from './types';
 
 export default class SolanaAccount extends Account {

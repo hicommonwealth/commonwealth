@@ -1,35 +1,24 @@
-import moment from 'moment';
-import type { Request, Response, NextFunction } from 'express';
-import {
-  NotificationCategories,
-  ProposalType,
-  ChainType,
-  ChainNetwork,
-} from 'common-common/src/types';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { Action, PermissionError } from 'common-common/src/permissions';
-import {
-  findAllRoles,
-  isAddressPermitted,
-} from 'commonwealth/server/util/roles';
-import validateTopicThreshold from '../util/validateTopicThreshold';
+import { ChainNetwork, ChainType, NotificationCategories, ProposalType, } from 'common-common/src/types';
+import { findAllRoles, isAddressPermitted, } from 'commonwealth/server/util/roles';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { MixpanelCommunityInteractionEvent, } from '../../shared/analytics/types';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
-import { parseUserMentions } from '../util/parseUserMentions';
-import type { DB } from '../models';
 import { sequelize } from '../database';
+import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
-} from '../../shared/analytics/types';
-import checkRule from '../util/rules/checkRule';
-import type RuleCache from '../util/rules/ruleCache';
 import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { parseUserMentions } from '../util/parseUserMentions';
+import checkRule from '../util/rules/checkRule';
+import type RuleCache from '../util/rules/ruleCache';
+import validateTopicThreshold from '../util/validateTopicThreshold';
 
 const log = factory.getLogger(formatFilename(__filename));
 

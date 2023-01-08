@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { Contract, ContractFactory, Overrides, Signer } from 'ethers';
 
-import type { GovernorBravoDelegateStorageV1 } from "../GovernorBravoDelegateStorageV1";
+import type { GovernorBravoDelegateStorageV1 } from '../GovernorBravoDelegateStorageV1';
 
 export class GovernorBravoDelegateStorageV1__factory extends ContractFactory {
   constructor(signer?: Signer) {

@@ -1,20 +1,15 @@
-import { populateRange } from '../../util';
-import {
-  CWEvent,
-  IStorageFetcher,
-  IDisconnectedRange,
-  SupportedNetwork,
-} from '../../interfaces';
+import { CWEvent, IDisconnectedRange, IStorageFetcher, SupportedNetwork, } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
+import { populateRange } from '../../util';
 
 import { Enrich } from './filters/enricher';
 import {
-  EventKind,
   Api,
-  IProposalCreated,
+  EventKind,
   IProposalCanceled,
-  IProposalQueued,
+  IProposalCreated,
   IProposalExecuted,
+  IProposalQueued,
   IVoteEmitted,
 } from './types';
 

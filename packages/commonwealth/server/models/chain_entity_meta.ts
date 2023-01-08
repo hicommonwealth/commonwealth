@@ -2,7 +2,7 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
 import type { ThreadAttributes } from './thread';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ChainEntityMetaAttributes = {
   id: number; // sequelize auto-generated primary key id --- NEVER USE DIRECTLY

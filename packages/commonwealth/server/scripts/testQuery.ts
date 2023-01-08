@@ -1,4 +1,4 @@
-import {QueryTypes} from "sequelize";
+import { QueryTypes } from 'sequelize';
 import models from '../database';
 
 async function main() {

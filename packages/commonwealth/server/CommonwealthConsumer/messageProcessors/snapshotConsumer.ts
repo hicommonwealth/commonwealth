@@ -1,6 +1,6 @@
 import axios from 'axios';
-import type { Logger } from 'typescript-logging';
 import { StatsDController } from 'common-common/src/statsd';
+import type { Logger } from 'typescript-logging';
 import type { SnapshotNotification } from '../../../shared/types';
 import type { DB } from '../../models';
 

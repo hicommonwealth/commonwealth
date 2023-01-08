@@ -1,7 +1,6 @@
-import Ethereum from 'controllers/chain/ethereum/adapter';
-
 import BN from 'bn.js';
-import { ChainNetwork, ContractType } from 'common-common/src/types';
+import { ContractType } from 'common-common/src/types';
+import Ethereum from 'controllers/chain/ethereum/adapter';
 import $ from 'jquery';
 import type { ChainInfo, ITokenAdapter } from 'models';
 import type { IApp } from 'state';

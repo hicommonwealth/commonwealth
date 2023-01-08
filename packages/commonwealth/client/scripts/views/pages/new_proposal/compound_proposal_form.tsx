@@ -1,23 +1,23 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
+import m from 'mithril';
 
 import 'pages/new_proposal/compound_proposal_form.scss';
 
 import app from 'state';
-import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
 import User from 'views/components/widgets/user';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWTextArea } from '../../components/component_kit/cw_text_area';
-import { AaveProposalState, defaultStateItem } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWTextArea } from '../../components/component_kit/cw_text_area';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { AaveProposalState, defaultStateItem } from './types';
 
 export class CompoundProposalForm extends ClassComponent {
   private aaveProposalState: Array<AaveProposalState>;

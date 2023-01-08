@@ -1,20 +1,20 @@
 /* eslint-disable no-script-url */
+import { ChainBase } from 'common-common/src/types';
 import 'components/widgets/user.scss';
+import { Popover, Tag } from 'construct-ui';
+import { link } from 'helpers';
+import jdenticon from 'jdenticon';
+import { capitalize } from 'lodash';
 
 import m from 'mithril';
-import { capitalize } from 'lodash';
-import { link } from 'helpers';
-import { Tag, Popover } from 'construct-ui';
+import type { Account } from 'models';
+import { AddressInfo, Profile } from 'models';
 
 import app from 'state';
-import jdenticon from 'jdenticon';
-import { ChainBase } from 'common-common/src/types';
-import type { Account} from 'models';
-import { AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
+import { CWButton } from '../component_kit/cw_button';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length

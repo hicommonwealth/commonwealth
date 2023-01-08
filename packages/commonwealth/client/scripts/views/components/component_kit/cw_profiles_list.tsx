@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_profiles_list.scss';
+import m from 'mithril';
+import { CWIcon } from './cw_icons/cw_icon';
 
 import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
 import { getClasses } from './helpers';
 
 type ProfileRowStyleAttrs = {

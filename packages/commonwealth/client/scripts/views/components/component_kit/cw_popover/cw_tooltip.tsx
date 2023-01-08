@@ -1,10 +1,10 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import { CWText } from '../cw_text';
-import { SharedPopoverAttrs, CWPopover } from './cw_popover';
+import { CWPopover, SharedPopoverAttrs } from './cw_popover';
 
 export type TooltipType =
   | 'bordered'

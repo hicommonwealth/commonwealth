@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_avatar_username_input.scss';
+import { formatAddressShort } from 'helpers';
+import m from 'mithril';
 
 import { Account } from 'models';
-import { formatAddressShort } from 'helpers';
-import { CWText } from './cw_text';
 import { AvatarUpload } from '../avatar_upload';
+import { CWText } from './cw_text';
 import { CWTextInput } from './cw_text_input';
 import { getClasses } from './helpers';
 

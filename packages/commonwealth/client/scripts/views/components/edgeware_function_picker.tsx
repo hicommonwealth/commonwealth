@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
 import { blake2AsHex } from '@polkadot/util-crypto';
+import ClassComponent from 'class_component';
+import Substrate from 'controllers/chain/substrate/adapter';
+import m from 'mithril';
 
 import app from 'state';
-import Substrate from 'controllers/chain/substrate/adapter';
+import { CWDropdown } from './component_kit/cw_dropdown';
 import { CWText } from './component_kit/cw_text';
 import { CWTextInput } from './component_kit/cw_text_input';
-import { CWDropdown } from './component_kit/cw_dropdown';
 
 type EdgewareFunctionPickerProps = {
   module: string;

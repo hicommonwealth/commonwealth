@@ -1,7 +1,7 @@
-import $ from 'jquery';
-import app from 'state';
 import type { WalletId } from 'common-common/src/types';
 import { ChainType } from 'common-common/src/types';
+import $ from 'jquery';
+import app from 'state';
 
 import type ChainInfo from './ChainInfo';
 import type Profile from './Profile';

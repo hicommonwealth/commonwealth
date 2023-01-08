@@ -1,9 +1,9 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import type { RegisteredTypes } from '@polkadot/types/types';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import { constructSubstrateUrl } from '../../shared/substrate';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

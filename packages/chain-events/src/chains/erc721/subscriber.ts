@@ -3,12 +3,12 @@
  */
 import { Listener } from '@ethersproject/providers';
 import sleep from 'sleep-promise';
+import { ERC721__factory as ERC721Factory } from '../../contractTypes';
 
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
-import { ERC721__factory as ERC721Factory } from '../../contractTypes';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, IErc721Contracts } from './types';
+import { IErc721Contracts, RawEvent } from './types';
 
 export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
   private _name: string;

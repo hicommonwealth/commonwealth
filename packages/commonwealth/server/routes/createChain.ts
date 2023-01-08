@@ -1,28 +1,29 @@
-import type {NextFunction} from 'express';
-import Web3 from 'web3';
-import fetch from 'node-fetch';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
-import type {Cluster} from '@solana/web3.js';
-import {Tendermint34Client} from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
-import {Op} from 'sequelize';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {BalanceType,ChainBase, ChainType, NotificationCategories} from 'common-common/src/types';
-import {AppError, ServerError} from 'common-common/src/errors';
-import {urlHasValidHTTPPrefix} from '../../shared/utils';
-import type {ChainAttributes} from '../models/chain';
-import type {ChainNodeAttributes} from '../models/chain_node';
-import testSubstrateSpec from '../util/testSubstrateSpec';
-import type {DB} from '../models';
-import type { TypedRequestBody, TypedResponse} from '../types';
-import {success} from '../types';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { BalanceType, ChainBase, ChainType, NotificationCategories } from 'common-common/src/types';
+import type { NextFunction } from 'express';
+import fetch from 'node-fetch';
+import { Op } from 'sequelize';
+import Web3 from 'web3';
+import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import type { DB } from '../models';
 
-import type {AddressInstance} from '../models/address';
-import {mixpanelTrack} from '../util/mixpanelUtil';
-import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
-import type {RoleAttributes, RoleInstance} from '../models/role';
+import type { AddressInstance } from '../models/address';
+import type { ChainAttributes } from '../models/chain';
+import type { ChainNodeAttributes } from '../models/chain_node';
+import type { RoleAttributes, RoleInstance } from '../models/role';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
+import testSubstrateSpec from '../util/testSubstrateSpec';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const MAX_IMAGE_SIZE_KB = 500;

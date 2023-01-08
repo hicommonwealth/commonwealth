@@ -1,15 +1,10 @@
-import express, { Request, Response } from "express";
-import { ISnapshotNotification } from "common-common/src/types";
-import {
-  RascalPublications,
-  RabbitMQController,
-  getRabbitMQConfig,
-} from "common-common/src/rabbitmq";
-import { factory, formatFilename } from "common-common/src/logging";
-import { RABBITMQ_URI } from "./config";
-import fetchNewSnapshotProposal from "./utils/fetchSnapshot";
-import { DEFAULT_PORT } from "./config";
-import { StatsDController } from "common-common/src/statsd";
+import { factory, formatFilename } from 'common-common/src/logging';
+import { getRabbitMQConfig, RabbitMQController, RascalPublications, } from 'common-common/src/rabbitmq';
+import { StatsDController } from 'common-common/src/statsd';
+import { ISnapshotNotification } from 'common-common/src/types';
+import express, { Request, Response } from 'express';
+import { DEFAULT_PORT, RABBITMQ_URI } from './config';
+import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 
 const log = factory.getLogger(formatFilename(__filename));
 

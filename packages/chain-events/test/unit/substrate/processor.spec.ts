@@ -1,6 +1,6 @@
-import chai from 'chai';
-import { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
+import { EventRecord, Extrinsic, Header } from '@polkadot/types/interfaces';
 import BN from 'bn.js';
+import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/substrate/processor';

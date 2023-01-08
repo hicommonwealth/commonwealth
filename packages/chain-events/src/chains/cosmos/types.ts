@@ -1,13 +1,7 @@
-import { Any } from 'cosmjs-types/google/protobuf/any';
-import { TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { BankExtension, Coin, GovExtension, QueryClient, StakingExtension, } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import {
-  QueryClient,
-  StakingExtension,
-  GovExtension,
-  BankExtension,
-  Coin,
-} from '@cosmjs/stargate';
+import { TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import { Any } from 'cosmjs-types/google/protobuf/any';
 
 export interface ListenerOptions {
   url: string;

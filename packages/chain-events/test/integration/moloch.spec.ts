@@ -1,31 +1,19 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-/* eslint-disable global-require */
-import { EventEmitter } from 'events';
-
-import { providers } from 'ethers';
 import chai from 'chai';
 
-import {
-  Moloch1__factory as Moloch1Factory,
-  Moloch1,
-  Token__factory as TokenFactory,
-  Token,
-} from '../../src/contractTypes';
-import {
-  Api,
-  IEventData,
-  EventKind,
-  ISubmitProposal,
-  IProcessProposal,
-  IAbort,
-} from '../../src/chains/moloch/types';
+import { providers } from 'ethers';
+/* eslint-disable global-require */
+import { EventEmitter } from 'events';
 import { subscribeEvents } from '../../src/chains/moloch/subscribeFunc';
+import { Api, EventKind, IAbort, IEventData, IProcessProposal, ISubmitProposal, } from '../../src/chains/moloch/types';
+
 import {
-  IEventHandler,
-  CWEvent,
-  IDisconnectedRange,
-  IChainEventData,
-} from '../../src/interfaces';
+  Moloch1,
+  Moloch1__factory as Moloch1Factory,
+  Token,
+  Token__factory as TokenFactory,
+} from '../../src/contractTypes';
+import { CWEvent, IChainEventData, IDisconnectedRange, IEventHandler, } from '../../src/interfaces';
 
 const { assert } = chai;
 

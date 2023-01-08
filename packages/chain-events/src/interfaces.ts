@@ -2,24 +2,23 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import * as SubstrateTypes from './chains/substrate/types';
-import * as MolochTypes from './chains/moloch/types';
-import * as CompoundTypes from './chains/compound/types';
-import * as Erc20Types from './chains/erc20/types';
-import * as Erc721Types from './chains/erc721/types';
-import * as AaveTypes from './chains/aave/types';
-import * as CommonwealthTypes from './chains/commonwealth/types';
-import * as CosmosTypes from './chains/cosmos/types';
 import { ApiPromise as SubstrateApi } from '@polkadot/api';
-import { Api as MolochApi } from './chains/moloch/types';
-import { IErc721Contracts as ERC721Api } from "./chains/erc721/types";
-import { IErc20Contracts as ERC20Api } from "./chains/erc20/types";
-import { Api as CompoundApi } from './chains/compound/types';
-import { Api as CommonwealthApi } from './chains/commonwealth/types';
+import { ChainEventInstance } from '../services/database/models/chain_event';
+import * as AaveTypes from './chains/aave/types';
 import { Api as AaveApi } from './chains/aave/types';
-import { StorageFetcher } from "./chains/aave";
-import { Listener } from "./Listener";
-import {ChainEventInstance} from "../services/database/models/chain_event";
+import * as CommonwealthTypes from './chains/commonwealth/types';
+import { Api as CommonwealthApi } from './chains/commonwealth/types';
+import * as CompoundTypes from './chains/compound/types';
+import { Api as CompoundApi } from './chains/compound/types';
+import * as CosmosTypes from './chains/cosmos/types';
+import * as Erc20Types from './chains/erc20/types';
+import { IErc20Contracts as ERC20Api } from './chains/erc20/types';
+import * as Erc721Types from './chains/erc721/types';
+import { IErc721Contracts as ERC721Api } from './chains/erc721/types';
+import * as MolochTypes from './chains/moloch/types';
+import { Api as MolochApi } from './chains/moloch/types';
+import * as SubstrateTypes from './chains/substrate/types';
+import { Listener } from './Listener';
 
 // add other events here as union types
 export type IChainEntityKind =

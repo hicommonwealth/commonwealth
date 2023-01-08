@@ -1,10 +1,9 @@
+import crypto from 'crypto';
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import { Model } from 'sequelize';
-import crypto from 'crypto';
 import { LOGIN_TOKEN_EXPIRES_IN } from '../config';
 import type { SocialAccountAttributes } from './social_account';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type LoginTokenAttributes = {
   token: string;

@@ -1,37 +1,28 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { initAppState } from 'app';
 import ClassComponent from 'class_component';
-import $ from 'jquery';
-import Web3 from 'web3';
+import { IERC721Metadata__factory } from 'common-common/src/eth/types';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
 import { providers } from 'ethers';
-import { isAddress } from 'web3-utils';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
 import { slugify, slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
-import { IERC721Metadata__factory } from 'common-common/src/eth/types';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import {
-  initChainForm,
-  defaultChainRows,
-  ethChainRows,
-} from './chain_input_rows';
-import {
-  ChainFormFields,
-  ChainFormState,
-  EthChainAttrs,
-  EthFormFields,
-} from './types';
+import Web3 from 'web3';
+import { isAddress } from 'web3-utils';
+import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
-import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+import { defaultChainRows, ethChainRows, initChainForm, } from './chain_input_rows';
+import { ChainFormFields, ChainFormState, EthChainAttrs, EthFormFields, } from './types';
 
 type CreateERC721Form = ChainFormFields & EthFormFields;
 

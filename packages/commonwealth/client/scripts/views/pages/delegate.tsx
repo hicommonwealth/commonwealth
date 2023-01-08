@@ -1,22 +1,22 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { ChainNetwork } from 'common-common/src/types';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import Aave from 'controllers/chain/ethereum/aave/adapter';
+import Compound from 'controllers/chain/ethereum/compound/adapter';
+import m from 'mithril';
 
 import 'pages/delegate.scss';
 
 import app from 'state';
-import { ChainNetwork } from 'common-common/src/types';
-import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { PageNotFound } from './404';
+import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWText } from '../components/component_kit/cw_text';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { GovExplainer } from '../components/gov_explainer';
+import { PageNotFound } from './404';
 
 type DelegateFormType = {
   address: string;

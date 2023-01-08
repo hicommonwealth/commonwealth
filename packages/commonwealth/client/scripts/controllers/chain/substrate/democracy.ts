@@ -1,15 +1,13 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { BlockNumber } from '@polkadot/types/interfaces';
 import type { ISubstrateDemocracyReferendum, SubstrateCoin } from 'adapters/chain/substrate/types';
-import type { ITXModalData} from 'models';
-import { ProposalModule } from 'models';
 import { SubstrateTypes } from 'chain-events/src';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
 import type { IApp } from 'state';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
-import type SubstrateAccounts from './account';
+import type SubstrateAccounts, { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
-import { chainToEventNetwork } from '../../server/chain_entities';
+import type SubstrateChain from './shared';
 
 class SubstrateDemocracy extends ProposalModule<
   ApiPromise,

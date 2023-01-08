@@ -1,19 +1,19 @@
 /* @jsx m */
 
+import ClassComponent from 'class_component';
 import $ from 'jquery';
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ITXModalData, IWebWallet } from 'models';
 
 import app from 'state';
-import { ITXModalData, IWebWallet } from 'models';
-import { CWTabBar, CWTab } from '../component_kit/cw_tabs';
+import { CWButton } from '../component_kit/cw_button';
+import { CWSpinner } from '../component_kit/cw_spinner';
+import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
+import { CWText } from '../component_kit/cw_text';
 import { TXSigningCLIOption } from './tx_signing_cli_option';
+import { TXSigningTransactionBox } from './tx_signing_transaction_box';
 import { TXSigningWebWalletOption } from './tx_signing_web_wallet_option';
 import { NextFn, TxDataState } from './types';
-import { CWButton } from '../component_kit/cw_button';
-import { TXSigningTransactionBox } from './tx_signing_transaction_box';
-import { CWText } from '../component_kit/cw_text';
-import { CWSpinner } from '../component_kit/cw_spinner';
 
 type TxSigningModalIntroStageAttrs = ITXModalData &
   NextFn & {

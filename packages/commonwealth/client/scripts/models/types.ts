@@ -1,10 +1,10 @@
 import type {
-  IFixedEndTime,
-  IFixedBlockEndTime,
   IDynamicEndTime,
-  IThresholdEndTime,
+  IFixedBlockEndTime,
+  IFixedEndTime,
   INotStartedEndTime,
   IQueuedEndTime,
+  IThresholdEndTime,
   IUnavailableEndTime,
 } from './interfaces';
 import type Proposal from './Proposal';

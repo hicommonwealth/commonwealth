@@ -1,6 +1,6 @@
+import { Express, Request, Response } from 'express';
 import Rollbar from 'rollbar';
-import { Request, Response, Express } from 'express';
-import { ServerError, AppError } from '../errors';
+import { AppError, ServerError } from '../errors';
 
 // Handle server and application errors.
 // 401 Unauthorized errors are handled by Express' middleware and returned

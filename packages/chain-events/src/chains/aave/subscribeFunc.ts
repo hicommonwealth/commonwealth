@@ -1,24 +1,18 @@
 import sleep from 'sleep-promise';
-
-import { createProvider } from '../../eth';
 import {
-  IDisconnectedRange,
-  CWEvent,
-  SubscribeFunc,
-  ISubscribeOptions,
-  SupportedNetwork,
-} from '../../interfaces';
-import { addPrefix, factory } from '../../logging';
-import {
-  IAaveGovernanceV2__factory as IAaveGovernanceV2Factory,
-  GovernanceStrategy__factory as GovernanceStrategyFactory,
   GovernancePowerDelegationERC20__factory as GovernancePowerDelegationERC20Factory,
+  GovernanceStrategy__factory as GovernanceStrategyFactory,
+  IAaveGovernanceV2__factory as IAaveGovernanceV2Factory,
 } from '../../contractTypes';
 
-import { Subscriber } from './subscriber';
+import { createProvider } from '../../eth';
+import { CWEvent, IDisconnectedRange, ISubscribeOptions, SubscribeFunc, SupportedNetwork, } from '../../interfaces';
+import { addPrefix, factory } from '../../logging';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
-import { IEventData, RawEvent, Api } from './types';
+
+import { Subscriber } from './subscriber';
+import { Api, IEventData, RawEvent } from './types';
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.

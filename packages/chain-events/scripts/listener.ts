@@ -1,21 +1,21 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-console */
 
-import * as yargs from 'yargs';
-import fetch from 'node-fetch';
 import EthDater from 'ethereum-block-by-date';
+import fetch from 'node-fetch';
+import * as yargs from 'yargs';
 
 import {
-  IEventHandler,
-  CWEvent,
-  SubstrateEvents,
-  CompoundEvents,
-  MolochEvents,
   AaveEvents,
-  Erc20Events,
-  SupportedNetwork,
-  Erc721Events,
+  CompoundEvents,
   CosmosEvents,
+  CWEvent,
+  Erc20Events,
+  Erc721Events,
+  IEventHandler,
+  MolochEvents,
+  SubstrateEvents,
+  SupportedNetwork,
 } from '../src/index';
 
 import { contracts, networkSpecs, networkUrls } from './listenerUtils';

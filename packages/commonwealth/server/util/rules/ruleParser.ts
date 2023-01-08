@@ -1,5 +1,5 @@
-import type { RuleArgumentType, DefaultSchemaT } from './ruleTypes';
 import RuleTypes from '../../ruleTypes';
+import type { DefaultSchemaT, RuleArgumentType } from './ruleTypes';
 
 const MAX_RECURSION_DEPTH = 8;
 

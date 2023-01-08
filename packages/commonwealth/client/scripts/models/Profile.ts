@@ -1,10 +1,7 @@
-import m from 'mithril';
 import jdenticon from 'jdenticon';
+import m from 'mithril';
 
-import {
-  CWAvatar,
-  CWJdenticon,
-} from '../views/components/component_kit/cw_avatar';
+import { CWAvatar, CWJdenticon, } from '../views/components/component_kit/cw_avatar';
 
 class Profile {
   private _name: string;

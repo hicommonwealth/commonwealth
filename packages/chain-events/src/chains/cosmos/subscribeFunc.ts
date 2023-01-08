@@ -1,23 +1,12 @@
-import {
-  QueryClient,
-  setupStakingExtension,
-  setupGovExtension,
-  setupBankExtension,
-} from '@cosmjs/stargate';
+import { QueryClient, setupBankExtension, setupGovExtension, setupStakingExtension, } from '@cosmjs/stargate';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import sleep from 'sleep-promise';
 
-import {
-  IDisconnectedRange,
-  CWEvent,
-  SubscribeFunc,
-  ISubscribeOptions,
-  SupportedNetwork,
-} from '../../interfaces';
+import { CWEvent, IDisconnectedRange, ISubscribeOptions, SubscribeFunc, SupportedNetwork, } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
+import { Processor } from './processor';
 
 import { Subscriber } from './subscriber';
-import { Processor } from './processor';
 import { Api, IEventData, RawEvent } from './types';
 
 export interface ICosmosSubscribeOptions extends ISubscribeOptions<Api> {

@@ -1,8 +1,5 @@
+import { IAaveGovernanceV2, IGovernancePowerDelegationToken, } from '../../contractTypes';
 import { TypedEvent } from '../../contractTypes/commons';
-import {
-  IAaveGovernanceV2,
-  IGovernancePowerDelegationToken,
-} from '../../contractTypes';
 
 // Used to unwrap promises returned by contract functions
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;

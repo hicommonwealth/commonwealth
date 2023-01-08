@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IPriceOracleAggregator } from "../IPriceOracleAggregator";
+import type { IPriceOracleAggregator } from '../IPriceOracleAggregator';
 
 export class IPriceOracleAggregator__factory {
   static connect(

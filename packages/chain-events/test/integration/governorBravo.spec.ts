@@ -1,20 +1,13 @@
 /* eslint-disable func-names */
 import '@nomiclabs/hardhat-ethers';
-import { EventEmitter } from 'events';
 
 import chai, { expect } from 'chai';
-import { ethers } from 'hardhat';
+import type { BigNumberish, providers, Signer } from 'ethers';
 import { BigNumber } from 'ethers';
-import type { Signer, providers, BigNumberish } from 'ethers';
-
-import {
-  GovernorBravoImmutable,
-  GovernorBravoImmutable__factory as GovernorBravoImmutableFactory,
-  MPond,
-  MPond__factory as MPondFactory,
-  TimelockMock as Timelock,
-  TimelockMock__factory as TimelockFactory,
-} from '../../src/contractTypes';
+import { EventEmitter } from 'events';
+import { ethers } from 'hardhat';
+import { CWEvent, IChainEventData, IEventHandler, SupportedNetwork, } from '../../src';
+import { createApi, StorageFetcher, subscribeEvents, } from '../../src/chains/compound';
 import {
   Api,
   BravoSupport,
@@ -27,17 +20,15 @@ import {
   IVoteCast,
   ProposalState,
 } from '../../src/chains/compound/types';
+
 import {
-  createApi,
-  StorageFetcher,
-  subscribeEvents,
-} from '../../src/chains/compound';
-import {
-  CWEvent,
-  IChainEventData,
-  IEventHandler,
-  SupportedNetwork,
-} from '../../src';
+  GovernorBravoImmutable,
+  GovernorBravoImmutable__factory as GovernorBravoImmutableFactory,
+  MPond,
+  MPond__factory as MPondFactory,
+  TimelockMock as Timelock,
+  TimelockMock__factory as TimelockFactory,
+} from '../../src/contractTypes';
 
 const { assert } = chai;
 

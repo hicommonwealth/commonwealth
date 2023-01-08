@@ -1,8 +1,8 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
-import { app } from '../../../services/app/Server';
 import { Errors as EntityErrors } from '../../../services/app/routes/entities';
 import { Errors as EventErrors } from '../../../services/app/routes/eventActivity';
+import { app } from '../../../services/app/Server';
 
 chai.use(chaiHttp);
 const { expect } = chai;

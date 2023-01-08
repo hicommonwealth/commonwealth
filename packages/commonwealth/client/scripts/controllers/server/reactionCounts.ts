@@ -1,16 +1,15 @@
 /* eslint-disable dot-notation */
+import { notifyError } from 'controllers/app/notifications';
+import proposalIdToEntity from 'helpers/proposalIdToEntity';
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import _ from 'lodash';
+import type { AnyProposal } from 'models';
+import { Comment, Proposal, Thread } from 'models';
+import ReactionCount from 'models/ReactionCount';
 
 import app from 'state';
 
 import { ReactionCountsStore } from 'stores';
-import ReactionCount from 'models/ReactionCount';
-import type { AnyProposal} from 'models';
-import { Comment, Thread, Proposal } from 'models';
-import { notifyError } from 'controllers/app/notifications';
-import proposalIdToEntity from "helpers/proposalIdToEntity";
 
 export const modelFromServer = (reactionCount) => {
   const { id, thread_id, comment_id, proposal_id, has_reacted, like } =

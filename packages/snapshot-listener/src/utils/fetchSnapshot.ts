@@ -1,6 +1,6 @@
-import fetch from "node-fetch";
-import dotenv from "dotenv";
-import { factory, formatFilename } from "common-common/src/logging";
+import { factory, formatFilename } from 'common-common/src/logging';
+import dotenv from 'dotenv';
+import fetch from 'node-fetch';
 
 dotenv.config();
 

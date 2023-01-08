@@ -1,47 +1,33 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { StdSignDoc } from '@cosmjs/amino';
+import { decodeSignature, pubkeyToAddress, serializeSignDoc } from '@cosmjs/amino';
 
-import { StargateClient } from '@cosmjs/stargate';
-import { bech32 } from 'bech32';
-import bs58 from 'bs58';
+import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import { recoverTypedSignature, SignTypedDataVersion, } from '@metamask/eth-sig-util';
 
 import Keyring, { decodeAddress } from '@polkadot/keyring';
 import type { KeyringOptions } from '@polkadot/keyring/types';
-import { stringToU8a, hexToU8a } from '@polkadot/util';
+import { hexToU8a, stringToU8a } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
-import * as ethUtil from 'ethereumjs-util';
-import {
-  recoverTypedSignature,
-  SignTypedDataVersion,
-} from '@metamask/eth-sig-util';
+import { bech32 } from 'bech32';
+import bs58 from 'bs58';
+import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 
-import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import type {
-  StdSignDoc} from '@cosmjs/amino';
-import {
-  pubkeyToAddress,
-  serializeSignDoc,
-  decodeSignature
-} from '@cosmjs/amino';
+import { ChainBase, NotificationCategories, WalletId, } from 'common-common/src/types';
+import * as ethUtil from 'ethereumjs-util';
+import type { NextFunction, Request, Response } from 'express';
 
 import nacl from 'tweetnacl';
-
-import {
-  ChainBase,
-  NotificationCategories,
-  WalletId,
-} from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { addressSwapper } from '../../shared/utils';
-import type { ChainInstance } from '../models/chain';
-import type { ProfileAttributes } from '../models/profile';
-import type { AddressInstance } from '../models/address';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedMessage } from '../../shared/adapters/chain/ethereum/keys';
-import type { DB } from '../models';
-import { DynamicTemplate } from '../../shared/types';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { mixpanelTrack } from '../util/mixpanelUtil';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
+import { DynamicTemplate } from '../../shared/types';
+import { addressSwapper } from '../../shared/utils';
+import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
+import type { ChainInstance } from '../models/chain';
+import type { ProfileAttributes } from '../models/profile';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');

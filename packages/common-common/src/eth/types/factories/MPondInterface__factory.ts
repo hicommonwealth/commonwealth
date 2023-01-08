@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { MPondInterface } from "../MPondInterface";
+import type { MPondInterface } from '../MPondInterface';
 
 export class MPondInterface__factory {
   static connect(

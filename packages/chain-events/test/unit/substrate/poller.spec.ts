@@ -1,10 +1,5 @@
+import { EventRecord, Hash, Header, RuntimeVersion, } from '@polkadot/types/interfaces';
 import chai from 'chai';
-import {
-  Hash,
-  EventRecord,
-  Header,
-  RuntimeVersion,
-} from '@polkadot/types/interfaces';
 
 import { Poller } from '../../../src/chains/substrate/poller';
 

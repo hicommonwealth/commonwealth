@@ -1,14 +1,14 @@
 declare let window: any;
 
+import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import $ from 'jquery';
+import type { Account, BlockInfo, IWebWallet } from 'models';
 import app from 'state';
 import Web3 from 'web3';
-import $ from 'jquery';
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, BlockInfo, IWebWallet } from 'models';
-import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS

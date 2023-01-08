@@ -1,20 +1,19 @@
+import type { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 import BN from 'bn.js';
+
+import { MolochEvents } from 'chain-events/src';
 
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 
-import type { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-
-import { MolochEvents } from 'chain-events/src';
-
 import type { IApp } from 'state';
+import { attachSigner } from '../contractApi';
+import type MolochAPI from './api';
+import type MolochChain from './chain';
+import type MolochMember from './member';
+import type MolochMembers from './members';
 
 import MolochProposal from './proposal';
-import type MolochMembers from './members';
-import type MolochAPI from './api';
-import type MolochMember from './member';
-import type MolochChain from './chain';
-import { attachSigner } from '../contractApi';
 
 export default class MolochGovernance extends ProposalModule<
   MolochAPI,

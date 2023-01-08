@@ -1,5 +1,5 @@
-import type { Request, Response, NextFunction } from 'express';
 import axios from 'axios';
+import type { NextFunction, Request, Response } from 'express';
 
 export const sendMessage = async (
   req: Request,

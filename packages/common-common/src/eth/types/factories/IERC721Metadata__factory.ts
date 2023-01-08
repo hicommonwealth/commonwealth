@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IERC721Metadata } from "../IERC721Metadata";
+import type { IERC721Metadata } from '../IERC721Metadata';
 
 export class IERC721Metadata__factory {
   static connect(

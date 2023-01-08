@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { GovernorVotes } from "../GovernorVotes";
+import type { GovernorVotes } from '../GovernorVotes';
 
 export class GovernorVotes__factory {
   static connect(

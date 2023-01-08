@@ -1,11 +1,6 @@
+import type { ConnectedWallet } from '@terra-money/wallet-controller';
+import { ConnectType, getChainOptions, WalletController, } from '@terra-money/wallet-controller';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type {
-  ConnectedWallet} from '@terra-money/wallet-controller';
-import {
-  ConnectType,
-  getChainOptions,
-  WalletController,
-} from '@terra-money/wallet-controller';
 import type { Account, IWebWallet } from 'models';
 
 // TODO: ensure this only opens on mobile

@@ -1,35 +1,24 @@
-import moment from 'moment';
+import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
+import { formatNumberLong } from 'adapters/currency';
 import BN from 'bn.js';
-import Web3 from 'web3';
-import $ from 'jquery';
 import bs58 from 'bs58';
 import { AaveTypes } from 'chain-events/src';
 import { ProposalType } from 'common-common/src/types';
-import type { EthereumCoin } from 'adapters/chain/ethereum/types';
-import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { formatNumberLong } from 'adapters/currency';
-
-import type {
-  IVote,
-  ITXModalData,
-  ProposalEndTime,
-  ChainEntity,
-  ChainEvent} from 'models';
-import {
-  Proposal,
-  VotingType,
-  VotingUnit,
-  ProposalStatus
-} from 'models';
 import { blocknumToTime } from 'helpers';
+import $ from 'jquery';
 
-import type { AaveExecutor } from './api';
-import type AaveAPI from './api';
-import type AaveGovernance from './governance';
-import { attachSigner } from '../contractApi';
-import type AaveChain from './chain';
-import type EthereumAccounts from '../accounts';
+import type { ChainEntity, ChainEvent, ITXModalData, IVote, ProposalEndTime } from 'models';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import moment from 'moment';
+import Web3 from 'web3';
 import type EthereumAccount from '../account';
+import type EthereumAccounts from '../accounts';
+import { attachSigner } from '../contractApi';
+
+import type AaveAPI, { AaveExecutor } from './api';
+import type AaveChain from './chain';
+import type AaveGovernance from './governance';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;

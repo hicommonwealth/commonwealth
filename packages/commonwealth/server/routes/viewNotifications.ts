@@ -1,6 +1,6 @@
-import Sequelize from 'sequelize';
-import type { Request, Response, NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import Sequelize from 'sequelize';
 import type { DB } from '../models';
 
 const Op = Sequelize.Op;

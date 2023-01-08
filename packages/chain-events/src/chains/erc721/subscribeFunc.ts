@@ -1,19 +1,14 @@
 import sleep from 'sleep-promise';
 import _ from 'underscore';
+import { ERC721, ERC721__factory as ERC721Factory } from '../../contractTypes';
 
 import { createProvider } from '../../eth';
-import {
-  CWEvent,
-  SubscribeFunc,
-  ISubscribeOptions,
-  SupportedNetwork,
-} from '../../interfaces';
+import { CWEvent, ISubscribeOptions, SubscribeFunc, SupportedNetwork, } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
-import { ERC721__factory as ERC721Factory, ERC721 } from '../../contractTypes';
+import { Processor } from './processor';
 
 import { Subscriber } from './subscriber';
-import { Processor } from './processor';
-import { IEventData, RawEvent, IErc721Contracts } from './types';
+import { IErc721Contracts, IEventData, RawEvent } from './types';
 
 export interface IErc721SubscribeOptions
   extends ISubscribeOptions<IErc721Contracts> {

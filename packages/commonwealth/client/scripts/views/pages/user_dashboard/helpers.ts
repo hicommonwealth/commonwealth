@@ -1,16 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { NotificationCategories } from 'common-common/src/types';
+import { notifySuccess } from 'controllers/app/notifications';
+import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
 import $ from 'jquery';
+import m from 'mithril';
+import type { NotificationSubscription } from 'models';
 
 import app from 'state';
-import {NotificationCategories} from 'common-common/src/types';
-import type {NotificationSubscription} from 'models';
-import {QuillFormattedText} from 'views/components/quill/quill_formatted_text';
-import {MarkdownFormattedText} from 'views/components/quill/markdown_formatted_text';
-import {notifySuccess} from 'controllers/app/notifications';
-import {DashboardViews} from '.';
-import {getBaseUrl, getFetch, ServiceUrls} from "helpers/getUrl";
+import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
+import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
+import { DashboardViews } from '.';
 
 export const getCommentPreview = (commentText) => {
   // TODO Graham 6-5-22: Duplicate with notification_row.ts? See relevant note there

@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { CompInterface } from "../CompInterface";
+import type { CompInterface } from '../CompInterface';
 
 export class CompInterface__factory {
   static connect(

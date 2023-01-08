@@ -1,11 +1,5 @@
 import { assert } from 'chai';
-import {
-  computePermissions,
-  Permissions,
-  Action,
-  addPermission,
-  isPermitted,
-} from 'common-common/src/permissions';
+import { Action, addPermission, computePermissions, isPermitted, } from 'common-common/src/permissions';
 
 describe('computePermissions() unit tests', () => {
   let base_permission;

@@ -1,23 +1,15 @@
 import EthDater from 'ethereum-block-by-date';
 import sleep from 'sleep-promise';
+import { Moloch1__factory as Moloch1Factory, Moloch2__factory as Moloch2Factory, } from '../../contractTypes';
 
 import { createProvider } from '../../eth';
-import {
-  Moloch1__factory as Moloch1Factory,
-  Moloch2__factory as Moloch2Factory,
-} from '../../contractTypes';
-import {
-  IDisconnectedRange,
-  CWEvent,
-  SubscribeFunc,
-  SupportedNetwork,
-} from '../../interfaces';
+import { CWEvent, IDisconnectedRange, SubscribeFunc, SupportedNetwork, } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
-
-import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
-import { IEventData, RawEvent, Api, SubscribeOptions } from './types';
+
+import { Subscriber } from './subscriber';
+import { Api, IEventData, RawEvent, SubscribeOptions } from './types';
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.

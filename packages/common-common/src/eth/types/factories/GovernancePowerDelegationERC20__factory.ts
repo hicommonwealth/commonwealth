@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { GovernancePowerDelegationERC20 } from "../GovernancePowerDelegationERC20";
+import type { GovernancePowerDelegationERC20 } from '../GovernancePowerDelegationERC20';
 
 export class GovernancePowerDelegationERC20__factory {
   static connect(

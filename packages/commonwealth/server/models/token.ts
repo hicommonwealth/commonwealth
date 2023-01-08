@@ -1,6 +1,5 @@
 import type * as Sequelize from 'sequelize';
-import { Model } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type TokenAttributes = {
   id: string;

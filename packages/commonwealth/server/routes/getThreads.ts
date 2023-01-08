@@ -1,6 +1,6 @@
-import type { Request, Response, NextFunction } from 'express';
+import { ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { AppError, ServerError } from 'common-common/src/errors';
 import type { DB } from '../models';
 
 const getThreads = async (

@@ -1,5 +1,5 @@
-import 'chai/register-should';
 import chai from 'chai';
+import 'chai/register-should';
 import type { GetCommunitiesReq } from 'common-common/src/api/extApiTypes';
 import { testChains, testComments } from 'test/integration/api/external/dbEntityHooks.spec';
 import { get } from './appHook.spec';

@@ -1,5 +1,4 @@
 import models from '../services/database/database';
-import {QueryTypes} from "sequelize";
 
 
 async function testSequelizeQuery() {

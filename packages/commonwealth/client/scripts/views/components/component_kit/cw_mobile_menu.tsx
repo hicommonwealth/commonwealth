@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_mobile_menu.scss';
+import m from 'mithril';
 
 import app from 'state';
-import { getClasses } from './helpers';
-import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
+import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
 import { ComponentType, MenuItem } from './types';
 
 class CWMobileMenuItem extends ClassComponent<MenuItem> {

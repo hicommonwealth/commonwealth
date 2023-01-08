@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { IWETH10 } from "../IWETH10";
+import type { IWETH10 } from '../IWETH10';
 
 export class IWETH10__factory {
   static connect(

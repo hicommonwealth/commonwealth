@@ -1,12 +1,12 @@
-import type moment from 'moment';
 import type { Coin } from 'adapters/currency';
 import type { IIdentifiable } from 'adapters/shared';
 import type { ProposalType } from 'common-common/src/types';
-import type { IVote, IUniqueId, ITXModalData } from './interfaces';
-import type { VotingType, VotingUnit, ProposalEndTime, ProposalStatus } from './types';
-import type Account from './Account';
+import type moment from 'moment';
 import type { ProposalStore } from '../stores';
+import type Account from './Account';
 import type ChainEvent from './ChainEvent';
+import type { ITXModalData, IUniqueId, IVote } from './interfaces';
+import type { ProposalEndTime, ProposalStatus, VotingType, VotingUnit } from './types';
 
 abstract class Proposal<
   ApiT,

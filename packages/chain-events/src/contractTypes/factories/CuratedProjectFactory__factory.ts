@@ -2,16 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  Signer,
-  BigNumberish,
-  Contract,
-  ContractFactory,
-  Overrides,
-} from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { BigNumberish, Contract, ContractFactory, Overrides, Signer, } from 'ethers';
 
-import type { CuratedProjectFactory } from "../CuratedProjectFactory";
+import type { CuratedProjectFactory } from '../CuratedProjectFactory';
 
 export class CuratedProjectFactory__factory extends ContractFactory {
   constructor(signer?: Signer) {

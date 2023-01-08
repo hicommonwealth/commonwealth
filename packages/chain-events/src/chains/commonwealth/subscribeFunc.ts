@@ -1,20 +1,14 @@
 import sleep from 'sleep-promise';
-
-import { createProvider } from '../../eth';
-import {
-  IDisconnectedRange,
-  CWEvent,
-  SubscribeFunc,
-  ISubscribeOptions,
-  SupportedNetwork,
-} from '../../interfaces';
-import { addPrefix, factory } from '../../logging';
 import { IProjectBaseFactory__factory as IProjectBaseFactoryFactory } from '../../contractTypes';
 
-import { Subscriber, constructProjectApi } from './subscriber';
+import { createProvider } from '../../eth';
+import { CWEvent, IDisconnectedRange, ISubscribeOptions, SubscribeFunc, SupportedNetwork, } from '../../interfaces';
+import { addPrefix, factory } from '../../logging';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
-import { IEventData, RawEvent, Api } from './types';
+
+import { constructProjectApi, Subscriber } from './subscriber';
+import { Api, IEventData, RawEvent } from './types';
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.

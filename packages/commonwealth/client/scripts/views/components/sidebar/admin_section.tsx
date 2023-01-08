@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import app from 'state';
 import { handleRedirectClicks } from 'helpers';
-import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
-import { SidebarSectionGroup } from './sidebar_section';
-import { OrderTopicsModal } from '../../modals/order_topics_modal';
-import { NewTopicModal } from '../../modals/new_topic_modal';
+import m from 'mithril';
+import app from 'state';
 import { EditTopicThresholdsModal } from '../../modals/edit_topic_thresholds_modal';
+import { NewTopicModal } from '../../modals/new_topic_modal';
+import { OrderTopicsModal } from '../../modals/order_topics_modal';
 import { verifyCachedToggleTree } from './helpers';
+import { SidebarSectionGroup } from './sidebar_section';
+import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 
 function setAdminToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(

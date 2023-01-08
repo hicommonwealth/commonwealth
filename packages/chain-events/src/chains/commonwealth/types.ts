@@ -1,11 +1,7 @@
 /* eslint-disable no-shadow */
-import {
-  IProjectBaseFactory,
-  ICuratedProject,
-  IERC20,
-} from '../../contractTypes';
+import { Web3Provider } from '@ethersproject/providers';
+import { ICuratedProject, IERC20, IProjectBaseFactory, } from '../../contractTypes';
 import { TypedEvent } from '../../contractTypes/commons';
-import {Web3Provider} from "@ethersproject/providers";
 
 // options for the listener class
 export interface ListenerOptions {

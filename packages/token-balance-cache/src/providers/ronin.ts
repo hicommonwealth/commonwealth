@@ -1,11 +1,11 @@
 import BN from 'bn.js';
-import { StateMutabilityType, AbiType } from 'web3-utils';
-import Web3 from 'web3';
-import { providers } from 'ethers';
 import { ERC20__factory } from 'common-common/src/eth/types';
-
-import { BalanceProvider, IChainNode } from "../types";
 import { BalanceType } from 'common-common/src/types';
+import { providers } from 'ethers';
+import Web3 from 'web3';
+import { AbiType, StateMutabilityType } from 'web3-utils';
+
+import { BalanceProvider, IChainNode } from '../types';
 
 export default class RoninBalanceProvider extends BalanceProvider {
   public name = 'ronin';

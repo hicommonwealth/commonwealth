@@ -1,34 +1,22 @@
-import moment from 'moment';
-import type { Request, Response, NextFunction } from 'express';
-import {
-  ChainNetwork,
-  ChainType,
-  NotificationCategories,
-  ProposalType,
-} from 'common-common/src/types';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import { ChainNetwork, ChainType, NotificationCategories, ProposalType, } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import validateTopicThreshold from '../util/validateTopicThreshold';
-import { parseUserMentions } from '../util/parseUserMentions';
-import type { DB } from '../models';
+import { MixpanelCommunityInteractionEvent, } from '../../shared/analytics/types';
 
-import {
-  getProposalUrl,
-  getProposalUrlWithoutObject,
-  renderQuillDeltaToText,
-} from '../../shared/utils';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
-} from '../../shared/analytics/types';
+import { getProposalUrl, getProposalUrlWithoutObject, renderQuillDeltaToText, } from '../../shared/utils';
 import { SENDGRID_API_KEY } from '../config';
+import type { DB } from '../models';
+import type BanCache from '../util/banCheckCache';
+import emitNotifications from '../util/emitNotifications';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { parseUserMentions } from '../util/parseUserMentions';
+import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
-import type BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { findAllRoles } from '../util/roles';
-import emitNotifications from '../util/emitNotifications';
+import validateTopicThreshold from '../util/validateTopicThreshold';
 
 const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);

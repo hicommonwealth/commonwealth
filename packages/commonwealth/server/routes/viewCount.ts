@@ -1,9 +1,8 @@
-import type { Request, Response, NextFunction } from 'express';
-import type ViewCountCache from '../util/viewCountCache';
+import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
-import { sequelize } from '../database';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type ViewCountCache from '../util/viewCountCache';
 
 const log = factory.getLogger(formatFilename(__filename));
 

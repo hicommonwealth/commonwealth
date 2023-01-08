@@ -1,6 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import 'hardhat-typechain';
 import '@nomiclabs/hardhat-waffle';
+import 'hardhat-typechain';
 
 export default {
   solidity: {

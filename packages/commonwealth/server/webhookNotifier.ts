@@ -1,13 +1,12 @@
-import request from 'superagent';
-import { Op } from 'sequelize';
-import { capitalize } from 'lodash';
 import type { CWEvent } from 'chain-events/src/interfaces';
 import { Label as ChainEventLabel } from 'chain-events/src/util';
 
 import { NotificationCategories } from 'common-common/src/types';
-import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
-import { getForumNotificationCopy } from '../shared/notificationFormatter';
-import { SERVER_URL, SLACK_FEEDBACK_WEBHOOK, DEFAULT_COMMONWEALTH_LOGO } from './config';
+import { capitalize } from 'lodash';
+import { Op } from 'sequelize';
+import request from 'superagent';
+import { renderQuillDeltaToText, smartTrim, validURL } from '../shared/utils';
+import { DEFAULT_COMMONWEALTH_LOGO, SERVER_URL, SLACK_FEEDBACK_WEBHOOK } from './config';
 
 export interface WebhookContent {
   notificationCategory: string;

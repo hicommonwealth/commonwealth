@@ -1,10 +1,10 @@
 import AWS from 'aws-sdk';
-import { v4 as uuidv4 } from 'uuid';
-
-import type { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+
+import type { NextFunction, Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

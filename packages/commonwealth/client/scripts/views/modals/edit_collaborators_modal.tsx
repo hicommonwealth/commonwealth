@@ -1,25 +1,21 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { ListItem, QueryList } from 'construct-ui';
+import { notifyError, notifyInfo, notifySuccess, } from 'controllers/app/notifications';
 import $ from 'jquery';
-import { QueryList, ListItem } from 'construct-ui';
+import m from 'mithril';
 
 import 'modals/edit_collaborators_modal.scss';
+import { Profile, Thread } from 'models';
 
 import app from 'state';
-import { Thread, Profile } from 'models';
 import User from 'views/components/widgets/user';
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-} from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
-import { ModalExitButton } from '../components/component_kit/cw_modal';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
+import { ModalExitButton } from '../components/component_kit/cw_modal';
+import { CWText } from '../components/component_kit/cw_text';
 
 type EditCollaboratorsModalAttrs = {
   thread: Thread;

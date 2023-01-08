@@ -1,21 +1,21 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
-import _ from 'lodash';
 import $ from 'jquery';
+import _ from 'lodash';
+import m from 'mithril';
+import { Profile } from 'models';
 
 import 'pages/members.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { PageLoading } from 'views/pages/loading';
 import User from 'views/components/widgets/user';
+import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import { Profile } from 'models';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { CWText } from '../components/component_kit/cw_text';
 
 // The number of member profiles that are batch loaded
 const DEFAULT_MEMBER_REQ_SIZE = 20;

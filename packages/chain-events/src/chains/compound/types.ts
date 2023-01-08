@@ -1,6 +1,6 @@
 /* eslint-disable no-shadow */
-import { TypedEvent } from '../../contractTypes/commons';
 import { GovernorAlpha, GovernorCompatibilityBravo } from '../../contractTypes';
+import { TypedEvent } from '../../contractTypes/commons';
 
 export enum ProposalState {
   Pending = 0,

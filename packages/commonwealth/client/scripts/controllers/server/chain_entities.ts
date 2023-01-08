@@ -1,24 +1,15 @@
 /* eslint-disable no-restricted-syntax */
-import $ from 'jquery';
-
-import { ChainEntityStore } from 'stores';
+import type { CWEvent, IChainEntityKind, IEventProcessor, IEventSubscriber } from 'chain-events/src';
+import { eventToEntity, getUniqueEntityKey, SubstrateTypes, SupportedNetwork } from 'chain-events/src';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { getBaseUrl, getFetch } from 'helpers/getUrl';
+import $ from 'jquery';
 import type { ChainInfo } from 'models';
 import { ChainEntity, ChainEvent, ChainEventType } from 'models';
 import app from 'state';
-import type {
-  CWEvent,
-  IEventProcessor,
-  IEventSubscriber,
-  IChainEntityKind} from 'chain-events/src';
-import {
-  eventToEntity,
-  SubstrateTypes,
-  SupportedNetwork,
-  getUniqueEntityKey
-} from 'chain-events/src';
+
+import { ChainEntityStore } from 'stores';
 import { notifyError } from '../app/notifications';
-import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;

@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'pages/view_proposal/proposal_header_links.scss';
+import { ProposalType } from 'common-common/src/types';
 
 import { externalLink, extractDomain, link } from 'helpers';
-import { AnyProposal } from 'models';
 import { getProposalUrlPath } from 'identifiers';
-import { ProposalType } from 'common-common/src/types';
+import m from 'mithril';
+import { AnyProposal } from 'models';
+
+import 'pages/view_proposal/proposal_header_links.scss';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 
 type ProposalHeaderLinkAttrs = {

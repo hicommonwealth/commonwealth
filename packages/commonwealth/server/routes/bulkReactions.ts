@@ -1,8 +1,8 @@
-import type { Request, Response, NextFunction } from 'express';
-import { uniqBy } from 'lodash';
+import { ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction, Request, Response } from 'express';
+import { uniqBy } from 'lodash';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 

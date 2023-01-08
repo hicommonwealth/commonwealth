@@ -1,7 +1,6 @@
-import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-
 import type { RegisteredTypes } from '@polkadot/types/types';
 import type { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
 import type { AddressAttributes, AddressInstance } from './address';
 import type { ChainNodeAttributes, ChainNodeInstance } from './chain_node';

@@ -1,11 +1,11 @@
-import m from 'mithril';
-import lity from 'lity';
-import { slugify } from 'utils';
-
-import app from 'state';
-import type { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
+import lity from 'lity';
+import m from 'mithril';
+import type { Thread } from 'models';
+
+import app from 'state';
+import { slugify } from 'utils';
 
 const ProfileProposal: m.Component<
   { proposal: Thread },

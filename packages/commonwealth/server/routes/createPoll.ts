@@ -1,9 +1,9 @@
-import moment from 'moment';
-import type { Request, Response, NextFunction } from 'express';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
 import { getNextPollEndingTime } from '../../shared/utils';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));

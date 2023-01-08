@@ -1,9 +1,9 @@
-import Web3 from 'web3';
-import { providers } from 'ethers';
 import { ERC20, ERC20__factory, ERC721, ERC721__factory } from 'common-common/src/eth/types';
-
-import { BalanceProvider, IChainNode } from "../types";
 import { BalanceType } from 'common-common/src/types';
+import { providers } from 'ethers';
+import Web3 from 'web3';
+
+import { BalanceProvider, IChainNode } from '../types';
 
 type EthBPOpts = {
   tokenAddress?: string;

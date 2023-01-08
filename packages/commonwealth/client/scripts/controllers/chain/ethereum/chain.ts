@@ -1,17 +1,11 @@
+import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import m from 'mithril';
+
+import type { ChainInfo, IChainModule, ITXData, ITXModalData, NodeInfo } from 'models';
+import moment from 'moment';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import Web3 from 'web3';
-import m from 'mithril';
-import moment from 'moment';
-
-import type {
-  NodeInfo,
-  ITXModalData,
-  ITXData,
-  IChainModule,
-  ChainInfo
-} from 'models';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import type EthereumAccount from './account';
 
 const ETHEREUM_BLOCK_TIME = 13;

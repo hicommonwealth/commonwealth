@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_wallet_option_row.scss';
+import m from 'mithril';
+import { CWCustomIcon } from './cw_icons/cw_custom_icon';
+import { CustomIconName } from './cw_icons/cw_icon_lookup';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { CWText } from './cw_text';
-import { CWCustomIcon } from './cw_icons/cw_custom_icon';
-import { getClasses } from './helpers';
-import { CustomIconName } from './cw_icons/cw_icon_lookup';
 
 type WalletOptionRowStyleAttrs = {
   disabled?: boolean;

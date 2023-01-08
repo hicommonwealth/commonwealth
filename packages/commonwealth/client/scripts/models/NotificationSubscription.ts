@@ -1,8 +1,8 @@
+import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 import type { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
 import type { IUniqueId } from './interfaces';
 

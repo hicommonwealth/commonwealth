@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { notifyError } from 'controllers/app/notifications';
 import dragula from 'dragula';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/order_topics_modal.scss';
+import { Topic } from 'models';
 
 import app from 'state';
-import { Topic } from 'models';
-import { notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWIcon } from '../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../components/component_kit/cw_text';
 
 export class OrderTopicsModal extends ClassComponent {
   private topics: Array<Topic>;

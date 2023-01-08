@@ -1,17 +1,11 @@
-import $ from 'jquery';
-import m from 'mithril';
-import app from 'state';
-import type moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
-import { IChainEntityKind } from 'chain-events/src';
-import type { IUniqueId } from './interfaces';
-import type { ThreadKind, ThreadStage } from './types';
-import type Attachment from './Attachment';
-import type Topic from './Topic';
-import Vote from './Vote';
+import type moment from 'moment';
 import type { VersionHistory } from '../controllers/server/threads';
-import { ChainEntity } from '.';
+import type Attachment from './Attachment';
+import type { IUniqueId } from './interfaces';
 import type Poll from './Poll';
+import type Topic from './Topic';
+import type { ThreadKind, ThreadStage } from './types';
 
 // field names copied from snapshot
 interface IOffchainVotingOptions {

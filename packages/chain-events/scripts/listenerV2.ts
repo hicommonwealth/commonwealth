@@ -2,7 +2,7 @@ import * as yargs from 'yargs';
 
 import { createListener, LoggingHandler, SupportedNetwork } from '../src';
 
-import { networkUrls, contracts, networkSpecs } from './listenerUtils';
+import { contracts, networkSpecs, networkUrls } from './listenerUtils';
 
 require('dotenv').config();
 

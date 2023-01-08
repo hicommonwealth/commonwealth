@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { Contract, ContractFactory, Overrides, Signer } from 'ethers';
 
-import type { AaveTokenV1Mock } from "../AaveTokenV1Mock";
+import type { AaveTokenV1Mock } from '../AaveTokenV1Mock';
 
 export class AaveTokenV1Mock__factory extends ContractFactory {
   constructor(signer?: Signer) {

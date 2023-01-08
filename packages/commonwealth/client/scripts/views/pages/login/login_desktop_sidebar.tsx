@@ -1,16 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import app from 'state';
-
-import 'pages/login/login_desktop_sidebar.scss';
+import { ChainNetwork } from 'common-common/src/types';
+import m from 'mithril';
 
 import { IWebWallet } from 'models';
-import { ChainNetwork } from 'common-common/src/types';
-import { CWText } from '../../components/component_kit/cw_text';
+
+import 'pages/login/login_desktop_sidebar.scss';
+import app from 'state';
 import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWText } from '../../components/component_kit/cw_text';
 import { LoginText } from './login_text';
 import { LoginSidebarType } from './types';
 

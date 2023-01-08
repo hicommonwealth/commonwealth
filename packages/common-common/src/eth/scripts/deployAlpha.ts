@@ -1,11 +1,7 @@
 import { providers } from 'ethers';
 import Web3 from 'web3';
 
-import {
-  MPond__factory,
-  TimelockMock__factory,
-  GovernorAlphaMock__factory,
-} from '../types';
+import { GovernorAlphaMock__factory, MPond__factory, TimelockMock__factory, } from '../types';
 
 async function main() {
   // TODO: configure URL based on chain

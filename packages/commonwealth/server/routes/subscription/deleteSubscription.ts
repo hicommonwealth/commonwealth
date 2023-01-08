@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
-import Errors from './errors';
+import { AppError } from 'common-common/src/errors';
 import { NotificationCategories } from 'common-common/src/types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import Errors from './errors';
 
 export default async (models, req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {

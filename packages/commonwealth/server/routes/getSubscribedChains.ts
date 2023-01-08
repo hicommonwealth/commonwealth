@@ -1,7 +1,7 @@
-import type {DB} from "../models";
-import type {NextFunction, Request, Response} from "express";
-import {AppError} from "common-common/src/errors";
-import {CHAIN_EVENT_SERVICE_SECRET} from "../config";
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import { CHAIN_EVENT_SERVICE_SECRET } from '../config';
+import type { DB } from '../models';
 
 export const Errors = {
   NeedSecret: 'Must provide the secret to use this route',

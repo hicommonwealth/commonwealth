@@ -1,8 +1,8 @@
-import m from 'mithril';
-import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
-import { uuidv4 } from 'lib/util';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelErrorCaptureEvent } from 'analytics/types';
+import { Icons, Intent, Size, Toast, ToasterPosition } from 'construct-ui';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import { uuidv4 } from 'lib/util';
+import m from 'mithril';
 import app from 'state';
 
 const timeout = 3000;

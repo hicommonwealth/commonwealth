@@ -1,7 +1,6 @@
+import { notifyError } from 'controllers/app/notifications';
 import $ from 'jquery';
 import app from 'state';
-
-import { notifyError } from 'controllers/app/notifications';
 
 class SettingsController {
   public static async disableRichText(value: boolean) {

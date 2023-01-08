@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
-import 'pages/view_proposal/aave_summary.scss';
-
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import { AaveInfoRow } from '../../components/proposals/aave_proposal_card_detail';
+import m from 'mithril';
+
+import 'pages/view_proposal/aave_summary.scss';
 import { CWText } from '../../components/component_kit/cw_text';
+import { AaveInfoRow } from '../../components/proposals/aave_proposal_card_detail';
 
 type AaveViewProposalDetailAttrs = {
   proposal: AaveProposal;

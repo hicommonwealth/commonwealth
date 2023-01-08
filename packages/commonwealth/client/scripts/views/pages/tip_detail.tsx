@@ -1,21 +1,21 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
+import m from 'mithril';
+import { DepositVote } from 'models';
+import { IBalanceAccount } from 'models/interfaces';
 
 import 'pages/tip_detail.scss';
 
 import app from 'state';
-import { DepositVote } from 'models';
-import { IBalanceAccount } from 'models/interfaces';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
-import Sublayout from '../sublayout';
-import User from '../components/widgets/user';
-import { MarkdownFormattedText } from '../components/quill/markdown_formatted_text';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { MarkdownFormattedText } from '../components/quill/markdown_formatted_text';
+import User from '../components/widgets/user';
 import { createTXModal } from '../modals/tx_signing_modal';
+import Sublayout from '../sublayout';
 
 type TipDetailAttrs = {
   headerTitle: string;

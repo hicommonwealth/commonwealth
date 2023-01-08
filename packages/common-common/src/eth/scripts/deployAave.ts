@@ -1,14 +1,12 @@
-import hre from 'hardhat';
 import '@nomiclabs/hardhat-ethers';
+import hre from 'hardhat';
 
 import {
-  AaveTokenV2Mock__factory as AaveTokenV2Factory,
-  AaveTokenV2Mock as AaveTokenV2,
-  GovernanceStrategy__factory as GovernanceStrategyFactory,
-  GovernanceStrategy,
-  Executor__factory as ExecutorFactory,
-  Executor,
   AaveGovernanceV2__factory as AaveGovernanceV2Factory,
+  AaveTokenV2Mock as AaveTokenV2,
+  AaveTokenV2Mock__factory as AaveTokenV2Factory,
+  Executor__factory as ExecutorFactory,
+  GovernanceStrategy__factory as GovernanceStrategyFactory,
 } from '../types';
 
 async function increaseTime(blocks: number): Promise<void> {

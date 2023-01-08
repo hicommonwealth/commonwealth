@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Contract, Signer } from "ethers";
-import { Provider } from "@ethersproject/providers";
+import { Provider } from '@ethersproject/providers';
+import { Contract, Signer } from 'ethers';
 
-import type { ERC20Burnable } from "../ERC20Burnable";
+import type { ERC20Burnable } from '../ERC20Burnable';
 
 export class ERC20Burnable__factory {
   static connect(

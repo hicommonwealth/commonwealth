@@ -1,25 +1,25 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import $ from 'jquery';
 import * as solw3 from '@solana/web3.js';
-
-import app from 'state';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { initAppState } from 'app';
-import { slugifyPreserveDashes } from 'utils';
+import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+import $ from 'jquery';
+import m from 'mithril';
+
+import app from 'state';
+import { slugifyPreserveDashes } from 'utils';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState } from './types';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { defaultChainRows, initChainForm } from './chain_input_rows';
+import { ChainFormFields, ChainFormState } from './types';
 
 type SplTokenFormFields = {
   cluster: solw3.Cluster;

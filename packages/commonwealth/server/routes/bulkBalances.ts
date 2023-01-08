@@ -1,11 +1,11 @@
 import BN from 'bn.js';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
+import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { QueryTypes } from 'sequelize';
-import type { AddressInstance } from '../models/address';
-import type { DB } from '../models';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import { sequelize } from '../database';
-import { AppError } from 'common-common/src/errors';
+import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 

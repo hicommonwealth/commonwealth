@@ -4,14 +4,10 @@
 import { decodeTxRaw } from '@cosmjs/proto-signing';
 import { Block } from '@cosmjs/tendermint-rpc';
 
-import {
-  IDisconnectedRange,
-  IEventSubscriber,
-  SupportedNetwork,
-} from '../../interfaces';
+import { IDisconnectedRange, IEventSubscriber, SupportedNetwork, } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, Api } from './types';
+import { Api, RawEvent } from './types';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;

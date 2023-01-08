@@ -1,31 +1,31 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import chai, { expect } from 'chai';
+
+import { BigNumberish, providers, Signer } from 'ethers';
 /* eslint-disable global-require */
 /* eslint-disable no-unused-expressions */
 import { EventEmitter } from 'events';
-
-import { providers, Signer, BigNumberish } from 'ethers';
-import chai, { expect } from 'chai';
-
-import {
-  MPond__factory as MPondFactory,
-  MPond,
-  GovernorAlphaMock__factory as GovernorAlphaFactory,
-  GovernorAlphaMock as GovernorAlpha,
-  TimelockMock__factory as TimelockFactory,
-  TimelockMock as Timelock,
-} from '../../src/contractTypes';
+import { subscribeEvents } from '../../src/chains/compound/subscribeFunc';
 import {
   Api,
-  IEventData,
   EventKind,
+  IEventData,
   IProposalCreated,
-  IProposalQueued,
   IProposalExecuted,
+  IProposalQueued,
   IVoteCast,
   ProposalState,
 } from '../../src/chains/compound/types';
-import { subscribeEvents } from '../../src/chains/compound/subscribeFunc';
-import { IEventHandler, CWEvent, IChainEventData } from '../../src/interfaces';
+
+import {
+  GovernorAlphaMock as GovernorAlpha,
+  GovernorAlphaMock__factory as GovernorAlphaFactory,
+  MPond,
+  MPond__factory as MPondFactory,
+  TimelockMock as Timelock,
+  TimelockMock__factory as TimelockFactory,
+} from '../../src/contractTypes';
+import { CWEvent, IChainEventData, IEventHandler } from '../../src/interfaces';
 
 const { assert } = chai;
 

@@ -1,25 +1,16 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import {
-  CWEvent,
-  IChainEventKind,
-  IEventHandler,
-  SubstrateTypes,
-} from 'chain-events/src';
-import * as Sequelize from 'sequelize';
+import { CWEvent, IChainEventKind, IEventHandler, SubstrateTypes, } from 'chain-events/src';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import {
-  RabbitMQController,
-  RascalPublications,
-  RmqCETypeCUD,
-} from 'common-common/src/rabbitmq';
+import { RabbitMQController, RascalPublications, RmqCETypeCUD, } from 'common-common/src/rabbitmq';
+import { StatsDController } from 'common-common/src/statsd';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
+import * as Sequelize from 'sequelize';
 
 import { DB } from '../../database/database';
 import { ChainEventInstance } from '../../database/models/chain_event';
-import {StatsDController} from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 

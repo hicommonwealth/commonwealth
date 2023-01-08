@@ -1,9 +1,9 @@
-import type { Request, Response } from 'express';
-import { QueryTypes } from 'sequelize';
-import { groupBy } from 'lodash';
 import { factory, formatFilename } from 'common-common/src/logging';
-import type { DB } from '../models';
+import type { Request, Response } from 'express';
+import { groupBy } from 'lodash';
+import { QueryTypes } from 'sequelize';
 import { sequelize } from '../database';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

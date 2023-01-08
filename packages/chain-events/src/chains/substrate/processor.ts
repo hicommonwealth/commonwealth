@@ -2,14 +2,14 @@
  * Processes substrate blocks and emits events.
  */
 import { ApiPromise } from '@polkadot/api';
-import { Extrinsic, Event } from '@polkadot/types/interfaces';
+import { Event, Extrinsic } from '@polkadot/types/interfaces';
 
-import { IEventProcessor, CWEvent, SupportedNetwork } from '../../interfaces';
+import { CWEvent, IEventProcessor, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
-
-import { Block, isEvent, IEventData } from './types';
-import { ParseType } from './filters/type_parser';
 import { Enrich, EnricherConfig } from './filters/enricher';
+import { ParseType } from './filters/type_parser';
+
+import { Block, IEventData, isEvent } from './types';
 
 export class Processor extends IEventProcessor<ApiPromise, Block> {
   constructor(

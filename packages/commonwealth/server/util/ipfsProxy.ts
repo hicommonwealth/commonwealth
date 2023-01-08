@@ -1,6 +1,6 @@
-import type { Express } from 'express';
 import axios from 'axios';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { Express } from 'express';
 
 const log = factory.getLogger(formatFilename(__filename));
 

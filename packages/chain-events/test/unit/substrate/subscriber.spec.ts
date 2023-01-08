@@ -1,5 +1,5 @@
+import { EventRecord, Hash, RuntimeVersion } from '@polkadot/types/interfaces';
 import chai from 'chai';
-import { Hash, EventRecord, RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { Subscriber } from '../../../src/chains/substrate/subscriber';
 

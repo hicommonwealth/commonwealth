@@ -11,10 +11,7 @@ import type {
 import { SERVER_URL } from '../config';
 import type { DB } from '../models';
 import type { NotificationInstance } from '../models/notification';
-import {
-  createImmediateNotificationEmailObject,
-  sendImmediateNotificationEmail
-} from '../scripts/emails';
+import { createImmediateNotificationEmailObject, sendImmediateNotificationEmail } from '../scripts/emails';
 import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
 

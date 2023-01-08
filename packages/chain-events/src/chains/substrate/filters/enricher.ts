@@ -1,57 +1,36 @@
 import { ApiPromise } from '@polkadot/api';
+import { Compact, Option, Vec, } from '@polkadot/types/codec';
 import {
-  Event,
-  ReferendumInfoTo239,
   AccountId,
-  TreasuryProposal,
+  AccountVote,
+  AuthorityId,
   Balance,
+  BalanceOf,
+  BlockNumber,
+  BountyIndex,
+  Event,
+  Exposure,
+  Extrinsic,
+  Hash,
+  IdentificationTuple,
   PropIndex,
   Proposal,
-  ReferendumIndex,
   ProposalIndex,
-  VoteThreshold,
-  Hash,
-  BlockNumber,
-  Extrinsic,
+  ReferendumIndex,
   ReferendumInfo,
+  ReferendumInfoTo239,
+  TreasuryProposal,
   ValidatorId,
-  Exposure,
-  AuthorityId,
-  IdentificationTuple,
-  AccountVote,
-  BountyIndex,
-  BalanceOf,
+  VoteThreshold,
 } from '@polkadot/types/interfaces';
-import {
-  Option,
-  Vec,
-  Compact,
-} from '@polkadot/types/codec';
-import {
-  bool,
-  u32,
-  u64,
-  StorageKey,
-  Bytes,
-} from '@polkadot/types/primitive';
-import { Codec, AnyTuple } from '@polkadot/types/types';
+import { Kind, OffenceDetails, OpaqueTimeSlot, } from '@polkadot/types/interfaces/offences';
+import { bool, Bytes, StorageKey, u32, u64, } from '@polkadot/types/primitive';
+import { AnyTuple, Codec } from '@polkadot/types/types';
 import { hexToString } from '@polkadot/util';
 import { filter } from 'lodash';
-import {
-  Kind,
-  OpaqueTimeSlot,
-  OffenceDetails,
-} from '@polkadot/types/interfaces/offences';
 
 import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import {
-  EventKind,
-  IEventData,
-  isEvent,
-  parseJudgement,
-  IdentityJudgement,
-  ActiveExposure,
-} from '../types';
+import { ActiveExposure, EventKind, IdentityJudgement, IEventData, isEvent, parseJudgement, } from '../types';
 import { currentPoints } from '../utils/currentPoint';
 
 export interface EnricherConfig {

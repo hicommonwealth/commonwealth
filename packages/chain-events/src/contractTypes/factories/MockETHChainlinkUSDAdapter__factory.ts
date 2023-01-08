@@ -2,10 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Signer, Contract, ContractFactory, Overrides } from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { Contract, ContractFactory, Overrides, Signer } from 'ethers';
 
-import type { MockETHChainlinkUSDAdapter } from "../MockETHChainlinkUSDAdapter";
+import type { MockETHChainlinkUSDAdapter } from '../MockETHChainlinkUSDAdapter';
 
 export class MockETHChainlinkUSDAdapter__factory extends ContractFactory {
   constructor(signer?: Signer) {

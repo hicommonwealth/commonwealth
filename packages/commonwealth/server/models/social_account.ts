@@ -1,8 +1,7 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes} from 'sequelize';
-import { Model } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
-import type { UserInstance, UserAttributes } from './user';
+import type { DataTypes } from 'sequelize';
+import type { ModelInstance, ModelStatic } from './types';
+import type { UserAttributes, UserInstance } from './user';
 
 export type SocialAccountAttributes = {
   provider: string;

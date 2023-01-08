@@ -1,5 +1,5 @@
+import type { Notification, NotificationSubscription } from '../models';
 import IdStore from './IdStore';
-import type { NotificationSubscription, Notification } from '../models';
 
 class NotificationStore extends IdStore<Notification> {
   private _storeSubscription: { [subscriptionId: number]: Notification } = {};

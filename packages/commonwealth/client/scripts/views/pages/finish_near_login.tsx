@@ -1,31 +1,31 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import { WalletAccount, WalletConnection } from 'near-api-js';
-import { FunctionCallOptions } from 'near-api-js/lib/account';
-import BN from 'bn.js';
-import $ from 'jquery';
-
-import app from 'state';
 import { initAppState, navigateToSubpage } from 'app';
+import BN from 'bn.js';
+import ClassComponent from 'class_component';
+import { ChainBase, WalletId } from 'common-common/src/types';
 import {
-  updateActiveAddresses,
+  completeClientLogin,
   createUserWithAddress,
   setActiveAccount,
-  completeClientLogin,
+  updateActiveAddresses,
 } from 'controllers/app/login';
-import { Account } from 'models';
-import Near from 'controllers/chain/near/adapter';
 import { NearAccount } from 'controllers/chain/near/account';
-import { ChainBase, WalletId } from 'common-common/src/types';
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
+import Near from 'controllers/chain/near/adapter';
+import $ from 'jquery';
+import m from 'mithril';
+import { Account } from 'models';
+import { WalletAccount, WalletConnection } from 'near-api-js';
+import { FunctionCallOptions } from 'near-api-js/lib/account';
+
+import app from 'state';
 import { PageNotFound } from 'views/pages/404';
-import { NewLoginModal } from '../modals/login_modal';
-import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
-import { CWText } from '../components/component_kit/cw_text';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
+import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
+import { NewLoginModal } from '../modals/login_modal';
 
 interface IState {
   validating: boolean;

@@ -1,6 +1,6 @@
+import { Extension } from '@terra-money/terra.js';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
 
 type TerraAddress = {
   address: string

@@ -1,6 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const getDiscussionDrafts = async (models, req: Request, res: Response, next: NextFunction) => {

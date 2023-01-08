@@ -1,8 +1,8 @@
 import { Web3Provider } from '@ethersproject/providers';
 import BN from 'bn.js';
+import { ERC20 } from '../../contractTypes';
 
 import { TypedEvent } from '../../contractTypes/commons';
-import { ERC20 } from '../../contractTypes';
 
 import { EnricherConfig } from './filters/enricher';
 

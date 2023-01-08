@@ -1,6 +1,6 @@
-import {RabbitMQController, RabbitMQControllerError} from "./rabbitMQController";
-import * as Rascal from "rascal";
-import {RascalPublications, RascalSubscriptions, TRmqMessages} from "./types";
+import * as Rascal from 'rascal';
+import { RabbitMQController, RabbitMQControllerError } from './rabbitMQController';
+import { RascalPublications, RascalSubscriptions, TRmqMessages } from './types';
 
 
 /**

@@ -1,15 +1,10 @@
 import EthDater from 'ethereum-block-by-date';
-
-import {
-  CWEvent,
-  IStorageFetcher,
-  IDisconnectedRange,
-  SupportedNetwork,
-} from '../../interfaces';
-import { addPrefix, factory } from '../../logging';
 import { Moloch1, Moloch2 } from '../../contractTypes';
 
-import { IEventData, EventKind, Api, ProposalV1, ProposalV2 } from './types';
+import { CWEvent, IDisconnectedRange, IStorageFetcher, SupportedNetwork, } from '../../interfaces';
+import { addPrefix, factory } from '../../logging';
+
+import { Api, EventKind, IEventData, ProposalV1, ProposalV2 } from './types';
 
 export class StorageFetcher extends IStorageFetcher<Api> {
   constructor(

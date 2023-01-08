@@ -2,16 +2,10 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
-  Signer,
-  BigNumberish,
-  Contract,
-  ContractFactory,
-  Overrides,
-} from "ethers";
-import { Provider, TransactionRequest } from "@ethersproject/providers";
+import { Provider, TransactionRequest } from '@ethersproject/providers';
+import { BigNumberish, Contract, ContractFactory, Overrides, Signer, } from 'ethers';
 
-import type { AaveGovernanceV2 } from "../AaveGovernanceV2";
+import type { AaveGovernanceV2 } from '../AaveGovernanceV2';
 
 export class AaveGovernanceV2__factory extends ContractFactory {
   constructor(signer?: Signer) {

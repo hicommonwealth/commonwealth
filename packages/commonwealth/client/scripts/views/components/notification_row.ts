@@ -1,24 +1,24 @@
+import type { CWEvent } from 'chain-events/src';
+import { Label as ChainEventLabel } from 'chain-events/src';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import 'components/notification_row.scss';
+import { link, pluralize } from 'helpers';
 
 import _ from 'lodash';
 import m from 'mithril';
+import type { Notification } from 'models';
+import { AddressInfo } from 'models';
 import moment from 'moment';
-import type { CWEvent} from 'chain-events/src';
-import { Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
 import type { IPostNotificationData } from 'types';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import type { Notification} from 'models';
-import { AddressInfo } from 'models';
-import { link, pluralize } from 'helpers';
 import User from 'views/components/widgets/user';
 import UserGallery from 'views/components/widgets/user_gallery';
-import { getProposalUrl, getCommunityUrl } from '../../../../shared/utils';
+import { getCommunityUrl, getProposalUrl } from '../../../../shared/utils';
+import { CWIconButton } from './component_kit/cw_icon_button';
+import { CWSpinner } from './component_kit/cw_spinner';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
-import { CWSpinner } from './component_kit/cw_spinner';
-import { CWIconButton } from './component_kit/cw_icon_button';
 
 const jumpHighlightNotification = (
   commentId,

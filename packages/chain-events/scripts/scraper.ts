@@ -1,8 +1,8 @@
-import { SubstrateEvents, SubstrateTypes } from '../dist/index';
-import { Registration } from '@polkadot/types/interfaces';
 import { Option } from '@polkadot/types';
-import { ParseType } from '../dist/substrate/filters/type_parser';
+import { Registration } from '@polkadot/types/interfaces';
 import fs from 'fs';
+import { SubstrateEvents, SubstrateTypes } from '../dist/index';
+import { ParseType } from '../dist/substrate/filters/type_parser';
 
 const args = process.argv.slice(2);
 const chain = args[0] || 'edgeware';

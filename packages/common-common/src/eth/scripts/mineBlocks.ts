@@ -1,5 +1,5 @@
-import Web3 from 'web3';
 import { providers } from 'ethers';
+import Web3 from 'web3';
 
 async function increaseTime(provider: providers.Web3Provider, blocks: number): Promise<void> {
   const timeToAdvance = blocks * 15;

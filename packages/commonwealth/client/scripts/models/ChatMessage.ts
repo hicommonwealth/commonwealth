@@ -1,4 +1,4 @@
-import type moment from "moment";
+import type moment from 'moment';
 
 export default class ChatMessage {
     public id?: number;

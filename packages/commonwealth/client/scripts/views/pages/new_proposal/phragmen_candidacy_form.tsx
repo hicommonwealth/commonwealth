@@ -1,19 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
+import Substrate from 'controllers/chain/substrate/adapter';
+import { proposalSlugToClass } from 'identifiers';
+import m from 'mithril';
+import { ITXModalData, ProposalModule } from 'models';
 
 import app from 'state';
-import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
-import { formatCoin } from 'adapters/currency';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { CWText } from '../../components/component_kit/cw_text';
 import { ProposalType } from '../../../../../../common-common/src/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
 import { createTXModal } from '../../modals/tx_signing_modal';
+import ErrorPage from '../error';
 
 export class PhragmenCandidacyForm extends ClassComponent {
   view() {

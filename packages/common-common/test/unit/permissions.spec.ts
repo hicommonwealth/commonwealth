@@ -1,10 +1,6 @@
 import { assert } from 'chai';
-import {
-  addPermission,
-  removePermission,
-  Action,
-  isPermitted,
-} from '../../src/permissions';
+import { Action, addPermission, isPermitted, removePermission, } from '../../src/permissions';
+
 const base_permission = BigInt(0);
 
 describe('addPermission() unit tests', () => {

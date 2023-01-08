@@ -1,26 +1,26 @@
 /**
  * Processes events during migration, upgrading from simple notifications to entities.
  */
-import {
-  IEventHandler,
-  CWEvent,
-  eventToEntity,
-  getUniqueEntityKey,
-  IChainEventData,
-  EntityEventKind,
-} from '../../../src';
-import { WhereOptions } from 'sequelize';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import {
   RabbitMQController,
-  RascalPublications, RmqCENotificationCUD, RmqCETypeCUD,
+  RascalPublications,
+  RmqCENotificationCUD,
+  RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../../database/database';
+import { WhereOptions } from 'sequelize';
 import {
-  ChainEventAttributes,
-  ChainEventInstance,
-} from '../../database/models/chain_event';
+  CWEvent,
+  EntityEventKind,
+  eventToEntity,
+  getUniqueEntityKey,
+  IChainEventData,
+  IEventHandler,
+} from '../../../src';
+import { DB } from '../../database/database';
+import { ChainEventAttributes, ChainEventInstance, } from '../../database/models/chain_event';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler<ChainEventInstance> {

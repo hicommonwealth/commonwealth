@@ -1,19 +1,20 @@
-import passport from 'passport';
 import type { MagicUserMetadata } from '@magic-sdk/admin';
 import { Magic } from '@magic-sdk/admin';
-import { Strategy as MagicStrategy } from 'passport-magic';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { NotificationCategories, WalletId } from 'common-common/src/types';
-
-import '../types';
-import type { DB } from '../models';
-import { sequelize } from '../database';
-import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
-import validateChain from '../middleware/validateChain';
-import type { ProfileAttributes } from '../models/profile';
 
 import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { NotificationCategories, WalletId } from 'common-common/src/types';
+import passport from 'passport';
+import { Strategy as MagicStrategy } from 'passport-magic';
+import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
+import { sequelize } from '../database';
+import validateChain from '../middleware/validateChain';
+import type { DB } from '../models';
+import type { ProfileAttributes } from '../models/profile';
+
+import '../types';
 import { createRole } from '../util/roles';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export function useMagicAuth(models: DB) {

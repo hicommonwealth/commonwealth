@@ -1,9 +1,9 @@
-import ceModels from 'chain-events/services/database/database';
-import cwModels from '../../server/database';
-import {DATABASE_URI as CE_DB_URI} from "chain-events/services/config";
-import {QueryTypes} from "sequelize";
-import {enforceDataConsistency} from "../../server/scripts/enforceDataConsistency";
 import chai from 'chai';
+import { DATABASE_URI as CE_DB_URI } from 'chain-events/services/config';
+import ceModels from 'chain-events/services/database/database';
+import { QueryTypes } from 'sequelize';
+import cwModels from '../../server/database';
+import { enforceDataConsistency } from '../../server/scripts/enforceDataConsistency';
 
 const {assert} = chai;
 
