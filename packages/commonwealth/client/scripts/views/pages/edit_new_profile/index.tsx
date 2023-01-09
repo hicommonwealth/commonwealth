@@ -194,25 +194,37 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
          <CWForm
             title="Edit Profile"
             description="Create and edit profiles and manage your connected addresses."
-            topRightElement={
+            actions={
               <div className="buttons-container">
                 <div className="buttons">
-                <CWButton
-                  label="Delete profile"
-                  onclick={() => {
-                    // TODO: handle delete profile
-                  }}
-                  className="save-button"
-                  buttonType="secondary-black"
-                />
-                <CWButton
-                  label="Save"
-                  onclick={() => {
-                    this.handleSaveProfile(vnode);
-                  }}
-                  className="save-button"
-                  buttonType="primary-black"
-                />
+                  <CWButton
+                    label="Delete profile"
+                    onclick={() => {
+                      // TODO: implement delete profile
+                    }}
+                    buttonType="tertiary-black"
+                  />
+                  <div className="buttons-right">
+                    <CWButton
+                      label="Cancel Edits"
+                      onclick={() => {
+                        this.loading = true;
+                        setTimeout(() => {
+                          m.route.set(`/profile/${this.address}`);
+                        }, 1000);
+                      }}
+                      className="save-button"
+                      buttonType="mini-white"
+                    />
+                    <CWButton
+                      label="Save"
+                      onclick={() => {
+                        this.handleSaveProfile(vnode);
+                      }}
+                      className="save-button"
+                      buttonType="mini-black"
+                    />
+                  </div>
                 </div>
                 <div className="status">
                   <div

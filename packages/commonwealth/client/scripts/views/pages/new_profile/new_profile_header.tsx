@@ -37,6 +37,19 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
 
     return (
       <div class="ProfileHeader">
+        <div className="edit">
+          {isCurrentUser && (
+            <CWButton
+              label="Edit"
+              buttonType="mini-white"
+              iconLeft="write"
+              onclick={() =>
+                m.route.set(`/profile/${m.route.param('address')}/edit`)
+              }
+            />
+          )
+        }
+        </div>
         <div class="profile-image">
           {profile.avatarUrl ? (
             <img src={profile.avatarUrl} />
@@ -52,20 +65,10 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
           <CWText type="h3" className={profile.name ? 'name hasMargin' : 'name'}>
             {profile.name ? profile.name : address}
           </CWText>
-          <div class={isCurrentUser ? 'buttons hasMargin' : 'buttons'}>
+          <div class="buttons">
             {/* TODO: Add delegate and follow buttons */}
             {/* <CWButton label="Delegate" buttonType="mini-black" onClick={() => {}} />
             <CWButton label="Follow" buttonType="mini-black" onClick={() => {}} /> */}
-            {isCurrentUser && (
-                <CWButton
-                  label="Edit"
-                  buttonType="mini-black"
-                  onclick={() =>
-                    m.route.set(`/profile/${m.route.param('address')}/edit`)
-                  }
-                />
-              )
-            }
           </div>
           <SocialAccounts profile={profile} />
           {bio && (

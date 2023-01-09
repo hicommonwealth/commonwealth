@@ -12,12 +12,12 @@ import { CWText } from './cw_text';
 type FormAttrs = {
   description: string;
   title: string;
-  topRightElement?: m.Vnode;
+  actions: m.Vnode;
 };
 
 export class CWForm extends ClassComponent<FormAttrs> {
   view(vnode: m.Vnode<FormAttrs>) {
-    const { description, title } = vnode.attrs;
+    const { description, title, actions } = vnode.attrs;
 
     return (
       <div className={ComponentType.Form}>
@@ -26,15 +26,13 @@ export class CWForm extends ClassComponent<FormAttrs> {
             <CWText type="h3" fontWeight="medium">{title}</CWText>
             <CWText type="b1">{description}</CWText>
           </div>
-          {vnode.attrs.topRightElement && (
-            <div className="top-right-element">
-              {vnode.attrs.topRightElement}
-            </div>
-          )}
         </div>
         <CWDivider />
         <div className="content">
           {vnode.children}
+        </div>
+        <div className="actions">
+          {actions}
         </div>
       </div>
     );
