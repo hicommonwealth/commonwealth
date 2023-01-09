@@ -26,9 +26,7 @@ import {
   ethChainRows,
 } from 'views/pages/create_community/chain_input_rows';
 
-import {
-  EthChainAttrs,
-} from 'views/pages/create_community/types';
+import { EthChainAttrs } from 'views/pages/create_community/types';
 
 import { slugifyPreserveDashes } from 'utils';
 import { Contract } from 'models';
@@ -103,8 +101,9 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
     const disableField = !this.loaded;
 
     const createDao = async (fn: AbiItem) => {
-      const contract: Contract =
-        app.contracts.getFactoryContractByNickname(this.daoFactoryType);
+      const contract: Contract = app.contracts.getFactoryContractByNickname(
+        this.daoFactoryType
+      );
       if (!contract || !contract.address) {
         return;
       }
@@ -149,88 +148,96 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
 
     const renderFactoryFunction = () => {
       const fn = loadFactoryContractAbi(this.daoFactoryType);
-      return (
-        <div class="function-row">
-          <CWText>{fn.name}</CWText>
-          <CWText>{fn.stateMutability}</CWText>
-          <div class="functions-input-container">
-            {fn.inputs.map((input: AbiInput, inputIdx: number) => {
-              return (
-                <div>
-                  <div class="function-inputs">
-                    <CWText>[{inputIdx}]</CWText>
-                    <CWText>{input.type}</CWText>
-                    <CWText>{input.name}</CWText>
-                  </div>
+      if (fn) {
+        return (
+          <div class="function-row">
+            <CWText>{fn.name}</CWText>
+            <CWText>{fn.stateMutability}</CWText>
+            <div class="functions-input-container">
+              {fn.inputs.map((input: AbiInput, inputIdx: number) => {
+                return (
                   <div>
-                    <CWTextInput
-                      name="Contract Input Field"
-                      placeholder="Insert Input Here"
-                      oninput={(e) => {
-                        handleMappingAbiInputs(
-                          inputIdx,
-                          e.target.value,
-                          fn.name,
-                          this.functionNameToFunctionInputArgs
-                        );
-                        this.loaded = true;
-                      }}
-                      inputValidationFn={(
-                        val: string
-                      ): [ValidationStatus, string] => {
-                        return validateAbiInput(val, input.type);
-                      }}
-                    />
+                    <div class="function-inputs">
+                      <CWText>[{inputIdx}]</CWText>
+                      <CWText>{input.type}</CWText>
+                      <CWText>{input.name}</CWText>
+                    </div>
+                    <div>
+                      <CWTextInput
+                        name="Contract Input Field"
+                        placeholder="Insert Input Here"
+                        oninput={(e) => {
+                          handleMappingAbiInputs(
+                            inputIdx,
+                            e.target.value,
+                            fn.name,
+                            this.functionNameToFunctionInputArgs
+                          );
+                          this.loaded = true;
+                        }}
+                        inputValidationFn={(
+                          val: string
+                        ): [ValidationStatus, string] => {
+                          return validateAbiInput(val, input.type);
+                        }}
+                      />
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-          <div class="functions-output-container">
-            {fn.outputs.map((output: AbiOutput, i) => {
-              const fnOutputArray = this.functionNameToFunctionOutput.get(
-                fn.name
-              );
-              return (
-                <div>
-                  <div class="function-outputs">
-                    <CWText>[{i}]</CWText>
-                    <CWText>{output.type}</CWText>
-                    <CWText>{output.name}</CWText>
-                  </div>
+                );
+              })}
+            </div>
+            <div class="functions-output-container">
+              {fn.outputs.map((output: AbiOutput, i) => {
+                const fnOutputArray = this.functionNameToFunctionOutput.get(
+                  fn.name
+                );
+                return (
                   <div>
-                    {this.loading && <CWSpinner />}
-                    <CWText>
-                      {fnOutputArray && fnOutputArray[i].toString()
-                        ? fnOutputArray[i].toString()
-                        : ''}
-                    </CWText>
+                    <div class="function-outputs">
+                      <CWText>[{i}]</CWText>
+                      <CWText>{output.type}</CWText>
+                      <CWText>{output.name}</CWText>
+                    </div>
+                    <div>
+                      {this.loading && <CWSpinner />}
+                      <CWText>
+                        {fnOutputArray && fnOutputArray[i].toString()
+                          ? fnOutputArray[i].toString()
+                          : ''}
+                      </CWText>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
+            <div class="function-call">
+              <CWButton
+                label="Create Dao"
+                disabled={this.saving || this.loading}
+                onclick={() => {
+                  notifySuccess('Create Dao button clicked!');
+                  this.saving = true;
+                  try {
+                    createDao(fn);
+                  } catch (err) {
+                    notifyError(
+                      err.responseJSON?.error ||
+                        'Creating Dao Function Call failed'
+                    );
+                  }
+                  this.saving = false;
+                }}
+              />
+            </div>
           </div>
-          <div class="function-call">
-            <CWButton
-              label="Create Dao"
-              disabled={this.saving || this.loading}
-              onclick={() => {
-                notifySuccess('Create Dao button clicked!');
-                this.saving = true;
-                try {
-                  createDao(fn);
-                } catch (err) {
-                  notifyError(
-                    err.responseJSON?.error ||
-                      'Creating Dao Function Call failed'
-                  );
-                }
-                this.saving = false;
-              }}
-            />
-          </div>
-        </div>
-      );
+        );
+      } else {
+        return (
+          <PageLoading
+            message= 'No ABI found for this DAO Factory Type'
+          />
+        );
+      }
     };
 
     if (this.loadingEthChains) queryEthChains();
