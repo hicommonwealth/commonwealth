@@ -14,7 +14,7 @@ import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { ComponentType, MenuItem } from './types';
 import { CommunityLabel } from '../community_label';
-import User from '../widgets/user';
+import { User } from '../widgets/user';
 
 // TODO: Switch to new component kit system, migrate to more native setup
 const renderCommunity = (item: ChainInfo) => {

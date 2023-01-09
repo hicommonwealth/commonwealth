@@ -14,7 +14,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import User from '../../components/widgets/user';
+import { User } from '../../components/widgets/user';
 import { getNotificationTypeText } from './helpers';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 

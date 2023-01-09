@@ -10,7 +10,7 @@ import app from 'state';
 import { orderAccountsByAddress, link, formatAddressShort } from 'helpers';
 import { unlinkLogin } from 'controllers/app/login';
 import { AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { WalletId } from 'common-common/src/types';

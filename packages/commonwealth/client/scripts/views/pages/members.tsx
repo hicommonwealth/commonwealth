@@ -10,7 +10,7 @@ import 'pages/members.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { PageLoading } from 'views/pages/loading';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import Sublayout from 'views/sublayout';
 import { Profile } from 'models';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';

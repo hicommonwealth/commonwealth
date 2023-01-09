@@ -23,7 +23,7 @@ import { PageNotFound } from 'views/pages/404';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
-import User from '../../components/widgets/user';
+import { User } from '../../components/widgets/user';
 import {
   ProposalSubheader,
   SubheaderProposalType,

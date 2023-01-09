@@ -4,7 +4,7 @@ import m from 'mithril';
 import app from 'state';
 
 import SubstrateIdentity from 'controllers/chain/substrate/identity';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
 import { alertModalWithText } from '../../modals/alert_modal';

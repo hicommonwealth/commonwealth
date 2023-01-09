@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'modals/offchain_voting_modal.scss';
 
 import { Vote, AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 
 type OffchainVotingModalAttrs = {

@@ -7,7 +7,7 @@ import $ from 'jquery';
 import 'pages/manage_community/manage_roles.scss';
 
 import app from 'state';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import { AddressInfo, RoleInfo } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { confirmationModalWithText } from '../../modals/confirm_modal';

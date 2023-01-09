@@ -16,7 +16,7 @@ import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import ErrorPage from './error';
-import User from '../components/widgets/user';
+import { User } from '../components/widgets/user';
 import { CardsCollection } from '../components/cards_collection';
 import { CWButton } from '../components/component_kit/cw_button';
 import { GovExplainer } from '../components/gov_explainer';

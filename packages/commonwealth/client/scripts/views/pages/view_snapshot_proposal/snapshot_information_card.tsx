@@ -11,7 +11,7 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { CWText } from '../../components/component_kit/cw_text';
-import User from '../../components/widgets/user';
+import { User } from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SnapshotThreadLink } from '../view_proposal/proposal_header_links';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';

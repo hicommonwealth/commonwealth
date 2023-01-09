@@ -28,7 +28,7 @@ import {
   ClosedProposalPill,
 } from '../../components/proposal_pills';
 import { CWText } from '../../components/component_kit/cw_text';
-import User from '../../components/widgets/user';
+import { User } from '../../components/widgets/user';
 
 type ViewProposalPageAttrs = {
   identifier: string;

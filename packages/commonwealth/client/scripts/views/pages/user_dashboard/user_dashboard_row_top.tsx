@@ -9,7 +9,7 @@ import 'pages/user_dashboard/user_dashboard_row_top.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import { formatTimestamp } from 'helpers/index';
 import { getCommentPreview } from './helpers';
 import { CWText } from '../../components/component_kit/cw_text';

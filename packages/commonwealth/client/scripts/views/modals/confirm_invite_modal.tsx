@@ -9,7 +9,6 @@ import 'modals/confirm_invite_modal.scss';
 import app from 'state';
 import { orderAccountsByAddress } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { UserBlock } from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { navigateToSubpage } from 'app';
 import { InviteCodeAttributes } from 'types';
@@ -21,6 +20,7 @@ import {
 } from '../components/component_kit/helpers';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
+import { UserBlock } from '../components/widgets/user_block';
 
 type SideMenuAttrs = {
   invites: Array<InviteCodeAttributes>;

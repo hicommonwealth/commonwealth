@@ -8,7 +8,7 @@ import { AnyProposal, Thread } from 'models';
 import { countLinesQuill, countLinesMarkdown } from './quill/helpers';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';
-import User from './widgets/user';
+import { User } from './widgets/user';
 
 const QUILL_PROPOSAL_LINES_CUTOFF_LENGTH = 50;
 const MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH = 70;

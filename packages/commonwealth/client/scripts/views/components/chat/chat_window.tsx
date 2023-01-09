@@ -10,7 +10,7 @@ import 'pages/chat.scss';
 import { Action } from 'common-common/src/permissions';
 import app from 'state';
 import { AddressInfo } from 'models';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import { WebsocketMessageNames } from 'types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelChatEvents } from 'analytics/types';

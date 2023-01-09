@@ -1,47 +1,46 @@
+/* @jsx m */
 /* eslint-disable no-script-url */
-import 'components/widgets/user.scss';
 
+import ClassComponent from 'class_component';
 import m from 'mithril';
-import { capitalize } from 'lodash';
 import { link } from 'helpers';
 import { Tag, Popover } from 'construct-ui';
 
+import 'components/widgets/user.scss';
+
 import app from 'state';
-import jdenticon from 'jdenticon';
 import { ChainBase } from 'common-common/src/types';
 import { Account, AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
-export interface IAddressDisplayOptions {
-  showFullAddress?: boolean;
+export type AddressDisplayOptions = {
   autoTruncate?: boolean;
   maxCharLength?: number;
-}
+  showFullAddress?: boolean;
+};
 
-const User: m.Component<
-  {
-    user: Account | AddressInfo | Profile;
-    avatarSize?: number;
-    avatarOnly?: boolean; // overrides most other properties
-    hideAvatar?: boolean;
-    hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
-    showAddressWithDisplayName?: boolean; // show address inline with the display name
-    addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
-    linkify?: boolean;
-    onclick?: any;
-    popover?: boolean;
-    showRole?: boolean;
-  },
-  {
-    identityWidgetLoading: boolean;
-  }
-> = {
-  view: (vnode) => {
+type UserAttrs = {
+  addressDisplayOptions?: AddressDisplayOptions; // display full or truncated address
+  avatarOnly?: boolean; // overrides most other properties
+  avatarSize?: number;
+  hideAvatar?: boolean;
+  hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
+  linkify?: boolean;
+  onclick?: any;
+  popover?: boolean;
+  showAddressWithDisplayName?: boolean; // show address inline with the display name
+  showRole?: boolean;
+  user: Account | AddressInfo | Profile;
+};
+
+export class User extends ClassComponent<UserAttrs> {
+  private identityWidgetLoading: boolean;
+
+  view(vnode: m.Vnode<UserAttrs>) {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
       avatarOnly,
@@ -86,17 +85,18 @@ const User: m.Component<
 
     if (
       app.chain?.base === ChainBase.Substrate &&
-      !vnode.state.identityWidgetLoading &&
+      !this.identityWidgetLoading &&
       !app.cachedIdentityWidget
     ) {
-      vnode.state.identityWidgetLoading = true;
+      this.identityWidgetLoading = true;
+
       import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "substrate-identity-widget" */
         './substrate_identity'
       ).then((mod) => {
         app.cachedIdentityWidget = mod.default;
-        vnode.state.identityWidgetLoading = false;
+        this.identityWidgetLoading = false;
         m.redraw();
       });
     }
@@ -365,219 +365,5 @@ const User: m.Component<
           key: profile?.address || '-',
         })
       : userFinal;
-  },
-};
-
-export const UserBlock: m.Component<{
-  user: Account | AddressInfo | Profile;
-  hideIdentityIcon?: boolean;
-  popover?: boolean;
-  showRole?: boolean;
-  showAddressWithDisplayName?: boolean;
-  addressDisplayOptions?: IAddressDisplayOptions;
-  searchTerm?: string;
-  showChainName?: boolean;
-  hideOnchainRole?: boolean;
-  selected?: boolean;
-  compact?: boolean;
-  linkify?: boolean;
-  avatarSize?: number;
-}> = {
-  view: (vnode) => {
-    const {
-      user,
-      hideIdentityIcon,
-      popover,
-      showRole,
-      searchTerm,
-      showAddressWithDisplayName,
-      showChainName,
-      selected,
-      compact,
-      linkify,
-      addressDisplayOptions,
-    } = vnode.attrs;
-
-    const { showFullAddress } = vnode.attrs.addressDisplayOptions || {};
-
-    let profile;
-
-    if (user instanceof AddressInfo) {
-      if (!user.chain || !user.address) return;
-      profile = app.profiles.getProfile(user.chain.id, user.address);
-    } else if (user instanceof Profile) {
-      profile = user;
-    } else {
-      profile = app.profiles.getProfile(user.chain.id, user.address);
-    }
-
-    const highlightSearchTerm =
-      profile?.address &&
-      searchTerm &&
-      profile.address.toLowerCase().includes(searchTerm);
-
-    const highlightedAddress = highlightSearchTerm
-      ? (() => {
-          const queryStart = profile.address.toLowerCase().indexOf(searchTerm);
-          const queryEnd = queryStart + searchTerm.length;
-
-          return [
-            m('span', profile.address.slice(0, queryStart)),
-            m('mark', profile.address.slice(queryStart, queryEnd)),
-            m('span', profile.address.slice(queryEnd, profile.address.length)),
-          ];
-        })()
-      : null;
-
-    const children = [
-      m('.user-block-left', [
-        m(User, {
-          user,
-          avatarOnly: true,
-          avatarSize: vnode.attrs.avatarSize || 28,
-          popover,
-        }),
-      ]),
-      m('.user-block-center', [
-        m('.user-block-name', [
-          m(User, {
-            user,
-            hideAvatar: true,
-            hideIdentityIcon,
-            showAddressWithDisplayName,
-            addressDisplayOptions,
-            popover,
-            showRole,
-          }),
-        ]),
-        m(
-          '.user-block-address',
-          {
-            class: profile?.address ? '' : 'no-address',
-          },
-          [
-            m(
-              '',
-              highlightSearchTerm
-                ? highlightedAddress
-                : showFullAddress
-                ? profile.address
-                : formatAddressShort(profile.address, profile.chain)
-            ),
-            profile?.address && showChainName && m('.address-divider', ' · '),
-            showChainName &&
-              m(
-                '',
-                typeof user.chain === 'string'
-                  ? capitalize(user.chain)
-                  : capitalize(user.chain.name)
-              ),
-          ]
-        ),
-      ]),
-      m('.user-block-right', [
-        m(
-          '.user-block-selected',
-          selected ? m(CWIcon, { iconName: 'check' }) : ''
-        ),
-      ]),
-    ];
-
-    const userLink = profile
-      ? `/${app.activeChainId() || profile.chain}/account/${
-          profile.address
-        }?base=${profile.chain}`
-      : 'javascript:';
-
-    return linkify
-      ? link('.UserBlock', userLink, children)
-      : m(
-          '.UserBlock',
-          {
-            class: compact ? 'compact' : '',
-          },
-          children
-        );
-  },
-};
-
-export const AnonymousUser: m.Component<
-  {
-    avatarSize?: number;
-    avatarOnly?: boolean;
-    hideAvatar?: boolean;
-    showAsDeleted?: boolean;
-    distinguishingKey: string; // To distinguish user from other anonymous users
-  },
-  {}
-> = {
-  view: (vnode) => {
-    const {
-      avatarOnly,
-      avatarSize,
-      hideAvatar,
-      distinguishingKey,
-      showAsDeleted,
-    } = vnode.attrs;
-
-    const showAvatar = !hideAvatar;
-
-    let profileAvatar;
-
-    if (showAvatar) {
-      const pseudoAddress = distinguishingKey;
-
-      profileAvatar = m('svg.Jdenticon', {
-        style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
-        'data-address': pseudoAddress,
-        oncreate: (vnode_) => {
-          jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
-        },
-        onupdate: (vnode_) => {
-          jdenticon.update(vnode_.dom as HTMLElement, pseudoAddress);
-        },
-      });
-    }
-
-    return avatarOnly
-      ? m(
-          '.User.avatar-only',
-          {
-            key: '-',
-          },
-          [
-            m(
-              '.user-avatar-only',
-              {
-                style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
-              },
-              [profileAvatar]
-            ),
-          ]
-        )
-      : m(
-          '.User',
-          {
-            key: '-',
-          },
-          [
-            showAvatar &&
-              m(
-                '.user-avatar-only',
-                {
-                  style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
-                },
-                [profileAvatar]
-              ),
-            [
-              m(
-                'a.user-display-name.username',
-                showAsDeleted ? 'Deleted' : 'Anonymous'
-              ),
-            ],
-          ]
-        );
-  },
-};
-
-export default User;
+  }
+}

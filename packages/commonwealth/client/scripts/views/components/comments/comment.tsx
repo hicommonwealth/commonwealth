@@ -18,9 +18,10 @@ import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
 import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
 import { SharePopover } from '../share_popover';
-import User, { AnonymousUser } from '../widgets/user';
+import { User } from '../widgets/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
+import { AnonymousUser } from '../widgets/anonymous_user';
 
 type CommentAuthorAttrs = {
   comment: CommentType<any>;
@@ -37,9 +38,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
         comment.authorChain !== app.chain.id &&
         comment.authorChain !== app.chain.base
       ) {
-        return m(AnonymousUser, {
-          distinguishingKey: comment.author,
-        });
+        return <AnonymousUser distinguishingKey={comment.author} />;
       }
     }
 

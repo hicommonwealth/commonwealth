@@ -14,7 +14,6 @@ import app from 'state';
 import { ChainBase } from 'common-common/src/types';
 import { ChainInfo, RoleInfo, Profile } from 'models';
 import { SearchScope } from 'models/SearchQuery';
-import { UserBlock } from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -22,6 +21,7 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { UserBlock } from '../components/widgets/user_block';
 
 type SearchParams = {
   chainScope?: string;
@@ -604,116 +604,3 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
     );
   }
 }
-
-// Gabe 7/28/22 - Invite link generation doesn't work right now
-
-// const CreateInviteLink: m.Component<
-//   {
-//     chain?: ChainInfo;
-//     onChangeHandler?: Function;
-//   },
-//   {
-//     link: string;
-//     inviteUses: string;
-//     inviteTime: string;
-//   }
-// > = {
-//   oninit: (vnode) => {
-//     this.link = '';
-//     this.inviteUses = 'none';
-//     this.inviteTime = 'none';
-//   },
-//   view: (vnode) => {
-//     const { chain, onChangeHandler } = vnode.attrs;
-//     const chainOrCommunityObj = { chain: chain.id };
-//     return m(Form, { class: 'CreateInviteLink' }, [
-//       m(FormGroup, { span: 12 }, [
-//         m('h2.invite-link-title', 'Generate Invite Link'),
-//       ]),
-//       m(FormGroup, { span: 4 }, [
-//         m(FormLabel, { for: 'uses' }, 'Number of Uses'),
-//         m(RadioGroup, {
-//           name: 'uses',
-//           options: [
-//             { value: 'none', label: 'Unlimited uses' },
-//             { value: '1', label: 'One time use' },
-//           ],
-//           value: this.inviteUses,
-//           onchange: (e: Event) => {
-//             this.inviteUses = (e.target as any).value;
-//           },
-//         }),
-//       ]),
-//       m(FormGroup, { span: 4 }, [
-//         m(FormLabel, { for: 'time' }, 'Expires after'),
-//         m(RadioGroup, {
-//           name: 'time',
-//           options: [
-//             { value: 'none', label: 'Never expires' },
-//             { value: '24h', label: '24 hours' },
-//             { value: '48h', label: '48 hours' },
-//             { value: '1w', label: '1 week' },
-//             { value: '30d', label: '30 days' },
-//           ],
-//           value: this.inviteTime,
-//           onchange: (e: Event) => {
-//             this.inviteTime = (e.target as any).value;
-//           },
-//         }),
-//       ]),
-//       m(FormGroup, { span: 4 }),
-//       m(FormGroup, { span: 4 }, [
-//         m(Button, {
-//           type: 'submit',
-//           intent: 'primary',
-//           rounded: true,
-//           onclick: (e) => {
-//             e.preventDefault();
-//             // TODO: Change to POST /inviteLink
-//             $.post(`${app.serverUrl()}/createInviteLink`, {
-//               ...chainOrCommunityObj,
-//               time: this.inviteTime,
-//               uses: this.inviteUses,
-//               jwt: app.user.jwt,
-//             }).then((response) => {
-//               const linkInfo = response.result;
-//               const url = app.isProduction
-//                 ? 'commonwealth.im'
-//                 : 'localhost:8080';
-//               if (onChangeHandler) onChangeHandler(linkInfo);
-//               this.link = `${url}${app.serverUrl()}/acceptInviteLink?id=${
-//                 linkInfo.id
-//               }`;
-//               m.redraw();
-//             });
-//           },
-//           label: 'Get invite link',
-//         }),
-//       ]),
-//       m(FormGroup, { span: 8, class: 'copy-link-line' }, [
-//         m(Input, {
-//           id: 'invite-link-pastebin',
-//           class: 'invite-link-pastebin',
-//           fluid: true,
-//           readonly: true,
-//           placeholder: 'Click to generate a link',
-//           value: `${this.link}`,
-//         }),
-//         m('img', {
-//           src: 'static/img/copy_default.svg',
-//           alt: '',
-//           class: 'mx-auto',
-//           onclick: (e) => {
-//             const copyText = document.getElementById(
-//               'invite-link-pastebin'
-//             ) as HTMLInputElement;
-//             copyText.select();
-//             copyText.setSelectionRange(0, 99999); /* For mobile devices */
-
-//             document.execCommand('copy');
-//           },
-//         }),
-//       ]),
-//     ]);
-//   },
-// };

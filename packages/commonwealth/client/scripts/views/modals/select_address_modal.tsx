@@ -9,7 +9,6 @@ import 'modals/select_address_modal.scss';
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, RoleInfo } from 'models';
-import { UserBlock } from 'views/components/widgets/user';
 import { isSameAccount, formatAsTitleCase } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { setActiveAccount } from 'controllers/app/login';
@@ -20,6 +19,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { getClasses } from '../components/component_kit/helpers';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
+import { UserBlock } from '../components/widgets/user_block';
 
 export class SelectAddressModal extends ClassComponent {
   private loading: boolean;

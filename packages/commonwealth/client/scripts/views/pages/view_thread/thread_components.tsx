@@ -20,7 +20,7 @@ import {
   ThreadStage as ThreadStageType,
   AddressInfo,
 } from 'models';
-import User from '../../components/widgets/user';
+import { User } from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWPopover } from '../../components/component_kit/cw_popover/cw_popover';
 import { getClasses } from '../../components/component_kit/helpers';

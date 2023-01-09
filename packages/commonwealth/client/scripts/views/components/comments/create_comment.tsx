@@ -13,7 +13,7 @@ import { ContentType } from 'types';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
-import User from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';
 import { weiToTokens } from 'helpers';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
@@ -123,10 +123,15 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
     const userFailsThreshold =
-      tokenPostingThreshold?.gtn(0) && userBalance?.gtn(0) && userBalance.lt(tokenPostingThreshold);
+      tokenPostingThreshold?.gtn(0) &&
+      userBalance?.gtn(0) &&
+      userBalance.lt(tokenPostingThreshold);
 
     const disabled =
-      this.quillEditorState?.isBlank() || sendingComment || uploadsInProgress || userFailsThreshold;
+      this.quillEditorState?.isBlank() ||
+      sendingComment ||
+      uploadsInProgress ||
+      userFailsThreshold;
 
     const decimals = app.chain?.meta?.decimals
       ? app.chain.meta.decimals

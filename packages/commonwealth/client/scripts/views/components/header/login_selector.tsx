@@ -26,7 +26,7 @@ import {
   setActiveAccount,
 } from 'controllers/app/login';
 import { addressSwapper } from 'commonwealth/shared/utils';
-import User, { UserBlock } from 'views/components/widgets/user';
+import { User } from 'views/components/widgets/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
@@ -38,6 +38,7 @@ import { CWIconButton } from '../component_kit/cw_icon_button';
 import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWToggle } from '../component_kit/cw_toggle';
+import { UserBlock } from '../widgets/user_block';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
