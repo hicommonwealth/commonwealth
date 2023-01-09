@@ -389,7 +389,7 @@ class ThreadsController {
         if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._listingStore.update(result);
+        this._listingStore.add(result);
         return result;
       },
       error: (err) => {

@@ -157,14 +157,8 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
                 }
 
                 // TODO: add set linked snapshot proposals
-                vnode.attrs.onChangeHandler(
-                  this.stage,
-                  this.chainEntitiesToSet,
-                  this.snapshotProposalsToSet
-                );
-
+                vnode.attrs.onChangeHandler(this.stage);
                 $(e.target).trigger('modalexit');
-                m.redraw();
               }}
             />
           </div>

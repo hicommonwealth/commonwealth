@@ -96,8 +96,6 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
       pinned: false,
     });
 
-    console.log('unpinnedThreads', unpinnedThreads);
-
     const totalThreadCount = pinnedThreads.length + unpinnedThreads.length;
 
     const subpage = topicName || stageName;
