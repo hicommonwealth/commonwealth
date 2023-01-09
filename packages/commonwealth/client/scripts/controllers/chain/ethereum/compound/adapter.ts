@@ -1,4 +1,4 @@
-// import { CompoundTypes } from 'chain-events/src';
+// import { CompoundTypes } from 'chain-events/src/types';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import EthereumAccount from 'controllers/chain/ethereum/account';
@@ -10,7 +10,7 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import { IApp } from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
-import { CompoundTypes } from 'chain-events/src';
+import { CompoundTypes } from 'chain-events/src/types';
 import CompoundChain from './chain';
 import CompoundGovernance from './governance';
 

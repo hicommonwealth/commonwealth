@@ -1,5 +1,5 @@
-@import 'shared';
-@import 'components/component_kit/cw_banner.scss';
+@import '../shared';
+@import '../components/component_kit/cw_banner.scss';
 
 .TermsBanner.Banner {
   @include bannerStyles;

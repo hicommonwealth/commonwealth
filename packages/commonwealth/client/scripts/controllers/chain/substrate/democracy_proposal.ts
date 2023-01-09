@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import BN from 'bn.js';
 
-import { SubstrateTypes } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { ApiPromise } from '@polkadot/api';
 import { Vec } from '@polkadot/types';
 import { ITuple } from '@polkadot/types/types';
