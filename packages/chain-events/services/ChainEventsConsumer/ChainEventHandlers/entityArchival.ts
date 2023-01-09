@@ -9,14 +9,15 @@ import {
   IChainEntityKind,
   IChainEventData,
   IEventHandler,
-  SubstrateTypes,
 } from 'chain-events/src';
-
+import { SubstrateTypes } from 'chain-events/src/types';
 import { addPrefix, factory } from 'common-common/src/logging';
 import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
 import {
-  RascalPublications, RmqEntityCUD,
+  RascalPublications,
+  RmqEntityCUD,
 } from 'common-common/src/rabbitmq/types';
+
 import { DB } from '../../database/database';
 
 export default class extends IEventHandler {
