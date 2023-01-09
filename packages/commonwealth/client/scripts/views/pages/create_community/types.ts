@@ -32,7 +32,7 @@ export type EthChainAttrs = {
 };
 
 export type EthDaoFormFields = {
-  network: ChainNetwork.Ethereum;
+  network: ChainNetwork;
   tokenName: string;
 };
 

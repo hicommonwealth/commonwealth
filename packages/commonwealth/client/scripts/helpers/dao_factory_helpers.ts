@@ -6,8 +6,10 @@ import { initAppState } from 'app';
 import app from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import { parseEventFromABI } from '../../../shared/abi_utils';
+import { parseAbiItemsFromABI, parseEventFromABI } from '../../../shared/abi_utils';
 import { CreateFactoryEthDaoForm } from '../views/pages/create_community/types';
+import { encodeFunctionSignature, processAbiInputsToDataTypes } from './abi_form_helpers';
+import { AbiItem } from 'web3-utils';
 
 export function decodeCuratedFactoryTx(
   web3: Web3,
@@ -30,20 +32,49 @@ export function decodeCuratedFactoryTx(
   return null;
 }
 
-export async function createCuratedFactory(
-  contract: Contract,
-  web3: Web3,
-  functionTx: any,
-  wallet: IWebWallet<any>,
+export async function createCuratedProjectDao(
+  contractAddress: string,
+  fn: AbiItem,
+  formInputMap: Map<string, Map<number, string>>,
   daoForm: CreateFactoryEthDaoForm
 ) {
+  const contract = app.contracts.getByAddress(contractAddress);
+  if (!contract) {
+    throw new Error('Contract not found');
+  }
+
+  const metamaskWallet =
+    await app.wallets.getFirstAvailableMetamaskWallet();
+
+  if (!metamaskWallet.api) {
+    throw new Error('Web3 Api Not Initialized');
+  }
+  const web3: Web3 = metamaskWallet.api;
+
+  // handle processing the forms inputs into their proper data types
+  const processedArgs = processAbiInputsToDataTypes(
+    fn.name,
+    fn.inputs,
+    formInputMap
+  );
+
+  const methodSignature = encodeFunctionSignature(fn);
+  const functionContract = new web3.eth.Contract(
+    parseAbiItemsFromABI(contract.abi),
+    contract.address
+  );
+
+  const functionTx = functionContract.methods[methodSignature](
+    ...processedArgs
+  );
+
   if (contract.nickname === 'curated-factory-goerli') {
     const eventAbiItem = parseEventFromABI(contract.abi, 'ProjectCreated');
     // Sign Tx with PK if not view function
     const txReceipt = await this.makeContractTx(
       contract.address,
       functionTx.encodeABI(),
-      wallet
+      metamaskWallet
     );
     const decodedLog = web3.eth.abi.decodeLog(
       eventAbiItem.inputs,
