@@ -46,16 +46,6 @@ import setupPassport from './server/passport';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
-import { performance, PerformanceObserver } from 'perf_hooks';
-
-
-const perfObserver = new PerformanceObserver((items) => {
-  items.getEntries().forEach((entry) => {
-    console.log(entry) // fake call to our custom logging solution
-  })
-})
-
-perfObserver.observe({ entryTypes: ["measure"], buffered: true })
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -65,7 +55,6 @@ require('express-async-errors');
 const app = express();
 
 async function main() {
-  performance.mark('A')
   const DEV = process.env.NODE_ENV !== 'production';
 
   // CLI parameters for which task to run
@@ -94,7 +83,6 @@ async function main() {
     process.exit(rc);
   }
 
-  performance.mark('B')
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
@@ -118,8 +106,6 @@ async function main() {
     }
   };
 
-  performance.mark('C')
-
   const sessionStore = new SequelizeStore({
     db: models.sequelize,
     tableName: 'Sessions',
@@ -135,8 +121,6 @@ async function main() {
     resave: false,
     saveUninitialized: false,
   });
-
-  performance.mark('D')
 
   const setupMiddleware = () => {
     // redirect from commonwealthapp.herokuapp.com to commonwealth.im
@@ -216,8 +200,6 @@ async function main() {
 
   const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
-  performance.mark('E')
-
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.
   if (DEV) {
@@ -228,8 +210,6 @@ async function main() {
 
   setupMiddleware();
   setupPassport(models);
-
-  performance.mark('F')
 
   const rollbar = new Rollbar({
     accessToken: ROLLBAR_SERVER_TOKEN,
@@ -263,9 +243,6 @@ async function main() {
     // TODO: this requires an immediate response if in production
   }
 
-  performance.mark('G')
-
-
   if (!NO_TOKEN_BALANCE_CACHE) await tokenBalanceCache.start();
   await ruleCache.start();
   const banCache = new BanCache(models);
@@ -279,7 +256,6 @@ async function main() {
   const dbValidationService: DatabaseValidationService =
     new DatabaseValidationService(models);
 
-  performance.mark('H');
   setupAPI(
     app,
     models,
@@ -294,20 +270,10 @@ async function main() {
   setupIpfsProxy(app);
   setupEntityProxy(app);
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+
   setupErrorHandlers(app, rollbar);
+
   setupServer(app, rollbar, models, rabbitMQController);
-  performance.mark('I');
-
-  performance.measure('A-B', 'A', 'B');
-  performance.measure('B-C', 'B', 'C');
-  performance.measure('C-D', 'C', 'D');
-  performance.measure('D-E', 'D', 'E');
-  performance.measure('E-F', 'E', 'F');
-  performance.measure('F-G', 'F', 'G');
-  performance.measure('G-H', 'G', 'H');
-  performance.measure('H-I', 'H', 'I');
-
-  performance.measure('Total  Time', 'A', 'I');
 }
 
 main();
