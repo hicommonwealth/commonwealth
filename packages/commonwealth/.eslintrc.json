@@ -20,7 +20,7 @@
     "import/resolver": {
       "node": {},
       "webpack": {
-        "config": "webpack/webpack.base.config.js"
+        "config": "webpack/webpack.common.js"
       }
     }
   },
