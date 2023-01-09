@@ -78,11 +78,11 @@ export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadA
         m(ListItem, {
           label: (
             <div class="item-container">
-              {m(User, {
-                user: new AddressInfo(null, item.address, item.chain, null),
-                avatarOnly: true,
-                avatarSize: 18,
-              })}
+              <User
+                user={new AddressInfo(null, item.address, item.chain, null)}
+                avatarOnly
+                avatarSize={18}
+              />
               {item.name ? (
                 <div class="item-and-address">
                   <CWText noWrap type="caption" fontWeight="medium">

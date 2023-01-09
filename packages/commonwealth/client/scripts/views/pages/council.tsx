@@ -47,7 +47,7 @@ class Councillor extends ClassComponent<CouncillorAttrs> {
 
     return (
       <CWCard className="CouncillorCard">
-        {m(User, { user: account, popover: true, hideIdentityIcon: true })}
+        <User user={account} popover hideIdentityIcon />
         <CWText className="councillor-status-text">
           {election.isMember(account)
             ? `${election.backing(account).format(true)} from ${pluralize(

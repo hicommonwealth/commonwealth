@@ -45,12 +45,7 @@ export class AaveProposalForm extends ClassComponent {
       <div class="AaveProposalForm">
         <div class="row-with-label">
           <CWLabel label="Proposer (you)" />
-          {m(User, {
-            user: author,
-            linkify: true,
-            popover: true,
-            showAddressWithDisplayName: true,
-          })}
+          <User user={author} linkify popover showAddressWithDisplayName />
         </div>
         <CWTextInput
           label="IPFS Hash"

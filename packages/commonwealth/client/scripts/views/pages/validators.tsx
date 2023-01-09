@@ -43,11 +43,11 @@ class Validator extends ClassComponent<ValidatorAttrs> {
     return (
       <CWCard className="ValidatorCard">
         <div class="user-and-nominator">
-          {m(User, {
-            user: new AddressInfo(null, info.stash, info.chain, null),
-            popover: true,
-            hideIdentityIcon: true,
-          })}
+          <User
+            user={new AddressInfo(null, info.stash, info.chain, null)}
+            popover
+            hideIdentityIcon
+          />
           <CWText type="caption" fontWeight="medium">
             {`${info.total?.format(true)} from ${pluralize(
               info.nominators,

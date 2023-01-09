@@ -104,12 +104,12 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                 >
                   <div class="row-top">
                     <div class="user-and-date-row">
-                      {m(User, {
-                        user,
-                        showAddressWithDisplayName: true,
-                        avatarSize: 24,
-                        linkify: true,
-                      })}
+                      <User
+                        user={user}
+                        showAddressWithDisplayName
+                        avatarSize={24}
+                        linkify
+                      />
                       <CWText className="last-updated-text">•</CWText>
                       <CWText
                         type="caption"

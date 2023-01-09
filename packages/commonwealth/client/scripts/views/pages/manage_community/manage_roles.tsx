@@ -43,19 +43,21 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
             ).length;
             return (
               <div class="role-row">
-                {m(User, {
-                  user: new AddressInfo(
-                    addr.id,
-                    addr.address,
-                    role.chain_id,
-                    null,
-                    addr.walletId
-                  ), // role.Address, // make AddressInfo?
-                  popover: true,
-                  linkify: false,
-                  hideAvatar: false,
-                  hideIdentityIcon: true,
-                })}
+                <User
+                  user={
+                    new AddressInfo(
+                      addr.id,
+                      addr.address,
+                      role.chain_id,
+                      null,
+                      addr.walletId
+                    )
+                  } // role.Address, // make AddressInfo?
+                  popover
+                  linkify
+                  hideAvatar
+                  hideIdentityIcon
+                />
                 <CWIcon
                   iconName="close"
                   iconSize="small"

@@ -83,24 +83,24 @@ export class UserBlock extends ClassComponent<{
     const children = (
       <>
         <div class="user-block-left">
-          {m(User, {
-            user,
-            avatarOnly: true,
-            avatarSize: vnode.attrs.avatarSize || 28,
-            popover,
-          })}
+          <User
+            user={user}
+            avatarOnly
+            avatarSize={vnode.attrs.avatarSize || 28}
+            popover={popover}
+          />
         </div>
         <div class="user-block-center">
           <div class="user-block-name">
-            {m(User, {
-              user,
-              hideAvatar: true,
-              hideIdentityIcon,
-              showAddressWithDisplayName,
-              addressDisplayOptions,
-              popover,
-              showRole,
-            })}
+            <User
+              user={user}
+              hideAvatar
+              hideIdentityIcon={hideIdentityIcon}
+              showAddressWithDisplayName={showAddressWithDisplayName}
+              addressDisplayOptions={addressDisplayOptions}
+              popover={popover}
+              showRole={showRole}
+            />
           </div>
           <div
             class={`user-block-address${profile?.address ? '' : 'no-address'}`}

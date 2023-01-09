@@ -58,11 +58,7 @@ class Tip extends ClassComponent<TipAttrs> {
           >
             Beneficiary
           </CWText>
-          {m(User, {
-            user: beneficiary,
-            popover: true,
-            showAddressWithDisplayName: true,
-          })}
+          <User user={beneficiary} popover showAddressWithDisplayName />
         </div>
       </div>
     );

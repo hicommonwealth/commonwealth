@@ -38,12 +38,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
     return (
       <>
         <CWLabel label="Finder" />,
-        {m(User, {
-          user: author,
-          linkify: true,
-          popover: true,
-          showAddressWithDisplayName: true,
-        })}
+        <User user={author} linkify popover showAddressWithDisplayName />
         <CWTextInput
           label="Beneficiary"
           placeholder="Beneficiary of treasury proposal"

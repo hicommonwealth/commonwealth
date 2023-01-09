@@ -98,7 +98,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                 );
 
                 return m(ListItem, {
-                  label: m(User, { user }),
+                  label: <User user={user} />,
                   selected: recentlyAdded,
                   key: role.Address.address,
                 });
@@ -149,7 +149,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
 
                   return (
                     <div class="collaborator-row">
-                      {m(User, { user })}
+                      <User user={user} />
                       <CWIconButton
                         iconName="close"
                         iconSize="small"

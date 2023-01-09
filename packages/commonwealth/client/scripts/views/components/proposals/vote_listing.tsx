@@ -99,11 +99,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof CosmosVote:
                 return (
                   <div class="vote">
-                    {m(User, {
-                      user: vote.account,
-                      linkify: true,
-                      popover: true,
-                    })}
+                    <User user={vote.account} linkify popover />
                     {/* {balanceWeighted && balance && <CWText>{balance}</CWText>} */}
                   </div>
                 );
@@ -111,7 +107,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof MolochProposalVote:
                 return (
                   <div class="vote">
-                    {m(User, { user: vote.account, linkify: true })}
+                    <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
                       <div class="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -125,7 +121,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof CompoundProposalVote:
                 return (
                   <div class="vote">
-                    {m(User, { user: vote.account, linkify: true })}
+                    <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
                       <div class="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -139,7 +135,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof AaveProposalVote:
                 return (
                   <div class="vote">
-                    {m(User, { user: vote.account, linkify: true })}
+                    <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
                       <div class="vote-right-container">
                         <CWText noWrap title={balance}>
@@ -155,11 +151,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   case vote instanceof SubstrateDemocracyVote:
                     return (
                       <div class="vote">
-                        {m(User, {
-                          user: vote.account,
-                          linkify: true,
-                          popover: true,
-                        })}
+                        <User user={vote.account} linkify popover />
                         <div class="vote-right-container">
                           <CWText
                             noWrap
@@ -190,22 +182,14 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   case vote instanceof SubstrateCollectiveVote:
                     return (
                       <div class="vote">
-                        {m(User, {
-                          user: vote.account,
-                          linkify: true,
-                          popover: true,
-                        })}
+                        <User user={vote.account} linkify popover />
                       </div>
                     );
 
                   default:
                     return (
                       <div class="vote">
-                        {m(User, {
-                          user: vote.account,
-                          linkify: true,
-                          popover: true,
-                        })}
+                        <User user={vote.account} linkify popover />
                         <div class="vote-right-container">
                           <CWText
                             noWrap
@@ -229,11 +213,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               case vote instanceof DepositVote:
                 return (
                   <div class="vote">
-                    {m(User, {
-                      user: vote.account,
-                      linkify: true,
-                      popover: true,
-                    })}
+                    <User user={vote.account} linkify popover />
                     <CWText>
                       {formatCoin((vote as DepositVote<any>).deposit, true)}
                     </CWText>
@@ -243,11 +223,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
               default:
                 return (
                   <div class="vote">
-                    {m(User, {
-                      user: vote.account,
-                      linkify: true,
-                      popover: true,
-                    })}
+                    <User user={vote.account} linkify popover />
                   </div>
                 );
             }

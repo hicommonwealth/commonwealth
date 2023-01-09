@@ -166,16 +166,18 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
               }
             >
               <div class="user-and-timestamp-container">
-                {m(User, {
-                  user: new AddressInfo(
-                    null,
-                    grp.address,
-                    app.activeChainId(),
-                    null
-                  ),
-                  linkify: true,
-                  avatarSize: 24,
-                })}
+                <User
+                  user={
+                    new AddressInfo(
+                      null,
+                      grp.address,
+                      app.activeChainId(),
+                      null
+                    )
+                  }
+                  linkify
+                  avatarSize={24}
+                />
                 <div class="chat-message-group-timestamp">
                   {formatTimestampForChat(grp.messages[0].created_at)}
                 </div>

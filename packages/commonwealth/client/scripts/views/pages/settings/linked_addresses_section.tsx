@@ -42,20 +42,9 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
         key={`${account.chain.id}#${account.address}`}
         onclick={vnode.attrs.onclick}
       >
-        {m(User, {
-          user: account,
-          avatarOnly: true,
-          avatarSize: 32,
-          linkify: true,
-          popover: true,
-        })}
+        <User user={account} avatarOnly avatarSize={32} linkify popover />
         <div class="info-col">
-          {m(User, {
-            user: account,
-            hideAvatar: true,
-            linkify: true,
-            popover: true,
-          })}
+          <User user={account} hideAvatar linkify popover />
           <CWText className="address-text" type="caption">
             {formatAddressShort(account.address)} -{' '}
             {app.config.chains.getById(account.chain.id)?.name}

@@ -47,19 +47,21 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
           {votes.map((vote) => (
             <div class="offchain-poll-voter">
               <div class="offchain-poll-voter-user">
-                {m(User, {
-                  avatarSize: 16,
-                  popover: true,
-                  linkify: true,
-                  user: new AddressInfo(
-                    null,
-                    vote.address,
-                    vote.authorChain,
-                    null,
-                    null
-                  ),
-                  hideIdentityIcon: true,
-                })}
+                <User
+                  avatarSize={16}
+                  popover
+                  linkify
+                  user={
+                    new AddressInfo(
+                      null,
+                      vote.address,
+                      vote.authorChain,
+                      null,
+                      null
+                    )
+                  }
+                  hideIdentityIcon
+                />
               </div>
               <div class="offchain-poll-voter-choice">{vote.option}</div>
             </div>

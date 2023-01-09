@@ -120,10 +120,10 @@ export const getActionSection = (
         )}
         <div class="action-info-row">
           <CWText>Proposed curator: </CWText>
-          {m(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
-            linkify: true,
-          })}
+          <User
+            user={new AddressInfo(null, bounty.curator, app.chain.id, null)}
+            linkify
+          />
         </div>
         {bounty.fee && <CWText>Curator fee: {formatCoin(bounty.fee)}</CWText>}
       </>
@@ -156,10 +156,10 @@ export const getActionSection = (
         )}
         <div class="action-info-row">
           <CWText>Curator: </CWText>
-          {m(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
-            linkify: true,
-          })}
+          <User
+            user={new AddressInfo(null, bounty.curator, app.chain.id, null)}
+            linkify
+          />
         </div>
         {bounty.fee && (
           <>
@@ -216,17 +216,17 @@ export const getActionSection = (
         />
         <div class="action-info-row">
           <CWText>Curator: </CWText>
-          {m(User, {
-            user: new AddressInfo(null, bounty.curator, app.chain.id, null),
-            linkify: true,
-          })}
+          <User
+            user={new AddressInfo(null, bounty.curator, app.chain.id, null)}
+            linkify
+          />
         </div>
         <div class="action-info-row">
           <CWText>Recipient: </CWText>
-          {m(User, {
-            user: new AddressInfo(null, bounty.beneficiary, app.chain.id, null),
-            linkify: true,
-          })}
+          <User
+            user={new AddressInfo(null, bounty.beneficiary, app.chain.id, null)}
+            linkify
+          />
         </div>
         <div class="action-info-row">
           <CWText>Review period ends at: </CWText>

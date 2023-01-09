@@ -38,9 +38,7 @@ class SudoForm extends ClassComponent {
       return (
         <div class="admin-column">
           <CWText>Must be logged into admin account to use Sudo: </CWText>
-          {m(User, {
-            user: app.chain.accounts.get(substrate.chain.sudoKey),
-          })}
+          <User user={app.chain.accounts.get(substrate.chain.sudoKey)} />
         </div>
       );
     }

@@ -101,19 +101,16 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
         <div class="main-content">
           <div class="top-row">
             <div class="user-and-date">
-              {m(User, {
-                avatarSize: 24,
-                user: new AddressInfo(
-                  null,
-                  thread.author,
-                  thread.authorChain,
-                  null
-                ),
-                linkify: true,
-                popover: false,
-                showAddressWithDisplayName: true,
-                hideIdentityIcon: true,
-              })}
+              <User
+                avatarSize={24}
+                user={
+                  new AddressInfo(null, thread.author, thread.authorChain, null)
+                }
+                linkify
+                popover
+                showAddressWithDisplayName
+                hideIdentityIcon
+              />
               {!this.isWindowSmallInclusive && (
                 <CWText className="last-updated-text">•</CWText>
               )}

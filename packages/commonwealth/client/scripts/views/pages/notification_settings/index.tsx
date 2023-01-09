@@ -158,23 +158,31 @@ class NotificationSettingsPage extends ClassComponent {
                       {subs.map((sub) => {
                         const getUser = () => {
                           if (sub.Thread) {
-                            return m(User, {
-                              user: new AddressInfo(
-                                null,
-                                sub.Thread.author,
-                                sub.Thread.chain,
-                                null
-                              ),
-                            });
+                            return (
+                              <User
+                                user={
+                                  new AddressInfo(
+                                    null,
+                                    sub.Thread.author,
+                                    sub.Thread.chain,
+                                    null
+                                  )
+                                }
+                              />
+                            );
                           } else if (sub.Comment) {
-                            return m(User, {
-                              user: new AddressInfo(
-                                null,
-                                sub.Comment.author,
-                                sub.Comment.chain,
-                                null
-                              ),
-                            });
+                            return (
+                              <User
+                                user={
+                                  new AddressInfo(
+                                    null,
+                                    sub.Comment.author,
+                                    sub.Comment.chain,
+                                    null
+                                  )
+                                }
+                              />
+                            );
                           } else {
                             // return empty div to ensure that grid layout is correct
                             // even in the absence of a user

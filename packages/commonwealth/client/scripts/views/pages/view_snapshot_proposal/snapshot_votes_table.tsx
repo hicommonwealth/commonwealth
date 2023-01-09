@@ -67,16 +67,13 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
           </div>
           {displayedVoters.map((vote) => (
             <div class="vote-row">
-              {m(User, {
-                user: new AddressInfo(
-                  null,
-                  vote.voter,
-                  app.activeChainId(),
-                  null
-                ),
-                linkify: true,
-                popover: true,
-              })}
+              <User
+                user={
+                  new AddressInfo(null, vote.voter, app.activeChainId(), null)
+                }
+                linkify
+                popover
+              />
               <CWText className="column-text" noWrap>
                 {choices[vote.choice - 1]}
               </CWText>

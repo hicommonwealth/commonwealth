@@ -58,11 +58,7 @@ export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetai
                 {proposal.ipfsData.author.split(' (')[0]}
               </CWText>
             ) : (
-              m(User, {
-                user: proposal.author,
-                hideAvatar: true,
-                linkify: true,
-              })
+              <User user={proposal.author} hideAvatar linkify />
             )}
           </div>
           <div class="aave-metadata-column">

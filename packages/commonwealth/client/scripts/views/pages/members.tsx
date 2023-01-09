@@ -223,7 +223,7 @@ class MembersPage extends ClassComponent {
                       navigateToSubpage(`/account/${address}?base=${chain}`);
                     }}
                   >
-                    {m(User, { user: profileInfo.profile, showRole: true })}
+                    <User user={profileInfo.profile} showRole />
                   </a>
                   <CWText>{profileInfo.postCount}</CWText>
                 </div>

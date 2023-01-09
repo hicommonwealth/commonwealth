@@ -54,12 +54,14 @@ export class UserGallery extends ClassComponent<UserGalleryAttrs> {
                 />
               );
             } else {
-              return m(User, {
-                user,
-                avatarOnly: true,
-                popover,
-                avatarSize,
-              });
+              return (
+                <User
+                  user={user}
+                  avatarOnly
+                  popover={popover}
+                  avatarSize={avatarSize}
+                />
+              );
             }
           })}
         {overflowUsers > 0 && (

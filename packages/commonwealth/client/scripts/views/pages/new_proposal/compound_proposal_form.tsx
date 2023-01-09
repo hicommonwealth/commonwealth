@@ -41,12 +41,7 @@ export class CompoundProposalForm extends ClassComponent {
       <div class="CompoundProposalForm">
         <div class="row-with-label">
           <CWLabel label="Proposer (you)" />
-          {m(User, {
-            user: author,
-            linkify: true,
-            popover: true,
-            showAddressWithDisplayName: true,
-          })}
+          <User user={author} linkify popover showAddressWithDisplayName />
         </div>
         <CWTextInput
           label="Proposal Title (leave blank for no title)"

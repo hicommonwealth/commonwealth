@@ -113,14 +113,16 @@ const getDiscussionResult = (thread, searchTerm) => {
         </CWText>
         <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
         <div class="search-results-thread-subtitle">
-          {m(User, {
-            user: new AddressInfo(
-              thread.address_id,
-              thread.address,
-              thread.address_chain,
-              null
-            ),
-          })}
+          <User
+            user={
+              new AddressInfo(
+                thread.address_id,
+                thread.address,
+                thread.address_chain,
+                null
+              )
+            }
+          />
           <CWText className="created-at">
             {moment(thread.created_at).fromNow()}
           </CWText>
@@ -163,14 +165,16 @@ const getCommentResult = (comment, searchTerm) => {
         </div> */}
         <div class="search-results-thread-subtitle">
           <span class="created-at">{moment(comment.created_at).fromNow()}</span>
-          {m(User, {
-            user: new AddressInfo(
-              comment.address_id,
-              comment.address,
-              comment.address_chain,
-              null
-            ),
-          })}
+          <User
+            user={
+              new AddressInfo(
+                comment.address_id,
+                comment.address,
+                comment.address_chain,
+                null
+              )
+            }
+          />
         </div>
         <div class="search-results-comment">
           {renderQuillTextBody(comment.text, {

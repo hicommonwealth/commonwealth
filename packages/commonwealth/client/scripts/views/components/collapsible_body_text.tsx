@@ -57,12 +57,7 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
 
       return author ? (
         <>
-          {m(User, {
-            user: author,
-            hideAvatar: true,
-            hideIdentityIcon: true,
-          })}{' '}
-          created this thread
+          <User user={author} hideAvatar hideIdentityIcon /> created this thread
         </>
       ) : (
         'Created this thread'

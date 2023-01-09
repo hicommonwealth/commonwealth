@@ -69,15 +69,13 @@ const LinkAccountItem: m.Component<
         m('.account-item-avatar', [
           m(
             '.account-user',
-            m(User, {
-              user: new AddressInfo(
-                null,
-                address,
-                app.chain?.id || walletNetwork
-              ),
-              avatarOnly: true,
-              avatarSize: 40,
-            })
+            <User
+              user={
+                new AddressInfo(null, address, app.chain?.id || walletNetwork)
+              }
+              avatarOnly
+              avatarSize={40}
+            />
           ),
         ]),
         m('.account-item-left', [
@@ -85,14 +83,12 @@ const LinkAccountItem: m.Component<
           m('.account-item-address', [
             m(
               '.account-user',
-              m(User, {
-                user: new AddressInfo(
-                  null,
-                  address,
-                  app.chain?.id || walletNetwork
-                ),
-                hideAvatar: true,
-              })
+              <User
+                user={
+                  new AddressInfo(null, address, app.chain?.id || walletNetwork)
+                }
+                hideAvatar
+              />
             ),
           ]),
           vnode.state.linking &&

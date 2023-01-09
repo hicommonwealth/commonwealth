@@ -167,7 +167,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                         label=""
                         value=""
                       />
-                      {m(User, { user: candidate })}
+                      <User user={candidate} />
                     </div>
                   );
                 })

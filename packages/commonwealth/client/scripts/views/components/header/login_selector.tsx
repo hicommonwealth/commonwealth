@@ -548,10 +548,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
           hoverCloseDelay: 0,
           position: 'top-end',
           trigger: m(Button, {
-            label: m(User, {
-              user: app.user.activeAccount,
-              hideIdentityIcon: true,
-            }),
+            label: <User user={app.user.activeAccount} hideIdentityIcon />,
           }),
           content: (
             <LoginSelectorMenuLeft

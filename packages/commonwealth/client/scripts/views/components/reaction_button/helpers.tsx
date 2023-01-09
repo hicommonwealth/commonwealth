@@ -32,10 +32,10 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       return (
         <div style="display: flex; width: 120px;">
           <CWText noWrap>
-            {m(User, {
-              user: new AddressInfo(null, address, chain?.id || chain, null),
-              linkify: true,
-            })}
+            <User
+              user={new AddressInfo(null, address, chain?.id || chain, null)}
+              linkify
+            />
           </CWText>
         </div>
       );

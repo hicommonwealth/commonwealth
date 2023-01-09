@@ -38,12 +38,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
 
     return (
       <div class="ThreadAuthor">
-        {m(User, {
-          avatarSize: 24,
-          user: author,
-          popover: true,
-          linkify: true,
-        })}
+        <User avatarSize={24} user={author} popover linkify />
         {thread.collaborators?.length > 0 && (
           <>
             <CWText type="caption">and</CWText>
@@ -53,9 +48,11 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
               content={
                 <div class="collaborators">
                   {thread.collaborators.map(({ address, chain }) => {
-                    return m(User, {
-                      user: new AddressInfo(null, address, chain, null),
-                    });
+                    return (
+                      <User
+                        user={new AddressInfo(null, address, chain, null)}
+                      />
+                    );
                   })}
                 </div>
               }

@@ -79,17 +79,21 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
             <div class="info-rows-container">
               <SnapshotInfoRow
                 label="Author"
-                value={m(User, {
-                  user: new AddressInfo(
-                    null,
-                    proposal.author,
-                    app.activeChainId(),
-                    null
-                  ),
-                  hideAvatar: true,
-                  linkify: true,
-                  popover: true,
-                })}
+                value={
+                  <User
+                    user={
+                      new AddressInfo(
+                        null,
+                        proposal.author,
+                        app.activeChainId(),
+                        null
+                      )
+                    }
+                    hideAvatar
+                    linkify
+                    popover
+                  />
+                }
               />
               <SnapshotInfoLinkRow
                 label="IPFS"

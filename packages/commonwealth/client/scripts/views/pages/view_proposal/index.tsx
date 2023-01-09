@@ -276,13 +276,14 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         <CWContentPage
           title={this.proposal.title}
           author={
-            !!this.proposal.author &&
-            m(User, {
-              avatarSize: 24,
-              user: this.proposal.author,
-              popover: true,
-              linkify: true,
-            })
+            !!this.proposal.author && (
+              <User
+                avatarSize={24}
+                user={this.proposal.author}
+                popover
+                linkify
+              />
+            )
           }
           createdAt={this.proposal.createdAt}
           subHeader={

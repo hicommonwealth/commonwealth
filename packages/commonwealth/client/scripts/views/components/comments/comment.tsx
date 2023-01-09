@@ -47,12 +47,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
     return comment.deleted ? (
       <span>[deleted]</span>
     ) : (
-      m(User, {
-        avatarSize: 24,
-        user: author,
-        popover: true,
-        linkify: true,
-      })
+      <User avatarSize={24} user={author} popover linkify />
     );
   }
 }

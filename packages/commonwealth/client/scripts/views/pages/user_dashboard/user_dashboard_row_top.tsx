@@ -54,22 +54,21 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
         ? `${decodedTitle.slice(0, 47)}...`
         : decodedTitle;
 
-    const actorName = m(User, {
-      user: new AddressInfo(
-        null,
-        author_address,
-        author_chain ?? chain_id,
-        null
-      ),
-      hideIdentityIcon: false,
-      linkify: true,
-      avatarSize: 16,
-      onclick: (e: any) => {
-        e.preventDefault();
-        e.stopPropagation();
-        m.route.set(`/${author_chain}/account/${author_address}`);
-      },
-    });
+    const actorName = (
+      <User
+        user={
+          new AddressInfo(null, author_address, author_chain ?? chain_id, null)
+        }
+        hideIdentityIcon={false}
+        linkify
+        avatarSize={16}
+        onclick={(e: any) => {
+          e.preventDefault();
+          e.stopPropagation();
+          m.route.set(`/${author_chain}/account/${author_address}`);
+        }}
+      />
+    );
 
     if (vnode.attrs.category === 'new-comment-creation') {
       return (

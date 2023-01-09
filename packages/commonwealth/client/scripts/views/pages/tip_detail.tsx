@@ -45,21 +45,16 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
             <div class="title">{title}</div>
             <div class="proposal-page-row">
               <div class="label">Finder</div>
-              {m(User, {
-                user: author,
-                linkify: true,
-                popover: true,
-                showAddressWithDisplayName: true,
-              })}
+              <User user={author} linkify popover showAddressWithDisplayName />
             </div>
             <div class="proposal-page-row">
               <div class="label">Beneficiary</div>
-              {m(User, {
-                user: app.profiles.getProfile(proposal.author.chain.id, who),
-                linkify: true,
-                popover: true,
-                showAddressWithDisplayName: true,
-              })}
+              <User
+                user={app.profiles.getProfile(proposal.author.chain.id, who)}
+                linkify
+                popover
+                showAddressWithDisplayName
+              />
             </div>
             <div class="proposal-page-row">
               <div class="label">Reason</div>
@@ -123,12 +118,12 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                       <div class="denominator">{deposit.denom}</div>
                       <div>{deposit.inDollars}</div>
                     </div>
-                    {m(User, {
-                      user: account,
-                      linkify: true,
-                      popover: true,
-                      showAddressWithDisplayName: true,
-                    })}
+                    <User
+                      user={account}
+                      linkify
+                      popover
+                      showAddressWithDisplayName
+                    />
                   </div>
                 ))}
               </>

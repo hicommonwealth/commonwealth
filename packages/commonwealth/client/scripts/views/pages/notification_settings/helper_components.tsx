@@ -80,15 +80,17 @@ const getTextRows = (subscription: NotificationSubscription) => {
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             fontWeight="bold"
           >
-            {m(User, {
-              hideAvatar: true,
-              user: new AddressInfo(
-                null,
-                subscription.Comment.author,
-                subscription.Comment.chain,
-                null
-              ),
-            })}
+            <User
+              hideAvatar
+              user={
+                new AddressInfo(
+                  null,
+                  subscription.Comment.author,
+                  subscription.Comment.chain,
+                  null
+                )
+              }
+            />
             's
           </CWText>
           <CWText

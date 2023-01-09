@@ -61,14 +61,16 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
         }
       >
         <div class="header-row">
-          {m(User, {
-            user: new AddressInfo(
-              searchResult.address_id,
-              searchResult.address,
-              searchResult.address_chain,
-              null
-            ),
-          })}
+          <User
+            user={
+              new AddressInfo(
+                searchResult.address_id,
+                searchResult.address,
+                searchResult.address_chain,
+                null
+              )
+            }
+          />
           <CWText className="last-updated-text">•</CWText>
           <CWText type="caption" className="last-updated-text">
             {moment(searchResult.created_at).format('l')}
@@ -153,13 +155,13 @@ export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRo
 
     return (
       <div class="SearchBarMemberPreviewRow">
-        {m(User, {
-          user: app.profiles.getProfile(
+        <User
+          user={app.profiles.getProfile(
             searchResult.chain,
             searchResult.address
-          ),
-          linkify: true,
-        })}
+          )}
+          linkify
+        />
       </div>
     );
   }
