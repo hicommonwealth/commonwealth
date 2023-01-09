@@ -37,7 +37,6 @@ export enum CommunityType {
   EthDao = 'Compound/Aave',
   SplToken = 'Solana Token',
   AbiFactory = 'Abi Factory',
-  AddContract = 'Add Contract',
 }
 
 const ADMIN_ONLY_TABS = [
