@@ -2,7 +2,7 @@ import { RabbitMQController, getRabbitMQConfig } from 'common-common/src/rabbitm
 import {
   RabbitMQSubscription,
   ServiceConsumer,
-} from 'common-common/src/ServiceConsumer';
+} from 'common-common/src/serviceConsumer';
 import { BrokerConfig } from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
@@ -12,6 +12,7 @@ import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import models from '../database';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 import {processChainEventTypeCUD} from "./messageProcessors/chainEventTypeCUDQueue";
+import {processSnapshotMessage} from "./messageProcessors/snapshotConsumer";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -60,10 +61,17 @@ export async function setupCommonwealthConsumer(): Promise<ServiceConsumer> {
     msgProcessorContext: context,
   };
 
+  const snapshotEventProcessorRmqSub: RabbitMQSubscription = {
+    messageProcessor: processSnapshotMessage,
+    subscriptionName: RascalSubscriptions.SnapshotListener,
+    msgProcessorContext: context
+  }
+
   const subscriptions: RabbitMQSubscription[] = [
     chainEntityCUDProcessorRmqSub,
     ceNotifsCUDProcessorRmqSub,
     ceTypeCUDProcessorRmqSub,
+    snapshotEventProcessorRmqSub
   ];
 
   const serviceConsumer = new ServiceConsumer(

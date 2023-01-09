@@ -1,7 +1,6 @@
 /* eslint-disable quotes */
 import { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
@@ -20,6 +19,7 @@ const searchComments = async (
 ) => {
   let bind = {};
 
+  const chain = req.chain;
   if (!req.query.search) {
     return next(new AppError(Errors.QueryMissing));
   }
@@ -30,9 +30,6 @@ const searchComments = async (
   // Community-scoped search
   let communityOptions = '';
   if (req.query.chain) {
-    const [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new AppError(error));
-
     // set up query parameters
     communityOptions = `AND "Comments".chain = $chain `;
     bind = { chain: chain.id };

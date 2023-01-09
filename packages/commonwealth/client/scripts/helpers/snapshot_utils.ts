@@ -104,7 +104,7 @@ export const PROPOSALS_QUERY = gql`
 export const PROPOSAL_VOTES_QUERY = gql`
   query Votes($proposalHash: String!) {
     votes(
-      first: 10000
+      first: 1000
       skip: 0
       where: { proposal: $proposalHash }
       orderBy: "created"

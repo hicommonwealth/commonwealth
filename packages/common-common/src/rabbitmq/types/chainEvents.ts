@@ -1,10 +1,11 @@
-import {CWEvent} from "chain-events/src";
-import {RmqMsgFormatError, RmqMsgNamespace} from "common-common/src/rabbitmq";
+import { CWEvent } from "chain-events/src";
+import { RmqMsgFormatError, RmqMsgNamespace } from "common-common/src/rabbitmq";
 
 /**
- * This object is merged with the namespace with the same name below so that within one object we have the invalid
+ * This class is merged with the namespace with the same name below so that within one object we have the invalid
  * format error, the function to check the format, and the type itself
  */
+
 export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
   /**
    * This function constructs an instance of the RmqMsgFormatError using the RabbitMQ message. This is used jointly with
@@ -31,7 +32,8 @@ export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
     return !!(
       typeof data.blockNumber === 'number'
       && data.data
-      && data.network && typeof data.network === 'string'
+      && data.network 
+      && typeof data.network === 'string'
     );
   },
 
@@ -53,3 +55,4 @@ export const RmqCWEvent: RmqMsgNamespace<CWEvent> = {
 export namespace RmqCWEvent {
   export type RmqMsgType = CWEvent;
 }
+

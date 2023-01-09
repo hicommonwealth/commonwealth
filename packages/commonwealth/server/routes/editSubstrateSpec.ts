@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from 'express';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { ChainBase } from 'common-common/src/types';
 import { AppError, ServerError } from 'common-common/src/errors';
@@ -13,8 +12,7 @@ const editSubstrateSpec = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   if (!chain) return next(new AppError('Unknown chain.'));
   if (chain.base !== ChainBase.Substrate)
     return next(new AppError('Chain must be substrate'));
