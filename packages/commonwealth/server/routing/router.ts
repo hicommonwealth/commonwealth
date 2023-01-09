@@ -162,7 +162,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
-import { getRoles } from '../controller';
+import * as controllers from '../controller';
 
 function setupRouter(
   app: Express,
@@ -532,8 +532,11 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models)
   );
 
-  // roles + permissions
-  router.get('/roles', getRoles.bind(this, models));
+  // roles 
+  router.get('/roles', controllers.getRoles.bind(this, models));
+  router.post('/roles', controllers.createRole.bind(this, models));
+  router.patch('/roles', controllers.updateRole.bind(this, models));
+
   router.get(
     '/bulkMembers',
     databaseValidationService.validateChain,

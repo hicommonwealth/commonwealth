@@ -13,12 +13,11 @@ export async function getRoles(models: DB, req: Request, res: Response) {
   }
 
   const result = await models.sequelize.query(
-    `SELECT DISTINCT "RoleAssignments".*, "CommunityRoles".* FROM "Profiles"
+    `SELECT "RoleAssignments".*, "CommunityRoles".* FROM "Profiles"
     JOIN "Addresses" ON "Addresses"."user_id" = "Profiles"."user_id"
     JOIN "RoleAssignments" ON "RoleAssignments"."address_id" = "Profiles"."user_id"
     JOIN "CommunityRoles" ON "RoleAssignments"."community_role_id" = "CommunityRoles"."id"
-    WHERE "Addresses"."address" = :address
-    `,
+    WHERE "Addresses"."address" = :address`,
     {
       replacements: { address },
       type: QueryTypes.SELECT,
@@ -28,7 +27,8 @@ export async function getRoles(models: DB, req: Request, res: Response) {
   return res.json(result);
 }
 
-export async function createRole(models:DB, req:Request, res:Response){
+
+export async function createRole(models: DB, req: Request, res: Response) {
   if (!req.body) {
     return res.status(400).json({ error: 'No body provided' });
   }
@@ -43,10 +43,17 @@ export async function createRole(models:DB, req:Request, res:Response){
   }
 
   const result = await models.sequelize.query(
-    `INSERT INTO "RoleAssignments" ("address_id", "community_role_id") VALUES (
-      (SELECT "user_id" FROM "Addresses" WHERE "address" = :address),
-      :role_id
-    )`,
+    `INSERT INTO "RoleAssignments" (
+      "address_id", 
+      "community_role_id", 
+      "created_at", 
+      "updated_at"
+    )
+    SELECT "Addresses"."user_id", :role_id, NOW(), NOW()
+    FROM "Addresses"
+    WHERE "Addresses"."address" = :address
+    RETURNING "address_id", "community_role_id"
+    `,
     {
       replacements: { address, role_id },
       type: QueryTypes.INSERT,
@@ -56,7 +63,7 @@ export async function createRole(models:DB, req:Request, res:Response){
   return res.json(result);
 }
 
-export async function updateRole(models:DB, req:Request, res:Response){
+export async function updateRole(models: DB, req: Request, res: Response) {
   if (!req.body) {
     return res.status(400).json({ error: 'No body provided' });
   }
@@ -71,9 +78,13 @@ export async function updateRole(models:DB, req:Request, res:Response){
   }
 
   const result = await models.sequelize.query(
-    `UPDATE "RoleAssignments" SET "community_role_id" = :role_id WHERE "address_id" = (
-      SELECT "user_id" FROM "Addresses" WHERE "address" = :address
-    )`,
+    `UPDATE "RoleAssignments"
+    SET "community_role_id" = :role_id, "updated_at" = NOW()
+    FROM "Addresses" a
+    JOIN (SELECT "user_id", "address" FROM "Addresses") b ON a."address" = b."address"
+    WHERE "address_id" = a."user_id" AND a."address" = :address
+    RETURNING "address_id", "community_role_id"
+    `,
     {
       replacements: { address, role_id },
       type: QueryTypes.UPDATE,
