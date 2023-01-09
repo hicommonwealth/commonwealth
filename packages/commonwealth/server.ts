@@ -46,6 +46,16 @@ import setupPassport from './server/passport';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
+import { performance, PerformanceObserver } from 'perf_hooks';
+
+
+const perfObserver = new PerformanceObserver((items) => {
+  items.getEntries().forEach((entry) => {
+    console.log(entry) // fake call to our custom logging solution
+  })
+})
+
+perfObserver.observe({ entryTypes: ["measure"], buffered: true })
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -55,6 +65,7 @@ require('express-async-errors');
 const app = express();
 
 async function main() {
+  performance.mark('A')
   const DEV = process.env.NODE_ENV !== 'production';
 
   // CLI parameters for which task to run
@@ -256,6 +267,7 @@ async function main() {
   const dbValidationService: DatabaseValidationService =
     new DatabaseValidationService(models);
 
+  performance.mark('B');
   setupAPI(
     app,
     models,
@@ -266,14 +278,27 @@ async function main() {
     globalActivityCache,
     dbValidationService
   );
+  performance.mark('C');
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
+  performance.mark('F');
   setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+  performance.mark('G');
 
   setupErrorHandlers(app, rollbar);
+  performance.mark('H');
 
   setupServer(app, rollbar, models, rabbitMQController);
+  performance.mark('I');
+
+  performance.measure('Main function up to setup', 'A', 'B');
+  performance.measure('Setup API', 'B', 'C');
+  performance.measure('Setup Proxies', 'C', 'F');
+  performance.measure('Setup App Routes', 'f', 'G');
+  performance.measure('Setup Error Handlers', 'G', 'H');
+  performance.measure('Setup Server', 'H', 'I');
+  performance.measure('Total  Time', 'A', 'I');
 }
 
 main();
