@@ -160,12 +160,12 @@ export class User extends ClassComponent<UserAttrs> {
       <>
         {/* 'long' makes role tags show as full length text */}
         {profile.isCouncillor && !hideIdentityIcon && (
-          <div class={`role-icon role-icon-councillor${long ? 'long' : ''}`}>
+          <div class={`role-icon role-icon-councillor${long ? ' long' : ''}`}>
             {long ? `${friendlyChainName} Councillor` : 'C'}
           </div>
         )}
         {profile.isValidator && !hideIdentityIcon && (
-          <div class={`role-icon role-icon-validator${long ? 'long' : ''}`}>
+          <div class={`role-icon role-icon-validator${long ? ' long' : ''}`}>
             {long ? `${friendlyChainName} Validator` : 'V'}
           </div>
         )}
@@ -191,7 +191,7 @@ export class User extends ClassComponent<UserAttrs> {
       </div>
     ) : (
       <div
-        class={`User${linkify ? 'linkified' : ''}`}
+        class={`User${linkify ? ' linkified' : ''}`}
         key={profile?.address || '-'}
       >
         {showAvatar && (
@@ -242,7 +242,7 @@ export class User extends ClassComponent<UserAttrs> {
                 ]
               )
             ) : (
-              <a class="user-display-name.username">
+              <a class="user-display-name username">
                 {!profile ? (
                   addrShort
                 ) : !showAddressWithDisplayName ? (
