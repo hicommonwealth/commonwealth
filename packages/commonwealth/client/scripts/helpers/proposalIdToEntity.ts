@@ -1,5 +1,5 @@
 import { ProposalType } from 'common-common/src/types';
-import { SubstrateTypes, MolochTypes, CompoundTypes, AaveTypes } from 'chain-events/src';
+import { SubstrateTypes, MolochTypes, CompoundTypes, AaveTypes } from 'chain-events/src/types';
 import { IApp } from "state";
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts
