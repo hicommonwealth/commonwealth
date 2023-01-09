@@ -7,10 +7,4 @@
 
 load-env-var '.env';
 
-if [[ -z "${PGPASSWORD}" ]]; then
-  PGPASSWORD="edgeware"
-else
-  PGPASSWORD="${PGPASSWORD}"
-fi
-
 psql -d postgres -U commonwealth -c 'DROP DATABASE commonwealth WITH (FORCE);' && npx sequelize db:create

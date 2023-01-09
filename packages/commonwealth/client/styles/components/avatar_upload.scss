@@ -1,4 +1,4 @@
-@import '../shared';
+@import 'shared';
 
 @mixin avatarUploadSizing($size) {
   @if $size == small {
