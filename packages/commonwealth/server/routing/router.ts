@@ -31,6 +31,7 @@ import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
 import createChain from '../routes/createChain';
 import createContract from '../routes/contracts/createContract';
+import createContractAbi from '../routes/contractAbis/createContractAbi';
 import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
 import updateBanner from '../routes/updateBanner';
@@ -128,7 +129,7 @@ import updateChainCategory from '../routes/updateChainCategory';
 import updateChainCustomDomain from '../routes/updateChainCustomDomain';
 import updateChainPriority from '../routes/updateChainPriority';
 
-import startSsoLogin from '../routes/startSsoLogin';
+import fetchEtherscanContract from '../routes/etherscanAPI';
 import finishSsoLogin from '../routes/finishSsoLogin';
 import getEntityMeta from '../routes/getEntityMeta';
 import { getTokensFromLists } from '../routes/getTokensFromLists';
@@ -162,6 +163,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import startSsoLogin from '../routes/startSsoLogin';
 
 
 
@@ -247,6 +249,12 @@ function setupRouter(
     '/createContract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
+  );
+
+  router.post(
+    '/etherscanAPI/fetchEtherscanContract',
+    passport.authenticate('jwt', { session: false }),
+    fetchEtherscanContract.bind(this, models)
   );
 
   router.post(

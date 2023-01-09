@@ -8,13 +8,8 @@ module.exports = {
      * Example:
      * await queryInterface.createTable('users', { id: Sequelize.INTEGER });
      */
-    await queryInterface.addColumn('Contracts', 'is_factory', {
-      type: Sequelize.BOOLEAN,
-      allowNull: false,
-      defaultValue: false,
-    });
-
-    await queryInterface.addColumn('Contracts', 'nickname', {
+    // add nickname column to ContractAbis table
+    await queryInterface.addColumn('ContractAbis', 'nickname', {
       type: Sequelize.STRING,
       allowNull: true,
     });
@@ -27,7 +22,7 @@ module.exports = {
      * Example:
      * await queryInterface.dropTable('users');
      */
-    await queryInterface.removeColumn('Contracts', 'is_factory');
-    await queryInterface.removeColumn('Contracts', 'nickname');
+    // remove nickname column from contractAbis table
+    await queryInterface.removeColumn('contractAbis', 'nickname');
   },
 };

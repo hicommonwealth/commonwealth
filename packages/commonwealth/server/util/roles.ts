@@ -1,4 +1,4 @@
-import { Transaction, Op, FindOptions } from 'sequelize';
+import { Model, Transaction, Op, FindOptions } from 'sequelize';
 import {
   computePermissions,
   Action,

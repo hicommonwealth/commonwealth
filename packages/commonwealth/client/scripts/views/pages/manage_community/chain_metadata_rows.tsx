@@ -16,7 +16,7 @@ import {
   ContractsViewable,
 } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { InputRow, SelectRow, ToggleRow } from 'views/components/metadata_rows';
+import { InputRow, ToggleRow } from 'views/components/metadata_rows';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo, RoleInfo } from 'models';
 import {
@@ -100,6 +100,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
       chain.defaultDenyPermissions,
       Action.VIEW_CHAT_CHANNELS
     );
+    this.contractsViewable = chain.contractsViewable;
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
     this.customDomain = chain.customDomain;
@@ -139,7 +140,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     if (this.discordBotConnected && !this.channelsLoaded) {
       getChannels();
     }
-
     return (
       <div class="ChainMetadataRows">
         <div class="AvatarUploadRow">
@@ -240,17 +240,25 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               : 'Discussion listing defaults to latest activity view'
           }
         />
-        <SelectRow
-          title="Contract Viewable Settings"
-          options={[
-            ContractsViewable.Off,
-            ContractsViewable.AdminOnly,
-            ContractsViewable.AllUsers,
-          ]}
-          value={this.contractsViewable}
-          onchange={(value) => {
-            this.contractsViewable = value;
-          }}/>
+        <CWDropdown
+          label="Contract Viewable Settings"
+          options={Object.keys(ContractsViewable).map(
+            (contractsViewableKey) => {
+              return {
+                label: ContractsViewable[contractsViewableKey],
+                value: contractsViewableKey,
+              };
+            }
+          )}
+          initialValue={{
+            value: this.contractsViewable,
+            label: this.contractsViewable,
+          }}
+          onSelect={(o) => {
+            // get the contracts viewable enum that corresponds to the selected option
+            this.contractsViewable = ContractsViewable[o.value];
+          }}
+        />
         <ToggleRow
           title="Chat Enabled"
           defaultValue={this.chatEnabled}

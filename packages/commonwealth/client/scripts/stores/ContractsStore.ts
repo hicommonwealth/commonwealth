@@ -54,7 +54,13 @@ class ContractsStore extends IdStore<Contract> {
 
   public getFactoryContracts(): Array<Contract> {
     // filter through the _storeId map for all contracts that are factories
-    return this._storeFactories || [];
+    const contractFactories = this.getAll().filter((c) => c.isFactory === true);
+    if (contractFactories.length > 0) {
+      return contractFactories;
+    } else {
+      console.log('No contract found with isFactory: ', true);
+      return [];
+    }
   }
 
   public getContractByAddress(address: string): Contract {

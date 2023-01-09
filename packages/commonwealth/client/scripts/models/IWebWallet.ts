@@ -9,8 +9,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enabled: boolean;
   enabling: boolean;
   accounts: readonly AccountT[];
-  api: any;
-
+  api?: any;
   enable: () => Promise<void>;
   reset?: () => Promise<void>;
   getRecentBlock?: () => Promise<BlockInfo>;

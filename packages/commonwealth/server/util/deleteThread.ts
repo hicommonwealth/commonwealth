@@ -4,7 +4,7 @@ export default async function deleteThread(
   models: DB,
   thread_id: number,
 ): Promise<void> {
-  models.Subscription.destroy({
+  await models.Subscription.destroy({
     where: {
       offchain_thread_id: thread_id,
     },

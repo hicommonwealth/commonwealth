@@ -9,6 +9,7 @@ import { Action } from 'common-common/src/permissions';
 
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';
+import { ContractsViewable } from 'common-common/src/types';
 import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { DiscussionSection } from './discussion_section';
 import { GovernanceSection } from './governance_section';
@@ -27,6 +28,14 @@ export type SidebarMenuName =
 
 export class Sidebar extends ClassComponent {
   view() {
+    const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
+    const contractsViewable = app.config.chains.getById(
+      app.activeChainId()
+    )?.contractsViewable;
+    const isContractsViewable =
+      (contractsViewable === ContractsViewable.AdminOnly && isAdmin) ||
+      contractsViewable === ContractsViewable.AllUsers;
+
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
     });
@@ -52,6 +61,7 @@ export class Sidebar extends ClassComponent {
                 <AdminSection />
                 <DiscussionSection />
                 <GovernanceSection />
+                {isContractsViewable && <ContractSection />}
                 {app.socket && !hideChat && <ChatSection />}
                 <ExternalLinksModule />
                 <div class="buttons-container">

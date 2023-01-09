@@ -6,7 +6,7 @@ import {
   parseFunctionFromABI,
   parseFunctionsFromABI,
   parseWriteFunctionsFromABI,
-} from 'client/scripts/helpers/abi_utils';
+} from '../../../shared/abi_utils';
 import { BigNumber, ethers } from 'ethers';
 
 describe('parseAbiItemsFromABI() unit tests', () => {

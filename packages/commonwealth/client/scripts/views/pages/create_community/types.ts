@@ -1,4 +1,4 @@
-import { ChainNetwork } from '../../../../../../common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
 import { ValidationTextAttrs } from '../../components/component_kit/cw_validation_text';
 
 export type ChainFormIdFields = {

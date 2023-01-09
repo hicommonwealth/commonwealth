@@ -1,14 +1,10 @@
-import { NextFunction } from 'express';
-import Web3 from 'web3';
-import BN from 'bn.js';
-import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from 'server/models';
-import { ContractAbiAttributes } from 'server/models/contract_abi';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { DB } from '../../models';
+import { ContractAbiAttributes } from '../../models/contract_abi';
 import { ContractAttributes } from '../../models/contract';
 import { TypedRequestBody, TypedResponse, success } from '../../types';
-
-const log = factory.getLogger(formatFilename(__filename));
+import validateAbi from '../../util/abiValidation';
 
 export const Errors = {
   NoContractId: 'Must provide contract id',
@@ -19,11 +15,13 @@ export const Errors = {
   ChainNameExists:
     'The name for this chain already exists, please choose another name',
   NotAdmin: 'Must be admin',
+  InvalidABI: 'Invalid ABI',
 };
 
 export type CreateContractAbiReq = {
   contractId: number;
-  abi: Array<Record<string, unknown>>;
+  abi: string;
+  nickname?: string;
 };
 
 export type CreateContractAbiResp = {
@@ -34,45 +32,49 @@ export type CreateContractAbiResp = {
 const createContractAbi = async (
   models: DB,
   req: TypedRequestBody<CreateContractAbiReq>,
-  res: TypedResponse<CreateContractAbiResp>,
-  next: NextFunction
+  res: TypedResponse<CreateContractAbiResp>
 ) => {
-  const { contractId, abi } = req.body;
+  const { contractId, abi, nickname } = req.body;
 
   if (!req.user) {
-    return next(new Error('Not logged in'));
+    throw new AppError('Not logged in');
   }
 
   if (!contractId) {
-    return next(new Error(Errors.NoContractId));
+    throw new AppError(Errors.NoContractId);
   }
 
-  if (!abi) {
-    return next(new Error(Errors.NoAbi));
+  if (!abi || abi === '') {
+    throw new AppError(Errors.NoAbi);
   }
 
-  try {
-    const contract_abi = await models.ContractAbi.create({
-      abi,
-    });
+  const abiAsRecord = validateAbi(abi);
 
-    const contract = await models.Contract.findOne({
-      where: { id: contractId },
-    });
+  const contract_abi = await models.ContractAbi.create({
+    abi: abiAsRecord,
+    nickname,
+  });
 
-    if (contract && contract_abi) {
-      contract.abi_id = contract_abi.id;
-      await contract.save();
-    }
+  const contract = await models.Contract.findOne({
+    where: { id: contractId },
+  });
 
+  if (!contract) {
     return success(res, {
       contractAbi: contract_abi.toJSON(),
-      contract,
+      contract: null,
     });
-  } catch (err) {
-    console.log('Error creating contract abi: ', err);
-    return next(err);
   }
+
+  if (contract && contract_abi) {
+    contract.abi_id = contract_abi.id;
+    await contract.save();
+  }
+
+  return success(res, {
+    contractAbi: contract_abi.toJSON(),
+    contract,
+  });
 };
 
 export default createContractAbi;

@@ -4,51 +4,44 @@ import 'pages/new_contract_page.scss';
 import app from 'state';
 import m from 'mithril';
 import $ from 'jquery';
+import ClassComponent from 'class_component';
 
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { BigNumber, ethers } from 'ethers';
-import { AbiItem, AbiInput, AbiOutput } from 'web3-utils/types';
-import { Contract as Web3Contract } from 'web3-eth-contract';
 import { CWText } from 'views/components/component_kit/cw_text';
-import { CWButton } from 'views/components/component_kit/cw_button';
-import { CWTextInput } from 'views/components/component_kit/cw_text_input';
-import { ValidationStatus } from 'views/components/component_kit/cw_validation_text';
 import { ChainBase } from 'common-common/src/types';
 import { AddContractForm } from './add_contract_form';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
-class NewContractPage implements m.ClassComponent<any> {
-  private state = {
-    ethChainNames: {},
-    ethChains: {},
-    loadingEthChains: true,
-  };
+class NewContractPage extends ClassComponent {
+  private ethChainNames = {};
+  private ethChains = {};
+  private loadingEthChains = true;
 
   oninit() {
     // query eth chains
     $.get(`${app.serverUrl()}/getSupportedEthChains`, {}).then(async (res) => {
       if (res.status === 'Success') {
-        this.state.ethChains = res.result;
+        this.ethChains = res.result;
       }
 
       // query names from chainlist if possible
       const chains = await $.getJSON('https://chainid.network/chains.json');
-      for (const id of Object.keys(this.state.ethChains)) {
+      for (const id of Object.keys(this.ethChains)) {
         const chain = chains.find((c) => c.chainId === +id);
         if (chain) {
-          this.state.ethChainNames[id] = chain.name;
+          this.ethChainNames[id] = chain.name;
         }
       }
-      this.state.loadingEthChains = false;
+      this.loadingEthChains = false;
       m.redraw();
     });
   }
 
-  view(vnode) {
+  view() {
     const getActiveForm = () => {
-      const { ethChains, ethChainNames } = this.state;
+      const { ethChains, ethChainNames } = this;
       return (
         <AddContractForm ethChains={ethChains} ethChainNames={ethChainNames} />
       );
@@ -70,7 +63,7 @@ class NewContractPage implements m.ClassComponent<any> {
       <Sublayout>
         <div class="NewContractPage">
           <CWText type="h4">Add New Contract</CWText>
-          {!this.state.loadingEthChains && getActiveForm()}
+          {!this.loadingEthChains ? getActiveForm() : <CWSpinner />}
         </div>
       </Sublayout>
     );

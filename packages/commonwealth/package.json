@@ -127,6 +127,7 @@
     "amqplib": "^0.8.0",
     "assert": "^2.0.0",
     "aws-sdk": "^2.814.0",
+    "axios-retry": "^3.3.1",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.4",
     "bcrypt-nodejs": "^0.0.3",
