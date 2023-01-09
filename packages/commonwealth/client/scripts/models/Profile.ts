@@ -134,7 +134,6 @@ class Profile {
   }
 
   public getAvatar(size: number) {
-    return render('div', { key: '-' });
     return this.avatarUrl
       ? render(CWAvatar, { avatarUrl: this.avatarUrl, size })
       : render(CWJdenticon, { address: this.address, size });

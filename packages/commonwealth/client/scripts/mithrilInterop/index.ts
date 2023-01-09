@@ -39,6 +39,8 @@ export const render = (tag: string | React.ComponentType, attrs: any = {}, ...ch
 
   // ensure vnode.children exists
   attrs.children = children;
+  attrs.className = className;
+
   if (typeof tag === 'string') {
     return createElement(tag, attrs, ...children);
   } else {

@@ -1,8 +1,8 @@
 /* @jsx jsx */
 import React from 'react';
 
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
-import jdenticon from 'jdenticon';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import Jdenticon from 'react-jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';
 
@@ -21,7 +21,11 @@ export class CWAvatar extends ClassComponent<AvatarAttrs> {
     return (
       <div
         className={ComponentType.Avatar}
-        STYLE={`width: ${size}px; height: ${size}px; background-image: url('${avatarUrl}');`}
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          backgroundImage: `url("${avatarUrl}")`,
+        }}
       />
     );
   }
@@ -34,20 +38,6 @@ export class CWJdenticon extends ClassComponent<JdenticonAttrs> {
     const { address, size } = vnode.attrs;
     if (!address) return null;
 
-    return (
-      <svg
-        width={size}
-        height={size}
-        key={address.toString()}
-        data-address={address.toString()}
-        // @REACT TODO
-        // oncreate={(vvnode) => {
-        //   jdenticon.update(vvnode.dom as HTMLElement, address);
-        // }}
-        // onupdate={(vvnode) => {
-        //   jdenticon.update(vvnode.dom as HTMLElement, address);
-        // }}
-      />
-    );
+    return <Jdenticon value={address.toString()} height={size} width={size} />;
   }
 }

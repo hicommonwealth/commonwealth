@@ -4,7 +4,7 @@ import React from 'react';
 
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { ClassComponent, render, redraw, Component } from 'mithrilInterop';
+import { ClassComponent, render, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -24,21 +24,19 @@ export interface IAddressDisplayOptions {
 }
 
 /* @FIXME @REACT need to refactor this state */
-class User extends ClassComponent<
-  {
-    user: Account | AddressInfo | Profile;
-    avatarSize?: number;
-    avatarOnly?: boolean; // overrides most other properties
-    hideAvatar?: boolean;
-    hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
-    showAddressWithDisplayName?: boolean; // show address inline with the display name
-    addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
-    linkify?: boolean;
-    onClick?: any;
-    popover?: boolean;
-    showRole?: boolean;
-  }
-> {
+class User extends ClassComponent<{
+  user: Account | AddressInfo | Profile;
+  avatarSize?: number;
+  avatarOnly?: boolean; // overrides most other properties
+  hideAvatar?: boolean;
+  hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
+  showAddressWithDisplayName?: boolean; // show address inline with the display name
+  addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
+  linkify?: boolean;
+  onClick?: any;
+  popover?: boolean;
+  showRole?: boolean;
+}> {
   private identityWidgetLoading = false;
   view(vnode) {
     // TODO: Fix showRole logic to fetch the role from chain
@@ -213,9 +211,12 @@ class User extends ClassComponent<
                 '.user-avatar',
                 {
                   key: profile?.address || '-',
-                  STYLE: `width: ${avatarSize}px; height: ${avatarSize}px;`,
+                  style: {
+                    width: `${avatarSize}px`,
+                    height: ` ${avatarSize}px`,
+                  },
                 },
-                [ profile && profile.getAvatar(avatarSize) ]
+                [profile && profile.getAvatar(avatarSize)]
               ),
             app.chain &&
             app.chain.base === ChainBase.Substrate &&
@@ -365,7 +366,7 @@ class User extends ClassComponent<
   }
 }
 
-export const UserBlock: Component<{
+export class UserBlock extends ClassComponent<{
   user: Account | AddressInfo | Profile;
   hideIdentityIcon?: boolean;
   popover?: boolean;
@@ -379,8 +380,8 @@ export const UserBlock: Component<{
   compact?: boolean;
   linkify?: boolean;
   avatarSize?: number;
-}> = {
-  view: (vnode) => {
+}> {
+  view(vnode) {
     const {
       user,
       hideIdentityIcon,
@@ -495,19 +496,17 @@ export const UserBlock: Component<{
           },
           children
         );
-  },
-};
-
-export const AnonymousUser: Component<
-  {
-    avatarSize?: number;
-    avatarOnly?: boolean;
-    hideAvatar?: boolean;
-    showAsDeleted?: boolean;
-    distinguishingKey: string; // To distinguish user from other anonymous users
   }
-> = {
-  view: (vnode) => {
+}
+
+export class AnonymousUser extends ClassComponent<{
+  avatarSize?: number;
+  avatarOnly?: boolean;
+  hideAvatar?: boolean;
+  showAsDeleted?: boolean;
+  distinguishingKey: string; // To distinguish user from other anonymous users
+}> {
+  view(vnode) {
     const {
       avatarOnly,
       avatarSize,
@@ -573,7 +572,7 @@ export const AnonymousUser: Component<
             ],
           ]
         );
-  },
-};
+  }
+}
 
 export default User;
