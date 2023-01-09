@@ -92,11 +92,11 @@ export class ConfirmInviteModal extends ClassComponent {
             this.selectedAddress = account.address;
           }}
         >
-          {m(UserBlock, {
-            user: account,
-            showChainName: true,
-            addressDisplayOptions: { showFullAddress: !isMobile },
-          })}
+          <UserBlock
+            user={account}
+            showChainName
+            addressDisplayOptions={{ showFullAddress: !isMobile }}
+          />
         </div>
       );
     };

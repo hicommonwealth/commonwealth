@@ -62,12 +62,15 @@ export class User extends ClassComponent<UserAttrs> {
     if (!user) return;
 
     let account: Account;
+
     let profile: Profile;
+
     const loggedInUserIsAdmin =
       app.user.isSiteAdmin ||
       app.roles.isAdminOfEntity({
         chain: app.activeChainId(),
       });
+
     let role;
 
     const addrShort = formatAddressShort(
@@ -103,8 +106,11 @@ export class User extends ClassComponent<UserAttrs> {
 
     if (vnode.attrs.user instanceof AddressInfo) {
       const chainId = vnode.attrs.user.chain;
+
       const address = vnode.attrs.user.address;
+
       if (!chainId || !address) return;
+
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === chainId.id) {
         try {
@@ -122,6 +128,7 @@ export class User extends ClassComponent<UserAttrs> {
       );
     } else if (vnode.attrs.user instanceof Profile) {
       profile = vnode.attrs.user;
+
       // only load account if it's possible to, using the current chain
       if (app.chain && app.chain.id === profile.chain) {
         try {
@@ -131,6 +138,7 @@ export class User extends ClassComponent<UserAttrs> {
           account = null;
         }
       }
+
       role = adminsAndMods.find(
         (r) =>
           r.address === profile.address && r.address_chain === profile.chain
@@ -140,160 +148,154 @@ export class User extends ClassComponent<UserAttrs> {
       // TODO: we should remove this, since account should always be of type Account,
       // but we currently inject objects of type 'any' on the profile page
       const chainId = account.chain.id;
+
       profile = account.profile;
+
       role = adminsAndMods.find(
         (r) => r.address === account.address && r.address_chain === chainId
       );
     }
 
-    const getRoleTags = (long?) => [
-      // 'long' makes role tags show as full length text
-      profile.isCouncillor &&
-        !hideIdentityIcon &&
-        m(
-          '.role-icon.role-icon-councillor',
-          {
-            class: long ? 'long' : '',
-          },
-          long ? `${friendlyChainName} Councillor` : 'C'
-        ),
-      profile.isValidator &&
-        !hideIdentityIcon &&
-        m(
-          '.role-icon.role-icon-validator',
-          {
-            class: long ? 'long' : '',
-          },
-          long ? `${friendlyChainName} Validator` : 'V'
-        ),
-      // role in commonwealth forum
-      showRole &&
-        role &&
-        m(Tag, {
-          class: 'role-tag',
-          label: role.permission,
-          rounded: true,
-          size: 'xs',
-        }),
-    ];
+    const getRoleTags = (long?: boolean) => (
+      <>
+        {/* 'long' makes role tags show as full length text */}
+        {profile.isCouncillor && !hideIdentityIcon && (
+          <div class={`role-icon role-icon-councillor${long ? 'long' : ''}`}>
+            {long ? `${friendlyChainName} Councillor` : 'C'}
+          </div>
+        )}
+        {profile.isValidator && !hideIdentityIcon && (
+          <div class={`role-icon role-icon-validator${long ? 'long' : ''}`}>
+            {long ? `${friendlyChainName} Validator` : 'V'}
+          </div>
+        )}
+        {/* role in commonwealth forum */}
+        {showRole &&
+          role &&
+          m(Tag, {
+            class: 'role-tag',
+            label: role.permission,
+            rounded: true,
+            size: 'xs',
+          })}
+      </>
+    );
 
-    const ghostAddress = app.user.addresses.some(
+    const _ghostAddress = app.user.addresses.some(
       ({ address, ghostAddress }) => {
-        if (this !== undefined) account.address === address && ghostAddress;
+        if (this !== undefined) {
+          return account.address === address && ghostAddress;
+        } else {
+          return false;
+        }
       }
     );
 
-    const userFinal = avatarOnly
-      ? m(
-          '.User.avatar-only',
-          {
-            key: profile?.address || '-',
-          },
-          !profile
-            ? null
-            : profile.avatarUrl
-            ? profile.getAvatar(avatarSize)
-            : profile.getAvatar(avatarSize - 4)
-        )
-      : m(
-          '.User',
-          {
-            key: profile?.address || '-',
-            class: linkify ? 'linkified' : '',
-          },
-          [
-            showAvatar &&
-              m(
-                '.user-avatar',
-                {
-                  style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
-                },
-                profile && profile.getAvatar(avatarSize)
-              ),
-            app.chain &&
-            app.chain.base === ChainBase.Substrate &&
-            app.cachedIdentityWidget
-              ? // substrate name
-                m(app.cachedIdentityWidget, {
-                  account,
-                  linkify,
-                  profile,
-                  hideIdentityIcon,
-                  addrShort,
-                  showAddressWithDisplayName,
-                })
-              : [
-                  // non-substrate name
-                  linkify
-                    ? link(
-                        'a.user-display-name.username',
-                        profile
-                          ? `/${app.activeChainId() || profile.chain}/account/${
-                              profile.address
-                            }?base=${profile.chain}`
-                          : 'javascript:',
-                        [
-                          !profile
-                            ? addrShort
-                            : !showAddressWithDisplayName
-                            ? profile.displayName
-                            : [
-                                profile.displayName,
-                                m(
-                                  '.id-short',
-                                  formatAddressShort(
-                                    profile.address,
-                                    profile.chain
-                                  )
-                                ),
-                              ],
-                          getRoleTags(false),
-                        ]
-                      )
-                    : m('a.user-display-name.username', [
-                        !profile
-                          ? addrShort
-                          : !showAddressWithDisplayName
-                          ? profile.displayName
-                          : [
-                              profile.displayName,
-                              m(
-                                '.id-short',
-                                formatAddressShort(
-                                  profile.address,
-                                  profile.chain
-                                )
-                              ),
-                            ],
-                        getRoleTags(false),
-                      ]),
-                  ghostAddress &&
-                    m('img', {
-                      src: '/static/img/ghost.svg',
-                      width: '20px',
-                      style: 'display: inline-block',
-                    }),
-                ],
-          ]
-        );
+    const userFinal = avatarOnly ? (
+      <div class="User avatar-only" key={profile?.address || '-'}>
+        {!profile
+          ? null
+          : profile.avatarUrl
+          ? profile.getAvatar(avatarSize)
+          : profile.getAvatar(avatarSize - 4)}
+      </div>
+    ) : (
+      <div
+        class={`User${linkify ? 'linkified' : ''}`}
+        key={profile?.address || '-'}
+      >
+        {showAvatar && (
+          <div
+            class="user-avatar"
+            style={`width: ${avatarSize}px; height: ${avatarSize}px;`}
+          >
+            {profile && profile.getAvatar(avatarSize)}
+          </div>
+        )}
+        {app.chain &&
+        app.chain.base === ChainBase.Substrate &&
+        app.cachedIdentityWidget ? (
+          // substrate name
+          m(app.cachedIdentityWidget, {
+            account,
+            linkify,
+            profile,
+            hideIdentityIcon,
+            addrShort,
+            showAddressWithDisplayName,
+          })
+        ) : (
+          <>
+            {/* non-substrate name */}
+            {linkify ? (
+              link(
+                'a.user-display-name.username',
+                profile
+                  ? `/${app.activeChainId() || profile.chain}/account/${
+                      profile.address
+                    }?base=${profile.chain}`
+                  : 'javascript:',
+                [
+                  !profile ? (
+                    addrShort
+                  ) : !showAddressWithDisplayName ? (
+                    profile.displayName
+                  ) : (
+                    <>
+                      {profile.displayName}
+                      <div class="id-short">
+                        {formatAddressShort(profile.address, profile.chain)}
+                      </div>
+                    </>
+                  ),
+                  getRoleTags(false),
+                ]
+              )
+            ) : (
+              <a class="user-display-name.username">
+                {!profile ? (
+                  addrShort
+                ) : !showAddressWithDisplayName ? (
+                  profile.displayName
+                ) : (
+                  <>
+                    {profile.displayName}
+                    <div class="id-short">
+                      {formatAddressShort(profile.address, profile.chain)}
+                    </div>
+                  </>
+                )}
+                {getRoleTags(false)}
+              </a>
+            )}
+            {_ghostAddress && (
+              <img
+                src="/static/img/ghost.svg"
+                width="20px"
+                style="display: inline-block"
+              />
+            )}
+          </>
+        )}
+      </div>
+    );
 
-    const userPopover = m(
-      '.UserPopover',
-      {
-        onclick: (e) => {
+    const userPopover = (
+      <div
+        class="UserPopover"
+        onclick={(e) => {
           e.stopPropagation();
-        },
-      },
-      [
-        m('.user-avatar', [
-          !profile
+        }}
+      >
+        <div class="user-avatar">
+          {!profile
             ? null
             : profile.avatarUrl
             ? profile.getAvatar(36)
-            : profile.getAvatar(32),
-        ]),
-        m('.user-name', [
-          app.chain &&
+            : profile.getAvatar(32)}
+        </div>
+        <div class="user-name">
+          {app.chain &&
           app.chain.base === ChainBase.Substrate &&
           app.cachedIdentityWidget
             ? m(app.cachedIdentityWidget, {
@@ -311,47 +313,49 @@ export class User extends ClassComponent<UserAttrs> {
                       profile.address
                     }?base=${profile.chain}`
                   : 'javascript:',
-                !profile
-                  ? addrShort
-                  : !showAddressWithDisplayName
-                  ? profile.displayName
-                  : [
-                      profile.displayName,
-                      m(
-                        '.id-short',
-                        formatAddressShort(profile.address, profile.chain)
-                      ),
-                    ]
-              ),
-        ]),
-        profile?.address &&
-          m(
-            '.user-address',
-            formatAddressShort(
+                !profile ? (
+                  addrShort
+                ) : !showAddressWithDisplayName ? (
+                  profile.displayName
+                ) : (
+                  <>
+                    {profile.displayName}
+                    <div class="id-short">
+                      {formatAddressShort(profile.address, profile.chain)}
+                    </div>
+                  </>
+                )
+              )}
+        </div>
+        {profile?.address && (
+          <div class="user-address">
+            {formatAddressShort(
               profile.address,
               profile.chain,
               false,
               maxCharLength
-            )
-          ),
-        friendlyChainName && m('.user-chain', friendlyChainName),
-        getRoleTags(true), // always show roleTags in .UserPopover
-
-        // If Admin Allow Banning
-        loggedInUserIsAdmin &&
-          m('.ban-wrapper', [
-            m(CWButton, {
-              onclick: () => {
+            )}
+          </div>
+        )}
+        {friendlyChainName && <div class="user-chain">{friendlyChainName}</div>}
+        {/* always show roleTags in UserPopover */}
+        {getRoleTags(true)}
+        {/* If Admin Allow Banning */}
+        {loggedInUserIsAdmin && (
+          <div class="ban-wrapper">
+            <CWButton
+              onclick={() => {
                 app.modals.create({
                   modal: BanUserModal,
                   data: { profile },
                 });
-              },
-              label: 'Ban User',
-              buttonType: 'primary-red',
-            }),
-          ]),
-      ]
+              }}
+              label="Ban User"
+              buttonType="primary-red"
+            />
+          </div>
+        )}
+      </div>
     );
 
     return popover

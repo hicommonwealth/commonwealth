@@ -46,13 +46,13 @@ const getMemberResult = (addr, searchTerm) => {
     contentLeft: <CWIcon iconSize="large" iconName="person" />,
     label: (
       <a class="search-results-item">
-        {m(UserBlock, {
-          user: profile,
-          searchTerm,
-          avatarSize: 36,
-          addressDisplayOptions: { showFullAddress: true },
-          showChainName: !scope,
-        })}
+        <UserBlock
+          user={profile}
+          searchTerm={searchTerm}
+          avatarSize={36}
+          addressDisplayOptions={{ showFullAddress: true }}
+          showChainName={!scope}
+        />
       </a>
     ),
     onclick: () => {

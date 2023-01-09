@@ -107,13 +107,13 @@ const getMemberPreview = (
     tabIndex,
     label: (
       <a class="search-results-item">
-        {m(UserBlock, {
-          user: profile,
-          searchTerm,
-          avatarSize: 24,
-          showAddressWithDisplayName: true,
-          showChainName,
-        })}
+        <UserBlock
+          user={profile}
+          searchTerm={searchTerm}
+          avatarSize={24}
+          showAddressWithDisplayName
+          showChainName={showChainName}
+        />
       </a>
     ),
     onclick: () => {

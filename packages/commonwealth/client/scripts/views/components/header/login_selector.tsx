@@ -74,13 +74,15 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               await setActiveAccount(account);
               m.redraw();
             },
-            label: m(UserBlock, {
-              user: account,
-              selected: isSameAccount(account, app.user.activeAccount),
-              showRole: false,
-              compact: true,
-              avatarSize: 16,
-            }),
+            label: (
+              <UserBlock
+                user={account}
+                selected={isSameAccount(account, app.user.activeAccount)}
+                showRole={false}
+                compact
+                avatarSize={16}
+              />
+            ),
           })
         )}
         {activeAddressesWithRole.length > 0 && m(MenuDivider)}

@@ -139,7 +139,7 @@ export class SelectAddressModal extends ClassComponent {
                   role && (
                     <div class="select-address-option existing">
                       <div class="select-address-option-left">
-                        {m(UserBlock, { user: account })}
+                        <UserBlock user={account} />
                         {app.user.addresses.find(
                           (a) =>
                             a.address === account.address &&
@@ -178,11 +178,11 @@ export class SelectAddressModal extends ClassComponent {
                       }}
                     >
                       <div class="select-address-option-left">
-                        {m(UserBlock, {
-                          user: account,
-                          showRole: true,
-                          selected: this.selectedIndex === index,
-                        })}
+                        <UserBlock
+                          user={account}
+                          showRole
+                          selected={this.selectedIndex === index}
+                        />
                         {app.user.addresses.find(
                           (a) =>
                             a.address === account.address &&
