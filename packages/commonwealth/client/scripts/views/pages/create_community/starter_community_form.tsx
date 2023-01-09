@@ -13,17 +13,18 @@ import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { notifyError } from 'controllers/app/notifications';
-import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
-import { baseToNetwork } from 'views/components/login_with_wallet_dropdown';
+import { IdRow, InputRow } from 'views/components/metadata_rows';
+import { baseToNetwork } from '../../../helpers';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ChainFormFields, ChainFormState } from './types';
 import { CommunityType } from '.';
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 // TODO: ChainFormState contains "uploadInProgress" which is technically
-// not part of the form (what we pass to /createChain), but of the general view's state,
+// not part of the form what we pass to /createChain, but of the general view's state,
 // and should be located elsewhere.
 type CreateStarterForm = ChainFormFields & { base: ChainBase };
 
@@ -64,15 +65,18 @@ export class StarterCommunityForm extends ClassComponent {
             this.state.form.symbol = v;
           }}
         />
-        <SelectRow
-          title="Base Chain"
-          options={['cosmos', 'ethereum', 'near']}
-          value={this.state.form.base}
-          onchange={(value) => {
-            this.state.form.base = value;
+        <CWDropdown
+          label="Base Chain"
+          options={[
+            { label: 'cosmos', value: 'cosmos' },
+            { label: 'ethereum', value: 'ethereum' },
+            { label: 'near', value: 'near' },
+          ]}
+          onSelect={(o) => {
+            this.state.form.base = o.value as ChainBase;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CHAIN_SELECTED,
-              chainBase: value,
+              chainBase: o.value,
               isCustomDomain: app.isCustomDomain(),
               communityType: CommunityType.StarterCommunity,
             });

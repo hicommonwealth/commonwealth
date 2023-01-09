@@ -15,7 +15,6 @@ import {
   isAddressPermitted,
 } from 'commonwealth/server/util/roles';
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import validateChain from '../middleware/validateChain';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
@@ -30,7 +29,7 @@ import {
 import checkRule from '../util/rules/checkRule';
 import RuleCache from '../util/rules/ruleCache';
 import BanCache from '../util/banCheckCache';
-import { findAllRoles } from '../util/roles';
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -145,7 +144,7 @@ const dispatchHooks = async (
   excludedAddrs.push(finalThread.Address.address);
 
   // dispatch notifications to subscribers of the given chain
-  models.Subscription.emitNotifications(
+  emitNotifications(
     models,
     NotificationCategories.NewThread,
     location,
@@ -177,7 +176,7 @@ const dispatchHooks = async (
       if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
       // dispatch notification emitting
-      return models.Subscription.emitNotifications(
+      return emitNotifications(
         models,
         NotificationCategories.NewMention,
         `user-${mentionedAddress.User.id}`,
@@ -213,9 +212,7 @@ const createThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-
-  if (error) return next(new AppError(error));
+  const chain = req.chain
 
   const author = req.address;
 

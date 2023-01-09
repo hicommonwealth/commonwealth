@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { AppError, ServerError } from 'common-common/src/errors';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 
 const getThreads = async (
@@ -10,8 +9,7 @@ const getThreads = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   let threads;
   try {
@@ -57,7 +55,7 @@ const getThreads = async (
     });
   } catch (e) {
     console.log(e);
-    throw new ServerError(error);
+    throw new ServerError(e);
   }
 
   return threads.length

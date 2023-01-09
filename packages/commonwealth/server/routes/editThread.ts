@@ -4,7 +4,6 @@ import moment from 'moment';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { parseUserMentions } from '../util/parseUserMentions';
-import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   renderQuillDeltaToText,
@@ -14,6 +13,7 @@ import { DB } from '../models';
 import BanCache from '../util/banCheckCache';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
+import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -45,8 +45,7 @@ const editThread = async (
       return next(new AppError(Errors.NoBodyOrAttachment));
     }
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   const author = req.address;
 
@@ -178,7 +177,7 @@ const editThread = async (
     });
 
     // dispatch notifications to subscribers of the given chain
-    models.Subscription.emitNotifications(
+    emitNotifications(
       models,
       NotificationCategories.ThreadEdit,
       '',
@@ -244,7 +243,7 @@ const editThread = async (
       mentionedAddresses.map((mentionedAddress) => {
         if (!mentionedAddress.User) return; // some Addresses may be missing users, e.g. if the user removed the address
 
-        models.Subscription.emitNotifications(
+        emitNotifications(
           models,
           NotificationCategories.NewMention,
           `user-${mentionedAddress.User.id}`,

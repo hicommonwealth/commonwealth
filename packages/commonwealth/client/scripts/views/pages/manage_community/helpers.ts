@@ -4,7 +4,7 @@ import app from 'state';
 
 import { RolePermission } from 'models';
 import { ChainCategoryType } from 'common-common/src/types';
-import { buildChainToCategoriesMap } from '../community_cards';
+import { buildChainToCategoriesMap } from '../communities';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
