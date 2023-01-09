@@ -162,6 +162,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import { getRoles } from '../controller';
 
 function setupRouter(
   app: Express,
@@ -532,6 +533,7 @@ function setupRouter(
   );
 
   // roles + permissions
+  router.get('/roles', getRoles.bind(this, models));
   router.get(
     '/bulkMembers',
     databaseValidationService.validateChain,
