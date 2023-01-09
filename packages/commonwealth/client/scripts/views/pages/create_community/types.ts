@@ -1,3 +1,4 @@
+import { ChainNetwork } from '../../../../../../common-common/src/types';
 import { ValidationTextAttrs } from '../../components/component_kit/cw_validation_text';
 
 export type ChainFormIdFields = {
@@ -30,6 +31,11 @@ export type EthChainAttrs = {
   ethChainNames: { [id: number]: string };
 };
 
+export type EthDaoFormFields = {
+  network: ChainNetwork.Ethereum;
+  tokenName: string;
+};
+
 export type EthFormFields = {
   address?: string;
   altWalletUrl?: string;
@@ -37,3 +43,7 @@ export type EthFormFields = {
   ethChainId?: string | number;
   nodeUrl?: string;
 };
+
+export type CreateFactoryEthDaoForm = ChainFormFields &
+  EthFormFields &
+  EthDaoFormFields;
