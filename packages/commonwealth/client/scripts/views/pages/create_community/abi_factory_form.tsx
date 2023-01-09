@@ -15,7 +15,7 @@ import {
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
 import { BigNumber, ethers } from 'ethers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { IdRow, InputRow, SelectRow } from 'views/components/metadata_rows';
+import { IdRow, InputRow } from 'views/components/metadata_rows';
 
 import { CWButton } from 'views/components/component_kit/cw_button';
 import {
@@ -35,11 +35,7 @@ import {
   EthChainAttrs,
   EthFormFields,
 } from 'views/pages/create_community/types';
-import {
-  parseAbiItemsFromABI,
-  parseEventFromABI,
-  parseFunctionFromABI,
-} from 'helpers/abi_utils';
+
 import { slugifyPreserveDashes } from 'utils';
 import { Contract } from 'models';
 import GeneralContractsController from 'controllers/chain/ethereum/generalContracts';
@@ -49,10 +45,14 @@ import {
   processAbiInputsToDataTypes,
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
+import { parseFunctionFromABI } from 'shared/abi_utils';
+import ClassComponent from 'class_component';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 type EthDaoFormFields = {
   network: ChainNetwork.Ethereum;
@@ -73,7 +73,7 @@ type CreateAbiFactoryState = ChainFormState & {
   form: CreateFactoryEthDaoForm;
 };
 
-export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
+export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
   generalContractsController: GeneralContractsController;
   private state: CreateAbiFactoryState = {
     message: '',
@@ -237,7 +237,7 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
                     <CWText>{output.name}</CWText>
                   </div>
                   <div>
-                    {this.state.loading && <Spinner active />}
+                    {this.state.loading && <CWSpinner />}
                     <CWText>
                       {fnOutputArray && fnOutputArray[i].toString()
                         ? fnOutputArray[i].toString()
@@ -282,20 +282,25 @@ export class AbiFactoryForm implements m.ClassComponent<EthChainAttrs> {
       <div class="CreateCommunityForm">
         {!this.state.loadingEthChains &&
           ethChainRows(vnode.attrs, this.state.form)}
-        <SelectRow
-          title="DAO Network Type (Only Ethereum is supported at this time)"
-          options={[ChainNetwork.Ethereum]}
+        <CWDropdown
+          label="DAO Network Type (Only Ethereum is supported at this time)"
+          options={[
+            { label: ChainNetwork.Ethereum, value: ChainNetwork.Ethereum },
+          ]}
           value={this.state.form.network}
           onchange={(value) => {
             this.state.form.network = value;
             this.state.loaded = true;
           }}
         />
-        <SelectRow
-          title="DAO Factory Type"
-          options={app.contracts
-            .getFactoryContracts()
-            .map((contract) => contract.nickname)}
+        <CWDropdown
+          label="DAO Factory Type"
+          options={app.contracts.getFactoryContracts().map((factContract) => {
+            return {
+              label: factContract.nickname,
+              value: factContract.nickname,
+            };
+          })}
           value={this.state.daoFactoryType}
           onchange={(value) => {
             this.state.daoFactoryType = value;

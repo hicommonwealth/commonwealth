@@ -1,6 +1,9 @@
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
+
+import { BigNumber } from "ethers";
+
 // eslint-disable-next-line import/prefer-default-export
 export const NotificationCategories = {
   NewComment: 'new-comment-creation',

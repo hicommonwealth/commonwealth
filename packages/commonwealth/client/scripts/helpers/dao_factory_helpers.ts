@@ -1,5 +1,5 @@
 import $ from 'jquery';
-
+import m from 'mithril';
 import Web3 from 'web3';
 import { Contract, IWebWallet } from 'models';
 import { initAppState } from 'app';
