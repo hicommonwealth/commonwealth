@@ -82,6 +82,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
                 onclick={(e) => {
                   e.preventDefault();
                   navigateToSubpage(`/discussions?stage=${targetStage}`);
+                  // m.redraw();
                 }}
                 label={`
                     ${threadStageToLabel(targetStage)} ${
