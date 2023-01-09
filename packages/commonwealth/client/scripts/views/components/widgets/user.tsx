@@ -181,16 +181,6 @@ export class User extends ClassComponent<UserAttrs> {
       </>
     );
 
-    const _ghostAddress = app.user.addresses.some(
-      ({ address, ghostAddress }) => {
-        if (this !== undefined) {
-          return account.address === address && ghostAddress;
-        } else {
-          return false;
-        }
-      }
-    );
-
     const userFinal = avatarOnly ? (
       <div class="User avatar-only" key={profile?.address || '-'}>
         {!profile
@@ -268,13 +258,17 @@ export class User extends ClassComponent<UserAttrs> {
                 {getRoleTags(false)}
               </a>
             )}
-            {_ghostAddress && (
-              <img
-                src="/static/img/ghost.svg"
-                width="20px"
-                style="display: inline-block"
-              />
-            )}
+            {account &&
+              app.user.addresses.some(
+                ({ address, ghostAddress }) =>
+                  account.address === address && ghostAddress
+              ) && (
+                <img
+                  src="/static/img/ghost.svg"
+                  width="20px"
+                  style="display: inline-block"
+                />
+              )}
           </>
         )}
       </div>
