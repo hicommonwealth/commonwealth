@@ -9,7 +9,7 @@ import { fromAscii } from '@cosmjs/encoding';
 import { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import { Proposal, TextProposal, ProposalStatus, TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
-  CommunityPoolSpendProposal, CommunityPoolSpendProposalWithDeposit
+  CommunityPoolSpendProposal
 } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { Any } from 'cosmjs-types/google/protobuf/any';
 import {
