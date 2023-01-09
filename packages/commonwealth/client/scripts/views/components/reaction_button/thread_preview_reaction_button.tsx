@@ -103,8 +103,9 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
       </div>
     );
 
-    return likes > 0
-      ? null // @TODO @REACT FIX ME
+    return reactionButtonComponent
+    // return likes > 0
+    //   ? null // @TODO @REACT FIX ME
       // m(Popover, {
       //     interactionType: 'hover',
       //     content: (
@@ -118,6 +119,6 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
       //     trigger: reactionButtonComponent,
       //     hoverOpenDelay: 100,
       //   })
-      : reactionButtonComponent;
+      // : reactionButtonComponent;
   }
 }

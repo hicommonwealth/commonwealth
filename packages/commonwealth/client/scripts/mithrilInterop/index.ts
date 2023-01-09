@@ -23,14 +23,30 @@ export type Children = ReactNode | ReactNode[];
 export const render = (tag: string | React.ComponentType, attrs: any = {}, ...children: any[]) => {
   // console.log(tag, attrs, children);
   let className = attrs?.className;
+
+  // check if selector starts with class (.)
   if (typeof tag === 'string' && tag[0] === '.') {
     if (className) {
       className = `${className} ${tag.slice(1)}`;
     } else {
       className = tag.slice(1);
     }
-    tag = `div`;
+    tag = 'div';
   }
+
+  // check if selector has class (.)
+  if (typeof tag === 'string' && tag.includes('.')) {
+    const [selector, ...classes] = tag.split('.');
+
+    if (className) {
+      className = `${className} ${classes.join(' ')}`;
+    } else {
+      className = classes.join(' ');
+    }
+
+    tag = selector;
+  }
+
   // handle children without attrs
   if (Array.isArray(attrs) || typeof attrs !== 'object') {
     children = attrs;
