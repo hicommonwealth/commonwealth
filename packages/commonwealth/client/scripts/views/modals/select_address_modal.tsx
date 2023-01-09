@@ -19,7 +19,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { getClasses } from '../components/component_kit/helpers';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
-import { UserBlock } from '../components/widgets/user_block';
+import { UserBlock } from '../components/user/user_block';
 
 export class SelectAddressModal extends ClassComponent {
   private loading: boolean;

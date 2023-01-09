@@ -13,7 +13,7 @@ import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { pluralize } from 'helpers';
 import { CWText } from '../../components/component_kit/cw_text';
-import { User } from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 // import { CWIconButton } from '../../components/component_kit/cw_icon_button';

@@ -20,7 +20,7 @@ import {
 } from '../components/component_kit/helpers';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
-import { UserBlock } from '../components/widgets/user_block';
+import { UserBlock } from '../components/user/user_block';
 
 type SideMenuAttrs = {
   invites: Array<InviteCodeAttributes>;

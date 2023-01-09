@@ -18,10 +18,10 @@ import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';
 import { CommentReactionButton } from '../reaction_button/comment_reaction_button';
 import { SharePopover } from '../share_popover';
-import { User } from '../widgets/user';
+import { User } from '../user/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
-import { AnonymousUser } from '../widgets/anonymous_user';
+import { AnonymousUser } from '../user/anonymous_user';
 
 type CommentAuthorAttrs = {
   comment: CommentType<any>;

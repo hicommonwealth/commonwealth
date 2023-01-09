@@ -15,7 +15,7 @@ import { slugify } from 'utils';
 import { isCommandClick, pluralize } from 'helpers';
 import { AddressInfo, Thread } from 'models';
 import { ThreadPreviewReactionButton } from '../../components/reaction_button/thread_preview_reaction_button';
-import { User } from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { SharePopover } from '../../components/share_popover';

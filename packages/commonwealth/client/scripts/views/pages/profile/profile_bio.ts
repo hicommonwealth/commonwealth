@@ -3,7 +3,7 @@ import m from 'mithril';
 import { Account } from 'models';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
-import { User } from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { initChain } from '../../../app';
 import SubstrateIdentity from '../../../controllers/chain/substrate/identity';
 import app from '../../../state';

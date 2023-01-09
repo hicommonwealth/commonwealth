@@ -12,7 +12,7 @@ import { formatCoin } from 'adapters/currency';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import Substrate from 'controllers/chain/substrate/adapter';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';

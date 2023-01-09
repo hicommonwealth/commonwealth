@@ -21,7 +21,7 @@ import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWLabel } from '../components/component_kit/cw_label';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWSpinner } from '../components/component_kit/cw_spinner';
-import { UserBlock } from '../components/widgets/user_block';
+import { UserBlock } from '../components/user/user_block';
 
 type SearchParams = {
   chainScope?: string;

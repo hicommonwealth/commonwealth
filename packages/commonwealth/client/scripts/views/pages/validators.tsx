@@ -12,7 +12,7 @@ import { ChainBase } from 'common-common/src/types';
 import { AddressInfo } from 'models';
 import Substrate from 'controllers/chain/substrate/adapter';
 import Sublayout from 'views/sublayout';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
 import { CWCard } from '../components/component_kit/cw_card';

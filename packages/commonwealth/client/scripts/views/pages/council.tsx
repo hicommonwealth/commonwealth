@@ -13,7 +13,7 @@ import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import Sublayout from 'views/sublayout';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { CouncilVotingModal } from 'views/modals/council_voting_modal';
 import { PageLoading } from 'views/pages/loading';

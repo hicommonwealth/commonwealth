@@ -13,7 +13,7 @@ import app from 'state';
 import { notifyError } from 'controllers/app/notifications';
 import { AddressInfo, Profile, SearchQuery } from 'models';
 import { SearchScope, SearchSort } from 'models/SearchQuery';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { SearchContentType } from 'types';
@@ -26,7 +26,7 @@ import { renderQuillTextBody } from '../../components/quill/helpers';
 import { PageNotFound } from '../404';
 import ErrorPage from '../error';
 import { CommunityLabel } from '../../components/community_label';
-import { UserBlock } from '../../components/widgets/user_block';
+import { UserBlock } from '../../components/user/user_block';
 
 const SEARCH_PAGE_SIZE = 50; // must be same as SQL limit specified in the database query
 

@@ -12,7 +12,7 @@ import Substrate from 'controllers/chain/substrate/adapter';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInfo } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import {
   ApproveBountyModal,
   ProposeCuratorModal,

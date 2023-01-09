@@ -16,7 +16,7 @@ import { CWCommunityAvatar } from '../../components/component_kit/cw_community_a
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
 import { CWCollapsible } from '../../components/component_kit/cw_collapsible';
 import { CWToggle } from '../../components/component_kit/cw_toggle';
-import { User } from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 import {
   SubscriptionRowTextContainer,

@@ -20,7 +20,7 @@ import { CWText } from './cw_text';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { getClasses, isWindowMediumSmallInclusive } from './helpers';
-import { User } from '../widgets/user';
+import { User } from '../user/user';
 import { CWIconButton } from './cw_icon_button';
 import { CWSpinner } from './cw_spinner';
 

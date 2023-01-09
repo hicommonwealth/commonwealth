@@ -10,7 +10,7 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import { User } from '../../components/widgets/user';
+import { User } from '../../components/user/user';
 import { getClasses } from '../../components/component_kit/helpers';
 import { CommunityLabel } from '../../components/community_label';
 

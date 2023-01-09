@@ -9,7 +9,7 @@ import app from 'state';
 import { CompoundProposalArgs } from 'controllers/chain/ethereum/compound/governance';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';

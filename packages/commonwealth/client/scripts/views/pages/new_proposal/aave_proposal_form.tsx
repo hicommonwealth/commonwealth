@@ -8,7 +8,7 @@ import 'pages/new_proposal/aave_proposal_form.scss';
 
 import app from 'state';
 import { Executor } from 'common-common/src/eth/types';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import { notifyError } from 'controllers/app/notifications';
 import Aave from 'controllers/chain/ethereum/aave/adapter';

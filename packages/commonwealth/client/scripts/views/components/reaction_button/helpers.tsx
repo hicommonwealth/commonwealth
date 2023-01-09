@@ -5,7 +5,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import { NewLoginModal } from '../../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';

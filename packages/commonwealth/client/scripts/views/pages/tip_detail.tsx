@@ -11,7 +11,7 @@ import { IBalanceAccount } from 'models/interfaces';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import Sublayout from '../sublayout';
-import { User } from '../components/widgets/user';
+import { User } from '../components/user/user';
 import { MarkdownFormattedText } from '../components/quill/markdown_formatted_text';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/cw_button';

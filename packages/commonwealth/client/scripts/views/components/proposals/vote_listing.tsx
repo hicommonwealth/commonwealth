@@ -8,7 +8,7 @@ import 'components/proposals/vote_listing.scss';
 import app from 'state';
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
-import { User } from 'views/components/widgets/user';
+import { User } from 'views/components/user/user';
 import {
   IVote,
   DepositVote,
