@@ -3,7 +3,7 @@
 import ClassComponent from 'class_component';
 import m from 'mithril';
 
-import 'components/widgets/user_gallery.scss';
+import 'components/user/user_gallery.scss';
 
 import { Account, AddressInfo } from 'models';
 import app from 'state';

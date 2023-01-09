@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 import m from 'mithril';
 import jdenticon from 'jdenticon';
 
-import 'components/widgets/user.scss';
+import 'components/user/user.scss';
 
 export class AnonymousUser extends ClassComponent<{
   avatarOnly?: boolean;

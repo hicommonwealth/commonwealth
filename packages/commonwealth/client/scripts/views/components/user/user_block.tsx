@@ -6,7 +6,7 @@ import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 
-import 'components/widgets/user.scss';
+import 'components/user/user.scss';
 
 import app from 'state';
 import { Account, AddressInfo, Profile } from 'models';

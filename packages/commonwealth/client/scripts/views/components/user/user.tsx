@@ -4,9 +4,8 @@
 import ClassComponent from 'class_component';
 import m from 'mithril';
 import { link } from 'helpers';
-import { Tag, Popover } from 'construct-ui';
 
-import 'components/widgets/user.scss';
+import 'components/user/user.scss';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
@@ -14,6 +13,8 @@ import { Account, AddressInfo, Profile } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../component_kit/cw_button';
 import { BanUserModal } from '../../modals/ban_user_modal';
+import { CWPopover } from '../component_kit/cw_popover/cw_popover';
+import { CWText } from '../component_kit/cw_text';
 
 // Address can be shown in full, autotruncated with formatAddressShort(),
 // or set to a custom max character length
@@ -170,14 +171,11 @@ export class User extends ClassComponent<UserAttrs> {
           </div>
         )}
         {/* role in commonwealth forum */}
-        {showRole &&
-          role &&
-          m(Tag, {
-            class: 'role-tag',
-            label: role.permission,
-            rounded: true,
-            size: 'xs',
-          })}
+        {showRole && role && (
+          <div class="role-tag-container">
+            <CWText className="role-tag-text">{role.permission}</CWText>
+          </div>
+        )}
       </>
     );
 
@@ -225,8 +223,8 @@ export class User extends ClassComponent<UserAttrs> {
                       profile.address
                     }?base=${profile.chain}`
                   : 'javascript:',
-                [
-                  !profile ? (
+                <>
+                  {!profile ? (
                     addrShort
                   ) : !showAddressWithDisplayName ? (
                     profile.displayName
@@ -237,9 +235,9 @@ export class User extends ClassComponent<UserAttrs> {
                         {formatAddressShort(profile.address, profile.chain)}
                       </div>
                     </>
-                  ),
-                  getRoleTags(false),
-                ]
+                  )}
+                  {getRoleTags(false)}
+                </>
               )
             ) : (
               <a class="user-display-name username">
@@ -352,16 +350,14 @@ export class User extends ClassComponent<UserAttrs> {
       </div>
     );
 
-    return popover
-      ? m(Popover, {
-          interactionType: 'hover',
-          content: userPopover,
-          trigger: userFinal,
-          closeOnContentClick: true,
-          transitionDuration: 0,
-          hoverOpenDelay: 500,
-          key: profile?.address || '-',
-        })
-      : userFinal;
+    return popover ? (
+      <CWPopover
+        interactionType="hover"
+        content={userPopover}
+        trigger={userFinal}
+      />
+    ) : (
+      userFinal
+    );
   }
 }

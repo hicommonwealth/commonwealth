@@ -4,7 +4,7 @@
 import ClassComponent from 'class_component';
 import m from 'mithril';
 
-import 'components/widgets/user.scss';
+import 'components/user/user.scss';
 
 import { link } from 'helpers';
 import app from 'state';
