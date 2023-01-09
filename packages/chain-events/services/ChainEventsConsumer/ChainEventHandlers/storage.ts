@@ -1,12 +1,7 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import {
-  CWEvent,
-  IChainEventKind,
-  IEventHandler,
-  SubstrateTypes,
-} from 'chain-events/src';
+import { CWEvent, IChainEventKind, IEventHandler } from 'chain-events/src';
 import * as Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import {
@@ -16,10 +11,11 @@ import {
 } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
+import { StatsDController } from 'common-common/src/statsd';
+import { SubstrateTypes } from 'chain-events/src/types';
 
 import { DB } from '../../database/database';
 import { ChainEventInstance } from '../../database/models/chain_event';
-import {StatsDController} from "common-common/src/statsd";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -124,12 +120,11 @@ export default class extends IEventHandler {
     if (!dbEventType) {
       log.error(`unknown event type: ${event.data.kind}`);
       return;
+    }
+    if (created) {
+      log.info(`Created new ChainEventType: ${dbEventType.id}`);
     } else {
-      if (created) {
-        log.info(`Created new ChainEventType: ${dbEventType.id}`);
-      } else {
-        log.trace(`found chain event type: ${dbEventType.id}`);
-      }
+      log.trace(`found chain event type: ${dbEventType.id}`);
     }
 
     const eventData = {
@@ -157,21 +152,17 @@ export default class extends IEventHandler {
       StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
 
       return dbEvent;
-    } else {
-      // refresh ttl for the duplicated event
-      this.eventCache.ttl(eventKey, this.ttl);
-
-      StatsDController.get().increment(
-        'ce.event-cache-chain-hit', {chain}
-      );
-
-      const cacheStats = this.eventCache.getStats();
-      StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
-      StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
-      StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
-
-      // return nothing so following handlers ignore this event
-      return;
     }
+    // refresh ttl for the duplicated event
+    this.eventCache.ttl(eventKey, this.ttl);
+
+    StatsDController.get().increment('ce.event-cache-chain-hit', { chain });
+
+    const cacheStats = this.eventCache.getStats();
+    StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
+    StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
+    StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
+
+    // return nothing so following handlers ignore this event
   }
 }
