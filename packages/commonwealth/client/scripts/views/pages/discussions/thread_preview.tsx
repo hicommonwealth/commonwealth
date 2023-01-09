@@ -212,7 +212,6 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                   }
                 />
               </div>
-              {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
               {app.isLoggedIn() && <ThreadPreviewMenu thread={thread} />}
             </div>
           </div>
