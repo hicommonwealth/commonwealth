@@ -295,7 +295,7 @@ async function main() {
   performance.measure('Main function up to setup', 'A', 'B');
   performance.measure('Setup API', 'B', 'C');
   performance.measure('Setup Proxies', 'C', 'F');
-  performance.measure('Setup App Routes', 'f', 'G');
+  performance.measure('Setup App Routes', 'F', 'G');
   performance.measure('Setup Error Handlers', 'G', 'H');
   performance.measure('Setup Server', 'H', 'I');
   performance.measure('Total  Time', 'A', 'I');
