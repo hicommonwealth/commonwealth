@@ -355,6 +355,7 @@ export class User extends ClassComponent<UserAttrs> {
         interactionType="hover"
         content={userPopover}
         trigger={userFinal}
+        persistOnHover
       />
     ) : (
       userFinal
