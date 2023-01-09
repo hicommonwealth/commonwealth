@@ -34,8 +34,6 @@ const generateImage = async (
 
   let image;
   try {
-    console.log('Starting Image Generation', Date.now());
-
     const response = await openai.createImage({
       prompt: description,
       size: '512x512',
@@ -43,9 +41,6 @@ const generateImage = async (
     });
 
     image = response.data.data[0].url;
-    console.log(image);
-
-    console.log('End Image Generation', Date.now());
   } catch (e) {
     console.log(e);
     throw new AppError('Problem Generating Image!');
@@ -63,12 +58,8 @@ const generateImage = async (
 
   let imageUrl = '';
   try {
-    console.log('Starting Image Upload', Date.now());
-
     const upload = await s3.upload(params).promise();
     imageUrl = upload.Location;
-
-    console.log('End Image Upload', Date.now());
   } catch (e) {
     console.log(e);
     throw new AppError('Problem uploading image!');
