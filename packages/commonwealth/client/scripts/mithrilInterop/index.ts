@@ -56,9 +56,16 @@ export const render = (tag: string | React.ComponentType, attrs: any = {}, ...ch
     attrs = { ...attrs };
   }
 
+  // ensure vnode.className exists
+  attrs.className = className;
+
+  // react forbids <img> tags to have children
+  if (tag === 'img') {
+    return createElement(tag, attrs);
+  }
+
   // ensure vnode.children exists
   attrs.children = children;
-  attrs.className = className;
 
   if (typeof tag === 'string') {
     return createElement(tag, attrs, ...children);
