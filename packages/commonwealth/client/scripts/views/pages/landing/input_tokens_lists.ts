@@ -1,5 +1,5 @@
 import m from 'mithril';
-import InputTokenOptionComponent from './input_token_option';
+import { InputTokenOptionComponent } from './input_token_option';
 import { Chain, Token } from './index';
 import { placeholderChain } from './tokens_community_hero';
 

@@ -3,7 +3,7 @@ import m from 'mithril';
 import { removeOrAddClasslistToAllElements } from 'helpers';
 import { ICardListItem } from 'models/interfaces';
 
-import ListedCardWithImage from './listed_card_with_image';
+import { ListedCardWithImage } from './listed_card_with_image';
 import ListContainer from './list_container';
 
 const ItemListsMapper: m.Component<
@@ -23,7 +23,14 @@ const ItemListsMapper: m.Component<
     vnode.state.cardImageActiveById = cardItems[0].card.id;
   },
   view: (vnode) => {
-    const { cardItems, tabHoverColorClick, textType, bgColor, margin, variant } = vnode.attrs;
+    const {
+      cardItems,
+      tabHoverColorClick,
+      textType,
+      bgColor,
+      margin,
+      variant,
+    } = vnode.attrs;
     const { buttonHoverActiveById, cardImageActiveById } = vnode.state;
 
     const handleClickItem = (cardItem: ICardListItem) => {
@@ -57,7 +64,7 @@ const ItemListsMapper: m.Component<
         imageAlt: card.imgAlt,
         tabHoverColorClick,
         textType,
-        variant
+        variant,
       });
     });
 

@@ -1,6 +1,6 @@
 import m from 'mithril';
 import { notifyError } from 'controllers/app/notifications';
-import FindYourTokenInputComponent from './find_your_token_input';
+import { FindYourTokenInputComponent } from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
 import 'pages/landing/tokens_community_hero.scss';
@@ -12,7 +12,7 @@ export const placeholderChain = {
   chainInfo: { symbol: 'PLACEHOLDER' },
   name: 'Add your token!',
   placeholder: true,
-}
+};
 
 interface IState {
   chainsAndTokens: (Chain | Token | typeof placeholderChain)[];
@@ -37,7 +37,9 @@ const initiateFullSearch = (searchTerm) => {
   if (searchTerm.length < 3) {
     notifyError('Query must be at least 3 characters');
   }
-  const params = `q=${encodeURIComponent(searchTerm.toString().trim())}&scope[]=Communities`;
+  const params = `q=${encodeURIComponent(
+    searchTerm.toString().trim()
+  )}&scope[]=Communities`;
   m.route.set(`/search?${params}`);
 };
 
@@ -49,10 +51,7 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
     vnode.state.chainsAndTokens = [];
   },
   view: (vnode) => {
-    vnode.state.chainsAndTokens = [
-      placeholderChain,
-      ...vnode.attrs.chains,
-    ];
+    vnode.state.chainsAndTokens = [placeholderChain, ...vnode.attrs.chains];
     const mappedCommunities = [
       {
         variant: `absolute object-top transform sm:translate-x-16 md:translate-x-64

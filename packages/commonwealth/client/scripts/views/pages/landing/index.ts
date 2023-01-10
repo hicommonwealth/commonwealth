@@ -8,11 +8,11 @@ import app, { LoginState } from 'state';
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { ChainInfo } from 'models';
-import HeaderLandingPage from './landing_page_header';
-import JoinCommonWealthSection from './landing_page_pre_footer';
+import { HeaderLandingPage } from './landing_page_header';
+import { JoinCommonWealthSection } from './landing_page_pre_footer';
 import TokensCommunityComponent from './tokens_community_hero';
 import TokensCreatorComponent from './creators_card_section';
-import TokensChainsComponent from './chains_slider';
+import { TokensChainsComponent } from './chains_slider';
 import TokenHoldersComponent from './find_your_community_section';
 import ChainsCrowdfundingComponent from './crowdfunding_card_section';
 
@@ -102,9 +102,6 @@ const LandingPage: m.Component<{}, IState> = {
             scrollHeader: true,
             navs: [
               { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-              // { text: 'Use Cases', redirectTo: '/whyCommonwealth' },
-              // { text: 'Crowdfunding', redirectTo: '/whyCommonwealth' },
-              // { text: 'Developers' },
             ],
           })
         ),
