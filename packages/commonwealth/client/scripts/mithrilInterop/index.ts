@@ -52,6 +52,8 @@ export const render = (tag: string | React.ComponentType, attrs: any = {}, ...ch
   if (Array.isArray(attrs) || typeof attrs !== 'object') {
     children = attrs;
     attrs = { className };
+  } else {
+    attrs = { ...attrs };
   }
 
   // ensure vnode.children exists
