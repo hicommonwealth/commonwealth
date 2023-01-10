@@ -281,8 +281,8 @@ class LandingPage extends ClassComponent {
               },
             ]}
           />
-          <JoinCommonWealthSection />,
-          <Footer />,
+          <JoinCommonWealthSection />
+          <Footer />
           <script
             src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js"
             integrity="sha512-IkLiryZhI6G4pnA3bBZzYCT9Ewk87U4DGEOz+TnRD3MrKqaUitt+ssHgn2X/sxoM7FxCP/ROUp6wcxjH/GcI5Q=="
