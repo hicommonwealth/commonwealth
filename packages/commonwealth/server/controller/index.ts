@@ -1,6 +1,7 @@
 import { QueryTypes } from 'sequelize';
 import { Request, Response } from 'express';
 import { DB } from '../models';
+import { PermissionManager, Action } from '../util/permissions';
 
 export async function getRoles(models: DB, req: Request, res: Response) {
   if (!req.query) {
@@ -40,6 +41,13 @@ export async function createRole(models: DB, req: Request, res: Response) {
 
   if (!role_id) {
     return res.status(400).json({ error: 'No role_id provided' });
+  }
+
+  const permissionManager = new PermissionManager(models);
+
+  // only users with the CREATE_ROLE permission can create roles
+  if (!permissionManager.isPermitted(Action.CREATE_ROLE)) {
+    return res.status(403).json({ error: 'Not authorized to create role' });
   }
 
   const result = await models.sequelize.query(

@@ -1,6 +1,6 @@
 import { DB } from '../models';
 
-export type AccessLevel = "admin" | "moderator" | "member" |"chain"| "none";
+export type AccessLevel = "admin" | "moderator" | "member" | "everyone";
 
 export enum PermissionError {
   NOT_PERMITTED = "Action not permitted",
@@ -30,78 +30,61 @@ export enum Action {
   VIEW_TOPICS = 20,
   EDIT_TOPIC = 21,
   DELETE_TOPIC = 22,
+  CREATE_ROLE = 23,
+  EDIT_ROLE = 24,
+  DELETE_ROLE = 25,
+  VIEW_ROLES = 26,
 }
 
-const allowImplicitActions = {
-  // Chat Subtree
-  [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
-  // View Subtree
-  [Action.VIEW_TOPICS]: [Action.VIEW_THREADS],
-  [Action.VIEW_THREADS]: [Action.VIEW_POLLS],
-  [Action.VIEW_POLLS]: [Action.VIEW_COMMENTS],
-  [Action.VIEW_COMMENTS]: [Action.VIEW_REACTIONS],
-  // Create Subtree
-  [Action.CREATE_TOPIC]: [
-    Action.CREATE_THREAD,
-    Action.EDIT_TOPIC,
-    Action.DELETE_TOPIC,
-    Action.VIEW_TOPICS,
-  ],
-  [Action.CREATE_THREAD]: [
-    Action.CREATE_POLL,
+const defaultAdminPermissions = {
+  [Action.DELETE_THREAD]: [
     Action.EDIT_THREAD,
-    Action.DELETE_THREAD,
-    Action.VIEW_TOPICS,
+    Action.CREATE_THREAD,
+    Action.VIEW_THREADS,
   ],
-  [Action.CREATE_POLL]: [
+  [Action.DELETE_COMMENT]: [
+    Action.EDIT_COMMENT,
     Action.CREATE_COMMENT,
-    Action.VOTE_ON_POLLS,
-    Action.VIEW_TOPICS,
+    Action.VIEW_COMMENTS,
   ],
-  [Action.CREATE_COMMENT]: [
+  [Action.DELETE_REACTION]: [
     Action.CREATE_REACTION,
-    Action.EDIT_COMMENT,
-    Action.DELETE_COMMENT,
+    Action.VIEW_REACTIONS,
+  ],
+  [Action.DELETE_TOPIC]: [
+    Action.EDIT_TOPIC,
+    Action.CREATE_TOPIC,
     Action.VIEW_TOPICS,
   ],
-  [Action.CREATE_REACTION]: [Action.DELETE_REACTION, Action.VIEW_TOPICS],
-  // Voting Subtree
-  [Action.VOTE_ON_POLLS]: [Action.VIEW_POLLS],
-  // Delete Subtree
-  [Action.DELETE_TOPIC]: [Action.DELETE_THREAD],
-  [Action.DELETE_THREAD]: [Action.DELETE_COMMENT],
-  [Action.DELETE_COMMENT]: [Action.DELETE_REACTION],
-  // Edit Subtree
-  [Action.EDIT_TOPIC]: [Action.EDIT_THREAD],
+}
+
+const defaultModeratorPermissions = {
+  [Action.CREATE_CHAT]: Action.VIEW_CHAT_CHANNELS,
   [Action.EDIT_THREAD]: [
-    Action.LINK_THREAD_TO_THREAD,
-    Action.LINK_PROPOSAL_TO_THREAD,
-    Action.EDIT_COMMENT,
+    Action.CREATE_THREAD,
+    Action.VIEW_THREADS,
   ],
-};
+  [Action.EDIT_COMMENT]: [
+    Action.CREATE_COMMENT,
+    Action.VIEW_COMMENTS,
+  ],
+  [Action.EDIT_TOPIC]: [
+    Action.CREATE_TOPIC,
+    Action.VIEW_TOPICS,
+  ],
+}
 
-const denyImplicitActions = {
-  // Chat Subtree
-  [Action.VIEW_CHAT_CHANNELS]: [Action.CREATE_CHAT],
-  // View Subtree
-  [Action.VIEW_REACTIONS]: [Action.VIEW_COMMENTS, Action.CREATE_REACTION],
-  [Action.VIEW_COMMENTS]: [Action.VIEW_THREADS, Action.CREATE_COMMENT],
-  [Action.VIEW_POLLS]: [Action.VOTE_ON_POLLS],
-  [Action.VIEW_THREADS]: [Action.CREATE_THREAD],
-  // Create Subtree
-  [Action.CREATE_REACTION]: [Action.CREATE_COMMENT],
-  [Action.CREATE_COMMENT]: [Action.EDIT_COMMENT, Action.CREATE_THREAD],
-  [Action.CREATE_THREAD]: [Action.EDIT_THREAD],
-  [Action.MANAGE_TOPIC]: [Action.DELETE_TOPIC],
-  // Voting Subtree
-  [Action.VOTE_ON_POLLS]: [Action.CREATE_POLL],
-  // Edit Subtree
-  [Action.EDIT_COMMENT]: [Action.DELETE_COMMENT],
-  [Action.EDIT_THREAD]: [Action.DELETE_THREAD]
-};
+const defaultMemberPermissions = {
+  [Action.CREATE_POLL]: [
+    Action.VOTE_ON_POLLS,
+    Action.VIEW_POLLS,
+  ],
+  [Action.CREATE_THREAD]: [Action.VIEW_THREADS],
+  [Action.CREATE_COMMENT]: [Action.VIEW_COMMENTS],
+  [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS],
+}
 
-
-const defaultPermissions: bigint =
+const defaultEveryonePermissions: bigint =
   (BigInt(1) << BigInt(Action.VIEW_REACTIONS)) |
   (BigInt(1) << BigInt(Action.CREATE_REACTION)) |
   (BigInt(1) << BigInt(Action.DELETE_REACTION)) |
@@ -111,16 +94,18 @@ const defaultPermissions: bigint =
 
 export class PermissionManager {
   private models: DB;
-  private permissions: bigint;
   private action: Action;
-  private allowImplicitActions: { [key: number]: Array<Action> };
-  private denyImplicitActions: { [key: number]: Array<Action> };
+  private defaultEveryonePermissions: bigint
+  private defaultAdminPermissions: { [key: number]: Array<Action> | Action };
+  private defaultModeratorPermissions: { [key: number]: Array<Action> | Action };
+  private defaultMemberPermissions: { [key: number]: Array<Action> | Action };
 
   constructor(_models: DB) {
     this.models = _models;
-    this.allowImplicitActions = allowImplicitActions;
-    this.denyImplicitActions = denyImplicitActions;
-    this.permissions = defaultPermissions;
+    this.defaultEveryonePermissions = defaultEveryonePermissions;
+    this.defaultAdminPermissions = defaultAdminPermissions;
+    this.defaultModeratorPermissions = defaultModeratorPermissions;
+    this.defaultMemberPermissions = defaultMemberPermissions;
   }
 
   gateGetAction(action: Action): bigint {
@@ -139,7 +124,7 @@ export class PermissionManager {
     return BigInt(1) << BigInt(action);
   }
 
-  gateActionWithPermissions(action: Action): bigint {
+  gateAction(action: Action): bigint {
     switch (action) {
       case Action.VIEW_REACTIONS:
       case Action.VIEW_COMMENTS:
@@ -219,6 +204,7 @@ export class PermissionManager {
   public setPermissions(permissions: bigint) {
     this.permissions = permissions;
   }
+
 
   public getImplicitPermissions(action: Action): Array<Action> {
     return this.implicitPermissions[action] || [];
