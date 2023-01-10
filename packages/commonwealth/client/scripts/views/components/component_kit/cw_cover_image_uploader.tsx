@@ -12,18 +12,32 @@ import { CWSpinner } from './cw_spinner';
 import { getClasses } from './helpers';
 import { MessageRow } from './cw_text_input';
 import { ValidationStatus } from './cw_validation_text';
+import { CWRadioGroup } from './cw_radio_group';
 
 type CoverImageUploaderAttrs = {
   headerText?: string;
   subheaderText?: string;
   uploadCompleteCallback: CallableFunction;
+  options?: boolean;
 };
+
+export enum ImageAs {
+  Cover = 'cover',
+  Background = 'background'
+}
+
+export enum ImageBehavior {
+  Stretch = 'cover',
+  Tiled = 'repeat'
+}
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
 export default class CWCoverImageUploader extends ClassComponent<CoverImageUploaderAttrs> {
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;
+  private imageAs: ImageAs;
+  private imageBehavior: ImageBehavior;
 
   async uploadImage(file: File): Promise<[string, ValidationStatus]> {
     try {
@@ -78,7 +92,11 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
       if (imageURL) {
         this.imageURL = imageURL;
         attachButton.style.display = 'none';
-        vnode.attrs.uploadCompleteCallback(imageURL);
+        if (vnode.attrs.options) {
+          vnode.attrs.uploadCompleteCallback(imageURL, this.imageAs, this.imageBehavior);
+        } else {
+          vnode.attrs.uploadCompleteCallback(imageURL);
+        }
       }
 
       m.redraw();
@@ -121,59 +139,115 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
 
     pseudoInput.addEventListener('change', pseudoInputHandler);
     attachZone.addEventListener('click', clickHandler);
+
+    // Set default values
+    this.imageAs = ImageAs.Cover;
+    this.imageBehavior = ImageBehavior.Stretch;
   }
 
   view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
-    const { imageURL, isUploading, uploadStatus } = this;
-    const { headerText, subheaderText } = vnode.attrs;
+    const { imageURL, isUploading, uploadStatus, imageAs, imageBehavior} = this;
+    const { headerText, subheaderText, uploadCompleteCallback, options } = vnode.attrs;
+
+    const backgroundStyles = {
+      backgroundImage: imageURL ? `url(${imageURL})` : 'none',
+      ...(options ? {
+        backgroundSize: imageBehavior === ImageBehavior.Stretch ? 'cover' : 'auto',
+        backgroundRepeat: imageBehavior === ImageBehavior.Tiled ? 'repeat' : 'no-repeat'
+      } : {}),
+    }
 
     return (
       <div class="CoverImageUploader">
-        {headerText && (
-          <CWText type="caption" fontWeight="medium">
-            {headerText}
-          </CWText>
-        )}
-        <MessageRow
-          label={subheaderText || 'Accepts JPG and PNG files.'}
-          hasFeedback={true}
-          statusMessage={
-            this.uploadStatus === 'success'
-              ? 'Image upload succeeded.'
-              : this.uploadStatus === 'failure'
-              ? 'Image upload failed.'
-              : null
-          }
-          validationStatus={this.uploadStatus}
-        />
-        <div
-          class={getClasses<{
-            isUploading: boolean;
-            uploadStatus: ValidationStatus;
-          }>(
-            {
-              isUploading,
-              uploadStatus,
-            },
-            'attach-zone'
-          )}
-          style={`background-image: url(${imageURL})`}
-        >
-          <input
-            type="file"
-            accept="image/jpeg, image/jpg, image/png"
-            id="pseudo-input"
-          />
-          {this.isUploading && <CWSpinner active="true" size="large" />}
-          <div class="attach-btn">
-            {!this.isUploading && (
-              <CWIcon iconName="imageUpload" iconSize="medium" />
-            )}
+        <div>
+          {headerText && (
             <CWText type="caption" fontWeight="medium">
-              Drag or upload your image here
+              {headerText}
             </CWText>
+          )}
+          <MessageRow
+            label={subheaderText || 'Accepts JPG and PNG files.'}
+            hasFeedback={true}
+            statusMessage={
+              this.uploadStatus === 'success'
+                ? 'Image upload succeeded.'
+                : this.uploadStatus === 'failure'
+                ? 'Image upload failed.'
+                : null
+            }
+            validationStatus={this.uploadStatus}
+          />
+          <div
+            class={getClasses<{
+              isUploading: boolean;
+              uploadStatus: ValidationStatus;
+            }>(
+              {
+                isUploading,
+                uploadStatus,
+              },
+              'attach-zone'
+            )}
+            style={backgroundStyles}
+          >
+            <input
+              type="file"
+              accept="image/jpeg, image/jpg, image/png"
+              id="pseudo-input"
+            />
+            {this.isUploading && <CWSpinner active="true" size="large" />}
+            <div class="attach-btn">
+              {!this.isUploading && (
+                <CWIcon iconName="imageUpload" iconSize="medium" />
+              )}
+                <CWText type="caption" fontWeight="medium">
+                  Drag or upload your image here
+                </CWText>
+            </div>
           </div>
         </div>
+        {vnode.attrs.options && (
+          <div className="options">
+            <CWText type="caption" fontWeight="medium" className="cover-image-title">Set as</CWText>
+            <CWRadioGroup
+              name="image-as"
+              onchange={(e) => {
+                this.imageAs = e.target.value;
+                uploadCompleteCallback(imageURL, this.imageAs, this.imageBehavior);
+              }}
+              toggledOption={imageAs}
+              options={[
+                {
+                  label: 'Cover Image',
+                  value: ImageAs.Cover,
+                },
+                {
+                  label: 'Background',
+                  value: ImageAs.Background,
+                }
+              ]}
+            />
+            <CWText type="caption" fontWeight="medium" className="cover-image-title">Choose Image Behavior</CWText>
+            <CWRadioGroup
+              name="image-behaviour"
+              onchange={(e) => {
+                this.imageBehavior = e.target.value;
+                uploadCompleteCallback(imageURL, this.imageAs, this.imageBehavior);
+              }}
+              toggledOption={imageBehavior}
+              options={[
+                {
+                  label: 'Strech',
+                  value: ImageBehavior.Stretch,
+                },
+                {
+                  label: 'Tile',
+                  value: ImageBehavior.Tiled,
+                }
+              ]}
+            />
+          </div>
+        )}
       </div>
     );
   }

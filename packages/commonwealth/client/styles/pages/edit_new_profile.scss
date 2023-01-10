@@ -17,14 +17,15 @@
 
   .buttons-container {
     justify-content: space-between;
-    @include smallInclusive {
-      display: flex;
-      flex-direction: row;
-    }
 
     .buttons {
       display: flex;
       justify-content: space-between;
+      align-items: center;
+
+      .tertiary-black {
+        padding-left: 0;
+      }
 
       .buttons-right {
         display: flex;
@@ -51,8 +52,6 @@
       margin-top: 8px;
 
       @include smallInclusive {
-        justify-content: flex-start;
-        margin-left: 16px;
         margin-top: 0;
       }
 

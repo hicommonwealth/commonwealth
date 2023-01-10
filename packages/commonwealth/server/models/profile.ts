@@ -5,6 +5,12 @@ import { UserAttributes, UserInstance } from './user';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressAttributes, AddressInstance } from './address';
 
+export type CoverImageAttributes = {
+  url: string;
+  imageAs: string;
+  imageBehavior: string;
+}
+
 export type ProfileAttributes = {
   id?: number;
   user_id: number;
@@ -18,6 +24,7 @@ export type ProfileAttributes = {
   avatar_url?: string;
   slug?: string;
   socials?: string[];
+  cover_image?: CoverImageAttributes;
 
   // associations
   User?: UserAttributes;
@@ -55,6 +62,7 @@ export default (
       avatar_url: { type: dataTypes.STRING, allowNull: true},
       slug: { type: dataTypes.STRING, allowNull: true},
       socials: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: true },
+      cover_image: { type: dataTypes.JSONB, allowNull: true },
     }, {
       tableName: 'Profiles',
       underscored: true,

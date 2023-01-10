@@ -21,6 +21,7 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWForm } from '../../components/component_kit/cw_form';
 import { CWFormSection } from '../../components/component_kit/cw_form_section';
 import { CWSocials } from '../../components/component_kit/cw_socials';
+import CWCoverImageUploader, { ImageAs, ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
 
 enum EditProfileError {
   None,
@@ -32,6 +33,12 @@ const NoAddressFoundError = 'No address found';
 const NoProfileFoundError = 'No profile found';
 
 type EditNewProfileAttrs = { placeholder?: string };
+
+export type CoverImage = {
+  url: string;
+  imageAs: ImageAs;
+  imageBehavior: ImageBehavior;
+}
 
 export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
   private address: string;
@@ -45,6 +52,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private username: string;
   private bio: QuillEditor;
   private avatarUrl: string;
+  private coverImage: CoverImage;
 
   private getProfile = async (address: string) => {
     this.loading = true;
@@ -67,6 +75,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     this.email = this.profile.email;
     this.socials = this.profile.socials;
     this.avatarUrl = this.profile.avatarUrl;
+    this.coverImage = this.profile.coverImage;
     this.loading = false;
     m.redraw();
   };
@@ -116,6 +125,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
     if (!_.isEqual(this.socials, this.profile?.socials))
       this.profileUpdate.socials = JSON.stringify(this.socials);
+
+    if (!_.isEqual(this.coverImage, this.profile?.coverImage))
+      this.profileUpdate.coverImage = JSON.stringify(this.coverImage);
   };
 
   private handleSaveProfile = (vnode: m.Vnode<EditNewProfileAttrs>) => {
@@ -322,6 +334,54 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   }}
                 />
               </div>
+            </CWFormSection>
+            <CWFormSection
+              title="Personalize Your Profile"
+              description="Express yourself through imagery."
+            >
+              <CWCoverImageUploader
+                uploadCompleteCallback={(url: string, imageAs: ImageAs, imageBehavior: ImageBehavior) => {
+                  console.log('url', url, imageAs, imageBehavior)
+                  this.coverImage = {
+                    url,
+                    imageAs,
+                    imageBehavior,
+                  };
+                }}
+                options={true}
+              />
+              {/* <CWText type="caption" fontWeight="medium" className="cover-image-title">Set as</CWText>
+              <CWRadioGroup
+                name="image-as"
+                onchange={(e) => { this.imageAs = e.target.value }}
+                toggledOption={this.imageAs}
+                options={[
+                  {
+                    label: 'Cover Image',
+                    value: 'cover-image',
+                  },
+                  {
+                    label: 'Background',
+                    value: 'background',
+                  }
+                ]}
+              />
+              <CWText type="caption" fontWeight="medium" className="cover-image-title">Choose Image Behavior</CWText>
+              <CWRadioGroup
+                name="image-behaviour"
+                onchange={(e) => { this.imageBehavour = e.target.value }}
+                toggledOption={this.imageBehavour}
+                options={[
+                  {
+                    label: 'Strech',
+                    value: 'stretch',
+                  },
+                  {
+                    label: 'Tile',
+                    value: 'tile',
+                  }
+                ]}
+              /> */}
             </CWFormSection>
             {/* TODO: Add back in when we have a way to manage addresses */}
             {/* <CWFormSection
