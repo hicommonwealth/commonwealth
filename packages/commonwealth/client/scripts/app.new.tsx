@@ -26,8 +26,8 @@ const useInitApp = () => {
   return { loading, customDomain };
 };
 
-const withLayout = (component, params) => {
-  return <Layout params={params}>{component}</Layout>;
+const withLayout = (Component, params) => {
+  return <Layout params={params}><Component /></Layout>;
 };
 
 const App = () => {
@@ -251,21 +251,21 @@ const App = () => {
   return (
     <Routes>
       <Route path="/whyCommonwealth" element={
-        withLayout(<WhyCommonwealthPage />, { scoped: false, hideSidebar: true })
+        withLayout(WhyCommonwealthPage, { scoped: false, hideSidebar: true })
       } />
       <Route
         path="/:scope/discussions"
         element={
-          withLayout(<DiscussionsPage />, { scoped: true, deferChain: true })
+          withLayout(DiscussionsPage, { scoped: true, deferChain: true })
         }
       />
       <Route
         path="/:scope/members"
         element={
-          withLayout(<MembersPage />, { scoped: true, deferChain: true })
+          withLayout(MembersPage, { scoped: true, deferChain: true })
         }
       />
-      <Route path="*" element={withLayout(<PageNotFound />, { scoped: false })} />
+      <Route path="*" element={withLayout(PageNotFound, { scoped: false })} />
     </Routes>
   );
 };
