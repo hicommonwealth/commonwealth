@@ -100,7 +100,7 @@ class ContractsController {
         symbol,
         isFactory: is_factory,
         nickname,
-        abi: ContractAbi,
+        abi: ContractAbi.abi,
       });
       this._store.add(result);
     });

@@ -98,7 +98,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
       );
     };
 
-    const disableField = !this.loaded;
+    const disableField = this.saving;
 
     const createDao = async (fn: AbiItem) => {
       const contract: Contract = app.contracts.getFactoryContractByNickname(
@@ -107,11 +107,10 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
       if (!contract || !contract.address) {
         return;
       }
-      const contractAddress = contract.address;
       try {
         this.loading = true;
         await createCuratedProjectDao(
-          contractAddress,
+          contract,
           fn,
           this.functionNameToFunctionInputArgs,
           this.form
@@ -122,7 +121,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
       } catch (err) {
         notifyError(
           err.responseJSON?.error ||
-            'Creating new ETH DAO Factory based community failed'
+            `Creating new ETH DAO Factory based community failed ${err}`
         );
         this.status = 'failure';
         this.message = err.message;
@@ -144,10 +143,6 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
             err.message ||
               `Fetching ETH DAO Factory based communities failed: ${err}`
           );
-        }
-        const contracts: Contract[] = app.contracts.getFactoryContracts();
-        if (contracts.length > 0) {
-          this.loaded = true;
         }
       }
     };
@@ -239,7 +234,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
             <div class="function-call">
               <CWButton
                 label="Create Dao"
-                disabled={this.saving || this.loading}
+                disabled={this.saving}
                 onclick={() => {
                   notifySuccess('Create Dao button clicked!');
                   this.saving = true;
@@ -278,6 +273,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           options={[
             { label: ChainNetwork.Ethereum, value: ChainNetwork.Ethereum },
           ]}
+          initialValue={{label: ChainNetwork.Ethereum, value: ChainNetwork.Ethereum}}
           onSelect={(o) => {
             this.form.network = ChainNetwork[o.value];
             this.loaded = true;
@@ -291,25 +287,22 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
               value: factContract.nickname,
             };
           })}
+          initialValue={{label: this.daoFactoryType, value: this.daoFactoryType}}
           onSelect={(o) => {
             this.daoFactoryType = o.value;
             this.loaded = true;
-            console.log('loaded');
             m.redraw();
           }}
         />
         <InputRow
           title="Name"
           value={this.form.name}
-          disabled={disableField}
           onChangeHandler={(v) => {
             this.form.name = v;
           }}
         />
-        <IdRow id={this.form.id} />
         <InputRow
           title="Symbol"
-          disabled={disableField}
           value={this.form.symbol}
           placeholder="XYZ"
           onChangeHandler={(v) => {

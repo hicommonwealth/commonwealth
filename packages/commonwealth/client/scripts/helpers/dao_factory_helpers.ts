@@ -33,16 +33,11 @@ export function decodeCuratedFactoryTx(
 }
 
 export async function createCuratedProjectDao(
-  contractAddress: string,
+  contract: Contract,
   fn: AbiItem,
   formInputMap: Map<string, Map<number, string>>,
   daoForm: CreateFactoryEthDaoForm
 ) {
-  const contract = app.contracts.getByAddress(contractAddress);
-  if (!contract) {
-    throw new Error('Contract not found');
-  }
-
   const metamaskWallet =
     await app.wallets.getFirstAvailableMetamaskWallet();
 
