@@ -34,7 +34,7 @@ import {
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
-import { useNavigate } from 'react-router';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 // import { ThreadPreviewMenu } from './thread_preview_menu';
 
 type ThreadPreviewAttrs = {
@@ -246,7 +246,4 @@ class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
   }
 }
 
-export function ThreadPreview(props) {
-  const navigate = useNavigate();
-  return <ThreadPreviewComponent {...props} navigate={navigate} />;
-}
+export const ThreadPreview = NavigationWrapper(ThreadPreviewComponent);
