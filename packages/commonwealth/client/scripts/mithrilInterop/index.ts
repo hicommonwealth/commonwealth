@@ -113,7 +113,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
           && typeof value !== 'function') {
           obj.setState({ ...obj.state, [prop]: value })
           obj._seenProps.push(prop);
-          console.log(prop, value);
+          // console.log(prop, value);
         }
         // @ts-ignore
         return Reflect.set(...arguments);

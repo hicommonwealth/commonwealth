@@ -101,7 +101,6 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
   view(vnode: ResultNode<ViewThreadPageAttrs>) {
     const { identifier } = vnode.attrs;
-    console.log(identifier);
 
     if (!app.chain?.meta) {
       return (
