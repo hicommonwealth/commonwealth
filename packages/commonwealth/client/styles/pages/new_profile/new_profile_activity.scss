@@ -7,9 +7,10 @@
   height: fit-content;
   width: 60vw;
   flex: none;
+  background-color: $white;
 
   @include mediumInclusive {
-    width: 50vw;
+    width: 55vw;
   }
 
   @include smallInclusive {

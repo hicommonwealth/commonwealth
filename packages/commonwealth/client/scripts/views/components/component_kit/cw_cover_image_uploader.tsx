@@ -27,7 +27,7 @@ export enum ImageAs {
 }
 
 export enum ImageBehavior {
-  Stretch = 'cover',
+  Fill = 'cover',
   Tiled = 'repeat'
 }
 
@@ -142,7 +142,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
 
     // Set default values
     this.imageAs = ImageAs.Cover;
-    this.imageBehavior = ImageBehavior.Stretch;
+    this.imageBehavior = ImageBehavior.Fill;
   }
 
   view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
@@ -152,8 +152,9 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     const backgroundStyles = {
       backgroundImage: imageURL ? `url(${imageURL})` : 'none',
       ...(options ? {
-        backgroundSize: imageBehavior === ImageBehavior.Stretch ? 'cover' : 'auto',
-        backgroundRepeat: imageBehavior === ImageBehavior.Tiled ? 'repeat' : 'no-repeat'
+        backgroundSize: imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
+        backgroundRepeat: imageBehavior === ImageBehavior.Fill ? 'no-repeat' : 'repeat',
+        backgroundPosition: imageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
       } : {}),
     }
 
@@ -237,8 +238,8 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
               toggledOption={imageBehavior}
               options={[
                 {
-                  label: 'Strech',
-                  value: ImageBehavior.Stretch,
+                  label: 'Fill',
+                  value: ImageBehavior.Fill,
                 },
                 {
                   label: 'Tile',

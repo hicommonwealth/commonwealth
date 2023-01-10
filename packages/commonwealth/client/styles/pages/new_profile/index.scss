@@ -7,7 +7,23 @@
   .ProfilePageContainer {
     display: flex;
     flex-direction: row;
-    margin: 80px 86px;
+    margin: 64px 80px;
+
+    &.smaller-margins { 
+      margin: 24px 80px;
+
+      @include mediumInclusive {
+        margin: 24px 72px;
+      }
+  
+      @include mediumSmallInclusive {
+        margin: 24px 48px;
+      }
+      
+      @include smallInclusive {
+        margin: 24px 32px;
+      }
+    }
 
     @include mediumInclusive {
       margin: 80px 72px;

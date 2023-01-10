@@ -21,6 +21,7 @@ import { CommentWithAssociatedThread, NewProfileActivity } from './new_profile_a
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
+import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
 
 enum ProfileError {
   None,
@@ -134,25 +135,71 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
         </div>
       );
 
-    if (this.error === ProfileError.None)
-      this.content = (
-        <div class="ProfilePage">
-          <div class="ProfilePageContainer">
-            <NewProfileHeader
-              profile={this.profile}
-              address={this.address}
-            />
-            <NewProfileActivity
-              threads={this.threads}
-              comments={this.comments}
-              chains={this.chains}
-              addresses={this.addresses}
-            />
-          </div>
-        </div>
-      );
+    if (this.error === ProfileError.None) {
+      if (!this.profile) return;
 
-    if (!this.profile) return;
+      if (this.profile.coverImage) {
+        const { url, imageBehavior, imageAs } = this.profile.coverImage;
+        this.content = (
+          <div className="ProfilePage"
+            style={
+              imageAs === 'background' ? (
+                  {
+                    backgroundImage: `url(${url})`,
+                    backgroundRepeat: `${imageBehavior === ImageBehavior.Fill ? 'no-repeat' : 'repeat'}`,
+                    backgroundSize: imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
+                    backgroundPosition: imageBehavior === ImageBehavior.Fill ? 'center' : '56px 56px',
+                    backgroundAttachment: 'fixed',
+                  }
+              ) : {}
+            }
+          >
+            { imageAs === 'cover' && (
+              <div
+                style={
+                  {
+                    backgroundImage: `url(${url})`,
+                    backgroundRepeat: `${imageBehavior === ImageBehavior.Fill ? 'no-repeat' : 'repeat'}`,
+                    backgroundSize: imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
+                    backgroundPosition: imageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
+                    height: '240px',
+                  }
+                }
+              />
+            )}
+            <div className={imageAs === 'background' ? 'ProfilePageContainer' : 'ProfilePageContainer smaller-margins'}>
+              <NewProfileHeader
+                profile={this.profile}
+                address={this.address}
+              />
+              <NewProfileActivity
+                threads={this.threads}
+                comments={this.comments}
+                chains={this.chains}
+                addresses={this.addresses}
+              />
+            </div>
+          </div>
+        );
+      } else {
+        this.content = (
+          <div className="ProfilePage">
+            <div className="ProfilePageContainer">
+              <NewProfileHeader
+                profile={this.profile}
+                address={this.address}
+              />
+              <NewProfileActivity
+                threads={this.threads}
+                comments={this.comments}
+                chains={this.chains}
+                addresses={this.addresses}
+              />
+            </div>
+          </div>
+        );
+      }
+    }
 
     return <Sublayout>{this.content}</Sublayout>;
   }
