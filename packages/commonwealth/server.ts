@@ -1,5 +1,6 @@
 import session from 'express-session';
 import express from 'express';
+import * as path from 'path';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
@@ -86,15 +87,18 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV
-    ? webpack(devWebpackConfig as any)
-    : webpack(prodWebpackConfig as any);
-  const devMiddleware =
-    DEV && !NO_CLIENT_SERVER && !process.env.EXTERNAL_WEBPACK
-      ? webpackDevMiddleware(compiler as any, {
-          publicPath: '/build',
-        })
-      : null;
+  let devMiddleware = null;
+  let compiler = null;
+  if (!process.env.EXTERNAL_WEBPACK) {
+    compiler = DEV
+      ? webpack(devWebpackConfig as any)
+      : webpack(prodWebpackConfig as any);
+    if (DEV && !NO_CLIENT_SERVER && !process.env.EXTERNAL_WEBPACK) {
+      devMiddleware = webpackDevMiddleware(compiler as any, {
+        publicPath: '/build',
+      });
+    }
+  }
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
@@ -133,36 +137,10 @@ async function main() {
     // dynamic compression settings used
     app.use(compression());
 
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
-
-    // serve the compiled app
-    if (!NO_CLIENT_SERVER) {
-      if (DEV && !process.env.EXTERNAL_WEBPACK) {
-        app.use(devMiddleware);
-        app.use(webpackHotMiddleware(compiler));
-      } else {
-        app.use('/', express.static('build'));
-      }
-    }
-
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
-      res.set('Content-Security-Policy', "frame-ancestors 'none';");
+      res.set('Content-Security-Policy', 'frame-ancestors \'none\';');
       next();
     });
 
@@ -181,16 +159,6 @@ async function main() {
     app.use(passport.session());
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
   };
-
-  const templateFile = (() => {
-    try {
-      return fs.readFileSync('./build/index.html');
-    } catch (e) {
-      console.error(`Failed to read template file: ${e.message}`);
-    }
-  })();
-
-  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.
@@ -261,7 +229,28 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
-  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+
+
+  // serve the compiled app
+  if (!NO_CLIENT_SERVER) {
+    if (DEV && !process.env.EXTERNAL_WEBPACK) {
+      app.use(devMiddleware);
+      app.use(webpackHotMiddleware(compiler));
+    } else if (process.env.EXTERNAL_WEBPACK) {
+      app.use('/buildjs', (req, res, next) => {
+        next();
+      });
+      app.use('/build', express.static(path.join(__dirname, 'build')));
+
+      app.get('/', function (req, res) {
+        res.sendFile(path.join(__dirname, 'build', 'index.html'));
+      });
+    } else {
+      app.use('/', express.static('build'));
+    }
+  }
+
+  setupAppRoutes(app, models, devMiddleware);
 
   setupErrorHandlers(app, rollbar);
 

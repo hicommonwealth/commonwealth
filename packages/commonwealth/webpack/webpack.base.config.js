@@ -15,6 +15,12 @@ module.exports = {
       P3P: 'CP="Commonwealth does not have a P3P compact privacy policy"',
     },
   },
+  output: {
+    publicPath: '/build/',
+    path: path.join(__dirname, '../build'),
+    filename: 'js/[name].[contenthash:8].js',
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
+  },
   plugins: [
     new webpack.DefinePlugin({
       'process.env.MAGIC_PUBLISHABLE_KEY': JSON.stringify(
