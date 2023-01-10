@@ -4,7 +4,6 @@ import * as path from 'path';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import SessionSequelizeStore from 'connect-session-sequelize';
-import fs from 'fs';
 import Rollbar from 'rollbar';
 import passport from 'passport';
 import cookieParser from 'cookie-parser';
@@ -87,18 +86,6 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  let devMiddleware = null;
-  let compiler = null;
-  if (!process.env.EXTERNAL_WEBPACK) {
-    compiler = DEV
-      ? webpack(devWebpackConfig as any)
-      : webpack(prodWebpackConfig as any);
-    if (DEV && !NO_CLIENT_SERVER && !process.env.EXTERNAL_WEBPACK) {
-      devMiddleware = webpackDevMiddleware(compiler as any, {
-        publicPath: '/build',
-      });
-    }
-  }
   const SequelizeStore = SessionSequelizeStore(session.Store);
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
@@ -211,6 +198,29 @@ async function main() {
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
 
+  const compiler = DEV
+    ? webpack(devWebpackConfig as any)
+    : webpack(prodWebpackConfig as any);
+  const devMiddleware = webpackDevMiddleware(compiler as any, {
+    publicPath: '/build',
+  });
+
+  // serve the compiled app
+  if (!NO_CLIENT_SERVER) {
+    if (DEV && !process.env.EXTERNAL_WEBPACK) {
+      app.use(devMiddleware);
+      app.use(webpackHotMiddleware(compiler));
+    } else if (process.env.EXTERNAL_WEBPACK) {
+      app.use('/build', express.static(path.join(__dirname, 'build')));
+
+      app.get('/', function (req, res) {
+        res.sendFile(path.join(__dirname, 'build', 'index.html'));
+      });
+    } else {
+      app.use('/', express.static('build'));
+    }
+  }
+
   // Declare Validation Middleware Service
   // middleware to use for all requests
   const dbValidationService: DatabaseValidationService =
@@ -229,26 +239,6 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
-
-
-  // serve the compiled app
-  if (!NO_CLIENT_SERVER) {
-    if (DEV && !process.env.EXTERNAL_WEBPACK) {
-      app.use(devMiddleware);
-      app.use(webpackHotMiddleware(compiler));
-    } else if (process.env.EXTERNAL_WEBPACK) {
-      app.use('/buildjs', (req, res, next) => {
-        next();
-      });
-      app.use('/build', express.static(path.join(__dirname, 'build')));
-
-      app.get('/', function (req, res) {
-        res.sendFile(path.join(__dirname, 'build', 'index.html'));
-      });
-    } else {
-      app.use('/', express.static('build'));
-    }
-  }
 
   setupAppRoutes(app, models, devMiddleware);
 

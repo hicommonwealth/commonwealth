@@ -39,17 +39,8 @@ if (!process.env.EXTERNAL_WEBPACK) {
         'webpack-hot-middleware/client?path=/__webpack_hmr&reload=true',
       ]
     },
-    output: {
-      publicPath: '/build',
-    },
     plugins: [
       new webpack.HotModuleReplacementPlugin(), // used for hot reloading
     ]
   });
-} else {
-  module.exports = merge(module.exports, {
-      output: {
-        publicPath: '/build/',
-      }
-    });
 }
