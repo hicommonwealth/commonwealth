@@ -1,6 +1,6 @@
 import { query, validationResult } from 'express-validator';
+import { ContractAttributes } from 'controllers/server/types';
 import { DB } from '../../models';
-import { ContractInstance } from '../../models/contract';
 import {
   TypedRequestQuery,
   TypedResponse,
@@ -20,7 +20,7 @@ type GetContractsReq = {
   nickname?: string;
 };
 
-type GetContractsResp = ContractInstance[];
+type GetContractsResp = { contracts: ContractAttributes[] };
 
 const getContracts = async (
   models: DB,
@@ -34,13 +34,30 @@ const getContracts = async (
 
   const { type, isFactory, nickname } = req.query;
 
-  const where = { type, is_factory: isFactory, nickname };
+  const include = [
+    {
+      model: models.ContractAbi,
+      required: true,
+    },
+  ];
+
+  const where = {};
+  if (type) {
+    where['type'] = type;
+  }
+  if (isFactory) {
+    where['is_factory'] = isFactory;
+  }
+  if (nickname) {
+    where['nickname'] = nickname;
+  }
 
   const contracts = await models.Contract.findAll({
     where,
+    include,
   });
 
-  return success(res, contracts);
+  return success(res, { contracts });
 };
 
 export default getContracts;

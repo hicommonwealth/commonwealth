@@ -108,15 +108,17 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
         return;
       }
       const contractAddress = contract.address;
-
-      this.loading = true;
       try {
+        this.loading = true;
         await createCuratedProjectDao(
           contractAddress,
           fn,
           this.functionNameToFunctionInputArgs,
           this.form
         );
+        this.saving = false;
+        this.loaded = true;
+        this.loading = false;
       } catch (err) {
         notifyError(
           err.responseJSON?.error ||
@@ -133,17 +135,41 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
       m.redraw();
     };
 
-    const loadFactoryContractAbi = (nickname: string): AbiItem => {
-      const contract: Contract =
-        app.contracts.getFactoryContractByNickname(nickname);
-      if (!contract || !contract.abi) {
-        // TODO: show screen for "no ABI found" -- or fetch data
-        return null;
+    const loadDaoFactoryContracts = async () => {
+      if (app.contracts.getFactoryContracts().length === 0) {
+        try {
+          await app.contracts.fetchFactoryContracts();
+        } catch (err) {
+          notifyError(
+            err.message ||
+              `Fetching ETH DAO Factory based communities failed: ${err}`
+          );
+        }
+        const contracts: Contract[] = app.contracts.getFactoryContracts();
+        if (contracts.length > 0) {
+          this.loaded = true;
+        }
       }
-      const factoryFn = factoryNicknameToCreateFunctionName[nickname];
-      if (!factoryFn) return null;
-      const abiFunction = parseFunctionFromABI(contract.abi, factoryFn);
-      return abiFunction;
+    };
+
+    const loadFactoryContractAbi = (nickname: string): AbiItem => {
+      try {
+        const contract: Contract =
+          app.contracts.getFactoryContractByNickname(nickname);
+        if (!contract || !contract.abi) {
+          // TODO: show screen for "no ABI found" -- or fetch data
+          return null;
+        }
+        const factoryFn = factoryNicknameToCreateFunctionName[nickname];
+        if (!factoryFn) return null;
+        const abiFunction = parseFunctionFromABI(contract.abi, factoryFn);
+        return abiFunction;
+      } catch (err) {
+        notifyError(
+          err.message ||
+            `Fetching Contract and ABI for ${nickname} failed: ${err}`
+        );
+      }
     };
 
     const renderFactoryFunction = () => {
@@ -232,15 +258,17 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           </div>
         );
       } else {
-        return (
-          <PageLoading
-            message= 'No ABI found for this DAO Factory Type'
-          />
-        );
+        return <PageLoading message="No ABI found for this DAO Factory Type" />;
       }
     };
 
     if (this.loadingEthChains) queryEthChains();
+
+    loadDaoFactoryContracts();
+
+    if (!app.contracts) {
+      return <PageLoading title="Dao Launcher" />;
+    }
 
     return (
       <div class="CreateCommunityForm">
@@ -250,9 +278,8 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           options={[
             { label: ChainNetwork.Ethereum, value: ChainNetwork.Ethereum },
           ]}
-          value={this.form.network}
-          onchange={(value) => {
-            this.form.network = value;
+          onSelect={(o) => {
+            this.form.network = ChainNetwork[o.value];
             this.loaded = true;
           }}
         />
@@ -264,9 +291,8 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
               value: factContract.nickname,
             };
           })}
-          value={this.daoFactoryType}
-          onchange={(value) => {
-            this.daoFactoryType = value;
+          onSelect={(o) => {
+            this.daoFactoryType = o.value;
             this.loaded = true;
             console.log('loaded');
             m.redraw();

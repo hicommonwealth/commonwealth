@@ -1,11 +1,9 @@
-import { getContractsValidation } from './../routes/contracts/getContracts';
 import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
-
 import domain from '../routes/domain';
 import status from '../routes/status';
 import createAddress from '../routes/createAddress';
@@ -32,6 +30,7 @@ import threadsUsersCountAndAvatars from '../routes/threadsUsersCountAndAvatars';
 import starCommunity from '../routes/starCommunity';
 import createChain from '../routes/createChain';
 import createContract from '../routes/contracts/createContract';
+import getContracts, { getContractsValidation } from '../routes/contracts/getContracts';
 import createContractAbi from '../routes/contractAbis/createContractAbi';
 import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
@@ -250,7 +249,7 @@ function setupRouter(
   router.get(
     '/getContracts',
     getContractsValidation,
-    getPolls.bind(this, models)
+    getContracts.bind(this, models)
   );
 
   router.post(

@@ -17,6 +17,9 @@ class ContractsController {
   public getFactoryContractByNickname(nickname: string) {
     return this._store.getFactoryContractByNickname(nickname);
   }
+  public getFactoryContracts() {
+    return this._store.getFactoryContracts();
+  }
   public getByIdentifier(id) {
     return this._store.getById(id);
   }
@@ -25,9 +28,6 @@ class ContractsController {
   }
   public getByType(type: string) {
     return this._store.getContractByType(type);
-  }
-  public getFactoryContracts() {
-    return this._store.getFactoryContracts();
   }
   public getCommunityContracts() {
     return this._store.getCommunityContracts();
@@ -62,6 +62,48 @@ class ContractsController {
     const resultContract = response['result']['contract'];
     const resultAbi = response['result']['contractAbi'];
     this.update(resultAbi.abi, resultContract);
+  }
+
+  public async fetchFactoryContracts() {
+    // Fetch factory contracts from server and add to store if not already there
+    const params = {
+      isFactory: true,
+    };
+    const response = await $.get(`${app.serverUrl()}/getContracts`, params);
+    const contracts = response.result.contracts;
+
+    contracts.forEach((contract) => {
+      const {
+        id,
+        address,
+        chain_node_id,
+        type,
+        created_at,
+        updated_at,
+        decimals,
+        token_name,
+        symbol,
+        is_factory,
+        nickname,
+        ContractAbi,
+      } = contract;
+
+      const result = new Contract({
+        id,
+        address,
+        chainNodeId: chain_node_id,
+        type,
+        createdAt: created_at,
+        updatedAt: updated_at,
+        decimals,
+        tokenName: token_name,
+        symbol,
+        isFactory: is_factory,
+        nickname,
+        abi: ContractAbi,
+      });
+      this._store.add(result);
+    });
   }
 
   public async update(
