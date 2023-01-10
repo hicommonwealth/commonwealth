@@ -10,13 +10,13 @@ import {
   eventToEntity,
   IEventProcessor,
   IEventSubscriber,
-  SubstrateTypes,
   SupportedNetwork,
   getUniqueEntityKey,
   IChainEntityKind,
 } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types'
+import { getBaseUrl, getFetch } from 'helpers/getUrl';
 import { notifyError } from '../app/notifications';
-import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;
@@ -92,8 +92,8 @@ class ChainEntityController {
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
-      getFetch(getBaseUrl() + '/entities', options),
-      getFetch(getBaseUrl() + '/getEntityMeta', options),
+      getFetch(`${getBaseUrl()  }/entities`, options),
+      getFetch(`${getBaseUrl()  }/getEntityMeta`, options),
     ]);
 
     if (Array.isArray(entities)) {
@@ -115,7 +115,7 @@ class ChainEntityController {
   }
 
   public async refreshRawEntities(chain: string) {
-    const entities = await getFetch(getBaseUrl() + '/entities', { chain });
+    const entities = await getFetch(`${getBaseUrl()  }/entities`, { chain });
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);

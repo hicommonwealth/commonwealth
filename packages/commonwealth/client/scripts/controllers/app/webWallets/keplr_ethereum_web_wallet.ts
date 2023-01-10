@@ -1,14 +1,11 @@
 import app from 'state';
 
-import { StargateClient } from '@cosmjs/stargate';
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import {
   Window as KeplrWindow,
-  ChainInfo,
-  EthSignType,
 } from '@keplr-wallet/types';
 
 declare global {
@@ -57,7 +54,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
       this._chainId,
       address,
       message,
-      EthSignType.MESSAGE
+      "message" as any
     );
     return `0x${Buffer.from(signature).toString('hex')}`;
   }
@@ -91,7 +88,8 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     try {
       // fetch chain id from URL using stargate client
       const url = `${window.location.origin}/cosmosAPI/${app.chain.id}`;
-      const client = await StargateClient.connect(url);
+      const cosm = await import('@cosmjs/stargate')
+      const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;
       client.disconnect();
@@ -104,7 +102,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
         );
 
         const bech32Prefix = app.chain.meta.bech32Prefix;
-        const info: ChainInfo = {
+        const info = {
           chainId: this._chainId,
           chainName: app.chain.meta.name,
           rpc: url,
