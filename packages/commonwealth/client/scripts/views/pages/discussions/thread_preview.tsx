@@ -34,13 +34,14 @@ import {
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { useNavigate } from 'react-router';
 // import { ThreadPreviewMenu } from './thread_preview_menu';
 
 type ThreadPreviewAttrs = {
   thread: Thread;
 };
 
-export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
+class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
   private isWindowSmallInclusive: boolean;
 
   onResize() {
@@ -112,7 +113,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
             scrollEle.scrollTop;
 
-          setRoute(discussionLink);
+          this.props.navigate(discussionLink);
         }}
         key={thread.id}
       >
@@ -243,4 +244,9 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
       </div>
     );
   }
+}
+
+export function ThreadPreview(props) {
+  const navigate = useNavigate();
+  return <ThreadPreviewComponent {...props} navigate={navigate} />;
 }

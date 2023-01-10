@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, BrowserRouter } from 'react-router-dom';
+import { Routes, Route, BrowserRouter, useParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import { Layout } from 'views/layout';
 import { initAppState } from 'app';
@@ -7,6 +7,7 @@ import DiscussionsPage from 'views/pages/discussions';
 import WhyCommonwealthPage from 'views/pages/why_commonwealth';
 import { PageNotFound } from 'views/pages/404';
 import MembersPage from './views/pages/members';
+import ViewThreadPage from './views/pages/view_thread';
 
 // TODO: This file is POC for now but this hook below and components should be placed in separate file
 const useInitApp = () => {
@@ -26,8 +27,13 @@ const useInitApp = () => {
   return { loading, customDomain };
 };
 
+const LayoutWrapper = ({ Component, params }) => {
+  const routerParams = useParams();
+  return <Layout params={Object.assign(params, routerParams)}><Component {...routerParams} /></Layout>;
+}
+
 const withLayout = (Component, params) => {
-  return <Layout params={params}><Component /></Layout>;
+  return <LayoutWrapper Component={Component} params={params} />;
 };
 
 const App = () => {
@@ -257,6 +263,18 @@ const App = () => {
         path="/:scope/discussions"
         element={
           withLayout(DiscussionsPage, { scoped: true, deferChain: true })
+        }
+      />
+      <Route
+        path="/:scope/discussions/:topic"
+        element={
+          withLayout(DiscussionsPage, { scoped: true, deferChain: true })
+        }
+      />
+      <Route
+        path="/:scope/discussion/:identifier"
+        element={
+          withLayout(ViewThreadPage, { scoped: true, deferChain: true })
         }
       />
       <Route

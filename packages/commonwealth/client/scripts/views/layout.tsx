@@ -165,10 +165,5 @@ class LayoutComponent extends ClassComponent<LayoutAttrs> {
   }
 }
 
-const LayoutWrapper = ({ children, params }) => {
-  const routerParams = useParams();
-  return <LayoutComponent params={Object.assign(params, routerParams)}>{...children}</LayoutComponent>;
-}
-
-export const Layout = LayoutWrapper;
+export const Layout = LayoutComponent;
 // export const Layout = withRouter(LayoutComponent);

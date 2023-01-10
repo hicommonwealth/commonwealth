@@ -15,6 +15,7 @@ import {
   // eslint-disable-next-line import/no-unresolved
   Component as ReactComponent,
 } from 'react';
+import { redirect } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
 // RENDERING FUNCTIONS
@@ -187,13 +188,17 @@ export function getRoute() {
 export function setRoute(route: string, data?: Record<string, unknown>, options?: RouteOptions) {
   // app._lastNavigatedBack = false;
   // app._lastNavigatedFrom = getRoute();
+  /*
   if (route !== getRoute()) {
     if (options?.replace) {
-      window.history.replaceState(data, null, route)
+      window.history.replaceState(data, null, route);
     } else {
-      window.history.pushState(data, null, route)
+      window.history.pushState(data, null, route);
     }
   }
+  */
+
+  redirect(route);
   // reset scroll position
   const html = document.getElementsByTagName('html')[0];
   if (html) html.scrollTo(0, 0);
