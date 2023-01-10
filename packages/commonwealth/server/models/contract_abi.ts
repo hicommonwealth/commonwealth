@@ -1,7 +1,8 @@
 import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import { DataTypes } from 'sequelize';
+import { ContractAttributes } from 'controllers/server/types';
 import { ModelStatic, ModelInstance } from './types';
-
+import { ContractInstance } from './contract';
 
 export type ContractAbiAttributes = {
   id: number;
@@ -10,10 +11,13 @@ export type ContractAbiAttributes = {
   verified?: boolean;
   created_at?: Date;
   updated_at?: Date;
+  is_factory?: boolean;
+
+  Contracts?: ContractAttributes[];
 };
 
 export type ContractAbiInstance = ModelInstance<ContractAbiAttributes> & {
-    // add mixins as needed
+  getContracts: Sequelize.HasManyGetAssociationsMixin<ContractInstance>;
 };
 
 export type ContractAbiModelStatic = ModelStatic<ContractAbiInstance>;
@@ -28,9 +32,18 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       nickname: { type: dataTypes.STRING, allowNull: true },
       abi: { type: dataTypes.JSONB, allowNull: false, unique: true },
-      verified: {type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+      verified: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       created_at: { type: dataTypes.DATE, allowNull: false },
       updated_at: { type: dataTypes.DATE, allowNull: false },
+      is_factory: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       tableName: 'ContractAbis',

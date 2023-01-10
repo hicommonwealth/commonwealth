@@ -18,6 +18,12 @@ module.exports = {
       type: Sequelize.STRING,
       allowNull: true,
     });
+
+    await queryInterface.addColumn('ContractAbis', 'is_factory', {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -29,5 +35,6 @@ module.exports = {
      */
     await queryInterface.removeColumn('Contracts', 'is_factory');
     await queryInterface.removeColumn('Contracts', 'nickname');
+    await queryInterface.removeColumn('ContractAbis', 'is_factory');
   },
 };

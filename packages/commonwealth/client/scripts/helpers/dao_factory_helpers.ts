@@ -46,13 +46,15 @@ export async function createCuratedProjectDao(
   }
   const web3: Web3 = metamaskWallet.api;
 
+  if (formInputMap.size === 0){
+    throw new Error('Must Insert Inputs');
+  }
   // handle processing the forms inputs into their proper data types
   const processedArgs = processAbiInputsToDataTypes(
     fn.name,
     fn.inputs,
     formInputMap
   );
-
   const methodSignature = encodeFunctionSignature(fn);
   const functionContract = new web3.eth.Contract(
     parseAbiItemsFromABI(contract.abi),

@@ -49,7 +49,6 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
   private loaded = false;
   private loading = false;
   private saving = false;
-  private status = undefined;
   private ethChainNames = {};
   private ethChains = {};
   private loadingEthChains = true;
@@ -121,9 +120,8 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
       } catch (err) {
         notifyError(
           err.responseJSON?.error ||
-            `Creating new ETH DAO Factory based community failed ${err}`
+            `${err}`
         );
-        this.status = 'failure';
         this.message = err.message;
         this.loading = false;
         m.redraw();
@@ -276,7 +274,6 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           initialValue={{label: ChainNetwork.Ethereum, value: ChainNetwork.Ethereum}}
           onSelect={(o) => {
             this.form.network = ChainNetwork[o.value];
-            this.loaded = true;
           }}
         />
         <CWDropdown
@@ -290,7 +287,6 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           initialValue={{label: this.daoFactoryType, value: this.daoFactoryType}}
           onSelect={(o) => {
             this.daoFactoryType = o.value;
-            this.loaded = true;
             m.redraw();
           }}
         />
@@ -299,6 +295,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           value={this.form.name}
           onChangeHandler={(v) => {
             this.form.name = v;
+            this.loaded = true;
           }}
         />
         <InputRow

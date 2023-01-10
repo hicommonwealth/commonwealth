@@ -1,5 +1,5 @@
 import { query, validationResult } from 'express-validator';
-import { ContractAttributes } from 'controllers/server/types';
+import { ContractAttributes } from 'server/models/contract';
 import { DB } from '../../models';
 import {
   TypedRequestQuery,
