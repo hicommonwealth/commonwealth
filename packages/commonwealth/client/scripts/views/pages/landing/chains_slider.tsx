@@ -33,13 +33,13 @@ const chainToTag = (chain, index: number) => {
 
 type TokensChainsComponentAttrs = {
   chains: Array<Chain>;
-  oncreateSlider: Function;
+  oncreateSlider: () => any;
 };
 
 export class TokensChainsComponent extends ClassComponent<TokensChainsComponentAttrs> {
   private displayedChains;
   private index: number;
-  private oncreateSlider: Function;
+  private oncreateSlider: () => any;
 
   oninit(vnode: m.Vnode<TokensChainsComponentAttrs>) {
     this.index = 0;
