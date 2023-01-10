@@ -51,7 +51,7 @@ export class PreviewModal extends ClassComponent<PreviewModalAttrs> {
               if (vnode.attrs.doc.trim() === '') {
                 return <PreviewModalEmptyState />;
               }
-              return <MarkdownFormattedText doc={vnode.attrs.doc} />;
+              return vnode.attrs.doc && <MarkdownFormattedText doc={vnode.attrs.doc} />;
             }
           })()}
         </div>

@@ -98,7 +98,7 @@ export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyA
           return getPlaceholder();
         }
 
-        return (
+        return body && (
           <MarkdownFormattedText
             doc={body}
             cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}
@@ -164,7 +164,7 @@ export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalB
           />
         );
       } catch (e) {
-        return (
+        return body && (
           <MarkdownFormattedText
             doc={body}
             cutoffLines={MARKDOWN_PROPOSAL_LINES_CUTOFF_LENGTH}

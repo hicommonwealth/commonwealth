@@ -65,7 +65,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
             <div className="proposal-page-row">
               <div className="label">Reason</div>
               <div className="tip-reason">
-                <MarkdownFormattedText doc={reason} />
+                {reason && <MarkdownFormattedText doc={reason} />}
               </div>
             </div>
             <div className="proposal-page-row">

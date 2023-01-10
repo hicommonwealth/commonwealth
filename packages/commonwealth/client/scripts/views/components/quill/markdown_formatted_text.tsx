@@ -41,8 +41,6 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
   isTruncated: boolean;
 
   oninit(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
-    if (!vnode.attrs.doc) return;
-
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);

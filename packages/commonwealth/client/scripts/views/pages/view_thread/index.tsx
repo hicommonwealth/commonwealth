@@ -276,9 +276,13 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     const updatedCommentsCallback = () => {
       this.comments = app.comments
         .getByProposal(thread)
-        .filter((c) => c.parentComment === null);
+        .filter((c) => c.parentComment === null) || [];
       this.redraw();
     };
+    if (!this.initializedComments) {
+      this.initializedComments = true;
+      updatedCommentsCallback();
+    }
 
     // load polls
     if (!this.prefetch[threadIdAndType]['pollsStarted']) {
@@ -291,9 +295,10 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
       this.prefetch[threadIdAndType]['pollsStarted'] = true;
     }
-    if (!this.initialized) {
-      this.initialized = true;
+    if (!this.initializedPolls) {
+      this.initializedPolls = true;
       this.polls = app.polls.getByThreadId(thread.id);
+      this.redraw();
     }
 
     // load view count
