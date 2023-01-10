@@ -653,7 +653,6 @@ export default class QuillEditorInternal {
         resultSize: 6,
         chainScope: app.activeChainId(),
       });
-      console.log('members', members);
       formattedMatches = members.map((addr) => {
         const profile: Profile = app.profiles.getProfile(
           addr.chain,
