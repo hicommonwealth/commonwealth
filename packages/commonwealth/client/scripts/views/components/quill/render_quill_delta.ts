@@ -350,6 +350,7 @@ export const renderQuillDelta = (
             })
           );
         };
+
         if (group.length) return group.map(renderListGroup);
         else return group.parents.map(renderParent);
       });

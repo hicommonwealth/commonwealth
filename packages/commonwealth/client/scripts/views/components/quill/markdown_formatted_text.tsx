@@ -41,6 +41,8 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
   isTruncated: boolean;
 
   oninit(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
+    if (!vnode.attrs.doc) return;
+
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
@@ -157,11 +159,14 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
         </div>
       );
     } else {
-      if (this.isTruncated)
+      if (!doc) return <React.Fragment></React.Fragment>;
+      if (this.isTruncated) {
         this.truncatedDoc = doc.slice(
           0,
           doc.split('\n', cutoffLines).join('\n').length
         );
+      }
+      if (!this.truncatedDoc) return <React.Fragment></React.Fragment>;
 
       const unsanitized = marked.parse(this.truncatedDoc.toString());
 

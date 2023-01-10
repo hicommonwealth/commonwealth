@@ -71,11 +71,11 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
     // if we're showing highlighted search terms, render the doc once, and cache the result
     if (searchTerm) {
       if (JSON.stringify(this.truncatedDoc) !== this.cachedDocWithHighlights) {
-        const vnodes = renderQuillDelta(
+        const vnodes = this.truncatedDoc ? renderQuillDelta(
           this.truncatedDoc,
           hideFormatting,
           true
-        ); // collapse = true, to inline blocks
+        ) : []; // collapse = true, to inline blocks
 
         const root = document.createElement('div');
 
@@ -147,7 +147,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
             //   })
           }}
         >
-          {renderQuillDelta(
+          {this.truncatedDoc && renderQuillDelta(
             this.truncatedDoc,
             hideFormatting,
             collapse,
