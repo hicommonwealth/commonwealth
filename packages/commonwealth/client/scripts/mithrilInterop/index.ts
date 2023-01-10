@@ -119,7 +119,8 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
           && obj[prop] !== value
 
           // do not update if the value is a function (not sure if necessary)
-          && typeof value !== 'function') {
+          && typeof value !== 'function'
+        ) {
           obj.setState({ ...obj.state, [prop]: value })
           obj._seenProps.push(prop);
           // console.log(prop, value);

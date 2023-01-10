@@ -285,11 +285,14 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       app.polls.fetchPolls(app.activeChainId(), thread.id).catch(() => {
         notifyError('Failed to load comments');
         this.comments = [];
+        this.polls = app.polls.getByThreadId(thread.id);
         this.redraw();
       });
 
       this.prefetch[threadIdAndType]['pollsStarted'] = true;
-    } else {
+    }
+    if (!this.initialized) {
+      this.initialized = true;
       this.polls = app.polls.getByThreadId(thread.id);
     }
 
