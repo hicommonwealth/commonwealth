@@ -10,7 +10,7 @@ module.exports = merge(common, {
     ],
   },
   mode: 'development',
-  devtool: 'eval-cheap-source-map',
+  // devtool: 'eval-cheap-source-map',
   stats: {
     assets: false,
     modules: false,

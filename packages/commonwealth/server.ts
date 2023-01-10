@@ -89,22 +89,14 @@ async function main() {
   const compiler = DEV
     ? webpack(devWebpackConfig as any)
     : webpack(prodWebpackConfig as any);
-  const SequelizeStore = SessionSequelizeStore(session.Store);
   const devMiddleware =
-    DEV && !NO_CLIENT_SERVER
+    DEV && !NO_CLIENT_SERVER && !process.env.EXTERNAL_WEBPACK
       ? webpackDevMiddleware(compiler as any, {
           publicPath: '/build',
         })
       : null;
+  const SequelizeStore = SessionSequelizeStore(session.Store);
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
-
-  const closeMiddleware = (): Promise<void> => {
-    if (!NO_CLIENT_SERVER) {
-      return new Promise((resolve) => devMiddleware.close(() => resolve()));
-    } else {
-      return Promise.resolve();
-    }
-  };
 
   const sessionStore = new SequelizeStore({
     db: models.sequelize,
@@ -159,11 +151,11 @@ async function main() {
 
     // serve the compiled app
     if (!NO_CLIENT_SERVER) {
-      if (DEV) {
+      if (DEV && !process.env.EXTERNAL_WEBPACK) {
         app.use(devMiddleware);
         app.use(webpackHotMiddleware(compiler));
       } else {
-        app.use('/build', express.static('build'));
+        app.use('/', express.static('build'));
       }
     }
 
