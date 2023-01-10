@@ -6,10 +6,10 @@ import { initAppState } from 'app';
 import app from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { AbiItem } from 'web3-utils';
 import { parseAbiItemsFromABI, parseEventFromABI } from '../../../shared/abi_utils';
 import { CreateFactoryEthDaoForm } from '../views/pages/create_community/types';
 import { encodeFunctionSignature, processAbiInputsToDataTypes } from './abi_form_helpers';
-import { AbiItem } from 'web3-utils';
 
 export function decodeCuratedFactoryTx(
   web3: Web3,

@@ -1,3 +1,4 @@
+import { getContractsValidation } from './../routes/contracts/getContracts';
 import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
@@ -243,6 +244,13 @@ function setupRouter(
     '/updateChain',
     passport.authenticate('jwt', { session: false }),
     updateChain.bind(this, models)
+  );
+
+  // Contracts
+  router.get(
+    '/getContracts',
+    getContractsValidation,
+    getPolls.bind(this, models)
   );
 
   router.post(
