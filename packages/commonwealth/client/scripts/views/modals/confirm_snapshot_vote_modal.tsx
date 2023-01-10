@@ -7,9 +7,10 @@ import $ from 'jquery';
 import 'modals/confirm_snapshot_vote_modal.scss';
 
 import app from 'state';
-import {
+import type {
   SnapshotProposal,
-  SnapshotSpace,
+  SnapshotSpace} from 'helpers/snapshot_utils';
+import {
   castVote,
 } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';

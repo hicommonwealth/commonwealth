@@ -1,12 +1,12 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
-import { Permission } from './role';
-import {
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ChainAttributes } from './chain';
+import type { Permission } from './role';
+import type {
   RoleAssignmentAttributes,
   RoleAssignmentInstance,
 } from './role_assignment';
-import { ModelStatic, ModelInstance } from './types';
+import type { ModelStatic, ModelInstance } from './types';
 
 export type CommunityRoleAttributes = {
   name: Permission;

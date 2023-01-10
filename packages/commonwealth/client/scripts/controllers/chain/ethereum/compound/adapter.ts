@@ -1,13 +1,14 @@
 // import { CompoundTypes } from 'chain-events/src';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import EthereumAccount from 'controllers/chain/ethereum/account';
+import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase } from 'common-common/src/types';
-import { IChainAdapter, ChainEntity, ChainEvent, ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
+import { IChainAdapter, ChainEntity, ChainEvent } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
-import { IApp } from 'state';
+import type { IApp } from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
 import { CompoundTypes } from 'chain-events/src';

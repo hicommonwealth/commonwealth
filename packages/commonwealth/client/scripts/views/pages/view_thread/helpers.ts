@@ -2,7 +2,7 @@ import m from 'mithril';
 import moment from 'moment';
 
 import app from 'state';
-import { Poll } from 'models';
+import type { Poll } from 'models';
 import { alertModalWithText } from '../../modals/alert_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 

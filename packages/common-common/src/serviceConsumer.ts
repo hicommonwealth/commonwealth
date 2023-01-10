@@ -1,12 +1,12 @@
 import crypto from 'crypto';
 import { addPrefix, factory, formatFilename } from './logging';
-import {
+import type {
   RabbitMQController,
   RascalSubscriptions,
   TRmqMessages,
 } from './rabbitmq';
-import Rollbar from 'rollbar';
-import { Logger } from 'typescript-logging';
+import type Rollbar from 'rollbar';
+import type { Logger } from 'typescript-logging';
 
 export type RabbitMQSubscription = {
   messageProcessor: (data: TRmqMessages, ...args: any) => Promise<void>;

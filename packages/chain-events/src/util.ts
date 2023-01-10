@@ -1,15 +1,16 @@
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { RegisteredTypes } from '@polkadot/types/types';
 
-import {
+import type {
   IDisconnectedRange,
   IEventProcessor,
   IEventSubscriber,
   IStorageFetcher,
-  SupportedNetwork,
   CWEvent,
   IEventTitle,
   IEventLabel,
-  IChainEventKind,
+  IChainEventKind} from './interfaces';
+import {
+  SupportedNetwork
 } from './interfaces';
 import { Listener as SubstrateListener } from './chains/substrate/Listener';
 import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
@@ -49,7 +50,7 @@ import {
   Title as CosmosTitle,
   Label as CosmosLabel,
 } from './chains/cosmos';
-import { Listener } from './Listener';
+import type { Listener } from './Listener';
 import { addPrefix, factory } from './logging';
 
 export function Title(

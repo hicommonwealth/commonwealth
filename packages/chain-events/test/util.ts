@@ -1,9 +1,10 @@
-import events from 'events';
+import type events from 'events';
 
-import {
+import type {
   CWEvent,
   IChainEventData,
-  IEventHandler,
+  IEventHandler} from '../src';
+import {
   ChainEventKinds,
 } from '../src';
 

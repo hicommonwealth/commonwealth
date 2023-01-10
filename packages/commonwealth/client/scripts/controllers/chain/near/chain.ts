@@ -1,29 +1,32 @@
-import {
+import type {
   Near as NearApi,
+  ConnectConfig} from 'near-api-js';
+import {
   Account as NearApiAccount,
   connect as nearConnect,
-  WalletAccount,
-  ConnectConfig,
+  WalletAccount
 } from 'near-api-js';
-import {
+import type {
   CodeResult,
   NodeStatusResult,
 } from 'near-api-js/lib/providers/provider';
-import { FunctionCallOptions } from 'near-api-js/lib/account';
-import { Action, FunctionCall } from 'near-api-js/lib/transaction';
+import type { FunctionCallOptions } from 'near-api-js/lib/account';
+import type { Action, FunctionCall } from 'near-api-js/lib/transaction';
 import { uuidv4 } from 'lib/util';
-import { ChainInfo, IChainModule, ITXModalData } from 'models';
+import type { ChainInfo, IChainModule, ITXModalData } from 'models';
 import { NearToken } from 'adapters/chain/near/types';
 import BN from 'bn.js';
-import { ApiStatus, IApp } from 'state';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
 import moment from 'moment';
 import * as m from 'mithril';
-import {
-  isGroupRole,
+import type {
   NearSputnikConfig,
-  NearSputnikPolicy,
+  NearSputnikPolicy} from './sputnik/types';
+import {
+  isGroupRole
 } from './sputnik/types';
-import { NearAccounts, NearAccount } from './account';
+import type { NearAccounts, NearAccount } from './account';
 
 export interface IDaoInfo {
   contractId: string;

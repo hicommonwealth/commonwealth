@@ -1,16 +1,17 @@
 import Sequelize from 'sequelize';
 import { query, validationResult } from 'express-validator';
-import {
+import type {
   GetReactionsReq,
   GetReactionsResp,
 } from 'common-common/src/api/extApiTypes';
-import {
+import type {
   TypedRequestQuery,
-  TypedResponse,
+  TypedResponse} from '../../types';
+import {
   success,
   failure,
 } from '../../types';
-import { DB } from '../../models';
+import type { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;

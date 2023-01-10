@@ -7,7 +7,8 @@ import 'pages/notification_settings/helper_components.scss';
 
 import app from 'state';
 import { getProposalUrlPath } from 'identifiers';
-import { AddressInfo, NotificationSubscription } from 'models';
+import type { NotificationSubscription } from 'models';
+import { AddressInfo } from 'models';
 import { slugify } from '../../../../../shared/utils';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';

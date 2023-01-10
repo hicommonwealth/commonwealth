@@ -1,7 +1,8 @@
 import * as solw3 from '@solana/web3.js';
 import { BalanceType } from 'common-common/src/types';
 
-import { BalanceProvider, IChainNode } from '../types';
+import type { IChainNode } from '../types';
+import { BalanceProvider } from '../types';
 
 type SplTokenBPOpts = {
   tokenAddress: string;

@@ -1,10 +1,10 @@
 import passport from 'passport';
 import passportGithub from 'passport-github2'; // passport-github is not up to date with Github OAuth 3.0
 import passportDiscord from 'passport-discord';
-import { Request } from 'express';
+import type { Request } from 'express';
 
 import '../types';
-import { DB } from '../models';
+import type { DB } from '../models';
 import {
   GITHUB_CLIENT_ID,
   GITHUB_CLIENT_SECRET,

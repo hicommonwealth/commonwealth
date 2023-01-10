@@ -5,11 +5,11 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { ITXModalData, IWebWallet } from 'models';
+import type { ITXModalData, IWebWallet } from 'models';
 import { CWTabBar, CWTab } from '../component_kit/cw_tabs';
 import { TXSigningCLIOption } from './tx_signing_cli_option';
 import { TXSigningWebWalletOption } from './tx_signing_web_wallet_option';
-import { NextFn, TxDataState } from './types';
+import type { NextFn, TxDataState } from './types';
 import { CWButton } from '../component_kit/cw_button';
 import { TXSigningTransactionBox } from './tx_signing_transaction_box';
 import { CWText } from '../component_kit/cw_text';

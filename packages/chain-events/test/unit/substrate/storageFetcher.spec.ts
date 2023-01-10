@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import chai from 'chai';
 import BN from 'bn.js';
-import {
+import type {
   AccountId,
   BalanceOf,
   Registration,
@@ -12,15 +12,15 @@ import {
   Bounty,
   OpenTip,
 } from '@polkadot/types/interfaces';
-import { Vec, Data, TypeRegistry, Bytes } from '@polkadot/types';
-import { Codec } from '@polkadot/types/types';
+import type { Vec, Bytes } from '@polkadot/types';
+import { Data, TypeRegistry } from '@polkadot/types';
+import type { Codec } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
-import { DeriveBounty } from '@polkadot/api-derive/types';
+import type { DeriveReferendum } from '@polkadot/api-derive/democracy/types';
+import type { DeriveBounty } from '@polkadot/api-derive/types';
 
 import { SupportedNetwork } from '../../../src';
-import {
-  EventKind,
+import type {
   IDemocracyProposed,
   IDemocracyStarted,
   IDemocracyPassed,
@@ -31,12 +31,14 @@ import {
   ISignalingVotingStarted,
   ISignalingVotingCompleted,
   ICollectiveVoted,
-  IdentityJudgement,
   ITreasuryBountyProposed,
   ITreasuryBountyBecameActive,
   INewTip,
   ITipVoted,
-  ITipClosing,
+  ITipClosing} from '../../../src/chains/substrate/types';
+import {
+  EventKind,
+  IdentityJudgement
 } from '../../../src/chains/substrate/types';
 import { StorageFetcher } from '../../../src/chains/substrate/storageFetcher';
 

@@ -1,7 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {

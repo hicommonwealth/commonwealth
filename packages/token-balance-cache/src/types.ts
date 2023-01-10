@@ -1,4 +1,4 @@
-import { BalanceType } from 'common-common/src/types';
+import type { BalanceType } from 'common-common/src/types';
 
 // map of addresses to balances
 export interface ICache {

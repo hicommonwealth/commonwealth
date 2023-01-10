@@ -1,8 +1,8 @@
-import { Model, DataTypes } from 'sequelize';
+import type { Model, DataTypes } from 'sequelize';
 import * as Sequelize from 'sequelize';
-import { ModelStatic } from './types';
-import { ChatMessageAttributes, ChatMessageInstance } from './chat_message';
-import { RuleAttributes } from './rule';
+import type { ModelStatic } from './types';
+import type { ChatMessageAttributes, ChatMessageInstance } from './chat_message';
+import type { RuleAttributes } from './rule';
 
 export interface ChatChannelAttributes {
   id?: number;

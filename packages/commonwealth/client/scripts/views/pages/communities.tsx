@@ -7,10 +7,11 @@ import numeral from 'numeral';
 import 'pages/communities.scss';
 
 import app from 'state';
-import { ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
+import type {
+  ChainCategoryType} from 'common-common/src/types';
 import {
   ChainBase,
-  ChainCategoryType,
   ChainNetwork,
 } from 'common-common/src/types';
 import { CWButton } from '../components/component_kit/cw_button';

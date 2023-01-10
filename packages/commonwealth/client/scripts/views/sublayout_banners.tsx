@@ -8,7 +8,8 @@ import {
   CWBanner,
   CWMessageBanner,
 } from './components/component_kit/cw_banner';
-import { ChainInfo, ITokenAdapter } from '../models';
+import type { ChainInfo} from '../models';
+import { ITokenAdapter } from '../models';
 import { isNonEmptyString } from '../helpers/typeGuards';
 import { TermsBanner } from './components/terms_banner';
 

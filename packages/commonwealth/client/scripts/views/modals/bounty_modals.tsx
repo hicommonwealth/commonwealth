@@ -7,8 +7,8 @@ import ClassComponent from 'class_component';
 import 'modals/bounty_modals.scss';
 
 import app from 'state';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInputTypeahead } from 'views/components/address_input_typeahead';
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';

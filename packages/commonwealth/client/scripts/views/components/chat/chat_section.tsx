@@ -8,7 +8,7 @@ import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 import 'components/sidebar/index.scss';
 
 import app from 'state';
-import { IChannel } from 'controllers/server/socket/chatNs';
+import type { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
 import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
@@ -20,7 +20,7 @@ import {
   DeleteCategory,
   DeleteChannel,
 } from './admin_modals';
-import {
+import type {
   ToggleTree,
   SubSectionAttrs,
   SectionGroupAttrs,

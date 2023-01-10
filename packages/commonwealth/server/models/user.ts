@@ -1,14 +1,14 @@
-import * as Sequelize from 'sequelize';
-import { CreateOptions, DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { AddressInstance, AddressAttributes } from './address';
-import { ChainAttributes, ChainInstance } from './chain';
-import { ProfileInstance, ProfileAttributes } from './profile';
-import {
+import type * as Sequelize from 'sequelize';
+import type { CreateOptions, DataTypes } from 'sequelize';
+import type { ModelStatic, ModelInstance } from './types';
+import type { AddressInstance, AddressAttributes } from './address';
+import type { ChainAttributes, ChainInstance } from './chain';
+import type { ProfileInstance, ProfileAttributes } from './profile';
+import type {
   SocialAccountInstance,
   SocialAccountAttributes,
 } from './social_account';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 export type EmailNotificationInterval = 'daily' | 'never';
 

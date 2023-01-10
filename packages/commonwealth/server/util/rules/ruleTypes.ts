@@ -1,5 +1,5 @@
-import { Transaction } from 'sequelize/types';
-import { DB } from '../../models';
+import type { Transaction } from 'sequelize/types';
+import type { DB } from '../../models';
 
 // acceptable types for rule arguments, verified in parser
 export type RuleArgumentType =

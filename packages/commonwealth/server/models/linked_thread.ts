@@ -1,7 +1,7 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { ThreadInstance } from './thread';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ModelStatic, ModelInstance } from './types';
+import type { ThreadInstance } from './thread';
 
 export type LinkedThreadAttributes = {
   id?: number;

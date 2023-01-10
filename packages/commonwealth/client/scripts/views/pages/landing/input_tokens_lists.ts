@@ -1,7 +1,7 @@
 import m from 'mithril';
 import InputTokenOptionComponent from './input_token_option';
-import { Chain, Token } from './index';
-import { placeholderChain } from './tokens_community_hero';
+import type { Chain, Token } from './index';
+import type { placeholderChain } from './tokens_community_hero';
 
 interface IAttrs {
   optionList: (Token | Chain | typeof placeholderChain)[];

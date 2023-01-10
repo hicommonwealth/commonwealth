@@ -7,10 +7,10 @@ import 'components/tx_signing/tx_signing_cli_option.scss';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { ITXModalData } from 'models';
-import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
+import type { ITXModalData } from 'models';
+import type { ISubstrateTXData } from 'controllers/chain/substrate/shared';
 import { CodeBlock } from 'views/components/code_block';
-import { NextFn } from './types';
+import type { NextFn } from './types';
 import { setupEventListeners } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { CWTextArea } from '../component_kit/cw_text_area';

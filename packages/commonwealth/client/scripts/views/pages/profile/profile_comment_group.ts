@@ -3,7 +3,8 @@ import _ from 'lodash';
 
 import app from 'state';
 import { link } from 'helpers';
-import { Thread, Comment, Account } from 'models';
+import type { Comment, Account } from 'models';
+import { Thread } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 

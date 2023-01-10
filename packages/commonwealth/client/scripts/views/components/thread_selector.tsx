@@ -7,8 +7,8 @@ import { ListItem, QueryList } from 'construct-ui';
 import 'components/thread_selector.scss';
 
 import app from 'state';
-import { Thread } from 'models';
-import { SearchParams } from 'models/SearchQuery';
+import type { Thread } from 'models';
+import type { SearchParams } from 'models/SearchQuery';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { formatAddressShort } from '../../../../shared/utils';
 import { CWTextInput } from './component_kit/cw_text_input';

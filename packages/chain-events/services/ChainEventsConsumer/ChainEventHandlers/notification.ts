@@ -1,17 +1,19 @@
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import type {
+  RmqCENotificationCUD} from 'common-common/src/rabbitmq/types';
 import {
-  RascalPublications,
-  RmqCENotificationCUD,
+  RascalPublications
 } from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
-import { ChainEventAttributes } from '../../database/models/chain_event';
-import { DB } from '../../database/database';
+import type { ChainEventAttributes } from '../../database/models/chain_event';
+import type { DB } from '../../database/database';
 
-import {
+import type {
   CWEvent,
   IChainEventData,
-  IChainEventKind,
+  IChainEventKind} from 'chain-events/src';
+import {
   IEventHandler,
 } from 'chain-events/src';
 

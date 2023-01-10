@@ -7,8 +7,8 @@ import 'pages/view_thread/linked_threads_card.scss';
 
 import app from 'state';
 import { getProposalUrlPath } from 'identifiers';
-import { Thread } from 'models';
-import { LinkedThreadRelation } from 'models/Thread';
+import type { Thread } from 'models';
+import type { LinkedThreadRelation } from 'models/Thread';
 import { LinkedThreadModal } from '../../modals/linked_thread_modal';
 import { slugify } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';

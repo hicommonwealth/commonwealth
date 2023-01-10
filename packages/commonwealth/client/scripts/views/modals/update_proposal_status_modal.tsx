@@ -8,8 +8,9 @@ import 'modals/update_proposal_status_modal.scss';
 
 import app from 'state';
 import { threadStageToLabel, parseCustomStages } from 'helpers';
-import { ChainEntity, Thread, ThreadStage } from 'models';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import type { ChainEntity, Thread} from 'models';
+import { ThreadStage } from 'models';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { ChainEntitiesSelector } from '../components/chain_entities_selector';
 import { CWButton } from '../components/component_kit/cw_button';
 import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';

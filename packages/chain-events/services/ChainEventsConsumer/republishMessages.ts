@@ -1,12 +1,13 @@
-import {
+import type {
   RabbitMQController,
+  RmqCETypeCUD} from 'common-common/src/rabbitmq';
+import {
   RascalPublications,
-  RepublishFailedMessages,
-  RmqCETypeCUD,
+  RepublishFailedMessages
 } from 'common-common/src/rabbitmq';
 import * as Sequelize from 'sequelize';
 
-import { DB } from '../database/database';
+import type { DB } from '../database/database';
 
 /**
  * A worker that periodically republishes data from the database if it's queued value is between -1 and 5. A queued

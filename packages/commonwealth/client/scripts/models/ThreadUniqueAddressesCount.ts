@@ -1,4 +1,4 @@
-import { IUniqueId } from './interfaces';
+import type { IUniqueId } from './interfaces';
 
 type Addresses = {
   address_id: number;

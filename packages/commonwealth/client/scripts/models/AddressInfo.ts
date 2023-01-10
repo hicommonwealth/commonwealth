@@ -1,4 +1,4 @@
-import { WalletId } from 'common-common/src/types';
+import type { WalletId } from 'common-common/src/types';
 import app from 'state';
 import Account from './Account';
 

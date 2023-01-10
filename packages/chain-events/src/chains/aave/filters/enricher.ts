@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber } from 'ethers';
+import type { BigNumber } from 'ethers';
 
-import { TypedEventFilter } from '../../../contractTypes/commons';
-import { AaveTokenV2, IAaveGovernanceV2 } from '../../../contractTypes';
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { EventKind, RawEvent, IEventData, Api } from '../types';
+import type { TypedEventFilter } from '../../../contractTypes/commons';
+import type { AaveTokenV2, IAaveGovernanceV2 } from '../../../contractTypes';
+import type { CWEvent} from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { RawEvent, IEventData, Api } from '../types';
+import { EventKind } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
 type GetArgType<Name extends keyof IAaveGovernanceV2['filters']> = GetEventArgs<

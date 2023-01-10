@@ -1,27 +1,29 @@
 import BN from 'bn.js';
 import moment from 'moment';
 
-import { MolochShares, EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
+import { MolochShares } from 'adapters/chain/ethereum/types';
+import type { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 import { MolochTypes } from 'chain-events/src';
 
 import { ProposalType } from 'common-common/src/types';
-import {
-  Proposal,
+import type {
   IVote,
   ITXModalData,
-  VotingType,
-  VotingUnit,
-  ProposalStatus,
   ProposalEndTime,
   ChainEntity,
-  ChainEvent,
+  ChainEvent} from 'models';
+import {
+  Proposal,
+  VotingType,
+  VotingUnit,
+  ProposalStatus
 } from 'models';
 
-import MolochMember from './member';
-import MolochMembers from './members';
-import MolochAPI from './api';
-import MolochGovernance from './governance';
+import type MolochMember from './member';
+import type MolochMembers from './members';
+import type MolochAPI from './api';
+import type MolochGovernance from './governance';
 import { attachSigner } from '../contractApi';
 
 export enum MolochVote {

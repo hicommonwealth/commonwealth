@@ -20,7 +20,7 @@ import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { QuillEditorComponent } from '../quill/quill_editor_component';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { renderQuillTextBody } from '../quill/helpers';
-import { QuillEditor } from '../quill/quill_editor';
+import type { QuillEditor } from '../quill/quill_editor';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 
 // how long a wait before visually separating multiple messages sent by the same person

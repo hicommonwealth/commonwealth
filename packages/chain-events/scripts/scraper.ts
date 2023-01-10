@@ -1,6 +1,6 @@
 import { SubstrateEvents, SubstrateTypes } from '../dist/index';
-import { Registration } from '@polkadot/types/interfaces';
-import { Option } from '@polkadot/types';
+import type { Registration } from '@polkadot/types/interfaces';
+import type { Option } from '@polkadot/types';
 import { ParseType } from '../dist/substrate/filters/type_parser';
 import fs from 'fs';
 

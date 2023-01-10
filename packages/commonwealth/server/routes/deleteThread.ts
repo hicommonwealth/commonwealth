@@ -1,8 +1,9 @@
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import BanCache from '../util/banCheckCache';
-import { TypedRequestBody, TypedResponse, success } from '../types';
+import type { DB } from '../models';
+import type BanCache from '../util/banCheckCache';
+import type { TypedRequestBody, TypedResponse} from '../types';
+import { success } from '../types';
 import validateRoles from '../util/validateRoles';
 import deleteThreadFromDb from '../util/deleteThread';
 

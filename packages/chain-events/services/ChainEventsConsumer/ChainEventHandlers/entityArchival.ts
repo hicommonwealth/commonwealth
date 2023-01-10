@@ -3,21 +3,23 @@
  */
 
 import { addPrefix, factory } from 'common-common/src/logging';
-import { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
+import type {
+  RmqEntityCUD} from 'common-common/src/rabbitmq/types';
 import {
-  RascalPublications,
-  RmqEntityCUD,
+  RascalPublications
 } from 'common-common/src/rabbitmq/types';
 
-import { DB } from '../../database/database';
+import type { DB } from '../../database/database';
 
-import {
+import type {
   CWEvent,
+  IChainEntityKind,
+  IChainEventData} from 'chain-events/src';
+import {
   EntityEventKind,
   eventToEntity,
   getUniqueEntityKey,
-  IChainEntityKind,
-  IChainEventData,
   IEventHandler,
   SubstrateTypes,
 } from 'chain-events/src';

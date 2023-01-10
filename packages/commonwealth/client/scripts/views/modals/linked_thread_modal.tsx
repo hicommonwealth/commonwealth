@@ -6,7 +6,7 @@ import $ from 'jquery';
 
 import 'modals/linked_thread_modal.scss';
 
-import { Thread } from 'models';
+import type { Thread } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { ThreadSelector } from 'views/components/thread_selector';
 import { CWButton } from '../components/component_kit/cw_button';

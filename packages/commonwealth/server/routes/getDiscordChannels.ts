@@ -1,12 +1,13 @@
 import axios from 'axios';
 import { AppError } from 'common-common/src/errors';
+import type {
+  TypedRequestBody,
+  TypedResponse} from '../types';
 import {
   success,
-  TypedRequestBody,
-  TypedRequestQuery,
-  TypedResponse,
+  TypedRequestQuery
 } from '../types';
-import { DB } from '../models';
+import type { DB } from '../models';
 import validateChain from '../middleware/validateChain';
 import { BanAttributes } from '../models/ban';
 

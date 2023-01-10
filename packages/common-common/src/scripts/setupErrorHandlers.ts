@@ -1,5 +1,5 @@
-import Rollbar from 'rollbar';
-import { Request, Response, Express } from 'express';
+import type Rollbar from 'rollbar';
+import type { Request, Response, Express } from 'express';
 import { ServerError, AppError } from '../errors';
 
 // Handle server and application errors.

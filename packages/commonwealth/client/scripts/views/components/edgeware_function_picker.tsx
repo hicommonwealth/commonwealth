@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
-import Substrate from 'controllers/chain/substrate/adapter';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import { CWText } from './component_kit/cw_text';
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWDropdown } from './component_kit/cw_dropdown';

@@ -4,7 +4,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import type { Express } from 'express';
 
 import { AppError } from 'common-common/src/errors';
-import { DB } from '../models';
+import type { DB } from '../models';
 const log = factory.getLogger(formatFilename(__filename));
 
 function setupCosmosProxy(app: Express, models: DB) {

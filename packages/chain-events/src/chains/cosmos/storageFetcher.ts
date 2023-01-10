@@ -1,23 +1,27 @@
+import type {
+  Proposal} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
-  Proposal,
   ProposalStatus,
   Deposit,
   Vote,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import type {
+  QueryProposalsResponse} from 'cosmjs-types/cosmos/gov/v1beta1/query';
 import {
-  QueryProposalsResponse,
   QueryDepositsResponse,
   QueryVotesResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
 
-import { CWEvent, IStorageFetcher, SupportedNetwork } from '../../interfaces';
+import type { CWEvent} from '../../interfaces';
+import { IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import {
+import type {
   IEventData,
-  EventKind,
   Api,
-  ISubmitProposal,
+  ISubmitProposal} from './types';
+import {
+  EventKind,
   IDeposit,
   IVote,
   coinToCoins,

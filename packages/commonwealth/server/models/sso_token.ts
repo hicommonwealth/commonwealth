@@ -1,7 +1,7 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { AddressAttributes } from './address';
-import { ModelStatic, ModelInstance } from './types';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { AddressAttributes } from './address';
+import type { ModelStatic, ModelInstance } from './types';
 
 export type SsoTokenAttributes = {
   id?: number;

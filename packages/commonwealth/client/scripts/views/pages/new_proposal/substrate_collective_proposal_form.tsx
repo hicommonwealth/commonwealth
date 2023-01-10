@@ -5,9 +5,9 @@ import ClassComponent from 'class_component';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { ITXModalData, ProposalModule } from 'models';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import EdgewareFunctionPicker from '../../components/edgeware_function_picker';

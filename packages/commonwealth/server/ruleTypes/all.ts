@@ -1,9 +1,11 @@
-import { Transaction } from 'sequelize/types';
-import { DB } from '../models';
-import {
-  RuleType,
-  RuleArgumentType,
+import type { Transaction } from 'sequelize/types';
+import type { DB } from '../models';
+import type {
   DefaultSchemaT,
+  RuleArgumentType
+} from '../util/rules/ruleTypes';
+import {
+  RuleType
 } from '../util/rules/ruleTypes';
 import RuleTypes from './index';
 

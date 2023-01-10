@@ -23,7 +23,7 @@ import { getText } from './helpers';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginEthAlert } from './login_eth_alert';
 import { LoginText } from './login_text';
-import { LoginAttrs } from './types';
+import type { LoginAttrs } from './types';
 
 export class LoginMobile extends ClassComponent<LoginAttrs> {
   view(vnode: m.Vnode<LoginAttrs>) {

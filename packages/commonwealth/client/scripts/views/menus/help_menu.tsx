@@ -7,7 +7,7 @@ import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { MenuItem } from '../components/component_kit/types';
+import type { MenuItem } from '../components/component_kit/types';
 import { FeedbackModal } from '../modals/feedback_modal';
 
 const gethelpMenuItems = (): Array<MenuItem> => {

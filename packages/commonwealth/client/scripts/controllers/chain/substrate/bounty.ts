@@ -1,26 +1,28 @@
-import { ApiPromise } from '@polkadot/api';
+import type { ApiPromise } from '@polkadot/api';
 
 import { formatCoin } from 'adapters/currency';
-import {
+import type {
   ISubstrateBounty,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
-import {
-  Proposal,
-  ProposalStatus,
+import type {
   ProposalEndTime,
   ITXModalData,
   BinaryVote,
-  VotingType,
-  VotingUnit,
   ChainEntity,
-  ChainEvent,
+  ChainEvent} from 'models';
+import {
+  Proposal,
+  ProposalStatus,
+  VotingType,
+  VotingUnit
 } from 'models';
 import { ProposalType } from 'common-common/src/types';
 import { SubstrateTypes } from 'chain-events/src';
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstrateBountyTreasury from './bountyTreasury';
+import type SubstrateChain from './shared';
+import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
+import type SubstrateBountyTreasury from './bountyTreasury';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,

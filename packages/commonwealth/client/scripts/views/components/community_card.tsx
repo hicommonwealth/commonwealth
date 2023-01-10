@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'components/community_card.scss';
 
 import { isCommandClick } from 'helpers';
-import { ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
 import { CWButton } from './component_kit/cw_button';
 import { CWCard } from './component_kit/cw_card';
 import { CWIconButton } from './component_kit/cw_icon_button';

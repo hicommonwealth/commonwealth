@@ -35,7 +35,7 @@ import {
   ethChainRows,
 } from 'views/pages/create_community/chain_input_rows';
 
-import {
+import type {
   ChainFormFields,
   ChainFormState,
   EthChainAttrs,

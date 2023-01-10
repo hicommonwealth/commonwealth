@@ -1,6 +1,6 @@
 import { utils, ethers } from 'ethers';
 import type { Block, SessionPayload } from '@canvas-js/interfaces';
-import {
+import type {
   TypedDataDomain,
   TypedDataField,
 } from '@ethersproject/abstract-signer';

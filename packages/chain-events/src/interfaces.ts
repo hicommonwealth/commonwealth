@@ -2,9 +2,9 @@
  * Defines general interfaces for chain event fetching and processing.
  */
 
-import { ApiPromise as SubstrateApi } from '@polkadot/api';
+import type { ApiPromise as SubstrateApi } from '@polkadot/api';
 
-import { ChainEventInstance } from '../services/database/models/chain_event';
+import type { ChainEventInstance } from '../services/database/models/chain_event';
 
 import * as SubstrateTypes from './chains/substrate/types';
 import * as MolochTypes from './chains/moloch/types';
@@ -14,14 +14,14 @@ import * as Erc721Types from './chains/erc721/types';
 import * as AaveTypes from './chains/aave/types';
 import * as CommonwealthTypes from './chains/commonwealth/types';
 import * as CosmosTypes from './chains/cosmos/types';
-import { Api as MolochApi } from './chains/moloch/types';
-import { IErc721Contracts as ERC721Api } from './chains/erc721/types';
-import { IErc20Contracts as ERC20Api } from './chains/erc20/types';
-import { Api as CompoundApi } from './chains/compound/types';
-import { Api as CommonwealthApi } from './chains/commonwealth/types';
-import { Api as AaveApi } from './chains/aave/types';
+import type { Api as MolochApi } from './chains/moloch/types';
+import type { IErc721Contracts as ERC721Api } from './chains/erc721/types';
+import type { IErc20Contracts as ERC20Api } from './chains/erc20/types';
+import type { Api as CompoundApi } from './chains/compound/types';
+import type { Api as CommonwealthApi } from './chains/commonwealth/types';
+import type { Api as AaveApi } from './chains/aave/types';
 import { StorageFetcher } from './chains/aave';
-import { Listener } from './Listener';
+import type { Listener } from './Listener';
 
 // add other events here as union types
 export type IChainEntityKind =

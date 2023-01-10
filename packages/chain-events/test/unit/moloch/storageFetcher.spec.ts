@@ -2,13 +2,14 @@ import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
 import { StorageFetcher } from '../../../src/chains/moloch/storageFetcher';
-import {
+import type {
   ProposalV1,
-  EventKind,
   ISubmitProposal,
-  IProcessProposal,
+  IProcessProposal} from '../../../src/chains/moloch/types';
+import {
+  EventKind
 } from '../../../src/chains/moloch/types';
-import { Moloch1 } from '../../../src/contractTypes';
+import type { Moloch1 } from '../../../src/contractTypes';
 
 const { assert } = chai;
 

@@ -13,7 +13,8 @@ import { QuillEditor } from './quill_editor';
 import { getClasses } from '../component_kit/helpers';
 import { CWIconButton } from '../component_kit/cw_icon_button';
 import { CWText } from '../component_kit/cw_text';
-import { QuillTextContents, QuillActiveMode, QuillMode } from './types';
+import type { QuillActiveMode, QuillMode } from './types';
+import type { QuillTextContents } from './types';
 
 // Rich text and Markdown editor.
 //

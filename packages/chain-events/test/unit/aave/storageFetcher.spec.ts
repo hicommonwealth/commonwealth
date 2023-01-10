@@ -3,13 +3,14 @@ import { BigNumber } from 'ethers';
 
 import { SupportedNetwork } from '../../../src';
 import { StorageFetcher } from '../../../src/chains/aave/storageFetcher';
+import type {
+  Proposal,
+  RawEvent} from '../../../src/chains/aave/types';
 import {
   EventKind,
-  Proposal,
-  ProposalState,
-  RawEvent,
+  ProposalState
 } from '../../../src/chains/aave/types';
-import { AaveGovernanceV2 } from '../../../src/contractTypes';
+import type { AaveGovernanceV2 } from '../../../src/contractTypes';
 
 const { assert } = chai;
 

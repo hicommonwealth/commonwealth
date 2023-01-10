@@ -3,7 +3,7 @@
 import $ from 'jquery';
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { ISubmittableResult } from '@polkadot/types/types';
+import type { ISubmittableResult } from '@polkadot/types/types';
 
 import 'pages/admin.scss';
 
@@ -11,8 +11,8 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { blockperiodToDuration, formatDuration } from 'helpers';
 import { formatCoin } from 'adapters/currency';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import User from 'views/components/widgets/user';
 import { PageLoading } from 'views/pages/loading';

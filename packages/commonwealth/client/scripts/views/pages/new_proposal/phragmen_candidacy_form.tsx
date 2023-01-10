@@ -5,9 +5,9 @@ import ClassComponent from 'class_component';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
+import type { ITXModalData, ProposalModule } from 'models';
 import { formatCoin } from 'adapters/currency';
-import Substrate from 'controllers/chain/substrate/adapter';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import { CWText } from '../../components/component_kit/cw_text';
 import { ProposalType } from '../../../../../../common-common/src/types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';

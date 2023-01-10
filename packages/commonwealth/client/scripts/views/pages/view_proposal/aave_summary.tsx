@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 
 import 'pages/view_proposal/aave_summary.scss';
 
-import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
+import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import { AaveInfoRow } from '../../components/proposals/aave_proposal_card_detail';
 import { CWText } from '../../components/component_kit/cw_text';
 

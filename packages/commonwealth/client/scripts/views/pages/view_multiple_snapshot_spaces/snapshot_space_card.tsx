@@ -5,9 +5,9 @@ import ClassComponent from 'class_component';
 
 import 'pages/snapshot/snapshot_space_card.scss';
 
-import { Thread } from 'models';
+import type { Thread } from 'models';
 import app from 'state';
-import { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
 import { navigateToSubpage } from '../../../app';
 import { REDIRECT_ACTIONS } from '.';
 import { CWCard } from '../../components/component_kit/cw_card';

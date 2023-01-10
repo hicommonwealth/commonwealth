@@ -5,7 +5,7 @@ import $ from 'jquery';
 
 import app from 'state';
 import { NotificationCategories } from 'common-common/src/types';
-import { NotificationSubscription } from 'models';
+import type { NotificationSubscription } from 'models';
 import { QuillFormattedText } from 'views/components/quill/quill_formatted_text';
 import { MarkdownFormattedText } from 'views/components/quill/markdown_formatted_text';
 import { notifySuccess } from 'controllers/app/notifications';

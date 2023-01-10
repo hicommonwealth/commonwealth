@@ -4,15 +4,17 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import app from 'state';
 import $ from 'jquery';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import type { ChainNetwork } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
 
 import 'components/component_kit/cw_wallets_list.scss';
 
-import { Account, AddressInfo, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
+import { AddressInfo } from 'models';
 import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
-import Near from 'controllers/chain/near/adapter';
-import Substrate from 'controllers/chain/substrate/adapter';
+import type Near from 'controllers/chain/near/adapter';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import { addressSwapper } from 'commonwealth/shared/utils';

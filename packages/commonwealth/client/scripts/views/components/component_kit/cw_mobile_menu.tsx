@@ -10,7 +10,8 @@ import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWCustomIcon } from './cw_icons/cw_custom_icon';
-import { ComponentType, MenuItem } from './types';
+import type { MenuItem } from './types';
+import { ComponentType } from './types';
 
 class CWMobileMenuItem extends ClassComponent<MenuItem> {
   view(vnode: m.Vnode<MenuItem>) {

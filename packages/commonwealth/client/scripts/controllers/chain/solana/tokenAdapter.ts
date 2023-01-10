@@ -1,7 +1,8 @@
 import BN from 'bn.js';
 import { ContractType } from 'common-common/src/types';
 import $ from 'jquery';
-import { ChainInfo, ITokenAdapter } from 'models';
+import type { ITokenAdapter } from 'models';
+import { ChainInfo } from 'models';
 import { IApp } from 'state';
 import Solana from './adapter';
 

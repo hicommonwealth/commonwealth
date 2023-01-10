@@ -1,4 +1,4 @@
-import { DB } from '../models';
+import type { DB } from '../models';
 
 export default async function deleteThread(
   models: DB,

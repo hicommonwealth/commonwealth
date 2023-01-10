@@ -2,7 +2,8 @@ import app from 'state';
 
 import { ThreadUniqueAddressesCountStore } from 'stores';
 import ThreadUniqueAddressesCount from 'models/ThreadUniqueAddressesCount';
-import { AddressInfo, Thread } from 'models';
+import type { Thread } from 'models';
+import { AddressInfo } from 'models';
 import $ from 'jquery';
 
 export const modelFromServer = (threadUniqueAddressesCount) => {

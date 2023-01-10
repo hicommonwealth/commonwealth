@@ -1,16 +1,17 @@
 import * as Rascal from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {
+import type {
   RascalPublications,
   RascalSubscriptions,
-  RmqMsgFormatError,
-  TRmqMessages,
+  TRmqMessages} from './types';
+import {
+  RmqMsgFormatError
 } from './types';
-import Rollbar from 'rollbar';
-import { Sequelize } from 'sequelize';
-import { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
-import { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
-import { ChainEventTypeModelStatic } from 'chain-events/services/database/models/chain_event_type';
+import type Rollbar from 'rollbar';
+import type { Sequelize } from 'sequelize';
+import type { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
+import type { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
+import type { ChainEventTypeModelStatic } from 'chain-events/services/database/models/chain_event_type';
 
 const log = factory.getLogger(formatFilename(__filename));
 

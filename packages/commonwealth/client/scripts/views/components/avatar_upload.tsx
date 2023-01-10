@@ -8,7 +8,7 @@ import Dropzone from 'dropzone';
 import 'components/avatar_upload.scss';
 
 import app from 'state';
-import { Account } from 'models';
+import type { Account } from 'models';
 import { isUndefined } from 'helpers/typeGuards';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { getClasses } from './component_kit/helpers';

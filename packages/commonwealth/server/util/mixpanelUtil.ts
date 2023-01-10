@@ -1,4 +1,4 @@
-import { BaseMixpanelPayload } from '../../shared/analytics/types';
+import type { BaseMixpanelPayload } from '../../shared/analytics/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 const log = factory.getLogger(formatFilename(__filename));
 import Mixpanel from 'mixpanel';

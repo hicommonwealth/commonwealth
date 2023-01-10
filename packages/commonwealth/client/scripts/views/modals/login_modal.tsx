@@ -15,16 +15,16 @@ import {
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
 import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
 import { notifyError } from 'controllers/app/notifications';
-import { Account, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
 import { ChainBase } from 'common-common/src/types';
 import {
   breakpointFnValidator,
   isWindowMediumSmallInclusive,
 } from '../components/component_kit/helpers';
-import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
+import type { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
-import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
+import type { LoginBodyType, LoginSidebarType } from '../pages/login/types';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;

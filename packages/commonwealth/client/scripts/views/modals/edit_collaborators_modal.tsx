@@ -8,7 +8,7 @@ import { QueryList, ListItem } from 'construct-ui';
 import 'modals/edit_collaborators_modal.scss';
 
 import app from 'state';
-import { Thread, Profile } from 'models';
+import type { Thread, Profile } from 'models';
 import User from 'views/components/widgets/user';
 import {
   notifyError,

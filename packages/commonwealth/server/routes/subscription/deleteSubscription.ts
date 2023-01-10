@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import Errors from './errors';
 import { NotificationCategories } from 'common-common/src/types';
 import { AppError, ServerError } from 'common-common/src/errors';

@@ -6,10 +6,10 @@ import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
+import type { ITXModalData, ProposalModule } from 'models';
 import { notifyError } from 'controllers/app/notifications';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/adapter';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';

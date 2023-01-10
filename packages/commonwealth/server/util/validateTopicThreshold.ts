@@ -1,11 +1,12 @@
 import BN from 'bn.js';
+import type {
+  TokenBalanceCache} from 'token-balance-cache/src/index';
 import {
-  TokenBalanceCache,
   FetchTokenBalanceErrors,
 } from 'token-balance-cache/src/index';
 import { factory, formatFilename } from 'common-common/src/logging';
 
-import { DB } from '../models';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

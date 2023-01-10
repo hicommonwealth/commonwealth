@@ -1,7 +1,7 @@
 declare let window: any;
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS

@@ -7,19 +7,19 @@ import 'pages/proposals.scss';
 
 import app from 'state';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
-import Cosmos from 'controllers/chain/cosmos/adapter';
-import Moloch from 'controllers/chain/ethereum/moloch/adapter';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
-import Aave from 'controllers/chain/ethereum/aave/adapter';
+import type { ProposalModule } from 'models';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type Cosmos from 'controllers/chain/cosmos/adapter';
+import type Moloch from 'controllers/chain/ethereum/moloch/adapter';
+import type Compound from 'controllers/chain/ethereum/compound/adapter';
+import type Aave from 'controllers/chain/ethereum/aave/adapter';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
 import { PageNotFound } from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
-import NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
 import { CardsCollection } from '../components/cards_collection';
 import {

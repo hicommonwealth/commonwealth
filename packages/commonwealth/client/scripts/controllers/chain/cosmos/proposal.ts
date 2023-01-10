@@ -1,22 +1,23 @@
 import BN from 'bn.js';
-import { MsgDepositEncodeObject, MsgVoteEncodeObject } from '@cosmjs/stargate';
+import type { MsgDepositEncodeObject, MsgVoteEncodeObject } from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queries/utils';
-import {
+import type {
   QueryDepositsResponse,
   QueryVotesResponse,
   QueryTallyResultResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import {
-  Proposal,
+import type {
   ITXModalData,
   ProposalEndTime,
+  IVote} from 'models';
+import {
+  Proposal,
   ProposalStatus,
-  IVote,
   VotingUnit,
   VotingType,
   DepositVote,
 } from 'models';
-import {
+import type {
   ICosmosProposal,
   CosmosToken,
   CosmosVoteChoice,
@@ -25,9 +26,11 @@ import {
 import moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
 import CosmosAccount from './account';
-import CosmosAccounts from './accounts';
-import CosmosChain, { CosmosApiType } from './chain';
-import CosmosGovernance, { marshalTally } from './governance';
+import type CosmosAccounts from './accounts';
+import type { CosmosApiType } from './chain';
+import type CosmosChain from './chain';
+import type CosmosGovernance from './governance';
+import { marshalTally } from './governance';
 
 export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
   if (typeof voteOption === 'number') {

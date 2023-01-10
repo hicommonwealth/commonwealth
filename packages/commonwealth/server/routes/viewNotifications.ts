@@ -1,7 +1,7 @@
 import Sequelize from 'sequelize';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 const Op = Sequelize.Op;
 const MAX_NOTIF = 40;

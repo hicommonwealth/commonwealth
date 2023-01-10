@@ -1,5 +1,5 @@
-import { ApiPromise } from '@polkadot/api';
-import {
+import type { ApiPromise } from '@polkadot/api';
+import type {
   Event,
   ReferendumInfoTo239,
   AccountId,
@@ -22,25 +22,28 @@ import {
   BountyIndex,
   BalanceOf,
 } from '@polkadot/types/interfaces';
-import { Option, Vec, Compact } from '@polkadot/types/codec';
-import { bool, u32, u64, StorageKey, Bytes } from '@polkadot/types/primitive';
-import { Codec, AnyTuple } from '@polkadot/types/types';
+import type { Vec, Compact } from '@polkadot/types/codec';
+import { Option } from '@polkadot/types/codec';
+import type { bool, u32, u64, StorageKey, Bytes } from '@polkadot/types/primitive';
+import type { Codec, AnyTuple } from '@polkadot/types/types';
 import { hexToString } from '@polkadot/util';
 import { filter } from 'lodash';
-import {
+import type {
   Kind,
   OpaqueTimeSlot,
   OffenceDetails,
 } from '@polkadot/types/interfaces/offences';
 
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
+import type { CWEvent} from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type {
+  IEventData,
+  IdentityJudgement,
+  ActiveExposure} from '../types';
 import {
   EventKind,
-  IEventData,
   isEvent,
-  parseJudgement,
-  IdentityJudgement,
-  ActiveExposure,
+  parseJudgement
 } from '../types';
 import { currentPoints } from '../utils/currentPoint';
 

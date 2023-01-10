@@ -1,5 +1,5 @@
 import IdStore from './IdStore';
-import { ChainInfo } from '../models';
+import type { ChainInfo } from '../models';
 
 class ChainStore extends IdStore<ChainInfo> {}
 

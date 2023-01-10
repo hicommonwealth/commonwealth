@@ -11,7 +11,7 @@ import { CWText } from './cw_text';
 import { CWSpinner } from './cw_spinner';
 import { getClasses } from './helpers';
 import { MessageRow } from './cw_text_input';
-import { ValidationStatus } from './cw_validation_text';
+import type { ValidationStatus } from './cw_validation_text';
 
 type CoverImageUploaderAttrs = {
   headerText?: string;

@@ -4,9 +4,10 @@ import * as yargs from 'yargs';
 import fetch from 'node-fetch';
 import EthDater from 'ethereum-block-by-date';
 
+import type {
+  CWEvent} from '../src/index';
 import {
   IEventHandler,
-  CWEvent,
   SubstrateEvents,
   CompoundEvents,
   MolochEvents,

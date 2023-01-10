@@ -1,8 +1,8 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { ChainAttributes } from './chain';
-import { AddressAttributes } from './address';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ModelStatic, ModelInstance } from './types';
+import type { ChainAttributes } from './chain';
+import type { AddressAttributes } from './address';
 
 export type ReactionAttributes = {
   address_id: number;

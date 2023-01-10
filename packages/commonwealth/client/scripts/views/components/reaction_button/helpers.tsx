@@ -4,7 +4,8 @@ import m from 'mithril';
 import $ from 'jquery';
 
 import app from 'state';
-import { Comment, Thread, AddressInfo, ChainInfo } from 'models';
+import type { Comment, ChainInfo } from 'models';
+import { Thread, AddressInfo } from 'models';
 import User from 'views/components/widgets/user';
 import { NewLoginModal } from '../../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';

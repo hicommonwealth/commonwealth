@@ -1,10 +1,11 @@
 import chai from 'chai';
 import { utils } from 'ethers';
 
+import type {
+  RawEvent,
+  Api} from '../../../src/chains/aave/types';
 import {
   EventKind,
-  RawEvent,
-  Api,
   DelegationType,
 } from '../../../src/chains/aave/types';
 import { SupportedNetwork } from '../../../src';

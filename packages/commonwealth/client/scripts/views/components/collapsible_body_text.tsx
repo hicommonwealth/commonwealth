@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { AnyProposal, Thread } from 'models';
+import type { AnyProposal, Thread } from 'models';
 import { countLinesQuill, countLinesMarkdown } from './quill/helpers';
 import { MarkdownFormattedText } from './quill/markdown_formatted_text';
 import { QuillFormattedText } from './quill/quill_formatted_text';

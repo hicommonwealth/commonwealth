@@ -2,16 +2,17 @@
  * Fetches events from Cosmos chain in real time.
  */
 import { decodeTxRaw } from '@cosmjs/proto-signing';
-import { Block } from '@cosmjs/tendermint-rpc';
+import type { Block } from '@cosmjs/tendermint-rpc';
 
+import type {
+  IDisconnectedRange} from '../../interfaces';
 import {
-  IDisconnectedRange,
   IEventSubscriber,
   SupportedNetwork,
 } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, Api } from './types';
+import type { RawEvent, Api } from './types';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;

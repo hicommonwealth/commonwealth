@@ -1,6 +1,7 @@
-import SubstrateAccounts, {
+import type {
   SubstrateAccount,
 } from 'controllers/chain/substrate/account';
+import SubstrateAccounts from 'controllers/chain/substrate/account';
 import SubstrateDemocracy from 'controllers/chain/substrate/democracy';
 import SubstrateDemocracyProposals from 'controllers/chain/substrate/democracy_proposals';
 import {
@@ -10,10 +11,11 @@ import {
 import SubstrateTreasury from 'controllers/chain/substrate/treasury';
 import SubstrateBountyTreasury from 'controllers/chain/substrate/bountyTreasury';
 import ChainEntityController from 'controllers/server/chain_entities';
-import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
+import type { ChainInfo} from 'models';
+import { IChainAdapter, NodeInfo } from 'models';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { IApp } from 'state';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
+import type { IApp } from 'state';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import SubstratePhragmenElections from './phragmen_elections';
 import SubstrateTreasuryTips from './treasury_tips';
 import SubstrateIdentities from './identities';

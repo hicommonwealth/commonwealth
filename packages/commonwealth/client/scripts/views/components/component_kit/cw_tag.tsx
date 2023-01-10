@@ -8,7 +8,7 @@ import 'components/component_kit/cw_tag.scss';
 import { ComponentType } from './types';
 import { CWText } from './cw_text';
 import { getClasses } from './helpers';
-import { IconName } from './cw_icons/cw_icon_lookup';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
 
 type TagType =

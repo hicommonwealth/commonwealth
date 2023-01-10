@@ -8,7 +8,7 @@ import 'components/sidebar/explore_sidebar.scss';
 import app from 'state';
 import { ChainInfo } from 'models';
 import { CWSidebarMenu } from '../component_kit/cw_sidebar_menu';
-import { MenuItem } from '../component_kit/types';
+import type { MenuItem } from '../component_kit/types';
 
 export class ExploreCommunitiesSidebar extends ClassComponent {
   view() {

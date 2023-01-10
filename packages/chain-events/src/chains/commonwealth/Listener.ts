@@ -1,12 +1,13 @@
 import { Listener as BaseListener } from '../../Listener';
-import {
+import type {
   CWEvent,
-  IDisconnectedRange,
+  IDisconnectedRange} from '../../interfaces';
+import {
   SupportedNetwork,
 } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import {
+import type {
   Api,
   EventKind,
   IEventData,

@@ -1,14 +1,15 @@
 import moment from 'moment';
-import { NextFunction } from 'express';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import type { NextFunction } from 'express';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import validateTopicThreshold from '../util/validateTopicThreshold';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { sequelize } from '../database';
-import { TypedRequestBody, TypedResponse, success } from '../types';
-import { VoteAttributes, VoteInstance } from '../models/vote';
+import type { TypedRequestBody, TypedResponse} from '../types';
+import { success } from '../types';
+import type { VoteAttributes, VoteInstance } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
-import RuleCache from '../util/rules/ruleCache';
+import type RuleCache from '../util/rules/ruleCache';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {

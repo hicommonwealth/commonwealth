@@ -1,4 +1,5 @@
-import { CWEvent, IEventHandler, IChainEventData } from '../interfaces';
+import type { CWEvent, IChainEventData } from '../interfaces';
+import { IEventHandler } from '../interfaces';
 import { addPrefix, factory } from '../logging';
 
 export class LoggingHandler extends IEventHandler {

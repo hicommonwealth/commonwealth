@@ -8,11 +8,11 @@ import 'components/component_kit/cw_text_input.scss';
 import { ComponentType } from './types';
 import { getClasses } from './helpers';
 import { CWLabel } from './cw_label';
-import { ValidationStatus } from './cw_validation_text';
+import type { ValidationStatus } from './cw_validation_text';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
-import { IconName } from './cw_icons/cw_icon_lookup';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 
 type TextInputSize = 'small' | 'large';
 

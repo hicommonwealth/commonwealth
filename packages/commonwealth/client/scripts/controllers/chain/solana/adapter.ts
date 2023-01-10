@@ -1,9 +1,10 @@
 import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
-import { IApp } from 'state';
+import type { ChainInfo} from 'models';
+import { IChainAdapter, NodeInfo } from 'models';
+import type { IApp } from 'state';
 
-import { SolanaToken } from './types';
-import SolanaAccount from './account';
+import type { SolanaToken } from './types';
+import type SolanaAccount from './account';
 import SolanaAccounts from './accounts';
 import SolanaChain from './chain';
 

@@ -1,6 +1,6 @@
 import { Pool } from 'pg';
 import _ from 'underscore';
-import { BrokerConfig } from 'rascal';
+import type { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import {
   RascalPublications,
@@ -28,7 +28,7 @@ import {
   manageErcListeners,
   manageRegularListeners,
 } from './util';
-import { ChainAttributes, IListenerInstances } from './types';
+import type { ChainAttributes, IListenerInstances } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -1,25 +1,26 @@
-import Sequelize, { DataTypes } from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { WebhookContent } from '../webhookNotifier';
-import { UserAttributes } from './user';
-import { DB } from '../models';
-import { NotificationCategoryAttributes } from './notification_category';
-import { ModelInstance, ModelStatic } from './types';
-import {
+import type { WebhookContent } from '../webhookNotifier';
+import type { UserAttributes } from './user';
+import type { DB } from '../models';
+import type { NotificationCategoryAttributes } from './notification_category';
+import type { ModelInstance, ModelStatic } from './types';
+import type {
   ICommunityNotificationData,
   IChainEventNotificationData,
   ISnapshotNotificationData,
   IPostNotificationData,
   IChatNotification,
 } from '../../shared/types';
-import { ChainAttributes } from './chain';
-import { ThreadAttributes } from './thread';
-import { CommentAttributes } from './comment';
-import {
+import type { ChainAttributes } from './chain';
+import type { ThreadAttributes } from './thread';
+import type { CommentAttributes } from './comment';
+import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
-import { NotificationInstance } from './notification';
+import type { NotificationInstance } from './notification';
 
 const log = factory.getLogger(formatFilename(__filename));
 

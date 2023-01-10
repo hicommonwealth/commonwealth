@@ -19,7 +19,7 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWWalletsList } from '../../components/component_kit/cw_wallets_list';
 import { LoginBoilerplate } from './login_boilerplate';
 import { LoginDesktopSidebar } from './login_desktop_sidebar';
-import { LoginAttrs } from './types';
+import type { LoginAttrs } from './types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export class LoginDesktop extends ClassComponent<LoginAttrs> {

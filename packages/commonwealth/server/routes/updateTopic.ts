@@ -1,7 +1,7 @@
 /* eslint-disable quotes */
-import { Response, NextFunction } from 'express';
+import type { Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 

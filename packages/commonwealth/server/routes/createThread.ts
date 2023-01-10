@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import {
   NotificationCategories,
   ProposalType,
@@ -7,7 +7,7 @@ import {
   ChainNetwork,
 } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { Action, PermissionError } from 'common-common/src/permissions';
 import {
@@ -17,9 +17,9 @@ import {
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { sequelize } from '../database';
-import { ThreadInstance } from '../models/thread';
+import type { ThreadInstance } from '../models/thread';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
@@ -27,8 +27,8 @@ import {
   MixpanelCommunityInteractionPayload,
 } from '../../shared/analytics/types';
 import checkRule from '../util/rules/checkRule';
-import RuleCache from '../util/rules/ruleCache';
-import BanCache from '../util/banCheckCache';
+import type RuleCache from '../util/rules/ruleCache';
+import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
 
 const log = factory.getLogger(formatFilename(__filename));

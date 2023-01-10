@@ -6,9 +6,10 @@ import ClassComponent from 'class_component';
 import 'components/proposals/voting_actions.scss';
 
 import app from 'state';
-import CosmosAccount from 'controllers/chain/cosmos/account';
+import type CosmosAccount from 'controllers/chain/cosmos/account';
 import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import { BinaryVote, DepositVote, VotingType, AnyProposal } from 'models';
+import type { AnyProposal } from 'models';
+import { BinaryVote, DepositVote, VotingType } from 'models';
 import {
   SubstrateDemocracyReferendum,
   convictionToWeight,
@@ -16,7 +17,7 @@ import {
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
 import MolochProposal, {
   MolochProposalVote,
@@ -27,19 +28,19 @@ import CompoundProposal, {
   CompoundProposalVote,
   BravoVote,
 } from 'controllers/chain/ethereum/compound/proposal';
-import EthereumAccount from 'controllers/chain/ethereum/account';
+import type EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
 import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import Cosmos from 'controllers/chain/cosmos/adapter';
-import Compound from 'controllers/chain/ethereum/compound/adapter';
+import type Cosmos from 'controllers/chain/cosmos/adapter';
+import type Compound from 'controllers/chain/ethereum/compound/adapter';
 import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import { NearAccount } from 'controllers/chain/near/account';
+import type { NearAccount } from 'controllers/chain/near/account';
 
 import { createTXModal } from 'views/modals/tx_signing_modal';
 import { ProposalExtensions } from './proposal_extensions';

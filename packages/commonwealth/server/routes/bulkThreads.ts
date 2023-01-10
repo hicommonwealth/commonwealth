@@ -1,11 +1,11 @@
 /* eslint-disable quotes */
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { QueryTypes } from 'sequelize';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { getLastEdited } from '../util/getLastEdited';
-import { DB } from '../models';
-import { ThreadInstance } from '../models/thread';
+import type { DB } from '../models';
+import type { ThreadInstance } from '../models/thread';
 
 const log = factory.getLogger(formatFilename(__filename));
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date

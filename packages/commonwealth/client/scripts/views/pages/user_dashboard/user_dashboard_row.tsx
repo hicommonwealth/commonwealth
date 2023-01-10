@@ -5,13 +5,14 @@ import ClassComponent from 'class_component';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 
+import type {
+  CWEvent} from 'chain-events/src';
 import {
-  CWEvent,
   Label as ChainEventLabel,
   // CompoundEvents
 } from 'chain-events/src';
 import app from 'state';
-import { DashboardActivityNotification } from 'models';
+import type { DashboardActivityNotification } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { UserDashboardRowBottom } from './user_dashboard_row_bottom';
 import { UserDashboardRowTop } from './user_dashboard_row_top';

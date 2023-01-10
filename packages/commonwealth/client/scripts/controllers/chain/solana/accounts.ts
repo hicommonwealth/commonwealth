@@ -1,11 +1,11 @@
 import _ from 'lodash';
-import { IApp } from 'state';
-import { IAccountsModule } from 'models';
+import type { IApp } from 'state';
+import type { IAccountsModule } from 'models';
 import { AccountsStore } from 'stores';
 
 import SolanaAccount from './account';
-import SolanaChain from './chain';
-import { SolanaToken } from './types';
+import type SolanaChain from './chain';
+import type { SolanaToken } from './types';
 
 export default class SolanaAccounts
   implements IAccountsModule<SolanaToken, SolanaAccount>

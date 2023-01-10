@@ -1,20 +1,22 @@
-import { ApiPromise } from '@polkadot/api';
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { ApiPromise } from '@polkadot/api';
+import type { RegisteredTypes } from '@polkadot/types/types';
 
-import {
+import type {
   CWEvent,
   IDisconnectedRange,
-  IEventPoller,
+  IEventPoller} from '../../interfaces';
+import {
   SupportedNetwork,
 } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 
-import { Block, EventKind, ISubstrateListenerOptions } from './types';
+import type { Block, EventKind, ISubstrateListenerOptions } from './types';
 
+import type {
+  EnricherConfig} from './index';
 import {
   createApi,
-  EnricherConfig,
   Poller,
   Processor,
   StorageFetcher,

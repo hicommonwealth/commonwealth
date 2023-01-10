@@ -5,8 +5,8 @@ import {
   SocketClosedUnexpectedlyError,
 } from 'redis';
 import { factory, formatFilename } from './logging';
-import { RedisNamespaces } from './types';
-import Rollbar from 'rollbar';
+import type { RedisNamespaces } from './types';
+import type Rollbar from 'rollbar';
 
 const log = factory.getLogger(formatFilename(__filename));
 

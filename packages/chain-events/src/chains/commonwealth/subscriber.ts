@@ -2,17 +2,19 @@
 /**
  * Fetches events from ERC20 contract in real time.
  */
-import { Listener } from '@ethersproject/providers';
+import type { Listener } from '@ethersproject/providers';
 
-import {
-  ICuratedProject__factory,
+import type {
   // IERC20__factory,
-  IProjectBaseFactory,
+  IProjectBaseFactory} from '../../contractTypes';
+import {
+  ICuratedProject__factory
 } from '../../contractTypes';
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, Api, ProjectApi, CommonContractType } from './types';
+import type { RawEvent, Api, ProjectApi} from './types';
+import { CommonContractType } from './types';
 
 export async function constructProjectApi(
   projectFactory: IProjectBaseFactory,

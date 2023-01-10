@@ -1,7 +1,8 @@
 import { assert } from 'chai';
+import type {
+  Permissions} from 'common-common/src/permissions';
 import {
   isPermitted,
-  Permissions,
   Action,
 } from 'common-common/src/permissions';
 

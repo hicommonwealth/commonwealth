@@ -14,7 +14,7 @@ import { detectURL } from 'helpers/threads';
 import { notifyError } from 'controllers/app/notifications';
 import { Profile } from 'models';
 import { PreviewModal } from 'views/modals/preview_modal';
-import {
+import type {
   DeltaOps,
   QuillActiveMode,
   QuillDelta,

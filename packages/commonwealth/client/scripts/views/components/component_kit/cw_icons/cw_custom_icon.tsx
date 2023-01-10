@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'components/component_kit/cw_icon.scss';
 
 import { customIconLookup } from './cw_icon_lookup';
-import { CustomIconAttrs } from './types';
+import type { CustomIconAttrs } from './types';
 import { ComponentType } from '../types';
 
 export class CWCustomIcon extends ClassComponent<CustomIconAttrs> {

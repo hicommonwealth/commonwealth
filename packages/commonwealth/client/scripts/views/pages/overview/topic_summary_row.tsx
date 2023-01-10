@@ -8,7 +8,7 @@ import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
 // import { navigateToSubpage } from 'app';
-import { Thread, Topic } from 'models';
+import type { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
 import { pluralize } from 'helpers';

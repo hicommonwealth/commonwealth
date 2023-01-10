@@ -7,7 +7,7 @@ import moment from 'moment';
 import 'pages/view_thread/poll_cards.scss';
 
 import app from 'state';
-import { Poll, Thread } from 'models';
+import type { Poll, Thread } from 'models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { PollEditorModal } from '../../modals/poll_editor_modal';
 import { PollCard } from '../../components/poll_card';

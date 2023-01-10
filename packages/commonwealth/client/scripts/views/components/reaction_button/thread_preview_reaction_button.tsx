@@ -8,7 +8,7 @@ import 'components/reaction_button/thread_preview_reaction_button.scss';
 
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { Thread, ChainInfo } from 'models';
+import type { Thread, ChainInfo } from 'models';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import {
   fetchReactionsByPost,

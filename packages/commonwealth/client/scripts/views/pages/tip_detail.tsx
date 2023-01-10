@@ -7,9 +7,9 @@ import 'pages/tip_detail.scss';
 
 import app from 'state';
 import { DepositVote } from 'models';
-import { IBalanceAccount } from 'models/interfaces';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
+import type { IBalanceAccount } from 'models/interfaces';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import Sublayout from '../sublayout';
 import User from '../components/widgets/user';
 import { MarkdownFormattedText } from '../components/quill/markdown_formatted_text';

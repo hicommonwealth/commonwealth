@@ -7,14 +7,16 @@ import Web3 from 'web3';
 
 import app from 'state';
 import { formatNumberLong, Coin } from 'adapters/currency';
-import { VotingType, AnyProposal } from 'models';
-import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
+import type { AnyProposal } from 'models';
+import { VotingType } from 'models';
+import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
-import AaveProposal, {
+import type {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
+import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import {
   AaveVotingResult,
   CompletedProposalVotingResult,

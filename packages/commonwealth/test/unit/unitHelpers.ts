@@ -1,4 +1,4 @@
-import { TypedRequestQuery, TypedResponse } from 'server/types';
+import type { TypedRequestQuery, TypedResponse } from 'server/types';
 
 // helper methods to be able to call individual methods assigned to the express router. Used to avoid type errors
 const expressRequest = {} as never as Express.Request;

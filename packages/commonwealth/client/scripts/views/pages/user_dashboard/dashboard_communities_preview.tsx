@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
 import app from 'state';
-import { ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
 import { pluralize } from 'helpers';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';

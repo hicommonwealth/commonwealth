@@ -9,7 +9,7 @@ import { AvatarUpload } from 'views/components/avatar_upload';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { ChainBase } from 'common-common/src/types';
-import {
+import type {
   ChainFormDefaultFields,
   ChainFormState,
   EthChainAttrs,
@@ -17,9 +17,10 @@ import {
 } from './types';
 import { CommunityType } from '.';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import type {
+  DropdownItemType} from '../../components/component_kit/cw_dropdown';
 import {
-  CWDropdown,
-  DropdownItemType,
+  CWDropdown
 } from '../../components/component_kit/cw_dropdown';
 
 export const initChainForm = (): ChainFormDefaultFields => {

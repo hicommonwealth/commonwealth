@@ -1,8 +1,9 @@
+import type {
+  SnapshotProposal,
+  SnapshotSpace} from 'helpers/snapshot_utils';
 import {
   getProposals,
-  getSpace,
-  SnapshotProposal,
-  SnapshotSpace,
+  getSpace
 } from 'helpers/snapshot_utils';
 
 class SnapshotController {

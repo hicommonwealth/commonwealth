@@ -3,17 +3,19 @@ import $ from 'jquery';
 
 import { ChainEntityStore } from 'stores';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
+import { ChainEntity, ChainEvent, ChainEventType } from 'models';
 import app from 'state';
-import {
+import type {
   CWEvent,
-  eventToEntity,
   IEventProcessor,
   IEventSubscriber,
+  IChainEntityKind} from 'chain-events/src';
+import {
+  eventToEntity,
   SubstrateTypes,
   SupportedNetwork,
-  getUniqueEntityKey,
-  IChainEntityKind,
+  getUniqueEntityKey
 } from 'chain-events/src';
 import { notifyError } from '../app/notifications';
 import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';

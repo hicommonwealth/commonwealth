@@ -1,5 +1,5 @@
 import IdStore from './IdStore';
-import { Contract } from '../models';
+import type { Contract } from '../models';
 
 // Models a store of all the contracts
 class ContractsStore extends IdStore<Contract> {

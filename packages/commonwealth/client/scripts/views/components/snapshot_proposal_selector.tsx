@@ -7,10 +7,11 @@ import { QueryList, ListItem } from 'construct-ui';
 import 'components/snapshot_proposal_selector.scss';
 
 import app from 'state';
-import { Thread } from 'models';
+import type { Thread } from 'models';
+import type {
+  SnapshotProposal} from 'helpers/snapshot_utils';
 import {
-  loadMultipleSpacesData,
-  SnapshotProposal,
+  loadMultipleSpacesData
 } from 'helpers/snapshot_utils';
 
 type SnapshotProposalSelectorAttrs = {

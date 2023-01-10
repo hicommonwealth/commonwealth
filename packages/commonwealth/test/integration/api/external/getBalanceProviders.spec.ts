@@ -1,4 +1,4 @@
-import { GetBalanceProvidersReq } from 'common-common/src/api/extApiTypes';
+import type { GetBalanceProvidersReq } from 'common-common/src/api/extApiTypes';
 import models from 'server/database';
 import { req, res } from 'test/unit/unitHelpers';
 import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';

@@ -1,8 +1,8 @@
 import BN from 'bn.js';
-import { IIdentifiable } from 'adapters/shared';
-import { IVote } from 'models';
-import { NearAccount } from 'controllers/chain/near/account';
-import { NearToken } from 'adapters/chain/near/types';
+import type { IIdentifiable } from 'adapters/shared';
+import type { IVote } from 'models';
+import type { NearAccount } from 'controllers/chain/near/account';
+import type { NearToken } from 'adapters/chain/near/types';
 
 export interface NearSputnikConfig {
   metadata: string;

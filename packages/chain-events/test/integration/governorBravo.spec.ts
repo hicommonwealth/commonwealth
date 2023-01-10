@@ -7,24 +7,26 @@ import { ethers } from 'hardhat';
 import { BigNumber } from 'ethers';
 import type { Signer, providers, BigNumberish } from 'ethers';
 
-import {
+import type {
   GovernorBravoImmutable,
-  GovernorBravoImmutable__factory as GovernorBravoImmutableFactory,
   MPond,
+  TimelockMock as Timelock} from '../../src/contractTypes';
+import {
+  GovernorBravoImmutable__factory as GovernorBravoImmutableFactory,
   MPond__factory as MPondFactory,
-  TimelockMock as Timelock,
   TimelockMock__factory as TimelockFactory,
 } from '../../src/contractTypes';
-import {
+import type {
   Api,
-  BravoSupport,
-  EventKind,
   IEventData,
   IProposalCanceled,
   IProposalCreated,
   IProposalExecuted,
   IProposalQueued,
-  IVoteCast,
+  IVoteCast} from '../../src/chains/compound/types';
+import {
+  BravoSupport,
+  EventKind,
   ProposalState,
 } from '../../src/chains/compound/types';
 import {
@@ -32,9 +34,10 @@ import {
   StorageFetcher,
   subscribeEvents,
 } from '../../src/chains/compound';
-import {
+import type {
   CWEvent,
-  IChainEventData,
+  IChainEventData} from '../../src';
+import {
   IEventHandler,
   SupportedNetwork,
 } from '../../src';

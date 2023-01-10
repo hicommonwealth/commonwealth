@@ -1,5 +1,5 @@
 import chai from 'chai';
-import {
+import type {
   Hash,
   EventRecord,
   Header,

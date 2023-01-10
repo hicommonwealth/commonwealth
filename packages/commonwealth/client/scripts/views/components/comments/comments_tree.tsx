@@ -6,7 +6,8 @@ import ClassComponent from 'class_component';
 import 'components/comments/comments_tree.scss';
 
 import app from 'state';
-import { Thread, Comment as CommentType, AnyProposal } from 'models';
+import type { Comment as CommentType, AnyProposal } from 'models';
+import { Thread } from 'models';
 import { Comment } from './comment';
 import { CWValidationText } from '../component_kit/cw_validation_text';
 import { CreateComment } from './create_comment';

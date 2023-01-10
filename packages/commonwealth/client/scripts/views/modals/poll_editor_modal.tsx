@@ -11,7 +11,7 @@ import 'modals/poll_editor_modal.scss';
 
 import { getNextPollEndingTime } from 'utils';
 import app from 'state';
-import { Thread } from 'models';
+import type { Thread } from 'models';
 import { pluralize } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';

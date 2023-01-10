@@ -8,7 +8,7 @@ import 'components/proposal_card/index.scss';
 
 import app from 'state';
 import { formatLastUpdated, formatTimestamp } from 'helpers';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { navigateToSubpage } from '../../../app';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { ProposalTag } from '../../components/proposal_card/proposal_tag';

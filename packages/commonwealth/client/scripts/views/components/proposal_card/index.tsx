@@ -9,7 +9,7 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { slugify } from 'utils';
 import { isNotNil } from 'helpers/typeGuards';
-import { AnyProposal } from 'models';
+import type { AnyProposal } from 'models';
 import { ProposalType } from 'common-common/src/types';
 import { getProposalUrlPath } from 'identifiers';
 import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';

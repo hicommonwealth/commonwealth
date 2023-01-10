@@ -8,7 +8,7 @@ import $ from 'jquery';
 import 'modals/order_topics_modal.scss';
 
 import app from 'state';
-import { Topic } from 'models';
+import type { Topic } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';

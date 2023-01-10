@@ -1,6 +1,6 @@
-import { Block } from '@cosmjs/tendermint-rpc';
+import type { Block } from '@cosmjs/tendermint-rpc';
 
-import { Api } from '../../../src/chains/cosmos/types';
+import type { Api } from '../../../src/chains/cosmos/types';
 
 export type MockBlock = {
   block: {

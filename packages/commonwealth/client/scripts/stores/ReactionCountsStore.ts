@@ -1,10 +1,11 @@
 import IdStore from 'stores/IdStore';
-import ReactionCount from 'models/ReactionCount';
+import type ReactionCount from 'models/ReactionCount';
+import type {
+  AnyProposal,
+  Reaction} from 'models';
 import {
   AbridgedThread,
-  AnyProposal,
   Comment,
-  Reaction,
   Thread,
   Proposal,
 } from 'models';

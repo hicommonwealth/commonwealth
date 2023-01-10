@@ -11,11 +11,12 @@ import {
   chainEntityTypeToProposalName,
   getProposalUrlPath,
 } from 'identifiers';
-import { ChainEntity, Thread, ThreadStage } from 'models';
-import {
-  loadMultipleSpacesData,
+import type { ChainEntity, Thread, ThreadStage } from 'models';
+import type {
   SnapshotProposal,
-  SnapshotSpace,
+  SnapshotSpace} from 'helpers/snapshot_utils';
+import {
+  loadMultipleSpacesData
 } from 'helpers/snapshot_utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';

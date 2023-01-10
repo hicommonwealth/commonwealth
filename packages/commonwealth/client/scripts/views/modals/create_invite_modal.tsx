@@ -12,7 +12,8 @@ import 'modals/create_invite_modal.scss';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, RoleInfo, Profile } from 'models';
+import type { ChainInfo, Profile } from 'models';
+import { RoleInfo } from 'models';
 import { SearchScope } from 'models/SearchQuery';
 import { UserBlock } from 'views/components/widgets/user';
 import { notifyError } from 'controllers/app/notifications';

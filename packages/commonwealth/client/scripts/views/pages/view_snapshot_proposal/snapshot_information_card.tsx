@@ -9,7 +9,7 @@ import 'pages/snapshot/snapshot_information_card.scss';
 
 import app from 'state';
 import { AddressInfo } from 'models';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';

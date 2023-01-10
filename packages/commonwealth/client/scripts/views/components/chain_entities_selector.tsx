@@ -8,7 +8,7 @@ import { QueryList, ListItem } from 'construct-ui';
 import 'components/chain_entities_selector.scss';
 
 import app from 'state';
-import { ChainEntity, Thread } from 'models';
+import type { ChainEntity, Thread } from 'models';
 import { chainEntityTypeToProposalName } from 'identifiers';
 
 type ChainEntitiesSelectorAttrs = {

@@ -1,9 +1,10 @@
 import hre from 'hardhat';
 import '@nomiclabs/hardhat-ethers';
 
+import type {
+  AaveTokenV2Mock as AaveTokenV2} from '../types';
 import {
   AaveTokenV2Mock__factory as AaveTokenV2Factory,
-  AaveTokenV2Mock as AaveTokenV2,
   GovernanceStrategy__factory as GovernanceStrategyFactory,
   GovernanceStrategy,
   Executor__factory as ExecutorFactory,

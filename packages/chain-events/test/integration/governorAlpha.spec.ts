@@ -3,29 +3,33 @@
 /* eslint-disable no-unused-expressions */
 import { EventEmitter } from 'events';
 
-import { providers, Signer, BigNumberish } from 'ethers';
+import type { Signer, BigNumberish } from 'ethers';
+import { providers } from 'ethers';
 import chai, { expect } from 'chai';
 
+import type {
+  MPond,
+  GovernorAlphaMock as GovernorAlpha,
+  TimelockMock as Timelock} from '../../src/contractTypes';
 import {
   MPond__factory as MPondFactory,
-  MPond,
   GovernorAlphaMock__factory as GovernorAlphaFactory,
-  GovernorAlphaMock as GovernorAlpha,
-  TimelockMock__factory as TimelockFactory,
-  TimelockMock as Timelock,
+  TimelockMock__factory as TimelockFactory
 } from '../../src/contractTypes';
-import {
+import type {
   Api,
   IEventData,
-  EventKind,
   IProposalCreated,
   IProposalQueued,
   IProposalExecuted,
-  IVoteCast,
+  IVoteCast} from '../../src/chains/compound/types';
+import {
+  EventKind,
   ProposalState,
 } from '../../src/chains/compound/types';
 import { subscribeEvents } from '../../src/chains/compound/subscribeFunc';
-import { IEventHandler, CWEvent, IChainEventData } from '../../src/interfaces';
+import type { CWEvent, IChainEventData } from '../../src/interfaces';
+import { IEventHandler } from '../../src/interfaces';
 
 const { assert } = chai;
 

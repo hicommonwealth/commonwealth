@@ -1,10 +1,11 @@
 import JobRunner from 'common-common/src/cacheJobRunner';
 
+import type {
+  GlobalActivity} from './queryGlobalActivity';
 import {
-  default as queryGlobalActivity,
-  GlobalActivity,
+  default as queryGlobalActivity
 } from './queryGlobalActivity';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 type CacheT = { activity: GlobalActivity };
 

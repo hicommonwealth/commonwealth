@@ -15,7 +15,7 @@ import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
-import { EthChainAttrs } from './types';
+import type { EthChainAttrs } from './types';
 import { EthDaoForm } from './eth_dao_form';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';

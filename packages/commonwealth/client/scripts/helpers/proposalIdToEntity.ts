@@ -5,7 +5,7 @@ import {
   CompoundTypes,
   AaveTypes,
 } from 'chain-events/src';
-import { IApp } from 'state';
+import type { IApp } from 'state';
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts
 // fetch the corresponding chain entity from the database

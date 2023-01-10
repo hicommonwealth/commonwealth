@@ -1,5 +1,5 @@
 import { chain } from 'web3-core/types';
-import {
+import type {
   AbiItem,
   AbiInput,
   AbiOutput,

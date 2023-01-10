@@ -1,9 +1,9 @@
-import { Server } from 'socket.io';
+import type { Server } from 'socket.io';
 import moment from 'moment';
 import { Op } from 'sequelize';
 import { Action } from 'common-common/src/permissions';
 import { addPrefix, factory } from 'common-common/src/logging';
-import { RedisCache } from 'common-common/src/redisCache';
+import type { RedisCache } from 'common-common/src/redisCache';
 import emitNotifications from '../util/emitNotifications';
 import {
   NotificationCategories,
@@ -16,7 +16,7 @@ import {
 } from '../../shared/types';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { checkReadPermitted } from '../util/roles';
 
 const log = factory.getLogger(addPrefix(__filename));

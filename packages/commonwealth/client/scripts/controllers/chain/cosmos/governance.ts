@@ -1,29 +1,33 @@
 import BN from 'bn.js';
 import moment from 'moment';
 import _ from 'underscore';
-import { ITXModalData, ProposalModule } from 'models';
+import type { ITXModalData} from 'models';
+import { ProposalModule } from 'models';
 import { fromAscii } from '@cosmjs/encoding';
-import { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
-import {
+import type { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
+import type {
   Proposal,
+  TallyResult} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import {
   TextProposal,
-  ProposalStatus,
-  TallyResult,
+  ProposalStatus
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   CommunityPoolSpendProposal,
   CommunityPoolSpendProposalWithDeposit,
 } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { Any } from 'cosmjs-types/google/protobuf/any';
-import {
+import type {
   ICosmosProposal,
-  CosmosToken,
   ICosmosProposalTally,
-  CosmosProposalState,
+  CosmosProposalState} from 'controllers/chain/cosmos/types';
+import {
+  CosmosToken
 } from 'controllers/chain/cosmos/types';
-import CosmosAccount from './account';
-import CosmosAccounts from './accounts';
-import CosmosChain, { CosmosApiType } from './chain';
+import type CosmosAccount from './account';
+import type CosmosAccounts from './accounts';
+import type { CosmosApiType } from './chain';
+import type CosmosChain from './chain';
 import { CosmosProposal } from './proposal';
 
 const stateEnumToString = (status: ProposalStatus): CosmosProposalState => {

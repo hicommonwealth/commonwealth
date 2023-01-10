@@ -7,7 +7,7 @@ import $ from 'jquery';
 import 'pages/settings/email_section.scss';
 
 import app from 'state';
-import { SocialAccount } from 'models';
+import type { SocialAccount } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { WalletId } from 'common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';

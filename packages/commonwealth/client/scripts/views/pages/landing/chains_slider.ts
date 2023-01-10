@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import m from 'mithril';
 import 'pages/landing/chains_slider.scss';
-import { Chain } from './index';
+import type { Chain } from './index';
 
 interface IState {
   chains: Chain[];

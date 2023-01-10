@@ -9,9 +9,10 @@ import 'modals/feedback_modal.scss';
 import app from 'state';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
+import type {
+  ValidationStatus} from '../components/component_kit/cw_validation_text';
 import {
-  CWValidationText,
-  ValidationStatus,
+  CWValidationText
 } from '../components/component_kit/cw_validation_text';
 
 export class FeedbackModal extends ClassComponent {

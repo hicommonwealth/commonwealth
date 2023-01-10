@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 
 import { formatCoin } from 'adapters/currency';
 import app from 'state';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { CWText } from '../component_kit/cw_text';
 
 type BalanceInfoAttrs = {

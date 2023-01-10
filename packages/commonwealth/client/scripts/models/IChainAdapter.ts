@@ -1,15 +1,16 @@
 import moment from 'moment';
-import { ApiStatus, IApp, LoginState } from 'state';
-import { Coin } from 'adapters/currency';
+import type { IApp} from 'state';
+import { ApiStatus, LoginState } from 'state';
+import type { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
 import m from 'mithril';
-import { ChainBase } from 'common-common/src/types';
+import type { ChainBase } from 'common-common/src/types';
 
 import ChainEntityController from 'controllers/server/chain_entities';
-import { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
-import { Account, ProposalModule } from '.';
-import ChainInfo from './ChainInfo';
+import type { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
+import type { Account, ProposalModule } from '.';
+import type ChainInfo from './ChainInfo';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.

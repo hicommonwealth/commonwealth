@@ -1,8 +1,8 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { ChainAttributes } from './chain';
-import { ThreadAttributes } from './thread';
-import { ModelStatic, ModelInstance } from './types';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ChainAttributes } from './chain';
+import type { ThreadAttributes } from './thread';
+import type { ModelStatic, ModelInstance } from './types';
 
 export type ChainEntityMetaAttributes = {
   id: number; // sequelize auto-generated primary key id --- NEVER USE DIRECTLY

@@ -1,5 +1,6 @@
 import moment from 'moment';
-import { Topic, AbridgedThread, Profile, Thread } from 'models';
+import type { Topic, Thread } from 'models';
+import { AbridgedThread, Profile } from 'models';
 import app from 'state';
 import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';

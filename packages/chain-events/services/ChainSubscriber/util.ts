@@ -1,20 +1,22 @@
 import _ from 'underscore';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
-import Rollbar from 'rollbar';
+import type Rollbar from 'rollbar';
 
-import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
+import type { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
+import type {
+  SubstrateEvents} from '../../src';
 import {
   createListener,
   ErcLoggingHandler,
   LoggingHandler,
-  SubstrateEvents,
   SubstrateTypes,
   SupportedNetwork,
 } from '../../src';
-import models, { DB } from '../database/database';
+import type { DB } from '../database/database';
+import models from '../database/database';
 
-import { ChainAttributes, IListenerInstances } from './types';
+import type { ChainAttributes, IListenerInstances } from './types';
 import { handleFatalListenerError } from './chainSubscriber';
 
 const log = factory.getLogger(formatFilename(__filename));

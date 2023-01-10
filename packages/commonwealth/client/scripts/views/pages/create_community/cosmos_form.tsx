@@ -14,7 +14,7 @@ import { slugifyPreserveDashes } from 'utils';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState, EthFormFields } from './types';
+import type { ChainFormFields, ChainFormState, EthFormFields } from './types';
 import { IdRow, InputRow } from '../../components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';

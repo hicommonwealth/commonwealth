@@ -8,7 +8,7 @@ import 'components/component_kit/cw_progress_bar.scss';
 import { getClasses } from './helpers';
 import { ComponentType } from './types';
 import { CWText } from './cw_text';
-import { IconName } from './cw_icons/cw_icon_lookup';
+import type { IconName } from './cw_icons/cw_icon_lookup';
 import { CWIcon } from './cw_icons/cw_icon';
 
 type ProgressBarStatus = 'selected' | 'neutral' | 'ongoing' | 'passed';

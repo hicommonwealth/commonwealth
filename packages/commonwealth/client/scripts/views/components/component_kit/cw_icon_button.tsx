@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import { CWIcon } from './cw_icons/cw_icon';
-import { IconComponentAttrs } from './cw_icons/types';
+import type { IconComponentAttrs } from './cw_icons/types';
 import { ComponentType } from './types';
 
 export class CWIconButton extends ClassComponent<IconComponentAttrs> {

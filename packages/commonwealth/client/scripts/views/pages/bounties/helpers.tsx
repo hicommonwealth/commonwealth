@@ -5,11 +5,11 @@ import m from 'mithril';
 import 'pages/bounties.scss';
 
 import app from 'state';
-import { SubstrateBounty } from 'controllers/chain/substrate/bounty';
+import type { SubstrateBounty } from 'controllers/chain/substrate/bounty';
 import { formatCoin } from 'adapters/currency';
 import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { AddressInfo } from 'models';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import User from 'views/components/widgets/user';

@@ -1,35 +1,39 @@
-import {
+import type {
   ITXModalData,
-  NodeInfo,
   IChainModule,
   ITXData,
-  ChainInfo,
+  ChainInfo} from 'models';
+import {
+  NodeInfo
 } from 'models';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 import m from 'mithril';
 import _ from 'lodash';
-import { ApiStatus, IApp } from 'state';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
 import moment from 'moment';
 import BN from 'bn.js';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 
-import {
+import type {
   StdFee,
+  StakingExtension,
+  GovExtension,
+  BankExtension} from '@cosmjs/stargate';
+import {
   isBroadcastTxSuccess,
   isBroadcastTxFailure,
   QueryClient,
-  StakingExtension,
   setupStakingExtension,
-  GovExtension,
   setupGovExtension,
-  BankExtension,
   setupBankExtension,
   SigningStargateClient,
 } from '@cosmjs/stargate';
-import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
-import { EncodeObject } from '@cosmjs/proto-signing';
-import CosmosAccount from './account';
-import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
+import type { Event } from '@cosmjs/tendermint-rpc';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import type { EncodeObject } from '@cosmjs/proto-signing';
+import type CosmosAccount from './account';
+import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
 import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
 
 export interface ICosmosTXData extends ITXData {

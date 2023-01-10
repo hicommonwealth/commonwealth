@@ -8,7 +8,7 @@ import 'pages/referenda.scss';
 import app from 'state';
 import { blockperiodToDuration } from 'helpers';
 import { ChainBase } from 'common-common/src/types';
-import Substrate from 'controllers/chain/substrate/adapter';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card';

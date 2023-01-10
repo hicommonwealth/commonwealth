@@ -3,12 +3,13 @@ import { BigNumber, utils } from 'ethers';
 
 import { SupportedNetwork } from '../../../src';
 import { StorageFetcher } from '../../../src/chains/compound/storageFetcher';
+import type {
+  RawEvent} from '../../../src/chains/compound/types';
 import {
   EventKind,
-  ProposalState,
-  RawEvent,
+  ProposalState
 } from '../../../src/chains/compound/types';
-import { GovernorAlpha } from '../../../src/contractTypes';
+import type { GovernorAlpha } from '../../../src/contractTypes';
 
 const { assert } = chai;
 

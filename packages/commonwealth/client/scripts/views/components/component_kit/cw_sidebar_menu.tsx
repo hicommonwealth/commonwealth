@@ -8,11 +8,13 @@ import 'components/component_kit/cw_sidebar_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import { AddressInfo, ChainInfo, RoleInfo } from 'models';
+import type { ChainInfo, RoleInfo } from 'models';
+import { AddressInfo } from 'models';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';
 import { CWIcon } from './cw_icons/cw_icon';
-import { ComponentType, MenuItem } from './types';
+import type { MenuItem } from './types';
+import { ComponentType } from './types';
 import { CommunityLabel } from '../community_label';
 import User from '../widgets/user';
 

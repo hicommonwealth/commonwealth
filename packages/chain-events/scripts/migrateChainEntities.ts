@@ -4,13 +4,14 @@
  * from the chain, writing the results back into the database.
  */
 
+import type {
+  IDisconnectedRange,
+  IStorageFetcher} from 'chain-events/src';
 import {
   AaveEvents,
   CommonwealthEvents,
   CompoundEvents,
   CosmosEvents,
-  IDisconnectedRange,
-  IStorageFetcher,
   SubstrateEvents,
 } from 'chain-events/src';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -25,7 +26,7 @@ import {
   RabbitMQController,
 } from 'common-common/src/rabbitmq';
 import fetch from 'node-fetch';
-import { BrokerConfig } from 'rascal';
+import type { BrokerConfig } from 'rascal';
 import { RABBITMQ_URI } from '../../commonwealth/server/config';
 import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
 import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from '../services/config';

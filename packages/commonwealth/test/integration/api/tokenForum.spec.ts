@@ -5,7 +5,7 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import BN from 'bn.js';
 import jwt from 'jsonwebtoken';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import {
   resetDatabase,
   getTokenBalanceCache,

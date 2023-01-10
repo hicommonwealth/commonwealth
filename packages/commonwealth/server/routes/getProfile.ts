@@ -1,10 +1,11 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError } from 'common-common/src/errors';
-import { AddressAttributes } from '../models/address';
-import { CommentAttributes } from '../models/comment';
-import { ThreadAttributes } from '../models/thread';
-import { success, TypedRequestQuery, TypedResponse } from '../types';
-import { DB } from '../models';
+import type { AddressAttributes } from '../models/address';
+import type { CommentAttributes } from '../models/comment';
+import type { ThreadAttributes } from '../models/thread';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { success } from '../types';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

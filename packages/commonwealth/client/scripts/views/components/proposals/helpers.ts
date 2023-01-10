@@ -2,7 +2,8 @@ import m from 'mithril';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
-import { AnyProposal, IVote, VotingUnit, ProposalStatus } from 'models';
+import type { AnyProposal, IVote} from 'models';
+import { VotingUnit, ProposalStatus } from 'models';
 import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
 import AaveProposal, {
   AaveProposalVote,

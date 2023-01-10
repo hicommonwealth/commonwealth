@@ -23,7 +23,7 @@ import {
   defaultChainRows,
   ethChainRows,
 } from './chain_input_rows';
-import {
+import type {
   ChainFormFields,
   ChainFormState,
   EthChainAttrs,

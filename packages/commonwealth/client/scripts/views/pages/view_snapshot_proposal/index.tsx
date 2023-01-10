@@ -9,10 +9,11 @@ import app from 'state';
 import { AddressInfo } from 'models';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 import Sublayout from 'views/sublayout';
-import {
+import type {
   SnapshotSpace,
   SnapshotProposal,
-  SnapshotProposalVote,
+  SnapshotProposalVote} from 'helpers/snapshot_utils';
+import {
   getResults,
   getPower,
 } from 'helpers/snapshot_utils';

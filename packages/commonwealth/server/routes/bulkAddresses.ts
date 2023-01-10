@@ -2,7 +2,7 @@
 import Sequelize from 'sequelize';
 const { Op } = Sequelize;
 import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));

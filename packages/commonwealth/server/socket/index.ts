@@ -1,9 +1,10 @@
 // Use https://admin.socket.io/#/ to monitor
 // TODO: turn on session affinity in all staging environments and in production to enable polling in transport options
-import { Server, Socket } from 'socket.io';
+import type { Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import * as jwt from 'jsonwebtoken';
-import { ExtendedError } from 'socket.io/dist/namespace';
-import * as http from 'http';
+import type { ExtendedError } from 'socket.io/dist/namespace';
+import type * as http from 'http';
 import { createAdapter } from '@socket.io/redis-adapter';
 import { createChatNamespace } from './createChatNamespace';
 import {
@@ -14,12 +15,13 @@ import {
 } from 'redis';
 import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
+import type {
+  RabbitMQController} from 'common-common/src/rabbitmq';
 import {
   getRabbitMQConfig,
-  RabbitMQController,
   RascalSubscriptions,
 } from 'common-common/src/rabbitmq';
-import Rollbar from 'rollbar';
+import type Rollbar from 'rollbar';
 import { RedisCache, redisRetryStrategy } from 'common-common/src/redisCache';
 import { WebsocketNamespaces } from '../../shared/types';
 import {
@@ -28,7 +30,7 @@ import {
   publishToSnapshotRoom,
 } from './createNamespace';
 import { JWT_SECRET, REDIS_URL, VULTR_IP } from '../config';
-import { DB } from '../models';
+import type { DB } from '../models';
 
 const log = factory.getLogger(formatFilename(__filename));
 

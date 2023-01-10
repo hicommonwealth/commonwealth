@@ -2,7 +2,8 @@ import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/moloch/processor';
-import { Api, RawEvent, EventKind } from '../../../src/chains/moloch/types';
+import type { Api, RawEvent} from '../../../src/chains/moloch/types';
+import { EventKind } from '../../../src/chains/moloch/types';
 
 const { assert } = chai;
 

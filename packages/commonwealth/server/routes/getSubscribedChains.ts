@@ -1,5 +1,5 @@
-import { DB } from '../models';
-import { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
+import type { NextFunction, Request, Response } from 'express';
 import { AppError } from 'common-common/src/errors';
 import { CHAIN_EVENT_SERVICE_SECRET } from '../config';
 

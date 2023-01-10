@@ -1,25 +1,27 @@
 /**
  * Processes events during migration, upgrading from simple notifications to entities.
  */
-import { WhereOptions } from 'sequelize';
-import {
+import type { WhereOptions } from 'sequelize';
+import type {
   RabbitMQController,
-  RascalPublications,
   RmqCENotificationCUD,
-  RmqCETypeCUD,
+  RmqCETypeCUD} from 'common-common/src/rabbitmq';
+import {
+  RascalPublications
 } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
 
+import type {
+  CWEvent,
+  IChainEventData} from '../../../src';
 import {
   IEventHandler,
-  CWEvent,
   eventToEntity,
   getUniqueEntityKey,
-  IChainEventData,
   EntityEventKind,
 } from '../../../src';
-import { DB } from '../../database/database';
-import {
+import type { DB } from '../../database/database';
+import type {
   ChainEventAttributes,
   ChainEventInstance,
 } from '../../database/models/chain_event';

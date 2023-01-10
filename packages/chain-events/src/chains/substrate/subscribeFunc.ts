@@ -1,12 +1,13 @@
 import { WsProvider } from '@polkadot/rpc-provider/ws';
 import { ApiPromise } from '@polkadot/api/promise';
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { RegisteredTypes } from '@polkadot/types/types';
 
-import {
+import type {
   IDisconnectedRange,
   CWEvent,
   SubscribeFunc,
-  ISubscribeOptions,
+  ISubscribeOptions} from '../../interfaces';
+import {
   SupportedNetwork,
 } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
@@ -14,8 +15,8 @@ import { addPrefix, factory } from '../../logging';
 import { Subscriber } from './subscriber';
 import { Poller } from './poller';
 import { Processor } from './processor';
-import { Block, IEventData } from './types';
-import { EnricherConfig } from './filters/enricher';
+import type { Block, IEventData } from './types';
+import type { EnricherConfig } from './filters/enricher';
 
 export interface ISubstrateSubscribeOptions
   extends ISubscribeOptions<ApiPromise> {

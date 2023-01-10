@@ -8,7 +8,7 @@ import $ from 'jquery';
 import 'modals/new_topic_modal.scss';
 
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { QuillEditor } from 'views/components/quill/quill_editor';
+import type { QuillEditor } from 'views/components/quill/quill_editor';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 
 import { pluralizeWithoutNumberPrefix } from 'helpers';

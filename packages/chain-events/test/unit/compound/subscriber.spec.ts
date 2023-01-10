@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import chai from 'chai';
 
 import { Subscriber } from '../../../src/chains/compound/subscriber';
-import { Api, RawEvent } from '../../../src/chains/compound/types';
+import type { Api, RawEvent } from '../../../src/chains/compound/types';
 
 const { assert } = chai;
 

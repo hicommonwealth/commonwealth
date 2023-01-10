@@ -1,6 +1,7 @@
-import { ChainNetwork } from 'common-common/src/types';
+import type { ChainNetwork } from 'common-common/src/types';
 
-import { CWEvent, IEventHandler } from '../interfaces';
+import type { CWEvent} from '../interfaces';
+import { IEventHandler } from '../interfaces';
 import { addPrefix, factory } from '../logging';
 
 export class ErcLoggingHandler extends IEventHandler {

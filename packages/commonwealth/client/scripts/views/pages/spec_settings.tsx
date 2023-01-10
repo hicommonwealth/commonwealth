@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { RegisteredTypes } from '@polkadot/types/types';
 
 import 'pages/spec_settings.scss';
 

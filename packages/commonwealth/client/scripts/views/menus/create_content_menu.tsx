@@ -7,12 +7,12 @@ import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWPopoverMenu } from '../components/component_kit/cw_popover/cw_popover_menu';
-import { MenuItem } from '../components/component_kit/types';
+import type { MenuItem } from '../components/component_kit/types';
 import { CWSidebarMenu } from '../components/component_kit/cw_sidebar_menu';
 
 const getCreateContentMenuItems = (): MenuItem[] => {

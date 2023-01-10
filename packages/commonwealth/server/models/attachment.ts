@@ -1,8 +1,8 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { CommentAttributes } from './comment';
-import { ThreadAttributes } from './thread';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ModelStatic, ModelInstance } from './types';
+import type { CommentAttributes } from './comment';
+import type { ThreadAttributes } from './thread';
 
 export type AttachmentAttributes = {
   attachable: string;

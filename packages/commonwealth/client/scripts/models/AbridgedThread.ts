@@ -1,7 +1,7 @@
-import moment from 'moment';
+import type moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
-import { IUniqueId } from './interfaces';
-import Topic from './Topic';
+import type { IUniqueId } from './interfaces';
+import type Topic from './Topic';
 
 class AbridgedThread implements IUniqueId {
   public readonly id: number;

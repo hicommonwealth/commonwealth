@@ -4,9 +4,9 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
+import type { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
 import { notifyError } from 'controllers/app/notifications';
-import NearSputnik from 'controllers/chain/near/sputnik/adapter';
+import type NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/cw_button';

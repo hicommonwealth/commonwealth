@@ -3,7 +3,7 @@ import { validateRule } from '../../../server/util/rules/ruleParser';
 import AllRule from '../../../server/ruleTypes/all';
 import * as modelUtils from '../../util/modelUtils';
 import models from '../../../server/database';
-import { DefaultSchemaT } from '../../../server/util/rules/ruleTypes';
+import type { DefaultSchemaT } from '../../../server/util/rules/ruleTypes';
 
 describe('All rule tests', () => {
   let loggedInAddr: string;

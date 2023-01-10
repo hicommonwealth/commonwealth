@@ -1,9 +1,10 @@
-import { ApiStatus, IApp } from 'state';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
 import Web3 from 'web3';
 import m from 'mithril';
 import moment from 'moment';
 
-import {
+import type {
   NodeInfo,
   ITXModalData,
   ITXData,
@@ -11,7 +12,7 @@ import {
   ChainInfo,
 } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import EthereumAccount from './account';
+import type EthereumAccount from './account';
 
 const ETHEREUM_BLOCK_TIME = 13;
 export interface IEthereumTXData extends ITXData {

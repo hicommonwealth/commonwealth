@@ -1,4 +1,4 @@
-import { Response, NextFunction } from 'express';
+import type { Response, NextFunction } from 'express';
 import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {

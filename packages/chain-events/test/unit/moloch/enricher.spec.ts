@@ -1,7 +1,8 @@
 import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
-import { EventKind, RawEvent, Api } from '../../../src/chains/moloch/types';
+import type { RawEvent, Api } from '../../../src/chains/moloch/types';
+import { EventKind } from '../../../src/chains/moloch/types';
 import { Enrich } from '../../../src/chains/moloch/filters/enricher';
 
 const { assert } = chai;

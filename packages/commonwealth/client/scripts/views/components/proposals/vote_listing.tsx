@@ -9,11 +9,12 @@ import app from 'state';
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
-import {
+import type {
   IVote,
+  AnyProposal} from 'models';
+import {
   DepositVote,
   BinaryVote,
-  AnyProposal,
   VotingUnit,
 } from 'models';
 import { CosmosVote } from 'controllers/chain/cosmos/proposal';

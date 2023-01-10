@@ -6,7 +6,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
-import {
+import type {
   SubSectionAttrs,
   SectionGroupAttrs,
   SidebarSectionAttrs,

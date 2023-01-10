@@ -3,7 +3,7 @@
 import { Op } from 'sequelize';
 import JobRunner from 'common-common/src/cacheJobRunner';
 
-import { DB } from '../models';
+import type { DB } from '../models';
 
 export const BanErrors = {
   NoAddress: 'Address not found',

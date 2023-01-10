@@ -14,7 +14,7 @@ import {
 } from './helpers';
 import { ComponentType } from '../types';
 import { getClasses } from '../helpers';
-import { TooltipType } from './cw_tooltip';
+import type { TooltipType } from './cw_tooltip';
 
 export type PopoverInteractionType = 'click' | 'hover';
 

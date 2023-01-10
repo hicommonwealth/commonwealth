@@ -8,7 +8,8 @@ import { AaveTypes, CompoundTypes } from 'chain-events/src';
 import 'components/proposal_card/index.scss';
 
 import { blocknumToDuration, formatNumberLong } from 'helpers';
-import { ProposalStatus, AnyProposal } from 'models';
+import type { AnyProposal } from 'models';
+import { ProposalStatus } from 'models';
 import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
 import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
 import MolochProposal, {

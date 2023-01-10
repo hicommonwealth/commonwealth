@@ -1,5 +1,6 @@
+import type {
+  IPagination} from '../../../common-common/src/api/extApiTypes';
 import {
-  IPagination,
   OrderByOptions,
 } from '../../../common-common/src/api/extApiTypes';
 

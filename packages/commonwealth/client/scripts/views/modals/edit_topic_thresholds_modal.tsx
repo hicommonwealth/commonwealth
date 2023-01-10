@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'modals/edit_topic_thresholds_modal.scss';
 
 import app from 'state';
-import { Topic } from 'models';
+import type { Topic } from 'models';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { TokenDecimalInput } from 'views/components/token_decimal_input';

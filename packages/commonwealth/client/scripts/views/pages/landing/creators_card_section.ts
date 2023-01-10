@@ -1,7 +1,7 @@
 import 'pages/landing/creators_card_section.scss';
 import m from 'mithril';
 
-import { ICardListItem } from 'models/interfaces';
+import type { ICardListItem } from 'models/interfaces';
 
 import LandingPageButton from './landing_page_button';
 import ItemListsMapper from './list_mapper_with_item';

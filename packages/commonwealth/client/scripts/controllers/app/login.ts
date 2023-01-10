@@ -8,14 +8,16 @@ import { isSameAccount } from 'helpers';
 
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
-import { ChainBase, WalletId } from 'common-common/src/types';
-import {
+import type { WalletId } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import type {
   ChainInfo,
+  BlockInfo} from 'models';
+import {
   SocialAccount,
   Account,
   AddressInfo,
-  ITokenAdapter,
-  BlockInfo,
+  ITokenAdapter
 } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';

@@ -1,6 +1,6 @@
-import { RmqEntityCUD } from './chainEntityCUD';
-import { RmqCENotificationCUD } from './chainEventNotificationsCUD';
-import { RmqCETypeCUD } from './chainEventTypeCUD';
+import type { RmqEntityCUD } from './chainEntityCUD';
+import type { RmqCENotificationCUD } from './chainEventNotificationsCUD';
+import type { RmqCETypeCUD } from './chainEventTypeCUD';
 
 export * from './chainEntityCUD';
 export * from './chainEventNotificationsCUD';
@@ -8,10 +8,10 @@ export * from './chainEventTypeCUD';
 
 export * from './chainEvents';
 export * from './chainEventNotification';
-import { RmqCWEvent } from './chainEvents';
-import { RmqCENotification } from './chainEventNotification';
-import { RmqSnapshotEvent } from './snapshotListener';
-import { RmqSnapshotNotification } from './snapshotNotification';
+import type { RmqCWEvent } from './chainEvents';
+import type { RmqCENotification } from './chainEventNotification';
+import type { RmqSnapshotEvent } from './snapshotListener';
+import type { RmqSnapshotNotification } from './snapshotNotification';
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ

@@ -1,6 +1,6 @@
-import { Logger } from 'typescript-logging';
+import type { Logger } from 'typescript-logging';
 
-import {
+import type {
   IEventHandler,
   IChainEventKind,
   IEventSubscriber,

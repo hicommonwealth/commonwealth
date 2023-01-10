@@ -1,5 +1,6 @@
-import { ISnapshotNotification } from '../../types';
-import { RmqMsgFormatError, RmqMsgNamespace } from 'common-common/src/rabbitmq';
+import type { ISnapshotNotification } from '../../types';
+import type { RmqMsgNamespace } from 'common-common/src/rabbitmq';
+import { RmqMsgFormatError } from 'common-common/src/rabbitmq';
 
 export const RmqSnapshotEvent: RmqMsgNamespace<ISnapshotNotification> = {
   getInvalidFormatError(event: any): RmqMsgFormatError {

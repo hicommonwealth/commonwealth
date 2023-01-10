@@ -5,8 +5,8 @@ import ClassComponent from 'class_component';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
-import { ITXModalData, ProposalModule } from 'models';
-import Substrate from 'controllers/chain/substrate/adapter';
+import type { ITXModalData, ProposalModule } from 'models';
+import type Substrate from 'controllers/chain/substrate/adapter';
 import { CWLabel } from '../../components/component_kit/cw_label';
 import User from '../../components/widgets/user';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';

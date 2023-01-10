@@ -1,5 +1,6 @@
-import { RmqMsgFormatError, RmqMsgNamespace } from 'common-common/src/rabbitmq';
-import { ChainEventNotification } from 'commonwealth/shared/types';
+import type { RmqMsgNamespace } from 'common-common/src/rabbitmq';
+import { RmqMsgFormatError } from 'common-common/src/rabbitmq';
+import type { ChainEventNotification } from 'commonwealth/shared/types';
 
 /**
  * This object is merged with the namespace with the same name below so that within one object we have the invalid

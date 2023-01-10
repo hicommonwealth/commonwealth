@@ -14,9 +14,10 @@ import {
   pluralize,
   threadStageToLabel,
 } from 'helpers';
-import {
+import type {
   Account,
-  Thread,
+  Thread} from 'models';
+import {
   ThreadStage as ThreadStageType,
   AddressInfo,
 } from 'models';

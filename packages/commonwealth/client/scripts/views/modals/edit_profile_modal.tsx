@@ -7,7 +7,7 @@ import $ from 'jquery';
 import 'modals/edit_profile_modal.scss';
 
 import app from 'state';
-import { Account } from 'models';
+import type { Account } from 'models';
 import { AvatarUpload } from 'views/components/avatar_upload';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/cw_button';

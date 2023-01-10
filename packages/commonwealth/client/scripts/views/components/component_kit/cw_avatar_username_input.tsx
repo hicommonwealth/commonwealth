@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_avatar_username_input.scss';
 
-import { Account } from 'models';
+import type { Account } from 'models';
 import { formatAddressShort } from 'helpers';
 import { CWText } from './cw_text';
 import { AvatarUpload } from '../avatar_upload';

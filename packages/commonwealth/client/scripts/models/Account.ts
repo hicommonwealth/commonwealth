@@ -1,9 +1,10 @@
 import $ from 'jquery';
 import app from 'state';
-import { ChainType, WalletId } from 'common-common/src/types';
+import type { WalletId } from 'common-common/src/types';
+import { ChainType } from 'common-common/src/types';
 
-import ChainInfo from './ChainInfo';
-import Profile from './Profile';
+import type ChainInfo from './ChainInfo';
+import type Profile from './Profile';
 
 class Account {
   public readonly address: string;

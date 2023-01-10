@@ -7,7 +7,7 @@ import moment from 'moment';
 import 'components/comments/comment.scss';
 
 import app from 'state';
-import { Account, Comment as CommentType } from 'models';
+import type { Account, Comment as CommentType } from 'models';
 import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';

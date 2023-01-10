@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 
-import { CWEvent, IEventHandler } from '../interfaces';
+import type { CWEvent, IEventHandler } from '../interfaces';
 import { addPrefix, factory } from '../logging';
 
 export class httpPostHandler implements IEventHandler {

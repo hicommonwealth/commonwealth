@@ -2,18 +2,20 @@ import sleep from 'sleep-promise';
 import _ from 'underscore';
 
 import { createProvider } from '../../eth';
-import {
+import type {
   CWEvent,
   SubscribeFunc,
-  ISubscribeOptions,
+  ISubscribeOptions} from '../../interfaces';
+import {
   SupportedNetwork,
 } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
-import { ERC721__factory as ERC721Factory, ERC721 } from '../../contractTypes';
+import type { ERC721 } from '../../contractTypes';
+import { ERC721__factory as ERC721Factory } from '../../contractTypes';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
-import { IEventData, RawEvent, IErc721Contracts } from './types';
+import type { IEventData, RawEvent, IErc721Contracts } from './types';
 
 export interface IErc721SubscribeOptions
   extends ISubscribeOptions<IErc721Contracts> {

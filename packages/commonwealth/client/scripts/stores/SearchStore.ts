@@ -1,4 +1,5 @@
-import { SearchResult, SearchQuery } from '../models';
+import type { SearchQuery } from '../models';
+import { SearchResult } from '../models';
 import { Store } from '.';
 
 class SearchStore extends Store<SearchResult> {

@@ -1,7 +1,8 @@
-import { DB } from '../../models';
+import type { DB } from '../../models';
 import { AppError, ServerError } from 'common-common/src/errors';
-import { TypedResponse, success, TypedRequestBody } from '../../types';
-import { RuleAttributes } from '../../models/rule';
+import type { TypedResponse, TypedRequestBody } from '../../types';
+import { success } from '../../types';
+import type { RuleAttributes } from '../../models/rule';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { validateRule } from '../../util/rules/ruleParser';

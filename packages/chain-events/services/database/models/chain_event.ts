@@ -1,12 +1,12 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
 
-import { ModelStatic, ModelInstance } from './types';
-import {
+import type { ModelStatic, ModelInstance } from './types';
+import type {
   ChainEventTypeAttributes,
   ChainEventTypeInstance,
 } from './chain_event_type';
-import { ChainEntityAttributes } from './chain_entity';
+import type { ChainEntityAttributes } from './chain_entity';
 
 export type ChainEventAttributes = {
   id: number;

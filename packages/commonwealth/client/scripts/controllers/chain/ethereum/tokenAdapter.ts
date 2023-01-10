@@ -3,8 +3,8 @@ import Ethereum from 'controllers/chain/ethereum/adapter';
 import BN from 'bn.js';
 import { ChainNetwork, ContractType } from 'common-common/src/types';
 import $ from 'jquery';
-import { ChainInfo, ITokenAdapter } from 'models';
-import { IApp } from 'state';
+import type { ChainInfo, ITokenAdapter } from 'models';
+import type { IApp } from 'state';
 
 export default class Token extends Ethereum implements ITokenAdapter {
   // required implementations for ITokenAdapter

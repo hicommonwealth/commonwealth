@@ -4,14 +4,15 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import type {
+  Permissions} from 'common-common/src/permissions';
 import {
   BASE_PERMISSIONS,
-  computePermissions,
-  Permissions,
+  computePermissions
 } from 'common-common/src/permissions';
 
 import { ProposalType } from 'common-common/src/types';
-import { Permission } from '../server/models/role';
+import type { Permission } from '../server/models/role';
 
 export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,

@@ -3,7 +3,8 @@ import { BalanceType } from 'common-common/src/types';
 import Web3 from 'web3';
 
 import { TokenBalanceCache } from '../src/tbc';
-import { BalanceProvider, IChainNode } from '../src/types';
+import type { IChainNode } from '../src/types';
+import { BalanceProvider } from '../src/types';
 
 class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
   public readonly name = 'test-provider';

@@ -3,10 +3,10 @@ declare let window: any;
 import app from 'state';
 import Web3 from 'web3';
 import $ from 'jquery';
-import { provider } from 'web3-core';
+import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, BlockInfo, IWebWallet } from 'models';
+import type { Account, BlockInfo, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 

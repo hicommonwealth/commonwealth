@@ -1,5 +1,6 @@
-import express, { Request, Response } from 'express';
-import { ISnapshotNotification } from 'common-common/src/types';
+import type { Request, Response } from 'express';
+import express from 'express';
+import type { ISnapshotNotification } from 'common-common/src/types';
 import {
   RascalPublications,
   RabbitMQController,

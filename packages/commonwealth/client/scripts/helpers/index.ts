@@ -1,9 +1,10 @@
 import $ from 'jquery';
-import m, { RouteOptions } from 'mithril';
+import type { RouteOptions } from 'mithril';
+import m from 'mithril';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ICardListItem } from 'models/interfaces';
+import type { ICardListItem } from 'models/interfaces';
 import app from 'state';
 import { ThreadStage } from 'models';
 import { navigateToSubpage } from '../app';

@@ -1,4 +1,4 @@
-import * as Rascal from 'rascal';
+import type * as Rascal from 'rascal';
 import {
   RascalBindings,
   RascalExchanges,

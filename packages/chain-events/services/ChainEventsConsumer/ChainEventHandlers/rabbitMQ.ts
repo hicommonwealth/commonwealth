@@ -1,10 +1,11 @@
-import Rascal from 'rascal';
+import type Rascal from 'rascal';
+import type {
+  RascalPublications} from 'common-common/src/rabbitmq';
 import {
-  RascalPublications,
   RabbitMQController,
 } from 'common-common/src/rabbitmq';
 
-import { CWEvent, IEventHandler } from 'chain-events/src';
+import type { CWEvent, IEventHandler } from 'chain-events/src';
 
 export class RabbitMqHandler
   extends RabbitMQController

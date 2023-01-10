@@ -1,5 +1,5 @@
 import fetch from 'node-fetch';
-import { RascalQueues, RascalExchanges, RascalRoutingKeys } from './types';
+import type { RascalQueues, RascalExchanges, RascalRoutingKeys } from './types';
 
 /*
 For more information on any of these routes and their behaviour/return values check:

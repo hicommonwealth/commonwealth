@@ -3,8 +3,9 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
-import { CodeResult } from 'near-api-js/lib/providers/provider';
+import type { ConnectConfig} from 'near-api-js';
+import { connect as nearConnect, keyStores } from 'near-api-js';
+import type { CodeResult } from 'near-api-js/lib/providers/provider';
 
 import 'pages/create_community.scss';
 
@@ -18,7 +19,7 @@ import { MixpanelCommunityCreationEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 
 import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState } from './types';
+import type { ChainFormFields, ChainFormState } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CommunityType } from '.';
 

@@ -6,13 +6,13 @@ import app from 'state';
 
 import 'pages/login/login_desktop_sidebar.scss';
 
-import { IWebWallet } from 'models';
+import type { IWebWallet } from 'models';
 import { ChainNetwork } from 'common-common/src/types';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWAccountCreationButton } from '../../components/component_kit/cw_account_creation_button';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { LoginText } from './login_text';
-import { LoginSidebarType } from './types';
+import type { LoginSidebarType } from './types';
 
 function generateText(wallets: Array<IWebWallet<any>>) {
   if (wallets.length === 0) {

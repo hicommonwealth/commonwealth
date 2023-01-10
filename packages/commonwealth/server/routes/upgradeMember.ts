@@ -1,14 +1,15 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { isAddress } from 'web3-utils';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import type {
+  RoleInstanceWithPermission} from '../util/roles';
 import {
   createRole,
   findAllRoles,
-  findOneRole,
-  RoleInstanceWithPermission,
+  findOneRole
 } from '../util/roles';
 
 const log = factory.getLogger(formatFilename(__filename));

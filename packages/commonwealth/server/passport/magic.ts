@@ -1,15 +1,16 @@
 import passport from 'passport';
-import { Magic, MagicUserMetadata } from '@magic-sdk/admin';
+import type { MagicUserMetadata } from '@magic-sdk/admin';
+import { Magic } from '@magic-sdk/admin';
 import { Strategy as MagicStrategy } from 'passport-magic';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
 
 import '../types';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { sequelize } from '../database';
 import { MAGIC_API_KEY, MAGIC_SUPPORTED_BASES } from '../config';
 import validateChain from '../middleware/validateChain';
-import { ProfileAttributes } from '../models/profile';
+import type { ProfileAttributes } from '../models/profile';
 
 import { AppError, ServerError } from 'common-common/src/errors';
 import { createRole } from '../util/roles';

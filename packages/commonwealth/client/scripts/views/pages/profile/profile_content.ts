@@ -2,9 +2,10 @@ import m from 'mithril';
 
 import app from 'state';
 import { pluralize } from 'helpers';
-import { Thread, Account } from 'models';
+import type { Account } from 'models';
+import { Thread } from 'models';
 
-import { UserContent } from './index';
+import type { UserContent } from './index';
 import ProfileCommentGroup from './profile_comment_group';
 import ProfileProposal from './profile_proposal';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';

@@ -8,7 +8,7 @@ import 'components/sidebar/index.scss';
 import app from 'state';
 import { handleRedirectClicks } from '../../../helpers';
 import { SidebarSectionGroup } from './sidebar_section';
-import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
+import type { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { verifyCachedToggleTree } from './helpers';
 
 function setDiscussionsToggleTree(path: string, toggle: boolean) {

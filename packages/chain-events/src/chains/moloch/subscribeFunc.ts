@@ -6,10 +6,11 @@ import {
   Moloch1__factory as Moloch1Factory,
   Moloch2__factory as Moloch2Factory,
 } from '../../contractTypes';
-import {
+import type {
   IDisconnectedRange,
   CWEvent,
-  SubscribeFunc,
+  SubscribeFunc} from '../../interfaces';
+import {
   SupportedNetwork,
 } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
@@ -17,7 +18,7 @@ import { addPrefix, factory } from '../../logging';
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
 import { StorageFetcher } from './storageFetcher';
-import { IEventData, RawEvent, Api, SubscribeOptions } from './types';
+import type { IEventData, RawEvent, Api, SubscribeOptions } from './types';
 
 /**
  * Attempts to open an API connection, retrying if it cannot be opened.

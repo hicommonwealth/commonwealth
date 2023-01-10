@@ -8,7 +8,7 @@ import 'pages/view_proposal/proposal_components.scss';
 import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
-import MolochMember from 'controllers/chain/ethereum/moloch/member';
+import type MolochMember from 'controllers/chain/ethereum/moloch/member';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   getStatusClass,

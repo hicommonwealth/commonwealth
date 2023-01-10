@@ -3,16 +3,17 @@ import { isAddress, toChecksumAddress } from 'web3-utils';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 
-import { TypedRequestBody, TypedResponse, success } from '../types';
+import type { TypedRequestBody, TypedResponse} from '../types';
+import { success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
-import { DB } from '../models';
+import type { DB } from '../models';
 import { sequelize } from '../database';
-import { ProfileAttributes } from '../models/profile';
+import type { ProfileAttributes } from '../models/profile';
 import { DynamicTemplate } from '../../shared/types';
 
 import { AppError, ServerError } from 'common-common/src/errors';
-import { UserAttributes } from '../models/user';
-import { AddressAttributes } from '../models/address';
+import type { UserAttributes } from '../models/user';
+import type { AddressAttributes } from '../models/address';
 
 import { redirectWithLoginError } from './finishEmailLogin';
 import { mixpanelTrack } from '../util/mixpanelUtil';

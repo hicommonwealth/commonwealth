@@ -10,7 +10,7 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { MixpanelSnapshotEvents } from 'analytics/types';
 
-import { SnapshotProposal } from 'helpers/snapshot_utils';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { SnapshotProposalCard } from './snapshot_proposal_card';
 import { CardsCollection } from '../../components/cards_collection';

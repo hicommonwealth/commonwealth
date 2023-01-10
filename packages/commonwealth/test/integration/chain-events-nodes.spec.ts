@@ -1,5 +1,6 @@
 import chai from 'chai';
-import { spawn, ChildProcess } from 'child_process';
+import type { ChildProcess } from 'child_process';
+import { spawn } from 'child_process';
 import { Pool, Client } from 'pg';
 import format from 'pg-format';
 import fetch from 'node-fetch';

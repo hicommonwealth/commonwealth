@@ -1,17 +1,19 @@
 import Sequelize from 'sequelize';
-import {
+import type {
   GetProfilesReq,
-  GetProfilesResp,
+  GetProfilesResp} from 'common-common/src/api/extApiTypes';
+import {
   needParamErrMsg,
 } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
-import {
+import type {
   TypedRequestQuery,
-  TypedResponse,
+  TypedResponse} from '../../types';
+import {
   success,
   failure,
 } from '../../types';
-import { DB } from '../../models';
+import type { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 
 const { Op } = Sequelize;

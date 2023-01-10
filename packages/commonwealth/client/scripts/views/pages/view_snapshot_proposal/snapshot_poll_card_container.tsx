@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 import moment from 'moment';
 
 import app from 'state';
-import {
+import type {
   SnapshotProposal,
   SnapshotProposalVote,
   SnapshotSpace,

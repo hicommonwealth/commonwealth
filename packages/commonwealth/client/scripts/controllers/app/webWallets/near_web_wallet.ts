@@ -1,5 +1,5 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
+import type { Account, IWebWallet } from 'models';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of NEAR login
 // is handled through redirects involving the `/finishNearLogin` page.

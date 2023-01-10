@@ -1,10 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Contract, utils } from 'ethers';
+import type { Contract} from 'ethers';
+import { utils } from 'ethers';
 
-import { GovernorCompatibilityBravo } from '../../../contractTypes';
-import { TypedEventFilter } from '../../../contractTypes/commons';
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { EventKind, RawEvent, IEventData, Api } from '../types';
+import type { GovernorCompatibilityBravo } from '../../../contractTypes';
+import type { TypedEventFilter } from '../../../contractTypes/commons';
+import type { CWEvent} from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { RawEvent, IEventData, Api } from '../types';
+import { EventKind } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<infer Y, any> ? Y : never;
 type GetArgType<

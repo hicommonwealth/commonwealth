@@ -1,15 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { hexToAscii } from 'web3-utils';
 
-import { TypedEventFilter } from '../../../contractTypes/commons';
-import {
+import type { TypedEventFilter } from '../../../contractTypes/commons';
+import type {
   ICuratedProjectFactory,
-  ICuratedProject,
+  ICuratedProject} from '../../../contractTypes';
+import {
   // eslint-disable-next-line camelcase
   ICuratedProject__factory,
 } from '../../../contractTypes';
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { EventKind, RawEvent, IEventData, Api } from '../types';
+import type { CWEvent} from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { RawEvent, IEventData, Api } from '../types';
+import { EventKind } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
 

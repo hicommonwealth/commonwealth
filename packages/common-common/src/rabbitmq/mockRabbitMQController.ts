@@ -2,8 +2,8 @@ import {
   RabbitMQController,
   RabbitMQControllerError,
 } from './rabbitMQController';
-import * as Rascal from 'rascal';
-import { RascalPublications, RascalSubscriptions, TRmqMessages } from './types';
+import type * as Rascal from 'rascal';
+import type { RascalPublications, RascalSubscriptions, TRmqMessages } from './types';
 
 /**
  * This is a mock RabbitMQController whose functions simply log a 'success' message when called. Used mainly for

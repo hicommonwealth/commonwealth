@@ -1,8 +1,8 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { SubscriptionAttributes } from './subscription';
-import { ModelStatic, ModelInstance } from './types';
-import { NotificationAttributes } from './notification';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { SubscriptionAttributes } from './subscription';
+import type { ModelStatic, ModelInstance } from './types';
+import type { NotificationAttributes } from './notification';
 
 export type NotificationsReadAttributes = {
   id: number;

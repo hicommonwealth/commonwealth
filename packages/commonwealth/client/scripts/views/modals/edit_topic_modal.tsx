@@ -18,8 +18,8 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
 import { CWButton } from '../components/component_kit/cw_button';
-import { QuillEditor } from '../components/quill/quill_editor';
-import { QuillTextContents } from '../components/quill/types';
+import type { QuillEditor } from '../components/quill/quill_editor';
+import type { QuillTextContents } from '../components/quill/types';
 
 type EditTopicModalAttrs = {
   defaultOffchainTemplate: string;

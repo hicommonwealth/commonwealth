@@ -1,5 +1,5 @@
-import { Coin } from 'adapters/currency';
-import { IVote, IBalanceAccount } from './interfaces';
+import type { Coin } from 'adapters/currency';
+import type { IVote, IBalanceAccount } from './interfaces';
 
 export class DepositVote<C extends Coin> implements IVote<C> {
   public readonly account: IBalanceAccount<C>;

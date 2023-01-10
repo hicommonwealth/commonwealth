@@ -1,7 +1,7 @@
-import { Response, NextFunction, Request } from 'express';
+import type { Response, NextFunction, Request } from 'express';
 import { AppError, ServerError } from 'common-common/src/errors';
 
-import { DB } from '../../database/database';
+import type { DB } from '../../database/database';
 
 export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',

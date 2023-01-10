@@ -1,5 +1,5 @@
-import { Express } from 'express';
-import Router from 'express/lib/router/index';
+import type { Express } from 'express';
+import type Router from 'express/lib/router/index';
 import {
   getThreads,
   getThreadsValidation,
@@ -17,8 +17,8 @@ import getCommunities, {
 import getProfiles, {
   getProfilesValidation,
 } from 'commonwealth/server/routes/profiles/getProfiles';
-import { DB } from 'commonwealth/server/models';
-import { TokenBalanceCache } from 'token-balance-cache/src';
+import type { DB } from 'commonwealth/server/models';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import {
   getChainNodes,
   getChainNodesValidation,

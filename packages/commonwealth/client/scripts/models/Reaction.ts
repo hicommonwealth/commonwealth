@@ -1,4 +1,4 @@
-import { IUniqueId } from './interfaces';
+import type { IUniqueId } from './interfaces';
 
 class Reaction<T extends IUniqueId> {
   public readonly id: number;

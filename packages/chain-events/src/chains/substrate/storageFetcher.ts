@@ -6,9 +6,9 @@
  */
 
 import _ from 'underscore';
-import { ApiPromise } from '@polkadot/api';
-import { Option, Vec } from '@polkadot/types';
-import {
+import type { ApiPromise } from '@polkadot/api';
+import type { Option, Vec } from '@polkadot/types';
+import type {
   BalanceOf,
   AccountId,
   Hash,
@@ -20,20 +20,20 @@ import {
   PropIndex,
   OpenTip,
 } from '@polkadot/types/interfaces';
-import { Codec } from '@polkadot/types/types';
-import { DeriveProposalImage } from '@polkadot/api-derive/types';
+import type { Codec } from '@polkadot/types/types';
+import type { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction, hexToString } from '@polkadot/util';
 
-import {
+import type {
   CWEvent,
-  IChainEntityKind,
+  IChainEntityKind} from '../../interfaces';
+import {
   IStorageFetcher,
   SupportedNetwork,
 } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import {
-  EventKind,
+import type {
   IDemocracyProposed,
   IDemocracyStarted,
   IDemocracyPassed,
@@ -48,15 +48,17 @@ import {
   ISignalingVotingCompleted,
   IEventData,
   IIdentitySet,
-  parseJudgement,
   IdentityJudgement,
   ITreasuryBountyBecameActive,
   ITreasuryBountyAwarded,
   ITreasuryBountyEvents,
-  EntityKind,
   INewTip,
   ITipVoted,
-  ITipClosing,
+  ITipClosing} from './types';
+import {
+  EventKind,
+  parseJudgement,
+  EntityKind
 } from './types';
 
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {

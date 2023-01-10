@@ -1,21 +1,23 @@
 import { Op } from 'sequelize';
 import moment from 'moment';
 import { capitalize } from 'lodash';
+import type {
+  CWEvent,
+  SupportedNetwork,
+  IChainEventData} from 'chain-events/src';
 import {
   Label as ChainEventLabel,
-  CWEvent,
-  IEventLabel,
-  SupportedNetwork,
-  IChainEventData,
+  IEventLabel
 } from 'chain-events/src';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { SENDGRID_API_KEY } from '../config';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
-import { IPostNotificationData, DynamicTemplate } from '../../shared/types';
-import { DB } from '../models';
-import { UserAttributes } from '../models/user';
+import type { IPostNotificationData} from '../../shared/types';
+import { DynamicTemplate } from '../../shared/types';
+import type { DB } from '../models';
+import type { UserAttributes } from '../models/user';
 
 const log = factory.getLogger(formatFilename(__filename));
 

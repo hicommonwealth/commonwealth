@@ -1,6 +1,8 @@
-import { CWEvent, SupportedNetwork } from 'chain-events/src';
-import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
-import { RmqMsgFormatError, RmqMsgNamespace } from './index';
+import type { CWEvent} from 'chain-events/src';
+import { SupportedNetwork } from 'chain-events/src';
+import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
+import type { RmqMsgNamespace } from './index';
+import { RmqMsgFormatError } from './index';
 
 interface IRmqMsgCreateCENotificationsCUD {
   ChainEvent: ChainEventAttributes;

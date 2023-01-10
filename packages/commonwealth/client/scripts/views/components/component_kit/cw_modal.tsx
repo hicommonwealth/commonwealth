@@ -9,7 +9,7 @@ import 'components/component_kit/cw_modal.scss';
 import { ComponentType } from './types';
 import { CWIconButton } from './cw_icon_button';
 import { breakpointFnValidator, getClasses } from './helpers';
-import { IconButtonTheme } from './cw_icons/types';
+import type { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
   onclick: (

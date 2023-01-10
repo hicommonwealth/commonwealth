@@ -1,9 +1,11 @@
-import {
+import type {
   LabelerFilter,
-  IEventLabel,
+  IEventLabel} from '../../../interfaces';
+import {
   SupportedNetwork,
 } from '../../../interfaces';
-import { IEventData, EventKind } from '../types';
+import type { IEventData} from '../types';
+import { EventKind } from '../types';
 
 /**
  * This a labeler function, which takes event data and describes it in "plain english",

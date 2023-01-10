@@ -5,14 +5,15 @@ import ClassComponent from 'class_component';
 
 import 'components/poll_card.scss';
 
+import type {
+  PollCardAttrs,
+  VoteInformation} from '../../components/poll_card';
 import {
   buildVoteDirectionString,
   CastVoteSection,
-  PollCardAttrs,
   PollOptions,
   ResultsSection,
-  VoteDisplay,
-  VoteInformation,
+  VoteDisplay
 } from '../../components/poll_card';
 import { CWCard } from '../../components/component_kit/cw_card';
 import { CWText } from '../../components/component_kit/cw_text';

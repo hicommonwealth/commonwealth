@@ -7,7 +7,8 @@ import 'components/reaction_button/comment_reaction_button.scss';
 
 import app from 'state';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { Thread, ChainInfo } from 'models';
+import type { ChainInfo } from 'models';
+import { Thread } from 'models';
 import {
   fetchReactionsByPost,
   getDisplayedReactorsForPopup,

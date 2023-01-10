@@ -3,14 +3,12 @@
 import $ from 'jquery';
 import app from 'state';
 
-import {
+import type {
   AddressInfo,
-  RoleInfo,
   SocialAccount,
   Account,
   StarredCommunity,
-  ChainInfo,
-} from 'models';
+  ChainInfo} from 'models';
 
 import NotificationsController from './notifications';
 import DraftsController from './drafts';

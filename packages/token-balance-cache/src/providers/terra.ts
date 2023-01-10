@@ -3,7 +3,8 @@ import axios from 'axios';
 import { BalanceType } from 'common-common/src/types';
 import { Bech32 } from '@cosmjs/encoding';
 
-import { BalanceProvider, IChainNode } from '../types';
+import type { IChainNode } from '../types';
+import { BalanceProvider } from '../types';
 
 export default class TerraBalanceProvider extends BalanceProvider {
   public name = 'terra';

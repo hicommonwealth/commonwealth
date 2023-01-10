@@ -1,4 +1,5 @@
-import { RmqMsgFormatError, RmqMsgNamespace } from './index';
+import type { RmqMsgNamespace } from './index';
+import { RmqMsgFormatError } from './index';
 
 interface IRmqMsgCreateEntityCUD {
   ce_id: number;

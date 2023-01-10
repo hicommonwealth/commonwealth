@@ -1,5 +1,6 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, ChainInfo, IWebWallet, BlockInfo } from 'models';
+import type { Account, IWebWallet, BlockInfo } from 'models';
+import type { ChainInfo } from 'models';
 import app from 'state';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';

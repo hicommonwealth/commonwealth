@@ -1,11 +1,11 @@
-import BN from 'bn.js';
-import moment from 'moment';
-import { EventEmitter } from 'events';
-import { Coin } from 'adapters/currency';
-import { IIdentifiable } from 'adapters/shared';
-import { TransactionStatus } from './types';
-import Account from './Account';
-import StorageModule from './StorageModule';
+import type BN from 'bn.js';
+import type moment from 'moment';
+import type { EventEmitter } from 'events';
+import type { Coin } from 'adapters/currency';
+import type { IIdentifiable } from 'adapters/shared';
+import type { TransactionStatus } from './types';
+import type Account from './Account';
+import type StorageModule from './StorageModule';
 
 export interface IBlockInfo {
   height: number;

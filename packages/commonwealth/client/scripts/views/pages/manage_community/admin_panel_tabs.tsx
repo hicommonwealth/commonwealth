@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 
-import { Webhook, RoleInfo } from 'models';
+import type { Webhook, RoleInfo } from 'models';
 import { WebhooksForm } from './webhooks_form';
 import { UpgradeRolesForm } from './upgrade_roles_form';
 import { CWTabBar, CWTab } from '../../components/component_kit/cw_tabs';

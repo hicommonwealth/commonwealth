@@ -2,8 +2,9 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import { WalletAccount, WalletConnection } from 'near-api-js';
-import { FunctionCallOptions } from 'near-api-js/lib/account';
+import type { WalletConnection } from 'near-api-js';
+import { WalletAccount } from 'near-api-js';
+import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import BN from 'bn.js';
 import $ from 'jquery';
 
@@ -15,9 +16,9 @@ import {
   setActiveAccount,
   completeClientLogin,
 } from 'controllers/app/login';
-import { Account } from 'models';
-import Near from 'controllers/chain/near/adapter';
-import { NearAccount } from 'controllers/chain/near/account';
+import type { Account } from 'models';
+import type Near from 'controllers/chain/near/adapter';
+import type { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';

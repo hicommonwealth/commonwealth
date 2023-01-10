@@ -1,18 +1,19 @@
 import * as fs from 'fs';
-import { IEventHandler, CWEvent } from 'chain-events/src';
+import type { IEventHandler, CWEvent } from 'chain-events/src';
 
 import ceModels, { sequelize } from '../services/database/database';
 import cwModels from '../../commonwealth/server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { ChainInstance } from 'commonwealth/server/models/chain';
+import type { ChainInstance } from 'commonwealth/server/models/chain';
 import { SubstrateTypes } from '../src';
+import type {
+  StorageFilterConfig} from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   EntityArchivalHandler,
   NotificationHandler,
-  StorageFilterConfig,
   StorageHandler,
 } from '../services/ChainEventsConsumer/ChainEventHandlers';
-import { BrokerConfig } from 'rascal';
+import type { BrokerConfig } from 'rascal';
 import {
   MockRabbitMQController,
   getRabbitMQConfig,

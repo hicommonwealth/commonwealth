@@ -1,9 +1,9 @@
 /* eslint-disable func-names */
 /* eslint-disable dot-notation */
-import { ApiPromise } from '@polkadot/api';
-import { Option } from '@polkadot/types';
-import { IdentityJudgement, AccountVote } from '@polkadot/types/interfaces';
-import { Codec } from '@polkadot/types/types';
+import type { ApiPromise } from '@polkadot/api';
+import type { Option } from '@polkadot/types';
+import type { IdentityJudgement, AccountVote } from '@polkadot/types/interfaces';
+import type { Codec } from '@polkadot/types/types';
 
 import { IdentityJudgement as JudgementEnum } from '../../../src/chains/substrate/types';
 

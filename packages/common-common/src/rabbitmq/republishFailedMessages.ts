@@ -1,4 +1,4 @@
-import { RabbitMQController } from './rabbitMQController';
+import type { RabbitMQController } from './rabbitMQController';
 import { factory, formatFilename } from '../logging';
 
 const log = factory.getLogger(formatFilename(__filename));

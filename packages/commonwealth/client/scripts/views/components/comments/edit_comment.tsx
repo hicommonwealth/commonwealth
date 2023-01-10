@@ -6,12 +6,12 @@ import ClassComponent from 'class_component';
 import 'components/comments/edit_comment.scss';
 
 import app from 'state';
-import { Comment } from 'models';
+import type { Comment } from 'models';
 import { ContentType } from 'types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { clearEditingLocalStorage } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
-import { QuillEditor } from '../quill/quill_editor';
+import type { QuillEditor } from '../quill/quill_editor';
 import { QuillEditorComponent } from '../quill/quill_editor_component';
 
 type EditCommentAttrs = {

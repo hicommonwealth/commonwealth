@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import chai from 'chai';
 import BN from 'bn.js';
-import {
+import type {
   AccountId,
   PropIndex,
   Hash,
@@ -18,15 +18,16 @@ import {
   RewardPoint,
   OpenTip,
 } from '@polkadot/types/interfaces';
-import {
+import type {
   DeriveDispatch,
   DeriveProposalImage,
   DeriveBounties,
 } from '@polkadot/api-derive/types';
-import { Vec, bool, Data, TypeRegistry, Option, Bytes } from '@polkadot/types';
-import { Codec, ITuple, TypeDef } from '@polkadot/types/types';
+import type { Vec, bool, Option, Bytes } from '@polkadot/types';
+import { Data, TypeRegistry } from '@polkadot/types';
+import type { Codec, ITuple, TypeDef } from '@polkadot/types/types';
 import { stringToHex } from '@polkadot/util';
-import {
+import type {
   OffenceDetails,
   ReportIdOf,
 } from '@polkadot/types/interfaces/offences';

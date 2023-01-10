@@ -5,8 +5,8 @@ import ClassComponent from 'class_component';
 
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 
-import { ChainInfo } from 'models';
-import { IEventLabel } from '../../../../../../chain-events/src';
+import type { ChainInfo } from 'models';
+import type { IEventLabel } from '../../../../../../chain-events/src';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';

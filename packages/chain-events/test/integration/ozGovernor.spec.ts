@@ -4,30 +4,33 @@ import { EventEmitter } from 'events';
 
 import chai, { expect } from 'chai';
 import { ethers } from 'hardhat';
-import { BigNumber, BigNumberish, utils } from 'ethers';
-import type { Signer, providers } from 'ethers';
+import { BigNumber, utils } from 'ethers';
+import type { Signer, providers , BigNumberish} from 'ethers';
 
-import {
+import type {
   GovernorMock,
-  GovernorMock__factory as GovernorMockFactory,
   ERC20VotesMock,
+  TimelockController} from '../../src/contractTypes';
+import {
+  GovernorMock__factory as GovernorMockFactory,
   ERC20VotesMock__factory as ERC20VotesMockFactory,
-  TimelockController,
   TimelockController__factory as TimelockControllerFactory,
 } from '../../src/contractTypes';
-import {
-  BravoSupport,
-  EventKind,
+import type {
   IEventData,
   IProposalCanceled,
   IProposalCreated,
   IProposalExecuted,
   IProposalQueued,
-  IVoteCast,
+  IVoteCast} from '../../src/chains/compound/types';
+import {
+  BravoSupport,
+  EventKind,
   ProposalState,
 } from '../../src/chains/compound/types';
 import { subscribeEvents } from '../../src/chains/compound';
-import { CWEvent, IChainEventData, IEventHandler } from '../../src';
+import type { CWEvent, IChainEventData} from '../../src';
+import { IEventHandler } from '../../src';
 
 const { assert } = chai;
 

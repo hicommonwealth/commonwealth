@@ -1,6 +1,6 @@
-import { DB } from '../models';
+import type { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
-import { Response, NextFunction, Request } from 'express';
+import type { Response, NextFunction, Request } from 'express';
 import { CHAIN_EVENT_SERVICE_SECRET } from '../config';
 import { QueryTypes } from 'sequelize';
 

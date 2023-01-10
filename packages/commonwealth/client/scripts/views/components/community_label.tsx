@@ -7,7 +7,7 @@ import 'components/community_label.scss';
 
 import { CWText } from './component_kit/cw_text';
 import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
-import { IconSize } from './component_kit/cw_icons/types';
+import type { IconSize } from './component_kit/cw_icons/types';
 
 type CommunityLabelAttrs = {
   community: any;

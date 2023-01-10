@@ -14,7 +14,7 @@ import {
   proposalSlugToFriendlyName,
   chainToProposalSlug,
 } from 'identifiers';
-import { ProposalModule } from 'models';
+import type { ProposalModule } from 'models';
 import { PageNotFound } from '../404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { AaveProposalForm } from './aave_proposal_form';

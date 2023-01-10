@@ -4,11 +4,11 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { ITXModalData, IWebWallet } from 'models';
+import type { ITXModalData, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
-import PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { NextFn } from './types';
+import type PolkadotWebWalletController from 'controllers/app/webWallets/polkadot_web_wallet';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { NextFn } from './types';
 import { setupEventListeners } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { CWText } from '../component_kit/cw_text';

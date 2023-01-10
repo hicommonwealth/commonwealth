@@ -17,7 +17,7 @@ import { IdRow, InputRow } from 'views/components/metadata_rows';
 import { baseToNetwork } from '../../../helpers';
 import { initChainForm, defaultChainRows } from './chain_input_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ChainFormFields, ChainFormState } from './types';
+import type { ChainFormFields, ChainFormState } from './types';
 import { CommunityType } from '.';
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';

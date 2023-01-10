@@ -1,7 +1,7 @@
 import request from 'superagent';
 import { Op } from 'sequelize';
 import { capitalize } from 'lodash';
-import { CWEvent } from 'chain-events/src/interfaces';
+import type { CWEvent } from 'chain-events/src/interfaces';
 import { Label as ChainEventLabel } from 'chain-events/src/util';
 
 import { NotificationCategories } from 'common-common/src/types';

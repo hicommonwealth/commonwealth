@@ -1,19 +1,21 @@
 import EthDater from 'ethereum-block-by-date';
 
-import {
+import type {
   CWEvent,
-  IDisconnectedRange,
+  IDisconnectedRange} from '../../interfaces';
+import {
   SupportedNetwork,
 } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 
-import {
+import type {
   Api,
   EventKind,
-  IEventData,
   ListenerOptions as MolochListenerOptions,
-  RawEvent,
+  RawEvent} from './types';
+import {
+  IEventData
 } from './types';
 
 import { createApi, Processor, StorageFetcher, Subscriber } from '.';

@@ -1,8 +1,8 @@
 // Adapted from:
 // https://github.com/uber-archive/express-statsd/blob/master/lib/express-statsd.js
 
-import { StatsD } from 'hot-shots';
-import { Request, Response, NextFunction } from 'express';
+import type { StatsD } from 'hot-shots';
+import type { Request, Response, NextFunction } from 'express';
 import { ProjectTag } from 'common-common/src/statsd';
 
 export default function expressStatsdInit(client: StatsD) {

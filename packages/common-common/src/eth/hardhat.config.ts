@@ -1,7 +1,7 @@
 // eslint-disable-next-line
 import 'hardhat-typechain';
 import '@nomiclabs/hardhat-ethers';
-import { HardhatUserConfig } from 'hardhat/types';
+import type { HardhatUserConfig } from 'hardhat/types';
 
 const config: HardhatUserConfig = {
   networks: {

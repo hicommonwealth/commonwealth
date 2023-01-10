@@ -14,7 +14,7 @@ import {
 } from 'common-common/src/types';
 import { handleRedirectClicks } from 'helpers';
 import { SidebarSectionGroup } from './sidebar_section';
-import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
+import type { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { verifyCachedToggleTree } from './helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {

@@ -3,8 +3,9 @@ import models from 'server/database';
 import chai from 'chai';
 import 'chai/register-should';
 import { req, res } from 'test/unit/unitHelpers';
+import type {
+  GetThreadsReq} from 'common-common/src/api/extApiTypes';
 import {
-  GetThreadsReq,
   OrderByOptions,
 } from 'common-common/src/api/extApiTypes';
 import 'test/integration/api/external/dbEntityHooks.spec';
@@ -12,7 +13,7 @@ import {
   testComments,
   testThreads,
 } from 'test/integration/api/external/dbEntityHooks.spec';
-import { ThreadAttributes } from 'server/models/thread';
+import type { ThreadAttributes } from 'server/models/thread';
 import { get } from 'test/integration/api/external/appHook.spec';
 
 describe('getThreads Tests', () => {

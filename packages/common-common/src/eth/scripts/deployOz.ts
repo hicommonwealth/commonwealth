@@ -1,12 +1,14 @@
-import { providers, Signer } from 'ethers';
-import { BigNumberish } from '@ethersproject/bignumber';
+import type { Signer } from 'ethers';
+import { providers } from 'ethers';
+import type { BigNumberish } from '@ethersproject/bignumber';
 import Web3 from 'web3';
 
+import type {
+  ERC20VotesMock,
+  TimelockController} from '../types';
 import {
   GovernorMock__factory as GovernorMockFactory,
-  ERC20VotesMock,
   ERC20VotesMock__factory as ERC20VotesMockFactory,
-  TimelockController,
   TimelockController__factory as TimelockControllerFactory,
 } from '../types';
 

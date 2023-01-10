@@ -1,12 +1,13 @@
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 
-import EthereumAccount from 'controllers/chain/ethereum/account';
+import type EthereumAccount from 'controllers/chain/ethereum/account';
 import EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import { ChainBase, ContractType } from 'common-common/src/types';
-import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
+import type { ChainInfo} from 'models';
+import { IChainAdapter, NodeInfo } from 'models';
 
 import ChainEntityController from 'controllers/server/chain_entities';
-import { IApp } from 'state';
+import type { IApp } from 'state';
 
 import CommonwealthChain from './chain';
 import CommonwealthAPI from './api';
