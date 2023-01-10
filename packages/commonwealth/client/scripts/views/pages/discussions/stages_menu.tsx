@@ -79,6 +79,7 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
             <CWDivider />
             {stages.map((targetStage) => (
               <ThreadsFilterMenuItem
+                key={stage}
                 isSelected={stage === targetStage}
                 onClick={(e) => {
                   e.preventDefault();

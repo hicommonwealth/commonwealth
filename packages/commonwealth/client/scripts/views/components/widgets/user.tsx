@@ -216,7 +216,7 @@ class User extends ClassComponent<{
                     height: ` ${avatarSize}px`,
                   },
                 },
-                [profile && profile.getAvatar(avatarSize)]
+                profile && profile.getAvatar(avatarSize)
               ),
             app.chain &&
             app.chain.base === ChainBase.Substrate &&

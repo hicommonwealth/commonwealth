@@ -115,7 +115,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
 
         if (isLivingCommentTree(comment, children)) {
           return (
-            <React.Fragment>
+            <React.Fragment key={comment.id}>
               <Comment
                 comment={comment}
                 handleIsReplying={handleIsReplying}
