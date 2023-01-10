@@ -1,7 +1,7 @@
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 // import { Toast, ToasterPosition, Intent, Icons, Size } from 'construct-ui';
 import { uuidv4 } from 'lib/util';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
+// import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelErrorCaptureEvent } from 'analytics/types';
 import app from 'state';
 
@@ -37,12 +37,12 @@ export class ToastStore {
     redraw();
   }
   public createError(message) {
-    mixpanelBrowserTrack({
-      message,
-      community: app.activeChainId(),
-      isCustomDomain: app.isCustomDomain(),
-      event: MixpanelErrorCaptureEvent.ERROR_CAPTURED,
-    });
+    // mixpanelBrowserTrack({
+    //   message,
+    //   community: app.activeChainId(),
+    //   isCustomDomain: app.isCustomDomain(),
+    //   event: MixpanelErrorCaptureEvent.ERROR_CAPTURED,
+    // });
     const key = uuidv4();
     // const toast = render(Toast, {
     //   key,
