@@ -536,6 +536,10 @@ function setupRouter(
   router.get('/roles', controllers.getRoles.bind(this, models));
   router.post('/roles', controllers.createRole.bind(this, models));
   router.patch('/roles', controllers.updateRole.bind(this, models));
+  // permissions
+  router.get('/permissions', controllers.getPermissions.bind(this, models));
+  router.post('/permissions', controllers.createPermission.bind(this, models));
+  router.patch('/permissions', controllers.updatePermission.bind(this, models));
 
   router.get(
     '/bulkMembers',

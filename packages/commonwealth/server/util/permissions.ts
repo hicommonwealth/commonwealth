@@ -34,6 +34,7 @@ export enum Action {
   EDIT_ROLE = 24,
   DELETE_ROLE = 25,
   VIEW_ROLES = 26,
+  CREATE_PERMISSION = 27,
 }
 
 const defaultAdminPermissions = {

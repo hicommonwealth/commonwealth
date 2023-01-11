@@ -29,18 +29,12 @@ export async function getRoles(models: DB, req: Request, res: Response) {
   return res.json(result);
 }
 
-
 export async function createRole(models: DB, req: Request, res: Response) {
   if (!req.body) {
     return res.status(400).json({ error: 'No body provided' });
   }
 
-  const {
-    address,
-    role_id,
-    address_id,
-    chain_id
-  } = req.body;
+  const { address, role_id, address_id, chain_id } = req.body;
 
   if (!address) {
     return res.status(400).json({ error: 'No address provided' });
@@ -55,7 +49,7 @@ export async function createRole(models: DB, req: Request, res: Response) {
     address_id,
     chain_id,
     Action.CREATE_ROLE
-  )
+  );
   if (!permitted) {
     return res.status(403).json({ error: 'Not permitted to create role' });
   }
@@ -112,6 +106,131 @@ export async function updateRole(models: DB, req: Request, res: Response) {
     `,
     {
       replacements: { address, role_id },
+      type: QueryTypes.UPDATE,
+    }
+  );
+
+  return res.json(result);
+}
+
+export async function getPermissions(models: DB, req: Request, res: Response) {
+  if (!req.query) {
+    return res.status(400).json({ error: 'No query provided' });
+  }
+
+  const { address } = req.query;
+  if (!address) {
+    return res.status(400).json({ error: 'No address provided' });
+  }
+
+  const result = await models.sequelize.query(
+    `SELECT "Permissions".* FROM "Profiles"
+    JOIN "Addresses" ON "Addresses"."user_id" = "Profiles"."user_id"
+    JOIN "RoleAssignments" ON "RoleAssignments"."address_id" = "Profiles"."user_id"
+    JOIN "CommunityRoles" ON "RoleAssignments"."community_role_id" = "CommunityRoles"."id"
+    JOIN "Permissions" ON "Permissions"."community_role_id" = "CommunityRoles"."id"
+    WHERE "Addresses"."address" = :address`,
+    {
+      replacements: { address },
+      type: QueryTypes.SELECT,
+    }
+  );
+
+  return res.json(result);
+}
+
+export async function createPermission(
+  models: DB,
+  req: Request,
+  res: Response
+) {
+  if (!req.body) {
+    return res.status(400).json({ error: 'No body provided' });
+  }
+
+  const { address, permission_id, address_id, chain_id } = req.body;
+
+  if (!address) {
+    return res.status(400).json({ error: 'No address provided' });
+  }
+
+  if (!permission_id) {
+    return res.status(400).json({ error: 'No permission_id provided' });
+  }
+
+  const permitted = await isAddressPermitted(
+    models,
+    address_id,
+    chain_id,
+    Action.CREATE_PERMISSION
+  );
+  if (!permitted) {
+    return res
+      .status(403)
+      .json({ error: 'Not permitted to create permission' });
+  }
+
+  const permissionManager = new PermissionManager(models);
+
+  // only users with the CREATE_PERMISSION permission can create permissions
+  if (!permissionManager.isPermitted(Action.CREATE_PERMISSION)) {
+    return res
+      .status(403)
+      .json({ error: 'Not authorized to create permission' });
+  }
+
+  const result = await models.sequelize.query(
+    `INSERT INTO "Permissions" (
+      "community_role_id", 
+      "action", 
+      "created_at", 
+      "updated_at"
+    )
+    SELECT "CommunityRoles"."id", :permission_id, NOW(), NOW()
+    FROM "RoleAssignments"
+    JOIN "CommunityRoles" ON "RoleAssignments"."community_role_id" = "CommunityRoles"."id"
+    JOIN "Addresses" ON "Addresses"."user_id" = "RoleAssignments"."address_id"
+    WHERE "Addresses"."address" = :address
+    RETURNING "community_role_id", "action"
+    `,
+    {
+      replacements: { address, permission_id },
+      type: QueryTypes.INSERT,
+    }
+  );
+
+  return res.json(result);
+}
+
+export async function updatePermission(
+  models: DB,
+  req: Request,
+  res: Response
+) {
+  if (!req.body) {
+    return res.status(400).json({ error: 'No body provided' });
+  }
+
+  const { address, permission_id } = req.body;
+  if (!address) {
+    return res.status(400).json({ error: 'No address provided' });
+  }
+
+  if (!permission_id) {
+    return res.status(400).json({ error: 'No permission_id provided' });
+  }
+
+  const result = await models.sequelize.query(
+    `UPDATE "Permissions"
+    SET "action" = :permission
+    FROM "RoleAssignments"
+    JOIN "CommunityRoles" ON "RoleAssignments"."community_role_id" = "CommunityRoles"."id"
+    JOIN "Addresses" ON "Addresses"."user_id" = "RoleAssignments"."address_id"
+    WHERE "Permissions"."community_role_id" = "CommunityRoles"."id" AND "Addresses"."address" = :address
+    RETURNING "community_role_id", "action"
+    `,
+    {
+      replacements: { address, permission_id },
       type: QueryTypes.UPDATE,
     }
   );
