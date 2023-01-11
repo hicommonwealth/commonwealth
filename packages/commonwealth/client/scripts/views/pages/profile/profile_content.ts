@@ -50,8 +50,12 @@ const ProfileContent: m.Component<
         ? [
             content.slice(0, vnode.attrs.count).map((data) => {
               if (data instanceof Thread) {
+                console.log("If instance of thread")
+                console.log(data)
                 return m(ProfileProposal, { proposal: data });
               } else {
+                console.log("inside the else")
+                console.log(data)
                 return m(ProfileCommentGroup, {
                   proposal: data,
                   comments: [data],

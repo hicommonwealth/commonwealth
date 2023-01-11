@@ -19,6 +19,8 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
     if (!proposal) return;
 
     const { slug, identifier } = proposal;
+    // BUG slug and identified are undefined
+    console.log(slug, identifier)
 
     // hide rows from communities that don't match
     if (app.isCustomDomain() && proposal.chain !== app.customDomainId()) return;
