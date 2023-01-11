@@ -45,7 +45,7 @@
     "migrate-db-down": "npx sequelize db:migrate:undo",
     "create-migration": "npx sequelize migration:generate --name",
     "dump-db-limit": "yarn run dump-db &&  psql $(heroku config:get DATABASE_URL -a commonwealthapp) -a -f limited_dump.sql",
-    "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonweyarn reset-db && yarn load-db && yarn migrate-dbalth -U commonwealth -a -f limited_load.sql",
+    "load-db-limit": "yarn run reset-db && yarn run load-db && psql -d commonwealth -U commonwealth -a -f limited_load.sql",
     "start-docker-setup": "chmod +rx ./scripts/start-docker-setup-help.sh && ./scripts/start-docker-setup-help.sh",
     "start-containers": "chmod +rx ./scripts/start-docker-containers.sh && ./scripts/start-docker-containers.sh",
     "stop-containers": "chmod +rx ./scripts/stop-docker-containers.sh && ./scripts/stop-docker-containers.sh",
