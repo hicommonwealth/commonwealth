@@ -61,7 +61,8 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     const url = `${window.location.origin}/cosmosAPI/${
       chainIdentifier
     }`;
-    const client = await StargateClient.connect(url);
+    const cosm = await import('@cosmjs/stargate')
+    const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
     const block = await client.getBlock(height);
 
