@@ -1,10 +1,3 @@
-import {
-  QueryClient,
-  setupStakingExtension,
-  setupGovExtension,
-  setupBankExtension,
-} from '@cosmjs/stargate';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import sleep from 'sleep-promise';
 
 import type {
@@ -42,12 +35,14 @@ export async function createApi(
   );
   for (let i = 0; i < 3; ++i) {
     try {
-      const tm = await Tendermint34Client.connect(url);
-      const lcd = QueryClient.withExtensions(
+      const tendermint = await import('@cosmjs/tendermint-rpc');
+      const tm = await tendermint.Tendermint34Client.connect(url);
+      const cosm = await import('@cosmjs/stargate');
+      const lcd = cosm.QueryClient.withExtensions(
         tm,
-        setupGovExtension,
-        setupStakingExtension,
-        setupBankExtension
+        cosm.setupGovExtension,
+        cosm.setupStakingExtension,
+        cosm.setupBankExtension
       );
       return { tm, lcd };
     } catch (err) {

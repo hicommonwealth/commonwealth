@@ -61,7 +61,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     return results;
   }
 
-  private _blocksToEvents(blocks: Block[]): RawEvent[] {
+  private async _blocksToEvents(blocks: Block[]): Promise<RawEvent[]> {
     // parse all transactions
     const events: RawEvent[] = [];
     for (const block of blocks) {
@@ -69,7 +69,8 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
         header: { height },
       } = block;
       for (const tx of block.txs) {
-        const decodedTx = decodeTxRaw(tx);
+        const cosm = await import('@cosmjs/proto-signing');
+        const decodedTx = cosm.decodeTxRaw(tx);
         const {
           body: { messages },
         } = decodedTx;
@@ -97,7 +98,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     }
     const listenFunc = async () => {
       const blocks = await this._queryBlocks();
-      const events = this._blocksToEvents(blocks);
+      const events = await this._blocksToEvents(blocks);
       for (const event of events) {
         cb(event);
       }

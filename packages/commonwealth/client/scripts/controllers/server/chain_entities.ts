@@ -17,8 +17,9 @@ import {
   SupportedNetwork,
   getUniqueEntityKey
 } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types'
+import { getBaseUrl, getFetch } from 'helpers/getUrl';
 import { notifyError } from '../app/notifications';
-import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   if (c.base === ChainBase.Substrate) return SupportedNetwork.Substrate;

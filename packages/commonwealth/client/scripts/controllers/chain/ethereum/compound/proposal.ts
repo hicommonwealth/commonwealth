@@ -10,7 +10,7 @@ import {
   GovernorMock__factory,
 } from 'common-common/src/eth/types';
 
-import { CompoundTypes } from 'chain-events/src';
+import { CompoundTypes } from 'chain-events/src/types';
 import { ProposalType } from 'common-common/src/types';
 
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';

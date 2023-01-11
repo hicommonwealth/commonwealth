@@ -21,7 +21,7 @@ import {
   VotingType,
   VotingUnit
 } from 'models';
-import { SubstrateTypes } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { Coin } from 'adapters/currency';
 import type SubstrateChain from './shared';
 import type { SubstrateAccount } from './account';

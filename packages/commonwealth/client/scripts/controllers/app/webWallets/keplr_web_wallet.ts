@@ -24,7 +24,6 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   private _chainId: string;
   private _chain: string;
   private _offlineSigner: OfflineDirectSigner;
-  private _client: SigningStargateClient;
 
   public readonly name = WalletId.Keplr;
   public readonly label = 'Keplr';
@@ -99,7 +98,8 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
       const url = `${window.location.origin}/cosmosAPI/${
         app.chain?.id || this.defaultNetwork
       }`;
-      const client = await StargateClient.connect(url);
+      const cosm = await import('@cosmjs/stargate');
+      const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;
       client.disconnect();

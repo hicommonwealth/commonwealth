@@ -1,4 +1,4 @@
-import type { CompoundTypes } from 'chain-events/src';
+import type { CompoundTypes } from 'chain-events/src/types';
 import type { ICompletable } from '../../shared';
 
 export type ICompoundProposalResponse = Omit<

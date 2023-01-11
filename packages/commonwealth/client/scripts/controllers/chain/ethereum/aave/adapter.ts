@@ -16,7 +16,7 @@ import ChainEntityController from 'controllers/server/chain_entities';
 import type { IApp } from 'state';
 
 import { notifyError } from 'controllers/app/notifications';
-import { AaveTypes } from 'chain-events/src';
+import { AaveTypes } from 'chain-events/src/types';
 import AaveChain from './chain';
 import AaveGovernance from './governance';
 

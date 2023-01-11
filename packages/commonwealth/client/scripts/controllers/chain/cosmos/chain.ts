@@ -56,8 +56,6 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return this._api;
   }
 
-  private _blockSubscription: NodeJS.Timeout;
-
   // TODO: rename this something like "bankDenom" or "gasDenom" or "masterDenom"
   private _denom: string;
   public get denom(): string {
@@ -88,12 +86,15 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
     console.log(`Starting Tendermint RPC API at ${url}...`);
     // TODO: configure broadcast mode
-    this._tmClient = await Tendermint34Client.connect(url);
-    this._api = QueryClient.withExtensions(
+
+    const tm = await import('@cosmjs/tendermint-rpc');
+    this._tmClient = await tm.Tendermint34Client.connect(url);
+    const cosm = await import('@cosmjs/stargate');
+    this._api = cosm.QueryClient.withExtensions(
       this._tmClient,
-      setupGovExtension,
-      setupStakingExtension,
-      setupBankExtension
+      cosm.setupGovExtension,
+      cosm.setupStakingExtension,
+      cosm.setupBankExtension,
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
@@ -143,10 +144,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (!wallet.enabled) {
       await wallet.enable();
     }
-    const client = await SigningStargateClient.connectWithSigner(
-      this._app.chain.meta.node.url,
-      wallet.offlineSigner
-    );
+    const cosm   = await import('@cosmjs/stargate');
+    const client = await cosm.SigningStargateClient.connectWithSigner(this._app.chain.meta.node.url, wallet.offlineSigner);
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -158,20 +157,13 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     // send the transaction using keplr-supported signing client
     try {
-      const result = await client.signAndBroadcast(
-        account.address,
-        [tx],
-        DEFAULT_FEE,
-        DEFAULT_MEMO
-      );
+      const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
       console.log(result);
-      if (isBroadcastTxFailure(result)) {
+      if (cosm.isBroadcastTxFailure(result)) {
         throw new Error('TX execution failed.');
-      } else if (isBroadcastTxSuccess(result)) {
+      } else if (cosm.isBroadcastTxSuccess(result)) {
         const txHash = result.transactionHash;
-        const txResult = await this._tmClient.tx({
-          hash: Buffer.from(txHash, 'hex'),
-        });
+        const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
         return txResult.result.events;
       } else {
         throw new Error('Unknown broadcast result');

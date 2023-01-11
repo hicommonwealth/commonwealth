@@ -1,5 +1,5 @@
-@import 'shared';
-@import 'components/component_kit/cw_card.scss';
+@import '../shared';
+@import 'component_kit/cw_card';
 
 .CardsCollection {
   display: flex;

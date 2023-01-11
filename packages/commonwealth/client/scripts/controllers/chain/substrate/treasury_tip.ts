@@ -16,7 +16,7 @@ import {
   VotingUnit,
   DepositVote,
 } from 'models';
-import { SubstrateTypes } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { chainEntityTypeToProposalSlug } from 'identifiers';
 import { ProposalType } from 'common-common/src/types';
 import type SubstrateChain from './shared';

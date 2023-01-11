@@ -1,4 +1,3 @@
-// import { CompoundTypes } from 'chain-events/src';
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 
 import type EthereumAccount from 'controllers/chain/ethereum/account';

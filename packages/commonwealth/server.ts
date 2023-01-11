@@ -22,8 +22,8 @@ import {
 } from 'common-common/src/rabbitmq';
 import { StatsDController } from 'common-common/src/statsd';
 import type { BrokerConfig } from 'rascal';
-import devWebpackConfig from './webpack/webpack.config.dev.js';
-import prodWebpackConfig from './webpack/webpack.config.prod.js';
+import devWebpackConfig from './webpack/webpack.dev.config.js';
+import prodWebpackConfig from './webpack/webpack.prod.config.js';
 import ViewCountCache from './server/util/viewCountCache';
 import RuleCache from './server/util/rules/ruleCache';
 import BanCache from './server/util/banCheckCache';
