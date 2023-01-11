@@ -14,6 +14,15 @@ function cleanMalformedUrl(str: string) {
   return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
 }
 
+const decodeTitle = (title: string) => {
+  try {
+    return decodeURIComponent(title);
+  } catch (err) {
+    console.error(`Could not decode title: "${title}"`);
+    return title;
+  }
+};
+
 const setupAppRoutes = (
   app,
   models: DB,
@@ -150,7 +159,9 @@ const setupAppRoutes = (
           },
         ],
       });
-      title = proposal ? decodeURIComponent(proposal.title) : '';
+
+      title = proposal ? decodeTitle(proposal.title) : '';
+
       description = proposal ? proposal.plaintext : '';
       image = chain
         ? `https://commonwealth.im${chain.icon_url}`
