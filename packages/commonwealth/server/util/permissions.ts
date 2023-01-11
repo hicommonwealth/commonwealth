@@ -1,9 +1,14 @@
 import { DB } from '../models';
 
-export type AccessLevel = "admin" | "moderator" | "member" | "everyone";
+export enum AccessLevel {
+  Admin = 'admin',
+  Moderator = 'moderator',
+  Member = 'member',
+  Everyone = 'everyone',
+}
 
 export enum PermissionError {
-  NOT_PERMITTED = "Action not permitted",
+  NOT_PERMITTED = 'Action not permitted',
 }
 
 export enum Action {
@@ -35,6 +40,7 @@ export enum Action {
   DELETE_ROLE = 25,
   VIEW_ROLES = 26,
   CREATE_PERMISSION = 27,
+  EDIT_PERMISSIONS = 28,
 }
 
 const defaultAdminPermissions = {
@@ -48,42 +54,27 @@ const defaultAdminPermissions = {
     Action.CREATE_COMMENT,
     Action.VIEW_COMMENTS,
   ],
-  [Action.DELETE_REACTION]: [
-    Action.CREATE_REACTION,
-    Action.VIEW_REACTIONS,
-  ],
+  [Action.DELETE_REACTION]: [Action.CREATE_REACTION, Action.VIEW_REACTIONS],
   [Action.DELETE_TOPIC]: [
     Action.EDIT_TOPIC,
     Action.CREATE_TOPIC,
     Action.VIEW_TOPICS,
   ],
-}
+};
 
 const defaultModeratorPermissions = {
   [Action.CREATE_CHAT]: Action.VIEW_CHAT_CHANNELS,
-  [Action.EDIT_THREAD]: [
-    Action.CREATE_THREAD,
-    Action.VIEW_THREADS,
-  ],
-  [Action.EDIT_COMMENT]: [
-    Action.CREATE_COMMENT,
-    Action.VIEW_COMMENTS,
-  ],
-  [Action.EDIT_TOPIC]: [
-    Action.CREATE_TOPIC,
-    Action.VIEW_TOPICS,
-  ],
-}
+  [Action.EDIT_THREAD]: [Action.CREATE_THREAD, Action.VIEW_THREADS],
+  [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT, Action.VIEW_COMMENTS],
+  [Action.EDIT_TOPIC]: [Action.CREATE_TOPIC, Action.VIEW_TOPICS],
+};
 
 const defaultMemberPermissions = {
-  [Action.CREATE_POLL]: [
-    Action.VOTE_ON_POLLS,
-    Action.VIEW_POLLS,
-  ],
+  [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS, Action.VIEW_POLLS],
   [Action.CREATE_THREAD]: [Action.VIEW_THREADS],
   [Action.CREATE_COMMENT]: [Action.VIEW_COMMENTS],
   [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS],
-}
+};
 
 const defaultEveryonePermissions: bigint =
   (BigInt(1) << BigInt(Action.VIEW_REACTIONS)) |
@@ -96,9 +87,11 @@ const defaultEveryonePermissions: bigint =
 export class PermissionManager {
   private models: DB;
   private action: Action;
-  private defaultEveryonePermissions: bigint
+  private defaultEveryonePermissions: bigint;
   private defaultAdminPermissions: { [key: number]: Array<Action> | Action };
-  private defaultModeratorPermissions: { [key: number]: Array<Action> | Action };
+  private defaultModeratorPermissions: {
+    [key: number]: Array<Action> | Action;
+  };
   private defaultMemberPermissions: { [key: number]: Array<Action> | Action };
 
   constructor(_models: DB) {
@@ -109,69 +102,69 @@ export class PermissionManager {
     this.defaultMemberPermissions = defaultMemberPermissions;
   }
 
-  public addAllowImplicitPermission(allowPermission: bigint, actionNumber: number): bigint {
+  public addAllowImplicitPermission(
+    allowPermission: bigint,
+    actionNumber: number
+  ): bigint {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
     const newAllowPermission: bigint = allowPermission | actionAsBigInt;
     return newAllowPermission;
   }
 
-  public removeAllowImplicitPermission(allowPermission: bigint, actionNumber: number): bigint {
+  public removeAllowImplicitPermission(
+    allowPermission: bigint,
+    actionNumber: number
+  ): bigint {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
     const newAllowPermission: bigint = allowPermission & ~actionAsBigInt;
     return newAllowPermission;
   }
 
-  public addDenyImplicitPermission(denyPermission: bigint, actionNumber: number): bigint {
+  public addDenyImplicitPermission(
+    denyPermission: bigint,
+    actionNumber: number
+  ): bigint {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
     const newDenyPermission: bigint = denyPermission | actionAsBigInt;
     return newDenyPermission;
   }
 
-  public removeDenyImplicitPermission(denyPermission: bigint, actionNumber: number): bigint {
+  public removeDenyImplicitPermission(
+    denyPermission: bigint,
+    actionNumber: number
+  ): bigint {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
     const newDenyPermission: bigint = denyPermission & ~actionAsBigInt;
     return newDenyPermission;
   }
 
-  public isPermitted(action: Action): boolean {
-    const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
-    const hasAction: boolean =
-      (this.permissions & actionAsBigInt) == actionAsBigInt;
-    return hasAction;
-  }
-
-  public computePermissions(
-    assignments: Array<{ allow: bigint; deny: bigint }>
-  ): bigint {
-    let permission: bigint = this.permissions;
-    for (const assignment of assignments) {
-      permission &= ~BigInt(assignment.deny);
-      permission |= BigInt(assignment.allow);
-    }
-
-    return permission;
-  }
-
-  public getPermissions(): bigint {
-    return this.permissions;
-  }
-
-  public setPermissions(permissions: bigint) {
-    this.permissions = permissions;
-  }
-
-
-  public getImplicitPermissions(action: Action): Array<Action> {
-    return this.implicitPermissions[action] || [];
-  }
-
-  public getImplicitPermissionsForAllActions(): Array<Action> {
-    const result: Array<Action> = [];
-    if (this.implicitPermissions) {
-      for (const action in this.implicitPermissions) {
-        result.push(...this.implicitPermissions[action]);
+  public computeAllowPermissions(assignments: {
+    [key: number]: Array<Action> | Action;
+  }): bigint {
+    return Object.values(assignments).reduce((permission, assignment) => {
+      if (Array.isArray(assignment)) {
+        assignment.forEach((subAssignment) => {
+          permission |= BigInt(1) << BigInt(subAssignment);
+        });
+      } else {
+        permission |= BigInt(1) << BigInt(assignment);
       }
-    }
-    return result;
+      return permission;
+    }, 0n);
+  }
+
+  public computeDenyPermissions(assignments: {
+    [key: number]: Array<Action> | Action;
+  }): bigint {
+    return Object.values(assignments).reduce((permission, assignment) => {
+      if (Array.isArray(assignment)) {
+        assignment.forEach((subAssignment) => {
+          permission &= ~(BigInt(1) << BigInt(subAssignment));
+        });
+      } else {
+        permission &= ~(BigInt(1) << BigInt(assignment));
+      }
+      return permission;
+    }, ~0n);
   }
 }

@@ -2,7 +2,7 @@ import { QueryTypes } from 'sequelize';
 import { Request, Response } from 'express';
 import { DB } from '../models';
 import { PermissionManager, Action } from '../util/permissions';
-import { findOneRole, isAddressPermitted } from '../util/roles';
+import { isAddressPermitted } from '../util/roles';
 
 export async function getRoles(models: DB, req: Request, res: Response) {
   if (!req.query) {
@@ -54,13 +54,6 @@ export async function createRole(models: DB, req: Request, res: Response) {
     return res.status(403).json({ error: 'Not permitted to create role' });
   }
 
-  const permissionManager = new PermissionManager(models);
-
-  // only users with the CREATE_ROLE permission can create roles
-  if (!permissionManager.isPermitted(Action.CREATE_ROLE)) {
-    return res.status(403).json({ error: 'Not authorized to create role' });
-  }
-
   const result = await models.sequelize.query(
     `INSERT INTO "RoleAssignments" (
       "address_id", 
@@ -87,13 +80,25 @@ export async function updateRole(models: DB, req: Request, res: Response) {
     return res.status(400).json({ error: 'No body provided' });
   }
 
-  const { address, role_id } = req.body;
+  const { address, role_id, address_id, chain_id } = req.body;
   if (!address) {
     return res.status(400).json({ error: 'No address provided' });
   }
 
   if (!role_id) {
     return res.status(400).json({ error: 'No role_id provided' });
+  }
+
+ const permitted = await isAddressPermitted(
+    models,
+    address_id,
+    chain_id,
+    Action.EDIT_ROLE
+  );
+  if (!permitted) {
+    return res
+      .status(403)
+      .json({ error: 'Not permitted to create permission' });
   }
 
   const result = await models.sequelize.query(
@@ -118,7 +123,7 @@ export async function getPermissions(models: DB, req: Request, res: Response) {
     return res.status(400).json({ error: 'No query provided' });
   }
 
-  const { address } = req.query;
+  const { address, address_id, chain_id } = req.query;
   if (!address) {
     return res.status(400).json({ error: 'No address provided' });
   }
@@ -170,15 +175,6 @@ export async function createPermission(
       .json({ error: 'Not permitted to create permission' });
   }
 
-  const permissionManager = new PermissionManager(models);
-
-  // only users with the CREATE_PERMISSION permission can create permissions
-  if (!permissionManager.isPermitted(Action.CREATE_PERMISSION)) {
-    return res
-      .status(403)
-      .json({ error: 'Not authorized to create permission' });
-  }
-
   const result = await models.sequelize.query(
     `INSERT INTO "Permissions" (
       "community_role_id", 
@@ -211,13 +207,29 @@ export async function updatePermission(
     return res.status(400).json({ error: 'No body provided' });
   }
 
-  const { address, permission_id } = req.body;
+  const {
+    address,
+    address_id,
+    chain_id,
+    permission_id
+  } = req.body;
+
   if (!address) {
     return res.status(400).json({ error: 'No address provided' });
   }
 
   if (!permission_id) {
     return res.status(400).json({ error: 'No permission_id provided' });
+  }
+
+  const permitted = await isAddressPermitted(
+    models,
+    address_id,
+    chain_id,
+    Action.EDIT_PERMISSION
+  );
+  if (!permitted) {
+    return res.status(403).json({ error: 'Not permitted to edit permission' });
   }
 
   const result = await models.sequelize.query(
