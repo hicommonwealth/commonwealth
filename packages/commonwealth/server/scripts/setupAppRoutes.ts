@@ -14,6 +14,15 @@ function cleanMalformedUrl(str: string) {
   return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
 }
 
+const decodeTitle = (title: string) => {
+  try {
+    return decodeURIComponent(title);
+  } catch (err) {
+    console.error(`Could not decode title: "${title}"`);
+    return title;
+  }
+};
+
 const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) => {
   if (NO_CLIENT_SERVER) {
     return;
@@ -36,7 +45,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
     throw new Error('Template not found, cannot start production server');
   }
 
- 
+
   const renderWithMetaTags = (res, title, description, author, image) => {
     if (image) {
       image = cleanMalformedUrl(image);
@@ -138,7 +147,9 @@ const setupAppRoutes = (app, models: DB, devMiddleware, templateFile, sendFile) 
           include: [ models.OffchainProfile ]
         }],
       });
-      title = proposal ? decodeURIComponent(proposal.title) : '';
+
+      title = proposal ? decodeTitle(proposal.title) : '';
+
       description = proposal ? proposal.plaintext : '';
       image = chain ? `https://commonwealth.im${chain.icon_url}` : DEFAULT_COMMONWEALTH_LOGO;
       try {
