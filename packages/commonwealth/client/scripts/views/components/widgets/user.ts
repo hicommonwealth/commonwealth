@@ -228,9 +228,7 @@ const User: m.Component<
                     ? link(
                         'a.user-display-name.username',
                         profile
-                          ? `/${app.activeChainId() || profile.chain}/account/${
-                              profile.address
-                            }?base=${profile.chain}`
+                          ? `/profile/${profile.address}`
                           : 'javascript:',
                         [
                           !profile
@@ -307,9 +305,7 @@ const User: m.Component<
             : link(
                 'a.user-display-name',
                 profile
-                  ? `/${app.activeChainId() || profile.chain}/account/${
-                      profile.address
-                    }?base=${profile.chain}`
+                  ? `/profile/${profile.address}`
                   : 'javascript:',
                 !profile
                   ? addrShort
@@ -484,9 +480,7 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      ? `/${app.activeChainId() || profile.chain}/account/${
-          profile.address
-        }?base=${profile.chain}`
+      ? `/profile/${profile.address}`
       : 'javascript:';
 
     return linkify

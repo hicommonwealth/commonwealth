@@ -46,12 +46,16 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
             </CWText>
           </div>
         </div>
-        <CWText className="title">
-          {isThread
-            ? 'Created a thread'
-            : 'Commented on the thread'}
-          <CWText fontWeight="semiBold" className="link">
-            &nbsp;{isThread
+        <div className="title">
+          <CWText fontWeight="semiBold" className="link" noWrap>
+            <span>
+              {isThread
+                ? 'Created a thread'
+                : 'Commented on the thread'
+              }
+              &nbsp;
+            </span>
+            {isThread
               ? link('a', `/${chain}/discussion/${id}`, [
                   `${title}`,
                 ])
@@ -60,14 +64,16 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
               ])
             }
           </CWText>
-        </CWText>
-        <CWText type="b2" className="gray-text">
-          {isThread ? (
-            renderQuillTextBody(body, { collapse: true })
-          ) : renderQuillTextBody(comment.text, { collapse: true })}
-        </CWText>
-        <div className="actions">
-          <SharePopover commentId={id}/>
+        </div>
+        <div className="content">
+          <CWText type="b2" className="gray-text">
+            {isThread ? (
+              renderQuillTextBody(body, { collapse: true })
+            ) : renderQuillTextBody(comment.text, { collapse: true })}
+          </CWText>
+          <div className="actions">
+            <SharePopover commentId={id}/>
+          </div>
         </div>
       </div>
     );

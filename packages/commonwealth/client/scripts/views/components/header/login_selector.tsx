@@ -88,8 +88,8 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
           m(MenuItem, {
             onclick: () => {
               const pf = app.user.activeAccount.profile;
-              if (app.chain) {
-                navigateToSubpage(`/account/${pf.address}`);
+              if (pf) {
+                m.route.set(`/profile/${pf.address}`)
               }
             },
             label: (
@@ -102,15 +102,11 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         {activeAddressesWithRole.length > 0 &&
           app.activeChainId() &&
           m(MenuItem, {
-            onclick: (e) => {
-              e.preventDefault();
-              app.modals.create({
-                modal: EditProfileModal,
-                data: {
-                  account: app.user.activeAccount,
-                  refreshCallback: () => m.redraw(),
-                },
-              });
+            onclick: () => {
+              const pf = app.user.activeAccount.profile;
+              if (pf) {
+                m.route.set(`/profile/${pf.address}/edit`)
+              }
             },
             label: (
               <div class="label-wrap">

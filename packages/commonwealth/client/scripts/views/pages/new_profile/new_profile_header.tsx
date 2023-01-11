@@ -63,7 +63,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
         </div>
         <div class="profile-name-and-bio">
           <CWText type="h3" className={profile.name ? 'name hasMargin' : 'name'}>
-            {profile.name ? profile.name : address}
+            {profile.name ? profile.name : `Anonymous (${address.slice(0, 5)}...)` }
           </CWText>
           <div class="buttons">
             {/* TODO: Add delegate and follow buttons */}

@@ -2,7 +2,6 @@
 
 .ProfileActivityRow {
   position: relative;
-  min-height: 168px;
   border-bottom: 1px solid #dddddd;
   padding: 24px 0;
   min-width: 100%;
@@ -11,7 +10,6 @@
   .actions {
     display: flex;
     justify-content: flex-end;
-    margin-top: 16px;
 
     .trigger-wrapper {
       margin-right: 24px;
@@ -56,11 +54,27 @@
     width: 100%;
   }
 
-  .title {
-    margin-bottom: 8px;
-  }
-
   .link a {
     color: $neutral-800;
+  }
+
+  .title {
+    display: flex;
+    margin-bottom: 8px;
+
+    span {
+      font-weight: 400;
+    }
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    .Text {
+      width: 90%;
+      margin-right: 16px;
+    }
   }
 }
