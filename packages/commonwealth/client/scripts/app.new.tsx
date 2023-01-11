@@ -4,6 +4,41 @@ import ReactDOM from 'react-dom/client';
 import { Layout } from 'views/layout';
 import { initAppState } from 'app';
 
+const LandingPage = lazy(() => import('./views/pages/landing'));
+const CommunitiesPage = lazy(() => import('./views/pages/communities'));
+const SearchPage = lazy(() => import('./views/pages/search'));
+const UserDashboard = lazy(() => import('./views/pages/user_dashboard'));
+const Web3LoginPage = lazy(() => import('./views/pages/web3login'));
+const NotificationsPage = lazy(() => import('./views/pages/notifications_page'));
+const NotificationSettingsPage = lazy(() => import('./views/pages/notification_settings'));
+// const FinishNearLogin = lazy(() => import('./views/pages/finish_near_login'));
+// const FinishAxieLogin = lazy(() => import('./views/pages/finish_axie_login'));
+const SettingsPage = lazy(() => import('./views/pages/settings'));
+const DiscussionsRedirect = lazy(() => import('./views/pages/discussions_redirect'));
+const OverviewPage = lazy(() => import('./views/pages/overview'));
+const SputnikDAOsPage = lazy(() => import('./views/pages/sputnikdaos'));
+const ChatPage = lazy(() => import('./views/pages/chat'));
+const NewThreadPage = lazy(() => import('./views/pages/new_thread'));
+const ProfilePage = lazy(() => import('./views/pages/profile'));
+const ReferendaPage = lazy(() => import('./views/pages/referenda'));
+const ProposalsPage = lazy(() => import('./views/pages/proposals'));
+const CouncilPage = lazy(() => import('./views/pages/council'));
+const DelegatePage = lazy(() => import('./views/pages/delegate'));
+const ViewProposalPage = lazy(() => import('./views/pages/view_proposal'));
+const NewProposalPage = lazy(() => import('./views/pages/new_proposal'));
+const TreasuryPage = lazy(() => import('./views/pages/treasury'));
+const BountiesPage = lazy(() => import('./views/pages/bounties'));
+const TipsPage = lazy(() => import('./views/pages/tips'));
+const ValidatorsPage = lazy(() => import('./views/pages/validators'));
+const AdminPage = lazy(() => import('./views/pages/admin'));
+const ManageCommunityPage = lazy(() => import('./views/pages/manage_community'));
+const SpecSettingsPage = lazy(() => import('./views/pages/spec_settings'));
+const StatsPage = lazy(() => import('./views/pages/stats'));
+const SnapshotProposalsPage = lazy(() => import('./views/pages/snapshot_proposals'));
+const MultipleSnapshotsPage = lazy(() => import('./views/pages/view_multiple_snapshot_spaces'));
+const NewSnapshotProposalPage = lazy(() => import('./views/pages/new_snapshot_proposal'));
+const ViewSnapshotProposalPage = lazy(() => import('./views/pages/view_snapshot_proposal'));
+
 const DiscussionsPage = lazy(() => import('views/pages/discussions'));
 const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
 const PageNotFound = lazy(() => import('views/pages/404'));
@@ -40,251 +75,140 @@ const withLayout = (Component, params) => {
 const App = () => {
   useInitApp();
 
-  /*
-  
-            '/': importRoute('views/pages/landing', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/communities': importRoute('views/pages/communities', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/search': importRoute('views/pages/search', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/whyCommonwealth': importRoute('views/pages/why_commonwealth', {
-              scoped: false,
-              hideSidebar: true,
-            }),
-            '/dashboard': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/dashboard/:type': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/web3login': importRoute('views/pages/web3login', {
-              scoped: false,
-              deferChain: true,
-            }),
-            // Scoped routes
-            //
-            '/:scope/proposal/discussion/:identifier': redirectRoute(
-              (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
-            ),
-
-            // Notifications
-            '/:scope/notifications': importRoute(
-              'views/pages/notifications_page',
-              { scoped: true, deferChain: true }
-            ),
-            '/notifications': redirectRoute(() => '/edgeware/notifications'),
-            '/notification-settings': importRoute(
-              'views/pages/notification_settings',
-              { scoped: true, deferChain: true }
-            ),
-            // NEAR
-            '/:scope/finishNearLogin': importRoute(
-              'views/pages/finish_near_login',
-              { scoped: true }
-            ),
-            '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
-              scoped: false,
-            }),
-            // Settings
-            '/settings': redirectRoute(() => '/edgeware/settings'),
-            '/:scope/settings': importRoute('views/pages/settings', {
-              scoped: true,
-            }),
-
-            // Discussions
-            '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
-            '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
-            '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope': importRoute('views/pages/discussions_redirect', {
-              scoped: true,
-            }),
-            '/:scope/discussions': importRoute('views/pages/discussions', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/overview': importRoute('views/pages/overview', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/discussions/:topic': importRoute(
-              'views/pages/discussions',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/search': importRoute('views/pages/search', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/members': importRoute('views/pages/members', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/sputnik-daos': importRoute('views/pages/sputnikdaos', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/chat/:channel': importRoute('views/pages/chat', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/new/discussion': importRoute('views/pages/new_thread', {
-              scoped: true,
-              deferChain: true,
-            }),
-            // Profiles
-            '/:scope/account/:address': importRoute('views/pages/profile', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/account': redirectRoute((a) =>
-              activeAccount
-                ? `/${a.scope}/account/${activeAccount.address}`
-                : `/${a.scope}/`
-            ),
-            // Governance
-            '/:scope/referenda': importRoute('views/pages/referenda', {
-              scoped: true,
-            }),
-            '/:scope/proposals': importRoute('views/pages/proposals', {
-              scoped: true,
-            }),
-            '/:scope/council': importRoute('views/pages/council', {
-              scoped: true,
-            }),
-            '/:scope/delegate': importRoute('views/pages/delegate', {
-              scoped: true,
-            }),
-            '/:scope/proposal/:type/:identifier': importRoute(
-              'views/pages/view_proposal/index',
-              { scoped: true }
-            ),
-            '/:scope/proposal/:identifier': importRoute(
-              'views/pages/view_proposal/index',
-              { scoped: true }
-            ),
-            '/:scope/discussion/:identifier': importRoute(
-              'views/pages/view_thread/index',
-              { scoped: true }
-            ),
-            '/:scope/new/proposal/:type': importRoute(
-              'views/pages/new_proposal/index',
-              { scoped: true }
-            ),
-            '/:scope/new/proposal': importRoute(
-              'views/pages/new_proposal/index',
-              { scoped: true }
-            ),
-
-            // Treasury
-            '/:scope/treasury': importRoute('views/pages/treasury', {
-              scoped: true,
-            }),
-            '/:scope/bounties': importRoute('views/pages/bounties', {
-              scoped: true,
-            }),
-            '/:scope/tips': importRoute('views/pages/tips', { scoped: true }),
-            '/:scope/validators': importRoute('views/pages/validators', {
-              scoped: true,
-            }),
-            // Settings
-            '/login': importRoute('views/pages/login', { scoped: false }),
-            '/:scope/login': importRoute('views/pages/login', {
-              scoped: true,
-              deferChain: true,
-            }),
-            // Admin
-            '/:scope/admin': importRoute('views/pages/admin', { scoped: true }),
-            '/manage': importRoute('views/pages/manage_community/index', {
-              scoped: false,
-            }),
-            '/:scope/manage': importRoute(
-              'views/pages/manage_community/index',
-              { scoped: true }
-            ),
-            '/:scope/spec_settings': importRoute('views/pages/spec_settings', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/analytics': importRoute('views/pages/stats', {
-              scoped: true,
-              deferChain: true,
-            }),
-
-            '/:scope/snapshot/:snapshotId': importRoute(
-              'views/pages/snapshot_proposals',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/multiple-snapshots': importRoute(
-              'views/pages/view_multiple_snapshot_spaces',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/snapshot/:snapshotId/:identifier': importRoute(
-              'views/pages/view_snapshot_proposal',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/new/snapshot/:snapshotId': importRoute(
-              'views/pages/new_snapshot_proposal',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
-              (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}`
-            ),
-            '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
-              (attrs) =>
-                `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-            ),
-            '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
-              (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
-            ),
-            '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
-              (attrs) =>
-                `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-            ),
-            '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
-              (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
-            ),
-          }),
- */
-
-  // TODO: use loader to avoid immediately importing all pages
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
+        <Route path="/" element={
+          withLayout(LandingPage, { scoped: false, hideSidebar: false })
+        } />
+        <Route path="/communities" element={
+          withLayout(CommunitiesPage, { scoped: false, hideSidebar: false })
+        } />
+        <Route path="/search" element={
+          withLayout(SearchPage, { scoped: false, deferChain: true })
+        } />
         <Route path="/whyCommonwealth" element={
           withLayout(WhyCommonwealthPage, { scoped: false, hideSidebar: true })
         } />
-        <Route
-          path="/:scope/discussions"
-          element={
-            withLayout(DiscussionsPage, { scoped: true, deferChain: true })
-          }
-        />
-        <Route
-          path="/:scope/discussions/:topic"
-          element={
-            withLayout(DiscussionsPage, { scoped: true, deferChain: true })
-          }
-        />
-        <Route
-          path="/:scope/discussion/:identifier"
-          element={
-            withLayout(ViewThreadPage, { scoped: true, deferChain: true })
-          }
-        />
-        <Route
-          path="/:scope/members"
-          element={
-            withLayout(MembersPage, { scoped: true, deferChain: true })
-          }
-        />
+        <Route path="/dashboard" element={
+          withLayout(UserDashboard, { scoped: false, deferChain: true })
+        } />
+        <Route path="/dashboard/:type" element={
+          withLayout(UserDashboard, { scoped: false, deferChain: true })
+        } />
+        <Route path="/web3login" element={
+          withLayout(Web3LoginPage, { scoped: false, deferChain: true })
+        } />
+        <Route path="/:scope/notifications" element={
+          withLayout(NotificationsPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/notification-settings" element={
+          withLayout(NotificationSettingsPage, { scoped: true, deferChain: true })
+        } />
+        {/*
+        <Route path="/:scope/finishNearLogin" element={
+          withLayout(FinishNearLogin, { scoped: true })
+        } />
+        <Route path="/finishaxielogin" element={
+          withLayout(FinishAxieLogin, { scoped: false })
+        } />
+        */}
+        <Route path="/:scope/settings" element={
+          withLayout(SettingsPage, { scoped: true })
+        } />
+        <Route path="/:scope" element={
+          withLayout(DiscussionsRedirect, { scoped: true })
+        } />
+        <Route path="/:scope/discussions" element={
+          withLayout(DiscussionsPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/overview" element={
+          withLayout(OverviewPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/discussions/:topic" element={
+          withLayout(DiscussionsPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/search" element={
+          withLayout(SearchPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/members" element={
+          withLayout(MembersPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/sputnik-daos" element={
+          withLayout(SputnikDAOsPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/chat/:channel" element={
+          withLayout(ChatPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/new/discussion" element={
+          withLayout(NewThreadPage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/account/:address" element={
+          withLayout(ProfilePage, { scoped: true, deferChain: true })
+        } />
+        <Route path="/:scope/referenda" element={
+          withLayout(ReferendaPage, { scoped: true })
+        } />
+        <Route path="/:scope/proposals" element={
+          withLayout(ProposalsPage, { scoped: true })
+        } />
+        <Route path="/:scope/council" element={
+          withLayout(CouncilPage, { scoped: true })
+        } />
+        <Route path="/:scope/delegate" element={
+          withLayout(DelegatePage, { scoped: true })
+        } />
+        <Route path="/:scope/proposal/:type/:identifier" element={
+          withLayout(ViewProposalPage, { scoped: true })
+        } />
+        <Route path="/:scope/proposal/:identifier" element={
+          withLayout(ViewProposalPage, { scoped: true })
+        } />
+        <Route path="/:scope/discussion/:identifier" element={
+          withLayout(ViewThreadPage, { scoped: true })
+        } />
+        <Route path="/:scope/new/proposal/:type" element={
+          withLayout(NewProposalPage, { scoped: true })
+        } />
+        <Route path="/:scope/new/proposal" element={
+          withLayout(NewProposalPage, { scoped: true })
+        } />
+        <Route path="/:scope/treasury" element={
+          withLayout(TreasuryPage, { scoped: true })
+        } />
+        <Route path="/:scope/bounties" element={
+          withLayout(BountiesPage, { scoped: true })
+        } />
+        <Route path="/:scope/tips" element={
+          withLayout(TipsPage, { scoped: true })
+        } />
+        <Route path="/:scope/validators" element={
+          withLayout(ValidatorsPage, { scoped: true })
+        } />
+        <Route path="/:scope/admin" element={
+          withLayout(AdminPage, { scoped: true })
+        } />
+        <Route path="/:scope/manage" element={
+          withLayout(ManageCommunityPage, { scoped: true })
+        } />
+        <Route path="/:scope/spec_settings" element={
+          withLayout(SpecSettingsPage, { scoped: true })
+        } />
+        <Route path="/:scope/analytics" element={
+          withLayout(StatsPage, { scoped: true })
+        } />
+        <Route path="/:scope/snapshot/:snapshotId" element={
+          withLayout(SnapshotProposalsPage, { scoped: true })
+        } />
+        <Route path="/:scope/multiple-snapshots" element={
+          withLayout(MultipleSnapshotsPage, { scoped: true })
+        } />
+        <Route path="/:scope/snapshot/:snapshotId/:identifier" element={
+          withLayout(ViewSnapshotProposalPage, { scoped: true })
+        } />
+        <Route path="/:scope/new/snapshot/:snapshotId" element={
+          withLayout(NewSnapshotProposalPage, { scoped: true })
+        } />
         <Route path="*" element={withLayout(PageNotFound, { scoped: false })} />
       </Routes>
     </Suspense>
