@@ -1,6 +1,6 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
+import type { Extension } from '@terra-money/terra.js';
 
 type TerraAddress = {
   address: string;
@@ -10,7 +10,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   private _enabled: boolean;
   private _accounts: TerraAddress[] = [];
   private _enabling = false;
-  private _extension = new Extension();
+  private _extension: Extension;
 
   public readonly name = WalletId.TerraStation;
   public readonly label = 'Terra Station';
@@ -41,6 +41,9 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
   public async enable() {
     console.log('Attempting to enable Terra Station');
     this._enabling = true;
+
+    const terra = await import('@terra-money/terra.js')
+    this._extension = new terra.Extension();
 
     // use a promise so that this function returns *after* the wallet has connected
     const accountAddr = await new Promise<TerraAddress>((resolve) => {

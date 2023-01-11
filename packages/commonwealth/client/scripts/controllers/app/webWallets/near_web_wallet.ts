@@ -35,6 +35,10 @@ class NearWebWalletController implements IWebWallet<any> {
   public get enabled() {
     return this._enabled;
   }
+
+  public async initConnection() {
+    throw new Error('not implemented');
+  }
 }
 
 export default NearWebWalletController;

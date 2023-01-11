@@ -1,11 +1,6 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type {
-  ConnectedWallet} from '@terra-money/wallet-controller';
-import {
-  ConnectType,
-  getChainOptions,
-  WalletController,
-} from '@terra-money/wallet-controller';
+import type { ConnectedWallet } from '@terra-money/wallet-controller';
+import type { WalletController } from '@terra-money/wallet-controller';
 import type { Account, IWebWallet } from 'models';
 
 // TODO: ensure this only opens on mobile
@@ -84,14 +79,14 @@ class TerraWalletConnectWebWalletController
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
     try {
-      // Create WalletConnect Provider
-      const chainOptions = await getChainOptions();
-      this._controller = new WalletController({
+      const terra = await import('@terra-money/wallet-controller');
+      const chainOptions = await terra.getChainOptions();
+      this._controller = new terra.WalletController({
         ...chainOptions,
       });
 
       //  Enable session (triggers QR Code modal)
-      await this._controller.connect(ConnectType.WALLETCONNECT);
+      await this._controller.connect(terra.ConnectType.WALLETCONNECT);
 
       let subscription;
       this._wallet = await new Promise((resolve, reject) => {
