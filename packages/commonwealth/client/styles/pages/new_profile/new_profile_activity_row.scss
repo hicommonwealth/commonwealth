@@ -1,11 +1,12 @@
-@import 'client/styles/shared';
-@import 'construct-ui/src/_shared/_colors';
+@import '../../shared';
 
 .ProfileActivityRow {
   position: relative;
   min-height: 168px;
   border-bottom: 1px solid #dddddd;
   padding: 24px 0;
+  min-width: 100%;
+  max-width: 0;
 
   .actions {
     display: flex;
@@ -52,6 +53,7 @@
 
   .gray-text {
     color: $neutral-600;
+    width: 100%;
   }
 
   .title {

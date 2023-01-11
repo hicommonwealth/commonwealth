@@ -341,7 +341,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
             >
               <CWCoverImageUploader
                 uploadCompleteCallback={(url: string, imageAs: ImageAs, imageBehavior: ImageBehavior) => {
-                  console.log('url', url, imageAs, imageBehavior)
                   this.coverImage = {
                     url,
                     imageAs,
