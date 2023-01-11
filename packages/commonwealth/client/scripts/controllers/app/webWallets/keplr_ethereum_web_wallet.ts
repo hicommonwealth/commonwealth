@@ -73,6 +73,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
       this._chainId,
       account.address,
       JSON.stringify(canvasMessage),
+      EthSignType.MESSAGE
     );
     return `0x${Buffer.from(signature).toString('hex')}`;
   }

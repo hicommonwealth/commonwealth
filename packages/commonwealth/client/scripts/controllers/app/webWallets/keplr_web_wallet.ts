@@ -1,9 +1,10 @@
 import app from 'state';
 
 import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
-
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
+
+import { Account, IWebWallet } from 'models';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { CanvasData } from 'shared/adapters/shared';
 
 interface Pubkey {
