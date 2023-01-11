@@ -2,6 +2,7 @@ import { QueryTypes } from 'sequelize';
 import { Request, Response } from 'express';
 import { DB } from '../models';
 import { PermissionManager, Action } from '../util/permissions';
+import { findOneRole, isAddressPermitted } from '../util/roles';
 
 export async function getRoles(models: DB, req: Request, res: Response) {
   if (!req.query) {
@@ -34,13 +35,29 @@ export async function createRole(models: DB, req: Request, res: Response) {
     return res.status(400).json({ error: 'No body provided' });
   }
 
-  const { address, role_id } = req.body;
+  const {
+    address,
+    role_id,
+    address_id,
+    chain_id
+  } = req.body;
+
   if (!address) {
     return res.status(400).json({ error: 'No address provided' });
   }
 
   if (!role_id) {
     return res.status(400).json({ error: 'No role_id provided' });
+  }
+
+  const permitted = await isAddressPermitted(
+    models,
+    address_id,
+    chain_id,
+    Action.CREATE_ROLE
+  )
+  if (!permitted) {
+    return res.status(403).json({ error: 'Not permitted to create role' });
   }
 
   const permissionManager = new PermissionManager(models);

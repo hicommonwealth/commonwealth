@@ -108,52 +108,6 @@ export class PermissionManager {
     this.defaultMemberPermissions = defaultMemberPermissions;
   }
 
-  gateGetAction(action: Action): bigint {
-    return BigInt(1) << BigInt(action);
-  }
-
-  gatePostAction(action: Action): bigint {
-    return BigInt(1) << BigInt(action);
-  }
-
-  gatePatchAction(action: Action): bigint {
-    return BigInt(1) << BigInt(action);
-  }
-
-  gateDeleteAction(action: Action): bigint {
-    return BigInt(1) << BigInt(action);
-  }
-
-  gateAction(action: Action): bigint {
-    switch (action) {
-      case Action.VIEW_REACTIONS:
-      case Action.VIEW_COMMENTS:
-      case Action.VIEW_POLLS:
-      case Action.VIEW_THREADS:
-      case Action.VIEW_TOPICS:
-      case Action.VIEW_CHAT_CHANNELS:
-        return this.gateGetAction(action);
-      case Action.CREATE_CHAT:
-      case Action.CREATE_REACTION:
-      case Action.CREATE_COMMENT:
-      case Action.CREATE_POLL:
-      case Action.CREATE_THREAD:
-      case Action.CREATE_TOPIC:
-        return this.gatePostAction(action);
-      case Action.EDIT_COMMENT:
-      case Action.EDIT_THREAD:
-      case Action.EDIT_TOPIC:
-        return this.gatePatchAction(action);
-      case Action.DELETE_REACTION:
-      case Action.DELETE_COMMENT:
-      case Action.DELETE_THREAD:
-      case Action.DELETE_TOPIC:
-        return this.gateDeleteAction(action);
-      default:
-        return BigInt(0);
-    }
-  }
-
   public addAllowImplicitPermission(allowPermission: bigint, actionNumber: number): bigint {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
     const newAllowPermission: bigint = allowPermission | actionAsBigInt;

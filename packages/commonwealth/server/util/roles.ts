@@ -300,7 +300,7 @@ export async function isAddressPermitted(
   address_id: number,
   chain_id: string,
   action: Action
-): Promise<PermissionError | undefined> {
+): Promise<PermissionError | boolean> {
   const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
 
   // fetch the default allow and deny permissions for the chain
@@ -325,6 +325,8 @@ export async function isAddressPermitted(
     // check if action is permitted
     if (!isPermitted(permission, action)) {
       return PermissionError.NOT_PERMITTED;
+    } else {
+      return true;
     }
   }
 }
