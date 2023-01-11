@@ -279,7 +279,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                             address = wallet.accounts[accountIndex].address;
                           }
                           $('.AccountSelector').trigger('modalexit');
-                          await handleNormalWalletLogin(wallet as KeplrWebWalletController, address);
+                          await handleNormalWalletLogin(wallet, address);
                         },
                       },
                     });
