@@ -48,13 +48,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async getRecentBlock(): Promise<BlockInfo> {
-    const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
+    const block = await this._web3.givenProvider.request({
+      method: 'eth_getBlockByNumber',
+      params: ['latest', false],
+    });
 
     return {
       number: hexToNumber(block.number),
       hash: block.hash,
       timestamp: hexToNumber(block.timestamp),
-    }
+    };
   }
 
   public async signMessage(message: string): Promise<string> {
@@ -66,12 +69,14 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const sessionPublicAddress = app.sessions.getOrCreateAddress(app.chain?.meta.node.ethChainId || 1);
+    const sessionPublicAddress = app.sessions.getOrCreateAddress(
+      app.chain?.meta.node.ethChainId || 1
+    );
     const msgParams = await constructTypedMessage(
       this.accounts[0],
       app.chain?.meta.node.ethChainId || 1,
       sessionPublicAddress,
-      validationBlockInfo,
+      validationBlockInfo
     );
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
@@ -81,23 +86,27 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   }
 
   public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(account.validationBlockInfo);
+    const webWalletSignature = await this.signLoginToken(
+      account.validationBlockInfo
+    );
     return webWalletSignature;
   }
 
-  public async validateWithAccount(account: Account, walletSignature: string): Promise<void> {
+  public async validateWithAccount(
+    account: Account,
+    walletSignature: string
+  ): Promise<void> {
     return account.validate(walletSignature);
   }
 
-  // ACTIONS
-  public async enable() {
+  private async switchWalletNetworks(ethChainId: string | number): Promise<void> {
     // TODO: use https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods to switch active
     // chain according to currently active node, if one exists
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
       // default to ETH
-      const chainId = app.chain?.meta.node.ethChainId || 1;
+      const chainId = ethChainId || 1;
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
       // TODO: does this come after?
@@ -154,6 +163,15 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       this._enabling = false;
       throw new Error(errorMsg);
     }
+  }
+
+  // ACTIONS
+  public async enable() {
+    this.switchWalletNetworks(app.chain?.meta.node.ethChainId);
+  }
+
+  public async enableForEthChainId(ethChainId: string | number) {
+    this.switchWalletNetworks(ethChainId);
   }
 
   public async initAccountsChanged() {

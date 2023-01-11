@@ -1,3 +1,4 @@
+import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import $ from 'jquery';
 import m from 'mithril';
 import Web3 from 'web3';
@@ -7,9 +8,15 @@ import app from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { AbiItem } from 'web3-utils';
-import { parseAbiItemsFromABI, parseEventFromABI } from '../../../shared/abi_utils';
+import {
+  parseAbiItemsFromABI,
+  parseEventFromABI,
+} from '../../../shared/abi_utils';
 import { CreateFactoryEthDaoForm } from '../views/pages/create_community/types';
-import { encodeFunctionSignature, processAbiInputsToDataTypes } from './abi_form_helpers';
+import {
+  encodeFunctionSignature,
+  processAbiInputsToDataTypes,
+} from './abi_form_helpers';
 
 export function decodeCuratedFactoryTx(
   web3: Web3,
@@ -41,12 +48,14 @@ export async function createCuratedProjectDao(
   const metamaskWallet =
     await app.wallets.getFirstAvailableMetamaskWallet();
 
+  metamaskWallet.enableForEthChainId(daoForm.ethChainId);
+
   if (!metamaskWallet.api) {
     throw new Error('Web3 Api Not Initialized');
   }
   const web3: Web3 = metamaskWallet.api;
 
-  if (formInputMap.size === 0){
+  if (formInputMap.size === 0) {
     throw new Error('Must Insert Inputs');
   }
   // handle processing the forms inputs into their proper data types

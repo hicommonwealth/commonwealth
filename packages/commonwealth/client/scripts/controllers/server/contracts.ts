@@ -58,7 +58,6 @@ class ContractsController {
         jwt: app.user.jwt,
       }
     );
-    console.log(response);
     const resultContract = response['result']['contract'];
     const resultAbi = response['result']['contractAbi'];
     this.update(resultAbi.abi, resultContract);
