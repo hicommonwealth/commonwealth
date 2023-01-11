@@ -322,7 +322,7 @@ class ThreadsController {
         kind: proposal.kind,
         stage: proposal.stage,
         body: encodeURIComponent(newBody),
-        title: newTitle,
+        title: encodeURIComponent(newTitle),
         url,
         'attachments[]': attachments,
         jwt: app.user.jwt,
