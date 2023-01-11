@@ -6,6 +6,7 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import {
   Window as KeplrWindow,
+  EthSignType,
 } from '@keplr-wallet/types';
 import { CanvasData } from 'shared/adapters/shared';
 
