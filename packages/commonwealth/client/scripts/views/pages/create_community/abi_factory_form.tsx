@@ -62,7 +62,6 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
     chainString: 'Ethereum Mainnet',
     ethChainId: 1,
     network: ChainNetwork.Ethereum,
-    id: '',
     name: '',
     nodeUrl: '',
     symbol: '',

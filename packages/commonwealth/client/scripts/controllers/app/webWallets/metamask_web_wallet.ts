@@ -109,7 +109,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       const chainId = ethChainId || 1;
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
-      // TODO: does this come after?
+      // TODO: does this come after? I think this is supposed to be called instead of web3.eth.getAccounts
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',
       });

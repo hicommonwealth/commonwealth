@@ -8,6 +8,7 @@ import app from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { AbiItem } from 'web3-utils';
+import { TransactionConfig } from 'web3-core';
 import {
   parseAbiItemsFromABI,
   parseEventFromABI,
@@ -45,15 +46,14 @@ export async function createCuratedProjectDao(
   formInputMap: Map<string, Map<number, string>>,
   daoForm: CreateFactoryEthDaoForm
 ) {
-  const metamaskWallet =
-    await app.wallets.getFirstAvailableMetamaskWallet();
+  const signingWallet = await app.wallets.getFirstAvailableMetamaskWallet();
 
-  metamaskWallet.enableForEthChainId(daoForm.ethChainId);
+  signingWallet.enableForEthChainId(daoForm.ethChainId);
 
-  if (!metamaskWallet.api) {
+  if (!signingWallet.api) {
     throw new Error('Web3 Api Not Initialized');
   }
-  const web3: Web3 = metamaskWallet.api;
+  const web3: Web3 = signingWallet.api;
 
   if (formInputMap.size === 0) {
     throw new Error('Must Insert Inputs');
@@ -76,12 +76,13 @@ export async function createCuratedProjectDao(
 
   if (contract.nickname === 'curated-factory-goerli') {
     const eventAbiItem = parseEventFromABI(contract.abi, 'ProjectCreated');
-    // Sign Tx with PK if not view function
-    const txReceipt = await this.makeContractTx(
-      contract.address,
-      functionTx.encodeABI(),
-      metamaskWallet
-    );
+    // Sign Tx with PK if this is write function
+    const tx: TransactionConfig = {
+      from: signingWallet.accounts[0],
+      to: contract.address,
+      data: functionTx.encodeABI(),
+    };
+    const txReceipt = await web3.eth.sendTransaction(tx);
     const decodedLog = web3.eth.abi.decodeLog(
       eventAbiItem.inputs,
       txReceipt.logs[0].data,
@@ -89,6 +90,7 @@ export async function createCuratedProjectDao(
     );
     try {
       const res = await $.post(`${app.serverUrl()}/createChain`, {
+        id: daoForm.name,
         base: ChainBase.Ethereum,
         chain_string: daoForm.chainString,
         eth_chain_id: daoForm.ethChainId,
@@ -111,6 +113,7 @@ export async function createCuratedProjectDao(
       // TODO: notify about needing to run event migration
       m.route.set(`/${res.result.chain?.id}`);
     } catch (err) {
+      console.log("err", err)
       throw new Error(err);
     }
   }
