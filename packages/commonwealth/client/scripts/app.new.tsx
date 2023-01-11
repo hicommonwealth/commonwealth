@@ -11,6 +11,7 @@ const UserDashboard = lazy(() => import('./views/pages/user_dashboard'));
 const Web3LoginPage = lazy(() => import('./views/pages/web3login'));
 const NotificationsPage = lazy(() => import('./views/pages/notifications_page'));
 const NotificationSettingsPage = lazy(() => import('./views/pages/notification_settings'));
+// @REACT @TODO cleanup these routes by removing explicit state variable
 // const FinishNearLogin = lazy(() => import('./views/pages/finish_near_login'));
 // const FinishAxieLogin = lazy(() => import('./views/pages/finish_axie_login'));
 const SettingsPage = lazy(() => import('./views/pages/settings'));
@@ -75,6 +76,7 @@ const withLayout = (Component, params) => {
 const App = () => {
   useInitApp();
 
+  // @REACT @TODO add redirect routes + custom domain logic
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <Routes>
