@@ -30,7 +30,7 @@ const ProfileContent: m.Component<
   oncreate: (vnode) => {
     if (window.location.hash) {
       const matches = window.location.hash.match(/#([0-9]+)/);
-      if (!matches || isNaN(+matches[1])) return;
+      if (!matches || Number.isNaN(+matches[1])) return;
 
       vnode.attrs.count = +matches[1];
       m.redraw();
