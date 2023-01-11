@@ -12,6 +12,7 @@ import {
   Component,
   jsx,
 } from 'mithrilInterop';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import 'footer.scss';
 
@@ -37,10 +38,10 @@ const footercontents = [
   },
 ];
 
-export class Footer extends ClassComponent {
+class FooterComponent extends ClassComponent {
   view() {
     const redirectClick = (route) => {
-      setRoute(route);
+      this.setRoute(route);
     };
 
     return (
@@ -75,3 +76,5 @@ export class Footer extends ClassComponent {
     );
   }
 }
+
+export const Footer = NavigationWrapper(FooterComponent);

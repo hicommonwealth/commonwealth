@@ -4,6 +4,7 @@ import React from 'react';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 // import { ListItem, Icon, Icons } from 'construct-ui';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
@@ -17,56 +18,7 @@ import { ComponentType, MenuItem } from './types';
 import { CommunityLabel } from '../community_label';
 import User from '../widgets/user';
 
-// TODO: Switch to new component kit system, migrate to more native setup
-const renderCommunity = (item: ChainInfo) => {
-  const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
-
-  return (
-    <div
-      className={getClasses<{ isSelected: boolean }>(
-        { isSelected: app.activeChainId() === item.id },
-        'SidebarMenuItem community'
-      )}
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        app.sidebarToggled = false;
-        app.sidebarMenu = 'default';
-        setRoute(item.id ? `/${item.id}` : '/');
-      }}
-    >
-      <CommunityLabel community={item} />
-      {app.isLoggedIn() && roles.length > 0 && (
-        <div className="roles-and-star">
-          {roles.map((role) => {
-            return render(User, {
-              avatarSize: 18,
-              avatarOnly: true,
-              user: new AddressInfo(
-                role.address_id,
-                role.address,
-                role.address_chain || role.chain_id,
-                null
-              ),
-            });
-          })}
-          <div
-            className={
-              app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
-            }
-            onClick={async (e) => {
-              e.stopPropagation();
-              await app.communities.setStarred(item.id);
-              redraw();
-            }}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
-class CWSidebarMenuItem extends ClassComponent<MenuItem> {
+class CWSidebarMenuItemComponent extends ClassComponent<MenuItem> {
   view(vnode: ResultNode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
       const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
@@ -96,10 +48,56 @@ class CWSidebarMenuItem extends ClassComponent<MenuItem> {
         </div>
       );
     } else if (vnode.attrs.type === 'community') {
-      return renderCommunity(vnode.attrs.community);
+      const item = vnode.attrs.community;
+      const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
+      return (
+        <div
+          className={getClasses<{ isSelected: boolean }>(
+            { isSelected: app.activeChainId() === item.id },
+            'SidebarMenuItem community'
+          )}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            app.sidebarToggled = false;
+            app.sidebarMenu = 'default';
+            this.setRoute(item.id ? `/${item.id}` : '/');
+          }}
+        >
+          <CommunityLabel community={item} />
+          {app.isLoggedIn() && roles.length > 0 && (
+            <div className="roles-and-star">
+              {roles.map((role) => {
+                return render(User, {
+                  avatarSize: 18,
+                  avatarOnly: true,
+                  user: new AddressInfo(
+                    role.address_id,
+                    role.address,
+                    role.address_chain || role.chain_id,
+                    null
+                  ),
+                });
+              })}
+              <div
+                className={
+                  app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
+                }
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  await app.communities.setStarred(item.id);
+                  redraw();
+                }}
+              />
+            </div>
+          )}
+        </div>
+      );
     }
   }
 }
+
+const CWSidebarMenuItem = NavigationWrapper(CWSidebarMenuItemComponent);
 
 type SidebarMenuAttrs = {
   className?: string;
@@ -107,7 +105,7 @@ type SidebarMenuAttrs = {
   menuItems: Array<MenuItem>;
 };
 
-export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
+class CWSidebarMenuComponent extends ClassComponent<SidebarMenuAttrs> {
   view(vnode: ResultNode<SidebarMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
 
@@ -144,7 +142,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               onClick: () => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
-                setRoute('/communities');
+                this.setRoute('/communities');
               },
             },
             {
@@ -154,7 +152,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               onClick: () => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
-                setRoute('/notification-settings');
+                this.setRoute('/notification-settings');
               },
             },
             {
@@ -167,7 +165,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
                 } else {
                   app.sidebarToggled = false;
                   app.sidebarMenu = 'default';
-                  setRoute('/settings');
+                  this.setRoute('/settings');
                 }
               },
             } as MenuItem,
@@ -181,3 +179,5 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
     );
   }
 }
+
+export const CWSidebarMenu = NavigationWrapper(CWSidebarMenuComponent);

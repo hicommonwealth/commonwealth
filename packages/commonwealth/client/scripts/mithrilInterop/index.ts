@@ -15,7 +15,7 @@ import {
   // eslint-disable-next-line import/no-unresolved
   Component as ReactComponent,
 } from 'react';
-import { redirect } from 'react-router-dom';
+import { redirect, NavigateFunction } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
 // RENDERING FUNCTIONS
@@ -96,7 +96,12 @@ const IGNORED_PROPS = [
   'context',
 ]
 
-export abstract class ClassComponent<A = {}> extends ReactComponent<A & { children?: Children }> {
+type AdditionalAttrs = {
+  children?: Children,
+  navigate?: NavigateFunction,
+};
+
+export abstract class ClassComponent<A = {}> extends ReactComponent<A & AdditionalAttrs> {
   protected readonly __props: A;
   private _isMounted = false;
   private _seenProps = [];
@@ -159,6 +164,23 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & { childr
 
   public redraw(sync = false) {
     this.forceUpdate();
+  }
+
+  public setRoute(route: string) {
+    if (this.props.navigate) {
+      this.props.navigate(route);
+    }
+  }
+
+  public navigateToSubpage(route: string) {
+    // hacky way to get the current scope
+    // @REACT @TODO: this will fail on custom domains
+    const scope = window.location.pathname.split('/')[1];
+    if (scope) {
+      this.setRoute(`/${scope}${route}`);
+    } else {
+      this.setRoute(route);
+    }
   }
 }
 
