@@ -3,7 +3,7 @@ import { AppError, ServerError } from 'common-common/src/errors';
 import axios from 'axios';
 import FormData from 'form-data';
 import type { DB } from '../models';
-import type { TypedRequestBody, TypedResponse} from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import lookupAddressIsOwnedByUser from '../middleware/lookupAddressIsOwnedByUser';
 

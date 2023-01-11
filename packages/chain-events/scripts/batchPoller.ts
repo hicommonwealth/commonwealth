@@ -3,11 +3,12 @@ import type { LogGroupControlSettings } from 'typescript-logging';
 import type {
   IDisconnectedRange,
   CWEvent,
-  SubstrateTypes} from '../dist/index';
+  SubstrateTypes,
+} from '../dist/index';
 import {
   chainSupportedBy,
   SubstrateEvents,
-  IEventHandler
+  IEventHandler,
 } from '../dist/index';
 import { factoryControl } from '../dist/logging';
 

@@ -24,13 +24,8 @@ import type { Codec } from '@polkadot/types/types';
 import type { DeriveProposalImage } from '@polkadot/api-derive/types';
 import { isFunction, hexToString } from '@polkadot/util';
 
-import type {
-  CWEvent,
-  IChainEntityKind} from '../../interfaces';
-import {
-  IStorageFetcher,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { CWEvent, IChainEntityKind } from '../../interfaces';
+import { IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import type {
@@ -54,12 +49,9 @@ import type {
   ITreasuryBountyEvents,
   INewTip,
   ITipVoted,
-  ITipClosing} from './types';
-import {
-  EventKind,
-  parseJudgement,
-  EntityKind
+  ITipClosing,
 } from './types';
+import { EventKind, parseJudgement, EntityKind } from './types';
 
 export class StorageFetcher extends IStorageFetcher<ApiPromise> {
   protected readonly log;

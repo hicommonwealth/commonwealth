@@ -1,10 +1,8 @@
-import type {
-  Near as NearApi,
-  ConnectConfig} from 'near-api-js';
+import type { Near as NearApi, ConnectConfig } from 'near-api-js';
 import {
   Account as NearApiAccount,
   connect as nearConnect,
-  WalletAccount
+  WalletAccount,
 } from 'near-api-js';
 import type {
   CodeResult,
@@ -20,12 +18,8 @@ import type { IApp } from 'state';
 import { ApiStatus } from 'state';
 import moment from 'moment';
 import * as m from 'mithril';
-import type {
-  NearSputnikConfig,
-  NearSputnikPolicy} from './sputnik/types';
-import {
-  isGroupRole
-} from './sputnik/types';
+import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
+import { isGroupRole } from './sputnik/types';
 import type { NearAccounts, NearAccount } from './account';
 
 export interface IDaoInfo {

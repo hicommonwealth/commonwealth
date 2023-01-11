@@ -2,7 +2,8 @@ import type {
   GovernorCompatibilityBravo,
   GovernorAlpha,
   MPond,
-  ERC20VotesComp} from 'common-common/src/eth/types';
+  ERC20VotesComp,
+} from 'common-common/src/eth/types';
 import {
   GovernorCompatibilityBravo__factory,
   GovernorAlpha__factory,

@@ -9,7 +9,7 @@ import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_ut
 import type { AbiItem } from 'web3-utils';
 import type { ContractAttributes } from '../../models/contract';
 import type { ChainNodeAttributes } from '../../models/chain_node';
-import type { TypedRequestBody, TypedResponse} from '../../types';
+import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 
 const log = factory.getLogger(formatFilename(__filename));

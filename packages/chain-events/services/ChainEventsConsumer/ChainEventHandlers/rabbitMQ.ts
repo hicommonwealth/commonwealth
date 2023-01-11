@@ -1,9 +1,6 @@
 import type Rascal from 'rascal';
-import type {
-  RascalPublications} from 'common-common/src/rabbitmq';
-import {
-  RabbitMQController,
-} from 'common-common/src/rabbitmq';
+import type { RascalPublications } from 'common-common/src/rabbitmq';
+import { RabbitMQController } from 'common-common/src/rabbitmq';
 
 import type { CWEvent, IEventHandler } from 'chain-events/src';
 

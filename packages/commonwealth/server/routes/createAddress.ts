@@ -7,7 +7,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { addressSwapper } from '../../shared/utils';
 import type { DB } from '../models';
-import type { TypedRequestBody, TypedResponse} from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { AddressAttributes } from '../models/address';

@@ -5,10 +5,9 @@ import * as Sequelize from 'sequelize';
 import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
 import type {
   RabbitMQController,
-  RmqCETypeCUD} from 'common-common/src/rabbitmq';
-import {
-  RascalPublications
+  RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
 import { StatsDController } from 'common-common/src/statsd';
@@ -16,13 +15,8 @@ import { StatsDController } from 'common-common/src/statsd';
 import type { DB } from '../../database/database';
 import type { ChainEventInstance } from '../../database/models/chain_event';
 
-import type {
-  CWEvent,
-  IChainEventKind} from 'chain-events/src';
-import {
-  IEventHandler,
-  SubstrateTypes,
-} from 'chain-events/src';
+import type { CWEvent, IChainEventKind } from 'chain-events/src';
+import { IEventHandler, SubstrateTypes } from 'chain-events/src';
 
 const log = factory.getLogger(formatFilename(__filename));
 

@@ -9,7 +9,7 @@ import bs58 from 'bs58';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { ChainBase } from 'common-common/src/types';
-import type { Thread, Comment} from 'models';
+import type { Thread, Comment } from 'models';
 import { Profile } from 'models';
 
 import Sublayout from 'views/sublayout';

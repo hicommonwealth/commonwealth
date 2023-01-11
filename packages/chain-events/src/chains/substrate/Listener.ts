@@ -4,17 +4,15 @@ import type { RegisteredTypes } from '@polkadot/types/types';
 import type {
   CWEvent,
   IDisconnectedRange,
-  IEventPoller} from '../../interfaces';
-import {
-  SupportedNetwork,
+  IEventPoller,
 } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 
 import type { Block, EventKind, ISubstrateListenerOptions } from './types';
 
-import type {
-  EnricherConfig} from './index';
+import type { EnricherConfig } from './index';
 import {
   createApi,
   Poller,

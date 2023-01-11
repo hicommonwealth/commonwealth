@@ -4,18 +4,16 @@
 
 import { addPrefix, factory } from 'common-common/src/logging';
 import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import type {
-  RmqEntityCUD} from 'common-common/src/rabbitmq/types';
-import {
-  RascalPublications
-} from 'common-common/src/rabbitmq/types';
+import type { RmqEntityCUD } from 'common-common/src/rabbitmq/types';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 
 import type { DB } from '../../database/database';
 
 import type {
   CWEvent,
   IChainEntityKind,
-  IChainEventData} from 'chain-events/src';
+  IChainEventData,
+} from 'chain-events/src';
 import {
   EntityEventKind,
   eventToEntity,

@@ -1,5 +1,9 @@
 import type { ApiPromise } from '@polkadot/api';
-import type { BalanceOf, Permill, BlockNumber } from '@polkadot/types/interfaces';
+import type {
+  BalanceOf,
+  Permill,
+  BlockNumber,
+} from '@polkadot/types/interfaces';
 import type { IApp } from 'state';
 import type {
   ISubstrateBounty,

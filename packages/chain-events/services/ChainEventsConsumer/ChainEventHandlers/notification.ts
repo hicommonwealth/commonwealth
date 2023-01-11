@@ -1,9 +1,6 @@
 import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import type {
-  RmqCENotificationCUD} from 'common-common/src/rabbitmq/types';
-import {
-  RascalPublications
-} from 'common-common/src/rabbitmq/types';
+import type { RmqCENotificationCUD } from 'common-common/src/rabbitmq/types';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
 import type { ChainEventAttributes } from '../../database/models/chain_event';
@@ -12,10 +9,9 @@ import type { DB } from '../../database/database';
 import type {
   CWEvent,
   IChainEventData,
-  IChainEventKind} from 'chain-events/src';
-import {
-  IEventHandler,
+  IChainEventKind,
 } from 'chain-events/src';
+import { IEventHandler } from 'chain-events/src';
 
 export default class extends IEventHandler {
   public readonly name = 'Notification Producer';

@@ -10,14 +10,15 @@ import type {
   CWEvent,
   IEventProcessor,
   IEventSubscriber,
-  IChainEntityKind} from 'chain-events/src';
+  IChainEntityKind,
+} from 'chain-events/src';
 import {
   eventToEntity,
   SubstrateTypes,
   SupportedNetwork,
-  getUniqueEntityKey
+  getUniqueEntityKey,
 } from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types'
+import { SubstrateTypes } from 'chain-events/src/types';
 import { getBaseUrl, getFetch } from 'helpers/getUrl';
 import { notifyError } from '../app/notifications';
 

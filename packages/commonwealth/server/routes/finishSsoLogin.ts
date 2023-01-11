@@ -3,7 +3,7 @@ import { isAddress, toChecksumAddress } from 'web3-utils';
 import { NotificationCategories, WalletId } from 'common-common/src/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 
-import type { TypedRequestBody, TypedResponse} from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { AXIE_SHARED_SECRET } from '../config';
 import type { DB } from '../models';

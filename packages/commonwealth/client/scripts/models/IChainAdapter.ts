@@ -1,5 +1,5 @@
 import moment from 'moment';
-import type { IApp} from 'state';
+import type { IApp } from 'state';
 import { ApiStatus, LoginState } from 'state';
 import type { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';

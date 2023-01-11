@@ -5,10 +5,9 @@ import { createProvider } from '../../eth';
 import type {
   CWEvent,
   SubscribeFunc,
-  ISubscribeOptions} from '../../interfaces';
-import {
-  SupportedNetwork,
+  ISubscribeOptions,
 } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 import type { ERC721 } from '../../contractTypes';
 import { ERC721__factory as ERC721Factory } from '../../contractTypes';

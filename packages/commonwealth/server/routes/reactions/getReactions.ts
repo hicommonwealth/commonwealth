@@ -4,13 +4,8 @@ import type {
   GetReactionsReq,
   GetReactionsResp,
 } from 'common-common/src/api/extApiTypes';
-import type {
-  TypedRequestQuery,
-  TypedResponse} from '../../types';
-import {
-  success,
-  failure,
-} from '../../types';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { success, failure } from '../../types';
 import type { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 

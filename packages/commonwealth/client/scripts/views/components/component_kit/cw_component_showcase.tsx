@@ -16,7 +16,7 @@ import { CWText } from './cw_text';
 import { CWIconButton } from './cw_icon_button';
 import { CWWalletOptionRow } from './cw_wallet_option_row';
 import { CWAccountCreationButton } from './cw_account_creation_button';
-import type { CheckboxType} from './cw_checkbox';
+import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
 import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
@@ -34,7 +34,7 @@ import { CWFilterMenu } from './cw_popover/cw_filter_menu';
 import { CWSpinner } from './cw_spinner';
 import { CWDropdown } from './cw_dropdown';
 import CWCoverImageUploader from './cw_cover_image_uploader';
-import type { RadioButtonType} from './cw_radio_button';
+import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
 import { CWContentPageCard } from './cw_content_page';
 

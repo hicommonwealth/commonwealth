@@ -1,12 +1,7 @@
 import { AppError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
-import type {
-  TypedRequestBody,
-  TypedResponse} from '../types';
-import {
-  success,
-  TypedRequestQuery
-} from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success, TypedRequestQuery } from '../types';
 import type { DB } from '../models';
 import { BanAttributes } from '../models/ban';
 

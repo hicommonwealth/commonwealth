@@ -8,12 +8,8 @@ import 'pages/communities.scss';
 
 import app from 'state';
 import type { ChainInfo } from 'models';
-import type {
-  ChainCategoryType} from 'common-common/src/types';
-import {
-  ChainBase,
-  ChainNetwork,
-} from 'common-common/src/types';
+import type { ChainCategoryType } from 'common-common/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { CWButton } from '../components/component_kit/cw_button';
 import Sublayout from '../sublayout';
 import { CommunityCard, NewCommunityCard } from '../components/community_card';

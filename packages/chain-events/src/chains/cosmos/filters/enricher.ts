@@ -4,7 +4,7 @@ import {
   MsgVote,
 } from 'cosmjs-types/cosmos/gov/v1beta1/tx';
 
-import type { CWEvent} from '../../../interfaces';
+import type { CWEvent } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
 import type { Api, IEventData, RawEvent } from '../types';
 import { coinToCoins, EventKind } from '../types';

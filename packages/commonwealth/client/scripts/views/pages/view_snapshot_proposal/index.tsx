@@ -12,11 +12,9 @@ import Sublayout from 'views/sublayout';
 import type {
   SnapshotSpace,
   SnapshotProposal,
-  SnapshotProposalVote} from 'helpers/snapshot_utils';
-import {
-  getResults,
-  getPower,
+  SnapshotProposalVote,
 } from 'helpers/snapshot_utils';
+import { getResults, getPower } from 'helpers/snapshot_utils';
 import { PageLoading } from '../loading';
 import { mixpanelBrowserTrack } from '../../../helpers/mixpanel_browser_util';
 import { SnapshotPollCardContainer } from './snapshot_poll_card_container';

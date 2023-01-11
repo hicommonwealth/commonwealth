@@ -15,12 +15,11 @@ import {
 } from '@metamask/eth-sig-util';
 
 import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import type {
-  StdSignDoc} from '@cosmjs/amino';
+import type { StdSignDoc } from '@cosmjs/amino';
 import {
   pubkeyToAddress,
   serializeSignDoc,
-  decodeSignature
+  decodeSignature,
 } from '@cosmjs/amino';
 
 import nacl from 'tweetnacl';

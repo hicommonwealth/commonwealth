@@ -1,5 +1,5 @@
 import { ChainBase } from 'common-common/src/types';
-import type { ChainInfo} from 'models';
+import type { ChainInfo } from 'models';
 import { IChainAdapter, NodeInfo } from 'models';
 import type { IApp } from 'state';
 

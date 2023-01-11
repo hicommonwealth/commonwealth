@@ -15,8 +15,7 @@ import {
 } from 'redis';
 import { StatsDController } from 'common-common/src/statsd';
 import { factory, formatFilename } from 'common-common/src/logging';
-import type {
-  RabbitMQController} from 'common-common/src/rabbitmq';
+import type { RabbitMQController } from 'common-common/src/rabbitmq';
 import {
   getRabbitMQConfig,
   RascalSubscriptions,

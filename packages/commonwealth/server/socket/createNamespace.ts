@@ -3,10 +3,11 @@ import { addPrefix, factory } from 'common-common/src/logging';
 import type {
   SnapshotProposalNotification,
   ChainEventNotification,
-  WebsocketNamespaces} from '../../shared/types';
+  WebsocketNamespaces,
+} from '../../shared/types';
 import {
   WebsocketEngineEvents,
-  WebsocketMessageNames
+  WebsocketMessageNames,
 } from '../../shared/types';
 import { authenticate } from './index';
 

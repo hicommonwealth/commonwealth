@@ -5,8 +5,7 @@ import ClassComponent from 'class_component';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 
-import type {
-  CWEvent} from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
 import {
   Label as ChainEventLabel,
   // CompoundEvents

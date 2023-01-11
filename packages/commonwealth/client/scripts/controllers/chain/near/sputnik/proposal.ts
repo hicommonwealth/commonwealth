@@ -1,23 +1,14 @@
 import type { Near as NearApi } from 'near-api-js';
 import BN from 'bn.js';
 import moment from 'moment';
-import type {
-  ProposalEndTime,
-  ITXModalData} from 'models';
-import {
-  Proposal,
-  VotingType,
-  VotingUnit,
-  ProposalStatus
-} from 'models';
+import type { ProposalEndTime, ITXModalData } from 'models';
+import { Proposal, VotingType, VotingUnit, ProposalStatus } from 'models';
 import type { NearToken } from 'adapters/chain/near/types';
 import type { NearAccount, NearAccounts } from 'controllers/chain/near/account';
 import type NearChain from 'controllers/chain/near/chain';
 import { ProposalType } from 'common-common/src/types';
 import type NearSputnikDao from './dao';
-import type {
-  INearSputnikProposal,
-  VotePolicy} from './types';
+import type { INearSputnikProposal, VotePolicy } from './types';
 import {
   NearSputnikVote,
   NearSputnikProposalStatus,

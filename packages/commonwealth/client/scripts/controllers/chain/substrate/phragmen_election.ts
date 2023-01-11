@@ -1,15 +1,7 @@
 import _ from 'underscore';
 import { ChainBase, ProposalType } from 'common-common/src/types';
-import type {
-  IVote,
-  Account,
-  IFixedBlockEndTime} from 'models';
-import {
-  Proposal,
-  VotingType,
-  VotingUnit,
-  ProposalStatus
-} from 'models';
+import type { IVote, Account, IFixedBlockEndTime } from 'models';
+import { Proposal, VotingType, VotingUnit, ProposalStatus } from 'models';
 import type { ApiPromise } from '@polkadot/api';
 import type {
   ISubstratePhragmenElection,

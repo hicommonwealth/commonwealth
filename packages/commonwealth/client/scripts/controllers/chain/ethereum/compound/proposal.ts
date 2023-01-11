@@ -1,10 +1,9 @@
 import moment from 'moment';
 import BN from 'bn.js';
 import { capitalize } from 'lodash';
-import type { ContractTransaction} from 'ethers';
+import type { ContractTransaction } from 'ethers';
 import { utils } from 'ethers';
-import type {
-  GovernorCompatibilityBravo} from 'common-common/src/eth/types';
+import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import {
   GovernorMock,
   GovernorMock__factory,
@@ -21,13 +20,9 @@ import type {
   ITXModalData,
   ProposalEndTime,
   ChainEntity,
-  ChainEvent} from 'models';
-import {
-  Proposal,
-  VotingType,
-  VotingUnit,
-  ProposalStatus
+  ChainEvent,
 } from 'models';
+import { Proposal, VotingType, VotingUnit, ProposalStatus } from 'models';
 import { blocknumToTime } from 'helpers';
 
 import type CompoundAPI from './api';

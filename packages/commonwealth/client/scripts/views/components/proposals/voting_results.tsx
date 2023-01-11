@@ -13,9 +13,7 @@ import type NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import { CosmosProposal } from 'controllers/chain/cosmos/proposal';
 import { MolochVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { BravoVote } from 'controllers/chain/ethereum/compound/proposal';
-import type {
-  AaveProposalVote,
-} from 'controllers/chain/ethereum/aave/proposal';
+import type { AaveProposalVote } from 'controllers/chain/ethereum/aave/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import {
   AaveVotingResult,

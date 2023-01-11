@@ -4,17 +4,15 @@ import { capitalize } from 'lodash';
 import type {
   CWEvent,
   SupportedNetwork,
-  IChainEventData} from 'chain-events/src';
-import {
-  Label as ChainEventLabel,
-  IEventLabel
+  IChainEventData,
 } from 'chain-events/src';
+import { Label as ChainEventLabel, IEventLabel } from 'chain-events/src';
 
 import { factory, formatFilename } from 'common-common/src/logging';
 import { NotificationCategories } from 'common-common/src/types';
 import { SENDGRID_API_KEY } from '../config';
 import { getForumNotificationCopy } from '../../shared/notificationFormatter';
-import type { IPostNotificationData} from '../../shared/types';
+import type { IPostNotificationData } from '../../shared/types';
 import { DynamicTemplate } from '../../shared/types';
 import type { DB } from '../models';
 import type { UserAttributes } from '../models/user';

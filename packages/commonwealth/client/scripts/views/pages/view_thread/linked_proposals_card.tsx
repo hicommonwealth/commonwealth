@@ -12,12 +12,8 @@ import {
   getProposalUrlPath,
 } from 'identifiers';
 import type { ChainEntity, Thread, ThreadStage } from 'models';
-import type {
-  SnapshotProposal,
-  SnapshotSpace} from 'helpers/snapshot_utils';
-import {
-  loadMultipleSpacesData
-} from 'helpers/snapshot_utils';
+import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
 import { CWContentPageCard } from '../../components/component_kit/cw_content_page';

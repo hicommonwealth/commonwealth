@@ -1,4 +1,4 @@
-import type { Response} from 'express';
+import type { Response } from 'express';
 import { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
 import type { TypedRequestBody } from '../types';

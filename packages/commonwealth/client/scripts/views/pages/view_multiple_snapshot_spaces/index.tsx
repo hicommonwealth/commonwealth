@@ -7,12 +7,8 @@ import 'pages/snapshot/multiple_snapshots_page.scss';
 
 import app from 'state';
 import Sublayout from 'views/sublayout';
-import type {
-  SnapshotProposal,
-  SnapshotSpace} from 'helpers/snapshot_utils';
-import {
-  loadMultipleSpacesData
-} from 'helpers/snapshot_utils';
+import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 import type { Thread } from 'models';
 import { SnapshotSpaceCard } from './snapshot_space_card';
 import { PageLoading } from '../loading';

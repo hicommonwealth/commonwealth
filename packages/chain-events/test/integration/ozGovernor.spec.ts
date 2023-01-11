@@ -5,12 +5,13 @@ import { EventEmitter } from 'events';
 import chai, { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { BigNumber, utils } from 'ethers';
-import type { Signer, providers , BigNumberish} from 'ethers';
+import type { Signer, providers, BigNumberish } from 'ethers';
 
 import type {
   GovernorMock,
   ERC20VotesMock,
-  TimelockController} from '../../src/contractTypes';
+  TimelockController,
+} from '../../src/contractTypes';
 import {
   GovernorMock__factory as GovernorMockFactory,
   ERC20VotesMock__factory as ERC20VotesMockFactory,
@@ -22,14 +23,15 @@ import type {
   IProposalCreated,
   IProposalExecuted,
   IProposalQueued,
-  IVoteCast} from '../../src/chains/compound/types';
+  IVoteCast,
+} from '../../src/chains/compound/types';
 import {
   BravoSupport,
   EventKind,
   ProposalState,
 } from '../../src/chains/compound/types';
 import { subscribeEvents } from '../../src/chains/compound';
-import type { CWEvent, IChainEventData} from '../../src';
+import type { CWEvent, IChainEventData } from '../../src';
 import { IEventHandler } from '../../src';
 
 const { assert } = chai;

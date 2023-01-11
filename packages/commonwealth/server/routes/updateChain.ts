@@ -7,7 +7,7 @@ import { Action } from 'common-common/src/permissions';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import type { DB } from '../models';
 import type { ChainAttributes } from '../models/chain';
-import type { TypedRequestBody, TypedResponse} from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';

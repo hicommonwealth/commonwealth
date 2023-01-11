@@ -1,22 +1,14 @@
 import $ from 'jquery';
 import app from 'state';
 
-import type {
-  AddressInfo,
-  RoleInfo,
-  ChainInfo} from 'models';
-import {
-  Account,
-  RolePermission
-} from 'models';
-import type {
-  Action,
-  Permissions} from 'common-common/src/permissions';
+import type { AddressInfo, RoleInfo, ChainInfo } from 'models';
+import { Account, RolePermission } from 'models';
+import type { Action, Permissions } from 'common-common/src/permissions';
 import {
   BASE_PERMISSIONS,
   computePermissions,
   isPermitted,
-  PermissionError
+  PermissionError,
 } from 'common-common/src/permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
 import type { UserController } from './user';

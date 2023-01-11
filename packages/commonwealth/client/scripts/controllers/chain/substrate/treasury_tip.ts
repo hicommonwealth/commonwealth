@@ -8,7 +8,8 @@ import type {
   ProposalEndTime,
   ITXModalData,
   ChainEntity,
-  ChainEvent} from 'models';
+  ChainEvent,
+} from 'models';
 import {
   Proposal,
   ProposalStatus,

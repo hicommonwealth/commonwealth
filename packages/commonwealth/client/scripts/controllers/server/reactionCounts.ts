@@ -7,7 +7,7 @@ import app from 'state';
 
 import { ReactionCountsStore } from 'stores';
 import ReactionCount from 'models/ReactionCount';
-import type { AnyProposal} from 'models';
+import type { AnyProposal } from 'models';
 import { Comment, Thread, Proposal } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import proposalIdToEntity from 'helpers/proposalIdToEntity';

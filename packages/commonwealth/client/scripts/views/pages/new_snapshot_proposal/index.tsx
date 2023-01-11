@@ -12,7 +12,7 @@ import { navigateToSubpage } from 'app';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { idToProposal } from 'identifiers';
-import type { SnapshotSpace} from 'helpers/snapshot_utils';
+import type { SnapshotSpace } from 'helpers/snapshot_utils';
 import { getScore } from 'helpers/snapshot_utils';
 import type { QuillEditor } from '../../components/quill/quill_editor';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';

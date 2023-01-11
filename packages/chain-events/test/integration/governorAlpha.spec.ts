@@ -10,11 +10,12 @@ import chai, { expect } from 'chai';
 import type {
   MPond,
   GovernorAlphaMock as GovernorAlpha,
-  TimelockMock as Timelock} from '../../src/contractTypes';
+  TimelockMock as Timelock,
+} from '../../src/contractTypes';
 import {
   MPond__factory as MPondFactory,
   GovernorAlphaMock__factory as GovernorAlphaFactory,
-  TimelockMock__factory as TimelockFactory
+  TimelockMock__factory as TimelockFactory,
 } from '../../src/contractTypes';
 import type {
   Api,
@@ -22,11 +23,9 @@ import type {
   IProposalCreated,
   IProposalQueued,
   IProposalExecuted,
-  IVoteCast} from '../../src/chains/compound/types';
-import {
-  EventKind,
-  ProposalState,
+  IVoteCast,
 } from '../../src/chains/compound/types';
+import { EventKind, ProposalState } from '../../src/chains/compound/types';
 import { subscribeEvents } from '../../src/chains/compound/subscribeFunc';
 import type { CWEvent, IChainEventData } from '../../src/interfaces';
 import { IEventHandler } from '../../src/interfaces';

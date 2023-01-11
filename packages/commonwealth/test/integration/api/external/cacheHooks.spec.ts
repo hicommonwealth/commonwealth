@@ -1,9 +1,5 @@
-import type {
-  IChainNode} from 'token-balance-cache/src';
-import {
-  BalanceProvider,
-  TokenBalanceCache,
-} from 'token-balance-cache/src';
+import type { IChainNode } from 'token-balance-cache/src';
+import { BalanceProvider, TokenBalanceCache } from 'token-balance-cache/src';
 import { BalanceType } from 'common-common/src/types';
 import type BN from 'bn.js';
 

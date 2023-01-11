@@ -3,15 +3,11 @@ import { factory, formatFilename } from 'common-common/src/logging';
 
 import { DATABASE_URI } from '../config';
 
-import type {
-  ChainEntityModelStatic,
-} from './models/chain_entity';
+import type { ChainEntityModelStatic } from './models/chain_entity';
 import ChainEntityFactory from './models/chain_entity';
 import type { ChainEventModelStatic } from './models/chain_event';
 import ChainEventFactory from './models/chain_event';
-import type {
-  ChainEventTypeModelStatic,
-} from './models/chain_event_type';
+import type { ChainEventTypeModelStatic } from './models/chain_event_type';
 import ChainEventTypeFactory from './models/chain_event_type';
 
 export type Models = {

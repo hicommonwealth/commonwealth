@@ -1,4 +1,8 @@
-import type { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import type {
+  ChainBase,
+  ChainNetwork,
+  WalletId,
+} from 'common-common/src/types';
 import type Account from './Account';
 import type BlockInfo from './BlockInfo';
 

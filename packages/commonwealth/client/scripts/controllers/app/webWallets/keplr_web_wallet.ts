@@ -1,6 +1,6 @@
 import app from 'state';
 
-import type { SigningStargateClient} from '@cosmjs/stargate';
+import type { SigningStargateClient } from '@cosmjs/stargate';
 import { StargateClient } from '@cosmjs/stargate';
 import type { AccountData } from '@cosmjs/proto-signing';
 import type { OfflineDirectSigner } from '@cosmjs/proto-signing';

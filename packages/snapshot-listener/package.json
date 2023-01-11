@@ -12,7 +12,7 @@
     "test": "ts-mocha -p tsconfig.json --exit src/**/*.spec.ts"
   },
   "engines": {
-    "node": "18.x"
+    "node": "14.x"
   },
   "keywords": [],
   "author": "",

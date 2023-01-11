@@ -5,10 +5,7 @@ import type { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import type {
-  ChainInfo,
-  Window as KeplrWindow,
-} from '@keplr-wallet/types';
+import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -90,7 +87,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     try {
       // fetch chain id from URL using stargate client
       const url = `${window.location.origin}/cosmosAPI/${app.chain.id}`;
-      const cosm = await import('@cosmjs/stargate')
+      const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;

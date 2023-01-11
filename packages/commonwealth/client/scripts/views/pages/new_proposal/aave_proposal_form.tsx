@@ -19,7 +19,7 @@ import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popo
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
-import type { AaveProposalState} from './types';
+import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 

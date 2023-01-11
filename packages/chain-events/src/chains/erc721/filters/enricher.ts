@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 
-import type { CWEvent} from '../../../interfaces';
+import type { CWEvent } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
 import type { TypedEventFilter } from '../../../contractTypes/commons';
 import type { ERC721 } from '../../../contractTypes';

@@ -1,16 +1,17 @@
 import BN from 'bn.js';
 import moment from 'moment';
 import _ from 'underscore';
-import type { ITXModalData} from 'models';
+import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import { fromAscii } from '@cosmjs/encoding';
 import type { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
 import type {
   Proposal,
-  TallyResult} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+  TallyResult,
+} from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   TextProposal,
-  ProposalStatus
+  ProposalStatus,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
   CommunityPoolSpendProposal,
@@ -20,10 +21,9 @@ import { Any } from 'cosmjs-types/google/protobuf/any';
 import type {
   ICosmosProposal,
   ICosmosProposalTally,
-  CosmosProposalState} from 'controllers/chain/cosmos/types';
-import {
-  CosmosToken
+  CosmosProposalState,
 } from 'controllers/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
 import type CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
 import type { CosmosApiType } from './chain';

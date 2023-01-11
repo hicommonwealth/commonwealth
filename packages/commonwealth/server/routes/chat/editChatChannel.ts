@@ -1,6 +1,6 @@
 import type { NextFunction } from 'express';
 import validateRoles from '../../util/validateRoles';
-import type { TypedRequestBody, TypedResponse} from '../../types';
+import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
 import type { DB } from '../../models';
 import { AppError, ServerError } from 'common-common/src/errors';

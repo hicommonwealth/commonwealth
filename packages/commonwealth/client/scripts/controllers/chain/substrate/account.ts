@@ -9,11 +9,9 @@ import type {
   AccountId,
   Exposure,
   Conviction,
-  StakingLedger} from '@polkadot/types/interfaces';
-import type {
-  BalanceLock,
-  BalanceLockTo212
+  StakingLedger,
 } from '@polkadot/types/interfaces';
+import type { BalanceLock, BalanceLockTo212 } from '@polkadot/types/interfaces';
 import type { Vec } from '@polkadot/types';
 import { stringToU8a, u8aToHex } from '@polkadot/util';
 

@@ -5,15 +5,12 @@ import type { WhereOptions } from 'sequelize';
 import type {
   RabbitMQController,
   RmqCENotificationCUD,
-  RmqCETypeCUD} from 'common-common/src/rabbitmq';
-import {
-  RascalPublications
+  RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
 
-import type {
-  CWEvent,
-  IChainEventData} from '../../../src';
+import type { CWEvent, IChainEventData } from '../../../src';
 import {
   IEventHandler,
   eventToEntity,

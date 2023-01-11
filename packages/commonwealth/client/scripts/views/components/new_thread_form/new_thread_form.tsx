@@ -10,14 +10,8 @@ import 'components/new_thread_form.scss';
 import app from 'state';
 import { navigateToSubpage } from 'app';
 import { detectURL } from 'helpers/threads';
-import type {
-  Topic,
-  DiscussionDraft,
-  Account} from 'models';
-import {
-  ThreadStage,
-  ThreadKind,
-} from 'models';
+import type { Topic, DiscussionDraft, Account } from 'models';
+import { ThreadStage, ThreadKind } from 'models';
 import { notifySuccess, notifyError } from 'controllers/app/notifications';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import type { DraftParams } from 'controllers/server/drafts';
@@ -27,7 +21,7 @@ import { TopicSelector } from '../topic_selector';
 import { QuillEditorComponent } from '../quill/quill_editor_component';
 import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import type { QuillEditor } from '../quill/quill_editor';
-import type { NewThreadFormType} from './types';
+import type { NewThreadFormType } from './types';
 import { NewDraftErrors } from './types';
 import { updateTopicList, checkNewThreadErrors } from './helpers';
 import { CWTabBar, CWTab } from '../component_kit/cw_tabs';

@@ -1,8 +1,5 @@
-import type {
-  TokenBalanceCache} from 'token-balance-cache/src/index';
-import {
-  FetchTokenBalanceErrors,
-} from 'token-balance-cache/src/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { FetchTokenBalanceErrors } from 'token-balance-cache/src/index';
 
 import { AppError, ServerError } from 'common-common/src/errors';
 import type { DB } from '../models';

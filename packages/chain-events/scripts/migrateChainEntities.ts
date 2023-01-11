@@ -4,9 +4,7 @@
  * from the chain, writing the results back into the database.
  */
 
-import type {
-  IDisconnectedRange,
-  IStorageFetcher} from 'chain-events/src';
+import type { IDisconnectedRange, IStorageFetcher } from 'chain-events/src';
 import {
   AaveEvents,
   CommonwealthEvents,

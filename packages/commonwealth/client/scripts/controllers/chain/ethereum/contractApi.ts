@@ -1,10 +1,9 @@
 import type {
   ExternalProvider,
   JsonRpcSigner,
-  Provider} from '@ethersproject/providers';
-import type {
-  Web3Provider
+  Provider,
 } from '@ethersproject/providers';
+import type { Web3Provider } from '@ethersproject/providers';
 import type { Contract } from 'ethers';
 import { ethers } from 'ethers';
 import { ChainBase } from 'common-common/src/types';

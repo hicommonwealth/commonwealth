@@ -8,7 +8,7 @@ import 'modals/update_proposal_status_modal.scss';
 
 import app from 'state';
 import { threadStageToLabel, parseCustomStages } from 'helpers';
-import type { ChainEntity, Thread} from 'models';
+import type { ChainEntity, Thread } from 'models';
 import { ThreadStage } from 'models';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { ChainEntitiesSelector } from '../components/chain_entities_selector';

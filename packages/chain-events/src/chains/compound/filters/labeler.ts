@@ -1,10 +1,6 @@
-import type {
-  LabelerFilter,
-  IEventLabel} from '../../../interfaces';
-import {
-  SupportedNetwork,
-} from '../../../interfaces';
-import type { IEventData} from '../types';
+import type { LabelerFilter, IEventLabel } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { IEventData } from '../types';
 import { EventKind } from '../types';
 
 /**

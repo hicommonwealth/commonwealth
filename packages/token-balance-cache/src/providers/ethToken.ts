@@ -1,12 +1,7 @@
 import Web3 from 'web3';
 import { providers } from 'ethers';
-import type {
-  ERC20,
-  ERC721} from 'common-common/src/eth/types';
-import {
-  ERC20__factory,
-  ERC721__factory,
-} from 'common-common/src/eth/types';
+import type { ERC20, ERC721 } from 'common-common/src/eth/types';
+import { ERC20__factory, ERC721__factory } from 'common-common/src/eth/types';
 
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';

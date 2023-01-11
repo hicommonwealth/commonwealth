@@ -1,9 +1,5 @@
-import type {
-  ChainEventNotification} from 'types';
-import {
-  WebsocketMessageNames,
-  WebsocketNamespaces,
-} from 'types';
+import type { ChainEventNotification } from 'types';
+import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 import app from 'state';
 import type { NotificationSubscription } from 'models';
 import { Notification } from 'models';

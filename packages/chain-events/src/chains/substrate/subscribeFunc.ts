@@ -6,10 +6,9 @@ import type {
   IDisconnectedRange,
   CWEvent,
   SubscribeFunc,
-  ISubscribeOptions} from '../../interfaces';
-import {
-  SupportedNetwork,
+  ISubscribeOptions,
 } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import { Subscriber } from './subscriber';

@@ -6,10 +6,9 @@ import type {
   Call,
   AccountId,
   IdentityJudgement,
-  IdentityFields} from '@polkadot/types/interfaces';
-import type {
-  RegistrarInfo
+  IdentityFields,
 } from '@polkadot/types/interfaces';
+import type { RegistrarInfo } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import type { Data } from '@polkadot/types';
 import type { ApiPromise } from '@polkadot/api';

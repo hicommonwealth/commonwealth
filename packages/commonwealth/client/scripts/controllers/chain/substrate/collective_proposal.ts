@@ -5,20 +5,16 @@ import type { Option } from '@polkadot/types';
 
 import type {
   ISubstrateCollectiveProposal,
-  SubstrateCoin} from 'adapters/chain/substrate/types';
-import {
-  formatCall,
+  SubstrateCoin,
 } from 'adapters/chain/substrate/types';
-import type {
-  ProposalEndTime,
-  ChainEntity,
-  ChainEvent} from 'models';
+import { formatCall } from 'adapters/chain/substrate/types';
+import type { ProposalEndTime, ChainEntity, ChainEvent } from 'models';
 import {
   Proposal,
   ProposalStatus,
   BinaryVote,
   VotingType,
-  VotingUnit
+  VotingUnit,
 } from 'models';
 import { ProposalType } from 'common-common/src/types';
 

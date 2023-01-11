@@ -30,7 +30,6 @@ import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
 
-
 // eslint-disable-next-line max-len
 const APPLICATION_UPDATE_MESSAGE =
   'A new version of the application has been released. Please save your work and refresh.';

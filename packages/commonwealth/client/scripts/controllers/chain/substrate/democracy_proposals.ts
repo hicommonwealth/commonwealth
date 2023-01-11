@@ -2,10 +2,9 @@ import type {
   BlockNumber,
   Call,
   Balance,
-  Hash} from '@polkadot/types/interfaces';
-import type {
-  VoteThreshold
+  Hash,
 } from '@polkadot/types/interfaces';
+import type { VoteThreshold } from '@polkadot/types/interfaces';
 import type { ApiPromise } from '@polkadot/api';
 import type {
   ISubstrateDemocracyProposal,

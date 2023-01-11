@@ -8,7 +8,8 @@ import type {
   SocialAccount,
   Account,
   StarredCommunity,
-  ChainInfo} from 'models';
+  ChainInfo,
+} from 'models';
 
 import NotificationsController from './notifications';
 import DraftsController from './drafts';

@@ -14,13 +14,9 @@ import type {
   ITXModalData,
   ProposalEndTime,
   ChainEntity,
-  ChainEvent} from 'models';
-import {
-  Proposal,
-  VotingType,
-  VotingUnit,
-  ProposalStatus
+  ChainEvent,
 } from 'models';
+import { Proposal, VotingType, VotingUnit, ProposalStatus } from 'models';
 import { blocknumToTime } from 'helpers';
 
 import type AaveAPI from './api';

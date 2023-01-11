@@ -3,17 +3,18 @@ import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import { getQueueStats, publishRmqMsg } from 'common-common/src/rabbitmq/util';
 import type {
   RmqCENotificationCUD,
-  RmqEntityCUD} from 'common-common/src/rabbitmq';
+  RmqEntityCUD,
+} from 'common-common/src/rabbitmq';
 import {
   RascalExchanges,
   RascalQueues,
-  RascalRoutingKeys
+  RascalRoutingKeys,
 } from 'common-common/src/rabbitmq';
 import { v4 as uuidv4 } from 'uuid';
 import type * as AaveTypes from 'chain-events/src/chains/aave/types';
 import type { ITransfer } from 'chain-events/src/chains/aave/types';
 import { EventKind } from 'chain-events/src/chains/aave/types';
-import type { CWEvent} from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
 import { SupportedNetwork } from 'chain-events/src';
 import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import { setupCommonwealthConsumer } from '../../server/CommonwealthConsumer/CommonwealthConsumer';

@@ -4,7 +4,7 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { EventEmitter } from 'events';
-import type { CWEvent} from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
 import { SubstrateTypes, SupportedNetwork } from 'chain-events/src';
 
 import { resetDatabase } from '../../../server-test';

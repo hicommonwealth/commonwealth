@@ -1,11 +1,8 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { BlockNumber } from '@polkadot/types/interfaces';
-import type {
-  ISubstrateDemocracyReferendum} from 'adapters/chain/substrate/types';
-import type {
-  SubstrateCoin,
-} from 'adapters/chain/substrate/types';
-import type { ITXModalData} from 'models';
+import type { ISubstrateDemocracyReferendum } from 'adapters/chain/substrate/types';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
+import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import { SubstrateTypes } from 'chain-events/src/types';
 import type { IApp } from 'state';

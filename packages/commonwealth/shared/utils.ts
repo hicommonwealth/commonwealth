@@ -4,11 +4,10 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import type {
-  Permissions} from 'common-common/src/permissions';
+import type { Permissions } from 'common-common/src/permissions';
 import {
   BASE_PERMISSIONS,
-  computePermissions
+  computePermissions,
 } from 'common-common/src/permissions';
 
 import { ProposalType } from 'common-common/src/types';

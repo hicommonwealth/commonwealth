@@ -1,7 +1,7 @@
 /**
  * Processes ERC20 events.
  */
-import type { CWEvent} from '../../interfaces';
+import type { CWEvent } from '../../interfaces';
 import { IEventProcessor, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 

@@ -5,7 +5,10 @@ import type { CommentAttributes } from 'commonwealth/server/models/comment';
 import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import type { ChainAttributes } from 'commonwealth/server/models/chain';
 import type { ProfileAttributes } from 'commonwealth/server/models/profile';
-import type { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
+import type {
+  BalanceProviderResp,
+  ChainNodeResp,
+} from 'token-balance-cache/src';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',

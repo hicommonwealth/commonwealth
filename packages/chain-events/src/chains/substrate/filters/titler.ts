@@ -1,9 +1,5 @@
-import type {
-  IEventTitle,
-  TitlerFilter} from '../../../interfaces';
-import {
-  SupportedNetwork
-} from '../../../interfaces';
+import type { IEventTitle, TitlerFilter } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
 import { EventKind } from '../types';
 
 /**

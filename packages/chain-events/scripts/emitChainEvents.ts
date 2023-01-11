@@ -6,8 +6,7 @@ import cwModels from '../../commonwealth/server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { ChainInstance } from 'commonwealth/server/models/chain';
 import { SubstrateTypes } from '../src';
-import type {
-  StorageFilterConfig} from '../services/ChainEventsConsumer/ChainEventHandlers';
+import type { StorageFilterConfig } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   EntityArchivalHandler,
   NotificationHandler,

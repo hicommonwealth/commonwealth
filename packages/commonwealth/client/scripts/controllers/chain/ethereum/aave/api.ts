@@ -3,7 +3,8 @@ import type {
   IAaveGovernanceV2,
   Executor,
   GovernanceStrategy,
-  AaveTokenV2} from 'common-common/src/eth/types';
+  AaveTokenV2,
+} from 'common-common/src/eth/types';
 import {
   Executor__factory,
   GovernanceStrategy__factory,

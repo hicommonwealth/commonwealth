@@ -1,13 +1,14 @@
 import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
-import type { TokenBalanceCache, TokenBalanceResp } from 'token-balance-cache/src';
+import type {
+  TokenBalanceCache,
+  TokenBalanceResp,
+} from 'token-balance-cache/src';
 import type { DB } from 'commonwealth/server/models';
 import type {
   TypedRequestQuery,
-  TypedResponse} from 'commonwealth/server/types';
-import {
-  failure,
-  success
+  TypedResponse,
 } from 'commonwealth/server/types';
+import { failure, success } from 'commonwealth/server/types';
 import { query, validationResult } from 'express-validator';
 
 export const getTokenBalanceValidation = [

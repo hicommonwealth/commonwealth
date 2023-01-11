@@ -5,7 +5,7 @@ import app from 'state';
 import { SearchContentType } from 'types';
 import type { SearchParams } from '../../models/SearchQuery';
 import { SearchScope } from '../../models/SearchQuery';
-import type { Thread} from '../../models';
+import type { Thread } from '../../models';
 import { SearchQuery } from '../../models';
 import { modelFromServer } from './threads';
 

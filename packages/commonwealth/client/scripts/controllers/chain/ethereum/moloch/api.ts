@@ -1,4 +1,4 @@
-import type { Moloch1, ERC20} from 'common-common/src/eth/types';
+import type { Moloch1, ERC20 } from 'common-common/src/eth/types';
 import { ERC20__factory } from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 

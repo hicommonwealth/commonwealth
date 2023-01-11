@@ -4,12 +4,13 @@ import { hexToAscii } from 'web3-utils';
 import type { TypedEventFilter } from '../../../contractTypes/commons';
 import type {
   ICuratedProjectFactory,
-  ICuratedProject} from '../../../contractTypes';
+  ICuratedProject,
+} from '../../../contractTypes';
 import {
   // eslint-disable-next-line camelcase
   ICuratedProject__factory,
 } from '../../../contractTypes';
-import type { CWEvent} from '../../../interfaces';
+import type { CWEvent } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
 import type { RawEvent, IEventData, Api } from '../types';
 import { EventKind } from '../types';

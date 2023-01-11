@@ -1,10 +1,7 @@
 import 'chai/register-should';
 import chai from 'chai';
-import type {
-  GetReactionsReq} from 'common-common/src/api/extApiTypes';
-import {
-  OrderByOptions,
-} from 'common-common/src/api/extApiTypes';
+import type { GetReactionsReq } from 'common-common/src/api/extApiTypes';
+import { OrderByOptions } from 'common-common/src/api/extApiTypes';
 import {
   testComments,
   testReactions,

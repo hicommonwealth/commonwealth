@@ -1,13 +1,6 @@
 import IdStore from './IdStore';
-import type {
-  AnyProposal} from '../models';
-import {
-  Reaction,
-  Thread,
-  Comment,
-  Proposal,
-  AbridgedThread,
-} from '../models';
+import type { AnyProposal } from '../models';
+import { Reaction, Thread, Comment, Proposal, AbridgedThread } from '../models';
 import { byAscendingCreationDate } from '../helpers';
 
 enum PostType {

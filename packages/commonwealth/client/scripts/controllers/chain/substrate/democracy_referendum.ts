@@ -3,23 +3,17 @@ import type { Call, Conviction } from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 import type {
   ISubstrateDemocracyReferendum,
-  SubstrateCoin} from 'adapters/chain/substrate/types';
-import {
-  DemocracyThreshold,
-  formatCall,
+  SubstrateCoin,
 } from 'adapters/chain/substrate/types';
+import { DemocracyThreshold, formatCall } from 'adapters/chain/substrate/types';
 import { ChainBase, ProposalType } from 'common-common/src/types';
-import type {
-  ProposalEndTime,
-  Account,
-  ChainEntity,
-  ChainEvent} from 'models';
+import type { ProposalEndTime, Account, ChainEntity, ChainEvent } from 'models';
 import {
   Proposal,
   ProposalStatus,
   BinaryVote,
   VotingType,
-  VotingUnit
+  VotingUnit,
 } from 'models';
 import { SubstrateTypes } from 'chain-events/src/types';
 import { Coin } from 'adapters/currency';

@@ -13,15 +13,8 @@ import { ProposalType } from 'common-common/src/types';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
 import { slugify } from 'utils';
 import { notifyError } from 'controllers/app/notifications';
-import type {
-  ChainEntity,
-  Poll,
-  Topic,
-  Comment,
-  Thread} from 'models';
-import {
-  ThreadStage as ThreadStageType
-} from 'models';
+import type { ChainEntity, Poll, Topic, Comment, Thread } from 'models';
+import { ThreadStage as ThreadStageType } from 'models';
 import { ContentType } from 'types';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from 'views/pages/loading';
@@ -29,11 +22,8 @@ import { PageNotFound } from 'views/pages/404';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { activeQuillEditorHasText } from './helpers';
-import type {
-  SidebarComponents} from '../../components/component_kit/cw_content_page';
-import {
-  CWContentPage
-} from '../../components/component_kit/cw_content_page';
+import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
+import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 import { CommentsTree } from '../../components/comments/comments_tree';

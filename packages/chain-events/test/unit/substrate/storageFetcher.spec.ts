@@ -35,10 +35,11 @@ import type {
   ITreasuryBountyBecameActive,
   INewTip,
   ITipVoted,
-  ITipClosing} from '../../../src/chains/substrate/types';
+  ITipClosing,
+} from '../../../src/chains/substrate/types';
 import {
   EventKind,
-  IdentityJudgement
+  IdentityJudgement,
 } from '../../../src/chains/substrate/types';
 import { StorageFetcher } from '../../../src/chains/substrate/storageFetcher';
 

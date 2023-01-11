@@ -1,6 +1,6 @@
 import { AppError } from 'common-common/src/errors';
 import type { DB } from '../models';
-import type { TypedRequestQuery, TypedResponse} from '../types';
+import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
 import type { ChainEntityMetaAttributes } from '../models/chain_entity_meta';
 import { ChainNetwork } from '../../../common-common/src/types';

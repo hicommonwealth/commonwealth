@@ -1,9 +1,10 @@
 import type {
   RabbitMQController,
-  RmqCETypeCUD} from 'common-common/src/rabbitmq';
+  RmqCETypeCUD,
+} from 'common-common/src/rabbitmq';
 import {
   RascalPublications,
-  RepublishFailedMessages
+  RepublishFailedMessages,
 } from 'common-common/src/rabbitmq';
 import * as Sequelize from 'sequelize';
 

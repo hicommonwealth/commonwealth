@@ -10,13 +10,9 @@ import type {
   ITXModalData,
   BinaryVote,
   ChainEntity,
-  ChainEvent} from 'models';
-import {
-  Proposal,
-  ProposalStatus,
-  VotingType,
-  VotingUnit
+  ChainEvent,
 } from 'models';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import { ProposalType } from 'common-common/src/types';
 import type { SubstrateTypes } from 'chain-events/src/types';
 import type SubstrateChain from './shared';

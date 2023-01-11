@@ -2,9 +2,7 @@ import BN from 'bn.js';
 import { Identity } from 'models';
 import type { IHasId, ISerializable } from 'stores';
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import type {
-  BalanceOf,
-  AccountId} from '@polkadot/types/interfaces';
+import type { BalanceOf, AccountId } from '@polkadot/types/interfaces';
 import type {
   RegistrationJudgement,
   IdentityInfo,

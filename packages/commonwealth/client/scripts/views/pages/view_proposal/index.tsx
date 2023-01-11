@@ -25,19 +25,13 @@ import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import User from '../../components/widgets/user';
-import type {
-  SubheaderProposalType} from './proposal_components';
-import {
-  ProposalSubheader
-} from './proposal_components';
+import type { SubheaderProposalType } from './proposal_components';
+import { ProposalSubheader } from './proposal_components';
 import { VotingActions } from '../../components/proposals/voting_actions';
 import { VotingResults } from '../../components/proposals/voting_results';
 import { AaveViewProposalDetail } from './aave_summary';
-import type {
-  LinkedSubstrateProposal} from './linked_proposals_embed';
-import {
-  LinkedProposalsEmbed
-} from './linked_proposals_embed';
+import type { LinkedSubstrateProposal } from './linked_proposals_embed';
+import { LinkedProposalsEmbed } from './linked_proposals_embed';
 import { CommentsTree } from '../../components/comments/comments_tree';
 import {
   CollapsibleProposalBody,

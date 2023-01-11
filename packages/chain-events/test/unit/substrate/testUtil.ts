@@ -2,7 +2,10 @@
 /* eslint-disable dot-notation */
 import type { ApiPromise } from '@polkadot/api';
 import type { Option } from '@polkadot/types';
-import type { IdentityJudgement, AccountVote } from '@polkadot/types/interfaces';
+import type {
+  IdentityJudgement,
+  AccountVote,
+} from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 
 import { IdentityJudgement as JudgementEnum } from '../../../src/chains/substrate/types';

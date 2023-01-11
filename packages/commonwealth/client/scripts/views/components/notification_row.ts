@@ -3,13 +3,13 @@ import 'components/notification_row.scss';
 import _ from 'lodash';
 import m from 'mithril';
 import moment from 'moment';
-import type { CWEvent} from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
 import { Label as ChainEventLabel } from 'chain-events/src';
 
 import app from 'state';
 import type { IPostNotificationData } from 'types';
 import { NotificationCategories, ProposalType } from 'common-common/src/types';
-import type { Notification} from 'models';
+import type { Notification } from 'models';
 import { AddressInfo } from 'models';
 import { link, pluralize } from 'helpers';
 import User from 'views/components/widgets/user';

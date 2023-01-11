@@ -1,11 +1,5 @@
-import type {
-  ITXModalData,
-  IChainModule,
-  ITXData,
-  ChainInfo} from 'models';
-import {
-  NodeInfo
-} from 'models';
+import type { ITXModalData, IChainModule, ITXData, ChainInfo } from 'models';
+import { NodeInfo } from 'models';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 import m from 'mithril';
 import _ from 'lodash';
@@ -19,7 +13,8 @@ import type {
   StdFee,
   StakingExtension,
   GovExtension,
-  BankExtension} from '@cosmjs/stargate';
+  BankExtension,
+} from '@cosmjs/stargate';
 import {
   isBroadcastTxSuccess,
   isBroadcastTxFailure,
@@ -94,7 +89,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       this._tmClient,
       cosm.setupGovExtension,
       cosm.setupStakingExtension,
-      cosm.setupBankExtension,
+      cosm.setupBankExtension
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
@@ -144,8 +139,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (!wallet.enabled) {
       await wallet.enable();
     }
-    const cosm   = await import('@cosmjs/stargate');
-    const client = await cosm.SigningStargateClient.connectWithSigner(this._app.chain.meta.node.url, wallet.offlineSigner);
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.SigningStargateClient.connectWithSigner(
+      this._app.chain.meta.node.url,
+      wallet.offlineSigner
+    );
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -157,13 +155,20 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     // send the transaction using keplr-supported signing client
     try {
-      const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
+      const result = await client.signAndBroadcast(
+        account.address,
+        [tx],
+        DEFAULT_FEE,
+        DEFAULT_MEMO
+      );
       console.log(result);
       if (cosm.isBroadcastTxFailure(result)) {
         throw new Error('TX execution failed.');
       } else if (cosm.isBroadcastTxSuccess(result)) {
         const txHash = result.transactionHash;
-        const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
+        const txResult = await this._tmClient.tx({
+          hash: Buffer.from(txHash, 'hex'),
+        });
         return txResult.result.events;
       } else {
         throw new Error('Unknown broadcast result');

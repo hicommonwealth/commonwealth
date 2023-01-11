@@ -1,9 +1,5 @@
-import type {
-  CWEvent,
-  IDisconnectedRange} from '../../interfaces';
-import {
-  SupportedNetwork,
-} from '../../interfaces';
+import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 

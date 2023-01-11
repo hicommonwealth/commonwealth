@@ -7,12 +7,8 @@ import $ from 'jquery';
 import 'modals/confirm_snapshot_vote_modal.scss';
 
 import app from 'state';
-import type {
-  SnapshotProposal,
-  SnapshotSpace} from 'helpers/snapshot_utils';
-import {
-  castVote,
-} from 'helpers/snapshot_utils';
+import type { SnapshotProposal, SnapshotSpace } from 'helpers/snapshot_utils';
+import { castVote } from 'helpers/snapshot_utils';
 import { notifyError } from 'controllers/app/notifications';
 import { formatNumberShort } from 'adapters/currency';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';

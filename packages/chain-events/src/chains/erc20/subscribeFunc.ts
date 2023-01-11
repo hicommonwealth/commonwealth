@@ -6,10 +6,9 @@ import { createProvider } from '../../eth';
 import type {
   CWEvent,
   SubscribeFunc,
-  ISubscribeOptions} from '../../interfaces';
-import {
-  SupportedNetwork,
+  ISubscribeOptions,
 } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 import type { ERC20 } from '../../contractTypes';
 import { ERC20__factory as ERC20Factory } from '../../contractTypes';

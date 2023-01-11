@@ -5,7 +5,7 @@ import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import type { DB } from '../models';
 import { sequelize } from '../database';
-import type { TypedRequestBody, TypedResponse} from '../types';
+import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import type { VoteAttributes, VoteInstance } from '../models/vote';
 import checkRule from '../util/rules/checkRule';

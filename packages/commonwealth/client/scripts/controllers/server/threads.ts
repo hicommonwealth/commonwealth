@@ -7,17 +7,14 @@ import $ from 'jquery';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
-import type {
-  Profile,
-  ChainEntity,
-  Topic} from 'models';
+import type { Profile, ChainEntity, Topic } from 'models';
 import {
   Thread,
   Attachment,
   ThreadStage,
   NodeInfo,
   NotificationSubscription,
-  Poll
+  Poll,
 } from 'models';
 import { NotificationCategories } from 'common-common/src/types';
 

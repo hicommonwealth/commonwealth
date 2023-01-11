@@ -1,11 +1,8 @@
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import type { ApiPromise } from '@polkadot/api';
-import type {
-  ISubstratePhragmenElection} from 'adapters/chain/substrate/types';
-import type {
-  SubstrateCoin,
-} from 'adapters/chain/substrate/types';
+import type { ISubstratePhragmenElection } from 'adapters/chain/substrate/types';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import type BN from 'bn.js';
 import type { BalanceOf, AccountId } from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';

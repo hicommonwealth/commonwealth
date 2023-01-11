@@ -4,8 +4,7 @@ import { factory, formatFilename } from 'common-common/src/logging';
 import type Rollbar from 'rollbar';
 
 import type { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
-import type {
-  SubstrateEvents} from '../../src';
+import type { SubstrateEvents } from '../../src';
 import {
   createListener,
   ErcLoggingHandler,

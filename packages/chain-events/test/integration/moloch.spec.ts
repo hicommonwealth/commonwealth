@@ -5,30 +5,26 @@ import { EventEmitter } from 'events';
 import { providers } from 'ethers';
 import chai from 'chai';
 
-import type {
-  Moloch1,
-  Token} from '../../src/contractTypes';
+import type { Moloch1, Token } from '../../src/contractTypes';
 import {
   Moloch1__factory as Moloch1Factory,
-  Token__factory as TokenFactory
+  Token__factory as TokenFactory,
 } from '../../src/contractTypes';
 import type {
   Api,
   IEventData,
   ISubmitProposal,
   IProcessProposal,
-  IAbort} from '../../src/chains/moloch/types';
-import {
-  EventKind
+  IAbort,
 } from '../../src/chains/moloch/types';
+import { EventKind } from '../../src/chains/moloch/types';
 import { subscribeEvents } from '../../src/chains/moloch/subscribeFunc';
 import type {
   CWEvent,
   IDisconnectedRange,
-  IChainEventData} from '../../src/interfaces';
-import {
-  IEventHandler
+  IChainEventData,
 } from '../../src/interfaces';
+import { IEventHandler } from '../../src/interfaces';
 
 const { assert } = chai;
 

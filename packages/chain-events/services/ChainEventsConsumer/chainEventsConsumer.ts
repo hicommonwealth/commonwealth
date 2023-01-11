@@ -1,9 +1,6 @@
 import type { BrokerConfig } from 'rascal';
-import type {
-  RabbitMQSubscription} from 'common-common/src/serviceConsumer';
-import {
-  ServiceConsumer,
-} from 'common-common/src/serviceConsumer';
+import type { RabbitMQSubscription } from 'common-common/src/serviceConsumer';
+import { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
@@ -19,11 +16,8 @@ import { SubstrateTypes } from '../../src';
 import EventStorageHandler from './ChainEventHandlers/storage';
 import NotificationsHandler from './ChainEventHandlers/notification';
 import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
-import type {
-  Ithis as ChainEventsProcessorContextType} from './MessageProcessors/ChainEventsQueue';
-import {
-  processChainEvents,
-} from './MessageProcessors/ChainEventsQueue';
+import type { Ithis as ChainEventsProcessorContextType } from './MessageProcessors/ChainEventsQueue';
+import { processChainEvents } from './MessageProcessors/ChainEventsQueue';
 
 const log = factory.getLogger(formatFilename(__filename));
 

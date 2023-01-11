@@ -5,10 +5,9 @@ import { StorageFetcher } from '../../../src/chains/moloch/storageFetcher';
 import type {
   ProposalV1,
   ISubmitProposal,
-  IProcessProposal} from '../../../src/chains/moloch/types';
-import {
-  EventKind
+  IProcessProposal,
 } from '../../../src/chains/moloch/types';
+import { EventKind } from '../../../src/chains/moloch/types';
 import type { Moloch1 } from '../../../src/contractTypes';
 
 const { assert } = chai;

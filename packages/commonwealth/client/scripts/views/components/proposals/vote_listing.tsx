@@ -9,14 +9,8 @@ import app from 'state';
 // TODO: remove formatCoin, only use coins.format()
 import { formatCoin } from 'adapters/currency';
 import User from 'views/components/widgets/user';
-import type {
-  IVote,
-  AnyProposal} from 'models';
-import {
-  DepositVote,
-  BinaryVote,
-  VotingUnit,
-} from 'models';
+import type { IVote, AnyProposal } from 'models';
+import { DepositVote, BinaryVote, VotingUnit } from 'models';
 import { CosmosVote } from 'controllers/chain/cosmos/proposal';
 import { MolochProposalVote } from 'controllers/chain/ethereum/moloch/proposal';
 import { CompoundProposalVote } from 'controllers/chain/ethereum/compound/proposal';

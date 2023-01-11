@@ -1,7 +1,6 @@
 import type { Transaction, FindOptions } from 'sequelize';
 import { Op } from 'sequelize';
-import type {
-  Action} from 'common-common/src/permissions';
+import type { Action } from 'common-common/src/permissions';
 import {
   computePermissions,
   isPermitted,

@@ -16,7 +16,7 @@ import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWTextArea } from '../../components/component_kit/cw_text_area';
-import type { AaveProposalState} from './types';
+import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
 import { CWButton } from '../../components/component_kit/cw_button';
 

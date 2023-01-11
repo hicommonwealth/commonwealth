@@ -1,11 +1,7 @@
 import app from 'state';
 import type { Account } from 'models';
-import type {
-  SnapshotSpace} from 'helpers/snapshot_utils';
-import {
-  getSpaceBlockNumber,
-  createProposal,
-} from 'helpers/snapshot_utils';
+import type { SnapshotSpace } from 'helpers/snapshot_utils';
+import { getSpaceBlockNumber, createProposal } from 'helpers/snapshot_utils';
 import type { QuillEditor } from '../../components/quill/quill_editor';
 import type { ThreadForm } from './types';
 import { NewThreadErrors } from './types';

@@ -1,5 +1,5 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes} from 'sequelize';
+import type { DataTypes } from 'sequelize';
 import { Model } from 'sequelize';
 import type { ChainAttributes } from './chain';
 import type { ModelStatic, ModelInstance } from './types';

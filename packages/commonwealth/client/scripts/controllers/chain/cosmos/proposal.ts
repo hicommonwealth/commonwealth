@@ -1,15 +1,15 @@
 import BN from 'bn.js';
-import type { MsgDepositEncodeObject, MsgVoteEncodeObject } from '@cosmjs/stargate';
+import type {
+  MsgDepositEncodeObject,
+  MsgVoteEncodeObject,
+} from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queries/utils';
 import type {
   QueryDepositsResponse,
   QueryVotesResponse,
   QueryTallyResultResponse,
 } from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import type {
-  ITXModalData,
-  ProposalEndTime,
-  IVote} from 'models';
+import type { ITXModalData, ProposalEndTime, IVote } from 'models';
 import {
   Proposal,
   ProposalStatus,

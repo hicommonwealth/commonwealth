@@ -17,11 +17,8 @@ import type {
 } from './types';
 import { CommunityType } from '.';
 import { CWLabel } from '../../components/component_kit/cw_label';
-import type {
-  DropdownItemType} from '../../components/component_kit/cw_dropdown';
-import {
-  CWDropdown
-} from '../../components/component_kit/cw_dropdown';
+import type { DropdownItemType } from '../../components/component_kit/cw_dropdown';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 export const initChainForm = (): ChainFormDefaultFields => {
   return {

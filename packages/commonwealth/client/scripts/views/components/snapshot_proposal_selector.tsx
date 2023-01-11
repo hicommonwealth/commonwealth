@@ -8,11 +8,8 @@ import 'components/snapshot_proposal_selector.scss';
 
 import app from 'state';
 import type { Thread } from 'models';
-import type {
-  SnapshotProposal} from 'helpers/snapshot_utils';
-import {
-  loadMultipleSpacesData
-} from 'helpers/snapshot_utils';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
 
 type SnapshotProposalSelectorAttrs = {
   onSelect: (sn: SnapshotProposal) => void;

@@ -3,7 +3,7 @@
 import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import type { ConnectConfig} from 'near-api-js';
+import type { ConnectConfig } from 'near-api-js';
 import { connect as nearConnect, keyStores } from 'near-api-js';
 import type { CodeResult } from 'near-api-js/lib/providers/provider';
 

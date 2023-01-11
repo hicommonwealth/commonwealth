@@ -10,15 +10,8 @@ import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import type { WalletId } from 'common-common/src/types';
 import { ChainBase } from 'common-common/src/types';
-import type {
-  ChainInfo,
-  BlockInfo} from 'models';
-import {
-  SocialAccount,
-  Account,
-  AddressInfo,
-  ITokenAdapter
-} from 'models';
+import type { ChainInfo, BlockInfo } from 'models';
+import { SocialAccount, Account, AddressInfo, ITokenAdapter } from 'models';
 import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
 

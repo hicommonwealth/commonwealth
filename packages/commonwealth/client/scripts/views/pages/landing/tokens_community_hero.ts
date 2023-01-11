@@ -4,7 +4,7 @@ import FindYourTokenInputComponent from './find_your_token_input';
 import InputTokensListComponent from './input_tokens_lists';
 
 import 'pages/landing/tokens_community_hero.scss';
-import type { Chain} from './index';
+import type { Chain } from './index';
 import type { Token } from './index';
 
 export const placeholderChain = {

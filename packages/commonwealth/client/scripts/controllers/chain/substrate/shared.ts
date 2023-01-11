@@ -4,24 +4,17 @@ import { ApiStatus } from 'state';
 import moment from 'moment';
 import BN from 'bn.js';
 
-import type {
-  SubmittableResult} from '@polkadot/api';
-import {
-  WsProvider,
-  Keyring,
-  ApiPromise,
-} from '@polkadot/api';
+import type { SubmittableResult } from '@polkadot/api';
+import { WsProvider, Keyring, ApiPromise } from '@polkadot/api';
 import { u8aToHex } from '@polkadot/util';
 import type {
   DispatchError,
   ActiveEraInfo,
   EraIndex,
   SessionIndex,
-  Call} from '@polkadot/types/interfaces';
-import {
-  Balance,
-  Hash
+  Call,
 } from '@polkadot/types/interfaces';
+import { Balance, Hash } from '@polkadot/types/interfaces';
 
 import type { Compact } from '@polkadot/types/codec';
 import type {
@@ -38,10 +31,9 @@ import type {
   ChainInfo,
   ITXModalData,
   IChainModule,
-  ITXData} from 'models';
-import {
-  TransactionStatus
+  ITXData,
 } from 'models';
+import { TransactionStatus } from 'models';
 
 import { SubstrateEvents } from 'chain-events/src';
 import { EventEmitter } from 'events';

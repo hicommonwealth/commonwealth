@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 import type { Coin } from 'adapters/currency';
-import type { Account} from '.';
+import type { Account } from '.';
 import { IChainAdapter } from '.';
 
 // Extension of IChainAdapter to support Token functionality

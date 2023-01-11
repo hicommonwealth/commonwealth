@@ -6,15 +6,8 @@ import _ from 'lodash';
 import app from 'state';
 
 import { ReactionStore } from 'stores';
-import type {
-  AnyProposal,
-  AbridgedThread} from 'models';
-import {
-  Reaction,
-  Comment,
-  Thread,
-  Proposal
-} from 'models';
+import type { AnyProposal, AbridgedThread } from 'models';
+import { Reaction, Comment, Thread, Proposal } from 'models';
 import { notifyError } from 'controllers/app/notifications';
 import { ProposalType } from 'common-common/src/types';
 import proposalIdToEntity from 'helpers/proposalIdToEntity';
