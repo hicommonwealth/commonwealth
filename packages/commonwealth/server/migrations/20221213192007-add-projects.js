@@ -51,7 +51,7 @@ module.exports = {
             default_symbol: 'CWP',
             name: 'Common Protocol',
             type: 'dao',
-            network: 'ethereum',
+            network: 'common-protocol',
             base: 'ethereum',
             active: true,
             description: '',
