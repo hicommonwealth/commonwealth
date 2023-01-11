@@ -1,11 +1,10 @@
 import { Transaction, Op, FindOptions } from 'sequelize';
 import {
-  computePermissions,
   Action,
-  isPermitted,
+  PermissionManager,
   PermissionError,
-  BASE_PERMISSIONS,
-} from 'common-common/src/permissions';
+  defaultEveryonePermissions,
+} from './permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
@@ -303,6 +302,8 @@ export async function isAddressPermitted(
 ): Promise<PermissionError | boolean> {
   const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
 
+  const permissionsManager = new PermissionManager(models)
+
   // fetch the default allow and deny permissions for the chain
   const chain = await models.Chain.findOne({ where: { id: chain_id } });
   if (!chain) {
@@ -322,8 +323,7 @@ export async function isAddressPermitted(
       deny: chain.default_deny_permissions,
     });
 
-    // check if action is permitted
-    if (!isPermitted(permission, action)) {
+    if (!permissionsManager.isPermitted(permission, action)) {
       return PermissionError.NOT_PERMITTED;
     } else {
       return true;

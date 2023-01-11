@@ -43,7 +43,9 @@ export enum Action {
   EDIT_PERMISSIONS = 28,
 }
 
-const defaultAdminPermissions = {
+type Permissions = { [key: number]: Array<Action> | Action }
+
+export const defaultAdminPermissions: Permissions = {
   [Action.DELETE_THREAD]: [
     Action.EDIT_THREAD,
     Action.CREATE_THREAD,
@@ -62,21 +64,21 @@ const defaultAdminPermissions = {
   ],
 };
 
-const defaultModeratorPermissions = {
+export const defaultModeratorPermissions: Permissions = {
   [Action.CREATE_CHAT]: Action.VIEW_CHAT_CHANNELS,
   [Action.EDIT_THREAD]: [Action.CREATE_THREAD, Action.VIEW_THREADS],
   [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT, Action.VIEW_COMMENTS],
   [Action.EDIT_TOPIC]: [Action.CREATE_TOPIC, Action.VIEW_TOPICS],
 };
 
-const defaultMemberPermissions = {
+export const defaultMemberPermissions: Permissions = {
   [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS, Action.VIEW_POLLS],
   [Action.CREATE_THREAD]: [Action.VIEW_THREADS],
   [Action.CREATE_COMMENT]: [Action.VIEW_COMMENTS],
   [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS],
 };
 
-const defaultEveryonePermissions: bigint =
+export const defaultEveryonePermissions: bigint =
   (BigInt(1) << BigInt(Action.VIEW_REACTIONS)) |
   (BigInt(1) << BigInt(Action.CREATE_REACTION)) |
   (BigInt(1) << BigInt(Action.DELETE_REACTION)) |
@@ -84,15 +86,14 @@ const defaultEveryonePermissions: bigint =
   (BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS)) |
   (BigInt(1) << BigInt(Action.VIEW_THREADS));
 
+
 export class PermissionManager {
   private models: DB;
   private action: Action;
   private defaultEveryonePermissions: bigint;
-  private defaultAdminPermissions: { [key: number]: Array<Action> | Action };
-  private defaultModeratorPermissions: {
-    [key: number]: Array<Action> | Action;
-  };
-  private defaultMemberPermissions: { [key: number]: Array<Action> | Action };
+  private defaultAdminPermissions: Permissions;
+  private defaultModeratorPermissions: Permissions;
+  private defaultMemberPermissions: Permissions;
 
   constructor(_models: DB) {
     this.models = _models;
@@ -100,6 +101,7 @@ export class PermissionManager {
     this.defaultAdminPermissions = defaultAdminPermissions;
     this.defaultModeratorPermissions = defaultModeratorPermissions;
     this.defaultMemberPermissions = defaultMemberPermissions;
+    this.basePermissions = this.defaultEveryonePermissions;
   }
 
   public addAllowImplicitPermission(
@@ -166,5 +168,12 @@ export class PermissionManager {
       }
       return permission;
     }, ~0n);
+  }
+
+  public isPermitted(action: Action): boolean {
+    const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
+    const hasAction: boolean =
+      (this.basePermission & actionAsBigInt) == actionAsBigInt;
+    return hasAction;
   }
 }
