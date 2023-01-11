@@ -19,7 +19,7 @@ export type ChainAttributes = {
   default_symbol: string;
   network: ChainNetwork;
   base: ChainBase;
-  icon_url: string;
+  icon_url?: string;
   active: boolean;
   type: ChainType;
   id?: string;
@@ -103,7 +103,7 @@ export default (
       network: { type: dataTypes.STRING, allowNull: false },
       base: { type: dataTypes.STRING, allowNull: false, defaultValue: '' },
       ss58_prefix: { type: dataTypes.INTEGER, allowNull: true },
-      icon_url: { type: dataTypes.STRING },
+      icon_url: { type: dataTypes.STRING, allowNull: true },
       active: { type: dataTypes.BOOLEAN },
       stages_enabled: {
         type: dataTypes.BOOLEAN,

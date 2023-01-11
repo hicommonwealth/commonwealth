@@ -86,18 +86,20 @@ export async function createCuratedProjectDao(
       chain_string: daoForm.chainString,
       eth_chain_id: daoForm.ethChainId,
       jwt: app.user.jwt,
-      node_url: daoForm.nodeUrl,
       token_name: daoForm.tokenName,
       type: ChainType.DAO,
       default_symbol: daoForm.symbol,
       address,
+      icon_url: daoForm.iconUrl,
+      node_url: daoForm.nodeUrl,
+      alt_wallet_url: daoForm.altWalletUrl,
       ...daoForm,
     });
     if (res.result.admin_address) {
       await linkExistingAddressToChainOrCommunity(
         res.result.admin_address,
-        res.result.role.chain_id,
-        res.result.role.chain_id
+        res.result.chain.id,
+        res.result.chain.id
       );
     }
     await initAppState(false);

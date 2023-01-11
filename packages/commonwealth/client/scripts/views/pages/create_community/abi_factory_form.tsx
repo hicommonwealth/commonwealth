@@ -270,7 +270,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           options={[
             { label: ChainNetwork.Ethereum, value: ChainNetwork.Ethereum },
           ]}
-          initialValue={{label: ChainNetwork.Ethereum, value: ChainNetwork.Ethereum}}
+          initialValue={{label: this.form.network, value: this.form.network}}
           onSelect={(o) => {
             this.form.network = ChainNetwork[o.value];
           }}

@@ -123,9 +123,10 @@ const createChain = async (
   if (!req.body.base || !req.body.base.trim()) {
     return next(new AppError(Errors.NoBase));
   }
-
-  if(await getFileSizeBytes(req.body.icon_url) / 1024 > MAX_IMAGE_SIZE_KB) {
-    throw new AppError(Errors.ImageTooLarge);
+  if (req.body.icon_url.length > 0) {
+    if(await getFileSizeBytes(req.body.icon_url) / 1024 > MAX_IMAGE_SIZE_KB) {
+      throw new AppError(Errors.ImageTooLarge);
+    }
   }
 
   const existingBaseChain = await models.Chain.findOne({
@@ -184,7 +185,7 @@ const createChain = async (
     const web3 = new Web3(provider);
     const code = await web3.eth.getCode(req.body.address);
     provider.disconnect(1000, 'finished');
-    if (code === '0x') {
+    if (code === '0x' && req.body.eth_chain_id === 1) {
       return next(new AppError(Errors.InvalidAddress));
     }
 
