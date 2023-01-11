@@ -24,7 +24,7 @@ import {
 } from 'app';
 import app from 'state';
 import { AppToasts } from 'views/toast';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { AppModals } from './app_modals';
 import { UserSurveyPopup } from './components/user_survey_popup';
 import { CWSpinner } from './components/component_kit/cw_spinner';

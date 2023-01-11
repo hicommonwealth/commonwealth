@@ -13,7 +13,7 @@ import { ChainBase } from 'common-common/src/types';
 import { Thread, Comment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 

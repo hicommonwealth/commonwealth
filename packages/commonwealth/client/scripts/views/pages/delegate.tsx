@@ -13,7 +13,7 @@ import { PageLoading } from 'views/pages/loading';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { PageNotFound } from './404';
+import PageNotFound from './404';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWText } from '../components/component_kit/cw_text';

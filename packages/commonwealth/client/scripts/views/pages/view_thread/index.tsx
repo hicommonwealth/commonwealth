@@ -25,7 +25,7 @@ import {
 import { ContentType } from 'types';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from 'views/pages/loading';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { activeQuillEditorHasText } from './helpers';

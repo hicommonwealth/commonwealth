@@ -16,7 +16,7 @@ import { ChainInfo, RolePermission } from 'models';
 import { constructSubstrateUrl } from 'substrate';
 import Sublayout from '../sublayout';
 import { PageLoading } from './loading';
-import { PageNotFound } from './404';
+import PageNotFound from './404';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWButton } from '../components/component_kit/cw_button';

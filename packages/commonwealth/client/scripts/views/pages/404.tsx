@@ -9,7 +9,7 @@ import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 
 type PageNotFoundAttrs = { title?: string; message?: string };
 
-export class PageNotFound extends ClassComponent<PageNotFoundAttrs> {
+export default class PageNotFound extends ClassComponent<PageNotFoundAttrs> {
   view(vnode: ResultNode<PageNotFoundAttrs>) {
     const { message } = vnode.attrs;
 

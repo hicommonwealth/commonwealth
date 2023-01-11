@@ -20,7 +20,7 @@ import Substrate from 'controllers/chain/substrate/adapter';
 import { notifyError } from 'controllers/app/notifications';
 import { Comment, Account, ProposalModule, AnyProposal } from 'models';
 import { PageLoading } from 'views/pages/loading';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';

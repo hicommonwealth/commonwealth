@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, lazy, Suspense } from 'react';
 import { Routes, Route, BrowserRouter, useParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import { Layout } from 'views/layout';
 import { initAppState } from 'app';
-import DiscussionsPage from 'views/pages/discussions';
-import WhyCommonwealthPage from 'views/pages/why_commonwealth';
-import { PageNotFound } from 'views/pages/404';
-import MembersPage from './views/pages/members';
-import ViewThreadPage from './views/pages/view_thread';
+
+const DiscussionsPage = lazy(() => import('views/pages/discussions'));
+const WhyCommonwealthPage = lazy(() => import('views/pages/why_commonwealth'));
+const PageNotFound = lazy(() => import('views/pages/404'));
+const MembersPage = lazy(() => import('views/pages/members'));
+const ViewThreadPage = lazy(() => import('views/pages/view_thread'));
 
 // TODO: This file is POC for now but this hook below and components should be placed in separate file
 const useInitApp = () => {
@@ -255,36 +256,38 @@ const App = () => {
 
   // TODO: use loader to avoid immediately importing all pages
   return (
-    <Routes>
-      <Route path="/whyCommonwealth" element={
-        withLayout(WhyCommonwealthPage, { scoped: false, hideSidebar: true })
-      } />
-      <Route
-        path="/:scope/discussions"
-        element={
-          withLayout(DiscussionsPage, { scoped: true, deferChain: true })
-        }
-      />
-      <Route
-        path="/:scope/discussions/:topic"
-        element={
-          withLayout(DiscussionsPage, { scoped: true, deferChain: true })
-        }
-      />
-      <Route
-        path="/:scope/discussion/:identifier"
-        element={
-          withLayout(ViewThreadPage, { scoped: true, deferChain: true })
-        }
-      />
-      <Route
-        path="/:scope/members"
-        element={
-          withLayout(MembersPage, { scoped: true, deferChain: true })
-        }
-      />
-      <Route path="*" element={withLayout(PageNotFound, { scoped: false })} />
-    </Routes>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Routes>
+        <Route path="/whyCommonwealth" element={
+          withLayout(WhyCommonwealthPage, { scoped: false, hideSidebar: true })
+        } />
+        <Route
+          path="/:scope/discussions"
+          element={
+            withLayout(DiscussionsPage, { scoped: true, deferChain: true })
+          }
+        />
+        <Route
+          path="/:scope/discussions/:topic"
+          element={
+            withLayout(DiscussionsPage, { scoped: true, deferChain: true })
+          }
+        />
+        <Route
+          path="/:scope/discussion/:identifier"
+          element={
+            withLayout(ViewThreadPage, { scoped: true, deferChain: true })
+          }
+        />
+        <Route
+          path="/:scope/members"
+          element={
+            withLayout(MembersPage, { scoped: true, deferChain: true })
+          }
+        />
+        <Route path="*" element={withLayout(PageNotFound, { scoped: false })} />
+      </Routes>
+    </Suspense>
   );
 };
 
