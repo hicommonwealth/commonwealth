@@ -43,7 +43,7 @@ export enum Action {
   EDIT_PERMISSIONS = 28,
 }
 
-export type Permissions = { [key: number]: Array<Action> | Action }
+export type Permissions = { [key: number]: Array<Action> | Action };
 
 export const defaultAdminPermissions: Permissions = {
   [Action.DELETE_THREAD]: [
@@ -78,19 +78,16 @@ export const defaultMemberPermissions: Permissions = {
   [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS],
 };
 
-export const defaultEveryonePermissions: bigint =
-  (BigInt(1) << BigInt(Action.VIEW_REACTIONS)) |
-  (BigInt(1) << BigInt(Action.CREATE_REACTION)) |
-  (BigInt(1) << BigInt(Action.DELETE_REACTION)) |
-  (BigInt(1) << BigInt(Action.CREATE_THREAD)) |
-  (BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS)) |
-  (BigInt(1) << BigInt(Action.VIEW_THREADS));
-
+export const defaultEveryonePermissions: Permissions = {
+  [Action.DELETE_REACTION]: [Action.CREATE_REACTION, Action.VIEW_REACTIONS],
+  [Action.CREATE_THREAD]: Action.VIEW_THREADS,
+  [Action.VIEW_CHAT_CHANNELS]: Action.VIEW_CHAT_CHANNELS,
+};
 
 export class PermissionManager {
   private models: DB;
   private action: Action;
-  private defaultEveryonePermissions: bigint;
+  private defaultEveryonePermissions: Permissions;
   private defaultAdminPermissions: Permissions;
   private defaultModeratorPermissions: Permissions;
   private defaultMemberPermissions: Permissions;
@@ -139,40 +136,37 @@ export class PermissionManager {
     return newDenyPermission;
   }
 
-  public computeAllowPermissions(assignments: {
-    [key: number]: Array<Action> | Action;
-  }): bigint {
-    return Object.values(assignments).reduce((permission, assignment) => {
-      if (Array.isArray(assignment)) {
-        assignment.forEach((subAssignment) => {
-          permission |= BigInt(1) << BigInt(subAssignment);
-        });
-      } else {
-        permission |= BigInt(1) << BigInt(assignment);
-      }
-      return permission;
-    }, 0n);
+
+mapPermissionsToBigint(permissions: Permissions): bigint {
+  let permission = 0n;
+  for (const key in permissions) {
+    const action = permissions[key];
+    if(Array.isArray(action)){
+        for(const a of action){
+            permission |= BigInt(1) << a;
+        }
+    }else{
+        permission |= BigInt(1) << action;
+    }
+  }
+  return permission;
+}
+
+  public computePermissions(
+    base: Permissions, assignments: Array<{ allow: bigint; deny: bigint }>
+  ): bigint {
+    let permissionsBigInt = this.mapPermissionsToBigint(base);
+    for (const assignment of assignments) {
+      permissionsBitInt &= ~assignment.deny;
+      permissionsBigInt |= assignment.allow;
+    }
+    return permissionsBigInt;
   }
 
-  public computeDenyPermissions(assignments: {
-    [key: number]: Array<Action> | Action;
-  }): bigint {
-    return Object.values(assignments).reduce((permission, assignment) => {
-      if (Array.isArray(assignment)) {
-        assignment.forEach((subAssignment) => {
-          permission &= ~(BigInt(1) << BigInt(subAssignment));
-        });
-      } else {
-        permission &= ~(BigInt(1) << BigInt(assignment));
-      }
-      return permission;
-    }, ~0n);
-  }
-
-  public isPermitted(action: Action): boolean {
+  public isPermitted(permission: bigint, action: number): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
     const hasAction: boolean =
-      (this.defaultEveryonePermissions & actionAsBigInt) == actionAsBigInt;
+      (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
     return hasAction;
   }
 }

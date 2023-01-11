@@ -371,14 +371,15 @@ export async function isAnyonePermitted(
   if (!chain) {
     throw new Error('Chain not found');
   }
-  const permission = computePermissions(BASE_PERMISSIONS, [
+  const permissionsManager = new PermissionManager(models)
+  const permission = permissionsManager.computePermissions(defaultEveryonePermissions, [
     {
       allow: chain.default_allow_permissions,
       deny: chain.default_deny_permissions,
     },
   ]);
   // check if action is permitted
-  if (!isPermitted(permission, action)) {
+  if (!permissionsManager.isPermitted(permission, action)) {
     return PermissionError.NOT_PERMITTED;
   }
 }
