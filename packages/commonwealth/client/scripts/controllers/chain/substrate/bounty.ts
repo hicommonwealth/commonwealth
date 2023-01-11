@@ -1,13 +1,11 @@
 import { ApiPromise } from '@polkadot/api';
-
-import { formatCoin } from 'adapters/currency';
 import { ISubstrateBounty, SubstrateCoin } from 'adapters/chain/substrate/types';
 import {
   Proposal, ProposalStatus, ProposalEndTime, ITXModalData, BinaryVote,
   VotingType, VotingUnit, ChainEntity, ChainEvent,
 } from 'models';
 import { ProposalType } from 'common-common/src/types';
-import { SubstrateTypes } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 import SubstrateChain from './shared';
 import SubstrateAccounts, { SubstrateAccount } from './account';
 import SubstrateBountyTreasury from './bountyTreasury';
@@ -82,10 +80,10 @@ export class SubstrateBounty extends Proposal<ApiPromise, SubstrateCoin, ISubstr
   private readonly _author: SubstrateAccount;
   public get author() { return this._author; }
 
-  private _awarded: boolean = false;
+  private _awarded = false;
   get awarded() { return this._awarded; }
 
-  private _active: boolean = false;
+  private _active = false;
   get active() { return this._active; }
 
   public readonly _value: SubstrateCoin;

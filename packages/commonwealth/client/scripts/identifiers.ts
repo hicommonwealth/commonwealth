@@ -1,5 +1,6 @@
-import { StorageModule, ProposalModule, ChainInfo } from 'models';
-import { SubstrateTypes, IChainEntityKind } from 'chain-events/src';
+import { ProposalModule, ChainInfo } from 'models';
+import { IChainEntityKind } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalStore } from 'stores';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { requiresTypeSlug } from 'utils';

@@ -54,6 +54,7 @@ export const modelFromServer = (thread) => {
     reactions,
     last_commented_on,
     linked_threads,
+    numberOfComments,
   } = thread;
 
   const attachments = Attachments
@@ -157,6 +158,7 @@ export const modelFromServer = (thread) => {
     polls: polls.map((p) => new Poll(p)),
     lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
     linkedThreads,
+    numberOfComments,
   });
 };
 
@@ -320,7 +322,7 @@ class ThreadsController {
         kind: proposal.kind,
         stage: proposal.stage,
         body: encodeURIComponent(newBody),
-        title: newTitle,
+        title: encodeURIComponent(newTitle),
         url,
         'attachments[]': attachments,
         jwt: app.user.jwt,
