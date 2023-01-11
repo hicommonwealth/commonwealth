@@ -11,6 +11,9 @@ export type ContractAbiAttributes = {
   created_at?: Date;
   updated_at?: Date;
   is_factory?: boolean;
+  create_dao_function_name?: string;
+  create_dao_event_name?: string;
+  create_dao_event_parameter?: string;
 
   Contracts?: ContractAttributes[];
 };
@@ -43,6 +46,9 @@ export default (
         allowNull: false,
         defaultValue: false,
       },
+      create_dao_function_name: { type: dataTypes.STRING, allowNull: true },
+      create_dao_event_name: { type: dataTypes.STRING, allowNull: true },
+      create_dao_event_parameter: { type: dataTypes.STRING, allowNull: true },
     },
     {
       tableName: 'ContractAbis',

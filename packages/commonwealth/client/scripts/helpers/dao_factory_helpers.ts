@@ -1,4 +1,3 @@
-import MetamaskWebWalletController from 'controllers/app/webWallets/metamask_web_wallet';
 import $ from 'jquery';
 import m from 'mithril';
 import Web3 from 'web3';
@@ -18,26 +17,23 @@ import {
   encodeFunctionSignature,
   processAbiInputsToDataTypes,
 } from './abi_form_helpers';
+import ContractAbi from '../models/ContractAbi';
 
-export function decodeCuratedFactoryTx(
+export function decodeCreateDaoTx(
   web3: Web3,
-  createFunctionName: string,
+  contractAbi: ContractAbi,
   tx: any,
-  contract: Contract
 ): string | null {
-  if (
-    contract.nickname === 'curated-factory-goerli' &&
-    createFunctionName === 'createProject'
-  ) {
-    const eventAbiItem = parseEventFromABI(this.contract.abi, 'ProjectCreated');
-    const decodedLog = web3.eth.abi.decodeLog(
-      eventAbiItem.inputs,
-      tx.logs[0].data,
-      tx.logs[0].topics
-    );
-    return decodedLog.projectAddress;
-  }
-  return null;
+  const eventAbiItem = parseEventFromABI(
+    contractAbi.abi,
+    contractAbi.create_dao_event_name
+  );
+  const decodedLog = web3.eth.abi.decodeLog(
+    eventAbiItem.inputs,
+    tx.logs[0].data,
+    tx.logs[0].topics
+  );
+  return decodedLog[contractAbi.create_dao_event_parameter];
 }
 
 export async function createCuratedProjectDao(
@@ -46,7 +42,8 @@ export async function createCuratedProjectDao(
   formInputMap: Map<string, Map<number, string>>,
   daoForm: CreateFactoryEthDaoForm
 ) {
-  const signingWallet = await app.wallets.getFirstAvailableMetamaskWallet();
+  const signingWallet: IWebWallet<any> =
+    await app.wallets.getFirstAvailableMetamaskWallet();
 
   signingWallet.enableForEthChainId(daoForm.ethChainId);
 
@@ -74,47 +71,40 @@ export async function createCuratedProjectDao(
     ...processedArgs
   );
 
-  if (contract.nickname === 'curated-factory-goerli') {
-    const eventAbiItem = parseEventFromABI(contract.abi, 'ProjectCreated');
-    // Sign Tx with PK if this is write function
-    const tx: TransactionConfig = {
-      from: signingWallet.accounts[0],
-      to: contract.address,
-      data: functionTx.encodeABI(),
-    };
-    const txReceipt = await web3.eth.sendTransaction(tx);
-    const decodedLog = web3.eth.abi.decodeLog(
-      eventAbiItem.inputs,
-      txReceipt.logs[0].data,
-      txReceipt.logs[0].topics
-    );
-    try {
-      const res = await $.post(`${app.serverUrl()}/createChain`, {
-        id: daoForm.name,
-        base: ChainBase.Ethereum,
-        chain_string: daoForm.chainString,
-        eth_chain_id: daoForm.ethChainId,
-        jwt: app.user.jwt,
-        node_url: daoForm.nodeUrl,
-        token_name: daoForm.tokenName,
-        type: ChainType.DAO,
-        default_symbol: daoForm.symbol,
-        address: decodedLog.projectAddress,
-        ...daoForm,
-      });
-      if (res.result.admin_address) {
-        await linkExistingAddressToChainOrCommunity(
-          res.result.admin_address,
-          res.result.role.chain_id,
-          res.result.role.chain_id
-        );
-      }
-      await initAppState(false);
-      // TODO: notify about needing to run event migration
-      m.route.set(`/${res.result.chain?.id}`);
-    } catch (err) {
-      console.log("err", err)
-      throw new Error(err);
+  // Sign Tx with PK if this is write function
+  const tx: TransactionConfig = {
+    from: signingWallet.accounts[0],
+    to: contract.address,
+    data: functionTx.encodeABI(),
+  };
+  const txReceipt = await web3.eth.sendTransaction(tx);
+  const address = await decodeCreateDaoTx(web3, contract.contractAbi, txReceipt);
+  try {
+    const res = await $.post(`${app.serverUrl()}/createChain`, {
+      id: daoForm.name,
+      base: ChainBase.Ethereum,
+      chain_string: daoForm.chainString,
+      eth_chain_id: daoForm.ethChainId,
+      jwt: app.user.jwt,
+      node_url: daoForm.nodeUrl,
+      token_name: daoForm.tokenName,
+      type: ChainType.DAO,
+      default_symbol: daoForm.symbol,
+      address,
+      ...daoForm,
+    });
+    if (res.result.admin_address) {
+      await linkExistingAddressToChainOrCommunity(
+        res.result.admin_address,
+        res.result.role.chain_id,
+        res.result.role.chain_id
+      );
     }
+    await initAppState(false);
+    // TODO: notify about needing to run event migration
+    m.route.set(`/${res.result.chain?.id}`);
+  } catch (err) {
+    console.log('err', err);
+    throw new Error(err);
   }
 }

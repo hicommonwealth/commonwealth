@@ -100,6 +100,7 @@ class ContractsController {
         isFactory: is_factory,
         nickname,
         abi: ContractAbi.abi,
+        contractAbi: ContractAbi
       });
       this._store.add(result);
     });
@@ -228,6 +229,7 @@ class ContractsController {
           Contract.fromJSON({
             ...contract,
             abi: abiJson,
+            contractAbi: contract.ContractAbi
           })
         );
       } catch (e) {

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import ContractAbi from './ContractAbi';
 
 class Contract {
   public readonly id: number;
@@ -15,6 +16,8 @@ class Contract {
   public readonly isFactory?: boolean;
   public readonly nickname?: string;
 
+  public readonly contractAbi?: ContractAbi;
+
   constructor({
     id,
     address,
@@ -28,6 +31,7 @@ class Contract {
     abi,
     isFactory,
     nickname,
+    contractAbi,
   }: {
     id: number;
     address: string;
@@ -41,6 +45,7 @@ class Contract {
     abi?: Array<Record<string, unknown>>;
     isFactory?: boolean;
     nickname?: string;
+    contractAbi?: ContractAbi;
   }) {
     this.id = id;
     this.address = address;
@@ -54,6 +59,7 @@ class Contract {
     this.abi = abi;
     this.isFactory = isFactory;
     this.nickname = nickname;
+    this.contractAbi = contractAbi;
   }
 
   public static fromJSON({
@@ -69,6 +75,7 @@ class Contract {
     abi,
     isFactory,
     nickname,
+    contractAbi
   }) {
     return new Contract({
       id,
@@ -83,6 +90,7 @@ class Contract {
       abi,
       isFactory,
       nickname,
+      contractAbi
     });
   }
 }
