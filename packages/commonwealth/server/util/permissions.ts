@@ -43,7 +43,7 @@ export enum Action {
   EDIT_PERMISSIONS = 28,
 }
 
-type Permissions = { [key: number]: Array<Action> | Action }
+export type Permissions = { [key: number]: Array<Action> | Action }
 
 export const defaultAdminPermissions: Permissions = {
   [Action.DELETE_THREAD]: [
@@ -101,7 +101,6 @@ export class PermissionManager {
     this.defaultAdminPermissions = defaultAdminPermissions;
     this.defaultModeratorPermissions = defaultModeratorPermissions;
     this.defaultMemberPermissions = defaultMemberPermissions;
-    this.basePermissions = this.defaultEveryonePermissions;
   }
 
   public addAllowImplicitPermission(
@@ -173,7 +172,7 @@ export class PermissionManager {
   public isPermitted(action: Action): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
     const hasAction: boolean =
-      (this.basePermission & actionAsBigInt) == actionAsBigInt;
+      (this.defaultEveryonePermissions & actionAsBigInt) == actionAsBigInt;
     return hasAction;
   }
 }

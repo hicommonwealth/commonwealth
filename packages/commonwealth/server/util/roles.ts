@@ -323,7 +323,7 @@ export async function isAddressPermitted(
       deny: chain.default_deny_permissions,
     });
 
-    if (!permissionsManager.isPermitted(permission, action)) {
+    if (!permissionsManager.isPermitted(action)) {
       return PermissionError.NOT_PERMITTED;
     } else {
       return true;
