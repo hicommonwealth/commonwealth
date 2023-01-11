@@ -233,14 +233,13 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
                 label="Create Dao"
                 disabled={this.saving}
                 onclick={() => {
-                  notifySuccess('Create Dao button clicked!');
                   this.saving = true;
                   try {
                     createDao(fn);
                   } catch (err) {
                     notifyError(
-                      err.responseJSON?.error ||
-                        'Creating Dao Function Call failed'
+                      err ||
+                        `Creating Dao Function Call failed: ${err}`
                     );
                   }
                   this.saving = false;

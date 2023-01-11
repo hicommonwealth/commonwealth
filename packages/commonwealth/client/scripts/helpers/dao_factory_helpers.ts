@@ -22,7 +22,7 @@ import ContractAbi from '../models/ContractAbi';
 export function decodeCreateDaoTx(
   web3: Web3,
   contractAbi: ContractAbi,
-  tx: any,
+  tx: any
 ): string | null {
   const eventAbiItem = parseEventFromABI(
     contractAbi.abi,
@@ -78,7 +78,11 @@ export async function createCuratedProjectDao(
     data: functionTx.encodeABI(),
   };
   const txReceipt = await web3.eth.sendTransaction(tx);
-  const address = await decodeCreateDaoTx(web3, contract.contractAbi, txReceipt);
+  const address = await decodeCreateDaoTx(
+    web3,
+    contract.contractAbi,
+    txReceipt
+  );
   try {
     const res = await $.post(`${app.serverUrl()}/createChain`, {
       id: daoForm.name,
@@ -95,11 +99,12 @@ export async function createCuratedProjectDao(
       alt_wallet_url: daoForm.altWalletUrl,
       ...daoForm,
     });
-    if (res.result.admin_address) {
+    const { admin_address, chain } = res.result;
+    if (admin_address) {
       await linkExistingAddressToChainOrCommunity(
         res.result.admin_address,
-        res.result.chain.id,
-        res.result.chain.id
+        chain.id,
+        chain.id
       );
     }
     await initAppState(false);
