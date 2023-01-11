@@ -2,14 +2,13 @@ import type { ApiPromise } from '@polkadot/api';
 import type { Call, AccountId } from '@polkadot/types/interfaces';
 import type { Vec } from '@polkadot/types';
 import type { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
-import type { SubstrateTypes } from 'chain-events/src/types';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import type SubstrateChain from './shared';
 import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
-import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateCollective extends ProposalModule<
   ApiPromise,

@@ -10,7 +10,7 @@ import type {
   ISubstrateDemocracyProposal,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
-import type { SubstrateTypes } from 'chain-events/src/types';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import type SubstrateChain from './shared';

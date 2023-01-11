@@ -5,7 +5,8 @@ import chaiHttp from 'chai-http';
 import 'chai/register-should';
 import { EventEmitter } from 'events';
 import type { CWEvent } from 'chain-events/src';
-import { SubstrateTypes, SupportedNetwork } from 'chain-events/src';
+import { SupportedNetwork } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 
 import { resetDatabase } from '../../../server-test';
 import models from 'chain-events/services/database/database';

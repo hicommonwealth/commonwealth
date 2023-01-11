@@ -14,7 +14,6 @@ import type {
 } from 'chain-events/src';
 import {
   eventToEntity,
-  SubstrateTypes,
   SupportedNetwork,
   getUniqueEntityKey,
 } from 'chain-events/src';

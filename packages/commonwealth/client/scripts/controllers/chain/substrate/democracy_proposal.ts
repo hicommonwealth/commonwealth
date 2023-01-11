@@ -1,7 +1,7 @@
 import _ from 'underscore';
 import BN from 'bn.js';
 
-import type { SubstrateTypes } from 'chain-events/src/types';
+import { SubstrateTypes } from 'chain-events/src/types';
 import type { ApiPromise } from '@polkadot/api';
 import type { Vec } from '@polkadot/types';
 import type { ITuple } from '@polkadot/types/types';
@@ -24,7 +24,6 @@ import {
   VotingUnit,
 } from 'models';
 
-import { chainEntityTypeToProposalSlug } from 'identifiers';
 import type SubstrateChain from './shared';
 import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';

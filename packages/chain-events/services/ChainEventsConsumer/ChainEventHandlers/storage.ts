@@ -16,7 +16,8 @@ import type { DB } from '../../database/database';
 import type { ChainEventInstance } from '../../database/models/chain_event';
 
 import type { CWEvent, IChainEventKind } from 'chain-events/src';
-import { IEventHandler, SubstrateTypes } from 'chain-events/src';
+import { IEventHandler } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 
 const log = factory.getLogger(formatFilename(__filename));
 

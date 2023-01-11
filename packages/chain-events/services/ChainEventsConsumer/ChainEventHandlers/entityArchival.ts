@@ -19,8 +19,8 @@ import {
   eventToEntity,
   getUniqueEntityKey,
   IEventHandler,
-  SubstrateTypes,
 } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 
 export default class extends IEventHandler {
   public readonly name = 'Entity Archival';

@@ -11,13 +11,12 @@ import type {
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
 import { ProposalModule } from 'models';
-import type { SubstrateTypes } from 'chain-events/src/types';
+import { SubstrateTypes } from 'chain-events/src/types';
 import type SubstrateChain from './shared';
 import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { SubstrateTreasuryProposal } from './treasury_proposal';
-import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateTreasury extends ProposalModule<
   ApiPromise,

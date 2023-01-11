@@ -9,9 +9,9 @@ import {
   createListener,
   ErcLoggingHandler,
   LoggingHandler,
-  SubstrateTypes,
   SupportedNetwork,
 } from '../../src';
+import { SubstrateTypes } from '../../src/types';
 import type { DB } from '../database/database';
 import models from '../database/database';
 

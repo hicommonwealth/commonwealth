@@ -8,10 +8,10 @@ import {
   RascalSubscriptions,
 } from 'common-common/src/rabbitmq';
 import Rollbar from 'rollbar';
+import { SubstrateTypes } from 'chain-events/src/types';
 
 import models from '../database/database';
 import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
-import { SubstrateTypes } from '../../src';
 
 import EventStorageHandler from './ChainEventHandlers/storage';
 import NotificationsHandler from './ChainEventHandlers/notification';

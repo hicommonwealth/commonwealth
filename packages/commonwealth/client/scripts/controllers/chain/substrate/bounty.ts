@@ -1,6 +1,5 @@
 import type { ApiPromise } from '@polkadot/api';
 
-import { formatCoin } from 'adapters/currency';
 import type {
   ISubstrateBounty,
   SubstrateCoin,
@@ -14,7 +13,7 @@ import type {
 } from 'models';
 import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import { ProposalType } from 'common-common/src/types';
-import type { SubstrateTypes } from 'chain-events/src/types';
+import { SubstrateTypes } from 'chain-events/src/types';
 import type SubstrateChain from './shared';
 import type SubstrateAccounts from './account';
 import type { SubstrateAccount } from './account';
