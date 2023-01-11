@@ -1,6 +1,4 @@
-import _ from 'underscore';
-
-import { SubstrateTypes } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 import type { ApiPromise } from '@polkadot/api';
 import type { Votes } from '@polkadot/types/interfaces';
 import type { Option } from '@polkadot/types';
@@ -23,7 +21,6 @@ import {
   VotingUnit
 } from 'models';
 import { ProposalType } from 'common-common/src/types';
-import { chainEntityTypeToProposalSlug } from 'identifiers';
 
 import type SubstrateChain from './shared';
 import type { SubstrateAccount } from './account';

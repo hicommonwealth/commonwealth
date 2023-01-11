@@ -2,9 +2,8 @@ import BN from 'bn.js';
 import moment from 'moment';
 
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { MolochShares } from 'adapters/chain/ethereum/types';
 import type { IMolochProposalResponse } from 'adapters/chain/moloch/types';
-import { MolochTypes } from 'chain-events/src';
+import { MolochTypes } from 'chain-events/src/types';
 
 import { ProposalType } from 'common-common/src/types';
 import type {

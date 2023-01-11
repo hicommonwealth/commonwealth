@@ -5,7 +5,7 @@ import type {
   ISubstrateTreasuryTip,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
-import { SubstrateTypes } from 'chain-events/src';
+import type { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import { formatAddressShort } from 'utils';

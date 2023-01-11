@@ -7,13 +7,12 @@ import type {
 } from 'adapters/chain/substrate/types';
 import type { ITXModalData} from 'models';
 import { ProposalModule } from 'models';
-import { SubstrateTypes } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 import type { IApp } from 'state';
 import type SubstrateChain from './shared';
 import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
-import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateDemocracy extends ProposalModule<
   ApiPromise,

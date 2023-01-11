@@ -2,7 +2,8 @@ import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { AaveEvents, AaveTypes } from 'chain-events/src';
+import { AaveTypes } from 'chain-events/src/types';
+import { AaveEvents } from 'chain-events/src';
 import type { Executor } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
 

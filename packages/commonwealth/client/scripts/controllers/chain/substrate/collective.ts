@@ -2,7 +2,7 @@ import type { ApiPromise } from '@polkadot/api';
 import type { Call, AccountId } from '@polkadot/types/interfaces';
 import type { Vec } from '@polkadot/types';
 import type { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
-import { SubstrateTypes } from 'chain-events/src';
+import type { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import type SubstrateChain from './shared';

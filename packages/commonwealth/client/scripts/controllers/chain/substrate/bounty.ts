@@ -18,7 +18,7 @@ import {
   VotingUnit
 } from 'models';
 import { ProposalType } from 'common-common/src/types';
-import { SubstrateTypes } from 'chain-events/src';
+import type { SubstrateTypes } from 'chain-events/src/types';
 import type SubstrateChain from './shared';
 import type SubstrateAccounts from './account';
 import type { SubstrateAccount } from './account';

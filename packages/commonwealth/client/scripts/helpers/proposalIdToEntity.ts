@@ -4,7 +4,7 @@ import {
   MolochTypes,
   CompoundTypes,
   AaveTypes,
-} from 'chain-events/src';
+} from 'chain-events/src/types';
 import type { IApp } from 'state';
 
 // this function takes an "old style" identifier such as treasuryproposal_4 and attempts

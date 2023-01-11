@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { CompoundEvents, CompoundTypes } from 'chain-events/src';
+import { CompoundTypes } from 'chain-events/src/types';
 import type { IApp } from 'state';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
 import type { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
@@ -13,6 +13,7 @@ import CompoundProposal from './proposal';
 import type CompoundChain from './chain';
 import { attachSigner } from '../contractApi';
 import type EthereumAccounts from '../accounts';
+import { CompoundEvents } from 'chain-events/src';
 
 export interface CompoundProposalArgs {
   targets: string[];
