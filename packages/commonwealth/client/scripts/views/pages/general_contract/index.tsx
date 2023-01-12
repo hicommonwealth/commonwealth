@@ -52,9 +52,12 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
     const callFunction = async (contractAddress: string, fn: AbiItem) => {
       try {
         this.loading = true;
-        // handle processing the forms inputs into their proper data types
+        const contract = app.contracts.getByAddress(contractAddress);
+        if (!contract) {
+          throw new Error('Contract not found');
+        }
         const result = await callContractFunction(
-          contractAddress,
+          contract,
           fn,
           this.form.functionNameToFunctionInputArgs
         );
