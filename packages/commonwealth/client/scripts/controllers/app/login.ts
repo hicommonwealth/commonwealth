@@ -9,7 +9,6 @@ import { isSameAccount } from 'helpers';
 import { initAppState } from 'app';
 import { Magic } from 'magic-sdk';
 import type { WalletId } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
 import type { ChainInfo, BlockInfo } from 'models';
 import { SocialAccount, Account, AddressInfo, ITokenAdapter } from 'models';
 import moment from 'moment';
@@ -241,6 +240,7 @@ export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
   chain: string,
+  sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo
 ): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
@@ -258,6 +258,7 @@ export async function createUserWithAddress(
     chain: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
+    sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
   });
   return { account, newlyCreated: response.result.newly_created };

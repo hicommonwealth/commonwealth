@@ -1,7 +1,9 @@
 declare let window: any;
 
+import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -30,8 +32,16 @@ class PhantomWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
-    const encodedMessage = new TextEncoder().encode(account.validationToken);
+  public getChainId() {
+    return app.chain?.id || this.defaultNetwork;
+  }
+
+  public async getRecentBlock(chainIdentifier: string) {
+    return null
+  }
+
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+    const encodedMessage = new TextEncoder().encode(JSON.stringify(canvasMessage));
     const { signature } = await window.solana.signMessage(
       encodedMessage,
       'utf8'
@@ -40,13 +50,6 @@ class PhantomWebWalletController implements IWebWallet<string> {
       'base64'
     );
     return signedMessage;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   // ACTIONS

@@ -87,7 +87,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     const blockNumber = await this._api.eth.getBlockNumber();
     console.log(blockNumber);
     const headers = await this._api.eth.getBlock(`${blockNumber}`);
-    if (this.app.chain && this.app.chain.meta.node.ethChainId !== 1) {
+    if (this.app.chain && this.app.chain.meta.node && this.app.chain.meta.node.ethChainId !== 1) {
       this.app.chain.block.height = headers.number;
       this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
 

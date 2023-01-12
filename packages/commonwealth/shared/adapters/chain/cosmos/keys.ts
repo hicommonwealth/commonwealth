@@ -4,6 +4,7 @@
 import type { AminoMsg, StdSignDoc, StdFee } from '@cosmjs/amino';
 import { makeSignDoc } from '@cosmjs/amino';
 import { toBase64 } from '@cosmjs/encoding';
+
 export const validationTokenToSignDoc = (
   token: Uint8Array,
   address: string

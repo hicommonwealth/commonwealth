@@ -7,20 +7,20 @@ import type BN from 'bn.js';
 import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
+import { stringToU8a } from '@polkadot/util';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { createRole, findOneRole } from 'server/util/roles';
-import { BalanceType } from 'common-common/src/types';
+import { BalanceType, ChainNetwork } from 'common-common/src/types';
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
 import app from '../../server-test';
 import models from '../../server/database';
 import type { Permission } from '../../server/models/role';
 import {
-  constructTypedMessage,
+  constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
-} from '../../shared/adapters/chain/ethereum/keys';
-import { Action } from '../../../common-common/src/permissions';
+} from '../../shared/adapters/chain/ethereum/keys';import { constructCanvasMessage } from 'shared/adapters/shared';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -67,14 +67,13 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
+    const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
-    const data = await constructTypedMessage(
-      address,
+    const message = constructCanvasMessage("eth",
       chain_id,
-      sessionWallet.address,
+     address, sessionWallet.address,
       TEST_BLOCK_INFO_STRING
-    );
+    );const data = constructTypedCanvasMessage(message);
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -110,10 +109,17 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({ address: keyPair.address, chain, wallet_id });
+
+    // generate session wallet
+    const sessionKeyring = new Keyring();
+    const sessionWallet = sessionKeyring.addFromUri(mnemonicGenerate(), {}, 'ed25519');
+    const chain_id = ChainNetwork.Edgeware
+    const timestamp = 1665083987891
+    const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+
+    const signature = keyPair.sign(stringToU8a(JSON.stringify(message)))
+
     const address_id = res.body.result.id;
-    const token = res.body.result.verification_token;
-    const u8aSignature = keyPair.sign(stringToU8a(token));
-    const signature = u8aToHex(u8aSignature).slice(2);
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')

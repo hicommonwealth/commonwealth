@@ -1,5 +1,6 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of Ronin login
 // is handled through redirects involving the `/finishAxieLogin` page.
@@ -18,15 +19,20 @@ class RoninWebWalletController implements IWebWallet<any> {
     return [];
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
+  public getChainId() {
+    return null;
+  }
+
+  public async getSessionPublicAddress(): Promise<string> {
+    return null;
+  }
+
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
     throw new Error('not implemented');
   }
 
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    throw new Error('not implemented');
+  public async getRecentBlock(chainIdentifier: string) {
+    return null;
   }
 
   public async enable() {

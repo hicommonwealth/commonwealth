@@ -8,9 +8,9 @@ import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import app, { resetDatabase } from '../../../server-test';
 import * as modelUtils from '../../util/modelUtils';
 import {
-  constructTypedMessage,
+  constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
-} from '../../../shared/adapters/chain/ethereum/keys';
+} from '../../../shared/adapters/chain/ethereum/keys';import { constructCanvasMessage } from 'shared/adapters/shared';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -69,12 +69,11 @@ describe('API Tests', () => {
       const token = res.body.result.verification_token;
       const chain_id = 1; // use ETH mainnet for testing
       const sessionWallet = ethers.Wallet.createRandom();
-      const data = await constructTypedMessage(
-        address,
+      const message = constructCanvasMessage("eth",
         chain_id,
-        sessionWallet.address,
+       address, sessionWallet.address,
         TEST_BLOCK_INFO_STRING
-      );
+      );const data = constructTypedCanvasMessage(message);
       const privateKey = keypair.getPrivateKey();
       const signature = signTypedData({
         privateKey,
