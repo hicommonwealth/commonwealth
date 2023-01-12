@@ -1,6 +1,8 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import { Extension, Msg, MsgStoreCode } from '@terra-money/terra.js';
+import { Extension, LCDClient, TendermintAPI } from '@terra-money/terra.js';
+import { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
 
 type TerraAddress = {
   address: string
@@ -58,7 +60,29 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
     this._enabling = false;
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
+  public getChainId() {
+    // Terra mainnet
+    return "phoenix-1";
+  }
+
+  public async getRecentBlock(chainIdentifier: string) {
+    const client = new LCDClient({
+      URL: app.chain.meta.ChainNode.url,
+      chainID: chainIdentifier
+    });
+    const tmClient = new TendermintAPI(client);
+    const blockInfo = await tmClient.blockInfo();
+
+    return {
+      number: parseInt(blockInfo.block.header.height),
+      // TODO: is this the hash we should use? the terra.js API has no documentation
+      hash: blockInfo.block.header.data_hash,
+      // seconds since epoch
+      timestamp: Math.floor(new Date(blockInfo.block.header.time).getTime() / 1000)
+    };
+  }
+
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
     // timeout?
     const result = await new Promise<any>((resolve, reject) => {
       this._extension.on('onSign', (payload) => {
@@ -67,7 +91,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(account.validationToken),
+          bytes: Buffer.from(JSON.stringify(canvasMessage)),
         });
       } catch (error) {
         console.error(error);
@@ -85,13 +109,6 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       },
     };
     return JSON.stringify(signature);
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 }
 
