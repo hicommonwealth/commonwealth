@@ -26,7 +26,7 @@ describe('aggregatePermissions() unit tests', () => {
   });
 
   it('should correctly aggregate permissions for a community with one member roles', () => {
-    const allowCreateThread = permissionsManager.addPermission(
+    const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
     );
@@ -45,8 +45,8 @@ describe('aggregatePermissions() unit tests', () => {
   });
 
   it('should correctly aggregate permissions for a community with member roles that overwrite each other', () => {
-    const createThread = permissionsManager.addPermission(base_permission, Action.CREATE_THREAD);
-    const viewChat = permissionsManager.addPermission(base_permission, Action.VIEW_CHAT_CHANNELS);
+    const createThread = permissionsManager.addAllowPermission(base_permission, Action.CREATE_THREAD);
+    const viewChat = permissionsManager.addAllowPermission(base_permission, Action.VIEW_CHAT_CHANNELS);
     const admin_name = AccessLevel.Admin;
     const moderator_name = AccessLevel.Moderator;
     const roles = [
@@ -70,9 +70,9 @@ describe('aggregatePermissions() unit tests', () => {
   });
 
   it('should correctly aggregate permissions for a community with multiple role and community overwrites', () => {
-    const createThread = permissionsManager.addPermission(base_permission, Action.CREATE_THREAD);
-    const viewChat = permissionsManager.addPermission(base_permission, Action.VIEW_CHAT_CHANNELS);
-    const createChat = permissionsManager.addPermission(base_permission, Action.CREATE_CHAT);
+    const createThread = permissionsManager.addAllowPermission(base_permission, Action.CREATE_THREAD);
+    const viewChat = permissionsManager.addAllowPermission(base_permission, Action.VIEW_CHAT_CHANNELS);
+    const createChat = permissionsManager.addAllowPermission(base_permission, Action.CREATE_CHAT);
     const admin_name = AccessLevel.Admin
     const moderator_name = AccessLevel.Moderator
     const member_name = AccessLevel.Member
@@ -107,8 +107,8 @@ describe('aggregatePermissions() unit tests', () => {
   });
 
   it('should correctly aggregate permissions for a community with multiple role overwrites', () => {
-    const createThread = permissionsManager.addPermission(base_permission, Action.CREATE_THREAD);
-    const viewChat = permissionsManager.addPermission(base_permission, Action.VIEW_CHAT_CHANNELS);
+    const createThread = permissionsManager.addAllowPermission(base_permission, Action.CREATE_THREAD);
+    const viewChat = permissionsManager.addAllowPermission(base_permission, Action.VIEW_CHAT_CHANNELS);
     const admin_name = AccessLevel.Admin
     const moderator_name = AccessLevel.Moderator
     const member_name = AccessLevel.Member
