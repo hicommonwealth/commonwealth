@@ -29,6 +29,7 @@ export const Errors = {
   EtherscanResponseFailed: 'Etherscan Response failed',
   InvalidABI: 'Invalid ABI',
   InvalidChainNode: 'Invalid Chain Node',
+  HasAbi: "Contract Already Has Abi"
 };
 
 type FetchEtherscanContractReq = {
@@ -55,24 +56,17 @@ const fetchEtherscanContract = async (
   // get Contract Object from Db by address
   const contract = await models.Contract.findOne({
     where: { address },
+    include:[{ model: models.ContractAbi, required: false }, { model: models.ChainNode, required: false }]
   });
   if (!contract) {
     throw new AppError(Errors.NoContractFound);
   }
 
-  // get chain node of contract from DB
-  const chainNode = await models.ChainNode.findOne({
-    where: { id: contract.chain_node_id },
-  });
-  if (
-    !chainNode ||
-    !chainNode.eth_chain_id ||
-    !networkIdToName[chainNode.eth_chain_id]
-  ) {
-    return new AppError(Errors.InvalidChainNode);
+  if (contract.ContractAbi) {
+    throw new AppError(Errors.HasAbi);
   }
 
-  const network = networkIdToName[chainNode.eth_chain_id];
+  const network = networkIdToName[contract.ChainNode.eth_chain_id];
 
   const fqdn = network === 'Mainnet' ? 'api' : `api-${network.toLowerCase()}`;
 

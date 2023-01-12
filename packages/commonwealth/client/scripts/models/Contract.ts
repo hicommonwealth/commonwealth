@@ -18,6 +18,8 @@ class Contract {
 
   public readonly contractAbi?: ContractAbi;
 
+  public readonly ethChainId?: number;
+
   constructor({
     id,
     address,
@@ -32,6 +34,7 @@ class Contract {
     isFactory,
     nickname,
     contractAbi,
+    ethChainId,
   }: {
     id: number;
     address: string;
@@ -46,6 +49,7 @@ class Contract {
     isFactory?: boolean;
     nickname?: string;
     contractAbi?: ContractAbi;
+    ethChainId: number;
   }) {
     this.id = id;
     this.address = address;
@@ -60,6 +64,7 @@ class Contract {
     this.isFactory = isFactory;
     this.nickname = nickname;
     this.contractAbi = contractAbi;
+    this.ethChainId = ethChainId;
   }
 
   public static fromJSON({
@@ -75,7 +80,8 @@ class Contract {
     abi,
     isFactory,
     nickname,
-    contractAbi
+    contractAbi,
+    ethChainId
   }) {
     return new Contract({
       id,
@@ -90,7 +96,8 @@ class Contract {
       abi,
       isFactory,
       nickname,
-      contractAbi
+      contractAbi,
+      ethChainId
     });
   }
 }

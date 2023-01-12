@@ -142,6 +142,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           // TODO: show screen for "no ABI found" -- or fetch data
           return null;
         }
+        // Set Eth Chain Id
         return parseFunctionFromABI(
           contract.abi,
           contract.contractAbi.create_dao_function_name
@@ -252,7 +253,6 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
 
     return (
       <div class="CreateCommunityForm">
-        {!this.loadingEthChains && ethChainRows(vnode.attrs, this.form)}
         <CWDropdown
           label="DAO Network Type (Only Ethereum is supported at this time)"
           options={[

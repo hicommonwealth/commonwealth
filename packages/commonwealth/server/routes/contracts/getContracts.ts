@@ -37,8 +37,12 @@ const getContracts = async (
   const include = [
     {
       model: models.ContractAbi,
-      required: true,
+      required: false,
     },
+    {
+      model: models.ChainNode,
+      required: false,
+    }
   ];
 
   const where = {};

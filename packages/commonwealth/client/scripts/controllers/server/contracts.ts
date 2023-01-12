@@ -85,6 +85,7 @@ class ContractsController {
         is_factory,
         nickname,
         ContractAbi,
+        ChainNode
       } = contract;
 
       const result = new Contract({
@@ -100,7 +101,8 @@ class ContractsController {
         isFactory: is_factory,
         nickname,
         abi: ContractAbi.abi,
-        contractAbi: ContractAbi
+        contractAbi: ContractAbi,
+        ethChainId: ChainNode.eth_chain_id
       });
       this._store.add(result);
     });
@@ -126,6 +128,7 @@ class ContractsController {
       symbol,
       is_factory,
       nickname,
+      ChainNode
     } = contractAttributes;
     this._store.add(
       new Contract({
@@ -141,6 +144,7 @@ class ContractsController {
         abi,
         isFactory: is_factory,
         nickname,
+        ethChainId: ChainNode.eth_chain_id
       })
     );
   }
@@ -203,6 +207,7 @@ class ContractsController {
       abi: abi !== undefined ? JSON.parse(abi) : abi,
       isFactory: is_factory,
       nickname,
+      ethChainId: eth_chain_id
     });
     if (this._store.getById(result.id)) {
       this._store.remove(this._store.getById(result.id));
@@ -232,7 +237,8 @@ class ContractsController {
           Contract.fromJSON({
             ...contract,
             abi: abiJson,
-            contractAbi: contract.ContractAbi
+            contractAbi: contract.ContractAbi,
+            ethChainId: contract.ChainNode.eth_chain_id
           })
         );
       } catch (e) {
