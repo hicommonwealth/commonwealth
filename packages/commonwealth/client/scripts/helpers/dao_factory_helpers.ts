@@ -17,21 +17,20 @@ import {
   sendFunctionCall,
 } from '../controllers/chain/ethereum/callContractFunction';
 
-export function decodeCreateDaoTx(
+export function decodeTxParameterFromEvent(
   web3: Web3,
   contractAbi: ContractAbi,
-  tx: any
+  tx: any,
+  event_name: string,
+  event_parameter: string
 ): string | null {
-  const eventAbiItem = parseEventFromABI(
-    contractAbi.abi,
-    contractAbi.create_dao_event_name
-  );
+  const eventAbiItem = parseEventFromABI(contractAbi.abi, event_name);
   const decodedLog = web3.eth.abi.decodeLog(
     eventAbiItem.inputs,
     tx.logs[0].data,
     tx.logs[0].topics
   );
-  return decodedLog[contractAbi.create_dao_event_parameter];
+  return decodedLog[event_parameter];
 }
 
 export async function createCuratedProjectDao(
@@ -72,7 +71,14 @@ export async function createCuratedProjectDao(
     web3
   );
 
-  const address = decodeCreateDaoTx(web3, contract.contractAbi, txReceipt);
+  const contractAbiObject = contract.contractAbi;
+  const address = decodeTxParameterFromEvent(
+    web3,
+    contractAbiObject.abi,
+    txReceipt,
+    contractAbiObject.create_dao_event_name,
+    contractAbiObject.create_dao_event_parameter
+  );
   try {
     const res = await $.post(`${app.serverUrl()}/createChain`, {
       id: daoForm.name,
