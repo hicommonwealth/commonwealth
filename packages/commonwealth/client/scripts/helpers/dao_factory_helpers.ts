@@ -45,7 +45,9 @@ export async function createCuratedProjectDao(
   const signingWallet: IWebWallet<any> =
     await app.wallets.getFirstAvailableMetamaskWallet();
 
-  signingWallet.enableForEthChainId(daoForm.ethChainId);
+  const ethChainId = contract.ethChainId
+
+  signingWallet.enableForEthChainId(ethChainId);
 
   if (!signingWallet.api) {
     throw new Error('Web3 Api Not Initialized');
@@ -88,7 +90,7 @@ export async function createCuratedProjectDao(
       id: daoForm.name,
       base: ChainBase.Ethereum,
       chain_string: daoForm.chainString,
-      eth_chain_id: daoForm.ethChainId,
+      eth_chain_id: ethChainId,
       jwt: app.user.jwt,
       token_name: daoForm.tokenName,
       type: ChainType.DAO,

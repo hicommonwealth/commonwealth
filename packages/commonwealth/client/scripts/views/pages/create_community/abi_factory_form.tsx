@@ -53,8 +53,6 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
   >();
   private daoFactoryType = '';
   private form = {
-    chainString: 'Ethereum Mainnet',
-    ethChainId: 1,
     network: ChainNetwork.Ethereum,
     name: '',
     nodeUrl: '',
