@@ -6,16 +6,22 @@ import {
 import { parseAbiItemsFromABI } from 'abi_utils';
 import app from 'state';
 import Web3 from 'web3';
-import { TransactionConfig } from 'web3-core/types';
+import { TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import { AbiItem, AbiOutput } from 'web3-utils';
 import Contract from 'client/scripts/models/Contract';
+import { IWebWallet } from 'client/scripts/models';
 
 /**
  * Uses the function Abi Item and processed arguments to encode a function call.
  * @return encoded function call transaction hash
  */
 
-function encodeFunctionCall(web3: Web3, fn: AbiItem, contract: Contract, processedArgs: any[]) {
+function encodeFunctionCall(
+  web3: Web3,
+  fn: AbiItem,
+  contract: Contract,
+  processedArgs: any[]
+) {
   const methodSignature = encodeFunctionSignature(fn);
   const functionContract = new web3.eth.Contract(
     parseAbiItemsFromABI(contract.abi),
@@ -26,6 +32,40 @@ function encodeFunctionCall(web3: Web3, fn: AbiItem, contract: Contract, process
     ...processedArgs
   );
   return functionTx;
+}
+
+async function sendFunctionCall(
+  fn: AbiItem,
+  signingWallet: IWebWallet<any>,
+  contract: Contract,
+  functionTx: any,
+  web3: Web3
+) {
+  let txReceipt: TransactionReceipt | any;
+  if (
+    fn.stateMutability !== 'view' &&
+    fn.stateMutability !== 'pure' &&
+    fn.constant !== true
+  ) {
+    // Sign Tx with PK if this is write function
+    const tx: TransactionConfig = {
+      from: signingWallet.accounts[0],
+      to: contract.address,
+      data: functionTx.encodeABI(),
+    };
+    txReceipt = await web3.eth.sendTransaction(tx);
+  } else {
+    // send call transaction
+    const tx: TransactionConfig = {
+      to: contract.address,
+      data: functionTx.encodeABI(),
+    };
+    txReceipt = await web3.givenProvider.request({
+      method: 'eth_call',
+      params: [tx, 'latest'],
+    });
+  }
+  return txReceipt;
 }
 
 /**
@@ -92,32 +132,12 @@ export async function callContractFunction(
   );
 
   const functionTx = encodeFunctionCall(web3, fn, contract, processedArgs);
-
-  if (
-    fn.stateMutability !== 'view' &&
-    fn.stateMutability !== 'pure' &&
-    fn.constant !== true
-  ) {
-    // Sign Tx with PK if this is write function
-    const tx: TransactionConfig = {
-      from: signingWallet.accounts[0],
-      to: contract.address,
-      data: functionTx.encodeABI(),
-    };
-    const txReceipt = await web3.eth.sendTransaction(tx);
-    return decodeTransactionData(fn.outputs, txReceipt);
-  } else {
-    // send call transaction
-    const tx: TransactionConfig = {
-      to: contract.address,
-      data: functionTx.encodeABI(),
-    };
-    const txResult = await web3.givenProvider.request({
-      method: 'eth_call',
-      params: [tx, 'latest'],
-    });
-    return decodeTransactionData(fn.outputs, txResult);
-  }
+  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
+    fn,
+    signingWallet,
+    contract,
+    functionTx,
+    web3
+  );
+  return decodeTransactionData(fn.outputs, txReceipt);
 }
-
-
