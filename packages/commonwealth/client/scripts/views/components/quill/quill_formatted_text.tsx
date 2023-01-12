@@ -65,7 +65,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
         this.truncatedDoc = doc;
       }
 
-      redraw();
+      this.redraw();
     };
 
     // if we're showing highlighted search terms, render the doc once, and cache the result

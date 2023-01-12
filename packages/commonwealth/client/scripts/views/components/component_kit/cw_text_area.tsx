@@ -69,7 +69,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
               this.isTyping = false;
               this.validationStatus = undefined;
               this.statusMessage = undefined;
-              redraw();
+              this.redraw();
             } else {
               e.stopPropagation();
               this.isTyping = true;
@@ -80,7 +80,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
                 if (inputValidationFn && e.target.value?.length > 3) {
                   [this.validationStatus, this.statusMessage] =
                     inputValidationFn(e.target.value);
-                  redraw();
+                  this.redraw();
                 }
               }, timeout);
             }
@@ -91,7 +91,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
                 this.isTyping = false;
                 this.validationStatus = undefined;
                 this.statusMessage = undefined;
-                redraw();
+                this.redraw();
               } else {
                 [this.validationStatus, this.statusMessage] = inputValidationFn(
                   e.target.value

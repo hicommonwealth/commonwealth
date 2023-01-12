@@ -240,7 +240,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
         $('.LoginDesktop').trigger('modalexit');
       }
 
-      redraw();
+      this.redraw();
     };
 
     return (

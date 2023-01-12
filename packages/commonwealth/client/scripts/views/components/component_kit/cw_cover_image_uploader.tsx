@@ -70,7 +70,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     const handleUpload = async (file: File) => {
       if (!file) return;
       this.isUploading = true;
-      redraw();
+      this.redraw();
 
       const [imageURL, uploadStatus] = await this.uploadImage(file);
       this.isUploading = false;
@@ -82,7 +82,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
         vnode.attrs.uploadCompleteCallback(imageURL);
       }
 
-      redraw();
+      this.redraw();
     };
 
     // Drag'n'Drop event handler declarations

@@ -86,7 +86,7 @@ class CWSidebarMenuItemComponent extends ClassComponent<MenuItem> {
                 onClick={async (e) => {
                   e.stopPropagation();
                   await app.communities.setStarred(item.id);
-                  redraw();
+                  this.redraw();
                 }}
               />
             </div>

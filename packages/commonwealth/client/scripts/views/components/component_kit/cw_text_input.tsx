@@ -168,7 +168,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                 this.isTyping = false;
                 this.validationStatus = undefined;
                 this.statusMessage = undefined;
-                redraw();
+                this.redraw();
               } else {
                 e.stopPropagation();
                 this.isTyping = true;
@@ -179,7 +179,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                   if (inputValidationFn && e.target.value?.length > 3) {
                     [this.validationStatus, this.statusMessage] =
                       inputValidationFn(e.target.value);
-                    redraw();
+                    this.redraw();
                   }
                 }, timeout);
               }
@@ -190,7 +190,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                   this.isTyping = false;
                   this.validationStatus = undefined;
                   this.statusMessage = undefined;
-                  redraw();
+                  this.redraw();
                 } else {
                   [this.validationStatus, this.statusMessage] =
                     inputValidationFn(e.target.value);

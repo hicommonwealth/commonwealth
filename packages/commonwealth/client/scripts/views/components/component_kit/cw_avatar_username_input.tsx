@@ -50,7 +50,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
           size={orientation === 'vertical' ? 'large' : 'small'}
           account={account}
           uploadStartedCallback={() => {
-            redraw();
+            this.redraw();
           }}
           uploadCompleteCallback={(files) => {
             files.forEach((f) => {
@@ -58,7 +58,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
               const url = f.uploadURL.replace(/\?.*/, '');
               onAvatarChangeHandler(url.trim);
             });
-            redraw();
+            this.redraw();
           }}
         />
         <div className="input-and-address-container">

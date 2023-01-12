@@ -59,7 +59,7 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
         ? 'tabsView'
         : 'sidebarView';
 
-    redraw();
+    this.redraw();
   }
 
   oninit(vnode: ResultNode<ContentPageAttrs>) {
