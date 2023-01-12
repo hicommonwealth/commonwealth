@@ -91,7 +91,7 @@ const fetchEtherscanContract = async (
       // Create new ABI
       // If source code fetch from etherscan is successful, then the abi is a verified one
       const [contract_abi] = await models.ContractAbi.findOrCreate({
-        where: { nickname, abi: abiString, verified: true },
+        where: { nickname, abi: JSON.parse(abiString), verified: true },
       });
       // update contract with new ABI
       contract.abi_id = contract_abi.id;

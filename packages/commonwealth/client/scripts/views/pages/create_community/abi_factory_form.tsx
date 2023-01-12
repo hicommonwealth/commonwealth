@@ -6,10 +6,7 @@ import $ from 'jquery';
 import 'pages/abi_factory_form.scss';
 
 import app from 'state';
-import {
-  ChainNetwork,
-  factoryNicknameToCreateFunctionName,
-} from 'common-common/src/types';
+import { ChainNetwork } from 'common-common/src/types';
 import { AbiInput, AbiItem, AbiOutput, isAddress } from 'web3-utils';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { IdRow, InputRow } from 'views/components/metadata_rows';
@@ -28,7 +25,6 @@ import {
 
 import { EthChainAttrs } from 'views/pages/create_community/types';
 
-import { slugifyPreserveDashes } from 'utils';
 import { Contract } from 'models';
 import {
   handleMappingAbiInputs,
@@ -37,7 +33,6 @@ import {
 import { parseFunctionFromABI } from 'commonwealth/shared/abi_utils';
 import ClassComponent from 'class_component';
 import { createCuratedProjectDao } from '../../../helpers/dao_factory_helpers';
-import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
@@ -45,7 +40,6 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 
 export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
-  private message = '';
   private loaded = false;
   private loading = false;
   private saving = false;
@@ -57,7 +51,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
     string,
     Map<number, string>
   >();
-  private daoFactoryType = 'curated-factory-goerli';
+  private daoFactoryType = '';
   private form = {
     chainString: 'Ethereum Mainnet',
     ethChainId: 1,
@@ -117,11 +111,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
         this.loaded = true;
         this.loading = false;
       } catch (err) {
-        notifyError(
-          err.responseJSON?.error ||
-            `${err}`
-        );
-        this.message = err.message;
+        notifyError(`${err}`);
         this.loading = false;
         m.redraw();
         return;
@@ -152,10 +142,10 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           // TODO: show screen for "no ABI found" -- or fetch data
           return null;
         }
-        const factoryFn = factoryNicknameToCreateFunctionName[nickname];
-        if (!factoryFn) return null;
-        const abiFunction = parseFunctionFromABI(contract.abi, factoryFn);
-        return abiFunction;
+        return parseFunctionFromABI(
+          contract.abi,
+          contract.contractAbi.create_dao_function_name
+        );
       } catch (err) {
         notifyError(
           err.message ||
@@ -238,8 +228,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
                     createDao(fn);
                   } catch (err) {
                     notifyError(
-                      err ||
-                        `Creating Dao Function Call failed: ${err}`
+                      err || `Creating Dao Function Call failed: ${err}`
                     );
                   }
                   this.saving = false;
@@ -269,7 +258,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
           options={[
             { label: ChainNetwork.Ethereum, value: ChainNetwork.Ethereum },
           ]}
-          initialValue={{label: this.form.network, value: this.form.network}}
+          initialValue={{ label: this.form.network, value: this.form.network }}
           onSelect={(o) => {
             this.form.network = ChainNetwork[o.value];
           }}
@@ -282,7 +271,10 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
               value: factContract.nickname,
             };
           })}
-          initialValue={{label: this.daoFactoryType, value: this.daoFactoryType}}
+          initialValue={{
+            label: this.daoFactoryType,
+            value: this.daoFactoryType,
+          }}
           onSelect={(o) => {
             this.daoFactoryType = o.value;
             m.redraw();
@@ -306,7 +298,7 @@ export class AbiFactoryForm extends ClassComponent<EthChainAttrs> {
         />
         <div class="GeneralContractPage">
           <CWText type="h4">General Contract</CWText>
-          <CWText>Selected Dao Factory: {this.daoFactoryType}</CWText>
+          <CWText>Selected Dao Factory: {this.daoFactoryType} </CWText>
           <div class="functions-container">
             <div class="header-row">
               <CWText>Name</CWText>
