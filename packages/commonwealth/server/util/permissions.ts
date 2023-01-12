@@ -136,24 +136,24 @@ export class PermissionManager {
     return newDenyPermission;
   }
 
-
-mapPermissionsToBigint(permissions: Permissions): bigint {
-  let permission = 0n;
-  for (const key in permissions) {
-    const action = permissions[key];
-    if(Array.isArray(action)){
-        for(const a of action){
-            permission |= BigInt(1) << a;
+  private mapPermissionsToBigint(permissions: Permissions): bigint {
+    let permission = 0n;
+    for (const key in permissions) {
+      const action = permissions[key];
+      if (Array.isArray(action)) {
+        for (const a of action) {
+          permission |= BigInt(1) << a;
         }
-    }else{
+      } else {
         permission |= BigInt(1) << action;
+      }
     }
+    return permission;
   }
-  return permission;
-}
 
   public computePermissions(
-    base: Permissions, assignments: Array<{ allow: bigint; deny: bigint }>
+    base: Permissions,
+    assignments: Array<{ allow: bigint; deny: bigint }>
   ): bigint {
     let permissionsBigInt = this.mapPermissionsToBigint(base);
     for (const assignment of assignments) {
