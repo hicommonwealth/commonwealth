@@ -30,12 +30,6 @@ import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
 
-// Prefetch commonly used pages
-import(/* webpackPrefetch: true */ 'views/pages/landing');
-// import(/* webpackPrefetch: true */ 'views/pages/why_commonwealth');
-import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
-import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
-import(/* webpackPrefetch: true */ 'views/pages/view_thread');
 
 // eslint-disable-next-line max-len
 const APPLICATION_UPDATE_MESSAGE =
