@@ -5,10 +5,8 @@ import { setActiveAccount } from 'controllers/app/login';
 import type { Account, BlockInfo, ChainInfo, IWebWallet } from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
-import type Web3 from 'web3';
+import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
-import type WalletConnectProvider from '@walletconnect/web3-provider';
-import { setActiveAccount } from 'controllers/app/login';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -96,8 +94,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
       this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
     const rpc = chainUrl ? { [chainId]: chainUrl } : {};
 
-    const walletconnect = await import('@walletconnect/web3-provider');
-    this._provider = new walletconnect.default({ rpc, chainId });
+    this._provider = new WalletConnectProvider({ rpc, chainId });
 
     // destroy pre-existing session if exists
     if (this._provider.wc?.connected) {
@@ -106,8 +103,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
 
     //  Enable session (triggers QR Code modal)
     await this._provider.enable();
-    const web3 = await import('web3');
-    this._web3 = new web3.default(this._provider as any);
+    this._web3 = new Web3(this._provider as any);
     this._accounts = await this._web3.eth.getAccounts();
     if (this._accounts.length === 0) {
       throw new Error('WalletConnect fetched no accounts.');

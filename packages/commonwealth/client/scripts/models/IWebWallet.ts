@@ -1,10 +1,10 @@
-import { ChainId } from '@canvas-js/interfaces';
+import type { ChainId } from '@canvas-js/interfaces';
 import type {
   ChainBase,
   ChainNetwork,
   WalletId,
 } from 'common-common/src/types';
-import { CanvasData } from 'shared/adapters/shared';
+import type { CanvasData } from 'shared/adapters/shared';
 import type Account from './Account';
 import type BlockInfo from './BlockInfo';
 
@@ -19,7 +19,7 @@ interface IWebWallet<AccountT extends { address: string } | string> {
   enable: () => Promise<void>;
   reset?: () => Promise<void>;
 
-  getChainId(): ChainId | null;
+  getChainId(): ChainId | string | null;
 
   getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
 

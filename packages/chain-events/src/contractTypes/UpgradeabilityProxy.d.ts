@@ -2,10 +2,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
+import type {
   ethers,
+  Signer} from "ethers";
+import {
   EventFilter,
-  Signer,
   BigNumber,
   BigNumberish,
   PopulatedTransaction,
@@ -13,9 +14,10 @@ import {
   ContractTransaction,
 } from "ethers";
 import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+import type { Listener, Provider } from "@ethersproject/providers";
+import type { EventFragment} from "@ethersproject/abi";
+import { FunctionFragment, Result } from "@ethersproject/abi";
+import type { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface UpgradeabilityProxyInterface extends ethers.utils.Interface {
   functions: {};

@@ -1,16 +1,13 @@
 import { StargateClient } from '@cosmjs/stargate';
 import { bech32 } from 'bech32';
-
-declare let window: any;
-
-import type Web3 from 'web3';
-import type { provider } from 'web3-core';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
 import type { Account, IWebWallet } from 'models';
-import { CanvasData } from 'shared/adapters/shared';
+import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
+import Web3 from 'web3';
+import type { provider } from 'web3-core';
 
 declare let window: any;
 
@@ -93,8 +90,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // (this needs to be called first, before other requests)
-      const web3 = await import('web3');
-      this._web3 = new web3.default((window as any).ethereum);
+      this._web3 = new Web3((window as any).ethereum);
       await this._web3.givenProvider.enable();
 
       this._ethAccounts = await this._web3.eth.getAccounts();

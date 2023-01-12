@@ -2,22 +2,23 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import {
+import type {
   ethers,
-  EventFilter,
   Signer,
   BigNumber,
   BigNumberish,
   PopulatedTransaction,
-  Contract,
   ContractTransaction,
   Overrides,
-  CallOverrides,
+  CallOverrides} from "ethers";
+import {
+  EventFilter,
+  Contract
 } from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
-import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
+import type { BytesLike } from "@ethersproject/bytes";
+import type { Listener, Provider } from "@ethersproject/providers";
+import type { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
+import type { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface AaveTokenV2MockInterface extends ethers.utils.Interface {
   functions: {
