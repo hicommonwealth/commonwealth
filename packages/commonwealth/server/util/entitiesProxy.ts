@@ -1,14 +1,12 @@
 import axios from 'axios';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { Express } from 'express';
 import url from 'url';
 
 import { ENTITIES_URL } from '../config';
-const log = factory.getLogger(formatFilename(__filename));
 
 function setupEntityProxy(app: Express) {
   // using bodyParser here because cosmjs generates text/plain type headers
-  app.get('/api/entities', async function entityProxy(req, res, next) {
+  app.get('/api/entities', async function entityProxy(req, res) {
     try {
       const search = url.parse(req.url).search;
       const entitiesUrl = `${ENTITIES_URL}/entities${search}`;

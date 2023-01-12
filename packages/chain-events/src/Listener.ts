@@ -36,6 +36,7 @@ export abstract class Listener<
 
   public storageFetcher: StorageFetcher;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public discoverReconnectRange: (chain: string) => Promise<IDisconnectedRange>;
 
   protected _subscriber: Subscriber;
@@ -106,6 +107,7 @@ export abstract class Listener<
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   protected abstract processBlock(block: any): Promise<void>;
 
   public get chain(): string {

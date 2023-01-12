@@ -1,21 +1,22 @@
-import app from 'state';
+import type { Signer } from '@polkadot/api/types';
 
 import {
+  isWeb3Injected,
   web3Accounts,
   web3Enable,
   web3FromAddress,
-  isWeb3Injected,
 } from '@polkadot/extension-dapp';
 import type { InjectedAccountWithMeta } from '@polkadot/extension-inject/types';
-import type { Signer } from '@polkadot/api/types';
-import { stringToHex } from '@polkadot/util';
 import type { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
+import { stringToHex } from '@polkadot/util';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
+import type { Account, IWebWallet } from 'models';
 import { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
 
-class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
+class PolkadotWebWalletController
+  implements IWebWallet<InjectedAccountWithMeta>
 {
   // GETTERS/SETTERS
   private _enabled: boolean;
@@ -58,12 +59,16 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
     return app.chain?.id || this.defaultNetwork;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getRecentBlock(chainIdentifier: string) {
-    return null
+    return null;
   }
 
   // ACTIONS
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const message = stringToHex(JSON.stringify(canvasMessage));
 
     const signer = await this.getSigner(account.address);
@@ -84,7 +89,7 @@ class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
     // (this needs to be called first, before other requests)
     this._enabling = true;
     try {
-      const injectedExtensionInfo = await web3Enable('commonwealth');
+      await web3Enable('commonwealth');
 
       // returns an array of { address, meta: { name, source } }
       // meta.source contains the name of the extension that provides this account

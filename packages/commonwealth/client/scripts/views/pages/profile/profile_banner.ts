@@ -1,10 +1,10 @@
+import { setActiveAccount } from 'controllers/app/login';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import m from 'mithril';
+import type { Account, AddressInfo } from 'models';
 import app from 'state';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { setActiveAccount } from 'controllers/app/login';
-import type { Account, AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 

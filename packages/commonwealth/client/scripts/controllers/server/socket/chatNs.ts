@@ -1,10 +1,10 @@
 import $ from 'jquery';
-import app from 'state';
-import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
-import type { Socket } from 'socket.io-client';
-import { io } from 'socket.io-client';
 import _ from 'lodash';
 import m from 'mithril';
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
+import app from 'state';
+import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 
 export enum ChatErrors {
   NOT_LOGGED_IN = 'User must be logged in to load chat',

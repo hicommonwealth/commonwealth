@@ -1,10 +1,9 @@
-import m from 'mithril';
-
 import { removeOrAddClasslistToAllElements } from 'helpers';
+import m from 'mithril';
 import type { ICardListItem } from 'models/interfaces';
+import ListContainer from './list_container';
 
 import ListedCardWithImage from './listed_card_with_image';
-import ListContainer from './list_container';
 
 const ItemListsMapper: m.Component<
   {

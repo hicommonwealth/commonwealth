@@ -8,6 +8,7 @@ function comparisonCustomizer(value1, value2) {
     return true;
   }
 }
+
 // Check that our current cached tree is structurally correct
 export function verifyCachedToggleTree(
   treeName: string,

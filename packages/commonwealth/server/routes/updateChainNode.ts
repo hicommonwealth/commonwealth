@@ -1,7 +1,6 @@
-import type { DB } from '../models';
-import type { NextFunction, Request, Response } from 'express';
 import type { RabbitMQController } from 'common-common/src/rabbitmq';
-import { RascalPublications } from 'common-common/src/rabbitmq';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 import { success } from '../types';
 
 const Errors = {

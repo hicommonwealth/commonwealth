@@ -1,10 +1,10 @@
 import type {
-  IFixedEndTime,
-  IFixedBlockEndTime,
   IDynamicEndTime,
-  IThresholdEndTime,
+  IFixedBlockEndTime,
+  IFixedEndTime,
   INotStartedEndTime,
   IQueuedEndTime,
+  IThresholdEndTime,
   IUnavailableEndTime,
 } from './interfaces';
 import type Proposal from './Proposal';
@@ -61,6 +61,7 @@ export enum VotingType {
   CompoundYesNoAbstain = 'compound_yes_no_abstain',
   YesNoReject = 'yes_no_reject',
 }
+
 export enum VotingUnit {
   OnePersonOneVote = '1p1v',
   CoinVote = 'coin',

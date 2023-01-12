@@ -1,13 +1,10 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError } from 'common-common/src/errors';
+import type { DB } from '../models';
 import type { AddressAttributes } from '../models/address';
 import type { CommentAttributes } from '../models/comment';
 import type { ThreadAttributes } from '../models/thread';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
-import type { DB } from '../models';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoChain: 'No base chain provided in query',

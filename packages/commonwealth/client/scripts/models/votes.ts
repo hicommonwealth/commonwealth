@@ -1,9 +1,10 @@
 import type { Coin } from 'adapters/currency';
-import type { IVote, IBalanceAccount } from './interfaces';
+import type { IBalanceAccount, IVote } from './interfaces';
 
 export class DepositVote<C extends Coin> implements IVote<C> {
   public readonly account: IBalanceAccount<C>;
   public readonly deposit: C;
+
   constructor(account: IBalanceAccount<C>, deposit: C) {
     this.account = account;
     this.deposit = deposit;
@@ -15,6 +16,7 @@ export class BinaryVote<C extends Coin> implements IVote<C> {
   public readonly choice: boolean;
   public readonly amount: number;
   public readonly weight: number;
+
   constructor(
     account: IBalanceAccount<C>,
     choice: boolean,

@@ -10,6 +10,7 @@ class NodeInfo {
     this.ethChainId = eth_chain_id;
     this.altWalletUrl = alt_wallet_url;
   }
+
   public static fromJSON(json) {
     return new NodeInfo(json);
   }

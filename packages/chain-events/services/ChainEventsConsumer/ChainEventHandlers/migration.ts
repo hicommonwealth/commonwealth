@@ -10,7 +10,7 @@ import type {
 import { RascalPublications } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
 
-import type { CWEvent, IChainEventData } from '../../../src';
+import type { CWEvent } from '../../../src';
 import {
   IEventHandler,
   eventToEntity,
@@ -37,7 +37,8 @@ export default class extends IEventHandler<ChainEventInstance> {
    * Handles an event during the migration process, by creating or updating existing
    * events depending whether we've seen them before.
    */
-  public async handle(event: CWEvent<IChainEventData>) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public async handle(event: CWEvent) {
     const chain = event.chain || this._chain;
 
     // case by entity type to determine what value to look for

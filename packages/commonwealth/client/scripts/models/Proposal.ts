@@ -1,17 +1,17 @@
-import type moment from 'moment';
 import type { Coin } from 'adapters/currency';
 import type { IIdentifiable } from 'adapters/shared';
 import type { ProposalType } from 'common-common/src/types';
-import type { IVote, IUniqueId, ITXModalData } from './interfaces';
+import type moment from 'moment';
+import type { ProposalStore } from '../stores';
+import type Account from './Account';
+import type ChainEvent from './ChainEvent';
+import type { ITXModalData, IUniqueId, IVote } from './interfaces';
 import type {
-  VotingType,
-  VotingUnit,
   ProposalEndTime,
   ProposalStatus,
+  VotingType,
+  VotingUnit,
 } from './types';
-import type Account from './Account';
-import type { ProposalStore } from '../stores';
-import type ChainEvent from './ChainEvent';
 
 abstract class Proposal<
   ApiT,
@@ -25,37 +25,49 @@ abstract class Proposal<
   public get data(): ConstructorT {
     return this._data;
   }
+
   public readonly identifier: string;
   public readonly slug: ProposalType;
+
   public abstract get shortIdentifier(): string;
+
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
   }
+
   public createdAt: moment.Moment;
   public threadId: number;
   public threadTitle: string;
 
   public abstract title: string;
+
   public abstract get description(): string;
+
   public abstract get author(): Account;
 
   // voting
   public abstract get votingType(): VotingType;
+
   public abstract get votingUnit(): VotingUnit;
+
   public abstract canVoteFrom(account: Account): boolean;
 
   protected votes: { [account: string]: VoteT } = {};
+
   public abstract get endTime(): ProposalEndTime;
+
   public abstract get isPassing(): ProposalStatus;
 
   // display
   public abstract get support(): Coin | number;
+
   public abstract get turnout(): number;
 
   protected _completed = false;
   get completed() {
     return this._completed;
   }
+
   protected _completedAt: moment.Moment; // TODO: fill this out
   get completedAt() {
     return this._completedAt;
@@ -73,9 +85,11 @@ abstract class Proposal<
   }
 
   public abstract update(e: ChainEvent): any;
+
   public updateVoters?: () => Promise<void>;
 
   protected complete(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     store: ProposalStore<Proposal<ApiT, C, ConstructorT, VoteT>>
   ): void {
     if (this._completed) {
@@ -95,18 +109,22 @@ abstract class Proposal<
   public addOrUpdateVote(vote: VoteT) {
     this.votes[vote.account.address] = vote;
   }
+
   public removeVote(account: Account) {
     if (this.hasVoted(account)) {
       delete this.votes[account.address];
     }
   }
+
   public clearVotes() {
     this.votes = {};
   }
+
   // TODO: these can be observables, if we want
   public hasVoted(account: Account) {
     return this.votes[account.address] !== undefined;
   }
+
   public getVotes(fromAccount?: Account) {
     if (fromAccount) {
       return this.votes[fromAccount.address] !== undefined
@@ -116,9 +134,11 @@ abstract class Proposal<
       return Object.values(this.votes);
     }
   }
+
   public getVoters(): string[] {
     return Object.keys(this.votes);
   }
+
   public abstract submitVoteTx(
     vote: VoteT,
     ...args

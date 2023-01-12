@@ -3,11 +3,11 @@
 // this script will compress the images in the Chains.icon_url, and re-upload these compressed images to s3.
 // Then it will update the icon_url with the new compressed image link
 
-import { Op } from 'sequelize';
-import fetch from 'node-fetch';
-import sharp from 'sharp';
 import type { S3 } from 'aws-sdk';
 import AWS from 'aws-sdk';
+import fetch from 'node-fetch';
+import { Op } from 'sequelize';
+import sharp from 'sharp';
 import models, { sequelize } from '../server/database';
 
 const s3 = new AWS.S3();

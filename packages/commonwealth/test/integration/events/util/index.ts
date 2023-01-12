@@ -1,13 +1,13 @@
-import { NotificationCategories } from 'common-common/src/types';
-import type { CWEvent } from 'chain-events/src';
-import models from '../../../../server/database';
-import ceModels from 'chain-events/services/database/database';
 import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
+import ceModels from 'chain-events/services/database/database';
+import type { CWEvent } from 'chain-events/src';
 import {
   getRabbitMQConfig,
   RabbitMQController,
 } from 'common-common/src/rabbitmq';
+import { NotificationCategories } from 'common-common/src/types';
 import { RABBITMQ_URI } from '../../../../server/config';
+import models from '../../../../server/database';
 
 interface ISetupSubscriptionsFunction {
   (email: string, address: string, chain: string): Promise<number>;

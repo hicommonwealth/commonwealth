@@ -1,11 +1,10 @@
+import { link } from 'helpers';
+import { getProposalUrlPath } from 'identifiers';
 import m from 'mithril';
-import _ from 'lodash';
+import type { Account, Comment } from 'models';
+import { Thread } from 'models';
 
 import app from 'state';
-import { link } from 'helpers';
-import type { Comment, Account } from 'models';
-import { Thread } from 'models';
-import { getProposalUrlPath } from 'identifiers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 
 interface IProfileCommentGroupAttrs {

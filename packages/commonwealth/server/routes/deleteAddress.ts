@@ -1,8 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
-import { WalletId } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import { WalletId } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -41,7 +40,7 @@ const deleteAddress = async (
   try {
     addressObj.user_id = null;
     addressObj.verified = null;
-    const result = await addressObj.save();
+    await addressObj.save();
     return res.json({ status: 'Success', response: 'Deleted address' });
   } catch (err) {
     return next(new ServerError(err));

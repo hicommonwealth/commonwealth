@@ -1,12 +1,10 @@
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import Sequelize from 'sequelize';
-import type { Request, Response, NextFunction } from 'express';
 import { sequelize } from '../../database';
-import { factory, formatFilename } from 'common-common/src/logging';
 import Errors from './errors';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const Op = Sequelize.Op;
-const log = factory.getLogger(formatFilename(__filename));
 
 export default async (
   models,

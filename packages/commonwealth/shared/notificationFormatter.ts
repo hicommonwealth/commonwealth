@@ -1,10 +1,10 @@
 import { NotificationCategories } from 'common-common/src/types';
 import type { IPostNotificationData } from './types';
 import {
+  formatAddressShort,
   getProposalUrl,
   renderQuillDeltaToText,
   smartTrim,
-  formatAddressShort,
 } from './utils';
 
 // forum notification format:
@@ -17,7 +17,6 @@ export const getForumNotificationCopy = async (
 ) => {
   // unpack notification_data
   const {
-    created_at,
     root_id,
     root_title,
     root_type,

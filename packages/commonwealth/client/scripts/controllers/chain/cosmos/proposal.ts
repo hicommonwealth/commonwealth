@@ -1,34 +1,34 @@
-import BN from 'bn.js';
 import type {
   MsgDepositEncodeObject,
   MsgVoteEncodeObject,
 } from '@cosmjs/stargate';
 import { longify } from '@cosmjs/stargate/build/queries/utils';
+import BN from 'bn.js';
+import { ProposalType } from 'common-common/src/types';
 import type {
-  QueryDepositsResponse,
-  QueryVotesResponse,
-  QueryTallyResultResponse,
-} from 'cosmjs-types/cosmos/gov/v1beta1/query';
-import type { ITXModalData, ProposalEndTime, IVote } from 'models';
-import {
-  Proposal,
-  ProposalStatus,
-  VotingUnit,
-  VotingType,
-  DepositVote,
-} from 'models';
-import type {
-  ICosmosProposal,
+  CosmosProposalState,
   CosmosToken,
   CosmosVoteChoice,
-  CosmosProposalState,
+  ICosmosProposal,
 } from 'controllers/chain/cosmos/types';
+import type {
+  QueryDepositsResponse,
+  QueryTallyResultResponse,
+  QueryVotesResponse,
+} from 'cosmjs-types/cosmos/gov/v1beta1/query';
+import type { ITXModalData, IVote, ProposalEndTime } from 'models';
+import {
+  DepositVote,
+  Proposal,
+  ProposalStatus,
+  VotingType,
+  VotingUnit,
+} from 'models';
 import moment from 'moment';
-import { ProposalType } from 'common-common/src/types';
 import CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
-import type { CosmosApiType } from './chain';
 import type CosmosChain from './chain';
+import type { CosmosApiType } from './chain';
 import type CosmosGovernance from './governance';
 import { marshalTally } from './governance';
 
@@ -55,10 +55,12 @@ export const voteToEnum = (voteOption: number | string): CosmosVoteChoice => {
 export class CosmosVote implements IVote<CosmosToken> {
   public readonly account: CosmosAccount;
   public readonly choice: CosmosVoteChoice;
+
   constructor(account: CosmosAccount, choice: CosmosVoteChoice) {
     this.account = account;
     this.choice = choice;
   }
+
   public get option(): number {
     switch (this.choice) {
       case 'Yes':
@@ -84,12 +86,15 @@ export class CosmosProposal extends Proposal<
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
+
   public get title() {
     return this.data.title;
   }
+
   public get description() {
     return this.data.description;
   }
+
   public get author() {
     return this.data.proposer
       ? this._Accounts.fromAddress(this.data.proposer)
@@ -321,6 +326,7 @@ export class CosmosProposal extends Proposal<
     this.addOrUpdateVote(vote);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public submitVoteTx(vote: CosmosVote, memo = '', cb?): ITXModalData {
     throw new Error('unsupported');
   }

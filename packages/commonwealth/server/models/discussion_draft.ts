@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize';
 import { DataTypes } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type DiscussionDraftAttributes = {
   id: number;
@@ -18,6 +18,7 @@ export type DiscussionDraftModelStatic = ModelStatic<DiscussionDraftInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   dataTypes: typeof DataTypes
 ) => {
   const DiscussionDraft = <DiscussionDraftModelStatic>sequelize.define(

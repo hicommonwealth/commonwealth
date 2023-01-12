@@ -1,18 +1,18 @@
-import m from 'mithril';
-import _ from 'lodash';
+import { notifyError } from 'controllers/app/notifications';
+import { loadScript } from 'helpers';
+import { detectURL } from 'helpers/threads';
 import $ from 'jquery';
+import { MarkdownShortcuts } from 'lib/markdownShortcuts';
+import _ from 'lodash';
+import m from 'mithril';
+import { Profile } from 'models';
 import moment from 'moment';
 import Quill from 'quill';
-import ImageUploader from 'quill-image-uploader';
 import QuillImageDropAndPaste from 'quill-image-drop-and-paste';
-import { MarkdownShortcuts } from 'lib/markdownShortcuts';
+import ImageUploader from 'quill-image-uploader';
 import QuillMention from 'quill-mention';
 
 import app from 'state';
-import { loadScript } from 'helpers';
-import { detectURL } from 'helpers/threads';
-import { notifyError } from 'controllers/app/notifications';
-import { Profile } from 'models';
 import { PreviewModal } from 'views/modals/preview_modal';
 import type {
   DeltaOps,
@@ -20,6 +20,8 @@ import type {
   QuillDelta,
   QuillTextContents,
 } from './types';
+
+/* eslint-disable */
 
 const Delta = Quill.import('delta');
 const Clipboard = Quill.import('modules/clipboard') as any;
@@ -750,6 +752,7 @@ export default class QuillEditorInternal {
       );
 
     const BlockEmbed = Quill.import('blots/block/embed');
+
     class TwitterBlot extends BlockEmbed {
       public static blotName = 'twitter';
       public static className = 'ql-twitter';

@@ -1,27 +1,27 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import type { Executor } from 'common-common/src/eth/types';
+import { notifyError } from 'controllers/app/notifications';
+import type Aave from 'controllers/chain/ethereum/aave/adapter';
+import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
 import { utils } from 'ethers';
+import m from 'mithril';
 
 import 'pages/new_proposal/aave_proposal_form.scss';
 
 import app from 'state';
-import type { Executor } from 'common-common/src/eth/types';
 import User from 'views/components/widgets/user';
-import type { AaveProposalArgs } from 'controllers/chain/ethereum/aave/governance';
-import { notifyError } from 'controllers/app/notifications';
-import type Aave from 'controllers/chain/ethereum/aave/adapter';
-import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { CWText } from '../../components/component_kit/cw_text';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWCheckbox } from '../../components/component_kit/cw_checkbox';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import type { AaveProposalState } from './types';
 import { defaultStateItem } from './types';
-import { CWButton } from '../../components/component_kit/cw_button';
 
 export class AaveProposalForm extends ClassComponent {
   private aaveProposalState: Array<AaveProposalState>;

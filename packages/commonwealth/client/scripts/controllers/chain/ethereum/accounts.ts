@@ -1,10 +1,10 @@
-import assert from 'assert';
-import type { IApp } from 'state';
-import type { IAccountsModule } from 'models';
-import { AccountsStore } from 'stores';
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
-import type EthereumChain from './chain';
+import assert from 'assert';
+import type { IAccountsModule } from 'models';
+import type { IApp } from 'state';
+import { AccountsStore } from 'stores';
 import EthereumAccount from './account';
+import type EthereumChain from './chain';
 
 // NOTE: this is just a boilerplate class; not verified to work yet.
 // TODO: hook this up to rest of the application and verify that it works

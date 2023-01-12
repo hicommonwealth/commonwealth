@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/edit_profile_modal.scss';
+import type { Account } from 'models';
 
 import app from 'state';
-import type { Account } from 'models';
 import { AvatarUpload } from 'views/components/avatar_upload';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 type EditProfileModalAttrs = {
   account: Account;

@@ -1,26 +1,26 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'pages/view_proposal/proposal_components.scss';
-
-import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
 import AaveProposal from 'controllers/chain/ethereum/aave/proposal';
 import CompoundProposal from 'controllers/chain/ethereum/compound/proposal';
 import type MolochMember from 'controllers/chain/ethereum/moloch/member';
+
+import MolochProposal from 'controllers/chain/ethereum/moloch/proposal';
+import m from 'mithril';
+
+import 'pages/view_proposal/proposal_components.scss';
+import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import {
   getStatusClass,
   getStatusText,
 } from '../../components/proposal_card/helpers';
+import { cancelProposal } from '../../components/proposals/helpers';
 import {
-  ThreadLink,
   BlockExplorerLink,
+  ThreadLink,
   VotingInterfaceLink,
 } from './proposal_header_links';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { cancelProposal } from '../../components/proposals/helpers';
 
 type BaseCancelButtonAttrs = {
   onModalClose?: () => void;
@@ -212,6 +212,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
     );
   }
 }
+
 // // needs refactoring
 // export class ProposalBodyLastEdited
 //   extends

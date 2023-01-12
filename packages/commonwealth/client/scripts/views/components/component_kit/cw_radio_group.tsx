@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_radio_group.scss';
+import m from 'mithril';
 
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
@@ -15,6 +15,7 @@ type RadioGroupAttrs = {
   options: Array<RadioButtonType>;
   toggledOption?: string;
 };
+
 export class CWRadioGroup extends ClassComponent<RadioGroupAttrs> {
   view(vnode: m.Vnode<RadioGroupAttrs>) {
     const { options, onchange, name, toggledOption } = vnode.attrs;

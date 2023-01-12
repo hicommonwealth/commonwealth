@@ -1,12 +1,11 @@
+import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
+import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 import { EthSignType } from '@keplr-wallet/types';
-import app from 'state';
-
-import type { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 import type { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -30,18 +29,23 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public get available() {
     return !!window.keplr;
   }
+
   public get enabling() {
     return this._enabling;
   }
+
   public get enabled() {
     return this.available && this._enabled;
   }
+
   public get accounts() {
     return this._accounts || [];
   }
+
   public get api() {
     return window.keplr;
   }
+
   public get offlineSigner() {
     return this._offlineSigner;
   }
@@ -51,10 +55,8 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${
-      chainIdentifier
-    }`;
-    const cosm = await import('@cosmjs/stargate')
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
     const block = await client.getBlock(height - 1);
@@ -63,11 +65,14 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
       number: block.header.height,
       hash: block.id,
       // seconds since epoch
-      timestamp: Math.floor((new Date(block.header.time)).getTime() / 1000)
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
     };
   }
 
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const signature = await window.keplr.signEthereum(
       this._chainId,
       account.address,

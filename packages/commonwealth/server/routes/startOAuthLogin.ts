@@ -1,18 +1,11 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
 import type { DB } from '../models';
-
-interface AuthInfoExtended extends Express.AuthInfo {
-  state?: {
-    hostname: string;
-  };
-}
 
 const startOAuthLogin = async (
   models: DB,
   provider: string,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   console.log('Auth info startOAuthLogin:', req.authInfo);
   const successRedirect = '/';

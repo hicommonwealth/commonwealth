@@ -1,18 +1,13 @@
-import type { NextFunction } from 'express';
-import Web3 from 'web3';
-import BN from 'bn.js';
-import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { ContractType } from 'common-common/src/types';
-import type { DB } from 'server/models';
 import { parseAbiItemsFromABI } from 'commonwealth/client/scripts/helpers/abi_utils';
+import type { NextFunction } from 'express';
+import type { DB } from 'server/models';
+import Web3 from 'web3';
 import type { AbiItem } from 'web3-utils';
-import type { ContractAttributes } from '../../models/contract';
 import type { ChainNodeAttributes } from '../../models/chain_node';
+import type { ContractAttributes } from '../../models/contract';
 import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoType: 'Must provide contract type',

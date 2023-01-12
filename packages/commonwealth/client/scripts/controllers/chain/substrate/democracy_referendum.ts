@@ -1,30 +1,30 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Call, Conviction } from '@polkadot/types/interfaces';
-import BN from 'bn.js';
 import type {
   ISubstrateDemocracyReferendum,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
 import { DemocracyThreshold, formatCall } from 'adapters/chain/substrate/types';
+import { Coin } from 'adapters/currency';
+import BN from 'bn.js';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ProposalType } from 'common-common/src/types';
-import type { ProposalEndTime, Account, ChainEntity, ChainEvent } from 'models';
+import type { Account, ChainEntity, ChainEvent, ProposalEndTime } from 'models';
 import {
+  BinaryVote,
   Proposal,
   ProposalStatus,
-  BinaryVote,
   VotingType,
   VotingUnit,
 } from 'models';
-import { SubstrateTypes } from 'chain-events/src/types';
-import { Coin } from 'adapters/currency';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
+import type Substrate from './adapter';
+import type { SubstrateCollectiveProposal } from './collective_proposal';
 import type SubstrateDemocracy from './democracy';
 import type SubstrateDemocracyProposal from './democracy_proposal';
+import type SubstrateChain from './shared';
 import type { SubstrateTreasuryProposal } from './treasury_proposal';
-import type { SubstrateCollectiveProposal } from './collective_proposal';
-import type Substrate from './adapter';
 
 export enum DemocracyConviction {
   None = 0,
@@ -163,12 +163,15 @@ export class SubstrateDemocracyReferendum extends Proposal<
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
+
   public get description() {
     return null;
   }
+
   public get author() {
     return null;
   }
+
   public get preimage() {
     return this._preimage;
   }
@@ -176,12 +179,15 @@ export class SubstrateDemocracyReferendum extends Proposal<
   public get votingType() {
     return VotingType.ConvictionYesNoVoting;
   }
+
   public get votingUnit() {
     return VotingUnit.CoinVote;
   }
+
   public canVoteFrom(account: Account) {
     return account.chain.base === ChainBase.Substrate;
   }
+
   public title: string;
   private _preimage;
   private _endBlock: number;
@@ -456,6 +462,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
     );
     return yesSupport / (yesSupport + noSupport);
   }
+
   public get turnout() {
     return this.edgVoted.inDollars / this._Chain.totalbalance.inDollars;
   }
@@ -470,6 +477,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
         .reduce((total, vote) => vote.coinWeight.add(total), new BN(0))
     );
   }
+
   private get edgVotedNo(): SubstrateCoin {
     if (this.getVotes().some((v) => v.balance === undefined)) {
       throw new Error("Balances haven't resolved");
@@ -480,6 +488,7 @@ export class SubstrateDemocracyReferendum extends Proposal<
         .reduce((total, vote) => vote.coinWeight.add(total), new BN(0))
     );
   }
+
   private get edgVoted(): SubstrateCoin {
     if (this.getVotes().some((v) => v.balance === undefined)) {
       throw new Error("Balances haven't resolved");
@@ -491,11 +500,13 @@ export class SubstrateDemocracyReferendum extends Proposal<
       )
     );
   }
+
   public get accountsVotedYes() {
     return this.getVotes()
       .filter((vote) => vote.choice === true)
       .map((vote) => vote.account);
   }
+
   public get accountsVotedNo() {
     return this.getVotes()
       .filter((vote) => vote.choice === false)

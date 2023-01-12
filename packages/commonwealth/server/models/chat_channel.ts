@@ -1,11 +1,11 @@
-import type { Model, DataTypes } from 'sequelize';
+import type { DataTypes, Model } from 'sequelize';
 import * as Sequelize from 'sequelize';
-import type { ModelStatic } from './types';
 import type {
   ChatMessageAttributes,
   ChatMessageInstance,
 } from './chat_message';
 import type { RuleAttributes } from './rule';
+import type { ModelStatic } from './types';
 
 export interface ChatChannelAttributes {
   id?: number;
@@ -31,6 +31,7 @@ export type ChatChannelModelStatic = ModelStatic<ChatChannelInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   dataTypes: typeof DataTypes
 ): ChatChannelModelStatic => {
   const ChatChannel = <ChatChannelModelStatic>sequelize.define(

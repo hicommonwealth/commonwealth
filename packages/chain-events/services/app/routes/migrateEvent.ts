@@ -14,7 +14,7 @@ enum MigrateEventErrors {
   ChainError = 'Failed to migrate chain events.',
 }
 
-const migrateEvent = async (
+const migrateEvent: any = async (
   models: DB,
   req: Request,
   res: Response,

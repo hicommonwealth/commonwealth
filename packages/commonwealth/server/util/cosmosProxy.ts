@@ -1,10 +1,11 @@
 import axios from 'axios';
 import bodyParser from 'body-parser';
-import { factory, formatFilename } from 'common-common/src/logging';
-import type { Express } from 'express';
 
 import { AppError } from 'common-common/src/errors';
+import type { Express } from 'express';
 import type { DB } from '../models';
+import { factory, formatFilename } from 'common-common/src/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 function setupCosmosProxy(app: Express, models: DB) {
@@ -12,7 +13,7 @@ function setupCosmosProxy(app: Express, models: DB) {
   app.post(
     '/cosmosAPI/:chain',
     bodyParser.text(),
-    async function cosmosProxy(req, res, next) {
+    async function cosmosProxy(req, res) {
       log.trace(`Got request: ${JSON.stringify(req.body, null, 2)}`);
       try {
         log.trace(`Querying cosmos endpoint for chain: ${req.params.chain}`);

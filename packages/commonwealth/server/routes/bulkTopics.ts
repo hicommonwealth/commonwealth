@@ -1,18 +1,9 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
 import type { DB } from '../models';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {};
 
-const bulkTopics = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const bulkTopics = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
 
   const topics = await models.Topic.findAll({

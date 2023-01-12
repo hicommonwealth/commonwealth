@@ -1,33 +1,29 @@
-import BN from 'bn.js';
-import moment from 'moment';
-import _ from 'underscore';
-import type { ITXModalData } from 'models';
-import { ProposalModule } from 'models';
 import { fromAscii } from '@cosmjs/encoding';
 import type { MsgSubmitProposalEncodeObject } from '@cosmjs/stargate';
+import BN from 'bn.js';
+import type {
+  CosmosProposalState,
+  ICosmosProposal,
+  ICosmosProposalTally,
+} from 'controllers/chain/cosmos/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
+import { CommunityPoolSpendProposal } from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import type {
   Proposal,
   TallyResult,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
 import {
-  TextProposal,
   ProposalStatus,
+  TextProposal,
 } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import {
-  CommunityPoolSpendProposal,
-  CommunityPoolSpendProposalWithDeposit,
-} from 'cosmjs-types/cosmos/distribution/v1beta1/distribution';
 import { Any } from 'cosmjs-types/google/protobuf/any';
-import type {
-  ICosmosProposal,
-  ICosmosProposalTally,
-  CosmosProposalState,
-} from 'controllers/chain/cosmos/types';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+import moment from 'moment';
 import type CosmosAccount from './account';
 import type CosmosAccounts from './accounts';
-import type { CosmosApiType } from './chain';
 import type CosmosChain from './chain';
+import type { CosmosApiType } from './chain';
 import { CosmosProposal } from './proposal';
 
 const stateEnumToString = (status: ProposalStatus): CosmosProposalState => {
@@ -78,18 +74,23 @@ class CosmosGovernance extends ProposalModule<
   private _vetoThreshold: number;
   private _maxDepositPeriodS: number;
   private _minDeposit: CosmosToken;
+
   public get votingPeriodNs() {
     return this._votingPeriodS;
   }
+
   public get yesThreshold() {
     return this._yesThreshold;
   }
+
   public get vetoThreshold() {
     return this._vetoThreshold;
   }
+
   public get maxDepositPeriodNs() {
     return this._maxDepositPeriodS;
   }
+
   public get minDeposit() {
     return this._minDeposit;
   }
@@ -208,6 +209,7 @@ class CosmosGovernance extends ProposalModule<
     title: string,
     description: string,
     initialDeposit: CosmosToken,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     memo = ''
   ): ITXModalData {
     throw new Error('unsupported');

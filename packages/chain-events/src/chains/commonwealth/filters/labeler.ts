@@ -1,5 +1,3 @@
-import moment from 'moment';
-
 import type { LabelerFilter, IEventLabel } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
 import type { IEventData } from '../types';

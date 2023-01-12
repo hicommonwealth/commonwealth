@@ -1,23 +1,23 @@
-import type { IApp } from 'state';
-import type { StorageModule } from 'models';
-import { PersistentStore } from 'stores';
-import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import type {
-  Call,
-  AccountId,
-  IdentityJudgement,
-  IdentityFields,
-} from '@polkadot/types/interfaces';
-import type { RegistrarInfo } from '@polkadot/types/interfaces';
-import type { Codec } from '@polkadot/types/types';
-import type { Data } from '@polkadot/types';
 import type { ApiPromise } from '@polkadot/api';
+import type { Data } from '@polkadot/types';
+import type {
+  AccountId,
+  Call,
+  IdentityFields,
+  IdentityJudgement,
+  RegistrarInfo,
+} from '@polkadot/types/interfaces';
+import type { Codec } from '@polkadot/types/types';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
+import type { StorageModule } from 'models';
+import type { IApp } from 'state';
+import { PersistentStore } from 'stores';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import type { ISubstrateIdentity } from './identity';
 import SubstrateIdentity from './identity';
+import type SubstrateChain from './shared';
 
 class SubstrateIdentityStore extends PersistentStore<
   ISubstrateIdentity,
@@ -42,6 +42,7 @@ class SubstrateIdentities implements StorageModule {
   public get initialized() {
     return this._initialized;
   }
+
   private _initializing = false;
   public get initializing() {
     return this._initializing;
@@ -51,6 +52,7 @@ class SubstrateIdentities implements StorageModule {
   public get disabled() {
     return this._disabled;
   }
+
   public disable() {
     this._disabled = true;
   }
@@ -73,18 +75,23 @@ class SubstrateIdentities implements StorageModule {
   private _subAcctDeposit: SubstrateCoin;
   private _maxSubAccts: number;
   private _maxAddlFields: number;
+
   public get fieldDeposit() {
     return this._fieldDeposit;
   }
+
   public get basicDeposit() {
     return this._basicDeposit;
   }
+
   public get subAcctDeposit() {
     return this._subAcctDeposit;
   }
+
   public get maxSubAccts() {
     return this._maxSubAccts;
   }
+
   public get maxAddlFields() {
     return this._maxAddlFields;
   }

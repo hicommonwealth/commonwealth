@@ -37,8 +37,7 @@ export async function Enrich(
         projectAddress,
         api.factory.provider
       );
-      const { id, name, ipfsHash, url, creator } =
-        await projectContract.metaData();
+      const { name, ipfsHash, url, creator } = await projectContract.metaData();
       const { threshold, deadline, beneficiary, acceptedToken } =
         await projectContract.projectData();
       const curatorFee = await projectContract.curatorFee();

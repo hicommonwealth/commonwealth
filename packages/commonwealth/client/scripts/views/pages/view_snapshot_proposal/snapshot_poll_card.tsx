@@ -1,9 +1,11 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/poll_card.scss';
+import m from 'mithril';
+import { CWCard } from '../../components/component_kit/cw_card';
+import { CWText } from '../../components/component_kit/cw_text';
 
 import type {
   PollCardAttrs,
@@ -16,8 +18,6 @@ import {
   ResultsSection,
   VoteDisplay,
 } from '../../components/poll_card';
-import { CWCard } from '../../components/component_kit/cw_card';
-import { CWText } from '../../components/component_kit/cw_text';
 
 export type SnapshotPollCardAttrs = Omit<
   PollCardAttrs,

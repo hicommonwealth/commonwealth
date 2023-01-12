@@ -1,25 +1,24 @@
-import BN from 'bn.js';
-import moment from 'moment';
-
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import type { IMolochProposalResponse } from 'adapters/chain/moloch/types';
+import BN from 'bn.js';
 import { MolochTypes } from 'chain-events/src/types';
 
 import { ProposalType } from 'common-common/src/types';
 import type {
-  IVote,
-  ITXModalData,
-  ProposalEndTime,
   ChainEntity,
   ChainEvent,
+  ITXModalData,
+  IVote,
+  ProposalEndTime,
 } from 'models';
-import { Proposal, VotingType, VotingUnit, ProposalStatus } from 'models';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import moment from 'moment';
+import { attachSigner } from '../contractApi';
+import type MolochAPI from './api';
+import type MolochGovernance from './governance';
 
 import type MolochMember from './member';
 import type MolochMembers from './members';
-import type MolochAPI from './api';
-import type MolochGovernance from './governance';
-import { attachSigner } from '../contractApi';
 
 export enum MolochVote {
   NULL = 'Null',
@@ -133,6 +132,7 @@ export default class MolochProposal extends Proposal<
   public get shortIdentifier() {
     return `MGP-${this.data.identifier}`;
   }
+
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.details);
@@ -150,6 +150,7 @@ export default class MolochProposal extends Proposal<
       }
     }
   }
+
   public get description(): string {
     try {
       const parsed = JSON.parse(this.data.details);
@@ -167,6 +168,7 @@ export default class MolochProposal extends Proposal<
   public get author() {
     return this._Members.get(this.data.delegateKey);
   }
+
   public get applicantAddress() {
     return this.data.applicantAddress;
   }
@@ -174,6 +176,7 @@ export default class MolochProposal extends Proposal<
   public get votingType() {
     return VotingType.MolochYesNo;
   }
+
   public get votingUnit() {
     return VotingUnit.CoinVote;
   }
@@ -181,12 +184,15 @@ export default class MolochProposal extends Proposal<
   public get startingPeriod() {
     return +this.data.startingPeriod;
   }
+
   public get votingPeriodEnd() {
     return this.startingPeriod + +this._Gov.votingPeriodLength;
   }
+
   public get gracePeriodEnd() {
     return this.votingPeriodEnd + +this._Gov.gracePeriod;
   }
+
   public get abortPeriodEnd() {
     return this.startingPeriod + +this._Gov.abortWindow;
   }
@@ -366,6 +372,7 @@ export default class MolochProposal extends Proposal<
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public canVoteFrom(account: MolochMember) {
     // We need to check the delegate of account to perform voting checks. Delegates must
     // be fetched from chain, which requires async calls, making this impossible to implement.

@@ -1,7 +1,8 @@
-import moment from 'moment';
 import JobRunner from 'common-common/src/cacheJobRunner';
 
+import moment from 'moment';
 import { factory, formatFilename } from 'common-common/src/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // map of rules-addresses to pass (fail always recheck)

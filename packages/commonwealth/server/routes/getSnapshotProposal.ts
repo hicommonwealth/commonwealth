@@ -1,7 +1,6 @@
 import type { Response } from 'express';
 import type { DB } from '../models';
 import type { TypedRequestQuery } from '../types';
-import { success } from '../types';
 import fetchNewSnapshotProposal from '../util/fetchSnapshot';
 
 export const Errors = {

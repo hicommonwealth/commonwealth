@@ -1,20 +1,20 @@
-import type { Server } from 'socket.io';
-import moment from 'moment';
-import { Op } from 'sequelize';
 import { addPrefix, factory } from 'common-common/src/logging';
+import type { RedisCache } from 'common-common/src/redisCache';
 import {
   NotificationCategories,
   RedisNamespaces,
 } from 'common-common/src/types';
+import moment from 'moment';
+import { Op } from 'sequelize';
+import type { Server } from 'socket.io';
 import {
   WebsocketEngineEvents,
   WebsocketMessageNames,
   WebsocketNamespaces,
 } from '../../shared/types';
+import type { DB } from '../models';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { authenticate } from './index';
-import type { DB } from '../models';
-import type { RedisCache } from 'common-common/src/redisCache';
 
 const log = factory.getLogger(addPrefix(__filename));
 
@@ -153,8 +153,8 @@ export function createChatNamespace(
         let finalAddress = redisAddress;
 
         // if the cached address and the address in the message don't match then either the user has switched addresses,
-        // so we must check if they own that address and update the cache, or they are trying to spoof the address, so we
-        // send back an authentication error
+        // so we must check if they own that address and update the cache, or they are trying to spoof the address,
+        // so we send back an authentication error
         if (address != redisAddress) {
           const userId = await models.Address.findOne({
             attributes: ['user_id'],

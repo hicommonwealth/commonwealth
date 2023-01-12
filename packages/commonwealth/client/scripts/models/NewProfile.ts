@@ -10,21 +10,27 @@ class NewProfile {
   get name() {
     return this._name;
   }
+
   get email() {
     return this._email;
   }
+
   get website() {
     return this._website;
   }
+
   get bio() {
     return this._bio;
   }
+
   get isDefault() {
     return this._isDefault;
   }
+
   get avatarUrl() {
     return this._avatarUrl;
   }
+
   get slug() {
     return this._slug;
   }

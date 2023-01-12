@@ -1,9 +1,9 @@
 import chai from 'chai';
 import type { ChildProcess } from 'child_process';
 import { spawn } from 'child_process';
-import { Pool, Client } from 'pg';
-import format from 'pg-format';
 import fetch from 'node-fetch';
+import { Client, Pool } from 'pg';
+import format from 'pg-format';
 
 const { assert } = chai;
 
@@ -321,6 +321,7 @@ function verifyListener(chains: string[], listeners: any) {
 // the following code ensures that child processes are terminated before the main process exits due to any reason
 function childExit(children: ChildProcess[]) {
   process.stdin.resume();
+
   function exitHandler() {
     console.log('Ending child processes');
     for (let child of children) {
@@ -331,6 +332,7 @@ function childExit(children: ChildProcess[]) {
     }
     console.log('All child processes closed');
   }
+
   // do something when app is closing
   process.on('exit', exitHandler);
   // catches ctrl+c event

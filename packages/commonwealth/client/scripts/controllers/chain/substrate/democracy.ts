@@ -1,15 +1,17 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { BlockNumber } from '@polkadot/types/interfaces';
-import type { ISubstrateDemocracyReferendum } from 'adapters/chain/substrate/types';
-import type { SubstrateCoin } from 'adapters/chain/substrate/types';
+import type {
+  ISubstrateDemocracyReferendum,
+  SubstrateCoin,
+} from 'adapters/chain/substrate/types';
+import { SubstrateTypes } from 'chain-events/src/types';
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
-import { SubstrateTypes } from 'chain-events/src/types';
 import type { IApp } from 'state';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import { SubstrateDemocracyReferendum } from './democracy_referendum';
+import type SubstrateChain from './shared';
 
 class SubstrateDemocracy extends ProposalModule<
   ApiPromise,
@@ -21,18 +23,23 @@ class SubstrateDemocracy extends ProposalModule<
   private _votingPeriod: number = null;
   private _emergencyVotingPeriod: number = null;
   private _preimageByteDeposit: SubstrateCoin = null;
+
   get enactmentPeriod() {
     return this._enactmentPeriod;
   }
+
   get cooloffPeriod() {
     return this._cooloffPeriod;
   }
+
   get votingPeriod() {
     return this._votingPeriod;
   }
+
   get emergencyVotingPeriod() {
     return this._emergencyVotingPeriod;
   }
+
   get preimageByteDeposit() {
     return this._preimageByteDeposit;
   }
@@ -178,6 +185,7 @@ class SubstrateDemocracy extends ProposalModule<
   }
   */
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args): ITXModalData {
     throw new Error('cannot directly create democracy referendum');
   }

@@ -1,17 +1,16 @@
+import type { ProposalType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
+import { uniqueIdToProposal } from 'identifiers';
 import $ from 'jquery';
 import _ from 'lodash';
+import type { IUniqueId } from 'models';
+import { Attachment, Comment } from 'models';
 import moment from 'moment';
 
 import app from 'state';
-import { uniqueIdToProposal } from 'identifiers';
 import { CommentsStore } from 'stores';
-import type { IUniqueId } from 'models';
-import { Comment, Attachment } from 'models';
-import { notifyError } from 'controllers/app/notifications';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import { updateLastVisited } from '../app/login';
-import type { ProposalType } from 'common-common/src/types';
-import proposalIdToEntity from 'helpers/proposalIdToEntity';
 
 // tslint:disable: object-literal-key-quotes
 
@@ -119,10 +118,6 @@ class CommentsController {
     return this._store.getByProposal(proposal);
   }
 
-  public getByAuthor(address: string, author_chain: string) {
-    return this._store.getByAuthor(address);
-  }
-
   public nComments<T extends IUniqueId>(proposal: T) {
     return this._store.nComments(proposal);
   }
@@ -140,6 +135,7 @@ class CommentsController {
     return _.uniq(authors);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async create<T extends IUniqueId>(
     address: string,
     proposalIdentifier: string,
@@ -152,10 +148,7 @@ class CommentsController {
     // TODO: is the below assumptions valid?
     // this only works if we assume that all chain-entities for the specific
     // chain are loaded when the comment is created
-    const [prefix, id] = proposalIdentifier.split('_') as [
-      ProposalType,
-      string
-    ];
+    const [prefix] = proposalIdentifier.split('_') as [ProposalType, string];
     let chainEntity;
     if (
       prefix.includes('proposal') ||

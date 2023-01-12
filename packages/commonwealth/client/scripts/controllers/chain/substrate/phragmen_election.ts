@@ -1,20 +1,20 @@
-import _ from 'underscore';
-import { ChainBase, ProposalType } from 'common-common/src/types';
-import type { IVote, Account, IFixedBlockEndTime } from 'models';
-import { Proposal, VotingType, VotingUnit, ProposalStatus } from 'models';
 import type { ApiPromise } from '@polkadot/api';
+import type { StorageKey, Vec } from '@polkadot/types';
+import type { AccountId, BalanceOf } from '@polkadot/types/interfaces';
+import type { Codec } from '@polkadot/types/types';
 import type {
   ISubstratePhragmenElection,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
-import type { BalanceOf, AccountId } from '@polkadot/types/interfaces';
-import type { Codec } from '@polkadot/types/types';
-import type { Vec, StorageKey } from '@polkadot/types';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
+import { ChainBase, ProposalType } from 'common-common/src/types';
+import type { Account, IFixedBlockEndTime, IVote } from 'models';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import _ from 'underscore';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import type SubstratePhragmenElections from './phragmen_elections';
+import type SubstrateChain from './shared';
 
 // inheriting from Vote to satisfy submitVoteTx requirement,
 // but choice/conviction are unused
@@ -22,6 +22,7 @@ export class PhragmenElectionVote implements IVote<SubstrateCoin> {
   public readonly account: SubstrateAccount;
   public readonly votes: string[];
   public readonly stake: SubstrateCoin;
+
   constructor(
     account: SubstrateAccount,
     votes: string[],
@@ -46,14 +47,17 @@ export class SubstratePhragmenElection extends Proposal<
   public get description() {
     return null;
   }
+
   public get author() {
     return null;
   }
+
   public title: string;
 
   public get support() {
     return null;
   }
+
   public get turnout() {
     return (
       this._Chain.coins(
@@ -68,15 +72,19 @@ export class SubstratePhragmenElection extends Proposal<
   public get votingType() {
     return VotingType.SimpleYesApprovalVoting;
   }
+
   public get votingUnit() {
     return VotingUnit.CoinVote;
   }
+
   public canVoteFrom(account: Account) {
     return account.chain.base === ChainBase.Substrate;
   }
+
   get isPassing() {
     return ProposalStatus.None;
   }
+
   get endTime(): IFixedBlockEndTime {
     return { kind: 'fixed_block', blocknum: this.data.endBlock };
   }
@@ -85,6 +93,7 @@ export class SubstratePhragmenElection extends Proposal<
   public get exposedCandidates() {
     return this._exposedCandidates;
   }
+
   public get candidates() {
     return [
       ...this._exposedCandidates,
@@ -212,6 +221,7 @@ export class SubstratePhragmenElection extends Proposal<
       () => this.updateVoters()
     );
   }
+
   public removeVoterTx(voter: SubstrateAccount) {
     return this._Chain.createTXModalData(
       voter,
@@ -221,6 +231,7 @@ export class SubstratePhragmenElection extends Proposal<
       () => this.updateVoters()
     );
   }
+
   public reportDefunctVoterTx(
     reporter: SubstrateAccount,
     voter: SubstrateAccount
@@ -234,6 +245,7 @@ export class SubstratePhragmenElection extends Proposal<
       () => this.updateVoters()
     );
   }
+
   public async submitCandidacyTx(candidate: SubstrateAccount) {
     // handle differing versions of Substrate API
     const txFunc = (api: ApiPromise) => {
@@ -253,6 +265,7 @@ export class SubstratePhragmenElection extends Proposal<
       () => this.updateVoters()
     );
   }
+
   public renounceCandidacyTx(candidate: SubstrateAccount) {
     return this._Chain.createTXModalData(
       candidate,

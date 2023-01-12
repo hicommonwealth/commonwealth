@@ -1,14 +1,14 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/proposals/aave_proposal_card_detail.scss';
 
 import type AaveProposal from 'controllers/chain/ethereum/aave/proposal';
-import User from '../widgets/user';
-import { CWText } from '../component_kit/cw_text';
+import m from 'mithril';
 import { CWLabel } from '../component_kit/cw_label';
+import { CWText } from '../component_kit/cw_text';
+import User from '../widgets/user';
 
 export const roundVote = (percentage) => {
   return percentage.toFixed(2).split('.0')[0].slice(0, 4);

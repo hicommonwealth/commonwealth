@@ -1,11 +1,10 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
 import type { DB } from '../models';
 
 export const getTokensFromLists = async (
   models: DB,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   try {
     const tokens = await models.Token.findAll();

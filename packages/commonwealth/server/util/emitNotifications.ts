@@ -1,4 +1,3 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import { StatsDController } from 'common-common/src/statsd';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import Sequelize, { QueryTypes } from 'sequelize';
@@ -17,6 +16,7 @@ import {
 } from '../scripts/emails';
 import type { WebhookContent } from '../webhookNotifier';
 import send from '../webhookNotifier';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

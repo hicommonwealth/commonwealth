@@ -1,5 +1,5 @@
 import moment from 'moment';
-import type { Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import {
   SENDGRID_API_KEY,
   LOGIN_RATE_LIMIT_MINS,
@@ -11,7 +11,7 @@ import { DynamicTemplate } from '../../shared/types';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { WalletId } from 'common-common/src/types';
 import validateChain from '../middleware/validateChain';
-import type { DB } from '../models';
+import { DB } from '../models';
 import { AppError } from 'common-common/src/errors';
 import sgMail from '@sendgrid/mail';
 sgMail.setApiKey(SENDGRID_API_KEY);
@@ -67,7 +67,7 @@ const startEmailLogin = async (
   // ignore error because someone might try to log in from the homepage, or another page without
   // chain or community
   const context = req.body.chain ? req.body : { chain: MAGIC_DEFAULT_CHAIN };
-  const [chain, error] = await validateChain(models, context);
+  const [chain] = await validateChain(models, context);
   const magicChain = chain;
 
   const isNewRegistration = !previousUser;
@@ -125,7 +125,7 @@ const startEmailLogin = async (
 
   sgMail
     .send(msg)
-    .then((result) => {
+    .then(() => {
       res.json({ status: 'Success' });
     })
     .catch((e) => {

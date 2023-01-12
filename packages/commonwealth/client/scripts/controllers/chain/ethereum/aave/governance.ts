@@ -1,17 +1,17 @@
+import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import { AaveEvents } from 'chain-events/src';
+import { AaveTypes } from 'chain-events/src/types';
+import type { Executor } from 'common-common/src/eth/types';
+import { chainToEventNetwork } from 'controllers/server/chain_entities';
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
-import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { AaveTypes } from 'chain-events/src/types';
-import { AaveEvents } from 'chain-events/src';
-import type { Executor } from 'common-common/src/eth/types';
-import { chainToEventNetwork } from 'controllers/server/chain_entities';
-
-import AaveProposal from './proposal';
-import type AaveChain from './chain';
+import type EthereumAccounts from '../accounts';
 import { attachSigner } from '../contractApi';
 import type AaveApi from './api';
-import type EthereumAccounts from '../accounts';
+import type AaveChain from './chain';
+
+import AaveProposal from './proposal';
 
 export interface AaveProposalArgs {
   executor: Executor | string;
@@ -37,6 +37,7 @@ export default class AaveGovernance extends ProposalModule<
   public get api() {
     return this._api;
   }
+
   public get usingServerChainEntities() {
     return this._usingServerChainEntities;
   }
@@ -169,6 +170,7 @@ export default class AaveGovernance extends ProposalModule<
     this.store.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args: any[]): ITXModalData {
     throw new Error('Method not implemented.');
   }

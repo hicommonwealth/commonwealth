@@ -1,11 +1,8 @@
-import type { Request, Response, NextFunction } from 'express';
+import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import request from 'superagent';
 import { SLACK_FEEDBACK_WEBHOOK } from '../config';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotSent: 'Nothing sent!',

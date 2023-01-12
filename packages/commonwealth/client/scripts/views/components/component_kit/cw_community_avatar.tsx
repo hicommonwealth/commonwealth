@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_community_avatar.scss';
+import m from 'mithril';
 
 import type { ChainInfo } from 'models';
-import { getClasses } from './helpers';
-import { ComponentType } from './types';
 import type { IconSize } from './cw_icons/types';
 import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+import { ComponentType } from './types';
 
 type CommunityAvatarAttrs = {
   community: ChainInfo;

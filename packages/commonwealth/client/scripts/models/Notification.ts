@@ -1,7 +1,7 @@
-import moment from 'moment';
 import type { ChainEventType } from 'models/index';
-import type NotificationSubscription from './NotificationSubscription';
+import moment from 'moment';
 import ChainEvent from './ChainEvent';
+import type NotificationSubscription from './NotificationSubscription';
 
 class Notification {
   public readonly id: number;

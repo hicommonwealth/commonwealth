@@ -1,16 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'modals/edit_topic_thresholds_modal.scss';
-
-import app from 'state';
-import type { Topic } from 'models';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { TokenDecimalInput } from 'views/components/token_decimal_input';
+import m from 'mithril';
+
+import 'modals/edit_topic_thresholds_modal.scss';
+import type { Topic } from 'models';
+
+import app from 'state';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { TokenDecimalInput } from 'views/components/token_decimal_input';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 

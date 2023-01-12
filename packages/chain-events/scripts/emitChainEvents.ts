@@ -5,7 +5,7 @@ import ceModels, { sequelize } from '../services/database/database';
 import cwModels from '../../commonwealth/server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
 import type { ChainInstance } from 'commonwealth/server/models/chain';
-import { SubstrateTypes } from '../src';
+import { SubstrateTypes } from '../src/types';
 import type { StorageFilterConfig } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   EntityArchivalHandler,
@@ -42,7 +42,7 @@ const handleEventFn = async (
 export const generateHandlers = (
   chain: ChainInstance,
   storageConfig: StorageFilterConfig = {}
-) => {
+): IEventHandler[] => {
   // writes events into the db as ChainEvents rows
   const storageHandler = new StorageHandler(
     ceModels,

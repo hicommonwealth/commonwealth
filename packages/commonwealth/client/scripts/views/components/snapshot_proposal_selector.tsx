@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/snapshot_proposal_selector.scss';
-
-import app from 'state';
-import type { Thread } from 'models';
+import { ListItem, QueryList } from 'construct-ui';
 import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { loadMultipleSpacesData } from 'helpers/snapshot_utils';
+import m from 'mithril';
+import type { Thread } from 'models';
+
+import app from 'state';
 
 type SnapshotProposalSelectorAttrs = {
   onSelect: (sn: SnapshotProposal) => void;

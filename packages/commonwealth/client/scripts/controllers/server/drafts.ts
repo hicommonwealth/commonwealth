@@ -1,10 +1,8 @@
 /* eslint-disable no-restricted-syntax */
-import _ from 'lodash';
-import { DiscussionDraft, Attachment } from 'models';
-
 import $ from 'jquery';
-import app from 'state';
+import { Attachment, DiscussionDraft } from 'models';
 import moment from 'moment';
+import app from 'state';
 import DraftStore from '../../stores/DraftStore';
 
 const modelFromServer = (draft) => {

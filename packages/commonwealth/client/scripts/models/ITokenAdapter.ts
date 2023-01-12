@@ -1,5 +1,5 @@
-import BN from 'bn.js';
 import type { Coin } from 'adapters/currency';
+import BN from 'bn.js';
 import type { Account } from '.';
 import { IChainAdapter } from '.';
 

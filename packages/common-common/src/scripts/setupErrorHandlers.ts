@@ -11,7 +11,7 @@ const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
   app.use(rollbar.errorHandler());
 
   // Handle 404 errors
-  app.use((req: Request, res: Response, next) => {
+  app.use((req: Request, res: Response) => {
     res.status(404);
     res.json({
       status: 404,
@@ -20,6 +20,7 @@ const setupErrorHandlers = (app: Express, rollbar: Rollbar) => {
   });
 
   // Handle our ServerErrors (500), AppErrors (400), or unknown errors.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((error, req, res: Response, next) => {
     if (error instanceof ServerError) {
       console.trace(error);

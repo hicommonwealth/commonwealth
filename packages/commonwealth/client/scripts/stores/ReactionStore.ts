@@ -1,12 +1,7 @@
-import IdStore from './IdStore';
-import type { AnyProposal } from '../models';
-import { Reaction, Thread, Comment, Proposal, AbridgedThread } from '../models';
 import { byAscendingCreationDate } from '../helpers';
-
-enum PostType {
-  discussion = 'discussion',
-  comment = 'comment',
-}
+import type { AnyProposal } from '../models';
+import { AbridgedThread, Comment, Proposal, Reaction, Thread } from '../models';
+import IdStore from './IdStore';
 
 class ReactionStore extends IdStore<Reaction<any>> {
   private _storePost: { [identifier: string]: Array<Reaction<any>> } = {};

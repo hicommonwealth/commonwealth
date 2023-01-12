@@ -1,7 +1,7 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import { CWText } from '../cw_text';
 import type { SharedPopoverAttrs } from './cw_popover';

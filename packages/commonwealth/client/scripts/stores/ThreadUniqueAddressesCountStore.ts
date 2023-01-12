@@ -1,5 +1,5 @@
-import IdStore from 'stores/IdStore';
 import type ThreadUniqueAddressesCount from 'models/ThreadUniqueAddressesCount';
+import IdStore from 'stores/IdStore';
 
 class ThreadUniqueAddressesCountStore extends IdStore<
   ThreadUniqueAddressesCount<any>

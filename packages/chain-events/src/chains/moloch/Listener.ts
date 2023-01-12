@@ -11,7 +11,6 @@ import type {
   ListenerOptions as MolochListenerOptions,
   RawEvent,
 } from './types';
-import { IEventData } from './types';
 
 import { createApi, Processor, StorageFetcher, Subscriber } from '.';
 

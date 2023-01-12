@@ -1,7 +1,7 @@
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Response } from 'express';
 import { Op } from 'sequelize';
-import type { Response, NextFunction } from 'express';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { findAllRoles } from '../util/roles';
 
 export const Errors = {

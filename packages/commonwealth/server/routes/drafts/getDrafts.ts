@@ -1,14 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
 
-const getDiscussionDrafts = async (
-  models,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getDiscussionDrafts = async (models, req: Request, res: Response) => {
   const addresses = await models.Address.findAll({
     where: {
       user_id: req.user.id,

@@ -1,7 +1,6 @@
 /**
  * Fetches events from Cosmos chain in real time.
  */
-import { decodeTxRaw } from '@cosmjs/proto-signing';
 import type { Block } from '@cosmjs/tendermint-rpc';
 
 import type { IDisconnectedRange } from '../../interfaces';

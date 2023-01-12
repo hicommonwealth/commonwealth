@@ -1,14 +1,13 @@
 import BN from 'bn.js';
 import type {
-  IAaveGovernanceV2,
+  AaveTokenV2,
   Executor,
   GovernanceStrategy,
-  AaveTokenV2,
+  IAaveGovernanceV2,
 } from 'common-common/src/eth/types';
 import {
   Executor__factory,
   GovernanceStrategy__factory,
-  AaveTokenV2__factory,
 } from 'common-common/src/eth/types';
 import ContractApi from 'controllers/chain/ethereum/contractApi';
 

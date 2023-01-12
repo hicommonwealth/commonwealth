@@ -1,35 +1,26 @@
-import type { ITXModalData, IChainModule, ITXData, ChainInfo } from 'models';
-import { NodeInfo } from 'models';
-import { ChainNetwork, WalletId } from 'common-common/src/types';
-import m from 'mithril';
-import _ from 'lodash';
-import type { IApp } from 'state';
-import { ApiStatus } from 'state';
-import moment from 'moment';
-import BN from 'bn.js';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { EncodeObject } from '@cosmjs/proto-signing';
 
 import type {
-  StdFee,
-  StakingExtension,
-  GovExtension,
   BankExtension,
+  GovExtension,
+  StakingExtension,
+  StdFee,
 } from '@cosmjs/stargate';
-import {
-  isBroadcastTxSuccess,
-  isBroadcastTxFailure,
-  QueryClient,
-  setupStakingExtension,
-  setupGovExtension,
-  setupBankExtension,
-  SigningStargateClient,
-} from '@cosmjs/stargate';
+import { QueryClient } from '@cosmjs/stargate';
 import type { Event } from '@cosmjs/tendermint-rpc';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import type { EncodeObject } from '@cosmjs/proto-signing';
-import type CosmosAccount from './account';
+import BN from 'bn.js';
+import { ChainNetwork, WalletId } from 'common-common/src/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
+import m from 'mithril';
+import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
+import moment from 'moment';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
-import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
+import type CosmosAccount from './account';
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export interface ICosmosTXData extends ITXData {
   chainId: string;
@@ -77,6 +68,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _tmClient: Tendermint34Client;
+
   public async init(chain: ChainInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
     console.log(`Starting Tendermint RPC API at ${url}...`);

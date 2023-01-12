@@ -1,19 +1,19 @@
-import type { Transaction, FindOptions } from 'sequelize';
-import { Op } from 'sequelize';
+import { AppError } from 'common-common/src/errors';
 import type { Action } from 'common-common/src/permissions';
 import {
+  BASE_PERMISSIONS,
   computePermissions,
   isPermitted,
   PermissionError,
-  BASE_PERMISSIONS,
 } from 'common-common/src/permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
-import { AppError } from 'common-common/src/errors';
+import type { FindOptions, Transaction } from 'sequelize';
+import { Op } from 'sequelize';
 import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
 import type { CommunityRoleAttributes } from '../models/community_role';
 import type { Permission } from '../models/role';
 import type { RoleAssignmentAttributes } from '../models/role_assignment';
-import type { AddressInstance } from '../models/address';
 
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   chain_id: string;

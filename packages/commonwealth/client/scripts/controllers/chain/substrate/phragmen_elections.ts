@@ -1,18 +1,17 @@
+import type { ApiPromise } from '@polkadot/api';
+import type { u32, Vec } from '@polkadot/types';
+import type { BalanceOf } from '@polkadot/types/interfaces';
+import type {
+  ISubstratePhragmenElection,
+  SubstrateCoin,
+} from 'adapters/chain/substrate/types';
+import type BN from 'bn.js';
 import type { ITXModalData } from 'models';
 import { ProposalModule } from 'models';
-import type { ApiPromise } from '@polkadot/api';
-import type { ISubstratePhragmenElection } from 'adapters/chain/substrate/types';
-import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import type BN from 'bn.js';
-import type { BalanceOf, AccountId } from '@polkadot/types/interfaces';
-import type { Codec } from '@polkadot/types/types';
-import type { Vec, u32 } from '@polkadot/types';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import { SubstratePhragmenElection } from './phragmen_election';
-
-type ElectionResultCodec = [AccountId, BalanceOf] & Codec;
+import type SubstrateChain from './shared';
 
 class SubstratePhragmenElections extends ProposalModule<
   ApiPromise,
@@ -24,18 +23,23 @@ class SubstratePhragmenElections extends ProposalModule<
   private _desiredMembers: number = null;
   private _desiredRunnersUp: number = null;
   private _termDuration: number = null;
+
   public get candidacyBond() {
     return this._candidacyBond;
   }
+
   public get votingBond() {
     return this._votingBond;
   }
+
   public get desiredMembers() {
     return this._desiredMembers;
   }
+
   public get desiredRunnersUp() {
     return this._desiredRunnersUp;
   }
+
   public get termDuration() {
     return this._termDuration;
   }
@@ -44,6 +48,7 @@ class SubstratePhragmenElections extends ProposalModule<
   public get activeElection() {
     return this._activeElection;
   }
+
   public get round() {
     return this._activeElection?.data.round;
   }
@@ -52,9 +57,11 @@ class SubstratePhragmenElections extends ProposalModule<
   public get members() {
     return Object.keys(this._members);
   }
+
   public isMember(who: SubstrateAccount) {
     return !!this._members[who.address];
   }
+
   public backing(who: SubstrateAccount) {
     return this._Chain.coins(this._members[who.address]);
   }
@@ -63,12 +70,15 @@ class SubstratePhragmenElections extends ProposalModule<
   public get runnersUp() {
     return this._runnersUp.map((r) => r.who);
   }
+
   public get nextRunnerUp() {
     return this._runnersUp[this._runnersUp.length - 1].who;
   }
+
   public isRunnerUp(who: SubstrateAccount) {
     return !!this._runnersUp.find((r) => r.who === who.address);
   }
+
   public runnerUpBacking(who: SubstrateAccount) {
     return this._Chain.coins(
       this._runnersUp.find((r) => r.who === who.address).score || 0
@@ -143,6 +153,7 @@ class SubstratePhragmenElections extends ProposalModule<
     this._initialized = true;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args): ITXModalData {
     throw new Error('cannot directly create election');
   }

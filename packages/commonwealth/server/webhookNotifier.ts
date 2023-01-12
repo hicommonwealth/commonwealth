@@ -1,16 +1,15 @@
-import request from 'superagent';
-import { Op } from 'sequelize';
-import { capitalize } from 'lodash';
 import type { CWEvent } from 'chain-events/src/interfaces';
 import { Label as ChainEventLabel } from 'chain-events/src/util';
 
 import { NotificationCategories } from 'common-common/src/types';
-import { smartTrim, validURL, renderQuillDeltaToText } from '../shared/utils';
-import { getForumNotificationCopy } from '../shared/notificationFormatter';
+import { capitalize } from 'lodash';
+import { Op } from 'sequelize';
+import request from 'superagent';
+import { renderQuillDeltaToText, smartTrim, validURL } from '../shared/utils';
 import {
+  DEFAULT_COMMONWEALTH_LOGO,
   SERVER_URL,
   SLACK_FEEDBACK_WEBHOOK,
-  DEFAULT_COMMONWEALTH_LOGO,
 } from './config';
 
 export interface WebhookContent {
@@ -148,9 +147,7 @@ const send = async (models, content: WebhookContent) => {
   });
 
   const {
-    community,
     actor,
-    action,
     actedOn,
     actedOnLink,
     notificationTitlePrefix,
@@ -210,7 +207,8 @@ const send = async (models, content: WebhookContent) => {
 
   // Third case
   if (!previewImageUrl) {
-    // if no embedded image url or the chain/community doesn't have a logo, show the Commonwealth logo as the preview image
+    // if no embedded image url or the chain/community doesn't have a logo,
+    // show the Commonwealth logo as the preview image
     previewImageUrl = previewImageUrl || DEFAULT_COMMONWEALTH_LOGO;
     previewAltText = previewAltText || 'Commonwealth';
   }
@@ -306,7 +304,8 @@ const send = async (models, content: WebhookContent) => {
                     },
                     title: notificationTitlePrefix + actedOn,
                     url: actedOnLink,
-                    description: notificationExcerpt.replace(REGEX_EMOJI, ''), // discord webhook description doesn't accept emoji
+                    // discord webhook description doesn't accept emoji
+                    description: notificationExcerpt.replace(REGEX_EMOJI, ''),
                     color: 15258703,
                     thumbnail: {
                       url: previewImageUrl,
@@ -329,7 +328,6 @@ const send = async (models, content: WebhookContent) => {
           let getChatUsername = url.split('/@');
           getChatUsername = `@${getChatUsername[1]}`;
 
-          const botToken = process.env.TELEGRAM_BOT_TOKEN;
           const getUpdatesUrl = `https://api.telegram.org/${process.env.TELEGRAM_BOT_TOKEN}`;
           url = `${getUpdatesUrl}/sendMessage`;
 

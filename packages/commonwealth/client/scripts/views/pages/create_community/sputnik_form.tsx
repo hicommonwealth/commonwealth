@@ -1,8 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { initAppState } from 'app';
 import ClassComponent from 'class_component';
+import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import $ from 'jquery';
+import m from 'mithril';
 import type { ConnectConfig } from 'near-api-js';
 import { connect as nearConnect, keyStores } from 'near-api-js';
 import type { CodeResult } from 'near-api-js/lib/providers/provider';
@@ -10,20 +15,14 @@ import type { CodeResult } from 'near-api-js/lib/providers/provider';
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { initAppState } from 'app';
-import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { notifyError } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
-
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import type { ChainFormFields, ChainFormState } from './types';
-import { CWButton } from '../../components/component_kit/cw_button';
 import { CommunityType } from '.';
 
 import { linkExistingAddressToChainOrCommunity } from '../../../controllers/app/login';
+import { CWButton } from '../../components/component_kit/cw_button';
+
+import { defaultChainRows, initChainForm } from './chain_input_rows';
+import type { ChainFormFields, ChainFormState } from './types';
 
 type CreateSputnikForm = ChainFormFields & { isMainnet: boolean };
 

@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
 import BN from 'bn.js';
+import ClassComponent from 'class_component';
+import type Near from 'controllers/chain/near/adapter';
+import type { IDaoInfo } from 'controllers/chain/near/chain';
+import { formatDuration } from 'helpers';
+import m from 'mithril';
 import moment from 'moment';
 
 import 'pages/sputnikdaos.scss';
 
 import app from 'state';
-import { formatDuration } from 'helpers';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
-import type Near from 'controllers/chain/near/adapter';
-import type { IDaoInfo } from 'controllers/chain/near/chain';
 // import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
 import { getClasses } from '../components/component_kit/helpers';

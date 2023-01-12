@@ -101,7 +101,8 @@ const TokensChainsComponent: m.Component<
             {
               class: 'text-left max-w-screen-md mx-auto text-2xl text-center',
             },
-            ' Subscribe to chain activity like whale transfers or major votes. Discuss new ideas, crowdfund projects, and access native governance for Layer 1s, tokens, and NFTs alike. '
+            ' Subscribe to chain activity like whale transfers or major votes. Discuss new ideas, crowdfund' +
+              ' projects, and access native governance for Layer 1s, tokens, and NFTs alike. '
           ),
         ]),
         m(

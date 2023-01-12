@@ -1,23 +1,23 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
 import { blake2AsHex } from '@polkadot/util-crypto';
-
-import app from 'state';
-import { proposalSlugToClass } from 'identifiers';
-import type { ITXModalData, ProposalModule } from 'models';
+import ClassComponent from 'class_component';
 import { notifyError } from 'controllers/app/notifications';
 import type { SubstrateAccount } from 'controllers/chain/substrate/account';
 import type Substrate from 'controllers/chain/substrate/adapter';
-import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
-import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import { proposalSlugToClass } from 'identifiers';
+import m from 'mithril';
+import type { ITXModalData, ProposalModule } from 'models';
+
+import app from 'state';
 import { ProposalType } from '../../../../../../common-common/src/types';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import ErrorPage from '../error';
 import { CWButton } from '../../components/component_kit/cw_button';
+import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import EdgewareFunctionPicker from '../../components/edgeware_function_picker';
 import { createTXModal } from '../../modals/tx_signing_modal';
+import ErrorPage from '../error';
 
 export class SubstrateDemocracyProposalForm extends ClassComponent {
   private deposit: number;

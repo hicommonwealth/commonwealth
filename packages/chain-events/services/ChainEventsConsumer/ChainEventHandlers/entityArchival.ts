@@ -39,6 +39,7 @@ export default class extends IEventHandler {
    *
    * `dbEvent` is the database entry corresponding to the `event`.
    */
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   public async handle(event: CWEvent<IChainEventData>, dbEvent) {
     // eslint-disable-next-line @typescript-eslint/no-shadow
     const log = factory.getLogger(
@@ -154,23 +155,21 @@ export default class extends IEventHandler {
     const fieldName = getUniqueEntityKey(event.network, entityKind);
     const fieldValue = event.data[fieldName].toString();
     const author = event.data['proposer'] || event.data['creator'];
-    let result;
     switch (updateType) {
       case EntityEventKind.Create: {
-        result = await createEntityFn(entityKind, fieldValue, author);
+        await createEntityFn(entityKind, fieldValue, author);
         break;
       }
       case EntityEventKind.Update:
       case EntityEventKind.Vote: {
-        result = await updateEntityFn(entityKind, fieldValue);
+        await updateEntityFn(entityKind, fieldValue);
         break;
       }
       case EntityEventKind.Complete: {
-        result = await updateEntityFn(entityKind, fieldValue, true);
+        await updateEntityFn(entityKind, fieldValue, true);
         break;
       }
       default: {
-        result = null;
         break;
       }
     }

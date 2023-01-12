@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_text_input.scss';
+import m from 'mithril';
+import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
+import { CWLabel } from './cw_label';
+import { CWText } from './cw_text';
+import type { ValidationStatus } from './cw_validation_text';
+import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { getClasses } from './helpers';
-import { CWLabel } from './cw_label';
-import type { ValidationStatus } from './cw_validation_text';
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWText } from './cw_text';
-import { CWIconButton } from './cw_icon_button';
-import type { IconName } from './cw_icons/cw_icon_lookup';
 
 type TextInputSize = 'small' | 'large';
 

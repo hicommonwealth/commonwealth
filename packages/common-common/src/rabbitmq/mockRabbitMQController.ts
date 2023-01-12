@@ -9,6 +9,8 @@ import type {
   TRmqMessages,
 } from './types';
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+
 /**
  * This is a mock RabbitMQController whose functions simply log a 'success' message when called. Used mainly for
  * testing and scripts that need to use eventHandlers without a live RabbitMQ instance.

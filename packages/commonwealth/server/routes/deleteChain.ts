@@ -1,13 +1,10 @@
+import { AppError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError } from 'common-common/src/errors';
+import type { DB } from '../models';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import type { DB } from '../models';
 import { findOneRole } from '../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -78,7 +75,7 @@ const deleteChain = async (
   }
 
   // eslint-disable-next-line no-new
-  new Promise(async (resolve, reject) => {
+  new Promise(async () => {
     await models.sequelize.transaction(async (t) => {
       // TODO: need a parallel API call to chain-events to destroy chain-entities there too
       await models.ChainEntityMeta.destroy({

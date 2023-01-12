@@ -1,7 +1,7 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';

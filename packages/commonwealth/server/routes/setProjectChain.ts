@@ -1,9 +1,9 @@
 import { AppError } from 'common-common/src/errors';
+import { ChainNetwork } from '../../../common-common/src/types';
 import type { DB } from '../models';
+import type { ChainEntityMetaAttributes } from '../models/chain_entity_meta';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';
-import type { ChainEntityMetaAttributes } from '../models/chain_entity_meta';
-import { ChainNetwork } from '../../../common-common/src/types';
 
 export const Errors = {
   OnlyAuthorCanSetChain: 'Creator of project not owned by caller',

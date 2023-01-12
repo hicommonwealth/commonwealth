@@ -1,30 +1,30 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
-import moment from 'moment';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import type { SnapshotSpace } from 'helpers/snapshot_utils';
+import { getScore } from 'helpers/snapshot_utils';
+import { idToProposal } from 'identifiers';
 import { capitalize } from 'lodash';
+import m from 'mithril';
+import moment from 'moment';
 
 import 'pages/new_snapshot_proposal.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
-import { idToProposal } from 'identifiers';
-import type { SnapshotSpace } from 'helpers/snapshot_utils';
-import { getScore } from 'helpers/snapshot_utils';
-import type { QuillEditor } from '../../components/quill/quill_editor';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
 import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWRadioGroup } from '../../components/component_kit/cw_radio_group';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWText } from '../../components/component_kit/cw_text';
-import type { ThreadForm } from './types';
-import { newLink } from './helpers';
-import { PageLoading } from '../loading';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
+import type { QuillEditor } from '../../components/quill/quill_editor';
 import Sublayout from '../../sublayout';
+import { PageLoading } from '../loading';
+import { newLink } from './helpers';
+import type { ThreadForm } from './types';
 
 type NewSnapshotProposalPageAttrs = {
   snapshotId: string;

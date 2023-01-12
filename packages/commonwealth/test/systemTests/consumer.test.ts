@@ -1,6 +1,10 @@
 import chai from 'chai';
-import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
-import { getQueueStats, publishRmqMsg } from 'common-common/src/rabbitmq/util';
+import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
+import type { CWEvent } from 'chain-events/src';
+import { SupportedNetwork } from 'chain-events/src';
+import type * as AaveTypes from 'chain-events/src/chains/aave/types';
+import type { ITransfer } from 'chain-events/src/chains/aave/types';
+import { EventKind } from 'chain-events/src/chains/aave/types';
 import type {
   RmqCENotificationCUD,
   RmqEntityCUD,
@@ -10,13 +14,9 @@ import {
   RascalQueues,
   RascalRoutingKeys,
 } from 'common-common/src/rabbitmq';
+import { getQueueStats, publishRmqMsg } from 'common-common/src/rabbitmq/util';
+import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import { v4 as uuidv4 } from 'uuid';
-import type * as AaveTypes from 'chain-events/src/chains/aave/types';
-import type { ITransfer } from 'chain-events/src/chains/aave/types';
-import { EventKind } from 'chain-events/src/chains/aave/types';
-import type { CWEvent } from 'chain-events/src';
-import { SupportedNetwork } from 'chain-events/src';
-import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import { setupCommonwealthConsumer } from '../../server/CommonwealthConsumer/CommonwealthConsumer';
 import { RABBITMQ_API_URI } from '../../server/config';
 import models from '../../server/database';

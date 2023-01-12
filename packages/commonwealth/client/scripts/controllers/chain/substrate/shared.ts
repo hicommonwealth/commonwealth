@@ -1,55 +1,53 @@
-import m from 'mithril';
-import type { IApp } from 'state';
-import { ApiStatus } from 'state';
-import moment from 'moment';
-import BN from 'bn.js';
-
 import type { SubmittableResult } from '@polkadot/api';
-import { WsProvider, Keyring, ApiPromise } from '@polkadot/api';
-import { u8aToHex } from '@polkadot/util';
-import type {
-  DispatchError,
-  ActiveEraInfo,
-  EraIndex,
-  SessionIndex,
-  Call,
-} from '@polkadot/types/interfaces';
-import { Balance, Hash } from '@polkadot/types/interfaces';
-
-import type { Compact } from '@polkadot/types/codec';
+import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import type {
   ApiOptions,
   Signer,
   SubmittableExtrinsic,
   VoidFn,
 } from '@polkadot/api/types';
+import type { u128 } from '@polkadot/types';
+
+import type { Compact } from '@polkadot/types/codec';
+import type {
+  ActiveEraInfo,
+  Call,
+  DispatchError,
+  EraIndex,
+  SessionIndex,
+} from '@polkadot/types/interfaces';
+import type { CallFunction, InterfaceTypes } from '@polkadot/types/types';
+import { u8aToHex } from '@polkadot/util';
+import { SubstrateCoin } from 'adapters/chain/substrate/types';
 
 import { formatCoin } from 'adapters/currency';
-import { ChainNetwork } from 'common-common/src/types';
-import type {
-  NodeInfo,
-  ChainInfo,
-  ITXModalData,
-  IChainModule,
-  ITXData,
-} from 'models';
-import { TransactionStatus } from 'models';
+import BN from 'bn.js';
 
 import { SubstrateEvents } from 'chain-events/src';
-import { EventEmitter } from 'events';
+import { ChainNetwork } from 'common-common/src/types';
 
 import {
-  notifySuccess,
   notifyError,
   notifyInfo,
+  notifySuccess,
 } from 'controllers/app/notifications';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import type { InterfaceTypes, CallFunction } from '@polkadot/types/types';
-import type { u128 } from '@polkadot/types';
+import { EventEmitter } from 'events';
+import m from 'mithril';
+import type {
+  ChainInfo,
+  IChainModule,
+  ITXData,
+  ITXModalData,
+  NodeInfo,
+} from 'models';
+import { TransactionStatus } from 'models';
+import moment from 'moment';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
 import { constructSubstrateUrl } from 'substrate';
 import { formatAddressShort } from '../../../../../shared/utils';
-import type { SubstrateAccount } from './account';
 import { chainToEventNetwork } from '../../server/chain_entities';
+import type { SubstrateAccount } from './account';
 
 export interface ISubstrateTXData extends ITXData {
   nonce: string;
@@ -89,6 +87,7 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   public get ss58Format() {
     return this._ss58Format;
   }
+
   public keyring(useEd25519 = false) {
     return new Keyring({
       type: useEd25519 ? 'ed25519' : 'sr25519',
@@ -136,9 +135,11 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
   public createType<K extends keyof InterfaceTypes>(type: K, ...params: any[]) {
     return this.api.registry.createType(type, ...params);
   }
+
   public findCall(callIndex: Uint8Array | string): CallFunction {
     return this.api.findCall(callIndex);
   }
+
   public get registry() {
     return this.api.registry;
   }

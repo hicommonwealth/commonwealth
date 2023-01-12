@@ -1,11 +1,11 @@
 /* eslint-disable no-use-before-define */
+import type { NearToken } from 'adapters/chain/near/types';
 import type { IAccountsModule } from 'models';
 import { Account } from 'models';
-import type { NearToken } from 'adapters/chain/near/types';
+import { Account as NearJsAccount, keyStores } from 'near-api-js';
+import type { AccountView } from 'near-api-js/lib/providers/provider';
 import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import { keyStores, Account as NearJsAccount } from 'near-api-js';
-import type { AccountView } from 'near-api-js/lib/providers/provider';
 import type NearChain from './chain';
 
 // NOTE: this is the actual type of validators in the NodeStatus struct,
@@ -30,6 +30,7 @@ export class NearAccount extends Account {
 
   private _Accounts: NearAccounts;
   private _Chain: NearChain;
+
   constructor(
     app: IApp,
     Chain: NearChain,
@@ -71,6 +72,7 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
   public get store() {
     return this._store;
   }
+
   public readonly keyStore: keyStores.BrowserLocalStorageKeyStore;
 
   private _validators: INearValidators = {};
@@ -116,6 +118,7 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
       }
     }
   }
+
   public async deinit() {
     for (const v of Object.keys(this._validators)) {
       delete this._validators[v];

@@ -1,13 +1,12 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import { Model } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
 import type { AttachmentAttributes } from './attachment';
+import type { ChainAttributes } from './chain';
+import type { ChainEntityMetaAttributes } from './chain_entity_meta';
 import type { LinkedThreadAttributes } from './linked_thread';
 import type { TopicAttributes } from './topic';
-import type { ChainEntityMetaAttributes } from './chain_entity_meta';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ThreadAttributes = {
   address_id: number;

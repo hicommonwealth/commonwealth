@@ -1,13 +1,9 @@
-import type { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { isAddress } from 'web3-utils';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 import type { RoleInstanceWithPermission } from '../util/roles';
 import { createRole, findAllRoles, findOneRole } from '../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   InvalidAddress: 'Invalid address',

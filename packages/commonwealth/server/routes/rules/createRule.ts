@@ -1,11 +1,12 @@
-import type { DB } from '../../models';
 import { AppError, ServerError } from 'common-common/src/errors';
-import type { TypedResponse, TypedRequestBody } from '../../types';
-import { success } from '../../types';
-import type { RuleAttributes } from '../../models/rule';
 
-import { factory, formatFilename } from 'common-common/src/logging';
+import type { DB } from '../../models';
+import type { RuleAttributes } from '../../models/rule';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
 import { validateRule } from '../../util/rules/ruleParser';
+import { factory, formatFilename } from 'common-common/src/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {

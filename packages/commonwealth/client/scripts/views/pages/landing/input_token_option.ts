@@ -55,7 +55,8 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
             }
           },
           class:
-            'p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row text-left leading-none w-full justify-between focus:outline-none',
+            'p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row text-left' +
+            ' leading-none w-full justify-between focus:outline-none',
         },
         m('span', { class: 'flex flex-row font-bold' }, [
           tokenImage,

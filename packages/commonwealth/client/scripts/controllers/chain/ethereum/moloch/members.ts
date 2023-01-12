@@ -1,12 +1,12 @@
-import type { IApp } from 'state';
 import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import type { IMolochMember } from 'adapters/chain/moloch/types';
 import type EthereumAccounts from 'controllers/chain/ethereum/accounts';
 import type EthereumChain from 'controllers/chain/ethereum/chain';
 import type { IAccountsModule } from 'models';
+import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import MolochMember from './member';
 import type MolochAPI from './api';
+import MolochMember from './member';
 
 // TODO: ideally we should store DAO accounts inside the EthereumAccount object, rather
 //   than extending it into a MolochMember. But this is our first-pass implementation,
@@ -22,6 +22,7 @@ export default class MolochMembers
   public get store() {
     return this._store;
   }
+
   public get api() {
     return this._api;
   }

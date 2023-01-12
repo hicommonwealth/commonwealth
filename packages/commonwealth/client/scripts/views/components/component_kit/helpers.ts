@@ -1,8 +1,7 @@
+import { isBoolean, isNotNil } from 'helpers/typeGuards';
 import m from 'mithril';
 
 import breakpoints from 'mixins/breakpoints.scss';
-
-import { isBoolean, isNotNil } from 'helpers/typeGuards';
 
 export const getClasses = <T>(
   styleAttrs: T,

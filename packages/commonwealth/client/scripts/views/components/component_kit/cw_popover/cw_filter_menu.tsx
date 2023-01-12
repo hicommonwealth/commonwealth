@@ -1,17 +1,17 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_popover/cw_filter_menu.scss';
-
-import { CWPopover } from './cw_popover';
-import { ComponentType } from '../types';
+import m from 'mithril';
+import { CWButton } from '../cw_button';
 import type { CheckboxType } from '../cw_checkbox';
 import { CWCheckbox } from '../cw_checkbox';
 import { CWText } from '../cw_text';
-import { CWButton } from '../cw_button';
 import { getClasses } from '../helpers';
+import { ComponentType } from '../types';
+
+import { CWPopover } from './cw_popover';
 
 type FilterMenuAttrs = {
   filterMenuItems: Array<CheckboxType>;

@@ -1,5 +1,5 @@
-import type { Response, NextFunction } from 'express';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Response } from 'express';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

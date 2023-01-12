@@ -1,4 +1,6 @@
 node_modules
+test
+static
 *build
 *.github
 *.env
@@ -10,7 +12,6 @@ packages/chain-events/.eslintrc.js
 *.md
 *coverage
 *.sol
-*.d.ts
 *contractTypes
 *factories
 *.nyc_output

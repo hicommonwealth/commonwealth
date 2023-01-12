@@ -4,20 +4,20 @@ import type {
   ISubstrateBounty,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
+import { SubstrateTypes } from 'chain-events/src/types';
+import { ProposalType } from 'common-common/src/types';
 import type {
-  ProposalEndTime,
-  ITXModalData,
   BinaryVote,
   ChainEntity,
   ChainEvent,
+  ITXModalData,
+  ProposalEndTime,
 } from 'models';
 import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
-import { ProposalType } from 'common-common/src/types';
-import { SubstrateTypes } from 'chain-events/src/types';
-import type SubstrateChain from './shared';
 import type SubstrateAccounts from './account';
 import type { SubstrateAccount } from './account';
 import type SubstrateBountyTreasury from './bountyTreasury';
+import type SubstrateChain from './shared';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,
@@ -61,9 +61,11 @@ export class SubstrateBounty extends Proposal<
     this._fee = this._Chain.coins(status.fee);
     this._curatorDeposit = this._Chain.coins(status.curatorDeposit);
   }
+
   public setUpdateDue(updateDue) {
     this._updateDue = updateDue;
   }
+
   private _title: string;
   private _isActive: boolean;
   private _isApproved: boolean;
@@ -79,33 +81,43 @@ export class SubstrateBounty extends Proposal<
   public get title() {
     return this._title || `Bounty ${this.shortIdentifier}`;
   }
+
   public get isActive() {
     return this._isActive;
   }
+
   public get isApproved() {
     return this._isApproved;
   }
+
   public get isCuratorProposed() {
     return this._isCuratorProposed;
   }
+
   public get isFunded() {
     return this._isFunded;
   }
+
   public get isPendingPayout() {
     return this._isPendingPayout;
   }
+
   public get isProposed() {
     return this._isProposed;
   }
+
   public get curator() {
     return this._curator;
   }
+
   public get updateDue() {
     return this._updateDue;
   }
+
   public get unlockAt() {
     return this._unlockAt;
   }
+
   public get beneficiary() {
     return this._beneficiary;
   }
@@ -158,6 +170,7 @@ export class SubstrateBounty extends Proposal<
     return VotingUnit.None;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public canVoteFrom(account) {
     return false;
   }
@@ -165,6 +178,7 @@ export class SubstrateBounty extends Proposal<
   public get support() {
     return null;
   }
+
   public get turnout() {
     return null;
   }
@@ -302,6 +316,7 @@ export class SubstrateBounty extends Proposal<
   }
 
   // TRANSACTIONS
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public submitVoteTx(vote: BinaryVote<SubstrateCoin>): ITXModalData {
     throw new Error('Cannot vote on a treasury proposal');
   }

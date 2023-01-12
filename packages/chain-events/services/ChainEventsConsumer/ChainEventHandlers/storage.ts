@@ -1,8 +1,7 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import * as Sequelize from 'sequelize';
-import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
+import { addPrefix, factory } from 'common-common/src/logging';
 import type {
   RabbitMQController,
   RmqCETypeCUD,
@@ -18,10 +17,6 @@ import type { ChainEventInstance } from '../../database/models/chain_event';
 import type { CWEvent, IChainEventKind } from 'chain-events/src';
 import { IEventHandler } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
-
-const log = factory.getLogger(formatFilename(__filename));
-
-const { Op } = Sequelize;
 
 export interface StorageFilterConfig {
   excludedEvents?: IChainEventKind[];

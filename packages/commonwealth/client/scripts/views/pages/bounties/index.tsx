@@ -1,19 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
+import { ChainBase } from 'common-common/src/types';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type { SubstrateBounty } from 'controllers/chain/substrate/bounty';
+import m from 'mithril';
 
 import 'pages/bounties.scss';
 
 import app from 'state';
-import { formatCoin } from 'adapters/currency';
-import { ChainBase } from 'common-common/src/types';
-import type Substrate from 'controllers/chain/substrate/adapter';
-import type { SubstrateBounty } from 'controllers/chain/substrate/bounty';
 import { CountdownUntilBlock } from 'views/components/countdown';
-import Sublayout from 'views/sublayout';
-import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../../components/breadcrumbs_title_tag';
 import { CardsCollection } from '../../components/cards_collection';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';

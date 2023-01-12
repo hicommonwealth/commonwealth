@@ -5,9 +5,7 @@ import type { AaveTokenV2Mock as AaveTokenV2 } from '../types';
 import {
   AaveTokenV2Mock__factory as AaveTokenV2Factory,
   GovernanceStrategy__factory as GovernanceStrategyFactory,
-  GovernanceStrategy,
   Executor__factory as ExecutorFactory,
-  Executor,
   AaveGovernanceV2__factory as AaveGovernanceV2Factory,
 } from '../types';
 

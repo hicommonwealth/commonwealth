@@ -1,5 +1,4 @@
-import express, { Request, Response } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
+import express from 'express';
 import bodyParser from 'body-parser';
 import passport from 'passport';
 import logger from 'morgan';
@@ -10,8 +9,6 @@ import { DEFAULT_PORT } from '../config';
 
 import setupPassport from './passport';
 import setupRouter from './router';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const port = process.env.PORT || DEFAULT_PORT;
 

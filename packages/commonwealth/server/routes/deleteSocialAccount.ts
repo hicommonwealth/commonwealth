@@ -1,15 +1,11 @@
-import type { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
+import type { Request, Response } from 'express';
 import type { DB } from '../models';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const deleteSocialAccount = async (
   models: DB,
   provider: string,
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ) => {
   const socialAccounts = await req.user.getSocialAccounts();
   const githubAccount = socialAccounts.find((sa) => sa.provider === provider);

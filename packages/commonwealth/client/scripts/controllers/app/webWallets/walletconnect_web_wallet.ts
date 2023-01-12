@@ -1,12 +1,12 @@
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, ChainInfo, BlockInfo, IWebWallet } from 'models';
+import { setActiveAccount } from 'controllers/app/login';
+import type { Account, BlockInfo, ChainInfo, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
-import type { CanvasData } from 'shared/adapters/shared';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -44,6 +44,7 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._chainInfo.node?.ethChainId || 1;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
     const block = await this._web3.givenProvider.request({
       method: 'eth_getBlockByNumber',
@@ -57,7 +58,10 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
     const signature = await this._provider.wc.signTypedData([
       account.address,
@@ -86,7 +90,8 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     const chainId = this._chainInfo.node?.ethChainId || 1;
 
     // use alt wallet url if available
-    const chainUrl = this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
+    const chainUrl =
+      this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
     const rpc = chainUrl ? { [chainId]: chainUrl } : {};
 
     this._provider = new WalletConnectProvider({ rpc, chainId });

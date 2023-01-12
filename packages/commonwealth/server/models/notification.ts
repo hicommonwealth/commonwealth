@@ -1,10 +1,10 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
 import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type NotificationAttributes = {
   id: number;
@@ -33,7 +33,8 @@ export default (
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
       notification_data: { type: dataTypes.TEXT, allowNull: false },
       chain_event_id: { type: dataTypes.INTEGER, allowNull: true },
-      chain_id: { type: dataTypes.STRING, allowNull: true }, // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
+      // for backwards compatibility of threads associated with OffchainCommunities rather than a proper chain
+      chain_id: { type: dataTypes.STRING, allowNull: true },
       category_id: { type: dataTypes.STRING, allowNull: false },
     },
     {

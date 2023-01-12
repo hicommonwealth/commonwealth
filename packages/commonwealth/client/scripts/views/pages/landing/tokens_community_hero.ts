@@ -1,11 +1,10 @@
-import m from 'mithril';
 import { notifyError } from 'controllers/app/notifications';
-import FindYourTokenInputComponent from './find_your_token_input';
-import InputTokensListComponent from './input_tokens_lists';
+import m from 'mithril';
 
 import 'pages/landing/tokens_community_hero.scss';
-import type { Chain } from './index';
-import type { Token } from './index';
+import FindYourTokenInputComponent from './find_your_token_input';
+import type { Chain, Token } from './index';
+import InputTokensListComponent from './input_tokens_lists';
 
 export const placeholderChain = {
   img: 'static/img/add.svg',
@@ -117,7 +116,8 @@ const TokensCommunityComponent: m.Component<IAttrs, IState> = {
                       class: 'text-xl text-gray-600 mb-5',
                     },
                     [
-                      'Commonwealth is an all-in-one platform for on-chain communities to discuss, vote, and fund projects together.',
+                      'Commonwealth is an all-in-one platform for on-chain communities to' +
+                        ' discuss, vote, and fund projects together.',
                       ' Never miss an on-chain event, proposal, or important discussion again. ',
                     ]
                   ),

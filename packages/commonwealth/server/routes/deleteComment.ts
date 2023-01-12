@@ -1,12 +1,9 @@
-import type { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { DB } from '../models';
 import type BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { findAllRoles, findOneRole } from '../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { findOneRole } from '../util/roles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
@@ -58,11 +55,6 @@ const deleteComment = async (
         },
         include: [models.Chain],
       });
-      const roleWhere = {
-        permission: { [Op.in]: ['admin', 'moderator'] },
-        address_id: { [Op.in]: userOwnedAddressIds },
-        chain_id: comment.Chain.id,
-      };
       const requesterIsAdminOrMod = await findOneRole(
         models,
         { where: { address_id: { [Op.in]: userOwnedAddressIds } } },

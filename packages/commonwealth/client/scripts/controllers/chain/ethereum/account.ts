@@ -1,9 +1,9 @@
-import BN from 'bn.js';
-import type { IApp } from 'state';
-import { Account } from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import EthereumChain from './chain';
+import BN from 'bn.js';
+import { Account } from 'models';
+import type { IApp } from 'state';
 import type EthereumAccounts from './accounts';
+import EthereumChain from './chain';
 
 export default class EthereumAccount extends Account {
   public get balance(): Promise<EthereumCoin> {

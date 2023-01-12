@@ -1,42 +1,41 @@
 /* @jsx m */
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_component_showcase.scss';
 
 import { notifySuccess } from 'controllers/app/notifications';
-import { CWButton } from './cw_button';
-import { CWRadioGroup } from './cw_radio_group';
-import { CWIcon } from './cw_icons/cw_icon';
-import { CWCard } from './cw_card';
-import { CWTextInput } from './cw_text_input';
-import type { IconName } from './cw_icons/cw_icon_lookup';
-import { iconLookup } from './cw_icons/cw_icon_lookup';
-import { CWText } from './cw_text';
-import { CWIconButton } from './cw_icon_button';
-import { CWWalletOptionRow } from './cw_wallet_option_row';
+import m from 'mithril';
 import { CWAccountCreationButton } from './cw_account_creation_button';
+import { CWBreadcrumbs } from './cw_breadcrumbs';
+import { CWButton } from './cw_button';
+import { CWCard } from './cw_card';
 import type { CheckboxType } from './cw_checkbox';
 import { CWCheckbox } from './cw_checkbox';
-import { CWTooltip } from './cw_popover/cw_tooltip';
-import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
-import type { ValidationStatus } from './cw_validation_text';
-import { CWTextArea } from './cw_text_area';
-import { CWTab, CWTabBar } from './cw_tabs';
-import { CWProgressBar } from './cw_progress_bar';
-import { CWThreadVoteButton } from './cw_thread_vote_button';
-import { CWToggle } from './cw_toggle';
-import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
 import { CWCollapsible } from './cw_collapsible';
-import { CWBreadcrumbs } from './cw_breadcrumbs';
-import { CWTag } from './cw_tag';
-import { CWFilterMenu } from './cw_popover/cw_filter_menu';
-import { CWSpinner } from './cw_spinner';
-import { CWDropdown } from './cw_dropdown';
+import { CWContentPageCard } from './cw_content_page';
 import CWCoverImageUploader from './cw_cover_image_uploader';
+import { CWDropdown } from './cw_dropdown';
+import { CWIconButton } from './cw_icon_button';
+import { CWIcon } from './cw_icons/cw_icon';
+import type { IconName } from './cw_icons/cw_icon_lookup';
+import { iconLookup } from './cw_icons/cw_icon_lookup';
+import { CWAddressTooltip } from './cw_popover/cw_address_tooltip';
+import { CWPopoverMenu } from './cw_popover/cw_popover_menu';
+import { CWTooltip } from './cw_popover/cw_tooltip';
+import { CWProgressBar } from './cw_progress_bar';
 import type { RadioButtonType } from './cw_radio_button';
 import { CWRadioButton } from './cw_radio_button';
-import { CWContentPageCard } from './cw_content_page';
+import { CWRadioGroup } from './cw_radio_group';
+import { CWSpinner } from './cw_spinner';
+import { CWTab, CWTabBar } from './cw_tabs';
+import { CWTag } from './cw_tag';
+import { CWText } from './cw_text';
+import { CWTextArea } from './cw_text_area';
+import { CWTextInput } from './cw_text_input';
+import { CWThreadVoteButton } from './cw_thread_vote_button';
+import { CWToggle } from './cw_toggle';
+import type { ValidationStatus } from './cw_validation_text';
+import { CWWalletOptionRow } from './cw_wallet_option_row';
 
 const displayIcons = (icons) => {
   return Object.entries(icons).map(([k, _]) => {
@@ -79,6 +78,7 @@ const checkboxGroupOptions: Array<CheckboxType> = [
     value: 'failed',
   },
 ];
+
 export class ComponentShowcase extends ClassComponent {
   private checkboxChecked: boolean;
   private checkboxGroupSelected: Array<string>;

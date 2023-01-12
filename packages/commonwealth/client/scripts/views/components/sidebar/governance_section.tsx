@@ -1,25 +1,25 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'components/sidebar/index.scss';
-
-import app from 'state';
 import {
-  ProposalType,
   ChainBase,
   ChainNetwork,
   ChainType,
+  ProposalType,
 } from 'common-common/src/types';
+
+import 'components/sidebar/index.scss';
 import { handleRedirectClicks } from 'helpers';
+import m from 'mithril';
+
+import app from 'state';
+import { verifyCachedToggleTree } from './helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import type {
   SectionGroupAttrs,
   SidebarSectionAttrs,
   ToggleTree,
 } from './types';
-import { verifyCachedToggleTree } from './helpers';
 
 function setGovernanceToggleTree(path: string, toggle: boolean) {
   let currentTree = JSON.parse(

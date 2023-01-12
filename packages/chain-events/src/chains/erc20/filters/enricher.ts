@@ -34,7 +34,7 @@ export async function Enrich(
   rawData: RawEvent,
   config: EnricherConfig = {}
 ): Promise<CWEvent<IEventData>> {
-  const { totalSupply, tokenName } = api.tokens.find(
+  const { totalSupply } = api.tokens.find(
     ({ contract }) =>
       contract.address.toLowerCase() === rawData.address.toLowerCase()
   );

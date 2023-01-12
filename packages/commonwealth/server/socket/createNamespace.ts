@@ -1,8 +1,8 @@
-import type { Server } from 'socket.io';
 import { addPrefix, factory } from 'common-common/src/logging';
+import type { Server } from 'socket.io';
 import type {
-  SnapshotProposalNotification,
   ChainEventNotification,
+  SnapshotProposalNotification,
   WebsocketNamespaces,
 } from '../../shared/types';
 import {

@@ -1,12 +1,9 @@
-import type { Express } from 'express';
 import axios from 'axios';
-import { factory, formatFilename } from 'common-common/src/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
+import type { Express } from 'express';
 
 function setupIpfsProxy(app: Express) {
   // using bodyParser here because cosmjs generates text/plain type headers
-  app.get('/api/ipfsProxy', async function cosmosProxy(req, res, next) {
+  app.get('/api/ipfsProxy', async function cosmosProxy(req, res) {
     try {
       const hash = req.query.hash;
       const response = await axios.get(

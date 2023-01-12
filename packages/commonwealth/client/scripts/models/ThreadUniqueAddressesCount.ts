@@ -6,6 +6,7 @@ type Addresses = {
   chain: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ThreadUniqueAddressesCount<T extends IUniqueId> {
   public readonly id: string;
   public readonly addresses: Addresses[];

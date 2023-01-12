@@ -1,29 +1,28 @@
 /* eslint-disable no-restricted-globals */
-/* eslint-disable no-restricted-syntax */
-import _ from 'lodash';
-import moment from 'moment';
-import m from 'mithril';
+import { NotificationCategories } from 'common-common/src/types';
+import { updateLastVisited } from 'controllers/app/login';
+
+import { notifyError } from 'controllers/app/notifications';
+import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import $ from 'jquery';
+/* eslint-disable no-restricted-syntax */
+import m from 'mithril';
+import type { ChainEntity, Profile, Topic } from 'models';
+import {
+  Attachment,
+  NotificationSubscription,
+  Poll,
+  Thread,
+  ThreadStage,
+} from 'models';
+import moment from 'moment';
+import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
-import type { Profile, ChainEntity, Topic } from 'models';
-import {
-  Thread,
-  Attachment,
-  ThreadStage,
-  NodeInfo,
-  NotificationSubscription,
-  Poll,
-} from 'models';
-import { NotificationCategories } from 'common-common/src/types';
-
-import { notifyError } from 'controllers/app/notifications';
-import { updateLastVisited } from 'controllers/app/login';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
+
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
@@ -201,9 +200,11 @@ class ThreadsController {
   public get store() {
     return this._store;
   }
+
   public get listingStore() {
     return this._listingStore;
   }
+
   public get overviewStore() {
     return this._overviewStore;
   }

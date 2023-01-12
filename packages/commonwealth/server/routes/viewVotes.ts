@@ -1,5 +1,5 @@
-import type { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import type { DB } from '../models';
 import type { VoteAttributes } from '../models/vote';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { success } from '../types';

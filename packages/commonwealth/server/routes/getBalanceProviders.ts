@@ -1,10 +1,10 @@
-import type { DB } from 'server/models';
 import type {
   GetBalanceProvidersReq,
   GetBalanceProvidersResp,
 } from 'common-common/src/api/extApiTypes';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
 import { query, validationResult } from 'express-validator';
+import type { DB } from 'server/models';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import type { TypedRequestQuery, TypedResponse } from '../types';
 import { failure, success } from '../types';
 

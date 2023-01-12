@@ -27,7 +27,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * subscriptions. The function also runs RepublishMessages which periodically republishes data stored in the database
  * that was previously unsuccessfully published.
  */
-export async function setupChainEventConsumer() {
+export async function setupChainEventConsumer(): Promise<ServiceConsumer> {
   let rollbar;
   if (ROLLBAR_SERVER_TOKEN) {
     rollbar = new Rollbar({

@@ -1,20 +1,20 @@
 import type { ApiPromise } from '@polkadot/api';
 import type {
   BalanceOf,
-  Permill,
   BlockNumber,
+  Permill,
 } from '@polkadot/types/interfaces';
-import type { IApp } from 'state';
 import type {
   ISubstrateBounty,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
-import { ProposalModule } from 'models';
 import { SubstrateTypes } from 'chain-events/src/types';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
+import { ProposalModule } from 'models';
+import type { IApp } from 'state';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import { SubstrateBounty } from './bounty';
+import type SubstrateChain from './shared';
 
 class SubstrateBountyTreasury extends ProposalModule<
   ApiPromise,

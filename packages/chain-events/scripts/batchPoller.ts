@@ -1,14 +1,11 @@
-import type { ApiPromise } from '@polkadot/api';
-import type { LogGroupControlSettings } from 'typescript-logging';
-import type {
+import { ApiPromise } from '@polkadot/api';
+import { LogGroupControlSettings } from 'typescript-logging';
+import {
+  SubstrateEvents,
+  IEventHandler,
   IDisconnectedRange,
   CWEvent,
   SubstrateTypes,
-} from '../dist/index';
-import {
-  chainSupportedBy,
-  SubstrateEvents,
-  IEventHandler,
 } from '../dist/index';
 import { factoryControl } from '../dist/logging';
 
@@ -17,7 +14,7 @@ export async function batchQuery(
   eventHandlers: IEventHandler<CWEvent>[],
   fullRange?: IDisconnectedRange,
   aggregateFirst = false // fetch all blocks before running processor function
-) {
+): Promise<void> {
   // turn off debug logging for poller -- it's annoying
   factoryControl.change({
     group: 'all',

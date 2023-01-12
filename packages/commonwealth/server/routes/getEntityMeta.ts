@@ -1,5 +1,5 @@
-import type { Response, NextFunction, Request } from 'express';
 import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import type { WhereOptions } from 'sequelize/types';
 import type { ChainEntityMetaAttributes } from 'server/models/chain_entity_meta';
 import type { DB } from '../models';

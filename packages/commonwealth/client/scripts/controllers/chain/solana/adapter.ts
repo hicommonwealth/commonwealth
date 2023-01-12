@@ -1,12 +1,12 @@
 import { ChainBase } from 'common-common/src/types';
 import type { ChainInfo } from 'models';
-import { IChainAdapter, NodeInfo } from 'models';
+import { IChainAdapter } from 'models';
 import type { IApp } from 'state';
-
-import type { SolanaToken } from './types';
 import type SolanaAccount from './account';
 import SolanaAccounts from './accounts';
 import SolanaChain from './chain';
+
+import type { SolanaToken } from './types';
 
 class Solana extends IChainAdapter<SolanaToken, SolanaAccount> {
   public chain: SolanaChain;

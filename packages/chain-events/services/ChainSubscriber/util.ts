@@ -28,7 +28,7 @@ export async function manageErcListeners(
   listenerInstances: IListenerInstances,
   producer: RabbitMqHandler,
   rollbar?: Rollbar
-) {
+): Promise<void> {
   // delete any listeners that have no more tokens to listen to
   const currentChainUrls = Object.keys(groupedTokens);
   for (const listenerName of Object.keys(listenerInstances)) {
@@ -164,7 +164,7 @@ export async function manageRegularListeners(
   listenerInstances: IListenerInstances,
   producer: RabbitMqHandler,
   rollbar?: Rollbar
-) {
+): Promise<void> {
   // for ease of use create a new object containing all listener instances that are not ERC20 or ERC721
   const regListenerInstances: IListenerInstances = {};
   const activeListenerNames: string[] = [];
