@@ -18,9 +18,9 @@ m.mount = lib.rootMount;
 m.render = lib.rootRender;
 m.route = lib.setRoute;
 m.parsePathname = lib.parsePathname;
+m.request = lib.request;
 
 m.vnode = () => { throw new Error('not implemented'); };
-m.request = () => { throw new Error('not implemented'); };
 m.jsonp = () => { throw new Error('not implemented'); };
 m.parseQueryString = () => { throw new Error('not implemented'); };
 m.buildQueryString = () => { throw new Error('not implemented'); };

@@ -39,6 +39,8 @@ export abstract class ClassComponent<A = {}> implements mithril.ClassComponent<A
   abstract view(v: ResultNode<A>): Children | null;
 }
 
+export const request = mithril.request;
+
 export function redraw(sync = false) {
   if (!sync) {
     mithril.redraw();
