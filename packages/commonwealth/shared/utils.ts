@@ -5,10 +5,9 @@ import {
   encodeAddress,
 } from '@polkadot/util-crypto';
 import {
-  BASE_PERMISSIONS,
-  computePermissions,
-  Permissions,
-} from 'common-common/src/permissions';
+  defaultEveryonePermissions,
+  PermissionsManager
+} from '../server/util/permissions';
 
 import { ProposalType } from 'common-common/src/types';
 import { Permission } from '../server/models/role';
@@ -307,6 +306,9 @@ export function aggregatePermissions(
   roles: RoleObject[],
   chain_permissions: { allow: Permissions; deny: Permissions }
 ) {
+
+  const permissionsManager = new PermissionsManager();
+
   // sort roles by roles with highest permissions last
   const ORDER: Permission[] = ['member', 'moderator', 'admin'];
 
@@ -324,8 +326,8 @@ export function aggregatePermissions(
   permissionsAllowDeny.unshift(chain_permissions);
 
   // compute permissions
-  const permission: bigint = computePermissions(
-    BASE_PERMISSIONS,
+  const permission: bigint = permissionsManager.computePermissions(
+    defaultEveryonePermissions,
     permissionsAllowDeny
   );
   return permission;

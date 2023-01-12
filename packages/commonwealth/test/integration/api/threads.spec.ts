@@ -17,7 +17,7 @@ import app, { resetDatabase } from 'commonwealth/server-test';
 import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
 import { addAllowDenyPermissions } from 'commonwealth/test/util/modelUtils';
-import { Action } from '../../../../common-common/src/permissions';
+import { Action } from 'commonwealth/server/util/permissions';
 
 chai.use(chaiHttp);
 const { expect } = chai;

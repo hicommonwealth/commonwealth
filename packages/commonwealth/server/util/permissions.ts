@@ -43,7 +43,7 @@ export enum Action {
 
 export type Permissions = { [key: number]: Array<Action> | Action };
 
-export const defaultAdminPermissions: Permissions = {
+export const adminPermissions: Permissions = {
   [Action.DELETE_THREAD]: [
     Action.EDIT_THREAD,
     Action.CREATE_THREAD,
@@ -62,38 +62,38 @@ export const defaultAdminPermissions: Permissions = {
   ],
 };
 
-export const defaultModeratorPermissions: Permissions = {
+export const moderatorPermissions: Permissions = {
   [Action.CREATE_CHAT]: Action.VIEW_CHAT_CHANNELS,
   [Action.EDIT_THREAD]: [Action.CREATE_THREAD, Action.VIEW_THREADS],
   [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT, Action.VIEW_COMMENTS],
   [Action.EDIT_TOPIC]: [Action.CREATE_TOPIC, Action.VIEW_TOPICS],
 };
 
-export const defaultMemberPermissions: Permissions = {
+export const memberPermissions: Permissions = {
   [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS, Action.VIEW_POLLS],
   [Action.CREATE_THREAD]: [Action.VIEW_THREADS],
   [Action.CREATE_COMMENT]: [Action.VIEW_COMMENTS],
   [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS],
 };
 
-export const defaultEveryonePermissions: Permissions = {
+export const everyonePermissions: Permissions = {
   [Action.DELETE_REACTION]: [Action.CREATE_REACTION, Action.VIEW_REACTIONS],
   [Action.CREATE_THREAD]: Action.VIEW_THREADS,
   [Action.VIEW_CHAT_CHANNELS]: Action.VIEW_CHAT_CHANNELS,
 };
 
+export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
+    [AccessLevel.Admin, adminPermissions],
+    [AccessLevel.Moderator, moderatorPermissions],
+    [AccessLevel.Member, memberPermissions],
+    [AccessLevel.Everyone, everyonePermissions],
+]);
+
 export class PermissionManager {
   private action: Action;
-  private defaultEveryonePermissions: Permissions;
-  private defaultAdminPermissions: Permissions;
-  private defaultModeratorPermissions: Permissions;
-  private defaultMemberPermissions: Permissions;
 
-  constructor() {
-    this.defaultEveryonePermissions = defaultEveryonePermissions;
-    this.defaultAdminPermissions = defaultAdminPermissions;
-    this.defaultModeratorPermissions = defaultModeratorPermissions;
-    this.defaultMemberPermissions = defaultMemberPermissions;
+  public getPemissions(accessLevel: AccessLevel): Permissions {
+    return accessLevelPermissions.get(accessLevel) as Permissions;
   }
 
   public addAllowPermission(
@@ -153,7 +153,7 @@ export class PermissionManager {
   ): bigint {
     let permissionsBigInt = this.mapPermissionsToBigint(base);
     for (const assignment of assignments) {
-      permissionsBitInt &= ~assignment.deny;
+      permissionsBigInt &= ~assignment.deny;
       permissionsBigInt |= assignment.allow;
     }
     return permissionsBigInt;

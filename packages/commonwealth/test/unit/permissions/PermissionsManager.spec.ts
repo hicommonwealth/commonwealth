@@ -1,13 +1,14 @@
+import { expect } from 'chai';
 import {
   PermissionManager,
+  AccessLevel,
   Permissions,
   Action,
   defaultAdminPermissions,
   defaultModeratorPermissions,
   defaultMemberPermissions,
+  defaultEveryonePermissions,
 } from '../../../server/util/permissions';
-import DB from '../../../server/database';
-import { expect } from 'chai';
 
 function permissionsToBigInt(permissions: Permissions): bigint {
   let bigInt = 0n;
@@ -30,14 +31,14 @@ describe('PermissionManager', () => {
   let permissionManager: PermissionManager;
 
   beforeEach(() => {
-    permissionManager = new PermissionManager(DB);
+    permissionManager = new PermissionManager();
   });
 
   describe('addAllowImplicitPermission', () => {
     it('should add the permission', () => {
       const originalPermission = 0n;
       const action = Action.CREATE_CHAT;
-      const newPermission = permissionManager.addAllowImplicitPermission(
+      const newPermission = permissionManager.addAllowPermission(
         originalPermission,
         action
       );
@@ -49,7 +50,7 @@ describe('PermissionManager', () => {
     it('should remove the permission', () => {
       const originalPermission = BigInt(1) << BigInt(Action.CREATE_CHAT);
       const action = Action.CREATE_CHAT;
-      const newPermission = permissionManager.removeAllowImplicitPermission(
+      const newPermission = permissionManager.removeAllowPermission(
         originalPermission,
         action
       );
@@ -61,7 +62,7 @@ describe('PermissionManager', () => {
     it('should add the permission', () => {
       const originalPermission = 0n;
       const action = Action.CREATE_CHAT;
-      const newPermission = permissionManager.addDenyImplicitPermission(
+      const newPermission = permissionManager.addDenyPermission(
         originalPermission,
         action
       );
@@ -73,7 +74,7 @@ describe('PermissionManager', () => {
     it('should remove the permission', () => {
       const originalPermission = BigInt(1) << BigInt(Action.CREATE_CHAT);
       const action = Action.CREATE_CHAT;
-      const newPermission = permissionManager.removeDenyImplicitPermission(
+      const newPermission = permissionManager.removeDenyPermission(
         originalPermission,
         action
       );
@@ -81,32 +82,66 @@ describe('PermissionManager', () => {
     });
   });
 
-  describe('computeAllowPermissions for admin', () => {
-    it('should compute permissions for admin', () => {
-      const newPermission = permissionManager.computeAllowPermissions(
-        defaultAdminPermissions
+  describe('computePermissions for each AccessLevel', () => {
+    it('should compute permissions correctly for Admin access level', () => {
+      const base = defaultAdminPermissions;
+      const assignments = [
+        { allow: BigInt(1) << BigInt(Action.CREATE_CHAT), deny: 0n },
+      ];
+      const expectedPermission =
+        (BigInt(1) << BigInt(Action.CREATE_CHAT)) |
+        (BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS));
+      const permission = permissionManager.computePermissions(
+        base,
+        assignments
       );
-      expect(newPermission).to.equal(
-        permissionsToBigInt(defaultAdminPermissions)
-      );
+      expect(permission).to.equal(expectedPermission);
     });
 
-    it('should compute permissions for moderator', () => {
-      const newPermission = permissionManager.computeAllowPermissions(
-        defaultModeratorPermissions
+    it('should compute permissions correctly for Moderator access level', () => {
+      const base = defaultModeratorPermissions;
+      const assignments = [
+        { allow: BigInt(1) << BigInt(Action.CREATE_POLL), deny: 0n },
+      ];
+      const expectedPermission =
+        (BigInt(1) << BigInt(Action.CREATE_POLL)) |
+        (BigInt(1) << BigInt(Action.VOTE_ON_POLLS)) |
+        (BigInt(1) << BigInt(Action.VIEW_POLLS));
+      const permission = permissionManager.computePermissions(
+        base,
+        assignments
       );
-      expect(newPermission).to.equal(
-        permissionsToBigInt(defaultModeratorPermissions)
-      );
+      expect(permission).to.equal(expectedPermission);
     });
 
-    it('should compute permissions for member', () => {
-      const newPermission = permissionManager.computeAllowPermissions(
-        defaultMemberPermissions
+    it('should compute permissions correctly for Member access level', () => {
+      const base = defaultMemberPermissions;
+      const assignments = [
+        { allow: BigInt(1) << BigInt(Action.CREATE_TOPIC), deny: 0n },
+      ];
+      const expectedPermission =
+        (BigInt(1) << BigInt(Action.CREATE_TOPIC)) |
+        (BigInt(1) << BigInt(Action.VIEW_TOPICS));
+      const permission = permissionManager.computePermissions(
+        base,
+        assignments
       );
-      expect(newPermission).to.equal(
-        permissionsToBigInt(defaultMemberPermissions)
+      expect(permission).to.equal(expectedPermission);
+    });
+
+    it('should compute permissions correctly for Everyone access level', () => {
+      const base = defaultEveryonePermissions;
+      const assignments = [
+        { allow: BigInt(1) << BigInt(Action.CREATE_TOPIC), deny: 0n },
+      ];
+      const expectedPermission =
+        (BigInt(1) << BigInt(Action.CREATE_TOPIC)) |
+        (BigInt(1) << BigInt(Action.VIEW_TOPICS));
+      const permission = permissionManager.computePermissions(
+        base,
+        assignments
       );
+      expect(permission).to.equal(expectedPermission);
     });
   });
 });

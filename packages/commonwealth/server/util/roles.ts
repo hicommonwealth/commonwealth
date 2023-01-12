@@ -323,7 +323,7 @@ export async function isAddressPermitted(
       deny: chain.default_deny_permissions,
     });
 
-    if (!permissionsManager.isPermitted(action)) {
+    if (!permissionsManager.isPermitted(permission, action)) {
       return PermissionError.NOT_PERMITTED;
     } else {
       return true;
@@ -366,22 +366,23 @@ export async function isAnyonePermitted(
   models: DB,
   chain_id: string,
   action: Action
-): Promise<PermissionError | undefined> {
+): Promise<PermissionError | boolean> {
   const chain = await models.Chain.findOne({ where: { id: chain_id } });
   if (!chain) {
     throw new Error('Chain not found');
   }
-  const permissionsManager = new PermissionManager(models)
+  const permissionsManager = new PermissionManager()
   const permission = permissionsManager.computePermissions(defaultEveryonePermissions, [
     {
       allow: chain.default_allow_permissions,
       deny: chain.default_deny_permissions,
     },
   ]);
-  // check if action is permitted
+
   if (!permissionsManager.isPermitted(permission, action)) {
     return PermissionError.NOT_PERMITTED;
   }
+  return true;
 }
 
 export async function checkReadPermitted(
@@ -389,7 +390,7 @@ export async function checkReadPermitted(
   chain_id: string,
   action: Action,
   user_id?: number,
-) {
+): Promise<PermissionError | boolean > {
   if (user_id) {
     // get active address
     const activeAddressInstance = await getActiveAddress(
@@ -407,13 +408,15 @@ export async function checkReadPermitted(
         action
       );
       if (permission_error) {
-        throw new AppError(permission_error);
+        return PermissionError.NOT_PERMITTED;
       }
-      return;
+      return true;
     }
   }
+
   const permission_error = await isAnyonePermitted(models, chain_id, action);
   if (permission_error) {
-    throw new AppError(permission_error);
+    return PermissionError.NOT_PERMITTED;
   }
+  return true;
 }
