@@ -4409,10 +4409,10 @@
   resolved "https://registry.npmjs.org/@types/minimist/-/minimist-1.2.0.tgz"
   integrity sha1-aaI6OtKcrwCX8G7aWbNh7i8GOfY=
 
-"@types/mithril@^2.0.7":
-  version "2.0.7"
-  resolved "https://registry.npmjs.org/@types/mithril/-/mithril-2.0.7.tgz"
-  integrity sha512-ByD422x0GnYh5MOEAWNyqfkw2QlKkK3Yf7y5e1CobDVPG9m+/ThblfrIHENihF7VnygT6sQRObPvY1J/fUZICg==
+"@types/mithril-lib@npm:@types/mithril@^2.0.7":
+  version "2.0.12"
+  resolved "https://registry.yarnpkg.com/@types/mithril/-/mithril-2.0.12.tgz#3391c691617c79e2e8e60dfa97527fc948cf07db"
+  integrity sha512-vedzt04n3EB7rcnfSLCv3+w3qJLkGWdsNRBKvelTqhSJSfg73Roq9b+rcnn9zeqGYtQAMqNcO6vNBR/w0OzipQ==
 
 "@types/mkdirp@^0.5.2":
   version "0.5.2"
@@ -14678,15 +14678,17 @@ mithril-infinite@^1.3.0:
     resize-observer-polyfill "^1.5.1"
     verge "^1.10.2"
 
+"mithril-lib@npm:mithril@^2.0.4":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/mithril/-/mithril-2.2.2.tgz#5a0743bd04726cc1efa6e91477f995d80fc6c539"
+  integrity sha512-YRm6eLv2UUaWaWHdH8L+desW9+DN7+oM34CxJv6tT2e1lNVue8bxQlknQeDRn9aKlO8sIujm2wqUHwM+Hb1wGQ==
+  dependencies:
+    ospec "4.0.0"
+
 mithril-transition-group@^0.2.0:
   version "0.2.0"
   resolved "https://registry.npmjs.org/mithril-transition-group/-/mithril-transition-group-0.2.0.tgz"
   integrity sha512-OJ8LeMLACxhJVUG5EPlHZ6KesW1vw4NgFjVOjo1CLnDL1yw7NwviV4NiIMwySFbCl6yxfommyOrqs3iReNUUqw==
-
-mithril@^2.0.4:
-  version "2.0.4"
-  resolved "https://registry.npmjs.org/mithril/-/mithril-2.0.4.tgz"
-  integrity sha512-mgw+DMZlhMS4PpprF6dl7ZoeZq5GGcAuWnrg5e12MvaGauc4jzWsDZtVGRCktsiQczOEUr2K5teKbE5k44RlOg==
 
 mixin-deep@^1.2.0:
   version "1.3.2"
@@ -15770,6 +15772,13 @@ osenv@^0.1.4:
   dependencies:
     os-homedir "^1.0.0"
     os-tmpdir "^1.0.0"
+
+ospec@4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/ospec/-/ospec-4.0.0.tgz#7aaf8cb6d352a3f22e879460eebbc5f12df99779"
+  integrity sha512-MpDtkpscOxHYb4w71v7GB4LBsRuzxZnM+HdwjhzJQzu+5EJvA80yxTaKw+wp5Dmf5RV2/Bg3Uvz2vlI/PhW9Ow==
+  dependencies:
+    glob "^7.1.3"
 
 p-cancelable@^0.3.0:
   version "0.3.0"
