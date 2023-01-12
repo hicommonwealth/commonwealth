@@ -1,4 +1,3 @@
-import { StargateClient } from '@cosmjs/stargate';
 import { bech32 } from 'bech32';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
@@ -56,7 +55,8 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public async getRecentBlock(chainIdentifier: string) {
     const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
-    const client = await StargateClient.connect(url);
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
     const block = await client.getBlock(height);
 
@@ -109,7 +109,8 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
       const url = `${window.location.origin}/cosmosAPI/${
         app.chain?.id || this.defaultNetwork
       }`;
-      const client = await StargateClient.connect(url);
+      const cosm = await import('@cosmjs/stargate');
+      const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;
 

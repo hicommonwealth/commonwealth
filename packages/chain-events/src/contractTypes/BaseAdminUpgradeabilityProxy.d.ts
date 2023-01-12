@@ -12,8 +12,6 @@ import type {
   PayableOverrides,
   CallOverrides} from "ethers";
 import {
-  EventFilter,
-  BigNumberish,
   Contract
 } from "ethers";
 import type { BytesLike } from "@ethersproject/bytes";

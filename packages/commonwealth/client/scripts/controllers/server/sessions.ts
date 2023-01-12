@@ -1,12 +1,11 @@
 // eslint-disable-next-line max-classes-per-file
-import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { Keyring } from '@polkadot/api';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import * as solw3 from '@solana/web3.js';
 import { ethers } from 'ethers';
 import { KeyPair } from 'near-api-js';
 import { PublicKey } from 'near-api-js/lib/utils';
-import { ChainBase } from '../../../../../common-common/src/types';
+import type { ChainBase } from '../../../../../common-common/src/types';
 
 abstract class ISessionController<
   ChainIdType extends string | number | symbol
@@ -56,7 +55,8 @@ class SubstrateSessionController extends ISessionController<string> {
 
 class CosmosSDKSessionController extends ISessionController<string> {
   async generateAddress(): Promise<string> {
-    const wallet = await DirectSecp256k1HdWallet.generate();
+    const cosm = await import('@cosmjs/proto-signing');
+    const wallet = await cosm.DirectSecp256k1HdWallet.generate();
     const accounts = await wallet.getAccounts();
 
     return accounts[0].address;

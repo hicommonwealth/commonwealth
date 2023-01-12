@@ -7,16 +7,10 @@ import type {
   Signer,
   BigNumber} from "ethers";
 import {
-  EventFilter,
-  BigNumberish,
-  PopulatedTransaction,
   Contract,
-  ContractTransaction,
 } from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type { EventFragment} from "@ethersproject/abi";
-import { FunctionFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface GovernorBravoEventsInterface extends ethers.utils.Interface {

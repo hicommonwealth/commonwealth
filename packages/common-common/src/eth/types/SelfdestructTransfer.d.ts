@@ -11,14 +11,11 @@ import type {
   PayableOverrides,
   CallOverrides} from "ethers";
 import {
-  EventFilter,
-  BigNumberish,
   Contract
 } from "ethers";
 import type { BytesLike } from "@ethersproject/bytes";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type { FunctionFragment, Result } from "@ethersproject/abi";
-import { EventFragment } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface SelfdestructTransferInterface extends ethers.utils.Interface {

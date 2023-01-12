@@ -12,13 +12,11 @@ import type {
   Overrides,
   CallOverrides} from "ethers";
 import {
-  EventFilter,
   Contract
 } from "ethers";
 import type { BytesLike } from "@ethersproject/bytes";
 import type { Listener, Provider } from "@ethersproject/providers";
 import type { FunctionFragment, Result } from "@ethersproject/abi";
-import { EventFragment } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IERC721ReceiverInterface extends ethers.utils.Interface {

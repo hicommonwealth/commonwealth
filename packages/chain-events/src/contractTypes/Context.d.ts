@@ -6,16 +6,9 @@ import type {
   ethers,
   Signer} from "ethers";
 import {
-  EventFilter,
-  BigNumber,
-  BigNumberish,
-  PopulatedTransaction,
   Contract,
-  ContractTransaction,
 } from "ethers";
-import { BytesLike } from "@ethersproject/bytes";
 import type { Listener, Provider } from "@ethersproject/providers";
-import { FunctionFragment, EventFragment, Result } from "@ethersproject/abi";
 import type { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface ContextInterface extends ethers.utils.Interface {

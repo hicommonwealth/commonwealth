@@ -9,10 +9,7 @@ import type {
   PopulatedTransaction,
   CallOverrides} from "ethers";
 import {
-  EventFilter,
-  BigNumberish,
-  Contract,
-  ContractTransaction
+  Contract
 } from "ethers";
 import type { BytesLike } from "@ethersproject/bytes";
 import type { Listener, Provider } from "@ethersproject/providers";
