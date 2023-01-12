@@ -1,7 +1,7 @@
 import * as lib from './mithril';
 
 // eslint-disable-next-line prefer-rest-params
-const m: any = function m() { return lib.render.apply(this, arguments) }
+const m = function m() { return lib.render.apply(this, arguments) }
 m.m = lib.render;
 m.trust = lib.trust
 m.fragment = lib.fragment;
@@ -12,10 +12,11 @@ m.Fragment = {
       return vnode.children;
     },
 };
-m.mount = lib.rootMount;
-m.route = lib.setRoute;
-m.render = lib.rootRender;
+
 m.redraw = lib.redraw;
+m.mount = lib.rootMount;
+m.render = lib.rootRender;
+m.route = lib.setRoute;
 m.parsePathname = lib.parsePathname;
 
 m.vnode = () => { throw new Error('not implemented'); };
