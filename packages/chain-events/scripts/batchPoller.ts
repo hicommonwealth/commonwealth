@@ -1,11 +1,12 @@
-import { ApiPromise } from '@polkadot/api';
-import { LogGroupControlSettings } from 'typescript-logging';
-import {
-  SubstrateEvents,
-  IEventHandler,
+import type { ApiPromise } from '@polkadot/api';
+import type { LogGroupControlSettings } from 'typescript-logging';
+import type {
   IDisconnectedRange,
   CWEvent,
-  SubstrateTypes,
+  SubstrateTypes} from '../dist/index';
+import {
+  SubstrateEvents,
+  IEventHandler
 } from '../dist/index';
 import { factoryControl } from '../dist/logging';
 

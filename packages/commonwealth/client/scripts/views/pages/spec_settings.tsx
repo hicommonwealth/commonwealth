@@ -1,6 +1,5 @@
 /* @jsx m */
 
-import { ApiPromise, WsProvider } from '@polkadot/api';
 import type { RegisteredTypes } from '@polkadot/types/types';
 import { initChain, selectChain } from 'app';
 import ClassComponent from 'class_component';
@@ -138,13 +137,14 @@ class SpecSettingsPage extends ClassComponent {
 
               // create new API
               this.isLoading = true;
-              const provider = new WsProvider(
+              const polkadot = await import('@polkadot/api');
+              const provider = new polkadot.WsProvider(
                 constructSubstrateUrl(node.url),
                 false
               );
               try {
                 await provider.connect();
-                const api = await ApiPromise.create({
+                const api = await polkadot.ApiPromise.create({
                   throwOnConnect: true,
                   provider,
                   ...this.spec,

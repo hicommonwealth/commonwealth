@@ -10,7 +10,6 @@ import {
   SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
 
-import Keyring, { decodeAddress } from '@polkadot/keyring';
 import type { KeyringOptions } from '@polkadot/keyring/types';
 import { hexToU8a, stringToHex } from '@polkadot/util';
 import type { KeypairType } from '@polkadot/util-crypto/types';
@@ -93,7 +92,8 @@ const verifySignature = async (
     //
     // substrate address handling
     //
-    const address = decodeAddress(addressModel.address);
+    const polkadot = await import('@polkadot/keyring');
+    const address = polkadot.decodeAddress(addressModel.address);
     const keyringOptions: KeyringOptions = { type: 'sr25519' };
     if (
       !addressModel.keytype ||
@@ -104,7 +104,7 @@ const verifySignature = async (
         keyringOptions.type = addressModel.keytype as KeypairType;
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
-      const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
+      const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(address);
       const message = stringToHex(JSON.stringify(canvasMessage));
 
       const signatureU8a =

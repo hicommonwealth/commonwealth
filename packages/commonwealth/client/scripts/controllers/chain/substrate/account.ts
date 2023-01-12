@@ -1,7 +1,6 @@
 /* eslint-disable no-use-before-define */
 /* eslint-disable consistent-return */
 import type { ApiPromise } from '@polkadot/api';
-import { decodeAddress } from '@polkadot/keyring';
 import type { Vec } from '@polkadot/types';
 import type {
   AccountId,
@@ -331,6 +330,7 @@ class SubstrateAccounts
 {
   private _initialized = false;
   private cachedValidators;
+  private polkadot;
 
   public get initialized() {
     return this._initialized;
@@ -361,13 +361,13 @@ class SubstrateAccounts
   }
 
   public isZero(address: string) {
-    const decoded = decodeAddress(address);
+    const decoded = this.polk.decodeAddress(address);
     return decoded.every((v) => v === 0);
   }
 
   public fromAddress(address: string, isEd25519 = false): SubstrateAccount {
     try {
-      decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
+      this.polk.decodeAddress(address); // try to decode address; this will produce an error if the address is invalid
     } catch (e) {
       console.error(`Decoded invalid address: ${address}`);
       return;
@@ -493,6 +493,7 @@ class SubstrateAccounts
   }
 
   public async init(ChainInfo: SubstrateChain): Promise<void> {
+    this.polkadot = await import('@polkadot/keyring');
     this._Chain = ChainInfo;
     this._initialized = true;
   }
