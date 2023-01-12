@@ -96,6 +96,14 @@ export class PermissionManager {
     return accessLevelPermissions.get(accessLevel) as Permissions;
   }
 
+  public getPermissionsForAccessLevel(accessLevel: AccessLevel) {
+    const permissions = accessLevelPermissions.get(accessLevel);
+    if (!permissions) {
+      throw new Error(`Invalid access level: ${accessLevel}`);
+    }
+    return permissions;
+  }
+
   public addAllowPermission(
     allowPermission: bigint,
     actionNumber: number

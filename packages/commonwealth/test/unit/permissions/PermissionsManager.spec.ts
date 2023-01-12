@@ -10,23 +10,6 @@ import {
   everyonePermissions,
 } from '../../../server/util/permissions';
 
-function permissionsToBigInt(permissions: Permissions): bigint {
-  let bigInt = 0n;
-  for (const key in permissions) {
-    if (permissions.hasOwnProperty(key)) {
-      const element = permissions[key];
-      if (Array.isArray(element)) {
-        element.forEach((subElement) => {
-          bigInt |= BigInt(1) << BigInt(subElement);
-        });
-      } else {
-        bigInt |= BigInt(1) << BigInt(element);
-      }
-    }
-  }
-  return bigInt;
-}
-
 describe('PermissionManager', () => {
   let permissionManager: PermissionManager;
 
@@ -42,7 +25,8 @@ describe('PermissionManager', () => {
         originalPermission,
         action
       );
-      expect(newPermission).to.equal(BigInt(1) << BigInt(action));
+      const expectedPermission = BigInt(1) << BigInt(action);
+      expect(newPermission).to.equal(expectedPermission);
     });
   });
 
@@ -81,67 +65,48 @@ describe('PermissionManager', () => {
       expect(newPermission).to.equal(0n);
     });
   });
+});
 
-  describe('computePermissions for each AccessLevel', () => {
-    it('should compute permissions correctly for Admin access level', () => {
-      const base = adminPermissions;
-      const assignments = [
-        { allow: BigInt(1) << BigInt(Action.CREATE_CHAT), deny: 0n },
-      ];
-      const expectedPermission =
-        (BigInt(1) << BigInt(Action.CREATE_CHAT)) |
-        (BigInt(1) << BigInt(Action.VIEW_CHAT_CHANNELS));
-      const permission = permissionManager.computePermissions(
-        base,
-        assignments
+describe('Access Level Permissions', () => {
+  let permissionManager: PermissionManager;
+
+  beforeEach(() => {
+    permissionManager = new PermissionManager();
+  });
+
+  describe(AccessLevel.Admin, () => {
+    it('should have all permissions', () => {
+      const permissions = permissionManager.getPermissionsForAccessLevel(
+        AccessLevel.Admin
       );
-      expect(permission).to.equal(expectedPermission);
+      expect(permissions).to.equal(adminPermissions);
     });
+  });
 
-    it('should compute permissions correctly for Moderator access level', () => {
-      const base = moderatorPermissions;
-      const assignments = [
-        { allow: BigInt(1) << BigInt(Action.CREATE_POLL), deny: 0n },
-      ];
-      const expectedPermission =
-        (BigInt(1) << BigInt(Action.CREATE_POLL)) |
-        (BigInt(1) << BigInt(Action.VOTE_ON_POLLS)) |
-        (BigInt(1) << BigInt(Action.VIEW_POLLS));
-      const permission = permissionManager.computePermissions(
-        base,
-        assignments
+  describe(AccessLevel.Moderator, () => {
+    it('should have all permissions except admin-only permissions', () => {
+      const permissions = permissionManager.getPermissionsForAccessLevel(
+        AccessLevel.Moderator
       );
-      expect(permission).to.equal(expectedPermission);
+      expect(permissions).to.equal(moderatorPermissions);
     });
+  });
 
-    it('should compute permissions correctly for Member access level', () => {
-      const base = memberPermissions;
-      const assignments = [
-        { allow: BigInt(1) << BigInt(Action.CREATE_TOPIC), deny: 0n },
-      ];
-      const expectedPermission =
-        (BigInt(1) << BigInt(Action.CREATE_TOPIC)) |
-        (BigInt(1) << BigInt(Action.VIEW_TOPICS));
-      const permission = permissionManager.computePermissions(
-        base,
-        assignments
+  describe(AccessLevel.Member, () => {
+    it('should have member permissions', () => {
+      const permissions = permissionManager.getPermissionsForAccessLevel(
+        AccessLevel.Member
       );
-      expect(permission).to.equal(expectedPermission);
+      expect(permissions).to.equal(memberPermissions);
     });
+  });
 
-    it('should compute permissions correctly for Everyone access level', () => {
-      const base = everyonePermissions;
-      const assignments = [
-        { allow: BigInt(1) << BigInt(Action.CREATE_TOPIC), deny: 0n },
-      ];
-      const expectedPermission =
-        (BigInt(1) << BigInt(Action.CREATE_TOPIC)) |
-        (BigInt(1) << BigInt(Action.VIEW_TOPICS));
-      const permission = permissionManager.computePermissions(
-        base,
-        assignments
+  describe(AccessLevel.Everyone, () => {
+    it('should have everyone permissions', () => {
+      const permissions = permissionManager.getPermissionsForAccessLevel(
+        AccessLevel.Everyone
       );
-      expect(permission).to.equal(expectedPermission);
+      expect(permissions).to.equal(everyonePermissions);
     });
   });
 });
