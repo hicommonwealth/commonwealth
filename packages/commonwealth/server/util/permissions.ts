@@ -96,7 +96,7 @@ export class PermissionManager {
     return accessLevelPermissions.get(accessLevel) as Permissions;
   }
 
-  public getPermissionsForAccessLevel(accessLevel: AccessLevel) {
+  public getPermissionsForAccessLevel(accessLevel: AccessLevel): Permissions {
     const permissions = accessLevelPermissions.get(accessLevel);
     if (!permissions) {
       throw new Error(`Invalid access level: ${accessLevel}`);
