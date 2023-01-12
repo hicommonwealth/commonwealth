@@ -1,5 +1,5 @@
-import Store from './Store';
 import type { Profile } from '../models';
+import Store from './Store';
 
 class ProfileStore extends Store<Profile> {
   private _storeAddress: { [address: string]: Profile } = {};

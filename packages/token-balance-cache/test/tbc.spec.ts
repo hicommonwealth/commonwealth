@@ -23,9 +23,7 @@ class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
   }
 }
 
-async function mockNodesProvider(
-  _lastQueryUnixTime: number
-): Promise<IChainNode[]> {
+async function mockNodesProvider(): Promise<IChainNode[]> {
   return [
     {
       id: 1,

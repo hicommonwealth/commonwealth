@@ -1,18 +1,27 @@
 import cheerio from 'cheerio';
-import type { DB } from '../models';
-import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
+import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
+import { factory, formatFilename } from 'common-common/src/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
 
-const log = factory.getLogger(formatFilename(__filename));
-
 function cleanMalformedUrl(str: string) {
   return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
 }
+
+const decodeTitle = (title: string) => {
+  try {
+    return decodeURIComponent(title);
+  } catch (err) {
+    console.error(`Could not decode title: "${title}"`);
+    return title;
+  }
+};
 
 const setupAppRoutes = (
   app,
@@ -80,7 +89,7 @@ const setupAppRoutes = (
     res.send(twitterSafeHtml);
   };
 
-  app.get('/:scope', async (req, res, next) => {
+  app.get('/:scope', async (req, res) => {
     // Retrieve chain
     const scope = req.params.scope;
     const chain = await models.Chain.findOne({ where: { id: scope } });
@@ -95,7 +104,7 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image);
   });
 
-  app.get('/:scope/account/:address', async (req, res, next) => {
+  app.get('/:scope/account/:address', async (req, res) => {
     // Retrieve title, description, and author from the database
     let title, description, author, profileData, image;
     const address = await models.Address.findOne({
@@ -150,7 +159,9 @@ const setupAppRoutes = (
           },
         ],
       });
-      title = proposal ? decodeURIComponent(proposal.title) : '';
+
+      title = proposal ? decodeTitle(proposal.title) : '';
+
       description = proposal ? proposal.plaintext : '';
       image = chain
         ? `https://commonwealth.im${chain.icon_url}`
@@ -175,21 +186,21 @@ const setupAppRoutes = (
     renderWithMetaTags(res, title, description, author, image);
   };
 
-  app.get('/:scope/proposal/:type/:identifier', async (req, res, next) => {
+  app.get('/:scope/proposal/:type/:identifier', async (req, res) => {
     const scope = req.params.scope;
     const proposalType = req.params.type;
     const proposalId = req.params.identifier.split('-')[0];
     await renderProposal(scope, proposalType, proposalId, res);
   });
 
-  app.get('/:scope/discussion/:identifier', async (req, res, next) => {
+  app.get('/:scope/discussion/:identifier', async (req, res) => {
     const scope = req.params.scope;
     const proposalType = ProposalType.Thread;
     const proposalId = req.params.identifier.split('-')[0];
     await renderProposal(scope, proposalType, proposalId, res);
   });
 
-  app.get('/:scope/proposal/:identifier', async (req, res, next) => {
+  app.get('/:scope/proposal/:identifier', async (req, res) => {
     const scope = req.params.scope;
     const proposalId = req.params.identifier.split('-')[0];
     const chain = await models.Chain.findOne({ where: { id: scope } });
@@ -214,7 +225,7 @@ const setupAppRoutes = (
     await renderProposal(scope, proposalType, proposalId, res, chain);
   });
 
-  app.get('*', (req, res, next) => {
+  app.get('*', (req, res) => {
     log.info(`setupAppRoutes sendFiles ${req.path}`);
     sendFile(res);
   });

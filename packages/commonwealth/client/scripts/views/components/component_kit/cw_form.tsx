@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_form.scss';
-
-import { ComponentType } from './types';
+import m from 'mithril';
 import { CWDivider } from './cw_divider';
 import { CWText } from './cw_text';
+
+import { ComponentType } from './types';
 
 type FormAttrs = {
   description: string;

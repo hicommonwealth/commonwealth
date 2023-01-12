@@ -1,7 +1,7 @@
 import type { Transaction } from 'sequelize/types';
-import { RuleType } from '../util/rules/ruleTypes';
-import { findOneRole } from '../util/roles';
 import type { DB } from '../models';
+import { findOneRole } from '../util/roles';
+import { RuleType } from '../util/rules/ruleTypes';
 
 type SchemaT = { AdminOnlyRule: [] };
 
@@ -18,6 +18,7 @@ export default class AdminOnlyRule extends RuleType<SchemaT> {
     address: string,
     chain: string,
     models: DB,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     transaction?: Transaction
   ): Promise<boolean> {
     const addressInstance = await models.Address.findOne({

@@ -1,6 +1,6 @@
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ContractAbiAttributes = {
   id: number;

@@ -1,27 +1,27 @@
 import type { ApiPromise } from '@polkadot/api';
-import BN from 'bn.js';
 import type {
   ISubstrateTreasuryTip,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
+import BN from 'bn.js';
+import { SubstrateTypes } from 'chain-events/src/types';
+import { ProposalType } from 'common-common/src/types';
 import type {
-  ProposalEndTime,
-  ITXModalData,
   ChainEntity,
-  ChainEvent} from 'models';
+  ChainEvent,
+  ITXModalData,
+  ProposalEndTime,
+} from 'models';
 import {
+  DepositVote,
   Proposal,
   ProposalStatus,
   VotingType,
   VotingUnit,
-  DepositVote,
 } from 'models';
-import { SubstrateTypes } from 'chain-events/src/types';
-import { chainEntityTypeToProposalSlug } from 'identifiers';
-import { ProposalType } from 'common-common/src/types';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
+import type SubstrateChain from './shared';
 import type SubstrateTreasuryTips from './treasury_tips';
 
 const backportEventToAdapter = (
@@ -85,6 +85,7 @@ export class SubstrateTreasuryTip extends Proposal<
   public get isClosing() {
     return !!this.data.closing;
   }
+
   public get isClosable() {
     return (
       this.data.closing &&
@@ -115,6 +116,7 @@ export class SubstrateTreasuryTip extends Proposal<
     }
     return this._Chain.coins(median, true);
   }
+
   public get turnout() {
     return null;
   }

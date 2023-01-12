@@ -18,6 +18,7 @@ module.exports = {
       });
       return updated_reactions;
     }
+
     await queryInterface.removeColumn('OffchainReactions', 'object_id', {
       type: Sequelize.STRING,
     });

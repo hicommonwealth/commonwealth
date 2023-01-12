@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { Contract} from 'ethers';
+import type { Contract } from 'ethers';
 import { utils } from 'ethers';
 
 import type { GovernorCompatibilityBravo } from '../../../contractTypes';
 import type { TypedEventFilter } from '../../../contractTypes/commons';
-import type { CWEvent} from '../../../interfaces';
+import type { CWEvent } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
 import type { RawEvent, IEventData, Api } from '../types';
 import { EventKind } from '../types';

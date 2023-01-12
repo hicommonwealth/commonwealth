@@ -1,35 +1,34 @@
-import 'pages/profile.scss';
-
-import m from 'mithril';
-import _ from 'lodash';
-import $ from 'jquery';
-import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
-import bs58 from 'bs58';
-
-import app from 'state';
-import { navigateToSubpage } from 'app';
-import { ChainBase } from 'common-common/src/types';
-import type { Thread, Comment} from 'models';
-import { Profile } from 'models';
-
-import Sublayout from 'views/sublayout';
-import { PageNotFound } from 'views/pages/404';
-import { PageLoading } from 'views/pages/loading';
-import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
-
 import {
-  decodeAddress,
   checkAddress,
+  decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import { navigateToSubpage } from 'app';
 import { bech32 } from 'bech32';
+import bs58 from 'bs58';
+import { ChainBase } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import ProfileHeader from './profile_header';
-import ProfileContent from './profile_content';
-import ProfileBio from './profile_bio';
+import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
+import $ from 'jquery';
+import _ from 'lodash';
+
+import m from 'mithril';
+import type { Comment, Thread } from 'models';
+import { Profile } from 'models';
+import 'pages/profile.scss';
+
+import app from 'state';
+import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
+import { PageNotFound } from 'views/pages/404';
+import { PageLoading } from 'views/pages/loading';
+
+import Sublayout from 'views/sublayout';
+import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import ProfileBanner from './profile_banner';
+import ProfileBio from './profile_bio';
+import ProfileContent from './profile_content';
+import ProfileHeader from './profile_header';
 
 const getProfileStatus = (account) => {
   const onOwnProfile =
@@ -96,6 +95,7 @@ interface IProfilePageAttrs {
   address: string;
   setIdentity?: boolean;
 }
+
 interface IProfilePageState {
   account;
   threads: Thread[];
@@ -114,7 +114,7 @@ interface IProfilePageState {
 const checkCosmosAddress = (address: string): boolean => {
   try {
     // 50 character max string length to throw on pubkey
-    const { prefix, words } = bech32.decode(address, 50);
+    bech32.decode(address, 50);
     // TODO: should we verify prefix as well?
     return true;
   } catch (e) {
@@ -328,7 +328,8 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       }
     }
   },
-  oncreate: async (vnode) => {}, // eslint-disable-line
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  oncreate: async () => {},
   view: (vnode) => {
     const { setIdentity } = vnode.attrs;
     const { account, loaded, loading, refreshProfile } = vnode.state;

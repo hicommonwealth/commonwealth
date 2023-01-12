@@ -1,14 +1,9 @@
-import type { Request, Response, NextFunction } from 'express';
+import { ServerError } from 'common-common/src/errors';
+import type { Request, Response } from 'express';
 import { Op } from 'sequelize';
-import { AppError, ServerError } from 'common-common/src/errors';
 import type { DB } from '../models';
 
-const getThreads = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const getThreads = async (models: DB, req: Request, res: Response) => {
   const chain = req.chain;
 
   let threads;

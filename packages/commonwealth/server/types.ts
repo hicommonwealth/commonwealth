@@ -1,5 +1,4 @@
 import type { Response } from 'express';
-import { Request } from 'express';
 import type { ValidationError } from 'express-validator';
 import type { AddressInstance } from './models/address';
 import type { ChainInstance } from './models/chain';

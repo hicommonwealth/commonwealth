@@ -1,10 +1,10 @@
 // const fetch = require('node-fetch');
 import syncRequest from 'sync-request';
-import fetch from 'node-fetch';
 import { syncPerformanceTester } from './util';
 
 const jwt =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIxMTMsImVtYWlsIjpudWxsLCJpYXQiOjE2NTI2NzA4MDR9.WN5vxIaAcAzpNvTJiCeelm071yErhRtcEgXbA5iS-wA';
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTIxMTMsImVtYWlsIjpudWxsLCJp' +
+  'YXQiOjE2NTI2NzA4MDR9.WN5vxIaAcAzpNvTJiCeelm071yErhRtcEgXbA5iS-wA';
 const url = 'http://localhost:8080/api/createThread';
 
 const options = {
@@ -12,7 +12,10 @@ const options = {
     'Content-Type': 'application/json',
     Authorization: `jwt ${jwt}`,
   },
-  body: `{"author_chain":"ethereum","author":{},"chain":"ethereum","address":"0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE","title":"Testing","body":"This is the thread body","kind":"forum","stage":"discussion","attachments[]":["someImage.com","anotherImage.com","thirdImage.com"],"topic_name":"General","topic_id":96,"jwt":"${jwt}"}`,
+  body: `{"author_chain":"ethereum","author":{},"chain":"ethereum",
+  "address":"0x2cE1F5d4f84B583Ab320cAc0948AddE52a131FBE","title":"Testing","body":"This is the thread body",
+  "kind":"forum","stage":"discussion","attachments[]":["someImage.com","anotherImage.com","thirdImage.com"],
+  "topic_name":"General","topic_id":96,"jwt":"${jwt}"}`,
 };
 
 function sync_requests() {
@@ -21,21 +24,6 @@ function sync_requests() {
     console.log('Request error');
     process.exit(1);
   }
-}
-
-function async_requests() {
-  fetch(url, { method: 'POST', ...options })
-    .then((res) => {
-      console.log('Request Completed');
-      if (res.status !== 200) {
-        console.log('Request error:', res.status);
-        process.exit(1);
-      }
-    })
-    .catch((err) => {
-      console.error('error:' + err);
-      process.exit(1);
-    });
 }
 
 // 10 samples of 100 synchronous queries each

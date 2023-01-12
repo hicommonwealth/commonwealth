@@ -1,33 +1,29 @@
-import { SubstrateTypes } from 'chain-events/src/types';
 import type { ApiPromise } from '@polkadot/api';
-import type { Votes } from '@polkadot/types/interfaces';
 import type { Option } from '@polkadot/types';
+import type { Votes } from '@polkadot/types/interfaces';
 
 import type {
   ISubstrateCollectiveProposal,
-  SubstrateCoin} from 'adapters/chain/substrate/types';
-import {
-  formatCall,
+  SubstrateCoin,
 } from 'adapters/chain/substrate/types';
-import type {
-  ProposalEndTime,
-  ChainEntity,
-  ChainEvent} from 'models';
+import { formatCall } from 'adapters/chain/substrate/types';
+import { SubstrateTypes } from 'chain-events/src/types';
+import { ProposalType } from 'common-common/src/types';
+import type { ChainEntity, ChainEvent, ProposalEndTime } from 'models';
 import {
+  BinaryVote,
   Proposal,
   ProposalStatus,
-  BinaryVote,
   VotingType,
-  VotingUnit
+  VotingUnit,
 } from 'models';
-import { ProposalType } from 'common-common/src/types';
-
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
+import type Substrate from './adapter';
 import type SubstrateCollective from './collective';
 import type { SubstrateDemocracyReferendum } from './democracy_referendum';
-import type Substrate from './adapter';
+
+import type SubstrateChain from './shared';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(
@@ -59,12 +55,15 @@ export class SubstrateCollectiveProposal extends Proposal<
   public get shortIdentifier() {
     return `#${this.data.index.toString()}`;
   }
+
   public get description() {
     return null;
   }
+
   public get author() {
     return null;
   }
+
   public get call() {
     return this._call;
   }
@@ -73,6 +72,7 @@ export class SubstrateCollectiveProposal extends Proposal<
   public canVoteFrom(account: SubstrateAccount) {
     return this._Collective.isMember(account);
   }
+
   public title: string;
   private readonly _call;
   private _approved = false;
@@ -80,6 +80,7 @@ export class SubstrateCollectiveProposal extends Proposal<
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
   private _Collective: SubstrateCollective;
+
   public get collectiveName(): string {
     return this._Collective.moduleName;
   }
@@ -247,9 +248,11 @@ export class SubstrateCollectiveProposal extends Proposal<
   public get votingType() {
     return VotingType.SimpleYesNoVoting;
   }
+
   public get votingUnit() {
     return VotingUnit.OnePersonOneVote;
   }
+
   get isPassing() {
     if (this.completed) {
       return this._approved ? ProposalStatus.Passed : ProposalStatus.Failed;
@@ -258,6 +261,7 @@ export class SubstrateCollectiveProposal extends Proposal<
       ? ProposalStatus.Passing
       : ProposalStatus.Failing;
   }
+
   get endTime(): ProposalEndTime {
     return { kind: 'threshold', threshold: this.data.threshold };
   }
@@ -268,6 +272,7 @@ export class SubstrateCollectiveProposal extends Proposal<
       : this.accountsVotedYes.length /
           (this.accountsVotedYes.length + this.accountsVotedNo.length);
   }
+
   public get turnout() {
     return this._Collective.members.length === 0
       ? 0
@@ -278,11 +283,13 @@ export class SubstrateCollectiveProposal extends Proposal<
   get approved() {
     return this._approved;
   }
+
   public get accountsVotedYes() {
     return this.getVotes()
       .filter((vote) => vote.choice === true)
       .map((vote) => vote.account);
   }
+
   public get accountsVotedNo() {
     return this.getVotes()
       .filter((vote) => vote.choice === false)
@@ -349,6 +356,7 @@ export class SubstrateCollectiveProposal extends Proposal<
       },
     ];
   }
+
   public submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     // TODO: check council status
     return this._Chain.createTXModalData(

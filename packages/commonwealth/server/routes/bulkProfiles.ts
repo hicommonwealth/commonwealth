@@ -1,10 +1,8 @@
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import _ from 'lodash';
-import type { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 
-const log = factory.getLogger(formatFilename(__filename));
 const bulkProfiles = async (
   models: DB,
   req: Request,

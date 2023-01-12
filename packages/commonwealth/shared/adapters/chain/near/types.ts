@@ -1,5 +1,5 @@
+import { Coin, formatNumberLong, formatNumberShort } from 'adapters/currency';
 import BN from 'bn.js';
-import { Coin, formatNumberShort, formatNumberLong } from 'adapters/currency';
 
 export class NearToken extends Coin {
   constructor(n: number | string | BN, inDollars = false, dollar: BN = null) {

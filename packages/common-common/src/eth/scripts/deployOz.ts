@@ -3,9 +3,7 @@ import { providers } from 'ethers';
 import type { BigNumberish } from '@ethersproject/bignumber';
 import Web3 from 'web3';
 
-import type {
-  ERC20VotesMock,
-  TimelockController} from '../types';
+import type { ERC20VotesMock, TimelockController } from '../types';
 import {
   GovernorMock__factory as GovernorMockFactory,
   ERC20VotesMock__factory as ERC20VotesMockFactory,

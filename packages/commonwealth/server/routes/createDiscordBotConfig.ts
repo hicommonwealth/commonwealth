@@ -1,13 +1,7 @@
 import { AppError } from 'common-common/src/errors';
-import type {
-  TypedRequestBody,
-  TypedResponse} from '../types';
-import {
-  success,
-  TypedRequestQuery
-} from '../types';
 import type { DB } from '../models';
-import { BanAttributes } from '../models/ban';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 import validateRoles from '../util/validateRoles';
 
 enum CreateDiscordBotConfigErrors {
@@ -73,7 +67,7 @@ const createDiscordBotConfig = async (
         message: 'updated an existing discord bot config',
       });
     } else {
-      const newConfig = await models.DiscordBotConfig.create({
+      await models.DiscordBotConfig.create({
         chain_id,
         verification_token,
         token_expiration,

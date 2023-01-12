@@ -1,17 +1,17 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
+import m from 'mithril';
+import { CWIcon } from '../cw_icons/cw_icon';
+import { CWText } from '../cw_text';
+import { getClasses } from '../helpers';
+import type { MenuItem } from '../types';
+import { ComponentType } from '../types';
 
 import type { SharedPopoverAttrs } from './cw_popover';
 import { CWPopover } from './cw_popover';
-import type { MenuItem } from '../types';
-import { ComponentType } from '../types';
-import { getClasses } from '../helpers';
-import { CWIcon } from '../cw_icons/cw_icon';
-import { CWText } from '../cw_text';
 
 export class CWPopoverMenuItem extends ClassComponent<MenuItem> {
   view(vnode: m.Vnode<MenuItem>) {

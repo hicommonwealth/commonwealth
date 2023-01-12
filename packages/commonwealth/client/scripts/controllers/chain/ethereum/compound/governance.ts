@@ -1,19 +1,19 @@
-import BN from 'bn.js';
-import type { ITXModalData } from 'models';
-import { ProposalModule } from 'models';
 import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+import BN from 'bn.js';
+import { CompoundEvents } from 'chain-events/src';
 import { CompoundTypes } from 'chain-events/src/types';
-import type { IApp } from 'state';
+import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
 import type { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
-import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+import type { IApp } from 'state';
+import type EthereumAccounts from '../accounts';
+import { attachSigner } from '../contractApi';
 import type CompoundAPI from './api';
 import { GovernorType } from './api';
-import CompoundProposal from './proposal';
 import type CompoundChain from './chain';
-import { attachSigner } from '../contractApi';
-import type EthereumAccounts from '../accounts';
-import { CompoundEvents } from 'chain-events/src';
+import CompoundProposal from './proposal';
 
 export interface CompoundProposalArgs {
   targets: string[];
@@ -42,12 +42,15 @@ export default class CompoundGovernance extends ProposalModule<
   public get quorumVotes() {
     return this._quorumVotes;
   }
+
   public get proposalThreshold() {
     return this._proposalThreshold;
   }
+
   public get votingDelay() {
     return this._votingDelay;
   }
+
   public get votingPeriod() {
     return this._votingPeriod;
   }
@@ -61,6 +64,7 @@ export default class CompoundGovernance extends ProposalModule<
   public get supportsAbstain() {
     return this._supportsAbstain;
   }
+
   private _useAbstainInQuorum: boolean;
   public get useAbstainInQuorum() {
     return this._useAbstainInQuorum;
@@ -217,6 +221,7 @@ export default class CompoundGovernance extends ProposalModule<
     this.store.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args: any[]): ITXModalData {
     throw new Error('Method not implemented.');
   }

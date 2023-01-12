@@ -5,7 +5,7 @@ import type {
   CommunityRoleAttributes,
   CommunityRoleInstance,
 } from './community_role';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type RoleAssignmentAttributes = {
   id?: number;

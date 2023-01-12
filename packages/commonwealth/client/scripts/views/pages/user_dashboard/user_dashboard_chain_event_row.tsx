@@ -1,11 +1,11 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
-import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
+import m from 'mithril';
 
 import type { ChainInfo } from 'models';
+
+import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 import type { IEventLabel } from '../../../../../../chain-events/src';
 import { CWCommunityAvatar } from '../../components/component_kit/cw_community_avatar';
 import { CWText } from '../../components/component_kit/cw_text';

@@ -1,18 +1,18 @@
-import type { Account, IWebWallet } from 'models';
 import type { ChainBase, WalletId } from 'common-common/src/types';
-import app from 'state';
 import $ from 'jquery';
-import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
-import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
-import KeplrWebWalletController from './webWallets/keplr_web_wallet';
-import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
-import NearWebWalletController from './webWallets/near_web_wallet';
-import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
-import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
+import type { Account, IWebWallet } from 'models';
+import app from 'state';
 import CosmosEvmMetamaskWalletController from './webWallets/cosmos_evm_metamask_web_wallet';
+import KeplrEthereumWalletController from './webWallets/keplr_ethereum_web_wallet';
+import KeplrWebWalletController from './webWallets/keplr_web_wallet';
+import MetamaskWebWalletController from './webWallets/metamask_web_wallet';
+import NearWebWalletController from './webWallets/near_web_wallet';
 import PhantomWebWalletController from './webWallets/phantom_web_wallet';
+import PolkadotWebWalletController from './webWallets/polkadot_web_wallet';
 import RoninWebWalletController from './webWallets/ronin_web_wallet';
+import TerraStationWebWalletController from './webWallets/terra_station_web_wallet';
 import TerraWalletConnectWebWalletController from './webWallets/terra_walletconnect_web_wallet';
+import WalletConnectWebWalletController from './webWallets/walletconnect_web_wallet';
 
 export default class WebWalletController {
   private _wallets: IWebWallet<any>[];

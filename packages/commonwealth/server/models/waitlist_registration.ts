@@ -1,7 +1,6 @@
 import type * as Sequelize from 'sequelize';
-import type { DataTypes} from 'sequelize';
-import { Model } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
+import type { DataTypes } from 'sequelize';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type WaitlistRegistrationAttributes = {
   user_id: number;

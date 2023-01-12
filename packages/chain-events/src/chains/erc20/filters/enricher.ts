@@ -1,6 +1,6 @@
 import BN from 'bn.js';
 
-import type { CWEvent} from '../../../interfaces';
+import type { CWEvent } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
 import type { TypedEventFilter } from '../../../contractTypes/commons';
 import type { ERC20 } from '../../../contractTypes';
@@ -34,7 +34,7 @@ export async function Enrich(
   rawData: RawEvent,
   config: EnricherConfig = {}
 ): Promise<CWEvent<IEventData>> {
-  const { totalSupply, tokenName } = api.tokens.find(
+  const { totalSupply } = api.tokens.find(
     ({ contract }) =>
       contract.address.toLowerCase() === rawData.address.toLowerCase()
   );

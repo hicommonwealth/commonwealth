@@ -8,10 +8,9 @@ import type {
   CWEvent,
   IEventTitle,
   IEventLabel,
-  IChainEventKind} from './interfaces';
-import {
-  SupportedNetwork
+  IChainEventKind,
 } from './interfaces';
+import { SupportedNetwork } from './interfaces';
 import { Listener as SubstrateListener } from './chains/substrate/Listener';
 import { Title as SubstrateTitle } from './chains/substrate/filters/titler';
 import { Label as SubstrateLabel } from './chains/substrate/filters/labeler';

@@ -6,7 +6,7 @@ import type {
   RoleAssignmentAttributes,
   RoleAssignmentInstance,
 } from './role_assignment';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityRoleAttributes = {
   name: Permission;

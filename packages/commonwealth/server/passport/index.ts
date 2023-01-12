@@ -1,15 +1,11 @@
+import { StatsDController } from 'common-common/src/statsd';
 import passport from 'passport';
 import passportJWT from 'passport-jwt';
-
-import { factory, formatFilename } from 'common-common/src/logging';
-import type { DB } from '../models';
 import { JWT_SECRET } from '../config';
-import { useSocialAccountAuth } from './socialAccount';
-import { useMagicAuth } from './magic';
+import type { DB } from '../models';
 import '../types';
-import { StatsDController } from 'common-common/src/statsd';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { useMagicAuth } from './magic';
+import { useSocialAccountAuth } from './socialAccount';
 
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;

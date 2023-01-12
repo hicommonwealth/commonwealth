@@ -1,22 +1,20 @@
-import passport from 'passport';
-import passportGithub from 'passport-github2'; // passport-github is not up to date with Github OAuth 3.0
-import passportDiscord from 'passport-discord';
+import { NotificationCategories } from 'common-common/src/types';
 import type { Request } from 'express';
-
-import '../types';
-import type { DB } from '../models';
+import passport from 'passport';
+import passportDiscord from 'passport-discord';
+import passportGithub from 'passport-github2'; // passport-github is not up to date with Github OAuth 3.0
 import {
-  GITHUB_CLIENT_ID,
-  GITHUB_CLIENT_SECRET,
-  GITHUB_OAUTH_CALLBACK,
   DISCORD_CLIENT_ID,
   DISCORD_CLIENT_SECRET,
   DISCORD_OAUTH_CALLBACK,
   DISCORD_OAUTH_SCOPES,
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GITHUB_OAUTH_CALLBACK,
 } from '../config';
-import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-const log = factory.getLogger(formatFilename(__filename));
+import type { DB } from '../models';
+
+import '../types';
 
 /**
  * The OAuth 2.0 authentication strategy authenticates requests using the OAuth

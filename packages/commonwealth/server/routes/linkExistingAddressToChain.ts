@@ -1,13 +1,14 @@
-import type { Request, Response, NextFunction } from 'express';
-import Sequelize from 'sequelize';
-import crypto from 'crypto';
+import { AppError } from 'common-common/src/errors';
 import { ChainBase } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
+import crypto from 'crypto';
+import type { NextFunction, Request, Response } from 'express';
+import Sequelize from 'sequelize';
 import { addressSwapper } from '../../shared/utils';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { createRole, findOneRole } from '../util/roles';
+import { factory, formatFilename } from 'common-common/src/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 const { Op } = Sequelize;

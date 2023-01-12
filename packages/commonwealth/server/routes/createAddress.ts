@@ -1,20 +1,21 @@
-import type { NextFunction } from 'express';
-import { bech32 } from 'bech32';
-import crypto from 'crypto';
-import Web3 from 'web3';
 import { PublicKey } from '@solana/web3.js';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { bech32 } from 'bech32';
+import { AppError } from 'common-common/src/errors';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { addressSwapper } from '../../shared/utils';
-import type { DB } from '../models';
-import type { TypedRequestBody, TypedResponse} from '../types';
-import { success } from '../types';
-import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
-import type { AddressAttributes } from '../models/address';
-import { mixpanelTrack } from '../util/mixpanelUtil';
+import crypto from 'crypto';
+import type { NextFunction } from 'express';
+import Web3 from 'web3';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { addressSwapper } from '../../shared/utils';
+import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
+import type { DB } from '../models';
+import type { AddressAttributes } from '../models/address';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 import { createRole, findOneRole } from '../util/roles';
+import { factory, formatFilename } from 'common-common/src/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {

@@ -1,5 +1,9 @@
 import chai from 'chai';
-import type { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
+import type {
+  Header,
+  EventRecord,
+  Extrinsic,
+} from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 
 import { SupportedNetwork } from '../../../src';

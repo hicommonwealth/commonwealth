@@ -1,5 +1,5 @@
 import type { Response, NextFunction, Request } from 'express';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 
 import type { DB } from '../../database/database';
 
@@ -7,7 +7,7 @@ export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',
 };
 
-const entities = async (
+const entities: any = async (
   models: DB,
   req: Request,
   res: Response,

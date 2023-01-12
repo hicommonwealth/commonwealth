@@ -1,9 +1,9 @@
+import { AppError } from 'common-common/src/errors';
 import type { NextFunction } from 'express';
-import validateRoles from '../../util/validateRoles';
-import type { TypedRequestBody, TypedResponse} from '../../types';
-import { success } from '../../types';
 import type { DB } from '../../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { TypedRequestBody, TypedResponse } from '../../types';
+import { success } from '../../types';
+import validateRoles from '../../util/validateRoles';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

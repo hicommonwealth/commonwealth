@@ -1,22 +1,22 @@
 /* eslint-disable global-require */
+import BN from 'bn.js';
 /* eslint-disable no-unused-expressions */
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import BN from 'bn.js';
 import jwt from 'jsonwebtoken';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import {
-  resetDatabase,
-  getTokenBalanceCache,
   getMockBalanceProvider,
+  getTokenBalanceCache,
+  resetDatabase,
 } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
+import { markdownComment } from '../../util/fixtures/markdownComment';
 import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;
-import { markdownComment } from '../../util/fixtures/markdownComment';
 
 describe('Token Forum tests', () => {
   const chain = 'alex';

@@ -1,16 +1,11 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
 import type { DB } from '../models';
 
 export const Errors = {
   NoEntity: 'Cannot find entity',
 };
 
-const fetchEntityTitle = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const fetchEntityTitle = async (models: DB, req: Request, res: Response) => {
   const { chain_entity_id } = req.query;
 
   const entityMeta = await models.ChainEntityMeta.findOne({

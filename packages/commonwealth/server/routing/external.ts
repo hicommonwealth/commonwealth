@@ -1,32 +1,32 @@
-import type { Express } from 'express';
-import type Router from 'express/lib/router/index';
+import type { DB } from 'commonwealth/server/models';
 import {
-  getThreads,
-  getThreadsValidation,
-} from 'commonwealth/server/routes/threads/getThreads';
-import {
-  getCommentsValidation,
   getComments,
+  getCommentsValidation,
 } from 'commonwealth/server/routes/comments/getComments';
-import getReactions, {
-  getReactionsValidation,
-} from 'commonwealth/server/routes/reactions/getReactions';
 import getCommunities, {
   getCommunitiesValidation,
 } from 'commonwealth/server/routes/communities/getCommunities';
 import getProfiles, {
   getProfilesValidation,
 } from 'commonwealth/server/routes/profiles/getProfiles';
-import type { DB } from 'commonwealth/server/models';
-import type { TokenBalanceCache } from 'token-balance-cache/src';
+import getReactions, {
+  getReactionsValidation,
+} from 'commonwealth/server/routes/reactions/getReactions';
 import {
-  getChainNodes,
-  getChainNodesValidation,
-} from '../routes/getChainNodes';
+  getThreads,
+  getThreadsValidation,
+} from 'commonwealth/server/routes/threads/getThreads';
+import type { Express } from 'express';
+import type Router from 'express/lib/router/index';
+import type { TokenBalanceCache } from 'token-balance-cache/src';
 import {
   getBalanceProviders,
   getBalanceProvidersValidation,
 } from '../routes/getBalanceProviders';
+import {
+  getChainNodes,
+  getChainNodesValidation,
+} from '../routes/getChainNodes';
 import {
   getTokenBalance,
   getTokenBalanceValidation,

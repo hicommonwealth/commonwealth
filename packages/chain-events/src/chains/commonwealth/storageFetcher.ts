@@ -1,11 +1,6 @@
 import { populateRange } from '../../util';
-import type {
-  CWEvent,
-  IDisconnectedRange} from '../../interfaces';
-import {
-  IStorageFetcher,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import { IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import { Enrich } from './filters/enricher';
@@ -17,10 +12,9 @@ import type {
   IProjectFailed,
   IProjectSucceeded,
   IProjectWithdraw,
-  RawEvent} from './types';
-import {
-  EventKind
+  RawEvent,
 } from './types';
+import { EventKind } from './types';
 
 type IEntityEventData =
   | IProjectCreated

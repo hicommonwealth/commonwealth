@@ -1,10 +1,10 @@
-import type BN from 'bn.js';
-import { u128, Compact } from '@polkadot/types';
-import type { Codec } from '@polkadot/types/types';
+import { Compact, u128 } from '@polkadot/types';
 import type { Call } from '@polkadot/types/interfaces';
+import type { Codec } from '@polkadot/types/types';
+import type BN from 'bn.js';
 import type { BountyStatus } from 'models/types';
-import type { IIdentifiable, ICompletable } from '../../shared';
 import { Coin } from '../../currency';
+import type { ICompletable, IIdentifiable } from '../../shared';
 
 export function formatCall(
   c: Call | { section: string; method: string; args: string[] }

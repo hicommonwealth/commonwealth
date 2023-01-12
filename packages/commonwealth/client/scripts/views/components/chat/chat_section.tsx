@@ -1,33 +1,32 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import _ from 'lodash';
-import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
 import 'components/sidebar/index.scss';
+import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
+import type { IChannel } from 'controllers/server/socket/chatNs';
+import { handleRedirectClicks } from 'helpers';
+import m from 'mithril';
 
 import app from 'state';
-import type { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
-import { handleRedirectClicks } from 'helpers';
+import { CWSpinner } from '../component_kit/cw_spinner';
+import { verifyCachedToggleTree } from '../sidebar/helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
+import type {
+  SectionGroupAttrs,
+  SidebarSectionAttrs,
+  SubSectionAttrs,
+  ToggleTree,
+} from '../sidebar/types';
 import {
   CreateCategory,
   CreateChannel,
-  RenameCategory,
-  RenameChannel,
   DeleteCategory,
   DeleteChannel,
+  RenameCategory,
+  RenameChannel,
 } from './admin_modals';
-import type {
-  ToggleTree,
-  SubSectionAttrs,
-  SectionGroupAttrs,
-  SidebarSectionAttrs,
-} from '../sidebar/types';
-import { verifyCachedToggleTree } from '../sidebar/helpers';
-import { CWSpinner } from '../component_kit/cw_spinner';
 
 enum Errors {
   None = '',

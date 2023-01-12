@@ -1,11 +1,11 @@
-import type { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
-import { NotificationCategories, ProposalType } from 'common-common/src/types';
 import { AppError } from 'common-common/src/errors';
-import { findOneRole } from '../util/roles';
+import { NotificationCategories, ProposalType } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
 import { getProposalUrl } from '../../shared/utils';
 import type { DB } from '../models';
 import emitNotifications from '../util/emitNotifications';
+import { findOneRole } from '../util/roles';
 
 export const Errors = {
   InvalidThread: 'Must provide a valid thread_id',

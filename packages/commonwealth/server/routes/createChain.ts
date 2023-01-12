@@ -1,34 +1,32 @@
-import type { NextFunction } from 'express';
-import Web3 from 'web3';
-import fetch from 'node-fetch';
-import * as solw3 from '@solana/web3.js';
-import type { Cluster } from '@solana/web3.js';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import type { Cluster } from '@solana/web3.js';
+import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
-import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError, ServerError } from 'common-common/src/errors';
 import {
   BalanceType,
   ChainBase,
   ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction } from 'express';
+import fetch from 'node-fetch';
+import { Op } from 'sequelize';
+import Web3 from 'web3';
+import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
-import type { ChainAttributes } from '../models/chain';
-import type { ChainNodeAttributes } from '../models/chain_node';
-import testSubstrateSpec from '../util/testSubstrateSpec';
 import type { DB } from '../models';
-import type { TypedRequestBody, TypedResponse } from '../types';
-import { success } from '../types';
 
 import type { AddressInstance } from '../models/address';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import type { ChainAttributes } from '../models/chain';
+import type { ChainNodeAttributes } from '../models/chain_node';
 import type { RoleAttributes, RoleInstance } from '../models/role';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 
 import { createDefaultCommunityRoles, createRole } from '../util/roles';
-const log = factory.getLogger(formatFilename(__filename));
+import testSubstrateSpec from '../util/testSubstrateSpec';
 
 const MAX_IMAGE_SIZE_KB = 500;
 
@@ -210,7 +208,7 @@ const createChain = async (
       const clusterUrl = solw3.clusterApiUrl(url as Cluster);
       const connection = new solw3.Connection(clusterUrl);
       const supply = await connection.getTokenSupply(pubKey);
-      const { decimals, amount } = supply.value;
+      const { amount } = supply.value;
       if (new BN(amount, 10).isZero()) {
         throw new AppError('Invalid supply amount');
       }
@@ -227,7 +225,7 @@ const createChain = async (
     }
     try {
       const tmClient = await Tendermint34Client.connect(url);
-      const { block } = await tmClient.block();
+      await tmClient.block();
     } catch (err) {
       return next(new ServerError(Errors.InvalidNode));
     }
@@ -370,13 +368,13 @@ const createChain = async (
   const nodeJSON = node.toJSON();
   delete nodeJSON.private_url;
 
-  const chatChannels = await models.ChatChannel.create({
+  await models.ChatChannel.create({
     name: 'General',
     chain_id: chain.id,
     category: 'General',
   });
 
-  const topics = await models.Topic.create({
+  await models.Topic.create({
     chain_id: chain.id,
     name: 'General',
   });
@@ -440,7 +438,7 @@ const createChain = async (
   if (addressToBeAdmin) {
     await createRole(models, addressToBeAdmin.id, chain.id, 'admin', true);
 
-    const [subscription] = await models.Subscription.findOrCreate({
+    await models.Subscription.findOrCreate({
       where: {
         subscriber_id: req.user.id,
         category_id: NotificationCategories.NewThread,

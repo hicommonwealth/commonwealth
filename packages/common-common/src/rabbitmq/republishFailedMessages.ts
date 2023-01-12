@@ -1,7 +1,4 @@
 import type { RabbitMQController } from './rabbitMQController';
-import { factory, formatFilename } from '../logging';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export abstract class RepublishFailedMessages<DB> {
   private _timeoutHandle: NodeJS.Timeout;

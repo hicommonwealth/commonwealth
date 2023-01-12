@@ -1,40 +1,26 @@
-import type {
-  ITXModalData,
-  IChainModule,
-  ITXData,
-  ChainInfo} from 'models';
-import {
-  NodeInfo
-} from 'models';
-import { ChainNetwork, WalletId } from 'common-common/src/types';
-import m from 'mithril';
-import _ from 'lodash';
-import type { IApp } from 'state';
-import { ApiStatus } from 'state';
-import moment from 'moment';
-import BN from 'bn.js';
-import { CosmosToken } from 'controllers/chain/cosmos/types';
+import type { EncodeObject } from '@cosmjs/proto-signing';
 
 import type {
-  StdFee,
-  StakingExtension,
+  BankExtension,
   GovExtension,
-  BankExtension} from '@cosmjs/stargate';
-import {
-  isBroadcastTxSuccess,
-  isBroadcastTxFailure,
-  QueryClient,
-  setupStakingExtension,
-  setupGovExtension,
-  setupBankExtension,
-  SigningStargateClient,
+  StakingExtension,
+  StdFee,
 } from '@cosmjs/stargate';
+import { QueryClient } from '@cosmjs/stargate';
 import type { Event } from '@cosmjs/tendermint-rpc';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import type { EncodeObject } from '@cosmjs/proto-signing';
-import type CosmosAccount from './account';
+import BN from 'bn.js';
+import { ChainNetwork, WalletId } from 'common-common/src/types';
+import { CosmosToken } from 'controllers/chain/cosmos/types';
+import m from 'mithril';
+import type { ChainInfo, IChainModule, ITXData, ITXModalData } from 'models';
+import moment from 'moment';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
 import type KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
-import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
+import type CosmosAccount from './account';
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 export interface ICosmosTXData extends ITXData {
   chainId: string;
@@ -82,6 +68,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   }
 
   private _tmClient: Tendermint34Client;
+
   public async init(chain: ChainInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
     console.log(`Starting Tendermint RPC API at ${url}...`);
@@ -94,7 +81,7 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
       this._tmClient,
       cosm.setupGovExtension,
       cosm.setupStakingExtension,
-      cosm.setupBankExtension,
+      cosm.setupBankExtension
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
@@ -144,8 +131,11 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (!wallet.enabled) {
       await wallet.enable();
     }
-    const cosm   = await import('@cosmjs/stargate');
-    const client = await cosm.SigningStargateClient.connectWithSigner(this._app.chain.meta.node.url, wallet.offlineSigner);
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.SigningStargateClient.connectWithSigner(
+      this._app.chain.meta.node.url,
+      wallet.offlineSigner
+    );
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -157,13 +147,20 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
 
     // send the transaction using keplr-supported signing client
     try {
-      const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
+      const result = await client.signAndBroadcast(
+        account.address,
+        [tx],
+        DEFAULT_FEE,
+        DEFAULT_MEMO
+      );
       console.log(result);
       if (cosm.isBroadcastTxFailure(result)) {
         throw new Error('TX execution failed.');
       } else if (cosm.isBroadcastTxSuccess(result)) {
         const txHash = result.transactionHash;
-        const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
+        const txResult = await this._tmClient.tx({
+          hash: Buffer.from(txHash, 'hex'),
+        });
         return txResult.result.events;
       } else {
         throw new Error('Unknown broadcast result');

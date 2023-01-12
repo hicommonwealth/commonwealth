@@ -1,16 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
+import m from 'mithril';
+import type { Thread, ThreadStage, Topic } from 'models';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import type { Thread, ThreadStage, Topic } from 'models';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
-import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 type ThreadPreviewMenuAttrs = {
   thread: Thread;

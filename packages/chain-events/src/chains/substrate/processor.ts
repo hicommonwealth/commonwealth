@@ -4,7 +4,7 @@
 import type { ApiPromise } from '@polkadot/api';
 import type { Extrinsic, Event } from '@polkadot/types/interfaces';
 
-import type { CWEvent} from '../../interfaces';
+import type { CWEvent } from '../../interfaces';
 import { IEventProcessor, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 

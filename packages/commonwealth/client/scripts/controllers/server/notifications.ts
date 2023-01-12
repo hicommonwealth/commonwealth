@@ -1,12 +1,12 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
 import m from 'mithril';
-
-import { NotificationStore } from 'stores';
-import { NotificationSubscription, Notification, ChainEventType } from 'models';
+import { ChainEventType, Notification, NotificationSubscription } from 'models';
 import { modelFromServer } from 'models/NotificationSubscription';
 
 import app from 'state';
+
+import { NotificationStore } from 'stores';
 
 const post = (route, args, callback) => {
   args['jwt'] = app.user.jwt;
@@ -110,7 +110,7 @@ class NotificationsController {
       {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
-      (result) => {
+      () => {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.enable();
@@ -128,7 +128,7 @@ class NotificationsController {
       {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
-      (result) => {
+      () => {
         const ceSubs = [];
         for (const s of subscriptions) {
           s.disable();
@@ -146,7 +146,7 @@ class NotificationsController {
       {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
-      (result) => {
+      () => {
         for (const s of subscriptions) {
           s.enableImmediateEmail();
         }
@@ -161,7 +161,7 @@ class NotificationsController {
       {
         'subscription_ids[]': subscriptions.map((n) => n.id),
       },
-      (result) => {
+      () => {
         for (const s of subscriptions) {
           s.disableImmediateEmail();
         }
@@ -176,7 +176,7 @@ class NotificationsController {
       {
         subscription_id: subscription.id,
       },
-      (result) => {
+      () => {
         const idx = this._subscriptions.indexOf(subscription);
         if (idx === -1) {
           throw new Error('subscription not found!');
@@ -203,7 +203,7 @@ class NotificationsController {
           .slice(0, MAX_NOTIFICATIONS_READ)
           .map((n) => n.id),
       },
-      (result) => {
+      () => {
         for (const n of unreadNotifications.slice(0, MAX_NOTIFICATIONS_READ)) {
           n.markRead();
         }
@@ -215,7 +215,7 @@ class NotificationsController {
   }
 
   public clearAllRead() {
-    return post('/clearReadNotifications', {}, (result) => {
+    return post('/clearReadNotifications', {}, () => {
       const toClear = this.allNotifications.filter((n) => n.isRead);
       for (const n of toClear) {
         this.removeFromStore(n);
@@ -245,7 +245,7 @@ class NotificationsController {
           .slice(0, MAX_NOTIFICATIONS_CLEAR)
           .map((n) => n.id),
       },
-      async (result) => {
+      async () => {
         notifications
           .slice(0, MAX_NOTIFICATIONS_CLEAR)
           .map((n) => this.removeFromStore(n));

@@ -4,9 +4,7 @@
  * from the chain, writing the results back into the database.
  */
 
-import type {
-  IDisconnectedRange,
-  IStorageFetcher} from 'chain-events/src';
+import type { IDisconnectedRange, IStorageFetcher } from 'chain-events/src';
 import {
   AaveEvents,
   CommonwealthEvents,
@@ -181,7 +179,7 @@ async function migrateChainEntities(
   }
 }
 
-export async function runEntityMigrations(chainId?: string) {
+export async function runEntityMigrations(chainId?: string): void {
   // "all" means run for all supported chains, otherwise we pass in the name of
   // the specific chain to migrate
   log.info('Started migrating chain entities into the DB');

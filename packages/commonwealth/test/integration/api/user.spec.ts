@@ -6,8 +6,8 @@ import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
+import * as modelUtils from '../../util/modelUtils';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);

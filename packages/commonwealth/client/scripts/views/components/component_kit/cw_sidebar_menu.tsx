@@ -1,22 +1,22 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
-import { ListItem, Icon, Icons } from 'construct-ui';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
-
-import app from 'state';
-import { navigateToSubpage } from 'app';
+import { Icon, Icons, ListItem } from 'construct-ui';
+import m from 'mithril';
 import type { ChainInfo, RoleInfo } from 'models';
 import { AddressInfo } from 'models';
-import { getClasses } from './helpers';
-import { CWText } from './cw_text';
-import { CWIcon } from './cw_icons/cw_icon';
-import type { MenuItem } from './types';
-import { ComponentType } from './types';
+
+import app from 'state';
 import { CommunityLabel } from '../community_label';
 import User from '../widgets/user';
+import { CWIcon } from './cw_icons/cw_icon';
+import { CWText } from './cw_text';
+import { getClasses } from './helpers';
+import type { MenuItem } from './types';
+import { ComponentType } from './types';
 
 // TODO: Switch to new component kit system, migrate to more native setup
 const renderCommunity = (item: ChainInfo) => {

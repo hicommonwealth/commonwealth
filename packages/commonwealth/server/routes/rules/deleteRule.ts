@@ -1,8 +1,8 @@
-import type { DB } from '../../models';
 import { AppError, ServerError } from 'common-common/src/errors';
-import validateRoles from '../../util/validateRoles';
-import type { TypedResponse, TypedRequestBody } from '../../types';
+import type { DB } from '../../models';
+import type { TypedRequestBody, TypedResponse } from '../../types';
 import { success } from '../../types';
+import validateRoles from '../../util/validateRoles';
 
 export const Errors = {
   AdminOnly: 'Only admin can delete rules',

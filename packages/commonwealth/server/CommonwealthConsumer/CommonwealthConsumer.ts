@@ -1,19 +1,16 @@
 import {
-  RabbitMQController,
   getRabbitMQConfig,
+  RabbitMQController,
 } from 'common-common/src/rabbitmq';
-import type {
-  RabbitMQSubscription} from 'common-common/src/serviceConsumer';
-import {
-  ServiceConsumer,
-} from 'common-common/src/serviceConsumer';
+import type { RabbitMQSubscription } from 'common-common/src/serviceConsumer';
+import { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import type { BrokerConfig } from 'rascal';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { RascalSubscriptions } from 'common-common/src/rabbitmq/types';
 import Rollbar from 'rollbar';
 import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
-import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import models from '../database';
+import { processChainEntityCUD } from './messageProcessors/chainEntityCUDQueue';
 import { processChainEventNotificationsCUD } from './messageProcessors/chainEventNotificationsCUDQueue';
 import { processChainEventTypeCUD } from './messageProcessors/chainEventTypeCUDQueue';
 import { processSnapshotMessage } from './messageProcessors/snapshotConsumer';

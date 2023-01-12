@@ -1,14 +1,7 @@
-import IdStore from 'stores/IdStore';
+import type { AnyProposal, Reaction } from 'models';
+import { AbridgedThread, Comment, Proposal, Thread } from 'models';
 import type ReactionCount from 'models/ReactionCount';
-import type {
-  AnyProposal,
-  Reaction} from 'models';
-import {
-  AbridgedThread,
-  Comment,
-  Thread,
-  Proposal,
-} from 'models';
+import IdStore from 'stores/IdStore';
 
 class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   private _storeRC: { [identifier: string]: ReactionCount<any> } = {};

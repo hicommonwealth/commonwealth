@@ -4,8 +4,7 @@ import * as yargs from 'yargs';
 import fetch from 'node-fetch';
 import EthDater from 'ethereum-block-by-date';
 
-import type {
-  CWEvent} from '../src/index';
+import type { CWEvent } from '../src/index';
 import {
   IEventHandler,
   SubstrateEvents,
@@ -259,7 +258,7 @@ if (network === SupportedNetwork.Substrate) {
   });
 } else if (network === SupportedNetwork.Cosmos) {
   CosmosEvents.createApi(url).then(async (api) => {
-    const fetcher = new CosmosEvents.StorageFetcher(api);
+    new CosmosEvents.StorageFetcher(api);
     try {
       // const fetched = await fetcher.fetch();
       // console.log(fetched.sort((a, b) => a.blockNumber - b.blockNumber));

@@ -1,26 +1,17 @@
 /**
  * @file Manages logged-in user accounts and local storage.
  */
-import $ from 'jquery';
-import m from 'mithril';
-import app from 'state';
-import { isSameAccount } from 'helpers';
-
 import { initAppState } from 'app';
-import { Magic } from 'magic-sdk';
 import type { WalletId } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
-import type {
-  ChainInfo,
-  BlockInfo} from 'models';
-import {
-  SocialAccount,
-  Account,
-  AddressInfo,
-  ITokenAdapter
-} from 'models';
-import moment from 'moment';
 import { notifyError } from 'controllers/app/notifications';
+import { isSameAccount } from 'helpers';
+import $ from 'jquery';
+import { Magic } from 'magic-sdk';
+import m from 'mithril';
+import type { BlockInfo, ChainInfo } from 'models';
+import { Account, AddressInfo, ITokenAdapter, SocialAccount } from 'models';
+import moment from 'moment';
+import app from 'state';
 
 export function linkExistingAddressToChainOrCommunity(
   address: string,
@@ -146,7 +137,7 @@ export async function updateLastVisited(
     if (updateFrontend) {
       app.user.lastVisited[activeEntity.id] = new Date().toISOString();
     }
-    const response = await $.post(`${app.serverUrl()}/writeUserSetting`, {
+    await $.post(`${app.serverUrl()}/writeUserSetting`, {
       jwt: app.user.jwt,
       key: 'lastVisited',
       value,
@@ -248,6 +239,7 @@ export async function createUserWithAddress(
   address: string,
   walletId: WalletId,
   chain: string,
+  sessionPublicAddress?: string,
   validationBlockInfo?: BlockInfo
 ): Promise<{ account: Account; newlyCreated: boolean }> {
   const response = await $.post(`${app.serverUrl()}/createAddress`, {
@@ -265,6 +257,7 @@ export async function createUserWithAddress(
     chain: chainInfo,
     validationToken: response.result.verification_token,
     walletId,
+    sessionPublicAddress: sessionPublicAddress,
     validationBlockInfo: response.result.block_info,
   });
   return { account, newlyCreated: response.result.newly_created };

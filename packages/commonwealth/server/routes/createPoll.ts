@@ -1,12 +1,9 @@
+import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import type { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
 import { getNextPollEndingTime } from '../../shared/utils';
 import type { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { findOneRole } from '../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',

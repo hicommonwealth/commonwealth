@@ -1,4 +1,3 @@
-import { Request } from 'express';
 import type { Permission } from '../models/role';
 import { findOneRole } from './roles';
 

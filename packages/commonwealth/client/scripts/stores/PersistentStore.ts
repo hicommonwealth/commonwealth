@@ -123,8 +123,7 @@ class PersistentStore<
     // attempt to find and revive item from localStorage, if it exists
     const localStorageItem = localStorage.getItem(this._getKey(id.toString()));
     if (localStorageItem) {
-      const { data, timestamp }: IStorageItem<SerializedT> =
-        JSON.parse(localStorageItem);
+      const { data }: IStorageItem<SerializedT> = JSON.parse(localStorageItem);
       const revivedItem: T = this._constructorFunc(data);
       this.add(revivedItem);
       return revivedItem;

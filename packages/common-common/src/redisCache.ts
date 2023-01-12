@@ -4,9 +4,9 @@ import {
   ReconnectStrategyError,
   SocketClosedUnexpectedlyError,
 } from 'redis';
-import { factory, formatFilename } from './logging';
 import type { RedisNamespaces } from './types';
 import type Rollbar from 'rollbar';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

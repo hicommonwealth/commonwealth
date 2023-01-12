@@ -1,15 +1,14 @@
 import type { ApiPromise } from '@polkadot/api';
-import type { Call, AccountId } from '@polkadot/types/interfaces';
 import type { Vec } from '@polkadot/types';
+import type { AccountId, Call } from '@polkadot/types/interfaces';
 import type { ISubstrateCollectiveProposal } from 'adapters/chain/substrate/types';
-import type { SubstrateTypes } from 'chain-events/src/types';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
 import { SubstrateCollectiveProposal } from './collective_proposal';
-import { chainToEventNetwork } from '../../server/chain_entities';
+import type SubstrateChain from './shared';
 
 class SubstrateCollective extends ProposalModule<
   ApiPromise,
@@ -20,6 +19,7 @@ class SubstrateCollective extends ProposalModule<
   public get members() {
     return this._members;
   }
+
   public isMember(account: SubstrateAccount): boolean {
     return (
       this._members.find((m) => m.address === account.address) !== undefined
@@ -93,10 +93,12 @@ class SubstrateCollective extends ProposalModule<
     ]);
     return this.createTx(author, threshold, func, func.encodedLength);
   }
+
   public vetoNextExternal(author: SubstrateAccount, hash: string) {
     const func = this._Chain.getTxMethod('democracy', 'vetoExternal', [hash]);
     return this.createTx(author, 1, func, func.encodedLength);
   }
+
   public createTreasuryApprovalMotion(
     author: SubstrateAccount,
     threshold: number,
@@ -107,6 +109,7 @@ class SubstrateCollective extends ProposalModule<
     ]);
     return this.createTx(author, threshold, func, func.encodedLength);
   }
+
   public createTreasuryRejectionMotion(
     author: SubstrateAccount,
     threshold: number,
@@ -117,6 +120,7 @@ class SubstrateCollective extends ProposalModule<
     ]);
     return this.createTx(author, threshold, func, func.encodedLength);
   }
+
   public createExternalProposal(
     author: SubstrateAccount,
     threshold: number,
@@ -128,6 +132,7 @@ class SubstrateCollective extends ProposalModule<
     ]);
     return this.createTx(author, threshold, func, length);
   }
+
   public createExternalProposalMajority(
     author: SubstrateAccount,
     threshold: number,
@@ -141,6 +146,7 @@ class SubstrateCollective extends ProposalModule<
     );
     return this.createTx(author, threshold, func, length);
   }
+
   public createExternalProposalDefault(
     author: SubstrateAccount,
     threshold: number,
@@ -155,6 +161,7 @@ class SubstrateCollective extends ProposalModule<
     );
     return this.createTx(author, threshold, func, length);
   }
+
   public createFastTrack(
     author: SubstrateAccount,
     threshold: number,
@@ -206,6 +213,7 @@ export class SubstrateCouncil extends SubstrateCollective {
   constructor(app: IApp) {
     super(app, 'council');
   }
+
   public init(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts
@@ -218,6 +226,7 @@ export class SubstrateTechnicalCommittee extends SubstrateCollective {
   constructor(app: IApp) {
     super(app, 'technicalCommittee');
   }
+
   public init(
     ChainInfo: SubstrateChain,
     Accounts: SubstrateAccounts

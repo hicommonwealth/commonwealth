@@ -20,7 +20,6 @@ import type { IErc20Contracts as ERC20Api } from './chains/erc20/types';
 import type { Api as CompoundApi } from './chains/compound/types';
 import type { Api as CommonwealthApi } from './chains/commonwealth/types';
 import type { Api as AaveApi } from './chains/aave/types';
-import { StorageFetcher } from './chains/aave';
 import type { Listener } from './Listener';
 
 // add other events here as union types

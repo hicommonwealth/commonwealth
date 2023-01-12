@@ -1,19 +1,18 @@
 import type { ApiPromise } from '@polkadot/api';
-import type { AccountId } from '@polkadot/types/interfaces';
 import type { Vec } from '@polkadot/types';
+import type { AccountId } from '@polkadot/types/interfaces';
 import type {
   ISubstrateTreasuryTip,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
-import type { SubstrateTypes } from 'chain-events/src/types';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { ProposalModule } from 'models';
 import type { IApp } from 'state';
 import { formatAddressShort } from 'utils';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
+import type SubstrateChain from './shared';
 import { SubstrateTreasuryTip } from './treasury_tip';
-import { chainToEventNetwork } from '../../server/chain_entities';
 
 class SubstrateTreasuryTips extends ProposalModule<
   ApiPromise,
@@ -24,6 +23,7 @@ class SubstrateTreasuryTips extends ProposalModule<
   public get members() {
     return this._members;
   }
+
   public isMember(account: SubstrateAccount): boolean {
     return (
       account &&

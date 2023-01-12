@@ -1,10 +1,7 @@
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
-import { factory, formatFilename } from 'common-common/src/logging';
 
 dotenv.config();
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export default async function fetchNewSnapshotProposal(
   id: string,

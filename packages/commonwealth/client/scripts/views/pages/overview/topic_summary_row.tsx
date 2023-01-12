@@ -1,27 +1,27 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { pluralize } from 'helpers';
+import { getProposalUrlPath } from 'identifiers';
+import m from 'mithril';
+// import { navigateToSubpage } from 'app';
+import type { Thread, Topic } from 'models';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
-// import { navigateToSubpage } from 'app';
-import type { Thread, Topic } from 'models';
-import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
-import { pluralize } from 'helpers';
-import { CWText } from '../../components/component_kit/cw_text';
-import User from '../../components/widgets/user';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
-// import { CWIconButton } from '../../components/component_kit/cw_icon_button';
-import { getLastUpdated, isHot } from '../discussions/helpers';
-import { SharePopover } from '../../components/share_popover';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
 // import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 // import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { getClasses } from '../../components/component_kit/helpers';
+import { SharePopover } from '../../components/share_popover';
+import User from '../../components/widgets/user';
+// import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { getLastUpdated, isHot } from '../discussions/helpers';
 
 type TopicSummaryRowAttrs = {
   monthlyThreads: Array<Thread>;

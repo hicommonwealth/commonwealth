@@ -1,12 +1,7 @@
 import type EthDater from 'ethereum-block-by-date';
 
-import type {
-  CWEvent,
-  IDisconnectedRange} from '../../interfaces';
-import {
-  IStorageFetcher,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import { IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 import type { Moloch1, Moloch2 } from '../../contractTypes';
 

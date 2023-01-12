@@ -1,56 +1,56 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/proposals/voting_actions.scss';
-
-import app from 'state';
-import type CosmosAccount from 'controllers/chain/cosmos/account';
-import { CosmosVote, CosmosProposal } from 'controllers/chain/cosmos/proposal';
-import type { AnyProposal } from 'models';
-import { BinaryVote, DepositVote, VotingType } from 'models';
-import {
-  SubstrateDemocracyReferendum,
-  convictionToWeight,
-} from 'controllers/chain/substrate/democracy_referendum';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import type { SubstrateAccount } from 'controllers/chain/substrate/account';
-import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
-import MolochProposal, {
-  MolochProposalVote,
-  MolochVote,
-  MolochProposalState,
-} from 'controllers/chain/ethereum/moloch/proposal';
-import CompoundProposal, {
-  CompoundProposalVote,
-  BravoVote,
-} from 'controllers/chain/ethereum/compound/proposal';
-import type EthereumAccount from 'controllers/chain/ethereum/account';
 import { notifyError } from 'controllers/app/notifications';
+import type CosmosAccount from 'controllers/chain/cosmos/account';
+import type Cosmos from 'controllers/chain/cosmos/adapter';
+import { CosmosProposal, CosmosVote } from 'controllers/chain/cosmos/proposal';
 import AaveProposal, {
   AaveProposalVote,
 } from 'controllers/chain/ethereum/aave/proposal';
-import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
-import type Cosmos from 'controllers/chain/cosmos/adapter';
+import type EthereumAccount from 'controllers/chain/ethereum/account';
 import type Compound from 'controllers/chain/ethereum/compound/adapter';
+import CompoundProposal, {
+  BravoVote,
+  CompoundProposalVote,
+} from 'controllers/chain/ethereum/compound/proposal';
+import MolochProposal, {
+  MolochProposalState,
+  MolochProposalVote,
+  MolochVote,
+} from 'controllers/chain/ethereum/moloch/proposal';
+import type { NearAccount } from 'controllers/chain/near/account';
+import NearSputnikProposal from 'controllers/chain/near/sputnik/proposal';
 import {
   NearSputnikVote,
   NearSputnikVoteString,
 } from 'controllers/chain/near/sputnik/types';
-import type { NearAccount } from 'controllers/chain/near/account';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import {
+  convictionToWeight,
+  SubstrateDemocracyReferendum,
+} from 'controllers/chain/substrate/democracy_referendum';
+import { SubstratePhragmenElection } from 'controllers/chain/substrate/phragmen_election';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import m from 'mithril';
+import type { AnyProposal } from 'models';
+import { BinaryVote, DepositVote, VotingType } from 'models';
+
+import app from 'state';
 
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { ProposalExtensions } from './proposal_extensions';
-import { getCanVote, getVotingResults } from './helpers';
-import { CWButton } from '../component_kit/cw_button';
-import { CWText } from '../component_kit/cw_text';
 import {
   CompoundCancelButton,
   MolochCancelButton,
 } from '../../pages/view_proposal/proposal_components';
+import { CWButton } from '../component_kit/cw_button';
+import { CWText } from '../component_kit/cw_text';
+import { getCanVote, getVotingResults } from './helpers';
+import { ProposalExtensions } from './proposal_extensions';
 
 type CannotVoteAttrs = { label: string };
 

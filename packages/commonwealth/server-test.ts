@@ -1,33 +1,33 @@
 /* eslint-disable dot-notation */
-import http from 'http';
-import favicon from 'serve-favicon';
-import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import passport from 'passport';
-import session from 'express-session';
-import express from 'express';
-import SessionSequelizeStore from 'connect-session-sequelize';
-import Rollbar from 'rollbar';
+import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import {
+  BalanceType,
   ChainBase,
   ChainNetwork,
-  NotificationCategories,
   ChainType,
-  BalanceType,
+  NotificationCategories,
 } from 'common-common/src/types';
+import SessionSequelizeStore from 'connect-session-sequelize';
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import session from 'express-session';
+import http from 'http';
+import passport from 'passport';
+import Rollbar from 'rollbar';
+import favicon from 'serve-favicon';
+import setupAPI from 'server/routing/router'; // performance note: this takes 15 seconds
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
 
 import { ROLLBAR_SERVER_TOKEN, SESSION_SECRET } from './server/config';
-import setupAPI from 'server/routing/router'; // performance note: this takes 15 seconds
-import setupPassport from './server/passport';
 import models from './server/database';
-import ViewCountCache from './server/util/viewCountCache';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
+import setupPassport from './server/passport';
 import BanCache from './server/util/banCheckCache';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import setupErrorHandlers from 'common-common/src/scripts/setupErrorHandlers';
 import RuleCache from './server/util/rules/ruleCache';
+import ViewCountCache from './server/util/viewCountCache';
 import { MockTokenBalanceProvider } from './test/util/modelUtils';
-import DatabaseValidationService from './server/middleware/databaseValidationService';
 
 require('express-async-errors');
 
@@ -114,7 +114,7 @@ const resetServer = (debug = false): Promise<void> => {
       );
 
       // Initialize different chain + node URLs
-      const edgMain = await models.Chain.create({
+      await models.Chain.create({
         id: 'edgeware',
         network: ChainNetwork.Edgeware,
         default_symbol: 'EDG',
@@ -127,7 +127,7 @@ const resetServer = (debug = false): Promise<void> => {
         has_chain_events_listener: false,
         chain_node_id: edgewareNode.id,
       });
-      const eth = await models.Chain.create({
+      await models.Chain.create({
         id: 'ethereum',
         network: ChainNetwork.Ethereum,
         default_symbol: 'ETH',
@@ -158,7 +158,7 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainNetwork.ERC20,
         chain_node_id: testnetNode.id,
       });
-      const alexCommunityContract = await models.CommunityContract.create({
+      await models.CommunityContract.create({
         chain_id: alex.id,
         contract_id: alexContract.id,
       });
@@ -181,7 +181,7 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainNetwork.ERC20,
         chain_node_id: mainnetNode.id,
       });
-      const yearnCommunityContract = await models.CommunityContract.create({
+      await models.CommunityContract.create({
         chain_id: yearn.id,
         contract_id: yearnContract.id,
       });
@@ -204,7 +204,7 @@ const resetServer = (debug = false): Promise<void> => {
         type: ChainNetwork.ERC20,
         chain_node_id: mainnetNode.id,
       });
-      const sushiCommunityContract = await models.CommunityContract.create({
+      await models.CommunityContract.create({
         chain_id: sushi.id,
         contract_id: sushiContract.id,
       });

@@ -32,6 +32,7 @@ module.exports = {
       });
       return updated_comments;
     }
+
     const updatedComments = await populateRootIds(comments);
     await Promise.all(
       Object.entries(updatedComments).map(async (entry) => {

@@ -1,6 +1,6 @@
 import axios from 'axios';
-import type { Logger } from 'typescript-logging';
 import { StatsDController } from 'common-common/src/statsd';
+import type { Logger } from 'typescript-logging';
 import type { SnapshotNotification } from '../../../shared/types';
 import type { DB } from '../../models';
 
@@ -10,6 +10,7 @@ const enum SnapshotEventType {
   Ended = 'proposal/end',
   Started = 'proposal/start',
 }
+
 export async function processSnapshotMessage(
   this: { models: DB; log: Logger },
   data: SnapshotNotification

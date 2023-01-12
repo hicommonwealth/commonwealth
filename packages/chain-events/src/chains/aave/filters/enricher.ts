@@ -3,7 +3,7 @@ import type { BigNumber } from 'ethers';
 
 import type { TypedEventFilter } from '../../../contractTypes/commons';
 import type { AaveTokenV2, IAaveGovernanceV2 } from '../../../contractTypes';
-import type { CWEvent} from '../../../interfaces';
+import type { CWEvent } from '../../../interfaces';
 import { SupportedNetwork } from '../../../interfaces';
 import type { RawEvent, IEventData, Api } from '../types';
 import { EventKind } from '../types';

@@ -1,16 +1,14 @@
-import moment from 'moment';
-import type { IApp} from 'state';
-import { ApiStatus, LoginState } from 'state';
 import type { Coin } from 'adapters/currency';
-import { clearLocalStorage } from 'stores/PersistentStore';
+import type { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 import m from 'mithril';
-import type { ChainBase } from 'common-common/src/types';
-
-import ChainEntityController from 'controllers/server/chain_entities';
-import type { IChainModule, IAccountsModule, IBlockInfo } from './interfaces';
+import moment from 'moment';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
+import { clearLocalStorage } from 'stores/PersistentStore';
 import type { Account, ProposalModule } from '.';
 import type ChainInfo from './ChainInfo';
+import type { IAccountsModule, IBlockInfo, IChainModule } from './interfaces';
 
 // Extended by a chain's main implementation. Responsible for module
 // initialization. Saved as `app.chain` in the global object store.
@@ -70,7 +68,6 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
       activeUsers,
       numVotingThreads,
       chatChannels,
-      rules, // TODO: store in rules controller
       communityBanner,
       contracts,
       communityRoles,
@@ -119,7 +116,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
     console.log(
-      `Started API for ${this.meta.id} on node: ${this.meta.node.url}.`
+      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`
     );
   }
 
@@ -128,7 +125,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
     console.log(
-      `Loaded data for ${this.meta.id} on node: ${this.meta.node.url}.`
+      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`
     );
   }
 
@@ -180,9 +177,11 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   get id() {
     return this.meta.id;
   }
+
   get network() {
     return this.meta.network;
   }
+
   get currency() {
     return this.meta.default_symbol;
   }

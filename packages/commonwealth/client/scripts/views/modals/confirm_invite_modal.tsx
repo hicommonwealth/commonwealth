@@ -1,26 +1,26 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { orderAccountsByAddress } from 'helpers';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/confirm_invite_modal.scss';
+import type { AddressInfo } from 'models';
 
 import app from 'state';
-import { orderAccountsByAddress } from 'helpers';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import type { InviteCodeAttributes } from 'types';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import { UserBlock } from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { navigateToSubpage } from 'app';
-import type { InviteCodeAttributes } from 'types';
-import type { AddressInfo } from 'models';
-import { ModalExitButton } from 'views/components/component_kit/cw_modal';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWText } from '../components/component_kit/cw_text';
 import {
   getClasses,
   isWindowSmallInclusive,
 } from '../components/component_kit/helpers';
-import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 
 type SideMenuAttrs = {
   invites: Array<InviteCodeAttributes>;

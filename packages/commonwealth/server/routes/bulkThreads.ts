@@ -1,13 +1,10 @@
 /* eslint-disable quotes */
-import type { Request, Response, NextFunction } from 'express';
+import { ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import { QueryTypes } from 'sequelize';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { getLastEdited } from '../util/getLastEdited';
 import type { DB } from '../models';
 import type { ThreadInstance } from '../models/thread';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { getLastEdited } from '../util/getLastEdited';
 // bulkThreads takes a date param and fetches the most recent 20 threads before that date
 const bulkThreads = async (
   models: DB,
@@ -186,7 +183,7 @@ const bulkThreads = async (
           attributes: { exclude: ['version_history'] },
           order: [['created_at', 'DESC']],
         })
-      ).map((t, idx) => {
+      ).map((t) => {
         const row = t.toJSON();
         const last_edited = getLastEdited(row);
         row['last_edited'] = last_edited;

@@ -1,9 +1,9 @@
 import type { IChainEntityKind } from 'chain-events/src';
+import type { ProposalType } from 'common-common/src/types';
+import { proposalSlugToChainEntityType } from 'identifiers';
 
 import type { ChainEntity } from '../models';
 import Store from './Store';
-import { proposalSlugToChainEntityType } from 'identifiers';
-import type { ProposalType } from 'common-common/src/types';
 
 class ChainEntityStore extends Store<ChainEntity> {
   private _storeType: { [type: string]: { [stringId: string]: ChainEntity } } =

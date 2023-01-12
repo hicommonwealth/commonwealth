@@ -1,11 +1,7 @@
 import BN from 'bn.js';
 
-import type {
-  IEventLabel,
-  LabelerFilter} from '../../../interfaces';
-import {
-  SupportedNetwork,
-} from '../../../interfaces';
+import type { IEventLabel, LabelerFilter } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
 import type { BalanceString, IEventData } from '../types';
 import { EventKind } from '../types';
 

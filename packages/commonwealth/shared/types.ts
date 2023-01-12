@@ -1,5 +1,5 @@
-import type { ChainAttributes } from '../server/models/chain';
 import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
+import type { ChainAttributes } from '../server/models/chain';
 import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
 
 export enum WebsocketMessageNames {
@@ -13,6 +13,7 @@ export enum WebsocketMessageNames {
   LeaveChatChannel = 'leave-chat-channel',
   Error = 'exception',
 }
+
 export type SnapshotProposalNotification = {
   id: string;
   category_id: 'snapshot-proposal';

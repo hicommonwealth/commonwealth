@@ -1,4 +1,4 @@
-import type { CWEvent} from 'chain-events/src';
+import type { CWEvent } from 'chain-events/src';
 import { SupportedNetwork } from 'chain-events/src';
 import type { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import type { RmqMsgNamespace } from './index';

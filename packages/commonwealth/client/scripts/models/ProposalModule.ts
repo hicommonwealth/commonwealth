@@ -1,17 +1,17 @@
-import type { IApp } from 'state';
 import type { Coin } from 'adapters/currency';
 import type { IIdentifiable } from 'adapters/shared';
+import type { IApp } from 'state';
 import { ProposalStore } from '../stores';
+import type ChainEntity from './ChainEntity';
+import type ChainEvent from './ChainEvent';
 import type {
-  IVote,
-  ITXModalData,
-  IChainModule,
   IAccountsModule,
+  IChainModule,
+  ITXModalData,
+  IVote,
 } from './interfaces';
 import type Proposal from './Proposal';
 import StorageModule from './StorageModule';
-import type ChainEntity from './ChainEntity';
-import type ChainEvent from './ChainEvent';
 
 // Implemented by a chain's governance module, assuming it uses a proposal-based mechanism.
 export abstract class ProposalModule<
@@ -25,6 +25,7 @@ export abstract class ProposalModule<
   public get disabled() {
     return this._disabled;
   }
+
   public disable() {
     this._disabled = true;
   }
@@ -33,10 +34,12 @@ export abstract class ProposalModule<
   public get initializing() {
     return this._initializing;
   }
+
   protected _initialized = false;
   public get initialized() {
     return this._initialized;
   }
+
   public get ready() {
     return this._initialized || this._disabled;
   }

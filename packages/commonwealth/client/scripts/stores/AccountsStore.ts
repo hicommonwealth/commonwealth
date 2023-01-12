@@ -1,5 +1,5 @@
-import Store from './Store';
 import type { IHasAddress } from './interfaces';
+import Store from './Store';
 
 export class AccountsStore<T extends IHasAddress> extends Store<T> {
   private _storeAddress: { [address: string]: T } = {};

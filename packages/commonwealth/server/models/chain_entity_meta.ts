@@ -2,11 +2,13 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 import type { ChainAttributes } from './chain';
 import type { ThreadAttributes } from './thread';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ChainEntityMetaAttributes = {
   id: number; // sequelize auto-generated primary key id --- NEVER USE DIRECTLY
-  ce_id: number; // this is the primary key id from the chain-events service (used to match chain-entity-meta with chain-entities from chain-events)
+  // this is the primary key id from the chain-events service
+  // (used to match chain-entity-meta with chain-entities from chain-events)
+  ce_id: number;
   title?: string;
   chain: string;
   author?: string;

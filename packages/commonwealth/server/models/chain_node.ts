@@ -1,7 +1,7 @@
+import type { BalanceType } from 'common-common/src/types';
 import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
 import type { DataTypes } from 'sequelize';
-import type { BalanceType } from 'common-common/src/types';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ChainNodeAttributes = {
   url: string;

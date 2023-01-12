@@ -1,28 +1,26 @@
 /* eslint-disable no-unused-expressions */
-import chai from 'chai';
-import 'chai/register-should';
-import Web3 from 'web3';
-import { ethers } from 'ethers';
-import type BN from 'bn.js';
-import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { stringToU8a } from '@polkadot/util';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
+import type BN from 'bn.js';
+import chai from 'chai';
+import 'chai/register-should';
+import { BalanceType, ChainNetwork } from 'common-common/src/types';
+import wallet from 'ethereumjs-wallet';
+import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
-import { BalanceType } from 'common-common/src/types';
+import { constructCanvasMessage } from 'shared/adapters/shared';
 import type { IChainNode } from 'token-balance-cache/src/index';
 import { BalanceProvider } from 'token-balance-cache/src/index';
+import Web3 from 'web3';
 import app from '../../server-test';
 import models from '../../server/database';
 import type { Permission } from '../../server/models/role';
 import {
-  constructTypedMessage,
+  constructTypedCanvasMessage,
   TEST_BLOCK_INFO_STRING,
 } from '../../shared/adapters/chain/ethereum/keys';
-import { Action } from '../../../common-common/src/permissions';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const generateEthAddress = () => {
   const keypair = wallet.generate();
@@ -66,15 +64,16 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .set('Accept', 'application/json')
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
     const address_id = res.body.result.id;
-    const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
     const sessionWallet = ethers.Wallet.createRandom();
-    const data = await constructTypedMessage(
-      address,
+    const message = constructCanvasMessage(
+      'eth',
       chain_id,
+      address,
       sessionWallet.address,
       TEST_BLOCK_INFO_STRING
     );
+    const data = constructTypedCanvasMessage(message);
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -110,10 +109,26 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({ address: keyPair.address, chain, wallet_id });
+
+    // generate session wallet
+    const sessionKeyring = new Keyring();
+    const sessionWallet = sessionKeyring.addFromUri(
+      mnemonicGenerate(),
+      {},
+      'ed25519'
+    );
+    const chain_id = ChainNetwork.Edgeware;
+    const message = constructCanvasMessage(
+      'eth',
+      chain_id,
+      address,
+      sessionWallet.address,
+      TEST_BLOCK_INFO_STRING
+    );
+
+    const signature = keyPair.sign(stringToU8a(JSON.stringify(message)));
+
     const address_id = res.body.result.id;
-    const token = res.body.result.verification_token;
-    const u8aSignature = keyPair.sign(stringToU8a(token));
-    const signature = u8aToHex(u8aSignature).slice(2);
     res = await chai.request
       .agent(app)
       .post('/api/verifyAddress')
@@ -155,6 +170,7 @@ export interface ThreadArgs {
   attachments?: string[];
   readOnly?: boolean;
 }
+
 export const createThread = async (args: ThreadArgs) => {
   const {
     chainId,
@@ -166,9 +182,7 @@ export const createThread = async (args: ThreadArgs) => {
     topicId,
     readOnly,
     kind,
-    stage,
     url,
-    attachments,
   } = args;
   const res = await chai.request
     .agent(app)
@@ -199,6 +213,7 @@ export interface CommentArgs {
   parentCommentId?: any;
   root_id?: any;
 }
+
 export const createComment = async (args: CommentArgs) => {
   const { chain, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request
@@ -365,6 +380,7 @@ export interface SubscriptionArgs {
   is_active: boolean;
   category: string;
 }
+
 export const createSubscription = async (args: SubscriptionArgs) => {
   const res = await chai
     .request(app)

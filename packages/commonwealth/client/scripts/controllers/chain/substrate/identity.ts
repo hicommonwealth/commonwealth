@@ -1,24 +1,23 @@
+import type { ApiPromise } from '@polkadot/api';
+import type { Option, Vec } from '@polkadot/types';
+import type {
+  AccountId,
+  BalanceOf,
+  IdentityInfo,
+  RegistrationJudgement,
+} from '@polkadot/types/interfaces';
+import type { Data } from '@polkadot/types/primitive';
+import type { Codec } from '@polkadot/types/types';
+import { u8aToString } from '@polkadot/util';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
 import { Identity } from 'models';
 import type { IHasId, ISerializable } from 'stores';
-import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import type {
-  BalanceOf,
-  AccountId} from '@polkadot/types/interfaces';
-import type {
-  RegistrationJudgement,
-  IdentityInfo,
-} from '@polkadot/types/interfaces';
-import type { Codec } from '@polkadot/types/types';
-import type { Vec, Option } from '@polkadot/types';
-import type { Data } from '@polkadot/types/primitive';
-import { u8aToString } from '@polkadot/util';
-import type { ApiPromise } from '@polkadot/api';
-import type SubstrateChain from './shared';
-import type { SubstrateAccount } from './account';
 import type SubstrateAccounts from './account';
-import type { SuperCodec } from './identities';
+import type { SubstrateAccount } from './account';
 import type SubstrateIdentities from './identities';
+import type { SuperCodec } from './identities';
+import type SubstrateChain from './shared';
 
 export interface IIdentitySubs {
   subs: SubstrateAccount[];

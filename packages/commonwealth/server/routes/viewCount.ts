@@ -1,11 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
-import type ViewCountCache from '../util/viewCountCache';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
-import { sequelize } from '../database';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
+import type ViewCountCache from '../util/viewCountCache';
 
 export const Errors = {
   NoObjectId: 'Must provide object ID',

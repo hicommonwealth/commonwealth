@@ -1,11 +1,13 @@
-import gql from 'graphql-tag';
-import snapshot from '@snapshot-labs/snapshot.js';
 import { Web3Provider } from '@ethersproject/providers';
+import snapshot from '@snapshot-labs/snapshot.js';
+import gql from 'graphql-tag';
 import { notifyError } from '../controllers/app/notifications';
+
 const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
 const client = new snapshot.Client712(hub);
 
 let apolloClient = null;
+
 async function getApolloClient() {
   if (apolloClient) return apolloClient;
 
@@ -212,7 +214,7 @@ export async function getVotes(
 
 export async function castVote(address: string, payload: any) {
   const web3 = new Web3Provider((window as any).ethereum);
-  const receipt = await client.vote(web3 as any, address, payload);
+  await client.vote(web3 as any, address, payload);
 }
 
 export async function createProposal(address: string, payload: any) {

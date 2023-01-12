@@ -1,5 +1,6 @@
 import type { IUniqueId } from './interfaces';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ReactionCount<T extends IUniqueId> {
   public readonly id: string;
   public readonly threadId: number;

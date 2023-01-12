@@ -2,29 +2,24 @@
 /* eslint-disable consistent-return */
 import type { ApiPromise } from '@polkadot/api';
 import { decodeAddress } from '@polkadot/keyring';
-import { KeyringPair } from '@polkadot/keyring/types';
-import type {
-  Balance,
-  EraIndex,
-  AccountId,
-  Exposure,
-  Conviction,
-  StakingLedger} from '@polkadot/types/interfaces';
-import type {
-  BalanceLock,
-  BalanceLockTo212
-} from '@polkadot/types/interfaces';
 import type { Vec } from '@polkadot/types';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
-
-import type { IApp } from 'state';
-import { formatCoin } from 'adapters/currency';
-import type { IAccountsModule } from 'models';
-import { Account } from 'models';
-import { AccountsStore } from 'stores';
+import type {
+  AccountId,
+  Balance,
+  BalanceLock,
+  BalanceLockTo212,
+  Conviction,
+  EraIndex,
+  Exposure,
+  StakingLedger,
+} from '@polkadot/types/interfaces';
 import type { Codec } from '@polkadot/types/types';
 import type { SubstrateCoin } from 'adapters/chain/substrate/types';
-import BN from 'bn.js';
+import type { IAccountsModule } from 'models';
+import { Account } from 'models';
+
+import type { IApp } from 'state';
+import { AccountsStore } from 'stores';
 import SubstrateChain from './shared';
 
 export interface IValidators {
@@ -330,6 +325,7 @@ export class SubstrateAccount extends Account {
     );
   }
 }
+
 class SubstrateAccounts
   implements IAccountsModule<SubstrateCoin, SubstrateAccount>
 {

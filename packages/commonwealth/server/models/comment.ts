@@ -1,10 +1,10 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
 
 import type { AddressAttributes } from './address';
-import type { ChainAttributes } from './chain';
 import type { AttachmentAttributes } from './attachment';
+import type { ChainAttributes } from './chain';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CommentAttributes = {
   root_id: string;

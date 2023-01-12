@@ -1,6 +1,6 @@
 import m from 'mithril';
 
-import type { ITXModalData} from 'models';
+import type { ITXModalData } from 'models';
 import { TransactionStatus } from 'models';
 import type { NextFn, StageName } from './types';
 

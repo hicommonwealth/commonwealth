@@ -1,19 +1,20 @@
-import type {
-  GovernorCompatibilityBravo,
-  GovernorAlpha,
-  MPond,
-  ERC20VotesComp} from 'common-common/src/eth/types';
-import {
-  GovernorCompatibilityBravo__factory,
-  GovernorAlpha__factory,
-  MPond__factory,
-  ERC20VotesComp__factory,
-} from 'common-common/src/eth/types';
 import type { ExternalProvider } from '@ethersproject/providers';
 import { Web3Provider } from '@ethersproject/providers';
-import { utils } from 'ethers';
+import type {
+  ERC20VotesComp,
+  GovernorAlpha,
+  GovernorCompatibilityBravo,
+  MPond,
+} from 'common-common/src/eth/types';
+import {
+  ERC20VotesComp__factory,
+  GovernorAlpha__factory,
+  GovernorCompatibilityBravo__factory,
+  MPond__factory,
+} from 'common-common/src/eth/types';
 
 import type ContractApi from 'controllers/chain/ethereum/contractApi';
+import { utils } from 'ethers';
 
 export enum GovernorType {
   Alpha,
@@ -37,12 +38,14 @@ export default class CompoundAPI
   public get Contract() {
     return this._Contract;
   }
+
   public readonly Provider: Web3Provider;
 
   private _tokenType: GovernorTokenType;
   public get tokenType() {
     return this._tokenType;
   }
+
   private _Token: MPond | ERC20VotesComp | undefined;
   public get Token() {
     return this._Token;
@@ -52,11 +55,13 @@ export default class CompoundAPI
   public get govType() {
     return this._govType;
   }
+
   public isGovAlpha(
     c: GovernorAlpha | GovernorCompatibilityBravo
   ): c is GovernorAlpha {
     return this._govType === GovernorType.Alpha;
   }
+
   public isTokenMPond(t: MPond | ERC20VotesComp | undefined): t is MPond {
     return this._tokenType === GovernorTokenType.MPondToken;
   }
@@ -72,7 +77,7 @@ export default class CompoundAPI
     this.Provider.pollingInterval = 12000;
   }
 
-  public async init(tokenName: string) {
+  public async init(tokenName: string): Promise<void> {
     // only Alpha has a guardian -- use to distinguish between types of governance contract
     try {
       this._Contract = GovernorAlpha__factory.connect(

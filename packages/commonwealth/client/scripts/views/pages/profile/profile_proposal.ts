@@ -1,11 +1,11 @@
-import m from 'mithril';
-import lity from 'lity';
-import { slugify } from 'utils';
-
-import app from 'state';
-import type { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
+import lity from 'lity';
+import m from 'mithril';
+import type { Thread } from 'models';
+
+import app from 'state';
+import { slugify } from 'utils';
 
 const ProfileProposal: m.Component<
   { proposal: Thread },
@@ -14,7 +14,7 @@ const ProfileProposal: m.Component<
   view: (vnode) => {
     const proposal = vnode.attrs.proposal;
     const { slug, identifier } = proposal;
-    const { attachments, author, body, title, createdAt, chain } = proposal;
+    const { attachments, author, title, createdAt, chain } = proposal;
 
     // hide rows from communities that don't match
     if (app.isCustomDomain() && chain !== app.customDomainId()) return;

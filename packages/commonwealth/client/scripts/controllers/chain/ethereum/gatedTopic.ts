@@ -1,9 +1,9 @@
-import app from 'state';
 import BN from 'bn.js';
 import { ITokenAdapter } from 'models';
+import app from 'state';
 
 export default class TopicGateCheck {
-  public static isGatedTopic(topicName: string, address?: string): boolean {
+  public static isGatedTopic(topicName: string): boolean {
     if (ITokenAdapter.instanceOf(app.chain) && topicName) {
       const tokenPostingThreshold: BN = app.topics.getByName(
         topicName,

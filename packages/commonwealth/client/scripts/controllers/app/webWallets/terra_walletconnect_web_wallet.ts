@@ -1,7 +1,10 @@
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { LCDClient, TendermintAPI } from '@terra-money/terra.js';
 import type { ConnectedWallet } from '@terra-money/wallet-controller';
 import type { WalletController } from '@terra-money/wallet-controller';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
 
 // TODO: ensure this only opens on mobile
 
@@ -37,10 +40,37 @@ class TerraWalletConnectWebWalletController
     return this._accounts || [];
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
+  public getChainId() {
+    // Terra mainnet
+    return 'phoenix-1';
+  }
+
+  public async getRecentBlock(chainIdentifier: string) {
+    const client = new LCDClient({
+      URL: app.chain.meta.ChainNode.url,
+      chainID: chainIdentifier,
+    });
+    const tmClient = new TendermintAPI(client);
+    const blockInfo = await tmClient.blockInfo();
+
+    return {
+      number: parseInt(blockInfo.block.header.height),
+      // TODO: is this the hash we should use? the terra.js API has no documentation
+      hash: blockInfo.block.header.data_hash,
+      // seconds since epoch
+      timestamp: Math.floor(
+        new Date(blockInfo.block.header.time).getTime() / 1000
+      ),
+    };
+  }
+
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     try {
       const result = await this._wallet.signBytes(
-        Buffer.from(account.validationToken)
+        Buffer.from(JSON.stringify(canvasMessage))
       );
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');
@@ -60,13 +90,6 @@ class TerraWalletConnectWebWalletController
       console.error(error);
       throw new Error(`Failed to sign with account: ${error.message}`);
     }
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   public async reset() {
@@ -89,7 +112,7 @@ class TerraWalletConnectWebWalletController
       await this._controller.connect(terra.ConnectType.WALLETCONNECT);
 
       let subscription;
-      this._wallet = await new Promise((resolve, reject) => {
+      this._wallet = await new Promise((resolve) => {
         subscription = this._controller
           .connectedWallet()
           .subscribe((connectedWallet) => {

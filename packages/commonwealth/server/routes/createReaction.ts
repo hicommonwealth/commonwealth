@@ -1,30 +1,27 @@
 /* eslint-disable prefer-const */
-/* eslint-disable dot-notation */
-import type { Request, Response, NextFunction } from 'express';
+import { AppError, ServerError } from 'common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
 } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
+/* eslint-disable dot-notation */
+import type { NextFunction, Request, Response } from 'express';
 import type { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { AppError, ServerError } from 'common-common/src/errors';
-import validateTopicThreshold from '../util/validateTopicThreshold';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
 } from '../../shared/utils';
 import type { DB } from '../models';
+import type BanCache from '../util/banCheckCache';
+import emitNotifications from '../util/emitNotifications';
 import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
-} from '../../shared/analytics/types';
 import { findAllRoles } from '../util/roles';
 import checkRule from '../util/rules/checkRule';
 import type RuleCache from '../util/rules/ruleCache';
-import type BanCache from '../util/banCheckCache';
-import emitNotifications from '../util/emitNotifications';
+import validateTopicThreshold from '../util/validateTopicThreshold';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -152,7 +149,7 @@ const createReaction = async (
   if (thread_id) options['thread_id'] = thread_id;
   else if (proposal_id) {
     if (!chain_entity_id) return next(new AppError(Errors.NoProposalMatch));
-    const [prefix, id] = proposal_id.split('_');
+    const [id] = proposal_id.split('_');
     proposal = { id };
     root_type = proposal_id.split('_')[0];
     options['proposal_id'] = proposal_id;

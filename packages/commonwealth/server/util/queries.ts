@@ -1,8 +1,5 @@
-import type {
-  IPagination} from '../../../common-common/src/api/extApiTypes';
-import {
-  OrderByOptions,
-} from '../../../common-common/src/api/extApiTypes';
+import type { IPagination } from '../../../common-common/src/api/extApiTypes';
+import { OrderByOptions } from '../../../common-common/src/api/extApiTypes';
 
 /*
 These methods are for generating the sequelize formatting for

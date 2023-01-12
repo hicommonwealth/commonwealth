@@ -41,6 +41,7 @@ export abstract class BalanceProvider<
   public readonly opts: Record<keyof OptT, string>;
   public abstract readonly validBases: BalanceType[];
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public getCacheKey(node: IChainNode, address: string, opts: OptT): string {
     return `${node.id}-${address}`;
   }

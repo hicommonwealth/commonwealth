@@ -1,20 +1,20 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { parseCustomStages, threadStageToLabel } from 'helpers';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/update_proposal_status_modal.scss';
+import type { ChainEntity, Thread } from 'models';
+import { ThreadStage } from 'models';
 
 import app from 'state';
-import { threadStageToLabel, parseCustomStages } from 'helpers';
-import type { ChainEntity, Thread} from 'models';
-import { ThreadStage } from 'models';
-import type { SnapshotProposal } from 'helpers/snapshot_utils';
 import { ChainEntitiesSelector } from '../components/chain_entities_selector';
 import { CWButton } from '../components/component_kit/cw_button';
-import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 import { ModalExitButton } from '../components/component_kit/cw_modal';
+import { SnapshotProposalSelector } from '../components/snapshot_proposal_selector';
 
 type UpdateProposalStatusModalAttrs = {
   onChangeHandler: (

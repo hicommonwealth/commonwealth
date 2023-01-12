@@ -17,15 +17,14 @@ import { v4 as uuidv4 } from 'uuid';
 import { QueryTypes } from 'sequelize';
 
 import { setupChainEventConsumer } from '../../../services/ChainEventsConsumer/chainEventsConsumer';
-import type { CWEvent} from '../../../src';
+import type { CWEvent } from '../../../src';
 import { SupportedNetwork } from '../../../src';
 import type * as AaveTypes from '../../../src/chains/aave/types';
 import type {
   IProposalCreated,
-  ITransfer} from '../../../src/chains/aave/types';
-import {
-  EventKind
+  ITransfer,
 } from '../../../src/chains/aave/types';
+import { EventKind } from '../../../src/chains/aave/types';
 import models from '../../../services/database/database';
 import { RABBITMQ_API_URI } from '../../../services/config';
 

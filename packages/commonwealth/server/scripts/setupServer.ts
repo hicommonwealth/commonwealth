@@ -1,4 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
+import type { RabbitMQController } from 'common-common/src/rabbitmq';
 import type { Express } from 'express-serve-static-core';
 import http from 'http';
 import type Rollbar from 'rollbar';
@@ -6,7 +6,7 @@ import type Rollbar from 'rollbar';
 import { DEFAULT_PORT } from '../config';
 import type { DB } from '../models';
 import { setupWebSocketServer } from '../socket';
-import type { RabbitMQController } from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

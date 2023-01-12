@@ -10,7 +10,8 @@ import type { Signer, providers, BigNumberish } from 'ethers';
 import type {
   GovernorBravoImmutable,
   MPond,
-  TimelockMock as Timelock} from '../../src/contractTypes';
+  TimelockMock as Timelock,
+} from '../../src/contractTypes';
 import {
   GovernorBravoImmutable__factory as GovernorBravoImmutableFactory,
   MPond__factory as MPondFactory,
@@ -23,7 +24,8 @@ import type {
   IProposalCreated,
   IProposalExecuted,
   IProposalQueued,
-  IVoteCast} from '../../src/chains/compound/types';
+  IVoteCast,
+} from '../../src/chains/compound/types';
 import {
   BravoSupport,
   EventKind,
@@ -34,13 +36,8 @@ import {
   StorageFetcher,
   subscribeEvents,
 } from '../../src/chains/compound';
-import type {
-  CWEvent,
-  IChainEventData} from '../../src';
-import {
-  IEventHandler,
-  SupportedNetwork,
-} from '../../src';
+import type { CWEvent, IChainEventData } from '../../src';
+import { IEventHandler, SupportedNetwork } from '../../src';
 
 const { assert } = chai;
 

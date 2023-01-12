@@ -1,11 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
 import axios from 'axios';
+import type { Request, Response } from 'express';
 
-export const sendMessage = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+export const sendMessage = async (req: Request, res: Response) => {
   const url = `${
     process.env.SNAPSHOT_HUB_URL || 'https://hub.snapshot.org'
   }/api/message`;

@@ -1,5 +1,5 @@
 import type * as Sequelize from 'sequelize';
-import type { Model, DataTypes } from 'sequelize';
+import type { DataTypes, Model } from 'sequelize';
 import type { ModelStatic } from './types';
 
 export interface ChainCategoryTypeAttributes {

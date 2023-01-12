@@ -1,23 +1,25 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 /* eslint-disable @typescript-eslint/ban-types */
 import $ from 'jquery';
-import app from 'state';
 
 import type {
-  AddressInfo,
-  SocialAccount,
   Account,
+  AddressInfo,
+  ChainInfo,
+  SocialAccount,
   StarredCommunity,
-  ChainInfo} from 'models';
+} from 'models';
+import app from 'state';
+import DraftsController from './drafts';
 
 import NotificationsController from './notifications';
-import DraftsController from './drafts';
 
 export class UserController {
   private _activeAccount: Account;
   public get activeAccount(): Account {
     return this._activeAccount;
   }
+
   private _setActiveAccount(account: Account): void {
     this._activeAccount = account;
   }
@@ -26,6 +28,7 @@ export class UserController {
   public get email(): string {
     return this._email;
   }
+
   private _setEmail(email: string): void {
     this._email = email;
   }
@@ -34,6 +37,7 @@ export class UserController {
   public get emailInterval(): string {
     return this._emailInterval;
   }
+
   private _setEmailInterval(emailInterval: string): void {
     this._emailInterval = emailInterval;
   }
@@ -42,6 +46,7 @@ export class UserController {
   public get emailVerified(): boolean {
     return this._emailVerified;
   }
+
   private _setEmailVerified(emailVerified: boolean): void {
     this._emailVerified = emailVerified;
   }
@@ -50,6 +55,7 @@ export class UserController {
   public get jwt(): string {
     return this._jwt;
   }
+
   private _setJWT(JWT: string): void {
     this._jwt = JWT;
   }
@@ -58,6 +64,7 @@ export class UserController {
   public get addresses(): AddressInfo[] {
     return this._addresses;
   }
+
   private _setAddresses(addresses: AddressInfo[]): void {
     this._addresses = addresses;
   }
@@ -66,6 +73,7 @@ export class UserController {
   public get activeAccounts(): Account[] {
     return this._activeAccounts;
   }
+
   private _setActiveAccounts(activeAccounts: Account[]): void {
     this._activeAccounts = activeAccounts;
   }
@@ -74,6 +82,7 @@ export class UserController {
   public get socialAccounts(): SocialAccount[] {
     return this._socialAccounts;
   }
+
   private _setSocialAccounts(socialAccounts: SocialAccount[]): void {
     this._socialAccounts = socialAccounts;
   }
@@ -82,6 +91,7 @@ export class UserController {
   public get selectedChain(): ChainInfo {
     return this._selectedChain;
   }
+
   private _setSelectedChain(selectedChain: ChainInfo): void {
     this._selectedChain = selectedChain;
   }
@@ -90,6 +100,7 @@ export class UserController {
   public get isSiteAdmin(): boolean {
     return this._isSiteAdmin;
   }
+
   private _setSiteAdmin(isAdmin: boolean): void {
     this._isSiteAdmin = isAdmin;
   }
@@ -98,6 +109,7 @@ export class UserController {
   public get disableRichText(): boolean {
     return this._disableRichText;
   }
+
   private _setDisableRichText(disableRichText: boolean): void {
     this._disableRichText = disableRichText;
   }
@@ -107,6 +119,7 @@ export class UserController {
   public get notifications(): NotificationsController {
     return this._notifications;
   }
+
   private _setNotifications(notifications: NotificationsController): void {
     this._notifications = notifications;
   }
@@ -115,6 +128,7 @@ export class UserController {
   public get lastVisited(): object {
     return this._lastVisited;
   }
+
   private _setLastVisited(lastVisited: object): void {
     this._lastVisited = lastVisited;
   }
@@ -123,6 +137,7 @@ export class UserController {
   public get starredCommunities(): StarredCommunity[] {
     return this._starredCommunities;
   }
+
   private _setStarredCommunities(starredCommunities: StarredCommunity[]): void {
     this._starredCommunities = starredCommunities;
   }
@@ -131,6 +146,7 @@ export class UserController {
   public get discussionDrafts(): DraftsController {
     return this._discussionDrafts;
   }
+
   private _setDiscussionDrafts(drafts: DraftsController): void {
     this._discussionDrafts = drafts;
   }
@@ -139,6 +155,7 @@ export class UserController {
   public get unseenPosts(): object {
     return this._unseenPosts;
   }
+
   private _setUnseenPosts(unseenPosts: object): void {
     this._unseenPosts = unseenPosts;
   }
@@ -149,15 +166,19 @@ export class UserController {
   public ephemerallySetActiveAccount(account: Account): void {
     this._setActiveAccount(account);
   }
+
   public setEmail(email: string): void {
     this._setEmail(email);
   }
+
   public setEmailInterval(emailInterval: string): void {
     this._setEmailInterval(emailInterval);
   }
+
   public setEmailVerified(verified: boolean): void {
     this._setEmailVerified(verified);
   }
+
   public setJWT(JWT: string): void {
     this._setJWT(JWT);
   }
@@ -165,9 +186,11 @@ export class UserController {
   public setAddresses(addresses: AddressInfo[]): void {
     this._setAddresses(addresses);
   }
+
   public addAddress(address: AddressInfo): void {
     this._addresses.push(address);
   }
+
   public removeAddress(address: AddressInfo): void {
     this._addresses.splice(
       this._addresses.findIndex((a) => a.address === address.address),
@@ -178,9 +201,11 @@ export class UserController {
   public setActiveAccounts(activeAccounts: Account[]): void {
     this._setActiveAccounts(activeAccounts);
   }
+
   public addActiveAddress(address: Account): void {
     this._activeAccounts.push(address);
   }
+
   public removeActiveAddress(address: Account): void {
     this._activeAccounts.splice(
       this._activeAccounts.findIndex((a) => a.address === address.address),
@@ -191,9 +216,11 @@ export class UserController {
   public setSocialAccounts(socialAccounts: SocialAccount[]): void {
     this._setSocialAccounts(socialAccounts);
   }
+
   public addSocialAccount(social: SocialAccount): void {
     this._socialAccounts.push(social);
   }
+
   public removeSocialAccount(social: SocialAccount): void {
     this._socialAccounts.splice(
       this._socialAccounts.findIndex((s) => s.username === social.username),
@@ -204,6 +231,7 @@ export class UserController {
   public setSelectedChain(selectedChain: ChainInfo): void {
     this._setSelectedChain(selectedChain);
   }
+
   public selectChain(options: { chain: string }): JQueryPromise<void> {
     return $.post(`${app.serverUrl()}/selectChain`, {
       chain: options.chain,
@@ -219,21 +247,25 @@ export class UserController {
           this.setSelectedChain(chain);
         }
       })
-      .catch((e) => console.error('Failed to select node on server'));
+      .catch(() => console.error('Failed to select node on server'));
   }
 
   public setSiteAdmin(isAdmin: boolean): void {
     this._setSiteAdmin(isAdmin);
   }
+
   public setDisableRichText(disableRichText: boolean): void {
     this._setDisableRichText(disableRichText);
   }
+
   public setNotifications(notifications: NotificationsController): void {
     this._setNotifications(notifications);
   }
+
   public setDiscussionDrafts(drafts: DraftsController): void {
     this.setDiscussionDrafts(drafts);
   }
+
   public setLastVisited(lastVisited: object): void {
     this._setLastVisited(lastVisited);
   }
@@ -241,9 +273,11 @@ export class UserController {
   public setStarredCommunities(star: StarredCommunity[]): void {
     this._setStarredCommunities(star);
   }
+
   public addStarredCommunity(star: StarredCommunity): void {
     this._starredCommunities.push(star);
   }
+
   public removeStarredCommunity(star: StarredCommunity): void {
     const index = this._starredCommunities.findIndex(
       (s) => s.user_id === star.user_id && s.chain === star.chain

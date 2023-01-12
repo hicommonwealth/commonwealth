@@ -1,3 +1,4 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import { Pool } from 'pg';
 import _ from 'underscore';
 import type { BrokerConfig } from 'rascal';
@@ -6,7 +7,6 @@ import {
   RascalPublications,
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
-import { factory, formatFilename } from 'common-common/src/logging';
 import Rollbar from 'rollbar';
 import fetch from 'node-fetch';
 import { StatsDController } from 'common-common/src/statsd';
@@ -49,7 +49,7 @@ export function handleFatalListenerError(
   chain_id: string,
   error: Error,
   rollbar?: Rollbar
-) {
+): void {
   log.error(`Listener for ${chain_id} threw an error`, error);
   rollbar?.critical(`Listener for ${chain_id} threw an error`, error);
 
@@ -243,7 +243,7 @@ export async function chainEventsSubscriberInitializer(): Promise<{
       max: 3,
     });
 
-    pool.on('error', (err, client) => {
+    pool.on('error', (err) => {
       log.error('Unexpected error on idle client', err);
     });
   }

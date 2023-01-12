@@ -1,10 +1,9 @@
-import { chain } from 'web3-core/types';
 import type {
-  AbiItem,
   AbiInput,
+  AbiItem,
   AbiOutput,
-  StateMutabilityType,
   AbiType,
+  StateMutabilityType,
 } from 'web3-utils/types';
 
 export function parseAbiItemsFromABI(

@@ -1,14 +1,8 @@
 import { AppError } from 'common-common/src/errors';
 import validateChain from '../middleware/validateChain';
-import type {
-  TypedRequestBody,
-  TypedResponse} from '../types';
-import {
-  success,
-  TypedRequestQuery
-} from '../types';
 import type { DB } from '../models';
-import { BanAttributes } from '../models/ban';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 
 enum SetDiscordBotConfigErrors {
   NoChain = 'Must supply a chain ID',
@@ -43,7 +37,7 @@ const setDiscordBotConfig = async (
     snapshot_channel_id,
   } = req.body;
 
-  const [chain, error] = await validateChain(models, { chain_id });
+  const [error] = await validateChain(models, { chain_id });
   if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   if (snapshot_channel_id) {
@@ -115,7 +109,7 @@ const setDiscordBotConfig = async (
   }
 
   try {
-    const updatedConfig = await configEntry.update(
+    await configEntry.update(
       {
         chain_id,
         bot_id,

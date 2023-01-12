@@ -8,7 +8,7 @@ export const Errors = {
   NeedLimit: 'Must provide limit to fetch events',
 };
 
-const eventActivity = async (
+const eventActivity: any = async (
   models: DB,
   req: Request,
   res: Response,

@@ -128,7 +128,6 @@ async function main(): Promise<any> {
   return listener;
 }
 
-main().then((listener) => {
-  const temp = listener;
+main().then(() => {
   console.log('Subscribed...');
 });

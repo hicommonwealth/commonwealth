@@ -1,15 +1,15 @@
-import _ from 'lodash';
-import BN from 'bn.js';
-import type { IApp } from 'state';
-import CosmosChain from 'controllers/chain/cosmos/chain';
-import type { CosmosToken } from 'controllers/chain/cosmos/types';
-import { Account } from 'models';
 import type {
-  MsgSendEncodeObject,
   MsgDelegateEncodeObject,
+  MsgSendEncodeObject,
   MsgUndelegateEncodeObject,
   MsgWithdrawDelegatorRewardEncodeObject,
 } from '@cosmjs/stargate';
+import BN from 'bn.js';
+import CosmosChain from 'controllers/chain/cosmos/chain';
+import type { CosmosToken } from 'controllers/chain/cosmos/types';
+import _ from 'lodash';
+import { Account } from 'models';
+import type { IApp } from 'state';
 import type CosmosAccounts from './accounts';
 
 export default class CosmosAccount extends Account {

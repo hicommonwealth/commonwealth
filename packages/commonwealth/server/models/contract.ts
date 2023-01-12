@@ -5,7 +5,7 @@ import type {
   CommunityContractAttributes,
   CommunityContractInstance,
 } from './community_contract';
-import type { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ContractAttributes = {
   id: number;

@@ -6,7 +6,7 @@ import { addPrefix, factory } from '../logging';
 export class httpPostHandler implements IEventHandler {
   public readonly url;
 
-  constructor(url) {
+  constructor(url: string) {
     this.url = url;
   }
 

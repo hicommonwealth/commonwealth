@@ -1,21 +1,13 @@
 import type { RabbitMQController } from 'common-common/src/rabbitmq/rabbitMQController';
-import type {
-  RmqCENotificationCUD} from 'common-common/src/rabbitmq/types';
-import {
-  RascalPublications
-} from 'common-common/src/rabbitmq/types';
+import type { RmqCENotificationCUD } from 'common-common/src/rabbitmq/types';
+import { RascalPublications } from 'common-common/src/rabbitmq/types';
 
 import { addPrefix, factory } from '../../../src/logging';
 import type { ChainEventAttributes } from '../../database/models/chain_event';
 import type { DB } from '../../database/database';
 
-import type {
-  CWEvent,
-  IChainEventData,
-  IChainEventKind} from 'chain-events/src';
-import {
-  IEventHandler,
-} from 'chain-events/src';
+import type { CWEvent, IChainEventKind } from 'chain-events/src';
+import { IEventHandler } from 'chain-events/src';
 
 export default class extends IEventHandler {
   public readonly name = 'Notification Producer';
@@ -28,7 +20,8 @@ export default class extends IEventHandler {
     super();
   }
 
-  public async handle(event: CWEvent<IChainEventData>, dbEvent) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public async handle(event: CWEvent, dbEvent) {
     const log = factory.getLogger(
       addPrefix(__filename, [event.network, event.chain])
     );

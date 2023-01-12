@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_divider.scss';
+import m from 'mithril';
+import { getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { getClasses } from './helpers';
 
 type DividerAttrs = {
   isVertical?: boolean;

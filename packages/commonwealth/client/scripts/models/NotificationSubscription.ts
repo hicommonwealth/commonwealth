@@ -1,10 +1,9 @@
+import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
+import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import moment from 'moment';
 
 import type { SubscriptionInstance } from 'server/models/subscription';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
-import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import type { Comment as CommentT, Thread as ThreadT } from '.';
-import type { ChainInfo } from '.';
+import type { ChainInfo, Comment as CommentT, Thread as ThreadT } from '.';
 import type { IUniqueId } from './interfaces';
 
 class NotificationSubscription {
@@ -22,9 +21,11 @@ class NotificationSubscription {
   public get immediateEmail() {
     return this._immediateEmail;
   }
+
   public enableImmediateEmail() {
     this._immediateEmail = true;
   }
+
   public disableImmediateEmail() {
     this._immediateEmail = false;
   }
@@ -33,9 +34,11 @@ class NotificationSubscription {
   public get isActive() {
     return this._isActive;
   }
+
   public enable() {
     this._isActive = true;
   }
+
   public disable() {
     this._isActive = false;
   }

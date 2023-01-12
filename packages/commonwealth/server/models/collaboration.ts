@@ -1,8 +1,8 @@
 import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
-import type { ModelStatic, ModelInstance } from './types';
-import type { AddressInstance, AddressAttributes } from './address';
-import type { ThreadInstance, ThreadAttributes } from './thread';
+import type { AddressAttributes, AddressInstance } from './address';
+import type { ThreadAttributes, ThreadInstance } from './thread';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CollaborationAttributes = {
   address_id: number;

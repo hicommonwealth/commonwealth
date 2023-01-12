@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/comments/comments_tree.scss';
+import m from 'mithril';
+import type { AnyProposal, Comment as CommentType } from 'models';
+import { Thread } from 'models';
 
 import app from 'state';
-import type { Comment as CommentType, AnyProposal } from 'models';
-import { Thread } from 'models';
-import { Comment } from './comment';
 import { CWValidationText } from '../component_kit/cw_validation_text';
+import { Comment } from './comment';
 import { CreateComment } from './create_comment';
 import { jumpHighlightComment } from './helpers';
 

@@ -1,32 +1,26 @@
-import type {
-  Near as NearApi,
-  ConnectConfig} from 'near-api-js';
+import { NearToken } from 'adapters/chain/near/types';
+import BN from 'bn.js';
+import { uuidv4 } from 'lib/util';
+import * as m from 'mithril';
+import type { ChainInfo, IChainModule, ITXModalData } from 'models';
+import moment from 'moment';
+import type { ConnectConfig, Near as NearApi } from 'near-api-js';
 import {
   Account as NearApiAccount,
   connect as nearConnect,
-  WalletAccount
+  WalletAccount,
 } from 'near-api-js';
+import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import type {
   CodeResult,
   NodeStatusResult,
 } from 'near-api-js/lib/providers/provider';
-import type { FunctionCallOptions } from 'near-api-js/lib/account';
 import type { Action, FunctionCall } from 'near-api-js/lib/transaction';
-import { uuidv4 } from 'lib/util';
-import type { ChainInfo, IChainModule, ITXModalData } from 'models';
-import { NearToken } from 'adapters/chain/near/types';
-import BN from 'bn.js';
 import type { IApp } from 'state';
 import { ApiStatus } from 'state';
-import moment from 'moment';
-import * as m from 'mithril';
-import type {
-  NearSputnikConfig,
-  NearSputnikPolicy} from './sputnik/types';
-import {
-  isGroupRole
-} from './sputnik/types';
-import type { NearAccounts, NearAccount } from './account';
+import type { NearAccount, NearAccounts } from './account';
+import type { NearSputnikConfig, NearSputnikPolicy } from './sputnik/types';
+import { isGroupRole } from './sputnik/types';
 
 export interface IDaoInfo {
   contractId: string;
@@ -58,7 +52,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   public get denom() {
     return this.app.chain.currency;
   }
+
   private _decimals: BN;
+
   public coins(n: number | string | BN, inDollars = false) {
     return new NearToken(n, inDollars, this._decimals);
   }
@@ -79,6 +75,7 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
   }
 
   private _networkId = 'testnet';
+
   public get isMainnet() {
     return this._networkId === 'mainnet';
   }
@@ -102,7 +99,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         : 'mainnet';
     this._config = {
       networkId: this.isMainnet ? 'mainnet' : 'testnet',
-      nodeUrl: chain.node.url,
+      nodeUrl: this.isMainnet
+        ? 'https://rpc.mainnet.near.org'
+        : 'https://rpc.testnet.near.org',
       walletUrl: this.isMainnet
         ? 'https://wallet.near.org/'
         : 'https://wallet.testnet.near.org/',

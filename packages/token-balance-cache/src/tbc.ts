@@ -5,16 +5,15 @@ import JobRunner from 'common-common/src/cacheJobRunner';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainNetwork } from 'common-common/src/types';
 
-import type {
+import {
   BalanceProvider,
   BalanceProviderResp,
   ChainNodeResp,
   ICache,
   IChainNode,
   ITokenBalanceCache,
-  TokenBalanceResp} from './types';
-import {
-  FetchTokenBalanceErrors
+  FetchTokenBalanceErrors,
+  TokenBalanceResp,
 } from './types';
 import { TbcStatsDSender } from './tbcStatsDSender';
 

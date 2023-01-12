@@ -1,17 +1,16 @@
 import * as Rascal from 'rascal';
-import { factory, formatFilename } from 'common-common/src/logging';
 import type {
   RascalPublications,
   RascalSubscriptions,
-  TRmqMessages} from './types';
-import {
-  RmqMsgFormatError
+  TRmqMessages,
 } from './types';
+import { RmqMsgFormatError } from './types';
 import type Rollbar from 'rollbar';
 import type { Sequelize } from 'sequelize';
 import type { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
 import type { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
 import type { ChainEventTypeModelStatic } from 'chain-events/services/database/models/chain_event_type';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 

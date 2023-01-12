@@ -1,9 +1,9 @@
-import moment from 'moment';
-import type { Topic, Thread } from 'models';
-import { AbridgedThread, Profile } from 'models';
-import app from 'state';
-import $ from 'jquery';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
+import $ from 'jquery';
+import type { Thread, Topic } from 'models';
+import { AbridgedThread, Profile } from 'models';
+import moment from 'moment';
+import app from 'state';
 
 export interface IAbridgedThreadFromServer {
   id: number;

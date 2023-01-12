@@ -1,14 +1,13 @@
-import { isU8a, isHex } from '@polkadot/util';
+import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import type {
-  Permissions} from 'common-common/src/permissions';
+import type { Permissions } from 'common-common/src/permissions';
 import {
   BASE_PERMISSIONS,
-  computePermissions
+  computePermissions,
 } from 'common-common/src/permissions';
 
 import { ProposalType } from 'common-common/src/types';
@@ -314,6 +313,7 @@ export function aggregatePermissions(
   function compare(o1: RoleObject, o2: RoleObject) {
     return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
   }
+
   roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{

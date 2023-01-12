@@ -1,11 +1,11 @@
-import models from '../database';
-import { QueryTypes } from 'sequelize';
 import {
   EntityEventKind,
   eventToEntity,
   SupportedNetwork,
 } from 'chain-events/src';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { QueryTypes } from 'sequelize';
+import models from '../database';
 
 async function main() {
   await models.sequelize.transaction(async (t) => {
@@ -57,7 +57,7 @@ async function main() {
       if (!temp) {
         return false;
       }
-      const [entityKind, updateType] = temp;
+      const updateType = temp[1];
       return updateType === EntityEventKind.Create;
     });
 

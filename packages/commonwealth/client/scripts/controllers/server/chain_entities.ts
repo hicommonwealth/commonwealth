@@ -1,24 +1,24 @@
 /* eslint-disable no-restricted-syntax */
-import $ from 'jquery';
-
-import { ChainEntityStore } from 'stores';
+import type {
+  CWEvent,
+  IChainEntityKind,
+  IEventProcessor,
+  IEventSubscriber,
+} from 'chain-events/src';
+import {
+  eventToEntity,
+  getUniqueEntityKey,
+  SupportedNetwork,
+} from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { getBaseUrl, getFetch } from 'helpers/getUrl';
+import $ from 'jquery';
 import type { ChainInfo } from 'models';
 import { ChainEntity, ChainEvent, ChainEventType } from 'models';
 import app from 'state';
-import type {
-  CWEvent,
-  IEventProcessor,
-  IEventSubscriber,
-  IChainEntityKind} from 'chain-events/src';
-import {
-  eventToEntity,
-  SubstrateTypes,
-  SupportedNetwork,
-  getUniqueEntityKey
-} from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types'
-import { getBaseUrl, getFetch } from 'helpers/getUrl';
+
+import { ChainEntityStore } from 'stores';
 import { notifyError } from '../app/notifications';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
@@ -34,17 +34,17 @@ export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   );
 }
 
-const get = (route, args, callback) => {
-  return $.get(app.serverUrl() + route, args)
-    .then((resp) => {
-      if (resp.status === 'Success') {
-        callback(resp.result);
-      } else {
-        console.error(resp);
-      }
-    })
-    .catch((e) => console.error(e));
-};
+// const get = (route, args, callback) => {
+//   return $.get(app.serverUrl() + route, args)
+//     .then((resp) => {
+//       if (resp.status === 'Success') {
+//         callback(resp.result);
+//       } else {
+//         console.error(resp);
+//       }
+//     })
+//     .catch((e) => console.error(e));
+// };
 
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
@@ -53,6 +53,7 @@ class ChainEntityController {
   public get store() {
     return this._store;
   }
+
   private _subscriber: IEventSubscriber<any, any>;
   private _handlers: { [t: string]: EntityHandler[] } = {};
 
@@ -222,7 +223,7 @@ class ChainEntityController {
         title,
         chain: app.activeChainId(),
       },
-      success: (response) => {
+      success: () => {
         chainEntity.title = title;
       },
       error: (err) => {

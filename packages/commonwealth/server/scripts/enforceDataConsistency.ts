@@ -1,5 +1,5 @@
-import models from '../database';
 import { QueryTypes } from 'sequelize';
+import models from '../database';
 
 /**
  * This script is meant as the worst case scenario recovery tool or as a method of ensuring consistency without a trace
@@ -10,7 +10,8 @@ import { QueryTypes } from 'sequelize';
  * `ts-node enforceDataConsistency.ts run-as-script [Chain-event DB URI]`
  *
  * WARNING:
- * Requires having the dbLink extension created/enabled by a superuser on each of the involved databases `create extension dblink;`
+ * Requires having the dbLink extension created/enabled by a superuser on each of the involved databases
+ * `create extension dblink;`
  * This script should be run while the queues are empty + the chain-event listeners are offline to avoid duplicate
  * data errors. For example if this script inserts a chain-event-type that is also in a queue, the queue processor will
  * throw when it attempts to insert and that message will be retried and eventually dead-lettered unnecessarily.
@@ -48,8 +49,8 @@ export async function enforceDataConsistency(
       WITH existingCeIds AS (SELECT ce_id FROM "ChainEntityMeta")
       INSERT INTO "ChainEntityMeta" (ce_id, chain, author, type_id)
       SELECT "AllChainEntities".id as ce_id, chain, author, type_id
-      FROM dblink('${ce_db_uri}',
-                  'SELECT id, chain, author, type_id FROM "ChainEntities";') as "AllChainEntities"(id int, chain varchar(255), author varchar(255), type_id varchar(255))
+      FROM dblink('${ce_db_uri}', 'SELECT id, chain, author, type_id FROM "ChainEntities";') as
+                   "AllChainEntities"(id int, chain varchar(255), author varchar(255), type_id varchar(255))
       WHERE "AllChainEntities".id NOT IN (SELECT * FROM existingCeIds)
       RETURNING ce_id;
   `;

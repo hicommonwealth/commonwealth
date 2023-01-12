@@ -6,14 +6,13 @@ import type { Listener } from '@ethersproject/providers';
 
 import type {
   // IERC20__factory,
-  IProjectBaseFactory} from '../../contractTypes';
-import {
-  ICuratedProject__factory
+  IProjectBaseFactory,
 } from '../../contractTypes';
+import { ICuratedProject__factory } from '../../contractTypes';
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import type { RawEvent, Api, ProjectApi} from './types';
+import type { RawEvent, Api, ProjectApi } from './types';
 import { CommonContractType } from './types';
 
 export async function constructProjectApi(

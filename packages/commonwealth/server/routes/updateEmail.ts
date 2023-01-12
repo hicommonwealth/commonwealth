@@ -1,16 +1,17 @@
-import Sequelize from 'sequelize';
-import type { Request, Response, NextFunction } from 'express';
-import moment from 'moment';
-import { LOGIN_RATE_LIMIT_MINS, SERVER_URL, SENDGRID_API_KEY } from '../config';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DynamicTemplate } from '../../shared/types';
-import { WalletId } from 'common-common/src/types';
-import type { DB } from '../models';
-import { AppError } from 'common-common/src/errors';
 import sgMail from '@sendgrid/mail';
-sgMail.setApiKey(SENDGRID_API_KEY);
+import { AppError } from 'common-common/src/errors';
+import { WalletId } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
+import Sequelize from 'sequelize';
+import { DynamicTemplate } from '../../shared/types';
+import { LOGIN_RATE_LIMIT_MINS, SENDGRID_API_KEY, SERVER_URL } from '../config';
+import type { DB } from '../models';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
+
+sgMail.setApiKey(SENDGRID_API_KEY);
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

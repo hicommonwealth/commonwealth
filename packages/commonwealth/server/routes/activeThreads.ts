@@ -1,6 +1,5 @@
-import type { Request, Response, NextFunction } from 'express';
-import { AppError, ServerError } from 'common-common/src/errors';
-import validateChain from '../middleware/validateChain';
+import { ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import type { DB } from '../models';
 import getThreadsWithCommentCount from '../util/getThreadCommentsCount';
 

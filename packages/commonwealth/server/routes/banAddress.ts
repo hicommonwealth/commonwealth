@@ -1,9 +1,9 @@
 import { AppError } from 'common-common/src/errors';
+import type { DB } from '../models';
+import type { BanAttributes, BanInstance } from '../models/ban';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
-import type { DB } from '../models';
 import validateRoles from '../util/validateRoles';
-import type { BanAttributes, BanInstance } from '../models/ban';
 
 enum BanAddressErrors {
   NoChain = 'Must supply a chain ID',

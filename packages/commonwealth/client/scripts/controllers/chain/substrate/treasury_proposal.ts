@@ -1,27 +1,22 @@
 import type { ApiPromise } from '@polkadot/api';
-import { formatCoin } from 'adapters/currency';
 import type {
   ISubstrateTreasuryProposal,
   SubstrateCoin,
 } from 'adapters/chain/substrate/types';
+import { formatCoin } from 'adapters/currency';
+import { SubstrateTypes } from 'chain-events/src/types';
+import { ProposalType } from 'common-common/src/types';
 import type {
-  ProposalEndTime,
-  ITXModalData,
   BinaryVote,
   ChainEntity,
-  ChainEvent} from 'models';
-import {
-  Proposal,
-  ProposalStatus,
-  VotingType,
-  VotingUnit
+  ChainEvent,
+  ITXModalData,
+  ProposalEndTime,
 } from 'models';
-import { ProposalType } from 'common-common/src/types';
-import { SubstrateTypes } from 'chain-events/src/types';
-import { chainEntityTypeToProposalSlug } from 'identifiers';
-import type SubstrateChain from './shared';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
 import type SubstrateAccounts from './account';
 import type { SubstrateAccount } from './account';
+import type SubstrateChain from './shared';
 import type SubstrateTreasury from './treasury';
 
 const backportEventToAdapter = (
@@ -49,9 +44,11 @@ export class SubstrateTreasuryProposal extends Proposal<
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
+
   public generateTitle() {
     return `Proposal for ${formatCoin(this.value)}`;
   }
+
   public get description() {
     return null;
   }
@@ -75,15 +72,20 @@ export class SubstrateTreasuryProposal extends Proposal<
   public get votingType() {
     return VotingType.None;
   }
+
   public get votingUnit() {
     return VotingUnit.None;
   }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public canVoteFrom(account) {
     return false;
   }
+
   public get support() {
     return null;
   }
+
   public get turnout() {
     return null;
   }
@@ -92,6 +94,7 @@ export class SubstrateTreasuryProposal extends Proposal<
     if (this.awarded) return ProposalStatus.Passed;
     return ProposalStatus.None;
   }
+
   get endTime(): ProposalEndTime {
     return { kind: 'unavailable' };
   }
@@ -199,6 +202,7 @@ export class SubstrateTreasuryProposal extends Proposal<
   // none
 
   // TRANSACTIONS
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public submitVoteTx(vote: BinaryVote<SubstrateCoin>): ITXModalData {
     throw new Error('Cannot vote on a treasury proposal');
   }

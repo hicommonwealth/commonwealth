@@ -1,9 +1,10 @@
 import type {
   RabbitMQController,
-  RmqCETypeCUD} from 'common-common/src/rabbitmq';
+  RmqCETypeCUD,
+} from 'common-common/src/rabbitmq';
 import {
   RascalPublications,
-  RepublishFailedMessages
+  RepublishFailedMessages,
 } from 'common-common/src/rabbitmq';
 import * as Sequelize from 'sequelize';
 
@@ -19,7 +20,7 @@ export class RepublishMessages extends RepublishFailedMessages<DB> {
     super(_rmqController, _models, 180000);
   }
 
-  protected async job() {
+  protected async job(): void {
     const result = await this._models.ChainEventType.findAll({
       where: {
         queued: {

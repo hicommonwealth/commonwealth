@@ -6,12 +6,9 @@ import {
   RabbitMQController,
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
-import { factory, formatFilename } from 'common-common/src/logging';
 import fetchNewSnapshotProposal from './utils/fetchSnapshot';
 import { DEFAULT_PORT, RABBITMQ_URI } from './config';
 import { StatsDController } from 'common-common/src/statsd';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const app = express();
 const port = process.env.PORT || DEFAULT_PORT;
