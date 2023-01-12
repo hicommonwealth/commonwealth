@@ -2,7 +2,7 @@
 
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import Infinite from 'mithril-infinite';
+import Infinite from 'lib/mithril-infinite';
 import { Button, PopoverMenu } from 'construct-ui';
 
 import 'components/header/notifications_menu.scss';

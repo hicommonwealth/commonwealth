@@ -2,7 +2,7 @@
 import 'pages/notifications_page.scss';
 
 import m from 'mithril';
-import Infinite from 'mithril-infinite';
+import Infinite from 'lib/mithril-infinite';
 import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
 
 import app from 'state';
