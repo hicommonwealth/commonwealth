@@ -226,7 +226,7 @@ export async function updatePermission(
     models,
     address_id,
     chain_id,
-    Action.EDIT_PERMISSION
+    Action.EDIT_PERMISSIONS
   );
   if (!permitted) {
     return res.status(403).json({ error: 'Not permitted to edit permission' });

@@ -3,7 +3,6 @@ import { NextFunction } from 'express';
 import { Op } from 'sequelize';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase } from 'common-common/src/types';
-import { Action } from 'common-common/src/permissions';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
 import { DB } from '../models';
 import { ChainAttributes } from '../models/chain';

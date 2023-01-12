@@ -20,10 +20,8 @@ import { AvatarUpload } from 'views/components/avatar_upload';
 import { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
-  addPermission,
-  isPermitted,
-  removePermission,
-} from 'common-common/src/permissions';
+  PermissionManager,
+} from 'commonwealth/server/util/permissions';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
 import {
@@ -82,6 +80,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   snapshotChannels: { id: string; name: string }[];
   selectedSnapshotChannel: { id: string; name: string } | null;
   snapshotNotificationsEnabled: boolean;
+  permissionsManager = new PermissionManager();
 
   oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -94,7 +93,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !isPermitted(
+    this.chatEnabled = !this.permissionsManager.isPermitted(
       chain.defaultDenyPermissions,
       Action.VIEW_CHAT_CHANNELS
     );
@@ -410,12 +409,12 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
 
             try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = removePermission(
+                this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
                   default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );
               } else {
-                this.default_deny_permissions = addPermission(
+                this.default_deny_permissions = this.permissionsManager.addDenyPermission(
                   default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );

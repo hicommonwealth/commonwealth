@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 
 import 'components/sidebar/index.scss';
 
-import { Action } from 'common-common/src/permissions';
+import { Action } from 'commonwealth/server/util/permissions';
 
 import app from 'state';
 import { SubscriptionButton } from 'views/components/subscription_button';

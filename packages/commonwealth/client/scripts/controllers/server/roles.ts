@@ -13,7 +13,7 @@ import {
   Action,
   defaultEveryonePermissions,
   PermissionManager,
-} from '../../../../server/util/permissions';
+} from 'commonwealth/server/util/permissions';
 import { UserController } from './user';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {

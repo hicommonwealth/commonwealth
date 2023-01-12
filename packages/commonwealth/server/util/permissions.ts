@@ -96,7 +96,7 @@ export class PermissionManager {
     this.defaultMemberPermissions = defaultMemberPermissions;
   }
 
-  public addAllowImplicitPermission(
+  public addAllowPermission(
     allowPermission: bigint,
     actionNumber: number
   ): bigint {
@@ -105,7 +105,7 @@ export class PermissionManager {
     return newAllowPermission;
   }
 
-  public removeAllowImplicitPermission(
+  public removeAllowPermission(
     allowPermission: bigint,
     actionNumber: number
   ): bigint {
@@ -114,7 +114,7 @@ export class PermissionManager {
     return newAllowPermission;
   }
 
-  public addDenyImplicitPermission(
+  public addDenyPermission(
     denyPermission: bigint,
     actionNumber: number
   ): bigint {
@@ -123,7 +123,7 @@ export class PermissionManager {
     return newDenyPermission;
   }
 
-  public removeDenyImplicitPermission(
+  public removeDenyPermission(
     denyPermission: bigint,
     actionNumber: number
   ): bigint {
@@ -138,10 +138,10 @@ export class PermissionManager {
       const action = permissions[key];
       if (Array.isArray(action)) {
         for (const a of action) {
-          permission |= BigInt(1) << a;
+          permission |= BigInt(1) << Number(a);
         }
       } else {
-        permission |= BigInt(1) << action;
+        permission |= BigInt(1) << Number(action);
       }
     }
     return permission;

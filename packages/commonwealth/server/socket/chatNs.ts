@@ -1,7 +1,7 @@
 import { Server } from 'socket.io';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import { Action } from 'common-common/src/permissions';
+import { Action } from '../../util/permissions';
 import { addPrefix, factory } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
 import emitNotifications from '../util/emitNotifications';
