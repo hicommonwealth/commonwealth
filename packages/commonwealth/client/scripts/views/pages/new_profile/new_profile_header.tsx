@@ -11,7 +11,7 @@ import { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import { SocialAccounts } from './new_profile_social_accounts';
+import { SocialAccounts } from '../../components/social_accounts';
 
 type NewProfileHeaderAttrs = {
   address: string;

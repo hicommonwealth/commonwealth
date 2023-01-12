@@ -1,0 +1,25 @@
+@import '../shared';
+
+.ManageProfiles {
+  margin: 48px 190px;
+
+  @include mediumInclusive {
+    margin: 48px 160px;
+  }
+
+  @include mediumSmallInclusive {
+    margin: 24px 40px;
+  }
+
+  @include smallInclusive {
+    margin: 40px 32px;
+  }
+
+  .title {
+    margin-bottom: 8px;
+  }
+
+  .description {
+    margin-bottom: 32px;
+  }
+}
