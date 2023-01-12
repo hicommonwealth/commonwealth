@@ -8,15 +8,12 @@ import {
   RolePermission,
   ChainInfo,
 } from 'models';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
 import {
   Action,
-  BASE_PERMISSIONS,
-  computePermissions,
-  isPermitted,
-  PermissionError,
-  Permissions,
-} from 'common-common/src/permissions';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
+  defaultEveryonePermissions,
+  PermissionManager,
+} from '../../../../server/util/permissions';
 import { UserController } from './user';
 
 const getPermissionLevel = (permission: RolePermission | undefined) => {
@@ -35,6 +32,8 @@ const getPermissionLevel = (permission: RolePermission | undefined) => {
 };
 
 export class RolesController {
+  private permissionManager = new PermissionManager();
+
   constructor(public readonly User: UserController) {}
 
   private _roles: RoleInfo[] = [];
@@ -343,7 +342,7 @@ export function isActiveAddressPermitted(
       allow: chain_info.defaultAllowPermissions,
       deny: chain_info.defaultDenyPermissions,
     });
-    if (!isPermitted(permission, action)) {
+    if (!this.permissionsManager.isPermitted(permission, action)) {
       return false;
     }
     return true;
@@ -351,13 +350,15 @@ export function isActiveAddressPermitted(
   // If no roles are given for the chain, compute permissions with chain default permissions
   else {
     // compute permissions with chain default permissions
-    const permission = computePermissions(BASE_PERMISSIONS, [
+    const permission =
+      this.permissionsManager.computePermissions(
+        defaultEveryonePermissions, [
       {
         allow: chain_info.defaultAllowPermissions,
         deny: chain_info.defaultDenyPermissions,
       },
     ]);
-    if (!isPermitted(permission, action)) {
+    if (!this.permissionsManager.isPermitted(permission, action)) {
       return false;
     }
     return true;

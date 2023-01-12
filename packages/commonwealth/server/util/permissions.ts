@@ -1,5 +1,3 @@
-import { DB } from '../models';
-
 export enum AccessLevel {
   Admin = 'admin',
   Moderator = 'moderator',
@@ -85,15 +83,13 @@ export const defaultEveryonePermissions: Permissions = {
 };
 
 export class PermissionManager {
-  private models: DB;
   private action: Action;
   private defaultEveryonePermissions: Permissions;
   private defaultAdminPermissions: Permissions;
   private defaultModeratorPermissions: Permissions;
   private defaultMemberPermissions: Permissions;
 
-  constructor(_models: DB) {
-    this.models = _models;
+  constructor() {
     this.defaultEveryonePermissions = defaultEveryonePermissions;
     this.defaultAdminPermissions = defaultAdminPermissions;
     this.defaultModeratorPermissions = defaultModeratorPermissions;

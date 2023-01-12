@@ -302,7 +302,7 @@ export async function isAddressPermitted(
 ): Promise<PermissionError | boolean> {
   const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
 
-  const permissionsManager = new PermissionManager(models)
+  const permissionsManager = new PermissionManager()
 
   // fetch the default allow and deny permissions for the chain
   const chain = await models.Chain.findOne({ where: { id: chain_id } });
