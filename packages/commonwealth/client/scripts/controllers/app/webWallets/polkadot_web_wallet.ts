@@ -1,3 +1,5 @@
+import app from 'state';
+
 import {
   web3Accounts,
   web3Enable,
@@ -11,9 +13,9 @@ import { SignerPayloadRaw } from '@polkadot/types/types/extrinsic';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
 import { addressSwapper } from 'commonwealth/shared/utils';
+import { CanvasData } from 'shared/adapters/shared';
 
-class PolkadotWebWalletController
-  implements IWebWallet<InjectedAccountWithMeta>
+class PolkadotWebWalletController implements IWebWallet<InjectedAccountWithMeta>
 {
   // GETTERS/SETTERS
   private _enabled: boolean;
@@ -54,24 +56,26 @@ class PolkadotWebWalletController
     return injector.signer;
   }
 
+  public getChainId() {
+    return app.chain?.id || this.defaultNetwork;
+  }
+
+  public async getRecentBlock(chainIdentifier: string) {
+    return null
+  }
+
   // ACTIONS
-  public async signWithAccount(account: Account): Promise<string> {
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+    const message = stringToHex(JSON.stringify(canvasMessage));
+
     const signer = await this.getSigner(account.address);
-    const token = account.validationToken;
     const payload: SignerPayloadRaw = {
       address: account.address,
-      data: stringToHex(token),
+      data: message,
       type: 'bytes',
     };
     const signature = (await signer.signRaw(payload)).signature;
     return signature;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   public async enable() {

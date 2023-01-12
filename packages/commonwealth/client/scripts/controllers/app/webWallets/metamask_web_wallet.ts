@@ -3,12 +3,15 @@ declare let window: any;
 import app from 'state';
 import Web3 from 'web3';
 import $ from 'jquery';
-import { provider } from 'web3-core';
+import {
+  provider,
+} from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, BlockInfo, IWebWallet } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
+import { CanvasData } from 'shared/adapters/shared';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -47,66 +50,41 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return this._web3;
   }
 
-  public async getRecentBlock(): Promise<BlockInfo> {
-    const block = await this._web3.givenProvider.request({
-      method: 'eth_getBlockByNumber',
-      params: ['latest', false],
-    });
+  public getChainId() {
+    // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
+    // and node? because the chain might not have a node provided
+    return app.chain?.meta.node?.ethChainId || 1;
+  }
+
+  public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
+    const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
 
     return {
       number: hexToNumber(block.number),
       hash: block.hash,
       timestamp: hexToNumber(block.timestamp),
-    };
+    }
   }
 
-  public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.sign(
-      this._web3.utils.sha3(message),
-      this.accounts[0]
-    );
-    return signature;
-  }
-
-  public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const sessionPublicAddress = app.sessions.getOrCreateAddress(
-      app.chain?.meta.node.ethChainId || 1
-    );
-    const msgParams = await constructTypedMessage(
-      this.accounts[0],
-      app.chain?.meta.node.ethChainId || 1,
-      sessionPublicAddress,
-      validationBlockInfo
-    );
+  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+    const typedCanvasMessage = await constructTypedCanvasMessage(canvasMessage);
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
-      params: [this._accounts[0], JSON.stringify(msgParams)],
+      params: [account.address, JSON.stringify(typedCanvasMessage)],
     });
     return signature;
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(
-      account.validationBlockInfo
-    );
-    return webWalletSignature;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
-  }
-
   private async switchWalletNetworks(ethChainId: string | number): Promise<void> {
+  // ACTIONS
     // TODO: use https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods to switch active
     // chain according to currently active node, if one exists
     console.log('Attempting to enable Metamask');
     this._enabling = true;
     try {
       // default to ETH
-      const chainId = ethChainId || 1;
+      const chainId = ethChainId || await this.getChainId();
+
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
       // TODO: does this come after? I think this is supposed to be called instead of web3.eth.getAccounts
