@@ -60,6 +60,7 @@ const createContract = async (
     decimals,
     chain_node_id,
     balance_type,
+    eth_chain_id
   } = req.body;
 
   if (!req.user) {
@@ -120,7 +121,7 @@ const createContract = async (
   // override provided URL for eth chains (typically ERC20) with stored, unless none found
   const node = await models.ChainNode.findOne({
     where: {
-      id: chain_node_id,
+      eth_chain_id,
     },
   });
 

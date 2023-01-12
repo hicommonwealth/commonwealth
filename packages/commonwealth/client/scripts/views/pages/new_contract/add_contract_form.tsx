@@ -40,6 +40,7 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
     symbol: '',
     token_name: '',
     decimals: 0,
+    ethChainId: 1
   };
 
   oninit(vnode: m.Vnode<EthChainAttrs>) {
@@ -159,6 +160,7 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
                 decimals,
                 nickname: contractNickname,
                 abiNickname: abiNickname !== '' ? abiNickname : undefined,
+                eth_chain_id: this.form.ethChainId,
               });
               if (res) {
                 this.status = 'success';

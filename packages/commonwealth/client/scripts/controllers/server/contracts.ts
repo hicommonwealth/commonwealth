@@ -158,6 +158,7 @@ class ContractsController {
     token_name,
     decimals,
     nickname,
+    eth_chain_id
   }: {
     community: string;
     balance_type: BalanceType;
@@ -171,6 +172,7 @@ class ContractsController {
     token_name: string;
     decimals: number;
     nickname: string;
+    eth_chain_id: number;
   }) {
     const response = await $.post(`${app.serverUrl()}/createContract`, {
       community,
@@ -186,6 +188,7 @@ class ContractsController {
       decimals,
       nickname,
       abiNickname,
+      eth_chain_id
     });
     const responseContract = response['result']['contract'];
     const { id, type, is_factory } = responseContract;
