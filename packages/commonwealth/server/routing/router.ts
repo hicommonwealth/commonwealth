@@ -165,8 +165,6 @@ import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import startSsoLogin from '../routes/startSsoLogin';
 
-
-
 function setupRouter(
   app: Express,
   models: DB,
