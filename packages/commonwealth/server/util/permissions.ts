@@ -83,10 +83,10 @@ export const everyonePermissions: Permissions = {
 };
 
 export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
-    [AccessLevel.Admin, adminPermissions],
-    [AccessLevel.Moderator, moderatorPermissions],
-    [AccessLevel.Member, memberPermissions],
-    [AccessLevel.Everyone, everyonePermissions],
+  [AccessLevel.Admin, adminPermissions],
+  [AccessLevel.Moderator, moderatorPermissions],
+  [AccessLevel.Member, memberPermissions],
+  [AccessLevel.Everyone, everyonePermissions],
 ]);
 
 export class PermissionManager {
@@ -138,10 +138,10 @@ export class PermissionManager {
       const action = permissions[key];
       if (Array.isArray(action)) {
         for (const a of action) {
-          permission |= BigInt(1) << Number(a);
+          permission |= 1n << BigInt(a);
         }
       } else {
-        permission |= BigInt(1) << Number(action);
+        permission |= 1n << BigInt(action);
       }
     }
     return permission;

@@ -4,10 +4,10 @@ import {
   AccessLevel,
   Permissions,
   Action,
-  adminPermissions,
-  moderatorPermissions,
-  memberPermissions,
-  everyonePermissions,
+  defaultAdminPermissions,
+  defaultModeratorPermissions,
+  defaultMemberPermissions,
+  defaultEveryonePermissions,
 } from '../../../server/util/permissions';
 
 function permissionsToBigInt(permissions: Permissions): bigint {
@@ -84,7 +84,7 @@ describe('PermissionManager', () => {
 
   describe('computePermissions for each AccessLevel', () => {
     it('should compute permissions correctly for Admin access level', () => {
-      const base = adminPermissions;
+      const base = defaultAdminPermissions;
       const assignments = [
         { allow: BigInt(1) << BigInt(Action.CREATE_CHAT), deny: 0n },
       ];
@@ -99,7 +99,7 @@ describe('PermissionManager', () => {
     });
 
     it('should compute permissions correctly for Moderator access level', () => {
-      const base = moderatorPermissions;
+      const base = defaultModeratorPermissions;
       const assignments = [
         { allow: BigInt(1) << BigInt(Action.CREATE_POLL), deny: 0n },
       ];
@@ -115,7 +115,7 @@ describe('PermissionManager', () => {
     });
 
     it('should compute permissions correctly for Member access level', () => {
-      const base = memberPermissions;
+      const base = defaultMemberPermissions;
       const assignments = [
         { allow: BigInt(1) << BigInt(Action.CREATE_TOPIC), deny: 0n },
       ];
@@ -130,7 +130,7 @@ describe('PermissionManager', () => {
     });
 
     it('should compute permissions correctly for Everyone access level', () => {
-      const base = everyonePermissions;
+      const base = defaultEveryonePermissions;
       const assignments = [
         { allow: BigInt(1) << BigInt(Action.CREATE_TOPIC), deny: 0n },
       ];

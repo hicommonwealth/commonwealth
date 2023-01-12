@@ -11,7 +11,7 @@ import 'pages/spec_settings.scss';
 import app from 'state';
 import { initChain, selectChain } from 'app';
 import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, RolePermission } from 'models';
+import { ChainInfo, AccessLevel } from 'models';
 import { constructSubstrateUrl } from 'substrate';
 import Sublayout from '../sublayout';
 import { PageLoading } from './loading';
@@ -37,7 +37,7 @@ class SpecSettingsPage extends ClassComponent {
     const substrateAdminChainIds = roles
       .filter(
         (r) =>
-          r.permission === RolePermission.admin &&
+          r.permission === AccessLevel.Admin&&
           app.config.chains.getById(r.chain_id).base === ChainBase.Substrate
       )
       .map((r) => r.chain_id);

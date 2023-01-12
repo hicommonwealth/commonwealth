@@ -16,7 +16,6 @@ import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
 import { constructTypedMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-import { Action } from '../../../common-common/src/permissions';
 
 const log = factory.getLogger(formatFilename(__filename));
 

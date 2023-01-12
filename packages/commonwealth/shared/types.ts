@@ -1,6 +1,7 @@
 import { ChainAttributes } from '../server/models/chain';
 import { ChainEventAttributes } from 'chain-events/services/database/models/chain_event';
 import type { SnapshotProposalAttributes } from '../server/models/snapshot_proposal';
+import { AccessLevel } from '../server/util/permissions';
 
 export enum WebsocketMessageNames {
   ChainEventNotification = 'chain-event-notification',
@@ -178,4 +179,10 @@ export type SnapshotGraphQLResponse = {
       };
     };
   };
+};
+
+export type RoleObject = {
+  permission: AccessLevel;
+  allow: bigint;
+  deny: bigint;
 };

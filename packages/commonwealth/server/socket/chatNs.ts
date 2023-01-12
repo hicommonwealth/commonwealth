@@ -1,11 +1,11 @@
 import { Server } from 'socket.io';
 import moment from 'moment';
 import { Op } from 'sequelize';
-import { Action } from '../../util/permissions';
-import { addPrefix, factory } from 'common-common/src/logging';
 import { RedisCache } from 'common-common/src/redisCache';
-import emitNotifications from '../util/emitNotifications';
+import { addPrefix, factory } from 'common-common/src/logging';
 import { NotificationCategories, RedisNamespaces } from 'common-common/src/types';
+import { Action } from '../util/permissions';
+import emitNotifications from '../util/emitNotifications';
 import {
     WebsocketEngineEvents,
     WebsocketMessageNames,

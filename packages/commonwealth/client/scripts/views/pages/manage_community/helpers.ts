@@ -2,17 +2,17 @@ import $ from 'jquery';
 import m from 'mithril';
 import app from 'state';
 
-import { RolePermission } from 'models';
+import { AccessLevel } from 'models';
 import { ChainCategoryType } from 'common-common/src/types';
 import { buildChainToCategoriesMap } from '../communities';
 
 export const sortAdminsAndModsFirst = (a, b) => {
   if (a.permission === b.permission)
     return a.Address.address.localeCompare(b.Address.address);
-  if (a.permission === RolePermission.admin) return -1;
-  if (b.permission === RolePermission.admin) return 1;
-  if (a.permission === RolePermission.moderator) return -1;
-  if (b.permission === RolePermission.moderator) return 1;
+  if (a.permission === AccessLevel.Admin) return -1;
+  if (b.permission === AccessLevel.Admin) return 1;
+  if (a.permission === AccessLevel.Moderator) return -1;
+  if (b.permission === AccessLevel.Moderator) return 1;
   return a.Address.address.localeCompare(b.Address.address);
 };
 

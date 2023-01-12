@@ -1,17 +1,17 @@
 import { Transaction, Op, FindOptions } from 'sequelize';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
 import {
   Action,
   PermissionManager,
   PermissionError,
-  defaultEveryonePermissions,
+  everyonePermissions,
 } from './permissions';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
-import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';
 import { RoleAssignmentAttributes } from '../models/role_assignment';
 import { AddressInstance } from '../models/address';
+import { RoleObject } from '../../shared/types';
 
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   chain_id: string;
@@ -316,7 +316,7 @@ export async function isAddressPermitted(
         permission: role.permission,
         allow: role.allow,
         deny: role.deny,
-      };
+      } as RoleObject;
     });
     const permission = aggregatePermissions(rolesWithPermission, {
       allow: chain.default_allow_permissions,
@@ -372,7 +372,7 @@ export async function isAnyonePermitted(
     throw new Error('Chain not found');
   }
   const permissionsManager = new PermissionManager()
-  const permission = permissionsManager.computePermissions(defaultEveryonePermissions, [
+  const permission = permissionsManager.computePermissions(everyonePermissions, [
     {
       allow: chain.default_allow_permissions,
       deny: chain.default_deny_permissions,
