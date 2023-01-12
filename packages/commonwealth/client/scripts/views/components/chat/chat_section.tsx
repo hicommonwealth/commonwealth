@@ -12,6 +12,7 @@ import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
 import { handleRedirectClicks } from 'helpers';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import {
   CreateCategory,
@@ -54,7 +55,7 @@ function setToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
+class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   channels: {
     [category: string]: IChannel[];
   };
@@ -353,6 +354,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         isUpdated: channel.unread > 0,
         onClick: (e) => {
           handleRedirectClicks(
+            this,
             e,
             `/chat/${channel.id}`,
             app.activeChainId(),
@@ -436,3 +438,5 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
     return <SidebarSectionGroup {...sidebarSectionData} />;
   }
 }
+
+export const ChatSection = NavigationWrapper(ChatSectionComponent);

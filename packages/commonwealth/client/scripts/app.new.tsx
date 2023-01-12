@@ -3,6 +3,7 @@ import { Routes, Route, BrowserRouter, useParams } from 'react-router-dom';
 import ReactDOM from 'react-dom/client';
 import { Layout } from 'views/layout';
 import { initAppState } from 'app';
+import { PageLoading } from './views/pages/loading';
 
 const LandingPage = lazy(() => import('./views/pages/landing'));
 const CommunitiesPage = lazy(() => import('./views/pages/communities'));
@@ -78,7 +79,7 @@ const App = () => {
 
   // @REACT @TODO add redirect routes + custom domain logic
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<PageLoading />}>
       <Routes>
         <Route path="/" element={
           withLayout(LandingPage, { scoped: false, hideSidebar: false })

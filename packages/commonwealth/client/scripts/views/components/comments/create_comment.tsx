@@ -202,9 +202,9 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
             )}
             <div
               className="form-bottom"
-              onmouseover={() => {
+              onMouseOver={() => {
                 // keeps Quill's isBlank up to date
-                return redraw();
+                return this.redraw();
               }}
             >
               <div className="form-buttons">

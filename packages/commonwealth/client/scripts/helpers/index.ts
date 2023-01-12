@@ -372,6 +372,7 @@ export const isCommandClick = (e: MouseEvent) => {
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
+  _this,
   e: MouseEvent,
   redirectLink: string,
   activeChainId: string | null,
@@ -386,7 +387,7 @@ export const handleRedirectClicks = (
     return;
   }
 
-  navigateToSubpage(redirectLink);
+  _this.navigateToSubpage(redirectLink);
   if (callback) {
     callback();
   }

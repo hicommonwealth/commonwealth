@@ -50,7 +50,7 @@ export class CWCard extends ClassComponent<CardAttrs> {
           ComponentType.Card
         )}
         onClick={onClick}
-        onmouseover={onmouseover}
+        onMouseOver={onmouseover}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
