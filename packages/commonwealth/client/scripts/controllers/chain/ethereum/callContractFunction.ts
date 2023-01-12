@@ -8,6 +8,25 @@ import app from 'state';
 import Web3 from 'web3';
 import { TransactionConfig } from 'web3-core/types';
 import { AbiItem, AbiOutput } from 'web3-utils';
+import Contract from 'client/scripts/models/Contract';
+
+/**
+ * Uses the function Abi Item and processed arguments to encode a function call.
+ * @return encoded function call transaction hash
+ */
+
+function encodeFunctionCall(web3: Web3, fn: AbiItem, contract: Contract, processedArgs: any[]) {
+  const methodSignature = encodeFunctionSignature(fn);
+  const functionContract = new web3.eth.Contract(
+    parseAbiItemsFromABI(contract.abi),
+    contract.address
+  );
+
+  const functionTx = functionContract.methods[methodSignature](
+    ...processedArgs
+  );
+  return functionTx;
+}
 
 /**
  * Uses the tx hash and function outputs to decodes the transaction data from the hash.
@@ -50,22 +69,10 @@ async function decodeTransactionData(
  * if there is a web3 api calls are misconfigured or fail.
  */
 export async function callContractFunction(
-  contractAddress: string,
+  contract: Contract,
   fn: AbiItem,
   formInputMap: Map<string, Map<number, string>>
 ): Promise<any[]> {
-  const contract = app.contracts.getByAddress(contractAddress);
-  if (!contract) {
-    throw new Error('Contract not found');
-  }
-
-  // handle processing the forms inputs into their proper data types
-  const processedArgs = processAbiInputsToDataTypes(
-    fn.name,
-    fn.inputs,
-    formInputMap
-  );
-
   const sender = app.user.activeAccount;
   // get querying wallet
   const signingWallet = await app.wallets.locateWallet(
@@ -77,15 +84,14 @@ export async function callContractFunction(
   }
   const web3: Web3 = signingWallet.api;
 
-  const methodSignature = encodeFunctionSignature(fn);
-  const functionContract = new web3.eth.Contract(
-    parseAbiItemsFromABI(contract.abi),
-    contract.address
+  // handle processing the forms inputs into their proper data types
+  const processedArgs = processAbiInputsToDataTypes(
+    fn.name,
+    fn.inputs,
+    formInputMap
   );
 
-  const functionTx = functionContract.methods[methodSignature](
-    ...processedArgs
-  );
+  const functionTx = encodeFunctionCall(web3, fn, contract, processedArgs);
 
   if (
     fn.stateMutability !== 'view' &&
@@ -113,3 +119,5 @@ export async function callContractFunction(
     return decodeTransactionData(fn.outputs, txResult);
   }
 }
+
+
