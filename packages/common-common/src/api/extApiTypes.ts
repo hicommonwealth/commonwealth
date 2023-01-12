@@ -86,4 +86,11 @@ export type GetTokenBalanceReq = {
   opts: Record<string, string | undefined>
 };
 
+export type GetNewProfilesReq = {
+  jwt: string;
+}
+
+export type GetNewProfilesResp = { profiles?: ProfileAttributes[] };
+
+
 export const needParamErrMsg = 'Please provide a parameter to query by';

@@ -60,6 +60,7 @@ import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
 import getProfileOld from '../routes/getProfile';
 import getProfileNew from '../routes/getNewProfile';
+import getNewProfiles from '../routes/getNewProfiles';
 
 import createRole from '../routes/createRole';
 import deleteRole from '../routes/deleteRole';
@@ -406,6 +407,11 @@ function setupRouter(
 
   router.get('/profile', getProfileOld.bind(this, models));
   router.get('/profile/v2', getProfileNew.bind(this, models));
+  router.post(
+    '/newProfiles',
+    passport.authenticate('jwt', { session: false }),
+    getNewProfiles.bind(this, models)
+  );
 
   // discussion drafts
   router.post(
