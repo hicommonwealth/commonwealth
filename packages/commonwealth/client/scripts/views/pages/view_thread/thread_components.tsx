@@ -42,7 +42,8 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
         {render(User, {
           avatarSize: 24,
           user: author,
-          popover: true,
+          // @TODO @REACT FIX ME change to true when popover will work
+          popover: false,
           linkify: true,
         })}
         {thread.collaborators?.length > 0 && (
