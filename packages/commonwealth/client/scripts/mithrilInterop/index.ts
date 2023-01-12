@@ -92,7 +92,6 @@ const IGNORED_PROPS = [
   'props',
   'state',
   '_isMounted',
-  '_seenProps',
   'context',
 ]
 
@@ -104,7 +103,6 @@ type AdditionalAttrs = {
 export abstract class ClassComponent<A = {}> extends ReactComponent<A & AdditionalAttrs> {
   protected readonly __props: A;
   private _isMounted = false;
-  private _seenProps = [];
 
   constructor(props) {
     super(props);
@@ -127,7 +125,6 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & Addition
           && typeof value !== 'function'
         ) {
           obj.setState({ ...obj.state, [prop]: value })
-          obj._seenProps.push(prop);
           // console.log(prop, value);
         }
         // @ts-ignore
