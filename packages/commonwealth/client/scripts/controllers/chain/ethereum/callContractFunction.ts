@@ -16,7 +16,7 @@ import { IWebWallet } from 'client/scripts/models';
  * @return encoded function call transaction hash
  */
 
-function encodeFunctionCall(
+export function encodeFunctionCall(
   web3: Web3,
   fn: AbiItem,
   contract: Contract,
@@ -34,7 +34,7 @@ function encodeFunctionCall(
   return functionTx;
 }
 
-async function sendFunctionCall(
+export async function sendFunctionCall(
   fn: AbiItem,
   signingWallet: IWebWallet<any>,
   contract: Contract,

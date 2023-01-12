@@ -7,17 +7,15 @@ import app from 'state';
 import { ChainBase, ChainType } from 'common-common/src/types';
 import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
 import { AbiItem } from 'web3-utils';
-import { TransactionConfig } from 'web3-core';
-import {
-  parseAbiItemsFromABI,
-  parseEventFromABI,
-} from '../../../shared/abi_utils';
+import { TransactionReceipt } from 'web3-core';
+import { parseEventFromABI } from '../../../shared/abi_utils';
 import { CreateFactoryEthDaoForm } from '../views/pages/create_community/types';
-import {
-  encodeFunctionSignature,
-  processAbiInputsToDataTypes,
-} from './abi_form_helpers';
+import { processAbiInputsToDataTypes } from './abi_form_helpers';
 import ContractAbi from '../models/ContractAbi';
+import {
+  encodeFunctionCall,
+  sendFunctionCall,
+} from '../controllers/chain/ethereum/callContractFunction';
 
 export function decodeCreateDaoTx(
   web3: Web3,
@@ -45,7 +43,7 @@ export async function createCuratedProjectDao(
   const signingWallet: IWebWallet<any> =
     await app.wallets.getFirstAvailableMetamaskWallet();
 
-  const ethChainId = contract.ethChainId
+  const ethChainId = contract.ethChainId;
 
   signingWallet.enableForEthChainId(ethChainId);
 
@@ -63,28 +61,18 @@ export async function createCuratedProjectDao(
     fn.inputs,
     formInputMap
   );
-  const methodSignature = encodeFunctionSignature(fn);
-  const functionContract = new web3.eth.Contract(
-    parseAbiItemsFromABI(contract.abi),
-    contract.address
+
+  const functionTx = encodeFunctionCall(web3, fn, contract, processedArgs);
+
+  const txReceipt: TransactionReceipt | any = await sendFunctionCall(
+    fn,
+    signingWallet,
+    contract,
+    functionTx,
+    web3
   );
 
-  const functionTx = functionContract.methods[methodSignature](
-    ...processedArgs
-  );
-
-  // Sign Tx with PK if this is write function
-  const tx: TransactionConfig = {
-    from: signingWallet.accounts[0],
-    to: contract.address,
-    data: functionTx.encodeABI(),
-  };
-  const txReceipt = await web3.eth.sendTransaction(tx);
-  const address = await decodeCreateDaoTx(
-    web3,
-    contract.contractAbi,
-    txReceipt
-  );
+  const address = decodeCreateDaoTx(web3, contract.contractAbi, txReceipt);
   try {
     const res = await $.post(`${app.serverUrl()}/createChain`, {
       id: daoForm.name,
