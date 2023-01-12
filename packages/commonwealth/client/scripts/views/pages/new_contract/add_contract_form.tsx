@@ -71,9 +71,12 @@ export class AddContractForm extends ClassComponent<EthChainAttrs> {
           options={Object.values(ContractType).map((type) => {
             return { label: type, value: type };
           })}
-          value={this.form.contractType}
-          onchange={(value) => {
-            this.form.contractType = value;
+          initialValue={{
+            value: this.form.contractType,
+            label: this.form.contractType,
+          }}
+          onSelect={(o) => {
+            this.form.contractType = ContractType[o.value];
             this.loaded = false;
           }}
         />

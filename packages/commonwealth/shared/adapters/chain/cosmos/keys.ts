@@ -3,6 +3,7 @@
 // generated signature. But first we need the message to insert.
 import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
 import { toBase64 } from '@cosmjs/encoding';
+
 export const validationTokenToSignDoc = (
   token: Uint8Array,
   address: string
