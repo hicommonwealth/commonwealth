@@ -33,7 +33,7 @@ const setupAppRoutes = (app, models: DB, devMiddleware) => {
 
   const templateFile = (() => {
     try {
-      return fs.readFileSync('./build/index.html');
+      return fs.readFileSync('../../build/index.html');
     } catch (e) {
       console.error(`Failed to read template file: ${e.message}`);
     }
