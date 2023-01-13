@@ -19,12 +19,12 @@ import {
 
 export function decodeTxParameterFromEvent(
   web3: Web3,
-  contractAbi: ContractAbi,
+  abi: Record<string, unknown>[],
   tx: any,
   event_name: string,
   event_parameter: string
 ): string | null {
-  const eventAbiItem = parseEventFromABI(contractAbi.abi, event_name);
+  const eventAbiItem = parseEventFromABI(abi, event_name);
   const decodedLog = web3.eth.abi.decodeLog(
     eventAbiItem.inputs,
     tx.logs[0].data,
