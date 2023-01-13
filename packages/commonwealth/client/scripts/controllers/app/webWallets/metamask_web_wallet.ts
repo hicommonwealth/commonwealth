@@ -83,7 +83,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // default to ETH
-      const chainId = ethChainId || await this.getChainId();
+      const chainId = ethChainId || this.getChainId();
 
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);

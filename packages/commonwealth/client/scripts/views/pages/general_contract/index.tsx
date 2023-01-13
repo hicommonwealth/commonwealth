@@ -19,6 +19,7 @@ import {
   validateAbiInput,
 } from 'helpers/abi_form_helpers';
 import { CWSpinner } from 'views/components/component_kit/cw_spinner';
+import { Result } from 'ethers/lib/utils';
 import { PageNotFound } from '../404';
 import { PageLoading } from '../loading';
 import Sublayout from '../../sublayout';
@@ -27,7 +28,7 @@ class GeneralContractPage extends ClassComponent<{ contractAddress?: string }> {
   private loaded = false;
   private loading = false;
   private saving = false;
-  private functionNameToFunctionOutput = new Map<string, any[]>();
+  private functionNameToFunctionOutput = new Map<string, Result>();
   private form = {
     functionNameToFunctionInputArgs: new Map<string, Map<number, string>>(),
   };
