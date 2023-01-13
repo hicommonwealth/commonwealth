@@ -1,8 +1,13 @@
-import gql from 'graphql-tag';
 import { Web3Provider } from '@ethersproject/providers';
+import snapshot from '@snapshot-labs/snapshot.js';
+import gql from 'graphql-tag';
 import { notifyError } from '../controllers/app/notifications';
 
+const hub = 'https://hub.snapshot.org'; // or https://testnet.snapshot.org for testnet
+const client = new snapshot.Client712(hub);
+
 let apolloClient = null;
+
 async function getApolloClient() {
   if (apolloClient) return apolloClient;
 
@@ -169,8 +174,8 @@ export async function getVersion(): Promise<string> {
 }
 
 export async function getSpace(space: string): Promise<SnapshotSpace> {
-  const client = await getApolloClient();
-  const spaceObj = await client.query({
+  await getApolloClient();
+  const spaceObj = await apolloClient.query({
     query: SPACE_QUERY,
     variables: {
       space,
@@ -180,8 +185,8 @@ export async function getSpace(space: string): Promise<SnapshotSpace> {
 }
 
 export async function getProposals(space: string): Promise<SnapshotProposal[]> {
-  const client = await getApolloClient();
-  const proposalsObj = await client.query({
+  await getApolloClient();
+  const proposalsObj = await apolloClient.query({
     query: PROPOSALS_QUERY,
     variables: {
       space,
@@ -197,8 +202,8 @@ export async function getProposals(space: string): Promise<SnapshotProposal[]> {
 export async function getVotes(
   proposalHash: string
 ): Promise<SnapshotProposalVote[]> {
-  const client = await getApolloClient();
-  const response = await client.query({
+  await getApolloClient();
+  const response = await apolloClient.query({
     query: PROPOSAL_VOTES_QUERY,
     variables: {
       proposalHash,
@@ -209,7 +214,7 @@ export async function getVotes(
 
 export async function castVote(address: string, payload: any) {
   const web3 = new Web3Provider((window as any).ethereum);
-  const receipt = await client.vote(web3 as any, address, payload);
+  await client.vote(web3 as any, address, payload);
 }
 
 export async function createProposal(address: string, payload: any) {
@@ -306,15 +311,16 @@ export async function getPower(
   );
   const blockTag =
     +proposal.snapshot > blockNumber ? 'latest' : +proposal.snapshot;
-  const scores: Array<{ [who: string]: number }> =
-    await snapshot.utils.getScores(
-      space.id,
-      proposal.strategies,
-      space.network,
-      [address],
-      blockTag
-      // Snapshot.utils.getProvider(space.network),
-    );
+  const scores: Array<{
+    [who: string]: number;
+  }> = await snapshot.utils.getScores(
+    space.id,
+    proposal.strategies,
+    space.network,
+    [address],
+    blockTag
+    // Snapshot.utils.getProvider(space.network),
+  );
   const summedScores = scores.map((score) =>
     Object.values(score).reduce((a, b) => a + b, 0)
   );
