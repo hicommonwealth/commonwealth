@@ -14,6 +14,7 @@ import { CWButton } from './component_kit/cw_button';
 import { LinkedAddresses } from './linked_addresses';
 
 type ProfilePreviewAttrs = {
+  profiles: Profile[];
   profile: Profile;
   addresses: AddressInfo[];
 };
@@ -26,10 +27,8 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
   }
 
   view(vnode: m.Vnode<ProfilePreviewAttrs>) {
-    const { profile, addresses } = vnode.attrs;
-    const { name, bio, avatarUrl, socials } = profile;
-
-    console.log('profile', profile, addresses)
+    const { profiles, profile, addresses } = vnode.attrs;
+    const { name, bio, avatarUrl } = profile;
 
     return (
       <div className="ProfilePreview">
@@ -62,7 +61,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
           <CWText type="h5">
             Linked Addresses
           </CWText>
-          <LinkedAddresses addresses={addresses} />
+          <LinkedAddresses profiles={profiles} profile={profile} addresses={addresses} />
         </div>
       </div>
     );

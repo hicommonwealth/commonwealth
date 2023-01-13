@@ -5,22 +5,28 @@ import ClassComponent from 'class_component';
 
 import 'components/linked_addresses.scss';
 
-import { AddressInfo } from 'models';
+import app from 'state';
+import { AddressInfo, NewProfile as Profile } from 'models';
 import { formatAddressShort } from '../../helpers';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from './component_kit/cw_icon_button';
+import { MoveAddressModal } from '../modals/move_address_modal';
 
 type AddressAttrs = {
+  profiles: Profile[];
+  profile: Profile;
   address: string;
 }
 
 type LinkedAddressesAttrs = {
+  profiles: Profile[];
+  profile: Profile;
   addresses: AddressInfo[];
 };
 
 class Address extends ClassComponent<AddressAttrs> {
   view (vnode: m.Vnode<AddressAttrs>) {
-    const { address } = vnode.attrs;
+    const { profiles, profile, address } = vnode.attrs;
 
     return (
       <div className="AddressContainer">
@@ -33,7 +39,16 @@ class Address extends ClassComponent<AddressAttrs> {
             {
               label: 'Move',
               iconLeft: 'externalLink',
-              onclick: () => {} // Implement Move Address
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: MoveAddressModal,
+                  data: {
+                    profile,
+                    profiles
+                  },
+                });
+              }
             },
             {
               label: 'Delete',
@@ -50,12 +65,12 @@ class Address extends ClassComponent<AddressAttrs> {
 
 export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
   view(vnode: m.Vnode<LinkedAddressesAttrs>) {
-    const { addresses } = vnode.attrs;
+    const { profiles, profile, addresses } = vnode.attrs;
 
     return (
       <div className="LinkedAddresses">
         {addresses.map((address) => {
-          return <Address address={address.address} />
+          return <Address profiles={profiles} profile={profile} address={address.address} />
         })}
       </div>
     );

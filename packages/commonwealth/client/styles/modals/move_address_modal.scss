@@ -1,0 +1,57 @@
+@import '../shared';
+
+.MoveAddressModal {
+  width: 504px;
+  padding: 24px;
+
+  .caption {
+    color: $neutral-500;
+    margin-bottom: 8px;
+  }
+
+  .b2 {
+    font-weight: 500;
+  }
+
+  .title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    .h4 {
+      font-weight: 600;
+    }
+  }
+
+  .current-address {
+    padding: 16px;
+    border: 1px solid $neutral-200;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+
+    img {
+      height: 32px;
+      width: 32px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+  }
+
+  .move-to-address {
+    padding: 24px 16px;
+    border: 1px solid $neutral-200;
+    border-radius: 5px;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    gap: 16px;
+    margin-top: 24px;
+  }
+}

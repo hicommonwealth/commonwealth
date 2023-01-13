@@ -21,7 +21,7 @@ export class ManageProfiles extends ClassComponent {
       const response = await $.post(`${app.serverUrl()}/newProfiles`, {
         jwt: app.user.jwt,
       });
-      console.log('response', response);
+
       this.profiles = response.result.profiles.map((profile) => new Profile(profile));
       this.addresses = response.result.addresses.map(
         (a) =>
@@ -53,7 +53,11 @@ export class ManageProfiles extends ClassComponent {
           <CWText type="h3" className="title">Manage Profiles and Addresses</CWText>
           <CWText className="description">Create and edit profiles and manage your connected addresses.</CWText>
           {this.profiles.map((profile) => (
-            <ProfilePreview profile={profile} addresses={this.addresses.filter((a) => a.profileId === profile.id)} />
+            <ProfilePreview
+              profiles={this.profiles}
+              profile={profile}
+              addresses={this.addresses.filter((a) => a.profileId === profile.id)}
+            />
           ))}
         </div>
       </Sublayout>
