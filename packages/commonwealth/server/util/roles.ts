@@ -6,6 +6,7 @@ import {
   PermissionError,
   everyonePermissions,
 } from './permissions';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';

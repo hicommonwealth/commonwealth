@@ -1,14 +1,10 @@
-import { expect } from 'chai';
+import { expect, assert } from 'chai';
 import {
   PermissionManager,
   AccessLevel,
-  Permissions,
   Action,
-  adminPermissions,
-  moderatorPermissions,
-  memberPermissions,
-  everyonePermissions,
-} from '../../../server/util/permissions';
+  Permissions,
+} from 'commonwealth/server/util/permissions';
 
 describe('PermissionManager', () => {
   let permissionManager: PermissionManager;
@@ -17,96 +13,139 @@ describe('PermissionManager', () => {
     permissionManager = new PermissionManager();
   });
 
-  describe('addAllowImplicitPermission', () => {
-    it('should add the permission', () => {
-      const originalPermission = 0n;
-      const action = Action.CREATE_CHAT;
-      const newPermission = permissionManager.addAllowPermission(
-        originalPermission,
-        action
+  describe('getPermissions', () => {
+    it('should return the correct permissions for a given access level', () => {
+      const accessLevel = AccessLevel.Admin;
+      const expectedPermissions = {
+        [Action.DELETE_THREAD]: [
+          Action.EDIT_THREAD,
+          Action.CREATE_THREAD,
+          Action.VIEW_THREADS,
+        ],
+        [Action.DELETE_COMMENT]: [
+          Action.EDIT_COMMENT,
+          Action.CREATE_COMMENT,
+          Action.VIEW_COMMENTS,
+        ],
+        [Action.DELETE_REACTION]: [
+          Action.CREATE_REACTION,
+          Action.VIEW_REACTIONS,
+        ],
+        [Action.DELETE_TOPIC]: [
+          Action.EDIT_TOPIC,
+          Action.CREATE_TOPIC,
+          Action.VIEW_TOPICS,
+        ],
+      };
+      expect(permissionManager.getPermissions(accessLevel)).to.deep.equal(
+        expectedPermissions
       );
-      const expectedPermission = BigInt(1) << BigInt(action);
-      expect(newPermission).to.equal(expectedPermission);
     });
   });
 
-  describe('removeAllowImplicitPermission', () => {
-    it('should remove the permission', () => {
-      const originalPermission = BigInt(1) << BigInt(Action.CREATE_CHAT);
-      const action = Action.CREATE_CHAT;
-      const newPermission = permissionManager.removeAllowPermission(
-        originalPermission,
-        action
-      );
-      expect(newPermission).to.equal(0n);
+  describe('getAllowedPermissionsByAction', () => {
+    it('should return an array of actions that are allowed by the given action, including the given action', () => {
+      const action = Action.CREATE_THREAD;
+      const expectedPermissions = [
+        Action.CREATE_THREAD,
+        Action.VIEW_THREADS,
+        Action.CREATE_COMMENT,
+        Action.VIEW_COMMENTS,
+        Action.CREATE_REACTION,
+        Action.VIEW_REACTIONS,
+      ];
+      const result = permissionManager.getAllowedPermissionsByAction(action);
+      assert.deepEqual(result.sort(), expectedPermissions.sort());
     });
   });
 
-  describe('addDenyImplicitPermission', () => {
-    it('should add the permission', () => {
-      const originalPermission = 0n;
-      const action = Action.CREATE_CHAT;
-      const newPermission = permissionManager.addDenyPermission(
-        originalPermission,
-        action
+  describe('getDeniedPermissionsByAction', () => {
+    it('should return an array of actions that are denied by the given action', () => {
+      const action = Action.CREATE_THREAD;
+      const expectedPermissions = [
+        Action.VIEW_CHAT_CHANNELS,
+        Action.VIEW_REACTIONS,
+        Action.VIEW_COMMENTS,
+        Action.VIEW_POLLS,
+        Action.VIEW_THREADS,
+      ];
+      assert.deepEqual(
+        permissionManager.getDeniedPermissionsByAction(action),
+        expectedPermissions
       );
-      expect(newPermission).to.equal(BigInt(1) << BigInt(action));
     });
   });
 
-  describe('removeDenyImplicitPermission', () => {
-    it('should remove the permission', () => {
-      const originalPermission = BigInt(1) << BigInt(Action.CREATE_CHAT);
-      const action = Action.CREATE_CHAT;
-      const newPermission = permissionManager.removeDenyPermission(
-        originalPermission,
-        action
+  describe('removeAllowPermission', () => {
+    it('should remove the given action from the allow permission bigint', () => {
+      const allowPermission = BigInt(11); // 1011 in binary (actions 1, 3 are allowed)
+      const actionNumber = Action.CREATE_REACTION;
+      const expectedPermission = BigInt(10); // 1010 in binary (actions 1, 2 are allowed)
+      assert.deepEqual(
+        permissionManager.removeAllowPermission(allowPermission, actionNumber),
+        expectedPermission
       );
-      expect(newPermission).to.equal(0n);
-    });
-  });
-});
-
-describe('Access Level Permissions', () => {
-  let permissionManager: PermissionManager;
-
-  beforeEach(() => {
-    permissionManager = new PermissionManager();
-  });
-
-  describe(AccessLevel.Admin, () => {
-    it('should have all permissions', () => {
-      const permissions = permissionManager.getPermissionsForAccessLevel(
-        AccessLevel.Admin
-      );
-      expect(permissions).to.equal(adminPermissions);
     });
   });
 
-  describe(AccessLevel.Moderator, () => {
-    it('should have all permissions except admin-only permissions', () => {
-      const permissions = permissionManager.getPermissionsForAccessLevel(
-        AccessLevel.Moderator
+  describe('removeDenyPermission', () => {
+    it('should remove the given action from the deny permission bigint', () => {
+      const denyPermission = BigInt(5); // 101 in binary (actions 1, 2 are denied)
+      const actionNumber = Action.VIEW_REACTIONS;
+      const expectedPermission = BigInt(1); // 001 in binary (only action 1 is denied)
+      assert.deepEqual(
+        permissionManager.removeDenyPermission(denyPermission, actionNumber),
+        expectedPermission
       );
-      expect(permissions).to.equal(moderatorPermissions);
     });
   });
 
-  describe(AccessLevel.Member, () => {
-    it('should have member permissions', () => {
-      const permissions = permissionManager.getPermissionsForAccessLevel(
-        AccessLevel.Member
+  describe('addAllowPermission', () => {
+    it('should add the given action and its implied actions to the allow permission bigint', () => {
+      const allowPermission = BigInt(0); // 0000 in binary (no actions allowed)
+      const actionNumber = Action.CREATE_COMMENT;
+      const expectedPermission = BigInt(11100); // 101100 in binary (actions 4, 5, 6 are allowed)
+      assert.deepEqual(
+        permissionManager.addAllowPermission(allowPermission, actionNumber),
+        expectedPermission
       );
-      expect(permissions).to.equal(memberPermissions);
     });
   });
 
-  describe(AccessLevel.Everyone, () => {
-    it('should have everyone permissions', () => {
-      const permissions = permissionManager.getPermissionsForAccessLevel(
-        AccessLevel.Everyone
+  describe('addDenyPermission', () => {
+    it('should add the given action and its implied actions to the deny permission bigint', () => {
+      let denyPermission = BigInt(0); // 0000 in binary (no actions denied)
+      const actionNumber = Action.READ;
+      denyPermission = permissionManager.addDenyPermission(
+        denyPermission,
+        actionNumber
       );
-      expect(permissions).to.equal(everyonePermissions);
+      const expectedPermission = BigInt(5); // 101 in binary (actions 1, 2 are denied)
+      assert.deepEqual(denyPermission, expectedPermission);
+    });
+  });
+
+  describe('mapPermissionsToBigint', () => {
+    it('should map the given permissions object to a bigint', () => {
+      const permissions: Permissions = {
+        [Action.CREATE_THREAD]: [Action.VIEW_THREADS, Action.DELETE_THREAD],
+        [Action.CREATE_COMMENT]: [Action.VIEW_COMMENTS, Action.DELETE_COMMENT],
+        [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS, Action.VIEW_POLLS],
+      };
+      const expectedBigInt =
+        (BigInt(1) << BigInt(Action.CREATE_THREAD)) |
+        (BigInt(1) << BigInt(Action.VIEW_THREADS)) |
+        (BigInt(1) << BigInt(Action.DELETE_THREAD)) |
+        (BigInt(1) << BigInt(Action.CREATE_COMMENT)) |
+        (BigInt(1) << BigInt(Action.VIEW_COMMENTS)) |
+        (BigInt(1) << BigInt(Action.DELETE_COMMENT)) |
+        (BigInt(1) << BigInt(Action.CREATE_POLL)) |
+        (BigInt(1) << BigInt(Action.VOTE_ON_POLLS)) |
+        (BigInt(1) << BigInt(Action.VIEW_POLLS));
+      assert.deepEqual(
+        permissionManager.mapPermissionsToBigint(permissions),
+        expectedBigInt
+      );
     });
   });
 });

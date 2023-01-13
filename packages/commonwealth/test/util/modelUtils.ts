@@ -13,12 +13,15 @@ import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceType, ChainNetwork } from 'common-common/src/types';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 import { constructCanvasMessage } from 'shared/adapters/shared';
+import { PermissionManager } from '../../server/util/permissions';
+import { mnemonicGenerate } from '@polkadot/util-crypto';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
-import { PermissionManager } from '../../server/util/permissions';
-import { constructTypedCanvasMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
-import { mnemonicGenerate } from '@polkadot/util-crypto';
+import {
+  constructTypedMessage,
+  TEST_BLOCK_INFO_STRING,
+} from '../../shared/adapters/chain/ethereum/keys';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -48,14 +51,14 @@ export async function addAllowDenyPermissionsForCommunityRole(
   let denyPermission;
   let allowPermission;
   if (deny_permission) {
-    denyPermission = permissionsManager.addDenyPermissions(
+    denyPermission = permissionsManager.addDenyPermission(
       BigInt(communityRole?.deny || 0),
       deny_permission,
     );
     communityRole.deny = denyPermission;
   }
   if (allow_permission) {
-    allowPermission = permissionsManager.addAllowPermissions(
+    allowPermission = permissionsManager.addAllowPermission(
       BigInt(communityRole?.allow || 0),
       allow_permission,
     );
@@ -81,10 +84,14 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
     console.log('createAndVerifyAddress res', res.body);
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
-    const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
-    const sessionWallet = ethers.Wallet.createRandom()
-    const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
-    const data = constructTypedCanvasMessage(message);
+    const chain_id = chain === 'alex' ? 3 : 1; // use ETH mainnet for testing except alex
+    const sessionWallet = ethers.Wallet.createRandom();
+    const data = await constructTypedMessage(
+      address,
+      chain_id,
+      sessionWallet.address,
+      TEST_BLOCK_INFO_STRING
+    );
     const privateKey = keypair.getPrivateKey();
     const signature = signTypedData({
       privateKey,
@@ -215,6 +222,7 @@ export interface CommentArgs {
   parentCommentId?: any;
   root_id?: any;
 }
+
 export const createComment = async (args: CommentArgs) => {
   const { chain, address, jwt, text, parentCommentId, root_id } = args;
   const res = await chai.request
@@ -258,6 +266,32 @@ export const editComment = async (args: EditCommentArgs) => {
       jwt,
       chain: community ? undefined : chain,
       community,
+    });
+  return res.body;
+};
+
+export interface CreateReactionArgs {
+  author_chain: string;
+  chain: string;
+  address: string;
+  reaction: string;
+  jwt: string;
+  comment_id: number;
+}
+
+export const createReaction = async (args: CreateReactionArgs) => {
+  const { chain, address, jwt, author_chain, reaction, comment_id } = args;
+  const res = await chai.request
+    .agent(app)
+    .post('/api/createReaction')
+    .set('Accept', 'application/json')
+    .send({
+      chain,
+      address,
+      reaction,
+      comment_id,
+      author_chain,
+      jwt,
     });
   return res.body;
 };
@@ -446,7 +480,7 @@ export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: st
   public async getBalance(
     node: IChainNode,
     address: string,
-    opts: { tokenAddress: string, contractType: string }
+    opts: { tokenAddress: string; contractType: string }
   ): Promise<string> {
     if (this.balanceFn) {
       const bal = await this.balanceFn(opts.tokenAddress, address);

@@ -8,7 +8,6 @@ import 'pages/manage_community/chain_metadata_rows.scss';
 
 import app from 'state';
 import { uuidv4 } from 'lib/util';
-
 import {
   ChainBase,
   ChainCategoryType,
@@ -406,8 +405,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               console.log(err);
             }
-
-            try {
+           try {
               if (this.chatEnabled) {
                 this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
                   default_deny_permissions,
@@ -442,7 +440,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               notifyError(err || 'Chain update failed');
             }
-
             m.redraw();
           }}
         />

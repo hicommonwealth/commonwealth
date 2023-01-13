@@ -4,13 +4,13 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import { ProposalType } from 'common-common/src/types';
 import {
   AccessLevel,
   PermissionManager,
   everyonePermissions,
 } from '../server/util/permissions';
 import { RoleObject } from './types';
+import { ProposalType } from 'common-common/src/types';
 
 export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
@@ -295,7 +295,6 @@ export const addressSwapper = (options: {
     return options.address;
   }
 };
-
 
 export function aggregatePermissions(
   roles: RoleObject[],

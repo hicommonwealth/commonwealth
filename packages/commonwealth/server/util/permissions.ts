@@ -111,24 +111,27 @@ const impliedAllowPermissionsByAction = new Map<number, Action[]>([
   [Action.EDIT_COMMENT, [Action.CREATE_COMMENT]],
 ]);
 
+
 const impliedDenyPermissionsByAction = new Map<number, Action[]>([
   // Chat Subtree
-  [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
+  [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
   // View Subtree
-  [Action.VIEW_REACTIONS, [Action.VIEW_COMMENTS, Action.CREATE_REACTION]],
-  [Action.VIEW_COMMENTS, [Action.VIEW_THREADS, Action.CREATE_COMMENT]],
-  [Action.VIEW_POLLS, [Action.VOTE_ON_POLLS]],
-  [Action.VIEW_THREADS, [Action.CREATE_THREAD]],
+  [Action.VIEW_THREADS, [Action.VIEW_COMMENTS, Action.CREATE_THREAD]],
+  [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS, Action.CREATE_COMMENT]],
   // Create Subtree
-  [Action.CREATE_REACTION, [Action.CREATE_COMMENT]],
-  [Action.CREATE_COMMENT, [Action.EDIT_COMMENT, Action.CREATE_THREAD]],
-  [Action.CREATE_THREAD, [Action.EDIT_THREAD]],
-  [Action.MANAGE_TOPIC, [Action.DELETE_TOPIC]],
+  [Action.CREATE_THREAD, [Action.VIEW_THREADS]],
+  [Action.CREATE_POLL, [Action.VOTE_ON_POLLS, Action.CREATE_POLL]],
+  [Action.CREATE_COMMENT, [Action.CREATE_REACTION, Action.VIEW_COMMENTS, Action.EDIT_COMMENT]],
+  [Action.CREATE_REACTION, [Action.VIEW_REACTIONS, Action.CREATE_COMMENT]],
   // Voting Subtree
-  [Action.VOTE_ON_POLLS, [Action.CREATE_POLL]],
+  [Action.VOTE_ON_POLLS, [Action.VIEW_POLLS, Action.CREATE_POLL]],
+  // Delete Subtree
+  [Action.DELETE_THREAD, [Action.EDIT_THREAD, Action.DELETE_THREAD]],
+  [Action.DELETE_COMMENT, [Action.EDIT_COMMENT, Action.DELETE_COMMENT]],
+  [Action.DELETE_TOPIC, [Action.MANAGE_TOPIC, Action.DELETE_TOPIC]],
   // Edit Subtree
-  [Action.EDIT_COMMENT, [Action.DELETE_COMMENT]],
-  [Action.EDIT_THREAD, [Action.DELETE_THREAD]],
+  [Action.EDIT_THREAD, [Action.CREATE_THREAD, Action.EDIT_THREAD]],
+  [Action.EDIT_COMMENT, [Action.CREATE_COMMENT, Action.EDIT_COMMENT]],
 ]);
 
 type allowDenyBigInt = {
@@ -139,7 +142,7 @@ type allowDenyBigInt = {
 export class PermissionManager {
   private action: Action;
 
-  public getPemissions(accessLevel: AccessLevel): Permissions {
+  public getPermissions(accessLevel: AccessLevel): Permissions {
     return accessLevelPermissions.get(accessLevel) as Permissions;
   }
 
@@ -158,27 +161,30 @@ export class PermissionManager {
       const newPermissions = impliedAllowPermissionsByAction.get(
         currentPermission
       );
-      if (newPermissions) {
-        allowedPermissions.push(...newPermissions);
+      if (!newPermissions) {
+        break;
       }
-      currentPermission = newPermissions[0];
+      allowedPermissions.push(...newPermissions);
+      currentPermission = newPermissions[newPermissions.length - 1];
     }
     return allowedPermissions;
   }
 
   public getDeniedPermissionsByAction(action: Action): Action[] {
-    const deniedPermissions = [];
+    const permissions = [action];
     let currentPermission = action;
     while (impliedDenyPermissionsByAction.has(currentPermission)) {
       const newPermissions = impliedDenyPermissionsByAction.get(
         currentPermission
       );
       if (newPermissions) {
-        deniedPermissions.push(...newPermissions);
+        permissions.push(...newPermissions);
+        currentPermission = newPermissions[newPermissions.length - 1];
+      } else {
+        break;
       }
-      currentPermission = newPermissions[0];
     }
-    return deniedPermissions;
+    return permissions;
   }
 
   public removeAllowPermission(
@@ -199,7 +205,7 @@ export class PermissionManager {
     return newDenyPermission;
   }
 
-  public addAllowPermissions(
+  public addAllowPermission(
     allowPermission: bigint,
     actionNumber: number
   ): bigint {
@@ -213,7 +219,7 @@ export class PermissionManager {
     return result;
   }
 
-  public addDenyPermissions(
+  public addDenyPermission(
     denyPermission: bigint,
     actionNumber: number
   ): bigint {
@@ -269,7 +275,6 @@ export class PermissionManager {
         permissionsBigInt |= allow;
       }
     }
-
     return permissionsBigInt;
   }
 

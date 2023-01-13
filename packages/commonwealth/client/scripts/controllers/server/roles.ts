@@ -335,6 +335,7 @@ export function isActiveAddressPermitted(
       return false;
     }
     return true;
+
   }
   // If no roles are given for the chain, compute permissions with chain default permissions
   else {
@@ -351,5 +352,6 @@ export function isActiveAddressPermitted(
       return false;
     }
     return true;
+
   }
 }
