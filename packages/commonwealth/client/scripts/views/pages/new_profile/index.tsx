@@ -20,8 +20,8 @@ import { NewProfileHeader } from './new_profile_header';
 import { CommentWithAssociatedThread, NewProfileActivity } from './new_profile_activity';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CWText } from '../../components/component_kit/cw_text';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
+import { PageNotFound } from '../404';
 
 enum ProfileError {
   None,
@@ -114,26 +114,10 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       );
 
     if (this.error === ProfileError.NoAddressFound)
-      this.content = (
-        <div class="ProfilePage">
-          <div class="ErrorPage">
-            <CWText type="h3">Not on Commonwealth</CWText>
-            <CWText>
-              If this is your address, sign in using your wallet to set up a profile.
-            </CWText>
-          </div>
-        </div>
-      );
+      return <PageNotFound message="We cannot find this profile." />
 
     if (this.error === ProfileError.NoProfileFound)
-      this.content = (
-        <div class="ProfilePage">
-          <div class="ErrorPage">
-            <CWText type="h3">No profile found</CWText>
-            <CWText>This address is not registered to Commonwealth.</CWText>
-          </div>
-        </div>
-      );
+      return <PageNotFound message="We cannot find this profile." />
 
     if (this.error === ProfileError.None) {
       if (!this.profile) return;
