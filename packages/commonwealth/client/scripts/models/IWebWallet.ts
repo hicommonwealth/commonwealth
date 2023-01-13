@@ -1,8 +1,8 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import Account from './Account';
-import BlockInfo from './BlockInfo';
 import { CanvasData } from 'shared/adapters/shared';
 import { ChainId } from '@canvas-js/interfaces';
+import Account from './Account';
+import BlockInfo from './BlockInfo';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
   name: WalletId;
