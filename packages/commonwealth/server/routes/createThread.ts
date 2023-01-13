@@ -6,21 +6,20 @@ import {
   ChainType,
   ChainNetwork,
 } from 'common-common/src/types';
-import { AppError, ServerError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-
+import { Action, PermissionError } from '../util/permissions';
 import {
   findAllRoles,
   isAddressPermitted,
 } from 'commonwealth/server/util/roles';
-import { Action, PermissionError } from '../util/permissions';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { DB } from '../models';
 import { sequelize } from '../database';
 import { ThreadInstance } from '../models/thread';
+import { AppError, ServerError } from 'common-common/src/errors';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 import {
   MixpanelCommunityInteractionEvent,
@@ -222,7 +221,7 @@ const createThread = async (
     chain.id,
     Action.CREATE_THREAD
   );
-  if (permission_error === PermissionError.NOT_PERMITTED) {
+  if (!permission_error) {
     return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 

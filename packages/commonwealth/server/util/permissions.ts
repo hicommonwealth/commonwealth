@@ -89,6 +89,11 @@ export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
   [AccessLevel.Everyone, everyonePermissions],
 ]);
 
+type allowDenyBigInt = {
+  allow: bigint;
+  deny: bigint;
+};
+
 export class PermissionManager {
   private action: Action;
 
@@ -140,19 +145,28 @@ export class PermissionManager {
     return newDenyPermission;
   }
 
-  private mapPermissionsToBigint(permissions: Permissions): bigint {
-    let permission = 0n;
+  mapPermissionsToBigint(permissions: Permissions): bigint {
+    let permission = BigInt(0);
     for (const key in permissions) {
       const action = permissions[key];
       if (Array.isArray(action)) {
         for (const a of action) {
-          permission |= 1n << BigInt(a);
+          permission |= BigInt(1) << BigInt(a);
         }
       } else {
-        permission |= 1n << BigInt(action);
+        permission |= BigInt(1) << BigInt(action);
       }
     }
     return permission;
+  }
+
+  convertStringToBigInt(
+    allowPermission: string,
+    denyPermission: string
+  ): allowDenyBigInt {
+    const allowPermissionAsBigInt: bigint = BigInt(allowPermission);
+    const denyPermissionAsBigInt: bigint = BigInt(denyPermission);
+    return { allow: allowPermissionAsBigInt, deny: denyPermissionAsBigInt };
   }
 
   public computePermissions(
@@ -160,13 +174,24 @@ export class PermissionManager {
     assignments: Array<{ allow: bigint; deny: bigint }>
   ): bigint {
     let permissionsBigInt = this.mapPermissionsToBigint(base);
+
     for (const assignment of assignments) {
-      permissionsBigInt &= ~assignment.deny;
-      permissionsBigInt |= assignment.allow;
+      const { allow, deny } = assignment;
+
+      if (typeof allow === 'string' && typeof deny === 'string') {
+        const converted = this.convertStringToBigInt(allow, deny);
+        permissionsBigInt &= ~converted.deny;
+        permissionsBigInt |= converted.allow;
+      } else {
+        permissionsBigInt &= ~deny;
+        permissionsBigInt |= allow;
+      }
     }
+
     return permissionsBigInt;
   }
 
+  //checks if a permissions explicity allows an action
   public isPermitted(permission: bigint, action: number): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
     const hasAction: boolean =

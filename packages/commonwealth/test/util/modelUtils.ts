@@ -16,6 +16,7 @@ import { constructCanvasMessage } from 'shared/adapters/shared';
 import app from '../../server-test';
 import models from '../../server/database';
 import { Permission } from '../../server/models/role';
+import { PermissionManager } from '../../server/util/permissions';
 import { constructTypedCanvasMessage, TEST_BLOCK_INFO_STRING } from '../../shared/adapters/chain/ethereum/keys';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 
@@ -28,12 +29,13 @@ export const generateEthAddress = () => {
   return { keypair, address };
 };
 
-export async function addAllowDenyPermissions(
+export async function addAllowDenyPermissionsForCommunityRole(
   role_name: Permission,
   chain_id: string,
-  allow_permission: number,
-  deny_permission: number
+  allow_permission: number | undefined,
+  deny_permission: number | undefined
 ) {
+  const permissionsManager = new PermissionManager();
   // get community role object from the database
   const communityRole = await models.CommunityRole.findOne({
     where: {
@@ -41,12 +43,22 @@ export async function addAllowDenyPermissions(
       name: role_name,
     },
   });
-  // update allow permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.allow = BigInt(communityRole.allow) | BigInt(1) << BigInt(allow_permission);
-  // update deny permission on community role object
-  // eslint-disable-next-line no-bitwise
-  communityRole.deny = BigInt(communityRole.deny) | BigInt(1) << BigInt(deny_permission);
+  let denyPermission;
+  let allowPermission;
+  if (deny_permission) {
+    denyPermission = permissionsManager.addDenyPermission(
+      BigInt(communityRole?.deny || 0),
+      deny_permission,
+    );
+    communityRole.deny = denyPermission;
+  }
+  if (allow_permission) {
+    allowPermission = permissionsManager.addAllowPermission(
+      BigInt(communityRole?.allow || 0),
+      allow_permission,
+    );
+    communityRole.allow = allowPermission;
+  }
   // save community role object to the database
   await communityRole.save();
 }
@@ -60,6 +72,7 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
       .post('/api/createAddress')
       .set('Accept', 'application/json')
       .send({ address, chain, wallet_id, block_info: TEST_BLOCK_INFO_STRING });
+    console.log('createAndVerifyAddress res', res.body);
     const address_id = res.body.result.id;
     const token = res.body.result.verification_token;
     const chain_id = chain === 'alex' ? 3 : 1;   // use ETH mainnet for testing except alex
@@ -164,10 +177,9 @@ export const createThread = async (args: ThreadArgs) => {
     topicId,
     readOnly,
     kind,
-    stage,
     url,
-    attachments,
   } = args;
+  console.log('createThread Args', args);
   const res = await chai.request
     .agent(app)
     .post('/api/createThread')

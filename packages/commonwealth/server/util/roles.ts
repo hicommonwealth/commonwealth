@@ -292,19 +292,17 @@ export async function createRole(
 }
 
 // Permissions Helpers for Roles
-/// ////////////////////////////////////////////////////////////////////////////////////////////
 
 export async function isAddressPermitted(
   models: DB,
   address_id: number,
   chain_id: string,
   action: Action
-): Promise<PermissionError | boolean> {
+): Promise<boolean> {
   const roles = await findAllRoles(models, { where: { address_id } }, chain_id);
 
   const permissionsManager = new PermissionManager()
 
-  // fetch the default allow and deny permissions for the chain
   const chain = await models.Chain.findOne({ where: { id: chain_id } });
   if (!chain) {
     throw new Error('Chain not found');
@@ -318,13 +316,16 @@ export async function isAddressPermitted(
         deny: role.deny,
       } as RoleObject;
     });
+
     const permission = aggregatePermissions(rolesWithPermission, {
       allow: chain.default_allow_permissions,
       deny: chain.default_deny_permissions,
     });
 
-    if (!permissionsManager.isPermitted(permission, action)) {
-      return PermissionError.NOT_PERMITTED;
+    const permitted = permissionsManager.isPermitted(permission, action);
+    if (!permitted) {
+      console.log('Permission denied');
+      throw new Error('Not permitted');
     } else {
       return true;
     }
