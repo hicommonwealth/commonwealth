@@ -7,7 +7,7 @@ import moment from 'moment';
 import 'pages/overview/topic_summary_row.scss';
 
 import app from 'state';
-// import { navigateToSubpage } from 'app';
+// import { navigateToSubpage } from 'router';
 import { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';

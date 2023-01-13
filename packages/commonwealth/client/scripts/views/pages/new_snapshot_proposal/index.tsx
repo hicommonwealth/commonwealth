@@ -8,7 +8,7 @@ import { capitalize } from 'lodash';
 import 'pages/new_snapshot_proposal.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { idToProposal } from 'identifiers';

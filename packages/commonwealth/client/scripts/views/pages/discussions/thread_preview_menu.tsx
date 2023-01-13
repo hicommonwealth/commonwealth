@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { Thread, ThreadStage, Topic } from 'models';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';

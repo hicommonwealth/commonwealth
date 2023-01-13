@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'pages/discussions/stages_menu.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { ThreadStage } from 'models';
 import { threadStageToLabel } from 'helpers';
 import { CWButton } from '../../components/component_kit/cw_button';

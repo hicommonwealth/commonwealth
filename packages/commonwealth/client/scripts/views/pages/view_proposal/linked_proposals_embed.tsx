@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'pages/view_proposal/linked_proposals_embed.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { ProposalType } from 'common-common/src/types';
 import { idToProposal } from 'identifiers';
 import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';

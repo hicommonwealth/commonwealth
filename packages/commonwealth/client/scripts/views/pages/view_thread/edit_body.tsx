@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'pages/view_thread/edit_body.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { notifySuccess } from 'controllers/app/notifications';
 import { Thread } from 'models';
 import { ContentType } from 'types';

@@ -23,21 +23,73 @@ import {
 } from 'controllers/app/notifications';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
-import { Layout } from 'views/layout';
 import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import { pathIsDiscussion } from './identifiers';
+import { getRoutes } from 'router';
+import {
+  APPLICATION_UPDATE_ACTION,
+  APPLICATION_UPDATE_MESSAGE,
+  MIXPANEL_DEV_TOKEN,
+  MIXPANEL_PROD_TOKEN,
+} from 'helpers/constants';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
 
+const injectGoogleTagManagerScript = () => {
+  const script = document.createElement('noscript');
+  m.render(
+    script,
+    m.trust(
+      // eslint-disable-next-line max-len
+      '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'
+    )
+  );
+  document.body.insertBefore(script, document.body.firstChild);
+};
 
-// eslint-disable-next-line max-len
-const APPLICATION_UPDATE_MESSAGE =
-  'A new version of the application has been released. Please save your work and refresh.';
-const APPLICATION_UPDATE_ACTION = 'Okay';
+const handleWindowError = () => {
+  // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
+  const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
+  // replace chunk loading errors with a notification that the app has been updated
+  const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token/;
 
-const MIXPANEL_DEV_TOKEN = '312b6c5fadb9a88d98dc1fb38de5d900';
-const MIXPANEL_PROD_TOKEN = '993ca6dd7df2ccdc2a5d2b116c0e18c5';
+  window.onerror = (errorMsg) => {
+    if (
+      typeof errorMsg === 'string' &&
+      resizeObserverLoopErrRe.test(errorMsg)
+    ) {
+      return false;
+    }
+
+    if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
+      alertModalWithText(
+        APPLICATION_UPDATE_MESSAGE,
+        APPLICATION_UPDATE_ACTION
+      )();
+      return false;
+    }
+
+    notifyError(`${errorMsg}`);
+    return false;
+  };
+};
+
+const initializeMixpanel = () => {
+  // initialize mixpanel, before adding an alias or tracking identity
+  try {
+    if (
+      document.location.host.startsWith('localhost') ||
+      document.location.host.startsWith('127.0.0.1')
+    ) {
+      mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
+    } else {
+      // Production Mixpanel Project
+      mixpanel.init(MIXPANEL_PROD_TOKEN, { debug: true });
+    }
+  } catch (e) {
+    console.error('Mixpanel initialization error');
+  }
+};
 
 // On login: called to initialize the logged-in state, available chains, and other metadata at /api/status
 // On logout: called to reset everything
@@ -92,13 +144,13 @@ export async function initAppState(
           ? LoginState.LoggedIn
           : LoginState.LoggedOut;
 
-        if (app.loginState == LoginState.LoggedIn) {
+        if (app.loginState === LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
           app.user.notifications.refresh().then(() => m.redraw());
         } else if (
-          app.loginState == LoginState.LoggedOut &&
+          app.loginState === LoginState.LoggedOut &&
           app.socket.isConnected
         ) {
           // TODO: create global deinit function
@@ -149,34 +201,107 @@ export async function deinitChainOrCommunity() {
   document.title = 'Commonwealth';
 }
 
-export async function handleInviteLinkRedirect() {
+const handleInviteLinkRedirect = () => {
   const inviteMessage = m.route.param('invitemessage');
-  if (inviteMessage) {
-    if (
-      inviteMessage === 'failure' &&
-      m.route.param('message') === 'Must be logged in to accept invites'
-    ) {
-      notifyInfo('Log in to join a community with an invite link');
-      app.modals.create({
-        modal: NewLoginModal,
-        data: {
-          modalType: isWindowMediumSmallInclusive(window.innerWidth)
-            ? 'fullScreen'
-            : 'centered',
-          breakpointFn: isWindowMediumSmallInclusive,
-        },
-      });
-    } else if (inviteMessage === 'failure') {
-      const message = m.route.param('message');
-      notifyError(message);
-    } else if (inviteMessage === 'success') {
-      if (app.config.invites.length === 0) return;
-      app.modals.create({ modal: ConfirmInviteModal });
-    } else {
-      notifyError('Unexpected error with invite link');
+
+  if (!inviteMessage) {
+    return;
+  }
+
+  const isAcceptInviteMessage =
+    m.route.param('message') === 'Must be logged in to accept invites';
+
+  if (inviteMessage === 'failure' && isAcceptInviteMessage) {
+    notifyInfo('Log in to join a community with an invite link');
+
+    app.modals.create({
+      modal: NewLoginModal,
+      data: {
+        modalType: isWindowMediumSmallInclusive(window.innerWidth)
+          ? 'fullScreen'
+          : 'centered',
+        breakpointFn: isWindowMediumSmallInclusive,
+      },
+    });
+  } else if (inviteMessage === 'failure') {
+    const message = m.route.param('message');
+    notifyError(message);
+  } else if (inviteMessage === 'success') {
+    if (app.config.invites.length === 0) {
+      return;
+    }
+
+    app.modals.create({ modal: ConfirmInviteModal });
+  } else {
+    notifyError('Unexpected error with invite link');
+  }
+};
+
+const handleLoginRedirects = () => {
+  if (
+    m.route.param('loggedin') &&
+    m.route.param('loggedin').toString() === 'true' &&
+    m.route.param('path') &&
+    !m.route.param('path').startsWith('/login')
+  ) {
+    // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
+    // handle param-based redirect after email login
+
+    /* If we are creating a new account, then we alias to create a new mixpanel user
+     else we identify to associate mixpanel events
+    */
+    if (m.route.param('new') && m.route.param('new').toString() === 'true') {
+      console.log('creating account');
+    }
+
+    m.route.set(m.route.param('path'), {}, { replace: true });
+  } else if (
+    localStorage &&
+    localStorage.getItem &&
+    localStorage.getItem('githubPostAuthRedirect')
+  ) {
+    // handle localStorage-based redirect after Github login (callback must occur within 30 seconds)
+    try {
+      const postAuth = JSON.parse(
+        localStorage.getItem('githubPostAuthRedirect')
+      );
+      if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
+        m.route.set(postAuth.path, {}, { replace: true });
+      }
+      localStorage.removeItem('githubPostAuthRedirect');
+    } catch (e) {
+      console.log('Error restoring path from localStorage');
+    }
+  } else if (
+    localStorage &&
+    localStorage.getItem &&
+    localStorage.getItem('discordPostAuthRedirect')
+  ) {
+    try {
+      const postAuth = JSON.parse(
+        localStorage.getItem('discordPostAuthRedirect')
+      );
+      if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
+        m.route.set(postAuth.path, {}, { replace: true });
+      }
+      localStorage.removeItem('discordPostAuthRedirect');
+    } catch (e) {
+      console.log('Error restoring path from localStorage');
     }
   }
-}
+};
+
+const showLoginNotification = () => {
+  const loggedIn = m.route.param('loggedin');
+  const loginError = m.route.param('loginerror');
+
+  if (loggedIn) {
+    notifySuccess('Logged in!');
+  } else if (loginError) {
+    notifyError('Could not log in');
+    console.error(m.route.param('loginerror'));
+  }
+};
 
 export async function handleUpdateEmailConfirmation() {
   if (m.route.param('confirmation')) {
@@ -437,50 +562,6 @@ export async function initNewTokenChain(address: string) {
   await selectChain(chainInfo);
 }
 
-// set up route navigation
-m.route.prefix = '';
-const _updateRoute = m.route.set;
-export const updateRoute = (...args) => {
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
-  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
-};
-m.route.set = (...args) => {
-  // set app params that maintain global state for:
-  // - whether the user last clicked the back button
-  // - the last page the user was on
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
-  // update route
-  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
-  // reset scroll position
-  const html = document.getElementsByTagName('html')[0];
-  if (html) html.scrollTo(0, 0);
-  const body = document.getElementsByTagName('body')[0];
-  if (body) body.scrollTo(0, 0);
-};
-export const navigateToSubpage = (...args) => {
-  // prepend community if we are not on a custom domain
-  if (!app.isCustomDomain() && app.activeChainId()) {
-    args[0] = `/${app.activeChainId()}${args[0]}`;
-  }
-  app.sidebarMenu = 'default';
-  m.route.set.apply(this, args);
-};
-
-/* Uncomment for redraw instrumentation
-const _redraw = m.redraw;
-function redrawInstrumented(...args) {
-  console.log('redraw!');
-  _redraw.apply(this, args);
-}
-redrawInstrumented.sync = (...args) => {
-  console.log('redraw sync!');
-  _redraw.sync.apply(this, args);
-};
-m.redraw = redrawInstrumented;
-*/
-
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
@@ -516,639 +597,15 @@ moment.updateLocale('en', {
 });
 
 Promise.all([$.ready, $.get('/api/domain')]).then(
-  async ([ready, { customDomain }]) => {
-    // set window error handler
-    // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
-    const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
-    // replace chunk loading errors with a notification that the app has been updated
-    const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token/;
-    window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
-      if (
-        typeof errorMsg === 'string' &&
-        resizeObserverLoopErrRe.test(errorMsg)
-      )
-        return false;
-      if (typeof errorMsg === 'string' && chunkLoadingErrRe.test(errorMsg)) {
-        alertModalWithText(
-          APPLICATION_UPDATE_MESSAGE,
-          APPLICATION_UPDATE_ACTION
-        )();
-        return false;
-      }
-      notifyError(`${errorMsg}`);
-      return false;
-    };
+  async ([, { customDomain }]) => {
+    handleWindowError();
 
-    const redirectRoute = (path: string | Function) => ({
-      render: (vnode) => {
-        m.route.set(
-          typeof path === 'string' ? path : path(vnode.attrs),
-          {},
-          { replace: true }
-        );
-        return m(Layout);
-      },
-    });
+    m.route(document.body, '/', getRoutes(customDomain));
 
-    interface RouteAttrs {
-      scoped: string | boolean;
-      hideSidebar?: boolean;
-      deferChain?: boolean;
-    }
-
-    let hasCompletedSuccessfulPageLoad = false;
-    const importRoute = (path: string, attrs: RouteAttrs) => ({
-      onmatch: async () => {
-        return import(
-          /* webpackMode: "lazy" */
-          /* webpackChunkName: "route-[request]" */
-          `./${path}`
-        )
-          .then((p) => {
-            hasCompletedSuccessfulPageLoad = true;
-            return p.default;
-          })
-          .catch((err) => {
-            // handle import() error
-            console.error(err);
-            if (err.name === 'ChunkLoadError') {
-              alertModalWithText(
-                APPLICATION_UPDATE_MESSAGE,
-                APPLICATION_UPDATE_ACTION
-              )();
-            }
-            // return to the last page, if it was on commonwealth
-            // eslint-disable-next-line no-restricted-globals
-            if (hasCompletedSuccessfulPageLoad) history.back();
-          });
-      },
-      render: (vnode) => {
-        const { scoped, hideSidebar } = attrs;
-        const scope =
-          typeof scoped === 'string'
-            ? // string => scope is defined by route
-              scoped
-            : scoped
-            ? // true => scope is derived from path
-              vnode.attrs.scope?.toString() || customDomain
-            : // false => scope is null
-              null;
-
-        // Special case to defer chain loading specifically for viewing an offchain thread. We need
-        // a special case because Threads and on-chain proposals are all viewed through the
-        // same "/:scope/proposal/:type/:id" route.
-        let deferChain = attrs.deferChain;
-        const isDiscussion =
-          vnode.attrs.type === 'discussion' ||
-          pathIsDiscussion(scope, window.location.pathname);
-        if (path === 'views/pages/view_proposal/index' && isDiscussion) {
-          deferChain = true;
-        }
-        if (app.chain?.meta.type === ChainType.Token) {
-          deferChain = false;
-        }
-        return m(Layout, { scope, deferChain, hideSidebar }, [vnode]);
-      },
-    });
-
-    const isCustomDomain = !!customDomain;
-    const { activeAccount } = app.user;
-    m.route(document.body, '/', {
-      // Sitewide pages
-      '/about': importRoute('views/pages/why_commonwealth', {
-        scoped: false,
-      }),
-      '/terms': importRoute('views/pages/terms', { scoped: false }),
-      '/privacy': importRoute('views/pages/privacy', { scoped: false }),
-      '/components': importRoute('views/pages/components', {
-        scoped: false,
-        hideSidebar: true,
-      }),
-      '/createCommunity': importRoute('views/pages/create_community', {
-        scoped: false,
-      }),
-      ...(isCustomDomain
-        ? {
-            //
-            // Custom domain routes
-            //
-            '/': importRoute('views/pages/discussions_redirect', {
-              scoped: true,
-            }),
-            '/web3login': redirectRoute(() => '/'),
-            '/search': importRoute('views/pages/search', {
-              scoped: false,
-              deferChain: true,
-            }),
-            // Notifications
-            '/notification-settings': importRoute(
-              'views/pages/notification_settings',
-              { scoped: true, deferChain: true }
-            ),
-            '/notifications': importRoute('views/pages/notifications_page', {
-              scoped: true,
-              deferChain: true,
-            }),
-            // NEAR
-            '/finishNearLogin': importRoute('views/pages/finish_near_login', {
-              scoped: true,
-            }),
-            '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
-              scoped: true,
-            }),
-            // Discussions
-            '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/discussions': importRoute('views/pages/discussions', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/discussions/:topic': importRoute('views/pages/discussions', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/overview': importRoute('views/pages/overview', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/members': importRoute('views/pages/members', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/sputnik-daos': importRoute('views/pages/sputnikdaos', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/chat/:channel': importRoute('views/pages/chat', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/new/discussion': importRoute('views/pages/new_thread', {
-              scoped: true,
-              deferChain: true,
-            }),
-            // Profiles
-            '/account/:address': importRoute('views/pages/profile', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/account': redirectRoute((a) =>
-              activeAccount ? `/account/${activeAccount.address}` : '/'
-            ),
-            // Governance
-            '/referenda': importRoute('views/pages/referenda', {
-              scoped: true,
-            }),
-            '/proposals': importRoute('views/pages/proposals', {
-              scoped: true,
-            }),
-            '/council': importRoute('views/pages/council', { scoped: true }),
-            '/delegate': importRoute('views/pages/delegate', { scoped: true }),
-            '/proposal/:type/:identifier': importRoute(
-              'views/pages/view_proposal/index',
-              { scoped: true }
-            ),
-            '/:scope/proposal/discussion/:identifier': redirectRoute(
-              (attrs) => `/discussion/${attrs.identifier}`
-            ),
-            '/proposal/:identifier': importRoute(
-              'views/pages/view_proposal/index',
-              { scoped: true }
-            ),
-            '/discussion/:identifier': importRoute(
-              'views/pages/view_thread/index',
-              { scoped: true }
-            ),
-            '/new/proposal/:type': importRoute(
-              'views/pages/new_proposal/index',
-              { scoped: true }
-            ),
-            '/new/proposal': importRoute('views/pages/new_proposal/index', {
-              scoped: true,
-            }),
-            // Treasury
-            '/treasury': importRoute('views/pages/treasury', { scoped: true }),
-            '/bounties': importRoute('views/pages/bounties', { scoped: true }),
-            '/tips': importRoute('views/pages/tips', { scoped: true }),
-            '/validators': importRoute('views/pages/validators', {
-              scoped: true,
-            }),
-            // Settings
-            '/login': importRoute('views/pages/login', {
-              scoped: true,
-              deferChain: true,
-            }),
-            // Admin
-            '/admin': importRoute('views/pages/admin', { scoped: true }),
-            '/manage': importRoute('views/pages/manage_community/index', {
-              scoped: true,
-            }),
-            '/spec_settings': importRoute('views/pages/spec_settings', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/settings': importRoute('views/pages/settings', { scoped: true }),
-            '/analytics': importRoute('views/pages/stats', {
-              scoped: true,
-              deferChain: true,
-            }),
-
-            '/snapshot/:snapshotId': importRoute(
-              'views/pages/snapshot_proposals',
-              { scoped: true, deferChain: true }
-            ),
-            '/multiple-snapshots': importRoute(
-              'views/pages/view_multiple_snapshot_spaces',
-              { scoped: true, deferChain: true }
-            ),
-            '/snapshot/:snapshotId/:identifier': importRoute(
-              'views/pages/view_snapshot_proposal',
-              { scoped: true, deferChain: true }
-            ),
-            '/new/snapshot/:snapshotId': importRoute(
-              'views/pages/new_snapshot_proposal',
-              { scoped: true, deferChain: true }
-            ),
-
-            // Redirects
-
-            '/:scope/dashboard': redirectRoute(() => '/'),
-            '/:scope/notifications': redirectRoute(() => '/notifications'),
-            '/:scope/notification-settings': redirectRoute(
-              () => '/notification-settings'
-            ),
-            '/:scope/overview': redirectRoute(() => '/overview'),
-            '/:scope/projects': redirectRoute(() => '/projects'),
-            '/:scope/backers': redirectRoute(() => '/backers'),
-            '/:scope/collectives': redirectRoute(() => '/collectives'),
-            '/:scope/finishNearLogin': redirectRoute(() => '/finishNearLogin'),
-            '/:scope/finishaxielogin': redirectRoute(() => '/finishaxielogin'),
-            '/:scope/home': redirectRoute(() => '/'),
-            '/:scope/discussions': redirectRoute(() => '/discussions'),
-            '/:scope': redirectRoute(() => '/'),
-            '/:scope/discussions/:topic': redirectRoute(
-              (attrs) => `/discussions/${attrs.topic}/`
-            ),
-            '/:scope/search': redirectRoute(() => '/search'),
-            '/:scope/members': redirectRoute(() => '/members'),
-            '/:scope/sputnik-daos': redirectRoute(() => '/sputnik-daos'),
-            '/:scope/chat/:channel': redirectRoute(
-              (attrs) => `/chat/${attrs.channel}`
-            ),
-            '/:scope/new/discussion': redirectRoute(() => '/new/discussion'),
-            '/:scope/account/:address': redirectRoute(
-              (attrs) => `/account/${attrs.address}/`
-            ),
-            '/:scope/account': redirectRoute(() =>
-              activeAccount ? `/account/${activeAccount.address}` : '/'
-            ),
-            '/:scope/referenda': redirectRoute(() => '/referenda'),
-            '/:scope/proposals': redirectRoute(() => '/proposals'),
-            '/:scope/council': redirectRoute(() => '/council'),
-            '/:scope/delegate': redirectRoute(() => '/delegate'),
-            '/:scope/proposal/:type/:identifier': redirectRoute(
-              (attrs) => `/proposal/${attrs.type}/${attrs.identifier}/`
-            ),
-            '/:scope/proposal/:identifier': redirectRoute(
-              (attrs) => `/proposal/${attrs.identifier}/`
-            ),
-            '/:scope/discussion/:identifier': redirectRoute(
-              (attrs) => `/discussion/${attrs.identifier}/`
-            ),
-            '/:scope/new/proposal/:type': redirectRoute(
-              (attrs) => `/new/proposal/${attrs.type}/`
-            ),
-            '/:scope/new/proposal': redirectRoute(() => '/new/proposal'),
-            '/:scope/treasury': redirectRoute(() => '/treasury'),
-            '/:scope/bounties': redirectRoute(() => '/bounties'),
-            '/:scope/tips': redirectRoute(() => '/tips'),
-            '/:scope/validators': redirectRoute(() => '/validators'),
-            '/:scope/login': redirectRoute(() => '/login'),
-            '/:scope/settings': redirectRoute(() => '/settings'),
-            '/:scope/admin': redirectRoute(() => '/admin'),
-            '/:scope/manage': redirectRoute(() => '/manage'),
-            '/:scope/spec_settings': redirectRoute(() => '/spec_settings'),
-            '/:scope/analytics': redirectRoute(() => '/analytics'),
-            '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
-              (attrs) => `/snapshot/${attrs.snapshotId}`
-            ),
-            '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
-              (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-            ),
-            '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
-              (attrs) => `/new/snapshot/${attrs.snapshotId}`
-            ),
-            '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
-              (attrs) => `/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-            ),
-            '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
-              (attrs) => `/new/snapshot/${attrs.snapshotId}`
-            ),
-          }
-        : {
-            //
-            // Global routes
-            //
-            '/': importRoute('views/pages/landing', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/communities': importRoute('views/pages/communities', {
-              scoped: false,
-              hideSidebar: false,
-            }),
-            '/search': importRoute('views/pages/search', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/whyCommonwealth': importRoute('views/pages/why_commonwealth', {
-              scoped: false,
-              hideSidebar: true,
-            }),
-            '/dashboard': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/dashboard/:type': importRoute('views/pages/user_dashboard', {
-              scoped: false,
-              deferChain: true,
-            }),
-            '/web3login': importRoute('views/pages/web3login', {
-              scoped: false,
-              deferChain: true,
-            }),
-            // Scoped routes
-            //
-            '/:scope/proposal/discussion/:identifier': redirectRoute(
-              (attrs) => `/${attrs.scope}/discussion/${attrs.identifier}`
-            ),
-
-            // Notifications
-            '/:scope/notifications': importRoute(
-              'views/pages/notifications_page',
-              { scoped: true, deferChain: true }
-            ),
-            '/notifications': redirectRoute(() => '/edgeware/notifications'),
-            '/notification-settings': importRoute(
-              'views/pages/notification_settings',
-              { scoped: true, deferChain: true }
-            ),
-            // NEAR
-            '/:scope/finishNearLogin': importRoute(
-              'views/pages/finish_near_login',
-              { scoped: true }
-            ),
-            '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
-              scoped: false,
-            }),
-            // Settings
-            '/settings': redirectRoute(() => '/edgeware/settings'),
-            '/:scope/settings': importRoute('views/pages/settings', {
-              scoped: true,
-            }),
-
-            // Discussions
-            '/home': redirectRoute('/'), // legacy redirect, here for compatibility only
-            '/discussions': redirectRoute('/'), // legacy redirect, here for compatibility only
-            '/:scope/home': redirectRoute((attrs) => `/${attrs.scope}/`),
-            '/:scope': importRoute('views/pages/discussions_redirect', {
-              scoped: true,
-            }),
-            '/:scope/discussions': importRoute('views/pages/discussions', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/overview': importRoute('views/pages/overview', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/discussions/:topic': importRoute(
-              'views/pages/discussions',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/search': importRoute('views/pages/search', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/members': importRoute('views/pages/members', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/sputnik-daos': importRoute('views/pages/sputnikdaos', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/chat/:channel': importRoute('views/pages/chat', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/new/discussion': importRoute('views/pages/new_thread', {
-              scoped: true,
-              deferChain: true,
-            }),
-            // Profiles
-            '/:scope/account/:address': importRoute('views/pages/profile', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/account': redirectRoute((a) =>
-              activeAccount
-                ? `/${a.scope}/account/${activeAccount.address}`
-                : `/${a.scope}/`
-            ),
-            // Governance
-            '/:scope/referenda': importRoute('views/pages/referenda', {
-              scoped: true,
-            }),
-            '/:scope/proposals': importRoute('views/pages/proposals', {
-              scoped: true,
-            }),
-            '/:scope/council': importRoute('views/pages/council', {
-              scoped: true,
-            }),
-            '/:scope/delegate': importRoute('views/pages/delegate', {
-              scoped: true,
-            }),
-            '/:scope/proposal/:type/:identifier': importRoute(
-              'views/pages/view_proposal/index',
-              { scoped: true }
-            ),
-            '/:scope/proposal/:identifier': importRoute(
-              'views/pages/view_proposal/index',
-              { scoped: true }
-            ),
-            '/:scope/discussion/:identifier': importRoute(
-              'views/pages/view_thread/index',
-              { scoped: true }
-            ),
-            '/:scope/new/proposal/:type': importRoute(
-              'views/pages/new_proposal/index',
-              { scoped: true }
-            ),
-            '/:scope/new/proposal': importRoute(
-              'views/pages/new_proposal/index',
-              { scoped: true }
-            ),
-
-            // Treasury
-            '/:scope/treasury': importRoute('views/pages/treasury', {
-              scoped: true,
-            }),
-            '/:scope/bounties': importRoute('views/pages/bounties', {
-              scoped: true,
-            }),
-            '/:scope/tips': importRoute('views/pages/tips', { scoped: true }),
-            '/:scope/validators': importRoute('views/pages/validators', {
-              scoped: true,
-            }),
-            // Settings
-            '/login': importRoute('views/pages/login', { scoped: false }),
-            '/:scope/login': importRoute('views/pages/login', {
-              scoped: true,
-              deferChain: true,
-            }),
-            // Admin
-            '/:scope/admin': importRoute('views/pages/admin', { scoped: true }),
-            '/manage': importRoute('views/pages/manage_community/index', {
-              scoped: false,
-            }),
-            '/:scope/manage': importRoute(
-              'views/pages/manage_community/index',
-              { scoped: true }
-            ),
-            '/:scope/spec_settings': importRoute('views/pages/spec_settings', {
-              scoped: true,
-              deferChain: true,
-            }),
-            '/:scope/analytics': importRoute('views/pages/stats', {
-              scoped: true,
-              deferChain: true,
-            }),
-
-            '/:scope/snapshot/:snapshotId': importRoute(
-              'views/pages/snapshot_proposals',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/multiple-snapshots': importRoute(
-              'views/pages/view_multiple_snapshot_spaces',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/snapshot/:snapshotId/:identifier': importRoute(
-              'views/pages/view_snapshot_proposal',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/new/snapshot/:snapshotId': importRoute(
-              'views/pages/new_snapshot_proposal',
-              { scoped: true, deferChain: true }
-            ),
-            '/:scope/snapshot-proposals/:snapshotId': redirectRoute(
-              (attrs) => `/${attrs.scope}/snapshot/${attrs.snapshotId}`
-            ),
-            '/:scope/snapshot-proposal/:snapshotId/:identifier': redirectRoute(
-              (attrs) =>
-                `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-            ),
-            '/:scope/new/snapshot-proposal/:snapshotId': redirectRoute(
-              (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
-            ),
-            '/:scope/snapshot-proposals/:snapshotId/:identifier': redirectRoute(
-              (attrs) =>
-                `/${attrs.scope}/snapshot/${attrs.snapshotId}/${attrs.identifier}`
-            ),
-            '/:scope/new/snapshot-proposals/:snapshotId': redirectRoute(
-              (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
-            ),
-          }),
-    });
-
-    const script = document.createElement('noscript');
-    // eslint-disable-next-line max-len
-    m.render(
-      script,
-      m.trust(
-        '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'
-      )
-    );
-    document.body.insertBefore(script, document.body.firstChild);
-
-    // initialize mixpanel, before adding an alias or tracking identity
-    try {
-      if (
-        document.location.host.startsWith('localhost') ||
-        document.location.host.startsWith('127.0.0.1')
-      ) {
-        mixpanel.init(MIXPANEL_DEV_TOKEN, { debug: true });
-      } else {
-        // Production Mixpanel Project
-        mixpanel.init(MIXPANEL_PROD_TOKEN, { debug: true });
-      }
-    } catch (e) {
-      console.error('Mixpanel initialization error');
-    }
-
-    // handle login redirects
-    if (
-      m.route.param('loggedin') &&
-      m.route.param('loggedin').toString() === 'true' &&
-      m.route.param('path') &&
-      !m.route.param('path').startsWith('/login')
-    ) {
-      // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
-      // handle param-based redirect after email login
-
-      /* If we are creating a new account, then we alias to create a new mixpanel user
-       else we identify to associate mixpanel events
-    */
-      if (m.route.param('new') && m.route.param('new').toString() === 'true') {
-        console.log('creating account');
-
-        try {
-        } catch (err) {
-          // Don't do anything... Just identify if there is an error
-          // mixpanel.identify(m.route.param('email').toString());
-        }
-      } else {
-      }
-      m.route.set(m.route.param('path'), {}, { replace: true });
-    } else if (
-      localStorage &&
-      localStorage.getItem &&
-      localStorage.getItem('githubPostAuthRedirect')
-    ) {
-      // handle localStorage-based redirect after Github login (callback must occur within 30 seconds)
-      try {
-        const postAuth = JSON.parse(
-          localStorage.getItem('githubPostAuthRedirect')
-        );
-        if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-          m.route.set(postAuth.path, {}, { replace: true });
-        }
-        localStorage.removeItem('githubPostAuthRedirect');
-      } catch (e) {
-        console.log('Error restoring path from localStorage');
-      }
-    } else if (
-      localStorage &&
-      localStorage.getItem &&
-      localStorage.getItem('discordPostAuthRedirect')
-    ) {
-      try {
-        const postAuth = JSON.parse(
-          localStorage.getItem('discordPostAuthRedirect')
-        );
-        if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-          m.route.set(postAuth.path, {}, { replace: true });
-        }
-        localStorage.removeItem('discordPostAuthRedirect');
-      } catch (e) {
-        console.log('Error restoring path from localStorage');
-      }
-    }
-    if (m.route.param('loggedin')) {
-      notifySuccess('Logged in!');
-    } else if (m.route.param('loginerror')) {
-      notifyError('Could not log in');
-      console.error(m.route.param('loginerror'));
-    }
+    injectGoogleTagManagerScript();
+    initializeMixpanel();
+    handleLoginRedirects();
+    showLoginNotification();
 
     // initialize the app
     initAppState(true, customDomain)
@@ -1177,8 +634,5 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 declare const module: any; // tslint:disable-line no-reserved-keywords
 if (module.hot) {
   module.hot.accept();
-  // module.hot.dispose((data: any) => {
-  //   m.redraw();
-  // })
 }
 // /////////////////////////////////////////////////////////

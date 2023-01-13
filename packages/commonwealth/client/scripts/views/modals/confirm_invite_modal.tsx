@@ -11,7 +11,7 @@ import { orderAccountsByAddress } from 'helpers';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { UserBlock } from 'views/components/widgets/user';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { InviteCodeAttributes } from 'types';
 import { AddressInfo } from 'models';
 import { ModalExitButton } from 'views/components/component_kit/cw_modal';

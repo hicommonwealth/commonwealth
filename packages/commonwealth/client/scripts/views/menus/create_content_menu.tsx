@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { SubstrateAccount } from 'controllers/chain/substrate/account';

@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'components/proposal_card/index.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { slugify } from 'utils';
 import { isNotNil } from 'helpers/typeGuards';
 import { AnyProposal } from 'models';

@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'pages/chat.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { ChatWindow } from 'views/components/chat/chat_window';
 import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';

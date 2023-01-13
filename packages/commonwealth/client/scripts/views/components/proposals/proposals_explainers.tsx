@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import BN from 'bn.js';
 
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import { CountdownUntilBlock } from 'views/components/countdown';
 import { GovExplainer } from '../gov_explainer';

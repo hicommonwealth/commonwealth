@@ -8,7 +8,7 @@ import { Button, PopoverMenu } from 'construct-ui';
 import 'components/header/notifications_menu.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import NotificationRow from '../components/notification_row';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';

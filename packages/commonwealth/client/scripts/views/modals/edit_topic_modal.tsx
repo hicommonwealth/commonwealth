@@ -7,7 +7,7 @@ import $ from 'jquery';
 import 'modals/edit_topic_modal.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { Topic } from 'models';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';

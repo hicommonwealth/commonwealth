@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'pages/tips.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { formatCoin } from 'adapters/currency';
 import { ProposalType, ChainBase } from 'common-common/src/types';
 import Substrate from 'controllers/chain/substrate/adapter';

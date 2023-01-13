@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'pages/discussions/recent_threads_header.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { parseCustomStages } from 'helpers';
 import { isUndefined } from 'helpers/typeGuards';
 import { ThreadStage } from 'models';

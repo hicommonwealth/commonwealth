@@ -6,7 +6,7 @@ import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { ICardListItem } from 'models/interfaces';
 import app from 'state';
 import { ThreadStage } from 'models';
-import { navigateToSubpage } from '../app';
+import { navigateToSubpage } from '../router';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));

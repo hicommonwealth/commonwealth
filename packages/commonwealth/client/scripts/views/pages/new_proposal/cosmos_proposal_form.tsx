@@ -5,7 +5,7 @@ import ClassComponent from 'class_component';
 import { Any as ProtobufAny } from 'cosmjs-types/google/protobuf/any';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import CosmosAccount from 'controllers/chain/cosmos/account';
 import { notifyError } from 'controllers/app/notifications';
 import { CosmosToken } from 'controllers/chain/cosmos/types';

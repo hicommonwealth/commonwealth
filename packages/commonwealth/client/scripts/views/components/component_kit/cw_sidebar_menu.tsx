@@ -7,7 +7,7 @@ import { ListItem, Icon, Icons } from 'construct-ui';
 import 'components/component_kit/cw_sidebar_menu.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { AddressInfo, ChainInfo, RoleInfo } from 'models';
 import { getClasses } from './helpers';
 import { CWText } from './cw_text';

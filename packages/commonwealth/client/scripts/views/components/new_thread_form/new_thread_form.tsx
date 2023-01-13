@@ -8,7 +8,7 @@ import $ from 'jquery';
 import 'components/new_thread_form.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { detectURL } from 'helpers/threads';
 import {
   Topic,

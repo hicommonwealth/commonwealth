@@ -7,7 +7,7 @@ import 'pages/overview/index.scss';
 
 import app from 'state';
 import { Thread, Topic } from 'models';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { TopicSummaryRow } from './topic_summary_row';

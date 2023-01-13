@@ -4,7 +4,7 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { notifyInfo } from 'controllers/app/notifications';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';

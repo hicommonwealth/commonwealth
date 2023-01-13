@@ -7,7 +7,7 @@ import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import bs58 from 'bs58';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { ChainBase } from 'common-common/src/types';
 import { Thread, Comment, Profile } from 'models';
 

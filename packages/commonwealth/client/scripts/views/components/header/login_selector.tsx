@@ -16,7 +16,8 @@ import _ from 'lodash';
 import 'components/header/login_selector.scss';
 
 import app from 'state';
-import { navigateToSubpage, initAppState } from 'app';
+import { initAppState } from 'app';
+import { navigateToSubpage } from 'router';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { AddressInfo, ITokenAdapter } from 'models';
 import { isSameAccount, pluralize } from 'helpers';

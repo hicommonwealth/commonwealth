@@ -6,7 +6,7 @@ import ClassComponent from 'class_component';
 import 'pages/council.scss';
 
 import app, { ApiStatus } from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import { ProposalType, ChainBase } from 'common-common/src/types';
 import { pluralize } from 'helpers';
 import Substrate from 'controllers/chain/substrate/adapter';

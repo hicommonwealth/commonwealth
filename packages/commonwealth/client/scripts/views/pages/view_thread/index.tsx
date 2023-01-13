@@ -7,7 +7,7 @@ import ClassComponent from 'class_component';
 import 'pages/view_thread/index.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { navigateToSubpage } from 'router';
 import Sublayout from 'views/sublayout';
 import { ProposalType } from 'common-common/src/types';
 import { getProposalUrlPath, idToProposal } from 'identifiers';
