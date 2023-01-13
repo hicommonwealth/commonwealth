@@ -89,6 +89,48 @@ export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
   [AccessLevel.Everyone, everyonePermissions],
 ]);
 
+const impliedAllowPermissionsByAction = new Map<number, Action[]>([
+  // Chat Subtree
+  [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
+  // View Subtree
+  [Action.VIEW_THREADS, [Action.VIEW_COMMENTS]],
+  [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS]],
+  // Create Subtree
+  [Action.CREATE_THREAD, [Action.VIEW_THREADS, Action.CREATE_COMMENT]],
+  [Action.CREATE_POLL, [Action.VOTE_ON_POLLS]],
+  [Action.CREATE_COMMENT, [Action.CREATE_REACTION, Action.VIEW_COMMENTS]],
+  [Action.CREATE_REACTION, [Action.VIEW_REACTIONS]],
+  // Voting Subtree
+  [Action.VOTE_ON_POLLS, [Action.VIEW_POLLS]],
+  // Delete Subtree
+  [Action.DELETE_THREAD, [Action.EDIT_THREAD]],
+  [Action.DELETE_COMMENT, [Action.EDIT_COMMENT]],
+  [Action.DELETE_TOPIC, [Action.MANAGE_TOPIC]],
+  // Edit Subtree
+  [Action.EDIT_THREAD, [Action.CREATE_THREAD]],
+  [Action.EDIT_COMMENT, [Action.CREATE_COMMENT]],
+]);
+
+const impliedDenyPermissionsByAction = new Map<number, Action[]>([
+  // Chat Subtree
+  [Action.VIEW_CHAT_CHANNELS, [Action.CREATE_CHAT]],
+  // View Subtree
+  [Action.VIEW_REACTIONS, [Action.VIEW_COMMENTS, Action.CREATE_REACTION]],
+  [Action.VIEW_COMMENTS, [Action.VIEW_THREADS, Action.CREATE_COMMENT]],
+  [Action.VIEW_POLLS, [Action.VOTE_ON_POLLS]],
+  [Action.VIEW_THREADS, [Action.CREATE_THREAD]],
+  // Create Subtree
+  [Action.CREATE_REACTION, [Action.CREATE_COMMENT]],
+  [Action.CREATE_COMMENT, [Action.EDIT_COMMENT, Action.CREATE_THREAD]],
+  [Action.CREATE_THREAD, [Action.EDIT_THREAD]],
+  [Action.MANAGE_TOPIC, [Action.DELETE_TOPIC]],
+  // Voting Subtree
+  [Action.VOTE_ON_POLLS, [Action.CREATE_POLL]],
+  // Edit Subtree
+  [Action.EDIT_COMMENT, [Action.DELETE_COMMENT]],
+  [Action.EDIT_THREAD, [Action.DELETE_THREAD]],
+]);
+
 type allowDenyBigInt = {
   allow: bigint;
   deny: bigint;
@@ -109,13 +151,34 @@ export class PermissionManager {
     return permissions;
   }
 
-  public addAllowPermission(
-    allowPermission: bigint,
-    actionNumber: number
-  ): bigint {
-    const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
-    const newAllowPermission: bigint = allowPermission | actionAsBigInt;
-    return newAllowPermission;
+  public getAllowedPermissionsByAction(action: Action): Action[] {
+    const allowedPermissions = [action];
+    let currentPermission = action;
+    while (impliedAllowPermissionsByAction.has(currentPermission)) {
+      const newPermissions = impliedAllowPermissionsByAction.get(
+        currentPermission
+      );
+      if (newPermissions) {
+        allowedPermissions.push(...newPermissions);
+      }
+      currentPermission = newPermissions[0];
+    }
+    return allowedPermissions;
+  }
+
+  public getDeniedPermissionsByAction(action: Action): Action[] {
+    const deniedPermissions = [];
+    let currentPermission = action;
+    while (impliedDenyPermissionsByAction.has(currentPermission)) {
+      const newPermissions = impliedDenyPermissionsByAction.get(
+        currentPermission
+      );
+      if (newPermissions) {
+        deniedPermissions.push(...newPermissions);
+      }
+      currentPermission = newPermissions[0];
+    }
+    return deniedPermissions;
   }
 
   public removeAllowPermission(
@@ -127,15 +190,6 @@ export class PermissionManager {
     return newAllowPermission;
   }
 
-  public addDenyPermission(
-    denyPermission: bigint,
-    actionNumber: number
-  ): bigint {
-    const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
-    const newDenyPermission: bigint = denyPermission | actionAsBigInt;
-    return newDenyPermission;
-  }
-
   public removeDenyPermission(
     denyPermission: bigint,
     actionNumber: number
@@ -143,6 +197,34 @@ export class PermissionManager {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
     const newDenyPermission: bigint = denyPermission & ~actionAsBigInt;
     return newDenyPermission;
+  }
+
+  public addAllowPermissions(
+    allowPermission: bigint,
+    actionNumber: number
+  ): bigint {
+    let result = BigInt(allowPermission);
+    const implicitActions = this.getAllowedPermissionsByAction(actionNumber);
+    if (implicitActions) {
+      for (let i = 0; i < implicitActions.length; i++) {
+        result |= BigInt(1) << BigInt(implicitActions[i]);
+      }
+    }
+    return result;
+  }
+
+  public addDenyPermissions(
+    denyPermission: bigint,
+    actionNumber: number
+  ): bigint {
+    let result = BigInt(denyPermission);
+    const implicitActions = this.getAllowedPermissionsByAction(actionNumber);
+    if (implicitActions) {
+      for (let i = 0; i < implicitActions.length; i++) {
+        result |= BigInt(1) << BigInt(implicitActions[i]);
+      }
+    }
+    return result;
   }
 
   mapPermissionsToBigint(permissions: Permissions): bigint {

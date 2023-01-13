@@ -35,6 +35,8 @@ export async function addAllowDenyPermissionsForCommunityRole(
   allow_permission: number | undefined,
   deny_permission: number | undefined
 ) {
+  try {
+    console.log('addAllowDenyPermissionsForCommunityRole');
   const permissionsManager = new PermissionManager();
   // get community role object from the database
   const communityRole = await models.CommunityRole.findOne({
@@ -46,21 +48,25 @@ export async function addAllowDenyPermissionsForCommunityRole(
   let denyPermission;
   let allowPermission;
   if (deny_permission) {
-    denyPermission = permissionsManager.addDenyPermission(
+    denyPermission = permissionsManager.addDenyPermissions(
       BigInt(communityRole?.deny || 0),
       deny_permission,
     );
     communityRole.deny = denyPermission;
   }
   if (allow_permission) {
-    allowPermission = permissionsManager.addAllowPermission(
+    allowPermission = permissionsManager.addAllowPermissions(
       BigInt(communityRole?.allow || 0),
       allow_permission,
     );
     communityRole.allow = allowPermission;
   }
   // save community role object to the database
-  await communityRole.save();
+  const updatedRole = await communityRole.save();
+  console.log('updatedRole', updatedRole);
+  } catch(err) {
+    throw new Error(err);
+  }
 }
 
 export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
