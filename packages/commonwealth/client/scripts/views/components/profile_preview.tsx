@@ -6,14 +6,16 @@ import jdenticon from 'jdenticon';
 
 import 'components/profile_preview.scss';
 
-import { NewProfile as Profile } from 'models';
+import { AddressInfo, NewProfile as Profile } from 'models';
 import { CWText } from './component_kit/cw_text';
 import { renderQuillTextBody } from './quill/helpers';
 import { SocialAccounts } from './social_accounts';
 import { CWButton } from './component_kit/cw_button';
+import { LinkedAddresses } from './linked_addresses';
 
 type ProfilePreviewAttrs = {
   profile: Profile;
+  addresses: AddressInfo[];
 };
 
 export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
@@ -24,35 +26,43 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
   }
 
   view(vnode: m.Vnode<ProfilePreviewAttrs>) {
-    const { profile } = vnode.attrs;
+    const { profile, addresses } = vnode.attrs;
     const { name, bio, avatarUrl, socials } = profile;
 
-    console.log('profile', profile)
+    console.log('profile', profile, addresses)
 
     return (
       <div className="ProfilePreview">
-        <div className="avatar">
-          <img src={avatarUrl} />
+        <div className="profile">
+          <div className="avatar">
+            <img src={avatarUrl} />
+          </div>
+          <div className="right-side">
+            <div className="content">
+              <CWText type="h4">
+                {name}
+              </CWText>
+              <CWText>
+                {renderQuillTextBody(bio)}
+              </CWText>
+              <SocialAccounts profile={profile} />
+            </div>
+            <div className="action">
+              <CWButton
+                label="Edit"
+                buttonType="mini-white"
+                onclick={() =>
+                  m.route.set(`/profile/${m.route.param('address')}/edit`)
+                }
+              />
+            </div>
+          </div>
         </div>
-        <div className="right-side">
-          <div className="content">
-            <CWText type="h4">
-              {name}
-            </CWText>
-            <CWText>
-              {renderQuillTextBody(bio)}
-            </CWText>
-            <SocialAccounts profile={profile} />
-          </div>
-          <div className="action">
-            <CWButton
-              label="Edit"
-              buttonType="mini-white"
-              onclick={() =>
-                m.route.set(`/profile/${m.route.param('address')}/edit`)
-              }
-            />
-          </div>
+        <div className="addresses">
+          <CWText type="h5">
+            Linked Addresses
+          </CWText>
+          <LinkedAddresses addresses={addresses} />
         </div>
       </div>
     );

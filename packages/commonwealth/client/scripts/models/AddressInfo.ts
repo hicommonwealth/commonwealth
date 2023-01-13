@@ -5,6 +5,7 @@ import Account from './Account';
 class AddressInfo extends Account {
   public readonly keytype: string;
   public readonly id: number;
+  public readonly profileId: number;
 
   constructor(
     id: number | null | undefined,
@@ -13,6 +14,7 @@ class AddressInfo extends Account {
     keytype?: string,
     walletId?: WalletId,
     ghostAddress?: boolean,
+    profileId?: number,
   ) {
     const chain = app.config.chains.getById(chainId);
     if (!chain) throw new Error(`Failed to locate chain: ${chainId}`);
@@ -21,10 +23,11 @@ class AddressInfo extends Account {
       chain,
       addressId: id,
       walletId,
-      ghostAddress
+      ghostAddress,
     });
     this.id = id;
     this.keytype = keytype;
+    this.profileId = profileId;
   }
 }
 

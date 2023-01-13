@@ -5,6 +5,7 @@ import { CommentAttributes } from 'commonwealth/server/models/comment';
 import { ReactionAttributes } from 'commonwealth/server/models/reaction';
 import { ChainAttributes } from 'commonwealth/server/models/chain';
 import { ProfileAttributes } from 'commonwealth/server/models/profile';
+import { AddressAttributes } from 'commonwealth/server/models/address';
 import { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
 
 export enum OrderByOptions {
@@ -90,7 +91,6 @@ export type GetNewProfilesReq = {
   jwt: string;
 }
 
-export type GetNewProfilesResp = { profiles?: ProfileAttributes[] };
-
+export type GetNewProfilesResp = { profiles?: ProfileAttributes[], addresses?: AddressAttributes[] };
 
 export const needParamErrMsg = 'Please provide a parameter to query by';

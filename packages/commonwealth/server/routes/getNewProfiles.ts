@@ -1,8 +1,10 @@
 import { GetNewProfilesReq, GetNewProfilesResp } from 'common-common/src/api/extApiTypes';
 import { validationResult } from 'express-validator';
 import { TypedRequestQuery, TypedResponse, success, failure } from '../types';
+import { DB } from '../models';
 
 const getNewProfiles = async (
+  models: DB,
   req: TypedRequestQuery<GetNewProfilesReq>,
   res: TypedResponse<GetNewProfilesResp>,
 ) => {
@@ -12,8 +14,9 @@ const getNewProfiles = async (
   }
 
   const profiles = await req.user.getProfiles();
+  const addresses = await req.user.getAddresses();
 
-  return success(res, { profiles });
+  return success(res, { profiles, addresses });
 };
 
 export default getNewProfiles;
