@@ -46,6 +46,7 @@ import setupPassport from './server/passport';
 import expressStatsdInit from './server/scripts/setupExpressStats';
 import GlobalActivityCache from './server/util/globalActivityCache';
 import DatabaseValidationService from './server/middleware/databaseValidationService';
+import * as v8 from "v8";
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -53,6 +54,8 @@ const log = factory.getLogger(formatFilename(__filename));
 require('express-async-errors');
 
 const app = express();
+
+console.log("Node Option max-old-space-size set to:", v8.getHeapStatistics().total_available_size / 1024 / 1024);
 
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
