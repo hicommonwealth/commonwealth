@@ -349,38 +349,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 }}
                 options={true}
               />
-              {/* <CWText type="caption" fontWeight="medium" className="cover-image-title">Set as</CWText>
-              <CWRadioGroup
-                name="image-as"
-                onchange={(e) => { this.imageAs = e.target.value }}
-                toggledOption={this.imageAs}
-                options={[
-                  {
-                    label: 'Cover Image',
-                    value: 'cover-image',
-                  },
-                  {
-                    label: 'Background',
-                    value: 'background',
-                  }
-                ]}
-              />
-              <CWText type="caption" fontWeight="medium" className="cover-image-title">Choose Image Behavior</CWText>
-              <CWRadioGroup
-                name="image-behaviour"
-                onchange={(e) => { this.imageBehavour = e.target.value }}
-                toggledOption={this.imageBehavour}
-                options={[
-                  {
-                    label: 'Strech',
-                    value: 'stretch',
-                  },
-                  {
-                    label: 'Tile',
-                    value: 'tile',
-                  }
-                ]}
-              /> */}
             </CWFormSection>
             {/* TODO: Add back in when we have a way to manage addresses */}
             {/* <CWFormSection

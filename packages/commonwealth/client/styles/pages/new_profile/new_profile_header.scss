@@ -26,8 +26,10 @@
     margin-bottom: 16px;
 
     img {
-      max-height: 160px;
+      height: 160px;
+      width: 160px;
       border-radius: 50%;
+      object-fit: cover;
     }
   }
 
