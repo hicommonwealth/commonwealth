@@ -11,7 +11,7 @@ import { IWebWallet } from 'client/scripts/models';
 import { ethers } from 'ethers';
 import { Result } from 'ethers/lib/utils';
 
-async function sendFunctionCall(
+export async function sendFunctionCall(
   fn: AbiItem,
   signingWallet: IWebWallet<any>,
   contract: Contract,

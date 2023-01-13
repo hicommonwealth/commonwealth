@@ -13,9 +13,9 @@ import { CreateFactoryEthDaoForm } from '../views/pages/create_community/types';
 import { processAbiInputsToDataTypes } from './abi_form_helpers';
 import ContractAbi from '../models/ContractAbi';
 import {
-  encodeFunctionCall,
   sendFunctionCall,
 } from '../controllers/chain/ethereum/callContractFunction';
+import { ethers } from 'ethers';
 
 export function decodeTxParameterFromEvent(
   web3: Web3,
@@ -61,7 +61,8 @@ export async function createCuratedProjectDao(
     formInputMap
   );
 
-  const functionTx = encodeFunctionCall(web3, fn, contract, processedArgs);
+  const ethersInterface = new ethers.utils.Interface(contract.abi);
+  const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
 
   const txReceipt: TransactionReceipt | any = await sendFunctionCall(
     fn,
