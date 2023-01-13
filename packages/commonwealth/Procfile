@@ -1,3 +1,2 @@
 web: cd packages/commonwealth && ts-node -P tsconfig.server.json -T server.ts
-consumer: cd packages/commonwealth && node build/commonwealth/server/CommonwealthConsumer/CommonwealthConsumer.js run-as-script
 release: cd packages/commonwealth && npx sequelize-cli db:migrate --config server/sequelize.json
