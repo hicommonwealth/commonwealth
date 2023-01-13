@@ -10,6 +10,8 @@ import { TransactionConfig, TransactionReceipt } from 'web3-core/types';
 import { AbiItem, AbiOutput } from 'web3-utils';
 import Contract from 'client/scripts/models/Contract';
 import { IWebWallet } from 'client/scripts/models';
+import { ethers } from 'ethers';
+import { Result } from 'ethers/lib/utils';
 
 /**
  * Uses the function Abi Item and processed arguments to encode a function call.
@@ -72,27 +74,15 @@ async function sendFunctionCall(
  * Uses the tx hash and function outputs to decodes the transaction data from the hash.
  */
 async function decodeTransactionData(
-  abiOutputs: AbiOutput[],
+  abi: Record<string, unknown>[],
+  fnName: string,
   tx: any
-): Promise<any[]> {
+): Promise<Result> {
   try {
-    const sender = app.user.activeAccount;
-    // get querying wallet
-    const signingWallet = await app.wallets.locateWallet(
-      sender,
-      ChainBase.Ethereum
-    );
-    if (!signingWallet.api) {
-      throw new Error('Web3 Api Not Initialized');
-    }
-    const web3: Web3 = signingWallet.api;
-    const decodedTxMap = web3.eth.abi.decodeParameters(
-      abiOutputs.map((output) => output.type),
-      tx
-    );
-    // complex return type
-    const result = Array.from(Object.values(decodedTxMap));
-    return result;
+    const ethersInterface = new ethers.utils.Interface(abi);
+    // const txFunctionFragment = ethersInterface.getFunction(fnName)
+    const functionResult: Result = ethersInterface.decodeFunctionResult(fnName, tx)
+    return functionResult;
   } catch (error) {
     console.error('Transaction Data Decoding Failed:', error);
     throw new Error(`Transaction Data Decoding Failed: ${error}`);
@@ -112,7 +102,7 @@ export async function callContractFunction(
   contract: Contract,
   fn: AbiItem,
   formInputMap: Map<string, Map<number, string>>
-): Promise<any[]> {
+): Promise<Result> {
   const sender = app.user.activeAccount;
   // get querying wallet
   const signingWallet = await app.wallets.locateWallet(
@@ -139,5 +129,5 @@ export async function callContractFunction(
     functionTx,
     web3
   );
-  return decodeTransactionData(fn.outputs, txReceipt);
+  return decodeTransactionData(contract.abi, fn.name, txReceipt);
 }
