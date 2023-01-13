@@ -1,7 +1,14 @@
+/* eslint-disable @typescript-eslint/no-namespace */
+import { Static as MStatic, Route } from 'mithril-lib';
 import * as lib from './mithril';
 
+namespace Mithril {
+  export interface Static extends MStatic { }
+}
+
 // eslint-disable-next-line prefer-rest-params
-const m = function m() { return lib.render.apply(this, arguments) }
+const m = function () { return lib.render.apply(this, arguments); };
+
 m.m = lib.render;
 m.trust = lib.trust
 m.fragment = lib.fragment;
@@ -13,10 +20,18 @@ m.Fragment = {
     },
 };
 
-m.redraw = lib.redraw;
+// eslint-disable-next-line prefer-rest-params
+m.redraw = function () { return lib.redraw.apply(this, arguments); } as Mithril.Static['redraw'];
+m.redraw.sync = () => lib.redraw(true)
+
 m.mount = lib.rootMount;
 m.render = lib.rootRender;
-m.route = lib.setRoute;
+m.route = {
+  set: lib.setRoute,
+  get: lib.getRoute,
+  param: lib.getRouteParam,
+  prefix: '',
+} as Route;
 m.parsePathname = lib.parsePathname;
 m.request = lib.request;
 
@@ -28,4 +43,4 @@ m.buildPathname = () => { throw new Error('not implemented'); };
 m.PromisePolyfill = () => { throw new Error('not implemented'); };
 m.censor = () => { throw new Error('not implemented'); };
 
-export default m;
+export default m as Mithril.Static;
