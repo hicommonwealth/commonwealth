@@ -13,7 +13,7 @@ MEMORY_LIMIT=$(echo -n "$(</sys/fs/cgroup/memory/memory.limit_in_bytes)")
 # the total ram breaks
 if [ "$MEMORY_LIMIT" ] && [ "$MEMORY_LIMIT" -gt 400000000 ]; then
   # set to 70% of total ram on the dyno
-  echo $($MEMORY_LIMIT*70/100/1000000);
+  echo $((MEMORY_LIMIT*70/100/1000000));
 else
   # default to 4GB
   echo 4096;
