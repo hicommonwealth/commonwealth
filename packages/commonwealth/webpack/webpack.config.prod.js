@@ -6,7 +6,7 @@ const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = merge(common, {
   entry: {
-    app: 'app.tsx',
+    app: 'app.new.tsx',
   },
   mode: 'production',
   stats: 'errors-only',
