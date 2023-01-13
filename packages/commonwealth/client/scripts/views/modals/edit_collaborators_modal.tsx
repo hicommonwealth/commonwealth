@@ -20,6 +20,7 @@ import { ModalExitButton } from '../components/component_kit/cw_modal';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWLabel } from '../components/component_kit/cw_label';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
 
 type EditCollaboratorsModalAttrs = {
   thread: Thread;
@@ -30,33 +31,38 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
   private items: any[];
   private membersFetched: boolean;
   private removedEditors: any;
+  private searchTerm: string;
 
   view(vnode: m.Vnode<EditCollaboratorsModalAttrs>) {
     const { thread } = vnode.attrs;
 
-    // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state
-    if (!this.membersFetched) {
-      this.membersFetched = true;
-      const chainOrCommObj = { chain: app.activeChainId() };
+    const fetchMembers = async (searchTerm) => {
+      const chainOrCommObj = { chain: app.activeChainId(), searchTerm };
 
-      // TODO Graham 4/4/21: This needs pagination, search, or serializing.
-      // The fetch time for large communities is getting unwieldy.
-      $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
+      await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
         .then((response) => {
           if (response.status !== 'Success')
             throw new Error('Could not fetch members');
           this.items = response.result.filter((role) => {
             return role.Address.address !== app.user.activeAccount?.address;
           });
+
+          console.log('response', response.result);
           m.redraw();
         })
         .catch((err) => {
           m.redraw();
           console.error(err);
         });
+    };
+
+    if (!this.membersFetched) {
+      this.items = [];
+      fetchMembers('');
+      this.membersFetched = true;
     }
 
-    if (!this.items?.length) return;
+    // if (!this.items?.length) return;
 
     if (!this.addedEditors) {
       this.addedEditors = {};
@@ -81,6 +87,44 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
         <div class="compact-modal-body">
           <div class="user-list-container">
             <CWLabel label="Users" />
+            <div class="selected-collaborators-section">
+              <CWTextInput
+                label="Search"
+                value={this.searchTerm}
+                oninput={async (e) => {
+                  this.searchTerm = e.target.value;
+                  await fetchMembers(this.searchTerm);
+                }}
+              />
+              <div class="collaborator-rows-container">
+                {items.map((c) => {
+                  const user: Profile = app.profiles.getProfile(
+                    c.chain_id,
+                    c.Address.address
+                  );
+
+                  return (
+                    <div class="collaborator-row">
+                      {m(User, { user })}
+                      <CWIconButton
+                        iconName="close"
+                        iconSize="small"
+                        onclick={async () => {
+                          // If already scheduled for addition, un-schedule
+                          if (this.addedEditors[c.address]) {
+                            delete this.addedEditors[c.address];
+                          } else {
+                            // If already an existing editor, schedule for removal
+                            this.removedEditors[c.address] = c;
+                          }
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+            {/* <CWLabel label="Selected collaborators" />
             {m(QueryList, {
               checkmark: true,
               items,
@@ -135,7 +179,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   notifyInfo('Already an editor');
                 }
               },
-            })}
+            })} */}
           </div>
           {allCollaborators.length > 0 ? (
             <div class="selected-collaborators-section">
