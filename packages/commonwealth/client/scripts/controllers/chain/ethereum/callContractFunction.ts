@@ -13,29 +13,6 @@ import { IWebWallet } from 'client/scripts/models';
 import { ethers } from 'ethers';
 import { Result } from 'ethers/lib/utils';
 
-/**
- * Uses the function Abi Item and processed arguments to encode a function call.
- * @return encoded function call transaction hash
- */
-
-function encodeFunctionCall(
-  web3: Web3,
-  fn: AbiItem,
-  contract: Contract,
-  processedArgs: any[]
-) {
-  const methodSignature = encodeFunctionSignature(fn);
-  const functionContract = new web3.eth.Contract(
-    parseAbiItemsFromABI(contract.abi),
-    contract.address
-  );
-
-  const functionTx = functionContract.methods[methodSignature](
-    ...processedArgs
-  );
-  return functionTx;
-}
-
 async function sendFunctionCall(
   fn: AbiItem,
   signingWallet: IWebWallet<any>,
@@ -53,14 +30,14 @@ async function sendFunctionCall(
     const tx: TransactionConfig = {
       from: signingWallet.accounts[0],
       to: contract.address,
-      data: functionTx.encodeABI(),
+      data: functionTx,
     };
     txReceipt = await web3.eth.sendTransaction(tx);
   } else {
     // send call transaction
     const tx: TransactionConfig = {
       to: contract.address,
-      data: functionTx.encodeABI(),
+      data: functionTx,
     };
     txReceipt = await web3.givenProvider.request({
       method: 'eth_call',
@@ -68,25 +45,6 @@ async function sendFunctionCall(
     });
   }
   return txReceipt;
-}
-
-/**
- * Uses the tx hash and function outputs to decodes the transaction data from the hash.
- */
-async function decodeTransactionData(
-  abi: Record<string, unknown>[],
-  fnName: string,
-  tx: any
-): Promise<Result> {
-  try {
-    const ethersInterface = new ethers.utils.Interface(abi);
-    // const txFunctionFragment = ethersInterface.getFunction(fnName)
-    const functionResult: Result = ethersInterface.decodeFunctionResult(fnName, tx)
-    return functionResult;
-  } catch (error) {
-    console.error('Transaction Data Decoding Failed:', error);
-    throw new Error(`Transaction Data Decoding Failed: ${error}`);
-  }
 }
 
 /**
@@ -120,8 +78,8 @@ export async function callContractFunction(
     fn.inputs,
     formInputMap
   );
-
-  const functionTx = encodeFunctionCall(web3, fn, contract, processedArgs);
+  const ethersInterface = new ethers.utils.Interface(contract.abi);
+  const functionTx = ethersInterface.encodeFunctionData(fn.name, processedArgs);
   const txReceipt: TransactionReceipt | any = await sendFunctionCall(
     fn,
     signingWallet,
@@ -129,5 +87,5 @@ export async function callContractFunction(
     functionTx,
     web3
   );
-  return decodeTransactionData(contract.abi, fn.name, txReceipt);
+  return ethersInterface.decodeFunctionResult(fn.name, txReceipt);
 }
