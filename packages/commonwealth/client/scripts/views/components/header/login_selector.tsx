@@ -3,14 +3,6 @@
 import $ from 'jquery';
 import m from 'mithril';
 import ClassComponent from 'class_component';
-import {
-  MenuItem,
-  MenuDivider,
-  Button,
-  Icons,
-  ButtonGroup,
-  PopoverMenu,
-} from 'construct-ui';
 import _ from 'lodash';
 
 import 'components/header/login_selector.scss';
@@ -18,7 +10,7 @@ import 'components/header/login_selector.scss';
 import app from 'state';
 import { navigateToSubpage, initAppState } from 'app';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { AddressInfo, ITokenAdapter } from 'models';
+import { Account, AddressInfo, ITokenAdapter } from 'models';
 import { isSameAccount, pluralize } from 'helpers';
 import { notifySuccess } from 'controllers/app/notifications';
 import {
@@ -30,7 +22,6 @@ import { User } from 'views/components/user/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWText } from '../component_kit/cw_text';
 import { CWButton } from '../component_kit/cw_button';
@@ -39,6 +30,8 @@ import { AccountSelector } from '../component_kit/cw_wallets_list';
 import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWToggle } from '../component_kit/cw_toggle';
 import { UserBlock } from '../user/user_block';
+import { CWDivider } from '../component_kit/cw_divider';
+import { CWPopover } from '../component_kit/cw_popover/cw_popover';
 
 const CHAINBASE_SHORT = {
   [ChainBase.CosmosSDK]: 'Cosmos',
@@ -54,58 +47,51 @@ const CHAINNETWORK_SHORT = {
 };
 
 type LoginSelectorMenuLeftAttrs = {
-  activeAddressesWithRole: any;
-  mobile?: boolean;
+  activeAddressesWithRole: Array<Account>;
   nAccountsWithoutRole: number;
 };
 
 export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftAttrs> {
   view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
-    const { activeAddressesWithRole, nAccountsWithoutRole, mobile } =
-      vnode.attrs;
+    const { activeAddressesWithRole, nAccountsWithoutRole } = vnode.attrs;
 
     return (
-      <>
-        {activeAddressesWithRole.map((account) =>
-          m(MenuItem, {
-            align: 'left',
-            basic: true,
-            onclick: async () => {
+      <div class="LoginSelectorMenu">
+        {activeAddressesWithRole.map((account) => (
+          <div
+            class="login-menu-item"
+            onclick={async () => {
               await setActiveAccount(account);
               m.redraw();
-            },
-            label: (
-              <UserBlock
-                user={account}
-                selected={isSameAccount(account, app.user.activeAccount)}
-                showRole={false}
-                compact
-                avatarSize={16}
-              />
-            ),
-          })
-        )}
-        {activeAddressesWithRole.length > 0 && m(MenuDivider)}
-        {activeAddressesWithRole.length > 0 &&
-          app.activeChainId() &&
-          m(MenuItem, {
-            onclick: () => {
+            }}
+          >
+            <UserBlock
+              user={account}
+              selected={isSameAccount(account, app.user.activeAccount)}
+              showRole={false}
+              compact
+              avatarSize={16}
+            />
+          </div>
+        ))}
+        {activeAddressesWithRole.length > 0 && <CWDivider />}
+        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
+          <div
+            class="login-menu-item"
+            onclick={() => {
               const pf = app.user.activeAccount.profile;
               if (app.chain) {
                 navigateToSubpage(`/account/${pf.address}`);
               }
-            },
-            label: (
-              <div class="label-wrap">
-                {mobile && <CWIcon iconName="views" />}
-                <span>View profile</span>
-              </div>
-            ),
-          })}
-        {activeAddressesWithRole.length > 0 &&
-          app.activeChainId() &&
-          m(MenuItem, {
-            onclick: (e) => {
+            }}
+          >
+            <CWText type="caption">View profile</CWText>
+          </div>
+        )}
+        {activeAddressesWithRole.length > 0 && app.activeChainId() && (
+          <div
+            class="login-menu-item"
+            onclick={(e) => {
               e.preventDefault();
               app.modals.create({
                 modal: EditProfileModal,
@@ -114,16 +100,14 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
                   refreshCallback: () => m.redraw(),
                 },
               });
-            },
-            label: (
-              <div class="label-wrap">
-                {mobile && <CWIcon iconName="write" />}
-                <span>Edit profile</span>
-              </div>
-            ),
-          })}
-        {m(MenuItem, {
-          onclick: () => {
+            }}
+          >
+            <CWText type="caption">Edit profile</CWText>
+          </div>
+        )}
+        <div
+          class="login-menu-item"
+          onclick={() => {
             if (nAccountsWithoutRole > 0) {
               app.modals.create({
                 modal: SelectAddressModal,
@@ -139,87 +123,72 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
                 },
               });
             }
-          },
-          label: (
-            <div class="label-wrap">
-              {mobile && <CWIcon iconName="wallet" />}
-              <span>
-                {nAccountsWithoutRole > 0
-                  ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
-                  : 'Connect a new address'}
-              </span>
-            </div>
-          ),
-        })}
-      </>
+          }}
+        >
+          <CWText type="caption">
+            {nAccountsWithoutRole > 0
+              ? `${pluralize(nAccountsWithoutRole, 'other address')}...`
+              : 'Connect a new address'}
+          </CWText>
+        </div>
+      </div>
     );
   }
 }
 
-type LoginSelectorMenuRightAttrs = { mobile?: boolean };
-
-export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRightAttrs> {
-  view(vnode: m.Vnode<LoginSelectorMenuRightAttrs>) {
-    const { mobile } = vnode.attrs;
+export class LoginSelectorMenuRight extends ClassComponent {
+  view() {
     const isDarkModeOn = localStorage.getItem('dark-mode-state') === 'on';
 
     return (
-      <>
-        {m(MenuItem, {
-          onclick: () => m.route.set('/notification-settings'),
-          label: (
-            <div class="label-wrap">
-              {mobile && <CWIcon iconName="bell" />}
-              <span>Notification settings</span>
-            </div>
-          ),
-        })}
-        {m(MenuItem, {
-          onclick: () =>
+      <div class="LoginSelectorMenu">
+        <div
+          class="login-menu-item"
+          onclick={() => m.route.set('/notification-settings')}
+        >
+          <CWText type="caption">Notification settings</CWText>
+        </div>
+        <div
+          class="login-menu-item"
+          onclick={() =>
             app.activeChainId()
               ? navigateToSubpage('/settings')
-              : m.route.set('/settings'),
-          label: (
-            <div class="label-wrap">
-              {mobile && <CWIcon iconName="person" />}
-              <span>Account settings</span>
-            </div>
-          ),
-        })}
-        {m(MenuItem, {
-          class: 'dark-mode-toggle',
-          onclick: (e) => {
-            if (isDarkModeOn) {
-              localStorage.setItem('dark-mode-state', 'off');
-              document
-                .getElementsByTagName('html')[0]
-                .classList.remove('invert');
-            } else {
-              document.getElementsByTagName('html')[0].classList.add('invert');
-              localStorage.setItem('dark-mode-state', 'on');
-            }
-            e.stopPropagation();
-            m.redraw();
-          },
-          label: (
-            <div class="label-wrap">
-              <CWToggle checked={isDarkModeOn} onchange={(e) => {}} />
-              <span>Dark mode</span>
-            </div>
-          ),
-        })}
-        {m(MenuDivider)}
-        {m(MenuItem, {
-          onclick: () => app.modals.create({ modal: FeedbackModal }),
-          label: (
-            <div class="label-wrap">
-              {mobile && <CWIcon iconName="feedback" />}
-              <span>Send feedback</span>
-            </div>
-          ),
-        })}
-        {m(MenuItem, {
-          onclick: () => {
+              : m.route.set('/settings')
+          }
+        >
+          <CWText type="caption">Account settings</CWText>
+        </div>
+        <div class="login-menu-item">
+          <CWToggle
+            checked={isDarkModeOn}
+            onchange={(e) => {
+              if (isDarkModeOn) {
+                localStorage.setItem('dark-mode-state', 'off');
+                document
+                  .getElementsByTagName('html')[0]
+                  .classList.remove('invert');
+              } else {
+                document
+                  .getElementsByTagName('html')[0]
+                  .classList.add('invert');
+                localStorage.setItem('dark-mode-state', 'on');
+              }
+              e.stopPropagation();
+              m.redraw();
+            }}
+          />
+          <CWText type="caption">Dark mode</CWText>
+        </div>
+        <CWDivider />
+        <div
+          class="login-menu-item"
+          onclick={() => app.modals.create({ modal: FeedbackModal })}
+        >
+          <CWText type="caption">Send feedback</CWText>
+        </div>
+        <div
+          class="login-menu-item"
+          onclick={() => {
             $.get(`${app.serverUrl()}/logout`)
               .then(async () => {
                 await initAppState();
@@ -230,15 +199,11 @@ export class LoginSelectorMenuRight extends ClassComponent<LoginSelectorMenuRigh
                 // eslint-disable-next-line no-restricted-globals
                 location.reload();
               });
-          },
-          label: (
-            <div class="label-wrap">
-              {mobile && <CWIcon iconName="logout" />}
-              <span>Logout</span>
-            </div>
-          ),
-        })}
-      </>
+          }}
+        >
+          <CWText type="caption">Logout</CWText>
+        </div>
+      </div>
     );
   }
 }
@@ -265,44 +230,36 @@ class TOSModal extends ClassComponent<TOSModalAttrs> {
           <CWText>
             By clicking accept you agree to the community's Terms of Service
           </CWText>
-          <CWButton onclick={vnode.attrs.onAccept} label="Accept"></CWButton>{' '}
+          <CWButton onclick={vnode.attrs.onAccept} label="Accept" />
         </div>
       </div>
     );
   }
 }
 
-type LoginSelectorAttrs = { small?: boolean };
-
-export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
+export class LoginSelector extends ClassComponent {
   private profileLoadComplete: boolean;
 
-  view(vnode: m.Vnode<LoginSelectorAttrs>) {
-    const { small } = vnode.attrs;
-
+  view() {
     if (!app.isLoggedIn()) {
       return (
         <div class="LoginSelector">
-          <div class="login-selector-user">
-            {m(Button, {
-              iconLeft: Icons.USER,
-              fluid: true,
-              label: 'Log in',
-              compact: true,
-              size: small ? 'sm' : 'default',
-              onclick: () => {
-                app.modals.create({
-                  modal: NewLoginModal,
-                  data: {
-                    modalType: isWindowMediumSmallInclusive(window.innerWidth)
-                      ? 'fullScreen'
-                      : 'centered',
-                    breakpointFn: isWindowMediumSmallInclusive,
-                  },
-                });
-              },
-            })}
-          </div>
+          <CWButton
+            buttonType="tertiary-black"
+            iconLeft="person"
+            label="Log in"
+            onclick={() => {
+              app.modals.create({
+                modal: NewLoginModal,
+                data: {
+                  modalType: isWindowMediumSmallInclusive(window.innerWidth)
+                    ? 'fullScreen'
+                    : 'centered',
+                  breakpointFn: isWindowMediumSmallInclusive,
+                },
+              });
+            }}
+          />
         </div>
       );
     }
@@ -319,7 +276,7 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
     const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
     const nAccountsWithoutRole = activeAccountsByRole.filter(
-      ([account, role], index) => !role
+      ([role]) => !role
     ).length;
 
     if (!this.profileLoadComplete && app.profiles.allLoaded()) {
@@ -503,77 +460,72 @@ export class LoginSelector extends ClassComponent<LoginSelectorAttrs> {
       }
     }
 
-    return m(ButtonGroup, { class: 'LoginSelector' }, [
-      app.chain &&
-        !app.chainPreloading &&
-        this.profileLoadComplete &&
-        !app.user.activeAccount &&
-        m(Button, {
-          onclick: async () => {
-            if (hasTermsOfService) {
-              // TODO: Replace this with a much prettier TOS
-              app.modals.create({
-                modal: TOSModal,
-                data: {
-                  onAccept: async () => {
-                    $('.TOSModal').trigger('modalexit');
+    return (
+      <div class="LoginSelector">
+        {app.chain &&
+          !app.chainPreloading &&
+          this.profileLoadComplete &&
+          !app.user.activeAccount && (
+            <div class="join-button-container">
+              <CWButton
+                buttonType="tertiary-black"
+                onclick={async () => {
+                  if (hasTermsOfService) {
+                    app.modals.create({
+                      modal: TOSModal,
+                      data: {
+                        onAccept: async () => {
+                          $('.TOSModal').trigger('modalexit');
+                          await performJoinCommunityLinking();
+                        },
+                      },
+                    });
+                  } else {
                     await performJoinCommunityLinking();
-                  },
-                },
-              });
-            } else {
-              await performJoinCommunityLinking();
-            }
-          },
-          label: (
-            <span class="hidden-sm">
-              {sameBaseAddressesRemoveDuplicates.length === 0
-                ? `No ${
-                    CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
-                    CHAINBASE_SHORT[app.chain?.meta?.base] ||
-                    ''
-                  } address`
-                : 'Join'}
-            </span>
-          ),
-        }),
-      app.chain &&
-        !app.chainPreloading &&
-        this.profileLoadComplete &&
-        app.user.activeAccount &&
-        m(PopoverMenu, {
-          hasArrow: false,
-          closeOnContentClick: true,
-          transitionDuration: 0,
-          hoverCloseDelay: 0,
-          position: 'top-end',
-          trigger: m(Button, {
-            label: <User user={app.user.activeAccount} hideIdentityIcon />,
-          }),
-          content: (
-            <LoginSelectorMenuLeft
-              activeAddressesWithRole={activeAddressesWithRole}
-              nAccountsWithoutRole={nAccountsWithoutRole}
+                  }
+                }}
+                label={
+                  sameBaseAddressesRemoveDuplicates.length === 0
+                    ? `No ${
+                        CHAINNETWORK_SHORT[app.chain?.meta?.network] ||
+                        CHAINBASE_SHORT[app.chain?.meta?.base] ||
+                        ''
+                      } address`
+                    : 'Join'
+                }
+              />
+            </div>
+          )}
+        {app.chain &&
+          !app.chainPreloading &&
+          this.profileLoadComplete &&
+          app.user.activeAccount && (
+            <CWPopover
+              trigger={
+                <div class="left-button">
+                  {m(User, {
+                    user: app.user.activeAccount,
+                    hideIdentityIcon: true,
+                  })}
+                </div>
+              }
+              content={
+                <LoginSelectorMenuLeft
+                  activeAddressesWithRole={activeAddressesWithRole}
+                  nAccountsWithoutRole={nAccountsWithoutRole}
+                />
+              }
             />
-          ),
-        }),
-      m(PopoverMenu, {
-        hasArrow: false,
-        closeOnContentClick: true,
-        transitionDuration: 0,
-        hoverCloseDelay: 0,
-        position: 'top-end',
-        overlayClass: 'LoginSelectorMenuRight',
-        trigger: m(Button, {
-          class: 'login-selector-right-button',
-          intent: 'none',
-          fluid: true,
-          compact: true,
-          size: small ? 'sm' : 'default',
-          label: <CWIcon iconName="person" iconSize="small" />,
-        }),
-        content: <LoginSelectorMenuRight />,
-      }),
-    ]);
+          )}
+        <CWPopover
+          trigger={
+            <div class="right-button">
+              <CWIconButton iconName="person" iconButtonTheme="black" />
+            </div>
+          }
+          content={<LoginSelectorMenuRight />}
+        />
+      </div>
+    );
   }
 }
