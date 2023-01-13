@@ -47,18 +47,24 @@ export default class ProjectsController {
   }
 
   // Refreshes a single project's entity data
-  private async _refreshProject(projectId: number, projectChain?: string) {
+  private async _refreshProject(projectId: string, projectChain?: string) {
     const options: Record<string, unknown> = { chain: ChainNetwork.CommonProtocol };
     if (projectId) {
       options.type_id = projectId;
     }
-    const entityJSON = await getFetch(
-      `${getBaseUrl()}/entities`,
-      {
-        chain: ChainNetwork.CommonProtocol,
-        type_id: projectId
-      }
-    );
+    let entityJSON;
+    try {
+      entityJSON = await getFetch(
+        `${getBaseUrl()}/entities`,
+        {
+          chain: ChainNetwork.CommonProtocol,
+          type_id: projectId
+        }
+      );
+    } catch(e) {
+      console.error(`Failed to refresh projects: ${e.message}`);
+      return
+    }
     if (entityJSON?.length > 0) {
       const entity = ChainEntity.fromJSON(entityJSON[0]);
       const project = this._store.getById(projectId);
@@ -122,7 +128,7 @@ export default class ProjectsController {
 
   public async create(
     projectData: IProjectCreationData
-  ): Promise<[ContractReceipt, number]> {
+  ): Promise<[ContractReceipt, string]> {
     if (!this._initialized) throw new Error('Projects not yet initialized');
 
     const ipfsContent = JSON.stringify(projectData);
@@ -138,7 +144,7 @@ export default class ProjectsController {
 
     const creator = this._app.user.activeAccount;
 
-    const contract = await attachSigner(
+    const projectFactoryContract = await attachSigner(
       this._app.wallets,
       creator,
       null,
@@ -165,7 +171,9 @@ export default class ProjectsController {
       throw new Error(`Failed to pin IPFS blob: ${err.message}`);
     }
 
-    const projectId = await contract.numProjects();
+    const projectIndex = await projectFactoryContract.numProjects();
+    // The Project Id is the address of the Curated Project
+    const projectId = await projectFactoryContract.projects(projectIndex);
     const cwUrl = `https://commonwealth.im/${chainId}/project/${projectId}`;
 
     // TODO: fix IPFS formatting here
@@ -180,7 +188,7 @@ export default class ProjectsController {
       curatorFee.toString(),
     ]);
 
-    const tx = await contract.createProject(
+    const tx = await projectFactoryContract.createProject(
       formatBytes32String(title.slice(0, 30)),
       formatBytes32String(ipfsHash.slice(0, 30)),
       formatBytes32String(cwUrl.slice(0, 30)),
@@ -229,7 +237,7 @@ export default class ProjectsController {
     return [txReceipt, projectId];
   }
 
-  public async back(projectId: number, value: string) {
+  public async back(projectId: string, value: string) {
     if (!this._initialized) throw new Error('Projects not yet initialized');
     const backer = this._app.user.activeAccount;
     const project = this._store.getById(projectId);
@@ -256,7 +264,7 @@ export default class ProjectsController {
     return txReceipt;
   }
 
-  public async curate(projectId: number, value: string) {
+  public async curate(projectId: string, value: string) {
     if (!this._initialized) throw new Error('Projects not yet initialized');
     const curator = this._app.user.activeAccount;
     const project = this._store.getById(projectId);
@@ -283,7 +291,7 @@ export default class ProjectsController {
     return txReceipt;
   }
 
-  public async beneficiaryWithdraw(projectId: number) {
+  public async beneficiaryWithdraw(projectId: string) {
     if (!this._initialized) throw new Error('Projects not yet initialized');
     const beneficiary = this._app.user.activeAccount;
     const project = this._store.getById(projectId);
@@ -313,7 +321,7 @@ export default class ProjectsController {
     return txReceipt;
   }
 
-  public async backerWithdraw(projectId: number) {
+  public async backerWithdraw(projectId: string) {
     if (!this._initialized) throw new Error('Projects not yet initialized');
     const backer = this._app.user.activeAccount;
     const project = this._store.getById(projectId);
@@ -343,7 +351,7 @@ export default class ProjectsController {
     return txReceipt;
   }
 
-  public async curatorWithdraw(projectId: number) {
+  public async curatorWithdraw(projectId: string) {
     if (!this._initialized) throw new Error('Projects not yet initialized');
     const curator = this._app.user.activeAccount;
     const project = this._store.getById(projectId);

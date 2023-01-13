@@ -1,6 +1,7 @@
-import { Response, NextFunction, Request } from 'express';
+import { AppError } from 'common-common/src/errors';
+import { NextFunction, Request, Response } from 'express';
+
 import { DB } from '../../database/database';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 export const Errors = {
   NeedChain: 'Must provide a chain to fetch entities from',
@@ -41,10 +42,10 @@ const entities = async (
   if (req.query.completed) {
     entityFindOptions.where.completed = true;
   }
-  const entities = await models.ChainEntity.findAll(entityFindOptions);
+  const chainEntities = await models.ChainEntity.findAll(entityFindOptions);
   return res.json({
     status: 'Success',
-    result: entities.map((e) => e.toJSON()),
+    result: chainEntities.map((e) => e.toJSON()),
   });
 };
 
