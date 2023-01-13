@@ -159,50 +159,49 @@ const setupAppRoutes = (app, models: DB, devMiddleware) => {
       renderWithMetaTags(res, title, description, author, image);
     };
 
-    app.get('/:scope/proposal/:type/:identifier', async (req, res, next) => {
-      const scope = req.params.scope;
-      const proposalType = req.params.type;
-      const proposalId = req.params.identifier.split('-')[0];
-      await renderProposal(scope, proposalType, proposalId, res);
-    });
+  app.get('/:scope/proposal/:type/:identifier', async (req, res, next) => {
+    const scope = req.params.scope;
+    const proposalType = req.params.type;
+    const proposalId = req.params.identifier.split('-')[0];
+    await renderProposal(scope, proposalType, proposalId, res);
+  });
 
-    app.get('/:scope/discussion/:identifier', async (req, res, next) => {
-      const scope = req.params.scope;
-      const proposalType = ProposalType.Thread;
-      const proposalId = req.params.identifier.split('-')[0];
-      await renderProposal(scope, proposalType, proposalId, res);
-    });
+  app.get('/:scope/discussion/:identifier', async (req, res, next) => {
+    const scope = req.params.scope;
+    const proposalType = ProposalType.Thread;
+    const proposalId = req.params.identifier.split('-')[0];
+    await renderProposal(scope, proposalType, proposalId, res);
+  });
 
-    app.get('/:scope/proposal/:identifier', async (req, res, next) => {
-      const scope = req.params.scope;
-      const proposalId = req.params.identifier.split('-')[0];
-      const chain = await models.Chain.findOne({ where: { id: scope } });
+  app.get('/:scope/proposal/:identifier', async (req, res, next) => {
+    const scope = req.params.scope;
+    const proposalId = req.params.identifier.split('-')[0];
+    const chain = await models.Chain.findOne({ where: { id: scope } });
 
-      // derive proposal type from scope if possible
-      let proposalType;
-      if (chain?.base === ChainBase.CosmosSDK) {
-        proposalType = ProposalType.CosmosProposal;
-      } else if (chain?.network === ChainNetwork.Sputnik) {
-        proposalType = ProposalType.SputnikProposal;
-      } else if (chain?.network === ChainNetwork.Moloch) {
-        proposalType = ProposalType.MolochProposal;
-      } else if (chain?.network === ChainNetwork.Compound) {
-        proposalType = ProposalType.CompoundProposal;
-      } else if (chain?.network === ChainNetwork.Aave) {
-        proposalType = ProposalType.AaveProposal;
-      } else {
-        renderWithMetaTags(res, '', '', '', null);
-        return;
-      }
+    // derive proposal type from scope if possible
+    let proposalType;
+    if (chain?.base === ChainBase.CosmosSDK) {
+      proposalType = ProposalType.CosmosProposal;
+    } else if (chain?.network === ChainNetwork.Sputnik) {
+      proposalType = ProposalType.SputnikProposal;
+    } else if (chain?.network === ChainNetwork.Moloch) {
+      proposalType = ProposalType.MolochProposal;
+    } else if (chain?.network === ChainNetwork.Compound) {
+      proposalType = ProposalType.CompoundProposal;
+    } else if (chain?.network === ChainNetwork.Aave) {
+      proposalType = ProposalType.AaveProposal;
+    } else {
+      renderWithMetaTags(res, '', '', '', null);
+      return;
+    }
 
-      await renderProposal(scope, proposalType, proposalId, res, chain);
-    });
+    await renderProposal(scope, proposalType, proposalId, res, chain);
+  });
 
-    app.get('*', (req, res, next) => {
-      res.sendFile(`${__dirname}/build/index.html`);
-    });
-  }
-;
+  app.get('*', (req, res, next) => {
+    res.sendFile(`${__dirname}/build/index.html`);
+  });
+};
 
 
 export default setupAppRoutes;
