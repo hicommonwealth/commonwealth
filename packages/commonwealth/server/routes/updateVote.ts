@@ -5,7 +5,6 @@ import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import validateTopicThreshold from '../util/validateTopicThreshold';
 import { DB } from '../models';
 import { sequelize } from '../database';
-import validateChain from '../middleware/validateChain';
 import { TypedRequestBody, TypedResponse, success } from '../types';
 import { VoteAttributes, VoteInstance } from '../models/vote';
 import checkRule from '../util/rules/checkRule';
@@ -40,8 +39,7 @@ const updateVote = async (
   res: TypedResponse<UpdateVoteResp>,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   const author = req.address;
 

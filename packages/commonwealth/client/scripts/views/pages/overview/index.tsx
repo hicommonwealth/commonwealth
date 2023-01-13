@@ -66,7 +66,7 @@ class OverviewPage extends ClassComponent {
       return { monthlyThreads, topic };
     });
 
-    return !topicSummaryRows.length ? (
+    return (!topicSummaryRows.length && !app.threads.initialized) ? (
       <PageLoading />
     ) : (
       <Sublayout>

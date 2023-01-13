@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { Op } from 'sequelize';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 
@@ -29,8 +28,6 @@ const deleteEditors = async (
   } catch (e) {
     return next(new AppError(Errors.InvalidEditorFormat));
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
 
   const author = req.address;
 

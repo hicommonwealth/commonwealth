@@ -38,6 +38,8 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
       app.user.activeAccount &&
       thread.author === app.user.activeAccount.address;
 
+    if (!isAuthor && !hasAdminPermissions) return;
+
     return (
       <div
         className="ThreadPreviewMenu"
@@ -55,9 +57,10 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                     onClick: (e) => {
                       e.preventDefault();
 
-                      app.threads
-                        .pin({ proposal: thread })
-                        .then(() => navigateToSubpage('/discussions'));
+                      app.threads.pin({ proposal: thread }).then(() => {
+                        navigateToSubpage('/discussions');
+                        this.redraw();
+                      });
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
                     iconLeft: 'pin' as const,

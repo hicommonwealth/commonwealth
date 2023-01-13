@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../middleware/validateChain';
 import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { createRole, findAllRoles, findOneRole } from '../util/roles';
@@ -22,9 +21,7 @@ const addMember = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
-  if (!chain) return next(new AppError(Errors.InvalidCommunity));
+  const chain = req.chain;
   if (!req.user) return next(new AppError(Errors.NotLoggedIn));
   if (!req.body.invitedAddress) return next(new AppError(Errors.NeedAddress));
 

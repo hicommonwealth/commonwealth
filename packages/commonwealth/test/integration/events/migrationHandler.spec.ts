@@ -6,17 +6,17 @@ import 'chai/register-should';
 
 import {
   CWEvent,
-  SubstrateTypes,
   SupportedNetwork,
 } from 'chain-events/src';
 
-import { resetDatabase } from '../../../server-test';
 import models from 'chain-events/services/database/database';
 import StorageHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/storage';
 import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
 import {MockRabbitMQController} from "common-common/src/rabbitmq/mockRabbitMQController";
 import {BrokerConfig} from "rascal";
 import {getRabbitMQConfig} from "common-common/src/rabbitmq";
+import { resetDatabase } from '../../../server-test';
+import { SubstrateTypes } from '../../../../chain-events/src/types';
 
 chai.use(chaiHttp);
 const { assert } = chai;

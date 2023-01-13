@@ -1,4 +1,4 @@
-import { ITXModalData, NodeInfo, IChainModule, ITXData, ChainInfo } from 'models';
+import { ITXModalData, IChainModule, ITXData, ChainInfo } from 'models';
 import { ChainNetwork, WalletId } from 'common-common/src/types';
 
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
@@ -8,24 +8,11 @@ import moment from 'moment';
 import BN from 'bn.js';
 import { CosmosToken } from 'controllers/chain/cosmos/types';
 
-import {
-  StdFee,
-  isBroadcastTxSuccess,
-  isBroadcastTxFailure,
-  QueryClient,
-  StakingExtension,
-  setupStakingExtension,
-  GovExtension,
-  setupGovExtension,
-  BankExtension,
-  setupBankExtension,
-  SigningStargateClient,
-} from '@cosmjs/stargate';
-import { Tendermint34Client, Event } from '@cosmjs/tendermint-rpc';
+import { Event } from '@cosmjs/tendermint-rpc/build/tendermint34';
 import { EncodeObject } from '@cosmjs/proto-signing';
+import { StdFee } from '@cosmjs/amino';
 import CosmosAccount from './account';
 import KeplrWebWalletController from '../../app/webWallets/keplr_web_wallet';
-import TerraStationWebWalletController from '../../app/webWallets/terra_station_web_wallet';
 
 export interface ICosmosTXData extends ITXData {
   chainId: string;
@@ -36,16 +23,11 @@ export interface ICosmosTXData extends ITXData {
   gas: number;
 }
 
-export type CosmosApiType = QueryClient
-  & StakingExtension
-  & GovExtension
-  & BankExtension;
+export type CosmosApiType = any;
 
 class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
   private _api: CosmosApiType;
   public get api() { return this._api; }
-
-  private _blockSubscription: NodeJS.Timeout;
 
   // TODO: rename this something like "bankDenom" or "gasDenom" or "masterDenom"
   private _denom: string;
@@ -70,17 +52,20 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     return new CosmosToken(this.denom, n);
   }
 
-  private _tmClient: Tendermint34Client;
+  private _tmClient: any;
   public async init(chain: ChainInfo, reset = false) {
     const url = `${window.location.origin}/cosmosAPI/${chain.id}`;
     console.log(`Starting Tendermint RPC API at ${url}...`);
     // TODO: configure broadcast mode
-    this._tmClient = await Tendermint34Client.connect(url);
-    this._api = QueryClient.withExtensions(
+
+    const tm = await import('@cosmjs/tendermint-rpc');
+    this._tmClient = await tm.Tendermint34Client.connect(url);
+    const cosm = await import('@cosmjs/stargate');
+    this._api = cosm.QueryClient.withExtensions(
       this._tmClient,
-      setupGovExtension,
-      setupStakingExtension,
-      setupBankExtension,
+      cosm.setupGovExtension,
+      cosm.setupStakingExtension,
+      cosm.setupBankExtension,
     );
     if (this.app.chain.networkStatus === ApiStatus.Disconnected) {
       this.app.chain.networkStatus = ApiStatus.Connecting;
@@ -120,7 +105,8 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     if (!wallet.enabled) {
       await wallet.enable();
     }
-    const client = await SigningStargateClient.connectWithSigner(this._app.chain.meta.node.url, wallet.offlineSigner);
+    const cosm   = await import('@cosmjs/stargate');
+    const client = await cosm.SigningStargateClient.connectWithSigner(this._app.chain.meta.node.url, wallet.offlineSigner);
 
     // these parameters will be overridden by the wallet
     // TODO: can it be simulated?
@@ -134,9 +120,9 @@ class CosmosChain implements IChainModule<CosmosToken, CosmosAccount> {
     try {
       const result = await client.signAndBroadcast(account.address, [ tx ], DEFAULT_FEE, DEFAULT_MEMO);
       console.log(result);
-      if (isBroadcastTxFailure(result)) {
+      if (cosm.isBroadcastTxFailure(result)) {
         throw new Error('TX execution failed.');
-      } else if (isBroadcastTxSuccess(result)) {
+      } else if (cosm.isBroadcastTxSuccess(result)) {
         const txHash = result.transactionHash;
         const txResult = await this._tmClient.tx({ hash: Buffer.from(txHash, 'hex') });
         return txResult.result.events;

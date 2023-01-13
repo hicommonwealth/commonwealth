@@ -1,7 +1,6 @@
 /* @jsx jsx */
 import React from 'react';
 
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 // import { ListItem, Icon, Icons } from 'construct-ui';
 import { NavigationWrapper } from 'mithrilInterop/helpers';
@@ -61,7 +60,7 @@ class CWSidebarMenuItemComponent extends ClassComponent<MenuItem> {
             e.stopPropagation();
             app.sidebarToggled = false;
             app.sidebarMenu = 'default';
-            this.setRoute(item.id ? `/${item.id}` : '/');
+            setRoute(item.id ? `/${item.id}` : '/');
           }}
         >
           <CommunityLabel community={item} />

@@ -1,4 +1,16 @@
-@import 'shared';
+@import '../../shared';
+
+@mixin searchRowStyles {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  padding: 8px 16px;
+
+  &:hover {
+    background-color: $neutral-50;
+  }
+}
 
 @mixin searchRowStyles {
   align-items: center;

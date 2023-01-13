@@ -2,7 +2,6 @@
 import React from 'react';
 
 import $ from 'jquery';
-
 import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
 
@@ -62,10 +61,10 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             className="login-menu-item"
             onClick={async () => {
               await setActiveAccount(account);
-              redraw();
+              this.redraw();
             }}
           >
-            {render(UserBlock, {
+            {m(UserBlock, {
               user: account,
               selected: isSameAccount(account, app.user.activeAccount),
               showRole: false,
@@ -174,7 +173,7 @@ export class LoginSelectorMenuRight extends ClassComponent {
                 localStorage.setItem('dark-mode-state', 'on');
               }
               e.stopPropagation();
-              redraw();
+              this.redraw();
             }}
           />
           <CWText type="caption">Dark mode</CWText>
@@ -503,7 +502,7 @@ export class LoginSelector extends ClassComponent {
             <CWPopover
               trigger={
                 <div className="left-button">
-                  {render(User, {
+                  {m(User, {
                     user: app.user.activeAccount,
                     hideIdentityIcon: true,
                   })}

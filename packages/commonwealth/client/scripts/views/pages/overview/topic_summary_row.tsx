@@ -12,6 +12,7 @@ import app from 'state';
 import { Thread, Topic } from 'models';
 import { getProposalUrlPath } from 'identifiers';
 import { slugify } from 'utils';
+import { pluralize } from 'helpers';
 import { CWText } from '../../components/component_kit/cw_text';
 import User from '../../components/widgets/user';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -127,19 +128,23 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                       {thread.pinned && <CWIcon iconName="pin" />}
                     </div>
                   </div>
+
                   <CWText type="b2" fontWeight="bold">
                     {thread.title}
                   </CWText>
+
+                  <CWText type="caption" className="thread-preview">
+                    {thread.plaintext}
+                  </CWText>
+
                   <div className="row-bottom">
                     <div className="comments-and-users">
-                      <CWText type="caption" className="thread-preview">
-                        {thread.plaintext}
-                      </CWText>
-                      {/* TODO Gabe 12/7/22 - Comment count isn't available before the comments store is initialized */}
-                      {/* <div className="comments-count">
+                      <div className="comments-count">
                         <CWIcon iconName="feedback" iconSize="small" />
-                        <CWText type="caption">{commentsCount} comments</CWText>
-                      </div> */}
+                        <CWText type="caption">
+                          {pluralize(thread.numberOfComments, 'comment')}
+                        </CWText>
+                      </div>
                       {/* TODO Gabe 10/3/22 - user gallery blocked by changes to user model */}
                       {/* <div className="user-gallery">
                         <div className="avatars-row">

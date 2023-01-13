@@ -121,7 +121,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
   public async initApi(): Promise<void> {
     this._apiInitialized = true;
     console.log(
-      `Started API for ${this.meta.id} on node: ${this.meta.node.url}.`
+      `Started API for ${this.meta.id} on node: ${this.meta.node?.url}.`
     );
   }
 
@@ -130,7 +130,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     this.app.chainModuleReady.emit('ready');
     this.app.isModuleReady = true;
     console.log(
-      `Loaded data for ${this.meta.id} on node: ${this.meta.node.url}.`
+      `Loaded data for ${this.meta.id} on node: ${this.meta.node?.url}.`
     );
   }
 

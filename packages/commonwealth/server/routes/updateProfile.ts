@@ -6,7 +6,6 @@ import {
   PROFILE_NAME_MIN_CHARS,
 } from '../../shared/types';
 import { DB } from '../models';
-import validateChain from '../middleware/validateChain';
 import { AppError } from 'common-common/src/errors';
 
 export const Errors = {
@@ -29,8 +28,6 @@ const updateProfile = async (
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new AppError(Errors.MissingParams));
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
 
   let unpackedData;
   try {

@@ -2,8 +2,6 @@
 
 Discussions and governance for blockchain networks.
 
-[![CircleCI](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master.svg?style=svg&circle-token=5fa7d1ea8b272bb5e508b933e7a0854366dca1fd)](https://circleci.com/gh/hicommonwealth/commonwealth/tree/master)
-
 ## Quickstart
 
 ### Install dependencies:
@@ -96,7 +94,7 @@ Make sure you have python installed in your Rosetta Terminal path. See: `https:/
 
 ## Environment Variables
 
-You should create a `.env` file in the root of the repository
+You should create a `.env` file at the `package/commonwealth` level
 to store environment variables like session secrets.
 
 Environment variables used for external services include:

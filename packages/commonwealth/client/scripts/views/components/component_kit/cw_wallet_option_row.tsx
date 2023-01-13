@@ -56,3 +56,26 @@ export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
     );
   }
 }
+
+export class CWWalletMissingOptionRow extends ClassComponent<{ darkMode?: boolean }> {
+  view(vnode: ResultNode<{ darkMode }>) {
+    return (
+      <div className={getClasses<WalletOptionRowStyleAttrs>(
+          {
+            disabled: true,
+            darkMode: vnode.attrs.darkMode,
+          },
+          ComponentType.WalletOptionRow
+      )} >
+        <CWText
+          type="h5"
+          fontWeight="semiBold"
+          className="wallet-option-text"
+          noWrap
+        >
+          No wallet found
+        </CWText>
+      </div>
+    );
+  }
+}

@@ -27,6 +27,10 @@ import { isWindowMediumSmallInclusive } from '../components/component_kit/helper
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/cw_button';
 
+import NearChain from 'client/scripts/controllers/chain/near/chain';
+import { constructCanvasMessage } from 'adapters/shared';
+import { Chain } from '@canvas-js/interfaces';
+
 interface IState {
   validating: boolean;
   validationCompleted: boolean;
@@ -47,15 +51,15 @@ interface IState {
 const redirectToNextPage = () => {
   if (
     localStorage &&
-    localStorage.getItem &&
-    localStorage.getItem('nearPostAuthRedirect')
+      localStorage.getItem &&
+      localStorage.getItem('nearPostAuthRedirect')
   ) {
     // handle localStorage-based redirect after Github login (callback must occur within 1 day)
     try {
       const postAuth = JSON.parse(localStorage.getItem('nearPostAuthRedirect'));
       if (
         postAuth.path &&
-        +new Date() - postAuth.timestamp < 24 * 60 * 60 * 1000
+          +new Date() - postAuth.timestamp < 24 * 60 * 60 * 1000
       ) {
         localStorage.removeItem('nearPostAuthRedirect');
         setRoute(postAuth.path, {}, { replace: true });
@@ -88,18 +92,40 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       const chain =
         app.user.selectedChain ||
         app.config.chains.getById(app.activeChainId());
+
+
+      // create canvas thing
+      const chainId = chain.id;
+      const sessionPublicAddress = await app.sessions.getOrCreateAddress(ChainBase.NEAR, chainId);
+
+      // We do not add blockInfo for NEAR
       const newAcct = await createUserWithAddress(
         acct.address,
         WalletId.NearWallet,
-        chain.id
+        chain.id,
+        sessionPublicAddress,
+        null
       );
+
+      const canvasMessage = constructCanvasMessage(
+        "near" as Chain,
+        chainId,
+        acct.address,
+        sessionPublicAddress,
+        null
+      );
+
       this.state.isNewAccount = newAcct.newlyCreated;
       // this.state.account = newAcct.account;
       acct.setValidationToken(newAcct.account.validationToken);
       acct.setWalletId(WalletId.NearWallet);
       acct.setAddressId(newAcct.account.addressId);
-      const signature = await acct.signMessage(`${acct.validationToken}\n`);
-      await acct.validate(signature);
+      acct.setSessionPublicAddress(sessionPublicAddress);
+      acct.setValidationBlockInfo(null);
+
+      const signature = await acct.signMessage(JSON.stringify(canvasMessage));
+
+      await acct.validate(signature, chainId);
       if (!app.isLoggedIn()) {
         await initAppState();
         await updateActiveAddresses(chain);
@@ -182,8 +208,8 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       return (
         <Sublayout>
           <CWText>
-            NEAR account log in error: {this.state.validationError}
-          </CWText>
+          NEAR account log in error: {this.state.validationError}
+        </CWText>
           <CWButton
             onClick={(e) => {
               e.preventDefault();
@@ -191,46 +217,46 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
             }}
             label="Return Home"
           />
-        </Sublayout>
+          </Sublayout>
       );
     } else if (this.state.validationCompleted) {
       return (
         <Sublayout>
           <div
-            oncreate={async () => {
-              if (this.state.validatedAccount.profile.name) {
-                redirectToNextPage();
-              } else {
-                if (this.state.isNewAccount) {
-                  if (!app.isLoggedIn()) {
-                    app.modals.create({
-                      modal: NewLoginModal,
-                      data: {
-                        initialBody: 'welcome',
-                        initialSidebar: 'newOrReturning',
-                        initialAccount: this.state.validatedAccount,
-                        modalType: isWindowMediumSmallInclusive(
-                          window.innerWidth
-                        )
-                          ? 'fullScreen'
-                          : 'centered',
-                        breakpointFn: isWindowMediumSmallInclusive,
-                      },
-                      exitCallback: () => {
-                        redirectToNextPage();
-                      },
-                    });
-                  } else {
-                    await completeClientLogin(this.state.validatedAccount);
+        oncreate={async () => {
+          if (this.state.validatedAccount.profile.name) {
+            redirectToNextPage();
+          } else {
+            if (this.state.isNewAccount) {
+              if (!app.isLoggedIn()) {
+                app.modals.create({
+                  modal: NewLoginModal,
+                  data: {
+                    initialBody: 'welcome',
+                    initialSidebar: 'newOrReturning',
+                    initialAccount: this.state.validatedAccount,
+                    modalType: isWindowMediumSmallInclusive(
+                      window.innerWidth
+                    )
+                      ? 'fullScreen'
+                      : 'centered',
+                    breakpointFn: isWindowMediumSmallInclusive,
+                  },
+                  exitCallback: () => {
                     redirectToNextPage();
-                  }
-                } else {
-                  redirectToNextPage();
-                }
+                  },
+                });
+              } else {
+                await completeClientLogin(this.state.validatedAccount);
+                redirectToNextPage();
               }
-            }}
+            } else {
+              redirectToNextPage();
+            }
+          }
+        }}
           />
-        </Sublayout>
+          </Sublayout>
       );
     } else if (!this.state.validating) {
       // chain loaded and on near -- finish login and call lingering txs

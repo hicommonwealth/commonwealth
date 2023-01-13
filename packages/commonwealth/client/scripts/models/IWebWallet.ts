@@ -1,6 +1,8 @@
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import Account from './Account';
 import BlockInfo from './BlockInfo';
+import { CanvasData } from 'shared/adapters/shared';
+import { ChainId } from '@canvas-js/interfaces';
 
 interface IWebWallet<AccountT extends { address: string } | string> {
   name: WalletId;
@@ -12,10 +14,11 @@ interface IWebWallet<AccountT extends { address: string } | string> {
 
   enable: () => Promise<void>;
   reset?: () => Promise<void>;
-  getRecentBlock?: () => Promise<BlockInfo>;
 
-  signWithAccount: (account: Account) => Promise<string>;
-  validateWithAccount: (account: Account, walletSignature: string) => Promise<void>;
+  getChainId(): ChainId | null;
+  getRecentBlock: (chainIdentifier: string) => Promise<BlockInfo>;
+
+  signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string>;
 
   chain: ChainBase;
   defaultNetwork: ChainNetwork;
