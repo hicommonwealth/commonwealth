@@ -9,28 +9,44 @@
   # https://help.heroku.com/TWBM7DL0/how-do-i-measure-current-memory-use-and-max-available-memory-on-a-dyno-in-a-private-space
   MEMORY_LIMIT=$(echo -n "$(</sys/fs/cgroup/memory/memory.limit_in_bytes)")
 
-  # if ram can be retrieved and it is greater than 400MB then return 70% of it
-  # the -gt check ensures that the max_old_space_size will never be set to a tiny value if the method of retrieving
-  # the total ram breaks
-  if [ "$MEMORY_LIMIT" ] && [ "$MEMORY_LIMIT" -gt 400000000 ]; then
-  re='^[0-9]+$'
+  ######## parsing the multiplier - this section will always yield a MULTIPLIER set to 1 or a decimal number ##########
   # if the multiplier is not given set multiplier to 1 (no effect)
   if ! [ "$1" ]; then
-    MULTIPLIER=1;
-  # if the multiplier is given but it is not a number then echo the default 1500
-  elif [ "$1" ] && ! [[ $1 =~ $re ]] ; then
-     echo 1501
+    MULTIPLIER=1
+  # if the multiplier is given but it is not a number (integer or decimal) then set multiplier to 1 (no effect)
+  elif [ "$1" ] && ! [[ $1 =~ ^[0-9]+$ ]] && ! [[ $1 =~ ^[0-9]*\.?[0-9]+$ ]]; then
+     MULTIPLIER=1
   # if the multiplier is given and it is a number the use it
   else
     MULTIPLIER=$1
   fi
 
-  # set to 70% of total ram on the dyno
-  echo $((MEMORY_LIMIT*70*MULTIPLIER/100/1000000));
-else
-  # default to 4GB on local development
-  echo 4096;
-fi } || {
-  echo 1502;
+
+  # if ram can be retrieved and it is greater than 400MB then return 70% of it
+  # the -gt check ensures that the max_old_space_size will never be set to a tiny value if the method of retrieving
+  # the total ram breaks
+  if [ "$MEMORY_LIMIT" ] && [ "$MEMORY_LIMIT" -gt 400000000 ]; then
+      # this if-else section ensures that the money multiplier does not increase memory beyond 95% of what is available
+      # or decrease under 400MB
+      # ensure that the new MAX_OLD_SPACE_SIZE is valid
+      $MAX_OLD_SPACE_SIZE=$(echo $MULTIPLIER*$MEMORY_LIMIT*70/100000000 | bc)
+      if [ $MAX_OLD_SPACE_SIZE -gt $($MEMORY_LIMIT*0.95 | bc) ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
+        # default to 70%
+        echo $MEMORY_LIMIT*70/100000000
+      else
+        # set to [70*MULTIPLIER]% of total ram on the dyno
+        echo MAX_OLD_SPACE_SIZE
+      fi
+  else
+    MAX_OLD_SPACE_SIZE=$(echo $MULTIPLIER*4096 | bc)
+    if [ $MAX_OLD_SPACE_SIZE -gt 10000 ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
+      # default to 4GB on local development
+      echo 4096
+    else
+      echo $MAX_OLD_SPACE_SIZE
+    fi
+  fi
+} || {
+  echo 1500;
 }
 
