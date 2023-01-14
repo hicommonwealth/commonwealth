@@ -22,8 +22,11 @@ import {
   Ithis as ChainEventsProcessorContextType,
   processChainEvents,
 } from './MessageProcessors/ChainEventsQueue';
+import v8 from "v8";
 
 const log = factory.getLogger(formatFilename(__filename));
+
+log.info(`Node Option max-old-space-size set to: ${JSON.stringify(v8.getHeapStatistics().heap_size_limit / 1000000000 )} GB`);
 
 /**
  * This functions initializes a single RabbitMQController instance and then subscribes to ChainCUD messages coming

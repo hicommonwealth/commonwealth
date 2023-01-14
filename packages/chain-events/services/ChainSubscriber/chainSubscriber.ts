@@ -26,8 +26,11 @@ import { ChainAttributes, IListenerInstances } from './types';
 import Rollbar from 'rollbar';
 import fetch from "node-fetch";
 import { StatsDController } from "common-common/src/statsd";
+import v8 from "v8";
 
 const log = factory.getLogger(formatFilename(__filename));
+
+log.info(`Node Option max-old-space-size set to: ${JSON.stringify(v8.getHeapStatistics().heap_size_limit / 1000000000 )} GB`);
 
 const listenerInstances: IListenerInstances = {};
 let allChainsAndTokens;

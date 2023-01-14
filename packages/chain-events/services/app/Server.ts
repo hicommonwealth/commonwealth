@@ -8,8 +8,11 @@ import models from '../database/database';
 import { DEFAULT_PORT } from '../config';
 import logger from 'morgan';
 import cors from 'cors';
+import v8 from "v8";
 
 const log = factory.getLogger(formatFilename(__filename));
+
+log.info(`Node Option max-old-space-size set to: ${JSON.stringify(v8.getHeapStatistics().heap_size_limit / 1000000000 )} GB`);
 
 const port = process.env.PORT || DEFAULT_PORT;
 
