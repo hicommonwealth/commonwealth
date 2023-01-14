@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # This file can be used to determine the proper max_old_space_size for a
-# Heroku dyno. If the total ram is available then use 70% of it otherwise use
+# Heroku dyno. If the total ram is available then use 75% of it otherwise use
 # the node default of 4GB. If the script throws an error at any point it will return a default of 1.5 GB
 
 {
