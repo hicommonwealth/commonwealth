@@ -33,18 +33,18 @@
     # or decrease under 400MB
     if [ $MAX_OLD_SPACE_SIZE -gt $(awk "BEGIN {print int($MEMORY_LIMIT*0.95); exit}") ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
       # default to 70%
-      echo $($MEMORY_LIMIT*70/100000000)
+      echo "$($MEMORY_LIMIT*70/100000000)"
     else
       # set to [70*MULTIPLIER]% of total ram on the dyno
-      echo MAX_OLD_SPACE_SIZE
+      echo "$MAX_OLD_SPACE_SIZE"
     fi
   else
     MAX_OLD_SPACE_SIZE=$(awk "BEGIN {print int($MULTIPLIER*4096); exit}")
-    if [ $MAX_OLD_SPACE_SIZE -gt 10000 ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
+    if [ "$MAX_OLD_SPACE_SIZE" -gt 10000 ] || [ "$MAX_OLD_SPACE_SIZE" -lt 400 ]; then
       # default to 4GB on local development
-      echo 4096
+      echo "4096"
     else
-      echo $MAX_OLD_SPACE_SIZE
+      echo "$MAX_OLD_SPACE_SIZE"
     fi
   fi
 } || {
