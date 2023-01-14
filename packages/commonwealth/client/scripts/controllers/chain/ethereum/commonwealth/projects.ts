@@ -36,6 +36,8 @@ export default class ProjectsController {
   private _factoryInfo: ChainInfo;
   private _app: IApp;
 
+  private acceptedProjectTokens: string[] = ["0x11eF819024de53671633cC27AA65Fd354d783178"]
+
   // initializes a new Project object from an entity by querying its IPFS metadata
   private async _initProject(entity: ChainEntity, projectChain?: string): Promise<Project> {
     // retrieve IPFS hash from events and query ipfs data
@@ -126,6 +128,25 @@ export default class ProjectsController {
     m.redraw(); // force redraw to show projects @TODO Remove hack
   }
 
+  public getAcceptedProjectTokens() {
+    return this.acceptedProjectTokens
+  }
+
+  public async acceptedProjectToken(tokenIndex: number) {
+    const creator = this._app.user.activeAccount;
+
+    const projectFactoryContract = await attachSigner(
+      this._app.wallets,
+      creator,
+      null,
+      this._factoryInfo.node,
+      ICuratedProjectFactory__factory.connect,
+      '0x6f2b3594E54BAAcCB5A7AE93185e1A4fa82Ba67a'
+    );
+    const token = await projectFactoryContract.acceptedTokens(tokenIndex);
+    return token;
+  }
+
   public async create(
     projectData: IProjectCreationData
   ): Promise<[ContractReceipt, string]> {
@@ -151,9 +172,7 @@ export default class ProjectsController {
       this._factoryInfo.node,
       ICuratedProjectFactory__factory.connect,
       '0x6f2b3594E54BAAcCB5A7AE93185e1A4fa82Ba67a'
-      // '0x9f20ed5f919dc1c1695042542c13adcfc100dcab'
     );
-
     // upload ipfs content
     let ipfsHash: string;
     try {

@@ -23,7 +23,7 @@ interface IProjectBaseFactory {
 
     function isAcceptedToken(address token) external view returns (bool);
 
-    function acceptedTokens() external view returns (address[] memory tokens);
+    function acceptedTokens(uint tokenIndex) external view returns (address);
 
     function numProjects() external view returns (uint32);
         

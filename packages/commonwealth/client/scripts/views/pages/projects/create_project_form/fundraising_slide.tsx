@@ -1,6 +1,7 @@
 /* @jsx m */
 
 import m from 'mithril';
+import app from 'state';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { CWTextInput } from 'views/components/component_kit/cw_text_input';
 import { CWTokenInput } from 'views/components/component_kit/cw_token_input';
@@ -9,9 +10,9 @@ import ClassComponent from 'class_component';
 import { validateProjectForm } from '../helpers';
 import { ICreateProjectForm, WethUrl, weekInSeconds } from '../types';
 
-export class FundraisingSlide
-  extends ClassComponent<{ form: ICreateProjectForm }>
-{
+export class FundraisingSlide extends ClassComponent<{
+  form: ICreateProjectForm;
+}> {
   private tokenName = 'WETH';
 
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
@@ -23,12 +24,19 @@ export class FundraisingSlide
           what address the funds will be going.
         </CWText>
         <CWDropdown
-          options={[{
-            label: 'WETH',
-            value: 'WETH',
-          }]}
+          options={app.projects.getAcceptedProjectTokens().map((tokenAddress) => {
+            return {
+              label: tokenAddress,
+              value: tokenAddress,
+            };
+          })}
           initialValue={{ label: 'WETH', value: 'WETH' }}
           label="Raise In"
+          onSelect={
+            (o) => {
+              vnode.attrs.form.token = o.value;
+            }
+          }
         />
         <CWTokenInput
           label="Goal"
