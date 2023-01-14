@@ -58,11 +58,11 @@ const ipfsPin = async (
       throw new ServerError(Errors.KeysError);
     }
   } catch (e) {
-    log.error(`Failed to pin IPFS blob: ${e.message}`);
+    log.error(`Failed to pin IPFS blob: ${e}`);
     if (e instanceof ServerError || e instanceof AppError) {
       throw e;
     } else {
-      throw new AppError(Errors.PinFailed)
+      throw new AppError(Errors.PinFailed);
     }
   }
 };

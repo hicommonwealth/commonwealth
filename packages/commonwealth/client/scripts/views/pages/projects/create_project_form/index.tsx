@@ -89,7 +89,7 @@ export default class CreateProjectForm implements m.ClassComponent {
       token: this.form.token,
       creator: this.form.creator,
       beneficiary: this.form.beneficiary,
-      threshold: weiToTokens(this.form.threshold.toString(), 18),
+      threshold: tokensToWei(this.form.threshold.toString(), 18),
       deadline: Math.round(nowInSeconds + this.form.fundraiseLength),
       curatorFee: Math.round(this.form.curatorFee),
     });
