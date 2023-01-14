@@ -19,7 +19,7 @@
     MULTIPLIER=1;
   # if the multiplier is given but it is not a number then echo the default 1500
   elif [ "$1" ] && ! [[ $1 =~ $re ]] ; then
-     echo 1500
+     echo 1501
   # if the multiplier is given and it is a number the use it
   else
     MULTIPLIER=$1
@@ -31,6 +31,6 @@ else
   # default to 4GB on local development
   echo 4096;
 fi } || {
-  echo 1500;
+  echo 1502;
 }
 
