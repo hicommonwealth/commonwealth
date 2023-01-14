@@ -1,3 +1,4 @@
+import moment from 'moment';
 import models from 'server/database';
 import Sequelize from 'sequelize';
 import { ThreadInstance } from 'server/models/thread';
@@ -42,7 +43,7 @@ before(async () => {
   await models.Profile.destroy({where: {id: {[Op.lt]: 0}}, force: true});
   await models.Role.destroy({where: {id: {[Op.lt]: 0}}, force: true});
 
-  testUsers = await Promise.all([...Array(2).keys()].map(
+  testUsers = await Promise.all([...Array(4).keys()].map(
     async (i) => (await models.User.findOrCreate({
       where: {
         id: -i - 1,
@@ -119,14 +120,16 @@ before(async () => {
     }))[0]
   ];
 
-  testAddresses = await Promise.all([...Array(2).keys()].map(
+  testAddresses = await Promise.all([...Array(4).keys()].map(
     async (i) => (await models.Address.findOrCreate({
       where: {
         id: -i - 1,
+        user_id: -i - 1,
         address: `testAddress${-i - 1}`,
         chain: 'cmntest',
         verification_token: '',
         profile_id: -i - 1,
+        verified: moment.now(),
       }
     }))[0]));
 

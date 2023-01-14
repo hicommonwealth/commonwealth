@@ -1,4 +1,15 @@
-import { body, query } from 'express-validator';
+import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
+import { body, oneOf, query } from 'express-validator';
+
+
+const optionalAddress = (base) => {
+  return [
+    oneOf([
+      query(`${base}.*.address`).exists().toArray(),
+      query(`${base}.*.address_id`).exists().toArray(),
+    ], `${needParamErrMsg} (address, address_id)`),
+  ];
+};
 
 export const onlyIds = [
   body('ids').exists().isArray(),
@@ -13,7 +24,7 @@ export const paginationValidation = [
 export const putCommentsValidation = [
   body('comments').exists().isArray(),
   body('comments.*.community_id').exists().isString().trim(),
-  body('comments.*.address_id').exists().toInt(),
+  ...optionalAddress('comments'),
   body('comments.*.text').exists().isString(),
   body('comments.*.created_at').not().exists(),
   body('comments.*.updated_at').not().exists(),
@@ -23,6 +34,7 @@ export const putCommentsValidation = [
 export const postReactionsValidation = [
   body('reactions').exists().isArray(),
   body('reactions.*.community_id').exists().isString().trim(),
+  ...optionalAddress('reactions'),
   body('reactions.*.reaction').exists().isString().trim(),
   body('reactions.*.created_at').not().exists(),
   body('reactions.*.updated_at').not().exists(),
@@ -49,7 +61,7 @@ export const postTopicsValidation = [
 export const postRolesValidation = [
   body('roles').exists().isArray(),
   body('roles.*.id').exists().toInt(),
-  body('roles.*.address_id').exists().toInt(),
+  ...optionalAddress('roles'),
   body('roles.*.created_at').not().exists(),
   body('roles.*.updated_at').not().exists(),
   body('roles.*.deleted_at').not().exists(),
@@ -62,4 +74,4 @@ export const postRulesValidation = [
   body('rules.*.created_at').not().exists(),
   body('rules.*.updated_at').not().exists(),
   body('rules.*.deleted_at').not().exists(),
-]
+];

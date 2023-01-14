@@ -10,6 +10,7 @@ import { addExternalRoutes } from 'server/routing/external';
 import { tokenBalanceCache } from 'test/integration/api/external/cacheHooks.spec';
 import chai, { assert } from 'chai';
 import chaiHttp from 'chai-http';
+import setupPassport from '../../../../server/passport/index';
 
 chai.use(chaiHttp);
 
@@ -37,6 +38,7 @@ before(async () => {
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(cookieParser());
   app.use(sessionParser);
+  setupPassport(models);
   app.use(passport.initialize());
   app.use(passport.session());
 
@@ -52,7 +54,11 @@ export async function get(path: string, val: Record<string, unknown> = null, exp
     .set('Accept', 'application/json')
     .query(val);
 
-  if (!expectError) assert.equal(res.statusCode, 200);
+  if (!expectError) {
+    assert.equal(res.statusCode, 200);
+  } else if (res.text === 'Unauthorized') {
+    return res;
+  }
 
   return JSON.parse(res.text);
 }
@@ -64,7 +70,11 @@ export async function put(path: string, val: Record<string, unknown>, expectErro
     .set('Accept', 'application/json')
     .send(val);
 
-  if (!expectError) assert.equal(res.statusCode, 200);
+  if (!expectError) {
+    assert.equal(res.statusCode, 200);
+  } else if (res.text === 'Unauthorized') {
+    return res;
+  }
 
   return JSON.parse(res.text);
 }
@@ -76,7 +86,11 @@ export async function post(path: string, val: Record<string, unknown>, expectErr
     .set('Accept', 'application/json')
     .send(val);
 
-  if (!expectError) assert.equal(res.statusCode, 200);
+  if (!expectError) {
+    assert.equal(res.statusCode, 200);
+  } else if (res.text === 'Unauthorized') {
+    return res;
+  }
 
   return JSON.parse(res.text);
 }

@@ -134,6 +134,6 @@ export type GetRulesResp = { rules?: RuleAttributes[], count: number };
 
 export type PostRulesReq = { rules: (RuleAttributes & { community_id: string })[] };
 
-export type OnlyErrorResp = { error?: String };
+export type OnlyErrorResp = { error?: String | object };
 
 export const needParamErrMsg = 'Please provide a parameter to query by';

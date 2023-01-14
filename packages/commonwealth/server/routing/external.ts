@@ -1,38 +1,48 @@
-import { Express } from 'express';
-import Router from 'express/lib/router/index';
-import { getThreads, getThreadsValidation } from 'commonwealth/server/routes/threads/getThreads';
-import { getCommentsValidation, getComments } from 'commonwealth/server/routes/comments/getComments';
-import getReactions, { getReactionsValidation } from 'commonwealth/server/routes/reactions/getReactions';
-import getCommunities, { getCommunitiesValidation } from 'commonwealth/server/routes/communities/getCommunities';
-import getProfiles, { getProfilesValidation } from 'commonwealth/server/routes/profiles/getProfiles';
-import { DB } from 'commonwealth/server/models';
-import { TokenBalanceCache } from 'token-balance-cache/src';
 import {
   DeleteReq,
-  OnlyErrorResp, PostProfilesReq,
-  PostReactionsReq, PostRolesReq, PostRulesReq, PostTopicsReq,
-  PutCommentsReq,
-  PutCommunitiesReq
-} from "common-common/src/api/extApiTypes";
-import { validationResult } from "express-validator";
-import { Op } from "sequelize";
-import { getChainNodes, getChainNodesValidation } from '../routes/getChainNodes';
-import { getBalanceProviders, getBalanceProvidersValidation } from '../routes/getBalanceProviders';
-import { getTokenBalance, getTokenBalanceValidation } from '../routes/getTokenBalance';
-import {
-  onlyIds, postProfilesValidation,
-  postReactionsValidation, postRolesValidation, postRulesValidation, postTopicsValidation,
-  putCommentsValidation,
-} from "../util/helperValidations";
-import { failure, success, TypedRequest, TypedResponse } from "../types";
-import { getTopics, getTopicsValidation } from "../routes/topics/getTopics";
-import { getRoles, getRolesValidation } from "../routes/roles/getRoles";
-import { getRules, getRulesValidation } from "../routes/rulesext/getRules";
+  OnlyErrorResp,
+  PostProfilesReq,
+  PostReactionsReq,
+  PostRolesReq,
+  PostRulesReq,
+  PostTopicsReq,
+  PutCommentsReq
+} from 'common-common/src/api/extApiTypes';
+import { DB } from 'commonwealth/server/models';
+import { getComments, getCommentsValidation } from 'commonwealth/server/routes/comments/getComments';
+import getCommunities, { getCommunitiesValidation } from 'commonwealth/server/routes/communities/getCommunities';
+import getProfiles, { getProfilesValidation } from 'commonwealth/server/routes/profiles/getProfiles';
+import getReactions, { getReactionsValidation } from 'commonwealth/server/routes/reactions/getReactions';
+import { getThreads, getThreadsValidation } from 'commonwealth/server/routes/threads/getThreads';
+import { Express } from 'express';
+import { validationResult } from 'express-validator';
+import Router from 'express/lib/router/index';
+import passport from 'passport';
+import { Op } from 'sequelize';
+import { TokenBalanceCache } from 'token-balance-cache/src';
+import { ModelStatic } from '../models/types';
 import { putCommunities, putCommunitiesValidation } from '../routes/communities/putCommunities';
+import { getBalanceProviders, getBalanceProvidersValidation } from '../routes/getBalanceProviders';
+import { getChainNodes, getChainNodesValidation } from '../routes/getChainNodes';
+import { getTokenBalance, getTokenBalanceValidation } from '../routes/getTokenBalance';
+import { getRoles, getRolesValidation } from '../routes/roles/getRoles';
+import { getRules, getRulesValidation } from '../routes/rulesext/getRules';
+import { getTopics, getTopicsValidation } from '../routes/topics/getTopics';
+import { failure, success, TypedRequest, TypedResponse } from '../types';
+import {
+  onlyIds,
+  postProfilesValidation,
+  postReactionsValidation,
+  postRolesValidation,
+  postRulesValidation,
+  postTopicsValidation,
+  putCommentsValidation,
+} from '../util/helperValidations';
+import { filterAddressOwnedByUser } from '../util/lookupAddressIsOwnedByUser';
 
 const deleteEntities = async (
   models: DB,
-  destroy: (obj) => Promise<number>,
+  model: ModelStatic<any>,
   req: TypedRequest<DeleteReq>,
   res: TypedResponse<OnlyErrorResp>
 ) => {
@@ -43,9 +53,28 @@ const deleteEntities = async (
 
   const where = { id: { [Op.in]: req.body.ids } };
 
+  const entities = await model.findAll({ where });
+
+  const addresses = await filterAddressOwnedByUser(
+    models,
+    req.user.id,
+    entities.map(e => e.chain),
+    [],
+    entities.map(e => e.address_id)
+  );
+
+  if (addresses.unowned.length !== 0) {
+    return failure(res, {
+      error: {
+        message: 'Some entities to delete were not owned by the user.',
+        unownedAddresses: addresses.unowned
+      }
+    });
+  }
+
   let error = '';
   try {
-    await destroy({ where });
+    await model.destroy({ where });
   } catch (e) {
     error = e.message;
   }
@@ -66,16 +95,45 @@ async function addEntities<M extends Record<string, unknown> = Record<string, un
   }
 
   const entityCopy = entities(req);
+
+  const addresses = await filterAddressOwnedByUser(
+    models,
+    req.user.id,
+    entityCopy.map(e => e.community_id),
+    entityCopy.map(e => e.address),
+    entityCopy.map(e => e.address_id)
+  );
+
+  if (addresses.unowned.length !== 0) {
+    return failure(res, {
+      error: {
+        message: 'Some addresses provided were not owned by the user.',
+        unownedAddresses: addresses.unowned
+      }
+    });
+  }
+
+  const addressMap = addresses.owned.reduce((map, obj) => {
+    map[obj.address] = obj.id;
+    return map;
+  });
+
   entityCopy.forEach(c => {
     c[chainIdFieldName] = c['community_id'];
     delete c['community_id'];
-  })
+
+    // all the entities use the address_id field. If user passed in address, map it to address_id
+    if(c.address) {
+      c.id = addressMap[c.address];
+      delete c['address']
+    }
+  });
 
   let error = '';
   try {
     await bulkCreate(entityCopy);
   } catch (e) {
-    error = e.message;
+    error = e.name + JSON.stringify(e.fields);
   }
   return success(res, { error });
 }
@@ -90,14 +148,15 @@ export function addExternalRoutes(
   router.get('/threads', getThreadsValidation, getThreads.bind(this, models));
 
   router.get('/comments', getCommentsValidation, getComments.bind(this, models));
-  router.put('/comments', putCommentsValidation, addEntities.bind(this, 'chain', models,
+  router.put('/comments', passport.authenticate('jwt', { session: false }), putCommentsValidation, addEntities.bind(this, 'chain', models,
     (a) => models.Comment.bulkCreate(a), (req: TypedRequest<PutCommentsReq>) => req.body.comments));
-  router.delete('/comments', onlyIds, deleteEntities.bind(this, models, (a) => models.Comment.destroy(a)));
+  router.delete('/comments', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this, models, models.Comment));
 
   router.get('/reactions', getReactionsValidation, getReactions.bind(this, models));
-  router.post('/reactions', postReactionsValidation, addEntities.bind(this, 'chain', models,
-    (a) => models.Reaction.bulkCreate(a), (req: TypedRequest<PostReactionsReq>) => req.body.reactions));
-  router.delete('/reactions', onlyIds, deleteEntities.bind(this, models, (a) => models.Reaction.destroy(a)));
+  router.post('/reactions', passport.authenticate('jwt', { session: false }),
+    postReactionsValidation, addEntities.bind(this, 'chain', models,
+      (a) => models.Reaction.bulkCreate(a), (req: TypedRequest<PostReactionsReq>) => req.body.reactions));
+  router.delete('/reactions', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this, models, (a) => models.Reaction));
 
   router.get('/communities', getCommunitiesValidation, getCommunities.bind(this, models));
   router.put('/communities', putCommunitiesValidation, putCommunities.bind(this, models, tokenBalanceCache));
@@ -112,9 +171,9 @@ export function addExternalRoutes(
   router.delete('/topics', onlyIds, deleteEntities.bind(this, models, (a) => models.Topic.destroy(a)));
 
   router.get('/roles', getRolesValidation, getRoles.bind(this, models));
-  router.post('/roles', postRolesValidation, addEntities.bind(this, 'chain_id', models,
-    (a) => models.Role.bulkCreate(a), (req: TypedRequest<PostRolesReq>) => req.body.roles));
-  router.delete('/roles', onlyIds, deleteEntities.bind(this, models, (a) => models.Role.destroy(a)));
+  router.post('/roles', passport.authenticate('jwt', { session: false }), postRolesValidation,
+    addEntities.bind(this, 'chain_id', models, (a) => models.Role.bulkCreate(a), (req: TypedRequest<PostRolesReq>) => req.body.roles));
+  router.delete('/roles', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this, models, (a) => models.Role.destroy(a)));
 
   router.get('/rules', getRulesValidation, getRules.bind(this, models));
   router.post('/rules', postRulesValidation, addEntities.bind(this, 'chain_id', models,
