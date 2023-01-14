@@ -26,19 +26,20 @@
   # the -gt check ensures that the max_old_space_size will never be set to a tiny value if the method of retrieving
   # the total ram breaks
   if [ "$MEMORY_LIMIT" ] && [ "$MEMORY_LIMIT" -gt 400000000 ]; then
-      # this if-else section ensures that the money multiplier does not increase memory beyond 95% of what is available
-      # or decrease under 400MB
-      # ensure that the new MAX_OLD_SPACE_SIZE is valid
-      $MAX_OLD_SPACE_SIZE=$(echo $MULTIPLIER*$MEMORY_LIMIT*70/100000000 | bc)
-      if [ $MAX_OLD_SPACE_SIZE -gt $($MEMORY_LIMIT*0.95 | bc) ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
-        # default to 70%
-        echo $($MEMORY_LIMIT*70/100000000)
-      else
-        # set to [70*MULTIPLIER]% of total ram on the dyno
-        echo MAX_OLD_SPACE_SIZE
-      fi
+    # rounds the MAX_OLD_SPACE_SIZE
+    MAX_OLD_SPACE_SIZE=$(awk "BEGIN {print int($MULTIPLIER*$MEMORY_LIMIT*70/100000000); exit}")
+
+    # this if-else section ensures that the money multiplier does not increase memory beyond 95% of what is available
+    # or decrease under 400MB
+    if [ $MAX_OLD_SPACE_SIZE -gt $(awk "BEGIN {print int($MEMORY_LIMIT*0.95); exit}") ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
+      # default to 70%
+      echo $($MEMORY_LIMIT*70/100000000)
+    else
+      # set to [70*MULTIPLIER]% of total ram on the dyno
+      echo MAX_OLD_SPACE_SIZE
+    fi
   else
-    MAX_OLD_SPACE_SIZE=$(echo $MULTIPLIER*4096 | bc)
+    MAX_OLD_SPACE_SIZE=$(awk "BEGIN {print int($MULTIPLIER*4096); exit}")
     if [ $MAX_OLD_SPACE_SIZE -gt 10000 ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
       # default to 4GB on local development
       echo 4096
