@@ -32,7 +32,7 @@
       $MAX_OLD_SPACE_SIZE=$(echo $MULTIPLIER*$MEMORY_LIMIT*70/100000000 | bc)
       if [ $MAX_OLD_SPACE_SIZE -gt $($MEMORY_LIMIT*0.95 | bc) ] || [ $MAX_OLD_SPACE_SIZE -lt 400 ]; then
         # default to 70%
-        echo $MEMORY_LIMIT*70/100000000
+        echo $($MEMORY_LIMIT*70/100000000)
       else
         # set to [70*MULTIPLIER]% of total ram on the dyno
         echo MAX_OLD_SPACE_SIZE
