@@ -26,6 +26,63 @@ const _abi = [
     inputs: [
       {
         indexed: false,
+        internalType: "string",
+        name: "action",
+        type: "string",
+      },
+      {
+        indexed: false,
+        internalType: "bool",
+        name: "pauseState",
+        type: "bool",
+      },
+    ],
+    name: "ActionPaused",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "oldAdmin",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newAdmin",
+        type: "address",
+      },
+    ],
+    name: "NewAdmin",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "oldPauseGuardian",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newPauseGuardian",
+        type: "address",
+      },
+    ],
+    name: "NewPauseGuardian",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
         internalType: "uint256",
         name: "projectIndex",
         type: "uint256",
@@ -117,6 +174,19 @@ const _abi = [
     type: "event",
   },
   {
+    inputs: [],
+    name: "acceptedTokens",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "tokens",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address[]",
@@ -167,9 +237,9 @@ const _abi = [
         type: "uint256",
       },
       {
-        internalType: "uint256",
+        internalType: "uint8",
         name: "_curatorFee",
-        type: "uint256",
+        type: "uint8",
       },
     ],
     name: "createProject",
@@ -276,6 +346,16 @@ const _abi = [
             name: "feeTo",
             type: "address",
           },
+          {
+            internalType: "address",
+            name: "admin",
+            type: "address",
+          },
+          {
+            internalType: "address",
+            name: "pauseGuardian",
+            type: "address",
+          },
         ],
         internalType: "struct DataTypes.ProtocolData",
         name: "",
@@ -283,6 +363,19 @@ const _abi = [
       },
     ],
     stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newAdmin",
+        type: "address",
+      },
+    ],
+    name: "setAdmin",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -307,6 +400,19 @@ const _abi = [
       },
     ],
     name: "setFeeTo",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "newPauseGuardian",
+        type: "address",
+      },
+    ],
+    name: "setPauseGuardian",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",

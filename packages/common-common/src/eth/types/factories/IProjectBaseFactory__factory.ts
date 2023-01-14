@@ -170,6 +170,19 @@ const _abi = [
     type: "event",
   },
   {
+    inputs: [],
+    name: "acceptedTokens",
+    outputs: [
+      {
+        internalType: "address[]",
+        name: "tokens",
+        type: "address[]",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
     inputs: [
       {
         internalType: "address[]",

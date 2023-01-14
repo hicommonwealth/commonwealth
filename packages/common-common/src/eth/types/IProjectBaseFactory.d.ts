@@ -21,6 +21,7 @@ import { TypedEventFilter, TypedEvent, TypedListener } from "./commons";
 
 interface IProjectBaseFactoryInterface extends ethers.utils.Interface {
   functions: {
+    "acceptedTokens()": FunctionFragment;
     "addAcceptedTokens(address[])": FunctionFragment;
     "isAcceptedToken(address)": FunctionFragment;
     "numProjects()": FunctionFragment;
@@ -35,6 +36,10 @@ interface IProjectBaseFactoryInterface extends ethers.utils.Interface {
     "setProtocolFee(uint8)": FunctionFragment;
   };
 
+  encodeFunctionData(
+    functionFragment: "acceptedTokens",
+    values?: undefined
+  ): string;
   encodeFunctionData(
     functionFragment: "addAcceptedTokens",
     values: [string[]]
@@ -75,6 +80,10 @@ interface IProjectBaseFactoryInterface extends ethers.utils.Interface {
     values: [BigNumberish]
   ): string;
 
+  decodeFunctionResult(
+    functionFragment: "acceptedTokens",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "addAcceptedTokens",
     data: BytesLike
@@ -174,6 +183,14 @@ export class IProjectBaseFactory extends Contract {
   interface: IProjectBaseFactoryInterface;
 
   functions: {
+    acceptedTokens(
+      overrides?: CallOverrides
+    ): Promise<[string[]] & { tokens: string[] }>;
+
+    "acceptedTokens()"(
+      overrides?: CallOverrides
+    ): Promise<[string[]] & { tokens: string[] }>;
+
     addAcceptedTokens(
       _tokens: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -293,6 +310,10 @@ export class IProjectBaseFactory extends Contract {
     ): Promise<ContractTransaction>;
   };
 
+  acceptedTokens(overrides?: CallOverrides): Promise<string[]>;
+
+  "acceptedTokens()"(overrides?: CallOverrides): Promise<string[]>;
+
   addAcceptedTokens(
     _tokens: string[],
     overrides?: Overrides & { from?: string | Promise<string> }
@@ -405,6 +426,10 @@ export class IProjectBaseFactory extends Contract {
   ): Promise<ContractTransaction>;
 
   callStatic: {
+    acceptedTokens(overrides?: CallOverrides): Promise<string[]>;
+
+    "acceptedTokens()"(overrides?: CallOverrides): Promise<string[]>;
+
     addAcceptedTokens(
       _tokens: string[],
       overrides?: CallOverrides
@@ -566,6 +591,10 @@ export class IProjectBaseFactory extends Contract {
   };
 
   estimateGas: {
+    acceptedTokens(overrides?: CallOverrides): Promise<BigNumber>;
+
+    "acceptedTokens()"(overrides?: CallOverrides): Promise<BigNumber>;
+
     addAcceptedTokens(
       _tokens: string[],
       overrides?: Overrides & { from?: string | Promise<string> }
@@ -664,6 +693,12 @@ export class IProjectBaseFactory extends Contract {
   };
 
   populateTransaction: {
+    acceptedTokens(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    "acceptedTokens()"(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     addAcceptedTokens(
       _tokens: string[],
       overrides?: Overrides & { from?: string | Promise<string> }

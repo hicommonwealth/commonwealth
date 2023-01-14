@@ -30,7 +30,7 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
     "curatorFee()": FunctionFragment;
     "curatorsWithdraw()": FunctionFragment;
     "funded()": FunctionFragment;
-    "initialize(tuple,tuple,tuple,uint256,address,address)": FunctionFragment;
+    "initialize(tuple,tuple,tuple,uint8,address,address)": FunctionFragment;
     "lockedWithdraw()": FunctionFragment;
     "metaData()": FunctionFragment;
     "projectData()": FunctionFragment;
@@ -83,7 +83,12 @@ interface ICuratedProjectInterface extends ethers.utils.Interface {
         beneficiary: string;
         acceptedToken: string;
       },
-      { fee: BigNumberish; feeTo: string },
+      {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       BigNumberish,
       string,
       string
@@ -307,14 +312,19 @@ export class ICuratedProject extends Contract {
         beneficiary: string;
         acceptedToken: string;
       },
-      _protocolData: { fee: BigNumberish; feeTo: string },
+      _protocolData: {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       _curatorFee: BigNumberish,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<ContractTransaction>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address,address,address),uint8,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -328,7 +338,12 @@ export class ICuratedProject extends Contract {
         beneficiary: string;
         acceptedToken: string;
       },
-      _protocolData: { fee: BigNumberish; feeTo: string },
+      _protocolData: {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       _curatorFee: BigNumberish,
       _bToken: string,
       _cToken: string,
@@ -395,11 +410,29 @@ export class ICuratedProject extends Contract {
 
     protocolData(
       overrides?: CallOverrides
-    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
+    ): Promise<
+      [
+        [number, string, string, string] & {
+          fee: number;
+          feeTo: string;
+          admin: string;
+          pauseGuardian: string;
+        }
+      ]
+    >;
 
     "protocolData()"(
       overrides?: CallOverrides
-    ): Promise<[[number, string] & { fee: number; feeTo: string }]>;
+    ): Promise<
+      [
+        [number, string, string, string] & {
+          fee: number;
+          feeTo: string;
+          admin: string;
+          pauseGuardian: string;
+        }
+      ]
+    >;
 
     setIpfsHash(
       _ipfsHash: BytesLike,
@@ -518,14 +551,19 @@ export class ICuratedProject extends Contract {
       beneficiary: string;
       acceptedToken: string;
     },
-    _protocolData: { fee: BigNumberish; feeTo: string },
+    _protocolData: {
+      fee: BigNumberish;
+      feeTo: string;
+      admin: string;
+      pauseGuardian: string;
+    },
     _curatorFee: BigNumberish,
     _bToken: string,
     _cToken: string,
     overrides?: Overrides & { from?: string | Promise<string> }
   ): Promise<ContractTransaction>;
 
-  "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
+  "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address,address,address),uint8,address,address)"(
     _metaData: {
       id: BigNumberish;
       name: BytesLike;
@@ -539,7 +577,12 @@ export class ICuratedProject extends Contract {
       beneficiary: string;
       acceptedToken: string;
     },
-    _protocolData: { fee: BigNumberish; feeTo: string },
+    _protocolData: {
+      fee: BigNumberish;
+      feeTo: string;
+      admin: string;
+      pauseGuardian: string;
+    },
     _curatorFee: BigNumberish,
     _bToken: string,
     _cToken: string,
@@ -598,11 +641,25 @@ export class ICuratedProject extends Contract {
 
   protocolData(
     overrides?: CallOverrides
-  ): Promise<[number, string] & { fee: number; feeTo: string }>;
+  ): Promise<
+    [number, string, string, string] & {
+      fee: number;
+      feeTo: string;
+      admin: string;
+      pauseGuardian: string;
+    }
+  >;
 
   "protocolData()"(
     overrides?: CallOverrides
-  ): Promise<[number, string] & { fee: number; feeTo: string }>;
+  ): Promise<
+    [number, string, string, string] & {
+      fee: number;
+      feeTo: string;
+      admin: string;
+      pauseGuardian: string;
+    }
+  >;
 
   setIpfsHash(
     _ipfsHash: BytesLike,
@@ -703,14 +760,19 @@ export class ICuratedProject extends Contract {
         beneficiary: string;
         acceptedToken: string;
       },
-      _protocolData: { fee: BigNumberish; feeTo: string },
+      _protocolData: {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       _curatorFee: BigNumberish,
       _bToken: string,
       _cToken: string,
       overrides?: CallOverrides
     ): Promise<boolean>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address,address,address),uint8,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -724,7 +786,12 @@ export class ICuratedProject extends Contract {
         beneficiary: string;
         acceptedToken: string;
       },
-      _protocolData: { fee: BigNumberish; feeTo: string },
+      _protocolData: {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       _curatorFee: BigNumberish,
       _bToken: string,
       _cToken: string,
@@ -783,11 +850,25 @@ export class ICuratedProject extends Contract {
 
     protocolData(
       overrides?: CallOverrides
-    ): Promise<[number, string] & { fee: number; feeTo: string }>;
+    ): Promise<
+      [number, string, string, string] & {
+        fee: number;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      }
+    >;
 
     "protocolData()"(
       overrides?: CallOverrides
-    ): Promise<[number, string] & { fee: number; feeTo: string }>;
+    ): Promise<
+      [number, string, string, string] & {
+        fee: number;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      }
+    >;
 
     setIpfsHash(_ipfsHash: BytesLike, overrides?: CallOverrides): Promise<void>;
 
@@ -952,14 +1033,19 @@ export class ICuratedProject extends Contract {
         beneficiary: string;
         acceptedToken: string;
       },
-      _protocolData: { fee: BigNumberish; feeTo: string },
+      _protocolData: {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       _curatorFee: BigNumberish,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<BigNumber>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address,address,address),uint8,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -973,7 +1059,12 @@ export class ICuratedProject extends Contract {
         beneficiary: string;
         acceptedToken: string;
       },
-      _protocolData: { fee: BigNumberish; feeTo: string },
+      _protocolData: {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       _curatorFee: BigNumberish,
       _bToken: string,
       _cToken: string,
@@ -1114,14 +1205,19 @@ export class ICuratedProject extends Contract {
         beneficiary: string;
         acceptedToken: string;
       },
-      _protocolData: { fee: BigNumberish; feeTo: string },
+      _protocolData: {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       _curatorFee: BigNumberish,
       _bToken: string,
       _cToken: string,
       overrides?: Overrides & { from?: string | Promise<string> }
     ): Promise<PopulatedTransaction>;
 
-    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address),uint256,address,address)"(
+    "initialize((uint256,bytes32,bytes32,bytes32,address),(uint256,uint256,address,address),(uint8,address,address,address),uint8,address,address)"(
       _metaData: {
         id: BigNumberish;
         name: BytesLike;
@@ -1135,7 +1231,12 @@ export class ICuratedProject extends Contract {
         beneficiary: string;
         acceptedToken: string;
       },
-      _protocolData: { fee: BigNumberish; feeTo: string },
+      _protocolData: {
+        fee: BigNumberish;
+        feeTo: string;
+        admin: string;
+        pauseGuardian: string;
+      },
       _curatorFee: BigNumberish,
       _bToken: string,
       _cToken: string,
