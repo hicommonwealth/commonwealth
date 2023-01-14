@@ -55,7 +55,7 @@ require('express-async-errors');
 
 const app = express();
 
-console.log("Node Option max-old-space-size set to:", v8.getHeapStatistics());
+log.info(`Node Option max-old-space-size set to: ${JSON.stringify(v8.getHeapStatistics().heap_size_limit / 1024 / 1024 )}GB`);
 
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
