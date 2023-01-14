@@ -78,7 +78,7 @@ export type Component<Props = unknown> = FunctionComponent<Props>;
 export const jsx = createElement;
 
 // corresponds to Mithril's Vnode type with attrs only (no state)
-export type ResultNode<A = {}> = { attrs: A, children: Children };
+export type ResultNode<A = unknown> = { attrs: A, children: Children };
 
 // Additions to base React Component attrs
 type AdditionalAttrs = {
@@ -91,7 +91,7 @@ type AdditionalAttrs = {
 
 // Replicates Mithril's ClassComponent functionality with support for JSX syntax.
 // Expects state on `this`, with redraws on this variable assignments.
-export abstract class ClassComponent<A = {}> extends ReactComponent<A & AdditionalAttrs> {
+export abstract class ClassComponent<A = unknown> extends ReactComponent<A & AdditionalAttrs> {
   protected readonly __props: A;
   private _isMounted = false;
 
@@ -159,10 +159,11 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & Addition
     return this.view({ attrs: this.props, children: this.props.children });
   }
 
-  public oninit(v: ResultNode<A>) {};
-  public onupdate(v: ResultNode<A>) {};
-  public onremove(v: ResultNode<A>) {};
-  public oncreate(v: ResultNode<A>) {};
+  /* eslint-disable @typescript-eslint/no-empty-function */
+  public oninit(v: ResultNode<A>) { }
+  public onupdate(v: ResultNode<A>) { }
+  public onremove(v: ResultNode<A>) { }
+  public oncreate(v: ResultNode<A>) { }
 
   abstract view(v: ResultNode<A>): Children | null;
 
@@ -174,6 +175,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & Addition
   // replicates `m.route.set()` functionality via react-router
   public setRoute(route: string) {
     if (this.props.navigate) {
+      console.log('setting route', route);
       this.props.navigate(route);
     }
   }
@@ -181,6 +183,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & Addition
   // replicates navigation to scoped page functionality via react-router
   // see `navigateToSubpage` in `app.tsx`
   public navigateToSubpage(route: string) {
+    console.log('Redirecting to', route);
     // hacky way to get the current scope
     // @REACT @TODO: this will fail on custom domains
     const scope = window.location.pathname.split('/')[1];

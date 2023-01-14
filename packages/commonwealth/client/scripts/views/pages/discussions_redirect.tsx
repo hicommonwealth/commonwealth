@@ -1,25 +1,24 @@
-/* @jsx jsx */
-import React from 'react';
-
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import React, { useEffect } from 'react';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
+import { useNavigate } from 'react-router-dom';
 import { PageLoading } from './loading';
 
-class DiscussionsRedirect extends ClassComponent {
-  view() {
-    if (app.chain) {
+export default function DiscussionsRedirect() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    app.chainAdapterReady.on('ready', () => {
+      if (!app.chain) return;
+      console.log('navigate', app.chain.meta.defaultOverview);
       if (app.chain.meta.defaultOverview) {
-        navigateToSubpage('/overview');
+        navigate(`/${app.chain.id}/overview`);
+        // this.navigateToSubpage('/overview');
       } else {
-        navigateToSubpage('/discussions');
+        navigate(`/${app.chain.id}/discussions`);
+        // this.navigateToSubpage('/discussions');
       }
-    } else {
-      return <PageLoading />;
-    }
-  }
-}
+    })
+  });
 
-export default DiscussionsRedirect;
+  return (<PageLoading />);
+}
