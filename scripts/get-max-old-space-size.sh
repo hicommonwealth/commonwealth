@@ -27,7 +27,7 @@
   # the total ram breaks
   if [ "$MEMORY_LIMIT" ] && [ "$MEMORY_LIMIT" -gt 400000000 ]; then
     # rounds the MAX_OLD_SPACE_SIZE
-    MAX_OLD_SPACE_SIZE=$(awk "BEGIN {print int($MULTIPLIER*$MEMORY_LIMIT*70/100000000); exit}")
+    MAX_OLD_SPACE_SIZE=$(awk "BEGIN {print int($MULTIPLIER*$MEMORY_LIMIT*80/100000000); exit}")
 
     # this if-else section ensures that the money multiplier does not increase memory beyond 95% of what is available
     # or decrease under 400MB
