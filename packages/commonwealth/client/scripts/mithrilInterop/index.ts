@@ -18,24 +18,15 @@ import {
 import { redirect, NavigateFunction } from 'react-router-dom';
 import { createRoot } from 'react-dom/client';
 
-// RENDERING FUNCTIONS
+// corresponds to Mithril's "Children" type -- RARELY USED
 export type Children = ReactNode | ReactNode[];
 
+// corresponds to Mithril's `m()` call
 export const render = (tag: string | React.ComponentType, attrs: any = {}, ...children: any[]) => {
-  // console.log(tag, attrs, children);
   let className = attrs?.className;
 
-  // check if selector starts with class (.)
-  if (typeof tag === 'string' && tag[0] === '.') {
-    if (className) {
-      className = `${className} ${tag.slice(1)}`;
-    } else {
-      className = tag.slice(1);
-    }
-    tag = 'div';
-  }
-
-  // check if selector has class (.)
+  // check if selector uses classes (.) and convert to props, as
+  // Mithril supports e.g. `.User.etc` tags while React does not
   if (typeof tag === 'string' && tag.includes('.')) {
     const [selector, ...classes] = tag.split('.');
 
@@ -45,10 +36,11 @@ export const render = (tag: string | React.ComponentType, attrs: any = {}, ...ch
       className = classes.join(' ');
     }
 
-    tag = selector;
+    // replace pure class selector (e.g. .User) with div (e.g. div.User)
+    tag = selector || 'div';
   }
 
-  // handle children without attrs
+  // handle children without attrs => corresponds to `m(tag, children)`
   if (Array.isArray(attrs) || typeof attrs !== 'object') {
     children = attrs;
     attrs = { className };
@@ -64,16 +56,13 @@ export const render = (tag: string | React.ComponentType, attrs: any = {}, ...ch
     return createElement(tag, attrs);
   }
 
-  // ensure vnode.children exists
+  // ensure vnode.children exists as mithril expects
   attrs.children = children;
 
-  if (typeof tag === 'string') {
-    return createElement(tag, attrs, ...children);
-  } else {
-    return createElement(tag, attrs, ...children);
-  }
+  return createElement(tag, attrs, ...children);
 };
 
+// corresponds to Mithril's `m.trust()` call, which is used to render inner HTML directly
 render.trust = (html: string, wrapper?: string) => {
   if (wrapper) {
     return createElement(wrapper, { dangerouslySetInnerHTML: { __html: html } });
@@ -82,30 +71,42 @@ render.trust = (html: string, wrapper?: string) => {
   }
 };
 
+// Mithril component type, maps to FC
 export type Component<Props = unknown> = FunctionComponent<Props>;
 
+// jsx shim for pragma -- unused
 export const jsx = createElement;
 
+// corresponds to Mithril's Vnode type with attrs only (no state)
 export type ResultNode<A = {}> = { attrs: A, children: Children };
 
-const IGNORED_PROPS = [
-  'props',
-  'state',
-  '_isMounted',
-  'context',
-]
-
+// Additions to base React Component attrs
 type AdditionalAttrs = {
+  // simulate mithril's vnode.children
   children?: Children,
+
+  // optionally used navigation for NavigationWrapper, see `./helpers.tsx`
   navigate?: NavigateFunction,
 };
 
+// Replicates Mithril's ClassComponent functionality with support for JSX syntax.
+// Expects state on `this`, with redraws on this variable assignments.
 export abstract class ClassComponent<A = {}> extends ReactComponent<A & AdditionalAttrs> {
   protected readonly __props: A;
   private _isMounted = false;
 
+  // props that should not trigger a redraw -- internal to React
+  private static readonly IGNORED_PROPS = [
+    'props',
+    'state',
+    '_isMounted',
+    'context',
+  ];
+
   constructor(props) {
     super(props);
+
+    // proxy props to trigger redraws on prop changes
     return new Proxy(this, {
       set(obj, prop, value) {
         if (
@@ -113,7 +114,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & Addition
           obj._isMounted
 
           // do not update on reserved keyword changes
-          && !IGNORED_PROPS.includes(prop as string)
+          && !ClassComponent.IGNORED_PROPS.includes(prop as string)
 
           // do not update if the prop is inherited = internal to React
           && Object.keys(obj).includes(prop as string)
@@ -127,26 +128,32 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & Addition
           obj.setState({ ...obj.state, [prop]: value })
           // console.log(prop, value);
         }
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
+        // eslint-disable-next-line prefer-rest-params
         return Reflect.set(...arguments);
       }
     })
   }
 
+  // used for mithril's `oninit` lifecycle hook
   public componentDidMount() {
     this.oninit({ attrs: this.props, children: this.props.children });
     this._isMounted = true;
   }
 
+  // used for mithril's `onupdate` lifecycle hook
   public componentDidUpdate(prevProps: A) {
     this.onupdate({ attrs: this.props, children: this.props.children });
   }
 
+  // used for mithril's `onremove` lifecycle hook
   public componentWillUnmount() {
     this.onremove({ attrs: this.props, children: this.props.children });
     this._isMounted = false;
   }
 
+  // used for mithril's `oncreate` lifecycle hook and for the main `view` function
   render() {
     this.oncreate({ attrs: this.props, children: this.props.children });
     return this.view({ attrs: this.props, children: this.props.children });
@@ -159,16 +166,20 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & Addition
 
   abstract view(v: ResultNode<A>): Children | null;
 
+  // replicates `m.redraw()` functionality -- sync is ignored
   public redraw(sync = false) {
     this.forceUpdate();
   }
 
+  // replicates `m.route.set()` functionality via react-router
   public setRoute(route: string) {
     if (this.props.navigate) {
       this.props.navigate(route);
     }
   }
 
+  // replicates navigation to scoped page functionality via react-router
+  // see `navigateToSubpage` in `app.tsx`
   public navigateToSubpage(route: string) {
     // hacky way to get the current scope
     // @REACT @TODO: this will fail on custom domains
@@ -181,6 +192,7 @@ export abstract class ClassComponent<A = {}> extends ReactComponent<A & Addition
   }
 }
 
+// m.rendraw() shim. NO-OP.
 export function redraw(sync = false, component?: any) {
   // TODO
   if (component) {
@@ -189,31 +201,33 @@ export function redraw(sync = false, component?: any) {
   }
 }
 
-// DOM FUNCTIONS
+// m.mount() shim
 export function rootMount(element: Element, component?: any | null) {
   return createRoot(element).render(component);
 }
 
+// m.render() shim
 export function rootRender(el: Element, vnodes: Children) {
   return rootMount(el, render('div', {}, vnodes));
 }
 
 // ROUTING FUNCTIONS
-type RouteOptions = {
-  replace?: boolean;
-};
-
-type Params = { [key: string]: string };
-
+// m.route.param() shim
 export function getRouteParam(name?: string) {
   const search = new URLSearchParams(window.location.search);
   return search.get(name);
 }
 
+// m.route.get() shim
 export function getRoute() {
   return window.location.pathname;
 }
 
+type RouteOptions = {
+  replace?: boolean;
+};
+
+// attempt to replicate global m.route.set(), currently a no-op.
 export function setRoute(route: string, data?: Record<string, unknown>, options?: RouteOptions) {
   // app._lastNavigatedBack = false;
   // app._lastNavigatedFrom = getRoute();
@@ -235,6 +249,9 @@ export function setRoute(route: string, data?: Record<string, unknown>, options?
   if (body) body.scrollTo(0, 0);
 }
 
+type Params = { [key: string]: string };
+
+// m.route.parsePathname() shim
 export function parsePathname(url: string): { path: string; params: Params } {
   const path = window.location.pathname;
   const search = new URLSearchParams(window.location.search);
