@@ -136,6 +136,13 @@
         "parameters": [
           {
             "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
             "name": "comments",
             "description": "List of comment ids.",
             "required": true,
@@ -187,7 +194,14 @@
         "summary": "Deletes comments.",
         "parameters": [
           {
-            "in": "query",
+            "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
             "name": "ids",
             "type": "array",
             "items": {
@@ -278,6 +292,13 @@
         "parameters": [
           {
             "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
             "name": "reactions",
             "description": "List of reactions to create.",
             "required": true,
@@ -320,7 +341,14 @@
         "summary": "Deletes reactions.",
         "parameters": [
           {
-            "in": "query",
+            "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
             "name": "ids",
             "type": "array",
             "items": {
@@ -668,7 +696,7 @@
         "summary": "Deletes topics.",
         "parameters": [
           {
-            "in": "query",
+            "in": "body",
             "name": "ids",
             "type": "array",
             "items": {
@@ -727,6 +755,13 @@
         "parameters": [
           {
             "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
             "name": "roles",
             "description": "List of roles to create.",
             "required": true,
@@ -769,7 +804,14 @@
         "summary": "Deletes roles.",
         "parameters": [
           {
-            "in": "query",
+            "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
             "name": "ids",
             "type": "array",
             "items": {

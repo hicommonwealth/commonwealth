@@ -48,13 +48,13 @@ export function addExternalRoutes(
   router.get('/comments', getCommentsValidation, getComments.bind(this, models));
   router.put('/comments', passport.authenticate('jwt', { session: false }), putCommentsValidation, addEntities.bind(this, 'chain', models,
     (a) => models.Comment.bulkCreate(a), (req: TypedRequest<PutCommentsReq>) => req.body.comments));
-  router.delete('/comments', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this, models, models.Comment));
+  router.delete('/comments', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this,'chain', models, models.Comment));
 
   router.get('/reactions', getReactionsValidation, getReactions.bind(this, models));
   router.post('/reactions', passport.authenticate('jwt', { session: false }),
     postReactionsValidation, addEntities.bind(this, 'chain', models,
       (a) => models.Reaction.bulkCreate(a), (req: TypedRequest<PostReactionsReq>) => req.body.reactions));
-  router.delete('/reactions', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this, models, models.Reaction));
+  router.delete('/reactions', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this,'chain', models, models.Reaction));
 
   router.get('/communities', getCommunitiesValidation, getCommunities.bind(this, models));
   router.put('/communities', putCommunitiesValidation, putCommunities.bind(this, models, tokenBalanceCache));
@@ -66,12 +66,12 @@ export function addExternalRoutes(
   router.get('/topics', getTopicsValidation, getTopics.bind(this, models));
   router.post('/topics', postTopicsValidation, addEntities.bind(this, 'chain_id', models,
     (a) => models.Topic.bulkCreate(a), (req: TypedRequest<PostTopicsReq>) => req.body.topics));
-  router.delete('/topics', onlyIds, deleteEntities.bind(this, models, models.Topic));
+  router.delete('/topics', onlyIds, deleteEntities.bind(this,'chain_id', models, models.Topic));
 
   router.get('/roles', getRolesValidation, getRoles.bind(this, models));
   router.post('/roles', passport.authenticate('jwt', { session: false }), postRolesValidation,
     addEntities.bind(this, 'chain_id', models, (a) => models.Role.bulkCreate(a), (req: TypedRequest<PostRolesReq>) => req.body.roles));
-  router.delete('/roles', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this, models, models.Role));
+  router.delete('/roles', passport.authenticate('jwt', { session: false }), onlyIds, deleteEntities.bind(this, 'chain_id', models, models.Role));
 
   router.get('/rules', getRulesValidation, getRules.bind(this, models));
   router.post('/rules', postRulesValidation, addEntities.bind(this, 'chain_id', models,
