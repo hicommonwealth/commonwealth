@@ -102,7 +102,11 @@ export async function del(path: string, val: Record<string, unknown>, expectErro
     .set('Accept', 'application/json')
     .send(val);
 
-  if (!expectError) assert.equal(res.statusCode, 200);
+  if (!expectError) {
+    assert.equal(res.statusCode, 200);
+  } else if (res.text === 'Unauthorized') {
+    return res;
+  }
 
   return JSON.parse(res.text);
 }
