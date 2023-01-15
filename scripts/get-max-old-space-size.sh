@@ -21,7 +21,7 @@
     MULTIPLIER=$1
   fi
 
-  DEFAULT_PERCENT=85
+  DEFAULT_PERCENT=80
 
   # if ram can be retrieved and it is greater than 400MB then return 70% of it
   # the -gt check ensures that the max_old_space_size will never be set to a tiny value if the method of retrieving
