@@ -99,7 +99,9 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
         : 'mainnet';
     this._config = {
       networkId: this.isMainnet ? 'mainnet' : 'testnet',
-      nodeUrl: chain.node.url,
+      nodeUrl: this.isMainnet
+        ? 'https://rpc.mainnet.near.org'
+        : 'https://rpc.testnet.near.org',
       walletUrl: this.isMainnet
         ? 'https://wallet.near.org/'
         : 'https://wallet.testnet.near.org/',

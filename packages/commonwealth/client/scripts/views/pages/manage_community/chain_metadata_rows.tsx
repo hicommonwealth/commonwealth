@@ -122,12 +122,9 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
 
     const getChannels = async () => {
       try {
-        const discordBotConfig = await $.post(
-          `${app.serverUrl()}/getDiscordChannels`,
-          { chain_id: chain.id, jwt: app.user.jwt }
-        );
-        this.snapshotChannels = discordBotConfig.result.channels;
-        this.selectedSnapshotChannel = discordBotConfig.result.selected_channel;
+        const res = await app.discord.getChannels(chain.id);
+        this.snapshotChannels = res.channels;
+        this.selectedSnapshotChannel = res.selectedChannel;
         if (this.selectedSnapshotChannel.id) {
           this.snapshotNotificationsEnabled = true;
         }
@@ -468,12 +465,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 onclick={async () => {
                   try {
                     const verification_token = uuidv4();
-
-                    await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
-                      chain_id: app.activeChainId(),
-                      verification_token,
-                      jwt: app.user.jwt,
-                    });
+                    await app.discord.createConfig(verification_token);
 
                     window.open(
                       `https://discord.com/oauth2/authorize?client_id=${
@@ -546,16 +538,11 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                     return;
                   }
                   try {
-                    const res = await $.post(
-                      `${app.serverUrl()}/setDiscordBotConfig`,
-                      {
-                        snapshot_channel_id: this.snapshotNotificationsEnabled
-                          ? this.selectedSnapshotChannel?.id
-                          : 'disabled',
-                        chain_id: app.activeChainId(),
-                        jwt: app.user.jwt,
-                      }
-                    );
+                    const channelId = this.snapshotNotificationsEnabled
+                      ? this.selectedSnapshotChannel?.id
+                      : 'disabled';
+
+                    await app.discord.setConfig(channelId);
                     notifySuccess('Snapshot Notifications Settings Saved');
                   } catch (e) {
                     console.log(e);
@@ -582,11 +569,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   try {
                     const verification_token = uuidv4();
 
-                    await $.post(`${app.serverUrl()}/createDiscordBotConfig`, {
-                      chain_id: app.activeChainId(),
-                      verification_token,
-                      jwt: app.user.jwt,
-                    });
+                    await app.discord.createConfig(verification_token);
 
                     window.open(
                       `https://discord.com/oauth2/authorize?client_id=${

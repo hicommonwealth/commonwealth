@@ -1,11 +1,13 @@
 const path = require('path');
 const webpack = require('webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 require('dotenv').config();
 
 module.exports = {
+  entry: {
+    app: ['app.ts'],
+  },
   context: __dirname,
   devServer: {
     headers: {
@@ -28,9 +30,6 @@ module.exports = {
         process.env.DISCORD_UI_URL || 'http://localhost:3000'
       ),
     }),
-    new CopyWebpackPlugin([
-      { from: path.resolve(__dirname, '../static'), to: 'static' },
-    ]),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
     }),
@@ -42,7 +41,7 @@ module.exports = {
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
-    new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
+    new webpack.IgnorePlugin({resourceRegExp: /\.md$/}),
   ],
   optimization: {
     splitChunks: {
@@ -54,7 +53,7 @@ module.exports = {
           chunks: 'all',
         },
         ethereum: {
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject)[\\/]/,
+          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject|ethereumjs-abi|web3-eth-accounts|)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
@@ -63,8 +62,13 @@ module.exports = {
           name: 'near',
           chunks: 'all',
         },
+        terra: {
+          test: /[\\/]node_modules[\\/](@terra-money|terra-proto|legacy-proto)[\\/]/,
+          name: 'terra',
+          chunks: 'all',
+        },
         cosmos: {
-          test: /[\\/]node_modules[\\/](@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
+          test: /[\\/]node_modules[\\/](cosmjs-types|@cosmjs|@tendermint|amino-js|supercop\.js|tendermint|libsodium)[\\/]/,
           name: 'cosmos',
           chunks: 'all',
         },
@@ -81,11 +85,6 @@ module.exports = {
         snapshot: {
           test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
           name: 'snapshot',
-          chunks: 'all',
-        },
-        vendor: {
-          test: /[\\/]node_modules[\\/](?!(mithril|jquery|moment|lodash|mixpanel-browser|construct-ui|quill|bn|@snapshot-labs|@apollo|@tendermint|amino-js|supercop\.js|tendermint|@audius|ethers|@walletconnect|@ethersproject).*)/,
-          name: 'vendors',
           chunks: 'all',
         },
       },
@@ -123,17 +122,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.svg$/,
-        include: [
-          path.resolve(__dirname, '../node_modules/quill-2.0-dev/assets/icons'),
-        ],
-        use: [
-          {
-            loader: 'html-loader',
-          },
-        ],
-      },
-      {
         // ignore ".spec.ts" test files in build
         test: /^(?!.*\.spec\.ts$).*(?:\.ts)$/,
         include: [
@@ -159,40 +147,18 @@ module.exports = {
         },
       },
       {
-        test: /\.(js)$/,
-        include: [
-          path.resolve(__dirname, '../client'),
-          path.resolve(__dirname, '../shared'),
-          path.resolve(__dirname, '../../common-common'),
-          path.resolve(__dirname, '../../chain-events'),
-          path.resolve(__dirname, '../../token-balance-cache'),
-        ],
-        exclude: /\/node_modules\//,
-        use: {
-          loader: 'babel-loader',
-        },
+        test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
+        type: 'asset',
       },
       {
-        test: /\.mjs$/,
-        include: /node_modules/,
-        type: 'javascript/auto',
+        test: /\.s?css$/i,
+        use: ['style-loader', 'css-loader', 'fast-sass-loader'],
+        sideEffects: true,
       },
       {
-        test: /mithril-infinite\.mjs$|magic-sdk\/provider\/dist\/modern\/index.mjs$|polkadot\/util\/logger.js$/,
+        test: /\.m?js/,
         resolve: {
           fullySpecified: false,
-        },
-      },
-      {
-        test: /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,
-        exclude: [
-          path.resolve(__dirname, '../node_modules/quill-2.0-dev/assets/icons'),
-        ],
-        use: {
-          loader: 'file-loader',
-          options: {
-            name: '[path][name].[ext]',
-          },
         },
       },
     ],
