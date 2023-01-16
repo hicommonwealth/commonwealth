@@ -324,10 +324,10 @@ export class PermissionManager {
     return permissionsBigInt;
   }
 
-  // checks if a permission allows an action
   public isPermitted(permission: bigint, action: number): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
-    const hasAction: boolean = (BigInt(permission) & actionAsBigInt) === 0n;
-    return !hasAction;
+    const hasAction: boolean =
+      (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
+    return hasAction;
   }
 }
