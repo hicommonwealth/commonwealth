@@ -170,7 +170,8 @@ export class PermissionManager {
     );
     if (Array.isArray(impliedAllowPermissions)) {
       impliedAllowPermissions.forEach((impliedAllowPermission) => {
-        allowPermission = allowPermission & ~BigInt(1 << impliedAllowPermission);
+        allowPermission =
+          allowPermission & ~BigInt(1 << impliedAllowPermission);
       });
     } else {
       allowPermission = allowPermission & ~BigInt(1 << impliedAllowPermissions);
@@ -261,7 +262,11 @@ export class PermissionManager {
 
     for (const assignment of assignments) {
       const { allow, deny } = assignment;
-
+      if (allow === deny) {
+        permissionsBigInt = allow;
+        // eslint-disable-next-line no-continue
+        continue;
+      }
       if (typeof allow === 'string' && typeof deny === 'string') {
         const converted = this.convertStringToBigInt(allow, deny);
         permissionsBigInt &= ~converted.deny;
@@ -274,7 +279,7 @@ export class PermissionManager {
     return permissionsBigInt;
   }
 
-  // checks if a permissions explicity allows an action
+  // checks if a permission allows an action
   public isPermitted(permission: bigint, action: number): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
     const hasAction: boolean =

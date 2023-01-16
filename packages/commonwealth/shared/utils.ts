@@ -139,10 +139,10 @@ export const smartTrim = (text, maxLength = 200) => {
 export const validURL = (str) => {
   const pattern = new RegExp(
     '^(https?:\\/\\/)?' + // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$',
     'i'
   ); // fragment locator
@@ -300,16 +300,14 @@ export function aggregatePermissions(
   roles: RoleObject[],
   chain_permissions: { allow: bigint; deny: bigint }
 ) {
-
   const permissionsManager = new PermissionManager();
 
   const ORDER: AccessLevel[] = [
     AccessLevel.Member,
     AccessLevel.Moderator,
-    AccessLevel.Admin
+    AccessLevel.Admin,
   ];
 
-  // sort roles by roles with highest permissions last
   function compare(o1: RoleObject, o2: RoleObject) {
     return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
   }
@@ -319,6 +317,9 @@ export function aggregatePermissions(
     allow: bigint;
     deny: bigint;
   }> = roles;
+
+  // add chain default permissions to beginning of permissions array
+  permissionsAllowDeny.unshift(chain_permissions);
 
   // compute permissions
   const permission: bigint = permissionsManager.computePermissions(
