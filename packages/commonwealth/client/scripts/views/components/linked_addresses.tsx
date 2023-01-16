@@ -45,7 +45,11 @@ class Address extends ClassComponent<AddressAttrs> {
                   modal: MoveAddressModal,
                   data: {
                     profile,
-                    profiles
+                    profiles,
+                    address,
+                  },
+                  completeCallback: () => {
+                    // call get profiles again to refresh?
                   },
                 });
               }

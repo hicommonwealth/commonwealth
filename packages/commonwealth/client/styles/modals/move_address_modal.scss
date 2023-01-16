@@ -25,24 +25,14 @@
   }
 
   .current-address {
-    padding: 16px;
     border: 1px solid $neutral-200;
     border-radius: 5px;
     display: flex;
     align-items: center;
     margin-bottom: 16px;
-
-    img {
-      height: 32px;
-      width: 32px;
-      object-fit: cover;
-      border-radius: 50%;
-      margin-right: 8px;
-    }
   }
 
   .move-to-address {
-    padding: 24px 16px;
     border: 1px solid $neutral-200;
     border-radius: 5px;
   }
@@ -53,5 +43,29 @@
     justify-content: flex-end;
     gap: 16px;
     margin-top: 24px;
+  }
+
+  .MoveAddressRow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    transition: background 0.2s ease-in-out;
+
+    &.selected {
+      background: $neutral-100;
+    }
+
+    &:hover {
+      background: $neutral-100;
+      cursor: pointer;
+    }
+
+    img {
+      height: 32px;
+      width: 32px;
+      object-fit: cover;
+      border-radius: 50%;
+    }
   }
 }

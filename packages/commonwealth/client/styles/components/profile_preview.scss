@@ -3,7 +3,11 @@
 .ProfilePreview {
   border: 1px solid $neutral-200;
   border-radius: 5px;
-  margin-bottom: 80px;
+  margin-bottom: 48px;
+
+  @include smallInclusive {
+    margin-bottom: 24px;
+  }
 
   .profile {
     display: flex;
