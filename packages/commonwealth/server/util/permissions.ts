@@ -89,50 +89,41 @@ export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
   [AccessLevel.Everyone, everyonePermissions],
 ]);
 
-const impliedAllowPermissionsByAction = new Map<number, Action[]>([
-  // Chat Subtree
-  [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
-  // View Subtree
-  [Action.VIEW_THREADS, [Action.VIEW_COMMENTS]],
-  [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS]],
-  // Create Subtree
-  [Action.CREATE_THREAD, [Action.VIEW_THREADS, Action.CREATE_COMMENT]],
-  [Action.CREATE_POLL, [Action.VOTE_ON_POLLS]],
-  [Action.CREATE_COMMENT, [Action.CREATE_REACTION, Action.VIEW_COMMENTS]],
-  [Action.CREATE_REACTION, [Action.VIEW_REACTIONS]],
-  // Voting Subtree
-  [Action.VOTE_ON_POLLS, [Action.VIEW_POLLS]],
-  // Delete Subtree
-  [Action.DELETE_THREAD, [Action.EDIT_THREAD]],
-  [Action.DELETE_COMMENT, [Action.EDIT_COMMENT]],
-  [Action.DELETE_TOPIC, [Action.MANAGE_TOPIC]],
-  // Edit Subtree
-  [Action.EDIT_THREAD, [Action.CREATE_THREAD]],
-  [Action.EDIT_COMMENT, [Action.CREATE_COMMENT]],
-]);
+const impliedAllowPermissionsByAction: Permissions = {
+  [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
+  [Action.VIEW_THREADS]: [Action.VIEW_COMMENTS],
+  [Action.VIEW_COMMENTS]: [Action.VIEW_REACTIONS],
+  [Action.CREATE_THREAD]: [Action.VIEW_THREADS, Action.CREATE_COMMENT],
+  [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS],
+  [Action.CREATE_COMMENT]: [Action.CREATE_REACTION, Action.VIEW_COMMENTS],
+  [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS],
+  [Action.VOTE_ON_POLLS]: [Action.VIEW_POLLS],
+  [Action.DELETE_THREAD]: [Action.EDIT_THREAD],
+  [Action.DELETE_COMMENT]: [Action.EDIT_COMMENT],
+  [Action.DELETE_TOPIC]: [Action.MANAGE_TOPIC],
+  [Action.EDIT_THREAD]: [Action.CREATE_THREAD],
+  [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT],
+};
 
-
-const impliedDenyPermissionsByAction = new Map<number, Action[]>([
-  // Chat Subtree
-  [Action.CREATE_CHAT, [Action.VIEW_CHAT_CHANNELS]],
-  // View Subtree
-  [Action.VIEW_THREADS, [Action.VIEW_COMMENTS, Action.CREATE_THREAD]],
-  [Action.VIEW_COMMENTS, [Action.VIEW_REACTIONS, Action.CREATE_COMMENT]],
-  // Create Subtree
-  [Action.CREATE_THREAD, [Action.VIEW_THREADS]],
-  [Action.CREATE_POLL, [Action.VOTE_ON_POLLS, Action.CREATE_POLL]],
-  [Action.CREATE_COMMENT, [Action.CREATE_REACTION, Action.VIEW_COMMENTS, Action.EDIT_COMMENT]],
-  [Action.CREATE_REACTION, [Action.VIEW_REACTIONS, Action.CREATE_COMMENT]],
-  // Voting Subtree
-  [Action.VOTE_ON_POLLS, [Action.VIEW_POLLS, Action.CREATE_POLL]],
-  // Delete Subtree
-  [Action.DELETE_THREAD, [Action.EDIT_THREAD, Action.DELETE_THREAD]],
-  [Action.DELETE_COMMENT, [Action.EDIT_COMMENT, Action.DELETE_COMMENT]],
-  [Action.DELETE_TOPIC, [Action.MANAGE_TOPIC, Action.DELETE_TOPIC]],
-  // Edit Subtree
-  [Action.EDIT_THREAD, [Action.CREATE_THREAD, Action.EDIT_THREAD]],
-  [Action.EDIT_COMMENT, [Action.CREATE_COMMENT, Action.EDIT_COMMENT]],
-]);
+const impliedDenyPermissionsByAction: Permissions = {
+  [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
+  [Action.VIEW_THREADS]: [Action.VIEW_COMMENTS, Action.CREATE_THREAD],
+  [Action.VIEW_COMMENTS]: [Action.VIEW_REACTIONS, Action.CREATE_COMMENT],
+  [Action.CREATE_THREAD]: [Action.VIEW_THREADS],
+  [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS, Action.CREATE_POLL],
+  [Action.CREATE_COMMENT]: [
+    Action.CREATE_REACTION,
+    Action.VIEW_COMMENTS,
+    Action.EDIT_COMMENT,
+  ],
+  [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS, Action.CREATE_COMMENT],
+  [Action.VOTE_ON_POLLS]: [Action.VIEW_POLLS, Action.CREATE_POLL],
+  [Action.DELETE_THREAD]: [Action.EDIT_THREAD, Action.DELETE_THREAD],
+  [Action.DELETE_COMMENT]: [Action.EDIT_COMMENT, Action.DELETE_COMMENT],
+  [Action.DELETE_TOPIC]: [Action.MANAGE_TOPIC, Action.DELETE_TOPIC],
+  [Action.EDIT_THREAD]: [Action.CREATE_THREAD, Action.EDIT_THREAD],
+  [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT, Action.EDIT_COMMENT],
+};
 
 type allowDenyBigInt = {
   allow: bigint;
@@ -154,35 +145,18 @@ export class PermissionManager {
     return permissions;
   }
 
-  public getAllowedPermissionsByAction(action: Action): Action[] {
-    const allowedPermissions = [action];
-    let currentPermission = action;
-    while (impliedAllowPermissionsByAction.has(currentPermission)) {
-      const newPermissions = impliedAllowPermissionsByAction.get(
-        currentPermission
-      );
-      if (!newPermissions) {
-        break;
-      }
-      allowedPermissions.push(...newPermissions);
-      currentPermission = newPermissions[newPermissions.length - 1];
+  public getAllowedPermissionsByAction(action: Action): Action[] | Action {
+    const permissions = impliedAllowPermissionsByAction[action];
+    if (!permissions) {
+      throw new Error(`Invalid action: ${action}`);
     }
-    return allowedPermissions;
+    return permissions;
   }
 
-  public getDeniedPermissionsByAction(action: Action): Action[] {
-    const permissions = [action];
-    let currentPermission = action;
-    while (impliedDenyPermissionsByAction.has(currentPermission)) {
-      const newPermissions = impliedDenyPermissionsByAction.get(
-        currentPermission
-      );
-      if (newPermissions) {
-        permissions.push(...newPermissions);
-        currentPermission = newPermissions[newPermissions.length - 1];
-      } else {
-        break;
-      }
+  public getDeniedPermissionsByAction(action: Action): Action[] | Action {
+    const permissions = impliedDenyPermissionsByAction[action];
+    if (!permissions) {
+      throw new Error(`Invalid action: ${action}`);
     }
     return permissions;
   }

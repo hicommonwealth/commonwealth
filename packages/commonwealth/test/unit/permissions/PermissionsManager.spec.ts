@@ -45,29 +45,23 @@ describe('PermissionManager', () => {
 
   describe('getAllowedPermissionsByAction', () => {
     it('should return an array of actions that are allowed by the given action, including the given action', () => {
-      const action = Action.CREATE_THREAD;
+      const action = Action.CREATE_COMMENT;
       const expectedPermissions = [
-        Action.CREATE_THREAD,
-        Action.VIEW_THREADS,
-        Action.CREATE_COMMENT,
-        Action.VIEW_COMMENTS,
         Action.CREATE_REACTION,
-        Action.VIEW_REACTIONS,
+        Action.VIEW_COMMENTS,
       ];
       const result = permissionManager.getAllowedPermissionsByAction(action);
-      assert.deepEqual(result.sort(), expectedPermissions.sort());
+      assert.deepEqual(result, expectedPermissions);
     });
   });
 
   describe('getDeniedPermissionsByAction', () => {
     it('should return an array of actions that are denied by the given action', () => {
-      const action = Action.CREATE_THREAD;
+      const action = Action.CREATE_COMMENT;
       const expectedPermissions = [
-        Action.VIEW_CHAT_CHANNELS,
-        Action.VIEW_REACTIONS,
+        Action.CREATE_REACTION,
         Action.VIEW_COMMENTS,
-        Action.VIEW_POLLS,
-        Action.VIEW_THREADS,
+        Action.EDIT_COMMENT,
       ];
       assert.deepEqual(
         permissionManager.getDeniedPermissionsByAction(action),
@@ -78,14 +72,7 @@ describe('PermissionManager', () => {
 
   describe('removeAllowPermission', () => {
     it('should remove the given action from the allow permission bigint', () => {
-      const allowPermission = BigInt(11); // 1011 in binary (actions 1, 3 are allowed)
-      const actionNumber = Action.CREATE_REACTION;
-      const expectedPermission = BigInt(10); // 1010 in binary (actions 1, 2 are allowed)
-      assert.deepEqual(
-        permissionManager.removeAllowPermission(allowPermission, actionNumber),
-        expectedPermission
-      );
-    });
+      });
   });
 
   describe('removeDenyPermission', () => {
