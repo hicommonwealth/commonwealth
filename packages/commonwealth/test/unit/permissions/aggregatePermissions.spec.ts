@@ -33,6 +33,8 @@ describe("aggregatePermissions() unit tests", () => {
       },
     ];
 
+    console.log("roles", roles);
+
     const permission = aggregatePermissions(roles, chain_permission);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(

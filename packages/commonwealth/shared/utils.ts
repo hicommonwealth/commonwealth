@@ -320,9 +320,6 @@ export function aggregatePermissions(
     deny: bigint;
   }> = roles;
 
-  // add chain default permissions to beginning of permissions array
-  permissionsAllowDeny.unshift(chain_permissions);
-
   // compute permissions
   const permission: bigint = permissionsManager.computePermissions(
     everyonePermissions,

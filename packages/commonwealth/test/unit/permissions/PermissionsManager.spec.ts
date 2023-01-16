@@ -90,13 +90,16 @@ describe('PermissionManager', () => {
     it('should remove the given action and its implied actions from the deny permission bigint', () => {
       const denyPermission = BigInt(0);
       const actionNumber = Action.DELETE_COMMENT;
-      
-      const result = permissionManager.addDenyPermission(denyPermission, actionNumber);
-      
-      const expectedPermissions = BigInt(1 << Action.EDIT_COMMENT) | BigInt(1 << Action.DELETE_COMMENT);
-      assert.equal(result, expectedPermissions);
 
-      });
+      const result = permissionManager.addDenyPermission(
+        denyPermission,
+        actionNumber
+      );
+
+      const expectedPermissions =
+        BigInt(1 << Action.EDIT_COMMENT) | BigInt(1 << Action.DELETE_COMMENT);
+      assert.equal(result, expectedPermissions);
+    });
   });
 
   describe('addAllowPermission', () => {
@@ -130,5 +133,4 @@ describe('PermissionManager', () => {
       assert.equal(result, expectedPermissions);
     });
   });
-
 });
