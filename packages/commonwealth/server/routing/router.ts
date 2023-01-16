@@ -99,6 +99,7 @@ import updateChain from '../routes/updateChain';
 import bulkProfiles from '../routes/bulkProfiles';
 import updateProfileOld from '../routes/updateProfile';
 import updateProfileNew from '../routes/updateNewProfile';
+import createProfile from '../routes/createProfile';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
 import logout from '../routes/logout';
@@ -659,6 +660,12 @@ function setupRouter(
     '/updateProfile/v2',
     passport.authenticate('jwt', { session: false }),
     updateProfileNew.bind(this, models)
+  );
+
+  router.post(
+    '/createProfile',
+    passport.authenticate('jwt', { session: false }),
+    createProfile.bind(this, models)
   );
 
   // social accounts

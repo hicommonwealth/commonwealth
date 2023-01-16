@@ -54,8 +54,10 @@ export class ManageProfiles extends ClassComponent {
 
   view() {
     if (this.loading) return (
-      <div class="ManageProfiles">
-        <CWSpinner />
+      <div class="ManageProfiles full-height">
+        <div className="loading-spinner">
+          <CWSpinner />
+        </div>
       </div>
     );
 
@@ -75,7 +77,12 @@ export class ManageProfiles extends ClassComponent {
               label="Create Profile"
               iconLeft="plus"
               buttonType="mini-black"
-              onclick={() => m.route.set('/profile/new')}
+              onclick={() => {
+                this.loading = true;
+                setTimeout(() => {
+                  m.route.set('/profile/new');
+                }, 1000);
+              }}
             />
           </div>
           {this.profiles.map((profile) => (

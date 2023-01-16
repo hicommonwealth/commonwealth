@@ -3,12 +3,15 @@
 .ProfilePreview {
   border: 1px solid $neutral-200;
   border-radius: 5px;
+  margin-bottom: 80px;
+
   .profile {
     display: flex;
     flex-direction: row;
     padding: 24px;
     gap: 40px;
     border-bottom: 1px solid $neutral-200;
+    width: 100%;
   
     @include smallInclusive {
       flex-direction: column;
@@ -33,6 +36,7 @@
     .right-side {
       display: flex;
       flex-direction: row;
+      width: 100%;
   
       @include smallInclusive {
         flex-direction: column-reverse;
@@ -73,6 +77,8 @@
       .actions {
         display: flex;
         gap: 8px;
+        justify-content: flex-end;
+        width: 100%;
 
         .Button {
           @include smallInclusive {
@@ -86,8 +92,23 @@
   .addresses {
     padding: 24px;
 
-    .h5 {
+    .title {
       margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+
+      &.no-margin {
+        margin-bottom: 0;
+      }
+
+      @include smallInclusive {
+        flex-direction: column;
+
+        .Button {
+          margin-top: 24px;
+          width: 100%;
+        }
+      }
     }
   }
 }

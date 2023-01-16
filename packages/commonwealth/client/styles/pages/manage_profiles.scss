@@ -3,6 +3,18 @@
 .ManageProfiles {
   margin: 48px 190px;
 
+  &.full-height {
+    margin: 0;
+    height: 100%;
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+  }
+
   @include mediumInclusive {
     margin: 48px 160px;
   }

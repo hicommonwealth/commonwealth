@@ -38,7 +38,7 @@ export default class CreateNewProfile extends ClassComponent {
   private coverImage: CoverImage;
 
   private createProfile = async () => {
-    const response: any = await $.post(`${app.serverUrl()}/createProfile`, { // TODO: create a new endpoint
+    const response: any = await $.post(`${app.serverUrl()}/createProfile`, {
       address: this.address,
       ...this.newProfile,
       jwt: app.user.jwt,
@@ -53,7 +53,7 @@ export default class CreateNewProfile extends ClassComponent {
     if (response?.status === 'Success') {
       // Redirect
       setTimeout(() => {
-        m.route.set(`/profile/${this.address}`); // new address created from response?
+        m.route.set('/manage-profiles'); // new address created from response?
       }, 1500);
     } else {
       this.error = true;
