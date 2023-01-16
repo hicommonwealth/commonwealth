@@ -89,7 +89,7 @@ export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
   [AccessLevel.Everyone, everyonePermissions],
 ]);
 
-const impliedAllowPermissionsByAction: Permissions = {
+export const impliedAllowPermissionsByAction: Permissions = {
   [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
   [Action.VIEW_THREADS]: [Action.VIEW_COMMENTS],
   [Action.VIEW_COMMENTS]: [Action.VIEW_REACTIONS],
@@ -105,7 +105,7 @@ const impliedAllowPermissionsByAction: Permissions = {
   [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT],
 };
 
-const impliedDenyPermissionsByAction: Permissions = {
+export const impliedDenyPermissionsByAction: Permissions = {
   [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
   [Action.VIEW_THREADS]: [Action.VIEW_COMMENTS, Action.CREATE_THREAD],
   [Action.VIEW_COMMENTS]: [Action.VIEW_REACTIONS, Action.CREATE_COMMENT],
@@ -165,46 +165,68 @@ export class PermissionManager {
     allowPermission: bigint,
     actionNumber: number
   ): bigint {
-    const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
-    const newAllowPermission: bigint = allowPermission & ~actionAsBigInt;
-    return newAllowPermission;
+    const impliedAllowPermissions = this.getAllowedPermissionsByAction(
+      actionNumber
+    );
+    if (Array.isArray(impliedAllowPermissions)) {
+      impliedAllowPermissions.forEach((impliedAllowPermission) => {
+        allowPermission = allowPermission & ~BigInt(1 << impliedAllowPermission);
+      });
+    } else {
+      allowPermission = allowPermission & ~BigInt(1 << impliedAllowPermissions);
+    }
+    return allowPermission;
   }
 
   public removeDenyPermission(
     denyPermission: bigint,
     actionNumber: number
   ): bigint {
-    const actionAsBigInt: bigint = BigInt(1) << BigInt(actionNumber);
-    const newDenyPermission: bigint = denyPermission & ~actionAsBigInt;
-    return newDenyPermission;
+    const impliedDenyPermissions = this.getDeniedPermissionsByAction(
+      actionNumber
+    );
+    if (Array.isArray(impliedDenyPermissions)) {
+      impliedDenyPermissions.forEach((impliedDenyPermission) => {
+        denyPermission = denyPermission & ~BigInt(1 << impliedDenyPermission);
+      });
+    } else {
+      denyPermission = denyPermission & ~BigInt(1 << impliedDenyPermissions);
+    }
+    return denyPermission;
   }
 
   public addAllowPermission(
     allowPermission: bigint,
     actionNumber: number
   ): bigint {
-    let result = BigInt(allowPermission);
-    const implicitActions = this.getAllowedPermissionsByAction(actionNumber);
-    if (implicitActions) {
-      for (let i = 0; i < implicitActions.length; i++) {
-        result |= BigInt(1) << BigInt(implicitActions[i]);
-      }
+    const impliedAllowPermissions = this.getAllowedPermissionsByAction(
+      actionNumber
+    );
+    if (Array.isArray(impliedAllowPermissions)) {
+      impliedAllowPermissions.forEach((impliedAllowPermission) => {
+        allowPermission = allowPermission | BigInt(1 << impliedAllowPermission);
+      });
+    } else {
+      allowPermission = allowPermission | BigInt(1 << impliedAllowPermissions);
     }
-    return result;
+    return allowPermission;
   }
 
   public addDenyPermission(
     denyPermission: bigint,
     actionNumber: number
   ): bigint {
-    let result = BigInt(denyPermission);
-    const implicitActions = this.getAllowedPermissionsByAction(actionNumber);
-    if (implicitActions) {
-      for (let i = 0; i < implicitActions.length; i++) {
-        result |= BigInt(1) << BigInt(implicitActions[i]);
-      }
+    const impliedDenyPermissions = this.getDeniedPermissionsByAction(
+      actionNumber
+    );
+    if (Array.isArray(impliedDenyPermissions)) {
+      impliedDenyPermissions.forEach((impliedDenyPermission) => {
+        denyPermission = denyPermission | BigInt(1 << impliedDenyPermission);
+      });
+    } else {
+      denyPermission = denyPermission | BigInt(1 << impliedDenyPermissions);
     }
-    return result;
+    return denyPermission;
   }
 
   mapPermissionsToBigint(permissions: Permissions): bigint {
@@ -252,7 +274,7 @@ export class PermissionManager {
     return permissionsBigInt;
   }
 
-  //checks if a permissions explicity allows an action
+  // checks if a permissions explicity allows an action
   public isPermitted(permission: bigint, action: number): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
     const hasAction: boolean =

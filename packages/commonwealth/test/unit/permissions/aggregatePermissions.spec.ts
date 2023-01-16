@@ -16,9 +16,6 @@ describe("aggregatePermissions() unit tests", () => {
 
   beforeEach(() => {
     base_permission = BigInt(0);
-    overwrite_admin = { allow: base_permission, deny: base_permission };
-    overwrite_moderator = { allow: base_permission, deny: base_permission };
-    overwrite_member = { allow: base_permission, deny: base_permission };
     chain_permission = { allow: base_permission, deny: base_permission };
     permissionsManager = new PermissionManager();
   });
@@ -28,12 +25,11 @@ describe("aggregatePermissions() unit tests", () => {
       base_permission,
       Action.CREATE_THREAD
     );
-    const admin_name = AccessLevel.Admin;
     const roles = [
       {
         allow: allowCreateThread,
         deny: base_permission,
-        permission: admin_name,
+        permission: AccessLevel.Admin,
       },
     ];
 
