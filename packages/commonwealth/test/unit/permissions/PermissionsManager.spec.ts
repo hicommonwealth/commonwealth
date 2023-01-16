@@ -4,6 +4,8 @@ import {
   AccessLevel,
   Action,
   Permissions,
+  impliedDenyPermissionsByAction,
+  impliedAllowPermissionsByAction,
 } from 'commonwealth/server/util/permissions';
 
 describe('PermissionManager', () => {
@@ -47,6 +49,7 @@ describe('PermissionManager', () => {
     it('should return an array of actions that are allowed by the given action, including the given action', () => {
       const action = Action.CREATE_COMMENT;
       const expectedPermissions = [
+        Action.CREATE_COMMENT,
         Action.CREATE_REACTION,
         Action.VIEW_COMMENTS,
       ];
@@ -59,6 +62,7 @@ describe('PermissionManager', () => {
     it('should return an array of actions that are denied by the given action', () => {
       const action = Action.CREATE_COMMENT;
       const expectedPermissions = [
+        Action.CREATE_COMMENT,
         Action.CREATE_REACTION,
         Action.VIEW_COMMENTS,
         Action.EDIT_COMMENT,
@@ -81,7 +85,9 @@ describe('PermissionManager', () => {
       );
 
       const expectedPermissions =
-        BigInt(1 << Action.VIEW_THREADS) | BigInt(1 << Action.CREATE_COMMENT);
+        BigInt(1 << Action.VIEW_THREADS) |
+        BigInt(1 << Action.CREATE_COMMENT) |
+        BigInt(1 << Action.CREATE_THREAD);
       assert.equal(result, expectedPermissions);
     });
   });
@@ -97,7 +103,9 @@ describe('PermissionManager', () => {
       );
 
       const expectedPermissions =
-        BigInt(1 << Action.EDIT_COMMENT) | BigInt(1 << Action.DELETE_COMMENT);
+        BigInt(1 << Action.EDIT_COMMENT) |
+        BigInt(1 << Action.DELETE_COMMENT);
+        
       assert.equal(result, expectedPermissions);
     });
   });
@@ -113,7 +121,10 @@ describe('PermissionManager', () => {
       );
 
       const expectedPermissions =
-        BigInt(1 << Action.VIEW_THREADS) | BigInt(1 << Action.CREATE_COMMENT);
+        BigInt(1 << Action.CREATE_THREAD) |
+        BigInt(1 << Action.VIEW_THREADS) |
+        BigInt(1 << Action.CREATE_COMMENT);
+
       assert.equal(result, expectedPermissions);
     });
   });

@@ -21,5 +21,4 @@ describe('isPermitted() unit tests', () => {
     const permission = BigInt(1 << Action.CREATE_COMMENT) | BigInt(1 << 15);
     assert.isFalse(permissionsManager.isPermitted(permission, Action.CREATE_THREAD));
   });
-
 });

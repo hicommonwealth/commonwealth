@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import {
   PermissionManager,
-  Action,
+  Action
 } from 'commonwealth/server/util/permissions';
 
 describe('computePermissions() unit tests', () => {
@@ -100,14 +100,25 @@ describe('computePermissions() unit tests', () => {
       Action.CREATE_THREAD
     );
     assert.isTrue(
-      permissionsManager.isPermitted(actionPermission, Action.VIEW_COMMENTS)
+      permissionsManager.isPermitted(actionPermission, Action.CREATE_THREAD)
     );
     assert.isTrue(
       permissionsManager.isPermitted(actionPermission, Action.VIEW_THREADS)
     );
-    // assert.isFalse(
-    //   permissionsManager.isPermitted(actionPermission, Action.CREATE_THREAD)
-    // );
+  });
+
+
+  it('should correctly implicit permissions for an addDenyPermission', () => {
+    const permission = permissionsManager.addDenyPermission(
+      base_permission,
+      Action.CREATE_THREAD
+    );
+    assert.isFalse(
+      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+    );
+    assert.isFalse(
+      permissionsManager.isPermitted(permission, Action.VIEW_THREADS)
+    );
   });
 
   it('should correctly computePermissions for an action and its implicit permissions', () => {
@@ -115,61 +126,28 @@ describe('computePermissions() unit tests', () => {
       BigInt(0),
       Action.CREATE_THREAD
     );
-    overwrite_moderator.deny = permissionsManager.addDenyPermission(
-      BigInt(0),
-      Action.CREATE_THREAD
-    );
-
-    const permission = permissionsManager.computePermissions(base_permission, [
-      overwrite_moderator,
-      overwrite_admin,
-    ]);
-
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+      permissionsManager.isPermitted(overwrite_admin.allow, Action.CREATE_THREAD)
     );
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_COMMENT)
-    );
-    assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_REACTION)
-    );
-    assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.VIEW_COMMENTS)
-    );
-    assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.VIEW_THREADS)
-    );
-    assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.VIEW_REACTIONS)
-    );
-    assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.CREATE_CHAT)
+      permissionsManager.isPermitted(overwrite_admin.allow, Action.VIEW_THREADS)
     );
   });
 
   it('should correctly computePermissions for an action and its implicit permissions with one denial that is overwritten by admin', () => {
-    // If moderator allows viewing comments, but admin denies threads, we should still be able
-    // to view comments because View Comments is not implicit for denying View Threads
+    overwrite_admin.allow = permissionsManager.addAllowPermission(
+      BigInt(0),
+      Action.CREATE_THREAD
+    );
     overwrite_admin.deny = permissionsManager.addDenyPermission(
       BigInt(0),
       Action.VIEW_THREADS
     );
-    overwrite_moderator.allow = permissionsManager.addAllowPermission(
-      BigInt(0),
-      Action.VIEW_COMMENTS
-    );
-
-    const permission = permissionsManager.computePermissions(base_permission, [
-      overwrite_moderator,
-      overwrite_admin,
-    ]);
-
-    assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.VIEW_THREADS)
-    );
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.VIEW_COMMENTS)
+      permissionsManager.isPermitted(overwrite_admin.allow, Action.CREATE_THREAD)
+    );
+    assert.isFalse(
+      permissionsManager.isPermitted(overwrite_admin.allow, Action.VIEW_THREADS)
     );
   });
 

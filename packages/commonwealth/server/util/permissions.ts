@@ -77,9 +77,13 @@ export const memberPermissions: Permissions = {
 };
 
 export const everyonePermissions: Permissions = {
-  [Action.DELETE_REACTION]: [Action.CREATE_REACTION, Action.VIEW_REACTIONS],
-  [Action.CREATE_THREAD]: Action.VIEW_THREADS,
-  [Action.VIEW_CHAT_CHANNELS]: Action.VIEW_CHAT_CHANNELS,
+  [Action.DELETE_REACTION]: [
+    Action.DELETE_REACTION,
+    Action.CREATE_REACTION,
+    Action.VIEW_REACTIONS,
+  ],
+  [Action.CREATE_THREAD]: [Action.CREATE_THREAD, Action.VIEW_THREADS],
+  [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
 };
 
 export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
@@ -90,39 +94,80 @@ export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
 ]);
 
 export const impliedAllowPermissionsByAction: Permissions = {
-  [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
-  [Action.VIEW_THREADS]: [Action.VIEW_COMMENTS],
-  [Action.VIEW_COMMENTS]: [Action.VIEW_REACTIONS],
-  [Action.CREATE_THREAD]: [Action.VIEW_THREADS, Action.CREATE_COMMENT],
-  [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS],
-  [Action.CREATE_COMMENT]: [Action.CREATE_REACTION, Action.VIEW_COMMENTS],
-  [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS],
-  [Action.VOTE_ON_POLLS]: [Action.VIEW_POLLS],
-  [Action.DELETE_THREAD]: [Action.EDIT_THREAD],
-  [Action.DELETE_COMMENT]: [Action.EDIT_COMMENT],
-  [Action.DELETE_TOPIC]: [Action.MANAGE_TOPIC],
-  [Action.EDIT_THREAD]: [Action.CREATE_THREAD],
-  [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT],
+  [Action.CREATE_CHAT]: [Action.CREATE_CHAT, Action.VIEW_CHAT_CHANNELS],
+  [Action.VIEW_THREADS]: [Action.VIEW_THREADS, Action.VIEW_COMMENTS],
+  [Action.VIEW_COMMENTS]: [Action.VIEW_COMMENTS, Action.VIEW_REACTIONS],
+  [Action.CREATE_THREAD]: [
+    Action.CREATE_THREAD,
+    Action.VIEW_THREADS,
+    Action.CREATE_COMMENT,
+  ],
+  [Action.CREATE_POLL]: [Action.CREATE_POLL, Action.VOTE_ON_POLLS],
+  [Action.CREATE_COMMENT]: [
+    Action.CREATE_COMMENT,
+    Action.CREATE_REACTION,
+    Action.VIEW_COMMENTS,
+  ],
+  [Action.CREATE_REACTION]: [Action.CREATE_REACTION, Action.VIEW_REACTIONS],
+  [Action.VOTE_ON_POLLS]: [Action.VOTE_ON_POLLS, Action.VIEW_POLLS],
+  [Action.DELETE_THREAD]: [Action.DELETE_THREAD, Action.EDIT_THREAD],
+  [Action.DELETE_COMMENT]: [Action.DELETE_COMMENT, Action.EDIT_COMMENT],
+  [Action.DELETE_TOPIC]: [Action.DELETE_TOPIC, Action.MANAGE_TOPIC],
+  [Action.EDIT_THREAD]: [Action.EDIT_THREAD, Action.CREATE_THREAD],
+  [Action.EDIT_COMMENT]: [Action.EDIT_COMMENT, Action.CREATE_COMMENT],
 };
 
 export const impliedDenyPermissionsByAction: Permissions = {
-  [Action.CREATE_CHAT]: [Action.VIEW_CHAT_CHANNELS],
-  [Action.VIEW_THREADS]: [Action.VIEW_COMMENTS, Action.CREATE_THREAD],
-  [Action.VIEW_COMMENTS]: [Action.VIEW_REACTIONS, Action.CREATE_COMMENT],
-  [Action.CREATE_THREAD]: [Action.VIEW_THREADS],
-  [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS, Action.CREATE_POLL],
+  [Action.CREATE_CHAT]: [Action.CREATE_CHAT, Action.VIEW_CHAT_CHANNELS],
+  [Action.VIEW_THREADS]: [
+    Action.VIEW_THREADS,
+    Action.VIEW_COMMENTS,
+    Action.CREATE_THREAD,
+  ],
+  [Action.VIEW_COMMENTS]: [
+    Action.VIEW_COMMENTS,
+    Action.VIEW_REACTIONS,
+    Action.CREATE_COMMENT,
+  ],
+  [Action.CREATE_THREAD]: [Action.CREATE_THREAD, Action.VIEW_THREADS],
+  [Action.CREATE_POLL]: [
+    Action.CREATE_POLL,
+    Action.VOTE_ON_POLLS,
+    Action.CREATE_POLL,
+  ],
   [Action.CREATE_COMMENT]: [
+    Action.CREATE_COMMENT,
     Action.CREATE_REACTION,
     Action.VIEW_COMMENTS,
     Action.EDIT_COMMENT,
   ],
-  [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS, Action.CREATE_COMMENT],
-  [Action.VOTE_ON_POLLS]: [Action.VIEW_POLLS, Action.CREATE_POLL],
-  [Action.DELETE_THREAD]: [Action.EDIT_THREAD, Action.DELETE_THREAD],
-  [Action.DELETE_COMMENT]: [Action.EDIT_COMMENT, Action.DELETE_COMMENT],
-  [Action.DELETE_TOPIC]: [Action.MANAGE_TOPIC, Action.DELETE_TOPIC],
-  [Action.EDIT_THREAD]: [Action.CREATE_THREAD, Action.EDIT_THREAD],
-  [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT, Action.EDIT_COMMENT],
+  [Action.CREATE_REACTION]: [
+    Action.CREATE_REACTION,
+    Action.VIEW_REACTIONS,
+    Action.CREATE_COMMENT,
+  ],
+  [Action.VOTE_ON_POLLS]: [
+    Action.VOTE_ON_POLLS,
+    Action.VIEW_POLLS,
+    Action.CREATE_POLL,
+  ],
+  [Action.DELETE_THREAD]: [Action.DELETE_THREAD, Action.EDIT_THREAD],
+  [Action.DELETE_COMMENT]: [Action.DELETE_COMMENT, Action.EDIT_COMMENT],
+  [Action.DELETE_TOPIC]: [
+    Action.DELETE_TOPIC,
+    Action.MANAGE_TOPIC,
+    Action.DELETE_TOPIC,
+  ],
+  [Action.EDIT_THREAD]: [
+    Action.EDIT_THREAD,
+    Action.CREATE_THREAD,
+    Action.EDIT_THREAD,
+  ],
+  [Action.EDIT_COMMENT]: [
+    Action.EDIT_COMMENT,
+    Action.CREATE_COMMENT,
+    Action.EDIT_COMMENT,
+  ],
 };
 
 type allowDenyBigInt = {
@@ -161,6 +206,40 @@ export class PermissionManager {
     return permissions;
   }
 
+  public addAllowPermission(
+    allowPermission: bigint,
+    actionNumber: number
+  ): bigint {
+    const impliedAllowPermissions = this.getAllowedPermissionsByAction(
+      actionNumber
+    );
+    if (Array.isArray(impliedAllowPermissions)) {
+      impliedAllowPermissions.forEach((impliedAllowPermission) => {
+        allowPermission = allowPermission | BigInt(1 << impliedAllowPermission);
+      });
+    } else {
+      allowPermission = allowPermission | BigInt(1 << impliedAllowPermissions);
+    }
+    return allowPermission;
+  }
+
+  public addDenyPermission(
+    denyPermission: bigint,
+    actionNumber: number
+  ): bigint {
+    const impliedDenyPermissions = this.getDeniedPermissionsByAction(
+      actionNumber
+    );
+    if (Array.isArray(impliedDenyPermissions)) {
+      impliedDenyPermissions.forEach((impliedDenyPermission) => {
+        denyPermission = denyPermission | BigInt(1 << impliedDenyPermission);
+      });
+    } else {
+      denyPermission = denyPermission | BigInt(1 << impliedDenyPermissions);
+    }
+    return denyPermission;
+  }
+
   public removeAllowPermission(
     allowPermission: bigint,
     actionNumber: number
@@ -192,40 +271,6 @@ export class PermissionManager {
       });
     } else {
       denyPermission = denyPermission & ~BigInt(1 << impliedDenyPermissions);
-    }
-    return denyPermission;
-  }
-
-  public addAllowPermission(
-    allowPermission: bigint,
-    actionNumber: number
-  ): bigint {
-    const impliedAllowPermissions = this.getAllowedPermissionsByAction(
-      actionNumber
-    );
-    if (Array.isArray(impliedAllowPermissions)) {
-      impliedAllowPermissions.forEach((impliedAllowPermission) => {
-        allowPermission = allowPermission | BigInt(1 << impliedAllowPermission);
-      });
-    } else {
-      allowPermission = allowPermission | BigInt(1 << impliedAllowPermissions);
-    }
-    return allowPermission;
-  }
-
-  public addDenyPermission(
-    denyPermission: bigint,
-    actionNumber: number
-  ): bigint {
-    const impliedDenyPermissions = this.getDeniedPermissionsByAction(
-      actionNumber
-    );
-    if (Array.isArray(impliedDenyPermissions)) {
-      impliedDenyPermissions.forEach((impliedDenyPermission) => {
-        denyPermission = denyPermission | BigInt(1 << impliedDenyPermission);
-      });
-    } else {
-      denyPermission = denyPermission | BigInt(1 << impliedDenyPermissions);
     }
     return denyPermission;
   }
@@ -282,8 +327,7 @@ export class PermissionManager {
   // checks if a permission allows an action
   public isPermitted(permission: bigint, action: number): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
-    const hasAction: boolean =
-      (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
-    return hasAction;
+    const hasAction: boolean = (BigInt(permission) & actionAsBigInt) === 0n;
+    return !hasAction;
   }
 }
