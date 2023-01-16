@@ -15,11 +15,17 @@
     margin: 40px 32px;
   }
 
-  .title {
-    margin-bottom: 8px;
-  }
+  .title-container {
+    display: flex;
+    justify-content: space-between;
 
-  .description {
-    margin-bottom: 32px;
+
+    .title {
+      margin-bottom: 8px;
+    }
+  
+    .description {
+      margin-bottom: 32px;
+    }
   }
 }

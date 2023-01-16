@@ -11,17 +11,17 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
-import { NewProfile as Profile, Account, Profile as OldProfile } from '../../../models';
-import { CWButton } from '../../components/component_kit/cw_button';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { AvatarUpload } from '../../components/avatar_upload';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWDivider } from '../../components/component_kit/cw_divider';
-import { CWForm } from '../../components/component_kit/cw_form';
-import { CWFormSection } from '../../components/component_kit/cw_form_section';
-import { CWSocials } from '../../components/component_kit/cw_socials';
-import CWCoverImageUploader, { ImageAs, ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
+import { NewProfile as Profile, Account, Profile as OldProfile } from '../../models';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { AvatarUpload } from '../components/avatar_upload';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWForm } from '../components/component_kit/cw_form';
+import { CWFormSection } from '../components/component_kit/cw_form_section';
+import { CWSocials } from '../components/component_kit/cw_socials';
+import CWCoverImageUploader, { ImageAs, ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
 
 enum EditProfileError {
   None,

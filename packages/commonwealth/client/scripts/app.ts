@@ -864,6 +864,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: true,
             }),
+            '/profile/new': importRoute('views/pages/create_new_profile', {
+              scoped: false,
+              hideSidebar: false,
+            }),
             '/profile/:address': importRoute('views/pages/new_profile', {
                 scoped: false,
                 hideSidebar: false,

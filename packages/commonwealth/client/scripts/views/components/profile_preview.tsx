@@ -29,6 +29,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
   view(vnode: m.Vnode<ProfilePreviewAttrs>) {
     const { profiles, profile, addresses } = vnode.attrs;
     const { name, bio, avatarUrl } = profile;
+    const address = addresses.find((a) => a.profileId === profile.id).address;
 
     return (
       <div className="ProfilePreview">
@@ -46,12 +47,19 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               </CWText>
               <SocialAccounts profile={profile} />
             </div>
-            <div className="action">
+            <div className="actions">
+              <CWButton
+                label="View"
+                buttonType="mini-white"
+                onclick={() =>
+                  m.route.set(`/profile/${address}`)
+                }
+              />
               <CWButton
                 label="Edit"
                 buttonType="mini-white"
                 onclick={() =>
-                  m.route.set(`/profile/${m.route.param('address')}/edit`)
+                  m.route.set(`/profile/${address}/edit`)
                 }
               />
             </div>

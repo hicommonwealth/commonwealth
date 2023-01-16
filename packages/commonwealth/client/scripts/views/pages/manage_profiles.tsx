@@ -11,8 +11,13 @@ import { AddressInfo, NewProfile as Profile } from 'models';
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
 import { ProfilePreview } from '../components/profile_preview';
+import { PageNotFound } from './404';
+import { CWSpinner } from '../components/component_kit/cw_spinner';
+import { CWButton } from '../components/component_kit/cw_button';
 
 export class ManageProfiles extends ClassComponent {
+  private error: boolean;
+  private loading: boolean;
   private profiles: Profile[];
   private addresses: AddressInfo[];
 
@@ -36,22 +41,43 @@ export class ManageProfiles extends ClassComponent {
           )
       );
     } catch (err) {
-      console.log('ERROR in call', err);
+      this.error = true;
     }
   };
 
   oninit() {
+    this.error = false;
+    this.loading = true;
     this.getProfiles();
+    this.loading = false;
   }
 
   view() {
+    if (this.loading) return (
+      <div class="ManageProfiles">
+        <CWSpinner />
+      </div>
+    );
+
+    if (this.error) return <PageNotFound message="We cannot find any profiles." />
+
     if (!this.profiles) return;
 
     return (
       <Sublayout>
         <div class="ManageProfiles">
-          <CWText type="h3" className="title">Manage Profiles and Addresses</CWText>
-          <CWText className="description">Create and edit profiles and manage your connected addresses.</CWText>
+          <div className="title-container">
+            <div>
+              <CWText type="h3" className="title">Manage Profiles and Addresses</CWText>
+              <CWText className="description">Create and edit profiles and manage your connected addresses.</CWText>
+            </div>
+            <CWButton
+              label="Create Profile"
+              iconLeft="plus"
+              buttonType="mini-black"
+              onclick={() => m.route.set('/profile/new')}
+            />
+          </div>
           {this.profiles.map((profile) => (
             <ProfilePreview
               profiles={this.profiles}

@@ -70,7 +70,10 @@
         }
       }
   
-      .action {
+      .actions {
+        display: flex;
+        gap: 8px;
+
         .Button {
           @include smallInclusive {
             width: 100%;
