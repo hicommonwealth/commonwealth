@@ -192,7 +192,6 @@ export const createThread = async (args: ThreadArgs) => {
     kind,
     url,
   } = args;
-  console.log('createThread Args', args);
   const res = await chai.request
     .agent(app)
     .post('/api/createThread')
