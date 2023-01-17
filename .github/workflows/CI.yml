@@ -135,3 +135,13 @@ jobs:
 
       - name: Run unit tests
         run: yarn unit-test
+
+      # TODO: fix integration tests -- they currently fail
+      # - name: Run integration tests
+      #  run: yarn integration-test
+
+      # TODO: reintegrate code coverage once we get nyc working with hardhat
+
+      # TODO: fix linter and then reintegrate using current ts version
+      # - name: Run linter
+      #   run: yarn lint
