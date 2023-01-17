@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { DB } from '../models';
 
 export const Errors = {
-  NotAuthorized: 'Not authorized',
+  NotLoggedIn: 'Not logged in',
   InvalidUpdate: 'Invalid update',
   NoUsernameProvided: 'No username provided in query',
 };
@@ -13,6 +13,10 @@ const createProfile = async (
   res: Response,
   next: NextFunction
 ) => {
+  if (!req.user) {
+    return next(new Error(Errors.NotLoggedIn));
+  }
+
   if (!req.body.name) {
     return next(new Error(Errors.NoUsernameProvided));
   }

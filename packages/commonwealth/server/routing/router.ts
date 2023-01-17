@@ -100,6 +100,7 @@ import bulkProfiles from '../routes/bulkProfiles';
 import updateProfileOld from '../routes/updateProfile';
 import updateProfileNew from '../routes/updateNewProfile';
 import createProfile from '../routes/createProfile';
+import deleteProfile from '../routes/deleteProfile';
 import moveAddress from '../routes/moveAddress';
 import writeUserSetting from '../routes/writeUserSetting';
 import sendFeedback from '../routes/sendFeedback';
@@ -667,6 +668,12 @@ function setupRouter(
     '/createProfile',
     passport.authenticate('jwt', { session: false }),
     createProfile.bind(this, models)
+  );
+
+  router.post(
+    '/deleteProfile',
+    passport.authenticate('jwt', { session: false }),
+    deleteProfile.bind(this, models)
   );
 
   router.post(

@@ -149,6 +149,35 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
   };
 
+  private handleDeleteProfile = async () => {
+    this.loading = true;
+
+    const response: any = await $.post(`${app.serverUrl()}/deleteProfile`, {
+      profileId: this.profile.id,
+      jwt: app.user.jwt,
+    }).catch(() => {
+      this.error = EditProfileError.UpdateProfileFailed;
+      this.failed = true;
+      setTimeout(() => {
+        this.failed = false;
+        m.redraw();
+      }, 2500);
+    });
+
+    if (response?.status === 'Success') {
+      // Redirect
+      setTimeout(() => {
+        m.route.set(`/manage-profiles`);
+      }, 1500);
+    } else {
+      this.failed = true;
+      setTimeout(() => {
+        this.failed = false;
+        m.redraw();
+      }, 2500);
+    }
+  };
+
   oninit() {
     this.address = m.route.param('address');
     this.error = EditProfileError.None;
@@ -211,9 +240,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <div className="buttons">
                   <CWButton
                     label="Delete profile"
-                    onclick={() => {
-                      // TODO: implement delete profile
-                    }}
+                    onclick={() => this.handleDeleteProfile()}
                     buttonType="tertiary-black"
                   />
                   <div className="buttons-right">
