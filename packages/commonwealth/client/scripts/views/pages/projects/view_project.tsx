@@ -33,6 +33,7 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
   private web3Initialized: boolean;
   private web3: Web3;
   private currentBlockNum: number;
+  private tokenBalance: string;
 
   async initializeWeb3() {
     const cmnUrl = app.config.chains.getById(ChainNetwork.CommonProtocol)?.node
@@ -48,6 +49,13 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
     this.web3Initialized = true;
   }
 
+  async getAcceptedProjectTokenUserBalance() {
+    const balance = await app.projects.getUserERC20TokenBalance(
+      this.project.token
+    );
+    this.tokenBalance = balance;
+  }
+
   view(vnode: m.Vnode<ProjectPageAttrs>) {
     if (!app) return <PageLoading />;
     const { identifier } = vnode.attrs;
@@ -57,7 +65,10 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
     }
 
     // @TODO Remove admin toggles
-    if (!app.roles.isAdminOfEntity({ chain: app.chain?.id }) && !app.user.isSiteAdmin) {
+    if (
+      !app.roles.isAdminOfEntity({ chain: app.chain?.id }) &&
+      !app.user.isSiteAdmin
+    ) {
       return <PageNotFound />;
     }
 
@@ -73,6 +84,8 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
     const threshold = +weiToTokens(project.threshold.toString(), 18);
     const fundingAmount = +weiToTokens(project.fundingAmount.toString(), 18);
     const chain: ChainInfo = app.config.chains.getById(project.chainId);
+
+    this.getAcceptedProjectTokenUserBalance();
 
     return (
       <Sublayout
@@ -93,13 +106,11 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
             </div>
             <div class="metadata-right">
               <CWTag
-                label={`Created on: ${project.createdAt.format('MMMM D, YYYY').toString()}`}
+                label={`Created on: ${project.createdAt
+                  .format('MMMM D, YYYY')
+                  .toString()}`}
               />
-              <CWTag
-                label={
-                  `Ends at block: ${project.deadline}`
-                }
-              />
+              <CWTag label={`Ends at block: ${project.deadline}`} />
             </div>
           </div>
 
@@ -133,6 +144,20 @@ export class ProjectPage implements m.ClassComponent<ProjectPageAttrs> {
                 supportType={ProjectRole.Curator}
               />
             </div>
+          </div>
+          <div class="project-token">
+            <CWDivider />
+            <CWText type="h1" textStyle="medium">
+              Accepted Project Token:
+            </CWText>
+            {project.token}
+          </div>
+          <div class="">
+            <CWDivider />
+            <CWText type="h1" textStyle="medium">
+              User Wallet Balance of Accepted Project Token:
+            </CWText>
+            {this.tokenBalance}
           </div>
 
           <div class="project-about">

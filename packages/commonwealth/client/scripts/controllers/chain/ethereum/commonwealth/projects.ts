@@ -4,6 +4,7 @@ import m from 'mithril';
 import {
   ICuratedProjectFactory__factory,
   ICuratedProject__factory,
+  IERC20__factory,
 } from 'common-common/src/eth/types';
 import { CommonwealthTypes } from 'chain-events/src';
 import { ChainEntity, ChainInfo, Project } from 'models';
@@ -11,7 +12,7 @@ import { IProjectCreationData } from 'models/Project';
 import { IApp } from 'state';
 import { ChainNetwork } from 'common-common/src/types';
 import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
-import { ContractReceipt } from 'ethers';
+import { ContractReceipt, BigNumber } from 'ethers';
 import { formatBytes32String } from 'ethers/lib/utils';
 import { attachSigner } from './contractApi';
 
@@ -265,6 +266,37 @@ export default class ProjectsController {
     }
 
     return [txReceipt, projectId];
+  }
+
+  public async projectData(projectId: string): Promise<[BigNumber, BigNumber, string, string]>  {
+    const caller = this._app.user.activeAccount;
+    const project = this._store.getById(projectId);
+
+    const contract = await attachSigner(
+      this._app.wallets,
+      caller,
+      null,
+      this._factoryInfo.node,
+      ICuratedProject__factory.connect,
+      project.address
+    );
+
+    const [threshold, deadline, beneficiary, acceptedToken] = await contract.projectData();
+    return [threshold, deadline, beneficiary, acceptedToken]
+  }
+
+  public async getUserERC20TokenBalance(tokenAddress: string): Promise<string> {
+    const caller = this._app.user.activeAccount;
+    const contract = await attachSigner(
+      this._app.wallets,
+      caller,
+      null,
+      this._factoryInfo.node,
+      IERC20__factory.connect,
+      tokenAddress
+    );
+    const tokenBalance = await contract.balanceOf(caller.address)
+    return tokenBalance.toString();
   }
 
   public async back(projectId: string, value: string) {
