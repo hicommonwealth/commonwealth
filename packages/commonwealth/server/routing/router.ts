@@ -301,7 +301,6 @@ function setupRouter(
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
     updateThreadStage.bind(this, models)
   );
   router.post(
