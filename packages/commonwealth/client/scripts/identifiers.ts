@@ -54,6 +54,9 @@ export const proposalSlugToClass = () => {
     string,
     ProposalModule<any, any, any> | ThreadsController
   >([[ProposalType.Thread, app.threads]]);
+  if (!app.chain) {
+    return mmap;
+  }
   if (app.chain.base === ChainBase.Substrate) {
     mmap.set(
       ProposalType.SubstrateDemocracyReferendum,

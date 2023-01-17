@@ -416,6 +416,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     const proposals = vnode.state.threads.sort(
       (a, b) => +b.createdAt - +a.createdAt
     );
+
     const allContent = []
       .concat(proposals || [])
       .concat(comments || [])

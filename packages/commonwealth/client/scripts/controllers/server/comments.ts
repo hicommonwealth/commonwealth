@@ -67,6 +67,7 @@ export const modelFromServer = (comment) => {
     proposal = uniqueIdToProposal(decodeURIComponent(comment.root_id));
   } catch (e) {
     // no proposal
+    console.log(e);
   }
 
   const commentParams =

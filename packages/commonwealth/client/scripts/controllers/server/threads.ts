@@ -133,7 +133,7 @@ export const modelFromServer = (thread) => {
     })
   );
 
-  return new Thread({
+  const t = new Thread({
     id,
     author: thread.Address.address,
     authorChain: thread.Address.chain,
@@ -160,6 +160,10 @@ export const modelFromServer = (thread) => {
     linkedThreads,
     numberOfComments,
   });
+
+  ThreadsController.Instance.store.add(t);
+
+  return t;
 };
 
 /*
@@ -196,9 +200,21 @@ export interface VersionHistory {
 }
 
 class ThreadsController {
+  private static _instance: ThreadsController;
   private _store = new ProposalStore<Thread>();
   private _listingStore: RecentListingStore = new RecentListingStore();
   private _overviewStore = new ProposalStore<Thread>();
+
+  private constructor() {
+  }
+
+  public static get Instance() {
+    if (!this._instance) {
+      this._instance = new ThreadsController();
+    }
+
+    return this._instance;
+  }
 
   public get store() {
     return this._store;
@@ -266,7 +282,6 @@ class ThreadsController {
         jwt: app.user.jwt,
       });
       const result = modelFromServer(response.result);
-      this._store.add(result);
 
       // Update stage counts
       if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
@@ -415,7 +430,6 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
-        this._store.update(result);
         this._listingStore.add(result);
         this._overviewStore.update(result);
         return result;
@@ -438,7 +452,6 @@ class ThreadsController {
       success: (response) => {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
-        this._store.update(result);
         this._listingStore.add(result);
         return result;
       },
@@ -535,7 +548,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    this._store.add(modelFromServer(response.result));
+    modelFromServer(response.result);
   }
 
   public async removeLinkedThread(
@@ -556,7 +569,7 @@ class ThreadsController {
     if (response.status !== 'Success') {
       throw new Error();
     }
-    this._store.add(modelFromServer(response.result));
+    modelFromServer(response.result);
   }
 
   public async fetchThreadIdsForSnapshot(args: { snapshot: string }) {
@@ -713,7 +726,6 @@ class ThreadsController {
         console.error('Thread missing address');
       }
       try {
-        this._store.add(modeledThread);
         this._listingStore.add(modeledThread);
       } catch (e) {
         console.error(e.message);

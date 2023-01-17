@@ -148,7 +148,7 @@ const app: IApp = {
   isModuleReady: false,
 
   // Thread
-  threads: new ThreadsController(),
+  threads: ThreadsController.Instance,
   threadUniqueAddressesCount: new ThreadUniqueAddressesCount(),
   comments: new CommentsController(),
   reactions: new ReactionsController(),
