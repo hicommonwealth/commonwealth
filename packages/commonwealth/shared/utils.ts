@@ -296,6 +296,7 @@ export const addressSwapper = (options: {
   }
 };
 
+
 export function aggregatePermissions(
   roles: RoleObject[],
   chain_permissions: { allow: bigint; deny: bigint }
@@ -316,7 +317,7 @@ export function aggregatePermissions(
   const permissionsAllowDeny: Array<{
     allow: bigint;
     deny: bigint;
-  }> = roles;
+  }> = roles.map(({allow, deny}) => ({allow, deny}));
 
   // add chain default permissions to beginning of permissions array
   permissionsAllowDeny.unshift(chain_permissions);

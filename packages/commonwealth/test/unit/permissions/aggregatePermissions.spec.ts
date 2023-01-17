@@ -137,17 +137,14 @@ describe('aggregatePermissions() unit tests', () => {
     chain_permission.deny = denyCreateThread;
 
     const permission = aggregatePermissions(roles, chain_permission);
-    // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.hasPermission(permission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(permission, Action.CREATE_THREAD, ToCheck.Allow)
     );
-    // eslint-disable-next-line no-bitwise
     assert.isFalse(
-      permissionsManager.hasPermission(permission, Action.VIEW_CHAT_CHANNELS)
+      permissionsManager.hasPermission(permission, Action.VIEW_CHAT_CHANNELS, ToCheck.Allow)
     );
-    // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.hasPermission(permission, Action.CREATE_CHAT)
+      permissionsManager.hasPermission(permission, Action.CREATE_CHAT, ToCheck.Allow)
     );
   });
 
@@ -192,11 +189,11 @@ describe('aggregatePermissions() unit tests', () => {
     const permission = aggregatePermissions(roles, chain_permission);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.hasPermission(permission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(permission, Action.CREATE_THREAD, ToCheck.Allow)
     );
     // eslint-disable-next-line no-bitwise
     assert.isFalse(
-      permissionsManager.hasPermission(permission, Action.VIEW_CHAT_CHANNELS)
+      permissionsManager.hasPermission(permission, Action.VIEW_CHAT_CHANNELS, ToCheck.Allow)
     );
   });
 });

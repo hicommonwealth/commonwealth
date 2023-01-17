@@ -108,6 +108,7 @@ export const impliedAllowPermissionsByAction: Permissions = {
     Action.CREATE_REACTION,
     Action.VIEW_COMMENTS,
   ],
+  [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
   [Action.CREATE_REACTION]: [Action.CREATE_REACTION, Action.VIEW_REACTIONS],
   [Action.VOTE_ON_POLLS]: [Action.VOTE_ON_POLLS, Action.VIEW_POLLS],
   [Action.DELETE_THREAD]: [Action.DELETE_THREAD, Action.EDIT_THREAD],
@@ -151,6 +152,7 @@ export const impliedDenyPermissionsByAction: Permissions = {
     Action.VIEW_POLLS,
     Action.CREATE_POLL,
   ],
+  [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
   [Action.DELETE_THREAD]: [Action.DELETE_THREAD, Action.EDIT_THREAD],
   [Action.DELETE_COMMENT]: [Action.DELETE_COMMENT, Action.EDIT_COMMENT],
   [Action.DELETE_TOPIC]: [
