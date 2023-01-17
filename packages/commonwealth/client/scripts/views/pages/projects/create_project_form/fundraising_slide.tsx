@@ -14,8 +14,15 @@ export class FundraisingSlide extends ClassComponent<{
   form: ICreateProjectForm;
 }> {
   private tokenName = 'WETH';
+  private acceptedTokens = [];
+
+  async fetchProjectTokens() {
+    this.acceptedTokens = await app.projects.getAcceptedProjectTokens();
+  }
 
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
+    this.fetchProjectTokens();
+
     return (
       <form class="FundraisingSlide">
         <CWText type="h1">Fundraising and Length</CWText>
@@ -24,7 +31,7 @@ export class FundraisingSlide extends ClassComponent<{
           what address the funds will be going.
         </CWText>
         <CWDropdown
-          options={app.projects.getAcceptedProjectTokens().map((tokenAddress) => {
+          options={this.acceptedTokens.map((tokenAddress) => {
             return {
               label: tokenAddress,
               value: tokenAddress,
@@ -32,11 +39,9 @@ export class FundraisingSlide extends ClassComponent<{
           })}
           initialValue={{ label: 'WETH', value: 'WETH' }}
           label="Raise In"
-          onSelect={
-            (o) => {
-              vnode.attrs.form.token = o.value;
-            }
-          }
+          onSelect={(o) => {
+            vnode.attrs.form.token = o.value;
+          }}
         />
         <CWTokenInput
           label="Goal"

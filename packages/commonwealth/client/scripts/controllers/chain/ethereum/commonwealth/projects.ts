@@ -128,8 +128,19 @@ export default class ProjectsController {
     m.redraw(); // force redraw to show projects @TODO Remove hack
   }
 
-  public getAcceptedProjectTokens() {
-    return this.acceptedProjectTokens
+  public async getAcceptedProjectTokens() {
+    let i = 0;
+    const acceptedTokens = [];
+    while(true) {
+      let token: string;
+      try {
+        token = await this.acceptedProjectToken(i);
+        i++
+      } catch(e) {
+        return acceptedTokens;
+      }
+      acceptedTokens.push(token)
+    }
   }
 
   public async acceptedProjectToken(tokenIndex: number) {
