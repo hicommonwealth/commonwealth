@@ -17,7 +17,7 @@
       "chain-events": ["../../packages/chain-events"],
       "chain-events/*": ["../../packages/chain-events/*"],
       "snapshot-listener/*": ["../../packages/snapshot-listener/*"]
-    }
+    },
   "extends": "../../tsconfig.json",
   "include": [
     "src",
