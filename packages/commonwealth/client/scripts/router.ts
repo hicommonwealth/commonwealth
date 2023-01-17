@@ -8,6 +8,10 @@ import {
   APPLICATION_UPDATE_ACTION,
   APPLICATION_UPDATE_MESSAGE,
 } from 'helpers/constants';
+import { notifyError, notifyInfo } from 'controllers/app/notifications';
+import { NewLoginModal } from 'views/modals/login_modal';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 
 interface RouteAttrs {
   scoped?: boolean;
@@ -22,7 +26,47 @@ interface ShouldDeferChainAttrs {
   path: string;
 }
 
-export const navigateToSubpage = (...args) => {
+// set up route navigation
+m.route.prefix = '';
+const _updateRoute = m.route.set;
+
+m.route.set = (...args) => {
+  // set app params that maintain global state for:
+  // - whether the user last clicked the back button
+  // - the last page the user was on
+  app._lastNavigatedBack = false;
+  app._lastNavigatedFrom = m.route.get();
+
+  // update route
+  if (args[0] !== m.route.get()) {
+    _updateRoute.apply(this, args);
+  }
+
+  // reset scroll position
+  const html = document.getElementsByTagName('html')[0];
+
+  if (html) {
+    html.scrollTo(0, 0);
+  }
+
+  const body = document.getElementsByTagName('body')[0];
+
+  if (body) {
+    body.scrollTo(0, 0);
+  }
+};
+
+const _onpopstate = window.onpopstate;
+window.onpopstate = (...args) => {
+  app._lastNavigatedBack = true;
+  app._lastNavigatedFrom = m.route.get();
+
+  if (_onpopstate) {
+    _onpopstate.apply(this, args);
+  }
+};
+
+const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain() && app.activeChainId()) {
     args[0] = `/${app.activeChainId()}${args[0]}`;
@@ -70,41 +114,97 @@ const redirectRoute = (
   },
 });
 
+const handleInviteLinkRedirect = () => {
+  const inviteMessage = m.route.param('invitemessage');
+
+  if (!inviteMessage) {
+    return;
+  }
+
+  const isAcceptInviteMessage =
+    m.route.param('message') === 'Must be logged in to accept invites';
+
+  if (inviteMessage === 'failure' && isAcceptInviteMessage) {
+    notifyInfo('Log in to join a community with an invite link');
+
+    app.modals.create({
+      modal: NewLoginModal,
+      data: {
+        modalType: isWindowMediumSmallInclusive(window.innerWidth)
+          ? 'fullScreen'
+          : 'centered',
+        breakpointFn: isWindowMediumSmallInclusive,
+      },
+    });
+  } else if (inviteMessage === 'failure') {
+    const message = m.route.param('message');
+    notifyError(message);
+  } else if (inviteMessage === 'success') {
+    if (app.config.invites.length === 0) {
+      return;
+    }
+
+    app.modals.create({ modal: ConfirmInviteModal });
+  } else {
+    notifyError('Unexpected error with invite link');
+  }
+};
+
+const handleLoginRedirects = () => {
+  if (
+    m.route.param('loggedin') &&
+    m.route.param('loggedin').toString() === 'true' &&
+    m.route.param('path') &&
+    !m.route.param('path').startsWith('/login')
+  ) {
+    // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
+    // handle param-based redirect after email login
+
+    /* If we are creating a new account, then we alias to create a new mixpanel user
+     else we identify to associate mixpanel events
+    */
+    if (m.route.param('new') && m.route.param('new').toString() === 'true') {
+      console.log('creating account');
+    }
+
+    m.route.set(m.route.param('path'), {}, { replace: true });
+  } else if (
+    localStorage &&
+    localStorage.getItem &&
+    localStorage.getItem('githubPostAuthRedirect')
+  ) {
+    // handle localStorage-based redirect after Github login (callback must occur within 30 seconds)
+    try {
+      const postAuth = JSON.parse(
+        localStorage.getItem('githubPostAuthRedirect')
+      );
+      if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
+        m.route.set(postAuth.path, {}, { replace: true });
+      }
+      localStorage.removeItem('githubPostAuthRedirect');
+    } catch (e) {
+      console.log('Error restoring path from localStorage');
+    }
+  } else if (
+    localStorage &&
+    localStorage.getItem &&
+    localStorage.getItem('discordPostAuthRedirect')
+  ) {
+    try {
+      const postAuth = JSON.parse(
+        localStorage.getItem('discordPostAuthRedirect')
+      );
+      if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
+        m.route.set(postAuth.path, {}, { replace: true });
+      }
+      localStorage.removeItem('discordPostAuthRedirect');
+    } catch (e) {
+      console.log('Error restoring path from localStorage');
+    }
+  }
+};
+
 let hasCompletedSuccessfulPageLoad = false;
-
-// set up route navigation
-m.route.prefix = '';
-const _updateRoute = m.route.set;
-export const updateRoute = (...args) => {
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
-  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
-};
-
-m.route.set = (...args) => {
-  // set app params that maintain global state for:
-  // - whether the user last clicked the back button
-  // - the last page the user was on
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
-
-  // update route
-  if (args[0] !== m.route.get()) {
-    _updateRoute.apply(this, args);
-  }
-
-  // reset scroll position
-  const html = document.getElementsByTagName('html')[0];
-  if (html) {
-    html.scrollTo(0, 0);
-  }
-
-  const body = document.getElementsByTagName('body')[0];
-
-  if (body) {
-    body.scrollTo(0, 0);
-  }
-};
 
 const renderRoute = (
   path: string,
@@ -592,4 +692,9 @@ const getRoutes = (customDomain: string) => {
   };
 };
 
-export { getRoutes };
+export {
+  getRoutes,
+  navigateToSubpage,
+  handleLoginRedirects,
+  handleInviteLinkRedirect,
+};

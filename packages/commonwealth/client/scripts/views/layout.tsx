@@ -6,15 +6,15 @@ import ClassComponent from 'class_component';
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
 
-import {
-  initChain,
-  initNewTokenChain,
-  deinitChainOrCommunity,
-  selectChain,
-} from 'app';
 import app from 'state';
 import { AppToasts } from 'views/toast';
 import { PageNotFound } from 'views/pages/404';
+import {
+  deinitChainOrCommunity,
+  initChain,
+  initNewTokenChain,
+  selectChain,
+} from 'helpers/chain';
 import { AppModals } from './app_modals';
 import { UserSurveyPopup } from './components/user_survey_popup';
 import { CWSpinner } from './components/component_kit/cw_spinner';
