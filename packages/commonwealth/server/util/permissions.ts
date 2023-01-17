@@ -175,6 +175,11 @@ type allowDenyBigInt = {
   deny: bigint;
 };
 
+export enum ToCheck {
+  Allow = 'allow',
+  Deny = 'deny',
+}
+
 export class PermissionManager {
   private action: Action;
 
@@ -324,10 +329,16 @@ export class PermissionManager {
     return permissionsBigInt;
   }
 
-  public isPermitted(permission: bigint, action: number): boolean {
+  hasPermission(permission: bigint, action: number, type: ToCheck ): boolean {
     const actionAsBigInt: bigint = BigInt(1) << BigInt(action);
     const hasAction: boolean =
       (BigInt(permission) & actionAsBigInt) == actionAsBigInt;
-    return hasAction;
+    if (type === 'allow') {
+      return hasAction;
+    } else if (type === 'deny') {
+      return !hasAction;
+    } else {
+      return false;
+    }
   }
 }

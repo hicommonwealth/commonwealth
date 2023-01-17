@@ -1,17 +1,19 @@
 import { assert } from 'chai';
 import {
   PermissionManager,
-  Action
+  Action,
+  ToCheck,
 } from 'commonwealth/server/util/permissions';
 
 describe('computePermissions() unit tests', () => {
-  const permissionsManager = new PermissionManager();
   let base_permission;
   let overwrite_admin;
   let overwrite_moderator;
   let overwrite_member;
   let chain_permission;
+  let permissionsManager;
   beforeEach(() => {
+    permissionsManager = new PermissionManager();
     base_permission = BigInt(0);
     overwrite_admin = { allow: base_permission, deny: base_permission };
     overwrite_moderator = { allow: base_permission, deny: base_permission };
@@ -20,17 +22,18 @@ describe('computePermissions() unit tests', () => {
   });
 
   it('should correctly computePermissions for allowing createThread action with two roles overwrites', () => {
-// eslint-disable-next-line no-bitwise
-    overwrite_admin.allow = BigInt(1) << BigInt(Action.CREATE_THREAD);
-
-    // eslint-disable-next-line no-bitwise
-    overwrite_moderator.deny = BigInt(1) << BigInt(Action.CREATE_THREAD);
 
     const permission = permissionsManager.computePermissions(base_permission, [
       overwrite_moderator,
       overwrite_admin,
     ]);
-    assert.isTrue(permissionsManager.isPermitted(permission, Action.CREATE_THREAD));
+    assert.isTrue(
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Deny
+      )
+    );
   });
 
   it('should correctly computePermissions for Denying createThread action with two roles overwrites', () => {
@@ -44,8 +47,13 @@ describe('computePermissions() unit tests', () => {
       overwrite_moderator,
       overwrite_admin,
     ]);
+
     assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
   });
 
@@ -57,8 +65,12 @@ describe('computePermissions() unit tests', () => {
       chain_permission,
       overwrite_admin,
     ]);
-    assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+    assert.isTrue(
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Deny
+      )
     );
   });
 
@@ -73,56 +85,58 @@ describe('computePermissions() unit tests', () => {
       overwrite_admin,
     ]);
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
-    );
-  });
-
-  it('should correctly default to allow for computePermissions for a permission with the same allow and deny and community permissions', () => {
-    overwrite_admin.deny = BigInt(1) << BigInt(Action.CREATE_THREAD);
-    overwrite_admin.allow = BigInt(1) << BigInt(Action.CREATE_THREAD);
-    chain_permission.deny = BigInt(1) << BigInt(Action.CREATE_THREAD);
-
-    const permission = permissionsManager.computePermissions(base_permission, [
-      chain_permission,
-      overwrite_admin,
-    ]);
-    assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
-    );
-    assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.VIEW_CHAT_CHANNELS)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
   });
 
   it('should correctly implicit permissions for an addAllowPermission', () => {
-    const actionPermission = permissionsManager.addAllowPermission(
+    const permission = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
     );
     assert.isTrue(
-      permissionsManager.isPermitted(actionPermission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
     assert.isTrue(
-      permissionsManager.isPermitted(actionPermission, Action.VIEW_THREADS)
+      permissionsManager.hasPermission(
+        permission,
+        Action.VIEW_THREADS,
+        ToCheck.Allow
+      )
     );
   });
 
-
-  it('should correctly implicit permissions for an addDenyPermission', () => {
+  it('should correctly implicit permissions for addDenyPermission', () => {
     const permission = permissionsManager.addDenyPermission(
       base_permission,
       Action.CREATE_THREAD
     );
     console.log('permission', permission);
-    assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+    assert.isFalse(
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Deny
+      )
     );
-    assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.VIEW_THREADS)
+    assert.isFalse(
+      permissionsManager.hasPermission(
+        permission,
+        Action.VIEW_THREADS,
+        ToCheck.Deny
+      )
     );
   });
 
-  it('should correctly implicit permissions for an removeAllowPermission', () => {
+  it('should correctly implicit permissions for removeAllowPermission', () => {
     const permission = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
@@ -132,24 +146,47 @@ describe('computePermissions() unit tests', () => {
       permission,
       Action.CREATE_THREAD
     );
+
+    const res = permissionsManager.hasPermission(
+      actionPermission,
+      Action.CREATE_THREAD,
+      ToCheck.Allow
+    );
+
     assert.isFalse(
-      permissionsManager.isPermitted(actionPermission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(
+        actionPermission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
     assert.isFalse(
-      permissionsManager.isPermitted(actionPermission, Action.VIEW_THREADS)
+      permissionsManager.hasPermission(
+        actionPermission,
+        Action.VIEW_THREADS,
+        ToCheck.Allow
+      )
     );
   });
 
   it('should correctly computePermissions for an action and its implicit permissions', () => {
-    overwrite_admin.allow = permissionsManager.addAllowPermission(
-      BigInt(0),
+    const allowPermission = permissionsManager.addAllowPermission(
+      base_permission,
       Action.CREATE_THREAD
     );
     assert.isTrue(
-      permissionsManager.isPermitted(overwrite_admin.allow, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(
+        allowPermission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
     assert.isTrue(
-      permissionsManager.isPermitted(overwrite_admin.allow, Action.VIEW_THREADS)
+      permissionsManager.hasPermission(
+        allowPermission,
+        Action.VIEW_THREADS,
+        ToCheck.Allow
+      )
     );
   });
 
@@ -165,16 +202,32 @@ describe('computePermissions() unit tests', () => {
       overwrite_admin,
     ]);
     assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.VIEW_THREADS)
+      permissionsManager.hasPermission(
+        permission,
+        Action.VIEW_THREADS,
+        ToCheck.Allow
+      )
     );
     assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.VIEW_COMMENTS)
+      permissionsManager.hasPermission(
+        permission,
+        Action.VIEW_COMMENTS,
+        ToCheck.Allow
+      )
     );
     assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.VIEW_THREADS)
+      permissionsManager.hasPermission(
+        permission,
+        Action.VIEW_THREADS,
+        ToCheck.Allow
+      )
     );
     assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
   });
 });

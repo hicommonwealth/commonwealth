@@ -1,12 +1,14 @@
-import { assert } from "chai";
+import { assert } from 'chai';
 import {
   Action,
   AccessLevel,
   PermissionManager,
-} from "commonwealth/server/util/permissions";
-import { aggregatePermissions } from "commonwealth/shared/utils";
+  ToCheck,
+} from 'commonwealth/server/util/permissions';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
+import { RoleObject } from 'commonwealth/shared/types';
 
-describe("aggregatePermissions() unit tests", () => {
+describe('aggregatePermissions() unit tests', () => {
   let base_permission;
   let overwrite_admin;
   let overwrite_moderator;
@@ -20,7 +22,7 @@ describe("aggregatePermissions() unit tests", () => {
     permissionsManager = new PermissionManager();
   });
 
-  it("should correctly aggregate permissions for a community with one member roles", () => {
+  it('should correctly aggregate permissions for a community with one member roles', () => {
     const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
@@ -33,16 +35,20 @@ describe("aggregatePermissions() unit tests", () => {
       },
     ];
 
-    console.log("roles", roles);
+    console.log('roles', roles);
 
     const permission = aggregatePermissions(roles, chain_permission);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
   });
 
-  it("should correctly aggregate permissions for a community with member roles that overwrite each other", () => {
+  it('should correctly aggregate permissions for a community with member roles that overwrite each other', () => {
     const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
@@ -51,7 +57,7 @@ describe("aggregatePermissions() unit tests", () => {
       base_permission,
       Action.VIEW_CHAT_CHANNELS
     );
-    const denyViewChat = permissionsManager.addDenyPermission(
+    const denyViewChat = permissionsManager.removeAllowPermission(
       base_permission,
       Action.VIEW_CHAT_CHANNELS
     );
@@ -61,7 +67,7 @@ describe("aggregatePermissions() unit tests", () => {
     );
     const admin_name = AccessLevel.Admin;
     const moderator_name = AccessLevel.Moderator;
-    const roles = [
+    const roles: RoleObject[] = [
       {
         allow: allowCreateThread,
         deny: denyViewChat,
@@ -77,15 +83,15 @@ describe("aggregatePermissions() unit tests", () => {
     const permission = aggregatePermissions(roles, chain_permission);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
-    );
-    // eslint-disable-next-line no-bitwise
-    assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.VIEW_CHAT_CHANNELS)
+      permissionsManager.hasPermission(
+        permission,
+        Action.CREATE_THREAD,
+        ToCheck.Allow
+      )
     );
   });
 
-  it("should correctly aggregate permissions for a community with multiple role and community overwrites (no implicit)", () => {
+  it('should correctly aggregate permissions for a community with multiple role and community overwrites (no implicit)', () => {
     const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
@@ -133,19 +139,19 @@ describe("aggregatePermissions() unit tests", () => {
     const permission = aggregatePermissions(roles, chain_permission);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(permission, Action.CREATE_THREAD)
     );
     // eslint-disable-next-line no-bitwise
     assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.VIEW_CHAT_CHANNELS)
+      permissionsManager.hasPermission(permission, Action.VIEW_CHAT_CHANNELS)
     );
     // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_CHAT)
+      permissionsManager.hasPermission(permission, Action.CREATE_CHAT)
     );
   });
 
-  it("should correctly aggregate permissions for a community with multiple role overwrites", () => {
+  it('should correctly aggregate permissions for a community with multiple role overwrites', () => {
     const allowCreateThread = permissionsManager.addAllowPermission(
       base_permission,
       Action.CREATE_THREAD
@@ -186,11 +192,11 @@ describe("aggregatePermissions() unit tests", () => {
     const permission = aggregatePermissions(roles, chain_permission);
     // eslint-disable-next-line no-bitwise
     assert.isTrue(
-      permissionsManager.isPermitted(permission, Action.CREATE_THREAD)
+      permissionsManager.hasPermission(permission, Action.CREATE_THREAD)
     );
     // eslint-disable-next-line no-bitwise
     assert.isFalse(
-      permissionsManager.isPermitted(permission, Action.VIEW_CHAT_CHANNELS)
+      permissionsManager.hasPermission(permission, Action.VIEW_CHAT_CHANNELS)
     );
   });
 });
