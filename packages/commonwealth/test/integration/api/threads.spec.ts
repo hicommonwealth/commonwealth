@@ -172,6 +172,7 @@ describe('Thread Tests', () => {
         readOnly,
         jwt: userJWT,
       });
+      console.log({ tRes });
       expect(tRes).not.to.be.null;
       expect(tRes.status).to.be.equal('Success');
       expect(tRes.result.read_only).to.be.equal(true);

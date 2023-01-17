@@ -326,10 +326,9 @@ export async function isAddressPermitted(
     const permitted = permissionsManager.hasPermission(
       permission,
       action,
-      ToCheck.Allow
+      ToCheck.Deny
     );
     if (!permitted) {
-      console.log('Permission denied');
       throw new Error('Not permitted');
     } else {
       return true;
