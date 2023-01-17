@@ -16,8 +16,8 @@ import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPi
 import app, { resetDatabase } from 'commonwealth/server-test';
 import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
-import { addAllowDenyPermissions } from 'commonwealth/test/util/modelUtils';
-import { Action } from '../../../../common-common/src/permissions';
+import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
+import { Action } from 'commonwealth/server/util/permissions';
 
 chai.use(chaiHttp);
 const { expect } = chai;
@@ -83,7 +83,7 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    addAllowDenyPermissions('member', chain2, 0, Action.CREATE_THREAD );
+    addAllowDenyPermissionsForCommunityRole('member', chain2, 0, Action.CREATE_THREAD );
   });
 
   describe('/createThread', () => {
