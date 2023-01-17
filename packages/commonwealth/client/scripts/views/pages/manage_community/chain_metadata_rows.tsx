@@ -20,6 +20,7 @@ import { ChainInfo, RoleInfo } from 'models';
 import {
   Action,
   PermissionManager,
+  ToCheck,
 } from 'commonwealth/server/util/permissions';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { ManageRoles } from './manage_roles';
@@ -92,9 +93,10 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !this.permissionsManager.isPermitted(
+    this.chatEnabled = !this.permissionsManager.hasPermission(
       chain.defaultDenyPermissions,
-      Action.VIEW_CHAT_CHANNELS
+      Action.VIEW_CHAT_CHANNELS,
+      ToCheck.Allow
     );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;

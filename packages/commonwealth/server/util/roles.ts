@@ -4,9 +4,9 @@ import {
   Action,
   PermissionManager,
   PermissionError,
+  ToCheck,
   everyonePermissions,
 } from './permissions';
-import { AppError } from 'common-common/src/errors';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';
@@ -323,7 +323,11 @@ export async function isAddressPermitted(
       deny: chain.default_deny_permissions,
     });
 
-    const permitted = permissionsManager.isPermitted(permission, action);
+    const permitted = permissionsManager.hasPermission(
+      permission,
+      action,
+      ToCheck.Allow
+    );
     if (!permitted) {
       console.log('Permission denied');
       throw new Error('Not permitted');
@@ -381,7 +385,7 @@ export async function isAnyonePermitted(
     },
   ]);
 
-  if (!permissionsManager.isPermitted(permission, action)) {
+  if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
     return PermissionError.NOT_PERMITTED;
   }
   return true;

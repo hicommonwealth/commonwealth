@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 import { PermissionManager, Action, ToCheck } from 'commonwealth/server/util/permissions';
 
-describe('isPermitted() unit tests', () => {
+describe('hasPermissions() unit tests', () => {
   const permissionsManager = new PermissionManager();
 
   it('should validate a create thread permission', () => {

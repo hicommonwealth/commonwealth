@@ -12,6 +12,7 @@ import {
   Action,
   AccessLevel,
   PermissionManager,
+  ToCheck,
   everyonePermissions,
 } from 'commonwealth/server/util/permissions';
 import { RoleObject } from 'commonwealth/shared/types';
@@ -331,7 +332,7 @@ export function isActiveAddressPermitted(
       allow: chain_info.defaultAllowPermissions,
       deny: chain_info.defaultDenyPermissions,
     });
-    if (!this.permissionsManager.isPermitted(permission, action)) {
+    if (!this.permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
     return true;
@@ -348,7 +349,7 @@ export function isActiveAddressPermitted(
         deny: chain_info.defaultDenyPermissions,
       },
     ]);
-    if (!this.permissionsManager.isPermitted(permission, action)) {
+    if (!this.permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
     return true;
