@@ -11,6 +11,7 @@ import { sequelize } from '../../database';
 
 export const Errors = {
   NeedPositiveBalance: 'Must provide address with positive balance',
+  NeedToSpecifyContract: 'Must provide admin_addresses, contract.token_type, and contarct.address',
 };
 
 const optionalValidation = [
@@ -22,7 +23,10 @@ const optionalValidation = [
 export const putCommunitiesValidation = [
   body('community.id').exists().isString().trim(),
   body('community.name').exists().isString().trim(),
-  body('community.chain_node_id').exists().isString().trim(),
+  body('community.chain_node_id').exists().isNumeric(),
+  body('community.default_symbol').exists().isString().trim(),
+  body('community.network').exists().isString().trim(),
+  body('community.type').exists().isString().trim(),
   body('community.created_at').not().exists(),
   body('community.updated_at').not().exists(),
   body('community.deleted_at').not().exists(),
@@ -48,7 +52,11 @@ export async function putCommunities(
   try {
     await models.Chain.create(community);
     // if optionalValidation route is used, check for positive balance in address provided
-    if (contract.token_type) {
+    if (contract) {
+      if(!contract.token_type || !contract.address || !admin_addresses) {
+        throw new AppError(Errors.NeedToSpecifyContract)
+      }
+
       const [{ bp }] = await tbc.getBalanceProviders(community.chain_node_id);
       const balanceResults = await tbc.getBalancesForAddresses(community.chain_node_id, admin_addresses, bp, {
         contractType: contract.token_type,
@@ -66,15 +74,15 @@ export async function putCommunities(
       if (!positiveBalance) {
         throw new AppError(Errors.NeedPositiveBalance);
       }
+
+      // create address for each admin_address, and assign to admin role
+      await Promise.all(admin_addresses.map(async (address) => {
+        const r: CreateAddressReq = { address, chain: community.id, community: community.id, wallet_id: null };
+
+        const newAddress = await createAddressHelper(r, models, req.user, next);
+        await models.Role.update({ permission: 'admin' }, { where: { address_id: (newAddress as any).id } });
+      }));
     }
-
-    // create address for each admin_address, and assign to admin role
-    await Promise.all(admin_addresses.map(async (address) => {
-      const r: CreateAddressReq = { address, chain: community.id, community: community.id, wallet_id: null };
-
-      const newAddress = await createAddressHelper(r, models, req.user, next);
-      await models.Role.update({ permission: 'admin' }, { where: { address_id: (newAddress as any).id } });
-    }));
 
     transaction.commit();
   } catch (e) {

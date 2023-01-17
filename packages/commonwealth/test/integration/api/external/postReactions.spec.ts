@@ -9,7 +9,7 @@ import { testAddresses, testChains, testComments, testReactions, testUsers } fro
 describe('postReactions Tests', () => {
   let jwtToken;
 
-  before(() => {
+  beforeEach(() => {
     jwtToken = jwt.sign({ id: testUsers[0].id, email: testUsers[0].email }, JWT_SECRET);
   });
 

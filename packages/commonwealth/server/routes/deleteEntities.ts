@@ -22,21 +22,23 @@ export const deleteEntities = async (
 
   const entities = await model.findAll({ where });
 
-  const addresses = await filterAddressOwnedByUser(
-    models,
-    req.user.id,
-    entities.map(e => e[chainIdFieldName]),
-    [],
-    entities.map(e => e.address_id)
-  );
+  if(req.user) {
+    const addresses = await filterAddressOwnedByUser(
+      models,
+      req.user.id,
+      entities.map(e => e[chainIdFieldName]),
+      [],
+      entities.map(e => e.address_id)
+    );
 
-  if (addresses.unowned.length !== 0) {
-    return failure(res, {
-      error: {
-        message: 'Some entities to delete were not owned by the user.',
-        unownedAddresses: addresses.unowned
-      }
-    });
+    if (addresses.unowned.length !== 0) {
+      return failure(res, {
+        error: {
+          message: 'Some entities to delete were not owned by the user.',
+          unownedAddresses: addresses.unowned
+        }
+      });
+    }
   }
 
   let error = '';

@@ -19,33 +19,36 @@ export async function addEntities<M extends Record<string, unknown> = Record<str
 
   const entityCopy = entities(req);
 
-  const addresses = await filterAddressOwnedByUser(
-    models,
-    req.user.id,
-    entityCopy.map(e => e.community_id),
-    entityCopy.map(e => e.address),
-    entityCopy.map(e => e.address_id)
-  );
+  let addressMap;
+  if (req.user) {
+    const addresses = await filterAddressOwnedByUser(
+      models,
+      req.user.id,
+      entityCopy.map(e => e.community_id),
+      entityCopy.map(e => e.address),
+      entityCopy.map(e => e.address_id)
+    );
 
-  if (addresses.unowned.length !== 0) {
-    return failure(res, {
-      error: {
-        message: 'Some addresses provided were not owned by the user.',
-        unownedAddresses: addresses.unowned
-      }
-    });
+    if (addresses.unowned.length !== 0) {
+      return failure(res, {
+        error: {
+          message: 'Some addresses provided were not owned by the user.',
+          unownedAddresses: addresses.unowned
+        }
+      });
+    }
+
+    addressMap = new Map(addresses.owned.map(obj => [obj.address, obj.id]));
   }
-
-  const addressMap = new Map(addresses.owned.map(obj => [obj.address, obj.id]));
 
   entityCopy.forEach(c => {
     c[chainIdFieldName] = c['community_id'];
     delete c['community_id'];
 
     // all the entities use the address_id field. If user passed in address, map it to address_id
-    if(c.address) {
+    if (addressMap && c.address) {
       c.address_id = addressMap.get(c.address);
-      delete c['address']
+      delete c['address'];
     }
   });
 

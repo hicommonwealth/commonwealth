@@ -9,7 +9,7 @@ import { testAddresses, testChains, testRoles, testUsers } from './dbEntityHooks
 describe('postRoles Tests', () => {
   let jwtToken;
 
-  before(() => {
+  beforeEach(() => {
     jwtToken = jwt.sign({ id: testUsers[0].id, email: testUsers[0].email }, JWT_SECRET);
   });
 

@@ -10,7 +10,7 @@ describe('putComments Tests', () => {
   let jwtToken;
   let jwtTokenUser2;
 
-  before(() => {
+  beforeEach(() => {
     jwtToken = jwt.sign({ id: testUsers[0].id, email: testUsers[0].email }, JWT_SECRET);
     jwtTokenUser2 = jwt.sign({ id: testUsers[1].id, email: testUsers[1].email }, JWT_SECRET);
   });
@@ -31,7 +31,7 @@ describe('putComments Tests', () => {
     chai.assert.equal(resp.result.error, '');
     chai.assert.equal(await models.Comment.count({where: {id: {[Op.in]: [smallestId - 1, smallestId - 2]}}}), 2);
 
-    resp = await del('/api/comments', { jwt: jwtTokenUser2, ids: [smallestId - 1, smallestId - 2] });
+    resp = await del('/api/comments', { jwt: jwtToken, ids: [smallestId - 1, smallestId - 2] });
 
     chai.assert.equal(resp.result.error, '');
     chai.assert.equal(await models.Comment.count({where: {id: {[Op.in]: [smallestId - 1, smallestId - 2]}}}), 0);
