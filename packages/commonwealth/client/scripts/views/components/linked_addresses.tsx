@@ -36,7 +36,7 @@ class Address extends ClassComponent<AddressAttrs> {
         <CWPopoverMenu
           menuItems={[
             {
-              label: 'Move',
+              label: 'Transfer to another Profile',
               iconLeft: 'externalLink',
               onclick: (e) => {
                 e.preventDefault();
@@ -54,7 +54,7 @@ class Address extends ClassComponent<AddressAttrs> {
               }
             },
             {
-              label: 'Delete',
+              label: 'Remove',
               iconLeft: 'trash',
               onclick: (e) => {
                 e.preventDefault();

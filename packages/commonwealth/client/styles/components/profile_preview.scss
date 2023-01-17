@@ -36,59 +36,59 @@
         object-fit: cover;
       }
     }
-  
-    .right-side {
-      display: flex;
-      flex-direction: row;
-      width: 100%;
-  
-      @include smallInclusive {
-        flex-direction: column-reverse;
-        gap: 24px;
-      }
-  
-      .content {
-        .h4 {
-          margin-bottom: 16px;
-    
-          @include smallInclusive {
-            display: flex;
-            justify-content: center;
-          }
-        }
-    
-        .b1 {
-          margin-bottom: 16px;
-        }
-    
-        .SocialAccounts {
-          max-width: none;
-          justify-content: flex-start;
-          margin-bottom: 0;
-    
-          >:first-child {
-            svg {
-              margin-left: 0;
-            }
-          }
-  
-          @include smallInclusive {
-            justify-content: space-between;
-          }
-        }
-      }
-  
-      .actions {
-        display: flex;
-        gap: 8px;
-        justify-content: flex-end;
-        width: 100%;
 
-        .Button {
-          @include smallInclusive {
-            width: 100%;
+    .content {
+      .h4 {
+        margin-bottom: 16px;
+  
+        @include smallInclusive {
+          display: flex;
+          justify-content: center;
+        }
+      }
+  
+      .b1 {
+        margin-bottom: 16px;
+      }
+
+      .actions {
+        display: none;
+        gap: 8px;
+        width: 100%;
+        margin-bottom: 16px;
+
+        @include mediumInclusive {
+          display: flex;
+        }
+
+        @include smallInclusive {
+          justify-content: center;
+        }
+      }
+  
+      .SocialAccounts {
+        max-width: none;
+        justify-content: flex-start;
+        margin-bottom: 0;
+  
+        >:first-child {
+          svg {
+            margin-left: 0;
           }
         }
+
+        @include smallInclusive {
+          justify-content: center;
+        }
+      }
+    }
+
+    .desktop-actions {
+      display: flex;
+      gap: 8px;
+
+      @include mediumInclusive {
+        display: none;
       }
     }
   }
@@ -109,8 +109,7 @@
         flex-direction: column;
 
         .Button {
-          margin-top: 24px;
-          width: 100%;
+          margin-top: 16px;
         }
       }
     }

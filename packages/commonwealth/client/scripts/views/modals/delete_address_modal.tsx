@@ -9,6 +9,7 @@ import 'modals/delete_address_modal.scss';
 
 import app from 'state';
 import { NewProfile as Profile } from 'client/scripts/models';
+import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -25,7 +26,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
   private error: boolean;
 
   private onDeleteAddress = async (e: Event, vnode: m.Vnode<DeleteAddressModalAttrs>) => {
-    const { address, chain } = vnode.attrs;
+    const { address, chain, profile } = vnode.attrs;
 
     e.preventDefault();
 
@@ -42,8 +43,11 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
     });
 
     if (response?.status === 'Success') {
-      // Redirect
-      m.redraw();
+      notifySuccess(`Address has been successfully removed from profile '${profile.name}'`);
+      $(e.target).trigger('modalcomplete');
+      setTimeout(() => {
+        $(e.target).trigger('modalexit');
+      }, 0);
     } else {
       this.error = true;
       setTimeout(() => {
@@ -51,11 +55,6 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
         m.redraw();
       }, 2500);
     }
-
-    $(e.target).trigger('modalcomplete');
-    setTimeout(() => {
-      $(e.target).trigger('modalexit');
-    }, 0);
   };
 
   oninit(vnode: m.Vnode<DeleteAddressModalAttrs>) {

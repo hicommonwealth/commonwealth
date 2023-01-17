@@ -47,20 +47,15 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               />
             )}
           </div>
-          <div className="right-side">
-            <div className="content">
-              <CWText type="h4">
-                {name}
-              </CWText>
-              <CWText>
-                {renderQuillTextBody(bio)}
-              </CWText>
-              <SocialAccounts profile={profile} />
-            </div>
+          <div className="content">
+            <CWText type="h4">
+              {name}
+            </CWText>
             <div className="actions">
               <CWButton
                 label="View"
                 buttonType="mini-white"
+                iconLeft="views"
                 onclick={() =>
                   m.route.set(`/profile/${address}`)
                 }
@@ -68,11 +63,34 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               <CWButton
                 label="Edit"
                 buttonType="mini-white"
+                iconLeft="write"
                 onclick={() =>
                   m.route.set(`/profile/${address}/edit`)
                 }
               />
             </div>
+            <CWText>
+              {renderQuillTextBody(bio)}
+            </CWText>
+            <SocialAccounts profile={profile} />
+          </div>
+          <div className="desktop-actions">
+            <CWButton
+              label="View"
+              buttonType="mini-white"
+              iconLeft="views"
+              onclick={() =>
+                m.route.set(`/profile/${address}`)
+              }
+            />
+            <CWButton
+              label="Edit"
+              buttonType="mini-white"
+              iconLeft="write"
+              onclick={() =>
+                m.route.set(`/profile/${address}/edit`)
+              }
+            />
           </div>
         </div>
         <div className="addresses">
@@ -82,7 +100,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
             </CWText>
             <CWButton
               label="Connect Address"
-              buttonType="mini-black"
+              buttonType="mini-white"
               onclick={() => {
                 app.modals.create({
                   modal: NewLoginModal,

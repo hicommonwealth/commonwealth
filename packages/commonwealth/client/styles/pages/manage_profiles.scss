@@ -4,14 +4,14 @@
   margin: 48px 190px;
 
   &.full-height {
-    margin: 0;
     height: 100%;
+    margin: 0;
   }
 
   .loading-spinner {
+    align-items: center;
     display: flex;
     justify-content: center;
-    align-items: center;
     height: 100%;
   }
 
@@ -31,6 +31,15 @@
     display: flex;
     justify-content: space-between;
 
+    @include smallInclusive {
+      flex-direction: column;
+      margin-bottom: 24px;
+      width: 100%;
+
+      .Button {
+        width: 100%;
+      }
+    }
 
     .title {
       margin-bottom: 8px;

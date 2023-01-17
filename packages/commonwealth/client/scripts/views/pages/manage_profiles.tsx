@@ -76,7 +76,7 @@ export class ManageProfiles extends ClassComponent {
             <CWButton
               label="Create Profile"
               iconLeft="plus"
-              buttonType="mini-black"
+              buttonType="mini-white"
               onclick={() => {
                 this.loading = true;
                 setTimeout(() => {

@@ -9,9 +9,11 @@ import 'modals/move_address_modal.scss';
 
 import app from 'state';
 import { NewProfile as Profile } from 'client/scripts/models';
+import { notifySuccess } from 'controllers/app/notifications';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
 
 type MoveAddressModalAttrs = {
   profile: Profile;
@@ -71,7 +73,11 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
 
     if (response?.status === 'Success') {
       // Redirect
-      m.redraw();
+      notifySuccess(`Address has been successfully moved to profile '${this.selectedProfile.name}'`);
+      $(e.target).trigger('modalcomplete');
+      setTimeout(() => {
+        $(e.target).trigger('modalexit');
+      }, 0);
     } else {
       this.error = true;
       setTimeout(() => {
@@ -79,11 +85,6 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
         m.redraw();
       }, 2500);
     }
-
-    $(e.target).trigger('modalcomplete');
-    setTimeout(() => {
-      $(e.target).trigger('modalexit');
-    }, 0);
   };
 
   oninit() {
@@ -91,13 +92,13 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
   }
 
   view(vnode: m.Vnode<MoveAddressModalAttrs>) {
-    const { profile, profiles } = vnode.attrs;
+    const { profile, profiles, address } = vnode.attrs;
     const moveToOptions = profiles.filter((p) => { return p.id !== profile.id; });
 
     return (
       <div class="MoveAddressModal">
         <div class="title">
-          <CWText type="h4">Move Address</CWText>
+          <CWText type="h4">Transfer Address</CWText>
           <CWIconButton
             iconName="close"
             onclick={(e) => {
@@ -110,6 +111,10 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
           />
         </div>
         <div class="body">
+          <CWText type="caption">
+            Address to be moved
+          </CWText>
+          <CWTruncatedAddress address={address} />
           <CWText type="caption">
             Currently In
           </CWText>

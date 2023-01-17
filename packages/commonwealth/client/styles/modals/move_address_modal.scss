@@ -24,12 +24,24 @@
     }
   }
 
+  .TruncatedAddress {
+    margin-bottom: 16px;
+  }
+
   .current-address {
     border: 1px solid $neutral-200;
     border-radius: 5px;
     display: flex;
     align-items: center;
     margin-bottom: 16px;
+
+    .MoveAddressRow {
+      &.selected, &:hover {
+        background: none;
+        border-radius: 0;
+        cursor: default;
+      }
+    }
   }
 
   .move-to-address {
@@ -50,15 +62,17 @@
     align-items: center;
     gap: 8px;
     padding: 16px;
-    transition: background 0.2s ease-in-out;
+    transition: background 0.1s ease-in-out;
 
     &.selected {
-      background: $neutral-100;
+      background: $neutral-50;
+      border-radius: 5px;
     }
 
     &:hover {
-      background: $neutral-100;
+      background: $neutral-50;
       cursor: pointer;
+      border-radius: 5px;
     }
 
     img {
