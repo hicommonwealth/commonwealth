@@ -7,15 +7,16 @@ import 'components/linked_addresses.scss';
 
 import app from 'state';
 import { AddressInfo, NewProfile as Profile } from 'models';
-import { formatAddressShort } from '../../helpers';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { MoveAddressModal } from '../modals/move_address_modal';
+import { DeleteAddressModal } from '../modals/delete_address_modal';
+import { CWTruncatedAddress } from './component_kit/cw_truncated_address';
 
 type AddressAttrs = {
   profiles: Profile[];
   profile: Profile;
-  address: string;
+  addressInfo: AddressInfo;
 }
 
 type LinkedAddressesAttrs = {
@@ -26,15 +27,13 @@ type LinkedAddressesAttrs = {
 
 class Address extends ClassComponent<AddressAttrs> {
   view (vnode: m.Vnode<AddressAttrs>) {
-    const { profiles, profile, address } = vnode.attrs;
+    const { profiles, profile, addressInfo } = vnode.attrs;
+    const { address, chain } = addressInfo;
 
     return (
       <div className="AddressContainer">
-      <div className="address">
-          {formatAddressShort(address)}
-
-      </div>
-      <CWPopoverMenu
+        <CWTruncatedAddress address={address} />
+        <CWPopoverMenu
           menuItems={[
             {
               label: 'Move',
@@ -57,7 +56,17 @@ class Address extends ClassComponent<AddressAttrs> {
             {
               label: 'Delete',
               iconLeft: 'trash',
-              onclick: () => {} // Implement Delete Address
+              onclick: (e) => {
+                e.preventDefault();
+                app.modals.create({
+                  modal: DeleteAddressModal,
+                  data: {
+                    profile,
+                    address,
+                    chain: chain.id,
+                  }
+                })
+              }
             },
           ]}
           trigger={<CWIconButton iconName="dotsVertical" />}
@@ -74,7 +83,7 @@ export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
     return (
       <div className="LinkedAddresses">
         {addresses.map((address) => {
-          return <Address profiles={profiles} profile={profile} address={address.address} />
+          return <Address profiles={profiles} profile={profile} addressInfo={address} />
         })}
       </div>
     );

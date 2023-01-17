@@ -27,8 +27,8 @@ export class ManageProfiles extends ClassComponent {
         jwt: app.user.jwt,
       });
 
-      this.profiles = response.result.profiles.map((profile) => new Profile(profile));
-      this.addresses = response.result.addresses.map(
+      this.profiles = response.result.profiles?.map((profile) => new Profile(profile));
+      this.addresses = response.result.addresses?.map(
         (a) =>
           new AddressInfo(
             a.id,
@@ -89,7 +89,7 @@ export class ManageProfiles extends ClassComponent {
             <ProfilePreview
               profiles={this.profiles}
               profile={profile}
-              addresses={this.addresses.filter((a) => a.profileId === profile.id)}
+              addresses={this.addresses?.filter((a) => a.profileId === profile.id)}
             />
           ))}
         </div>
