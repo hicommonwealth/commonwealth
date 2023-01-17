@@ -15,36 +15,6 @@ describe('PermissionManager', () => {
     permissionManager = new PermissionManager();
   });
 
-  describe('getPermissions', () => {
-    it('should return the correct permissions for a given access level', () => {
-      const accessLevel = AccessLevel.Admin;
-      const expectedPermissions = {
-        [Action.DELETE_THREAD]: [
-          Action.EDIT_THREAD,
-          Action.CREATE_THREAD,
-          Action.VIEW_THREADS,
-        ],
-        [Action.DELETE_COMMENT]: [
-          Action.EDIT_COMMENT,
-          Action.CREATE_COMMENT,
-          Action.VIEW_COMMENTS,
-        ],
-        [Action.DELETE_REACTION]: [
-          Action.CREATE_REACTION,
-          Action.VIEW_REACTIONS,
-        ],
-        [Action.DELETE_TOPIC]: [
-          Action.EDIT_TOPIC,
-          Action.CREATE_TOPIC,
-          Action.VIEW_TOPICS,
-        ],
-      };
-      expect(permissionManager.getPermissions(accessLevel)).to.deep.equal(
-        expectedPermissions
-      );
-    });
-  });
-
   describe('getAllowedPermissionsByAction', () => {
     it('should return an array of actions that are allowed by the given action, including the given action', () => {
       const action = Action.CREATE_COMMENT;

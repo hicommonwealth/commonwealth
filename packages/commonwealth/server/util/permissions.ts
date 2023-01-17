@@ -43,39 +43,6 @@ export enum Action {
 
 export type Permissions = { [key: number]: Array<Action> | Action };
 
-export const adminPermissions: Permissions = {
-  [Action.DELETE_THREAD]: [
-    Action.EDIT_THREAD,
-    Action.CREATE_THREAD,
-    Action.VIEW_THREADS,
-  ],
-  [Action.DELETE_COMMENT]: [
-    Action.EDIT_COMMENT,
-    Action.CREATE_COMMENT,
-    Action.VIEW_COMMENTS,
-  ],
-  [Action.DELETE_REACTION]: [Action.CREATE_REACTION, Action.VIEW_REACTIONS],
-  [Action.DELETE_TOPIC]: [
-    Action.EDIT_TOPIC,
-    Action.CREATE_TOPIC,
-    Action.VIEW_TOPICS,
-  ],
-};
-
-export const moderatorPermissions: Permissions = {
-  [Action.CREATE_CHAT]: Action.VIEW_CHAT_CHANNELS,
-  [Action.EDIT_THREAD]: [Action.CREATE_THREAD, Action.VIEW_THREADS],
-  [Action.EDIT_COMMENT]: [Action.CREATE_COMMENT, Action.VIEW_COMMENTS],
-  [Action.EDIT_TOPIC]: [Action.CREATE_TOPIC, Action.VIEW_TOPICS],
-};
-
-export const memberPermissions: Permissions = {
-  [Action.CREATE_POLL]: [Action.VOTE_ON_POLLS, Action.VIEW_POLLS],
-  [Action.CREATE_THREAD]: [Action.VIEW_THREADS],
-  [Action.CREATE_COMMENT]: [Action.VIEW_COMMENTS],
-  [Action.CREATE_REACTION]: [Action.VIEW_REACTIONS],
-};
-
 export const everyonePermissions: Permissions = {
   [Action.DELETE_REACTION]: [
     Action.DELETE_REACTION,
@@ -86,12 +53,6 @@ export const everyonePermissions: Permissions = {
   [Action.VIEW_CHAT_CHANNELS]: [Action.VIEW_CHAT_CHANNELS],
 };
 
-export const accessLevelPermissions: Map<AccessLevel, Permissions> = new Map([
-  [AccessLevel.Admin, adminPermissions],
-  [AccessLevel.Moderator, moderatorPermissions],
-  [AccessLevel.Member, memberPermissions],
-  [AccessLevel.Everyone, everyonePermissions],
-]);
 
 export const impliedAllowPermissionsByAction: Permissions = {
   [Action.CREATE_CHAT]: [Action.CREATE_CHAT, Action.VIEW_CHAT_CHANNELS],
@@ -185,17 +146,6 @@ export enum ToCheck {
 export class PermissionManager {
   private action: Action;
 
-  public getPermissions(accessLevel: AccessLevel): Permissions {
-    return accessLevelPermissions.get(accessLevel) as Permissions;
-  }
-
-  public getPermissionsForAccessLevel(accessLevel: AccessLevel): Permissions {
-    const permissions = accessLevelPermissions.get(accessLevel);
-    if (!permissions) {
-      throw new Error(`Invalid access level: ${accessLevel}`);
-    }
-    return permissions;
-  }
 
   public getAllowedPermissionsByAction(action: Action): Action[] | Action {
     const permissions = impliedAllowPermissionsByAction[action];
