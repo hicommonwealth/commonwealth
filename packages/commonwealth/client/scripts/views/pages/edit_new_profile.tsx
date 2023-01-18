@@ -8,6 +8,7 @@ import _ from 'underscore';
 import 'pages/edit_new_profile.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
@@ -105,7 +106,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       if (response?.status === 'Success') {
         setTimeout(() => {
           this.loading = false;
-          m.route.set(`/profile/${this.username}`);
+          navigateToSubpage(`/profile/${this.username}`);
         }, 1500);
       }
     } catch (err) {
@@ -171,7 +172,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
         // Redirect
         setTimeout(() => {
           this.loading = false;
-          m.route.set('/profile/manage');
+          navigateToSubpage('/profile/manage');
           m.redraw();
         }, 1500);
       }
@@ -189,7 +190,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     this.getProfile(this.username);
 
     if (!app.isLoggedIn()) {
-      m.route.set(`/profile/${this.username}`);
+      navigateToSubpage(`/profile/${this.username}`);
     }
 
     this.profileUpdate = {};
@@ -212,7 +213,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
     if (this.error === EditProfileError.None) {
       if (!this.isOwner) {
-        m.route.set(`/profile/${this.username}`);
+        navigateToSubpage(`/profile/${this.username}`);
       }
 
       const oldProfile = new OldProfile(
@@ -254,7 +255,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                         onclick={() => {
                           this.loading = true;
                           setTimeout(() => {
-                            m.route.set(`/profile/${this.username}`);
+                            navigateToSubpage(`/profile/${this.username}`);
                           }, 1000);
                         }}
                         className="save-button"

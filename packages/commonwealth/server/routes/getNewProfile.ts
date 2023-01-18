@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import { DB } from '../models';
 
 export const Errors = {
-  NoUsernameProvided: 'No username provided in query',
+  NoIdentifierProvided: 'No username or address provided in query',
   NoProfileFound: 'No profile found',
 };
 
@@ -13,14 +13,36 @@ const getNewProfile = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { username } = req.query;
-  if (!username) return next(new Error(Errors.NoUsernameProvided));
+  const { username, address } = req.query;
+  if (!username && !address) return next(new Error(Errors.NoIdentifierProvided));
 
-  const profile = await models.Profile.findOne({
-    where: {
-      username,
-    },
-  });
+  let profile;
+
+  if (username) {
+    profile = await models.Profile.findOne({
+      where: {
+        username,
+      },
+    });
+  }
+
+  if (address) {
+    const addressModel = await models.Address.findOne({
+      where: {
+        address,
+      },
+      include: [models.Profile]
+    });
+
+    if (!addressModel) return next(new Error(Errors.NoProfileFound));
+
+    profile = await models.Profile.findOne({
+      where: {
+        id: addressModel.profile_id,
+      },
+    });
+  }
+
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
   const addresses = await profile.getAddresses();

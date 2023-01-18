@@ -7,6 +7,7 @@ import jdenticon from 'jdenticon';
 import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { NewProfile as Profile } from 'client/scripts/models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
@@ -43,7 +44,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
               buttonType="mini-white"
               iconLeft="write"
               onclick={() =>
-                m.route.set(`/profile/${m.route.param('username')}/edit`)
+                navigateToSubpage(`/profile/${username}/edit`)
               }
             />
           )

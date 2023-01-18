@@ -873,16 +873,17 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               hideSidebar: false,
             }),
             '/profile/:username': importRoute('views/pages/new_profile', {
-                scoped: false,
-                hideSidebar: false,
+              scoped: false,
+              hideSidebar: false,
             }),
-            '/profile/:username/edit': importRoute(
-              'views/pages/edit_new_profile',
-              {
-                scoped: false,
-                hideSidebar: false,
-              }
-            ),
+            '/profile/:username/edit': importRoute('views/pages/edit_new_profile', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            '/profile/a/:address': importRoute('views/pages/new_profile_redirect', {
+              scoped: false,
+              hideSidebar: false,
+            }),
             '/dashboard': importRoute('views/pages/user_dashboard', {
               scoped: false,
               deferChain: true,

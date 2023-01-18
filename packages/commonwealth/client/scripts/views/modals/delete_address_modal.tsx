@@ -44,15 +44,11 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
         notifySuccess(`Address has been successfully removed from profile '${displayName}'`);
       }
     } catch (err) {
-      setTimeout(() => {
-        notifyError('Address was not successfully deleted, please try again.');
-      }, 1500);
+      notifyError('Address was not successfully deleted, please try again.');
     }
 
     $(e.target).trigger('modalcomplete');
-    setTimeout(() => {
-      $(e.target).trigger('modalexit');
-    }, 0);
+    $(e.target).trigger('modalexit');
   };
 
   oninit(vnode: m.Vnode<DeleteAddressModalAttrs>) {

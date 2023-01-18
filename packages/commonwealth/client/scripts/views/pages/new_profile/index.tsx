@@ -33,7 +33,6 @@ type NewProfileAttrs = {
   placeholder?: string;
 };
 
-const NoAddressFoundError = 'No address found';
 const NoProfileFoundError = 'No profile found';
 
 export default class NewProfile extends ClassComponent<NewProfileAttrs> {
@@ -82,12 +81,6 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
     } catch (err) {
       if (
         err.status === 500 &&
-        err.responseJSON.error === NoAddressFoundError
-      ) {
-        this.error = ProfileError.NoAddressFound;
-      }
-      if (
-        err.status === 500 &&
         err.responseJSON.error === NoProfileFoundError
       ) {
         this.error = ProfileError.NoProfileFound;
@@ -115,9 +108,6 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
           </div>
         </div>
       );
-
-    if (this.error === ProfileError.NoAddressFound)
-      return <PageNotFound message="We cannot find this profile." />
 
     if (this.error === ProfileError.NoProfileFound)
       return <PageNotFound message="We cannot find this profile." />

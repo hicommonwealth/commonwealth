@@ -73,15 +73,11 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
         notifySuccess(`Address has been successfully moved to profile '${displayName}'`);
       }
     } catch (err) {
-      setTimeout(() => {
-        notifyError('Address was not successfully transferred, please try again.');
-      }, 1500);
+      notifyError('Address was not successfully transferred, please try again.');
     }
 
     $(e.target).trigger('modalcomplete');
-    setTimeout(() => {
-      $(e.target).trigger('modalexit');
-    }, 0);
+    $(e.target).trigger('modalexit');
   };
 
   oninit() {

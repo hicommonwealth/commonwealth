@@ -8,6 +8,7 @@ import 'components/profile_preview.scss';
 
 import app from 'state';
 import { AddressInfo, NewProfile as Profile } from 'models';
+import { navigateToSubpage } from 'app';
 import { CWText } from './component_kit/cw_text';
 import { renderQuillTextBody } from './quill/helpers';
 import { SocialAccounts } from './social_accounts';
@@ -57,7 +58,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
                 buttonType="mini-white"
                 iconLeft="views"
                 onclick={() =>
-                  m.route.set(`/profile/${username}`)
+                  navigateToSubpage(`/profile/${username}`)
                 }
               />
               <CWButton
@@ -65,7 +66,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
                 buttonType="mini-white"
                 iconLeft="write"
                 onclick={() =>
-                  m.route.set(`/profile/${username}/edit`)
+                  navigateToSubpage(`/profile/${username}/edit`)
                 }
               />
             </div>
@@ -82,7 +83,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               buttonType="mini-white"
               iconLeft="views"
               onclick={() =>
-                m.route.set(`/profile/${username}`)
+                navigateToSubpage(`/profile/${username}`)
               }
             />
             <CWButton
@@ -90,7 +91,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               buttonType="mini-white"
               iconLeft="write"
               onclick={() =>
-                m.route.set(`/profile/${username}/edit`)
+                navigateToSubpage(`/profile/${username}/edit`)
               }
             />
           </div>
