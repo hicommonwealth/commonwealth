@@ -8,32 +8,31 @@ import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
 import { NewProfile as Profile } from 'client/scripts/models';
+import { formatAnonymousUsername } from 'shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { SocialAccounts } from '../../components/social_accounts';
 
 type NewProfileHeaderAttrs = {
-  address: string;
   profile: Profile;
+  isOwner: boolean;
 };
 
 export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
   private defaultAvatar: string;
 
   oninit(vnode: m.Vnode<NewProfileHeaderAttrs>) {
-    this.defaultAvatar = jdenticon.toSvg(vnode.attrs.address, 90);
+    this.defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
   }
 
   view(vnode: m.Vnode<NewProfileHeaderAttrs>) {
-    const { profile, address } = vnode.attrs;
+    const { profile, isOwner } = vnode.attrs;
 
     if (!profile) return;
-    const bio = profile.bio;
+    const { bio, name, username } = profile;
 
-    const isCurrentUser = app.isLoggedIn() && app.user.addresses
-      .map((addressInfo) => addressInfo.address)
-      .includes(address);
+    const isCurrentUser = app.isLoggedIn() && isOwner;
 
     return (
       <div class="ProfileHeader">
@@ -44,7 +43,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
               buttonType="mini-white"
               iconLeft="write"
               onclick={() =>
-                m.route.set(`/profile/${m.route.param('address')}/edit`)
+                m.route.set(`/profile/${m.route.param('username')}/edit`)
               }
             />
           )
@@ -62,8 +61,8 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
           )}
         </div>
         <div class="profile-name-and-bio">
-          <CWText type="h3" className={profile.name ? 'name hasMargin' : 'name'}>
-            {profile.name ? profile.name : `Anonymous (${address.slice(0, 5)}...)` }
+          <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
+            {name || formatAnonymousUsername(username)}
           </CWText>
           <div class="buttons">
             {/* TODO: Add delegate and follow buttons */}

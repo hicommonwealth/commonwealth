@@ -9,7 +9,8 @@ import 'modals/delete_address_modal.scss';
 
 import app from 'state';
 import { NewProfile as Profile } from 'client/scripts/models';
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { formatAnonymousUsername } from 'shared/utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -30,31 +31,28 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
 
     e.preventDefault();
 
-    const response: any = await $.post(`${app.serverUrl()}/deleteAddress`, {
-      address,
-      chain,
-      jwt: app.user.jwt,
-    }).catch(() => {
-      this.error = true;
-      setTimeout(() => {
-        this.error = false;
-        m.redraw();
-      }, 2500);
-    });
+    try {
+      const response: any = await $.post(`${app.serverUrl()}/deleteAddress`, {
+        address,
+        chain,
+        jwt: app.user.jwt,
+      });
 
-    if (response?.status === 'Success') {
-      notifySuccess(`Address has been successfully removed from profile '${profile.name}'`);
-      $(e.target).trigger('modalcomplete');
+      if (response?.status === 'Success') {
+        const { name, username } = profile;
+        const displayName = name || formatAnonymousUsername(username);
+        notifySuccess(`Address has been successfully removed from profile '${displayName}'`);
+      }
+    } catch (err) {
       setTimeout(() => {
-        $(e.target).trigger('modalexit');
-      }, 0);
-    } else {
-      this.error = true;
-      setTimeout(() => {
-        this.error = false;
-        m.redraw();
-      }, 2500);
+        notifyError('Address was not successfully deleted, please try again.');
+      }, 1500);
     }
+
+    $(e.target).trigger('modalcomplete');
+    setTimeout(() => {
+      $(e.target).trigger('modalexit');
+    }, 0);
   };
 
   oninit(vnode: m.Vnode<DeleteAddressModalAttrs>) {
@@ -64,6 +62,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
 
   view(vnode: m.Vnode<DeleteAddressModalAttrs>) {
     const { profile, address } = vnode.attrs;
+    const { name, username } = profile;
 
     return (
       <div class="DeleteAddressModal">
@@ -95,7 +94,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
               />
             )}
             <CWText fontWeight="bold">
-              {profile.name}
+              {name || `Anonymous (${username.length > 5 ? username.slice(0, 5).concat('...') : username})`}
             </CWText>
           </div>
           <div className="confirmation">

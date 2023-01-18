@@ -10,6 +10,7 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
+import { notifyError } from 'controllers/app/notifications';
 import { NewProfile as Profile } from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
@@ -25,53 +26,54 @@ import { CoverImage } from './edit_new_profile';
 import { ConfirmCancelNewProfileModal } from '../modals/confirm_cancel_new_profile_modal';
 
 export default class CreateNewProfile extends ClassComponent {
-  private address: string;
   private email: string;
-  private error: boolean;
   private loading: boolean;
   private profile: Profile;
   private newProfile: any;
   private socials: string[];
   private username: string;
+  private name: string;
   private bio: QuillEditor;
   private avatarUrl: string;
   private coverImage: CoverImage;
 
   private createProfile = async () => {
-    const response: any = await $.post(`${app.serverUrl()}/createProfile`, {
-      address: this.address,
-      ...this.newProfile,
-      jwt: app.user.jwt,
-    }).catch(() => {
-      this.error = true;
-      setTimeout(() => {
-        this.error = false;
-        m.redraw();
-      }, 2500);
-    });
+    this.loading = true;
 
-    if (response?.status === 'Success') {
-      // Redirect
+    try {
+      const response = await $.post(`${app.serverUrl()}/createProfile`, {
+        username: this.username,
+        ...this.newProfile,
+        jwt: app.user.jwt,
+      });
+
+      if (response?.status === 'Success') {
+        // Redirect
+        setTimeout(() => {
+          this.loading = false;
+          m.route.set(`/profile/${this.username}`);
+        }, 1500);
+      }
+    } catch (err) {
       setTimeout(() => {
-        m.route.set('/profile/manage'); // new address created from response?
+        this.loading = false;
+        notifyError(err.responseJSON?.error || 'Something went wrong.');
       }, 1500);
-    } else {
-      this.error = true;
-      setTimeout(() => {
-        this.error = false;
-        m.redraw();
-      }, 2500);
     }
+    m.redraw();
   };
 
   private populateNewProfileFields = () => {
     this.newProfile = {};
 
+    if (this.username)
+      this.newProfile.username = this.username;
+
+    if (this.name)
+      this.newProfile.name = this.name;
+
     if (this.email)
       this.newProfile.email = this.email;
-
-    if (this.username)
-      this.newProfile.name = this.username;
 
     if (this.bio.textContentsAsString)
       this.newProfile.bio = this.bio.textContentsAsString;
@@ -89,7 +91,6 @@ export default class CreateNewProfile extends ClassComponent {
   private handleCreateProfile = () => {
     this.loading = true;
     this.populateNewProfileFields();
-    console.log('new profile:', this.newProfile);
     this.createProfile();
   };
 
@@ -99,7 +100,6 @@ export default class CreateNewProfile extends ClassComponent {
     }
 
     this.loading = false;
-    this.error = false;
     this.newProfile = {};
   }
 
@@ -113,6 +113,7 @@ export default class CreateNewProfile extends ClassComponent {
         </div>
       );
     }
+
     return (
       <Sublayout class="Homepage">
         <div class="CreateProfilePage">
@@ -180,6 +181,22 @@ export default class CreateNewProfile extends ClassComponent {
                   placeholder="username"
                   oninput={(e) => {
                     this.username = e.target.value;
+                  }}
+                />
+                <CWTextInput
+                  name="name-form-field"
+                  inputValidationFn={(val: string) => {
+                    if (val.match(/[^A-Za-z0-9]/)) {
+                      return ['failure', 'Must enter characters A-Z, 0-9'];
+                    } else {
+                      return ['success', 'Input validated'];
+                    }
+                  }}
+                  label="Display name"
+                  value={this.name}
+                  placeholder="display name"
+                  oninput={(e) => {
+                    this.name = e.target.value;
                   }}
                 />
                 <CWTextInput

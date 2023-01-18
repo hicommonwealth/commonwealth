@@ -28,11 +28,8 @@ import { PageNotFound } from './404';
 enum EditProfileError {
   None,
   NoProfileFound,
-  UpdateProfileFailed,
-  AddressesStillLinked,
 }
 
-const NoAddressFoundError = 'No address found';
 const NoProfileFoundError = 'No profile found';
 
 type EditNewProfileAttrs = { placeholder?: string };
@@ -44,7 +41,6 @@ export type CoverImage = {
 }
 
 export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
-  private address: string;
   private email: string;
   private error: EditProfileError;
   private failed: boolean;
@@ -53,21 +49,23 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private profileUpdate: any;
   private socials: string[];
   private username: string;
+  private name: string;
   private bio: QuillEditor;
   private avatarUrl: string;
   private coverImage: CoverImage;
   private addresses: AddressInfo[];
+  private isOwner: boolean;
 
-  private getProfile = async (address: string) => {
+  private getProfile = async (username: string) => {
     this.loading = true;
     try {
       const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
-        address,
+        username,
         jwt: app.user.jwt,
       })
 
       this.profile = new Profile(response.profile);
-      this.username = this.profile.name;
+      this.name = this.profile.name;
       this.email = this.profile.email;
       this.socials = this.profile.socials;
       this.avatarUrl = this.profile.avatarUrl;
@@ -83,11 +81,11 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
             a.ghost_address
           )
       );
+      this.isOwner = response.isOwner;
     } catch (err) {
       if (
         err.status === 500 &&
-        (err.responseJSON.error === NoAddressFoundError ||
-          err.responseJSON.error === NoProfileFoundError)
+        err.responseJSON?.error === NoProfileFoundError
       ) {
         this.error = EditProfileError.NoProfileFound;
       }
@@ -97,41 +95,38 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   };
 
   private updateProfile = async () => {
-    const response: any = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
-      address: this.address,
-      ...this.profileUpdate,
-      jwt: app.user.jwt,
-    }).catch(() => {
-      this.error = EditProfileError.UpdateProfileFailed;
-      this.failed = true;
-      setTimeout(() => {
-        this.failed = false;
-        m.redraw();
-      }, 2500);
-    });
+    try {
+      const response: any = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
+        profileId: this.profile.id,
+        ...this.profileUpdate,
+        jwt: app.user.jwt,
+      })
 
-    if (response?.status === 'Success') {
-      // Redirect
+      if (response?.status === 'Success') {
+        setTimeout(() => {
+          this.loading = false;
+          m.route.set(`/profile/${this.username}`);
+        }, 1500);
+      }
+    } catch (err) {
       setTimeout(() => {
-        m.route.set(`/profile/${this.address}`);
+        this.loading = false;
+        notifyError(err.responseJSON?.error || 'Something went wrong.');
       }, 1500);
-    } else {
-      this.failed = true;
-      setTimeout(() => {
-        this.failed = false;
-        m.redraw();
-      }, 2500);
     }
   };
 
   private checkForUpdates = () => {
     this.profileUpdate = {};
 
+    if (!_.isEqual(this.username, this.profile?.username))
+      this.profileUpdate.username = this.username;
+
+    if (!_.isEqual(this.name, this.profile?.name))
+      this.profileUpdate.name = this.name;
+
     if (!_.isEqual(this.email, this.profile?.email))
       this.profileUpdate.email = this.email;
-
-    if (!_.isEqual(this.username, this.profile?.name))
-      this.profileUpdate.name = this.username;
 
     if (!_.isEqual(this.bio.textContentsAsString, this.profile?.bio))
       this.profileUpdate.bio = this.bio.textContentsAsString;
@@ -146,22 +141,16 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       this.profileUpdate.coverImage = JSON.stringify(this.coverImage);
   };
 
-  private handleSaveProfile = (vnode: m.Vnode<EditNewProfileAttrs>) => {
+  private handleSaveProfile = () => {
     this.loading = true;
     this.checkForUpdates();
     if (Object.keys(this.profileUpdate).length > 0) {
       this.updateProfile();
     } else {
-      this.failed = true;
-      this.loading = false;
-      setTimeout(
-        () => {
-          this.failed = false;
-          m.redraw();
-        },
-        2500,
-        vnode
-      );
+      setTimeout(() => {
+        this.loading = false;
+        notifyError('No updates found.');
+      }, 1500);
     }
   };
 
@@ -173,52 +162,41 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
     this.loading = true;
 
-    const response: any = await $.post(`${app.serverUrl()}/deleteProfile`, {
-      profileId: this.profile.id,
-      jwt: app.user.jwt,
-    }).catch(() => {
-      this.error = EditProfileError.UpdateProfileFailed;
-      this.failed = true;
+    try {
+      const response: any = await $.post(`${app.serverUrl()}/deleteProfile`, {
+        profileId: this.profile.id,
+        jwt: app.user.jwt,
+      })
+      if (response?.status === 'Success') {
+        // Redirect
+        setTimeout(() => {
+          this.loading = false;
+          m.route.set('/profile/manage');
+          m.redraw();
+        }, 1500);
+      }
+    } catch (err) {
       setTimeout(() => {
-        this.failed = false;
-        m.redraw();
-      }, 2500);
-    });
-
-    if (response?.status === 'Success') {
-      // Redirect
-      setTimeout(() => {
-        m.route.set(`/profile/manage`);
+        this.loading = false;
+        notifyError(err.responseJSON?.error || 'Something went wrong.');
       }, 1500);
-    } else {
-      this.failed = true;
-      setTimeout(() => {
-        this.failed = false;
-        m.redraw();
-      }, 2500);
     }
   };
 
   oninit() {
-    this.address = m.route.param('address');
+    this.username = m.route.param('username');
     this.error = EditProfileError.None;
-    this.getProfile(this.address);
+    this.getProfile(this.username);
 
-    // If not logged in or address not owned by logged in user
-    if (
-      !app.isLoggedIn() ||
-      !app.user.addresses
-        .map((addressInfo) => addressInfo.address)
-        .includes(this.address)
-    ) {
-      m.route.set(`/profile/${this.address}`);
+    if (!app.isLoggedIn()) {
+      m.route.set(`/profile/${this.username}`);
     }
 
     this.profileUpdate = {};
     this.failed = false;
   }
 
-  view(vnode: m.Vnode<EditNewProfileAttrs>) {
+  view() {
     if (this.loading) {
       return (
         <div class="EditProfilePage full-height">
@@ -233,6 +211,10 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       return <PageNotFound message="We cannot find this profile." />
 
     if (this.error === EditProfileError.None) {
+      if (!this.isOwner) {
+        m.route.set(`/profile/${this.username}`);
+      }
+
       const oldProfile = new OldProfile(
         app.user.addresses[0].profile.name,
         app.user.addresses[0].profile.address,
@@ -272,7 +254,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                         onclick={() => {
                           this.loading = true;
                           setTimeout(() => {
-                            m.route.set(`/profile/${this.address}`);
+                            m.route.set(`/profile/${this.username}`);
                           }, 1000);
                         }}
                         className="save-button"
@@ -281,7 +263,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                       <CWButton
                         label="Save"
                         onclick={() => {
-                          this.handleSaveProfile(vnode);
+                          this.handleSaveProfile();
                         }}
                         className="save-button"
                         buttonType="mini-black"
@@ -337,6 +319,22 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                     placeholder="username"
                     oninput={(e) => {
                       this.username = e.target.value;
+                    }}
+                  />
+                  <CWTextInput
+                    name="name-form-field"
+                    inputValidationFn={(val: string) => {
+                      if (val.match(/[^A-Za-z0-9]/)) {
+                        return ['failure', 'Must enter characters A-Z, 0-9'];
+                      } else {
+                        return ['success', 'Input validated'];
+                      }
+                    }}
+                    label="Display Name"
+                    value={this.name}
+                    placeholder="display name"
+                    oninput={(e) => {
+                      this.name = e.target.value;
                     }}
                   />
                   <CWTextInput

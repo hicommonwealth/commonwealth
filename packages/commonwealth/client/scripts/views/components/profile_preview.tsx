@@ -8,6 +8,7 @@ import 'components/profile_preview.scss';
 
 import app from 'state';
 import { AddressInfo, NewProfile as Profile } from 'models';
+import { formatAnonymousUsername } from 'shared/utils';
 import { CWText } from './component_kit/cw_text';
 import { renderQuillTextBody } from './quill/helpers';
 import { SocialAccounts } from './social_accounts';
@@ -30,8 +31,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
 
   view(vnode: m.Vnode<ProfilePreviewAttrs>) {
     const { profiles, profile, addresses } = vnode.attrs;
-    const { name, bio, avatarUrl } = profile;
-    const address = addresses?.find((a) => a.profileId === profile.id)?.address;
+    const { bio, avatarUrl, username, name } = profile;
 
     return (
       <div className="ProfilePreview">
@@ -49,7 +49,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
           </div>
           <div className="content">
             <CWText type="h4">
-              {name}
+              {name || formatAnonymousUsername(username)}
             </CWText>
             <div className="actions">
               <CWButton
@@ -57,7 +57,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
                 buttonType="mini-white"
                 iconLeft="views"
                 onclick={() =>
-                  m.route.set(`/profile/${address}`)
+                  m.route.set(`/profile/${username}`)
                 }
               />
               <CWButton
@@ -65,13 +65,15 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
                 buttonType="mini-white"
                 iconLeft="write"
                 onclick={() =>
-                  m.route.set(`/profile/${address}/edit`)
+                  m.route.set(`/profile/${username}/edit`)
                 }
               />
             </div>
-            <CWText>
-              {renderQuillTextBody(bio)}
-            </CWText>
+            {bio && (
+              <CWText>
+                {renderQuillTextBody(bio)}
+              </CWText>
+            )}
             <SocialAccounts profile={profile} />
           </div>
           <div className="desktop-actions">
@@ -80,7 +82,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               buttonType="mini-white"
               iconLeft="views"
               onclick={() =>
-                m.route.set(`/profile/${address}`)
+                m.route.set(`/profile/${username}`)
               }
             />
             <CWButton
@@ -88,7 +90,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               buttonType="mini-white"
               iconLeft="write"
               onclick={() =>
-                m.route.set(`/profile/${address}/edit`)
+                m.route.set(`/profile/${username}/edit`)
               }
             />
           </div>

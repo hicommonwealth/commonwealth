@@ -1,5 +1,6 @@
 import * as Sequelize from 'sequelize';
 import { CreateOptions, DataTypes } from 'sequelize';
+import { generateUsername } from 'friendly-username-generator';
 import { ModelStatic, ModelInstance } from './types';
 import { AddressInstance, AddressAttributes } from './address';
 import { ChainAttributes, ChainInstance } from './chain';
@@ -135,7 +136,13 @@ export default (
   ): Promise<UserInstance> => {
     const newUser = await User.create(attrs, options);
     const profile = await models.Profile.create(
-      { user_id: newUser.id },
+      {
+        user_id: newUser.id,
+        username: generateUsername({
+          useHyphen: false,
+          useRandomNumber: false,
+        }),
+      },
       options
     );
     newUser.Profiles = [profile];

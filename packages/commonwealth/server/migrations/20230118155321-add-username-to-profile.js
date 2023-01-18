@@ -4,7 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn('Profiles', 'username', {
-        type: Sequelize.JSONB,
+        type: Sequelize.STRING,
         allowNull: true
       }, { transaction: t });
     });

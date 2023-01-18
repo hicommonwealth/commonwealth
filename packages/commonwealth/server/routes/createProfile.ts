@@ -3,8 +3,8 @@ import { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  InvalidUpdate: 'Invalid update',
   NoUsernameProvided: 'No username provided in query',
+  UsernameAlreadyExists: 'Username already exists',
 };
 
 const createProfile = async (
@@ -17,30 +17,28 @@ const createProfile = async (
     return next(new Error(Errors.NotLoggedIn));
   }
 
-  if (!req.body.name) {
+  if (!req.body.username) {
     return next(new Error(Errors.NoUsernameProvided));
   }
 
-  if (
-    !req.body.email &&
-    !req.body.slug &&
-    !req.body.name &&
-    !req.body.bio &&
-    !req.body.website &&
-    !req.body.avatarUrl &&
-    !req.body.socials &&
-    !req.body.coverImage
-  ) {
-    return next(new Error(Errors.InvalidUpdate));
+  const { username, email, slug, name, bio, website, avatarUrl, socials, coverImage } = req.body;
+
+  const existingProfile = await models.Profile.findOne({
+    where: {
+      username,
+    },
+  });
+
+  if (existingProfile) {
+    return next(new Error(Errors.UsernameAlreadyExists));
   }
 
-  const { email, slug, name, bio, website, avatarUrl, socials, coverImage } = req.body;
-
-  const existingProfiles = await req.user.getProfiles();
+  const userProfiles = await req.user.getProfiles();
 
   const profile = await models.Profile.create(
     {
       user_id: req.user.id,
+      username,
       ...(email && { email }),
       ...(slug && { slug }),
       ...(name && { profile_name: name }),
@@ -51,7 +49,7 @@ const createProfile = async (
       ...(coverImage && { cover_image: JSON.parse(coverImage) }),
     },
   );
-  const newProfiles = [...existingProfiles, profile];
+  const newProfiles = [...userProfiles, profile];
 
   const updateStatus = await models.User.update(
     {

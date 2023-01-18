@@ -46,11 +46,13 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
   private loading: boolean;
   private profile: Profile;
   private threads: Thread[];
+  private username: string;
+  private isOwner: boolean;
 
-  private getProfileData = async (address: string) => {
+  private getProfileData = async (username: string) => {
     try {
       const response = await $.get(`${app.serverUrl()}/profile/v2`, {
-        address,
+        username,
         jwt: app.user.jwt,
       });
 
@@ -76,6 +78,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
             a.ghost_address
           )
       );
+      this.isOwner = response.isOwner;
     } catch (err) {
       if (
         err.status === 500 &&
@@ -94,12 +97,12 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
   };
 
   oninit() {
-    this.address = m.route.param('address');
+    this.username = m.route.param('username');
     this.loading = true;
     this.error = ProfileError.None;
     this.comments = [];
     this.threads = [];
-    this.getProfileData(this.address);
+    this.getProfileData(this.username);
     this.loading = false;
   }
 
@@ -154,7 +157,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
             <div className={imageAs === 'background' ? 'ProfilePageContainer' : 'ProfilePageContainer smaller-margins'}>
               <NewProfileHeader
                 profile={this.profile}
-                address={this.address}
+                isOwner={this.isOwner}
               />
               <NewProfileActivity
                 threads={this.threads}
@@ -171,7 +174,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
             <div className="ProfilePageContainer">
               <NewProfileHeader
                 profile={this.profile}
-                address={this.address}
+                isOwner={this.isOwner}
               />
               <NewProfileActivity
                 threads={this.threads}

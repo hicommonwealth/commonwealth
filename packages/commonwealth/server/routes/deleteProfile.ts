@@ -21,13 +21,19 @@ const deleteProfile = async (
     return next(new Error(Errors.NoProfileProvided));
   }
 
-  const existingAddresses = await req.user.getAddresses();
+  const { profileId } = req.body;
+
+  const profileToDelete = await models.Profile.findOne({
+    where: {
+      id: profileId,
+    },
+  });
+
+  const existingAddresses = await profileToDelete.getAddresses();
 
   if (existingAddresses.length > 0) {
     return next(new Error(Errors.AddressesStillLinked));
   }
-
-  const { profileId } = req.body;
 
   const existingProfiles = await req.user.getProfiles();
   const newProfiles = existingProfiles.filter((p) => p.id !== parseInt(profileId, 10));

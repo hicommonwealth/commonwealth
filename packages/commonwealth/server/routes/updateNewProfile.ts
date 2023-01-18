@@ -5,8 +5,8 @@ export const Errors = {
   NotAuthorized: 'Not authorized',
   InvalidUpdate: 'Invalid update',
   NoProfileFound: 'No profile found',
-  NoAddressFound: 'No address found',
-  NoAddressProvided: 'No address provided in query',
+  UsernameAlreadyExists: 'Username already exists',
+  NoProfileIdProvided: 'No profile id provided in query',
 };
 
 const updateNewProfile = async (
@@ -15,11 +15,12 @@ const updateNewProfile = async (
   res: Response,
   next: NextFunction
 ) => {
-  if (!req.body.address) {
-    return next(new Error(Errors.NoAddressProvided));
+  if (!req.body.profileId) {
+    return next(new Error(Errors.NoProfileIdProvided));
   }
 
   if (
+    !req.body.username &&
     !req.body.email &&
     !req.body.slug &&
     !req.body.name &&
@@ -32,29 +33,35 @@ const updateNewProfile = async (
     return next(new Error(Errors.InvalidUpdate));
   }
 
-  const { address, email, slug, name, bio, website, avatarUrl, socials, coverImage } = req.body;
-
-  const addressModel = await models.Address.findOne({
-    where: {
-      address,
-    },
-    include: [models.OffchainProfile],
-  });
-  if (!addressModel) return next(new Error(Errors.NoAddressFound));
-
-  if (addressModel.user_id !== req.user.id) {
-    return next(new Error(Errors.NotAuthorized));
-  }
+  const { profileId, username, email, slug, name, bio, website, avatarUrl, socials, coverImage } = req.body;
 
   const profile = await models.Profile.findOne({
     where: {
-      id: addressModel.profile_id,
+      id: profileId,
     },
   });
   if (!profile) return next(new Error(Errors.NoProfileFound));
 
+  if (profile.user_id !== req.user.id) {
+    return next(new Error(Errors.NotAuthorized));
+  }
+
+  if (username && username !== profile.username) {
+    const existingProfile = await models.Profile.findOne({
+      where: {
+        username,
+      },
+    });
+
+    if (existingProfile) {
+      return next(new Error(Errors.UsernameAlreadyExists));
+    }
+  }
+
+
   const updateStatus = await models.Profile.update(
     {
+      ...(username && { username }),
       ...(email && { email }),
       ...(slug && { slug }),
       ...(name && { profile_name: name }),
@@ -66,7 +73,7 @@ const updateNewProfile = async (
     },
     {
       where: {
-        id: profile.id,
+        id: profileId,
       },
     }
   );

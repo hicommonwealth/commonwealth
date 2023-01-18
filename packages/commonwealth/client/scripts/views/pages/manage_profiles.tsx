@@ -22,6 +22,8 @@ export class ManageProfiles extends ClassComponent {
   private addresses: AddressInfo[];
 
   private getProfiles = async () => {
+    this.loading = true;
+
     try {
       const response = await $.post(`${app.serverUrl()}/newProfiles`, {
         jwt: app.user.jwt,
@@ -43,13 +45,12 @@ export class ManageProfiles extends ClassComponent {
     } catch (err) {
       this.error = true;
     }
+    this.loading = false;
   };
 
   oninit() {
     this.error = false;
-    this.loading = true;
     this.getProfiles();
-    this.loading = false;
   }
 
   view() {

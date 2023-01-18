@@ -872,11 +872,11 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
-            '/profile/:address': importRoute('views/pages/new_profile', {
+            '/profile/:username': importRoute('views/pages/new_profile', {
                 scoped: false,
                 hideSidebar: false,
             }),
-            '/profile/:address/edit': importRoute(
+            '/profile/:username/edit': importRoute(
               'views/pages/edit_new_profile',
               {
                 scoped: false,

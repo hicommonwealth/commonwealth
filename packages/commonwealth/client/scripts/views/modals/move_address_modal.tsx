@@ -9,7 +9,8 @@ import 'modals/move_address_modal.scss';
 
 import app from 'state';
 import { NewProfile as Profile } from 'client/scripts/models';
-import { notifySuccess } from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import { formatAnonymousUsername } from 'shared/utils';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -30,6 +31,7 @@ type MoveAddressRowAttrs = {
 export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
   view(vnode: m.Vnode<MoveAddressRowAttrs>) {
     const { profile, selected, onclick } = vnode.attrs;
+    const { name, username } = profile;
     const defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
 
     return (
@@ -42,7 +44,7 @@ export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
           />
         )}
         <CWText type="b2">
-          {profile.name}
+          {name || formatAnonymousUsername(username)}
         </CWText>
       </div>
     );
@@ -58,33 +60,28 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
 
     e.preventDefault();
 
-    const response: any = await $.post(`${app.serverUrl()}/moveAddress`, {
-      addressHash: address,
-      oldProfileId: profile.id,
-      newProfileId: this.selectedProfile.id,
-      jwt: app.user.jwt,
-    }).catch(() => {
-      this.error = true;
+    try {
+      const response: any = await $.post(`${app.serverUrl()}/moveAddress`, {
+        addressHash: address,
+        oldProfileId: profile.id,
+        newProfileId: this.selectedProfile.id,
+        jwt: app.user.jwt,
+      });
+      if (response?.status === 'Success') {
+        const { name, username } = this.selectedProfile;
+        const displayName = name || formatAnonymousUsername(username);
+        notifySuccess(`Address has been successfully moved to profile '${displayName}'`);
+      }
+    } catch (err) {
       setTimeout(() => {
-        this.error = false;
-        m.redraw();
-      }, 2500);
-    });
-
-    if (response?.status === 'Success') {
-      // Redirect
-      notifySuccess(`Address has been successfully moved to profile '${this.selectedProfile.name}'`);
-      $(e.target).trigger('modalcomplete');
-      setTimeout(() => {
-        $(e.target).trigger('modalexit');
-      }, 0);
-    } else {
-      this.error = true;
-      setTimeout(() => {
-        this.error = false;
-        m.redraw();
-      }, 2500);
+        notifyError('Address was not successfully transferred, please try again.');
+      }, 1500);
     }
+
+    $(e.target).trigger('modalcomplete');
+    setTimeout(() => {
+      $(e.target).trigger('modalexit');
+    }, 0);
   };
 
   oninit() {

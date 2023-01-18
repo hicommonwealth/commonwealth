@@ -12,6 +12,7 @@ class NewProfile {
   private _socials: string[];
   private _coverImage: CoverImage;
   private _id: number;
+  private _isOwner: boolean;
 
   get name() { return this._name; }
   get username() { return this._username; }
@@ -24,8 +25,11 @@ class NewProfile {
   get socials() { return this._socials; }
   get coverImage() { return this._coverImage; }
   get id() { return this._id; }
+  get isOwner() { return this._isOwner; }
 
-  constructor({profile_name, username, email, website, bio, is_default, avatar_url, slug, socials, cover_image, id}) {
+  constructor({
+    profile_name, username, email, website, bio, is_default, avatar_url, slug, socials, cover_image, id, is_owner
+  }) {
     this._name = profile_name;
     this._username = username;
     this._email = email;
@@ -37,9 +41,10 @@ class NewProfile {
     this._socials = socials;
     this._coverImage = cover_image;
     this._id = id;
+    this._isOwner = is_owner;
   }
 
-  public initialize(name, username, email, website, bio, isDefault, avatarUrl, slug, socials, coverImage, id) {
+  public initialize(name, username, email, website, bio, isDefault, avatarUrl, slug, socials, coverImage, id, isOwner) {
     this._name = name;
     this._username = username;
     this._email = email;
@@ -51,6 +56,7 @@ class NewProfile {
     this._socials = socials;
     this._coverImage = coverImage;
     this._id = id;
+    this._isOwner = isOwner;
   }
 
   public static fromJSON(json) {
