@@ -3,8 +3,8 @@ import { DB } from '../models';
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',
-  InvalidUpdate: 'Invalid update',
   NoProfileProvided: 'No profile provided in query',
+  AddressesStillLinked: 'Cannot delete profile with addresses',
 };
 
 const deleteProfile = async (
@@ -21,29 +21,18 @@ const deleteProfile = async (
     return next(new Error(Errors.NoProfileProvided));
   }
 
+  const existingAddresses = await req.user.getAddresses();
+
+  if (existingAddresses.length > 0) {
+    return next(new Error(Errors.AddressesStillLinked));
+  }
+
   const { profileId } = req.body;
 
   const existingProfiles = await req.user.getProfiles();
-  const existingAddresses = await req.user.getAddresses();
-
   const newProfiles = existingProfiles.filter((p) => p.id !== parseInt(profileId, 10));
-  const newAddresses = existingAddresses.filter((a) => a.profile_id !== parseInt(profileId, 10));
 
-  const updateAddressesStatus = await models.Address.update(
-    {
-      user_id: null
-    },
-    {
-      where: {
-        profile_id: profileId,
-      }
-    }
-  );
-
-  const updateProfileStatus = await models.Profile.update(
-    {
-      user_id: 0, // TODO: user_id cannot be null
-    },
+  const updateProfileStatus = await models.Profile.destroy(
     {
       where: {
         id: profileId,
@@ -54,7 +43,6 @@ const deleteProfile = async (
   const updateUserStatus = await models.User.update(
     {
       Profiles: newProfiles,
-      Addresses: newAddresses,
     },
     {
       where: {
@@ -63,7 +51,7 @@ const deleteProfile = async (
     }
   );
 
-  if (!updateProfileStatus && !updateUserStatus && !updateAddressesStatus) {
+  if (!updateProfileStatus && !updateUserStatus) {
     return res.json({
       status: 'Failed',
     });
@@ -71,7 +59,6 @@ const deleteProfile = async (
 
   return res.json({
     status: 'Success',
-    response: req.user
   });
 };
 

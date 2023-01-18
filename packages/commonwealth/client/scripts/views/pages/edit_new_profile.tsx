@@ -11,7 +11,8 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
-import { NewProfile as Profile, Account, Profile as OldProfile } from '../../models';
+import { notifyError } from 'controllers/app/notifications';
+import { NewProfile as Profile, Account, Profile as OldProfile, AddressInfo } from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { AvatarUpload } from '../components/avatar_upload';
@@ -22,11 +23,13 @@ import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
 import CWCoverImageUploader, { ImageAs, ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
+import { PageNotFound } from './404';
 
 enum EditProfileError {
   None,
   NoProfileFound,
   UpdateProfileFailed,
+  AddressesStillLinked,
 }
 
 const NoAddressFoundError = 'No address found';
@@ -53,29 +56,42 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private bio: QuillEditor;
   private avatarUrl: string;
   private coverImage: CoverImage;
+  private addresses: AddressInfo[];
 
   private getProfile = async (address: string) => {
     this.loading = true;
-    const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
-      address,
-      jwt: app.user.jwt,
-    }).catch((err: any) => {
+    try {
+      const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
+        address,
+        jwt: app.user.jwt,
+      })
+
+      this.profile = new Profile(response.profile);
+      this.username = this.profile.name;
+      this.email = this.profile.email;
+      this.socials = this.profile.socials;
+      this.avatarUrl = this.profile.avatarUrl;
+      this.coverImage = this.profile.coverImage;
+      this.addresses = response.addresses.map(
+        (a) =>
+          new AddressInfo(
+            a.id,
+            a.address,
+            a.chain,
+            a.keytype,
+            a.wallet_id,
+            a.ghost_address
+          )
+      );
+    } catch (err) {
       if (
         err.status === 500 &&
         (err.responseJSON.error === NoAddressFoundError ||
           err.responseJSON.error === NoProfileFoundError)
       ) {
         this.error = EditProfileError.NoProfileFound;
-        m.route.set(`/profile/${this.address}`); // display error page
       }
-      m.redraw();
-    });
-    this.profile = new Profile(response.profile);
-    this.username = this.profile.name;
-    this.email = this.profile.email;
-    this.socials = this.profile.socials;
-    this.avatarUrl = this.profile.avatarUrl;
-    this.coverImage = this.profile.coverImage;
+    }
     this.loading = false;
     m.redraw();
   };
@@ -150,6 +166,11 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   };
 
   private handleDeleteProfile = async () => {
+    if (this.addresses.length > 0) {
+      notifyError('You must unlink all addresses before deleting your profile.');
+      return;
+    }
+
     this.loading = true;
 
     const response: any = await $.post(`${app.serverUrl()}/deleteProfile`, {
@@ -198,8 +219,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   }
 
   view(vnode: m.Vnode<EditNewProfileAttrs>) {
-    if (this.error !== EditProfileError.None) return;
-
     if (this.loading) {
       return (
         <div class="EditProfilePage full-height">
@@ -210,195 +229,197 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       );
     }
 
-    const oldProfile = new OldProfile(
-      app.user.addresses[0].profile.name,
-      app.user.addresses[0].profile.address,
-    );
+    if (this.error === EditProfileError.NoProfileFound)
+      return <PageNotFound message="We cannot find this profile." />
 
-    oldProfile.initialize(
-      this.username,
-      null,
-      this.bio,
-      this.avatarUrl,
-      null,
-    );
+    if (this.error === EditProfileError.None) {
+      const oldProfile = new OldProfile(
+        app.user.addresses[0].profile.name,
+        app.user.addresses[0].profile.address,
+      );
 
-    const account = new Account({
-      chain: app.user.addresses[0].chain,
-      address: app.user.addresses[0].address,
-      profile: oldProfile,
-    });
+      oldProfile.initialize(
+        this.username,
+        null,
+        this.bio,
+        this.avatarUrl,
+        null,
+      );
 
-    return (
-      <Sublayout class="Homepage">
-        <div class="EditProfilePage">
-         <CWForm
-            title="Edit Profile"
-            description="Create and edit profiles and manage your connected addresses."
-            actions={
-              <div className="buttons-container">
-                <div className="buttons">
-                  <CWButton
-                    label="Delete profile"
-                    onclick={() => this.handleDeleteProfile()}
-                    buttonType="tertiary-black"
-                  />
-                  <div className="buttons-right">
+      const account = new Account({
+        chain: app.user.addresses[0].chain,
+        address: app.user.addresses[0].address,
+        profile: oldProfile,
+      });
+
+      return (
+        <Sublayout class="Homepage">
+          <div class="EditProfilePage">
+           <CWForm
+              title="Edit Profile"
+              description="Create and edit profiles and manage your connected addresses."
+              actions={
+                <div className="buttons-container">
+                  <div className="buttons">
                     <CWButton
-                      label="Cancel Edits"
-                      onclick={() => {
-                        this.loading = true;
-                        setTimeout(() => {
-                          m.route.set(`/profile/${this.address}`);
-                        }, 1000);
-                      }}
-                      className="save-button"
-                      buttonType="mini-white"
+                      label="Delete profile"
+                      onclick={() => this.handleDeleteProfile()}
+                      buttonType="tertiary-black"
                     />
-                    <CWButton
-                      label="Save"
-                      onclick={() => {
-                        this.handleSaveProfile(vnode);
-                      }}
-                      className="save-button"
-                      buttonType="mini-black"
-                    />
+                    <div className="buttons-right">
+                      <CWButton
+                        label="Cancel Edits"
+                        onclick={() => {
+                          this.loading = true;
+                          setTimeout(() => {
+                            m.route.set(`/profile/${this.address}`);
+                          }, 1000);
+                        }}
+                        className="save-button"
+                        buttonType="mini-white"
+                      />
+                      <CWButton
+                        label="Save"
+                        onclick={() => {
+                          this.handleSaveProfile(vnode);
+                        }}
+                        className="save-button"
+                        buttonType="mini-black"
+                      />
+                    </div>
+                  </div>
+                  <div className="status">
+                    <div
+                      className={
+                        this.failed ? 'save-button-message show' : 'save-button-message'
+                      }
+                    >
+                      <CWText> No changes saved.</CWText>
+                    </div>
                   </div>
                 </div>
-                <div className="status">
-                  <div
-                    className={
-                      this.failed ? 'save-button-message show' : 'save-button-message'
-                    }
-                  >
-                    <CWText> No changes saved.</CWText>
-                  </div>
-                </div>
-              </div>
-            }
-          >
-            <CWFormSection
-              title="General Info"
-              description="Some helpful text that makes the user feel welcome. This process will be quick and easy."
+              }
             >
-               <div className="profile-image-section">
-                <CWText type="caption" fontWeight="medium">Profile Image</CWText>
-                <CWText type="caption" className="description">Select an image from your files to upload</CWText>
-                <div className="image-upload">
-                  <AvatarUpload
-                    scope="user"
-                    account={account}
-                    uploadCompleteCallback={(files) => {
-                      files.forEach((f) => {
-                        if (!f.uploadURL) return;
-                        const url = f.uploadURL.replace(/\?.*/, '').trim();
-                        this.avatarUrl = url;
-                      });
-                      m.redraw();
+              <CWFormSection
+                title="General Info"
+                description="Some helpful text that makes the user feel welcome. This process will be quick and easy."
+              >
+                 <div className="profile-image-section">
+                  <CWText type="caption" fontWeight="medium">Profile Image</CWText>
+                  <CWText type="caption" className="description">Select an image from your files to upload</CWText>
+                  <div className="image-upload">
+                    <AvatarUpload
+                      scope="user"
+                      account={account}
+                      uploadCompleteCallback={(files) => {
+                        files.forEach((f) => {
+                          if (!f.uploadURL) return;
+                          const url = f.uploadURL.replace(/\?.*/, '').trim();
+                          this.avatarUrl = url;
+                        });
+                        m.redraw();
+                      }}
+                    />
+                  </div>
+                </div>
+                <div className="info-section">
+                  <CWTextInput
+                    name="username-form-field"
+                    inputValidationFn={(val: string) => {
+                      if (val.match(/[^A-Za-z0-9]/)) {
+                        return ['failure', 'Must enter characters A-Z, 0-9'];
+                      } else {
+                        return ['success', 'Input validated'];
+                      }
+                    }}
+                    label="Username"
+                    value={this.username}
+                    placeholder="username"
+                    oninput={(e) => {
+                      this.username = e.target.value;
+                    }}
+                  />
+                  <CWTextInput
+                    name="email-form-field"
+                    inputValidationFn={(val: string) => {
+                      if (!val.match(/\S+@\S+\.\S+/)) {
+                        return ['failure', 'Must enter valid email'];
+                      } else {
+                        return ['success', 'Input validated'];
+                      }
+                    }}
+                    label="Email"
+                    value={this.email}
+                    placeholder="email"
+                    oninput={(e) => {
+                      this.email = e.target.value;
                     }}
                   />
                 </div>
-              </div>
-
-              <div className="info-section">
-                <CWTextInput
-                  name="username-form-field"
-                  inputValidationFn={(val: string) => {
-                    if (val.match(/[^A-Za-z0-9]/)) {
-                      return ['failure', 'Must enter characters A-Z, 0-9'];
-                    } else {
-                      return ['success', 'Input validated'];
-                    }
-                  }}
-                  label="Username"
-                  value={this.username}
-                  placeholder="username"
-                  oninput={(e) => {
-                    this.username = e.target.value;
-                  }}
-                />
-                <CWTextInput
-                  name="email-form-field"
-                  inputValidationFn={(val: string) => {
-                    if (!val.match(/\S+@\S+\.\S+/)) {
-                      return ['failure', 'Must enter valid email'];
-                    } else {
-                      return ['success', 'Input validated'];
-                    }
-                  }}
-                  label="Email"
-                  value={this.email}
-                  placeholder="email"
-                  oninput={(e) => {
-                    this.email = e.target.value;
-                  }}
-                />
-              </div>
-
-              <div className="bio-section">
-                <CWText type="caption">Bio</CWText>
-                <QuillEditorComponent
-                  contentsDoc={this.profile?.bio}
-                  oncreateBind={(state: QuillEditor) => {
-                    this.bio = state;
-                  }}
-                  editorNamespace={`${document.location.pathname}-bio`}
-                  imageUploader
-                />
-              </div>
-              <CWDivider />
-
-              <div className="socials-section">
-                <CWText type="b1">Social Links</CWText>
-                <CWText type="caption">
-                  Add any of your community's links (Websites, social platforms, etc)
-                  These can be added and edited later.
-                </CWText>
-                <CWSocials
-                  socials={this.profile?.socials}
-                  handleInputChange={(e) => {
-                    this.socials = e
-                  }}
-                />
-              </div>
-            </CWFormSection>
-            <CWFormSection
-              title="Personalize Your Profile"
-              description="Express yourself through imagery."
-            >
-              <CWCoverImageUploader
-                uploadCompleteCallback={(url: string, imageAs: ImageAs, imageBehavior: ImageBehavior) => {
-                  this.coverImage = {
-                    url,
-                    imageAs,
-                    imageBehavior,
-                  };
-                }}
-                options={true}
-              />
-            </CWFormSection>
-            {/* TODO: Add back in when we have a way to manage addresses */}
-            {/* <CWFormSection
-              title="Linked Addresses"
-              description="Transfer, Edit and Delete addresses connected to this profile."
-            >
-              <div className="addresses-section">
-                <div className="addresses">
-                  <Address address="0x1234567890" />
-                  <Address address="0x1234567890" />
-                  <Address address="0x1234567890" />
+                <div className="bio-section">
+                  <CWText type="caption">Bio</CWText>
+                  <QuillEditorComponent
+                    contentsDoc={this.profile?.bio}
+                    oncreateBind={(state: QuillEditor) => {
+                      this.bio = state;
+                    }}
+                    editorNamespace={`${document.location.pathname}-bio`}
+                    imageUploader
+                  />
                 </div>
-                <CWButton
-                  iconName="plus"
-                  buttonType="mini-black"
-                  label="Connect a New Address"
-                  onclick={() => {}}
+                <CWDivider />
+                <div className="socials-section">
+                  <CWText type="b1">Social Links</CWText>
+                  <CWText type="caption">
+                    Add any of your community's links (Websites, social platforms, etc)
+                    These can be added and edited later.
+                  </CWText>
+                  <CWSocials
+                    socials={this.profile?.socials}
+                    handleInputChange={(e) => {
+                      this.socials = e
+                    }}
+                  />
+                </div>
+              </CWFormSection>
+              <CWFormSection
+                title="Personalize Your Profile"
+                description="Express yourself through imagery."
+              >
+                <CWCoverImageUploader
+                  uploadCompleteCallback={(url: string, imageAs: ImageAs, imageBehavior: ImageBehavior) => {
+                    this.coverImage = {
+                      url,
+                      imageAs,
+                      imageBehavior,
+                    };
+                  }}
+                  options={true}
                 />
-              </div>
-            </CWFormSection> */}
-          </CWForm>
-        </div>
-      </Sublayout>
-    );
+              </CWFormSection>
+              {/* TODO: Add back in when we have a way to manage addresses */}
+              {/* <CWFormSection
+                title="Linked Addresses"
+                description="Transfer, Edit and Delete addresses connected to this profile."
+              >
+                <div className="addresses-section">
+                  <div className="addresses">
+                    <Address address="0x1234567890" />
+                    <Address address="0x1234567890" />
+                    <Address address="0x1234567890" />
+                  </div>
+                  <CWButton
+                    iconName="plus"
+                    buttonType="mini-black"
+                    label="Connect a New Address"
+                    onclick={() => {}}
+                  />
+                </div>
+              </CWFormSection> */}
+            </CWForm>
+          </div>
+        </Sublayout>
+      );
+    }
   }
 }
