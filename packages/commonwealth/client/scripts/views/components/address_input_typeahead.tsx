@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import $ from 'jquery';
-import { InputSelect, ListItem } from 'construct-ui';
 
 import 'components/address_input_typeahead.scss';
+import { InputSelect, ListItem } from 'construct-ui';
+import $ from 'jquery';
+import m from 'mithril';
+import { AddressInfo } from 'models';
 
 import app from 'state';
 import User from 'views/components/widgets/user';
-import { AddressInfo } from 'models';
 import { CWText } from './component_kit/cw_text';
 
 type AddressInputTypeaheadItem = {

@@ -1,5 +1,5 @@
-import { ComponentType } from '../types';
-import { CustomIconName, IconName } from './cw_icon_lookup';
+import type { ComponentType } from '../types';
+import type { CustomIconName, IconName } from './cw_icon_lookup';
 
 export type IconButtonTheme = 'black' | 'neutral' | 'primary' | 'hasBackground';
 

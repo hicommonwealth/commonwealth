@@ -1,5 +1,9 @@
 import chai from 'chai';
-import { Hash, EventRecord, RuntimeVersion } from '@polkadot/types/interfaces';
+import type {
+  Hash,
+  EventRecord,
+  RuntimeVersion,
+} from '@polkadot/types/interfaces';
 
 import { Subscriber } from '../../../src/chains/substrate/subscriber';
 
@@ -7,13 +11,13 @@ import { constructFakeApi } from './testUtil';
 
 const { assert } = chai;
 
-const hashes = [(1 as unknown) as Hash, (2 as unknown) as Hash];
+const hashes = [1 as unknown as Hash, 2 as unknown as Hash];
 const events = [
-  ([{ event: { data: [1] } }] as unknown) as EventRecord[],
-  ([
+  [{ event: { data: [1] } }] as unknown as EventRecord[],
+  [
     { event: { data: [2] } },
     { event: { data: [3, 4] } },
-  ] as unknown) as EventRecord[],
+  ] as unknown as EventRecord[],
 ];
 
 const getApi = () => {
@@ -40,10 +44,10 @@ const getApi = () => {
       };
     },
     subscribeRuntimeVersion: async (callback) => {
-      callback(({
+      callback({
         specVersion: 10,
         specName: 'edgeware',
-      } as unknown) as RuntimeVersion);
+      } as unknown as RuntimeVersion);
     },
   });
 };

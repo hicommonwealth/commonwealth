@@ -1,6 +1,6 @@
 import m from 'mithril';
 import QuillEditorInternal from './quill_editor_internal';
-import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
+import type { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 
 // DOCUMENTATION
 // Standard usage flow:

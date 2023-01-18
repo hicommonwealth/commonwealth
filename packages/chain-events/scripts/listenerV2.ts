@@ -3,8 +3,8 @@ import * as yargs from 'yargs';
 import { createListener, LoggingHandler, SupportedNetwork } from '../src';
 
 import { networkUrls, contracts, networkSpecs } from './listenerUtils';
-
-require('dotenv').config();
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const { argv } = yargs.options({
   network: {
@@ -128,7 +128,6 @@ async function main(): Promise<any> {
   return listener;
 }
 
-main().then((listener) => {
-  const temp = listener;
+main().then(() => {
   console.log('Subscribed...');
 });

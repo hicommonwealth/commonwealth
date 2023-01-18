@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { initAppState } from 'app';
 import ClassComponent from 'class_component';
+import { updateActiveAddresses } from 'controllers/app/login';
 import $ from 'jquery';
+import m from 'mithril';
 
 import app from 'state';
-import { initAppState } from 'app';
 import { PageLoading } from 'views/pages/loading';
-import { updateActiveAddresses } from 'controllers/app/login';
 import ErrorPage from './error';
 
 interface IState {

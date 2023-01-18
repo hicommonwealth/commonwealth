@@ -1,11 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { NotificationCategories } from 'common-common/src/types';
-import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import { NotificationCategories } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 import { createRole } from '../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoInviteCodeFound: (code) => `Cannot find invite code: ${code}`,
@@ -62,12 +59,7 @@ const acceptInvite = async (
     return next(new AppError(Errors.NoCommunityFound(code.chain_id)));
   }
 
-  const role = await createRole(
-    models,
-    addressObj.id,
-    chain?.id,
-    'member'
-  );
+  const role = await createRole(models, addressObj.id, chain?.id, 'member');
 
   if (!role) return next(new ServerError(Errors.RoleCreationFailure));
 

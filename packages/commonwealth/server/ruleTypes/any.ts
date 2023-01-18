@@ -1,28 +1,31 @@
-import { Transaction } from 'sequelize/types';
-import { DB } from '../models';
-import { RuleType, RuleArgumentType, DefaultSchemaT } from '../util/rules/ruleTypes';
+import type { Transaction } from 'sequelize/types';
+import type { DB } from '../models';
+import type { DefaultSchemaT, RuleArgumentType } from '../util/rules/ruleTypes';
+import { RuleType } from '../util/rules/ruleTypes';
 import RuleTypes from './index';
 
-type SchemaT = { AnyRule: [ Array<DefaultSchemaT> ] };
+type SchemaT = { AnyRule: [Array<DefaultSchemaT>] };
 
 export default class AnyRule extends RuleType<SchemaT> {
   public readonly identifier = 'AnyRule';
   public readonly metadata = {
     name: 'Any Rule',
     description: 'Passes if any of the provided rules pass',
-    arguments: [{
-      name: 'Rules',
-      description: 'Rules to check',
-      type: 'rule[]' as RuleArgumentType,
-    }],
-  }
+    arguments: [
+      {
+        name: 'Rules',
+        description: 'Rules to check',
+        type: 'rule[]' as RuleArgumentType,
+      },
+    ],
+  };
 
   public async check(
     ruleSchema: SchemaT,
     address: string,
     chain: string,
     models: DB,
-    transaction?: Transaction,
+    transaction?: Transaction
   ): Promise<boolean> {
     const rules = ruleSchema.AnyRule[0];
     for (const subRule of rules) {
@@ -30,7 +33,13 @@ export default class AnyRule extends RuleType<SchemaT> {
       const subRuleObj = RuleTypes[subRuleId];
 
       // TODO: permit caching of sub-rules
-      const isValid = await subRuleObj.check(subRule, address, chain, models, transaction);
+      const isValid = await subRuleObj.check(
+        subRule,
+        address,
+        chain,
+        models,
+        transaction
+      );
       if (isValid) return true;
     }
     return false;

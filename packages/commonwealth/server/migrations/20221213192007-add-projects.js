@@ -21,7 +21,7 @@ module.exports = {
         {
           type: Sequelize.STRING,
           allowNull: true,
-          references: { model: 'Chains', key: 'id', }
+          references: { model: 'Chains', key: 'id' },
         },
         { transaction: t }
       );
@@ -55,7 +55,7 @@ module.exports = {
             base: 'ethereum',
             active: true,
             description: '',
-            chain_node_id: ethChainNode[0].id
+            chain_node_id: ethChainNode[0].id,
           },
         ],
         { transaction: t }
@@ -88,34 +88,43 @@ module.exports = {
         { transaction: t }
       );
 
-      await queryInterface.addColumn('Chains', 'hide_projects', {
-        type: Sequelize.BOOLEAN,
-        allowNull: true,
-      }, { transaction: t });
+      await queryInterface.addColumn(
+        'Chains',
+        'hide_projects',
+        {
+          type: Sequelize.BOOLEAN,
+          allowNull: true,
+        },
+        { transaction: t }
+      );
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.createTable('IpfsPins', {
-        id: {
-          allowNull: false,
-          autoIncrement: true,
-          primaryKey: true,
-          type: Sequelize.INTEGER,
+      await queryInterface.createTable(
+        'IpfsPins',
+        {
+          id: {
+            allowNull: false,
+            autoIncrement: true,
+            primaryKey: true,
+            type: Sequelize.INTEGER,
+          },
+          address_id: {
+            type: Sequelize.INTEGER,
+            allowNull: false,
+            references: { model: 'Addresses', key: 'id' },
+          },
+          ipfs_hash: {
+            type: Sequelize.STRING,
+            allowNull: false,
+          },
+          created_at: { type: Sequelize.DATE, allowNull: false },
+          updated_at: { type: Sequelize.DATE, allowNull: false },
         },
-        address_id: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-          references: { model: 'Addresses', key: 'id' }
-        },
-        ipfs_hash: {
-          type: Sequelize.STRING,
-          allowNull: false,
-        },
-        created_at: { type: Sequelize.DATE, allowNull: false },
-        updated_at: { type: Sequelize.DATE, allowNull: false },
-      }, { transaction: t });
+        { transaction: t }
+      );
 
       await queryInterface.bulkDelete(
         'CommunityContracts',
@@ -137,9 +146,15 @@ module.exports = {
         { eth_chain_id: 5 },
         { transaction: t }
       );
-      await queryInterface.removeColumn('ChainEntityMeta', 'type_id', { transaction: t });
-      await queryInterface.removeColumn('ChainEntityMeta', 'project_chain', { transaction: t });
-      await queryInterface.removeColumn('Chains', 'hide_projects', { transaction: t });
+      await queryInterface.removeColumn('ChainEntityMeta', 'type_id', {
+        transaction: t,
+      });
+      await queryInterface.removeColumn('ChainEntityMeta', 'project_chain', {
+        transaction: t,
+      });
+      await queryInterface.removeColumn('Chains', 'hide_projects', {
+        transaction: t,
+      });
     });
-  }
+  },
 };

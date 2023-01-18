@@ -1,8 +1,9 @@
-import { CWEvent, SupportedNetwork } from '../../interfaces';
+import type { CWEvent } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { Listener as BaseListener } from '../../Listener';
 import { addPrefix, factory } from '../../logging';
 
-import {
+import type {
   EventKind,
   IErc721Contracts,
   ListenerOptions as Erc721ListenerOptions,

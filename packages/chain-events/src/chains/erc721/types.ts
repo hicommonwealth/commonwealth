@@ -1,7 +1,7 @@
-import { Web3Provider } from '@ethersproject/providers';
+import type { Web3Provider } from '@ethersproject/providers';
 
-import { TypedEvent } from '../../contractTypes/commons';
-import { ERC721 } from '../../contractTypes';
+import type { TypedEvent } from '../../contractTypes/commons';
+import type { ERC721 } from '../../contractTypes';
 
 interface IErc721Contract {
   contract: ERC721;

@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_collapsible.scss';
+import m from 'mithril';
+import { CWIconButton } from './cw_icon_button';
 
 import { ComponentType } from './types';
-import { CWIconButton } from './cw_icon_button';
 
 type CollapsibleAttrs = {
   collapsibleContent: m.Vnode;

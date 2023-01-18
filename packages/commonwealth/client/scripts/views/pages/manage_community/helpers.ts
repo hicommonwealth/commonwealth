@@ -1,9 +1,9 @@
+import { ChainCategoryType } from 'common-common/src/types';
 import $ from 'jquery';
 import m from 'mithril';
-import app from 'state';
 
 import { RolePermission } from 'models';
-import { ChainCategoryType } from 'common-common/src/types';
+import app from 'state';
 import { buildChainToCategoriesMap } from '../communities';
 
 export const sortAdminsAndModsFirst = (a, b) => {

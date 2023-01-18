@@ -1,12 +1,8 @@
 import chai from 'chai';
 import { utils } from 'ethers';
 
-import {
-  EventKind,
-  RawEvent,
-  Api,
-  DelegationType,
-} from '../../../src/chains/aave/types';
+import type { RawEvent, Api } from '../../../src/chains/aave/types';
+import { EventKind, DelegationType } from '../../../src/chains/aave/types';
 import { SupportedNetwork } from '../../../src';
 import { Enrich } from '../../../src/chains/aave/filters/enricher';
 
@@ -20,7 +16,7 @@ const constructEvent = (data, address?: string): RawEvent => {
 };
 
 const blockNumber = 10000;
-const api: Api = ({} as unknown) as Api;
+const api: Api = {} as unknown as Api;
 
 describe('Aave Event Enricher Filter Tests', () => {
   // ProposalCreated

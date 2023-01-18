@@ -1,9 +1,12 @@
-import { Request, Response, Router } from 'express';
+import type { Request, Response } from 'express';
+import { Router } from 'express';
 import passport from 'passport';
+
+import type { DB } from '../database/database';
+
 import entities from './routes/entities';
 import eventActivity from './routes/eventActivity';
-import { DB } from '../database/database';
-import migrateEvent from "./routes/migrateEvent";
+import migrateEvent from './routes/migrateEvent';
 
 /**
  * Function that creates an Express Router for the ChainEvents app. This function defines all of our apps routes.
