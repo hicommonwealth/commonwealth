@@ -1,25 +1,24 @@
 /* @jsx m */
 
-import m from 'mithril';
+import {
+  deinitChainOrCommunity,
+  initChain,
+  initNewTokenChain,
+  selectChain,
+} from 'app';
 import ClassComponent from 'class_component';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
-
-import {
-  initChain,
-  initNewTokenChain,
-  deinitChainOrCommunity,
-  selectChain,
-} from 'app';
+import m from 'mithril';
 import app from 'state';
-import { AppToasts } from 'views/toast';
 import { PageNotFound } from 'views/pages/404';
+import { AppToasts } from 'views/toast';
 import { AppModals } from './app_modals';
-import { UserSurveyPopup } from './components/user_survey_popup';
-import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
+import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWText } from './components/component_kit/cw_text';
+import { UserSurveyPopup } from './components/user_survey_popup';
 
 class LoadingLayout extends ClassComponent {
   view() {

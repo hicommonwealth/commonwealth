@@ -1,19 +1,19 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { WalletId } from 'common-common/src/types';
-import { ModelStatic, ModelInstance } from './types';
-import { ChainAttributes, ChainInstance } from './chain';
-import { UserAttributes, UserInstance } from './user';
-import {
+import type { WalletId } from 'common-common/src/types';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ChainAttributes, ChainInstance } from './chain';
+import type {
   OffchainProfileAttributes,
   OffchainProfileInstance,
 } from './offchain_profile';
-import { ProfileInstance } from './profile';
-import { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
-import {
+import type { ProfileInstance } from './profile';
+import type {
   RoleAssignmentAttributes,
   RoleAssignmentInstance,
 } from './role_assignment';
+import type { SsoTokenAttributes, SsoTokenInstance } from './sso_token';
+import type { ModelInstance, ModelStatic } from './types';
+import type { UserAttributes, UserInstance } from './user';
 
 export type AddressAttributes = {
   address: string;
@@ -42,9 +42,7 @@ export type AddressAttributes = {
   SsoToken?: SsoTokenAttributes;
 };
 
-// eslint-disable-next-line no-use-before-define
 export type AddressInstance = ModelInstance<AddressAttributes> & {
-  // no mixins used yet
   getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
   getUser: Sequelize.BelongsToGetAssociationMixin<UserInstance>;
   getOffchainProfile: Sequelize.BelongsToGetAssociationMixin<OffchainProfileInstance>;

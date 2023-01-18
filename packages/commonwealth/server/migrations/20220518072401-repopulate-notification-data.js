@@ -16,5 +16,5 @@ module.exports = {
       SET notification_data = ''
       WHERE N.category_id = 'chain-event';
     `);
-  }
+  },
 };

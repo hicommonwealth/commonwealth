@@ -10,5 +10,5 @@ module.exports = {
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.removeColumn('ChainNodes', 'private_url');
-  }
+  },
 };

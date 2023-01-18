@@ -1,10 +1,15 @@
 import chai from 'chai';
-import { Header, EventRecord, Extrinsic } from '@polkadot/types/interfaces';
+import type {
+  Header,
+  EventRecord,
+  Extrinsic,
+} from '@polkadot/types/interfaces';
 import BN from 'bn.js';
 
 import { SupportedNetwork } from '../../../src';
 import { Processor } from '../../../src/chains/substrate/processor';
-import { EventKind, ISlash } from '../../../src/chains/substrate/types';
+import type { ISlash } from '../../../src/chains/substrate/types';
+import { EventKind } from '../../../src/chains/substrate/types';
 
 import { constructFakeApi } from './testUtil';
 
@@ -27,14 +32,14 @@ const constructFakeBlock = (
   extrinsics = []
 ) => {
   return {
-    header: ({
+    header: {
       hash: blockNumber,
       number: blockNumber,
-    } as unknown) as Header,
+    } as unknown as Header,
     events: events.map((event) => {
       const phase = { ...event.phase };
       delete event.phase;
-      return ({ event, phase } as unknown) as EventRecord;
+      return { event, phase } as unknown as EventRecord;
     }),
     versionNumber: 10,
     versionName: 'edgeware',

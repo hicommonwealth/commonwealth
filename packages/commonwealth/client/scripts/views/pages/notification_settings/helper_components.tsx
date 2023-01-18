@@ -1,22 +1,23 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { getProposalUrlPath } from 'identifiers';
+import m from 'mithril';
+import type { NotificationSubscription } from 'models';
+import { AddressInfo } from 'models';
 
 import 'pages/notification_settings/helper_components.scss';
 
 import app from 'state';
-import { getProposalUrlPath } from 'identifiers';
-import { AddressInfo, NotificationSubscription } from 'models';
 import { slugify } from '../../../../../shared/utils';
-import { CWText } from '../../components/component_kit/cw_text';
-import { renderQuillTextBody } from '../../components/quill/helpers';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWText } from '../../components/component_kit/cw_text';
+import { isWindowExtraSmall } from '../../components/component_kit/helpers';
+import { renderQuillTextBody } from '../../components/quill/helpers';
 import User from '../../components/widgets/user';
 import { getNotificationTypeText } from './helpers';
-import { isWindowExtraSmall } from '../../components/component_kit/helpers';
 
 const getTextRows = (subscription: NotificationSubscription) => {
   if (subscription.Thread) {

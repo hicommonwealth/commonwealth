@@ -1,38 +1,34 @@
-import _ from 'underscore';
+import type { ApiPromise } from '@polkadot/api';
+import type { Vec } from '@polkadot/types';
+import type { AccountId, BalanceOf } from '@polkadot/types/interfaces';
+import type { ITuple } from '@polkadot/types/types';
+import { isFunction } from '@polkadot/util';
+
+import type {
+  ISubstrateDemocracyProposal,
+  SubstrateCoin,
+} from 'adapters/chain/substrate/types';
+import { formatCall } from 'adapters/chain/substrate/types';
 import BN from 'bn.js';
 
 import { SubstrateTypes } from 'chain-events/src/types';
-import { ApiPromise } from '@polkadot/api';
-import { Vec } from '@polkadot/types';
-import { ITuple } from '@polkadot/types/types';
-import { AccountId, BalanceOf } from '@polkadot/types/interfaces';
-import { isFunction } from '@polkadot/util';
-
-import {
-  ISubstrateDemocracyProposal,
-  SubstrateCoin,
-  formatCall,
-} from 'adapters/chain/substrate/types';
-import { formatProposalHashShort } from 'helpers';
 import { ChainBase, ProposalType } from 'common-common/src/types';
+import { formatProposalHashShort } from 'helpers';
+import type { Account, ChainEntity, ChainEvent, ProposalEndTime } from 'models';
 import {
+  DepositVote,
   Proposal,
   ProposalStatus,
-  ProposalEndTime,
-  DepositVote,
   VotingType,
   VotingUnit,
-  Account,
-  ChainEntity,
-  ChainEvent,
 } from 'models';
+import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
+import type Substrate from './adapter';
+import type SubstrateDemocracyProposals from './democracy_proposals';
+import type { SubstrateDemocracyReferendum } from './democracy_referendum';
 
-import { chainEntityTypeToProposalSlug } from 'identifiers';
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstrateDemocracyProposals from './democracy_proposals';
-import { SubstrateDemocracyReferendum } from './democracy_referendum';
-import Substrate from './adapter';
+import type SubstrateChain from './shared';
 
 const backportEventToAdapter = (
   ChainInfo: SubstrateChain,

@@ -1,27 +1,27 @@
-import * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
-import { DataTypes } from 'sequelize';
-import { ChainAttributes, ChainInstance } from './chain';
-import { ContractAttributes, ContractInstance } from './contract';
-import { ModelStatic, ModelInstance } from './types';
-
+import type * as Sequelize from 'sequelize'; // must use "* as" to avoid scope errors
+import type { DataTypes } from 'sequelize';
+import type { ChainAttributes, ChainInstance } from './chain';
+import type { ContractAttributes, ContractInstance } from './contract';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityContractAttributes = {
-    id: number;
-    chain_id: string;
-    contract_id: number;
+  id: number;
+  chain_id: string;
+  contract_id: number;
 
-    // Associations
-    Contract?: ContractAttributes;
-    Chain?: ChainAttributes;
+  // Associations
+  Contract?: ContractAttributes;
+  Chain?: ChainAttributes;
 };
 
-export type CommunityContractInstance = ModelInstance<CommunityContractAttributes> & {
-  // add mixins as needed
-  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
-  getContract: Sequelize.BelongsToGetAssociationMixin<ContractInstance>;
-};
+export type CommunityContractInstance =
+  ModelInstance<CommunityContractAttributes> & {
+    getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+    getContract: Sequelize.BelongsToGetAssociationMixin<ContractInstance>;
+  };
 
-export type CommunityContractModelStatic = ModelStatic<CommunityContractInstance>;
+export type CommunityContractModelStatic =
+  ModelStatic<CommunityContractInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
@@ -42,15 +42,19 @@ export default (
       underscored: true,
       createdAt: 'created_at',
       updatedAt: 'updated_at',
-      indexes: [
-        { fields: ['chain_id'], unique: true },
-      ],
+      indexes: [{ fields: ['chain_id'], unique: true }],
     }
   );
 
   CommunityContract.associate = (models) => {
-    models.CommunityContract.belongsTo(models.Contract, { foreignKey: 'contract_id', targetKey: 'id' });
-    models.CommunityContract.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
+    models.CommunityContract.belongsTo(models.Contract, {
+      foreignKey: 'contract_id',
+      targetKey: 'id',
+    });
+    models.CommunityContract.belongsTo(models.Chain, {
+      foreignKey: 'chain_id',
+      targetKey: 'id',
+    });
   };
 
   return CommunityContract;

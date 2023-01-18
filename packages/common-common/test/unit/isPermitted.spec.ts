@@ -1,5 +1,6 @@
 import { assert } from 'chai';
-import { isPermitted, Permissions, Action } from 'common-common/src/permissions';
+import type { Permissions } from 'common-common/src/permissions';
+import { isPermitted, Action } from 'common-common/src/permissions';
 
 describe('isPermitted() unit tests', () => {
   it('should validate a create thread permission', () => {

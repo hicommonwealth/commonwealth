@@ -1,6 +1,7 @@
-import { IAnyListener } from '../../src';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { ChainBase, ChainNetwork } from 'common-common/src/types';
+import type { RegisteredTypes } from '@polkadot/types/types';
+
+import type { IAnyListener } from '../../src';
 
 export type IListenerInstances = { [key: string]: IAnyListener };
 

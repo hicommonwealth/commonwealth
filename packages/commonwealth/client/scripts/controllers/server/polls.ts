@@ -1,11 +1,10 @@
 /* eslint-disable no-restricted-globals */
-import _ from 'lodash';
 import $ from 'jquery';
+import { Poll, Vote } from 'models';
 import moment from 'moment';
 import app from 'state';
 
 import PollStore from 'stores/PollStore';
-import { Poll, Vote } from 'models';
 
 export const modelFromServer = (poll) => {
   const {

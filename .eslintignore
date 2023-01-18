@@ -1,0 +1,17 @@
+node_modules
+test
+static
+*build
+*.github
+*.env
+*node_modules
+packages/chain-events/.eslintrc.js
+*.mocharc.json
+*.nycrc
+*.stylelintrc
+*.md
+*coverage
+*.sol
+*contractTypes
+*factories
+*.nyc_output

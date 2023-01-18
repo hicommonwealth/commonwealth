@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/gov_explainer.scss';
+import m from 'mithril';
 import { CWText } from './component_kit/cw_text';
 
 type StatHeader = {

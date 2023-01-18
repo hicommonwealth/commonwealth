@@ -1,14 +1,9 @@
 import axios from 'axios';
 import { AppError } from 'common-common/src/errors';
-import {
-  success,
-  TypedRequestBody,
-  TypedRequestQuery,
-  TypedResponse,
-} from '../types';
-import { DB } from '../models';
 import validateChain from '../middleware/validateChain';
-import { BanAttributes } from '../models/ban';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 
 enum SetDiscordBotConfigErrors {
   NoChain = 'Must supply a chain ID',
@@ -40,7 +35,7 @@ const getDiscordChannels = async (
 ) => {
   const { chain_id } = req.body;
 
-  const [chain, error] = await validateChain(models, { chain_id });
+  const [error] = await validateChain(models, { chain_id });
   if (!chain_id || error) throw new AppError(SetDiscordBotConfigErrors.NoChain);
 
   const configEntry = await models.DiscordBotConfig.findOne({

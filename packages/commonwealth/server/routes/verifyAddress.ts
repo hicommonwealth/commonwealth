@@ -1,52 +1,53 @@
-import { Request, Response, NextFunction } from 'express';
+import {
+  decodeSignature,
+  pubkeyToAddress,
+  serializeSignDoc,
+} from '@cosmjs/amino';
 
-import { StargateClient } from '@cosmjs/stargate';
-import { bech32 } from 'bech32';
-import bs58 from 'bs58';
-
-import Keyring, { decodeAddress } from '@polkadot/keyring';
-import { KeyringOptions } from '@polkadot/keyring/types';
-import { stringToU8a, hexToU8a, stringToHex } from '@polkadot/util';
-import { KeypairType } from '@polkadot/util-crypto/types';
-import * as ethUtil from 'ethereumjs-util';
+import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
 import {
   recoverTypedSignature,
   SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
 
-import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
-import {
-  pubkeyToAddress,
-  serializeSignDoc,
-  decodeSignature,
-  StdSignDoc,
-} from '@cosmjs/amino';
+import Keyring, { decodeAddress } from '@polkadot/keyring';
+import type { KeyringOptions } from '@polkadot/keyring/types';
+import { hexToU8a, stringToHex } from '@polkadot/util';
+import type { KeypairType } from '@polkadot/util-crypto/types';
 
-import nacl from 'tweetnacl';
+import { bech32 } from 'bech32';
+import bs58 from 'bs58';
+import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import {
   ChainBase,
   NotificationCategories,
   WalletId,
 } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { addressSwapper } from '../../shared/utils';
-import { ChainInstance } from '../models/chain';
-import { ProfileAttributes } from '../models/profile';
-import { AddressInstance } from '../models/address';
+import * as ethUtil from 'ethereumjs-util';
+import type { NextFunction, Request, Response } from 'express';
+
+import nacl from 'tweetnacl';
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
-import { DB } from '../models';
-import { DynamicTemplate } from '../../shared/types';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { mixpanelTrack } from '../util/mixpanelUtil';
+import {
+  chainBasetoCanvasChain,
+  constructCanvasMessage,
+} from '../../shared/adapters/shared';
 import { MixpanelLoginEvent } from '../../shared/analytics/types';
-import { chainBasetoCanvasChain, constructCanvasMessage } from '../../shared/adapters/shared';
+import { DynamicTemplate } from '../../shared/types';
+import { addressSwapper } from '../../shared/utils';
+import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
+import type { ChainInstance } from '../models/chain';
+import type { ProfileAttributes } from '../models/profile';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sgMail = require('@sendgrid/mail');
-const log = factory.getLogger(formatFilename(__filename));
-
 export const Errors = {
   NoChain: 'Must provide chain',
   InvalidChain: 'Invalid chain',
@@ -69,7 +70,7 @@ const verifySignature = async (
   user_id: number,
   signatureString: string,
   sessionPublicAddress: string | null, // used when signing a block to login
-  sessionBlockInfo: string | null,     // used when signing a block to login
+  sessionBlockInfo: string | null // used when signing a block to login
 ): Promise<boolean> => {
   if (!chain) {
     log.error('no chain provided to verifySignature');
@@ -81,10 +82,10 @@ const verifySignature = async (
     chainBasetoCanvasChain(chain.base),
     // TODO: Figure out how to retrieve the right chain ID
     // this is not currently being checked
-    "unknown",
+    'unknown',
     addressModel.address,
     sessionPublicAddress,
-    addressModel.block_info!
+    addressModel.block_info
   );
 
   let isValid: boolean;
@@ -222,7 +223,10 @@ const verifySignature = async (
       ) {
         try {
           // Generate sign doc from token and verify it against the signature
-          const generatedSignDoc = validationTokenToSignDoc(Buffer.from(JSON.stringify(canvasMessage)), generatedAddress)
+          const generatedSignDoc = validationTokenToSignDoc(
+            Buffer.from(JSON.stringify(canvasMessage)),
+            generatedAddress
+          );
 
           const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
@@ -256,7 +260,9 @@ const verifySignature = async (
       const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
 
       if (addressModel.block_info !== sessionBlockInfo) {
-        throw new Error(`Eth verification failed for ${addressModel.address}: signed a different block than expected`)
+        throw new Error(
+          `Eth verification failed for ${addressModel.address}: signed a different block than expected`
+        );
       }
       const address = recoverTypedSignature({
         data: typedCanvasMessage,
@@ -363,7 +369,7 @@ const processAddress = async (
   signature: string,
   user: Express.User,
   sessionPublicAddress: string | null,
-  sessionBlockInfo: string | null,
+  sessionBlockInfo: string | null
 ): Promise<void> => {
   const existingAddress = await models.Address.scope('withPrivateData').findOne(
     {
@@ -471,7 +477,7 @@ const verifyAddress = async (
     req.body.signature,
     req.user,
     req.body.session_public_address,
-    req.body.session_block_data,
+    req.body.session_block_data
   );
 
   if (req.user) {
