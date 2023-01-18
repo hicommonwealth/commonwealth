@@ -8,11 +8,11 @@ import 'pages/new_profile/new_profile_header.scss';
 
 import app from 'state';
 import { NewProfile as Profile } from 'client/scripts/models';
-import { formatAnonymousUsername } from 'shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { SocialAccounts } from '../../components/social_accounts';
+import { formatAnonymousUsername } from '../../../../../shared/utils';
 
 type NewProfileHeaderAttrs = {
   profile: Profile;

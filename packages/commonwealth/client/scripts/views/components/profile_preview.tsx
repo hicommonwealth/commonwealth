@@ -8,13 +8,13 @@ import 'components/profile_preview.scss';
 
 import app from 'state';
 import { AddressInfo, NewProfile as Profile } from 'models';
-import { formatAnonymousUsername } from 'shared/utils';
 import { CWText } from './component_kit/cw_text';
 import { renderQuillTextBody } from './quill/helpers';
 import { SocialAccounts } from './social_accounts';
 import { CWButton } from './component_kit/cw_button';
 import { LinkedAddresses } from './linked_addresses';
 import { NewLoginModal } from '../modals/login_modal';
+import { formatAnonymousUsername } from '../../../../shared/utils';
 
 type ProfilePreviewAttrs = {
   profiles: Profile[];
