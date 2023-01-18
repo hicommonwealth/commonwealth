@@ -1,11 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import ViewCountCache from '../util/viewCountCache';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import { sequelize } from '../database';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
+import type ViewCountCache from '../util/viewCountCache';
 
 export const Errors = {
   NoObjectId: 'Must provide object ID',
@@ -14,7 +10,13 @@ export const Errors = {
   InvalidThread: 'Invalid thread',
 };
 
-const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: Response, next: NextFunction) => {
+const viewCount = async (
+  models: DB,
+  cache: ViewCountCache,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.body.object_id) {
     return next(new AppError(Errors.NoObjectId));
   }
@@ -22,7 +24,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
     return next(new AppError(Errors.NoChainOrComm));
   }
   const chain = await models.Chain.findOne({
-    where: { id: req.body.chain || null }
+    where: { id: req.body.chain || null },
   });
   if (!chain) {
     return next(new AppError(Errors.InvalidChainOrComm));
@@ -33,7 +35,7 @@ const viewCount = async (models: DB, cache: ViewCountCache, req: Request, res: R
     where: {
       chain: req.body.chain,
       object_id: req.body.object_id,
-    }
+    },
   });
   if (!count) {
     return next(new AppError(Errors.InvalidThread));

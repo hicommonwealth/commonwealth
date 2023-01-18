@@ -1,23 +1,23 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { MixpanelCommunityCreationEvent } from 'analytics/types';
+import { initAppState } from 'app';
 import ClassComponent from 'class_component';
+import { ChainBase, ChainType } from 'common-common/src/types';
+import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
+import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/create_community.scss';
 
 import app from 'state';
-import { MixpanelCommunityCreationEvent } from 'analytics/types';
-import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
-import { initAppState } from 'app';
 import { slugifyPreserveDashes } from 'utils';
-import { ChainBase, ChainType } from 'common-common/src/types';
-import { linkExistingAddressToChainOrCommunity } from 'controllers/app/login';
-import { initChainForm, defaultChainRows } from './chain_input_rows';
-import { ChainFormFields, ChainFormState, EthFormFields } from './types';
-import { IdRow, InputRow } from '../../components/metadata_rows';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
+import { IdRow, InputRow } from '../../components/metadata_rows';
+import { defaultChainRows, initChainForm } from './chain_input_rows';
+import type { ChainFormFields, ChainFormState, EthFormFields } from './types';
 
 // TODO: populate additional fields
 

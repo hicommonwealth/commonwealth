@@ -2,6 +2,7 @@
 
 .LandingPageHeaderLinks {
   white-space: nowrap;
+
   a.text-gray-500.leading-none {
     color: $neutral-800;
     text-decoration: none;
@@ -35,6 +36,7 @@
   .close {
     display: block;
   }
+
   nav {
     display: block !important;
   }
@@ -76,15 +78,18 @@
 .LandingPageHeaderLoginButton {
   cursor: pointer;
   white-space: nowrap;
+
   img {
     position: relative;
     top: -2px;
   }
+
   a {
     text-decoration: none !important;
     padding-bottom: 0.55rem;
   }
 }
+
 li.LandingPageHeaderLoginButton.ml-10.pt-2 {
   a.btn-primary.pb-3.text-white {
     padding-top: 14px;
@@ -92,15 +97,18 @@ li.LandingPageHeaderLoginButton.ml-10.pt-2 {
     color: $white;
     text-decoration: none;
     cursor: pointer;
+
     &:hover {
       background-color: $yellow-800;
     }
+
     img {
       position: relative;
       top: -2px;
     }
   }
 }
+
 li.LandingPageMenuButton.ml-10.pt-2 {
   white-space: nowrap;
   background: $white;

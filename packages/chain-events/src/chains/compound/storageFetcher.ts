@@ -1,24 +1,19 @@
 import { populateRange } from '../../util';
-import {
-  CWEvent,
-  IStorageFetcher,
-  IDisconnectedRange,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { CWEvent, IDisconnectedRange } from '../../interfaces';
+import { IStorageFetcher, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import { Enrich } from './filters/enricher';
-import {
+import type {
   IEventData,
-  EventKind,
   Api,
   IVoteCast,
   IProposalCreated,
   IProposalCanceled,
   IProposalQueued,
   IProposalExecuted,
-  isGovernorAlpha,
 } from './types';
+import { EventKind, isGovernorAlpha } from './types';
 
 export class StorageFetcher extends IStorageFetcher<Api> {
   private readonly log;

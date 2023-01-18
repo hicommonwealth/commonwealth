@@ -7,15 +7,43 @@ class NewProfile {
   private _avatarUrl: string;
   private _slug: string;
 
-  get name() { return this._name; }
-  get email() { return this._email; }
-  get website() { return this._website; }
-  get bio() { return this._bio; }
-  get isDefault() { return this._isDefault; }
-  get avatarUrl() { return this._avatarUrl; }
-  get slug() { return this._slug; }
+  get name() {
+    return this._name;
+  }
 
-  constructor({profile_name, email, website, bio, is_default, avatarUrl, slug}) {
+  get email() {
+    return this._email;
+  }
+
+  get website() {
+    return this._website;
+  }
+
+  get bio() {
+    return this._bio;
+  }
+
+  get isDefault() {
+    return this._isDefault;
+  }
+
+  get avatarUrl() {
+    return this._avatarUrl;
+  }
+
+  get slug() {
+    return this._slug;
+  }
+
+  constructor({
+    profile_name,
+    email,
+    website,
+    bio,
+    is_default,
+    avatarUrl,
+    slug,
+  }) {
     this._name = profile_name;
     this._email = email;
     this._website = website;
@@ -36,7 +64,7 @@ class NewProfile {
   }
 
   public static fromJSON(json) {
-    return new NewProfile(json)
+    return new NewProfile(json);
   }
 }
 

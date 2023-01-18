@@ -53,24 +53,26 @@ module.exports = {
         chain,
         event_name,
       });
-      const kusamaObjs = Object.values(SubstrateEventKinds).map((s) => buildObject(s, 'kusama'));
+      const kusamaObjs = Object.values(SubstrateEventKinds).map((s) =>
+        buildObject(s, 'kusama')
+      );
 
       // TODO: somehow switch this on for testing purposes?
-      return queryInterface.bulkInsert(
-        'ChainEventTypes',
-        [
-          ...kusamaObjs,
-        ],
-        { transaction: t }
-      );
+      return queryInterface.bulkInsert('ChainEventTypes', [...kusamaObjs], {
+        transaction: t,
+      });
     });
   },
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.bulkDelete('ChainEventTypes', {
-        chain: 'kusama',
-      }, { transaction: t });
+      await queryInterface.bulkDelete(
+        'ChainEventTypes',
+        {
+          chain: 'kusama',
+        },
+        { transaction: t }
+      );
     });
-  }
+  },
 };

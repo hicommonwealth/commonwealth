@@ -3,12 +3,9 @@ import { BigNumber, utils } from 'ethers';
 
 import { SupportedNetwork } from '../../../src';
 import { StorageFetcher } from '../../../src/chains/compound/storageFetcher';
-import {
-  EventKind,
-  ProposalState,
-  RawEvent,
-} from '../../../src/chains/compound/types';
-import { GovernorAlpha } from '../../../src/contractTypes';
+import type { RawEvent } from '../../../src/chains/compound/types';
+import { EventKind, ProposalState } from '../../../src/chains/compound/types';
+import type { GovernorAlpha } from '../../../src/contractTypes';
 
 const { assert } = chai;
 
@@ -21,7 +18,7 @@ const constructEvent = (blockNumber: number, data, rawData?): RawEvent => {
 };
 
 const makeApi = (proposals, isBravo = false) => {
-  const governorAlpha = ({
+  const governorAlpha = {
     interface: {
       functions: {
         'guardian()': !isBravo,
@@ -83,7 +80,7 @@ const makeApi = (proposals, isBravo = false) => {
       ProposalQueued: () => 'ProposalQueued',
       ProposalExecuted: () => 'ProposalExecuted',
     },
-  } as unknown) as GovernorAlpha;
+  } as unknown as GovernorAlpha;
   return governorAlpha;
 };
 

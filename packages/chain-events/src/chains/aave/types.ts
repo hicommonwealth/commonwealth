@@ -1,5 +1,5 @@
-import { TypedEvent } from '../../contractTypes/commons';
-import {
+import type { TypedEvent } from '../../contractTypes/commons';
+import type {
   IAaveGovernanceV2,
   IGovernancePowerDelegationToken,
 } from '../../contractTypes';

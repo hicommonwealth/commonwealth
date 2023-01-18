@@ -1,5 +1,6 @@
-import { IUniqueId } from './interfaces';
+import type { IUniqueId } from './interfaces';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class Reaction<T extends IUniqueId> {
   public readonly id: number;
   public readonly author: string;
@@ -9,6 +10,7 @@ class Reaction<T extends IUniqueId> {
   public readonly commentId: number | string;
   public readonly proposalId: number | string;
   public readonly author_chain: string;
+
   // TODO: Do thread/comment/proposal ids ever appear as strings?
 
   constructor(

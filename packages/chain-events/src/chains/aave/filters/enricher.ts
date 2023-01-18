@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { BigNumber } from 'ethers';
+import type { BigNumber } from 'ethers';
 
-import { TypedEventFilter } from '../../../contractTypes/commons';
-import { AaveTokenV2, IAaveGovernanceV2 } from '../../../contractTypes';
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { EventKind, RawEvent, IEventData, Api } from '../types';
+import type { TypedEventFilter } from '../../../contractTypes/commons';
+import type { AaveTokenV2, IAaveGovernanceV2 } from '../../../contractTypes';
+import type { CWEvent } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { RawEvent, IEventData, Api } from '../types';
+import { EventKind } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
 type GetArgType<Name extends keyof IAaveGovernanceV2['filters']> = GetEventArgs<
@@ -84,9 +86,8 @@ export async function Enrich(
       };
     }
     case EventKind.ProposalQueued: {
-      const { id, executionTime } = rawData.args as GetArgType<
-        'ProposalQueued'
-      >;
+      const { id, executionTime } =
+        rawData.args as GetArgType<'ProposalQueued'>;
       return {
         blockNumber,
         excludeAddresses: [],
@@ -99,9 +100,8 @@ export async function Enrich(
       };
     }
     case EventKind.VoteEmitted: {
-      const { voter, id, support, votingPower } = rawData.args as GetArgType<
-        'VoteEmitted'
-      >;
+      const { voter, id, support, votingPower } =
+        rawData.args as GetArgType<'VoteEmitted'>;
       return {
         blockNumber,
         excludeAddresses: [voter],
@@ -116,11 +116,8 @@ export async function Enrich(
       };
     }
     case EventKind.DelegateChanged: {
-      const {
-        delegator,
-        delegatee,
-        delegationType,
-      } = rawData.args as GetTokenArgType<'DelegateChanged'>;
+      const { delegator, delegatee, delegationType } =
+        rawData.args as GetTokenArgType<'DelegateChanged'>;
       return {
         blockNumber,
         excludeAddresses: [delegator],
@@ -135,9 +132,8 @@ export async function Enrich(
       };
     }
     case EventKind.DelegatedPowerChanged: {
-      const { user, amount, delegationType } = rawData.args as GetTokenArgType<
-        'DelegatedPowerChanged'
-      >;
+      const { user, amount, delegationType } =
+        rawData.args as GetTokenArgType<'DelegatedPowerChanged'>;
       return {
         blockNumber,
         excludeAddresses: [user],
@@ -167,9 +163,8 @@ export async function Enrich(
       };
     }
     case EventKind.Approval: {
-      const { owner, spender, value } = rawData.args as GetTokenArgType<
-        'Approval'
-      >;
+      const { owner, spender, value } =
+        rawData.args as GetTokenArgType<'Approval'>;
       return {
         blockNumber,
         excludeAddresses: [owner],

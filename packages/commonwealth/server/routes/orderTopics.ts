@@ -1,9 +1,9 @@
 /* eslint-disable quotes */
-import { Response, NextFunction } from 'express';
-import { TopicInstance } from 'server/models/topic';
-import validateRoles from '../util/validateRoles';
-import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction, Response } from 'express';
+import type { TopicInstance } from 'server/models/topic';
+import type { DB } from '../models';
+import validateRoles from '../util/validateRoles';
 
 enum OrderTopicsErrors {
   NoUser = 'Not logged in',

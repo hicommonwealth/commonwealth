@@ -1,6 +1,5 @@
-import type { Block, Chain, SessionPayload } from '@canvas-js/interfaces';
+import type { Chain, SessionPayload } from '@canvas-js/interfaces';
 import { ChainBase } from 'common-common/src/types';
-
 
 /// An object with an identifier.
 export interface IIdentifiable {
@@ -13,11 +12,11 @@ export interface ICompletable extends IIdentifiable {
 }
 
 export type CanvasData = {
-  loginTo: string
-  registerSessionAddress: string
-  registerSessionDuration: string
-  timestamp: string
-}
+  loginTo: string;
+  registerSessionAddress: string;
+  registerSessionDuration: string;
+  timestamp: string;
+};
 
 export const constructCanvasMessage = (
   chain: Chain,
@@ -27,7 +26,7 @@ export const constructCanvasMessage = (
   validationBlockInfoString: string
 ): CanvasData => {
   const placeholderMultihash = '/commonwealth';
-  const validationBlockInfo = JSON.parse(validationBlockInfoString)
+  const validationBlockInfo = JSON.parse(validationBlockInfoString);
 
   // Not all data here is used. For chains without block data
   // like Solana/Polkadot, timestamp is left blank in session login.
@@ -42,7 +41,7 @@ export const constructCanvasMessage = (
     timestamp: validationBlockInfo?.timestamp,
     blockhash: validationBlockInfo?.hash,
     chain: chain,
-    chainId: chainId
+    chainId: chainId,
   };
 
   return {
@@ -51,21 +50,21 @@ export const constructCanvasMessage = (
     registerSessionDuration: payload?.duration?.toString() ?? null,
     timestamp: payload?.timestamp?.toString() ?? null,
   };
-}
+};
 
 export function chainBasetoCanvasChain(chainBase: ChainBase): Chain {
   /*
   Translate the commonwealth ChainBase names to canvas Chain names.
   */
-  if(chainBase == ChainBase.CosmosSDK) {
-    return "cosmos"
+  if (chainBase == ChainBase.CosmosSDK) {
+    return 'cosmos';
   } else if (chainBase == ChainBase.Ethereum) {
-    return "eth"
+    return 'eth';
   } else if (chainBase == ChainBase.NEAR) {
-    return "near"
+    return 'near';
   } else if (chainBase == ChainBase.Solana) {
-    return "eth"
+    return 'eth';
   } else if (chainBase == ChainBase.Substrate) {
-    return "substrate"
+    return 'substrate';
   }
 }

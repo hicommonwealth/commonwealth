@@ -1,16 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 import _ from 'lodash';
+import m from 'mithril';
 import moment from 'moment';
 
 import 'pages/stats.scss';
 
 import app from 'state';
-import { PageLoading } from 'views/pages/loading';
 import ErrorPage from 'views/pages/error';
+import { PageLoading } from 'views/pages/loading';
 import Sublayout from 'views/sublayout';
 import { BreadcrumbsTitleTag } from '../components/breadcrumbs_title_tag';
 import { CWText } from '../components/component_kit/cw_text';
