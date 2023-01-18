@@ -15,3 +15,5 @@ packages/chain-events/.eslintrc.js
 **/factories
 **/eth/types
 **/.eslintrc.js
+**/ios/App/App
+

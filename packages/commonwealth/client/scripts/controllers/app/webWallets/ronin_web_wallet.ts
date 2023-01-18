@@ -1,8 +1,7 @@
+import { SessionPayload } from '@canvas-js/interfaces';
+
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
-
-/* eslint-disable @typescript-eslint/no-unused-vars */
 
 // Stub wallet to satisfy the spec that does nothing -- the actual function of Ronin login
 // is handled through redirects involving the `/finishAxieLogin` page.
@@ -31,7 +30,7 @@ class RoninWebWalletController implements IWebWallet<any> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
     throw new Error('not implemented');
   }

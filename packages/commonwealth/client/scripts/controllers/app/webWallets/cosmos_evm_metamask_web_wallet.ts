@@ -1,13 +1,15 @@
 import { StargateClient } from '@cosmjs/stargate';
 import { bech32 } from 'bech32';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
-import type { Account, IWebWallet } from 'models';
-import { CanvasData } from 'shared/adapters/shared';
-import app from 'state';
+import { SessionPayload } from '@canvas-js/interfaces';
 import Web3 from 'web3';
 import type { provider } from 'web3-core';
+
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+
+import type { Account, IWebWallet } from 'models';
+import app from 'state';
 
 declare let window: any;
 
@@ -74,7 +76,7 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
     const signature = await this._web3.eth.personal.sign(
       JSON.stringify(canvasMessage),

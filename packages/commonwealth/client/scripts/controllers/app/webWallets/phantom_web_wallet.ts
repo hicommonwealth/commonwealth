@@ -1,9 +1,11 @@
 declare let window: any;
 
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
+import * as solw3 from '@solana/web3.js';
+import { SessionPayload } from '@canvas-js/interfaces';
+
 import app from 'state';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { Account, IWebWallet } from 'models';
 
 class PhantomWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -33,7 +35,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
   }
 
   public getChainId() {
-    return app.chain?.id || this.defaultNetwork;
+    return 'mainnet';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -43,7 +45,7 @@ class PhantomWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
     const encodedMessage = new TextEncoder().encode(
       JSON.stringify(canvasMessage)
