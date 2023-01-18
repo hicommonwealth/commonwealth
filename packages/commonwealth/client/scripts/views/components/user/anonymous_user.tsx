@@ -1,5 +1,5 @@
-/* @jsx m */
-/* eslint-disable no-script-url */
+/* @jsx jsx */
+import React from 'react';
 
 import {
   ClassComponent,
