@@ -1,11 +1,8 @@
-import { Request, Response, NextFunction } from 'express';
-import { Op } from 'sequelize';
 import { AppError, ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
+import type { NextFunction, Request, Response } from 'express';
+import { Op } from 'sequelize';
+import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
-import { DB } from '../models';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NoThreadId: 'Must provide thread_id',

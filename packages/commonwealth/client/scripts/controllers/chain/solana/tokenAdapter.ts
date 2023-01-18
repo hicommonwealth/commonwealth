@@ -1,14 +1,14 @@
 import BN from 'bn.js';
 import { ContractType } from 'common-common/src/types';
 import $ from 'jquery';
-import { ChainInfo, ITokenAdapter } from 'models';
-import { IApp } from 'state';
+import type { ITokenAdapter } from 'models';
 import Solana from './adapter';
 
 export default class Token extends Solana implements ITokenAdapter {
   public contractAddress: string;
   public hasToken = false;
   public tokenBalance: BN = new BN(0);
+
   public async activeAddressHasToken(activeAddress?: string): Promise<boolean> {
     if (!activeAddress) return false;
     this.hasToken = false;

@@ -1,14 +1,10 @@
 import { AppError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { Op } from 'sequelize';
-import { DB } from '../models';
-import { AddressAttributes } from '../models/address';
-import { CommentAttributes } from '../models/comment';
-import { ThreadAttributes } from '../models/thread';
-import { success, TypedRequestQuery, TypedResponse } from '../types';
-
-
-const log = factory.getLogger(formatFilename(__filename));
+import type { DB } from '../models';
+import type { AddressAttributes } from '../models/address';
+import type { CommentAttributes } from '../models/comment';
+import type { ThreadAttributes } from '../models/thread';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { success } from '../types';
 
 export const Errors = {
   NoChain: 'No base chain provided in query',

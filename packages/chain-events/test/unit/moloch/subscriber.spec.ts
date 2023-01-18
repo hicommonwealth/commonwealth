@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import chai from 'chai';
 
 import { Subscriber } from '../../../src/chains/moloch/subscriber';
-import { Api, RawEvent } from '../../../src/chains/moloch/types';
+import type { Api, RawEvent } from '../../../src/chains/moloch/types';
 
 const { assert } = chai;
 
@@ -13,10 +13,10 @@ describe('Moloch Event Subscriber Tests', () => {
   it('should callback with event data', (done) => {
     const molochApi = new EventEmitter();
     const subscriber = new Subscriber(
-      (molochApi as unknown) as Api,
+      molochApi as unknown as Api,
       'moloch-test'
     );
-    const event = ({
+    const event = {
       event: 'SubmitProposal',
       blockNumber: 10,
       args: {
@@ -27,7 +27,7 @@ describe('Moloch Event Subscriber Tests', () => {
         tokenTribute: toHex(5),
         sharesRequested: toHex(6),
       },
-    } as unknown) as RawEvent;
+    } as unknown as RawEvent;
     const cb = (receivedEvent: RawEvent) => {
       assert.deepEqual(event, receivedEvent);
       done();
@@ -40,7 +40,7 @@ describe('Moloch Event Subscriber Tests', () => {
   it('should no-op on unnecessary unsubscribe', (done) => {
     const molochApi = new EventEmitter();
     const subscriber = new Subscriber(
-      (molochApi as unknown) as Api,
+      molochApi as unknown as Api,
       'moloch-test'
     );
     subscriber.unsubscribe();
@@ -50,7 +50,7 @@ describe('Moloch Event Subscriber Tests', () => {
   it('should unsubscribe successfully', (done) => {
     const molochApi = new EventEmitter();
     const subscriber = new Subscriber(
-      (molochApi as unknown) as Api,
+      molochApi as unknown as Api,
       'moloch-test'
     );
     const cb = () => {

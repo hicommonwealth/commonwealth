@@ -1,11 +1,11 @@
-import { ProposalModule, ChainInfo } from 'models';
-import { IChainEntityKind } from 'chain-events/src';
+import type { IChainEntityKind } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
-import { ProposalStore } from 'stores';
-import { ProposalType, ChainBase, ChainNetwork } from 'common-common/src/types';
+import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import type { ChainInfo, ProposalModule } from 'models';
+import type { ProposalStore } from 'stores';
 import { requiresTypeSlug } from 'utils';
+import type ThreadsController from './controllers/server/threads';
 import app from './state';
-import ThreadsController from './controllers/server/threads';
 
 export const pathIsDiscussion = (
   scope: string | null,

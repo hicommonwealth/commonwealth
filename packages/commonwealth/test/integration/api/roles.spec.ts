@@ -3,15 +3,15 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import jwt from 'jsonwebtoken';
 import { NotificationCategories } from 'common-common/src/types';
+import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
 
 import { Errors as createErrors } from '../../../server/routes/createRole';
-import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
 import { Errors as deleteErrors } from '../../../server/routes/deleteRole';
+import { Errors as upgradeErrors } from '../../../server/routes/upgradeMember';
+import * as modelUtils from '../../util/modelUtils';
 import { generateEthAddress } from '../../util/modelUtils';
 
 chai.use(chaiHttp);

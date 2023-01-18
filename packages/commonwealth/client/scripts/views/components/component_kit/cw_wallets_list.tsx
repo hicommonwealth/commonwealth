@@ -1,29 +1,33 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import app from 'state';
-import $ from 'jquery';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import type { ChainNetwork } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
 import 'components/component_kit/cw_wallets_list.scss';
-
-import { Account, AddressInfo, IWebWallet } from 'models';
-import { notifyInfo } from 'controllers/app/notifications';
 import { createUserWithAddress } from 'controllers/app/login';
-import Near from 'controllers/chain/near/adapter';
-import Substrate from 'controllers/chain/substrate/adapter';
-import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import { notifyInfo } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
-import { addressSwapper } from 'commonwealth/shared/utils';
-import { CWText } from './cw_text';
-import { CWWalletOptionRow, CWWalletMissingOptionRow } from './cw_wallet_option_row';
-import { CWTooltip } from './cw_popover/cw_tooltip';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
+import WalletConnectWebWalletController from 'controllers/app/webWallets/walletconnect_web_wallet';
+import type Near from 'controllers/chain/near/adapter';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import $ from 'jquery';
+import m from 'mithril';
+
+import type { Account, IWebWallet } from 'models';
+import { AddressInfo } from 'models';
+import app from 'state';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
-import KeplrWebWalletController from 'client/scripts/controllers/app/webWallets/keplr_web_wallet';
+import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWSpinner } from './cw_spinner';
+import { CWText } from './cw_text';
+import {
+  CWWalletMissingOptionRow,
+  CWWalletOptionRow,
+} from './cw_wallet_option_row';
+import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
@@ -208,9 +212,14 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       }
 
       try {
-        const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, wallet.getChainId());
+        const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+          wallet.chain,
+          wallet.getChainId()
+        );
         const chainIdentifier = app.chain?.id || wallet.defaultNetwork;
-        const validationBlockInfo = wallet.getRecentBlock && await wallet.getRecentBlock(chainIdentifier);
+        const validationBlockInfo =
+          wallet.getRecentBlock &&
+          (await wallet.getRecentBlock(chainIdentifier));
         const { account: signerAccount, newlyCreated } =
           await createUserWithAddress(
             address,
@@ -354,7 +363,9 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                 }}
               />
             ))}
-            {wallets.length === 0 && <CWWalletMissingOptionRow darkMode={darkMode} />}
+            {wallets.length === 0 && (
+              <CWWalletMissingOptionRow darkMode={darkMode} />
+            )}
           </div>
           <div className="wallet-list-links">
             {showResetWalletConnect && (

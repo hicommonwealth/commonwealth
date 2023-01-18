@@ -1,8 +1,8 @@
-import { IHasId } from './interfaces';
+import type { IHasId } from './interfaces';
 import Store from './Store';
 
 class IdStore<T extends IHasId> extends Store<T> {
-  private _storeId: { [id: string]: T} = {};
+  private _storeId: { [id: string]: T } = {};
 
   public add(n: T) {
     super.add(n);

@@ -1,10 +1,7 @@
 /* eslint-disable dot-notation */
-import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../models';
 
 export const Errors = {
   NoCommentOrThreadId: 'Must provide a comment or thread ID',

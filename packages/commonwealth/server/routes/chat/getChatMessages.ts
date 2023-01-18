@@ -1,11 +1,10 @@
-import { Action } from 'common-common/src/permissions';
-import { DB } from '../../models';
-import { ChatChannelAttributes } from '../../models/chat_channel';
-import { success, TypedRequestQuery, TypedResponse } from '../../types';
 import { AppError } from 'common-common/src/errors';
-import {
-  checkReadPermitted
-} from '../../util/roles';
+import { Action } from 'common-common/src/permissions';
+import type { DB } from '../../models';
+import type { ChatChannelAttributes } from '../../models/chat_channel';
+import type { TypedRequestQuery, TypedResponse } from '../../types';
+import { success } from '../../types';
+import { checkReadPermitted } from '../../util/roles';
 
 export const Errors = {
   NoCommunityId: 'No community id given',
@@ -13,14 +12,14 @@ export const Errors = {
 
 type GetChatMessagesReq = {
   chain_id: string;
-}
+};
 
 type GetChatMessagesResp = ChatChannelAttributes[];
 
 export default async (
   models: DB,
   req: TypedRequestQuery<GetChatMessagesReq>,
-  res: TypedResponse<GetChatMessagesResp>,
+  res: TypedResponse<GetChatMessagesResp>
 ) => {
   if (!req.query.chain_id) {
     throw new AppError(Errors.NoCommunityId);
@@ -30,7 +29,7 @@ export default async (
     models,
     req.query.chain_id,
     Action.VIEW_CHAT_CHANNELS,
-    req.user?.id,
+    req.user?.id
   );
 
   // get all messages
@@ -44,5 +43,8 @@ export default async (
     },
   });
 
-  return success(res, messages.map((m) => m.toJSON()));
+  return success(
+    res,
+    messages.map((m) => m.toJSON())
+  );
 };

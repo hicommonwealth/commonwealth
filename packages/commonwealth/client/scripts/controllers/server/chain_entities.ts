@@ -1,21 +1,24 @@
 /* eslint-disable no-restricted-syntax */
-import $ from 'jquery';
-
-import { ChainEntityStore } from 'stores';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ChainEntity, ChainEvent, ChainEventType, ChainInfo } from 'models';
-import app from 'state';
-import {
+import type {
   CWEvent,
-  eventToEntity,
+  IChainEntityKind,
   IEventProcessor,
   IEventSubscriber,
-  SupportedNetwork,
-  getUniqueEntityKey,
-  IChainEntityKind,
 } from 'chain-events/src';
-import { SubstrateTypes } from 'chain-events/src/types'
+import {
+  eventToEntity,
+  getUniqueEntityKey,
+  SupportedNetwork,
+} from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import { getBaseUrl, getFetch } from 'helpers/getUrl';
+import $ from 'jquery';
+import type { ChainInfo } from 'models';
+import { ChainEntity, ChainEvent, ChainEventType } from 'models';
+import app from 'state';
+
+import { ChainEntityStore } from 'stores';
 import { notifyError } from '../app/notifications';
 
 export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
@@ -31,17 +34,17 @@ export function chainToEventNetwork(c: ChainInfo): SupportedNetwork {
   );
 }
 
-const get = (route, args, callback) => {
-  return $.get(app.serverUrl() + route, args)
-    .then((resp) => {
-      if (resp.status === 'Success') {
-        callback(resp.result);
-      } else {
-        console.error(resp);
-      }
-    })
-    .catch((e) => console.error(e));
-};
+// const get = (route, args, callback) => {
+//   return $.get(app.serverUrl() + route, args)
+//     .then((resp) => {
+//       if (resp.status === 'Success') {
+//         callback(resp.result);
+//       } else {
+//         console.error(resp);
+//       }
+//     })
+//     .catch((e) => console.error(e));
+// };
 
 type EntityHandler = (entity: ChainEntity, event: ChainEvent) => void;
 
@@ -50,6 +53,7 @@ class ChainEntityController {
   public get store() {
     return this._store;
   }
+
   private _subscriber: IEventSubscriber<any, any>;
   private _handlers: { [t: string]: EntityHandler[] } = {};
 
@@ -92,8 +96,8 @@ class ChainEntityController {
 
     // load the chain-entity objects
     const [entities, entityMetas] = await Promise.all([
-      getFetch(`${getBaseUrl()  }/entities`, options),
-      getFetch(`${getBaseUrl()  }/getEntityMeta`, options),
+      getFetch(getBaseUrl() + '/entities', options),
+      getFetch(getBaseUrl() + '/getEntityMeta', options),
     ]);
 
     if (Array.isArray(entities)) {
@@ -115,7 +119,7 @@ class ChainEntityController {
   }
 
   public async refreshRawEntities(chain: string) {
-    const entities = await getFetch(`${getBaseUrl()  }/entities`, { chain });
+    const entities = await getFetch(getBaseUrl() + '/entities', { chain });
     if (Array.isArray(entities)) {
       for (const entityJSON of entities) {
         const entity = ChainEntity.fromJSON(entityJSON);
@@ -219,7 +223,7 @@ class ChainEntityController {
         title,
         chain: app.activeChainId(),
       },
-      success: (response) => {
+      success: () => {
         chainEntity.title = title;
       },
       error: (err) => {

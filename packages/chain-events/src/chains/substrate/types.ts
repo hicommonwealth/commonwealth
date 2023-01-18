@@ -1,13 +1,13 @@
-import {
+import type {
   Header,
   EventRecord,
   Extrinsic,
   Event,
   IdentityJudgement as SubstrateJudgement,
 } from '@polkadot/types/interfaces';
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { RegisteredTypes } from '@polkadot/types/types';
 
-import { EnricherConfig } from './filters/enricher';
+import type { EnricherConfig } from './filters/enricher';
 
 export interface ISubstrateListenerOptions {
   startBlock: number;

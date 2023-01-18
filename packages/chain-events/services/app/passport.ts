@@ -25,7 +25,7 @@ function useDefaultUserAuth() {
   );
 }
 
-function setupPassport() {
+function setupPassport(): void {
   useDefaultUserAuth();
 }
 
