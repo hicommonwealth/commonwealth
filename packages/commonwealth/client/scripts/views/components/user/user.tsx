@@ -366,15 +366,14 @@ export class User extends ClassComponent<UserAttrs> {
       </div>
     );
 
-    return popover ? (
-      <CWPopover
-        interactionType="hover"
-        content={userPopover}
-        trigger={userFinal}
-        persistOnHover
-      />
-    ) : (
-      userFinal
-    );
+    return popover
+      ? null
+      : // <CWPopover
+        //   interactionType="hover"
+        //   content={userPopover}
+        //   trigger={userFinal}
+        //   persistOnHover
+        // />
+        userFinal;
   }
 }
