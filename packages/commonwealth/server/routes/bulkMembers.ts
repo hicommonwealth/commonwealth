@@ -18,7 +18,7 @@ const bulkMembers = async (
 
   const options = {};
 
-  if (searchTerm?.length === 0) {
+  if (searchTerm && searchTerm?.length === 0) {
     return res.json({
       status: 'Success',
       result: [],

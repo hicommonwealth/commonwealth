@@ -107,6 +107,7 @@ export async function findAllCommunityRolesWithRoleAssignments(
       ],
     };
   }
+
   const communityRoles = await models.CommunityRole.findAll(roleFindOptions);
   return communityRoles.map((communityRole) => communityRole.toJSON());
 }

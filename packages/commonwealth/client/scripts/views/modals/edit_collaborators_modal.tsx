@@ -37,7 +37,13 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
     const { thread } = vnode.attrs;
 
     const fetchMembers = async (searchTerm) => {
-      const chainOrCommObj = { chain: app.activeChainId(), searchTerm };
+      if (searchTerm.length < 3) {
+        return;
+      }
+      const chainOrCommObj = {
+        chain: app.activeChainId(),
+        searchTerm,
+      };
 
       await $.get(`${app.serverUrl()}/bulkMembers`, chainOrCommObj)
         .then((response) => {
@@ -47,7 +53,6 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
             return role.Address.address !== app.user.activeAccount?.address;
           });
 
-          console.log('response', response.result);
           m.redraw();
         })
         .catch((err) => {
@@ -61,8 +66,6 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
       fetchMembers('');
       this.membersFetched = true;
     }
-
-    // if (!this.items?.length) return;
 
     if (!this.addedEditors) {
       this.addedEditors = {};
@@ -86,11 +89,11 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
         </div>
         <div class="compact-modal-body">
           <div class="user-list-container">
-            <CWLabel label="Users" />
             <div class="selected-collaborators-section">
               <CWTextInput
-                label="Search"
+                label="Search Members"
                 value={this.searchTerm}
+                placeholder="type 3 or more characters to search"
                 oninput={async (e) => {
                   this.searchTerm = e.target.value;
                   await fetchMembers(this.searchTerm);
@@ -104,82 +107,42 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   );
 
                   return (
-                    <div class="collaborator-row">
-                      {m(User, { user })}
-                      <CWIconButton
-                        iconName="close"
-                        iconSize="small"
-                        onclick={async () => {
-                          // If already scheduled for addition, un-schedule
-                          if (this.addedEditors[c.address]) {
-                            delete this.addedEditors[c.address];
-                          } else {
-                            // If already an existing editor, schedule for removal
-                            this.removedEditors[c.address] = c;
-                          }
-                        }}
-                      />
+                    <div
+                      class="collaborator-row"
+                      onclick={async () => {
+                        const addrItem = (c as any).Address;
+
+                        // If already scheduled for removal, un-schedule
+                        if (this.removedEditors[addrItem.address]) {
+                          delete this.removedEditors[addrItem.address];
+                        }
+
+                        // If already scheduled for addition, un-schedule
+                        if (this.addedEditors[addrItem.address]) {
+                          delete this.addedEditors[addrItem.address];
+                        } else if (
+                          thread.collaborators.filter((collaborator) => {
+                            return (
+                              collaborator.address === addrItem.address &&
+                              collaborator.chain === addrItem.chain
+                            );
+                          }).length === 0
+                        ) {
+                          // If unscheduled for addition, and not an existing editor, schedule
+                          this.addedEditors[addrItem.address] = addrItem;
+                        } else {
+                          notifyInfo('Already an editor');
+                        }
+                      }}
+                    >
+                      {m(User, {
+                        user,
+                      })}
                     </div>
                   );
                 })}
               </div>
             </div>
-            {/* <CWLabel label="Selected collaborators" />
-            {m(QueryList, {
-              checkmark: true,
-              items,
-              inputAttrs: {
-                placeholder: 'Enter username or address...',
-              },
-              itemRender: (role: any) => {
-                const user: Profile = app.profiles.getProfile(
-                  role.Address.chain,
-                  role.Address.address
-                );
-
-                const recentlyAdded = !$.isEmptyObject(
-                  this.addedEditors[role.Address.address]
-                );
-
-                return m(ListItem, {
-                  label: m(User, { user }),
-                  selected: recentlyAdded,
-                  key: role.Address.address,
-                });
-              },
-              itemPredicate: (query, item) => {
-                const address = (item as any).Address;
-
-                return address.name
-                  ? address.name.toLowerCase().includes(query.toLowerCase())
-                  : address.address.toLowerCase().includes(query.toLowerCase());
-              },
-              onSelect: (item) => {
-                const addrItem = (item as any).Address;
-
-                // If already scheduled for removal, un-schedule
-                if (this.removedEditors[addrItem.address]) {
-                  delete this.removedEditors[addrItem.address];
-                }
-
-                // If already scheduled for addition, un-schedule
-                if (this.addedEditors[addrItem.address]) {
-                  delete this.addedEditors[addrItem.address];
-                } else if (
-                  thread.collaborators.filter((c) => {
-                    return (
-                      c.address === addrItem.address &&
-                      c.chain === addrItem.chain
-                    );
-                  }).length === 0
-                ) {
-                  // If unscheduled for addition, and not an existing editor, schedule
-                  this.addedEditors[addrItem.address] = addrItem;
-                } else {
-                  notifyInfo('Already an editor');
-                }
-              },
-            })} */}
           </div>
           {allCollaborators.length > 0 ? (
             <div class="selected-collaborators-section">
