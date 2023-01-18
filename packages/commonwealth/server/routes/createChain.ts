@@ -1,27 +1,36 @@
-import {NextFunction} from 'express';
+import { NextFunction } from 'express';
 import Web3 from 'web3';
 import fetch from 'node-fetch';
 import * as solw3 from '@solana/web3.js';
-import {Cluster} from '@solana/web3.js';
-import {Tendermint34Client} from '@cosmjs/tendermint-rpc';
+import { Cluster } from '@solana/web3.js';
+import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import BN from 'bn.js';
-import {Op} from 'sequelize';
-import {factory, formatFilename} from 'common-common/src/logging';
-import {BalanceType,ChainBase, ChainType, NotificationCategories} from 'common-common/src/types';
-import {AppError, ServerError} from 'common-common/src/errors';
-import {urlHasValidHTTPPrefix} from '../../shared/utils';
-import {ChainAttributes} from '../models/chain';
-import {ChainNodeAttributes} from '../models/chain_node';
+import { Op } from 'sequelize';
+import { factory, formatFilename } from 'common-common/src/logging';
+import {
+  BalanceType,
+  ChainBase,
+  ChainType,
+  NotificationCategories,
+} from 'common-common/src/types';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { urlHasValidHTTPPrefix } from '../../shared/utils';
+import { ChainAttributes } from '../models/chain';
+import { ChainNodeAttributes } from '../models/chain_node';
 import testSubstrateSpec from '../util/testSubstrateSpec';
-import {DB} from '../models';
-import {success, TypedRequestBody, TypedResponse} from '../types';
+import { DB } from '../models';
+import { success, TypedRequestBody, TypedResponse } from '../types';
 
-import {AddressInstance} from '../models/address';
-import {mixpanelTrack} from '../util/mixpanelUtil';
-import {MixpanelCommunityCreationEvent} from '../../shared/analytics/types';
-import {RoleAttributes, RoleInstance} from '../models/role';
+import { AddressInstance } from '../models/address';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { MixpanelCommunityCreationEvent } from '../../shared/analytics/types';
+import { RoleAttributes, RoleInstance } from '../models/role';
 
-import { createDefaultCommunityRoles, createRole } from '../util/roles';
+import {
+  createDefaultCommunityRoles,
+  createRole,
+  RoleInstanceWithPermission,
+} from '../util/roles';
 const log = factory.getLogger(formatFilename(__filename));
 
 const MAX_IMAGE_SIZE_KB = 500;
@@ -59,13 +68,14 @@ export const Errors = {
   ImageTooLarge: `Image must be smaller than ${MAX_IMAGE_SIZE_KB}kb`,
 };
 
-export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> & Omit<ChainNodeAttributes, 'id'> & {
-  id: string;
-  node_url: string;
-  substrate_spec: string;
-  address?: string;
-  decimals: number;
-};
+export type CreateChainReq = Omit<ChainAttributes, 'substrate_spec'> &
+  Omit<ChainNodeAttributes, 'id'> & {
+    id: string;
+    node_url: string;
+    substrate_spec: string;
+    address?: string;
+    decimals: number;
+  };
 
 type CreateChainResp = {
   chain: ChainAttributes;
@@ -124,12 +134,12 @@ const createChain = async (
     return next(new AppError(Errors.NoBase));
   }
 
-  if(await getFileSizeBytes(req.body.icon_url) / 1024 > MAX_IMAGE_SIZE_KB) {
+  if ((await getFileSizeBytes(req.body.icon_url)) / 1024 > MAX_IMAGE_SIZE_KB) {
     throw new AppError(Errors.ImageTooLarge);
   }
 
   const existingBaseChain = await models.Chain.findOne({
-    where: {base: req.body.base},
+    where: { base: req.body.base },
   });
   if (!existingBaseChain) {
     return next(new AppError(Errors.InvalidBase));
@@ -164,7 +174,7 @@ const createChain = async (
     const node = await models.ChainNode.scope('withPrivateData').findOne({
       where: {
         eth_chain_id,
-      }
+      },
     });
     if (!node && !req.user.isAdmin) {
       // if creating a new ETH node, must be admin -- users cannot submit custom URLs
@@ -203,7 +213,7 @@ const createChain = async (
       const clusterUrl = solw3.clusterApiUrl(url as Cluster);
       const connection = new solw3.Connection(clusterUrl);
       const supply = await connection.getTokenSupply(pubKey);
-      const {decimals, amount} = supply.value;
+      const { decimals, amount } = supply.value;
       if (new BN(amount, 10).isZero()) {
         throw new AppError('Invalid supply amount');
       }
@@ -220,13 +230,16 @@ const createChain = async (
     }
     try {
       const tmClient = await Tendermint34Client.connect(url);
-      const {block} = await tmClient.block();
+      const { block } = await tmClient.block();
     } catch (err) {
       return next(new ServerError(Errors.InvalidNode));
     }
 
     // TODO: test altWalletUrl if available
-  } else if (req.body.base === ChainBase.Substrate && req.body.type !== ChainType.Offchain) {
+  } else if (
+    req.body.base === ChainBase.Substrate &&
+    req.body.type !== ChainType.Offchain
+  ) {
     const spec = req.body.substrate_spec || '{}';
     if (req.body.substrate_spec) {
       try {
@@ -235,7 +248,6 @@ const createChain = async (
         return next(new ServerError(Errors.InvalidNode));
       }
     }
-
   } else {
     if (!url || !url.trim()) {
       return next(new AppError(Errors.InvalidNodeUrl));
@@ -277,7 +289,7 @@ const createChain = async (
   }
 
   const oldChain = await models.Chain.findOne({
-    where: {[Op.or]: [{name: req.body.name}, {id: req.body.id}]},
+    where: { [Op.or]: [{ name: req.body.name }, { id: req.body.id }] },
   });
   if (oldChain && oldChain.id === req.body.id) {
     return next(new AppError(Errors.ChainIDExists));
@@ -287,26 +299,27 @@ const createChain = async (
   }
 
   const [node] = await models.ChainNode.scope('withPrivateData').findOrCreate({
-    where: {url},
+    where: { url },
     defaults: {
       eth_chain_id,
       alt_wallet_url: altWalletUrl,
       private_url: privateUrl,
-      balance_type: base === ChainBase.CosmosSDK
-        ? BalanceType.Cosmos
-        : base === ChainBase.Substrate
-        ? BalanceType.Substrate
-        : base === ChainBase.Ethereum
-        ? BalanceType.Ethereum
-        // beyond here should never really happen, but just to make sure...
-        : base === ChainBase.NEAR
-        ? BalanceType.NEAR
-        : base === ChainBase.Solana
-        ? BalanceType.Solana
-        : undefined,
+      balance_type:
+        base === ChainBase.CosmosSDK
+          ? BalanceType.Cosmos
+          : base === ChainBase.Substrate
+          ? BalanceType.Substrate
+          : base === ChainBase.Ethereum
+          ? BalanceType.Ethereum
+          : // beyond here should never really happen, but just to make sure...
+          base === ChainBase.NEAR
+          ? BalanceType.NEAR
+          : base === ChainBase.Solana
+          ? BalanceType.Solana
+          : undefined,
       // use first chain name as node name
       name: req.body.name,
-    }
+    },
   });
 
   const chain = await models.Chain.create({
@@ -328,10 +341,10 @@ const createChain = async (
     substrate_spec: sanitizedSpec || '',
     chain_node_id: node.id,
     token_name,
-    has_chain_events_listener: network === 'aave' || network === 'compound'
+    has_chain_events_listener: network === 'aave' || network === 'compound',
   });
 
-  await createDefaultCommunityRoles(models, chain.id)
+  await createDefaultCommunityRoles(models, chain.id);
 
   if (req.body.address) {
     const [contract] = await models.Contract.findOrCreate({
@@ -346,7 +359,7 @@ const createChain = async (
         token_name: chain.token_name,
         symbol: chain.default_symbol,
         type: chain.network,
-      }
+      },
     });
 
     await models.CommunityContract.create({
@@ -368,12 +381,12 @@ const createChain = async (
 
   const topics = await models.Topic.create({
     chain_id: chain.id,
-    name: 'General'
-  })
+    name: 'General',
+  });
 
   // try to make admin one of the user's addresses
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role: RoleInstance | undefined;
+  let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
   if (chain.base === ChainBase.Ethereum) {
@@ -381,28 +394,32 @@ const createChain = async (
       where: {
         user_id: req.user.id,
         address: {
-          [Op.startsWith]: '0x'
-        }
+          [Op.startsWith]: '0x',
+        },
       },
-      include: [{
-        model: models.Chain,
-        where: {base: chain.base},
-        required: true,
-      }]
+      include: [
+        {
+          model: models.Chain,
+          where: { base: chain.base },
+          required: true,
+        },
+      ],
     });
   } else if (chain.base === ChainBase.NEAR) {
     addressToBeAdmin = await models.Address.findOne({
       where: {
         user_id: req.user.id,
         address: {
-          [Op.endsWith]: '.near'
-        }
+          [Op.endsWith]: '.near',
+        },
       },
-      include: [{
-        model: models.Chain,
-        where: {base: chain.base},
-        required: true,
-      }]
+      include: [
+        {
+          model: models.Chain,
+          where: { base: chain.base },
+          required: true,
+        },
+      ],
     });
   } else if (chain.base === ChainBase.Solana) {
     addressToBeAdmin = await models.Address.findOne({
@@ -410,19 +427,27 @@ const createChain = async (
         user_id: req.user.id,
         address: {
           // This is the regex formatting for solana addresses per their website
-          [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}'
-        }
+          [Op.regexp]: '[1-9A-HJ-NP-Za-km-z]{32,44}',
+        },
       },
-      include: [{
-        model: models.Chain,
-        where: {base: chain.base},
-        required: true,
-      }]
+      include: [
+        {
+          model: models.Chain,
+          where: { base: chain.base },
+          required: true,
+        },
+      ],
     });
   }
 
   if (addressToBeAdmin) {
-    await createRole(models, addressToBeAdmin.id, chain.id, 'admin', true);
+    role = await createRole(
+      models,
+      addressToBeAdmin.id,
+      chain.id,
+      'admin',
+      true
+    );
 
     const [subscription] = await models.Subscription.findOrCreate({
       where: {
@@ -431,7 +456,7 @@ const createChain = async (
         chain_id: chain.id,
         object_id: chain.id,
         is_active: true,
-      }
+      },
     });
   }
 

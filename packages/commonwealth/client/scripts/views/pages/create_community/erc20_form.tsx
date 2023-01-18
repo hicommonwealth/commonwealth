@@ -196,8 +196,14 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
-            const { altWalletUrl, chainString, ethChainId, nodeUrl, symbol } =
-              this.state.form;
+            const {
+              altWalletUrl,
+              chainString,
+              ethChainId,
+              nodeUrl,
+              symbol,
+              iconUrl,
+            } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
@@ -211,6 +217,7 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
                 base: ChainBase.Ethereum,
                 chain_string: chainString,
                 eth_chain_id: ethChainId,
+                icon_url: iconUrl,
                 jwt: app.user.jwt,
                 network: ChainNetwork.ERC20,
                 node_url: nodeUrl,
