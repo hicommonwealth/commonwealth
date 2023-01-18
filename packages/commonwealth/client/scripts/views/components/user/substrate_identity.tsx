@@ -1,8 +1,17 @@
 /* @jsx m */
 /* eslint-disable no-script-url */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/user/user.scss';
 
@@ -29,7 +38,7 @@ type SubstrateIdentityAttrs = {
 class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttrs> {
   private identity: SubstrateIdentity | null;
 
-  oninit(vnode: m.Vnode<SubstrateIdentityAttrs>) {
+  oninit(vnode: ResultNode<SubstrateIdentityAttrs>) {
     app.runWhenReady(async () => {
       this.identity =
         vnode.attrs.account instanceof SubstrateAccount &&
@@ -37,11 +46,11 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
         (app.chain as Substrate).identities
           ? await (app.chain as Substrate).identities.load(vnode.attrs.account)
           : null;
-      m.redraw();
+      redraw();
     });
   }
 
-  view(vnode: m.Vnode<SubstrateIdentityAttrs>) {
+  view(vnode: ResultNode<SubstrateIdentityAttrs>) {
     const {
       profile,
       linkify,
@@ -68,7 +77,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
       displayName = showAddressWithDisplayName ? (
         <>
           {profile.displayName}
-          <div class="id-short">
+          <div className="id-short">
             {formatAddressShort(profile.address, profile.chain)}
           </div>
         </>
@@ -81,7 +90,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
       displayName = showAddressWithDisplayName ? (
         <>
           {this.identity.username}
-          <div class="id-short">
+          <div className="id-short">
             {formatAddressShort(profile.address, profile.chain)}
           </div>
         </>
@@ -97,7 +106,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
           {displayName}
           {!hideIdentityIcon && (
             <span
-              class={`identity-icon${
+              className={`identity-icon${
                 quality === IdentityQuality.Good
                   ? '.green'
                   : quality === IdentityQuality.Bad
@@ -129,7 +138,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
         )
       ) : (
         <a
-          class={`user-display-name username onchain-username${
+          className={`user-display-name username onchain-username${
             IdentityQuality.Good ? ' verified' : ''
           }`}
         >
@@ -154,14 +163,14 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
         ) : (
           <>
             {profile.displayName}
-            <div class="id-short">
+            <div className="id-short">
               {formatAddressShort(profile.address, profile.chain)}
             </div>
           </>
         )
       )
     ) : (
-      <a class="user-display-name username">
+      <a className="user-display-name username">
         {!profile ? (
           addrShort
         ) : !showAddressWithDisplayName ? (
@@ -169,7 +178,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
         ) : (
           <>
             {profile.displayName}
-            <div class="id-short">
+            <div className="id-short">
               {formatAddressShort(profile.address, profile.chain)}
             </div>
           </>
@@ -182,7 +191,7 @@ class SubstrateOnlineIdentityWidget extends ClassComponent<SubstrateIdentityAttr
 class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAttrs> {
   private identity: SubstrateIdentity | null;
 
-  view(vnode: m.Vnode<SubstrateIdentityAttrs>) {
+  view(vnode: ResultNode<SubstrateIdentityAttrs>) {
     const {
       addrShort,
       hideIdentityIcon,
@@ -202,7 +211,7 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
           {showAddressWithDisplayName ? (
             <>
               {profile.name}
-              <div class="id-short">
+              <div className="id-short">
                 {formatAddressShort(profile.address, profile.chain)}
               </div>
             </>
@@ -210,7 +219,7 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
             profile.name
           )}
           <span
-            class={`identity-icon${
+            className={`identity-icon${
               quality === IdentityQuality.Good
                 ? '.green'
                 : quality === IdentityQuality.Bad
@@ -241,7 +250,7 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
         )
       ) : (
         <a
-          class={`user-display-name username onchain-username${
+          className={`user-display-name username onchain-username${
             IdentityQuality.Good ? ' verified' : ''
           }`}
         >
@@ -266,14 +275,14 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
         ) : (
           <>
             {profile.displayName}
-            <div class="id-short">
+            <div className="id-short">
               {formatAddressShort(profile.address, profile.chain)}
             </div>
           </>
         )
       )
     ) : (
-      <a class="user-display-name username">
+      <a className="user-display-name username">
         {!profile ? (
           addrShort
         ) : !showAddressWithDisplayName ? (
@@ -281,7 +290,7 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
         ) : (
           <>
             {profile.displayName}
-            <div class="id-short">
+            <div className="id-short">
               {formatAddressShort(profile.address, profile.chain)}
             </div>
           </>
@@ -294,7 +303,7 @@ class SubstrateOfflineIdentityWidget extends ClassComponent<SubstrateIdentityAtt
 class SubstrateIdentityWidget extends ClassComponent<SubstrateIdentityAttrs> {
   private identity: SubstrateIdentity | null;
 
-  view(vnode: m.Vnode<SubstrateIdentityAttrs>) {
+  view(vnode: ResultNode<SubstrateIdentityAttrs>) {
     if (
       app.chain?.loaded &&
       vnode.attrs.account &&

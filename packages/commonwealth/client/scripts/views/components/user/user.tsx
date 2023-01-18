@@ -1,8 +1,17 @@
 /* @jsx m */
 /* eslint-disable no-script-url */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { link } from 'helpers';
 
 import 'components/user/user.scss';
@@ -41,7 +50,7 @@ type UserAttrs = {
 export class User extends ClassComponent<UserAttrs> {
   private identityWidgetLoading: boolean;
 
-  view(vnode: m.Vnode<UserAttrs>) {
+  view(vnode: ResultNode<UserAttrs>) {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
       avatarOnly,
@@ -101,7 +110,7 @@ export class User extends ClassComponent<UserAttrs> {
       ).then((mod) => {
         app.cachedIdentityWidget = mod.default;
         this.identityWidgetLoading = false;
-        m.redraw();
+        redraw();
       });
     }
 
@@ -161,18 +170,22 @@ export class User extends ClassComponent<UserAttrs> {
       <>
         {/* 'long' makes role tags show as full length text */}
         {profile.isCouncillor && !hideIdentityIcon && (
-          <div class={`role-icon role-icon-councillor${long ? ' long' : ''}`}>
+          <div
+            className={`role-icon role-icon-councillor${long ? ' long' : ''}`}
+          >
             {long ? `${friendlyChainName} Councillor` : 'C'}
           </div>
         )}
         {profile.isValidator && !hideIdentityIcon && (
-          <div class={`role-icon role-icon-validator${long ? ' long' : ''}`}>
+          <div
+            className={`role-icon role-icon-validator${long ? ' long' : ''}`}
+          >
             {long ? `${friendlyChainName} Validator` : 'V'}
           </div>
         )}
         {/* role in commonwealth forum */}
         {showRole && role && (
-          <div class="role-tag-container">
+          <div className="role-tag-container">
             <CWText className="role-tag-text">{role.permission}</CWText>
           </div>
         )}
@@ -180,7 +193,7 @@ export class User extends ClassComponent<UserAttrs> {
     );
 
     const userFinal = avatarOnly ? (
-      <div class="User avatar-only" key={profile?.address || '-'}>
+      <div className="User avatar-only" key={profile?.address || '-'}>
         {!profile
           ? null
           : profile.avatarUrl
@@ -189,13 +202,13 @@ export class User extends ClassComponent<UserAttrs> {
       </div>
     ) : (
       <div
-        class={`User${linkify ? ' linkified' : ''}`}
+        className={`User${linkify ? ' linkified' : ''}`}
         key={profile?.address || '-'}
       >
         {showAvatar && (
           <div
-            class="user-avatar"
-            style={`width: ${avatarSize}px; height: ${avatarSize}px;`}
+            className="user-avatar"
+            style={{ width: `${avatarSize}px`, height: `${avatarSize}px;` }}
           >
             {profile && profile.getAvatar(avatarSize)}
           </div>
@@ -204,7 +217,7 @@ export class User extends ClassComponent<UserAttrs> {
         app.chain.base === ChainBase.Substrate &&
         app.cachedIdentityWidget ? (
           // substrate name
-          m(app.cachedIdentityWidget, {
+          render(app.cachedIdentityWidget, {
             account,
             linkify,
             profile,
@@ -231,7 +244,7 @@ export class User extends ClassComponent<UserAttrs> {
                   ) : (
                     <>
                       {profile.displayName}
-                      <div class="id-short">
+                      <div className="id-short">
                         {formatAddressShort(profile.address, profile.chain)}
                       </div>
                     </>
@@ -240,7 +253,7 @@ export class User extends ClassComponent<UserAttrs> {
                 </>
               )
             ) : (
-              <a class="user-display-name username">
+              <a className="user-display-name username">
                 {!profile ? (
                   addrShort
                 ) : !showAddressWithDisplayName ? (
@@ -248,7 +261,7 @@ export class User extends ClassComponent<UserAttrs> {
                 ) : (
                   <>
                     {profile.displayName}
-                    <div class="id-short">
+                    <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
                   </>
@@ -264,7 +277,7 @@ export class User extends ClassComponent<UserAttrs> {
                 <img
                   src="/static/img/ghost.svg"
                   width="20px"
-                  style="display: inline-block"
+                  style={{ display: 'inline-block' }}
                 />
               )}
           </>
@@ -274,23 +287,23 @@ export class User extends ClassComponent<UserAttrs> {
 
     const userPopover = (
       <div
-        class="UserPopover"
-        onclick={(e) => {
+        className="UserPopover"
+        onClick={(e) => {
           e.stopPropagation();
         }}
       >
-        <div class="user-avatar">
+        <div className="user-avatar">
           {!profile
             ? null
             : profile.avatarUrl
             ? profile.getAvatar(36)
             : profile.getAvatar(32)}
         </div>
-        <div class="user-name">
+        <div className="user-name">
           {app.chain &&
           app.chain.base === ChainBase.Substrate &&
           app.cachedIdentityWidget
-            ? m(app.cachedIdentityWidget, {
+            ? render(app.cachedIdentityWidget, {
                 account,
                 linkify: true,
                 profile,
@@ -312,7 +325,7 @@ export class User extends ClassComponent<UserAttrs> {
                 ) : (
                   <>
                     {profile.displayName}
-                    <div class="id-short">
+                    <div className="id-short">
                       {formatAddressShort(profile.address, profile.chain)}
                     </div>
                   </>
@@ -320,7 +333,7 @@ export class User extends ClassComponent<UserAttrs> {
               )}
         </div>
         {profile?.address && (
-          <div class="user-address">
+          <div className="user-address">
             {formatAddressShort(
               profile.address,
               profile.chain,
@@ -329,14 +342,16 @@ export class User extends ClassComponent<UserAttrs> {
             )}
           </div>
         )}
-        {friendlyChainName && <div class="user-chain">{friendlyChainName}</div>}
+        {friendlyChainName && (
+          <div className="user-chain">{friendlyChainName}</div>
+        )}
         {/* always show roleTags in UserPopover */}
         {getRoleTags(true)}
         {/* If Admin Allow Banning */}
         {loggedInUserIsAdmin && (
-          <div class="ban-wrapper">
+          <div className="ban-wrapper">
             <CWButton
-              onclick={() => {
+              onClick={() => {
                 app.modals.create({
                   modal: BanUserModal,
                   data: { profile },

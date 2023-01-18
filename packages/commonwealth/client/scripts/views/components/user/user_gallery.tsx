@@ -1,7 +1,16 @@
 /* eslint-disable no-script-url */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/user/user_gallery.scss';
 
@@ -24,7 +33,7 @@ type UserGalleryAttrs = {
 // wishes to prevent redundant rendering of avatars.
 
 export class UserGallery extends ClassComponent<UserGalleryAttrs> {
-  view(vnode: m.Vnode<UserGalleryAttrs>) {
+  view(vnode: ResultNode<UserGalleryAttrs>) {
     const { users, avatarSize, popover, addressesCount } = vnode.attrs;
 
     const userCount = users.length;
@@ -35,7 +44,7 @@ export class UserGallery extends ClassComponent<UserGalleryAttrs> {
       addressesCount || (userCount < maxUsers ? 0 : userCount - maxUsers);
 
     return (
-      <div class="UserGallery">
+      <div className="UserGallery">
         {users
           .slice(0, Math.min(userCount, maxUsers))
           .map((user: Account | AddressInfo) => {
@@ -66,10 +75,14 @@ export class UserGallery extends ClassComponent<UserGalleryAttrs> {
           })}
         {overflowUsers > 0 && (
           <div
-            class="overflow-users-wrap"
-            style={`width: ${avatarSize}px; height: ${avatarSize}px; line-height: ${avatarSize}px;`}
+            className="overflow-users-wrap"
+            style={{
+              width: `${avatarSize}px`,
+              height: `${avatarSize}px`,
+              lineHeight: `${avatarSize}px;`,
+            }}
           >
-            <div class="overflow-users">+{overflowUsers}</div>
+            <div className="overflow-users">+{overflowUsers}</div>
           </div>
         )}
       </div>

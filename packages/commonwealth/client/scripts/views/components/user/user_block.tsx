@@ -1,8 +1,17 @@
 /* @jsx m */
 /* eslint-disable no-script-url */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
 
@@ -82,7 +91,7 @@ export class UserBlock extends ClassComponent<{
 
     const children = (
       <>
-        <div class="user-block-left">
+        <div className="user-block-left">
           <User
             user={user}
             avatarOnly
@@ -90,8 +99,8 @@ export class UserBlock extends ClassComponent<{
             popover={popover}
           />
         </div>
-        <div class="user-block-center">
-          <div class="user-block-name">
+        <div className="user-block-center">
+          <div className="user-block-name">
             <User
               user={user}
               hideAvatar
@@ -103,7 +112,9 @@ export class UserBlock extends ClassComponent<{
             />
           </div>
           <div
-            class={`user-block-address${profile?.address ? '' : 'no-address'}`}
+            className={`user-block-address${
+              profile?.address ? '' : 'no-address'
+            }`}
           >
             <div>
               {highlightSearchTerm
@@ -113,7 +124,7 @@ export class UserBlock extends ClassComponent<{
                 : formatAddressShort(profile.address, profile.chain)}
             </div>
             {profile?.address && showChainName && (
-              <div class="address-divider"> · </div>
+              <div className="address-divider"> · </div>
             )}
             {showChainName && (
               <div>
@@ -124,8 +135,8 @@ export class UserBlock extends ClassComponent<{
             )}
           </div>
         </div>
-        <div class="user-block-right">
-          <div class="user-block-selected">
+        <div className="user-block-right">
+          <div className="user-block-selected">
             {selected ? <CWIcon iconName="check" /> : ''}
           </div>
         </div>
@@ -141,7 +152,9 @@ export class UserBlock extends ClassComponent<{
     return linkify ? (
       link('.UserBlock', userLink, children)
     ) : (
-      <div class={getClasses<{ compact?: boolean }>({ compact }, 'UserBlock')}>
+      <div
+        className={getClasses<{ compact?: boolean }>({ compact }, 'UserBlock')}
+      >
         {children}
       </div>
     );

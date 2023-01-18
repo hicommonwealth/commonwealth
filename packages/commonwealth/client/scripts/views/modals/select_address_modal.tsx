@@ -146,8 +146,8 @@ export class SelectAddressModal extends ClassComponent {
               {activeAccountsByRole.map(
                 ([account, role]) =>
                   role && (
-                    <div class="select-address-option existing">
-                      <div class="select-address-option-left">
+                    <div className="select-address-option existing">
+                      <div className="select-address-option-left">
                         <UserBlock user={account} />
                         {app.user.addresses.find(
                           (a) =>
@@ -186,7 +186,7 @@ export class SelectAddressModal extends ClassComponent {
                         this.selectedIndex = index;
                       }}
                     >
-                      <div class="select-address-option-left">
+                      <div className="select-address-option-left">
                         <UserBlock
                           user={account}
                           showRole
