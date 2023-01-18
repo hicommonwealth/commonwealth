@@ -1,5 +1,9 @@
+import bs58 from 'bs58';
+import { KeyPair } from 'near-api-js';
+import { PublicKey } from 'near-api-js/lib/utils';
 import { KeyPairEd25519 } from 'near-api-js/lib/utils';
 import { actionToHash } from 'helpers/canvas';
+import { serializeActionPayload } from '@canvas-js/interfaces';
 import {
   Action,
   ActionPayload,
@@ -8,10 +12,10 @@ import {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
+import { verify as verifyCanvasSessionSignature } from 'views/modals/canvas_verify_data_modal';
 
-const getNearSignatureData = (payload: ActionPayload | SessionPayload) => {
-  const serialized = JSON.stringify(payload);
-  return new TextEncoder().encode(serialized);
+const getNearSignatureData = (payload: ActionPayload) => {
+  return new TextEncoder().encode(serializeActionPayload(payload));
 };
 
 export class NEARSessionController implements ISessionController {
@@ -41,8 +45,12 @@ export class NEARSessionController implements ISessionController {
     payload: SessionPayload,
     signature: string
   ) {
-    // TODO: verify signature is valid
-    // TODO: verify payload datetime is valid
+    const valid = await verifyCanvasSessionSignature({
+      session: { type: 'session', payload, signature },
+    });
+    if (!valid) {
+      // throw new Error("Invalid signature");
+    }
     if (payload.address !== this.getAddress(chainId)) {
       throw new Error(
         `Invalid auth: ${payload.address} vs. ${this.getAddress(chainId)}`
@@ -63,8 +71,8 @@ export class NEARSessionController implements ISessionController {
     // TODO: test session restoration on NEAR
     try {
       const storage = localStorage.getItem(storageKey);
-      const { privateKey } = JSON.parse(storage);
-      this.signers[chainId] = new KeyPairEd25519(privateKey);
+      const { secretKey } = JSON.parse(storage);
+      this.signers[chainId] = new KeyPairEd25519(secretKey);
 
       const auth = localStorage.getItem(authStorageKey);
       if (auth !== null) {
@@ -72,14 +80,17 @@ export class NEARSessionController implements ISessionController {
           payload,
           signature,
         }: { payload: SessionPayload; signature: string } = JSON.parse(auth);
+        const valid = await verifyCanvasSessionSignature({
+          session: { type: 'session', payload, signature },
+        });
+        if (!valid) throw new Error();
+
         if (payload.address === this.getAddress(chainId)) {
           console.log(
             'Restored authenticated session:',
             this.getAddress(chainId)
           );
           this.auths[chainId] = { payload, signature };
-          // TODO: verify signature is valid, as below in sign()
-          // TODO: verify payload is not expired
         } else {
           console.log('Restored logged-out session:', this.getAddress(chainId));
         }
@@ -88,10 +99,8 @@ export class NEARSessionController implements ISessionController {
       console.log('Could not restore previous session', err);
       this.signers[chainId] = KeyPairEd25519.fromRandom();
       delete this.auths[chainId];
-      localStorage.setItem(
-        storageKey,
-        JSON.stringify({ privateKey: this.signers[chainId].secretKey })
-      );
+      const secretKey: string = this.signers[chainId].secretKey;
+      localStorage.setItem(storageKey, JSON.stringify({ secretKey }));
     }
     return this.signers[chainId];
   }
@@ -123,7 +132,7 @@ export class NEARSessionController implements ISessionController {
 
     const message = getNearSignatureData(actionPayload);
     const { signature: signatureBytes, publicKey } = signer.sign(message);
-    const signature = new Buffer(signatureBytes).toString('hex');
+    const signature = bs58.encode(signatureBytes);
     if (!signer.verify(message, signatureBytes)) {
       throw new Error('Invalid signature!');
     }

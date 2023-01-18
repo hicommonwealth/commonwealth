@@ -1,22 +1,25 @@
-import {
-  decodeSignature,
-  pubkeyToAddress,
-  serializeSignDoc,
-} from '@cosmjs/amino';
+import { Request, Response, NextFunction } from 'express';
 
-import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import { bech32 } from 'bech32';
+import bs58 from 'bs58';
+
+import Keyring, { decodeAddress } from '@polkadot/keyring';
+import { KeyringOptions } from '@polkadot/keyring/types';
+import { hexToU8a, stringToHex } from '@polkadot/util';
+import { KeypairType } from '@polkadot/util-crypto/types';
+import * as ethUtil from 'ethereumjs-util';
 import {
   recoverTypedSignature,
   SignTypedDataVersion,
 } from '@metamask/eth-sig-util';
 
-import Keyring, { decodeAddress } from '@polkadot/keyring';
-import type { KeyringOptions } from '@polkadot/keyring/types';
-import { hexToU8a, stringToHex } from '@polkadot/util';
-import type { KeypairType } from '@polkadot/util-crypto/types';
+import { Secp256k1, Secp256k1Signature, Sha256 } from '@cosmjs/crypto';
+import {
+  pubkeyToAddress,
+  serializeSignDoc,
+  decodeSignature,
+} from '@cosmjs/amino';
 
-import { bech32 } from 'bech32';
-import bs58 from 'bs58';
 import { AppError } from 'common-common/src/errors';
 import { factory, formatFilename } from 'common-common/src/logging';
 
@@ -25,10 +28,8 @@ import {
   NotificationCategories,
   WalletId,
 } from 'common-common/src/types';
-import * as ethUtil from 'ethereumjs-util';
-import type { NextFunction, Request, Response } from 'express';
-
 import nacl from 'tweetnacl';
+
 import { validationTokenToSignDoc } from '../../shared/adapters/chain/cosmos/keys';
 import { constructTypedCanvasMessage } from '../../shared/adapters/chain/ethereum/keys';
 import { DynamicTemplate } from '../../shared/types';
@@ -44,6 +45,13 @@ import {
   chainBaseToCanvasChainId,
   constructCanvasMessage,
 } from '../../shared/adapters/shared';
+
+import type { SessionPayload } from '@canvas-js/interfaces';
+
+let serializeSessionPayload;
+import('@canvas-js/interfaces').then((interfaces) => {
+  serializeSessionPayload = interfaces.serializeSessionPayload;
+});
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -62,6 +70,11 @@ export const Errors = {
   BadToken: 'Invalid login token',
   WrongWallet: 'Verified with different wallet than created',
 };
+
+// We can't import getSessionPayloadData from Canvas since it's
+// an ES module, so this performs the same serialization.
+const sortedStringify = (message: SessionPayload) =>
+  JSON.stringify(message, Object.keys(message).sort());
 
 // Address.verifySignature
 const verifySignature = async (
@@ -118,7 +131,7 @@ const verifySignature = async (
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
       const signerKeyring = new Keyring(keyringOptions).addFromAddress(address);
-      const message = stringToHex(JSON.stringify(canvasMessage));
+      const message = stringToHex(sortedStringify(canvasMessage));
 
       const signatureU8a =
         signatureString.slice(0, 2) === '0x'
@@ -137,7 +150,7 @@ const verifySignature = async (
     //
     // ethereum address handling on cosmos chains via metamask
     //
-    const msgBuffer = Buffer.from(JSON.stringify(canvasMessage));
+    const msgBuffer = Buffer.from(sortedStringify(canvasMessage));
 
     // toBuffer() doesn't work if there is a newline
     const msgHash = ethUtil.hashPersonalMessage(msgBuffer);
@@ -173,7 +186,7 @@ const verifySignature = async (
     //
 
     // provided string should be serialized AminoSignResponse object
-    const { signature: stdSignature } = JSON.parse(signatureString);
+    const stdSignature = JSON.parse(signatureString);
 
     // we generate an address from the actual public key and verify that it matches,
     // this prevents people from using a different key to sign the message than
@@ -195,7 +208,7 @@ const verifySignature = async (
           const { pubkey, signature } = decodeSignature(stdSignature);
           const secpSignature = Secp256k1Signature.fromFixedLength(signature);
           const messageHash = new Sha256(
-            Buffer.from(JSON.stringify(canvasMessage))
+            Buffer.from(sortedStringify(canvasMessage))
           ).digest();
 
           isValid = await Secp256k1.verifySignature(
@@ -212,8 +225,7 @@ const verifySignature = async (
     //
     // cosmos-sdk address handling
     //
-
-    const { signature: stdSignature } = JSON.parse(signatureString);
+    const stdSignature = JSON.parse(signatureString);
 
     const bech32Prefix = chain.bech32_prefix;
     if (!bech32Prefix) {
@@ -236,7 +248,7 @@ const verifySignature = async (
         try {
           // Generate sign doc from token and verify it against the signature
           const generatedSignDoc = validationTokenToSignDoc(
-            Buffer.from(JSON.stringify(canvasMessage)),
+            Buffer.from(sortedStringify(canvasMessage)),
             generatedAddress
           );
 
@@ -301,7 +313,7 @@ const verifySignature = async (
     // both in base64 encoding
     const { signature: sigObj, publicKey } = JSON.parse(signatureString);
     isValid = nacl.sign.detached.verify(
-      Buffer.from(JSON.stringify(canvasMessage)),
+      Buffer.from(sortedStringify(canvasMessage)),
       Buffer.from(sigObj, 'base64'),
       Buffer.from(publicKey, 'base64')
     );
@@ -315,8 +327,8 @@ const verifySignature = async (
       const decodedAddress = bs58.decode(addressModel.address);
       if (decodedAddress.length === 32) {
         isValid = nacl.sign.detached.verify(
-          Buffer.from(`${JSON.stringify(canvasMessage)}`),
-          Buffer.from(signatureString, 'base64'),
+          Buffer.from(sortedStringify(canvasMessage)),
+          bs58.decode(signatureString),
           decodedAddress
         );
       } else {

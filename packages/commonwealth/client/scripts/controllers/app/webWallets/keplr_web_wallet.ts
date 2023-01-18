@@ -1,11 +1,21 @@
 import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
-import { SessionPayload } from '@canvas-js/interfaces';
+import app from 'state';
+
+import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 
 import { Account, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import app from 'state';
+
+interface Pubkey {
+  readonly type: string;
+  readonly value: any;
+}
+interface StdSignature {
+  readonly pub_key: Pubkey;
+  readonly signature: string;
+}
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -77,9 +87,9 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
     const stdSignature = await window.keplr.signArbitrary(
       chainId,
       account.address,
-      JSON.stringify(canvasMessage)
+      serializeSessionPayload(canvasMessage)
     );
-    return JSON.stringify({ signature: stdSignature });
+    return JSON.stringify(stdSignature);
   }
 
   // ACTIONS

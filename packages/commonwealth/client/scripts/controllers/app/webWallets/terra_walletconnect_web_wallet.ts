@@ -5,7 +5,7 @@ import {
   getChainOptions,
   WalletController,
 } from '@terra-money/wallet-controller';
-import { SessionPayload } from '@canvas-js/interfaces';
+import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 
 import { Account, BlockInfo, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
@@ -75,22 +75,18 @@ class TerraWalletConnectWebWalletController
   ): Promise<string> {
     try {
       const result = await this._wallet.signBytes(
-        Buffer.from(JSON.stringify(canvasMessage))
+        Buffer.from(serializeSessionPayload(canvasMessage))
       );
       if (!result.success) {
         throw new Error('SignBytes unsuccessful');
       }
-      const signature = {
-        signature: {
-          pub_key: {
-            type: 'tendermint/PubKeySecp256k1',
-            // TODO: ensure single signature
-            value: result.result.public_key.toAmino().value,
-          },
-          signature: Buffer.from(result.result.signature).toString('base64'),
+      return JSON.stringify({
+        pub_key: {
+          type: 'tendermint/PubKeySecp256k1',
+          value: result.result.public_key.toAmino().value,
         },
-      };
-      return JSON.stringify(signature);
+        signature: Buffer.from(result.result.signature).toString('base64'),
+      });
     } catch (error) {
       console.error(error);
       throw new Error(`Failed to sign with account: ${error.message}`);
@@ -117,7 +113,7 @@ class TerraWalletConnectWebWalletController
       await this._controller.connect(ConnectType.WALLETCONNECT);
 
       let subscription;
-      this._wallet = await new Promise((resolve) => {
+      this._wallet = await new Promise((resolve, reject) => {
         subscription = this._controller
           .connectedWallet()
           .subscribe((connectedWallet) => {

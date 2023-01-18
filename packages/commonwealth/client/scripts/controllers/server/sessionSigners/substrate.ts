@@ -2,7 +2,9 @@ import { Keyring } from '@polkadot/api';
 import { IKeyringPair } from '@polkadot/types/types';
 import { mnemonicGenerate, signatureVerify } from '@polkadot/util-crypto';
 import { actionToHash } from 'helpers/canvas';
-import {
+import { addressSwapper } from '../../../../../shared/utils';
+import { serializeActionPayload } from '@canvas-js/interfaces';
+import type {
   Action,
   ActionPayload,
   ActionArgument,
@@ -10,10 +12,10 @@ import {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
+import { verify as verifyCanvasSessionSignature } from 'views/modals/canvas_verify_data_modal';
 
-const getSubstrateSignatureData = (payload: ActionPayload | SessionPayload) => {
-  const serialized = JSON.stringify(payload);
-  return new TextEncoder().encode(serialized);
+const getSubstrateSignatureData = (payload: ActionPayload) => {
+  return new TextEncoder().encode(serializeActionPayload(payload));
 };
 
 export class SubstrateSessionController implements ISessionController {
@@ -25,7 +27,10 @@ export class SubstrateSessionController implements ISessionController {
   > = {};
 
   getAddress(chainId: string) {
-    return new Buffer(this.signers[chainId].pair.publicKey).toString('hex'); // TODO: use chainId to format?
+    return addressSwapper({
+      address: this.signers[chainId].pair.address,
+      currentPrefix: 42,
+    });
   }
 
   async hasAuthenticatedSession(chainId: string): Promise<boolean> {
@@ -36,9 +41,10 @@ export class SubstrateSessionController implements ISessionController {
   }
 
   async getOrCreateAddress(chainId: string): Promise<string> {
-    return new Buffer(
-      (await this.getOrCreateSigner(chainId)).publicKey
-    ).toString('hex'); // TODO: use chainId to format?
+    return addressSwapper({
+      address: (await this.getOrCreateSigner(chainId)).address,
+      currentPrefix: 42,
+    });
   }
 
   async authSession(
@@ -46,8 +52,12 @@ export class SubstrateSessionController implements ISessionController {
     payload: SessionPayload,
     signature: string
   ) {
-    // TODO: verify signature is valid
-    // TODO: verify payload datetime is valid
+    const valid = await verifyCanvasSessionSignature({
+      session: { type: 'session', payload, signature },
+    });
+    if (!valid) {
+      // throw new Error("Invalid signature");
+    }
     if (payload.address !== this.getAddress(chainId)) {
       throw new Error(
         `Invalid auth: ${payload.address} vs. ${this.getAddress(chainId)}`
@@ -72,22 +82,23 @@ export class SubstrateSessionController implements ISessionController {
       this.signers[chainId] = { pair, privateKey };
 
       // TODO: verify signature key matches this.signers[chainId]
-      // TODO: verify signature is valid
-      // TODO: verify payload datetime is valid
       const auth = localStorage.getItem(authStorageKey);
       if (auth !== null) {
         const {
           payload,
           signature,
         }: { payload: SessionPayload; signature: string } = JSON.parse(auth);
+        const valid = await verifyCanvasSessionSignature({
+          session: { type: 'session', payload, signature },
+        });
+        if (!valid) throw new Error();
+
         if (payload.address === this.getAddress(chainId)) {
           console.log(
             'Restored authenticated session:',
             this.getAddress(chainId)
           );
           this.auths[chainId] = { payload, signature };
-          // TODO: verify signature is valid, as below in sign()
-          // TODO: verify payload is not expired
         } else {
           console.log('Restored logged-out session:', this.getAddress(chainId));
         }

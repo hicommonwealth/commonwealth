@@ -76,7 +76,7 @@ export const sessionSigninModal = () => {
       modal: SessionSigninModal,
       data: {},
       completeCallback: () => resolve(),
-      exitCallback: () => reject(),
+      exitCallback: () => reject(new Error("Invalid signature")),
     });
   });
 };

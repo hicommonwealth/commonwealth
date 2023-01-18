@@ -12,7 +12,6 @@ import {
   signSessionWithAccount,
   getSessionSigningTimestamp,
 } from 'controllers/server/sessions';
-
 import { createUserWithAddress } from 'controllers/app/login';
 import { notifyInfo } from 'controllers/app/notifications';
 import TerraWalletConnectWebWalletController from 'controllers/app/webWallets/terra_walletconnect_web_wallet';
@@ -23,16 +22,16 @@ import $ from 'jquery';
 import m from 'mithril';
 
 import app from 'state';
+import {
+  CWWalletOptionRow,
+  CWWalletMissingOptionRow,
+} from './cw_wallet_option_row';
+import { CWTooltip } from './cw_popover/cw_tooltip';
+import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 import User from '../widgets/user';
 import { CWIconButton } from './cw_icon_button';
-import { CWTooltip } from './cw_popover/cw_tooltip';
 import { CWSpinner } from './cw_spinner';
 import { CWText } from './cw_text';
-import {
-  CWWalletMissingOptionRow,
-  CWWalletOptionRow,
-} from './cw_wallet_option_row';
-import { getClasses, isWindowMediumSmallInclusive } from './helpers';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
@@ -221,7 +220,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
       const { chainId, sessionPayload, signature } =
         await signSessionWithAccount(wallet, account, timestamp);
       await account.validate(signature, timestamp, chainId);
-      app.sessions.authSession(
+      await app.sessions.authSession(
         wallet.chain,
         chainId,
         sessionPayload,

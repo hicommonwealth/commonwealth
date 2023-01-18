@@ -3,6 +3,11 @@ import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 import { actionToHash } from 'helpers/canvas';
 import {
+
+  serializeActionPayload,
+  serializeSessionPayload,
+} from '@canvas-js/interfaces';
+import type {
   Action,
   ActionArgument,
   ActionPayload,
@@ -10,10 +15,10 @@ import {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
+import { verify as verifyCanvasSessionSignature } from 'views/modals/canvas_verify_data_modal';
 
-const getSolanaSignatureData = (payload: ActionPayload | SessionPayload) => {
-  const serialized = JSON.stringify(payload);
-  return new TextEncoder().encode(serialized);
+const getSolanaSignatureData = (payload: ActionPayload) => {
+  return new TextEncoder().encode(serializeActionPayload(payload));
 };
 
 export class SolanaSessionController implements ISessionController {
@@ -43,14 +48,17 @@ export class SolanaSessionController implements ISessionController {
     payload: SessionPayload,
     signature: string
   ) {
-    // TODO: verify signature is valid, as below in sign()
-    // TODO: verify payload datetime is valid
+    const valid = await verifyCanvasSessionSignature({
+      session: { type: 'session', payload, signature },
+    });
+    if (!valid) {
+      // throw new Error("Invalid signature");
+    }
     if (payload.address !== this.getAddress(chainId)) {
       throw new Error(
         `Invalid auth: ${payload.address} vs. ${this.getAddress(chainId)}`
       );
     }
-
     this.auths[chainId] = { payload, signature };
 
     const authStorageKey = `CW_SESSIONS-solana-${chainId}-auth`;
@@ -76,14 +84,17 @@ export class SolanaSessionController implements ISessionController {
           payload,
           signature,
         }: { payload: SessionPayload; signature: string } = JSON.parse(auth);
+        const valid = await verifyCanvasSessionSignature({
+          session: { type: 'session', payload, signature },
+        });
+        if (!valid) throw new Error();
+
         if (payload.address === this.getAddress(chainId)) {
           console.log(
             'Restored authenticated session:',
             this.getAddress(chainId)
           );
           this.auths[chainId] = { payload, signature };
-          // TODO: verify signature is valid, as below in sign()
-          // TODO: verify payload is not expired
         } else {
           console.log('Restored logged-out session:', this.getAddress(chainId));
         }
@@ -125,7 +136,7 @@ export class SolanaSessionController implements ISessionController {
 
     const message = getSolanaSignatureData(actionPayload);
     const signatureBytes = nacl.sign.detached(message, signer.secretKey);
-    const signature = Buffer.from(signatureBytes).toString('hex');
+    const signature = bs58.encode(signatureBytes);
     if (
       !nacl.sign.detached.verify(
         message,

@@ -21,6 +21,7 @@ import { SharePopover } from '../share_popover';
 import User, { AnonymousUser } from '../widgets/user';
 import { EditComment } from './edit_comment';
 import { clearEditingLocalStorage } from './helpers';
+import { showCanvasVerifyDataModal } from '../../modals/canvas_verify_data_modal';
 
 type CommentAuthorAttrs = {
   comment: CommentType<any>;
@@ -130,6 +131,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
               type="caption"
               fontWeight="medium"
               className="published-text"
+              onclick={() => showCanvasVerifyDataModal(comment)}
             >
               {moment(comment.createdAt).format('l')}
             </CWText>

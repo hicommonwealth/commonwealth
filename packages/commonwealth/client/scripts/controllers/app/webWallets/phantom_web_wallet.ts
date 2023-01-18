@@ -1,7 +1,8 @@
 declare let window: any;
 
+import bs58 from 'bs58';
 import * as solw3 from '@solana/web3.js';
-import { SessionPayload } from '@canvas-js/interfaces';
+import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
@@ -48,16 +49,13 @@ class PhantomWebWalletController implements IWebWallet<string> {
     canvasMessage: SessionPayload
   ): Promise<string> {
     const encodedMessage = new TextEncoder().encode(
-      JSON.stringify(canvasMessage)
+      serializeSessionPayload(canvasMessage)
     );
     const { signature } = await window.solana.signMessage(
       encodedMessage,
       'utf8'
     );
-    const signedMessage = Buffer.from(signature as Uint8Array).toString(
-      'base64'
-    );
-    return signedMessage;
+    return bs58.encode(signature as Uint8Array);
   }
 
   // ACTIONS

@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import {
   Action,
   ActionArgument,
@@ -9,6 +9,7 @@ import {
 import { getActionSignatureData } from '@canvas-js/verifiers';
 import { actionToHash } from 'helpers/canvas';
 import { ISessionController } from '.';
+import { verify as verifyCanvasSessionSignature } from 'views/modals/canvas_verify_data_modal';
 
 export class EthereumSessionController implements ISessionController {
   private signers: Record<number, ethers.Wallet> = {};
@@ -37,8 +38,12 @@ export class EthereumSessionController implements ISessionController {
     payload: SessionPayload,
     signature: string
   ) {
-    // TODO: verify signature is valid, as below in sign()
-    // TODO: verify payload datetime is valid
+    const valid = await verifyCanvasSessionSignature({
+      session: { type: 'session', payload, signature },
+    });
+    if (!valid) {
+      // throw new Error("Invalid signature");
+    }
     if (
       payload.address.toLowerCase() !==
       this.signers[chainId].address.toLowerCase()
@@ -73,6 +78,11 @@ export class EthereumSessionController implements ISessionController {
           payload,
           signature,
         }: { payload: SessionPayload; signature: string } = JSON.parse(auth);
+        const valid = await verifyCanvasSessionSignature({
+          session: { type: 'session', payload, signature },
+        });
+        if (!valid) throw new Error();
+
         if (
           payload.address.toLowerCase() ===
           this.signers[chainId].address.toLowerCase()
@@ -82,8 +92,6 @@ export class EthereumSessionController implements ISessionController {
             this.getAddress(chainId)
           );
           this.auths[chainId] = { payload, signature };
-          // TODO: verify signature is valid, as below in sign()
-          // TODO: verify payload is not expired
         } else {
           console.log('Restored logged-out session:', this.getAddress(chainId));
         }
@@ -128,6 +136,14 @@ export class EthereumSessionController implements ISessionController {
 
     const [domain, types, value] = getActionSignatureData(actionPayload);
     const signature = await actionSigner._signTypedData(domain, types, value);
+    const recoveredAddr = utils.verifyTypedData(
+      domain,
+      types,
+      value,
+      signature
+    );
+    const valid = recoveredAddr === this.signers[chainId].address;
+    if (!valid) throw new Error('Invalid signature!');
 
     const session: Session = {
       type: 'session',

@@ -2,7 +2,7 @@ import { Extension, LCDClient, TendermintAPI } from '@terra-money/terra.js';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import type { Account, IWebWallet } from 'models';
 
-import { SessionPayload } from '@canvas-js/interfaces';
+import { SessionPayload, serializeSessionPayload } from '@canvas-js/interfaces';
 
 import app from 'state';
 
@@ -98,24 +98,20 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
       });
       try {
         this._extension.signBytes({
-          bytes: Buffer.from(JSON.stringify(canvasMessage)),
+          bytes: Buffer.from(serializeSessionPayload(canvasMessage)),
         });
       } catch (error) {
         console.error(error);
       }
     });
 
-    console.log(result);
-    const signature = {
-      signature: {
-        pub_key: {
-          type: 'tendermint/PubKeySecp256k1',
-          value: result.public_key,
-        },
-        signature: result.signature,
+    return JSON.stringify({
+      pub_key: {
+        type: 'tendermint/PubKeySecp256k1',
+        value: result.public_key,
       },
-    };
-    return JSON.stringify(signature);
+      signature: result.signature,
+    });
   }
 }
 

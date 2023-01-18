@@ -1,7 +1,7 @@
 /* @jsx m */
 
-import { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
+import { Chain, serializeSessionPayload } from '@canvas-js/interfaces';
 import { initAppState, navigateToSubpage } from 'app';
 import BN from 'bn.js';
 import ClassComponent from 'class_component';
@@ -126,7 +126,9 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
       acct.setSessionPublicAddress(sessionPublicAddress);
       acct.setValidationBlockInfo(null);
 
-      const signature = await acct.signMessage(JSON.stringify(canvasMessage));
+      const signature = await acct.signMessage(
+        serializeSessionPayload(canvasMessage)
+      );
 
       await acct.validate(signature, null, chainId);
 
