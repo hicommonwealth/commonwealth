@@ -1,7 +1,16 @@
 import Sequelize from 'sequelize';
-import { GetProfilesReq, GetProfilesResp, needParamErrMsg } from 'common-common/src/api/extApiTypes';
-import { oneOf, query, validationResult } from "express-validator";
-import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
+import {
+  GetProfilesReq,
+  GetProfilesResp,
+  needParamErrMsg,
+} from 'common-common/src/api/extApiTypes';
+import { oneOf, query, validationResult } from 'express-validator';
+import {
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+  failure,
+} from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 import { paginationValidation } from '../../util/helperValidations';
@@ -9,10 +18,13 @@ import { paginationValidation } from '../../util/helperValidations';
 const { Op } = Sequelize;
 
 export const getProfilesValidation = [
-  oneOf([
-    query('addresses').exists().toArray(),
-    query('profile_ids').exists().toArray(),
-  ], `${needParamErrMsg} (addresses, profile_ids)`),
+  oneOf(
+    [
+      query('addresses').exists().toArray(),
+      query('profile_ids').exists().toArray(),
+    ],
+    `${needParamErrMsg} (addresses, profile_ids)`
+  ),
   query('count_only').optional().isBoolean().toBoolean(),
   ...paginationValidation,
 ];
@@ -42,8 +54,8 @@ const getProfiles = async (
     });
 
   let profiles, count;
-  if(!count_only) {
-    ({rows: profiles, count} = await models.Profile.findAndCountAll({
+  if (!count_only) {
+    ({ rows: profiles, count } = await models.Profile.findAndCountAll({
       where,
       include,
       attributes: { exclude: ['user_id'] },

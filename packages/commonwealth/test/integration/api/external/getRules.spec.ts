@@ -10,14 +10,20 @@ chai.use(chaiHttp);
 
 describe('getRules Tests', () => {
   it('should return rules with specified community_id correctly', async () => {
-    const r: GetRulesReq = { community_id: testRules[0].chain_id, count_only: false };
+    const r: GetRulesReq = {
+      community_id: testRules[0].chain_id,
+      count_only: false,
+    };
     const resp = await get('/api/rules', r);
 
     chai.assert.lengthOf(resp.result.rules, 2);
   });
 
   it('should return count only when specified correctly', async () => {
-    const r: GetRulesReq = { community_id: testRules[0].chain_id, count_only: true };
+    const r: GetRulesReq = {
+      community_id: testRules[0].chain_id,
+      count_only: true,
+    };
     const resp = await get('/api/rules', r);
 
     chai.assert.equal(resp.result.count, 2);
@@ -25,7 +31,10 @@ describe('getRules Tests', () => {
   });
 
   it('should return rules with specified id correctly', async () => {
-    const r: GetRulesReq = { community_id: testRules[0].chain_id, ids: [ testRules[0].id ] };
+    const r: GetRulesReq = {
+      community_id: testRules[0].chain_id,
+      ids: [testRules[0].id],
+    };
 
     let resp = await get('/api/rules', r);
 
@@ -58,7 +67,7 @@ describe('getRules Tests', () => {
     const r: GetRulesReq = {
       community_id: testRules[0].chain_id,
       ids: [testRules[0].id],
-      sort: OrderByOptions.CREATED
+      sort: OrderByOptions.CREATED,
     };
     let resp = await get('/api/rules', r);
 
@@ -66,7 +75,8 @@ describe('getRules Tests', () => {
     chai.assert.deepEqual(
       resp.result.rules,
       ([...resp.result.rules] as RuleAttributes[]).sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
     );
 
@@ -77,7 +87,8 @@ describe('getRules Tests', () => {
     chai.assert.deepEqual(
       resp.result.rules,
       ([...resp.result.rules] as RuleAttributes[]).sort(
-        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
     );
   });
@@ -88,7 +99,11 @@ describe('getRules Tests', () => {
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value(s)');
 
-    resp = await get('/api/rules', {community_id: testRules[0].chain_id, count_only: 3}, true);
+    resp = await get(
+      '/api/rules',
+      { community_id: testRules[0].chain_id, count_only: 3 },
+      true
+    );
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

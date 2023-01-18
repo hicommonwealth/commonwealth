@@ -10,14 +10,20 @@ chai.use(chaiHttp);
 
 describe('getRoles Tests', () => {
   it('should return roles with specified community_id correctly', async () => {
-    const r: GetRolesReq = { community_id: testRoles[0].chain_id, count_only: false };
+    const r: GetRolesReq = {
+      community_id: testRoles[0].chain_id,
+      count_only: false,
+    };
     const resp = await get('/api/roles', r);
 
     chai.assert.lengthOf(resp.result.roles, 2);
   });
 
   it('should return count only when specified correctly', async () => {
-    const r: GetRolesReq = { community_id: testRoles[0].chain_id, count_only: true };
+    const r: GetRolesReq = {
+      community_id: testRoles[0].chain_id,
+      count_only: true,
+    };
     const resp = await get('/api/roles', r);
 
     chai.assert.equal(resp.result.count, 2);
@@ -25,7 +31,10 @@ describe('getRoles Tests', () => {
   });
 
   it('should return roles with specified addresses correctly', async () => {
-    const r: GetRolesReq = { community_id: testRoles[0].chain_id, addresses: ['testAddress-1'] };
+    const r: GetRolesReq = {
+      community_id: testRoles[0].chain_id,
+      addresses: ['testAddress-1'],
+    };
 
     let resp = await get('/api/roles', r);
 
@@ -58,7 +67,7 @@ describe('getRoles Tests', () => {
     const r: GetRolesReq = {
       community_id: testRoles[0].chain_id,
       addresses: ['testAddress-2'],
-      sort: OrderByOptions.CREATED
+      sort: OrderByOptions.CREATED,
     };
     let resp = await get('/api/roles', r);
 
@@ -66,7 +75,8 @@ describe('getRoles Tests', () => {
     chai.assert.deepEqual(
       resp.result.roles,
       ([...resp.result.roles] as RoleAttributes[]).sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
     );
 
@@ -77,7 +87,8 @@ describe('getRoles Tests', () => {
     chai.assert.deepEqual(
       resp.result.roles,
       ([...resp.result.roles] as RoleAttributes[]).sort(
-        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
     );
   });
@@ -89,7 +100,11 @@ describe('getRoles Tests', () => {
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
     chai.assert.equal(resp.result[0].param, 'community_id');
 
-    resp = await get('/api/roles', {community_id: testRoles[0].chain_id, count_only: 3}, true);
+    resp = await get(
+      '/api/roles',
+      { community_id: testRoles[0].chain_id, count_only: 3 },
+      true
+    );
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

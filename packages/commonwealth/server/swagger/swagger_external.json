@@ -7,9 +7,7 @@
   },
   "host": "localhost:3000",
   "basePath": "/api",
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/threads": {
       "get": {
@@ -152,11 +150,7 @@
                 "type": "array",
                 "items": {
                   "type": "object",
-                  "required": [
-                    "address_id",
-                    "community_id",
-                    "text"
-                  ],
+                  "required": ["address_id", "community_id", "text"],
                   "properties": {
                     "address_id": {
                       "type": "integer"

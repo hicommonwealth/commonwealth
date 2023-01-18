@@ -4,7 +4,9 @@ import { filterAddressOwnedByUser } from '../middleware/lookupAddressIsOwnedByUs
 import { DB } from '../models';
 import { failure, success, TypedRequest, TypedResponse } from '../types';
 
-export async function addEntities<M extends Record<string, unknown> = Record<string, unknown>>(
+export async function addEntities<
+  M extends Record<string, unknown> = Record<string, unknown>
+>(
   chainIdFieldName: string,
   models: DB,
   bulkCreate: (obj) => Promise<number>,
@@ -24,24 +26,24 @@ export async function addEntities<M extends Record<string, unknown> = Record<str
     const addresses = await filterAddressOwnedByUser(
       models,
       req.user.id,
-      entityCopy.map(e => e.community_id),
-      entityCopy.map(e => e.address),
-      entityCopy.map(e => e.address_id)
+      entityCopy.map((e) => e.community_id),
+      entityCopy.map((e) => e.address),
+      entityCopy.map((e) => e.address_id)
     );
 
     if (addresses.unowned.length !== 0) {
       return failure(res, {
         error: {
           message: 'Some addresses provided were not owned by the user.',
-          unownedAddresses: addresses.unowned
-        }
+          unownedAddresses: addresses.unowned,
+        },
       });
     }
 
-    addressMap = new Map(addresses.owned.map(obj => [obj.address, obj.id]));
+    addressMap = new Map(addresses.owned.map((obj) => [obj.address, obj.id]));
   }
 
-  entityCopy.forEach(c => {
+  entityCopy.forEach((c) => {
     c[chainIdFieldName] = c['community_id'];
     delete c['community_id'];
 

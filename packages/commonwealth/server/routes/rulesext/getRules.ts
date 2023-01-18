@@ -1,7 +1,12 @@
 import Sequelize from 'sequelize';
 import { GetRulesReq, GetRulesResp } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
-import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
+import {
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+  failure,
+} from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 
@@ -12,13 +17,13 @@ export const getRulesValidation = [
     query('community_id').exists().isString().trim(),
     query('ids').exists().toArray(),
   ]),
-  query('count_only').optional().isBoolean().toBoolean()
+  query('count_only').optional().isBoolean().toBoolean(),
 ];
 
 export const getRules = async (
   models: DB,
   req: TypedRequestQuery<GetRulesReq>,
-  res: TypedResponse<GetRulesResp>,
+  res: TypedResponse<GetRulesResp>
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -36,12 +41,12 @@ export const getRules = async (
   if (!count_only) {
     ({ rows: rules, count } = await models.Rule.findAndCountAll({
       where,
-      ...formatPagination(req.query)
+      ...formatPagination(req.query),
     }));
   } else {
     count = <any>await models.Rule.count({
       where,
-      ...formatPagination(req.query)
+      ...formatPagination(req.query),
     });
   }
 

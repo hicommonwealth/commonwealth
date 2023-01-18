@@ -1,6 +1,9 @@
 import 'chai/register-should';
 import chai from 'chai';
-import { GetTopicsReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
+import {
+  GetTopicsReq,
+  OrderByOptions,
+} from 'common-common/src/api/extApiTypes';
 import { testTopics } from 'test/integration/api/external/dbEntityHooks.spec';
 import { TopicAttributes } from 'server/models/topic';
 import { get } from 'test/integration/api/external/appHook.spec';
@@ -10,14 +13,20 @@ chai.use(chaiHttp);
 
 describe('getTopics Tests', () => {
   it('should return topics with specified community_id correctly', async () => {
-    const r: GetTopicsReq = { community_id: testTopics[0].chain_id, count_only: false };
+    const r: GetTopicsReq = {
+      community_id: testTopics[0].chain_id,
+      count_only: false,
+    };
     const resp = await get('/api/topics', r);
 
     chai.assert.lengthOf(resp.result.topics, 2);
   });
 
   it('should return count only when specified correctly', async () => {
-    const r: GetTopicsReq = { community_id: testTopics[0].chain_id, count_only: true };
+    const r: GetTopicsReq = {
+      community_id: testTopics[0].chain_id,
+      count_only: true,
+    };
     const resp = await get('/api/topics', r);
 
     chai.assert.equal(resp.result.count, 2);
@@ -44,7 +53,7 @@ describe('getTopics Tests', () => {
   it('should order correctly', async () => {
     const r: GetTopicsReq = {
       community_id: testTopics[0].chain_id,
-      sort: OrderByOptions.CREATED
+      sort: OrderByOptions.CREATED,
     };
     let resp = await get('/api/topics', r);
 
@@ -52,7 +61,8 @@ describe('getTopics Tests', () => {
     chai.assert.deepEqual(
       resp.result.topics,
       ([...resp.result.topics] as TopicAttributes[]).sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
     );
 
@@ -63,7 +73,8 @@ describe('getTopics Tests', () => {
     chai.assert.deepEqual(
       resp.result.topics,
       ([...resp.result.topics] as TopicAttributes[]).sort(
-        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
     );
   });
@@ -75,7 +86,11 @@ describe('getTopics Tests', () => {
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
     chai.assert.equal(resp.result[0].param, 'community_id');
 
-    resp = await get('/api/topics', {community_id: testTopics[0].chain_id, count_only: 3}, true);
+    resp = await get(
+      '/api/topics',
+      { community_id: testTopics[0].chain_id, count_only: 3 },
+      true
+    );
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

@@ -1,5 +1,8 @@
 import { body, validationResult } from 'express-validator';
-import { PutCommunitiesReq, PutCommunitiesResp } from 'common-common/src/api/extApiTypes';
+import {
+  PutCommunitiesReq,
+  PutCommunitiesResp,
+} from 'common-common/src/api/extApiTypes';
 import { NextFunction } from 'express';
 import { TokenBalanceCache } from 'token-balance-cache/src';
 import { AppError } from 'common-common/src/errors';
@@ -11,13 +14,14 @@ import { sequelize } from '../../database';
 
 export const Errors = {
   NeedPositiveBalance: 'Must provide address with positive balance',
-  NeedToSpecifyContract: 'Must provide admin_addresses, contract.token_type, and contarct.address',
+  NeedToSpecifyContract:
+    'Must provide admin_addresses, contract.token_type, and contarct.address',
 };
 
 const optionalValidation = [
   body('contract.token_type').optional().isString().trim(),
   body('contract.address').optional().isString().trim(),
-  body('admin_addresses').optional().isArray()
+  body('admin_addresses').optional().isArray(),
 ];
 
 export const putCommunitiesValidation = [
@@ -53,15 +57,20 @@ export async function putCommunities(
     await models.Chain.create(community);
     // if optionalValidation route is used, check for positive balance in address provided
     if (contract) {
-      if(!contract.token_type || !contract.address || !admin_addresses) {
-        throw new AppError(Errors.NeedToSpecifyContract)
+      if (!contract.token_type || !contract.address || !admin_addresses) {
+        throw new AppError(Errors.NeedToSpecifyContract);
       }
 
       const [{ bp }] = await tbc.getBalanceProviders(community.chain_node_id);
-      const balanceResults = await tbc.getBalancesForAddresses(community.chain_node_id, admin_addresses, bp, {
-        contractType: contract.token_type,
-        tokenAddress: contract.address,
-      });
+      const balanceResults = await tbc.getBalancesForAddresses(
+        community.chain_node_id,
+        admin_addresses,
+        bp,
+        {
+          contractType: contract.token_type,
+          tokenAddress: contract.address,
+        }
+      );
 
       let positiveBalance = false;
       for (const balance of Object.values(balanceResults.balances)) {
@@ -76,12 +85,27 @@ export async function putCommunities(
       }
 
       // create address for each admin_address, and assign to admin role
-      await Promise.all(admin_addresses.map(async (address) => {
-        const r: CreateAddressReq = { address, chain: community.id, community: community.id, wallet_id: null };
+      await Promise.all(
+        admin_addresses.map(async (address) => {
+          const r: CreateAddressReq = {
+            address,
+            chain: community.id,
+            community: community.id,
+            wallet_id: null,
+          };
 
-        const newAddress = await createAddressHelper(r, models, req.user, next);
-        await models.Role.update({ permission: 'admin' }, { where: { address_id: (newAddress as any).id } });
-      }));
+          const newAddress = await createAddressHelper(
+            r,
+            models,
+            req.user,
+            next
+          );
+          await models.Role.update(
+            { permission: 'admin' },
+            { where: { address_id: (newAddress as any).id } }
+          );
+        })
+      );
     }
 
     transaction.commit();

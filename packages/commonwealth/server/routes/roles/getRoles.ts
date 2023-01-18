@@ -1,7 +1,12 @@
 import Sequelize from 'sequelize';
 import { GetRolesReq, GetRolesResp } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
+import {
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+  failure,
+} from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 import { paginationValidation } from '../../util/helperValidations';
@@ -18,7 +23,7 @@ export const getRolesValidation = [
 export const getRoles = async (
   models: DB,
   req: TypedRequestQuery<GetRolesReq>,
-  res: TypedResponse<GetRolesResp>,
+  res: TypedResponse<GetRolesResp>
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -30,24 +35,25 @@ export const getRoles = async (
   const where = { chain_id: community_id };
 
   const include = [];
-  if (addresses) include.push({
-    model: models.Address,
-    where: { address: { [Op.in]: addresses } },
-    required: true
-  });
+  if (addresses)
+    include.push({
+      model: models.Address,
+      where: { address: { [Op.in]: addresses } },
+      required: true,
+    });
 
   let roles, count;
   if (!count_only) {
     ({ rows: roles, count } = await models.Role.findAndCountAll({
       where,
       include,
-      ...formatPagination(req.query)
+      ...formatPagination(req.query),
     }));
   } else {
     count = await models.Role.count({
       where,
       include,
-      ...formatPagination(req.query)
+      ...formatPagination(req.query),
     });
   }
 

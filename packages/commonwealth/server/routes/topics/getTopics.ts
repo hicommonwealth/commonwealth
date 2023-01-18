@@ -1,6 +1,11 @@
 import { GetTopicsReq, GetTopicsResp } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import { TypedRequestQuery, TypedResponse, success, failure } from '../../types';
+import {
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+  failure,
+} from '../../types';
 import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 import { paginationValidation } from '../../util/helperValidations';
@@ -14,7 +19,7 @@ export const getTopicsValidation = [
 export const getTopics = async (
   models: DB,
   req: TypedRequestQuery<GetTopicsReq>,
-  res: TypedResponse<GetTopicsResp>,
+  res: TypedResponse<GetTopicsResp>
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -29,12 +34,12 @@ export const getTopics = async (
   if (!count_only) {
     ({ rows: topics, count } = await models.Topic.findAndCountAll({
       where,
-      ...formatPagination(req.query)
+      ...formatPagination(req.query),
     }));
   } else {
     count = await models.Topic.count({
       where,
-      ...formatPagination(req.query)
+      ...formatPagination(req.query),
     });
   }
 

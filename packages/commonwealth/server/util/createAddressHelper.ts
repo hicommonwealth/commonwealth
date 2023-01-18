@@ -39,10 +39,7 @@ export async function createAddressHelper(
   if (!req.chain) {
     return next(new AppError(Errors.NeedChain));
   }
-  if (
-    !req.wallet_id ||
-    !Object.values(WalletId).includes(req.wallet_id)
-  ) {
+  if (!req.wallet_id || !Object.values(WalletId).includes(req.wallet_id)) {
     return next(new AppError(Errors.NeedWallet));
   }
 

@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import passport from 'passport';
@@ -43,16 +43,22 @@ before(async () => {
   app.use(passport.session());
 
   const router = express.Router();
-  addExternalRoutes(router, app, models, tokenBalanceCache)
+  addExternalRoutes(router, app, models, tokenBalanceCache);
   app.use('/api', router);
 });
 
-export async function get(path: string, val: Record<string, unknown> = null, expectError = false) {
-  const res = <any>await chai
-    .request(app)
-    .get(path)
-    .set('Accept', 'application/json')
-    .query(val);
+export async function get(
+  path: string,
+  val: Record<string, unknown> = null,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .get(path)
+      .set('Accept', 'application/json')
+      .query(val)
+  );
 
   if (!expectError) {
     assert.equal(res.statusCode, 200);
@@ -63,12 +69,18 @@ export async function get(path: string, val: Record<string, unknown> = null, exp
   return JSON.parse(res.text);
 }
 
-export async function put(path: string, val: Record<string, unknown>, expectError = false) {
-  const res = <any>await chai
-    .request(app)
-    .put(path)
-    .set('Accept', 'application/json')
-    .send(val);
+export async function put(
+  path: string,
+  val: Record<string, unknown>,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .put(path)
+      .set('Accept', 'application/json')
+      .send(val)
+  );
 
   if (!expectError) {
     assert.equal(res.statusCode, 200);
@@ -79,12 +91,18 @@ export async function put(path: string, val: Record<string, unknown>, expectErro
   return JSON.parse(res.text);
 }
 
-export async function post(path: string, val: Record<string, unknown>, expectError = false) {
-  const res = <any>await chai
-    .request(app)
-    .post(path)
-    .set('Accept', 'application/json')
-    .send(val);
+export async function post(
+  path: string,
+  val: Record<string, unknown>,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .post(path)
+      .set('Accept', 'application/json')
+      .send(val)
+  );
 
   if (!expectError) {
     assert.equal(res.statusCode, 200);
@@ -95,12 +113,18 @@ export async function post(path: string, val: Record<string, unknown>, expectErr
   return JSON.parse(res.text);
 }
 
-export async function del(path: string, val: Record<string, unknown>, expectError = false) {
-  const res = <any>await chai
-    .request(app)
-    .delete(path)
-    .set('Accept', 'application/json')
-    .send(val);
+export async function del(
+  path: string,
+  val: Record<string, unknown>,
+  expectError = false
+) {
+  const res = <any>(
+    await chai
+      .request(app)
+      .delete(path)
+      .set('Accept', 'application/json')
+      .send(val)
+  );
 
   if (!expectError) {
     assert.equal(res.statusCode, 200);

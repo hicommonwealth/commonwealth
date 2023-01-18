@@ -1,19 +1,21 @@
 import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { body, oneOf, query } from 'express-validator';
 
-
 const optionalAddress = (base) => {
   return [
-    oneOf([
-      query(`${base}.*.address`).exists().toArray(),
-      query(`${base}.*.address_id`).exists().toArray(),
-    ], `${needParamErrMsg} (address, address_id)`),
+    oneOf(
+      [
+        query(`${base}.*.address`).exists().toArray(),
+        query(`${base}.*.address_id`).exists().toArray(),
+      ],
+      `${needParamErrMsg} (address, address_id)`
+    ),
   ];
 };
 
 export const onlyIds = [
   body('ids').exists().isArray(),
-  body('ids.*').exists().toInt()
+  body('ids.*').exists().toInt(),
 ];
 
 export const paginationValidation = [
