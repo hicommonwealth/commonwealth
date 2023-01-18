@@ -7,7 +7,11 @@ import type { Account, IWebWallet } from 'models';
 import { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';
-import type { provider } from 'web3-core';
+import type {
+  provider,
+  TransactionConfig,
+  RLPEncodedTransaction,
+} from 'web3-core';
 
 declare let window: any;
 
@@ -88,7 +92,9 @@ class CosmosEvmWebWalletController implements IWebWallet<string> {
     return signature;
   }
 
-  public async signTransaction(tx: TransactionConfig): Promise<RLPEncodedTransaction> {
+  public async signTransaction(
+    tx: TransactionConfig
+  ): Promise<RLPEncodedTransaction> {
     const rlpEncodedTx = await this._web3.eth.personal.signTransaction(tx, '');
     return rlpEncodedTx;
   }

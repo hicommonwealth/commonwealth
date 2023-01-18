@@ -127,4 +127,5 @@ export const DISCORD_BOT_SUCCESS_URL =
   process.env.DISCORD_BOT_SUCCESS_URL || 'http://localhost:3000';
 
 export const ETHERSCAN_JS_API_KEY = process.env.ETHERSCAN_JS_API_KEY;
-export const CHAIN_EVENT_SERVICE_SECRET = process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';
+export const CHAIN_EVENT_SERVICE_SECRET =
+  process.env.CHAIN_EVENT_SERVICE_SECRET || 'secret';

@@ -82,7 +82,7 @@ class Contract {
       symbol,
       isFactory,
       nickname,
-      abi
+      abi,
     });
   }
 }
