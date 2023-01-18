@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
+import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/search/search_bar_components.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
+import { CommunityLabel } from '../../components/community_label';
 import { CWText } from '../../components/component_kit/cw_text';
+import { getClasses } from '../../components/component_kit/helpers';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import User from '../../components/widgets/user';
-import { getClasses } from '../../components/component_kit/helpers';
-import { CommunityLabel } from '../../components/community_label';
 
 type SearchChipAttrs = {
   isActive: boolean;

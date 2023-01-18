@@ -1,13 +1,13 @@
-import {
+import type {
   AccountId,
   EraPoints,
   EraRewardPoints,
   EraIndex,
   BlockHash,
 } from '@polkadot/types/interfaces';
-import { ApiPromise } from '@polkadot/api';
+import type { ApiPromise } from '@polkadot/api';
 
-import { AccountPoints } from '../types';
+import type { AccountPoints } from '../types';
 
 export function currentPoints(
   api: ApiPromise,

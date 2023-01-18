@@ -1,9 +1,14 @@
-import { Request, Response, NextFunction } from 'express';
-import Errors from './errors';
+import { AppError } from 'common-common/src/errors';
 import { NotificationCategories } from 'common-common/src/types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import Errors from './errors';
 
-export default async (models, req: Request, res: Response, next: NextFunction) => {
+export default async (
+  models,
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   if (!req.user) {
     return next(new AppError(Errors.NotLoggedIn));
   }
@@ -13,7 +18,7 @@ export default async (models, req: Request, res: Response, next: NextFunction) =
   }
 
   const subscription = await models.Subscription.findOne({
-    where: { id: req.body.subscription_id }
+    where: { id: req.body.subscription_id },
   });
   if (!subscription) {
     return next(new AppError(Errors.NoSubscription));

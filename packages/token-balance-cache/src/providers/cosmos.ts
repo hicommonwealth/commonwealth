@@ -7,7 +7,8 @@ import { Bech32 } from '@cosmjs/encoding';
 import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import { BalanceType } from 'common-common/src/types';
 
-import { BalanceProvider, IChainNode } from "../types";
+import type { IChainNode } from '../types';
+import { BalanceProvider } from '../types';
 
 export default class CosmosBalanceProvider extends BalanceProvider {
   public name = 'cosmos';
@@ -23,12 +24,14 @@ export default class CosmosBalanceProvider extends BalanceProvider {
     const encodedAddress = Bech32.encode(node.bech32, data);
 
     /* also do network === ChainNetwork.NativeCosmos / Terra or ChainNetwork.CosmosNFT => should check NFTs */
-    const tmClient = await Tendermint34Client.connect(node.private_url || node.url);
+    const tmClient = await Tendermint34Client.connect(
+      node.private_url || node.url
+    );
 
     const api = QueryClient.withExtensions(
       tmClient,
       setupBankExtension,
-      setupStakingExtension,
+      setupStakingExtension
     );
 
     try {

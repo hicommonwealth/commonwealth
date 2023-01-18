@@ -1,10 +1,10 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
 import { PageLoading } from './loading';
 
 class DiscussionsRedirect extends ClassComponent {

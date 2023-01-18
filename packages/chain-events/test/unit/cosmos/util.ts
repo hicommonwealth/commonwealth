@@ -1,6 +1,6 @@
-import { Block } from '@cosmjs/tendermint-rpc';
+import type { Block } from '@cosmjs/tendermint-rpc';
 
-import { Api } from '../../../src/chains/cosmos/types';
+import type { Api } from '../../../src/chains/cosmos/types';
 
 export type MockBlock = {
   block: {
@@ -10,15 +10,15 @@ export type MockBlock = {
 };
 
 export function getApi(blocks: MockBlock[]): Api {
-  return ({
+  return {
     tm: {
       block: (height?: number) => {
         if (!height) {
-          return (blocks[0] as unknown) as Block;
+          return blocks[0] as unknown as Block;
         }
 
         const ret = blocks.find((b) => b.block.header.height === height);
-        if (ret) return (ret as unknown) as Block;
+        if (ret) return ret as unknown as Block;
         throw new Error('Unknown block!');
       },
     },
@@ -29,5 +29,5 @@ export function getApi(blocks: MockBlock[]): Api {
         deposits: () => {},
       },
     },
-  } as unknown) as Api;
+  } as unknown as Api;
 }

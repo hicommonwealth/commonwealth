@@ -2,7 +2,6 @@
 
 const { Op } = require('sequelize');
 
-
 const BountyEventKinds = {
   TreasuryBountyProposed: 'treasury-bounty-proposed',
   TreasuryBountyAwarded: 'treasury-bounty-awarded',
@@ -32,25 +31,27 @@ module.exports = {
       });
 
       await SubstrateChains.forEach(async (c) => {
-        const bountyObjs = Object.values(BountyEventKinds).map((s) => buildObject(s, c));
-        await queryInterface.bulkInsert(
-          'ChainEventTypes',
-          [
-            ...bountyObjs,
-          ],
-          { transaction: t }
+        const bountyObjs = Object.values(BountyEventKinds).map((s) =>
+          buildObject(s, c)
         );
+        await queryInterface.bulkInsert('ChainEventTypes', [...bountyObjs], {
+          transaction: t,
+        });
       });
     });
   },
 
   down: (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.bulkDelete('ChainEventTypes', {
-        event_name: {
-          [Op.like]: '%treasury-bounty%'
-        }
-      }, { transaction: t });
+      await queryInterface.bulkDelete(
+        'ChainEventTypes',
+        {
+          event_name: {
+            [Op.like]: '%treasury-bounty%',
+          },
+        },
+        { transaction: t }
+      );
     });
-  }
+  },
 };

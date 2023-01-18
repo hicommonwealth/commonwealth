@@ -1,5 +1,5 @@
-import moment from 'moment';
-import Attachment from './Attachment';
+import type moment from 'moment';
+import type Attachment from './Attachment';
 
 class DiscussionDraft {
   public readonly id: number;
