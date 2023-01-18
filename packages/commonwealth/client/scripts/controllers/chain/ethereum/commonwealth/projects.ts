@@ -383,7 +383,7 @@ export default class ProjectsController {
       null,
       this._factoryInfo.node,
       ICuratedProject__factory.connect,
-      project?.address
+      project.address
     );
 
     const tx = await contract.curate(value);

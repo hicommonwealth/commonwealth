@@ -11,11 +11,11 @@ import { Project } from 'models';
 import { CWButton } from 'views/components/component_kit/cw_button';
 import { CWIcon } from 'views/components/component_kit/cw_icons/cw_icon';
 import app from 'state';
+import { BigNumber } from 'ethers';
 import { ValidationStatus } from '../../components/component_kit/cw_validation_text';
 import { ProjectRole } from './types';
 import { CWAvatar } from '../../components/component_kit/cw_avatar';
 import { CWTokenInput } from '../../components/component_kit/cw_token_input';
-import { BigNumber } from 'ethers';
 
 // eslint-disable-next-line max-len
 const WethUrl =
@@ -33,7 +33,6 @@ const validateSupportAmount = (value: string): [ValidationStatus, string] => {
 
 export default class SupportCard extends ClassComponent<SupportCardAttrs> {
   private amount: string;
-  private isTokenApproved;
 
   async hasAcceptedTokenAllowance(
     projectId: string,
@@ -93,7 +92,7 @@ export default class SupportCard extends ClassComponent<SupportCardAttrs> {
             }}
             tokenIconUrl={WethUrl}
           />
-          {this.isTokenApproved ? (
+          {isTokenApproved ? (
             <CWButton label={buttonLabel} onclick={onclick} />
           ) : (
             <CWButton
