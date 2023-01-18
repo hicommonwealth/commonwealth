@@ -1,20 +1,15 @@
 declare let window: any;
 
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import $ from 'jquery';
+import type { Account, BlockInfo, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';
-import $ from 'jquery';
-import {
-  provider,
-  RLPEncodedTransaction,
-  TransactionConfig,
-  TransactionReceipt,
-} from 'web3-core';
+import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, BlockInfo, IWebWallet } from 'models';
-import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
-import { CanvasData } from 'shared/adapters/shared';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -59,17 +54,24 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return app.chain?.meta.node?.ethChainId || 1;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
-    const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
+    const block = await this._web3.givenProvider.request({
+      method: 'eth_getBlockByNumber',
+      params: ['latest', false],
+    });
 
     return {
       number: hexToNumber(block.number),
       hash: block.hash,
       timestamp: hexToNumber(block.timestamp),
-    }
+    };
   }
 
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const typedCanvasMessage = await constructTypedCanvasMessage(canvasMessage);
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',

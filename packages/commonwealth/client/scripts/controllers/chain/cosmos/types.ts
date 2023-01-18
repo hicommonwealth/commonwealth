@@ -1,10 +1,10 @@
-import BN from 'bn.js';
-import moment from 'moment';
 import { Coin } from 'adapters/currency';
-import { IIdentifiable, ICompletable } from 'adapters/shared';
+import type { ICompletable, IIdentifiable } from 'adapters/shared';
+import type BN from 'bn.js';
+import type moment from 'moment';
 
 export class CosmosToken extends Coin {
-  constructor(denom: string, n: number | string | BN, inDollars: boolean = false) {
+  constructor(denom: string, n: number | string | BN, inDollars = false) {
     if (typeof n === 'string') {
       n = parseInt(n, 10);
     }
@@ -28,7 +28,13 @@ export class CosmosToken extends Coin {
 
 export type CosmosProposalType = 'text' | 'upgrade' | 'parameter';
 export type CosmosVoteChoice = 'Yes' | 'No' | 'NoWithVeto' | 'Abstain';
-export type CosmosProposalState = 'DepositPeriod' | 'VotingPeriod' | 'Passed' | 'Rejected' | 'Failed';
+export type CosmosProposalState =
+  | 'DepositPeriod'
+  | 'VotingPeriod'
+  | 'Passed'
+  | 'Rejected'
+  | 'Failed';
+
 export interface ICosmosProposalTally {
   yes: BN;
   abstain: BN;
@@ -39,9 +45,9 @@ export interface ICosmosProposalTally {
 // TODO: note that these vote number values are in terms of _stake_
 export interface ICosmosProposalState extends ICompletable {
   status: CosmosProposalState;
-  depositors: Array<[ string, BN ]>;
+  depositors: Array<[string, BN]>;
   totalDeposit: BN;
-  voters: Array<[ string, CosmosVoteChoice ]>;
+  voters: Array<[string, CosmosVoteChoice]>;
   tally: ICosmosProposalTally;
 }
 

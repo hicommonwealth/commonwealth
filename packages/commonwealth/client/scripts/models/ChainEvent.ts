@@ -1,5 +1,5 @@
+import type { IChainEventData } from 'chain-events/src';
 import _ from 'underscore';
-import { IChainEventData } from 'chain-events/src';
 import ChainEventType from './ChainEventType';
 
 class ChainEvent {
@@ -24,7 +24,7 @@ class ChainEvent {
       json.blockNumber || json.block_number,
       json.data || json.event_data,
       chainEventType || ChainEventType.fromJSON(json.ChainEventType),
-      json.id,
+      json.id
     );
   }
 }

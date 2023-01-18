@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/community_label.scss';
+import m from 'mithril';
+import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
+import type { IconSize } from './component_kit/cw_icons/types';
 
 import { CWText } from './component_kit/cw_text';
-import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
-import { IconSize } from './component_kit/cw_icons/types';
 
 type CommunityLabelAttrs = {
   community: any;

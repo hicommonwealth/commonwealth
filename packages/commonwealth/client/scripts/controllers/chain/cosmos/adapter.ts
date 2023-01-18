@@ -1,14 +1,14 @@
 import BN from 'bn.js';
-import $ from 'jquery';
 import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, IChainAdapter, ITokenAdapter } from 'models';
-import { IApp } from 'state';
-import { CosmosToken } from './types';
-import CosmosAccount from './account';
+import $ from 'jquery';
+import type { ChainInfo, ITokenAdapter } from 'models';
+import { IChainAdapter } from 'models';
+import type { IApp } from 'state';
+import type CosmosAccount from './account';
 import CosmosAccounts from './accounts';
 import CosmosChain from './chain';
 import CosmosGovernance from './governance';
-import ChainEntityController from '../../server/chain_entities';
+import type { CosmosToken } from './types';
 
 class Cosmos
   extends IChainAdapter<CosmosToken, CosmosAccount>
@@ -51,6 +51,7 @@ class Cosmos
   public readonly contractAddress: string; // undefined for native tokens
   public hasToken = false;
   public tokenBalance = new BN(0);
+
   public async activeAddressHasToken(activeAddress?: string): Promise<boolean> {
     if (!activeAddress) return false;
     this.hasToken = false;

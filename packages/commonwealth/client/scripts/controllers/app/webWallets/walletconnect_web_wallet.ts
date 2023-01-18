@@ -1,12 +1,12 @@
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, ChainInfo, BlockInfo, IWebWallet } from 'models';
+import { setActiveAccount } from 'controllers/app/login';
+import type { Account, BlockInfo, ChainInfo, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
-import { CanvasData } from 'shared/adapters/shared';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
@@ -48,17 +48,24 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._chainInfo.node?.ethChainId || 1;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
-    const block = await this._web3.givenProvider.request({ method: 'eth_getBlockByNumber', params: ["latest", false] })
+    const block = await this._web3.givenProvider.request({
+      method: 'eth_getBlockByNumber',
+      params: ['latest', false],
+    });
 
     return {
       number: hexToNumber(block.number),
       hash: block.hash,
       timestamp: hexToNumber(block.timestamp),
-    }
+    };
   }
 
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
     const signature = await this._provider.wc.signTypedData([
       account.address,
@@ -81,33 +88,34 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable WalletConnect');
     this._enabling = true;
     // try {
-      // Create WalletConnect Provider
-      this._chainInfo =
-        app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
-      const chainId = this._chainInfo.node?.ethChainId || 1;
+    // Create WalletConnect Provider
+    this._chainInfo =
+      app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
+    const chainId = this._chainInfo.node?.ethChainId || 1;
 
+    // use alt wallet url if available
+    const chainUrl =
+      this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
+    const rpc = chainUrl ? { [chainId]: chainUrl } : {};
 
-      // use alt wallet url if available
-      const chainUrl = this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
-      const rpc = chainUrl ? { [chainId]: chainUrl } : {};
-      this._provider = new WalletConnectProvider({ rpc, chainId });
+    this._provider = new WalletConnectProvider({ rpc, chainId });
 
-      // destroy pre-existing session if exists
-      if (this._provider.wc?.connected) {
-        await this._provider.wc.killSession();
-      }
+    // destroy pre-existing session if exists
+    if (this._provider.wc?.connected) {
+      await this._provider.wc.killSession();
+    }
 
-      //  Enable session (triggers QR Code modal)
-      await this._provider.enable();
-      this._web3 = new Web3(this._provider as any);
-      this._accounts = await this._web3.eth.getAccounts();
-      if (this._accounts.length === 0) {
-        throw new Error('WalletConnect fetched no accounts.');
-      }
+    //  Enable session (triggers QR Code modal)
+    await this._provider.enable();
+    this._web3 = new Web3(this._provider as any);
+    this._accounts = await this._web3.eth.getAccounts();
+    if (this._accounts.length === 0) {
+      throw new Error('WalletConnect fetched no accounts.');
+    }
 
-      await this.initAccountsChanged();
-      this._enabled = true;
-      this._enabling = false;
+    await this.initAccountsChanged();
+    this._enabled = true;
+    this._enabling = false;
     // } catch (error) {
     //   this._enabling = false;
     //   throw new Error(`Failed to enable WalletConnect: ${error.message}`);

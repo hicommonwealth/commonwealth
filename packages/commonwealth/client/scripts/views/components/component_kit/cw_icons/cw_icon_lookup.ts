@@ -1,5 +1,5 @@
-import * as Icons from './cw_icons';
 import * as CustomIcons from './cw_custom_icons';
+import * as Icons from './cw_icons';
 
 export const iconLookup = {
   arrowLeft: Icons.CWArrowLeft,

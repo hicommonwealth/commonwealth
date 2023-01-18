@@ -1,7 +1,7 @@
-import * as Sequelize from 'sequelize';
-import { Model, DataTypes } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { ThreadInstance } from './thread';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ThreadInstance } from './thread';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type LinkedThreadAttributes = {
   id?: number;
@@ -9,7 +9,7 @@ export type LinkedThreadAttributes = {
   linking_thread: number;
   created_at?: Date;
   updated_at?: Date;
-}
+};
 
 export type LinkedThreadInstance = ModelInstance<LinkedThreadAttributes> & {
   getThread: Sequelize.BelongsToGetAssociationMixin<ThreadInstance>;
@@ -17,7 +17,7 @@ export type LinkedThreadInstance = ModelInstance<LinkedThreadAttributes> & {
     ThreadInstance,
     ThreadInstance['id']
   >;
-}
+};
 
 export type LinkedThreadModelStatic = ModelStatic<LinkedThreadInstance>;
 

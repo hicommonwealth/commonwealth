@@ -15,6 +15,7 @@ class Topic {
   public get tokenThreshold() {
     return this._tokenThreshold;
   }
+
   public setTokenThreshold(t: BN) {
     this._tokenThreshold = t;
   }

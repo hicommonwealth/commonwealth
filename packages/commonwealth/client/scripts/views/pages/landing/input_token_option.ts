@@ -14,14 +14,22 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
     let tokenImage;
     if (!iconImg || !iconImg.length || iconImg.slice(0, 4) === 'ipfs') {
       tokenImage = m('.TokenIcon', [
-        m('.token-icon.no-image', {
-          style: 'width: 1.5rem; height: 1.5rem; margin-right: 1rem;',
-          onclick
-        }, [
-          m('span', {
-            style: 'font-size: 1.25rem;'
-          }, vnode.attrs.text.slice(0, 1))
-        ])
+        m(
+          '.token-icon.no-image',
+          {
+            style: 'width: 1.5rem; height: 1.5rem; margin-right: 1rem;',
+            onclick,
+          },
+          [
+            m(
+              'span',
+              {
+                style: 'font-size: 1.25rem;',
+              },
+              vnode.attrs.text.slice(0, 1)
+            ),
+          ]
+        ),
       ]);
     } else {
       tokenImage = m('img', {
@@ -47,7 +55,8 @@ const InputTokenOptionComponent: m.Component<IAttrs, {}> = {
             }
           },
           class:
-            'p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row text-left leading-none w-full justify-between focus:outline-none',
+            'p-3 rounded hover:bg-gray-100 flex flex-grow items-center flex-row text-left' +
+            ' leading-none w-full justify-between focus:outline-none',
         },
         m('span', { class: 'flex flex-row font-bold' }, [
           tokenImage,

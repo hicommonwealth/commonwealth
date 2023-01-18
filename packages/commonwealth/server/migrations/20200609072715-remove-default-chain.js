@@ -5,7 +5,7 @@ module.exports = {
     return queryInterface.changeColumn('OffchainThreads', 'chain', {
       type: Sequelize.STRING,
       allowNull: true,
-      defaultValue: null
+      defaultValue: null,
     });
   },
 
@@ -13,7 +13,7 @@ module.exports = {
     return queryInterface.changeColumn('OffchainThreads', 'chain', {
       type: Sequelize.STRING,
       allowNull: true,
-      defaultValue: 'edgeware-testnet'
+      defaultValue: 'edgeware-testnet',
     });
-  }
+  },
 };

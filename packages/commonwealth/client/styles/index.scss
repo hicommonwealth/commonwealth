@@ -36,7 +36,8 @@ html.invert {
   -o-filter: invert(90%);
   -ms-filter: invert(90%);
 
-  img, .user-avatar {
+  img,
+  .user-avatar {
     filter: invert(90%);
     -webkit-filter: invert(90%);
     -moz-filter: invert(90%);
@@ -62,6 +63,7 @@ strong {
 a {
   color: $purple-400;
   text-decoration: none;
+
   &:hover {
     text-decoration: underline;
   }

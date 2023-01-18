@@ -1,16 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
+import m from 'mithril';
+import type { Thread, ThreadStage, Topic } from 'models';
 
 import app from 'state';
-import { navigateToSubpage } from 'app';
-import { Thread, ThreadStage, Topic } from 'models';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { ChangeTopicModal } from '../../modals/change_topic_modal';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { UpdateProposalStatusModal } from '../../modals/update_proposal_status_modal';
-import { ChangeTopicModal } from '../../modals/change_topic_modal';
-import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
-import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 type ThreadPreviewMenuAttrs = {
   thread: Thread;
@@ -37,6 +37,8 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
       app.user.activeAccount &&
       thread.author === app.user.activeAccount.address;
 
+    if (!isAuthor && !hasAdminPermissions) return;
+
     return (
       <div
         class="ThreadPreviewMenu"
@@ -54,9 +56,10 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                     onclick: (e) => {
                       e.preventDefault();
 
-                      app.threads
-                        .pin({ proposal: thread })
-                        .then(() => navigateToSubpage('/discussions'));
+                      app.threads.pin({ proposal: thread }).then(() => {
+                        navigateToSubpage('/discussions');
+                        m.redraw();
+                      });
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
                     iconLeft: 'pin' as const,

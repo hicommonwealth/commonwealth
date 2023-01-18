@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_dropdown.scss';
+import m from 'mithril';
+import { CWText } from './cw_text';
 
 import { CWTextInput } from './cw_text_input';
-import { CWText } from './cw_text';
 
 export type DropdownItemType = {
   label: string;

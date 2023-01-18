@@ -8,9 +8,11 @@ import { BalanceType, ContractType } from 'common-common/src/types';
 class ContractsController {
   private _store: ContractsStore = new ContractsStore();
   private _initialized = false;
+
   public get store() {
     return this._store;
   }
+
   public get initialized() {
     return this._initialized;
   }
@@ -168,6 +170,7 @@ class ContractsController {
   public addToStore(contract: Contract) {
     return this._store.add(contract);
   }
+
   public initialize(contracts = [], reset = true) {
     if (reset) {
       this._store.clear();

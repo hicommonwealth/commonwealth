@@ -1,8 +1,10 @@
 import { assert } from 'chai';
 import {
-  Action, addPermission, isPermitted
+  Action,
+  addPermission,
+  isPermitted,
 } from 'common-common/src/permissions';
-import { Permission } from 'server/models/role';
+import type { Permission } from 'server/models/role';
 import { aggregatePermissions } from '../../../shared/utils';
 
 describe('aggregatePermissions() unit tests', () => {
@@ -30,7 +32,7 @@ describe('aggregatePermissions() unit tests', () => {
         allow: allowCreateThread,
         deny: base_permission,
         permission: admin_name,
-      }
+      },
     ];
 
     const permission = aggregatePermissions(roles, chain_permission);

@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import { SelectList, ListItem, Callout, Icons } from 'construct-ui';
 
 import 'components/topic_selector.scss';
+import { Callout, Icons, ListItem, SelectList } from 'construct-ui';
+import { isNotUndefined } from 'helpers/typeGuards';
+import m from 'mithril';
 
 import { Topic } from 'models';
-import { isNotUndefined } from 'helpers/typeGuards';
 import { CWButton } from './component_kit/cw_button';
 
 type TopicSelectorAttrs = {

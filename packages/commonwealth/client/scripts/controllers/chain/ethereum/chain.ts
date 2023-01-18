@@ -1,30 +1,16 @@
-import { ApiStatus, IApp } from 'state';
-import Web3 from 'web3';
-import m from 'mithril';
-import moment from 'moment';
-
-import { TransactionReceipt } from 'web3-core';
-
-import {
-  NodeInfo,
-  ITXModalData,
-  ITXData,
-  IChainModule,
-  ChainInfo,
-  IWebWallet,
-} from 'models';
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import EthereumAccount from './account';
+import m from 'mithril';
+
+import type { ChainInfo, IChainModule, ITXModalData, NodeInfo } from 'models';
+import moment from 'moment';
+import type { IApp } from 'state';
+import { ApiStatus } from 'state';
+import Web3 from 'web3';
+import type EthereumAccount from './account';
+
+/* eslint-disable @typescript-eslint/no-unused-vars */
 
 const ETHEREUM_BLOCK_TIME = 13;
-export interface IEthereumTXData extends ITXData {
-  chainId: string;
-  accountNumber: number;
-  sequence: number;
-
-  // skip simulating the tx twice by saving the original estimated gas
-  gas: number;
-}
 
 class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   public createTXModalData(
@@ -37,6 +23,7 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   }
 
   private static _instance;
+
   public static get(): EthereumChain {
     if (!this._instance) {
       // TODO: Figure out how to inject the app since this method is static
@@ -65,9 +52,11 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
   private _api: Web3;
   private _metadataInitialized = false;
   private _totalbalance: EthereumCoin;
+
   public get metadataInitialized() {
     return this._metadataInitialized;
   }
+
   public get totalbalance() {
     return this._totalbalance;
   }
@@ -93,7 +82,11 @@ class EthereumChain implements IChainModule<EthereumCoin, EthereumAccount> {
     const blockNumber = await this._api.eth.getBlockNumber();
     console.log(blockNumber);
     const headers = await this._api.eth.getBlock(`${blockNumber}`);
-    if (this.app.chain && this.app.chain.meta.node && this.app.chain.meta.node.ethChainId !== 1) {
+    if (
+      this.app.chain &&
+      this.app.chain.meta.node &&
+      this.app.chain.meta.node.ethChainId !== 1
+    ) {
       this.app.chain.block.height = headers.number;
       this.app.chain.block.lastTime = moment.unix(+headers.timestamp);
 

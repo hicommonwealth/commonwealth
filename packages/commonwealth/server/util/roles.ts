@@ -1,25 +1,26 @@
-import { Transaction, Op, FindOptions } from 'sequelize';
+import { AppError } from 'common-common/src/errors';
+import type { Action } from 'common-common/src/permissions';
 import {
+  BASE_PERMISSIONS,
   computePermissions,
-  Action,
   isPermitted,
   PermissionError,
-  BASE_PERMISSIONS,
 } from 'common-common/src/permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
-import { AppError } from 'common-common/src/errors';
-import { DB } from '../models';
-import { CommunityRoleAttributes } from '../models/community_role';
-import { Permission } from '../models/role';
-import { RoleAssignmentAttributes } from '../models/role_assignment';
-import { AddressInstance } from '../models/address';
+import type { FindOptions, Transaction } from 'sequelize';
+import { Op } from 'sequelize';
+import type { DB } from '../models';
+import type { AddressInstance } from '../models/address';
+import type { CommunityRoleAttributes } from '../models/community_role';
+import type { Permission } from '../models/role';
+import type { RoleAssignmentAttributes } from '../models/role_assignment';
 
 export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   chain_id: string;
   permission: Permission;
   allow: bigint;
   deny: bigint;
-}
+};
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;
@@ -385,7 +386,7 @@ export async function checkReadPermitted(
   models: DB,
   chain_id: string,
   action: Action,
-  user_id?: number,
+  user_id?: number
 ) {
   if (user_id) {
     // get active address

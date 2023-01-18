@@ -1,5 +1,5 @@
-import { AddressInfo } from 'models';
-import RolePermission from './RolePermission';
+import type { AddressInfo } from 'models';
+import type RolePermission from './RolePermission';
 
 class RoleInfo {
   public readonly id: number;

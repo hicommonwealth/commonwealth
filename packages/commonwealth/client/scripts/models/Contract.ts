@@ -1,4 +1,4 @@
-import moment from 'moment';
+import type moment from 'moment';
 
 class Contract {
   public readonly id: number;
@@ -11,9 +11,9 @@ class Contract {
   public readonly decimals?: number;
   public readonly tokenName?: string;
   public readonly symbol?: string;
-  public readonly abi?: Array<Record<string, unknown>>;
   public readonly isFactory?: boolean;
   public readonly nickname?: string;
+  public readonly abi?: Array<Record<string, unknown>>;
 
   constructor({
     id,
@@ -25,9 +25,9 @@ class Contract {
     decimals,
     tokenName,
     symbol,
-    abi,
     isFactory,
     nickname,
+    abi,
   }: {
     id: number;
     address: string;
@@ -38,9 +38,9 @@ class Contract {
     decimals?: number;
     tokenName?: string;
     symbol?: string;
-    abi?: Array<Record<string, unknown>>;
     isFactory?: boolean;
     nickname?: string;
+    abi?: Array<Record<string, unknown>>;
   }) {
     this.id = id;
     this.address = address;
@@ -51,9 +51,9 @@ class Contract {
     this.decimals = decimals;
     this.tokenName = tokenName;
     this.symbol = symbol;
-    this.abi = abi;
     this.isFactory = isFactory;
     this.nickname = nickname;
+    this.abi = abi;
   }
 
   public static fromJSON({
@@ -66,9 +66,9 @@ class Contract {
     decimals,
     tokenName,
     symbol,
-    abi,
     isFactory,
     nickname,
+    abi,
   }) {
     return new Contract({
       id,
@@ -80,9 +80,9 @@ class Contract {
       decimals,
       tokenName,
       symbol,
-      abi,
       isFactory,
       nickname,
+      abi
     });
   }
 }

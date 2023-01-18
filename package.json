@@ -11,7 +11,13 @@
     "migrate-db": "yarn --cwd packages/commonwealth migrate-db",
     "start-all": "chmod u+x scripts/start.sh && ./scripts/start.sh all",
     "start-apps": "chmod u+x scripts/start.sh && ./scripts/start.sh apps",
-    "start-rmq": "sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management"
+    "start-rmq": "sudo docker run -it --rm --name rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3.11-management",
+    "format-check": "prettier --check .",
+    "format": "prettier --write .",
+    "lint": "./scripts/lint-new-work.sh",
+    "lint-all": "NODE_OPTIONS=\"--max-old-space-size=4096\" eslint './packages/**/*.ts'",
+    "lint-branch": "./scripts/lint-branch.sh",
+    "stylelint": "stylelint packages/commonwealth/client/styles/*"
   },
   "engines": {
     "node": "14.x"
@@ -36,11 +42,21 @@
     "ethers": "5.4.3",
     "moment": "^2.23.0",
     "pg": "^8.7.1",
-    "typescript": "4.3.4",
+    "stylelint": "^14.14.1",
+    "stylelint-config-prettier": "^9.0.4",
+    "stylelint-config-standard": "^29.0.0",
+    "typescript": "^4.8.4",
     "web3": "1.5.2",
     "web3-utils": "1.5.2"
   },
   "devDependencies": {
-    "concurrently": "^7.6.0"
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
+    "concurrently": "^7.6.0",
+    "eslint": "^8.27.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-import-resolver-typescript": "^3.5.2",
+    "eslint-import-resolver-webpack": "^0.13.2",
+    "prettier": "2.7.1"
   }
 }

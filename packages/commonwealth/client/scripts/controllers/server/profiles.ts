@@ -1,11 +1,11 @@
-import m from 'mithril';
+import { addressSwapper } from 'commonwealth/shared/utils';
 import $ from 'jquery';
 import _ from 'lodash';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import m from 'mithril';
+import { Profile } from 'models';
 
 import app from 'state';
 import { ProfileStore } from 'stores';
-import { Profile } from 'models';
 import { ChainBase } from '../../../../../common-common/src/types';
 
 class ProfilesController {

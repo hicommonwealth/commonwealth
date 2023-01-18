@@ -1,7 +1,7 @@
-import { Any } from 'cosmjs-types/google/protobuf/any';
-import { TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
-import {
+import type { Any } from 'cosmjs-types/google/protobuf/any';
+import type { TallyResult } from 'cosmjs-types/cosmos/gov/v1beta1/gov';
+import type { Tendermint34Client } from '@cosmjs/tendermint-rpc';
+import type {
   QueryClient,
   StakingExtension,
   GovExtension,

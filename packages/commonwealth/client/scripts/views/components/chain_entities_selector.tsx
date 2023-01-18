@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import { uuidv4 } from 'lib/util';
-import { QueryList, ListItem } from 'construct-ui';
 
 import 'components/chain_entities_selector.scss';
+import { ListItem, QueryList } from 'construct-ui';
+import { chainEntityTypeToProposalName } from 'identifiers';
+import { uuidv4 } from 'lib/util';
+import m from 'mithril';
+import type { ChainEntity, Thread } from 'models';
 
 import app from 'state';
-import { ChainEntity, Thread } from 'models';
-import { chainEntityTypeToProposalName } from 'identifiers';
 
 type ChainEntitiesSelectorAttrs = {
   chainEntitiesToSet: Array<ChainEntity>;
@@ -28,13 +28,11 @@ export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorA
 
     if (!this.initialized) {
       this.initialized = true;
-      app.chainEntities
-        ?.refresh(app.chain.id)
-        .then(() => {
-          // refreshing loads the latest chain entities into app.chainEntities store
-          this.chainEntitiesLoaded = true;
-          m.redraw();
-        });
+      app.chainEntities?.refresh(app.chain.id).then(() => {
+        // refreshing loads the latest chain entities into app.chainEntities store
+        this.chainEntitiesLoaded = true;
+        m.redraw();
+      });
     }
 
     return (
