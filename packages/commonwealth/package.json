@@ -185,7 +185,6 @@
     "lodash": "^4.17.21",
     "magic-sdk": "^10.0.0",
     "marked": "^4.0.10",
-    "microcbor": "^0.2.1",
     "mithril": "^2.0.4",
     "mithril-infinite": "^1.3.0",
     "mixpanel": "^0.14.0",

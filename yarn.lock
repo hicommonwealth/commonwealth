@@ -11359,11 +11359,6 @@ fp-ts@^2.6.1:
   resolved "https://registry.yarnpkg.com/fp-ts/-/fp-ts-2.13.1.tgz#1bf2b24136cca154846af16752dc29e8fa506f2a"
   integrity sha512-0eu5ULPS2c/jsa1lGFneEFFEdTbembJv8e4QKXeVJ3lm/5hyve06dlKZrpxmMwJt6rYen7sxmHHK2CLaXvWuWQ==
 
-fp16@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/fp16/-/fp16-0.2.0.tgz#9bc5283af42ef844e53cb52a5a528b18ff19e19f"
-  integrity sha512-rP3kzmANkEOeg99U3b8d9UGkAJV9MUse/2oooxqMwLYjqSe0ZmrqnrCzI3WGobkxTOw4eVQUz0hH9iRkP3WBKg==
-
 fragment-cache@^0.2.1:
   version "0.2.1"
   resolved "https://registry.npmjs.org/fragment-cache/-/fragment-cache-0.2.1.tgz"
@@ -14639,13 +14634,6 @@ methods@^1.1.1, methods@^1.1.2, methods@~1.1.2:
   version "1.1.2"
   resolved "https://registry.npmjs.org/methods/-/methods-1.1.2.tgz"
   integrity sha1-VSmk1nZUE07cxSZmVoNbD4Ua/O4=
-
-microcbor@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/microcbor/-/microcbor-0.2.1.tgz#3a691dcfb710af83b079d5b9ead525fff38b2997"
-  integrity sha512-CdVF2APl2GGgWEXrGUbEt24blu3FvzxnccNA3pR9L0yaifFi8y6WfkZewGG6nyrWIrEB6W7ldFmrD2Fz967hkQ==
-  dependencies:
-    fp16 "^0.2.0"
 
 micromatch@^3.1.10, micromatch@^3.1.4:
   version "3.1.10"

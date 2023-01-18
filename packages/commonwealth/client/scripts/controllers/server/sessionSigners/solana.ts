@@ -27,7 +27,7 @@ export class SolanaSessionController implements ISessionController {
     return this.signers[chainId].publicKey.toBase58();
   }
 
-  async hasAuthenticatedSession(chainId: string): boolean {
+  async hasAuthenticatedSession(chainId: string): Promise<boolean> {
     this.getOrCreateSigner(chainId);
     return (
       this.signers[chainId] !== undefined && this.auths[chainId] !== undefined
