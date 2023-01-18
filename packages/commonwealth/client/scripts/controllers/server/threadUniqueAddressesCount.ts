@@ -1,9 +1,10 @@
+import $ from 'jquery';
+import type { Thread } from 'models';
+import { AddressInfo } from 'models';
+import ThreadUniqueAddressesCount from 'models/ThreadUniqueAddressesCount';
 import app from 'state';
 
 import { ThreadUniqueAddressesCountStore } from 'stores';
-import ThreadUniqueAddressesCount from 'models/ThreadUniqueAddressesCount';
-import { AddressInfo, Thread } from 'models';
-import $ from 'jquery';
 
 export const modelFromServer = (threadUniqueAddressesCount) => {
   const { id, addresses, count } = threadUniqueAddressesCount;
@@ -14,12 +15,15 @@ class ThreadUniqueAddressesCountController {
   private _store: ThreadUniqueAddressesCountStore =
     new ThreadUniqueAddressesCountStore();
   private _initializedPinned = false;
+
   public get store() {
     return this._store;
   }
+
   public getInitializedPinned() {
     return this._initializedPinned;
   }
+
   public getAddressesCountRootId(rootId: string) {
     const { count } = this._store.getById(rootId) || {};
     return count;

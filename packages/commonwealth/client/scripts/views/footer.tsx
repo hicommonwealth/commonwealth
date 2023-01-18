@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'footer.scss';
+import m from 'mithril';
 
 import { isNotUndefined } from '../helpers/typeGuards';
 

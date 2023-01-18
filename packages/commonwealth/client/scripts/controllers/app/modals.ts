@@ -1,8 +1,9 @@
-import m from 'mithril';
 import { uuidv4 } from 'lib/util';
+import m from 'mithril';
 
 export class ModalStore {
   private _modals: any[];
+
   constructor() {
     this._modals = [];
   }

@@ -1,12 +1,12 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
-import { ModelStatic, ModelInstance } from './types';
-import { AddressAttributes } from './address';
-import { ChainAttributes } from './chain';
-import { AttachmentAttributes } from './attachment';
-import { LinkedThreadAttributes } from './linked_thread';
-import { TopicAttributes } from './topic';
-import { ChainEntityMetaAttributes } from "./chain_entity_meta";
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { AddressAttributes } from './address';
+import type { AttachmentAttributes } from './attachment';
+import type { ChainAttributes } from './chain';
+import type { ChainEntityMetaAttributes } from './chain_entity_meta';
+import type { LinkedThreadAttributes } from './linked_thread';
+import type { TopicAttributes } from './topic';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type ThreadAttributes = {
   address_id: number;
@@ -35,9 +35,7 @@ export type ThreadAttributes = {
   // associations
   Chain?: ChainAttributes;
   Address?: AddressAttributes;
-  Attachments?:
-    | AttachmentAttributes[]
-    | AttachmentAttributes['id'][];
+  Attachments?: AttachmentAttributes[] | AttachmentAttributes['id'][];
   ChainEntityMeta?: ChainEntityMetaAttributes;
   collaborators?: AddressAttributes[];
   linked_threads?: LinkedThreadAttributes[];
@@ -145,7 +143,7 @@ export default (
     models.Thread.hasMany(models.ChainEntityMeta, {
       foreignKey: 'thread_id',
       constraints: false,
-      as: 'chain_entity_meta'
+      as: 'chain_entity_meta',
     });
     models.Thread.hasMany(models.LinkedThread, {
       foreignKey: 'linked_thread',
@@ -159,8 +157,8 @@ export default (
       foreignKey: 'thread_id',
     });
     models.Thread.hasOne(models.ChainEntityMeta, {
-      foreignKey: 'id'
-    })
+      foreignKey: 'id',
+    });
   };
 
   return Thread;

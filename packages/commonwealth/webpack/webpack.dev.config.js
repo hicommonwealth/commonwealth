@@ -5,9 +5,7 @@ const common = require('./webpack.base.config.js');
 
 module.exports = merge(common, {
   entry: {
-    app: [
-      'webpack-hot-middleware/client?path=/__webpack_hmr&reload=true',
-    ],
+    app: ['webpack-hot-middleware/client?path=/__webpack_hmr&reload=true'],
   },
   mode: 'development',
   devtool: 'eval-cheap-source-map',
@@ -17,7 +15,7 @@ module.exports = merge(common, {
   },
   ignoreWarnings: [
     { module: /client\/styles\/construct.scss/ },
-    { module: /node_modules\/magic-sdk\/dist\/es\/index.mjs/ }
+    { module: /node_modules\/magic-sdk\/dist\/es\/index.mjs/ },
   ],
   target: 'web',
   output: {

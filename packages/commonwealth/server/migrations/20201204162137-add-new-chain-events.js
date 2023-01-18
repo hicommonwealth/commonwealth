@@ -36,8 +36,12 @@ module.exports = {
       event_name,
     });
 
-    const [ chains ] = await queryInterface.sequelize.query('SELECT * FROM "Chains"');
-    const eventSupportingChains = chains.map((c) => c.id).filter((c) => EventChains.indexOf(c) !== -1);
+    const [chains] = await queryInterface.sequelize.query(
+      'SELECT * FROM "Chains"'
+    );
+    const eventSupportingChains = chains
+      .map((c) => c.id)
+      .filter((c) => EventChains.indexOf(c) !== -1);
     const objs = [];
     for (const c of eventSupportingChains) {
       const chainObjs = Object.values(EventKinds).map((s) => buildObject(s, c));
@@ -48,11 +52,8 @@ module.exports = {
   },
 
   down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete(
-      'ChainEventTypes',
-      { event_name:
-        { [Op.in]: Object.values(EventKinds) }
-      }
-    );
+    return queryInterface.bulkDelete('ChainEventTypes', {
+      event_name: { [Op.in]: Object.values(EventKinds) },
+    });
   },
 };

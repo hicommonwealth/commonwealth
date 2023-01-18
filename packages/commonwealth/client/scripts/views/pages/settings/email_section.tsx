@@ -1,19 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { WalletId } from 'common-common/src/types';
 import $ from 'jquery';
+import m from 'mithril';
+import type { SocialAccount } from 'models';
 
 import 'pages/settings/email_section.scss';
 
 import app from 'state';
-import { SocialAccount } from 'models';
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
-import { WalletId } from 'common-common/src/types';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { CWText } from '../../components/component_kit/cw_text';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { CWValidationText } from '../../components/component_kit/cw_validation_text';
 import { getClasses } from '../../components/component_kit/helpers';
 

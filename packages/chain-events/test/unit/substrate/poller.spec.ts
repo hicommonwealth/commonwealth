@@ -1,5 +1,5 @@
 import chai from 'chai';
-import {
+import type {
   Hash,
   EventRecord,
   Header,
@@ -21,24 +21,24 @@ class IMockHash extends Number {
 }
 
 const hashNums: number[] = [...Array(10).keys()].map((i) => (i < 5 ? 0 : i));
-const hashes = (hashNums.map((n) => new IMockHash(n)) as unknown) as Hash[];
+const hashes = hashNums.map((n) => new IMockHash(n)) as unknown as Hash[];
 const headers: Header[] = hashNums.map((hash) => {
   if (hash === 0) {
     return undefined;
   }
-  return ({
+  return {
     parentHash: hash - 1,
     number: 100 + hash,
     hash,
-  } as unknown) as Header;
+  } as unknown as Header;
 });
 
 const events = {
-  6: ([{ event: { data: [1] } }] as unknown) as EventRecord[],
-  8: ([
+  6: [{ event: { data: [1] } }] as unknown as EventRecord[],
+  8: [
     { event: { data: [2] } },
     { event: { data: [3, 4] } },
-  ] as unknown) as EventRecord[],
+  ] as unknown as EventRecord[],
 };
 
 const getMockApi = () => {
@@ -47,10 +47,10 @@ const getMockApi = () => {
       if (hash === undefined) {
         hash = hashes[hashes.length - 1];
       }
-      return headers[(hash as unknown) as number];
+      return headers[hash as unknown as number];
     },
     'events.at': (hash: Hash) => {
-      return events[(hash as unknown) as number] || [];
+      return events[hash as unknown as number] || [];
     },
     getBlockHash: async (blockNumber: number) => {
       if (blockNumber === 2600 || blockNumber === 2400) {
@@ -69,10 +69,10 @@ const getMockApi = () => {
       };
     },
     getRuntimeVersion: async () => {
-      return ({
+      return {
         specVersion: 10,
         specName: 'edgeware',
-      } as unknown) as RuntimeVersion;
+      } as unknown as RuntimeVersion;
     },
   });
 };

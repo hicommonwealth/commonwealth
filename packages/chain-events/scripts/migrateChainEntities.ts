@@ -4,9 +4,13 @@
  * from the chain, writing the results back into the database.
  */
 
+import type { IDisconnectedRange, IStorageFetcher } from 'chain-events/src';
 import {
-  AaveEvents, CommonwealthEvents, CompoundEvents,
-  CosmosEvents, IDisconnectedRange, IStorageFetcher, SubstrateEvents
+  AaveEvents,
+  CommonwealthEvents,
+  CompoundEvents,
+  CosmosEvents,
+  SubstrateEvents,
 } from 'chain-events/src';
 import { factory, formatFilename } from 'common-common/src/logging';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -15,12 +19,15 @@ import EntityArchivalHandler from 'chain-events/services/ChainEventsConsumer/Cha
 import MigrationHandler from 'chain-events/services/ChainEventsConsumer/ChainEventHandlers/migration';
 import ceModels from 'chain-events/services/database/database';
 
-import { getRabbitMQConfig, RabbitMQController } from 'common-common/src/rabbitmq';
-import fetch from "node-fetch";
-import { BrokerConfig } from "rascal";
-import { RABBITMQ_URI } from "../../commonwealth/server/config";
+import {
+  getRabbitMQConfig,
+  RabbitMQController,
+} from 'common-common/src/rabbitmq';
+import fetch from 'node-fetch';
+import type { BrokerConfig } from 'rascal';
+import { RABBITMQ_URI } from '../../commonwealth/server/config';
 import { constructSubstrateUrl } from '../../commonwealth/shared/substrate';
-import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from "../services/config";
+import { CHAIN_EVENT_SERVICE_SECRET, CW_SERVER_URL } from '../services/config';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -38,8 +45,8 @@ async function fetchData(url: string, data: any) {
   try {
     const res = await fetch(url, {
       method: 'POST',
-      body: JSON.stringify({secret: CHAIN_EVENT_SERVICE_SECRET, ...data}),
-      headers: { 'Content-Type': 'application/json' }
+      body: JSON.stringify({ secret: CHAIN_EVENT_SERVICE_SECRET, ...data }),
+      headers: { 'Content-Type': 'application/json' },
     });
     if (res.ok) return (await res.json()).result;
     throw new HTTPResponseError(res);
@@ -50,7 +57,10 @@ async function fetchData(url: string, data: any) {
   }
 }
 
-async function migrateChainEntity(chain: string, rmqController: RabbitMQController): Promise<void> {
+async function migrateChainEntity(
+  chain: string,
+  rmqController: RabbitMQController
+): Promise<void> {
   // 1. fetch the node and url of supported/selected chains
   log.info(`Fetching node info for ${chain}...`);
   if (!chain) {
@@ -58,18 +68,16 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
   }
 
   // query one node for each supported chain
-  const chainInstance = await fetchData(
-    `${CW_SERVER_URL}/api/getChain`,
-    {chain_id: chain}
-  );
+  const chainInstance = await fetchData(`${CW_SERVER_URL}/api/getChain`, {
+    chain_id: chain,
+  });
   if (!chainInstance) {
     throw new Error('no chain found for chain entity migration');
   }
 
-  const node = await fetchData(
-    `${CW_SERVER_URL}/api/getChainNode`,
-    {chain_node_id: chainInstance.chain_node_id}
-  );
+  const node = await fetchData(`${CW_SERVER_URL}/api/getChainNode`, {
+    chain_node_id: chainInstance.chain_node_id,
+  });
   if (!node) {
     throw new Error('no nodes found for chain entity migration');
   }
@@ -77,13 +85,21 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
   // 2. for each node, fetch and migrate chain entities
   log.info(`Fetching and migrating chain entities for: ${chain}`);
   try {
-    const migrationHandler = new MigrationHandler(ceModels, rmqController, chain);
-    const entityArchivalHandler = new EntityArchivalHandler(ceModels, rmqController, chain);
+    const migrationHandler = new MigrationHandler(
+      ceModels,
+      rmqController,
+      chain
+    );
+    const entityArchivalHandler = new EntityArchivalHandler(
+      ceModels,
+      rmqController,
+      chain
+    );
     let fetcher: IStorageFetcher<any>;
     const range: IDisconnectedRange = { startBlock: 0 };
     if (chainInstance.base === ChainBase.Substrate) {
       const nodeUrl = constructSubstrateUrl(node.private_url || node.url);
-      console.log(chainInstance.substrate_spec)
+      console.log(chainInstance.substrate_spec);
       const api = await SubstrateEvents.createApi(
         nodeUrl,
         chainInstance.substrate_spec
@@ -99,7 +115,7 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
     } else if (chainInstance.network === ChainNetwork.Compound) {
       const contracts = await fetchData(
         `${CW_SERVER_URL}/api/getChainContracts`,
-        {chain_id: chain}
+        { chain_id: chain }
       );
       const api = await CompoundEvents.createApi(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
@@ -110,7 +126,7 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
     } else if (chainInstance.network === ChainNetwork.Aave) {
       const contracts = await fetchData(
         `${CW_SERVER_URL}/api/getChainContracts`,
-        {chain_id: chain}
+        { chain_id: chain }
       );
       const api = await AaveEvents.createApi(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
@@ -121,7 +137,7 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
     } else if (chainInstance.network === ChainNetwork.CommonProtocol) {
       const contracts = await fetchData(
         `${CW_SERVER_URL}/api/getChainContracts`,
-        {chain_id: chain}
+        { chain_id: chain }
       );
       const api = await CommonwealthEvents.createApi(
         contracts[0].ChainNode.private_url || contracts[0].ChainNode.url,
@@ -151,7 +167,9 @@ async function migrateChainEntity(chain: string, rmqController: RabbitMQControll
   }
 }
 
-async function migrateChainEntities(rmqController: RabbitMQController): Promise<void> {
+async function migrateChainEntities(
+  rmqController: RabbitMQController
+): Promise<void> {
   const chains = await fetchData(
     `${CW_SERVER_URL}/api/getSubscribedChains`,
     {}
@@ -161,7 +179,7 @@ async function migrateChainEntities(rmqController: RabbitMQController): Promise<
   }
 }
 
-export async function runEntityMigrations(chainId?: string) {
+export async function runEntityMigrations(chainId?: string): void {
   // "all" means run for all supported chains, otherwise we pass in the name of
   // the specific chain to migrate
   log.info('Started migrating chain entities into the DB');
@@ -181,8 +199,9 @@ export async function runEntityMigrations(chainId?: string) {
   }
 
   try {
-    if (CHAIN_ID || chainId) await migrateChainEntity(CHAIN_ID || chainId, rmqController)
-    else await migrateChainEntities(rmqController)
+    if (CHAIN_ID || chainId)
+      await migrateChainEntity(CHAIN_ID || chainId, rmqController);
+    else await migrateChainEntities(rmqController);
     log.info('Finished migrating chain entities into the DB');
     process.exit(0);
   } catch (e) {

@@ -6,8 +6,8 @@ import 'chai/register-should';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
 import { Errors as updateEmailErrors } from '../../../server/routes/updateEmail';
+import * as modelUtils from '../../util/modelUtils';
 
 const ethUtil = require('ethereumjs-util');
 chai.use(chaiHttp);
@@ -42,7 +42,8 @@ describe('User Model Routes', () => {
 
     it('should add an email to user with just an address', async () => {
       const email = 'test@commonwealth.im';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
         .send({
@@ -54,7 +55,8 @@ describe('User Model Routes', () => {
     });
 
     it('should fail to update without email', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
         .send({
@@ -65,7 +67,8 @@ describe('User Model Routes', () => {
     });
 
     it('should fail to update if email in use by another user', async () => {
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
         .send({
@@ -78,7 +81,8 @@ describe('User Model Routes', () => {
 
     it('should fail with an invalid email', async () => {
       const email = 'testatcommonwealthdotim';
-      const res = await chai.request(app)
+      const res = await chai
+        .request(app)
         .post('/api/updateEmail')
         .set('Accept', 'application/json')
         .send({

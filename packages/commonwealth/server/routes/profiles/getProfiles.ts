@@ -20,7 +20,7 @@ export const getProfilesValidation = [
 const getProfiles = async (
   models: DB,
   req: TypedRequestQuery<GetProfilesReq>,
-  res: TypedResponse<GetProfilesResp>,
+  res: TypedResponse<GetProfilesResp>
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -32,13 +32,14 @@ const getProfiles = async (
   const pagination = formatPagination(req.query);
 
   const where = {};
-  if(profile_ids) where['id'] = { [Op.in]: profile_ids, };
+  if (profile_ids) where['id'] = { [Op.in]: profile_ids };
   const include = [];
-  if (addresses) include.push({
-    model: models.Address,
-    where: { address: { [Op.in]: addresses } },
-    required: true
-  });
+  if (addresses)
+    include.push({
+      model: models.Address,
+      where: { address: { [Op.in]: addresses } },
+      required: true,
+    });
 
   let profiles, count;
   if(!count_only) {
@@ -59,6 +60,5 @@ const getProfiles = async (
 
   return success(res, { profiles, count });
 };
-
 
 export default getProfiles;

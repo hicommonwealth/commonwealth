@@ -1,12 +1,14 @@
-import {
+import type {
   RabbitMQController,
+  RmqCETypeCUD,
+} from 'common-common/src/rabbitmq';
+import {
   RascalPublications,
   RepublishFailedMessages,
-  RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
 import * as Sequelize from 'sequelize';
 
-import { DB } from '../database/database';
+import type { DB } from '../database/database';
 
 /**
  * A worker that periodically republishes data from the database if it's queued value is between -1 and 5. A queued
@@ -18,7 +20,7 @@ export class RepublishMessages extends RepublishFailedMessages<DB> {
     super(_rmqController, _models, 180000);
   }
 
-  protected async job() {
+  protected async job(): void {
     const result = await this._models.ChainEventType.findAll({
       where: {
         queued: {
@@ -28,7 +30,7 @@ export class RepublishMessages extends RepublishFailedMessages<DB> {
     });
 
     // TODO
-    if (result.length > 100) {}
+    // if (result.length > 100) {}
 
     for (const eventType of result) {
       const publishData: RmqCETypeCUD.RmqMsgType = {

@@ -1,12 +1,13 @@
-import { CWEvent, IEventHandler } from 'chain-events/src';
-import Rascal from 'rascal';
-import {
-  RascalPublications,
-  RabbitMQController,
-} from 'common-common/src/rabbitmq';
+import type Rascal from 'rascal';
+import type { RascalPublications } from 'common-common/src/rabbitmq';
+import { RabbitMQController } from 'common-common/src/rabbitmq';
 
-export class RabbitMqHandler extends RabbitMQController
-  implements IEventHandler {
+import type { CWEvent, IEventHandler } from 'chain-events/src';
+
+export class RabbitMqHandler
+  extends RabbitMQController
+  implements IEventHandler
+{
   protected publication: RascalPublications;
 
   constructor(

@@ -1,4 +1,4 @@
-import { IUniqueId } from './interfaces';
+import type { IUniqueId } from './interfaces';
 
 type Addresses = {
   address_id: number;
@@ -6,6 +6,7 @@ type Addresses = {
   chain: string;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 class ThreadUniqueAddressesCount<T extends IUniqueId> {
   public readonly id: string;
   public readonly addresses: Addresses[];

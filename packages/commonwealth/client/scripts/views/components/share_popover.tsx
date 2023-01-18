@@ -1,7 +1,7 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import m from 'mithril';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';

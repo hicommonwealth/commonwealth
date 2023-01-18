@@ -9,5 +9,5 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     // Down not possible
-  }
+  },
 };

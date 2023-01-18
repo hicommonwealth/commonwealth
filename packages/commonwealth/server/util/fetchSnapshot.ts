@@ -1,6 +1,6 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import fetch from 'node-fetch';
-import { DB } from '../models';
+import type { DB } from '../models';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -19,10 +19,7 @@ async function createSnapshotProposal(res: any, models: DB) {
   }
 }
 
-export default async function fetchNewSnapshotProposal(
-  id: string,
-  models: DB
-) {
+export default async function fetchNewSnapshotProposal(id: string, models: DB) {
   try {
     const response = await fetch('https://hub.snapshot.org/graphql', {
       method: 'POST',

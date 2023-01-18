@@ -3,14 +3,14 @@
 /* eslint-disable max-classes-per-file */
 /* eslint-disable max-len */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
+import m from 'mithril';
 
 import { getClasses } from '../helpers';
-import { IconAttrs, IconStyleAttrs } from './types';
+import type { IconAttrs, IconStyleAttrs } from './types';
 
 // ADDING ICONS: INSTRUCTIONS
 //
