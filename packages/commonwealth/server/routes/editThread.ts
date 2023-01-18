@@ -28,7 +28,18 @@ const editThread = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { body, title, kind, stage, thread_id, url } = req.body;
+  const {
+    body,
+    title,
+    kind,
+    stage,
+    thread_id,
+    version_history,
+    url,
+    canvas_action,
+    canvas_session,
+    canvas_hash,
+  } = req.body;
   if (!thread_id) {
     return next(new AppError(Errors.NoThreadId));
   }

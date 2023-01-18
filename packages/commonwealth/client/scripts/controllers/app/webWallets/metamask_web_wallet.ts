@@ -1,15 +1,17 @@
 declare let window: any;
 
-import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
 import $ from 'jquery';
-import type { Account, BlockInfo, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
-import app from 'state';
 import Web3 from 'web3';
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
+
+import { SessionPayload } from '@canvas-js/interfaces';
+
+import app from 'state';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { Account, BlockInfo, IWebWallet } from 'models';
+import { setActiveAccount } from 'controllers/app/login';
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -66,13 +68,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    sessionPayload: SessionPayload
   ): Promise<string> {
-    const typedCanvasMessage = await constructTypedCanvasMessage(canvasMessage);
+    const typedCanvasMessage = await constructTypedCanvasMessage(
+      sessionPayload
+    );
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
       params: [account.address, JSON.stringify(typedCanvasMessage)],
     });
+    const chainId = (app.chain?.meta.node.ethChainId || 1).toString();
     return signature;
   }
 

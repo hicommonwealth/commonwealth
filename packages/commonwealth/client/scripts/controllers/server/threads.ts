@@ -52,6 +52,9 @@ export const modelFromServer = (thread) => {
     last_commented_on,
     linked_threads,
     numberOfComments,
+    canvasAction,
+    canvasSession,
+    canvasHash,
   } = thread;
 
   const attachments = Attachments
@@ -156,6 +159,9 @@ export const modelFromServer = (thread) => {
     lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
     linkedThreads,
     numberOfComments,
+    canvasAction,
+    canvasSession,
+    canvasHash,
   });
 };
 
@@ -248,6 +254,17 @@ class ThreadsController {
   ) {
     try {
       // TODO: Change to POST /thread
+      const {
+        action = null,
+        session = null,
+        hash = null,
+      } = await app.sessions.signThread({
+        community: chainId,
+        title,
+        body,
+        link: url,
+        topic: topic.id,
+      });
       const response = await $.post(`${app.serverUrl()}/createThread`, {
         author_chain: app.user.activeAccount.chain.id,
         author: JSON.stringify(app.user.activeAccount.profile),
@@ -263,6 +280,9 @@ class ThreadsController {
         url,
         readOnly,
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       const result = modelFromServer(response.result);
       this._store.add(result);
@@ -295,6 +315,8 @@ class ThreadsController {
       throw new Error(
         err.responseJSON && err.responseJSON.error
           ? err.responseJSON.error
+          : err.message
+          ? err.message
           : 'Failed to create thread'
       );
     }
@@ -309,6 +331,18 @@ class ThreadsController {
   ) {
     const newBody = body || proposal.body;
     const newTitle = title || proposal.title;
+    const {
+      action = null,
+      session = null,
+      hash = null,
+    } = await app.sessions.signThread({
+      community: app.activeChainId(),
+      title: newTitle,
+      body: newBody,
+      link: url,
+      topic: proposal.topic.id,
+    });
+
     await $.ajax({
       url: `${app.serverUrl()}/editThread`,
       type: 'PUT',
@@ -325,6 +359,9 @@ class ThreadsController {
         url,
         'attachments[]': attachments,
         jwt: app.user.jwt,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       },
       success: (response) => {
         const result = modelFromServer(response.result);
@@ -348,6 +385,14 @@ class ThreadsController {
   }
 
   public async delete(proposal) {
+    const {
+      session = null,
+      action = null,
+      hash = 0,
+    } = await app.sessions.signDeleteThread({
+      thread_id: proposal.canvasHash,
+    });
+
     return new Promise((resolve, reject) => {
       // TODO: Change to DELETE /thread
       $.post(`${app.serverUrl()}/deleteThread`, {

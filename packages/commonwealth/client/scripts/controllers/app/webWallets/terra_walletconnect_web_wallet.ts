@@ -5,9 +5,10 @@ import {
   getChainOptions,
   WalletController,
 } from '@terra-money/wallet-controller';
+import { SessionPayload } from '@canvas-js/interfaces';
+
+import { Account, BlockInfo, IWebWallet } from 'models';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 
 // TODO: ensure this only opens on mobile
@@ -70,7 +71,7 @@ class TerraWalletConnectWebWalletController
 
   public async signCanvasMessage(
     account: Account,
-    canvasMessage: CanvasData
+    canvasMessage: SessionPayload
   ): Promise<string> {
     try {
       const result = await this._wallet.signBytes(

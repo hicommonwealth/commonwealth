@@ -383,12 +383,20 @@ module.exports = {
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 18 },
-        { transaction, truncate: true, cascade: true }
+        { transaction }
       );
       await queryInterface.bulkDelete(
         'ChainNodes',
         { id: 21 },
         { transaction }
+      );
+      await queryInterface.sequelize.query(
+        `UPDATE "ChainNodes" SET name = REGEXP_REPLACE(url, 'https?://', 'Imported node:');`,
+        {
+          raw: true,
+          type: 'RAW',
+          transaction,
+        }
       );
       await queryInterface.changeColumn(
         'ChainNodes',

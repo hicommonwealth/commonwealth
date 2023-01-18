@@ -38,12 +38,35 @@ class ReactionCountController {
     reaction: string,
     chainId: string
   ) {
+    // TODO: use canvas id
+    const like = reaction === 'like';
+    const {
+      session = null,
+      action = null,
+      hash = null,
+    } = post instanceof Thread
+      ? await app.sessions.signThreadReaction({
+          thread_id: (post as Thread).id,
+          like,
+        })
+      : post instanceof Proposal
+      ? {}
+      : post instanceof Comment
+      ? await app.sessions.signCommentReaction({
+          comment_id: (post as Comment<any>).id,
+          like,
+        })
+      : {};
+
     const options = {
       author_chain: app.user.activeAccount.chain.id,
       chain: chainId,
       address,
       reaction,
       jwt: app.user.jwt,
+      canvas_action: action,
+      canvas_session: session,
+      canvas_hash: hash,
     };
     if (post instanceof Thread) {
       options['thread_id'] = (post as Thread).id;
@@ -81,6 +104,9 @@ class ReactionCountController {
           comment_id,
           has_reacted: true,
           like: 1,
+          canvas_action: action,
+          canvas_session: session,
+          canvas_hash: hash,
         };
         this.store.add(modelFromServer(rc));
       } else {
@@ -96,12 +122,31 @@ class ReactionCountController {
   }
 
   public async delete(reaction, reactionCount: ReactionCount<any>) {
+    const {
+      session = null,
+      action = null,
+      hash = null,
+    } = reaction.thread_id
+      ? await app.sessions.signDeleteThreadReaction({
+          thread_id: reaction.canvas_hash,
+        })
+      : reaction.proposal_id
+      ? {}
+      : reaction.comment_id
+      ? await app.sessions.signDeleteCommentReaction({
+          comment_id: reaction.canvas_hash,
+        })
+      : {};
+
     // TODO Graham 4/24/22: Investigate necessity of this duplication
     const _this = this; // eslint-disable-line
     try {
       await $.post(`${app.serverUrl()}/deleteReaction`, {
         jwt: app.user.jwt,
         reaction_id: reaction.id,
+        canvas_action: action,
+        canvas_session: session,
+        canvas_hash: hash,
       });
       _this.store.update(reactionCount);
       if (reactionCount.likes === 0 && reactionCount.dislikes === 0) {
