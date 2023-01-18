@@ -7,7 +7,7 @@ export * as Erc721Events from './chains/erc721/index';
 export * as AaveEvents from './chains/aave/index';
 export * as CommonwealthEvents from './chains/commonwealth/index';
 export * as CosmosEvents from './chains/cosmos/index';
-
+export * as CommonwealthTypes from './chains/commonwealth/types';
 export { Listener } from './Listener';
 export * from './handlers';
 export * from './util';

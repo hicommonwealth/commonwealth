@@ -48,7 +48,7 @@ const LinkAccountItem: m.Component<
       ? addressSwapper({
           address: account.address,
           currentPrefix: parseInt(
-            (app.chain as Substrate)?.meta.ss58Prefix,
+            (app.chain as Substrate)?.meta.ss58_prefix,
             10
           ),
         })
@@ -192,7 +192,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
               ? addressSwapper({
                   address,
                   currentPrefix: parseInt(
-                    (app.chain as Substrate)?.meta.ss58Prefix,
+                    (app.chain as Substrate)?.meta.ss58_prefix,
                     10
                   ),
                 })

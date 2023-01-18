@@ -13,6 +13,7 @@ import { ChainStore, NodeStore } from 'stores';
 import type { InviteCodeAttributes } from 'types';
 import RecentActivityController from './controllers/app/recent_activity';
 import WebWalletController from './controllers/app/web_wallets';
+import ProjectsController from './controllers/chain/ethereum/commonwealth/projects';
 import SnapshotController from './controllers/chain/snapshot';
 import CommentsController from './controllers/server/comments';
 import CommunitiesController from './controllers/server/communities';

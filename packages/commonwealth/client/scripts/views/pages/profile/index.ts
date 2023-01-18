@@ -141,7 +141,7 @@ const loadProfile = async (
   const chainInfo = app.config.chains.getById(chain);
   let valid = false;
   if (chainInfo?.base === ChainBase.Substrate) {
-    const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
+    const ss58Prefix = parseInt(chainInfo.ss58_prefix, 10);
     [valid] = checkAddress(address, ss58Prefix);
   } else if (chainInfo?.base === ChainBase.Ethereum) {
     valid = checkAddressChecksum(address);
@@ -298,7 +298,7 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
 
     if (chainInfo?.base === ChainBase.Substrate) {
       const decodedAddress = decodeAddress(address);
-      const ss58Prefix = parseInt(chainInfo.ss58Prefix, 10);
+      const ss58Prefix = parseInt(chainInfo.ss58_prefix, 10);
 
       const [valid] = checkAddress(address, ss58Prefix);
       if (!valid) {

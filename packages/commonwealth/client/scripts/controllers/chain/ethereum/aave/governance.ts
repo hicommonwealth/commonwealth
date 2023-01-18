@@ -11,7 +11,6 @@ import { attachSigner } from '../contractApi';
 import type AaveApi from './api';
 import type AaveChain from './chain';
 
-import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import AaveProposal from './proposal';
 
 export interface AaveProposalArgs {

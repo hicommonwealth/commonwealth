@@ -109,7 +109,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           `Failed to enable chain: ${err.message}. Trying experimentalSuggestChain...`
         );
 
-        const bech32Prefix = app.chain.meta.bech32Prefix;
+        const bech32Prefix = app.chain.meta.bech32_prefix;
         const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.name,
@@ -130,21 +130,21 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
           },
           currencies: [
             {
-              coinDenom: app.chain.meta.defaultSymbol,
-              coinMinimalDenom: `u${app.chain.meta.defaultSymbol.toLowerCase()}`,
+              coinDenom: app.chain.meta.default_symbol,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           feeCurrencies: [
             {
-              coinDenom: app.chain.meta.defaultSymbol,
-              coinMinimalDenom: `u${app.chain.meta.defaultSymbol.toLowerCase()}`,
+              coinDenom: app.chain.meta.default_symbol,
+              coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
               coinDecimals: app.chain.meta.decimals || 6,
             },
           ],
           stakeCurrency: {
-            coinDenom: app.chain.meta.defaultSymbol,
-            coinMinimalDenom: `u${app.chain.meta.defaultSymbol.toLowerCase()}`,
+            coinDenom: app.chain.meta.default_symbol,
+            coinMinimalDenom: `u${app.chain.meta.default_symbol.toLowerCase()}`,
             coinDecimals: app.chain.meta.decimals || 6,
           },
           gasPriceStep: { low: 0, average: 0.025, high: 0.03 },

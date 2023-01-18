@@ -13,7 +13,6 @@ import type MolochChain from './chain';
 import type MolochMember from './member';
 import type MolochMembers from './members';
 
-import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import MolochProposal from './proposal';
 
 export default class MolochGovernance extends ProposalModule<

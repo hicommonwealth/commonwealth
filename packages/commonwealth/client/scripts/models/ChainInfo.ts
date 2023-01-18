@@ -1,11 +1,8 @@
 import type { RegisteredTypes } from '@polkadot/types/types';
-import type { ChainNetwork } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
 import m from 'mithril';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'common-common/src/types';
-import NodeInfo from './NodeInfo';
 import app from 'state';
 
 import {
@@ -19,7 +16,7 @@ class ChainInfo {
   public readonly id: string;
   public readonly ChainNode: NodeInfo;
   public readonly tokenName: string;
-  public readonly defaultSymbol: string;
+  public readonly default_symbol: string;
   public name: string;
   public readonly network: ChainNetwork;
   public readonly base: ChainBase;
@@ -44,8 +41,8 @@ class ChainInfo {
   public type: string;
   public defaultAllowPermissions: bigint;
   public defaultDenyPermissions: bigint;
-  public readonly ss58Prefix: string;
-  public readonly bech32Prefix: string;
+  public readonly ss58_prefix: string;
+  public readonly bech32_prefix: string;
   public decimals: number;
   public substrateSpec: RegisteredTypes;
   public hideProjects: boolean;
@@ -61,7 +58,7 @@ class ChainInfo {
   constructor({
     id,
     network,
-    defaultSymbol,
+    default_symbol,
     name,
     iconUrl,
     description,
@@ -80,8 +77,8 @@ class ChainInfo {
     defaultOverview,
     adminsAndMods,
     base,
-    ss58Prefix,
-    bech32Prefix,
+    ss58_prefix,
+    bech32_prefix,
     type,
     defaultAllowPermissions,
     defaultDenyPermissions,
@@ -97,7 +94,7 @@ class ChainInfo {
     this.id = id;
     this.network = network;
     this.base = base;
-    this.defaultSymbol = defaultSymbol;
+    this.default_symbol = default_symbol;
     this.name = name;
     this.iconUrl = iconUrl;
     this.description = description;
@@ -118,8 +115,8 @@ class ChainInfo {
     this.type = type;
     this.defaultAllowPermissions = defaultAllowPermissions;
     this.defaultDenyPermissions = defaultDenyPermissions;
-    this.ss58Prefix = ss58Prefix;
-    this.bech32Prefix = bech32Prefix;
+    this.ss58_prefix = ss58_prefix;
+    this.bech32_prefix = bech32_prefix;
     this.decimals = decimals;
     this.substrateSpec = substrateSpec;
     this.hideProjects = hideProjects;
@@ -183,7 +180,7 @@ class ChainInfo {
     return new ChainInfo({
       id,
       network,
-      defaultSymbol: default_symbol,
+      default_symbol: default_symbol,
       name,
       iconUrl: icon_url,
       description,
@@ -202,8 +199,8 @@ class ChainInfo {
       defaultOverview: default_summary_view,
       adminsAndMods,
       base,
-      ss58Prefix: ss58_prefix,
-      bech32Prefix: bech32_prefix,
+      ss58_prefix: ss58_prefix,
+      bech32_prefix: bech32_prefix,
       type,
       defaultAllowPermissions: default_allow_permissions,
       defaultDenyPermissions: default_deny_permissions,
