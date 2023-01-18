@@ -868,6 +868,10 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
+            '/profile/manage': importRoute('views/pages/manage_profiles', {
+              scoped: false,
+              hideSidebar: false,
+            }),
             '/profile/:address': importRoute('views/pages/new_profile', {
                 scoped: false,
                 hideSidebar: false,
@@ -879,10 +883,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
                 hideSidebar: false,
               }
             ),
-            '/manage-profiles': importRoute('views/pages/manage_profiles', {
-              scoped: false,
-              hideSidebar: false,
-            }),
             '/dashboard': importRoute('views/pages/user_dashboard', {
               scoped: false,
               deferChain: true,

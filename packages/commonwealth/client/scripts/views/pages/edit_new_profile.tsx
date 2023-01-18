@@ -188,7 +188,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     if (response?.status === 'Success') {
       // Redirect
       setTimeout(() => {
-        m.route.set(`/manage-profiles`);
+        m.route.set(`/profile/manage`);
       }, 1500);
     } else {
       this.failed = true;

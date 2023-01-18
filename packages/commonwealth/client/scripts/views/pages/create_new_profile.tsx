@@ -53,7 +53,7 @@ export default class CreateNewProfile extends ClassComponent {
     if (response?.status === 'Success') {
       // Redirect
       setTimeout(() => {
-        m.route.set('/manage-profiles'); // new address created from response?
+        m.route.set('/profile/manage'); // new address created from response?
       }, 1500);
     } else {
       this.error = true;

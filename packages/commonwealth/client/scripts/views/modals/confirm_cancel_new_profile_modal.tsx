@@ -49,7 +49,7 @@ export class ConfirmCancelNewProfileModal extends ClassComponent {
               setTimeout(() => {
                 $(e.target).trigger('modalexit');
               }, 0);
-              m.route.set(`/manage-profiles`);
+              m.route.set(`/profile/manage`);
             }}
           />
         </div>
