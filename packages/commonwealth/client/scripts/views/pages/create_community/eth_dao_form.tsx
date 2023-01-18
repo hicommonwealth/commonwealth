@@ -206,8 +206,14 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
-            const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
-              this.state.form;
+            const {
+              chainString,
+              ethChainId,
+              nodeUrl,
+              tokenName,
+              symbol,
+              iconUrl,
+            } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
@@ -222,6 +228,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
                 eth_chain_id: ethChainId,
                 jwt: app.user.jwt,
                 node_url: nodeUrl,
+                icon_url: iconUrl,
                 token_name: tokenName,
                 type: ChainType.DAO,
                 default_symbol: symbol,
