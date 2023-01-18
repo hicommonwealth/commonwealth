@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
 
@@ -36,7 +37,7 @@ export type PollOptionAttrs = {
 };
 
 export class PollOptions extends ClassComponent<PollOptionAttrs> {
-  view(vnode: m.Vnode<PollOptionAttrs>) {
+  view(vnode: ResultNode<PollOptionAttrs>) {
     const {
       multiSelect,
       voteInformation,
@@ -45,7 +46,7 @@ export class PollOptions extends ClassComponent<PollOptionAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="PollOptions">
+      <div className="PollOptions">
         {multiSelect
           ? voteInformation.map((option) => (
               <CWCheckbox
@@ -91,7 +92,7 @@ export type CastVoteAttrs = {
 };
 
 export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
-  view(vnode: m.Vnode<CastVoteAttrs>) {
+  view(vnode: ResultNode<CastVoteAttrs>) {
     const {
       disableVoteButton,
       timeRemaining,
@@ -100,7 +101,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="CastVoteSection">
+      <div className="CastVoteSection">
         {disableVoteButton ? (
           <CWTooltip
             interactionType="hover"
@@ -112,7 +113,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
                 label="Vote"
                 buttonType="mini-black"
                 disabled={disableVoteButton}
-                onclick={() => onVoteCast()}
+                onClick={() => onVoteCast()}
               />
             }
           />
@@ -121,7 +122,7 @@ export class CastVoteSection extends ClassComponent<CastVoteAttrs> {
             label="Vote"
             buttonType="mini-black"
             disabled={disableVoteButton}
-            onclick={() => onVoteCast()}
+            onClick={() => onVoteCast()}
           />
         )}
         <CWText className="time-remaining-text" type="caption">
@@ -140,7 +141,7 @@ export type VoteDisplayAttrs = {
 };
 
 export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
-  view(vnode: m.Vnode<VoteDisplayAttrs>) {
+  view(vnode: ResultNode<VoteDisplayAttrs>) {
     const { voteDirectionString, timeRemaining, pollEnded, voteInformation } =
       vnode.attrs;
 
@@ -149,10 +150,10 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
     )[0].label;
 
     return (
-      <div class="VoteDisplay">
+      <div className="VoteDisplay">
         {!pollEnded ? (
-          <>
-            <div class="vote-direction">
+          <React.Fragment>
+            <div className="vote-direction">
               <CWIcon
                 iconName="check"
                 iconSize="small"
@@ -163,9 +164,9 @@ export class VoteDisplay extends ClassComponent<VoteDisplayAttrs> {
             <CWText className="time-remaining-text" type="caption">
               {timeRemaining}
             </CWText>
-          </>
+          </React.Fragment>
         ) : (
-          <div class="completed-vote-information">
+          <div className="completed-vote-information">
             <CWText type="caption">This Poll is Complete</CWText>
             <CWText type="caption">{`"${topResponse}" was the Top Response`}</CWText>
             {voteDirectionString !== '' && (
@@ -196,7 +197,7 @@ export type ResultsSectionAttrs = {
 };
 
 export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
-  view(vnode: m.Vnode<ResultsSectionAttrs>) {
+  view(vnode: ResultNode<ResultsSectionAttrs>) {
     const {
       resultString,
       onResultsClick,
@@ -233,9 +234,9 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
     }
 
     return (
-      <div class="ResultsSection">
+      <div className="ResultsSection">
         {!isPreview && (
-          <div class="results-header">
+          <div className="results-header">
             <CWText type="b1" fontWeight="bold">
               {resultString}
             </CWText>
@@ -244,7 +245,7 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
               className={getClasses<{ clickable?: boolean }>({
                 clickable: onResultsClick && hasVotes,
               })}
-              onclick={
+              onClick={
                 onResultsClick && hasVotes
                   ? (e) => onResultsClick(e)
                   : undefined
@@ -256,7 +257,7 @@ export class ResultsSection extends ClassComponent<ResultsSectionAttrs> {
             </CWText>
           </div>
         )}
-        <div class="results-content">
+        <div className="results-content">
           {voteInformation
             .sort((option1, option2) => {
               if (pollEnded) {
@@ -315,7 +316,7 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
   private totalVoteCount: number;
   private voteDirectionString: string;
 
-  oninit(vnode: m.Vnode<PollCardAttrs>) {
+  oninit(vnode: ResultNode<PollCardAttrs>) {
     // Initialize state which can change during the lifecycle of the component.
     this.hasVoted = vnode.attrs.hasVoted;
     this.voteDirectionString = vnode.attrs.votedFor
@@ -325,7 +326,7 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
     this.selectedOptions = [];
   }
 
-  view(vnode: m.Vnode<PollCardAttrs>) {
+  view(vnode: ResultNode<PollCardAttrs>) {
     const {
       disableVoteButton = false,
       incrementalVoteCast,
@@ -367,7 +368,7 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
         },
         this.selectedOptions.length === 0
       );
-      m.redraw();
+      redraw();
     };
 
     return (
@@ -375,9 +376,9 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
         <CWText type="b2" className="poll-title-text">
           {proposalTitle}
         </CWText>
-        <div class="poll-voting-section">
+        <div className="poll-voting-section">
           {!this.hasVoted && !pollEnded && !isPreview && (
-            <>
+            <React.Fragment>
               <PollOptions
                 multiSelect={multiSelect}
                 voteInformation={voteInformation}
@@ -392,7 +393,7 @@ export class PollCard extends ClassComponent<PollCardAttrs> {
                 tooltipErrorMessage={tooltipErrorMessage}
                 onVoteCast={castVote}
               />
-            </>
+            </React.Fragment>
           )}
           {((this.hasVoted && !isPreview) || pollEnded) && (
             <VoteDisplay

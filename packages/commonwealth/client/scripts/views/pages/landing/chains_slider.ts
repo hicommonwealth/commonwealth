@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import 'pages/landing/chains_slider.scss';
 import { Chain } from './index';
 
@@ -11,31 +12,31 @@ interface IState {
 const initialSlides = 4;
 
 const chainToTag = (chain, index: number) => {
-  return m(
+  return render(
     'li',
     {
       id: `card_${index}`,
       class: 'glide__slide mt-4 pb-8',
 
-      onclick: (e) => {
+      onClick: (e) => {
         e.preventDefault();
-        m.route.set(`/${chain.id}`);
+        setRoute(`/${chain.id}`);
         localStorage['home-scrollY'] = window.scrollY;
       },
     },
-    m(
+    render(
       'div',
       {
         class:
           'bg-white shadow-xl p-5 xl:p-10 rounded-xl text-center h-56 grow',
       },
       [
-        m('img', {
+        render('img', {
           class: 'mx-auto mb-3 w-12 h-auto',
           src: chain.img,
           alt: '',
         }),
-        m(
+        render(
           'h3',
           {
             class: 'text-2xl font-extrabold mb-1',
@@ -43,13 +44,14 @@ const chainToTag = (chain, index: number) => {
           },
           chain.name
         ),
-        m('p', { class: 'text-xl' }, chain.description),
+        render('p', { class: 'text-xl' }, chain.description),
       ]
     )
   );
 };
 
-const TokensChainsComponent: m.Component<IState, IState & { displayedChains, index: number }> = {
+/* @FIXME STATE NEEDS TO GO */
+const TokensChainsComponent: Component<IState, IState & { displayedChains, index: number }> = {
   oninit: (vnode) => {
     vnode.state.index = 0;
     vnode.state.displayedChains = vnode.attrs.chains.slice(0, initialSlides).map(chainToTag);
@@ -59,7 +61,7 @@ const TokensChainsComponent: m.Component<IState, IState & { displayedChains, ind
     const glide = vnode.state.oncreateSlider();
 
     glide.on('run.before', () => {
-      m.redraw();
+      redraw();
       vnode.state.index++;
     });
 
@@ -73,22 +75,22 @@ const TokensChainsComponent: m.Component<IState, IState & { displayedChains, ind
     glide.mount();
   },
   view: (vnode) => {
-    return m(
+    return render(
       'section.TokensChainsComponent',
       {
         class:
           'bg-geometric-pattern bg-cover bg-full pt-20 pb-40 md:pb-48 mb-48 relative',
       },
       [
-        m('div', { class: 'container mx-auto' }, [
-          m(
+        render('div', { class: 'container mx-auto' }, [
+          render(
             'h2',
             {
               class: 'text-3xl text-left font-extrabold mb-5 text-center',
             },
             ' Every token, every chain '
           ),
-          m(
+          render(
             'p',
             {
               class:
@@ -97,18 +99,18 @@ const TokensChainsComponent: m.Component<IState, IState & { displayedChains, ind
             ' Subscribe to chain activity like whale transfers or major votes. Discuss new ideas, crowdfund projects, and access native governance for Layer 1s, tokens, and NFTs alike. '
           ),
         ]),
-        m(
+        render(
           'div',
           {
             class: 'absolute bottom-0 left-0 right-0 transform translate-y-1/2',
           },
-          m(
+          render(
             'div',
             { class: 'glide' },
-            m(
+            render(
               'div',
               { class: 'glide__track', 'data-glide-el': 'track' },
-              m('ul', { class: 'glide__slides' }, [
+              render('ul', { class: 'glide__slides' }, [
                 ...vnode.state.displayedChains,
               ])
             )

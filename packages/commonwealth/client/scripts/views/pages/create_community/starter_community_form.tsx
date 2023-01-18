@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -47,7 +48,7 @@ export class StarterCommunityForm extends ClassComponent {
 
   view() {
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <InputRow
           title="Name"
           placeholder="Enter the name of your community"
@@ -86,7 +87,7 @@ export class StarterCommunityForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving || this.state.form.id.length < 1}
-          onclick={async () => {
+          onClick={async () => {
             this.state.saving = true;
             const additionalArgs: {
               eth_chain_id?: number;
@@ -172,7 +173,7 @@ export class StarterCommunityForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              m.route.set(`/${res.result.chain?.id}`);
+              setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error ||

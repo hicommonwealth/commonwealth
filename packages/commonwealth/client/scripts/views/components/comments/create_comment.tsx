@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import BN from 'bn.js';
 
 import 'components/comments/create_comment.scss';
@@ -36,7 +46,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
   private sendingComment;
   private uploadsInProgress;
 
-  view(vnode: m.Vnode<CreateCommmentAttrs>) {
+  view(vnode: ResultNode<CreateCommmentAttrs>) {
     const {
       handleIsReplying,
       parentCommentId,
@@ -92,7 +102,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
         // once we are receiving notifications from the websocket
         await app.user.notifications.refresh();
 
-        m.redraw();
+        redraw();
 
         jumpHighlightComment(res.id);
       } catch (err) {
@@ -101,7 +111,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
         this.quillEditorState.enable();
         this.error = err.message;
         this.sendingComment = false;
-        m.redraw();
+        redraw();
       }
 
       this.saving = false;
@@ -109,7 +119,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       if (handleIsReplying) {
         handleIsReplying(false);
       }
-      m.redraw();
+      redraw();
     };
 
     const activeTopicName =
@@ -142,7 +152,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
       : 18;
 
     return (
-      <div class="CreateComment">
+      <div className="CreateComment">
         {app.user.activeAccount && !app.user.activeAccount?.profile.name ? (
           <CWText type="h5" className="callout-text">
             You haven't set a display name yet.
@@ -150,13 +160,13 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
               href={`/${app.activeChainId()}/account/${
                 app.user.activeAccount.address
               }?base=${app.user.activeAccount.chain.id}`}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 app.modals.create({
                   modal: EditProfileModal,
                   data: {
                     account: app.user.activeAccount,
-                    refreshCallback: () => m.redraw(),
+                    refreshCallback: () => redraw(),
                   },
                 });
               }}
@@ -165,9 +175,9 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
             </a>
           </CWText>
         ) : (
-          <>
-            <div class="attribution-row">
-              <div class="attribution-left-content">
+          <React.Fragment>
+            <div className="attribution-row">
+              <div className="attribution-left-content">
                 <CWText type="caption">
                   {parentType === ContentType.Comment
                     ? 'Reply as'
@@ -178,7 +188,11 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                   fontWeight="medium"
                   className="user-link-text"
                 >
-                  <User user={author} hideAvatar linkify />
+                  {render(User, {
+                    user: author,
+                    hideAvatar: true,
+                    linkify: true,
+                  })}
                 </CWText>
               </div>
               {error && <CWValidationText message={error} status="failure" />}
@@ -197,21 +211,21 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                 {weiToTokens(tokenPostingThreshold.toString(), decimals)}{' '}
                 {app.chain.meta.default_symbol}.{' '}
                 {userBalance && app.user.activeAccount && (
-                  <>
+                  <React.Fragment>
                     You have {weiToTokens(userBalance.toString(), decimals)}{' '}
                     {app.chain.meta.default_symbol}.
-                  </>
+                  </React.Fragment>
                 )}
               </CWText>
             )}
             <div
-              class="form-bottom"
-              onmouseover={() => {
+              className="form-bottom"
+              onMouseOver={() => {
                 // keeps Quill's isBlank up to date
-                return m.redraw();
+                return this.redraw();
               }}
             >
-              <div class="form-buttons">
+              <div className="form-buttons">
                 <CWButton
                   disabled={
                     !handleIsReplying
@@ -219,7 +233,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                       : undefined
                   }
                   buttonType="secondary-blue"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
 
                     if (handleIsReplying) {
@@ -230,12 +244,12 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                 />
                 <CWButton
                   disabled={disabled}
-                  onclick={handleSubmitComment}
+                  onClick={handleSubmitComment}
                   label={uploadsInProgress > 0 ? 'Uploading...' : 'Submit'}
                 />
               </div>
             </div>
-          </>
+          </React.Fragment>
         )}
       </div>
     );

@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -37,7 +47,7 @@ class MembersPage extends ClassComponent {
   private membersLoaded: MemberInfo[];
   private membersRequested: boolean;
   private numProfilesLoaded: number;
-  private onscroll: any;
+  private onScroll: any;
   private profilesFinishedLoading: boolean;
   private profilesLoaded: ProfileInfo[];
   private totalMembersCount: number;
@@ -88,7 +98,7 @@ class MembersPage extends ClassComponent {
         this.membersLoaded = membersActive
           .concat(membersInactive)
           .sort((a, b) => b.count - a.count);
-        m.redraw();
+        this.redraw();
       });
     }
 
@@ -109,6 +119,11 @@ class MembersPage extends ClassComponent {
     if (!this.initialProfilesLoaded) {
       this.initialScrollFinished = false;
       this.initialProfilesLoaded = true;
+
+      // TODO: expand into controller
+      app.profiles.isFetched.on('redraw', () => {
+        this.redraw();
+      });
 
       // Set initial number loaded (contingent on navigation)
       if (navigatedFromAccount) {
@@ -156,7 +171,7 @@ class MembersPage extends ClassComponent {
       }, 100);
     }
 
-    this.onscroll = _.debounce(() => {
+    this.onScroll = _.debounce(() => {
       const scrollHeight = $(document).height();
 
       const scrollPos = $(window).height() + $(window).scrollTop();
@@ -181,7 +196,7 @@ class MembersPage extends ClassComponent {
         }
 
         this.numProfilesLoaded += newBatchSize;
-        m.redraw();
+        this.redraw();
       }
     }, 400);
 
@@ -196,24 +211,24 @@ class MembersPage extends ClassComponent {
     return (
       <Sublayout
         title={<BreadcrumbsTitleTag title="Members" />}
-        onscroll={this.onscroll}
+        onScroll={this.onScroll}
       >
-        <div class="MembersPage">
+        <div className="MembersPage">
           <CWText type="h3" fontWeight="medium">
             {totalMembersCount ? `Members (${totalMembersCount})` : 'Members'}
           </CWText>
-          <div class="header-row">
+          <div className="header-row">
             <CWText type="h5">Member</CWText>
             <CWText type="h5">Posts / Month</CWText>
           </div>
-          <div class="members-container">
-            {profilesLoaded.map((profileInfo) => {
+          <div className="members-container">
+            {profilesLoaded.map((profileInfo, i) => {
               const { address, chain } = profileInfo.profile;
               return (
-                <div class="member-row">
+                <div className="member-row" key={i}>
                   <a
                     href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       localStorage[`${app.activeChainId()}-members-scrollY`] =
                         window.scrollY;
@@ -230,7 +245,7 @@ class MembersPage extends ClassComponent {
               );
             })}
           </div>
-          <div class="infinite-scroll-wrapper">
+          <div className="infinite-scroll-wrapper">
             {profilesFinishedLoading ? (
               <CWText className="infinite-scroll-reached-end-text">
                 Showing all {membersLoaded.length} community members

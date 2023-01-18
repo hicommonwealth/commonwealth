@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import 'pages/landing/landing_page_header.scss';
 import app from 'state';
 import { NewLoginModal } from 'views/modals/login_modal';
@@ -47,7 +48,7 @@ const scrollingHeader = () => {
   }
 };
 
-const HeaderLandingPage: m.Component<IAttrs, IState> = {
+const HeaderLandingPage: Component<IAttrs, IState> = {
   oninit: (vnode) => {
     if (vnode.attrs.scrollHeader) {
       window.addEventListener('scroll', scrollingHeader);
@@ -60,59 +61,59 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
   },
   view: (vnode) => {
     const redirectClick = (route) => {
-      m.route.set(route);
+      setRoute(route);
     };
 
-    return m(
+    return render(
       '.HeaderLandingPage',
       { class: 'container mx-auto' },
-      m(
+      render(
         'header',
         {
           id: 'landing-page',
           class: `landing-header ${INITIAL_HEADER_STYLE}     mt-8`,
         },
         [
-          // m(CWIcon, {
+          // render(CWIcon, {
           //   iconName: 'commonLogo',
           //   iconSize: 'xxl',
           //   alt: 'Commonwealth',
-          //   style: m.route.get() === '/' ? '' : 'cursor:pointer',
-          //   onclick: () => redirectClick('/'),
+          //   style: getRoute() === '/' ? '' : 'cursor:pointer',
+          //   onClick: () => redirectClick('/'),
           // }),
-          m('img', {
+          render('img', {
             src: 'static/img/commonLogoWithText.svg',
             alt: 'Commonwealth',
             class: 'logoWithText',
           }),
-          m(
+          render(
             'nav',
             { class: 'lg:block hidden' },
-            m('ul', { class: 'lg:flex lg:flex-row lg:items-center' }, [
+            render('ul', { class: 'lg:flex lg:flex-row lg:items-center' }, [
               vnode.attrs.navs.map((nav: any) => {
-                return m(
+                return render(
                   'li.LandingPageHeaderLinks',
                   { class: 'ml-10 py-8 lg:flex' },
-                  m(
+                  render(
                     'a',
                     {
                       class: 'text-2xl lg:text-base text-gray-500 leading-none',
-                      onclick: () => redirectClick(nav.redirectTo),
+                      onClick: () => redirectClick(nav.redirectTo),
                     },
                     nav.text
                   )
                 );
               }),
-              m(
+              render(
                 'li.LandingPageHeaderLoginButton',
                 { class: ' ml-5 md:ml-10 lg:pt-0 ' },
-                m(
+                render(
                   'a',
                   {
                     class:
                       ' block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline',
                     style: 'padding: 8px 16px',
-                    onclick: () =>
+                    onClick: () =>
                       app.modals.create({
                         modal: NewLoginModal,
                         data: {
@@ -126,7 +127,7 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
                       }),
                   },
                   [
-                    m('img', {
+                    render('img', {
                       class: 'inline mr-1.5',
                       style: 'padding: 0',
                       src: 'static/img/user.svg',
@@ -138,19 +139,19 @@ const HeaderLandingPage: m.Component<IAttrs, IState> = {
               ),
             ])
           ),
-          m(
+          render(
             'button',
             {
               class: 'menuButton lg:hidden',
-              onclick: () => triggerMenu(),
+              onClick: () => triggerMenu(),
             },
             [
-              m('img', {
+              render('img', {
                 class: 'inline mr-1.5 menu',
                 src: 'static/img/menu.svg',
                 alt: 'Menu icon',
               }),
-              m('img', {
+              render('img', {
                 class: 'inline mr-1.5 close',
                 src: 'static/img/close.svg',
                 alt: 'Close icon',

@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -29,7 +29,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWText>
           Becoming a candidate requires a deposit of
           {formatCoin(substrate.phragmenElections.candidacyBond)}. It will be
@@ -39,7 +39,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
         </CWText>
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
@@ -59,7 +59,7 @@ export class PhragmenCandidacyForm extends ClassComponent {
             );
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

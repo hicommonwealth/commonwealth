@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import { formatDuration, blocknumToTime } from 'helpers';
@@ -16,7 +17,7 @@ export class Countdown extends ClassComponent<CountdownAttrs> {
   private timer;
   private timerHandle;
 
-  view(vnode: m.Vnode<CountdownAttrs>) {
+  view(vnode: ResultNode<CountdownAttrs>) {
     const { time, duration, includeSeconds } = vnode.attrs;
     if (!time && !duration) return;
 
@@ -29,7 +30,7 @@ export class Countdown extends ClassComponent<CountdownAttrs> {
         oncreate={() => {
           this.timerHandle = setInterval(() => {
             this.timer++;
-            m.redraw();
+            redraw();
           }, 1000);
         }}
         onremove={() => {
@@ -52,7 +53,7 @@ type CountdownUntilBlockAttrs = {
 };
 
 export class CountdownUntilBlock extends ClassComponent<CountdownUntilBlockAttrs> {
-  view(vnode: m.Vnode<CountdownUntilBlockAttrs>) {
+  view(vnode: ResultNode<CountdownUntilBlockAttrs>) {
     let { includeSeconds } = vnode.attrs;
     if (!vnode.attrs.block) return;
     if (includeSeconds === undefined) includeSeconds = true;

@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/council.scss';
 
@@ -31,7 +41,7 @@ type CouncillorAttrs = {
 };
 
 class Councillor extends ClassComponent<CouncillorAttrs> {
-  view(vnode: m.Vnode<CouncillorAttrs>) {
+  view(vnode: ResultNode<CouncillorAttrs>) {
     if (!vnode.attrs.account) return;
 
     const { account } = vnode.attrs;
@@ -167,7 +177,7 @@ class CouncilPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Council" />}
       >
-        <div class="CouncilPage">
+        <div className="CouncilPage">
           <GovExplainer
             statHeaders={[
               {
@@ -205,9 +215,9 @@ class CouncilPage extends ClassComponent {
               app.user.activeAccount &&
               app.user.activeAccount instanceof SubstrateAccount &&
               app.chain.networkStatus === ApiStatus.Connected && (
-                <>
+                <React.Fragment>
                   <CWButton
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       app.modals.create({
                         modal: CouncilVotingModal,
@@ -217,7 +227,7 @@ class CouncilPage extends ClassComponent {
                     label="Vote"
                   />
                   <CWButton
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       if (activeAccountIsCandidate) {
                         return;
@@ -233,7 +243,7 @@ class CouncilPage extends ClassComponent {
                         : 'Run for council'
                     }
                   />
-                </>
+                </React.Fragment>
               )
             }
           />

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/sidebar/external_links_module.scss';
 
@@ -17,40 +18,40 @@ export class ExternalLinksModule extends ClassComponent {
     if (!website && !discord && !telegram && !github) return;
 
     return (
-      <div class="ExternalLinksModule">
+      <div className="ExternalLinksModule">
         {discord && (
           <CWIcon
             iconName="discord"
             className="discord-link"
-            onclick={() => window.open(discord)}
+            onClick={() => window.open(discord)}
           />
         )}
         {element && (
           <CWIcon
             iconName="element"
             className="element-link"
-            onclick={() => window.open(element)}
+            onClick={() => window.open(element)}
           />
         )}
         {telegram && (
           <CWIcon
             iconName="telegram"
             className="telegram-link"
-            onclick={() => window.open(telegram)}
+            onClick={() => window.open(telegram)}
           />
         )}
         {github && (
           <CWIcon
             iconName="github"
             className="github-link"
-            onclick={() => window.open(github)}
+            onClick={() => window.open(github)}
           />
         )}
         {website && (
           <CWIcon
             iconName="website"
             className="website-link"
-            onclick={() => window.open(website)}
+            onClick={() => window.open(website)}
           />
         )}
       </div>

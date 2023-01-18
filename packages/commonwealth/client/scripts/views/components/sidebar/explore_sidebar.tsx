@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/sidebar/explore_sidebar.scss';
 
@@ -74,7 +75,7 @@ export class ExploreCommunitiesSidebar extends ClassComponent {
         className="ExploreCommunitiesSidebar"
         menuHeader={{
           label: 'Explore',
-          onclick: async () => {
+          onClick: async () => {
             const sidebar = document.getElementsByClassName(
               'ExploreCommunitiesSidebar'
             );
@@ -82,7 +83,7 @@ export class ExploreCommunitiesSidebar extends ClassComponent {
             setTimeout(() => {
               app.sidebarToggled = false;
               app.sidebarMenu = 'default';
-              m.redraw();
+              redraw();
             }, 200);
           },
         }}

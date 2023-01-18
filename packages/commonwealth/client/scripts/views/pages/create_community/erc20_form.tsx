@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import Web3 from 'web3';
 import { providers } from 'ethers';
@@ -58,11 +59,11 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode: m.Vnode<EthChainAttrs>) {
+  oninit(vnode: ResultNode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode: m.Vnode<EthChainAttrs>) {
+  view(vnode: ResultNode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
@@ -148,11 +149,11 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
           err.responseJSON?.error || 'Failed to load Token Information';
       }
       this.state.loading = false;
-      m.redraw();
+      redraw();
     };
 
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
         <CWButton
           label="Populate fields"
@@ -162,7 +163,7 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
             !this.state.form.ethChainId ||
             this.state.loading
           }
-          onclick={async () => {
+          onClick={async () => {
             await updateTokenForum();
           }}
         />
@@ -195,7 +196,7 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
         <CWButton
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
-          onclick={async () => {
+          onClick={async () => {
             const { altWalletUrl, chainString, ethChainId, nodeUrl, symbol } =
               this.state.form;
             this.state.saving = true;
@@ -226,7 +227,7 @@ export class ERC20Form extends ClassComponent<EthChainAttrs> {
                 );
               }
               await initAppState(false);
-              m.route.set(`/${res.result.chain?.id}`);
+              setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error || 'Creating new ERC20 community failed'

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import Sublayout from 'views/sublayout';
 import { CWEmptyState } from '../components/component_kit/cw_empty_state';
@@ -9,7 +10,7 @@ import { CWEmptyState } from '../components/component_kit/cw_empty_state';
 type ErrorPageAttrs = { title?: any; message?: string };
 
 class ErrorPage extends ClassComponent<ErrorPageAttrs> {
-  view(vnode: m.Vnode<ErrorPageAttrs>) {
+  view(vnode: ResultNode<ErrorPageAttrs>) {
     const { message } = vnode.attrs;
 
     return (

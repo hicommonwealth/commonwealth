@@ -1,8 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import { Popover } from 'construct-ui';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/reaction_button/thread_preview_reaction_button.scss';
 
@@ -28,7 +28,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
     this.loading = false;
   }
 
-  view(vnode: m.Vnode<ThreadPreviewReactionButtonAttrs>) {
+  view(vnode: ResultNode<ThreadPreviewReactionButtonAttrs>) {
     const { thread } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(thread);
     const { likes = 0, hasReacted } = reactionCounts || {};
@@ -65,7 +65,7 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
             ({ Address }) => Address.address !== userAddress
           );
           this.loading = false;
-          m.redraw();
+          redraw();
         });
     };
 
@@ -81,17 +81,17 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
               Address: { address: userAddress, chain },
             },
           ];
-          m.redraw();
+          redraw();
         });
     };
 
     const reactionButtonComponent = (
       <div
-        onmouseenter={async () => {
+        onMouseEnter={async () => {
           this.reactors = await fetchReactionsByPost(thread);
         }}
-        onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
-        class={`ThreadPreviewReactionButton${this.loading ? ' disabled' : ''}${
+        onClick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
+        className={`ThreadPreviewReactionButton${this.loading ? ' disabled' : ''}${
           hasReacted ? ' has-reacted' : ''
         }`}
       >
@@ -99,24 +99,26 @@ export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewRea
           iconName={hasReacted ? 'heartFilled' : 'heartEmpty'}
           iconSize="small"
         />
-        <div class="reactions-count">{likes}</div>
+        <div className="reactions-count">{likes}</div>
       </div>
     );
 
-    return likes > 0
-      ? m(Popover, {
-          interactionType: 'hover',
-          content: (
-            <div class="reaction-button-tooltip-contents">
-              {getDisplayedReactorsForPopup({
-                likes,
-                reactors: this.reactors,
-              })}
-            </div>
-          ),
-          trigger: reactionButtonComponent,
-          hoverOpenDelay: 100,
-        })
-      : reactionButtonComponent;
+    return reactionButtonComponent
+    // return likes > 0
+    //   ? null // @TODO @REACT FIX ME
+      // m(Popover, {
+      //     interactionType: 'hover',
+      //     content: (
+      //       <div className="reaction-button-tooltip-contents">
+      //         {getDisplayedReactorsForPopup({
+      //           likes,
+      //           reactors: this.reactors,
+      //         })}
+      //       </div>
+      //     ),
+      //     trigger: reactionButtonComponent,
+      //     hoverOpenDelay: 100,
+      //   })
+      // : reactionButtonComponent;
   }
 }

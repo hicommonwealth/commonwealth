@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/component_kit/cw_content_page.scss';
@@ -19,7 +20,7 @@ import { CWCard } from './cw_card';
 
 export type ContentPageSidebarItem = {
   label: string;
-  item: m.Vnode;
+  item: ResultNode;
 };
 
 // tuple
@@ -31,20 +32,20 @@ export type SidebarComponents = [
 
 type ContentPageAttrs = {
   createdAt: moment.Moment | number;
-  title: string | m.Vnode;
+  title: string | ResultNode;
 
   // optional
-  author?: m.Vnode;
+  author?: ResultNode;
   actions?: Array<MenuItem>;
-  body?: m.Vnode;
-  comments?: m.Vnode;
+  body?: ResultNode;
+  comments?: ResultNode;
   contentBodyLabel?: 'Snapshot' | 'Thread'; // proposals don't need a label because they're never tabbed
-  headerComponents?: m.Vnode;
+  headerComponents?: ResultNode;
   readOnly?: boolean;
   showSidebar?: boolean;
   sidebarComponents?: SidebarComponents;
-  subBody?: m.Vnode;
-  subHeader?: m.Vnode;
+  subBody?: ResultNode;
+  subHeader?: ResultNode;
   viewCount?: number;
 };
 
@@ -52,16 +53,16 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
   private viewType: 'sidebarView' | 'tabsView';
   private tabSelected: number;
 
-  onResize(vnode: m.Vnode<ContentPageAttrs>) {
+  onResize(vnode: ResultNode<ContentPageAttrs>) {
     this.viewType =
       isWindowMediumSmallInclusive(window.innerWidth) && vnode.attrs.showSidebar
         ? 'tabsView'
         : 'sidebarView';
 
-    m.redraw();
+    this.redraw();
   }
 
-  oninit(vnode: m.Vnode<ContentPageAttrs>) {
+  oninit(vnode: ResultNode<ContentPageAttrs>) {
     this.viewType =
       isWindowMediumSmallInclusive(window.innerWidth) && vnode.attrs.showSidebar
         ? 'tabsView'
@@ -76,13 +77,13 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
     });
   }
 
-  onremove(vnode: m.Vnode<ContentPageAttrs>) {
+  onremove(vnode: ResultNode<ContentPageAttrs>) {
     window.removeEventListener('resize', () => {
       this.onResize(vnode);
     });
   }
 
-  view(vnode: m.Vnode<ContentPageAttrs>) {
+  view(vnode: ResultNode<ContentPageAttrs>) {
     const {
       actions,
       author,
@@ -101,8 +102,8 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
     } = vnode.attrs;
 
     const mainBody = (
-      <div class="main-body-container">
-        <div class="header">
+      <div className="main-body-container">
+        <div className="header">
           {typeof title === 'string' ? (
             <CWText type="h3" fontWeight="semiBold">
               {title}
@@ -110,7 +111,7 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
           ) : (
             title
           )}
-          <div class="header-info-row">
+          <div className="header-info-row">
             {author}
             {typeof createdAt === 'number' ||
               (moment.isMoment(createdAt) && createdAt.isValid() && (
@@ -144,21 +145,21 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
     );
 
     return (
-      <div class={ComponentType.ContentPage}>
+      <div className={ComponentType.ContentPage}>
         {this.viewType === 'sidebarView' && (
-          <div class="sidebar-view">
+          <div className="sidebar-view">
             {mainBody}
             {showSidebar && (
-              <div class="sidebar">{sidebarComponents.map((c) => c.item)}</div>
+              <div className="sidebar">{sidebarComponents.map((c) => c.item)}</div>
             )}
           </div>
         )}
         {this.viewType === 'tabsView' && (
-          <div class="tabs-view">
+          <div className="tabs-view">
             <CWTabBar>
               <CWTab
                 label={contentBodyLabel}
-                onclick={() => {
+                onClick={() => {
                   this.tabSelected = 0;
                 }}
                 isSelected={this.tabSelected === 0}
@@ -166,7 +167,7 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
               {sidebarComponents.map((item, i) => (
                 <CWTab
                   label={item.label}
-                  onclick={() => {
+                  onClick={() => {
                     this.tabSelected = i + 1;
                   }}
                   isSelected={this.tabSelected === i + 1}
@@ -191,17 +192,17 @@ export class CWContentPage extends ClassComponent<ContentPageAttrs> {
 }
 
 type ContentPageCardAttrs = {
-  content: m.Vnode;
+  content: ResultNode;
   header: string;
 };
 
 export class CWContentPageCard extends ClassComponent<ContentPageCardAttrs> {
-  view(vnode: m.Vnode<ContentPageCardAttrs>) {
+  view(vnode: ResultNode<ContentPageCardAttrs>) {
     const { content, header } = vnode.attrs;
 
     return (
       <CWCard className="ContentPageCard">
-        <div class="header-container">
+        <div className="header-container">
           <CWText type="h5" fontWeight="semiBold">
             {header}
           </CWText>

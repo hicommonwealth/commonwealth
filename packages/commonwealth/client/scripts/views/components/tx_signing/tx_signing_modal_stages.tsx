@@ -1,8 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
 import $ from 'jquery';
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -27,23 +28,23 @@ export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntro
     this.introTab = 'webWallet';
   }
 
-  view(vnode: m.Vnode<TxSigningModalIntroStageAttrs>) {
+  view(vnode: ResultNode<TxSigningModalIntroStageAttrs>) {
     const { author, next, polkaWallet, txData, txType } = vnode.attrs;
 
     return (
-      <>
+      <React.Fragment>
         <CWTabBar>
           <CWTab
             label="Web wallet"
             isSelected={this.introTab === 'webWallet'}
-            onclick={() => {
+            onClick={() => {
               this.introTab = 'webWallet';
             }}
           />
           <CWTab
             label="Command line"
             isSelected={this.introTab === 'commandLine'}
-            onclick={() => {
+            onClick={() => {
               this.introTab = 'commandLine';
             }}
           />
@@ -65,7 +66,7 @@ export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntro
             next={next}
           />
         )}
-      </>
+      </React.Fragment>
     );
   }
 }
@@ -75,7 +76,7 @@ export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
   private timer?: number;
   private timerHandle?: NodeJS.Timeout;
 
-  oncreate(vnode: m.Vnode<NextFn>) {
+  oncreate(vnode: ResultNode<NextFn>) {
     const $parent = $('.TXSigningModal');
 
     this.timer = 0;
@@ -83,7 +84,7 @@ export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
     // TODO: set a timeout? We currently have no failure case due to how event handling works.
     this.timerHandle = global.setInterval(() => {
       this.timer++;
-      m.redraw();
+      redraw();
     }, 1000);
 
     // for edgeware mainnet, timeout after 10 sec
@@ -109,23 +110,23 @@ export class TxSigningModalWaitingStage extends ClassComponent<NextFn> {
 
   view() {
     return (
-      <>
+      <React.Fragment>
         <CWText>
           Waiting for your transaction to be confirmed by the network...
         </CWText>
         <CWSpinner />
         <CWText>`Waiting ${this.timer || 0}s...</CWText>
-      </>
+      </React.Fragment>
     );
   }
 }
 
 export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
-  view(vnode: m.VnodeDOM<TxDataState, this>) {
+  view(vnode: ResultNode<TxDataState>) {
     const { blocknum, hash, timestamp } = vnode.attrs;
 
     return (
-      <>
+      <React.Fragment>
         <TXSigningTransactionBox
           success
           status="Success"
@@ -134,13 +135,13 @@ export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
           timestamp={timestamp ? timestamp.format() : '--'}
         />
         <CWButton
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             $(vnode.dom).trigger('modalexit');
           }}
           label="Done"
         />
-      </>
+      </React.Fragment>
     );
   }
 }
@@ -148,11 +149,11 @@ export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
 type TxSigningModalRejectedStageAttrs = TxDataState & NextFn;
 
 export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRejectedStageAttrs> {
-  view(vnode: m.VnodeDOM<TxSigningModalRejectedStageAttrs>) {
+  view(vnode: ResultNode<TxSigningModalRejectedStageAttrs>) {
     const { blocknum, error, hash, timestamp, next } = vnode.attrs;
 
     return (
-      <>
+      <React.Fragment>
         <TXSigningTransactionBox
           success={false}
           status={error.toString()}
@@ -160,22 +161,22 @@ export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRe
           blockNum={blocknum || '--'}
           timestamp={timestamp ? timestamp.format() : '--'}
         />
-        <div class="buttons-row">
+        <div className="buttons-row">
           <CWButton
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(vnode.dom).trigger('modalexit');
             }}
             label="Done"
           />
           <CWButton
-            onclick={() => {
+            onClick={() => {
               next('intro');
             }}
             label="Try again"
           />
         </div>
-      </>
+      </React.Fragment>
     );
   }
 }

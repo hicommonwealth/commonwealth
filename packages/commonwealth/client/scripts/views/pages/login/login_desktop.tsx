@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/login/login_desktop.scss';
 
@@ -23,7 +24,7 @@ import { LoginAttrs } from './types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
 export class LoginDesktop extends ClassComponent<LoginAttrs> {
-  view(vnode: m.Vnode<LoginAttrs>) {
+  view(vnode: ResultNode<LoginAttrs>) {
     const {
       address,
       bodyType,
@@ -50,20 +51,20 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="LoginDesktop">
+      <div className="LoginDesktop">
         <LoginDesktopSidebar
           sidebarType={sidebarType}
           createNewAccountCallback={createNewAccountCallback}
           linkExistingAccountCallback={linkExistingAccountCallback}
           wallets={wallets}
         />
-        <div class="body">
+        <div className="body">
           <ModalExitButton />
           {bodyType === 'walletList' && (
-            <div class="inner-body-container centered">
+            <div className="inner-body-container centered">
               <LoginBoilerplate />
               <CWWalletsList
-                connectAnotherWayOnclick={() => {
+                connectAnotherWayonClick={() => {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
@@ -78,8 +79,8 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             </div>
           )}
           {bodyType === 'selectAccountType' && (
-            <div class="inner-body-container centered">
-              <div class="header-container">
+            <div className="inner-body-container centered">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
@@ -89,7 +90,7 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                   Looks like this address hasn't been connected before.
                 </CWText>
               </div>
-              <div class="select-row">
+              <div className="select-row">
                 <CWIcon iconName="arrowLeft" />
                 <CWText
                   type="h5"
@@ -103,8 +104,8 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             </div>
           )}
           {bodyType === 'connectWithEmail' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
@@ -125,21 +126,21 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
               ) : (
                 <CWSpinner />
               )}
-              <div class="buttons-row">
+              <div className="buttons-row">
                 <CWButton
                   label="Back"
                   buttonType="secondary-blue"
-                  onclick={() => {
+                  onClick={() => {
                     setBodyType('walletList');
                   }}
                 />
-                <CWButton label="Connect" onclick={handleEmailLoginCallback} />
+                <CWButton label="Connect" onClick={handleEmailLoginCallback} />
               </div>
             </div>
           )}
           {bodyType === 'welcome' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="bold"
@@ -162,12 +163,12 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                   handleSetUsername(u);
                 }}
               />
-              <CWButton label="Finish" onclick={saveProfileInfoCallback} />
+              <CWButton label="Finish" onClick={saveProfileInfoCallback} />
             </div>
           )}
           {bodyType === 'ethWalletList' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
@@ -190,8 +191,8 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             </div>
           )}
           {bodyType === 'selectPrevious' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="semiBold"
@@ -206,7 +207,7 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 </CWText>
               </div>
               <CWWalletsList
-                connectAnotherWayOnclick={() => {
+                connectAnotherWayonClick={() => {
                   setBodyType('connectWithEmail');
                 }}
                 wallets={wallets}
@@ -221,8 +222,8 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
             </div>
           )}
           {bodyType === 'selectProfile' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="bold"
@@ -240,12 +241,12 @@ export class LoginDesktop extends ClassComponent<LoginAttrs> {
                 </CWText>
               </div>
               <CWProfilesList profiles={profiles} />
-              <CWButton label="Finish" onclick={performLinkingCallback} />
+              <CWButton label="Finish" onClick={performLinkingCallback} />
             </div>
           )}
           {bodyType === 'allSet' && (
-            <div class="inner-body-container">
-              <div class="header-container">
+            <div className="inner-body-container">
+              <div className="header-container">
                 <CWText
                   type="h3"
                   fontWeight="bold"

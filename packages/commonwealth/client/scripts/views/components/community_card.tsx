@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/community_card.scss';
 
@@ -16,7 +17,7 @@ import { CWCommunityAvatar } from './component_kit/cw_community_avatar';
 type CommunityCardAttrs = { chain: ChainInfo };
 
 export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
-  view(vnode: m.Vnode<CommunityCardAttrs>) {
+  view(vnode: ResultNode<CommunityCardAttrs>) {
     const { chain } = vnode.attrs as CommunityCardAttrs;
 
     const redirectFunction = (e) => {
@@ -26,7 +27,7 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
         return;
       }
       localStorage['home-scrollY'] = window.scrollY;
-      m.route.set(`/${chain.id}`);
+      setRoute(`/${chain.id}`);
     };
 
     // Potentially Temporary (could be built into create community flow)
@@ -44,9 +45,9 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
         elevation="elevation-2"
         interactive
         className="community-card"
-        onclick={redirectFunction}
+        onClick={redirectFunction}
       >
-        <div class="top-content">
+        <div className="top-content">
           <CWCommunityAvatar community={chain} size="xxl" />
           <CWText
             type="h4"
@@ -58,7 +59,7 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
             {chain.name}
           </CWText>
         </div>
-        <div class="bottom-content">
+        <div className="bottom-content">
           <CWText
             className="card-description"
             type="caption"
@@ -69,10 +70,10 @@ export class CommunityCard extends ClassComponent<CommunityCardAttrs> {
           <CWButton
             buttonType="secondary-black"
             label="See More"
-            onclick={redirectFunction}
+            onClick={redirectFunction}
           />
           {/* for mobile */}
-          <CWIconButton iconName="expand" onclick={redirectFunction} />
+          <CWIconButton iconName="expand" onClick={redirectFunction} />
         </div>
       </CWCard>
     );
@@ -86,13 +87,13 @@ export class NewCommunityCard extends ClassComponent {
         elevation="elevation-2"
         interactive={true}
         className="new-community-card"
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           document.location =
             'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
         }}
       >
-        <div class="new-community-card-body">
+        <div className="new-community-card-body">
           <CWText
             type="h3"
             fontWeight="semiBold"
@@ -103,7 +104,7 @@ export class NewCommunityCard extends ClassComponent {
           <CWText className="new-community">
             Launch and grow your decentralized community on Commonwealth
           </CWText>
-          <a class="learn-more" href="#">
+          <a className="learn-more" href="#">
             Learn more
           </a>
         </div>

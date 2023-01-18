@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_area.scss';
 
@@ -23,7 +24,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode: m.Vnode<TextAreaAttrs>) {
+  view(vnode: ResultNode<TextAreaAttrs>) {
     const {
       autocomplete,
       autofocus,
@@ -39,7 +40,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class={ComponentType.TextArea}>
+      <div className={ComponentType.TextArea}>
         {label && (
           <MessageRow
             hasFeedback={!!inputValidationFn}
@@ -51,7 +52,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
         <textarea
           autofocus={autofocus}
           autocomplete={autocomplete}
-          class={getClasses<TextAreaStyleAttrs & { isTyping: boolean }>({
+          className={getClasses<TextAreaStyleAttrs & { isTyping: boolean }>({
             validationStatus: this.validationStatus,
             disabled,
             isTyping: this.isTyping,
@@ -68,7 +69,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
               this.isTyping = false;
               this.validationStatus = undefined;
               this.statusMessage = undefined;
-              m.redraw();
+              this.redraw();
             } else {
               e.stopPropagation();
               this.isTyping = true;
@@ -79,7 +80,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
                 if (inputValidationFn && e.target.value?.length > 3) {
                   [this.validationStatus, this.statusMessage] =
                     inputValidationFn(e.target.value);
-                  m.redraw();
+                  this.redraw();
                 }
               }, timeout);
             }
@@ -90,7 +91,7 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
                 this.isTyping = false;
                 this.validationStatus = undefined;
                 this.statusMessage = undefined;
-                m.redraw();
+                this.redraw();
               } else {
                 [this.validationStatus, this.statusMessage] = inputValidationFn(
                   e.target.value

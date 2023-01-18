@@ -1,12 +1,13 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 export type BaseSidebarAttrs = {
   isActive?: boolean; // Is this the current page
   isUpdated?: boolean; // Does this page have updates (relevant for chat, less so for other sections)
   isVisible?: boolean; // Is this section shown as an option
-  onclick?: any;
+  onClick?: any;
   onhover?: () => void;
-  rightIcon?: m.Vnode;
+  rightIcon?: ResultNode;
   title?: string;
   className?: string;
 };
@@ -24,7 +25,7 @@ export type SectionGroupAttrs = {
 export type SidebarSectionAttrs = {
   hasDefaultToggle?: boolean;
   displayData?: SectionGroupAttrs[];
-  extraComponents?: m.Vnode;
+  extraComponents?: ResultNode;
   toggleDisabled?: boolean;
 } & BaseSidebarAttrs;
 

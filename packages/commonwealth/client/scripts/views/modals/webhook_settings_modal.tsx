@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/webhook_settings_modal.scss';
@@ -30,14 +31,14 @@ type WebhookSettingsModalAttrs = {
 export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAttrs> {
   private selectedCategories: string[];
 
-  oninit(vnode: m.Vnode<WebhookSettingsModalAttrs>) {
+  oninit(vnode: ResultNode<WebhookSettingsModalAttrs>) {
     this.selectedCategories = [];
     vnode.attrs.webhook.categories.forEach((v) =>
       this.selectedCategories.push(v)
     );
   }
 
-  view(vnode: m.Vnode<WebhookSettingsModalAttrs>) {
+  view(vnode: ResultNode<WebhookSettingsModalAttrs>) {
     const { webhook } = vnode.attrs;
     const isChain = !!webhook.chain_id;
 
@@ -75,14 +76,14 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
               this.selectedCategories = this.selectedCategories.filter(
                 (v) => !values.includes(v)
               );
-              m.redraw();
+              redraw();
             } else {
               values.forEach((v) => {
                 if (!this.selectedCategories.includes(v)) {
                   this.selectedCategories.push(v);
                 }
               });
-              m.redraw();
+              redraw();
             }
           }}
         />
@@ -90,14 +91,14 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
     };
 
     return (
-      <div class="WebhookSettingsModal">
-        <div class="compact-modal-title">
+      <div className="WebhookSettingsModal">
+        <div className="compact-modal-title">
           <h3>Webhook Settings</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWText>Which events should trigger this webhook?</CWText>
-          <div class="checkbox-section">
+          <div className="checkbox-section">
             <CWText type="h5" fontWeight="semiBold">
               Off-chain discussions
             </CWText>
@@ -106,7 +107,7 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
             {row('New reaction', [NotificationCategories.NewReaction])}
           </div>
           {isChain && Object.keys(chainNotifications).length > 0 && (
-            <div class="checkbox-section">
+            <div className="checkbox-section">
               <CWText type="h5" fontWeight="semiBold">
                 On-chain events
               </CWText>
@@ -118,7 +119,7 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
           )}
           <CWButton
             label="Save webhook settings"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               const chainOrCommObj = { chain: webhook.chain_id };
               $.ajax({
@@ -137,7 +138,7 @@ export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAtt
                 },
                 error: (err) => {
                   notifyError(err.statusText);
-                  m.redraw();
+                  redraw();
                 },
               });
             }}

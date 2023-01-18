@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_checkbox.scss';
 
@@ -23,7 +24,7 @@ type CheckboxAttrs = {
   CheckboxStyleAttrs;
 
 export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
-  view(vnode: m.Vnode<CheckboxAttrs>) {
+  view(vnode: ResultNode<CheckboxAttrs>) {
     const {
       className,
       disabled = false,
@@ -44,7 +45,7 @@ export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
 
     return (
       <label
-        class={getClasses<CheckboxStyleAttrs>(
+        className={getClasses<CheckboxStyleAttrs>(
           {
             checked,
             disabled,
@@ -54,8 +55,8 @@ export class CWCheckbox extends ClassComponent<CheckboxAttrs> {
           ComponentType.Checkbox
         )}
       >
-        <input class="checkbox-input" {...params} />
-        <div class="checkbox-control" />
+        <input className="checkbox-input" {...params} />
+        <div className="checkbox-control" />
         <CWText className="checkbox-label">{label || value}</CWText>
       </label>
     );

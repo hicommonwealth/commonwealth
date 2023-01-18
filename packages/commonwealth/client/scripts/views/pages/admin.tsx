@@ -1,8 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
 import $ from 'jquery';
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import { ISubmittableResult } from '@polkadot/types/types';
 
 import 'pages/admin.scss';
@@ -16,7 +26,7 @@ import { SubstrateAccount } from 'controllers/chain/substrate/account';
 import EdgewareFunctionPicker from 'views/components/edgeware_function_picker';
 import { User } from 'views/components/user/user';
 import { PageLoading } from 'views/pages/loading';
-import { PageNotFound } from './404';
+import PageNotFound from './404';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWLabel } from '../components/component_kit/cw_label';
@@ -36,7 +46,7 @@ class SudoForm extends ClassComponent {
 
     if (author && author.address !== substrate.chain.sudoKey) {
       return (
-        <div class="admin-column">
+        <div className="admin-column">
           <CWText>Must be logged into admin account to use Sudo: </CWText>
           <User user={app.chain.accounts.get(substrate.chain.sudoKey)} />
         </div>
@@ -54,12 +64,12 @@ class SudoForm extends ClassComponent {
     }
 
     return (
-      <div class="admin-column">
+      <div className="admin-column">
         <CWText type="h5">Sudo: run function as Admin</CWText>
-        {m(EdgewareFunctionPicker)}
+        {render(EdgewareFunctionPicker)}
         <CWButton
           disabled={this.txProcessing}
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             const call = EdgewareFunctionPicker.getMethod({
               module: '',
@@ -68,7 +78,7 @@ class SudoForm extends ClassComponent {
             });
             this.txProcessing = true;
             this.resultText = 'Waiting...';
-            m.redraw();
+            redraw();
             substrate.chain.api.tx.sudo
               .sudo(call)
               .signAndSend(keyring, (result: ISubmittableResult) => {
@@ -79,7 +89,7 @@ class SudoForm extends ClassComponent {
                   } else {
                     this.resultText = 'Action was unsuccessful.';
                   }
-                  m.redraw();
+                  redraw();
                 }
               });
           }}
@@ -102,71 +112,71 @@ class ChainStats extends ClassComponent {
     ];
 
     return (
-      <div class="admin-column">
+      <div className="admin-column">
         <CWText type="h5">ChainInfo</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Id" />
           <CWText>{app.activeChainId()}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Name" />
           <CWText>{app.chain.name?.toString()}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Version" />
           <CWText>{app.chain.version?.toString()}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Runtime" />
           <CWText>{app.chain.runtimeName?.toString()}</CWText>
         </div>
         <CWText type="h5">Block Production</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Current Block" />
           <CWText>{app.chain.block?.height}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Last Block Created" />
           <CWText>{app.chain.block?.lastTime.format('HH:mm:ss')}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Target Block Time" />
           <CWText>{app.chain.block?.duration} sec</CWText>
         </div>
         <CWText type="h5">Balances</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Total EDG" />
           <CWText>{formatCoin(substrate.chain.totalbalance)}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Existential Deposit" />
           <CWText>{formatCoin(substrate.chain.existentialdeposit)}</CWText>
         </div>
         <CWText type="h5">Democracy Proposals</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Launch Period" />
           <CWText>
             {formatBlocks(substrate.democracyProposals.launchPeriod)}
           </CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Minimum Deposit" />
           <CWText>
             {formatCoin(substrate.democracyProposals.minimumDeposit)}
           </CWText>
         </div>
         <CWText type="h5">Phragmen Elections</CWText>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Term Length" />
           <CWText>
             {formatBlocks(substrate.phragmenElections.termDuration)}
           </CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Voting Bond" />
           <CWText>{formatCoin(substrate.phragmenElections.votingBond)}</CWText>
         </div>
-        <div class="stat">
+        <div className="stat">
           <CWLabel label="Candidacy Bond" />
           <CWText>
             {formatCoin(substrate.phragmenElections.candidacyBond)}
@@ -214,7 +224,7 @@ class AdminActions extends ClassComponent {
     }
 
     return (
-      <div class="admin-column">
+      <div className="admin-column">
         <CWText type="h5">Admin</CWText>
         <CWText>Set up the chain with test proposals</CWText>
         <CWText>
@@ -250,7 +260,7 @@ class AdminActions extends ClassComponent {
         />
         <CWButton
           disabled={this.inprogress}
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             this.inprogress = true;
             // TODO: Change to PUT /adminStatus
@@ -262,7 +272,7 @@ class AdminActions extends ClassComponent {
             }).then(
               (response) => {
                 if (response.status === 'Success') {
-                  m.redraw();
+                  redraw();
                 } else {
                   // error tracking
                 }
@@ -272,7 +282,7 @@ class AdminActions extends ClassComponent {
                 this.failure = true;
                 this.disabled = false;
                 if (err.responseJSON) this.error = err.responseJSON.error;
-                m.redraw();
+                redraw();
               }
             );
           }}
@@ -288,18 +298,18 @@ class AdminActions extends ClassComponent {
 class AdminPage extends ClassComponent {
   view() {
     if (!app.chain) {
-      m.route.set('/', {}, { replace: true });
+      setRoute('/', {}, { replace: true });
       return <PageLoading />;
     } else if (app.chain && app.user.isSiteAdmin) {
       return (
         <Sublayout>
-          <div class="AdminPage">
+          <div className="AdminPage">
             {app.chain ? (
-              <>
+              <React.Fragment>
                 <AdminActions />
                 <SudoForm />
                 <ChainStats />
-              </>
+              </React.Fragment>
             ) : null}
           </div>
         </Sublayout>

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { formatCoin } from 'adapters/currency';
 import app from 'state';
@@ -17,7 +18,7 @@ export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
   private freeBalance: any;
   private lockedBalance: any;
 
-  oninit(vnode: m.Vnode<BalanceInfoAttrs>) {
+  oninit(vnode: ResultNode<BalanceInfoAttrs>) {
     const { account } = vnode.attrs;
 
     app.runWhenReady(async () => {
@@ -27,13 +28,13 @@ export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
 
       this.balance = await account.balance;
 
-      m.redraw();
+      redraw();
     });
   }
 
   view() {
     return (
-      <>
+      <React.Fragment>
         <CWText>
           Free: {this.freeBalance ? formatCoin(this.freeBalance) : '--'}
         </CWText>
@@ -41,7 +42,7 @@ export class BalanceInfo extends ClassComponent<BalanceInfoAttrs> {
           Locked: {this.lockedBalance ? formatCoin(this.lockedBalance) : '--'}
         </CWText>
         <CWText>Total: {this.balance ? formatCoin(this.balance) : '--'}</CWText>
-      </>
+      </React.Fragment>
     );
   }
 }

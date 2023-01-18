@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_breadcrumbs.scss';
 
@@ -18,21 +19,21 @@ type BreadcrumbsAttrs = {
 };
 
 export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
-  view(vnode: m.Vnode<BreadcrumbsAttrs>) {
+  view(vnode: ResultNode<BreadcrumbsAttrs>) {
     const { breadcrumbs } = vnode.attrs;
 
     return (
-      <div class={ComponentType.Breadcrumbs}>
+      <div className={ComponentType.Breadcrumbs}>
         {breadcrumbs.map((b, k) => {
           const isCurrent = k === breadcrumbs.length - 1;
 
           return (
-            <>
+            <React.Fragment>
               <CWText
                 type="caption"
                 fontWeight="medium"
                 className={isCurrent ? 'current-text' : 'parent-text'}
-                onclick={isCurrent ? undefined : () => m.route.set(b.path)}
+                onClick={isCurrent ? undefined : () => setRoute(b.path)}
               >
                 {b.label}
               </CWText>
@@ -45,7 +46,7 @@ export class CWBreadcrumbs extends ClassComponent<BreadcrumbsAttrs> {
                   /
                 </CWText>
               )}
-            </>
+            </React.Fragment>
           );
         })}
       </div>

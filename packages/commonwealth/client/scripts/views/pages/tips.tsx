@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/tips.scss';
 
@@ -28,13 +38,13 @@ type TipAttrs = {
 };
 
 class Tip extends ClassComponent<TipAttrs> {
-  view(vnode: m.Vnode<TipAttrs>) {
+  view(vnode: ResultNode<TipAttrs>) {
     const { proposal } = vnode.attrs;
     const beneficiary = app.chain.accounts.get(proposal.data.who);
 
     return (
-      <div class="TipDetail">
-        <div class="tip-detail-group">
+      <div className="TipDetail">
+        <div className="tip-detail-group">
           <CWText
             fontWeight="medium"
             type="caption"
@@ -50,7 +60,7 @@ class Tip extends ClassComponent<TipAttrs> {
             {proposal.data.reason}
           </CWText>
         </div>
-        <div class="tip-detail-group">
+        <div className="tip-detail-group">
           <CWText
             fontWeight="medium"
             type="caption"
@@ -119,7 +129,7 @@ class TipsPage extends ClassComponent {
         <ProposalCard proposal={tip} injectedContent={<Tip proposal={tip} />} />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     const inactiveTipContent = inactiveTips.length ? (
@@ -127,14 +137,14 @@ class TipsPage extends ClassComponent {
         <ProposalCard proposal={tip} injectedContent={<Tip proposal={tip} />} />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     return (
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Tips" />}
       >
-        <div class="TipsPage">
+        <div className="TipsPage">
           <GovExplainer
             statHeaders={[
               {
@@ -154,7 +164,7 @@ class TipsPage extends ClassComponent {
             statAction={
               activeAccount && (
                 <CWButton
-                  onclick={() =>
+                  onClick={() =>
                     navigateToSubpage('/new/proposal/:type', {
                       type: ProposalType.SubstrateTreasuryTip,
                     })

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/proposal_card/proposal_tag.scss';
 
@@ -10,7 +11,7 @@ import { CWText } from '../component_kit/cw_text';
 type ProposalTagAttrs = { label: string };
 
 export class ProposalTag extends ClassComponent<ProposalTagAttrs> {
-  view(vnode: m.Vnode<ProposalTagAttrs>) {
+  view(vnode: ResultNode<ProposalTagAttrs>) {
     const { label } = vnode.attrs;
 
     return (

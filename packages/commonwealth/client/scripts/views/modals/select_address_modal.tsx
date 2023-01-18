@@ -1,7 +1,16 @@
 /* @jsx m */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/select_address_modal.scss';
@@ -47,7 +56,7 @@ export class SelectAddressModal extends ClassComponent {
         })
         .then(() => {
           this.loading = false;
-          m.redraw();
+          redraw();
           this.selectedIndex = null;
           // select the address, and close the form
           notifySuccess(
@@ -58,13 +67,13 @@ export class SelectAddressModal extends ClassComponent {
             )}`
           );
           setActiveAccount(account).then(() => {
-            m.redraw();
+            redraw();
             $(e.target).trigger('modalexit');
           });
         })
         .catch((err: any) => {
           this.loading = false;
-          m.redraw();
+          redraw();
           notifyError(err.responseJSON.error);
         });
     };
@@ -85,7 +94,7 @@ export class SelectAddressModal extends ClassComponent {
 
       if (!confirmed) {
         this.loading = false;
-        m.redraw();
+        redraw();
         return;
       }
 
@@ -96,7 +105,7 @@ export class SelectAddressModal extends ClassComponent {
         })
         .then(() => {
           this.loading = false;
-          m.redraw();
+          redraw();
           this.selectedIndex = null;
           // unset activeAccount, or set it to the next activeAccount
           if (isSameAccount(app.user.activeAccount, account)) {
@@ -105,7 +114,7 @@ export class SelectAddressModal extends ClassComponent {
         })
         .catch((err: any) => {
           this.loading = false;
-          m.redraw();
+          redraw();
           notifyError(err.responseJSON.error);
         });
     };
@@ -116,14 +125,14 @@ export class SelectAddressModal extends ClassComponent {
     const hasTermsOfService = !!activeCommunityMeta?.terms;
 
     return (
-      <div class="SelectAddressModal">
-        <div class="compact-modal-title">
+      <div className="SelectAddressModal">
+        <div className="compact-modal-title">
           <h3>Manage addresses</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           {activeAccountsByRole.length === 0 ? (
-            <div class="select-address-placeholder">
+            <div className="select-address-placeholder">
               Connect{' '}
               {chainbase && app.chain.network === ChainNetwork.Terra
                 ? 'Terra'
@@ -133,7 +142,7 @@ export class SelectAddressModal extends ClassComponent {
               address to join this community:
             </div>
           ) : (
-            <div class="select-address-options">
+            <div className="select-address-options">
               {activeAccountsByRole.map(
                 ([account, role]) =>
                   role && (
@@ -145,20 +154,20 @@ export class SelectAddressModal extends ClassComponent {
                             a.address === account.address &&
                             a.chain.id === account.chain.id
                         )?.walletId === WalletId.Magic && (
-                          <div class="magic-label">
+                          <div className="magic-label">
                             Magically linked to {app.user.email}
                           </div>
                         )}
                       </div>
-                      <div class="role-remove">
-                        <span class="already-connected">
+                      <div className="role-remove">
+                        <span className="already-connected">
                           {formatAsTitleCase(role.permission)} of{' '}
                           {activeEntityInfo?.name}
                         </span>
                         <CWIcon
                           iconName="close"
                           iconSize="small"
-                          onclick={deleteRole.bind(this)}
+                          onClick={deleteRole.bind(this)}
                         />
                       </div>
                     </div>
@@ -168,11 +177,11 @@ export class SelectAddressModal extends ClassComponent {
                 ([account, role], index) =>
                   !role && (
                     <div
-                      class={getClasses<{ isSelected: boolean }>(
+                      className={getClasses<{ isSelected: boolean }>(
                         { isSelected: this.selectedIndex === index },
                         'select-address-option'
                       )}
-                      onclick={async (e) => {
+                      onClick={async (e) => {
                         e.preventDefault();
                         this.selectedIndex = index;
                       }}
@@ -188,13 +197,13 @@ export class SelectAddressModal extends ClassComponent {
                             a.address === account.address &&
                             a.chain.id === account.chain.id
                         )?.walletId === WalletId.Magic && (
-                          <div class="magic-label">
+                          <div className="magic-label">
                             Magically linked to {app.user.email}
                           </div>
                         )}
                       </div>
                       {role && (
-                        <div class="role-permission">
+                        <div className="role-permission">
                           <CWText className="role-tag">
                             {formatAsTitleCase(role.permission)}
                           </CWText>
@@ -209,7 +218,7 @@ export class SelectAddressModal extends ClassComponent {
             </div>
           )}
           {hasTermsOfService && (
-            <div class="terms-of-service">
+            <div className="terms-of-service">
               By linking an address, you agree to ${activeCommunityMeta.name}'s{' '}
               <a href={activeCommunityMeta.terms} target="_blank">
                 terms of service
@@ -221,7 +230,7 @@ export class SelectAddressModal extends ClassComponent {
             <CWButton
               label="Join community with address"
               disabled={typeof this.selectedIndex !== 'number' || this.loading}
-              onclick={createRole.bind(this)}
+              onClick={createRole.bind(this)}
             />
           )}
         </div>

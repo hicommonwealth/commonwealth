@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, Component, jsx, Children } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_popover.scss';
 
@@ -9,7 +9,6 @@ import { CWPortal } from '../cw_portal';
 import {
   applyArrowStyles,
   cursorInBounds,
-  findRef,
   getPosition,
 } from './helpers';
 import { ComponentType } from '../types';
@@ -25,17 +24,21 @@ export type SharedPopoverAttrs = {
   persistOnHover?: boolean;
   tooltipType?: TooltipType;
   toSide?: boolean;
-  trigger: m.Vnode;
+  trigger: Children;
 };
 
 type PopoverAttrs = {
-  content: m.Children;
+  content: Children;
   onToggle?: (isOpen: boolean) => void;
 } & SharedPopoverAttrs;
 
 const defaultHoverCloseDelay = 100;
 
 export class CWPopover extends ClassComponent<PopoverAttrs> {
+  view() { return <div /> }
+}
+
+export class CWPopoverOld extends ClassComponent<PopoverAttrs> {
   private arrowId: string;
   private contentId: string;
   private isOpen: boolean;
@@ -43,15 +46,15 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
   private isRendered: boolean;
   private triggerRef: Element;
 
-  oncreate(vnode: m.VnodeDOM<PopoverAttrs>) {
+  oncreate(vnode: ResultNode<PopoverAttrs>) {
     this.contentId = `popover-container-ref-${Math.random()}`; // has to be set first
     this.arrowId = `${this.contentId}-arrow`;
     this.isOpen = false;
     this.isRendered = true;
-    this.triggerRef = findRef(vnode.dom, 'trigger-wrapper-ref');
+    // this.triggerRef = vnode.dom.matches(`[ref=trigger-wrapper-ref]`) ? vnode.dom : vnode.dom.querySelector(`[ref=trigger-wrapper-ref]`);
   }
 
-  onupdate(vnode: m.Vnode<PopoverAttrs>) {
+  onupdate(vnode: ResultNode<PopoverAttrs>) {
     if (this.isOpen && !this.isRendered) {
       try {
         this.applyPopoverPosition(vnode);
@@ -68,10 +71,10 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     this.isOpen = newIsOpen;
     this.isRendered = false;
 
-    m.redraw();
+    this.redraw();
   }
 
-  applyPopoverPosition(vnode: m.Vnode<PopoverAttrs>) {
+  applyPopoverPosition(vnode: ResultNode<PopoverAttrs>) {
     // Apply styles in real time
     try {
       // TODO Gabe 6/1/22 - Figure out how to avoid these both being null at first
@@ -98,13 +101,13 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     } catch (e) {
       console.log(e);
     }
-    m.redraw();
+    this.redraw();
   }
 
   handleHoverExit(
     e: MouseEvent,
     onToggle: (isOpen: boolean) => void,
-    vnode: m.Vnode<PopoverAttrs>
+    vnode: ResultNode<PopoverAttrs>
   ) {
     const { persistOnHover } = vnode.attrs;
 
@@ -144,7 +147,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<PopoverAttrs>) {
+  view(vnode: ResultNode<PopoverAttrs>) {
     const {
       content,
       hoverOpenDelay,
@@ -162,16 +165,16 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
     }
 
     return (
-      <>
+      <React.Fragment>
         <div
-          class="trigger-wrapper"
+          className="trigger-wrapper"
           ref="trigger-wrapper-ref"
-          onclick={() => {
+          onClick={() => {
             if (!interactionType || interactionType === 'click') {
               this.togglePopOver(onToggle);
             }
           }}
-          onmouseenter={() => {
+          onMouseEnter={() => {
             if (interactionType === 'hover') {
               this.handleHoverEnter(hoverOpenDelay, onToggle);
             }
@@ -182,20 +185,20 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
         {isOpen ? (
           <CWPortal>
             <div
-              class="popover-overlay"
-              onclick={() => {
+              className="popover-overlay"
+              onClick={() => {
                 if (!interactionType || interactionType === 'click') {
                   this.togglePopOver(onToggle);
                 }
               }}
-              onmousemove={(e: MouseEvent) => {
+              onMouseMove={(e: MouseEvent) => {
                 if (interactionType === 'hover') {
                   this.handleHoverExit(e, onToggle, vnode);
                 }
               }}
             >
               <div
-                class={getClasses<{ tooltipType: TooltipType }>(
+                className={getClasses<{ tooltipType: TooltipType }>(
                   {
                     tooltipType,
                   },
@@ -203,10 +206,10 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
                 )}
                 ref="popover-container-ref"
                 id={this.contentId}
-                onmouseenter={() => {
+                onMouseEnter={() => {
                   this.isOverContent = true;
                 }}
-                onmouseleave={() => {
+                onMouseLeave={() => {
                   this.isOverContent = false;
                 }}
               >
@@ -216,7 +219,7 @@ export class CWPopover extends ClassComponent<PopoverAttrs> {
             </div>
           </CWPortal>
         ) : null}
-      </>
+      </React.Fragment>
     );
   }
 }

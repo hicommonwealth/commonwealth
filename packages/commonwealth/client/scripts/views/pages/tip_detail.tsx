@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/tip_detail.scss';
 
@@ -25,7 +35,7 @@ type TipDetailAttrs = {
 };
 
 export class TipDetail extends ClassComponent<TipDetailAttrs> {
-  view(vnode: m.Vnode<TipDetailAttrs>) {
+  view(vnode: ResultNode<TipDetailAttrs>) {
     const { headerTitle, proposal, setTipAmount, tipAmount } = vnode.attrs;
 
     const {
@@ -56,28 +66,28 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                 showAddressWithDisplayName
               />
             </div>
-            <div class="proposal-page-row">
-              <div class="label">Reason</div>
-              <div class="tip-reason">
-                <MarkdownFormattedText doc={reason} />
+            <div className="proposal-page-row">
+              <div className="label">Reason</div>
+              <div className="tip-reason">
+                {reason && <MarkdownFormattedText doc={reason} />}
               </div>
             </div>
-            <div class="proposal-page-row">
-              <div class="label">Amount</div>
-              <div class="amount">
-                <div class="denominator">{proposal.support.denom}</div>
+            <div className="proposal-page-row">
+              <div className="label">Amount</div>
+              <div className="amount">
+                <div className="denominator">{proposal.support.denom}</div>
                 <div>{proposal.support.inDollars}</div>
               </div>
             </div>
           </div>
-          <div class="tip-contributions">
+          <div className="tip-contributions">
             {proposal.canVoteFrom(
               app.user.activeAccount as SubstrateAccount
             ) && (
-              <div class="contribute">
-                <div class="title">Contribute</div>
-                <div class="mb-12">
-                  <div class="label">Amount</div>
+              <div className="contribute">
+                <div className="title">Contribute</div>
+                <div className="mb-12">
+                  <div className="label">Amount</div>
                   <CWTextInput
                     name="amount"
                     placeholder="Enter tip amount"
@@ -88,14 +98,14 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                           ? app.chain.chain.coins(parseFloat(result), true)
                           : undefined
                       );
-                      m.redraw();
+                      redraw();
                     }}
                   />
                 </div>
                 <CWButton
                   disabled={tipAmount === undefined}
                   label="Submit Transaction"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     createTXModal(
                       proposal.submitVoteTx(
@@ -110,12 +120,12 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
               </div>
             )}
             {contributors.length > 0 && (
-              <>
-                <div class="contributors title">Contributors</div>
+              <React.Fragment>
+                <div className="contributors title">Contributors</div>
                 {contributors.map(({ account, deposit }) => (
-                  <div class="contributors-row">
-                    <div class="amount">
-                      <div class="denominator">{deposit.denom}</div>
+                  <div className="contributors-row">
+                    <div className="amount">
+                      <div className="denominator">{deposit.denom}</div>
                       <div>{deposit.inDollars}</div>
                     </div>
                     <User
@@ -126,7 +136,7 @@ export class TipDetail extends ClassComponent<TipDetailAttrs> {
                     />
                   </div>
                 ))}
-              </>
+              </React.Fragment>
             )}
           </div>
         </div>

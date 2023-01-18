@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/view_thread/thread_components.scss';
 import 'pages/view_proposal/proposal_header_links.scss';
@@ -31,7 +41,7 @@ type ThreadComponentAttrs = {
 };
 
 export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: m.Vnode<ThreadComponentAttrs>) {
+  view(vnode: ResultNode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     const author: Account = app.chain.accounts.get(thread.author);
@@ -40,13 +50,13 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
       <div class="ThreadAuthor">
         <User avatarSize={24} user={author} popover linkify />
         {thread.collaborators?.length > 0 && (
-          <>
+          <React.Fragment>
             <CWText type="caption">and</CWText>
             <CWPopover
               interactionType="hover"
               hoverCloseDelay={500}
               content={
-                <div class="collaborators">
+                <div className="collaborators">
                   {thread.collaborators.map(({ address, chain }) => {
                     return (
                       <User
@@ -62,7 +72,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
                 </CWText>
               }
             />
-          </>
+          </React.Fragment>
         )}
       </div>
     );
@@ -70,7 +80,7 @@ export class ThreadAuthor extends ClassComponent<ThreadComponentAttrs> {
 }
 
 export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: m.Vnode<ThreadComponentAttrs>) {
+  view(vnode: ResultNode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     return (
@@ -91,7 +101,7 @@ export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
           },
           'proposal-stage-text'
         )}
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           navigateToSubpage(`?stage=${thread.stage}`);
         }}
@@ -103,11 +113,11 @@ export class ThreadStage extends ClassComponent<ThreadComponentAttrs> {
 }
 
 export class ExternalLink extends ClassComponent<ThreadComponentAttrs> {
-  view(vnode: m.Vnode<ThreadComponentAttrs>) {
+  view(vnode: ResultNode<ThreadComponentAttrs>) {
     const { thread } = vnode.attrs;
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {externalLink('a', thread.url, [extractDomain(thread.url)])}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/view_proposal/proposal_components.scss';
 
@@ -34,7 +35,7 @@ type MolochCancelButtonAttrs = {
 } & BaseCancelButtonAttrs;
 
 export class MolochCancelButton extends ClassComponent<MolochCancelButtonAttrs> {
-  view(vnode: m.Vnode<MolochCancelButtonAttrs>) {
+  view(vnode: ResultNode<MolochCancelButtonAttrs>) {
     const {
       proposal,
       votingModalOpen,
@@ -50,7 +51,7 @@ export class MolochCancelButton extends ClassComponent<MolochCancelButtonAttrs> 
           !(proposal.canAbort(molochMember) && !proposal.completed) ||
           votingModalOpen
         }
-        onclick={(e) =>
+        onClick={(e) =>
           cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.isAborted ? 'Cancelled' : 'Cancel'}
@@ -64,7 +65,7 @@ type AaveCancelButtonAttrs = {
 } & BaseCancelButtonAttrs;
 
 export class AaveCancelButton extends ClassComponent<AaveCancelButtonAttrs> {
-  view(vnode: m.Vnode<AaveCancelButtonAttrs>) {
+  view(vnode: ResultNode<AaveCancelButtonAttrs>) {
     const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
       vnode.attrs;
 
@@ -72,7 +73,7 @@ export class AaveCancelButton extends ClassComponent<AaveCancelButtonAttrs> {
       <CWButton
         buttonType="primary-red"
         disabled={!proposal.isCancellable || votingModalOpen}
-        onclick={(e) =>
+        onClick={(e) =>
           cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.data.cancelled ? 'Cancelled' : 'Cancel'}
@@ -86,7 +87,7 @@ type CompoundCancelButtonAttrs = {
 } & BaseCancelButtonAttrs;
 
 export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAttrs> {
-  view(vnode: m.Vnode<CompoundCancelButtonAttrs>) {
+  view(vnode: ResultNode<CompoundCancelButtonAttrs>) {
     const { proposal, votingModalOpen, onModalClose, toggleVotingModal } =
       vnode.attrs;
 
@@ -94,7 +95,7 @@ export class CompoundCancelButton extends ClassComponent<CompoundCancelButtonAtt
       <CWButton
         buttonType="primary-red"
         disabled={proposal.completed || votingModalOpen}
-        onclick={(e) =>
+        onClick={(e) =>
           cancelProposal(e, toggleVotingModal, proposal, onModalClose)
         }
         label={proposal.isCancelled ? 'Cancelled' : 'Cancel'}
@@ -114,7 +115,7 @@ type ProposalSubheaderAttrs = {
 } & BaseCancelButtonAttrs;
 
 export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
-  view(vnode: m.Vnode<ProposalSubheaderAttrs>) {
+  view(vnode: ResultNode<ProposalSubheaderAttrs>) {
     const {
       molochMember,
       onModalClose,
@@ -124,14 +125,14 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="ProposalSubheader">
+      <div className="ProposalSubheader">
         <CWText className={`onchain-status-text ${getStatusClass(proposal)}`}>
           {getStatusText(proposal)}
         </CWText>
         {(proposal['blockExplorerLink'] ||
           proposal['votingInterfaceLink'] ||
           proposal.threadId) && (
-          <div class="proposal-links">
+          <div className="proposal-links">
             {proposal.threadId && <ThreadLink proposal={proposal} />}
             {proposal['blockExplorerLink'] && (
               <BlockExplorerLink proposal={proposal} />
@@ -143,11 +144,11 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
         )}
 
         {proposal instanceof AaveProposal && (
-          <div class="proposal-buttons">
+          <div className="proposal-buttons">
             {proposal.isQueueable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.queueTx().then(() => m.redraw())}
+                onClick={() => proposal.queueTx().then(() => redraw())}
                 label={
                   proposal.data.queued || proposal.data.executed
                     ? 'Queued'
@@ -158,7 +159,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
             {proposal.isExecutable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.executeTx().then(() => m.redraw())}
+                onClick={() => proposal.executeTx().then(() => redraw())}
                 label={proposal.data.executed ? 'Executed' : 'Execute'}
               />
             )}
@@ -173,11 +174,11 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
           </div>
         )}
         {proposal instanceof CompoundProposal && (
-          <div class="proposal-buttons">
+          <div className="proposal-buttons">
             {proposal.isQueueable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.queueTx().then(() => m.redraw())}
+                onClick={() => proposal.queueTx().then(() => redraw())}
                 label={
                   proposal.data.queued || proposal.data.executed
                     ? 'Queued'
@@ -188,7 +189,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
             {proposal.isExecutable && (
               <CWButton
                 disabled={votingModalOpen}
-                onclick={() => proposal.executeTx().then(() => m.redraw())}
+                onClick={() => proposal.executeTx().then(() => redraw())}
                 label={proposal.data.executed ? 'Executed' : 'Execute'}
               />
             )}
@@ -231,7 +232,7 @@ export class ProposalSubheader extends ClassComponent<ProposalSubheaderAttrs> {
 //     return (
 //       <a
 //         href="#"
-//         onclick={async (e) => {
+//         onClick={async (e) => {
 //           e.preventDefault();
 
 //           let postWithHistory;

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row.scss';
 
@@ -23,7 +24,7 @@ type UserDashboardRowAttrs = {
 };
 
 export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
-  view(vnode: m.Vnode<UserDashboardRowAttrs>) {
+  view(vnode: ResultNode<UserDashboardRowAttrs>) {
     const {
       likeCount,
       viewCount,
@@ -63,13 +64,13 @@ export class UserDashboardRow extends ClassComponent<UserDashboardRowAttrs> {
 
     return (
       <div
-        class={getClasses<{ isLink?: boolean }>(
+        className={getClasses<{ isLink?: boolean }>(
           { isLink: !!path },
           'UserDashboardRow'
         )}
-        onclick={() => {
-          m.route.set(path);
-          m.redraw();
+        onClick={() => {
+          setRoute(path);
+          redraw();
         }}
       >
         <UserDashboardRowTop

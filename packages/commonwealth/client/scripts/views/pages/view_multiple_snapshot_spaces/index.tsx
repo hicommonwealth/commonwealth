@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/snapshot/multiple_snapshots_page.scss';
 
@@ -70,14 +71,14 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
     proposals: SnapshotProposal[];
   }>;
 
-  view(vnode: m.Vnode<MultipleSnapshotsPageAttrs>) {
+  view(vnode: ResultNode<MultipleSnapshotsPageAttrs>) {
     const { action, proposal } = vnode.attrs;
     const redirectOptions = redirectHandler(action, proposal);
 
     if (app.chain && !this.snapshotSpaces) {
       this.snapshotSpaces =
         app.config.chains?.getById(app.activeChainId()).snapshot || [];
-      m.redraw();
+      redraw();
     }
 
     const { snapshotSpaces } = this;
@@ -85,7 +86,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
     if (!this.spacesMetadata && snapshotSpaces) {
       loadMultipleSpacesData(snapshotSpaces).then((data) => {
         this.spacesMetadata = data;
-        m.redraw();
+        redraw();
       });
 
       return <PageLoading />;
@@ -95,12 +96,12 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
       <Sublayout
       // title="Proposals"
       >
-        <div class="MultipleSnapshotsPage">
+        <div className="MultipleSnapshotsPage">
           <CWText type="h3">{redirectOptions.headerMessage}</CWText>
           {app.chain && this.spacesMetadata && (
             <CardsCollection
               content={
-                <>
+                <React.Fragment>
                   {this.spacesMetadata.map((data) => (
                     <SnapshotSpaceCard
                       space={data.space}
@@ -109,7 +110,7 @@ class MultipleSnapshotsPage extends ClassComponent<MultipleSnapshotsPageAttrs> {
                       proposal={redirectOptions.proposal}
                     />
                   ))}
-                </>
+                </React.Fragment>
               }
             />
           )}

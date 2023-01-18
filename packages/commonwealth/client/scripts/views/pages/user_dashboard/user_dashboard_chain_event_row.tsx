@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_chain_event_row.scss';
 
@@ -18,37 +19,37 @@ type UserDashboardChainEventRowAttrs = {
 };
 
 export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChainEventRowAttrs> {
-  view(vnode: m.Vnode<UserDashboardChainEventRowAttrs>) {
+  view(vnode: ResultNode<UserDashboardChainEventRowAttrs>) {
     const { blockNumber, chain, label } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ isLink?: boolean }>(
+        className={getClasses<{ isLink?: boolean }>(
           { isLink: !!label.linkUrl },
           'UserDashboardChainEventRow'
         )}
-        onclick={() => {
+        onClick={() => {
           if (label.linkUrl) {
-            m.route.set(label.linkUrl);
+            setRoute(label.linkUrl);
           }
-          m.redraw();
+          redraw();
         }}
       >
         <CWCommunityAvatar community={chain} />
-        <div class="chain-event-text-container">
+        <div className="chain-event-text-container">
           <CWText className="row-top-text">
             <b>{label.heading}</b>
             <span>in</span>
             <a
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                m.route.set(`/${chain}`);
+                setRoute(`/${chain}`);
               }}
             >
               {chain?.name || 'Unknown chain'}
             </a>
-            <span class="block-number">Block {blockNumber}</span>
+            <span className="block-number">Block {blockNumber}</span>
           </CWText>
           <CWText>{label.label}</CWText>
         </div>

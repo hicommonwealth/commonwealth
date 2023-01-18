@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -32,7 +32,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWTextInput
           title="Beneficiary"
           placeholder="Beneficiary of proposal"
@@ -67,7 +67,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
         </CWText>
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             const createFunc: (
@@ -93,7 +93,7 @@ export class SubstrateTreasuryProposalForm extends ClassComponent {
             );
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

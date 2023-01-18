@@ -1,4 +1,4 @@
-import m from 'mithril';
+
 import lity from 'lity';
 import { slugify } from 'utils';
 
@@ -6,8 +6,9 @@ import app from 'state';
 import { Thread } from 'models';
 import { link } from 'helpers';
 import { getProposalUrlPath } from 'identifiers';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
-const ProfileProposal: m.Component<
+const ProfileProposal: Component<
   { proposal: Thread },
   { revealThread: boolean }
 > = {
@@ -19,9 +20,9 @@ const ProfileProposal: m.Component<
     // hide rows from communities that don't match
     if (app.isCustomDomain() && chain !== app.customDomainId()) return;
 
-    return m('.ProfileProposal', [
-      m('.summary', [
-        m('', [
+    return render('.ProfileProposal', [
+      render('.summary', [
+        render('', [
           'Created a new ',
           link(
             'a.link-bold',
@@ -39,7 +40,7 @@ const ProfileProposal: m.Component<
         ]),
         createdAt && createdAt.fromNow(),
       ]),
-      m(
+      render(
         '.activity.proposal',
         [
           link(
@@ -56,10 +57,10 @@ const ProfileProposal: m.Component<
         ],
         // TODO: show a truncated thread once we have a good formatting stripping helper
         !!attachments?.length &&
-          m('.proposal-attachments', [
-            m('p', `Attachments (${attachments.length})`),
+          render('.proposal-attachments', [
+            render('p', `Attachments (${attachments.length})`),
             attachments.map((attachment) =>
-              m(
+              render(
                 'a.attachment-item',
                 {
                   href: attachment.url,
@@ -67,13 +68,13 @@ const ProfileProposal: m.Component<
                   target: '_blank',
                   noopener: 'noopener',
                   noreferrer: 'noreferrer',
-                  onclick: (e) => {
+                  onClick: (e) => {
                     e.preventDefault();
                     lity(attachment.url);
                   },
                 },
                 [
-                  m('img', {
+                  render('img', {
                     src: attachment.url,
                   }),
                 ]

@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import app from 'state';
@@ -69,7 +70,7 @@ const handleToggleSubscription = async (
     notifySuccess('Subscribed!');
   }
 
-  m.redraw();
+  redraw();
 };
 
 export const getCommentSubscription = (thread: Thread) => {
@@ -96,7 +97,7 @@ export const getThreadSubScriptionMenuItem = (thread: Thread) => {
     commentSubscription?.isActive && reactionSubscription?.isActive;
 
   return {
-    onclick: (e) => {
+    onClick: (e) => {
       e.preventDefault();
       handleToggleSubscription(
         thread,
@@ -104,7 +105,7 @@ export const getThreadSubScriptionMenuItem = (thread: Thread) => {
         getReactionSubscription(thread),
         isSubscribed
       );
-      m.redraw();
+      redraw();
     },
     label: isSubscribed ? 'Unsubscribe' : 'Subscribe',
     iconLeft: isSubscribed ? 'unsubscribe' : 'bell',

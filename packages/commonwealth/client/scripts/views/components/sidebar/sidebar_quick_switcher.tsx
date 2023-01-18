@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { MixpanelPageViewEvent } from 'analytics/types';
 import 'components/sidebar/sidebar_quick_switcher.scss';
@@ -30,13 +31,13 @@ export class SidebarQuickSwitcher extends ClassComponent {
     });
 
     return (
-      <div class="SidebarQuickSwitcher">
-        <div class="community-nav-bar">
+      <div className="SidebarQuickSwitcher">
+        <div className="community-nav-bar">
           {app.isLoggedIn() && (
             <CWIconButton
               iconName="plusCircle"
               iconButtonTheme="black"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 mixpanelBrowserTrack({
                   event: MixpanelPageViewEvent.COMMUNITY_CREATION_PAGE_VIEW,
@@ -49,19 +50,19 @@ export class SidebarQuickSwitcher extends ClassComponent {
           <CWIconButton
             iconName="compass"
             iconButtonTheme="black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               app.sidebarMenu = 'exploreCommunities';
             }}
           />
         </div>
         <CWDivider />
-        <div class="scrollable-community-bar">
+        <div className="scrollable-community-bar">
           {starredCommunities.map((item) => (
             <CWCommunityAvatar
               size="large"
               community={item}
-              onclick={link ? () => m.route.set(`/${item.id}`) : undefined}
+              onClick={link ? () => setRoute(`/${item.id}`) : undefined}
             />
           ))}
         </div>

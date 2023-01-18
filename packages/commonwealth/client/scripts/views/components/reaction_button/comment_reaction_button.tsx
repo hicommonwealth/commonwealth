@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/reaction_button/comment_reaction_button.scss';
 
@@ -30,7 +31,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
     this.loading = false;
   }
 
-  view(vnode: m.Vnode<CommentReactionButtonAttrs>) {
+  view(vnode: ResultNode<CommentReactionButtonAttrs>) {
     const { comment } = vnode.attrs;
     const reactionCounts = app.reactionCounts.store.getByPost(comment);
     const { likes = 0, hasReacted } = reactionCounts || {};
@@ -68,7 +69,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
             ({ Address }) => Address.address !== userAddress
           );
           this.loading = false;
-          m.redraw();
+          redraw();
         });
     };
 
@@ -84,7 +85,7 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
               Address: { address: userAddress, chain },
             },
           ];
-          m.redraw();
+          redraw();
         });
     };
 
@@ -96,11 +97,11 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
 
     return (
       <div
-        class={getClasses<{ disabled?: boolean }>(
+        className={getClasses<{ disabled?: boolean }>(
           { disabled: this.loading },
           'CommentReactionButton'
         )}
-        onmouseenter={async () => {
+        onMouseEnter={async () => {
           this.reactors = await fetchReactionsByPost(comment);
         }}
       >
@@ -108,13 +109,13 @@ export class CommentReactionButton extends ClassComponent<CommentReactionButtonA
           iconName="upvote"
           iconSize="small"
           selected={hasReacted}
-          onclick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
+          onClick={async (e) => onReactionClick(e, hasReacted, dislike, like)}
         />
         {likes > 0 ? (
           <CWTooltip
             interactionType="hover"
             tooltipContent={
-              <div class="reaction-button-tooltip-contents">
+              <div className="reaction-button-tooltip-contents">
                 {getDisplayedReactorsForPopup({
                   likes,
                   reactors: this.reactors,

@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { ITXModalData, TransactionStatus } from 'models';
 import { NextFn, StageName } from './types';
@@ -46,7 +47,7 @@ export const getTransactionLabel = (txname) => {
 };
 
 export const setupEventListeners = (
-  vnode: m.Vnode<NextFn & ITXModalData>,
+  vnode: ResultNode<NextFn & ITXModalData>,
   timerHandle?: NodeJS.Timeout
 ) => {
   vnode.attrs.txData.events.once(TransactionStatus.Ready.toString(), () => {

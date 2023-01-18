@@ -1,19 +1,20 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 interface IAttrs {
-  onclick?: () => {};
+  onClick?: () => {};
   href: any;
   text: string;
 }
 
-const LandingPageButton: m.Component<IAttrs, {}> = {
+const LandingPageButton: Component<IAttrs, {}> = {
   view: (vnode) => {
-    return m(
+    return render(
       'a',
       {
         class: 'btn-outline text-xl rounded-lg pb-2 pt-3 px-3 ',
         href: vnode.attrs.href,
-        onclick: vnode.attrs.onclick,
+        onClick: vnode.attrs.onClick,
         style: 'padding: 8px 16px',
       },
       vnode.attrs.text

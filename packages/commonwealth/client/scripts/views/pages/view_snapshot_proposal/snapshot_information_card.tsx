@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -18,15 +28,15 @@ import { CWContentPageCard } from '../../components/component_kit/cw_content_pag
 
 type SnapshotInfoRowAttrs = {
   label: string;
-  value: string | m.Vnode;
+  value: string | ResultNode;
 };
 
 class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
-  view(vnode: m.Vnode<SnapshotInfoRowAttrs>) {
+  view(vnode: ResultNode<SnapshotInfoRowAttrs>) {
     const { label, value } = vnode.attrs;
 
     return (
-      <div class="SnapshotInfoRow">
+      <div className="SnapshotInfoRow">
         <CWText type="caption" className="snapshot-info-row-label">
           {label}
         </CWText>
@@ -39,11 +49,11 @@ class SnapshotInfoRow extends ClassComponent<SnapshotInfoRowAttrs> {
 type SnapshotInfoLinkRowAttrs = SnapshotInfoRowAttrs & { url: string };
 
 class SnapshotInfoLinkRow extends ClassComponent<SnapshotInfoLinkRowAttrs> {
-  view(vnode: m.Vnode<SnapshotInfoLinkRowAttrs>) {
+  view(vnode: ResultNode<SnapshotInfoLinkRowAttrs>) {
     const { label, url, value } = vnode.attrs;
 
     return (
-      <div class="SnapshotInfoRow">
+      <div className="SnapshotInfoRow">
         <CWText type="caption" className="snapshot-info-row-label">
           {label}
         </CWText>
@@ -64,7 +74,7 @@ type SnapshotInformationCardAttrs = {
 };
 
 export class SnapshotInformationCard extends ClassComponent<SnapshotInformationCardAttrs> {
-  view(vnode: m.Vnode<SnapshotInformationCardAttrs>) {
+  view(vnode: ResultNode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;
 
     const votingSystem = capitalize(
@@ -76,7 +86,7 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
         header="Information"
         content={
           <div className="SnapshotInformationCard">
-            <div class="info-rows-container">
+            <div className="info-rows-container">
               <SnapshotInfoRow
                 label="Author"
                 value={
@@ -127,7 +137,7 @@ export class SnapshotInformationCard extends ClassComponent<SnapshotInformationC
               />
             </div>
             {!!threads && (
-              <div class="linked-discussions">
+              <div className="linked-discussions">
                 <CWText type="h5" fontWeight="semiBold">
                   Linked Discussions
                 </CWText>

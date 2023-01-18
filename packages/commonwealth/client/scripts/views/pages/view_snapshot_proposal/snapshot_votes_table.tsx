@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
@@ -29,12 +39,12 @@ type SnapshotVotesTableAttrs = {
 export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> {
   isVotersListExpanded: boolean;
 
-  view(vnode: m.Vnode<SnapshotVotesTableAttrs>) {
+  view(vnode: ResultNode<SnapshotVotesTableAttrs>) {
     const { choices, symbol, voters } = vnode.attrs;
 
     const toggleExpandedVoterList = () => {
       this.isVotersListExpanded = !this.isVotersListExpanded;
-      m.redraw();
+      redraw();
     };
 
     const displayedVoters = this.isVotersListExpanded
@@ -42,19 +52,19 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
       : voters.slice(0, 10);
 
     return (
-      <div class="SnapshotVotesTable">
-        <div class="votes-header-row">
+      <div className="SnapshotVotesTable">
+        <div className="votes-header-row">
           <CWText type="h4" fontWeight="semiBold">
             Votes
           </CWText>
-          <div class="vote-count">
+          <div className="vote-count">
             <CWText className="vote-count-text" fontWeight="medium">
               {voters.length}
             </CWText>
           </div>
         </div>
-        <div class="votes-container">
-          <div class="column-header-row">
+        <div className="votes-container">
+          <div className="column-header-row">
             <CWText type="h5" className="column-header-text">
               User
             </CWText>
@@ -82,7 +92,7 @@ export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> 
               </CWText>
             </div>
           ))}
-          <div class="view-more-footer" onclick={toggleExpandedVoterList}>
+          <div className="view-more-footer" onClick={toggleExpandedVoterList}>
             <CWText className="view-more-text" fontWeight="medium">
               View More
             </CWText>

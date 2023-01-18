@@ -2,7 +2,8 @@
 /* eslint-disable no-restricted-syntax */
 import _ from 'lodash';
 import moment from 'moment';
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
@@ -177,7 +178,7 @@ regardless of whether they belong on a given listing.
 Threads are fetched in several ways depending on context. On chain or community initialization,
 /bulkOffchain is called directly from the init page (bypassing the threads controller) and
 fetching the most recent 20 posts for that chain/community (including pinned posts). As a user
-scrolls through the discussions listing, the onscroll listener continuously calls the controller
+scrolls through the discussions listing, the onScroll listener continuously calls the controller
 fn loadNextPage, passing a "cutoff date"—the date of the least recently active thread thus far
 rendered on the listing—and receiving the next page worth of threads (typically the next 20).
 
@@ -361,7 +362,7 @@ class ThreadsController {
           this.store.remove(proposal);
           this._listingStore.remove(proposal);
           this._overviewStore.remove(proposal);
-          m.redraw();
+          redraw();
           resolve(result);
         })
         .catch((e) => {

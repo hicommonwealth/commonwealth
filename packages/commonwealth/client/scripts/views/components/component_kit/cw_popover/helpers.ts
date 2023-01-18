@@ -157,10 +157,6 @@ export const cursorInBounds = (
   return false;
 };
 
-export function findRef(dom, ref) {
-  return dom.matches(`[ref=${ref}]`) ? dom : dom.querySelector(`[ref=${ref}]`);
-}
-
 export const applyArrowStyles = (
   arrowId: string,
   inlineStyle: any, // Gabe 6/1/22 TODO - Type for real

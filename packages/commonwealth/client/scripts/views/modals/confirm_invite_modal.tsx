@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/confirm_invite_modal.scss';
@@ -29,19 +39,19 @@ type SideMenuAttrs = {
 };
 
 class SideMenu extends ClassComponent<SideMenuAttrs> {
-  view(vnode: m.Vnode<SideMenuAttrs>) {
+  view(vnode: ResultNode<SideMenuAttrs>) {
     const { invites, location, onChangeHandler } = vnode.attrs;
 
     return (
-      <div class="SideMenu">
+      <div className="SideMenu">
         {invites.map((invite, i) => {
           return (
             <div
-              class={getClasses<{ selected: boolean }>(
+              className={getClasses<{ selected: boolean }>(
                 { selected: location === i },
                 'invite-title'
               )}
-              onclick={() => {
+              onClick={() => {
                 onChangeHandler(i);
               }}
             >
@@ -61,7 +71,7 @@ export class ConfirmInviteModal extends ClassComponent {
   private isComplete: boolean;
   private location: number;
   private rejected: Array<number>;
-  private selectedAddress: string;
+  private selectedAddress: string | null;
 
   oninit() {
     this.invites = app.config.invites;
@@ -79,7 +89,7 @@ export class ConfirmInviteModal extends ClassComponent {
 
       return (
         <div
-          class={getClasses<{ selected: boolean; mobile: boolean }>(
+          className={getClasses<{ selected: boolean; mobile: boolean }>(
             {
               selected: this.selectedAddress === account.address,
               mobile: isMobile,
@@ -87,7 +97,7 @@ export class ConfirmInviteModal extends ClassComponent {
             'SwitchAddress'
           )}
           key={`${account.chain.id}-${account.address}`}
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             this.selectedAddress = account.address;
           }}
@@ -117,8 +127,8 @@ export class ConfirmInviteModal extends ClassComponent {
     const hasTermsOfService = !!activeInvite?.terms;
 
     return (
-      <div class="ConfirmInviteModal">
-        <div class="compact-modal-title">
+      <div className="ConfirmInviteModal">
+        <div className="compact-modal-title">
           <h3>{!this.isComplete ? 'Manage Invites' : 'No more invites'}</h3>
           <ModalExitButton />
         </div>
@@ -133,7 +143,7 @@ export class ConfirmInviteModal extends ClassComponent {
           />
         )}
         {invites.length > 0 && !this.isComplete ? (
-          <div class="compact-modal-body">
+          <div className="compact-modal-body">
             <CWText>
               You've been invited to the{' '}
               <strong>{invites[location].community_name}</strong> community.{' '}
@@ -155,16 +165,16 @@ export class ConfirmInviteModal extends ClassComponent {
             ) : this.rejected.includes(location) ? (
               <CWText type="h5">You've already deleted this invite!</CWText>
             ) : (
-              <>
-                <div class="invite-addresses">{addresses}</div>
+              <React.Fragment>
+                <div className="invite-addresses">{addresses}</div>
                 {addresses.length > 0 && (
-                  <div class="invite-actions">
+                  <div className="invite-actions">
                     <CWButton
                       disabled={
                         this.accepted.includes(location) ||
                         !this.selectedAddress
                       }
-                      onclick={(e) => {
+                      onClick={(e) => {
                         e.preventDefault();
 
                         const communityName = invites[location].community_name;
@@ -189,7 +199,7 @@ export class ConfirmInviteModal extends ClassComponent {
                                 }
                                 const chainId = invites[location].chain_id;
                                 // if private community, re-init app
-                                m.route.set(`/${chainId}`);
+                                setRoute(`/${chainId}`);
                                 notifySuccess(
                                   `Successfully joined ${communityName}.`
                                 );
@@ -205,7 +215,7 @@ export class ConfirmInviteModal extends ClassComponent {
                     <CWText>or</CWText>
                     <CWButton
                       disabled={this.accepted.includes(location)}
-                      onclick={async (e) => {
+                      onClick={async (e) => {
                         e.preventDefault();
 
                         const confirmed = await confirmationModalWithText(
@@ -225,7 +235,7 @@ export class ConfirmInviteModal extends ClassComponent {
                               );
                               this.rejected.push(location);
                               this.selectedAddress = null;
-                              m.redraw();
+                              redraw();
                             },
                             () => {
                               notifyError('Error rejecting invite.');
@@ -238,7 +248,7 @@ export class ConfirmInviteModal extends ClassComponent {
                 )}
                 {addresses.length === 0 && (
                   <a
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
 
                       // set defaults for the web3 login modal
@@ -246,7 +256,7 @@ export class ConfirmInviteModal extends ClassComponent {
                       const defaultChainId = 'edgeware';
                       const joiningCommunity = invites[this.location].chain_id;
                       const targetCommunity = joiningCommunity;
-                      const prev = m.route.get();
+                      const prev = getRoute();
                       const next = `/${joiningCommunity}`;
                       // TODO: implement joiningChain once confirm_invite_modal supports chains
                       const web3loginParams = joiningCommunity
@@ -257,7 +267,7 @@ export class ConfirmInviteModal extends ClassComponent {
                       if (app.activeChainId()) {
                         navigateToSubpage('/web3login', web3loginParams);
                       } else {
-                        m.route.set(
+                        setRoute(
                           `${defaultChainId}/web3login`,
                           web3loginParams
                         );
@@ -268,7 +278,7 @@ export class ConfirmInviteModal extends ClassComponent {
                         joiningCommunity,
                         targetCommunity,
                         successCallback: () => {
-                          m.route.set(next);
+                          setRoute(next);
                           $(e.target).trigger('modalexit');
                         },
                       });
@@ -277,11 +287,11 @@ export class ConfirmInviteModal extends ClassComponent {
                     Connect a new address
                   </a>
                 )}
-              </>
+              </React.Fragment>
             )}
           </div>
         ) : (
-          <div class="compact-modal-body">
+          <div className="compact-modal-body">
             <CWText>No more invites!</CWText>
             <CWText>Click anywhere outside this window to close it.</CWText>
           </div>

@@ -1,7 +1,13 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  getRouteParam,
+  redraw,
+  jsx,
+} from 'mithrilInterop';
 
 import 'sublayout.scss';
 
@@ -18,7 +24,7 @@ import { SublayoutHeader } from './sublayout_header';
 type SublayoutAttrs = {
   hideFooter?: boolean;
   hideSearch?: boolean;
-  onscroll?: () => void; // lazy loading for page content
+  onScroll?: () => void; // lazy loading for page content
 };
 
 class Sublayout extends ClassComponent<SublayoutAttrs> {
@@ -26,7 +32,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
 
   onResize() {
     this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
-    m.redraw();
+    redraw();
   }
 
   oninit() {
@@ -47,8 +53,8 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
     });
   }
 
-  view(vnode: m.Vnode<SublayoutAttrs>) {
-    const { hideFooter = false, hideSearch, onscroll } = vnode.attrs;
+  view(vnode: ResultNode<SublayoutAttrs>) {
+    const { hideFooter = false, hideSearch, onScroll } = vnode.attrs;
 
     const chain = app.chain ? app.chain.meta : null;
     const terms = app.chain ? chain.terms : null;
@@ -57,20 +63,20 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
     const bannerStatus = localStorage.getItem(`${app.activeChainId()}-banner`);
     const showSidebar = app.sidebarToggled || !this.isWindowSmallInclusive;
 
-    if (m.route.param('triggerInvite') === 't') {
+    if (getRouteParam('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
 
     return (
-      <div class="Sublayout">
-        <div class="header-and-body-container">
+      <div className="Sublayout">
+        <div className="header-and-body-container">
           <SublayoutHeader
             hideSearch={hideSearch}
             onMobile={this.isWindowSmallInclusive}
           />
-          <div class="sidebar-and-body-container">
+          <div className="sidebar-and-body-container">
             {showSidebar && <Sidebar />}
-            <div class="body-and-sticky-headers-container">
+            <div className="body-and-sticky-headers-container">
               <SublayoutBanners
                 banner={banner}
                 chain={chain}
@@ -82,7 +88,7 @@ class Sublayout extends ClassComponent<SublayoutAttrs> {
               {this.isWindowSmallInclusive && app.mobileMenu ? (
                 <AppMobileMenus />
               ) : (
-                <div class="Body" onscroll={onscroll}>
+                <div className="Body" onScroll={onScroll}>
                   {vnode.children}
                   {!app.isCustomDomain() && !hideFooter && <Footer />}
                 </div>

@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 import moment from 'moment';
@@ -164,7 +165,7 @@ export default class QuillEditorInternal {
           );
           this._unsavedChanges = new Delta();
         }
-        m.redraw();
+        redraw();
       }
     }, 250);
 
@@ -180,7 +181,7 @@ export default class QuillEditorInternal {
       // newThread draft system prompts w/ save confirmation modal
       if (source === 'user' && !this._alteredText) {
         this._alteredText = true;
-        m.redraw();
+        redraw();
       }
     });
   }

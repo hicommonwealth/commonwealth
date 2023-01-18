@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/settings/composer_section.scss';
 
@@ -25,7 +26,7 @@ export class ComposerSection extends ClassComponent {
     ];
 
     return (
-      <div class="ComposerSection">
+      <div className="ComposerSection">
         <CWText type="h5" fontWeight="semiBold">
           Composer
         </CWText>

@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/proposals/vote_listing.scss';
 
@@ -35,7 +45,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
   private balancesCache;
   private balancesCacheInitialized;
 
-  view(vnode: m.Vnode<VoteListingAttrs>) {
+  view(vnode: ResultNode<VoteListingAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
     const balanceWeighted =
@@ -56,7 +66,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
     }
 
     return (
-      <div class="VoteListing">
+      <div className="VoteListing">
         {sortedVotes.length === 0 ? (
           <CWText className="no-votes">No votes</CWText>
         ) : (
@@ -76,11 +86,11 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                 if (vote instanceof AaveProposalVote) {
                   balance = vote.power;
                   this.balancesCache[vote.account.address] = vote.format();
-                  m.redraw();
+                  redraw();
                 } else if (vote instanceof CompoundProposalVote) {
                   balance = formatCoin(app.chain.chain.coins(vote.power), true);
                   this.balancesCache[vote.account.address] = balance;
-                  m.redraw();
+                  redraw();
                 } else {
                   vote.account.balance.then((b) => {
                     balance = b;
@@ -88,7 +98,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                       b,
                       true
                     );
-                    m.redraw();
+                    redraw();
                   });
                   balance = '--';
                 }
@@ -109,7 +119,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   <div class="vote">
                     <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
-                      <div class="vote-right-container">
+                      <div className="vote-right-container">
                         <CWText noWrap title={balance}>
                           {balance}
                         </CWText>
@@ -123,7 +133,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   <div class="vote">
                     <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
-                      <div class="vote-right-container">
+                      <div className="vote-right-container">
                         <CWText noWrap title={balance}>
                           {balance}
                         </CWText>
@@ -137,7 +147,7 @@ export class VoteListing extends ClassComponent<VoteListingAttrs> {
                   <div class="vote">
                     <User user={vote.account} linkify />
                     {balance && typeof balance === 'string' && (
-                      <div class="vote-right-container">
+                      <div className="vote-right-container">
                         <CWText noWrap title={balance}>
                           {balance}
                         </CWText>

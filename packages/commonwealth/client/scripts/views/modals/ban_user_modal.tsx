@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import { Profile } from 'models';
@@ -14,28 +15,28 @@ type BanUserModalAttrs = {
 };
 
 export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
-  view(vnode: m.VnodeDOM<BanUserModalAttrs, this>) {
+  view(vnode: ResultNode<BanUserModalAttrs>) {
     const { address } = vnode.attrs.profile;
 
     const exitModal = () => {
       $(vnode.dom).trigger('modalexit');
-      m.redraw();
+      redraw();
     };
 
     return (
-      <>
-        <div class="compact-modal-title ban-user">
+      <React.Fragment>
+        <div className="compact-modal-title ban-user">
           <h3>Are You Sure?</h3>
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <div>
             Banning an address prevents it from interacting with the forum.
           </div>
-          <div class="ban-modal-content">
+          <div className="ban-modal-content">
             <CWButton
               label="Ban Address (just click once and wait)"
               buttonType="primary-red"
-              onclick={async () => {
+              onClick={async () => {
                 try {
                   // ZAK TODO: Update Banned User Table with userProfile
                   if (!address) {
@@ -56,7 +57,7 @@ export class BanUserModal extends ClassComponent<BanUserModalAttrs> {
             />
           </div>
         </div>
-      </>
+      </React.Fragment>
     );
   }
 }

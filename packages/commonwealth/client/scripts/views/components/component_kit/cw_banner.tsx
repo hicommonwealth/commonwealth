@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_banner.scss';
 
@@ -11,36 +12,36 @@ import { CWIconButton } from './cw_icon_button';
 import { getClasses } from './helpers';
 
 type BannerAttrs = {
-  bannerContent: string | m.Vnode;
+  bannerContent: string | ResultNode;
   className?: string;
   onClose?: () => void;
 };
 
 export class CWBanner extends ClassComponent<BannerAttrs> {
-  view(vnode: m.Vnode<BannerAttrs>) {
+  view(vnode: ResultNode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ className?: string }>(
+        className={getClasses<{ className?: string }>(
           { className },
           ComponentType.Banner
         )}
       >
         <CWText type="b2">{bannerContent}</CWText>
-        {onClose && <CWIconButton iconName="close" onclick={onClose} />}
+        {onClose && <CWIconButton iconName="close" onClick={onClose} />}
       </div>
     );
   }
 }
 
 export class CWMessageBanner extends ClassComponent<BannerAttrs> {
-  view(vnode: m.Vnode<BannerAttrs>) {
+  view(vnode: ResultNode<BannerAttrs>) {
     const { bannerContent, className, onClose } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ className?: string }>(
+        className={getClasses<{ className?: string }>(
           { className },
           ComponentType.MessageBanner
         )}
@@ -51,7 +52,7 @@ export class CWMessageBanner extends ClassComponent<BannerAttrs> {
         {onClose && (
           <CWIconButton
             iconName="close"
-            onclick={onClose}
+            onClick={onClose}
             iconButtonTheme="primary"
           />
         )}

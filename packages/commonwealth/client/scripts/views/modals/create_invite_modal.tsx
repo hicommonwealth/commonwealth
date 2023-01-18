@@ -1,9 +1,19 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import $ from 'jquery';
-import { ListItem, List, SelectList } from 'construct-ui';
+// import { ListItem, List, SelectList } from 'construct-ui';
 import { checkAddressChecksum } from 'web3-utils';
 import { decodeAddress } from '@polkadot/util-crypto';
 import moment from 'moment';
@@ -103,30 +113,31 @@ const getMemberPreview = (
 
   if (addr.name) profile.initialize(addr.name, null, null, null, null);
 
-  return m(ListItem, {
-    tabIndex,
-    label: (
-      <a class="search-results-item">
-        <UserBlock
-          user={profile}
-          searchTerm={searchTerm}
-          avatarSize={24}
-          showAddressWithDisplayName
-          showChainName={showChainName}
-        />
-      </a>
-    ),
-    onclick: () => {
-      enterAddressFn(addr.address);
-      closeResultsFn();
-    },
-    onkeyup: (e) => {
-      if (e.key === 'Enter') {
-        enterAddressFn(addr.address);
-        closeResultsFn();
-      }
-    },
-  });
+  return null; // @TODO @REACT FIX ME
+  // return m(ListItem, {
+  //   tabIndex,
+  //   label: (
+  //     <a className="search-results-item">
+  //       {m(UserBlock, {
+  //         user: profile,
+  //         searchTerm,
+  //         avatarSize: 24,
+  //         showAddressWithDisplayName: true,
+  //         showChainName,
+  //       })}
+  //     </a>
+  //   ),
+  //   onClick: () => {
+  //     enterAddressFn(addr.address);
+  //     closeResultsFn();
+  //   },
+  //   onkeyup: (e) => {
+  //     if (e.key === 'Enter') {
+  //       enterAddressFn(addr.address);
+  //       closeResultsFn();
+  //     }
+  //   },
+  // });
 };
 
 const getResultsPreview = (searchTerm: string, state, params: SearchParams) => {
@@ -178,7 +189,7 @@ const concludeSearch = (
   } else {
     state.results = getResultsPreview(searchTerm, state, params);
   }
-  m.redraw();
+  redraw();
 };
 
 const searchMentionableAddresses = async (
@@ -262,7 +273,7 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
     this.loading = false;
   }
 
-  view(vnode: m.Vnode<InviteButtonAttrs>) {
+  view(vnode: ResultNode<InviteButtonAttrs>) {
     const {
       selection,
       successCallback,
@@ -279,7 +290,7 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
         loading={this.loading}
         disabled={disabled}
         label={selection === 'email' ? 'Send Invite' : 'Add address'}
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           const address = invitedAddress;
           const emailAddress = invitedEmail;
@@ -352,12 +363,12 @@ class InviteButton extends ClassComponent<InviteButtonAttrs> {
               } else {
                 failureCallback(true, response.message);
               }
-              m.redraw();
+              redraw();
             },
             (err) => {
               failureCallback(true, err.responseJSON.error);
               this.loading = false;
-              m.redraw();
+              redraw();
             }
           );
         }}
@@ -388,7 +399,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
   private searchAddressTerm: string;
   private success: boolean;
 
-  view(vnode: m.Vnode<CreateInviteModalAttrs>) {
+  view(vnode: ResultNode<CreateInviteModalAttrs>) {
     const { chainInfo } = vnode.attrs;
 
     const chainOrCommunityObj = chainInfo ? { chain: chainInfo } : null;
@@ -440,16 +451,16 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
     };
 
     return (
-      <div class="CreateInviteModal">
-        <div class="compact-modal-title">
+      <div className="CreateInviteModal">
+        <div className="compact-modal-title">
           <h3>Invite members</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
-          <div class="community-and-address-row">
-            <div class="community-select-container">
+        <div className="compact-modal-body">
+          <div className="community-and-address-row">
+            <div className="community-select-container">
               <CWLabel label="Community" />
-              {m(SelectList, {
+              {/* {m(SelectList, { // @TODO @REACT FIX ME
                 closeOnSelect: true,
                 items: chainInfo
                   ? [{ label: chainInfo.name, value: chainInfo.id }]
@@ -465,7 +476,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
                         return 0;
                       }),
                 itemRender: (item: CommunityOption) =>
-                  m(ListItem, {
+                  render(ListItem, {
                     label: item.label,
                     selected:
                       this.invitedAddressChain &&
@@ -492,7 +503,7 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
                   placeholder: 'Search Community...',
                 },
                 checkmark: false,
-              })}
+              })} */}
             </div>
             <CWTextInput
               label="Address"
@@ -528,43 +539,44 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
               }}
             />
           </div>
-          {searchAddressTerm?.length > 3 &&
-            !this.hideResults &&
-            m(List, [
-              !results || results?.length === 0
-                ? app.searchAddressCache[searchAddressTerm]?.loaded
-                  ? m(ListItem, {
-                      label: (
-                        <div class="no-addresses">
-                          <CWText fontWeight="medium">
-                            {searchAddressTerm}
-                          </CWText>
-                          <CWText type="caption">No addresses found</CWText>
-                        </div>
-                      ),
-                      onclick: () => {
-                        if (searchAddressTerm.length < 4) {
-                          notifyError('Query must be at least 4 characters');
-                        }
-                      },
-                    })
-                  : m(ListItem, { label: <CWSpinner size="small" /> })
-                : this.isTyping
-                ? m(ListItem, { label: <CWSpinner size="small" /> })
-                : results,
-            ])}
+          {
+            searchAddressTerm?.length > 3 && !this.hideResults && null // @TODO @REACT FIX ME
+            // m(List, [
+            //   !results || results?.length === 0
+            //     ? app.searchAddressCache[searchAddressTerm]?.loaded
+            //       ? m(ListItem, {
+            //           label: (
+            //             <div className="no-addresses">
+            //               <CWText fontWeight="medium">
+            //                 {searchAddressTerm}
+            //               </CWText>
+            //               <CWText type="caption">No addresses found</CWText>
+            //             </div>
+            //           ),
+            //           onClick: () => {
+            //             if (searchAddressTerm.length < 4) {
+            //               notifyError('Query must be at least 4 characters');
+            //             }
+            //           },
+            //         })
+            //       : m(ListItem, { label: <CWSpinner size="small" /> })
+            //     : this.isTyping
+            //     ? m(ListItem, { label: <CWSpinner size="small" /> })
+            //     : results,
+            // ])
+          }
           <InviteButton
             selection="address"
             disabled={!this.isAddressValid}
             successCallback={(v: boolean) => {
               this.success = v;
               this.searchAddressTerm = '';
-              m.redraw();
+              redraw();
             }}
             failureCallback={(v: boolean, err?: string) => {
               this.failure = v;
               if (err) this.error = err;
-              m.redraw();
+              redraw();
             }}
             invitedAddress={this.searchAddressTerm}
             invitedAddressChain={selectedChainId}
@@ -583,21 +595,23 @@ export class CreateInviteModal extends ClassComponent<CreateInviteModalAttrs> {
             successCallback={(v: boolean) => {
               this.success = v;
               this.invitedEmail = '';
-              m.redraw();
+              redraw();
             }}
             failureCallback={(v: boolean, err?: string) => {
               this.failure = v;
               if (err) this.error = err;
-              m.redraw();
+              redraw();
             }}
             invitedEmail={this.invitedEmail}
             {...chainOrCommunityObj}
           />
           {this.success && (
-            <div class="success-message">Success! Your invite was sent</div>
+            <div className="success-message">Success! Your invite was sent</div>
           )}
           {this.failure && (
-            <div class="error-message">{this.error || 'An error occurred'}</div>
+            <div className="error-message">
+              {this.error || 'An error occurred'}
+            </div>
           )}
         </div>
       </div>

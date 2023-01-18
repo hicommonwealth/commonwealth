@@ -1,9 +1,10 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import Infinite from 'mithril-infinite';
-import { Button, PopoverMenu } from 'construct-ui';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+// import Infinite from 'mithril-infinite';
+// import { Button, PopoverMenu } from 'construct-ui';
 
 import 'components/header/notifications_menu.scss';
 
@@ -37,7 +38,7 @@ export class NotificationsMenu extends ClassComponent {
       )
         this.minDiscussionNotification += MAX_NOTIFS;
     }
-    m.redraw();
+    redraw();
   }
 
   private _nextPage(showingChainEvents: boolean) {
@@ -70,7 +71,7 @@ export class NotificationsMenu extends ClassComponent {
     } else if (this.minDiscussionNotification !== 0) {
       this.minDiscussionNotification = 0;
     }
-    m.redraw();
+    redraw();
   }
 
   view() {
@@ -87,54 +88,55 @@ export class NotificationsMenu extends ClassComponent {
       );
 
     return (
-      <div class="NotificationsMenu">
-        <div class="NotificationsMenuHeader">
-          {m(Button, {
+      <div className="NotificationsMenu">
+        <div className="NotificationsMenuHeader">
+          {/* {m(Button, { // @TODO @REACT FIX ME
             label:
               // discussionNotificationsCount
               //   ? `Discussions (${discussionNotificationsCount})`
               //   : 'Discussions'
               'Discussions',
             active: !this.selectedChainEvents,
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = false;
             },
           })}
-          {m(Button, {
+          {render(Button, {
             label:
               // chainNotificationsCount
               //   ? `Chain events (${chainNotificationsCount})`
               //   : 'Chain events'
               'Chain events',
             active: !!this.selectedChainEvents,
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               e.stopPropagation();
-              this.selectedChainEvents = true;
+              this.selectedChainEvents = true; // @TODO @REACT FIX ME
             },
-          })}
+          })} */}
         </div>
-        <div class="notification-list">
+        <div className="notification-list">
           {(() => {
             if (this.selectedChainEvents) {
               if (this.showingChainEventNotifications.length > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
-                  pageKey: () =>
-                    `${this.minChainEventsNotification} - ${
-                      this.minChainEventsNotification + MAX_NOTIFS
-                    }`,
-                  key:
-                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                    // sortedFilteredNotifications.length
-                    'chain',
-                  // TODO: add the length/num of total chain-events once
-                  // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
-                });
+                return null; // @TODO @REACT FIX ME
+                // return m(Infinite, { // @TODO @REACT FIX ME
+                //   maxPages: 1, // prevents rollover/repeat
+                //   pageData: () => this.showingChainEventNotifications, // limit the number of rows shown here
+                //   pageKey: () =>
+                //     `${this.minChainEventsNotification} - ${
+                //       this.minChainEventsNotification + MAX_NOTIFS
+                //     }`,
+                //   key:
+                //     // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+                //     // sortedFilteredNotifications.length
+                //     'chain',
+                //   // TODO: add the length/num of total chain-events once
+                //   // notifications and notifications read table are split
+                //   item: (data) => m(NotificationRow, { notifications: [data] }),
+                // });
               } else if (
                 app.user.notifications.chainEventNotifications.length === 0
               )
@@ -142,21 +144,22 @@ export class NotificationsMenu extends ClassComponent {
               else return 'No more chain notifications';
             } else {
               if (this.showingDiscussionNotifications.length > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
-                  pageKey: () =>
-                    `${this.minDiscussionNotification} - ${
-                      this.minDiscussionNotification + MAX_NOTIFS
-                    }`,
-                  key:
-                    // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
-                    // sortedFilteredNotifications.length
-                    'discussion',
-                  // TODO: add the length/num of total chain-events once
-                  // notifications and notifications read table are split
-                  item: (data) => m(NotificationRow, { notifications: [data] }),
-                });
+                return null; // @TODO @REACT FIX ME
+                // return m(Infinite, { // @TODO @REACT FIX ME
+                //   maxPages: 1, // prevents rollover/repeat
+                //   pageData: () => this.showingDiscussionNotifications, // limit the number of rows shown here
+                //   pageKey: () =>
+                //     `${this.minDiscussionNotification} - ${
+                //       this.minDiscussionNotification + MAX_NOTIFS
+                //     }`,
+                //   key:
+                //     // (this.selectedChainEvents ? 'chain-' : 'discussion-') +
+                //     // sortedFilteredNotifications.length
+                //     'discussion',
+                //   // TODO: add the length/num of total chain-events once
+                //   // notifications and notifications read table are split
+                //   item: (data) => m(NotificationRow, { notifications: [data] }),
+                // });
               } else if (
                 app.user.notifications.discussionNotifications.length === 0
               )
@@ -165,17 +168,17 @@ export class NotificationsMenu extends ClassComponent {
             }
           })()}
         </div>
-        <div class="NotificationsMenuFooter">
-          {m(Button, {
+        <div className="NotificationsMenuFooter">
+          {/* {m(Button, { // @TODO @REACT FIX ME
             label: 'See all',
-            onclick: () =>
+            onClick: () =>
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
-                : m.route.set('/notifications'),
+                : setRoute('/notifications'),
           })}
-          {m(Button, {
+          {render(Button, {
             label: 'Mark all read',
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               // e.stopPropagation();
               const typeNotif = this.selectedChainEvents
@@ -184,20 +187,20 @@ export class NotificationsMenu extends ClassComponent {
               if (typeNotif.length < 1) return;
               app.user.notifications
                 .markAsRead(typeNotif)
-                ?.then(() => m.redraw());
+                ?.then(() => redraw());
             },
           })}
-          {m(Button, {
+          {render(Button, {
             label: '<',
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               this._previousPage(this.selectedChainEvents);
             },
           })}
-          {m(Button, {
+          {render(Button, {
             label: '>',
-            onclick: (e) => {
+            onClick: (e) => {
               e.preventDefault();
               e.stopPropagation();
               // necessary since page refresh loads the first set of notifications for both but the min may not be set
@@ -210,7 +213,7 @@ export class NotificationsMenu extends ClassComponent {
               }
               this._nextPage(this.selectedChainEvents);
             },
-          })}
+          })} */}
         </div>
       </div>
     );
@@ -219,22 +222,23 @@ export class NotificationsMenu extends ClassComponent {
 
 export class NotificationsMenuPopover extends ClassComponent {
   view() {
-    return m(PopoverMenu, {
-      closeOnContentClick: true,
-      closeOnOutsideClick: true,
-      hasArrow: false,
-      hoverCloseDelay: 0,
-      position: 'bottom-end',
-      transitionDuration: 0,
-      trigger:
-        app.user.notifications.numUnread > 0 ? (
-          <div class="unreads-icon">
-            <CWCustomIcon iconName="unreads" />
-          </div>
-        ) : (
-          <CWIconButton iconButtonTheme="black" iconName="bell" />
-        ),
-      content: <NotificationsMenu />,
-    });
+    return null;
+    // return m(PopoverMenu, {
+    //   closeOnContentClick: true,
+    //   closeOnOutsideClick: true,
+    //   hasArrow: false,
+    //   hoverCloseDelay: 0,
+    //   position: 'bottom-end',
+    //   transitionDuration: 0,
+    //   trigger:
+    //     app.user.notifications.numUnread > 0 ? (
+    //       <div className="unreads-icon">
+    //         <CWCustomIcon iconName="unreads" />
+    //       </div>
+    //     ) : (
+    //       <CWIconButton iconButtonTheme="black" iconName="bell" />
+    //     ),
+    //   content: <NotificationsMenu />,
+    // });
   }
 }

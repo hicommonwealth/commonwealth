@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/proposals/voting_actions.scss';
 
@@ -54,9 +55,9 @@ import {
 type CannotVoteAttrs = { label: string };
 
 class CannotVote extends ClassComponent<CannotVoteAttrs> {
-  view(vnode: m.Vnode<CannotVoteAttrs>) {
+  view(vnode: ResultNode<CannotVoteAttrs>) {
     return (
-      <div class="CannotVote">
+      <div className="CannotVote">
         <CWButton disabled label={vnode.attrs.label} />
       </div>
     );
@@ -74,7 +75,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
   private amount: number;
   private conviction: number;
 
-  view(vnode: m.Vnode<VotingActionsAttrs>) {
+  view(vnode: ResultNode<VotingActionsAttrs>) {
     const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
       vnode.attrs;
 
@@ -156,35 +157,35 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
               user,
               (app.chain as Cosmos).chain.coins(this.amount)
             )
-            .then(() => m.redraw())
+            .then(() => redraw())
             .catch((err) => notifyError(err.toString()));
         } else {
           proposal
             .voteTx(new CosmosVote(user, 'Yes'))
-            .then(() => m.redraw())
+            .then(() => redraw())
             .catch((err) => notifyError(err.toString()));
         }
       } else if (proposal instanceof MolochProposal) {
         proposal
           .submitVoteWebTx(new MolochProposalVote(user, MolochVote.YES))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof CompoundProposal) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.YES))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
         proposal
           .submitVoteWebTx(new AaveProposalVote(user, true))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof NearSputnikProposal) {
         proposal
           .submitVoteWebTx(
             new NearSputnikVote(user, NearSputnikVoteString.Approve)
           )
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof SubstratePhragmenElection) {
         toggleVotingModal(false);
@@ -230,28 +231,28 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       } else if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'No'))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof MolochProposal) {
         proposal
           .submitVoteWebTx(new MolochProposalVote(user, MolochVote.NO))
-          .then(() => m.redraw());
+          .then(() => redraw());
       } else if (proposal instanceof CompoundProposal) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.NO))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof AaveProposal) {
         proposal
           .submitVoteWebTx(new AaveProposalVote(user, false))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (proposal instanceof NearSputnikProposal) {
         proposal
           .submitVoteWebTx(
             new NearSputnikVote(user, NearSputnikVoteString.Reject)
           )
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
         toggleVotingModal(false);
@@ -268,7 +269,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           .processTx()
           .then(() => {
             onModalClose();
-            m.redraw();
+            redraw();
           })
           .catch((err) => {
             onModalClose();
@@ -287,7 +288,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'Abstain'))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else if (
         proposal instanceof CompoundProposal &&
@@ -295,7 +296,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       ) {
         proposal
           .submitVoteWebTx(new CompoundProposalVote(user, BravoVote.ABSTAIN))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
         toggleVotingModal(false);
@@ -310,7 +311,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       if (proposal instanceof CosmosProposal) {
         proposal
           .voteTx(new CosmosVote(user, 'NoWithVeto'))
-          .then(() => m.redraw())
+          .then(() => redraw())
           .catch((err) => notifyError(err.toString()));
       } else {
         toggleVotingModal(false);
@@ -329,7 +330,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           )
           .then(() => {
             onModalClose();
-            m.redraw();
+            redraw();
           })
           .catch((err) => {
             onModalClose();
@@ -355,7 +356,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     const yesButton = (
       <CWButton
         disabled={!canVote || hasVotedYes || votingModalOpen}
-        onclick={voteYes}
+        onClick={voteYes}
         label={hasVotedYes ? 'Voted yes' : 'Vote yes'}
       />
     );
@@ -364,7 +365,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       <CWButton
         buttonType="primary-red"
         disabled={!canVote || hasVotedNo || votingModalOpen}
-        onclick={voteNo}
+        onClick={voteNo}
         label={hasVotedNo ? 'Voted no' : 'Vote no'}
       />
     );
@@ -373,7 +374,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     const multiDepositApproveButton = (
       <CWButton
         disabled={!canVote || votingModalOpen}
-        onclick={voteYes}
+        onClick={voteYes}
         label={hasVotedYes && !canVote ? 'Already approved' : 'Second'}
       />
     );
@@ -383,7 +384,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       <CWButton
         buttonType="primary-red"
         disabled={!canVote || hasVotedAbstain || votingModalOpen}
-        onclick={voteAbstain}
+        onClick={voteAbstain}
         label={hasVotedAbstain ? 'Abstained' : 'Abstain'}
       />
     );
@@ -393,7 +394,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       <CWButton
         buttonType="primary-red"
         disabled={!canVote || hasVotedVeto || votingModalOpen}
-        onclick={voteVeto}
+        onClick={voteVeto}
         label={hasVotedVeto ? 'Vetoed' : 'Veto'}
       />
     );
@@ -405,7 +406,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
           proposal.state !== MolochProposalState.ReadyToProcess ||
           votingModalOpen
         }
-        onclick={processProposal}
+        onClick={processProposal}
         label={proposal.data.processed ? 'Processed' : 'Process'}
       />
     );
@@ -414,7 +415,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     const removeButton = proposal instanceof NearSputnikProposal && (
       <CWButton
         disabled={!canVote || votingModalOpen}
-        onclick={voteRemove}
+        onClick={voteRemove}
         label={hasVotedRemove ? 'Voted remove' : 'Vote remove'}
       />
     );
@@ -423,25 +424,25 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
 
     if (proposal instanceof AaveProposal) {
       votingActionObj = (
-        <div class="button-row">
+        <div className="button-row">
           {yesButton}
           {noButton}
         </div>
       );
     } else if (proposal.votingType === VotingType.SimpleYesNoVoting) {
       votingActionObj = (
-        <>
-          <div class="button-row">
+        <React.Fragment>
+          <div className="button-row">
             {yesButton}
             {noButton}
           </div>
           <ProposalExtensions proposal={proposal} />
-        </>
+        </React.Fragment>
       );
     } else if (proposal.votingType === VotingType.ConvictionYesNoVoting) {
       votingActionObj = (
-        <>
-          <div class="button-row">
+        <React.Fragment>
+          <div className="button-row">
             {yesButton}
             {noButton}
           </div>
@@ -454,36 +455,36 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
               this.amount = c;
             }}
           />
-        </>
+        </React.Fragment>
       );
     } else if (proposal.votingType === VotingType.SimpleYesApprovalVoting) {
       votingActionObj = (
-        <>
-          <div class="button-row">{multiDepositApproveButton}</div>
+        <React.Fragment>
+          <div className="button-row">{multiDepositApproveButton}</div>
           <ProposalExtensions
             proposal={proposal}
             setCosmosDepositAmount={(c) => {
               this.amount = c;
             }}
           />
-        </>
+        </React.Fragment>
       );
     } else if (proposal.votingType === VotingType.YesNoAbstainVeto) {
       votingActionObj = (
-        <>
-          <div class="button-row">
+        <React.Fragment>
+          <div className="button-row">
             {yesButton}
             {noButton}
             {abstainButton}
             {noWithVetoButton}
           </div>
           <ProposalExtensions proposal={proposal} />
-        </>
+        </React.Fragment>
       );
     } else if (proposal.votingType === VotingType.MolochYesNo) {
       votingActionObj = (
-        <>
-          <div class="button-row">
+        <React.Fragment>
+          <div className="button-row">
             {yesButton}
             {noButton}
             {processButton}
@@ -495,11 +496,11 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
             />
           </div>
           <ProposalExtensions proposal={proposal} />
-        </>
+        </React.Fragment>
       );
     } else if (proposal.votingType === VotingType.CompoundYesNo) {
       votingActionObj = (
-        <div class="button-row">
+        <div className="button-row">
           {yesButton}
           <CompoundCancelButton
             onModalClose={onModalClose}
@@ -510,7 +511,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       );
     } else if (proposal.votingType === VotingType.CompoundYesNoAbstain) {
       votingActionObj = (
-        <div class="button-row">
+        <div className="button-row">
           {yesButton}
           {noButton}
           {abstainButton}
@@ -523,7 +524,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
       );
     } else if (proposal.votingType === VotingType.YesNoReject) {
       votingActionObj = (
-        <div class="button-row">
+        <div className="button-row">
           {yesButton}
           {noButton}
           {removeButton}
@@ -538,7 +539,7 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
     }
 
     return (
-      <div class="VotingActions">
+      <div className="VotingActions">
         <CWText type="h4" className="voting-actions-header">
           Cast Your Vote
         </CWText>

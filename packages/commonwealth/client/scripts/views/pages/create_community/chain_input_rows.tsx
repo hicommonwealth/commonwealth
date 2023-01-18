@@ -1,6 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 
@@ -49,13 +51,13 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
       }}
       textarea
     />,
-    <div class="AvatarUploadRow">
+    <div className="AvatarUploadRow">
       <CWLabel label="Upload Icon" />
       <AvatarUpload
         scope="community"
         uploadStartedCallback={() => {
           state.uploadInProgress = true;
-          m.redraw();
+          redraw();
         }}
         uploadCompleteCallback={(files) => {
           files.forEach((f) => {
@@ -64,7 +66,7 @@ export function defaultChainRows<T extends ChainFormDefaultFields>(
             state.iconUrl = url;
           });
           state.uploadInProgress = false;
-          m.redraw();
+          redraw();
         }}
       />
     </div>,

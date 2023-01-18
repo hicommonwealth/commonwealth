@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
 
@@ -21,26 +22,26 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
   private calldata?: ISubstrateTXData;
   private signedTx: string;
 
-  async oncreate(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
+  async oncreate(vnode: ResultNode<TXSigningCLIOptionAttrs>) {
     if (this.calldata === undefined) {
       this.calldata =
         (await vnode.attrs.txData.unsignedData()) as ISubstrateTXData;
-      m.redraw();
+      redraw();
     }
   }
 
-  view(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
+  view(vnode: ResultNode<TXSigningCLIOptionAttrs>) {
     const transact = (...args) => {
       setupEventListeners(vnode);
       vnode.attrs.txData.transact(...args);
     };
 
     return (
-      <div class="TXSigningCLIOption">
+      <div className="TXSigningCLIOption">
         {this.calldata &&
         app.chain &&
         app.chain.base === ChainBase.Substrate ? (
-          <>
+          <React.Fragment>
             <CodeBlock clickToSelect>
               {`subkey ${
                 this.calldata.isEd25519 ? '-e ' : ''
@@ -51,7 +52,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
             2
           )} \\ --password "" \\
           --suri "`}
-              <span class="no-select">secret phrase</span>
+              <span className="no-select">secret phrase</span>
               {`"`}
             </CodeBlock>
             <CWTextArea
@@ -63,7 +64,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
               }}
             />
             <CWButton
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 try {
                   transact(this.signedTx.trim());
@@ -73,7 +74,7 @@ export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> 
               }}
               label="Send transaction"
             />
-          </>
+          </React.Fragment>
         ) : (
           <CodeBlock clickToSelect>Loading transaction data...</CodeBlock>
         )}

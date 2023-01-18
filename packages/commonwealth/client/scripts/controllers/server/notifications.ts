@@ -1,6 +1,7 @@
 /* eslint-disable no-restricted-syntax */
 import $ from 'jquery';
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import {NotificationStore} from 'stores';
 import {NotificationSubscription, Notification, ChainEventType} from 'models';
@@ -260,10 +261,10 @@ class NotificationsController {
   public update(n: Notification) {
     if (n.chainEvent && !this._chainEventStore.getById(n.id)) {
       this._chainEventStore.add(n);
-      m.redraw();
+      redraw();
     } else if (!n.chainEvent && !this._discussionStore.getById(n.id)) {
       this._discussionStore.add(n);
-      m.redraw();
+      redraw();
     }
   }
 

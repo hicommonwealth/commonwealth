@@ -1,32 +1,33 @@
 import 'pages/landing/creators_card_section.scss';
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { ICardListItem } from 'models/interfaces';
 
 import LandingPageButton from './landing_page_button';
 import ItemListsMapper from './list_mapper_with_item';
 
-const TokensCreatorComponent: m.Component<{ creators: ICardListItem[] }, {}> = {
+const TokensCreatorComponent: Component<{ creators: ICardListItem[] }, {}> = {
   view: (vnode) => {
     const { creators } = vnode.attrs;
 
-    return m('section.TokensCreatorComponent', { class: 'container mx-auto pt-10' }, [
-      m(
+    return render('section.TokensCreatorComponent', { class: 'container mx-auto pt-10' }, [
+      render(
         'h2',
         { class: 'text-3xl font-bold mb-5 text-center' },
         ' Token creators are empowered '
       ),
-      m(
+      render(
         'p',
         { class: 'text-2xl max-w-screen-sm mx-auto text-center mb-10' },
         ' Commonwealth lets you simplify your community and governance, bringing four tools into one. '
       ),
-      // m(
+      // render(
       //   'div.TokensCreatorsUseCaseButton',
       //   { class: 'text-center hidden lg:block xl:block mb-20' },
-      //   m(LandingPageButton, { href: '', text: 'See use cases' })
+      //   render(LandingPageButton, { href: '', text: 'See use cases' })
       // ),
-      m(ItemListsMapper, {
+      render(ItemListsMapper, {
         bgColor: 'bg-gray-900',
         margin: 'mt-4',
         cardItems: creators,

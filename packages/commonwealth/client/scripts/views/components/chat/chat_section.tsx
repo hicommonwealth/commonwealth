@@ -1,9 +1,10 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
-import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
+// import { Icon, Icons, Menu, MenuItem, Overlay } from 'construct-ui';
 
 import 'components/sidebar/index.scss';
 
@@ -11,6 +12,7 @@ import app from 'state';
 import { IChannel } from 'controllers/server/socket/chatNs';
 import { WebsocketMessageNames } from 'types';
 import { handleRedirectClicks } from 'helpers';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SidebarSectionGroup } from '../sidebar/sidebar_section';
 import {
   CreateCategory,
@@ -53,7 +55,7 @@ function setToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
+class ChatSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   channels: {
     [category: string]: IChannel[];
   };
@@ -70,7 +72,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
   chain: string;
   activeChannel: number;
 
-  async oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
+  async oninit(vnode: ResultNode<SidebarSectionAttrs>) {
     this.loaded = false;
     this.chain = app.activeChainId();
     this.activeChannel = null;
@@ -122,7 +124,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
     });
 
     this.onIncomingMessage = (msg) => {
-      m.redraw.sync();
+      redraw(true);
     };
 
     app.socket.chatNs.addListener(
@@ -150,7 +152,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
   view() {
     if (!app.socket) return;
     if (!this.loaded) return <CWSpinner />;
-    this.activeChannel = m.route.param()['channel'];
+    this.activeChannel = getRouteParam()['channel'];
     app.socket.chatNs.activeChannel = String(this.activeChannel);
 
     const isAdmin = app.roles.isAdminOfEntity({ chain: app.activeChainId() });
@@ -183,15 +185,16 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
 
     // ---------- Build Section Props ---------- //
 
-    const sectionAdminButton: m.Vnode = m(Icon, {
-      name: Icons.PLUS_CIRCLE,
-      onclick: (e) => {
-        e.stopPropagation();
-        this.adminModals['CreateCategory'] = true;
-      },
-    });
+    // @TODO @REACT FIX ME
+    // const sectionAdminButton: ResultNode = m(Icon, {
+    //   name: Icons.PLUS_CIRCLE,
+    //   onClick: (e) => {
+    //     e.stopPropagation();
+    //     this.adminModals['CreateCategory'] = true;
+    //   },
+    // });
 
-    const categoryAdminButton = (category: string): m.Vnode => {
+    const categoryAdminButton = (category: string): ResultNode => {
       const handleMouseout = () => {
         if (this.menuToggleTree['children'][category]['toggledState']) {
           this.menuToggleTree['children'][category]['toggledState'] = false;
@@ -214,49 +217,50 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         handleMouseout();
       };
 
-      const menuComponent = m(
-        Menu,
-        {
-          class: 'admin-menu',
-          onmouseenter: handleMouseover,
-          onmouseleave: handleMouseout,
-        },
-        [
-          m(MenuItem, {
-            iconLeft: Icons.PLUS_CIRCLE,
-            label: 'Add Channel',
-            onclick: (e) => {
-              handleMenuClick(e, 'CreateChannel');
-            },
-          }),
-          m(MenuItem, {
-            iconLeft: Icons.EDIT_2,
-            label: 'Rename Category',
-            onclick: (e) => {
-              handleMenuClick(e, 'RenameCategory');
-            },
-          }),
-          m(MenuItem, {
-            iconLeft: Icons.DELETE,
-            label: 'Delete Category',
-            onclick: (e) => {
-              handleMenuClick(e, 'DeleteCategory');
-            },
-          }),
-        ]
-      );
-
-      return (
-        <>
-          {m(Icon, {
-            name: Icons.EDIT,
-            onmouseenter: handleMouseover,
-            onmouseleave: handleMouseout,
-          })}
-          {this.menuToggleTree['children'][category]['toggledState'] &&
-            menuComponent}
-        </>
-      );
+      // @TODO @REACT FIX ME
+      // const menuComponent = m(
+      //   Menu,
+      //   {
+      //     class: 'admin-menu',
+      //     onMouseEnter: handleMouseover,
+      //     onMouseLeave: handleMouseout,
+      //   },
+      //   [
+      //     m(MenuItem, {
+      //       iconLeft: Icons.PLUS_CIRCLE,
+      //       label: 'Add Channel',
+      //       onClick: (e) => {
+      //         handleMenuClick(e, 'CreateChannel');
+      //       },
+      //     }),
+      //     m(MenuItem, {
+      //       iconLeft: Icons.EDIT_2,
+      //       label: 'Rename Category',
+      //       onClick: (e) => {
+      //         handleMenuClick(e, 'RenameCategory');
+      //       },
+      //     }),
+      //     m(MenuItem, {
+      //       iconLeft: Icons.DELETE,
+      //       label: 'Delete Category',
+      //       onClick: (e) => {
+      //         handleMenuClick(e, 'DeleteCategory');
+      //       },
+      //     }),
+      //   ]
+      // );
+      return null; // @TODO @REACT Fix me
+      // return (
+      //   <React.Fragment>
+      //     {m(Icon, {
+      //       name: Icons.EDIT,
+      //       onMouseEnter: handleMouseover,
+      //       onMouseLeave: handleMouseout,
+      //     })}
+      //     {this.menuToggleTree['children'][category]['toggledState'] &&
+      //       menuComponent}
+      //   </React.Fragment>
+      // );
     };
 
     const channelRightIcon = (channel: IChannel) => {
@@ -294,46 +298,48 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         handleMouseout();
       };
 
-      const menuComponent = m(
-        Menu,
-        {
-          class: 'admin-menu',
-          onmouseenter: handleMouseover,
-          onmouseleave: handleMouseout,
-        },
-        [
-          m(MenuItem, {
-            iconLeft: Icons.EDIT_2,
-            label: 'Rename Channel',
-            onclick: (e) => {
-              handleMenuClick(e, 'RenameChannel');
-            },
-          }),
-          m(MenuItem, {
-            iconLeft: Icons.DELETE,
-            label: 'Delete Channel',
-            onclick: (e) => {
-              handleMenuClick(e, 'DeleteChannel');
-            },
-          }),
-        ]
-      );
+      // @TODO @REACT FIX ME
+      // const menuComponent = m(
+      //   Menu,
+      //   {
+      //     class: 'admin-menu',
+      //     onMouseEnter: handleMouseover,
+      //     onMouseLeave: handleMouseout,
+      //   },
+      //   [
+      //     m(MenuItem, {
+      //       iconLeft: Icons.EDIT_2,
+      //       label: 'Rename Channel',
+      //       onClick: (e) => {
+      //         handleMenuClick(e, 'RenameChannel');
+      //       },
+      //     }),
+      //     m(MenuItem, {
+      //       iconLeft: Icons.DELETE,
+      //       label: 'Delete Channel',
+      //       onClick: (e) => {
+      //         handleMenuClick(e, 'DeleteChannel');
+      //       },
+      //     }),
+      //   ]
+      // );
 
-      return (
-        <>
-          {channel.unread > 0 && (
-            <div class="unread-icon">{channel.unread}</div>
-          )}
-          {m(Icon, {
-            name: Icons.EDIT,
-            onmouseenter: handleMouseover,
-            onmouseleave: handleMouseout,
-          })}
-          {this.menuToggleTree['children'][channel.category]['children'][
-            channel.name
-          ]['toggledState'] && menuComponent}
-        </>
-      );
+      return null; // @TODO @REACT FIX ME
+      // return (
+      //   <React.Fragment>
+      //     {channel.unread > 0 && (
+      //       <div className="unread-icon">{channel.unread}</div>
+      //     )}
+      //     {m(Icon, {
+      //       name: Icons.EDIT,
+      //       onMouseEnter: handleMouseover,
+      //       onMouseLeave: handleMouseout,
+      //     })}
+      //     {this.menuToggleTree['children'][channel.category]['children'][
+      //       channel.name
+      //     ]['toggledState'] && menuComponent}
+      //   </React.Fragment>
+      // );
     };
 
     const channelToSubSectionProps = (channel: IChannel): SubSectionAttrs => {
@@ -344,10 +350,11 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         title: channel.name,
         rowIcon: true,
         isVisible: true,
-        isActive: onChannelPage(m.route.get()),
+        isActive: onChannelPage(getRoute()),
         isUpdated: channel.unread > 0,
-        onclick: (e) => {
+        onClick: (e) => {
           handleRedirectClicks(
+            this,
             e,
             `/chat/${channel.id}`,
             app.activeChainId(),
@@ -369,7 +376,7 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
         isVisible: true,
         isActive: false, // TODO: if any child is active
         isUpdated: false, // TODO: is collapsed and children has unread
-        onclick: (e) => {
+        onClick: (e) => {
           e.preventDefault();
         },
         displayData: this.channels[category].map(channelToSubSectionProps),
@@ -385,10 +392,10 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       Object.keys(this.adminModals).forEach((k) => {
         this.adminModals[k] = false;
       });
-      m.redraw();
+      redraw();
     };
 
-    const overlayContent: m.Vnode = this.adminModals['CreateCategory'] ? (
+    const overlayContent: ResultNode = this.adminModals['CreateCategory'] ? (
       <CreateCategory handleClose={closeOverlay} />
     ) : this.adminModals['CreateChannel'] ? (
       <CreateChannel handleClose={closeOverlay} category={this.adminCategory} />
@@ -412,22 +419,24 @@ export class ChatSection extends ClassComponent<SidebarSectionAttrs> {
       title: 'Chat',
       className: 'ChatSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setToggleTree('toggledState', toggle);
       },
       displayData: channelData,
       isActive: false,
-      rightIcon: isAdmin && sectionAdminButton,
-      extraComponents: m(Overlay, {
-        class: 'chatAdminOverlay',
-        isOpen: Object.values(this.adminModals).some(Boolean),
-        onClose: closeOverlay,
-        closeOnOutsideClick: true,
-        content: overlayContent,
-      }),
+      // rightIcon: isAdmin && sectionAdminButton, // @TODO @REACT FIX ME
+      // extraComponents: m(Overlay, {
+      //   class: 'chatAdminOverlay',
+      //   isOpen: Object.values(this.adminModals).some(Boolean),
+      //   onClose: closeOverlay,
+      //   closeOnOutsideClick: true,
+      //   content: overlayContent,
+      // }),
     };
 
     return <SidebarSectionGroup {...sidebarSectionData} />;
   }
 }
+
+export const ChatSection = NavigationWrapper(ChatSectionComponent);

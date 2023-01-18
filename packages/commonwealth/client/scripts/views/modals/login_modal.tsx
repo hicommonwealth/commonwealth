@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
@@ -71,7 +72,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
   private magicLoading: boolean;
   private showMobile: boolean;
 
-  oninit(vnode: m.Vnode<LoginModalAttrs>) {
+  oninit(vnode: ResultNode<LoginModalAttrs>) {
     // Determine if in a community
     this.currentlyInCommunityPage = app.activeChainId() !== undefined;
 
@@ -143,7 +144,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     );
   }
 
-  view(vnode: m.Vnode<LoginModalAttrs>) {
+  view(vnode: ResultNode<LoginModalAttrs>) {
     const { onSuccess } = vnode.attrs;
     const wcEnabled = _.any(
       this.wallets,
@@ -197,7 +198,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           }
           if (onSuccess) onSuccess();
         }
-        m.redraw();
+        redraw();
       } else {
         // log in as the new user
         await initAppState(false);
@@ -215,7 +216,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           }
           if (onSuccess) onSuccess();
         }
-        m.redraw();
+        redraw();
       }
     };
 
@@ -276,7 +277,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           this.sidebarType = 'newAddressLinked';
           this.bodyType = 'selectProfile';
         }
-        m.redraw();
+        redraw();
       }
     };
 
@@ -297,13 +298,13 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
         }
       }
       this.bodyType = 'welcome';
-      m.redraw();
+      redraw();
     };
 
     // Handle branching logic for linking an account
     const linkExistingAccountCallback = async () => {
       this.bodyType = 'selectPrevious';
-      m.redraw();
+      redraw();
     };
 
     // Handle signature and validation logic for linking an account
@@ -337,7 +338,7 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
           $('.LoginDesktop').trigger('modalexit');
         }
         if (onSuccess) onSuccess();
-        m.redraw();
+        redraw();
       } catch (e) {
         console.log(e);
         notifyError('Failed to save profile info');

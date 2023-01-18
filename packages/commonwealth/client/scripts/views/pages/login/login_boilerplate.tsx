@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/login/login_boilerplate.scss';
 
@@ -14,12 +15,12 @@ type LoginBoilerplateAttrs = {
 };
 
 export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
-  view(vnode: m.Vnode<LoginBoilerplateAttrs>) {
+  view(vnode: ResultNode<LoginBoilerplateAttrs>) {
     const { darkMode } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ darkMode?: boolean }>(
+        className={getClasses<{ darkMode?: boolean }>(
           { darkMode },
           'LoginBoilerplate'
         )}
@@ -27,8 +28,8 @@ export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
         <CWText type="caption" className="boilerplate-text" isCentered>
           By connecting to Common, you agree to our{' '}
           <a
-            class="link"
-            onclick={(e) => {
+            className="link"
+            onClick={(e) => {
               modalRedirectClick(e, '/terms');
             }}
           >
@@ -36,8 +37,8 @@ export class LoginBoilerplate extends ClassComponent<LoginBoilerplateAttrs> {
           </a>{' '}
           and{' '}
           <a
-            class="link"
-            onclick={(e) => {
+            className="link"
+            onClick={(e) => {
               modalRedirectClick(e, '/privacy');
             }}
           >

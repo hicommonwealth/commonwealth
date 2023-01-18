@@ -1,7 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/confirm_modal.scss';
@@ -12,7 +14,7 @@ import { CWButton } from '../components/component_kit/cw_button';
 const ConfirmModal = {
   confirmExit: async () => true,
   view(
-    vnode: m.Vnode<{
+    vnode: ResultNode<{
       prompt: string;
       primaryButton?: string;
       secondaryButton?: string;
@@ -24,8 +26,8 @@ const ConfirmModal = {
 
     return (
       <div
-        class="ConfirmModal"
-        onclick={(e) => {
+        className="ConfirmModal"
+        onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
@@ -34,12 +36,12 @@ const ConfirmModal = {
           e.stopPropagation();
         }}
       >
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <h3>{confirmText}</h3>
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {
@@ -53,7 +55,7 @@ const ConfirmModal = {
           />
           <CWButton
             buttonType="secondary-blue"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalexit');
             }}

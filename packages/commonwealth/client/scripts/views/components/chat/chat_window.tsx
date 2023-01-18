@@ -1,8 +1,19 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
 import $ from 'jquery';
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/chat.scss';
@@ -76,12 +87,12 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
 
   private _messageIsHighlighted = (message: any): boolean => {
     return (
-      m.route.param('message') &&
-      Number(m.route.param('message')) === message.id
+      getRouteParam('message') &&
+      Number(getRouteParam('message')) === message.id
     );
   };
 
-  oninit(vnode: m.VnodeDOM<ChatWindowAttrs, this>) {
+  oninit(vnode: ResultNode<ChatWindowAttrs>) {
     const activeAddressRoles = app.roles.getAllRolesInCommunity({
       chain: app.activeChainId(),
     });
@@ -97,7 +108,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     if (this.hideChat) return;
 
     this.shouldScroll = true;
-    this.shouldScrollToHighlight = Boolean(m.route.param('message'));
+    this.shouldScrollToHighlight = Boolean(getRouteParam('message'));
 
     this.scrollToBottom = () => {
       const scroller = $(vnode.dom).find('.chat-messages')[0];
@@ -108,7 +119,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
       if (chat_channel_id === vnode.attrs.channel_id) {
         this.shouldScroll = false;
       }
-      m.redraw();
+      redraw();
     };
 
     app.socket.chatNs.addListener(
@@ -124,7 +135,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     );
   }
 
-  view(vnode: m.Vnode<ChatWindowAttrs>) {
+  view(vnode: ResultNode<ChatWindowAttrs>) {
     if (this.hideChat) return;
 
     const { channel_id } = vnode.attrs;
@@ -149,16 +160,16 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
     }, []);
 
     return (
-      <div class="ChatPage">
-        <div class="chat-messages">
+      <div className="ChatPage">
+        <div className="chat-messages">
           {groupedMessages.length === 0 && app.socket.chatNs.isConnected && (
-            <div class="no-messages-container">
-              <div class="no-messages-placeholder">No messages yet</div>
+            <div className="no-messages-container">
+              <div className="no-messages-placeholder">No messages yet</div>
             </div>
           )}
           {groupedMessages.map((grp) => (
             <div
-              class="chat-message-group"
+              className="chat-message-group"
               id={
                 grp.messages.some(this._messageIsHighlighted)
                   ? 'highlighted'
@@ -184,7 +195,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                 <CWIconButton
                   iconName="copy"
                   iconSize="small"
-                  onclick={() => async () => {
+                  onClick={() => async () => {
                     const route = app.socket.chatNs.getRouteToMessage(
                       grp.messages[0].chat_channel_id,
                       grp.messages[0].id,
@@ -204,9 +215,9 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                   }}
                 />
               </div>
-              <div class="clear" />
+              <div className="clear" />
               {grp.messages.map((msg) => (
-                <div class="chat-message-text">
+                <div className="chat-message-text">
                   {renderQuillTextBody(msg.message, {
                     openLinksInNewTab: true,
                   })}
@@ -217,16 +228,18 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
         </div>
 
         {!app.isLoggedIn() ? (
-          <div class="chat-composer-unavailable">Log in to join chat</div>
+          <div className="chat-composer-unavailable">Log in to join chat</div>
         ) : !app.user.activeAccount ? (
-          <div class="chat-composer-unavailable">
+          <div className="chat-composer-unavailable">
             Set up an account to join chat
           </div>
         ) : !app.socket.chatNs.isConnected ? (
-          <div class="chat-composer-unavailable">Waiting for connection</div>
+          <div className="chat-composer-unavailable">
+            Waiting for connection
+          </div>
         ) : (
           <div
-            class={`chat-composer${
+            className={`chat-composer${
               app.socket.chatNs.isConnected ? '' : ' disabled'
             }`}
           >
@@ -241,7 +254,7 @@ export class ChatWindow extends ClassComponent<ChatWindowAttrs> {
                 this._handleSubmitMessage();
               }}
             />
-            <CWIcon iconName="send" onclick={this._handleSubmitMessage} />
+            <CWIcon iconName="send" onClick={this._handleSubmitMessage} />
           </div>
         )}
       </div>

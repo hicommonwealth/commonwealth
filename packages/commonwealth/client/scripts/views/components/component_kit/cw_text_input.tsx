@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text_input.scss';
 
@@ -23,14 +24,14 @@ export type BaseTextInputAttrs = {
   defaultValue?: string | number;
   value?: string | number;
   iconRight?: IconName;
-  iconRightonclick?: () => void;
+  iconRightonClick?: () => void;
   inputValidationFn?: (value: string) => [ValidationStatus, string];
   label?: string;
   maxlength?: number;
   name?: string;
   oninput?: (e) => void;
   onenterkey?: (e) => void;
-  onclick?: (e) => void;
+  onClick?: (e) => void;
   placeholder?: string;
   tabindex?: number;
 };
@@ -61,12 +62,12 @@ type TextInputAttrs = BaseTextInputAttrs &
   InputInternalStyleAttrs;
 
 export class MessageRow extends ClassComponent<MessageRowAttrs> {
-  view(vnode: m.Vnode<MessageRowAttrs>) {
+  view(vnode: ResultNode<MessageRowAttrs>) {
     const { hasFeedback, label, statusMessage, validationStatus } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ hasFeedback: boolean }>(
+        className={getClasses<{ hasFeedback: boolean }>(
           { hasFeedback },
           'MessageRow'
         )}
@@ -94,7 +95,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
   private statusMessage?: string = '';
   private validationStatus?: ValidationStatus = undefined;
 
-  view(vnode: m.Vnode<TextInputAttrs>) {
+  view(vnode: ResultNode<TextInputAttrs>) {
     const {
       autocomplete = 'off',
       autofocus,
@@ -104,7 +105,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
       value,
       disabled,
       iconRight,
-      iconRightonclick,
+      iconRightonClick,
       inputClassName,
       inputValidationFn,
       label,
@@ -112,7 +113,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
       name,
       oninput,
       onenterkey,
-      onclick,
+      onClick,
       placeholder,
       size = 'large',
       tabindex,
@@ -121,7 +122,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
 
     return (
       <div
-        class={getClasses<{
+        className={getClasses<{
           containerClassName?: string;
           validationStatus?: ValidationStatus;
         }>(
@@ -131,7 +132,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
           },
           ComponentType.TextInput
         )}
-        onclick={onclick}
+        onClick={onClick}
       >
         {label && (
           <MessageRow
@@ -141,11 +142,11 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
             validationStatus={this.validationStatus}
           />
         )}
-        <div class="input-and-icon-container">
+        <div className="input-and-icon-container">
           <input
             autofocus={autofocus}
             autocomplete={autocomplete}
-            class={getClasses<InputStyleAttrs & InputInternalStyleAttrs>({
+            className={getClasses<InputStyleAttrs & InputInternalStyleAttrs>({
               size,
               validationStatus: this.validationStatus,
               disabled,
@@ -167,7 +168,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                 this.isTyping = false;
                 this.validationStatus = undefined;
                 this.statusMessage = undefined;
-                m.redraw();
+                this.redraw();
               } else {
                 e.stopPropagation();
                 this.isTyping = true;
@@ -178,7 +179,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                   if (inputValidationFn && e.target.value?.length > 3) {
                     [this.validationStatus, this.statusMessage] =
                       inputValidationFn(e.target.value);
-                    m.redraw();
+                    this.redraw();
                   }
                 }, timeout);
               }
@@ -189,7 +190,7 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                   this.isTyping = false;
                   this.validationStatus = undefined;
                   this.statusMessage = undefined;
-                  m.redraw();
+                  this.redraw();
                 } else {
                   [this.validationStatus, this.statusMessage] =
                     inputValidationFn(e.target.value);
@@ -204,12 +205,12 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
             value={value}
             defaultValue={defaultValue}
           />
-          {iconRightonclick && !!iconRight && !disabled ? (
-            <div class="text-input-right-onclick-icon">
+          {iconRightonClick && !!iconRight && !disabled ? (
+            <div className="text-input-right-onClick-icon">
               <CWIconButton
                 iconName={iconRight}
                 iconSize="small"
-                onclick={iconRightonclick}
+                onClick={iconRightonClick}
                 theme="primary"
               />
             </div>

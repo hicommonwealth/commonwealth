@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_button.scss';
 
@@ -38,8 +39,8 @@ export type ButtonStyleAttrs = {
 export type ButtonAttrs = {
   iconLeft?: IconName;
   iconRight?: IconName;
-  label: string | m.Vnode;
-  onclick?: (e?: MouseEvent) => void;
+  label: string | ResultNode;
+  onClick?: (e?: MouseEvent) => void;
 } & ButtonStyleAttrs;
 
 const getTextType = (buttonType: ButtonType) => {
@@ -53,7 +54,7 @@ const getTextType = (buttonType: ButtonType) => {
 };
 
 export class CWButton extends ClassComponent<ButtonAttrs> {
-  view(vnode: m.Vnode<ButtonAttrs>) {
+  view(vnode: ResultNode<ButtonAttrs>) {
     const {
       buttonType = 'primary-blue',
       className,
@@ -61,11 +62,11 @@ export class CWButton extends ClassComponent<ButtonAttrs> {
       iconLeft,
       iconRight,
       label,
-      onclick,
+      onClick,
     } = vnode.attrs;
     return (
       <button
-        class={getClasses<ButtonStyleAttrs>(
+        className={getClasses<ButtonStyleAttrs>(
           {
             disabled,
             buttonType,
@@ -73,7 +74,7 @@ export class CWButton extends ClassComponent<ButtonAttrs> {
           },
           ComponentType.Button
         )}
-        onclick={onclick}
+        onClick={onClick}
         disabled={disabled}
       >
         {!!iconLeft && (

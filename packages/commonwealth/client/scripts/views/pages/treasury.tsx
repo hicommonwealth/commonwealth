@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/treasury.scss';
 
@@ -91,7 +92,7 @@ class TreasuryPage extends ClassComponent {
         <ProposalCard proposal={proposal} />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     const inactiveTreasuryProposals =
@@ -105,14 +106,14 @@ class TreasuryPage extends ClassComponent {
         <ProposalCard proposal={proposal} />
       ))
     ) : (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     );
 
     return (
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Referenda" />}
       >
-        <div class="TreasuryPage">
+        <div className="TreasuryPage">
           {onSubstrate && (
             <GovExplainer
               statHeaders={[

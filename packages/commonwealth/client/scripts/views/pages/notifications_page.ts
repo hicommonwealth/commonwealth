@@ -1,15 +1,22 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import 'pages/notifications_page.scss';
 
-import m from 'mithril';
-import Infinite from 'mithril-infinite';
-import { Button, ButtonGroup, Popover, Tag } from 'construct-ui';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+
+// @ TODO: REACT REMOVE Infinite
+// import Infinite from 'mithril-infinite';
+// @TODO: REACT CLEANUP
 
 import app from 'state';
 import NotificationRow from 'views/components/notification_row';
 import Sublayout from 'views/sublayout';
 import PageError from 'views/pages/error';
 import { PageLoading } from 'views/pages/loading';
+
+// TODO: FIX UI FOR THESE
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
+import { CWTag } from '../components/component_kit/cw_tag';
 
 let minDiscussionNotification = 0;
 let minChainEventsNotification = 0;
@@ -42,21 +49,21 @@ function nextPage() {
   if (numChainEventNotif < minChainEventsNotification + MAX_NOTIFS) {
     app.user.notifications.getChainEventNotifications().then(() => {
       increment('chain-event');
-      m.redraw();
+      redraw();
     });
   } else {
     increment('chain-event');
-    m.redraw();
+    redraw();
   }
 
   if (numDiscussionNotif < minDiscussionNotification + MAX_NOTIFS) {
     app.user.notifications.getDiscussionNotifications().then(() => {
       increment('discussion');
-      m.redraw();
+      redraw();
     });
   } else {
     increment('discussion');
-    m.redraw();
+    redraw();
   }
 }
 
@@ -77,19 +84,17 @@ function previousPage() {
     minDiscussionNotification = 0;
     flag = true;
   }
-  if (flag) m.redraw();
+  if (flag) redraw();
 }
 
-const NotificationsPage: m.Component<{}> = {
+const NotificationsPage: Component<{}> = {
   view: (vnode) => {
     if (!app.isLoggedIn())
-      return m(PageError, {
+      return render(PageError, {
         title: [
           'Notifications ',
-          m(Tag, {
-            size: 'xs',
+          render(CWTag, {
             label: 'Beta',
-            style: 'position: relative; top: -2px; margin-left: 6px',
           }),
         ],
         message: 'This page requires you to be logged in.',
@@ -97,10 +102,10 @@ const NotificationsPage: m.Component<{}> = {
 
     const activeEntity = app.chain;
     if (!activeEntity)
-      return m(PageLoading, {
+      return render(PageLoading, {
         // title: [
         //   'Notifications ',
-        //   m(Tag, {
+        //   render(Tag, {
         //     size: 'xs',
         //     label: 'Beta',
         //     style: 'position: relative; top: -2px; margin-left: 6px',
@@ -116,12 +121,12 @@ const NotificationsPage: m.Component<{}> = {
     // const sortedNotifications = sortNotifications(app.user.notifications.allNotifications).reverse();
     // console.log("Sorted Notifications:", sortedNotifications);
 
-    return m(
+    return render(
       Sublayout,
       // {
       //   title: [
       //     'Notifications ',
-      //     m(Tag, {
+      //     render(Tag, {
       //       size: 'xs',
       //       label: 'Beta',
       //       style: 'position: relative; top: -2px; margin-left: 6px',
@@ -129,17 +134,16 @@ const NotificationsPage: m.Component<{}> = {
       //   ],
       // },
       [
-        m('.NotificationsPage', [
-          m(
-            ButtonGroup,
+        render('.NotificationsPage', [
+          render(
+            '.ButtonGroup',
             {
               class: 'NotificationButtons',
-              outlined: true,
             },
             [
-              m(Button, {
+              render(CWButton, {
                 label: 'Previous Page',
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   pageKey -= 1;
                   console.log(
@@ -161,9 +165,9 @@ const NotificationsPage: m.Component<{}> = {
                   );
                 },
               }),
-              m(Button, {
+              render(CWButton, {
                 label: 'Next Page',
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   pageKey += 1;
 
@@ -193,29 +197,27 @@ const NotificationsPage: m.Component<{}> = {
                   );
                 },
               }),
-              m(Button, {
+              render(CWButton, {
                 label: 'Mark all as read',
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   app.user.notifications
                     .markAsRead(
                       discussionNotifications.concat(chainEventNotifications)
                     )
-                    .then(() => m.redraw());
+                    .then(() => redraw());
                 },
               }),
-              m(Popover, {
+              render(CWPopover, {
                 content: [
-                  m(
+                  render(
                     'div',
                     { style: 'margin-bottom: 10px' },
                     'Clear all chain notifications?'
                   ),
-                  m(Button, {
+                  render(CWButton, {
                     label: 'Confirm',
-                    fluid: true,
-                    rounded: true,
-                    onclick: async (e) => {
+                    onClick: async (e) => {
                       e.preventDefault();
                       if (
                         app.user.notifications.chainEventNotifications
@@ -224,23 +226,17 @@ const NotificationsPage: m.Component<{}> = {
                         return;
                       app.user.notifications
                         .delete(app.user.notifications.chainEventNotifications)
-                        .then(() => m.redraw());
+                        .then(() => redraw());
                     },
                   }),
                 ],
-                trigger: m(Button, {
+                trigger: render(CWButton, {
                   label: 'Clear chain events',
                 }),
-                transitionDuration: 0,
-                closeOnContentClick: true,
-                closeOnEscapeKey: true,
-                onClosed: () => {
-                  m.redraw();
-                },
               }),
             ]
           ),
-          m('.NotificationsList', [
+          render('.NotificationsList', [
             (() => {
               const discussionNotif = discussionNotifications.slice(
                 minDiscussionNotification,
@@ -257,23 +253,24 @@ const NotificationsPage: m.Component<{}> = {
 
               const totalLength = allNotifications.length;
               if (totalLength > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  key: totalLength,
-                  pageData: () => {
-                    return allNotifications;
-                  },
-                  pageKey: () => {
-                    return pageKey;
-                  },
-                  item: (data, opts, index) => {
-                    return m(NotificationRow, {
-                      notifications: [data],
-                      onListPage: true,
-                    });
-                  },
-                });
-              } else return m('.no-notifications', 'No Notifications');
+                return null; // @TODO @REACT FIX ME
+                // return render(Infinite, {
+                //   maxPages: 1, // prevents rollover/repeat
+                //   key: totalLength,
+                //   pageData: () => {
+                //     return allNotifications;
+                //   },
+                //   pageKey: () => {
+                //     return pageKey;
+                //   },
+                //   item: (data, opts, index) => {
+                //     return render(NotificationRow, {
+                //       notifications: [data],
+                //       onListPage: true,
+                //     });
+                //   },
+                // });
+              } else return render('.no-notifications', 'No Notifications');
             })(),
           ]),
         ]),

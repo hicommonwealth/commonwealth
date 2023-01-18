@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -48,7 +49,7 @@ export class CosmosForm extends ClassComponent {
 
   view() {
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <InputRow
           title="RPC URL"
           value={this.state.form.nodeUrl}
@@ -95,7 +96,7 @@ export class CosmosForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving}
-          onclick={async () => {
+          onClick={async () => {
             const {
               altWalletUrl,
               bech32Prefix,
@@ -133,14 +134,14 @@ export class CosmosForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              m.route.set(`/${res.result.chain?.id}`);
+              setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               this.state.message =
                 err.responseJSON?.error ||
                 'Creating new Cosmos community failed';
             } finally {
               this.state.saving = false;
-              m.redraw();
+              redraw();
             }
           }}
         />

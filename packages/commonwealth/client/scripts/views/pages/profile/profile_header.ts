@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 
@@ -25,7 +26,7 @@ export interface IProfileHeaderState {
   loading: boolean;
 }
 
-const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
+const ProfileHeader: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   view: (vnode) => {
     const { account, refreshCallback, onOwnProfile, onLinkedProfile } =
       vnode.attrs;
@@ -53,7 +54,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
-        m.redraw();
+        redraw();
         notifySuccess('Joined community');
       } catch (err) {
         vnode.state.loading = false;
@@ -61,45 +62,45 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       }
     };
 
-    return m('.ProfileHeader', [
-      m('.bio-main', [
-        m('.bio-left', [
+    return render('.ProfileHeader', [
+      render('.bio-main', [
+        render('.bio-left', [
           // TODO: Rename class to non-bio to avoid confusion with Bio component
           account.profile && account.profile?.getAvatar(90),
         ]),
-        m('.bio-right', [
-          m('.name-row', [
-            m(
+        render('.bio-right', [
+          render('.name-row', [
+            render(
               '.User',
               account.profile
-                ? m(User, { user: account, hideAvatar: true, showRole: true })
+                ? render(User, { user: account, hideAvatar: true, showRole: true })
                 : account.address
             ),
           ]),
-          m('.address-block-left', [
-            m(
+          render('.address-block-left', [
+            render(
               '.address',
               `${account.address.slice(0, 6)}...${account.address.slice(
                 account.address.length - 6
               )}`
             ),
-            m('img', {
+            render('img', {
               src: '/static/img/copy_default.svg',
               alt: '',
               class: 'cursor-pointer',
-              onclick: (e) => {
+              onClick: (e) => {
                 window.navigator.clipboard
                   .writeText(account.address)
                   .then(() => notifySuccess('Copied address to clipboard'));
               },
             }),
           ]),
-          m('.info-row', [
+          render('.info-row', [
             account.profile?.headline &&
-              m('span.profile-headline', account.profile.headline),
-            m('.space'),
+              render('span.profile-headline', account.profile.headline),
+            render('.space'),
             // isClaimable &&
-            //   m(LoginWithWalletDropdown, {
+            //   render(LoginWithWalletDropdown, {
             //     prepopulateAddress: account.address,
             //     loggingInWithAddress: !app.isLoggedIn(),
             //     joiningChain: app.activeChainId(),
@@ -108,19 +109,19 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]),
       ]),
-      m('.bio-actions', [
+      render('.bio-actions', [
         account.profile &&
           account.profile.bio &&
-          m(CWButton, {
-            onclick: () => {
+          render(CWButton, {
+            onClick: () => {
               alertModalWithText(account.profile.bio, 'Close')();
             },
             label: 'View Bio',
           }),
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
-          m(CWButton, {
-            onclick: () => {
+          render(CWButton, {
+            onClick: () => {
               app.modals.create({
                 modal: BanUserModal,
                 data: { profile: account.profile },
@@ -129,16 +130,16 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
             label: 'Ban User',
             buttonType: 'primary-red',
           }),
-        m('', [
+        render('', [
           onOwnProfile
             ? showJoinCommunityButton && app.activeChainId()
-            : m(CWButton, {
-                onclick: async () => {
+            : render(CWButton, {
+                onClick: async () => {
                   if (onLinkedProfile) {
                     vnode.state.loading = true;
                     try {
                       await setActiveAccount(account);
-                      m.redraw();
+                      redraw();
                     } catch (e) {
                       vnode.state.loading = false;
                       notifyError(e);
@@ -146,7 +147,7 @@ const ProfileHeader: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   } else {
                     try {
                       await joinCommunity();
-                      m.redraw();
+                      redraw();
                     } catch (e) {
                       vnode.state.loading = false;
                       notifyError(e);

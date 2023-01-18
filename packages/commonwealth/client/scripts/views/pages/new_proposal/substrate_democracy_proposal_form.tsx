@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
@@ -50,7 +50,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
     const formState = { module: '', function: '', args: [] };
 
     return (
-      <>
+      <React.Fragment>
         <CWRadioGroup
           name="democracy-tx-switcher"
           onchange={(value) => {
@@ -66,7 +66,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
             },
           ]}
         />
-        {m(EdgewareFunctionPicker, formState)}
+        {render(EdgewareFunctionPicker, formState)}
         {this.toggleValue === 'proposal' && (
           <CWTextInput
             label={`Deposit (${app.chain.currency})`}
@@ -79,7 +79,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
         )}
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             let createFunc: (...args) => ITXModalData | Promise<ITXModalData> =
@@ -146,7 +146,7 @@ export class SubstrateDemocracyProposalForm extends ClassComponent {
             );
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

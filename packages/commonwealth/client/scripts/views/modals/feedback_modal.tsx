@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/feedback_modal.scss';
@@ -22,11 +23,11 @@ export class FeedbackModal extends ClassComponent {
 
   view() {
     return (
-      <div class="FeedbackModal">
-        <div class="compact-modal-title">
+      <div className="FeedbackModal">
+        <div className="compact-modal-title">
           <h3>Send feedback</h3>
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWTextArea
             placeholder="Report a bug, or suggest an improvement"
             value={this.feedbackText}
@@ -37,7 +38,7 @@ export class FeedbackModal extends ClassComponent {
           <CWButton
             disabled={this.sending}
             label="Send feedback"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               this.sending = true;
               const urlText = document.location.href;
@@ -52,13 +53,13 @@ export class FeedbackModal extends ClassComponent {
                   this.sending = false;
                   this.status = 'success';
                   this.message = 'Sent successfully!';
-                  m.redraw();
+                  redraw();
                 },
                 (err) => {
                   this.sending = false;
                   this.status = 'failure';
                   this.message = err.responseJSON?.message || err.responseText;
-                  m.redraw();
+                  redraw();
                 }
               );
             }}

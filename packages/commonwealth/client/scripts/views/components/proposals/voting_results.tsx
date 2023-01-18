@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import BN from 'bn.js';
 import Web3 from 'web3';
 
@@ -27,7 +28,7 @@ import {
 type VotingResultsAttrs = { proposal: AnyProposal };
 
 export class VotingResults extends ClassComponent<VotingResultsAttrs> {
-  view(vnode: m.Vnode<VotingResultsAttrs>) {
+  view(vnode: ResultNode<VotingResultsAttrs>) {
     const { proposal } = vnode.attrs;
     const votes = proposal.getVotes();
 

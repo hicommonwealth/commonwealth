@@ -1,8 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import { ListItem, QueryList } from 'construct-ui';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/thread_selector.scss';
 
@@ -23,22 +23,23 @@ const renderThreadPreview = (
   const selected = linkedThreads.some((lt) => +lt.id === +thread.id);
   const author = app.profiles.getProfile(thread.authorChain, thread.author);
 
-  return m(ListItem, {
-    label: (
-      <div class="thread-preview-row">
-        <CWText fontWeight="medium" noWrap>
-          {thread.title}
-        </CWText>
-        <CWText type="caption">
-          {author.name
-            ? `${author.name} • ${formatAddressShort(thread.author)}`
-            : thread.author}
-        </CWText>
-      </div>
-    ),
-    selected,
-    key: idx,
-  });
+    return render('@TODO @REACT PLEASE REMOVE ME')
+  // return m(ListItem, {
+  //   label: (
+  //     <div className="thread-preview-row">
+  //       <CWText fontWeight="medium" noWrap>
+  //         {thread.title}
+  //       </CWText>
+  //       <CWText type="caption">
+  //         {author.name
+  //           ? `${author.name} • ${formatAddressShort(thread.author)}`
+  //           : thread.author}
+  //       </CWText>
+  //     </div>
+  //   ),
+  //   selected,
+  //   key: idx,
+  // });
 };
 
 // The thread-to-thread relationship is comprised of linked and linking threads,
@@ -57,14 +58,14 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
   private searchTerm: string;
   private showOnlyLinkedThreads: boolean;
 
-  oninit(vnode: m.Vnode<ThreadSelectorAttrs>) {
+  oninit(vnode: ResultNode<ThreadSelectorAttrs>) {
     this.showOnlyLinkedThreads = true;
     this.searchResults = [];
     this.linkedThreads = vnode.attrs.linkedThreads;
     this.searchTerm = '';
   }
 
-  view(vnode: m.Vnode<ThreadSelectorAttrs>) {
+  view(vnode: ResultNode<ThreadSelectorAttrs>) {
     const { linkingThread } = vnode.attrs;
     const { searchResults } = this;
 
@@ -87,14 +88,14 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
     };
 
     return (
-      <div class="ThreadSelector">
+      <div className="ThreadSelector">
         {this.loading ? (
           <CWSpinner />
         ) : (
-          <>
+          <React.Fragment>
             <CWTextInput
               placeholder="Search thread titles..."
-              iconRightonclick={() => {
+              iconRightonClick={() => {
                 this.searchTerm = '';
                 this.searchResults = [];
                 this.showOnlyLinkedThreads = true;
@@ -131,7 +132,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                             thread.author
                           );
                         });
-                        m.redraw();
+                        redraw();
                       })
                       .catch(() => {
                         notifyError('Could not find matching thread');
@@ -142,7 +143,7 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                 }, 250);
               }}
             />
-            {m(QueryList, {
+            {/* {m(QueryList, {
               filterable: false,
               checkmark: true,
               inputAttrs: {
@@ -182,8 +183,8 @@ export class ThreadSelector extends ClassComponent<ThreadSelectorAttrs> {
                     });
                 }
               },
-            })}
-          </>
+            })} */}
+          </React.Fragment>
         )}
       </div>
     );

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/confirm_snapshot_vote_modal.scss';
@@ -34,29 +35,29 @@ type ConfirmSnapshotVoteModalAttrs = {
 export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVoteModalAttrs> {
   private saving: boolean;
 
-  view(vnode: m.Vnode<ConfirmSnapshotVoteModalAttrs>) {
+  view(vnode: ResultNode<ConfirmSnapshotVoteModalAttrs>) {
     const author = app.user.activeAccount;
 
     const { proposal, space, id, selectedChoice, totalScore, successCallback } =
       vnode.attrs;
 
     return (
-      <div class="ConfirmSnapshotVoteModal">
-        <div class="compact-modal-title">
+      <div className="ConfirmSnapshotVoteModal">
+        <div className="compact-modal-title">
           <h3>Confirm vote</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWText type="h4" fontWeight="semiBold">
             Are you sure you want to vote {proposal.choices[selectedChoice]}?
           </CWText>
           <CWText type="h5">This action cannot be undone.</CWText>
-          <div class="vote-info">
-            <div class="vote-info-row">
+          <div className="vote-info">
+            <div className="vote-info-row">
               <CWText>Option</CWText>
               <CWText>{proposal.choices[selectedChoice]}</CWText>
             </div>
-            <div class="vote-info-row">
+            <div className="vote-info-row">
               <CWText>Your voting power</CWText>
               <CWText>
                 {`${formatNumberShort(totalScore)} ${space.symbol
@@ -65,12 +66,12 @@ export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVote
               </CWText>
             </div>
           </div>
-          <div class="button-group">
+          <div className="button-group">
             <CWButton
               label="Cancel"
               buttonType="secondary-blue"
               disabled={this.saving}
-              onclick={async (e) => {
+              onClick={async (e) => {
                 e.preventDefault();
                 $(e.target).trigger('modalexit');
               }}
@@ -78,7 +79,7 @@ export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVote
             <CWButton
               label="Vote"
               disabled={this.saving}
-              onclick={async (e) => {
+              onClick={async (e) => {
                 e.preventDefault();
 
                 this.saving = true;
@@ -95,7 +96,7 @@ export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVote
                   castVote(author.address, votePayload).then(() => {
                     $(e.target).trigger('modalexit');
                     successCallback();
-                    m.redraw();
+                    redraw();
                   });
                   mixpanelBrowserTrack({
                     event: MixpanelSnapshotEvents.SNAPSHOT_VOTE_OCCURRED,

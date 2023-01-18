@@ -1,6 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { ChainBase } from 'common-common/src/types';
@@ -12,7 +14,7 @@ import { BreadcrumbsTitleTag } from './breadcrumbs_title_tag';
 export const loadSubstrateModules = (
   name: string,
   getModules: () => ProposalModule<any, any, any>[]
-): m.Vnode | undefined => {
+): ResultNode | undefined => {
   const onSubstrate = app.chain?.base === ChainBase.Substrate;
 
   if (onSubstrate) {

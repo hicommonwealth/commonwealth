@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import {
   convictionToWeight,
@@ -13,11 +14,11 @@ import { CWDropdown } from '../component_kit/cw_dropdown';
 type ConvictionsChooserAttrs = { callback: (number) => void };
 
 export class ConvictionsChooser extends ClassComponent<ConvictionsChooserAttrs> {
-  oncreate(vnode: m.Vnode<ConvictionsChooserAttrs>) {
+  oncreate(vnode: ResultNode<ConvictionsChooserAttrs>) {
     vnode.attrs.callback(convictions()[0].toString());
   }
 
-  view(vnode: m.Vnode<ConvictionsChooserAttrs>) {
+  view(vnode: ResultNode<ConvictionsChooserAttrs>) {
     const options = convictions().map((c) => ({
       value: c.toString(),
       label: `${convictionToWeight(

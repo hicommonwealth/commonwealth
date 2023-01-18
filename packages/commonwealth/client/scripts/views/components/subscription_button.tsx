@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
@@ -20,17 +21,17 @@ export class SubscriptionButton extends ClassComponent {
 
     return (
       <CWButton
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
           if (isNotUndefined(communitySubscription)) {
             subscriptions.deleteSubscription(communitySubscription).then(() => {
-              m.redraw();
+              redraw();
             });
           } else {
             subscriptions
               .subscribe(NotificationCategories.NewThread, communityOrChain)
               .then(() => {
-                m.redraw();
+                redraw();
               });
           }
         }}

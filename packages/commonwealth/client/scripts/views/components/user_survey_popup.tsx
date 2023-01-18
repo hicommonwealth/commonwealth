@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 
 import 'components/user_survey_popup.scss';
@@ -23,14 +24,14 @@ type UserSurveyViewAttrs = {
 };
 
 class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
-  view(vnode: m.Vnode<UserSurveyViewAttrs>) {
+  view(vnode: ResultNode<UserSurveyViewAttrs>) {
     const { disabled, checked, onRedirectClick, onClose, onCheckboxClick } =
       vnode.attrs;
     return (
       <CWGrowl position="bottom-right" disabled={disabled}>
-        <div class="UserSurveyPopup">
-          <div class="survey-svg-header"></div>
-          <CWIcon iconName="close" className="close-icon" onclick={onClose} />
+        <div className="UserSurveyPopup">
+          <div className="survey-svg-header"></div>
+          <CWIcon iconName="close" className="close-icon" onClick={onClose} />
           <CWText type="h3" fontWeight="bold" className="header-text">
             Want a Milk Carton NFT?
           </CWText>
@@ -38,16 +39,16 @@ class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
             Take a quick survey to help us improve Common and get a special NFT
             dropped to your ETH address!
           </CWText>
-          <div class="button-wrapper">
+          <div className="button-wrapper">
             <CWButton
               buttonType="secondary-black"
               label="No Thanks"
-              onclick={onClose}
+              onClick={onClose}
             />
             <CWButton
               buttonType="primary-black"
               label="Sure Thing!"
-              onclick={onRedirectClick}
+              onClick={onRedirectClick}
             />
           </div>
           <CWCheckbox
@@ -113,7 +114,7 @@ export class UserSurveyPopup extends ClassComponent<UserSurveyPopupAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<UserSurveyPopupAttrs>) {
+  view(vnode: ResultNode<UserSurveyPopupAttrs>) {
     const { surveyReadyForDisplay } = vnode.attrs;
 
     const handleClose = () => {
@@ -123,7 +124,7 @@ export class UserSurveyPopup extends ClassComponent<UserSurveyPopupAttrs> {
       this.surveyLocked = true;
       localStorage.setItem('user-survey-last-displayed', Date.now().toString());
       console.log('setting new survey-last-displayed');
-      m.redraw();
+      redraw();
     };
 
     const handleRedirect = () => {

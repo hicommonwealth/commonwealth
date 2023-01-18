@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, parsePathname } from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -40,15 +41,15 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
   private space: SnapshotSpace;
   private userScore: number;
 
-  view(vnode: m.Vnode<NewSnapshotProposalPageAttrs>) {
+  view(vnode: ResultNode<NewSnapshotProposalPageAttrs>) {
     if (!app.chain) {
       return <PageLoading />;
     }
 
-    const pathVars = m.parsePathname(window.location.href);
+    const pathVars = parsePathname(window.location.href);
 
     if (!app.snapshot.initialized) {
-      app.snapshot.init(vnode.attrs.snapshotId).then(() => m.redraw());
+      app.snapshot.init(vnode.attrs.snapshotId).then(() => redraw());
       return <PageLoading />;
     }
 
@@ -112,7 +113,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
         this.members = space.members;
 
         this.snapshotScoresFetched = true;
-        m.redraw();
+        redraw();
       });
     }
 
@@ -152,7 +153,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
 
     return (
       <Sublayout>
-        <div class="NewSnapshotProposalPage">
+        <div className="NewSnapshotProposalPage">
           <CWText type="h3" fontWeight="medium">
             New Snapshot Proposal
           </CWText>
@@ -194,16 +195,16 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
                 }
                 oninput={(e) => {
                   this.form.choices[idx] = (e.target as any).value;
-                  m.redraw();
+                  redraw();
                 }}
                 iconRight={
                   idx > 1 && idx === this.form.choices.length - 1
                     ? 'trash'
                     : undefined
                 }
-                iconRightonclick={() => {
+                iconRightonClick={() => {
                   this.form.choices.pop();
-                  m.redraw();
+                  redraw();
                 }}
               />
             );
@@ -211,12 +212,12 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
           <CWButton
             iconLeft="plus"
             label="Add voting choice"
-            onclick={() => {
+            onClick={() => {
               this.form.choices.push(`Option ${this.form.choices.length + 1}`);
-              m.redraw();
+              redraw();
             }}
           />
-          <div class="date-range">
+          <div className="date-range">
             <CWLabel label="Date Range" />
             <CWRadioGroup
               name="period"
@@ -248,7 +249,7 @@ export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalP
           <CWButton
             label="Publish"
             disabled={!author || this.saving || !isValid}
-            onclick={async () => {
+            onClick={async () => {
               this.saving = true;
 
               try {

@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'modals/offchain_voting_modal.scss';
 
@@ -14,7 +24,7 @@ type OffchainVotingModalAttrs = {
 };
 
 export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs> {
-  view(vnode: m.Vnode<OffchainVotingModalAttrs>) {
+  view(vnode: ResultNode<OffchainVotingModalAttrs>) {
     const { votes } = vnode.attrs;
 
     if (!votes || votes.length === 0) return;
@@ -24,15 +34,15 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
     votes.forEach((vote) => csvRows.push([vote.address, vote.option]));
 
     return (
-      <div class="OffchainVotingModal">
-        <div class="compact-modal-title">
+      <div className="OffchainVotingModal">
+        <div className="compact-modal-title">
           <h3>Votes</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
-          <div class="download-link">
+        <div className="compact-modal-body">
+          <div className="download-link">
             <a
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 const csvContent = `data:text/csv;charset=utf-8,${csvRows
                   .map((r) => r.join(','))
@@ -63,7 +73,7 @@ export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs
                   hideIdentityIcon
                 />
               </div>
-              <div class="offchain-poll-voter-choice">{vote.option}</div>
+              <div className="offchain-poll-voter-choice">{vote.option}</div>
             </div>
           ))}
         </div>

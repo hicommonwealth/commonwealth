@@ -1,5 +1,6 @@
 import $ from 'jquery';
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 
 import { RolePermission } from 'models';
@@ -49,7 +50,7 @@ export const setChainCategories = async (
           // else we don't have a response.result, so we don't know what to remove
         }
         resolve();
-        m.redraw();
+        redraw();
       })
       .catch(() => {
         reject();

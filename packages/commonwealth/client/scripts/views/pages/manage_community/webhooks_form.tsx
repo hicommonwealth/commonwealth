@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import smartTruncate from 'smart-truncate';
 
@@ -27,7 +28,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
   private success: boolean;
   private webhookUrl: string;
 
-  view(vnode: m.Vnode<WebhooksFormAttrs>) {
+  view(vnode: ResultNode<WebhooksFormAttrs>) {
     const { webhooks } = vnode.attrs;
     const chainOrCommObj = { chain: app.activeChainId() };
 
@@ -72,20 +73,20 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
             notifyError(result.message);
           }
 
-          m.redraw();
+          redraw();
         },
         (err) => {
           this.failure = true;
           this.disabled = false;
           notifyError(err?.responseJSON?.error || 'Unknown error');
-          m.redraw();
+          redraw();
         }
       );
     };
 
     return (
-      <div class="WebhooksForm">
-        <div class="webhooks-container">
+      <div className="WebhooksForm">
+        <div className="webhooks-container">
           {webhooks.map((webhook) => {
             const label =
               webhook.url.indexOf('discord') !== -1
@@ -95,8 +96,8 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                 : null;
 
             return (
-              <div class="webhook-row">
-                <div class="webhook-info">
+              <div className="webhook-row">
+                <div className="webhook-info">
                   <CWText>{smartTruncate(webhook.url, 25)}</CWText>
                   {label && (
                     <CWText type="caption" className="webhook-tag-text">
@@ -107,11 +108,11 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                     {pluralize(webhook.categories.length, 'event')}
                   </CWText>
                 </div>
-                <div class="buttons">
+                <div className="buttons">
                   <CWIconButton
                     iconName="gear"
                     iconSize="small"
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       app.modals.create({
                         modal: WebhookSettingsModal,
@@ -132,7 +133,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                     iconName="trash"
                     iconSize="small"
                     disabled={this.disabled}
-                    onclick={(e) => {
+                    onClick={(e) => {
                       e.preventDefault();
                       this.disabled = true;
                       this.success = false;
@@ -162,7 +163,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
 
                             notifyError(result.message);
                           }
-                          m.redraw();
+                          redraw();
                         },
                         (err) => {
                           this.failure = true;
@@ -173,7 +174,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
                             err?.responseJSON?.error || 'Unknown error'
                           );
 
-                          m.redraw();
+                          redraw();
                         }
                       );
                     }}
@@ -201,7 +202,7 @@ export class WebhooksForm extends ClassComponent<WebhooksFormAttrs> {
         <CWButton
           disabled={!this.webhookUrl}
           label="Add webhook"
-          onclick={createWebhook}
+          onClick={createWebhook}
         />
       </div>
     );

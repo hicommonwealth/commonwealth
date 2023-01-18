@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/view_thread/linked_proposals_card.scss';
 
@@ -29,7 +30,7 @@ type LinkedProposalAttrs = {
 };
 
 class LinkedProposal extends ClassComponent<LinkedProposalAttrs> {
-  view(vnode: m.Vnode<LinkedProposalAttrs>) {
+  view(vnode: ResultNode<LinkedProposalAttrs>) {
     const { thread, chainEntity } = vnode.attrs;
 
     const slug = chainEntityTypeToProposalSlug(chainEntity.type);
@@ -64,7 +65,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
   private snapshotProposalsLoaded: boolean;
   private space: SnapshotSpace;
 
-  view(vnode: m.Vnode<LinkedProposalsCardAttrs>) {
+  view(vnode: ResultNode<LinkedProposalsCardAttrs>) {
     const { onChangeHandler, thread, showAddProposalButton } = vnode.attrs;
 
     if (!this.initialized && thread.snapshotProposal?.length > 0) {
@@ -85,7 +86,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
 
         this.snapshotProposalsLoaded = true;
         this.initialized = false;
-        m.redraw();
+        redraw();
       });
     }
 
@@ -106,15 +107,15 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
         content={
           thread.snapshotProposal?.length > 0 &&
           !this.snapshotProposalsLoaded ? (
-            <div class="spinner-container">
+            <div className="spinner-container">
               <CWSpinner size="medium" />
             </div>
           ) : (
-            <div class="LinkedProposalsCard">
+            <div className="LinkedProposalsCard">
               {thread.chainEntities.length > 0 || showSnapshot ? (
-                <div class="links-container">
+                <div className="links-container">
                   {thread.chainEntities.length > 0 && (
-                    <div class="linked-proposals">
+                    <div className="linked-proposals">
                       {thread.chainEntities.map((chainEntity) => {
                         return (
                           <LinkedProposal
@@ -138,7 +139,7 @@ export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs
                 <CWButton
                   buttonType="mini-black"
                   label="Link proposal"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     app.modals.create({
                       modal: UpdateProposalStatusModal,

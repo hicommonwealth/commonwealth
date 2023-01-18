@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { WalletAccount, WalletConnection } from 'near-api-js';
 import { FunctionCallOptions } from 'near-api-js/lib/account';
 import BN from 'bn.js';
@@ -21,7 +21,7 @@ import { NearAccount } from 'controllers/chain/near/account';
 import { ChainBase, WalletId } from 'common-common/src/types';
 import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { NewLoginModal } from '../modals/login_modal';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { CWText } from '../components/component_kit/cw_text';
@@ -62,7 +62,7 @@ const redirectToNextPage = () => {
           +new Date() - postAuth.timestamp < 24 * 60 * 60 * 1000
       ) {
         localStorage.removeItem('nearPostAuthRedirect');
-        m.route.set(postAuth.path, {}, { replace: true });
+        setRoute(postAuth.path, {}, { replace: true });
       } else {
         navigateToSubpage('/', { replace: true });
       }
@@ -140,7 +140,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
     }
 
     // tx error handling
-    const failedTx = m.route.param('tx_failure');
+    const failedTx = getRouteParam('tx_failure');
     if (failedTx) {
       console.log(`Login failed: deleting storage key ${failedTx}`);
       if (localStorage[failedTx]) {
@@ -152,7 +152,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
 
     // tx success handling
     // TODO: ensure that create() calls redirect correctly
-    const savedTx = m.route.param('saved_tx');
+    const savedTx = getRouteParam('saved_tx');
     if (savedTx && localStorage[savedTx]) {
       try {
         // fetch tx localstorage hash and execute
@@ -177,7 +177,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
     // create new chain handling
     // TODO: we need to figure out how to clean this localStorage entry up
     //   in the case of transaction failure!!
-    const chainName = m.route.param('chain_name');
+    const chainName = getRouteParam('chain_name');
     if (chainName && localStorage[chainName]) {
       try {
         const chainCreateArgString = localStorage[chainName];
@@ -190,7 +190,7 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
           chainCreateArgs
         );
         await initAppState(false);
-        m.route.set(`${window.location.origin}/${res.result.chain.id}`);
+        setRoute(`${window.location.origin}/${res.result.chain.id}`);
       } catch (err) {
         this.state.validationError = `Failed to initialize chain node: ${err.message}`;
       }
@@ -211,11 +211,11 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
           NEAR account log in error: {this.state.validationError}
         </CWText>
           <CWButton
-        onclick={(e) => {
-          e.preventDefault();
-          redirectToNextPage();
-        }}
-        label="Return Home"
+            onClick={(e) => {
+              e.preventDefault();
+              redirectToNextPage();
+            }}
+            label="Return Home"
           />
           </Sublayout>
       );
@@ -269,13 +269,13 @@ class FinishNearLogin extends ClassComponent<Record<string, never>> {
         this._validate(wallet).then(() => {
           this.state.validationCompleted = true;
           this.state.validating = false;
-          m.redraw();
+          redraw();
         });
       } else {
         this.state.validationError = 'Sign-in failed.';
         this.state.validating = false;
         this.state.validationCompleted = true;
-        m.redraw();
+        redraw();
       }
     } else {
       // validation in progress

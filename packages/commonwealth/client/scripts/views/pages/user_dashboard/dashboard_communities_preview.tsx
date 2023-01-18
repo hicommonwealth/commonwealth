@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/user_dashboard/dashboard_communities_preview.scss';
 
@@ -18,7 +19,7 @@ type CommunityPreviewCardAttrs = {
 };
 
 class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
-  view(vnode: m.Vnode<CommunityPreviewCardAttrs>) {
+  view(vnode: ResultNode<CommunityPreviewCardAttrs>) {
     const { chain } = vnode.attrs;
     const { unseenPosts } = app.user;
     const visitedChain = !!unseenPosts[chain.id];
@@ -36,12 +37,12 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
         className="CommunityPreviewCard"
         elevation="elevation-1"
         interactive
-        onclick={(e) => {
+        onClick={(e) => {
           e.preventDefault();
-          m.route.set(`/${chain.id}`);
+          setRoute(`/${chain.id}`);
         }}
       >
-        <div class="card-top">
+        <div className="card-top">
           <CWCommunityAvatar community={chain} />
           <CWText type="h4" fontWeight="medium">
             {chain.name}
@@ -50,12 +51,12 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
         <CWText className="card-subtext">{chain.description}</CWText>
         {/* if no recently active threads, hide this module altogether */}
         {!!monthlyThreadCount && (
-          <>
+          <React.Fragment>
             <CWText className="card-subtext" type="b2" fontWeight="medium">
               {`${pluralize(monthlyThreadCount, 'new thread')} this month`}
             </CWText>
             {isMember && (
-              <>
+              <React.Fragment>
                 {app.isLoggedIn() && !visitedChain && (
                   <CWText className="new-activity-tag">New</CWText>
                 )}
@@ -64,9 +65,9 @@ class CommunityPreviewCard extends ClassComponent<CommunityPreviewCardAttrs> {
                     {updatedThreads} new
                   </CWText>
                 )}
-              </>
+              </React.Fragment>
             )}
-          </>
+          </React.Fragment>
         )}
       </CWCard>
     );
@@ -87,15 +88,15 @@ export class DashboardCommunitiesPreview extends ClassComponent {
       });
 
     return (
-      <div class="DashboardCommunitiesPreview">
+      <div className="DashboardCommunitiesPreview">
         <CWText type="h3">Active Communities</CWText>
-        <div class="community-preview-cards-collection">
+        <div className="community-preview-cards-collection">
           {sortedChains.length > 3 ? sortedChains.slice(0, 3) : sortedChains}
         </div>
         <CWButton
-          onclick={() => {
-            m.route.set('/communities');
-            m.redraw();
+          onClick={() => {
+            setRoute('/communities');
+            redraw();
           }}
           label="View more communities"
         />

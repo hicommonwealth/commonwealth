@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 import { capitalize } from 'lodash';
 
@@ -20,7 +30,7 @@ type UserDashboardRowTopAttrs = {
 };
 
 export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs> {
-  view(vnode: m.Vnode<UserDashboardRowTopAttrs>) {
+  view(vnode: ResultNode<UserDashboardRowTopAttrs>) {
     const { commentCount } = vnode.attrs.activityData;
 
     const {
@@ -72,7 +82,7 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
 
     if (vnode.attrs.category === 'new-comment-creation') {
       return (
-        <div class="UserDashboardRowTop">
+        <div className="UserDashboardRowTop">
           <CWText className="row-top-text">
             {actorName}
             <span>
@@ -83,34 +93,34 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
             <b>{titleText}</b>
             <span>in</span>
             <a
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                m.route.set(`/${chain_id}`);
+                setRoute(`/${chain_id}`);
               }}
             >
               {communityName}
             </a>
             <span>({formatTimestamp(moment(created_at))})</span>
           </CWText>
-          <div class="comment-preview-container">
+          <div className="comment-preview-container">
             {getCommentPreview(comment_text)}
           </div>
         </div>
       );
     } else if (vnode.attrs.category === 'new-thread-creation') {
       return (
-        <div class="UserDashboardRowTop">
+        <div className="UserDashboardRowTop">
           <CWText className="row-top-text">
             {actorName}
             <span>created new thread</span>
             <b>{titleText}</b>
             <span>in</span>
             <a
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                m.route.set(`/${chain_id}`);
+                setRoute(`/${chain_id}`);
               }}
             >
               {communityName}
@@ -121,6 +131,6 @@ export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs
       );
     }
 
-    return <div class="UserDashboardRowTop">{actorName}</div>;
+    return <div className="UserDashboardRowTop">{actorName}</div>;
   }
 }
