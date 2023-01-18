@@ -198,19 +198,18 @@ export interface VersionHistory {
 
 class ThreadsController {
   private static _instance: ThreadsController;
-  private _store = new ProposalStore<Thread>();
-  private _listingStore: RecentListingStore = new RecentListingStore();
-  private _overviewStore = new ProposalStore<Thread>();
+  private readonly _store: ProposalStore<Thread>;
+  private readonly _listingStore: RecentListingStore;
+  private readonly _overviewStore: ProposalStore<Thread>;
 
   private constructor() {
+    this._store = new ProposalStore<Thread>();
+    this._listingStore = new RecentListingStore();
+    this._overviewStore = new ProposalStore<Thread>();
   }
 
   public static get Instance() {
-    if (!this._instance) {
-      this._instance = new ThreadsController();
-    }
-
-    return this._instance;
+    return this._instance || (this._instance = new this());
   }
 
   public get store() {

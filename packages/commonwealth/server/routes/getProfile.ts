@@ -1,4 +1,5 @@
 import { AppError } from 'common-common/src/errors';
+import { Op } from 'sequelize';
 import type { DB } from '../models';
 import type { AddressAttributes } from '../models/address';
 import type { CommentAttributes } from '../models/comment';
@@ -12,12 +13,12 @@ export const Errors = {
   NoAddressFound: 'No address found',
 };
 
-type GetProfileReq = { chain: string, address: string };
+type GetProfileReq = { chain: string; address: string };
 type GetProfileResp = {
-  account: AddressAttributes,
-  threads: ThreadAttributes[],
-  comments: CommentAttributes[],
-}
+  account: AddressAttributes;
+  threads: ThreadAttributes[];
+  comments: CommentAttributes[];
+};
 
 const getProfile = async (
   models: DB,
@@ -33,7 +34,7 @@ const getProfile = async (
       address,
       chain,
     },
-    include: [models.OffchainProfile,],
+    include: [models.OffchainProfile],
   });
   if (!addressModel) throw new AppError(Errors.NoAddressFound);
 
@@ -45,10 +46,12 @@ const getProfile = async (
 
   const threads = await models.Thread.findAll({
     where: {
-      [Op.or]: [{
-        id: { [Op.in]: comments.map(c => c.root_id.split('_')[1]) },
-        address_id: addressModel.id
-      }]
+      [Op.or]: [
+        {
+          id: { [Op.in]: comments.map((c) => c.root_id.split('_')[1]) },
+          address_id: addressModel.id,
+        },
+      ],
     },
     include: [{ model: models.Address, as: 'Address' }],
   });
@@ -56,7 +59,7 @@ const getProfile = async (
   return success(res, {
     account: addressModel.toJSON(),
     threads: threads.map((t) => t.toJSON()),
-    comments: comments.map((c) => c.toJSON())
+    comments: comments.map((c) => c.toJSON()),
   });
 };
 
