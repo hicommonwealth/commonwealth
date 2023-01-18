@@ -1,4 +1,3 @@
-// eslint-disable-next-line max-classes-per-file
 import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
 import { Keyring } from '@polkadot/api';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
