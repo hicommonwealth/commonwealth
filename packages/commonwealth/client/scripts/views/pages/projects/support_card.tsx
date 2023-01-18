@@ -5,7 +5,6 @@ import 'pages/projects/support_card.scss';
 import m from 'mithril';
 import ClassComponent from 'class_component';
 
-
 import _ from 'lodash';
 import { CWText } from 'views/components/component_kit/cw_text';
 import { Project } from 'models';
@@ -16,6 +15,7 @@ import { ValidationStatus } from '../../components/component_kit/cw_validation_t
 import { ProjectRole } from './types';
 import { CWAvatar } from '../../components/component_kit/cw_avatar';
 import { CWTokenInput } from '../../components/component_kit/cw_token_input';
+import { BigNumber } from 'ethers';
 
 // eslint-disable-next-line max-len
 const WethUrl =
@@ -33,9 +33,26 @@ const validateSupportAmount = (value: string): [ValidationStatus, string] => {
 
 export default class SupportCard extends ClassComponent<SupportCardAttrs> {
   private amount: string;
+  private isTokenApproved;
+
+  async hasAcceptedTokenAllowance(
+    projectId: string,
+    address: string
+  ): Promise<boolean> {
+    const allowance = await app.projects.getUserERC20TokenAllowance(
+      projectId,
+      address
+    );
+    return BigNumber.from(allowance).gt(0);
+  }
 
   view(vnode: m.Vnode<SupportCardAttrs>) {
     const { project, supportType } = vnode.attrs;
+
+    const isTokenApproved = this.hasAcceptedTokenAllowance(
+      project.id,
+      project.token
+    );
 
     let headerText: string;
     let buttonLabel: string;
@@ -76,7 +93,17 @@ export default class SupportCard extends ClassComponent<SupportCardAttrs> {
             }}
             tokenIconUrl={WethUrl}
           />
-          <CWButton label={buttonLabel} onclick={onclick} />
+          {this.isTokenApproved ? (
+            <CWButton label={buttonLabel} onclick={onclick} />
+          ) : (
+            <CWButton
+              label={'Approve'}
+              onclick={() => {
+                app.projects.approveToken(project.id, project.token);
+                m.redraw();
+              }}
+            />
+          )}
         </div>
       </div>
     );

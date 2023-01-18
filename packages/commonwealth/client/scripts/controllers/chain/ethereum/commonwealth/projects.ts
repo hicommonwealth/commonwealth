@@ -12,7 +12,7 @@ import { IProjectCreationData } from 'models/Project';
 import { IApp } from 'state';
 import { ChainNetwork } from 'common-common/src/types';
 import { getBaseUrl, getFetch, ServiceUrls } from 'helpers/getUrl';
-import { ContractReceipt, BigNumber } from 'ethers';
+import { ContractReceipt, BigNumber, constants } from 'ethers';
 import { formatBytes32String } from 'ethers/lib/utils';
 import { attachSigner } from './contractApi';
 
@@ -295,9 +295,54 @@ export default class ProjectsController {
       IERC20__factory.connect,
       tokenAddress
     );
-    const tokenBalance = await contract.balanceOf(caller.address)
+    const walletAddress = await contract.signer.getAddress()
+    const tokenBalance = await contract.balanceOf(walletAddress)
     return tokenBalance.toString();
   }
+
+  public async getUserERC20TokenAllowance(projectId: string, tokenAddress: string): Promise<string> {
+    const caller = this._app.user.activeAccount;
+    const project = this._store.getById(projectId);
+
+    const contract = await attachSigner(
+      this._app.wallets,
+      caller,
+      null,
+      this._factoryInfo.node,
+      IERC20__factory.connect,
+      tokenAddress
+    );
+    const walletAddress = await contract.signer.getAddress()
+    const allowance = await contract.allowance(walletAddress, project.address)
+    return allowance.toString();
+  }
+
+  public async approveToken(projectId: string, tokenAddress: string) {
+    if (!this._initialized) throw new Error('Projects not yet initialized');
+    const caller = this._app.user.activeAccount;
+    const project = this._store.getById(projectId);
+
+    // make tx (TODO: additional validation, or do this earlier)
+    const contract = await attachSigner(
+      this._app.wallets,
+      caller,
+      null,
+      this._factoryInfo.node,
+      IERC20__factory.connect,
+      tokenAddress
+    );
+
+    const tx = await contract.approve(project.address, constants.MaxUint256);
+    const txReceipt = await tx.wait();
+    if (txReceipt.status !== 1) {
+      throw new Error(`Failed to Approve Token Address ${tokenAddress}`);
+    }
+
+    // refresh metadata
+    await this._refreshProject(projectId);
+    return txReceipt;
+  }
+
 
   public async back(projectId: string, value: string) {
     if (!this._initialized) throw new Error('Projects not yet initialized');
