@@ -63,7 +63,7 @@ const api = constructFakeApi({
     addrs.map((addr, i) => {
       if (i === 1) return constructOption();
       if (addr === 'dave')
-        return constructOption({
+        return constructOption(({
           info: {
             // NO DISPLAY NAME SET
             web: new Data(new TypeRegistry(), {
@@ -71,8 +71,8 @@ const api = constructFakeApi({
             }),
           },
           judgements: [],
-        } as unknown as Registration);
-      return constructOption({
+        } as unknown) as Registration);
+      return constructOption(({
         info: {
           display: new Data(new TypeRegistry(), {
             Raw: stringToHex(`${addr}-display-name`),
@@ -85,11 +85,11 @@ const api = constructFakeApi({
                 [1, constructIdentityJudgement(IdentityJudgement.Erroneous)],
               ]
             : [],
-      } as unknown as Registration);
+      } as unknown) as Registration);
     }),
   registrars: async () => [
-    constructOption({ account: 'charlie' } as unknown as RegistrarInfo),
-    constructOption({ account: 'dave' } as unknown as RegistrarInfo),
+    constructOption(({ account: 'charlie' } as unknown) as RegistrarInfo),
+    constructOption(({ account: 'dave' } as unknown) as RegistrarInfo),
   ],
 
   // democracy proposals
@@ -97,7 +97,7 @@ const api = constructFakeApi({
   depositOf: async (idx) =>
     idx !== 1
       ? constructOption()
-      : constructOption([new BN('100'), ['Alice']] as unknown as [
+      : constructOption(([new BN('100'), ['Alice']] as unknown) as [
           BalanceOf,
           Vec<AccountId>
         ] &
@@ -105,14 +105,14 @@ const api = constructFakeApi({
 
   // democracy referenda
   referendumsActive: async () => [
-    {
+    ({
       index: '3',
       imageHash: 'image-hash-2',
       status: {
         threshold: 'Supermajorityapproval',
         end: '100',
       },
-    } as unknown as DeriveReferendum,
+    } as unknown) as DeriveReferendum,
   ],
   dispatchQueue: async () => [
     {
@@ -154,12 +154,12 @@ const api = constructFakeApi({
   treasuryProposalsMulti: async (ids) =>
     ids.length === 1 && +ids[0] === 3
       ? [
-          constructOption({
+          constructOption(({
             proposer: 'Alice',
             value: 50,
             beneficiary: 'Bob',
             bond: 5,
-          } as unknown as TreasuryProposal),
+          } as unknown) as TreasuryProposal),
         ]
       : [], // should not see anything else
 
@@ -169,18 +169,18 @@ const api = constructFakeApi({
   bountiesMulti: async (ids) =>
     ids.length === 1 && +ids[0] === 3
       ? [
-          constructOption({
+          constructOption(({
             proposer: 'alice',
             value: 50,
             fee: 10,
             curatorDeposit: 10,
             bond: 10,
             status: {},
-          } as unknown as Bounty),
+          } as unknown) as Bounty),
         ]
       : [], // should not see anything else
   bounties: async () => [
-    {
+    ({
       bounty: {
         proposer: 'alice',
         value: 50,
@@ -199,29 +199,29 @@ const api = constructFakeApi({
       description: 'hello',
       index: 0,
       proposals: [{}],
-    } as unknown as DeriveBounty,
+    } as unknown) as DeriveBounty,
   ],
 
   // collective proposals
   collectiveProposals: async () => ['council-hash2', 'council-hash'],
   votingMulti: async () => [
     constructOption(),
-    constructOption({
+    constructOption(({
       index: '15',
       threshold: '4',
       ayes: ['Alice'],
       nays: ['Bob'],
-    } as unknown as Votes),
+    } as unknown) as Votes),
   ],
   collectiveProposalOf: async (h) => {
     if (h !== 'council-hash') {
       throw new Error('invalid council proposal');
     } else {
-      return constructOption({
+      return constructOption(({
         method: 'proposal-method',
         section: 'proposal-section',
         args: ['proposal-arg-1', 'proposal-arg-2'],
-      } as unknown as Proposal);
+      } as unknown) as Proposal);
     }
   },
 
@@ -233,7 +233,7 @@ const api = constructFakeApi({
   ],
   getStorage: async (key) => {
     if (key?.args[0] === 'tip-hash-1') {
-      return constructOption({
+      return constructOption(({
         reason: 'reasonHash1',
         who: 'alice',
         finder: 'bob',
@@ -243,10 +243,10 @@ const api = constructFakeApi({
         findersFee: {
           valueOf: () => true,
         },
-      } as unknown as OpenTip);
+      } as unknown) as OpenTip);
     }
     if (key?.args[0] === 'tip-hash-2') {
-      return constructOption({
+      return constructOption(({
         reason: 'reasonHash2',
         who: 'charlie',
         finder: 'dave',
@@ -259,14 +259,14 @@ const api = constructFakeApi({
         findersFee: {
           valueOf: () => false,
         },
-      } as unknown as OpenTip);
+      } as unknown) as OpenTip);
     }
     throw new Error('UNKNOWN STORAGE ITEM');
   },
   tipReasons: async (hash) =>
     hash === 'reasonHash1'
-      ? constructOption(stringToHex('hello world!') as unknown as Bytes)
-      : constructOption(stringToHex('goodbye world!') as unknown as Bytes),
+      ? constructOption((stringToHex('hello world!') as unknown) as Bytes)
+      : constructOption((stringToHex('goodbye world!') as unknown) as Bytes),
 
   // signaling proposals
   inactiveProposals: async () => [['inactive-hash', '100']],

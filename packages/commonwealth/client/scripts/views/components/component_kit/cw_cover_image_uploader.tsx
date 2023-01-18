@@ -21,7 +21,9 @@ type ICWCoverImageUploaderAttrs = {
 };
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
-export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUploaderAttrs> {
+export default class CWCoverImageUploader extends ClassComponent<
+  ICWCoverImageUploaderAttrs
+> {
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;

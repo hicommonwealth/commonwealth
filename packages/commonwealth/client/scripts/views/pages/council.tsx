@@ -39,9 +39,7 @@ class Councillor extends ClassComponent<CouncillorAttrs> {
     // TODO: refactor this logic to the top level
     const election = (app.chain as Substrate).phragmenElections;
 
-    const votes: PhragmenElectionVote[] = (
-      app.chain as Substrate
-    ).phragmenElections.activeElection
+    const votes: PhragmenElectionVote[] = (app.chain as Substrate).phragmenElections.activeElection
       ?.getVotes()
       .filter((v) => v.votes.includes(account.address));
 

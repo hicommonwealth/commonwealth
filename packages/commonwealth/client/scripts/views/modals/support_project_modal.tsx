@@ -15,7 +15,8 @@ const supportProjectModalCopy = {
   curate: {
     sidebar: {
       header: 'Become A Curator',
-      body: 'To curate is stake in support of the project with actively donating. Your funds will NOT be used for backing the project but you will be entitled to a percent of the project’s Curator Fee.',
+      body:
+        'To curate is stake in support of the project with actively donating. Your funds will NOT be used for backing the project but you will be entitled to a percent of the project’s Curator Fee.',
     },
     body: {
       header: 'How Much Do You Want to Curate?',
@@ -26,7 +27,8 @@ const supportProjectModalCopy = {
   back: {
     sidebar: {
       header: 'Back This Project',
-      body: 'To back is supporting with funds pending the success fo the project. If the project is successful, you will recieve what the project author erfe. If the project is not successful, your funds will be returned.',
+      body:
+        'To back is supporting with funds pending the success fo the project. If the project is successful, you will recieve what the project author erfe. If the project is not successful, your funds will be returned.',
     },
     body: {
       header: 'How Much Do You Want to Back?',
@@ -38,8 +40,7 @@ const supportProjectModalCopy = {
 
 export default class SupportProjectModal
   implements
-    m.ClassComponent<{ project: Project; supportType: 'curate' | 'back' }>
-{
+    m.ClassComponent<{ project: Project; supportType: 'curate' | 'back' }> {
   private amount;
 
   private _onSubmit(projectId, supportType: 'curate' | 'back', e: Event) {

@@ -36,7 +36,10 @@ export class HeaderPanel extends ClassComponent<HeaderPanelAttrs> {
                 {_.capitalize(userRole)}
               </CWText>
               {isSupporter && (
-                <CWIcon iconName={userRole as IconName} iconSize="small"></CWIcon>
+                <CWIcon
+                  iconName={userRole as IconName}
+                  iconSize="small"
+                ></CWIcon>
               )}
             </div>
             <div class="banner-right">

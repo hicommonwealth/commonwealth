@@ -88,8 +88,9 @@ class CommunitiesPage extends ClassComponent {
   view() {
     const chainBaseFilter = (list: ChainInfo[], filterMap) => {
       return list.filter((data) => {
-        const chainBase =
-          Object.keys(ChainBase)[Object.values(ChainBase).indexOf(data.base)];
+        const chainBase = Object.keys(ChainBase)[
+          Object.values(ChainBase).indexOf(data.base)
+        ];
         // Converts chain.base into a ChainBase key to match our filterMap keys
 
         return filterMap[chainBase];
@@ -98,10 +99,9 @@ class CommunitiesPage extends ClassComponent {
 
     const chainNetworkFilter = (list: ChainInfo[], filterMap) => {
       return list.filter((data) => {
-        const chainNetwork =
-          Object.keys(ChainNetwork)[
-            Object.values(ChainNetwork).indexOf(data.network)
-          ]; // Converts chain.base into a ChainBase key to match our filterMap keys
+        const chainNetwork = Object.keys(ChainNetwork)[
+          Object.values(ChainNetwork).indexOf(data.network)
+        ]; // Converts chain.base into a ChainBase key to match our filterMap keys
 
         if (this.chainNetworks.includes(chainNetwork)) {
           return filterMap[chainNetwork];

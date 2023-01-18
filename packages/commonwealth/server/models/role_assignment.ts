@@ -22,7 +22,9 @@ export type RoleAssignmentAttributes = {
 };
 
 export type RoleAssignmentInstance = ModelInstance<RoleAssignmentAttributes> & {
-  getCommunityRole: Sequelize.BelongsToGetAssociationMixin<CommunityRoleInstance>;
+  getCommunityRole: Sequelize.BelongsToGetAssociationMixin<
+    CommunityRoleInstance
+  >;
   getAddress: Sequelize.BelongsToGetAssociationMixin<AddressInstance>;
 };
 

@@ -115,8 +115,10 @@ class NearChain implements IChainModule<NearToken, NearAccount> {
 
       // handle chain-related updates
       this._chainId = this._nodeStatus.chain_id;
-      const { latest_block_time, latest_block_height } =
-        this._nodeStatus.sync_info;
+      const {
+        latest_block_time,
+        latest_block_height,
+      } = this._nodeStatus.sync_info;
 
       // update block heights and times
       this.app.chain.block.lastTime = moment(latest_block_time);

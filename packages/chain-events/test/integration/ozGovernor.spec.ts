@@ -243,8 +243,13 @@ describe('OpenZeppelin Governance Event Integration Tests', () => {
     });
 
     it('proposal castvote against with reason', async () => {
-      const { api, token, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        api,
+        token,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       const from = addresses[0];
       const p = await createActiveProposal(handler, api, token, from, provider);
 
@@ -272,8 +277,13 @@ describe('OpenZeppelin Governance Event Integration Tests', () => {
     });
 
     it('proposal castvote for', async () => {
-      const { api, token, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        api,
+        token,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       const from = addresses[0];
       const p = await createActiveProposal(handler, api, token, from, provider);
 
@@ -297,8 +307,13 @@ describe('OpenZeppelin Governance Event Integration Tests', () => {
     });
 
     it('proposal cancel', async () => {
-      const { api, token, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        api,
+        token,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       const from = addresses[0];
       const p = await createActiveProposal(handler, api, token, from, provider);
 
@@ -324,8 +339,13 @@ describe('OpenZeppelin Governance Event Integration Tests', () => {
     });
 
     it('proposal castvote abstain', async () => {
-      const { api, token, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        api,
+        token,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       const from = addresses[0];
       const p = await createActiveProposal(handler, api, token, from, provider);
 
@@ -349,8 +369,13 @@ describe('OpenZeppelin Governance Event Integration Tests', () => {
     });
 
     it('proposal should succeed once voting period has expired', async () => {
-      const { api, token, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        api,
+        token,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       const from = addresses[0];
       const p = await createActiveProposal(handler, api, token, from, provider);
 
@@ -370,8 +395,13 @@ describe('OpenZeppelin Governance Event Integration Tests', () => {
     });
 
     it('proposal should be defeated once voting period has expired', async () => {
-      const { api, token, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        api,
+        token,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       const from = addresses[0];
       const p = await createActiveProposal(handler, api, token, from, provider);
 
@@ -391,8 +421,13 @@ describe('OpenZeppelin Governance Event Integration Tests', () => {
     });
 
     it('should be queued and executed', async function () {
-      const { api, token, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        api,
+        token,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       const from = addresses[0];
       const p = await createActiveProposal(handler, api, token, from, provider);
 

@@ -37,8 +37,9 @@ class CommentsStore extends IdStore<Comment<any>> {
     this._storeAuthor[comment.author].splice(authorIndex, 1);
 
     if (comment.proposal) {
-      const proposalIndex =
-        this._storeProposal[comment.proposal.uniqueIdentifier].indexOf(comment);
+      const proposalIndex = this._storeProposal[
+        comment.proposal.uniqueIdentifier
+      ].indexOf(comment);
       if (comment.proposal && proposalIndex === -1) {
         console.error(
           'Attempting to remove a comment that was not found in the proposals store'

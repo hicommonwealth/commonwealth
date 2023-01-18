@@ -154,7 +154,10 @@ export async function updateActiveAddresses(chain?: ChainInfo) {
     app.user.addresses
       .filter((a) => a.chain.id === chain.id)
       .map((addr) => {
-        const acct: Account = app.chain?.accounts.get(addr.address, addr.keytype);
+        const acct: Account = app.chain?.accounts.get(
+          addr.address,
+          addr.keytype
+        );
         if (acct) acct.setWalletId(addr.walletId);
         return acct;
       })

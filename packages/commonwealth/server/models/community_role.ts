@@ -23,7 +23,9 @@ export type CommunityRoleAttributes = {
 };
 
 export type CommunityRoleInstance = ModelInstance<CommunityRoleAttributes> & {
-  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<RoleAssignmentInstance>;
+  getRoleAssignments: Sequelize.HasManyGetAssociationsMixin<
+    RoleAssignmentInstance
+  >;
 };
 
 export type CommunityRoleModelStatic = ModelStatic<CommunityRoleInstance>;

@@ -37,13 +37,21 @@ export default class ProjectsController {
   private _factoryInfo: ChainInfo;
   private _app: IApp;
 
-  private acceptedProjectTokens: string[] = ["0x11eF819024de53671633cC27AA65Fd354d783178"]
+  private acceptedProjectTokens: string[] = [
+    '0x11eF819024de53671633cC27AA65Fd354d783178',
+  ];
 
   // initializes a new Project object from an entity by querying its IPFS metadata
-  private async _initProject(entity: ChainEntity, projectChain?: string): Promise<Project> {
+  private async _initProject(
+    entity: ChainEntity,
+    projectChain?: string
+  ): Promise<Project> {
     // retrieve IPFS hash from events and query ipfs data
-    const createEvent = entity.chainEvents.find((e) => e.data.kind === CommonwealthTypes.EventKind.ProjectCreated);
-    const ipfsHash = (createEvent.data as CommonwealthTypes.IProjectCreated).ipfsHash;
+    const createEvent = entity.chainEvents.find(
+      (e) => e.data.kind === CommonwealthTypes.EventKind.ProjectCreated
+    );
+    const ipfsHash = (createEvent.data as CommonwealthTypes.IProjectCreated)
+      .ipfsHash;
     const ipfsData = await $.get(`${getBaseUrl()}/ipfsProxy/${ipfsHash}`);
 
     return new Project(entity, ipfsData, projectChain);
@@ -51,22 +59,21 @@ export default class ProjectsController {
 
   // Refreshes a single project's entity data
   private async _refreshProject(projectId: string, projectChain?: string) {
-    const options: Record<string, unknown> = { chain: ChainNetwork.CommonProtocol };
+    const options: Record<string, unknown> = {
+      chain: ChainNetwork.CommonProtocol,
+    };
     if (projectId) {
       options.type_id = projectId;
     }
     let entityJSON;
     try {
-      entityJSON = await getFetch(
-        `${getBaseUrl()}/entities`,
-        {
-          chain: ChainNetwork.CommonProtocol,
-          type_id: projectId
-        }
-      );
-    } catch(e) {
+      entityJSON = await getFetch(`${getBaseUrl()}/entities`, {
+        chain: ChainNetwork.CommonProtocol,
+        type_id: projectId,
+      });
+    } catch (e) {
       console.error(`Failed to refresh projects: ${e.message}`);
-      return
+      return;
     }
     if (entityJSON?.length > 0) {
       const entity = ChainEntity.fromJSON(entityJSON[0]);
@@ -84,7 +91,9 @@ export default class ProjectsController {
   // Queries all extant Common Protocol projects -- used for initializing the controller
   private async _initProjects() {
     // TODO later: only fetch for chain => currently no way to filter query beyond "all projects"
-    const options: Record<string, unknown> = { chain: ChainNetwork.CommonProtocol };
+    const options: Record<string, unknown> = {
+      chain: ChainNetwork.CommonProtocol,
+    };
 
     // entities contain the needed data, entityMeta contains source_chain
     const [entities, entityMetas] = await Promise.all([
@@ -92,14 +101,18 @@ export default class ProjectsController {
       getFetch(`${getBaseUrl()}/getEntityMeta`, options),
     ]);
 
-    await Promise.all(entities.map(async (entityJSON) => {
-      const entity = ChainEntity.fromJSON(entityJSON);
+    await Promise.all(
+      entities.map(async (entityJSON) => {
+        const entity = ChainEntity.fromJSON(entityJSON);
 
-      // query chain entity metas for project chain (i.e. community that created it)
-      const projectChain = entityMetas.find((meta) => meta.type_id === entity.typeId)?.project_chain;
-      const project = await this._initProject(entity, projectChain);
-      this._store.add(project);
-    }));
+        // query chain entity metas for project chain (i.e. community that created it)
+        const projectChain = entityMetas.find(
+          (meta) => meta.type_id === entity.typeId
+        )?.project_chain;
+        const project = await this._initProject(entity, projectChain);
+        this._store.add(project);
+      })
+    );
   }
 
   public async init(app: IApp) {
@@ -132,15 +145,15 @@ export default class ProjectsController {
   public async getAcceptedProjectTokens() {
     let i = 0;
     const acceptedTokens = [];
-    while(true) {
+    while (true) {
       let token: string;
       try {
         token = await this.acceptedProjectToken(i);
-        i++
-      } catch(e) {
+        i++;
+      } catch (e) {
         return acceptedTokens;
       }
-      acceptedTokens.push(token)
+      acceptedTokens.push(token);
     }
   }
 
@@ -268,7 +281,9 @@ export default class ProjectsController {
     return [txReceipt, projectId];
   }
 
-  public async projectData(projectId: string): Promise<[BigNumber, BigNumber, string, string]>  {
+  public async projectData(
+    projectId: string
+  ): Promise<[BigNumber, BigNumber, string, string]> {
     const caller = this._app.user.activeAccount;
     const project = this._store.getById(projectId);
 
@@ -281,8 +296,13 @@ export default class ProjectsController {
       project.address
     );
 
-    const [threshold, deadline, beneficiary, acceptedToken] = await contract.projectData();
-    return [threshold, deadline, beneficiary, acceptedToken]
+    const [
+      threshold,
+      deadline,
+      beneficiary,
+      acceptedToken,
+    ] = await contract.projectData();
+    return [threshold, deadline, beneficiary, acceptedToken];
   }
 
   public async getUserERC20TokenBalance(tokenAddress: string): Promise<string> {
@@ -295,12 +315,15 @@ export default class ProjectsController {
       IERC20__factory.connect,
       tokenAddress
     );
-    const walletAddress = await contract.signer.getAddress()
-    const tokenBalance = await contract.balanceOf(walletAddress)
+    const walletAddress = await contract.signer.getAddress();
+    const tokenBalance = await contract.balanceOf(walletAddress);
     return tokenBalance.toString();
   }
 
-  public async getUserERC20TokenAllowance(projectId: string, tokenAddress: string): Promise<string> {
+  public async getUserERC20TokenAllowance(
+    projectId: string,
+    tokenAddress: string
+  ): Promise<string> {
     const caller = this._app.user.activeAccount;
     const project = this._store.getById(projectId);
 
@@ -312,8 +335,8 @@ export default class ProjectsController {
       IERC20__factory.connect,
       tokenAddress
     );
-    const walletAddress = await contract.signer.getAddress()
-    const allowance = await contract.allowance(walletAddress, project.address)
+    const walletAddress = await contract.signer.getAddress();
+    const allowance = await contract.allowance(walletAddress, project.address);
     return allowance.toString();
   }
 
@@ -342,7 +365,6 @@ export default class ProjectsController {
     await this._refreshProject(projectId);
     return txReceipt;
   }
-
 
   public async back(projectId: string, value: string) {
     if (!this._initialized) throw new Error('Projects not yet initialized');

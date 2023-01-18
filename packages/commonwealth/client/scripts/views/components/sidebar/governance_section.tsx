@@ -40,8 +40,9 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 
   const newTree = currentTree;
 
-  localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
-    JSON.stringify(newTree);
+  localStorage[
+    `${app.activeChainId()}-governance-toggle-tree`
+  ] = JSON.stringify(newTree);
 }
 
 export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
@@ -113,7 +114,9 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       app.chain?.network !== ChainNetwork.Darwinia;
 
     // @TODO remove admin toggle when ready
-    const showProjects = app.chain?.base === ChainBase.Ethereum && app.roles.isAdminOfEntity({chain: app.chain.id});
+    const showProjects =
+      app.chain?.base === ChainBase.Ethereum &&
+      app.roles.isAdminOfEntity({ chain: app.chain.id });
 
     // ---------- Build Toggle Tree ---------- //
     const governanceDefaultToggleTree: ToggleTree = {
@@ -188,13 +191,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-governance-toggle-tree`]) {
-      localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
-        JSON.stringify(governanceDefaultToggleTree);
+      localStorage[
+        `${app.activeChainId()}-governance-toggle-tree`
+      ] = JSON.stringify(governanceDefaultToggleTree);
     } else if (
       !verifyCachedToggleTree('governance', governanceDefaultToggleTree)
     ) {
-      localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
-        JSON.stringify(governanceDefaultToggleTree);
+      localStorage[
+        `${app.activeChainId()}-governance-toggle-tree`
+      ] = JSON.stringify(governanceDefaultToggleTree);
     }
 
     const toggleTreeState = JSON.parse(
@@ -246,7 +251,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
     const onProjectsPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/projects`);
 
-      const onNotificationsPage = (p) => p.startsWith('/notifications');
+    const onNotificationsPage = (p) => p.startsWith('/notifications');
 
     const onMembersPage = (p) =>
       p.startsWith(`/${app.activeChainId()}/members`) ||

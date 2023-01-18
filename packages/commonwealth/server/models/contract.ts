@@ -24,7 +24,9 @@ export type ContractAttributes = {
 
 export type ContractInstance = ModelInstance<ContractAttributes> & {
   getChainNode: Sequelize.BelongsToGetAssociationMixin<ChainNodeInstance>;
-  getCommunityContract: Sequelize.BelongsToGetAssociationMixin<CommunityContractInstance>;
+  getCommunityContract: Sequelize.BelongsToGetAssociationMixin<
+    CommunityContractInstance
+  >;
 };
 
 export type ContractModelStatic = ModelStatic<ContractInstance>;

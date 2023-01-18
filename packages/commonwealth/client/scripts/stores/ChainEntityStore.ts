@@ -6,8 +6,9 @@ import type { ChainEntity } from '../models';
 import Store from './Store';
 
 class ChainEntityStore extends Store<ChainEntity> {
-  private _storeType: { [type: string]: { [stringId: string]: ChainEntity } } =
-    {};
+  private _storeType: {
+    [type: string]: { [stringId: string]: ChainEntity };
+  } = {};
 
   public get(entity: ChainEntity) {
     return this._store.find((e) => e.eq(entity));

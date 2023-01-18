@@ -20,7 +20,9 @@ type ThreadPreviewReactionButtonAttrs = {
   thread: Thread;
 };
 
-export class ThreadPreviewReactionButton extends ClassComponent<ThreadPreviewReactionButtonAttrs> {
+export class ThreadPreviewReactionButton extends ClassComponent<
+  ThreadPreviewReactionButtonAttrs
+> {
   private loading: boolean;
   private reactors: any;
 

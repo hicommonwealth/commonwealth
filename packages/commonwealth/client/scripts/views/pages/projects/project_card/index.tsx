@@ -15,7 +15,7 @@ import { InformationPanel } from './information_panel';
 type ProjectCardAttrs = {
   project: Project;
   currentBlockNum: number;
-}
+};
 
 export class ProjectCard extends ClassComponent<ProjectCardAttrs> {
   view(vnode: m.Vnode<ProjectCardAttrs>) {

@@ -76,11 +76,9 @@ export async function Enrich(
       };
     }
     case EventKind.Transfer: {
-      const {
-        from,
-        to,
-        value: valueBigNumber,
-      } = rawData.args as GetArgType<'Transfer'>;
+      const { from, to, value: valueBigNumber } = rawData.args as GetArgType<
+        'Transfer'
+      >;
       const contractAddress = rawData.address;
       const value = new BN(valueBigNumber.toString());
 

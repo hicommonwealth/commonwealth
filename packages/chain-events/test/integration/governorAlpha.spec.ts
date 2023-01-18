@@ -371,14 +371,23 @@ describe('Governor Alpha Integration Tests', () => {
 
   describe('GovernorAlpha contract function events', () => {
     it('should create a proposal', async () => {
-      const { governorAlpha, comp, addresses, handler } =
-        await setupSubscription();
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+      } = await setupSubscription();
       await createProposal(handler, governorAlpha, comp, addresses[0]);
     });
 
     it('proposal castvote', async () => {
-      const { governorAlpha, comp, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       await proposeAndVote(
         handler,
         provider,
@@ -390,8 +399,13 @@ describe('Governor Alpha Integration Tests', () => {
     });
 
     it('should fail once not active', async () => {
-      const { governorAlpha, comp, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       await proposeAndWait(
         handler,
         provider,
@@ -403,8 +417,13 @@ describe('Governor Alpha Integration Tests', () => {
     });
 
     it('should succeed once not active', async () => {
-      const { governorAlpha, comp, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       await proposeAndWait(
         handler,
         provider,
@@ -416,8 +435,13 @@ describe('Governor Alpha Integration Tests', () => {
     });
 
     it('should be queued and executed', async () => {
-      const { governorAlpha, comp, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        governorAlpha,
+        comp,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       await proposeAndQueue(
         handler,
         provider,
@@ -451,8 +475,14 @@ describe('Governor Alpha Integration Tests', () => {
     });
 
     it('should expire in queue', async () => {
-      const { governorAlpha, comp, timelock, addresses, handler, provider } =
-        await setupSubscription();
+      const {
+        governorAlpha,
+        comp,
+        timelock,
+        addresses,
+        handler,
+        provider,
+      } = await setupSubscription();
       await proposeAndQueue(
         handler,
         provider,

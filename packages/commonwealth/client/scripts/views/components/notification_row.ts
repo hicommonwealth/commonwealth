@@ -405,8 +405,13 @@ const NotificationRow: m.Component<
         () => m.redraw.sync()
       );
     } else if (category === NotificationCategories.NewChatMention) {
-      const { chain_id, author_address, created_at, message_id, channel_id } =
-        JSON.parse(notification.data);
+      const {
+        chain_id,
+        author_address,
+        created_at,
+        message_id,
+        channel_id,
+      } = JSON.parse(notification.data);
       const route = app.socket.chatNs.getRouteToMessage(
         channel_id,
         message_id,

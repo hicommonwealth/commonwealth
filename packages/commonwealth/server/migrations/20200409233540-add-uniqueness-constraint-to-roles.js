@@ -52,10 +52,12 @@ module.exports = {
         return fields;
       };
 
-      const duplicateChainRoles =
-        duplicateChainRolesQuery[0].map(processQueryFields);
-      const duplicateCommunityRoles =
-        duplicateCommunityRolesQuery[0].map(processQueryFields);
+      const duplicateChainRoles = duplicateChainRolesQuery[0].map(
+        processQueryFields
+      );
+      const duplicateCommunityRoles = duplicateCommunityRolesQuery[0].map(
+        processQueryFields
+      );
       if (duplicateChainRoles.length > 0) {
         await queryInterface.bulkInsert('Roles', duplicateChainRoles, {
           transaction: t,

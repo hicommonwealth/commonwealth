@@ -47,7 +47,9 @@ type SearchBarPreviewRowAttrs = {
   searchTerm?: string;
 };
 
-export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
+export class SearchBarThreadPreviewRow extends ClassComponent<
+  SearchBarPreviewRowAttrs
+> {
   view(vnode: m.Vnode<SearchBarPreviewRowAttrs>) {
     const { searchResult, searchTerm } = vnode.attrs;
 
@@ -90,7 +92,9 @@ export class SearchBarThreadPreviewRow extends ClassComponent<SearchBarPreviewRo
   }
 }
 
-export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
+export class SearchBarCommentPreviewRow extends ClassComponent<
+  SearchBarPreviewRowAttrs
+> {
   view(vnode: m.Vnode<SearchBarPreviewRowAttrs>) {
     const { searchResult, searchTerm } = vnode.attrs;
 
@@ -124,7 +128,9 @@ export class SearchBarCommentPreviewRow extends ClassComponent<SearchBarPreviewR
   }
 }
 
-export class SearchBarCommunityPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
+export class SearchBarCommunityPreviewRow extends ClassComponent<
+  SearchBarPreviewRowAttrs
+> {
   view(vnode: m.Vnode<SearchBarPreviewRowAttrs>) {
     const { searchResult } = vnode.attrs;
 
@@ -147,7 +153,9 @@ export class SearchBarCommunityPreviewRow extends ClassComponent<SearchBarPrevie
   }
 }
 
-export class SearchBarMemberPreviewRow extends ClassComponent<SearchBarPreviewRowAttrs> {
+export class SearchBarMemberPreviewRow extends ClassComponent<
+  SearchBarPreviewRowAttrs
+> {
   view(vnode: m.Vnode<SearchBarPreviewRowAttrs>) {
     const { searchResult } = vnode.attrs;
 

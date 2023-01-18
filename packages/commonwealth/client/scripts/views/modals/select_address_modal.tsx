@@ -26,8 +26,10 @@ export class SelectAddressModal extends ClassComponent {
   private selectedIndex: number;
 
   view() {
-    const activeAccountsByRole: Array<[Account, RoleInfo]> =
-      app.roles.getActiveAccountsByRole();
+    const activeAccountsByRole: Array<[
+      Account,
+      RoleInfo
+    ]> = app.roles.getActiveAccountsByRole();
 
     const activeEntityInfo = app.chain?.meta;
 

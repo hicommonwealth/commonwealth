@@ -16,11 +16,9 @@ import { ProjectStatus } from '../types';
 type InformationPanelAttrs = {
   project: Project;
   projectStatus: ProjectStatus;
-}
+};
 
-export class InformationPanel
-  extends ClassComponent<InformationPanelAttrs>
-{
+export class InformationPanel extends ClassComponent<InformationPanelAttrs> {
   getProjectShortDescription(p: Project) {
     if (p.shortDescription) return p.shortDescription;
     else {
@@ -43,11 +41,9 @@ export class InformationPanel
             intent="none"
             class={projectStatus}
             label={
-              projectStatus ? (
-                  projectStatus.toString()
-              ) : (
-                `${project.deadline} blocks`
-              )
+              projectStatus
+                ? projectStatus.toString()
+                : `${project.deadline} blocks`
             }
           />
           <div class="funding-state">
@@ -60,7 +56,7 @@ export class InformationPanel
           </div>
         </div>
         <div class="description">
-          <CWText type="h5" fontWeight={"semiBold"}>
+          <CWText type="h5" fontWeight={'semiBold'}>
             {project.title}
           </CWText>
           <CWText type="caption">
@@ -77,11 +73,7 @@ export class InformationPanel
             {project.curatorFee > 0 && (
               <CWText type="caption">{project.curatorFee}% Curator Fee</CWText>
             )}
-            {project.chainId && (
-              <CWTag
-                label={projectChain.name}
-              />
-            )}
+            {project.chainId && <CWTag label={projectChain.name} />}
           </div>
         </div>
       </div>

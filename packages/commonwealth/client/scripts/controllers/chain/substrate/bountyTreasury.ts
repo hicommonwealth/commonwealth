@@ -81,8 +81,7 @@ class SubstrateBountyTreasury extends ProposalModule<
     this._bountyDepositBase = this._Chain.coins(
       bountyModule.bountyDepositBase as BalanceOf
     );
-    this._bountyDepositPayoutDelay =
-      bountyModule.bountyDepositPayoutDelay as BlockNumber;
+    this._bountyDepositPayoutDelay = bountyModule.bountyDepositPayoutDelay as BlockNumber;
     this._bountyValueMinimum = this._Chain.coins(
       bountyModule.bountyValueMinimum as BalanceOf
     );

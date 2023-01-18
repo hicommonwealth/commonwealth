@@ -25,7 +25,9 @@ type QuillFormattedTextAttrs = {
   doc;
 } & QuillTextParams;
 
-export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> {
+export class QuillFormattedText extends ClassComponent<
+  QuillFormattedTextAttrs
+> {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;
   private isTruncated: boolean;

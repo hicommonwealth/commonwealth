@@ -10,10 +10,10 @@ import { ProjectCard } from './project_card/index';
 import { ProjectCardSize } from './types';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 
-export default class YoursPage
-  extends
-    ClassComponent<{ currentBlockNum: number; userProjects: Project[] }>
-{
+export default class YoursPage extends ClassComponent<{
+  currentBlockNum: number;
+  userProjects: Project[];
+}> {
   // TODO v2: These counts will be used for pagination or scroll
   private totalActiveProjects = 0;
   private totalEndedProjects = 0;
@@ -52,7 +52,11 @@ export default class YoursPage
     }
 
     const userProjects = vnode.attrs.userProjects.map((project) => (
-      <ProjectCard project={project} size={ProjectCardSize.Large} currentBlockNum={vnode.attrs.currentBlockNum} />
+      <ProjectCard
+        project={project}
+        size={ProjectCardSize.Large}
+        currentBlockNum={vnode.attrs.currentBlockNum}
+      />
     ));
 
     return (

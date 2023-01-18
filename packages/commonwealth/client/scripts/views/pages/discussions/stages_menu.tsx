@@ -22,7 +22,9 @@ type ThreadsFilterMenuItemAttrs = {
   onclick: (e: any) => void;
 };
 
-export class ThreadsFilterMenuItem extends ClassComponent<ThreadsFilterMenuItemAttrs> {
+export class ThreadsFilterMenuItem extends ClassComponent<
+  ThreadsFilterMenuItemAttrs
+> {
   view(vnode: m.Vnode<ThreadsFilterMenuItemAttrs>) {
     const { iconRight, isSelected, label, onclick } = vnode.attrs;
 

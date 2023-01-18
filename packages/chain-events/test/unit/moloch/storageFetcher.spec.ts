@@ -13,7 +13,7 @@ import type { Moloch1 } from '../../../src/contractTypes';
 const { assert } = chai;
 
 const makeApi = (proposals: ProposalV1[]) => {
-  return {
+  return ({
     periodDuration: async () => '1',
     summoningTime: async () => '2',
     votingPeriodLength: async () => '3',
@@ -25,7 +25,7 @@ const makeApi = (proposals: ProposalV1[]) => {
       getBlock: async (n: number) => ({ timestamp: n * 1000 }),
       getBlockNumber: async () => 200,
     },
-  } as unknown as Moloch1;
+  } as unknown) as Moloch1;
 };
 
 const makeDater = (minAvailableBlock = 0) => {
@@ -51,7 +51,7 @@ describe('Moloch Storage Fetcher Tests', () => {
 
   it('should fetch an active moloch1 proposal from storage', async () => {
     const proposals: ProposalV1[] = [
-      {
+      ({
         proposer: 'proposer',
         applicant: 'applicant',
         sharesRequested: '2',
@@ -64,7 +64,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as ProposalV1,
+      } as unknown) as ProposalV1,
     ];
     const api = makeApi(proposals);
     const fetcher = new StorageFetcher(api, 1, makeDater());
@@ -89,7 +89,7 @@ describe('Moloch Storage Fetcher Tests', () => {
 
   it('should fetch an aborted moloch1 proposal from storage', async () => {
     const proposals: ProposalV1[] = [
-      {
+      ({
         proposer: 'proposer',
         applicant: 'applicant',
         sharesRequested: '2',
@@ -102,7 +102,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as ProposalV1,
+      } as unknown) as ProposalV1,
     ];
     const api = makeApi(proposals);
     const fetcher = new StorageFetcher(api, 1, makeDater());
@@ -138,7 +138,7 @@ describe('Moloch Storage Fetcher Tests', () => {
 
   it('should fetch a processed moloch1 proposal from storage', async () => {
     const proposals: ProposalV1[] = [
-      {
+      ({
         proposer: 'proposer',
         applicant: 'applicant',
         sharesRequested: '2',
@@ -151,7 +151,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as ProposalV1,
+      } as unknown) as ProposalV1,
     ];
     const api = makeApi(proposals);
     const fetcher = new StorageFetcher(api, 1, makeDater());
@@ -191,7 +191,7 @@ describe('Moloch Storage Fetcher Tests', () => {
 
   it('should accept a range parameter with/without endBlock', async () => {
     const proposals: ProposalV1[] = [
-      {
+      ({
         proposer: 'proposer',
         applicant: 'applicant',
         sharesRequested: '2',
@@ -204,8 +204,8 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as ProposalV1,
-      {
+      } as unknown) as ProposalV1,
+      ({
         proposer: 'proposer',
         applicant: 'applicant',
         sharesRequested: '2',
@@ -218,8 +218,8 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as ProposalV1,
-      {
+      } as unknown) as ProposalV1,
+      ({
         proposer: 'proposer',
         applicant: 'applicant',
         sharesRequested: '2',
@@ -232,7 +232,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as ProposalV1,
+      } as unknown) as ProposalV1,
     ];
     const api = makeApi(proposals);
     const fetcher = new StorageFetcher(api, 1, makeDater());
@@ -336,7 +336,7 @@ describe('Moloch Storage Fetcher Tests', () => {
 
   it('should terminate fetch on completed due to argument', async () => {
     const proposals: ProposalV1[] = [
-      {
+      ({
         proposer: 'proposer',
         applicant: 'applicant',
         sharesRequested: '2',
@@ -349,8 +349,8 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as ProposalV1,
-      {
+      } as unknown) as ProposalV1,
+      ({
         proposer: 'proposer',
         applicant: 'applicant',
         sharesRequested: '2',
@@ -363,7 +363,7 @@ describe('Moloch Storage Fetcher Tests', () => {
         tokenTribute: '4',
         details: 'test',
         maxTotalSharesAtYesVote: '2',
-      } as unknown as ProposalV1,
+      } as unknown) as ProposalV1,
     ];
 
     const api = makeApi(proposals);
@@ -500,7 +500,7 @@ describe('Moloch Storage Fetcher Tests', () => {
   });
 
   it('should throw error on api error', (done) => {
-    const api = {} as unknown as Moloch1;
+    const api = ({} as unknown) as Moloch1;
     const fetcher = new StorageFetcher(api, 1, makeDater());
     fetcher
       .fetch()

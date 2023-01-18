@@ -44,7 +44,9 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
   return timeRemainingString;
 }
 
-export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCardsAttrs> {
+export class SnapshotPollCardContainer extends ClassComponent<
+  SnapshotProposalCardsAttrs
+> {
   view(vnode: m.Vnode<SnapshotProposalCardsAttrs>) {
     const {
       identifier,

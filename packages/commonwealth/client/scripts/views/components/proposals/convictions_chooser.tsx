@@ -12,7 +12,9 @@ import { CWDropdown } from '../component_kit/cw_dropdown';
 
 type ConvictionsChooserAttrs = { callback: (number) => void };
 
-export class ConvictionsChooser extends ClassComponent<ConvictionsChooserAttrs> {
+export class ConvictionsChooser extends ClassComponent<
+  ConvictionsChooserAttrs
+> {
   oncreate(vnode: m.Vnode<ConvictionsChooserAttrs>) {
     vnode.attrs.callback(convictions()[0].toString());
   }

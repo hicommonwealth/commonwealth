@@ -48,10 +48,10 @@ import {
 
 const { assert } = chai;
 const offenceDetails = [
-  constructOption({
+  constructOption(({
     offender: ['charlie', { total: 0, own: 0, others: 0 }],
     reporters: ['alice', 'dave'],
-  } as unknown as Option<OffenceDetails>),
+  } as unknown) as Option<OffenceDetails>),
 ];
 const blockNumber = 10;
 const api = constructFakeApi({
@@ -426,7 +426,7 @@ const api = constructFakeApi({
           // @ts-ignore
           .map((points) => registry.createType('RewardPoint', points))
           .map((points, index): [AccountId, RewardPoint] => [
-            validators[index] as unknown as AccountId,
+            (validators[index] as unknown) as AccountId,
             points,
           ])
       ),
@@ -435,36 +435,37 @@ const api = constructFakeApi({
     return eraPoints;
   },
   'payee.at': async () => 'staked',
-  currentEra: async () => constructOption(new BN(12) as unknown as BN & Codec),
+  currentEra: async () =>
+    constructOption((new BN(12) as unknown) as BN & Codec),
   'currentEra.at': async () =>
-    constructOption(new BN(12) as unknown as BN & Codec),
+    constructOption((new BN(12) as unknown) as BN & Codec),
   'currentIndex.at': async () => new BN(12),
-  concurrentReportsIndex: async () => ['0x00'] as unknown as Vec<ReportIdOf>,
+  concurrentReportsIndex: async () => (['0x00'] as unknown) as Vec<ReportIdOf>,
   'reports.multi': async () =>
-    offenceDetails as unknown as Option<OffenceDetails>[],
+    (offenceDetails as unknown) as Option<OffenceDetails>[],
   bonded: async (stash) =>
     stash !== 'alice-stash'
       ? constructOption()
-      : constructOption('alice' as unknown as AccountId),
+      : constructOption(('alice' as unknown) as AccountId),
   'bonded.at': async (hash, stash) =>
     stash !== 'alice-stash'
       ? constructOption()
-      : constructOption('alice' as unknown as AccountId),
+      : constructOption(('alice' as unknown) as AccountId),
   publicProps: async () =>
-    [
+    ([
       [1, 'hash1', 'charlie'],
       [2, 'hash2', 'dave'],
-    ] as unknown as Vec<ITuple<[PropIndex, Hash, AccountId]>>,
+    ] as unknown) as Vec<ITuple<[PropIndex, Hash, AccountId]>>,
   referendumInfoOf: async (idx) =>
     +idx === 1
-      ? constructOption({
+      ? constructOption(({
           end: 20,
           proposalHash: 'hash',
           threshold: 'Supermajorityapproval',
           delay: 10,
-        } as unknown as ReferendumInfoTo239)
+        } as unknown) as ReferendumInfoTo239)
       : +idx === 2
-      ? constructOption({
+      ? constructOption(({
           isOngoing: true,
           isFinished: false,
           asOngoing: {
@@ -479,26 +480,26 @@ const api = constructFakeApi({
             },
           },
           asFinished: null,
-        } as unknown as ReferendumInfo)
+        } as unknown) as ReferendumInfo)
       : constructOption(),
   dispatchQueue: async () =>
-    [
+    ([
       { index: 1, imageHash: 'hash1', at: 20 },
       { index: 2, imageHash: 'hash2', at: 30 },
-    ] as unknown as DeriveDispatch[],
+    ] as unknown) as DeriveDispatch[],
   treasuryProposals: async (idx) =>
     +idx !== 1
       ? constructOption()
-      : constructOption({
+      : constructOption(({
           proposer: 'alice',
           value: 1000,
           beneficiary: 'bob',
           bond: 2000,
-        } as unknown as TreasuryProposal),
+        } as unknown) as TreasuryProposal),
   bounties: async () =>
-    [
+    ([
       {
-        bounty: {
+        bounty: ({
           proposer: 'alice',
           value: 50,
           fee: 10,
@@ -509,13 +510,13 @@ const api = constructFakeApi({
             isPendingPayout: false,
             isProposed: true,
           },
-        } as unknown as Bounty,
+        } as unknown) as Bounty,
         description: 'hello',
         index: 0,
         proposals: [],
       },
       {
-        bounty: {
+        bounty: ({
           proposer: 'alice',
           value: 50,
           fee: 10,
@@ -529,13 +530,13 @@ const api = constructFakeApi({
               updateDue: '999',
             },
           },
-        } as unknown as Bounty,
+        } as unknown) as Bounty,
         description: 'hello',
         index: 2,
         proposals: [],
       },
       {
-        bounty: {
+        bounty: ({
           proposer: 'alice',
           value: 50,
           fee: 10,
@@ -550,22 +551,22 @@ const api = constructFakeApi({
               beneficiary: 'dave',
             },
           },
-        } as unknown as Bounty,
+        } as unknown) as Bounty,
         description: 'hello',
         index: 3,
         proposals: [],
       },
-    ] as unknown as DeriveBounties,
+    ] as unknown) as DeriveBounties,
   voting: async (hash) =>
     hash.toString() !== 'hash'
       ? constructOption()
-      : constructOption({
+      : constructOption(({
           index: 1,
           threshold: 3,
           ayes: ['alice', 'bob'],
           nays: ['charlie', 'dave'],
           end: 100,
-        } as unknown as Votes),
+        } as unknown) as Votes),
   signalingProposalOf: async (hash) =>
     hash.toString() !== 'hash'
       ? constructOption()
@@ -591,7 +592,7 @@ const api = constructFakeApi({
   preimage: async (hash) =>
     hash.toString() !== 'hash'
       ? undefined
-      : ({
+      : (({
           at: 30,
           balance: 1000,
           proposal: {
@@ -600,17 +601,17 @@ const api = constructFakeApi({
             args: ['arg1', 'arg2'],
           },
           proposer: 'alice',
-        } as unknown as DeriveProposalImage),
+        } as unknown) as DeriveProposalImage),
   collectiveProposalOf: async (hash) =>
     hash.toString() !== 'hash'
       ? constructOption()
-      : constructOption({
+      : constructOption(({
           section: 'section',
           method: 'method',
           args: ['arg1', 'arg2'],
-        } as unknown as Proposal),
+        } as unknown) as Proposal),
   identityOf: async (addr) =>
-    constructOption({
+    constructOption(({
       info: {
         // eslint-disable-next-line
         // @ts-ignore
@@ -622,13 +623,13 @@ const api = constructFakeApi({
         [0, constructIdentityJudgement(IdentityJudgement.KnownGood)],
         [1, constructIdentityJudgement(IdentityJudgement.Erroneous)],
       ],
-    } as unknown as Registration),
+    } as unknown) as Registration),
   registrars: async () => [
-    constructOption({ account: 'charlie' } as unknown as RegistrarInfo),
-    constructOption({ account: 'dave' } as unknown as RegistrarInfo),
+    constructOption(({ account: 'charlie' } as unknown) as RegistrarInfo),
+    constructOption(({ account: 'dave' } as unknown) as RegistrarInfo),
   ],
   tips: async () =>
-    constructOption({
+    constructOption(({
       reason: 'reasonHash',
       who: 'alice',
       finder: 'bob',
@@ -637,9 +638,9 @@ const api = constructFakeApi({
       findersFee: {
         valueOf: () => true,
       },
-    } as unknown as Option<OpenTip>),
+    } as unknown) as Option<OpenTip>),
   tipReasons: async () =>
-    constructOption(stringToHex('hello world!') as unknown as Bytes),
+    constructOption((stringToHex('hello world!') as unknown) as Bytes),
 });
 
 class FakeEventData extends Array {
@@ -663,11 +664,11 @@ const constructEvent = (
 };
 
 const constructExtrinsic = (signer: string, args: any[] = []): Extrinsic => {
-  return {
+  return ({
     signer,
     args,
     data: new Uint8Array(),
-  } as unknown as Extrinsic;
+  } as unknown) as Extrinsic;
 };
 
 const constructBool = (b: boolean): bool => {

@@ -17,11 +17,13 @@ import { EventKind } from '../types';
 
 type GetEventArgs<T> = T extends TypedEventFilter<any, infer Y> ? Y : never;
 
-type GetArgType<Name extends keyof ICuratedProjectFactory['filters']> =
-  GetEventArgs<ReturnType<ICuratedProjectFactory['filters'][Name]>>;
+type GetArgType<
+  Name extends keyof ICuratedProjectFactory['filters']
+> = GetEventArgs<ReturnType<ICuratedProjectFactory['filters'][Name]>>;
 
-type GetProjectArgType<Name extends keyof ICuratedProject['filters']> =
-  GetEventArgs<ReturnType<ICuratedProject['filters'][Name]>>;
+type GetProjectArgType<
+  Name extends keyof ICuratedProject['filters']
+> = GetEventArgs<ReturnType<ICuratedProject['filters'][Name]>>;
 
 export async function Enrich(
   api: Api,
@@ -31,15 +33,20 @@ export async function Enrich(
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.ProjectCreated: {
-      const { projectIndex, projectAddress } =
-        rawData.args as GetArgType<'ProjectCreated'>;
+      const { projectIndex, projectAddress } = rawData.args as GetArgType<
+        'ProjectCreated'
+      >;
       const projectContract = ICuratedProject__factory.connect(
         projectAddress,
         api.factory.provider
       );
       const { name, ipfsHash, url, creator } = await projectContract.metaData();
-      const { threshold, deadline, beneficiary, acceptedToken } =
-        await projectContract.projectData();
+      const {
+        threshold,
+        deadline,
+        beneficiary,
+        acceptedToken,
+      } = await projectContract.projectData();
       const curatorFee = await projectContract.curatorFee();
       const fundingAmount = await projectContract.totalFunding();
       return {
@@ -64,8 +71,9 @@ export async function Enrich(
       };
     }
     case EventKind.ProjectBacked: {
-      const { sender, token, amount } =
-        rawData.args as GetProjectArgType<'Back'>;
+      const { sender, token, amount } = rawData.args as GetProjectArgType<
+        'Back'
+      >;
 
       return {
         blockNumber,
@@ -81,8 +89,9 @@ export async function Enrich(
       };
     }
     case EventKind.ProjectCurated: {
-      const { sender, token, amount } =
-        rawData.args as GetProjectArgType<'Curate'>;
+      const { sender, token, amount } = rawData.args as GetProjectArgType<
+        'Curate'
+      >;
       return {
         blockNumber,
         excludeAddresses: [sender],
@@ -97,8 +106,9 @@ export async function Enrich(
       };
     }
     case EventKind.ProjectSucceeded: {
-      const { timestamp, amount } =
-        rawData.args as GetProjectArgType<'Succeeded'>;
+      const { timestamp, amount } = rawData.args as GetProjectArgType<
+        'Succeeded'
+      >;
       return {
         blockNumber,
         excludeAddresses: [],
@@ -124,8 +134,12 @@ export async function Enrich(
       };
     }
     case EventKind.ProjectWithdraw: {
-      const { sender, token, amount, withdrawalType } =
-        rawData.args as GetProjectArgType<'Withdraw'>;
+      const {
+        sender,
+        token,
+        amount,
+        withdrawalType,
+      } = rawData.args as GetProjectArgType<'Withdraw'>;
       return {
         blockNumber,
         excludeAddresses: [sender],

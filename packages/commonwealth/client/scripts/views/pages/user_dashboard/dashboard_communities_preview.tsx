@@ -99,13 +99,15 @@ export class DashboardCommunitiesPreview extends ClassComponent {
           }}
           label="View more communities"
         />
-        {app.user?.isSiteAdmin && <CWButton // @TODO: this is a hack to hide the button for non admins
-          onclick={() => {
-            m.route.set('/projects/explore');
-            m.redraw();
-          }}
-          label="View crowdfund projects"
-        />}
+        {app.user?.isSiteAdmin && (
+          <CWButton // @TODO: this is a hack to hide the button for non admins
+            onclick={() => {
+              m.route.set('/projects/explore');
+              m.redraw();
+            }}
+            label="View crowdfund projects"
+          />
+        )}
       </div>
     );
   }

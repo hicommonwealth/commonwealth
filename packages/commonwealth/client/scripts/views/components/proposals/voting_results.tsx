@@ -127,8 +127,12 @@ export class VotingResults extends ClassComponent<VotingResultsAttrs> {
         proposal.completed &&
         (proposal as CosmosProposal).data?.state?.tally
       ) {
-        const { yes, no, abstain, noWithVeto } = (proposal as CosmosProposal)
-          .data.state.tally;
+        const {
+          yes,
+          no,
+          abstain,
+          noWithVeto,
+        } = (proposal as CosmosProposal).data.state.tally;
 
         // TODO: move this marshalling into controller
         const formatCurrency = (n: BN) => {

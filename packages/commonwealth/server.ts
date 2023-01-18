@@ -243,8 +243,9 @@ async function main() {
 
   // Declare Validation Middleware Service
   // middleware to use for all requests
-  const dbValidationService: DatabaseValidationService =
-    new DatabaseValidationService(models);
+  const dbValidationService: DatabaseValidationService = new DatabaseValidationService(
+    models
+  );
 
   setupAPI(
     app,

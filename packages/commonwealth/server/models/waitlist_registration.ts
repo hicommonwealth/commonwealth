@@ -10,11 +10,13 @@ export type WaitlistRegistrationAttributes = {
   updated_at?: Date;
 };
 
-export type WaitlistRegistrationInstance =
-  ModelInstance<WaitlistRegistrationAttributes>;
+export type WaitlistRegistrationInstance = ModelInstance<
+  WaitlistRegistrationAttributes
+>;
 
-export type WaitlistRegistrationModelStatic =
-  ModelStatic<WaitlistRegistrationInstance>;
+export type WaitlistRegistrationModelStatic = ModelStatic<
+  WaitlistRegistrationInstance
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,

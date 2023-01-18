@@ -447,9 +447,9 @@ export default class CompoundProposal extends Proposal<
       const descriptionHash = utils.keccak256(
         utils.toUtf8Bytes(this.data.description)
       );
-      const gasLimit = await (
-        contract as GovernorCompatibilityBravo
-      ).estimateGas['queue(address[],uint256[],bytes[],bytes32)'](
+      const gasLimit = await (contract as GovernorCompatibilityBravo).estimateGas[
+        'queue(address[],uint256[],bytes[],bytes32)'
+      ](
         this.data.targets,
         this.data.values,
         this.data.calldatas,
@@ -493,9 +493,9 @@ export default class CompoundProposal extends Proposal<
       const descriptionHash = utils.keccak256(
         utils.toUtf8Bytes(this.data.description)
       );
-      const gasLimit = await (
-        contract as GovernorCompatibilityBravo
-      ).estimateGas['execute(address[],uint256[],bytes[],bytes32)'](
+      const gasLimit = await (contract as GovernorCompatibilityBravo).estimateGas[
+        'execute(address[],uint256[],bytes[],bytes32)'
+      ](
         this.data.targets,
         this.data.values,
         this.data.calldatas,

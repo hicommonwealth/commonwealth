@@ -11,7 +11,9 @@ import { CWText } from './component_kit/cw_text';
 
 type ActiveProposalPillAttrs = { proposalEnd: number };
 
-export class ActiveProposalPill extends ClassComponent<ActiveProposalPillAttrs> {
+export class ActiveProposalPill extends ClassComponent<
+  ActiveProposalPillAttrs
+> {
   view(vnode: m.Vnode<ActiveProposalPillAttrs>) {
     const { proposalEnd } = vnode.attrs;
 
@@ -30,7 +32,9 @@ export class ActiveProposalPill extends ClassComponent<ActiveProposalPillAttrs> 
 
 type ClosedProposalPillAttrs = { proposalState: string };
 
-export class ClosedProposalPill extends ClassComponent<ClosedProposalPillAttrs> {
+export class ClosedProposalPill extends ClassComponent<
+  ClosedProposalPillAttrs
+> {
   view(vnode: m.Vnode<ClosedProposalPillAttrs>) {
     const { proposalState } = vnode.attrs;
 

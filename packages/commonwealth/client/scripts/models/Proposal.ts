@@ -18,8 +18,7 @@ abstract class Proposal<
   C extends Coin,
   ConstructorT extends IIdentifiable,
   VoteT extends IVote<C>
-> implements IUniqueId
-{
+> implements IUniqueId {
   // basic info
   protected _data: ConstructorT;
   public get data(): ConstructorT {

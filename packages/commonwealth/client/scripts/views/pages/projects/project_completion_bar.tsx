@@ -7,13 +7,10 @@ import ClassComponent from 'class_component';
 
 import { ProjectStatus } from './types';
 
-export default class ProjectCompletionBar
-  extends
-    ClassComponent<{
-      completionPercent: number;
-      projectStatus?: ProjectStatus;
-    }>
-{
+export default class ProjectCompletionBar extends ClassComponent<{
+  completionPercent: number;
+  projectStatus?: ProjectStatus;
+}> {
   view(vnode) {
     const { completionPercent, projectStatus } = vnode.attrs;
 

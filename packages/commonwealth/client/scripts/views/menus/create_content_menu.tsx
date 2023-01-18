@@ -156,26 +156,28 @@ const getCreateContentMenuItems = (): MenuItem[] => {
         ]
       : [];
 
-    const getCrowdfundProposalItems = (): Array<MenuItem> =>
-      app.chain?.base === ChainBase.Ethereum
-        ?  (app.roles.isAdminOfEntity({chain: app.chain?.id})) ? [
+  const getCrowdfundProposalItems = (): Array<MenuItem> =>
+    app.chain?.base === ChainBase.Ethereum
+      ? app.roles.isAdminOfEntity({ chain: app.chain?.id })
+        ? [
             { type: 'divider' },
             {
               label: 'New Crowdfund',
               iconLeft: 'wallet',
               onclick: () => navigateToSubpage('/new/project'),
             },
-          ] : []
-        : (app.user.isSiteAdmin) ? [
+          ]
+        : []
+      : app.user.isSiteAdmin
+      ? [
           { type: 'divider' },
-            {
-              label: 'New Crowdfund',
-              iconLeft: 'wallet',
-              onclick: () => navigateToSubpage('/new/project'),
-            },
-        ] : 
-        [];
-      
+          {
+            label: 'New Crowdfund',
+            iconLeft: 'wallet',
+            onclick: () => navigateToSubpage('/new/project'),
+          },
+        ]
+      : [];
 
   const getUniversalCreateItems = (): MenuItem[] => [
     {

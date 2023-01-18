@@ -13,8 +13,9 @@ export type DiscordBotConfigAttributes = {
   verified: boolean;
 };
 
-export type DiscordBotConfigInstance =
-  ModelInstance<DiscordBotConfigAttributes>;
+export type DiscordBotConfigInstance = ModelInstance<
+  DiscordBotConfigAttributes
+>;
 
 export type DiscordBotConfigModelStatic = ModelStatic<DiscordBotConfigInstance>;
 

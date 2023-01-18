@@ -119,13 +119,12 @@ export async function findAllRoles(
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission[]> {
   // find all CommunityRoles with chain id, permissions and find options given
-  const communityRoles: CommunityRoleAttributes[] =
-    await findAllCommunityRolesWithRoleAssignments(
-      models,
-      findOptions,
-      chain_id,
-      permissions
-    );
+  const communityRoles: CommunityRoleAttributes[] = await findAllCommunityRolesWithRoleAssignments(
+    models,
+    findOptions,
+    chain_id,
+    permissions
+  );
   const roles: RoleInstanceWithPermission[] = [];
   if (communityRoles) {
     for (const communityRole of communityRoles) {
@@ -154,13 +153,12 @@ export async function findOneRole(
   chain_id: string,
   permissions?: Permission[]
 ): Promise<RoleInstanceWithPermission> {
-  const communityRoles: CommunityRoleAttributes[] =
-    await findAllCommunityRolesWithRoleAssignments(
-      models,
-      findOptions,
-      chain_id,
-      permissions
-    );
+  const communityRoles: CommunityRoleAttributes[] = await findAllCommunityRolesWithRoleAssignments(
+    models,
+    findOptions,
+    chain_id,
+    permissions
+  );
   let communityRole: CommunityRoleAttributes;
   if (communityRoles) {
     // find the highest role
@@ -236,8 +234,9 @@ export async function createRole(
   );
   if (communityRoles.findIndex((r) => r.name === role_name) !== -1) {
     // if role is already assigned to address, return current highest role this address has on that chain
-    const highestCommunityRole: CommunityRoleAttributes =
-      await getHighestRoleFromCommunityRoles(communityRoles);
+    const highestCommunityRole: CommunityRoleAttributes = await getHighestRoleFromCommunityRoles(
+      communityRoles
+    );
     if (
       highestCommunityRole.RoleAssignments &&
       highestCommunityRole.RoleAssignments.length > 0

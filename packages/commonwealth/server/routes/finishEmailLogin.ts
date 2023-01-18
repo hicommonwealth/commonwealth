@@ -76,13 +76,13 @@ const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
           newAddresses,
         ] = await Promise.all([
           previousUser.getSocialAccounts(),
-          (
-            await previousUser.getAddresses()
-          ).filter((address) => !!address.verified),
+          (await previousUser.getAddresses()).filter(
+            (address) => !!address.verified
+          ),
           existingUser.getSocialAccounts(),
-          (
-            await existingUser.getAddresses()
-          ).filter((address) => !!address.verified),
+          (await existingUser.getAddresses()).filter(
+            (address) => !!address.verified
+          ),
         ]);
         await existingUser.setSocialAccounts(
           oldSocialAccounts.concat(newSocialAccounts)

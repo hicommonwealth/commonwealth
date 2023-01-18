@@ -6,10 +6,9 @@ import ClassComponent from 'class_component';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ProjectCard } from './project_card/index';
 
-
-export default class ExplorePage
-  extends ClassComponent<{ currentBlockNum: number }>
-{
+export default class ExplorePage extends ClassComponent<{
+  currentBlockNum: number;
+}> {
   view(vnode) {
     const { currentBlockNum } = vnode.attrs;
     if (!app.projects.initialized()) {

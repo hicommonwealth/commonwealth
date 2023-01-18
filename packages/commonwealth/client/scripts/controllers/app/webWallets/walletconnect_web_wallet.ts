@@ -2,7 +2,13 @@ import WalletConnectProvider from '@walletconnect/web3-provider';
 import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
-import type { Account, BlockInfo, ChainInfo, IWebWallet, NodeInfo } from 'models';
+import type {
+  Account,
+  BlockInfo,
+  ChainInfo,
+  IWebWallet,
+  NodeInfo,
+} from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';

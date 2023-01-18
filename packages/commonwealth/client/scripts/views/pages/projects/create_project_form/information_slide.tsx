@@ -7,7 +7,10 @@ import { Account, ChainInfo } from 'models';
 import { setActiveAccount } from 'controllers/app/login';
 import ClassComponent from 'class_component';
 import CWCoverImageUploader from '../../../components/component_kit/cw_cover_image_uploader';
-import { CWDropdown, DropdownItemType } from '../../../components/component_kit/cw_dropdown';
+import {
+  CWDropdown,
+  DropdownItemType,
+} from '../../../components/component_kit/cw_dropdown';
 import { CWText } from '../../../components/component_kit/cw_text';
 import { CWTextArea } from '../../../components/component_kit/cw_text_area';
 import { CWTextInput } from '../../../components/component_kit/cw_text_input';
@@ -19,9 +22,9 @@ import {
 import { ICreateProjectForm } from '../types';
 import { DefaultMenuItem } from '../../../components/component_kit/types';
 
-export class InformationSlide
-  extends ClassComponent<{ form: ICreateProjectForm }>
-{
+export class InformationSlide extends ClassComponent<{
+  form: ICreateProjectForm;
+}> {
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
     if (!app) return;
     if (vnode.attrs.form.chainId !== app.activeChainId()) {
@@ -43,16 +46,22 @@ export class InformationSlide
       .concat(allEthChains)
       .filter((c) => c.id === app.activeChainId());
 
-    const chainOptions: Array<DropdownItemType> = allEthChains.map((chain: ChainInfo) => {
+    const chainOptions: Array<DropdownItemType> = allEthChains.map(
+      (chain: ChainInfo) => {
         const disabled = !userEthChains.includes(chain);
         return { label: chain.name, value: chain.name, disabled };
-    });
+      }
+    );
 
-    const accountOptions: Array<DropdownItemType> = chainAccounts.map((acc: Account) => {
-      return { label: acc.address, value: acc.address };
-    });
+    const accountOptions: Array<DropdownItemType> = chainAccounts.map(
+      (acc: Account) => {
+        return { label: acc.address, value: acc.address };
+      }
+    );
 
-    const initialOption = chainOptions.filter((option) => option.label === defaultChain[0].name);
+    const initialOption = chainOptions.filter(
+      (option) => option.label === defaultChain[0].name
+    );
 
     return (
       <form class="InformationSlide">
@@ -96,7 +105,9 @@ export class InformationSlide
             setActiveAccount(selectedAccount);
             vnode.attrs.form.creator === selectedAccount.address;
           }}
-          initialValue={accountOptions.find((option) => option.label === vnode.attrs.form.creator)}
+          initialValue={accountOptions.find(
+            (option) => option.label === vnode.attrs.form.creator
+          )}
         />
         <CWTextArea
           placeholder="Write a short 2 or 3 sentence description of your project"

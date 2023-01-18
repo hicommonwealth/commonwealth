@@ -34,30 +34,60 @@ export type IProjectCreationData = {
 };
 
 class Project {
-  public get id() { return this.createdEvent.id }
-  public get address() { return this.createdEvent.id; }
-  public get creator() { return this.createdEvent.creator; }
-  public get beneficiary() { return this.createdEvent.beneficiary; }
-  public get token() { return this.createdEvent.acceptedToken; }
+  public get id() {
+    return this.createdEvent.id;
+  }
+  public get address() {
+    return this.createdEvent.id;
+  }
+  public get creator() {
+    return this.createdEvent.creator;
+  }
+  public get beneficiary() {
+    return this.createdEvent.beneficiary;
+  }
+  public get token() {
+    return this.createdEvent.acceptedToken;
+  }
 
-  public get curatorFee() { return +this.createdEvent.curatorFee; }
-  public get threshold() { return new BN(this.createdEvent.threshold); }
-  public get deadline() { return this.createdEvent.deadline; }
-  public get createdAt() { return this._entity.createdAt; }
+  public get curatorFee() {
+    return +this.createdEvent.curatorFee;
+  }
+  public get threshold() {
+    return new BN(this.createdEvent.threshold);
+  }
+  public get deadline() {
+    return this.createdEvent.deadline;
+  }
+  public get createdAt() {
+    return this._entity.createdAt;
+  }
 
-  public get title() { return this._ipfsData?.title || projectDefaults.title; }
-  public get description() { return this._ipfsData?.description || projectDefaults.description; }
-  public get shortDescription() { return this._ipfsData?.shortDescription || projectDefaults.description; }
-  public get coverImage() { return this._ipfsData?.coverImage || projectDefaults.coverImage; }
+  public get title() {
+    return this._ipfsData?.title || projectDefaults.title;
+  }
+  public get description() {
+    return this._ipfsData?.description || projectDefaults.description;
+  }
+  public get shortDescription() {
+    return this._ipfsData?.shortDescription || projectDefaults.description;
+  }
+  public get coverImage() {
+    return this._ipfsData?.coverImage || projectDefaults.coverImage;
+  }
 
-  public get chainId() { return this._projectChain; }
+  public get chainId() {
+    return this._projectChain;
+  }
 
   public get fundingAmount() {
     const backerFunding = this.backEvents.reduce(
-      (prev, curr) => prev.add(new BN(curr.amount)), new BN(0)
+      (prev, curr) => prev.add(new BN(curr.amount)),
+      new BN(0)
     );
     const curatorFunding = this.curateEvents.reduce(
-      (prev, curr) => prev.add(new BN(curr.amount)), new BN(0)
+      (prev, curr) => prev.add(new BN(curr.amount)),
+      new BN(0)
     );
     return backerFunding.add(curatorFunding);
   }
@@ -75,10 +105,8 @@ class Project {
   constructor(
     private _entity: ChainEntityT,
     private _ipfsData: IProjectCreationData,
-    private _projectChain?: string,
-  ) {
-
-  }
+    private _projectChain?: string
+  ) {}
 
   // Event getters
   public get createdEvent(): CommonwealthTypes.IProjectCreated {

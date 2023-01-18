@@ -62,7 +62,10 @@ export default class ProjectListing implements m.ClassComponent {
     if (!app) return <PageLoading />;
 
     // @TODO Remove admin toggles
-    if (!app.roles.isAdminOfEntity({ chain: app.chain?.id }) && !app.user.isSiteAdmin) {
+    if (
+      !app.roles.isAdminOfEntity({ chain: app.chain?.id }) &&
+      !app.user.isSiteAdmin
+    ) {
       return <PageNotFound />;
     }
 

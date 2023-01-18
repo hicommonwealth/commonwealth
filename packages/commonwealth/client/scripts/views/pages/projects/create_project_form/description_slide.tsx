@@ -7,9 +7,9 @@ import m from 'mithril';
 import ClassComponent from 'class_component';
 import { ICreateProjectForm } from '../types';
 
-export class DescriptionSlide
-  extends ClassComponent<{ form: ICreateProjectForm }>
-{
+export class DescriptionSlide extends ClassComponent<{
+  form: ICreateProjectForm;
+}> {
   view(vnode: m.Vnode<{ form: ICreateProjectForm }>) {
     return (
       <form class="DescriptionSlide">

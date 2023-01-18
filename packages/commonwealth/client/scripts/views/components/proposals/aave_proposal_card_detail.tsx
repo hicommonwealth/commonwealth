@@ -36,7 +36,9 @@ type AaveProposalCardDetailAttrs = {
   statusText: any;
 };
 
-export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetailAttrs> {
+export class AaveProposalCardDetail extends ClassComponent<
+  AaveProposalCardDetailAttrs
+> {
   view(vnode: m.Vnode<AaveProposalCardDetailAttrs>) {
     const { proposal } = vnode.attrs;
 

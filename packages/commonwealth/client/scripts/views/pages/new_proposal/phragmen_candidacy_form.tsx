@@ -45,11 +45,9 @@ export class PhragmenCandidacyForm extends ClassComponent {
             let createFunc: (
               ...args
             ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (
-                proposalSlugToClass().get(
-                  ProposalType.PhragmenCandidacy
-                ) as ProposalModule<any, any, any>
-              ).createTx(...a);
+              return (proposalSlugToClass().get(
+                ProposalType.PhragmenCandidacy
+              ) as ProposalModule<any, any, any>).createTx(...a);
             };
 
             createFunc = ([a]) =>

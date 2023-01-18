@@ -128,12 +128,11 @@ class ValidatorsPage extends ClassComponent {
     const sort = 'amount';
     // also: nominators, return
 
-    const validatorCards = (
-      sort === 'amount'
-        ? validators?.sort((a, b) => b.total?.toString() - a.total?.toString())
-        : sort === 'nominators'
-        ? validators?.sort((a, b) => b.nominators - a.nominators)
-        : validators?.sort((a, b) => b.expectedReturn - a.expectedReturn)
+    const validatorCards = (sort === 'amount'
+      ? validators?.sort((a, b) => b.total?.toString() - a.total?.toString())
+      : sort === 'nominators'
+      ? validators?.sort((a, b) => b.nominators - a.nominators)
+      : validators?.sort((a, b) => b.expectedReturn - a.expectedReturn)
     ).map((info) => <Validator info={info} />);
 
     return (

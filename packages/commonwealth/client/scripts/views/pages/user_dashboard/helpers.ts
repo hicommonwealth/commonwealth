@@ -105,10 +105,12 @@ export const fetchActivity = async (requestType: DashboardViews) => {
       chains.add(event.chain);
     }
 
-    const res: { result: { id: string; icon_url: string }[]; status: boolean } =
-      await $.post(`${app.serverUrl()}/viewChainIcons`, {
-        chains: JSON.stringify(Array.from(chains)),
-      });
+    const res: {
+      result: { id: string; icon_url: string }[];
+      status: boolean;
+    } = await $.post(`${app.serverUrl()}/viewChainIcons`, {
+      chains: JSON.stringify(Array.from(chains)),
+    });
 
     const chainIconUrls = {};
     for (const item of res.result) {

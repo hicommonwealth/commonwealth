@@ -21,10 +21,9 @@ const InputTokenList: m.Component<
     const chainNameInputValue = inputValue.toLowerCase();
     if (refilterResults && inputValue !== vnode.state.oldValue) {
       vnode.state.oldValue = inputValue;
-      vnode.state.options = (
-        inputValue.includes(oldValue) && !!oldValue
-          ? vnode.state.options
-          : optionList
+      vnode.state.options = (inputValue.includes(oldValue) && !!oldValue
+        ? vnode.state.options
+        : optionList
       ).filter((option) => {
         if ((option as Token).symbol) {
           option = option as Token;

@@ -15,7 +15,9 @@ type AccountCreationButtonAttrs = {
   onclick: () => void;
 };
 
-export class CWAccountCreationButton extends ClassComponent<AccountCreationButtonAttrs> {
+export class CWAccountCreationButton extends ClassComponent<
+  AccountCreationButtonAttrs
+> {
   view(vnode: m.Vnode<AccountCreationButtonAttrs>) {
     const { creationType = 'newAccount', onclick } = vnode.attrs;
 

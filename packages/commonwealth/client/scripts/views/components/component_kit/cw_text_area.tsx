@@ -78,8 +78,10 @@ export class CWTextArea extends ClassComponent<TextAreaAttrs> {
               this.inputTimeout = setTimeout(() => {
                 this.isTyping = false;
                 if (inputValidationFn && e.target.value?.length > 3) {
-                  [this.validationStatus, this.statusMessage] =
-                    inputValidationFn(e.target.value);
+                  [
+                    this.validationStatus,
+                    this.statusMessage,
+                  ] = inputValidationFn(e.target.value);
                   m.redraw();
                 }
               }, timeout);

@@ -23,9 +23,9 @@ export class OrderTopicsModal extends ClassComponent {
   ): Topic => allTopics.find((t: Topic) => t.name.trim() === htmlEle.innerText);
 
   private _storeNewTopicOrder = (HTMLContainer: HTMLElement) => {
-    this.topics = Array.from(HTMLContainer.childNodes).map(
-      (node: HTMLElement) => this._getTopicFromElement(node, this.topics)
-    );
+    this.topics = Array.from(
+      HTMLContainer.childNodes
+    ).map((node: HTMLElement) => this._getTopicFromElement(node, this.topics));
 
     this.topics.forEach((t, idx) => {
       t.order = idx + 1;

@@ -122,8 +122,9 @@ export default class MolochMember extends EthereumAccount {
     }
 
     // ensure no other member is using delegate
-    const otherMemberDelegate =
-      await this._Members.api.Contract.memberAddressByDelegateKey(delegateKey);
+    const otherMemberDelegate = await this._Members.api.Contract.memberAddressByDelegateKey(
+      delegateKey
+    );
     if (parseInt(otherMemberDelegate, 16) !== 0) {
       throw new Error('other member already using delegate key');
     }

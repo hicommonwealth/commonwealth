@@ -97,17 +97,11 @@ const backportEntityToAdapter = (
 
   // optional properties
   if (processEvent) {
-    proposal.didPass = (
-      processEvent.data as MolochTypes.IProcessProposal
-    ).didPass;
+    proposal.didPass = (processEvent.data as MolochTypes.IProcessProposal).didPass;
     proposal.aborted = false;
     proposal.status = proposal.didPass ? 'PASSED' : 'FAILED';
-    proposal.yesVotes = (
-      processEvent.data as MolochTypes.IProcessProposal
-    ).yesVotes;
-    proposal.yesVotes = (
-      processEvent.data as MolochTypes.IProcessProposal
-    ).noVotes;
+    proposal.yesVotes = (processEvent.data as MolochTypes.IProcessProposal).yesVotes;
+    proposal.yesVotes = (processEvent.data as MolochTypes.IProcessProposal).noVotes;
   }
   if (abortEvent) {
     proposal.didPass = false;
