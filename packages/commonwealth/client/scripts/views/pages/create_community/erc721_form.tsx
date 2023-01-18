@@ -191,8 +191,14 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
           onclick={async () => {
-            const { altWalletUrl, chainString, ethChainId, nodeUrl, symbol } =
-              this.state.form;
+            const {
+              altWalletUrl,
+              chainString,
+              ethChainId,
+              nodeUrl,
+              symbol,
+              iconUrl,
+            } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
@@ -208,6 +214,7 @@ export class ERC721Form extends ClassComponent<EthChainAttrs> {
                 chain_string: chainString,
                 eth_chain_id: ethChainId,
                 jwt: app.user.jwt,
+                icon_url: iconUrl,
                 network: ChainNetwork.ERC721,
                 node_url: nodeUrl,
                 type: ChainType.Token,
