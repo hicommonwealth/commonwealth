@@ -34,7 +34,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, '../client/index.html'),
       attributes: {
-        'data-cfasync': "false"
+        'data-cfasync': 'false',
       },
     }),
     new HtmlWebpackInjectAttributesPlugin(),
