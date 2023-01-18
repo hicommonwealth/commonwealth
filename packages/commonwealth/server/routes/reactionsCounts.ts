@@ -82,13 +82,8 @@ const reactionsCounts = async (
               );
             }
           );
-          const {
-            reaction,
-            count,
-            thread_id,
-            comment_id,
-            proposal_id,
-          } = rcJSon as never;
+          const { reaction, count, thread_id, comment_id, proposal_id } =
+            rcJSon as never;
           if (index > 0) {
             acc[index][reaction] = count;
           } else {

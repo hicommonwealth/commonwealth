@@ -16,9 +16,7 @@ type TXSigningTransactionBoxAttrs = {
   timestamp: string;
 };
 
-export class TXSigningTransactionBox extends ClassComponent<
-  TXSigningTransactionBoxAttrs
-> {
+export class TXSigningTransactionBox extends ClassComponent<TXSigningTransactionBoxAttrs> {
   view(vnode: m.Vnode<TXSigningTransactionBoxAttrs>) {
     const { blockHash, blockNum, status, success, timestamp } = vnode.attrs;
 

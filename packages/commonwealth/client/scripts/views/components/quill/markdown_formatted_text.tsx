@@ -33,9 +33,7 @@ type MarkdownFormattedTextAttrs = {
   cutoffLines?: number;
 };
 
-export class MarkdownFormattedText extends ClassComponent<
-  MarkdownFormattedTextAttrs
-> {
+export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextAttrs> {
   private cachedDocWithHighlights: string;
   private cachedResultWithHighlights;
   truncatedDoc;

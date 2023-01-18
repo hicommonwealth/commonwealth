@@ -36,16 +36,14 @@ export default class RuleCache extends JobRunner<CacheT> {
   public async check(ruleId: number, address: string): Promise<boolean> {
     const key = `${ruleId}-${address}`;
     const fetchedAt = moment();
-    return this.access(
-      async (c: CacheT): Promise<boolean> => {
-        if (c[key]) {
-          c[key] = fetchedAt;
-          return true;
-        } else {
-          return false;
-        }
+    return this.access(async (c: CacheT): Promise<boolean> => {
+      if (c[key]) {
+        c[key] = fetchedAt;
+        return true;
+      } else {
+        return false;
       }
-    );
+    });
   }
 
   public async add(ruleId: number, address: string): Promise<void> {

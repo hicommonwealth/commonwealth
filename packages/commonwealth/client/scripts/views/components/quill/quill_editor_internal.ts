@@ -551,8 +551,10 @@ export default class QuillEditorInternal {
   }
 
   private _insertEmbeds(text: string) {
-    const twitterRe = /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
-    const videoRe = /^(?:http[s]?:\/\/)?(?:www[.])?((?:vimeo\.com|youtu\.be|youtube\.com)\/[^\s]+)$/;
+    const twitterRe =
+      /^(?:http[s]?:\/\/)?(?:www[.])?twitter[.]com\/.+?\/status\/(\d+)$/;
+    const videoRe =
+      /^(?:http[s]?:\/\/)?(?:www[.])?((?:vimeo\.com|youtu\.be|youtube\.com)\/[^\s]+)$/;
     const embeddableTweet = twitterRe.test(text);
     const embeddableVideo = videoRe.test(text);
     const insertionIdx = this._quill.getSelection().index;

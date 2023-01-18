@@ -230,10 +230,7 @@ export default class NearSputnikProposal extends Proposal<
         // ratio threshold: must have sufficient proportion
         const [numerator, denominator] = this._votePolicy.threshold;
         threshold = BN.min(
-          this._totalSupply
-            .muln(+numerator)
-            .divn(+denominator)
-            .addn(1),
+          this._totalSupply.muln(+numerator).divn(+denominator).addn(1),
           this._totalSupply
         );
       }

@@ -23,9 +23,7 @@ type ThreadReactionButtonAttrs = {
   thread: Thread;
 };
 
-export class ThreadReactionButton extends ClassComponent<
-  ThreadReactionButtonAttrs
-> {
+export class ThreadReactionButton extends ClassComponent<ThreadReactionButtonAttrs> {
   private loading: boolean;
   private reactors: any;
 

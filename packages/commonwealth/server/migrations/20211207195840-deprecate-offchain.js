@@ -445,9 +445,7 @@ module.exports = {
 
       // Remove offchain communities
       // await queryInterface.dropTable('Collaborations', { transaction: t });
-      const [
-        offchainToRemove,
-      ] = await queryInterface.sequelize.query(
+      const [offchainToRemove] = await queryInterface.sequelize.query(
         `SELECT id FROM "OffchainCommunities" WHERE id NOT IN (${[
           ...offChainCommunities.map((oc) => `'${oc}'`),
         ]})`,

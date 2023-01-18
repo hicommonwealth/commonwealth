@@ -70,9 +70,8 @@ const setDiscordBotConfig = async (
     throw new AppError(SetDiscordBotConfigErrors.TokenExpired);
   }
 
-  const existingCommunityWithGuildConnected = await models.DiscordBotConfig.findAll(
-    { where: { guild_id } }
-  );
+  const existingCommunityWithGuildConnected =
+    await models.DiscordBotConfig.findAll({ where: { guild_id } });
 
   const chainInstance = await models.Chain.findOne({
     where: { id: chain_id },

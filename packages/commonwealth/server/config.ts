@@ -58,9 +58,8 @@ export const DISCORD_OAUTH_CALLBACK =
   (process.env.NODE_ENV === 'production'
     ? 'https://commonwealth.im'
     : 'http://localhost:8080') + '/api/auth/discord/callback';
-export const DISCORD_OAUTH_SCOPES = process.env.DISCORD_OAUTH_SCOPES?.split(
-  ' '
-);
+export const DISCORD_OAUTH_SCOPES =
+  process.env.DISCORD_OAUTH_SCOPES?.split(' ');
 
 export const DATABASE_URI =
   !process.env.DATABASE_URL || process.env.NODE_ENV === 'development'

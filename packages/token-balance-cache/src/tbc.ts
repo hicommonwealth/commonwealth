@@ -47,8 +47,10 @@ async function queryChainNodesFromDB(
 
 // TODO: have JobRunner/cache as include rather than extends, for unit testing,
 //    then rename to TokenBalanceController / TokenBalanceService
-export class TokenBalanceCache extends JobRunner<ICache>
-  implements ITokenBalanceCache {
+export class TokenBalanceCache
+  extends JobRunner<ICache>
+  implements ITokenBalanceCache
+{
   private _nodes: { [id: number]: IChainNode } = {};
   private _providers: { [name: string]: BalanceProvider } = {};
   private _lastQueryTime = 0;

@@ -7,7 +7,8 @@ import type SolanaChain from './chain';
 import type { SolanaToken } from './types';
 
 export default class SolanaAccounts
-  implements IAccountsModule<SolanaToken, SolanaAccount> {
+  implements IAccountsModule<SolanaToken, SolanaAccount>
+{
   private _initialized = false;
   public get initialized() {
     return this._initialized;

@@ -63,7 +63,8 @@ export function getIdentityQuality(judgements: string[]): IdentityQuality {
 
 export default class SubstrateIdentity
   extends Identity<SubstrateCoin, SubstrateAccount>
-  implements ISerializable<ISubstrateIdentity> {
+  implements ISerializable<ISubstrateIdentity>
+{
   private _judgements: RegistrationJudgement[];
   private _info: IdentityInfo;
   public get info() {

@@ -70,9 +70,11 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
             const createFunc: (
               ...args
             ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (proposalSlugToClass().get(
-                ProposalType.SubstrateTreasuryTip
-              ) as ProposalModule<any, any, any>).createTx(...a);
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.SubstrateTreasuryTip
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
             };
 
             const beneficiary = app.chain.accounts.get(this.beneficiary);

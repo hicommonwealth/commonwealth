@@ -179,10 +179,8 @@ class CosmosGovernance extends ProposalModule<
       let nextKey = pagination.nextKey;
       while (nextKey.length > 0) {
         console.log(nextKey);
-        const {
-          proposals: addlProposals,
-          pagination: nextPage,
-        } = await this._Chain.api.gov.proposals(0, '', '', nextKey);
+        const { proposals: addlProposals, pagination: nextPage } =
+          await this._Chain.api.gov.proposals(0, '', '', nextKey);
         proposals.push(...addlProposals);
         nextKey = nextPage.nextKey;
       }

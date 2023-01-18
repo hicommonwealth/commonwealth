@@ -25,9 +25,7 @@ type EditCollaboratorsModalAttrs = {
   thread: Thread;
 };
 
-export class EditCollaboratorsModal extends ClassComponent<
-  EditCollaboratorsModalAttrs
-> {
+export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModalAttrs> {
   private addedEditors: any;
   private items: any[];
   private membersFetched: boolean;

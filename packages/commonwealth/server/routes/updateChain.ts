@@ -121,15 +121,14 @@ const updateChain = async (
     return next(new AppError(Errors.InvalidTerms));
   }
 
-  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] = await models.CommunitySnapshotSpaces.findAll(
-    {
+  const snapshotSpaces: CommunitySnapshotSpaceWithSpaceAttached[] =
+    await models.CommunitySnapshotSpaces.findAll({
       where: { chain_id: chain.id },
       include: {
         model: models.SnapshotSpace,
         as: 'snapshot_space',
       },
-    }
-  );
+    });
 
   // Check if any snapshot spaces are being removed
   const removedSpaces = snapshotSpaces.filter((space) => {

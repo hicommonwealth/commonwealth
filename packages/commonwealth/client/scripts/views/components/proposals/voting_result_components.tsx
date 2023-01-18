@@ -73,9 +73,7 @@ type CompletedProposalVotingResultAttrs = {
   yesResults: string;
 };
 
-export class CompletedProposalVotingResult extends ClassComponent<
-  CompletedProposalVotingResultAttrs
-> {
+export class CompletedProposalVotingResult extends ClassComponent<CompletedProposalVotingResultAttrs> {
   view(vnode: m.Vnode<CompletedProposalVotingResultAttrs>) {
     const {
       abstainPct,
@@ -123,9 +121,7 @@ type SimpleYesApprovalVotingResultAttrs = {
   approvedCount: number;
 } & BaseVotingResultAttrs;
 
-export class SimpleYesApprovalVotingResult extends ClassComponent<
-  SimpleYesApprovalVotingResultAttrs
-> {
+export class SimpleYesApprovalVotingResult extends ClassComponent<SimpleYesApprovalVotingResultAttrs> {
   view(vnode: m.Vnode<SimpleYesApprovalVotingResultAttrs>) {
     const { approvedCount, proposal, votes } = vnode.attrs;
 
@@ -208,9 +204,7 @@ type YesNoAbstainVetoVotingResultAttrs = {
   votes: Array<CosmosVote>;
 };
 
-export class YesNoAbstainVetoVotingResult extends ClassComponent<
-  YesNoAbstainVetoVotingResultAttrs
-> {
+export class YesNoAbstainVetoVotingResult extends ClassComponent<YesNoAbstainVetoVotingResultAttrs> {
   view(vnode: m.Vnode<YesNoAbstainVetoVotingResultAttrs>) {
     const { proposal, votes } = vnode.attrs;
 
@@ -266,9 +260,7 @@ type YesNoRejectVotingResultAttrs = {
   votes: Array<NearSputnikVote>;
 };
 
-export class YesNoRejectVotingResult extends ClassComponent<
-  YesNoRejectVotingResultAttrs
-> {
+export class YesNoRejectVotingResult extends ClassComponent<YesNoRejectVotingResultAttrs> {
   view(vnode: m.Vnode<YesNoRejectVotingResultAttrs>) {
     const { proposal, votes } = vnode.attrs;
 

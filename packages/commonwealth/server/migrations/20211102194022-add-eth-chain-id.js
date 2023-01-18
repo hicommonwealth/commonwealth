@@ -28,8 +28,7 @@ module.exports = {
           eth_chain_id: 1,
         },
         {
-          url:
-            'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
         },
         { transaction }
       );
@@ -39,8 +38,7 @@ module.exports = {
           eth_chain_id: 3,
         },
         {
-          url:
-            'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+          url: 'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
         },
         { transaction }
       );

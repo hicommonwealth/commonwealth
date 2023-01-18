@@ -36,7 +36,8 @@ export type IRuleType<SchemaT extends DefaultSchemaT> = {
 };
 
 export abstract class RuleType<SchemaT extends DefaultSchemaT = DefaultSchemaT>
-  implements IRuleType<SchemaT> {
+  implements IRuleType<SchemaT>
+{
   // parser-used identifier for a rule, e.g. "ThresholdRule"
   abstract get identifier(): string;
 

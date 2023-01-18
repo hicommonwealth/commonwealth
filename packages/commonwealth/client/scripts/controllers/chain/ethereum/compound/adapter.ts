@@ -33,7 +33,8 @@ export default class Compound extends IChainAdapter<
     try {
       await this.chain.init(this.meta);
       // TODO: Fix the global eth block height setting
-      this.block.height = await this.chain.compoundApi.Provider.getBlockNumber();
+      this.block.height =
+        await this.chain.compoundApi.Provider.getBlockNumber();
       await super.initApi();
     } catch (e) {
       this._failed = true;

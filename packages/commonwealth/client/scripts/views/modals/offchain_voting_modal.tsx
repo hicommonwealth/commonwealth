@@ -14,9 +14,7 @@ type OffchainVotingModalAttrs = {
   votes: Array<Vote>;
 };
 
-export class OffchainVotingModal extends ClassComponent<
-  OffchainVotingModalAttrs
-> {
+export class OffchainVotingModal extends ClassComponent<OffchainVotingModalAttrs> {
   view(vnode: m.Vnode<OffchainVotingModalAttrs>) {
     const { votes } = vnode.attrs;
 

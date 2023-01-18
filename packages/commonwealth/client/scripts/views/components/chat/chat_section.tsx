@@ -48,9 +48,8 @@ function setToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-chat-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-chat-toggle-tree`] =
+    JSON.stringify(newTree);
 }
 
 export class ChatSection extends ClassComponent<SidebarSectionAttrs> {

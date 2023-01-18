@@ -27,9 +27,7 @@ type LinkedProposalsEmbedAttrs = {
   proposal: LinkedSubstrateProposal;
 };
 
-export class LinkedProposalsEmbed extends ClassComponent<
-  LinkedProposalsEmbedAttrs
-> {
+export class LinkedProposalsEmbed extends ClassComponent<LinkedProposalsEmbedAttrs> {
   view(vnode: m.Vnode<LinkedProposalsEmbedAttrs>) {
     const { proposal } = vnode.attrs;
 

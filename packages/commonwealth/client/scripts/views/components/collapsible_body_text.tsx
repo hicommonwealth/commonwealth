@@ -17,9 +17,7 @@ type CollapsibleThreadBodyAttrs = {
   thread: Thread;
 };
 
-export class CollapsibleThreadBody extends ClassComponent<
-  CollapsibleThreadBodyAttrs
-> {
+export class CollapsibleThreadBody extends ClassComponent<CollapsibleThreadBodyAttrs> {
   private body: any;
   private collapsed: boolean;
 
@@ -116,9 +114,7 @@ type CollapsibleProposalBodyAttrs = {
   proposal: AnyProposal;
 };
 
-export class CollapsibleProposalBody extends ClassComponent<
-  CollapsibleProposalBodyAttrs
-> {
+export class CollapsibleProposalBody extends ClassComponent<CollapsibleProposalBodyAttrs> {
   private body: any;
   private collapsed: boolean;
 

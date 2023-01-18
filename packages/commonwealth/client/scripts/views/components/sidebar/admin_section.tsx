@@ -29,9 +29,8 @@ function setAdminToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[`${app.activeChainId()}-admin-toggle-tree`] = JSON.stringify(
-    newTree
-  );
+  localStorage[`${app.activeChainId()}-admin-toggle-tree`] =
+    JSON.stringify(newTree);
 }
 
 export class AdminSection extends ClassComponent<SidebarSectionAttrs> {

@@ -136,15 +136,16 @@ const bulkBalances = async (
       for (const contract of contracts) {
         let balanceTotal = new BN(0);
         try {
-          const balanceResults = await tokenBalanceCache.getBalancesForAddresses(
-            nodeId,
-            profileWalletAddresses,
-            bp,
-            {
-              contractType: contract.tokenType,
-              tokenAddress: contract.address,
-            }
-          );
+          const balanceResults =
+            await tokenBalanceCache.getBalancesForAddresses(
+              nodeId,
+              profileWalletAddresses,
+              bp,
+              {
+                contractType: contract.tokenType,
+                tokenAddress: contract.address,
+              }
+            );
           for (const balance of Object.values(balanceResults.balances)) {
             balanceTotal = balanceTotal.add(new BN(balance));
           }

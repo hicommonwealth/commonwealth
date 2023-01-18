@@ -74,12 +74,8 @@ export async function Enrich(
       };
     }
     case EventKind.SubmitVote: {
-      const {
-        proposalIndex,
-        delegateKey,
-        memberAddress,
-        uintVote,
-      } = rawData.args as GetArgType<Moloch1, 'SubmitVote'>;
+      const { proposalIndex, delegateKey, memberAddress, uintVote } =
+        rawData.args as GetArgType<Moloch1, 'SubmitVote'>;
       const member = await (api as Moloch1).members(memberAddress);
       return {
         blockNumber,

@@ -111,9 +111,9 @@ class SubstratePhragmenElections extends ProposalModule<
     this._desiredMembers = +ChainInfo.api.consts[moduleName].desiredMembers;
     this._desiredRunnersUp = +ChainInfo.api.consts[moduleName].desiredRunnersUp;
     this._termDuration = +ChainInfo.api.consts[moduleName].termDuration;
-    const members = (await ChainInfo.api.query[moduleName].members()) as Vec<
-      any
-    >;
+    const members = (await ChainInfo.api.query[
+      moduleName
+    ].members()) as Vec<any>;
     const runnersUp = (await ChainInfo.api.query[
       moduleName
     ].runnersUp()) as Vec<any>;
@@ -130,9 +130,9 @@ class SubstratePhragmenElections extends ProposalModule<
       return ms;
     }, {});
 
-    const currentIndex = +(await ChainInfo.api.query[moduleName].electionRounds<
-      u32
-    >());
+    const currentIndex = +(await ChainInfo.api.query[
+      moduleName
+    ].electionRounds<u32>());
     const blockNumber = await ChainInfo.api.derive.chain.bestNumber();
     const termDuration = +ChainInfo.api.consts[moduleName].termDuration;
     const roundStartBlock =

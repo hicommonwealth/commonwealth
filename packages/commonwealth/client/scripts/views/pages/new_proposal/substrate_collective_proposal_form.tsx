@@ -90,7 +90,8 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
               label="Proposal"
               options={[
                 {
-                  value: substrate.democracyProposals.nextExternal[0].hash.toString(),
+                  value:
+                    substrate.democracyProposals.nextExternal[0].hash.toString(),
                   label: `${substrate.democracyProposals.nextExternal[0].hash
                     .toString()
                     .slice(0, 8)}...`,
@@ -169,9 +170,11 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
             let createFunc: (
               ...args
             ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (proposalSlugToClass().get(
-                ProposalType.SubstrateCollectiveProposal
-              ) as ProposalModule<any, any, any>).createTx(...a);
+              return (
+                proposalSlugToClass().get(
+                  ProposalType.SubstrateCollectiveProposal
+                ) as ProposalModule<any, any, any>
+              ).createTx(...a);
             };
 
             let args = [];

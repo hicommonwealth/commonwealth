@@ -17,7 +17,8 @@ type TerraAddress = {
 };
 
 class TerraWalletConnectWebWalletController
-  implements IWebWallet<TerraAddress> {
+  implements IWebWallet<TerraAddress>
+{
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: TerraAddress[];

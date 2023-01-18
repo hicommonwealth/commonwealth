@@ -18,9 +18,7 @@ export type NotificationAttributes = {
 };
 
 export type NotificationInstance = ModelInstance<NotificationAttributes> & {
-  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<
-    NotificationsReadInstance
-  >;
+  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 };
 
 export type NotificationModelStatic = ModelStatic<NotificationInstance>;

@@ -25,9 +25,7 @@ type CouncilVotingModalAttrs = {
   candidates: Array<[SubstrateAccount, number]>;
 };
 
-export class CouncilVotingModal extends ClassComponent<
-  CouncilVotingModalAttrs
-> {
+export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> {
   private currentApprovals: Array<string>;
   private currentStake: number;
   private error: string;
@@ -37,9 +35,9 @@ export class CouncilVotingModal extends ClassComponent<
   oninit(vnode: m.Vnode<CouncilVotingModalAttrs>) {
     const candidates = vnode.attrs.candidates || [];
     // get currently set approvals
-    const currentVote = (app.chain as Substrate).phragmenElections.activeElection.getVotes(
-      app.user.activeAccount
-    );
+    const currentVote = (
+      app.chain as Substrate
+    ).phragmenElections.activeElection.getVotes(app.user.activeAccount);
 
     const currentStake = currentVote[0] ? currentVote[0].stake.inDollars : 0;
 
@@ -194,9 +192,9 @@ export class CouncilVotingModal extends ClassComponent<
                 e.preventDefault();
                 const account = app.user.activeAccount as SubstrateAccount;
                 createTXModal(
-                  (app.chain as Substrate).phragmenElections.activeElection.removeVoterTx(
-                    account
-                  )
+                  (
+                    app.chain as Substrate
+                  ).phragmenElections.activeElection.removeVoterTx(account)
                 ).then(
                   () => {
                     $(e.target).trigger('modalforceexit');

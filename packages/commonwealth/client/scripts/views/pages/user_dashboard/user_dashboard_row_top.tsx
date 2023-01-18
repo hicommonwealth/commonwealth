@@ -19,9 +19,7 @@ type UserDashboardRowTopAttrs = {
   category: string;
 };
 
-export class UserDashboardRowTop extends ClassComponent<
-  UserDashboardRowTopAttrs
-> {
+export class UserDashboardRowTop extends ClassComponent<UserDashboardRowTopAttrs> {
   view(vnode: m.Vnode<UserDashboardRowTopAttrs>) {
     const { commentCount } = vnode.attrs.activityData;
 

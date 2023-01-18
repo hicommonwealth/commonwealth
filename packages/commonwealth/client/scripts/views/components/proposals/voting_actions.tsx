@@ -76,12 +76,8 @@ export class VotingActions extends ClassComponent<VotingActionsAttrs> {
   private conviction: number;
 
   view(vnode: m.Vnode<VotingActionsAttrs>) {
-    const {
-      onModalClose,
-      proposal,
-      toggleVotingModal,
-      votingModalOpen,
-    } = vnode.attrs;
+    const { onModalClose, proposal, toggleVotingModal, votingModalOpen } =
+      vnode.attrs;
 
     if (proposal instanceof SubstrateTreasuryProposal) {
       return;

@@ -29,7 +29,8 @@ export enum GovernorTokenType {
 }
 
 export default class CompoundAPI
-  implements ContractApi<GovernorAlpha | GovernorCompatibilityBravo> {
+  implements ContractApi<GovernorAlpha | GovernorCompatibilityBravo>
+{
   public readonly gasLimit: number = 3000000;
 
   public readonly contractAddress: string;

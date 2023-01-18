@@ -27,9 +27,8 @@ export async function Enrich(
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.Approval: {
-      const { owner, approved, tokenId } = rawData.args as GetArgType<
-        'Approval'
-      >;
+      const { owner, approved, tokenId } =
+        rawData.args as GetArgType<'Approval'>;
       const contractAddress = rawData.address;
 
       // should not notify sender or recipient
@@ -49,9 +48,8 @@ export async function Enrich(
       };
     }
     case EventKind.ApprovalForAll: {
-      const { owner, operator, approved } = rawData.args as GetArgType<
-        'ApprovalForAll'
-      >;
+      const { owner, operator, approved } =
+        rawData.args as GetArgType<'ApprovalForAll'>;
       const contractAddress = rawData.address;
 
       // should not notify sender or recipient

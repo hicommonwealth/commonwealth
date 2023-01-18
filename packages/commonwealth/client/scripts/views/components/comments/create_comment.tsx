@@ -119,9 +119,8 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
     const { error, sendingComment, uploadsInProgress } = this;
 
     // token balance check if needed
-    const tokenPostingThreshold: BN = TopicGateCheck.getTopicThreshold(
-      activeTopicName
-    );
+    const tokenPostingThreshold: BN =
+      TopicGateCheck.getTopicThreshold(activeTopicName);
 
     const userBalance: BN = TopicGateCheck.getUserBalance();
     const userFailsThreshold =

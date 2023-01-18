@@ -191,11 +191,12 @@ export class Comment extends ClassComponent<CommentAttrs> {
                                   comment.id,
                                   ContentType.Comment
                                 );
-                                this.shouldRestoreEdits = await confirmationModalWithText(
-                                  'Previous changes found. Restore edits?',
-                                  'Yes',
-                                  'No'
-                                )();
+                                this.shouldRestoreEdits =
+                                  await confirmationModalWithText(
+                                    'Previous changes found. Restore edits?',
+                                    'Yes',
+                                    'No'
+                                  )();
                               }
                               setIsEditingComment(true);
                             },

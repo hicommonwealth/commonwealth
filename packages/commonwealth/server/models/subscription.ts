@@ -46,9 +46,7 @@ export type SubscriptionAttributes = {
 };
 
 export type SubscriptionInstance = ModelInstance<SubscriptionAttributes> & {
-  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<
-    NotificationsReadInstance
-  >;
+  getNotificationsRead: Sequelize.HasManyGetAssociationsMixin<NotificationsReadInstance>;
 };
 
 export type SubscriptionModelStatic = ModelStatic<SubscriptionInstance> & {
