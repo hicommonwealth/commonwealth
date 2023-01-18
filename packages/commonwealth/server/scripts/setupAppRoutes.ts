@@ -1,11 +1,10 @@
 import cheerio from 'cheerio';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
+import fs from 'fs';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
 import { factory, formatFilename } from 'common-common/src/logging';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';

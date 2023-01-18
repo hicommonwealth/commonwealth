@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
-const { DuplicatesPlugin } = require("inspectpack/plugin");
+const { DuplicatesPlugin } = require('inspectpack/plugin');
 
 module.exports = merge(common, {
   entry: {
@@ -36,7 +36,7 @@ module.exports = merge(common, {
       // Emit compilation warning or error? (Default: `false`)
       emitErrors: false,
       // Display full duplicates information? (Default: `false`)
-      verbose: false
+      verbose: false,
     }),
   ],
 });
@@ -45,12 +45,10 @@ module.exports = merge(common, {
 if (!process.env.EXTERNAL_WEBPACK) {
   module.exports = merge(module.exports, {
     entry: {
-      app: [
-        'webpack-hot-middleware/client?path=/__webpack_hmr&reload=true',
-      ]
+      app: ['webpack-hot-middleware/client?path=/__webpack_hmr&reload=true'],
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(), // used for hot reloading
-    ]
+    ],
   });
 }

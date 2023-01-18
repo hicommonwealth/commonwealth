@@ -10,9 +10,9 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
-import fs from 'fs';
 import logger from 'morgan';
 import passport from 'passport';
+import * as path from 'path';
 import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
@@ -124,7 +124,7 @@ async function main() {
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
-      res.set('Content-Security-Policy', 'frame-ancestors \'none\';');
+      res.set('Content-Security-Policy', "frame-ancestors 'none';");
       next();
     });
 
