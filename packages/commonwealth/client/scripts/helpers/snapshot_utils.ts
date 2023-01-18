@@ -311,15 +311,16 @@ export async function getPower(
   );
   const blockTag =
     +proposal.snapshot > blockNumber ? 'latest' : +proposal.snapshot;
-  const scores: Array<{ [who: string]: number }> =
-    await snapshot.utils.getScores(
-      space.id,
-      proposal.strategies,
-      space.network,
-      [address],
-      blockTag
-      // Snapshot.utils.getProvider(space.network),
-    );
+  const scores: Array<{
+    [who: string]: number;
+  }> = await snapshot.utils.getScores(
+    space.id,
+    proposal.strategies,
+    space.network,
+    [address],
+    blockTag
+    // Snapshot.utils.getProvider(space.network),
+  );
   const summedScores = scores.map((score) =>
     Object.values(score).reduce((a, b) => a + b, 0)
   );
