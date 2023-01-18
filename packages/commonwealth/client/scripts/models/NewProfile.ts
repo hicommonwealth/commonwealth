@@ -2,6 +2,7 @@ import { CoverImage } from "../views/pages/edit_new_profile";
 
 class NewProfile {
   private _name: string;
+  private _username: string;
   private _email: string;
   private _website: string;
   private _bio: string;
@@ -13,6 +14,7 @@ class NewProfile {
   private _id: number;
 
   get name() { return this._name; }
+  get username() { return this._username; }
   get email() { return this._email; }
   get website() { return this._website; }
   get bio() { return this._bio; }
@@ -23,8 +25,9 @@ class NewProfile {
   get coverImage() { return this._coverImage; }
   get id() { return this._id; }
 
-  constructor({profile_name, email, website, bio, is_default, avatar_url, slug, socials, cover_image, id}) {
+  constructor({profile_name, username, email, website, bio, is_default, avatar_url, slug, socials, cover_image, id}) {
     this._name = profile_name;
+    this._username = username;
     this._email = email;
     this._website = website;
     this._bio = bio;
@@ -36,8 +39,9 @@ class NewProfile {
     this._id = id;
   }
 
-  public initialize(name, email, website, bio, isDefault, avatarUrl, slug, socials, coverImage, id) {
+  public initialize(name, username, email, website, bio, isDefault, avatarUrl, slug, socials, coverImage, id) {
     this._name = name;
+    this._username = username;
     this._email = email;
     this._website = website;
     this._bio = bio;

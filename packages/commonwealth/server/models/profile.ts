@@ -14,6 +14,7 @@ export type CoverImageAttributes = {
 export type ProfileAttributes = {
   id?: number;
   user_id: number;
+  username: string;
   created_at?: Date;
   updated_at?: Date;
   profile_name?: string;
@@ -52,6 +53,7 @@ export default (
         primaryKey: true,
       },
       user_id: { type: dataTypes.INTEGER, allowNull: false },
+      username: { type: dataTypes.STRING, allowNull: false, unique: true },
       created_at: { type: dataTypes.DATE, allowNull: true },
       updated_at: { type: dataTypes.DATE, allowNull: true },
       profile_name: { type: dataTypes.STRING, allowNull: true },
