@@ -1,11 +1,19 @@
+/* eslint-disable max-classes-per-file */
+/* eslint-disable max-len */
 /* @jsx jsx */
 import React from 'react';
 
-/* eslint-disable max-classes-per-file */
-/* eslint-disable max-len */
-
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
 import 'components/component_kit/cw_icon_button.scss';
