@@ -18,7 +18,7 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
 
-    const { slug, identifier } = proposal.proposal;
+    const { slug, identifier, title } = proposal.proposal;
 
     // hide rows from communities that don't match
     if (app.isCustomDomain() && proposal.chain !== app.customDomainId()) return;
@@ -32,7 +32,7 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
             link(
               'a.link-bold',
               `/${proposal.chain}${getProposalUrlPath(slug, identifier, true)}`,
-              proposal instanceof Thread ? 'thread' : 'proposal',
+              `${title}`,
               {},
               `profile-${account.address}-${account.chain.id}-${proposal.chain}-scrollY`
             ),

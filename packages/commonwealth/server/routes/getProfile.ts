@@ -44,13 +44,13 @@ const getProfile = async (
     },
   });
 
+  const commentThreadIds = comments.map((c) => c.root_id.split('_')[1]);
+
   const threads = await models.Thread.findAll({
     where: {
       [Op.or]: [
-        {
-          id: { [Op.in]: comments.map((c) => c.root_id.split('_')[1]) },
-          address_id: addressModel.id,
-        },
+        { id: { [Op.in]: commentThreadIds }, },
+        { address_id: addressModel.id, },
       ],
     },
     include: [{ model: models.Address, as: 'Address' }],
