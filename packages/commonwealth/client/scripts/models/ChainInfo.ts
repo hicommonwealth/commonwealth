@@ -1,16 +1,19 @@
-import m from 'mithril';
+import type { RegisteredTypes } from '@polkadot/types/types';
+import type { ChainNetwork } from 'common-common/src/types';
+import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
-import { RegisteredTypes } from '@polkadot/types/types';
-import app from 'state';
+import m from 'mithril';
 import { RoleInfo, RolePermission } from 'models';
 import { ChainNetwork, ChainBase } from 'common-common/src/types';
 import NodeInfo from './NodeInfo';
+import app from 'state';
 
 import {
   CWAvatar,
   CWJdenticon,
 } from '../views/components/component_kit/cw_avatar';
-import CommunityRole from './CommunityRole';
+import type CommunityRole from './CommunityRole';
+import type NodeInfo from './NodeInfo';
 
 class ChainInfo {
   public readonly id: string;

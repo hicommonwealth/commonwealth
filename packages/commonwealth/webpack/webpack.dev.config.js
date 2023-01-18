@@ -1,26 +1,23 @@
 const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const common = require('./webpack.common.js');
+const common = require('./webpack.base.config.js');
 
 module.exports = merge(common, {
   entry: {
-    app: [
-      'webpack-hot-middleware/client?path=/__webpack_hmr&reload=true',
-      'app.ts',
-    ],
+    app: ['webpack-hot-middleware/client?path=/__webpack_hmr&reload=true'],
   },
-  ignoreWarnings: [
-    { module: /client\/styles\/construct.scss/ },
-    { module: /node_modules\/magic-sdk\/dist\/es\/index.mjs/ }
-  ],
+  mode: 'development',
+  devtool: 'eval-cheap-source-map',
   stats: {
     assets: false,
     modules: false,
   },
-  mode: 'development',
+  ignoreWarnings: [
+    { module: /client\/styles\/construct.scss/ },
+    { module: /node_modules\/magic-sdk\/dist\/es\/index.mjs/ },
+  ],
   target: 'web',
-  devtool: 'eval-cheap-source-map',
   output: {
     publicPath: '/build',
     path: path.join(__dirname, '../build'),
@@ -38,18 +35,4 @@ module.exports = merge(common, {
     }),
     new webpack.HotModuleReplacementPlugin(), // used for hot reloading
   ],
-  module: {
-    rules: [
-      {
-        test: /\.s?css$/i,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
-      },
-      {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false,
-        },
-      },
-    ],
-  },
 });

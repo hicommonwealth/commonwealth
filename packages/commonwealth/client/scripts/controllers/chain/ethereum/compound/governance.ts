@@ -1,16 +1,19 @@
+import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
 import BN from 'bn.js';
-import { ProposalModule, ITXModalData } from 'models';
-import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-import { CompoundEvents, CompoundTypes } from 'chain-events/src';
-import { IApp } from 'state';
+import { CompoundEvents } from 'chain-events/src';
+import { CompoundTypes } from 'chain-events/src/types';
+import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
-import { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
-import { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
-import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
-import CompoundAPI, { GovernorType } from './api';
+import type { BigNumber, BigNumberish, ContractTransaction } from 'ethers';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+import type { IApp } from 'state';
+import type EthereumAccounts from '../accounts';
+import { attachSigner } from '../contractApi';
+import type CompoundAPI from './api';
+import { GovernorType } from './api';
+import type CompoundChain from './chain';
 import CompoundProposal from './proposal';
-import CompoundChain from './chain';
-import EthereumAccounts from '../accounts';
 
 export interface CompoundProposalArgs {
   targets: string[];
@@ -39,17 +42,22 @@ export default class CompoundGovernance extends ProposalModule<
   public get quorumVotes() {
     return this._quorumVotes;
   }
+
   public get proposalThreshold() {
     return this._proposalThreshold;
   }
+
   public get votingDelay() {
     return this._votingDelay;
   }
+
   public get votingPeriod() {
     return this._votingPeriod;
   }
 
-  public get api() { return this._api; }
+  public get api() {
+    return this._api;
+  }
 
   // capacities based on governor type
   private _supportsAbstain: boolean;
@@ -173,14 +181,17 @@ export default class CompoundGovernance extends ProposalModule<
     // load server proposals
     console.log('Fetching compound proposals from backend.');
     await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.store.getByType(CompoundTypes.EntityKind.Proposal);
+    const entities = this.app.chainEntities.store.getByType(
+      CompoundTypes.EntityKind.Proposal
+    );
     console.log(`Found ${entities.length} proposals!`);
     entities.forEach((e) => this._entityConstructor(e));
     await Promise.all(this.store.getAll().map((p) => p.init()));
 
     // register new chain-event handlers
     this.app.chainEntities.registerEntityHandler(
-      CompoundTypes.EntityKind.Proposal, (entity, event) => {
+      CompoundTypes.EntityKind.Proposal,
+      (entity, event) => {
         this.updateProposal(entity, event);
         const proposal = this.store.getByIdentifier(entity.typeId);
         if (!proposal.initialized) {
@@ -209,6 +220,7 @@ export default class CompoundGovernance extends ProposalModule<
     this.store.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args: any[]): ITXModalData {
     throw new Error('Method not implemented.');
   }

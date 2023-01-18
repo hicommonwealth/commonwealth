@@ -1,18 +1,19 @@
+import WalletConnectProvider from '@walletconnect/web3-provider';
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import type { Account, BlockInfo, ChainInfo, IWebWallet, NodeInfo } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';
 import { hexToNumber } from 'web3-utils';
-import WalletConnectProvider from '@walletconnect/web3-provider';
-
-import { Account, ChainInfo, IWebWallet, NodeInfo, BlockInfo } from 'models';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
 class WalletConnectWebWalletController implements IWebWallet<string> {
   private _enabled: boolean;
   private _enabling = false;
   private _accounts: string[];
   private _node: NodeInfo;
+  private _chainInfo: ChainInfo;
   private _provider: WalletConnectProvider;
   private _web3: Web3;
 
@@ -42,7 +43,14 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     return this._node;
   }
 
-  public async getRecentBlock(): Promise<BlockInfo> {
+  public getChainId() {
+    // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
+    // and node? because the chain might not have a node provided
+    return this._chainInfo.node?.ethChainId || 1;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
     const block = await this._web3.givenProvider.request({
       method: 'eth_getBlockByNumber',
       params: ['latest', false],
@@ -55,40 +63,16 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.sign(message, this.accounts[0]);
-    return signature;
-  }
-
-  public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const sessionPublicAddress = app.sessions.getOrCreateAddress(
-      this._node.ethChainId
-    );
-    const msgParams = await constructTypedMessage(
-      this.accounts[0],
-      this._node.ethChainId || 1,
-      sessionPublicAddress,
-      validationBlockInfo
-    );
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
+    const typedCanvasMessage = constructTypedCanvasMessage(canvasMessage);
     const signature = await this._provider.wc.signTypedData([
-      this.accounts[0],
-      JSON.stringify(msgParams),
+      account.address,
+      JSON.stringify(typedCanvasMessage),
     ]);
     return signature;
-  }
-
-  public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(
-      account.validationBlockInfo
-    );
-    return webWalletSignature;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   public async reset() {
@@ -106,14 +90,15 @@ class WalletConnectWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     // try {
     // Create WalletConnect Provider
-    this._node =
-      node ||
-      app.chain?.meta.node ||
-      app.config.chains.getById(this.defaultNetwork).node;
-    const chainId = this._node.ethChainId;
+    this._chainInfo =
+      app.chain?.meta || app.config.chains.getById(this.defaultNetwork);
+    const chainId = this._chainInfo.node?.ethChainId || 1;
 
     // use alt wallet url if available
-    const rpc = { [chainId]: this._node.altWalletUrl || this._node.url };
+    const chainUrl =
+      this._chainInfo.node?.altWalletUrl || this._chainInfo.node?.url;
+    const rpc = chainUrl ? { [chainId]: chainUrl } : {};
+
     this._provider = new WalletConnectProvider({ rpc, chainId });
 
     // destroy pre-existing session if exists

@@ -1,14 +1,14 @@
 /**
  * Fetches events from ERC721 contract in real time.
  */
-import { Listener } from '@ethersproject/providers';
+import type { Listener } from '@ethersproject/providers';
 import sleep from 'sleep-promise';
 
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { ERC721__factory as ERC721Factory } from '../../contractTypes';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, IErc721Contracts } from './types';
+import type { RawEvent, IErc721Contracts } from './types';
 
 export class Subscriber extends IEventSubscriber<IErc721Contracts, RawEvent> {
   private _name: string;

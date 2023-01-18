@@ -1,5 +1,5 @@
+import type { IChainEventData } from 'chain-events/src';
 import _ from 'underscore';
-import { IChainEventData } from 'chain-events/src';
 import ChainEventType from './ChainEventType';
 
 class ChainEvent {

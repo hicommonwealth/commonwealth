@@ -2,10 +2,10 @@
 /* eslint-disable dot-notation */
 /* eslint-disable no-unused-expressions */
 require('dotenv').config();
-import faker from 'faker';
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
+import faker from 'faker';
 import jwt from 'jsonwebtoken';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';

@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import moment from 'moment';
 
 import 'components/comments/comment.scss';
+import m from 'mithril';
+import type { Account, Comment as CommentType } from 'models';
+import moment from 'moment';
 
 import app from 'state';
-import { Account, Comment as CommentType } from 'models';
 import { ContentType } from 'types';
 import { ChainType } from '../../../../../../common-common/src/types';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWIconButton } from '../component_kit/cw_icon_button';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWPopoverMenu } from '../component_kit/cw_popover/cw_popover_menu';
 import { CWText } from '../component_kit/cw_text';
 import { renderQuillTextBody } from '../quill/helpers';

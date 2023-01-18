@@ -1,13 +1,11 @@
 const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
-const common = require('./webpack.common.js');
+const common = require('./webpack.base.config.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = merge(common, {
-  entry: {
-    app: 'app.ts',
-  },
   mode: 'production',
   stats: 'errors-only',
   bail: true,
@@ -31,15 +29,24 @@ module.exports = merge(common, {
   module: {
     rules: [
       {
-        test: /\.s?css/i,
-        use: ['style-loader', 'css-loader', 'sass-loader'],
-      },
-      {
-        test: /\.m?js/,
-        resolve: {
-          fullySpecified: false,
+        test: /\.(js)$/,
+        include: [
+          path.resolve(__dirname, '../client'),
+          path.resolve(__dirname, '../shared'),
+          path.resolve(__dirname, '../../common-common'),
+          path.resolve(__dirname, '../../chain-events'),
+          path.resolve(__dirname, '../../token-balance-cache'),
+        ],
+        exclude: /\/node_modules\//,
+        use: {
+          loader: 'babel-loader',
         },
       },
+    ],
+  },
+  optimization: {
+    minimizer: [
+      new CssMinimizerPlugin({ minimizerOptions: { preset: ['default'] } }),
     ],
   },
 });

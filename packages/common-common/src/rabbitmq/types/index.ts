@@ -1,19 +1,17 @@
-import { RmqEntityCUD } from './chainEntityCUD'
-import {
-  RmqCENotificationCUD
-} from "./chainEventNotificationsCUD";
-import { RmqCETypeCUD } from "./chainEventTypeCUD";
+import type { RmqEntityCUD } from './chainEntityCUD';
+import type { RmqCENotificationCUD } from './chainEventNotificationsCUD';
+import type { RmqCETypeCUD } from './chainEventTypeCUD';
 
 export * from './chainEntityCUD';
-export * from './chainEventNotificationsCUD'
-export * from './chainEventTypeCUD'
+export * from './chainEventNotificationsCUD';
+export * from './chainEventTypeCUD';
 
-export * from "./chainEvents"
-export * from "./chainEventNotification"
-import { RmqCWEvent } from "./chainEvents";
-import { RmqCENotification } from "./chainEventNotification";
-import { RmqSnapshotEvent } from "./snapshotListener";
-import { RmqSnapshotNotification } from "./snapshotNotification";
+export * from './chainEvents';
+export * from './chainEventNotification';
+import type { RmqCWEvent } from './chainEvents';
+import type { RmqCENotification } from './chainEventNotification';
+import type { RmqSnapshotEvent } from './snapshotListener';
+import type { RmqSnapshotNotification } from './snapshotNotification';
 
 /**
  * This error type should be used in tandem with isRmqMsg functions. If this error type is thrown, RabbitMQ
@@ -29,18 +27,19 @@ export class RmqMsgFormatError extends Error {
  * This type contains ALL the possible RabbitMQ message types. If you are publishing a message to any queue,
  * anywhere, it MUST be one of these types
  */
-export type TRmqMessages = RmqEntityCUD.RmqMsgType
+export type TRmqMessages =
+  | RmqEntityCUD.RmqMsgType
   | RmqCENotificationCUD.RmqMsgType
   | RmqCETypeCUD.RmqMsgType
   | RmqCWEvent.RmqMsgType
   | RmqCENotification.RmqMsgType
   | RmqSnapshotEvent.RmqMsgType
-  | RmqSnapshotNotification.RmqMsgType
+  | RmqSnapshotNotification.RmqMsgType;
 
 export interface RmqMsgNamespace<MsgType> {
-  getInvalidFormatError(...args): RmqMsgFormatError,
-  isValidMsgFormat(data: any): data is MsgType,
-  checkMsgFormat(data: any): void
+  getInvalidFormatError(...args): RmqMsgFormatError;
+  isValidMsgFormat(data: any): data is MsgType;
+  checkMsgFormat(data: any): void;
 }
 
 export enum RascalPublications {
@@ -50,7 +49,7 @@ export enum RascalPublications {
   ChainEventNotifications = 'ChainEventNotificationsPublication',
   ChainEventTypeCUDMain = 'ChainEventTypeCUDMainPublication',
   SnapshotProposalNotifications = 'SnapshotProposalNotificationsPublication',
-  SnapshotListener = 'SnapshotListenerPublication'
+  SnapshotListener = 'SnapshotListenerPublication',
 }
 
 export enum RascalSubscriptions {
@@ -68,7 +67,7 @@ export enum RascalExchanges {
   CUD = 'CreateUpdateDeleteExchange',
   Notifications = 'NotificationsExchange',
   SnapshotListener = 'SnapshotListenerExchange',
-  DeadLetter = 'DeadLetterExchange'
+  DeadLetter = 'DeadLetterExchange',
 }
 
 export enum RascalQueues {
@@ -90,7 +89,7 @@ export enum RascalBindings {
   ChainEventType = 'ChainEventTypeBinding',
   SnapshotProposalNotifications = 'SnapshotProposalNotificationsBinding',
   SnapshotListener = 'SnapshotListenerBinding',
-  DeadLetter = 'DeadLetterBinding'
+  DeadLetter = 'DeadLetterBinding',
 }
 
 export enum RascalRoutingKeys {
@@ -101,6 +100,5 @@ export enum RascalRoutingKeys {
   ChainEventTypeCUD = 'ChainEventTypeCUD',
   SnapshotProposalNotifications = 'SnapshotProposalNotifications',
   SnapshotListener = 'SnapshotListener',
-  DeadLetter = 'DeadLetter'
+  DeadLetter = 'DeadLetter',
 }
-

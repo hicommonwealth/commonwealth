@@ -1,33 +1,31 @@
-import moment from 'moment';
-import BN from 'bn.js';
-import Web3 from 'web3';
-import $ from 'jquery';
-import bs58 from 'bs58';
-import { AaveTypes } from 'chain-events/src';
-import { ProposalType } from 'common-common/src/types';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import { formatNumberLong } from 'adapters/currency';
+import BN from 'bn.js';
+import bs58 from 'bs58';
+import { AaveTypes } from 'chain-events/src/types';
+import { ProposalType } from 'common-common/src/types';
+import { blocknumToTime } from 'helpers';
+import $ from 'jquery';
 
-import {
-  Proposal,
-  IVote,
-  ITXModalData,
-  VotingType,
-  VotingUnit,
-  ProposalStatus,
-  ProposalEndTime,
+import type {
   ChainEntity,
   ChainEvent,
+  ITXModalData,
+  IVote,
+  ProposalEndTime,
 } from 'models';
-import { blocknumToTime } from 'helpers';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import moment from 'moment';
+import Web3 from 'web3';
+import type EthereumAccount from '../account';
+import type EthereumAccounts from '../accounts';
+import { attachSigner } from '../contractApi';
 
-import AaveAPI, { AaveExecutor } from './api';
-import AaveGovernance from './governance';
-import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
-import AaveChain from './chain';
-import EthereumAccounts from '../accounts';
-import EthereumAccount from '../account';
+import type AaveAPI from './api';
+import type { AaveExecutor } from './api';
+import type AaveChain from './chain';
+import type AaveGovernance from './governance';
 
 export class AaveProposalVote implements IVote<EthereumCoin> {
   public readonly account: EthereumAccount;
@@ -103,9 +101,11 @@ export default class AaveProposal extends Proposal<
   public get shortIdentifier() {
     return `#${this.identifier.toString()}`;
   }
+
   public get title(): string {
     return this._ipfsData?.title || `Proposal #${this.data.identifier}`;
   }
+
   public get description(): string {
     return this._ipfsData?.description || '';
   }
@@ -138,6 +138,7 @@ export default class AaveProposal extends Proposal<
   public get votingType() {
     return VotingType.ConvictionYesNoVoting;
   }
+
   public get votingUnit() {
     return VotingUnit.PowerVote;
   }
@@ -293,7 +294,7 @@ export default class AaveProposal extends Proposal<
           throw new Error('Invalid IPFS data format');
         }
       })
-      .catch((e) =>
+      .catch(() =>
         console.error(`Failed to fetch ipfs data for ${this._ipfsAddress}`)
       );
 
@@ -392,6 +393,7 @@ export default class AaveProposal extends Proposal<
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public canVoteFrom(account: EthereumAccount) {
     // TODO
     // We need to check the delegate of account to perform voting checks. Delegates must

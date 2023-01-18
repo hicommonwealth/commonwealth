@@ -8,7 +8,6 @@ import {
 const base_permission = BigInt(0);
 
 describe('addPermission() unit tests', () => {
-
   it('should correctly add permission to a role', () => {
     let base = base_permission;
     base = addPermission(base, Action.CREATE_THREAD);
@@ -30,7 +29,6 @@ describe('addPermission() unit tests', () => {
 });
 
 describe('removePermission() unit tests', () => {
-
   it('should correctly add and remove permission to a role', () => {
     let base = base_permission;
     base = addPermission(base, Action.CREATE_THREAD);

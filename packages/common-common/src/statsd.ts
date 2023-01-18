@@ -1,8 +1,8 @@
 import { StatsD } from 'hot-shots';
 
 export enum ProjectTag {
-  Commonwealth = "commonwealth",
-  TokenBalanceCache = "token-balance-cache",
+  Commonwealth = 'commonwealth',
+  TokenBalanceCache = 'token-balance-cache',
 }
 
 export class StatsDController {
@@ -15,7 +15,7 @@ export class StatsDController {
       globalTags: { env: process.env.NODE_ENV || 'development' },
       errorHandler: (error) => {
         console.error(`Caught statsd socket error: ${error}`);
-      }
+      },
     });
   }
 

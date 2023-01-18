@@ -1,6 +1,6 @@
 import { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
-import { ERC20Votes } from 'common-common/src/eth/types';
+import type { ERC20Votes } from 'common-common/src/eth/types';
 import { ContractType } from 'common-common/src/types';
 import { BigNumber } from 'ethers';
 import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
@@ -16,7 +16,7 @@ export default class CompoundChain extends EthereumChain {
 
   public coins(n: number, inDollars?: boolean) {
     return new EthereumCoin(
-      this.app?.chain?.meta.defaultSymbol || '???',
+      this.app?.chain?.meta.default_symbol || '???',
       n,
       inDollars
     );

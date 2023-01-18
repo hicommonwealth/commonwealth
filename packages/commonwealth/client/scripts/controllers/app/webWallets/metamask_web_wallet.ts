@@ -1,13 +1,16 @@
 import detectEthereumProvider from '@metamask/detect-provider';
+declare let window: any;
+
+import { constructTypedCanvasMessage } from 'adapters/chain/ethereum/keys';
+import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
+import { setActiveAccount } from 'controllers/app/login';
+import $ from 'jquery';
+import type { Account, BlockInfo, IWebWallet, NodeInfo } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';
-import $ from 'jquery';
-import { provider } from 'web3-core';
+import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
-import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet, BlockInfo, NodeInfo } from 'models';
-import { setActiveAccount } from 'controllers/app/login';
-import { constructTypedMessage } from 'adapters/chain/ethereum/keys';
 
 class MetamaskWebWalletController implements IWebWallet<string> {
   // GETTERS/SETTERS
@@ -47,7 +50,14 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return this._node;
   }
 
-  public async getRecentBlock(): Promise<BlockInfo> {
+  public getChainId() {
+    // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
+    // and node? because the chain might not have a node provided
+    return app.chain?.meta.node?.ethChainId || 1;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  public async getRecentBlock(chainIdentifier: string): Promise<BlockInfo> {
     const block = await this._web3.givenProvider.request({
       method: 'eth_getBlockByNumber',
       params: ['latest', false],
@@ -60,43 +70,16 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     };
   }
 
-  public async signMessage(message: string): Promise<string> {
-    const signature = await this._web3.eth.sign(
-      this._web3.utils.sha3(message),
-      this.accounts[0]
-    );
-    return signature;
-  }
-
-  public async signLoginToken(validationBlockInfo: string): Promise<string> {
-    const sessionPublicAddress = app.sessions.getOrCreateAddress(
-      app.chain?.meta.node.ethChainId || 1
-    );
-    const msgParams = await constructTypedMessage(
-      this.accounts[0],
-      app.chain?.meta.node.ethChainId || 1,
-      sessionPublicAddress,
-      validationBlockInfo
-    );
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
+    const typedCanvasMessage = await constructTypedCanvasMessage(canvasMessage);
     const signature = await this._web3.givenProvider.request({
       method: 'eth_signTypedData_v4',
-      params: [this._accounts[0], JSON.stringify(msgParams)],
+      params: [account.address, JSON.stringify(typedCanvasMessage)],
     });
     return signature;
-  }
-
-  public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(
-      account.validationBlockInfo
-    );
-    return webWalletSignature;
-  }
-
-  public async validateWithAccount(
-    account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
   }
 
   // ACTIONS
@@ -111,7 +94,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     console.log('Attempting to enable Metamask');
     try {
       // default to ETH
-      const chainId = this._node.ethChainId || 1;
+      const chainId = await this.getChainId();
 
       // ensure we're on the correct chain
       this._provider = await detectEthereumProvider({ mustBeMetaMask: true });

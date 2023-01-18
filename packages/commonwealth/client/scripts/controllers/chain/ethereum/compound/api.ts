@@ -1,17 +1,20 @@
-import {
-  GovernorCompatibilityBravo,
-  GovernorCompatibilityBravo__factory,
-  GovernorAlpha,
-  GovernorAlpha__factory,
-  MPond,
+import type { ExternalProvider } from '@ethersproject/providers';
+import { Web3Provider } from '@ethersproject/providers';
+import type {
   ERC20VotesComp,
-  MPond__factory,
-  ERC20VotesComp__factory,
+  GovernorAlpha,
+  GovernorCompatibilityBravo,
+  MPond,
 } from 'common-common/src/eth/types';
-import { Web3Provider, ExternalProvider } from '@ethersproject/providers';
-import { utils } from 'ethers';
+import {
+  ERC20VotesComp__factory,
+  GovernorAlpha__factory,
+  GovernorCompatibilityBravo__factory,
+  MPond__factory,
+} from 'common-common/src/eth/types';
 
-import ContractApi from 'controllers/chain/ethereum/commonwealth/contractApi';
+import type ContractApi from 'controllers/chain/ethereum/contractApi';
+import { utils } from 'ethers';
 
 export enum GovernorType {
   Alpha,
@@ -55,6 +58,7 @@ export default class CompoundAPI
   ): c is GovernorAlpha {
     return this._govType === GovernorType.Alpha;
   }
+
   public isTokenMPond(t: MPond | ERC20VotesComp | undefined): t is MPond {
     return this._tokenType === GovernorTokenType.MPondToken;
   }
@@ -70,7 +74,7 @@ export default class CompoundAPI
     this.Provider.pollingInterval = 12000;
   }
 
-  public async init(tokenName: string) {
+  public async init(tokenName: string): Promise<void> {
     // only Alpha has a guardian -- use to distinguish between types of governance contract
     try {
       this._Contract = GovernorAlpha__factory.connect(

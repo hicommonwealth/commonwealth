@@ -1,7 +1,8 @@
 import chai from 'chai';
 
 import { SupportedNetwork } from '../../../src';
-import { EventKind, RawEvent, Api } from '../../../src/chains/moloch/types';
+import type { RawEvent, Api } from '../../../src/chains/moloch/types';
+import { EventKind } from '../../../src/chains/moloch/types';
 import { Enrich } from '../../../src/chains/moloch/filters/enricher';
 
 const { assert } = chai;
@@ -13,7 +14,7 @@ const constructEvent = (data): RawEvent => {
 };
 
 const blockNumber = 10000;
-const api: Api = ({
+const api: Api = {
   proposalQueue: async () => ({
     startingPeriod: '1',
     details: 'hello',
@@ -28,7 +29,7 @@ const api: Api = ({
     exists: true,
     highestIndexYesVote: 1,
   }),
-} as unknown) as Api;
+} as unknown as Api;
 
 const toHex = (n: number | string) => ({ _hex: `0x${n.toString(16)}` });
 

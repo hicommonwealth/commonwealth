@@ -1,15 +1,15 @@
-import BN from 'bn.js';
-import app, { IApp } from 'state';
-
 import { MolochShares } from 'adapters/chain/ethereum/types';
-import { IMolochMember } from 'adapters/chain/moloch/types';
-
-import EthereumAccounts from 'controllers/chain/ethereum/accounts';
+import type { IMolochMember } from 'adapters/chain/moloch/types';
+import BN from 'bn.js';
 import EthereumAccount from 'controllers/chain/ethereum/account';
-import EthereumChain from 'controllers/chain/ethereum/chain';
 
-import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
-import MolochMembers from './members';
+import type EthereumAccounts from 'controllers/chain/ethereum/accounts';
+import type EthereumChain from 'controllers/chain/ethereum/chain';
+import type { IApp } from 'state';
+import app from 'state';
+import { attachSigner } from '../contractApi';
+
+import type MolochMembers from './members';
 
 export default class MolochMember extends EthereumAccount {
   private _isMember: boolean;
@@ -33,12 +33,15 @@ export default class MolochMember extends EthereumAccount {
   public get isMember() {
     return this._isMember;
   }
+
   public get delegateKey() {
     return this._delegateKey;
   }
+
   public get shares() {
     return this._shares;
   }
+
   public get highestIndexYesVote() {
     return this._highestIndexYesVote;
   }
@@ -68,7 +71,7 @@ export default class MolochMember extends EthereumAccount {
         : null;
       this._initialized = Promise.resolve(true);
     } else {
-      this._initialized = new Promise((resolve, reject) => {
+      this._initialized = new Promise((resolve) => {
         this.refresh().then(() => resolve(true));
       });
     }

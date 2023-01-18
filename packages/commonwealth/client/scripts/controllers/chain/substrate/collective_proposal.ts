@@ -1,33 +1,29 @@
-import _ from 'underscore';
+import type { ApiPromise } from '@polkadot/api';
+import type { Option } from '@polkadot/types';
+import type { Votes } from '@polkadot/types/interfaces';
 
-import { SubstrateTypes } from 'chain-events/src';
-import { ApiPromise } from '@polkadot/api';
-import { Votes } from '@polkadot/types/interfaces';
-import { Option } from '@polkadot/types';
-
-import {
+import type {
   ISubstrateCollectiveProposal,
   SubstrateCoin,
-  formatCall,
 } from 'adapters/chain/substrate/types';
+import { formatCall } from 'adapters/chain/substrate/types';
+import { SubstrateTypes } from 'chain-events/src/types';
+import { ProposalType } from 'common-common/src/types';
+import type { ChainEntity, ChainEvent, ProposalEndTime } from 'models';
 import {
+  BinaryVote,
   Proposal,
   ProposalStatus,
-  ProposalEndTime,
-  BinaryVote,
   VotingType,
   VotingUnit,
-  ChainEntity,
-  ChainEvent,
 } from 'models';
-import { ProposalType } from 'common-common/src/types';
-import { chainEntityTypeToProposalSlug } from 'identifiers';
+import type SubstrateAccounts from './account';
+import type { SubstrateAccount } from './account';
+import type Substrate from './adapter';
+import type SubstrateCollective from './collective';
+import type { SubstrateDemocracyReferendum } from './democracy_referendum';
 
-import SubstrateChain from './shared';
-import SubstrateAccounts, { SubstrateAccount } from './account';
-import SubstrateCollective from './collective';
-import { SubstrateDemocracyReferendum } from './democracy_referendum';
-import Substrate from './adapter';
+import type SubstrateChain from './shared';
 
 export class SubstrateCollectiveVote extends BinaryVote<SubstrateCoin> {
   constructor(
@@ -59,12 +55,15 @@ export class SubstrateCollectiveProposal extends Proposal<
   public get shortIdentifier() {
     return `#${this.data.index.toString()}`;
   }
+
   public get description() {
     return null;
   }
+
   public get author() {
     return null;
   }
+
   public get call() {
     return this._call;
   }
@@ -73,13 +72,15 @@ export class SubstrateCollectiveProposal extends Proposal<
   public canVoteFrom(account: SubstrateAccount) {
     return this._Collective.isMember(account);
   }
+
   public title: string;
   private readonly _call;
-  private _approved: boolean = false;
+  private _approved = false;
 
   private _Chain: SubstrateChain;
   private _Accounts: SubstrateAccounts;
   private _Collective: SubstrateCollective;
+
   public get collectiveName(): string {
     return this._Collective.moduleName;
   }
@@ -247,9 +248,11 @@ export class SubstrateCollectiveProposal extends Proposal<
   public get votingType() {
     return VotingType.SimpleYesNoVoting;
   }
+
   public get votingUnit() {
     return VotingUnit.OnePersonOneVote;
   }
+
   get isPassing() {
     if (this.completed) {
       return this._approved ? ProposalStatus.Passed : ProposalStatus.Failed;
@@ -258,6 +261,7 @@ export class SubstrateCollectiveProposal extends Proposal<
       ? ProposalStatus.Passing
       : ProposalStatus.Failing;
   }
+
   get endTime(): ProposalEndTime {
     return { kind: 'threshold', threshold: this.data.threshold };
   }
@@ -268,6 +272,7 @@ export class SubstrateCollectiveProposal extends Proposal<
       : this.accountsVotedYes.length /
           (this.accountsVotedYes.length + this.accountsVotedNo.length);
   }
+
   public get turnout() {
     return this._Collective.members.length === 0
       ? 0
@@ -278,11 +283,13 @@ export class SubstrateCollectiveProposal extends Proposal<
   get approved() {
     return this._approved;
   }
+
   public get accountsVotedYes() {
     return this.getVotes()
       .filter((vote) => vote.choice === true)
       .map((vote) => vote.account);
   }
+
   public get accountsVotedNo() {
     return this.getVotes()
       .filter((vote) => vote.choice === false)
@@ -349,6 +356,7 @@ export class SubstrateCollectiveProposal extends Proposal<
       },
     ];
   }
+
   public submitVoteTx(vote: BinaryVote<SubstrateCoin>, cb?) {
     // TODO: check council status
     return this._Chain.createTXModalData(

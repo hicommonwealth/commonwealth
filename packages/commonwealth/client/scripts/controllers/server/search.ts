@@ -1,10 +1,12 @@
 import $ from 'jquery';
 import moment from 'moment';
-import SearchStore from 'stores/SearchStore';
 import app from 'state';
+import SearchStore from 'stores/SearchStore';
 import { SearchContentType } from 'types';
-import { SearchScope, SearchParams } from '../../models/SearchQuery';
-import { Thread, SearchQuery } from '../../models';
+import type { Thread } from '../../models';
+import { SearchQuery } from '../../models';
+import type { SearchParams } from '../../models/SearchQuery';
+import { SearchScope } from '../../models/SearchQuery';
 import { modelFromServer } from './threads';
 
 const SEARCH_PREVIEW_SIZE = 6;
@@ -14,6 +16,7 @@ const SEARCH_HISTORY_SIZE = 10;
 
 class SearchController {
   private _store: SearchStore = new SearchStore();
+
   public store() {
     return this._store;
   }

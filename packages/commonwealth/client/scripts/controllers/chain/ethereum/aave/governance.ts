@@ -1,15 +1,18 @@
-import { ProposalModule, ITXModalData } from 'models';
-import { IApp } from 'state';
-import { IAaveProposalResponse } from 'adapters/chain/aave/types';
-import { AaveEvents, AaveTypes } from 'chain-events/src';
-import { Executor } from 'common-common/src/eth/types';
+import type { IAaveProposalResponse } from 'adapters/chain/aave/types';
+import { AaveEvents } from 'chain-events/src';
+import { AaveTypes } from 'chain-events/src/types';
+import type { Executor } from 'common-common/src/eth/types';
 import { chainToEventNetwork } from 'controllers/server/chain_entities';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+import type { IApp } from 'state';
+import type EthereumAccounts from '../accounts';
+import { attachSigner } from '../contractApi';
+import type AaveApi from './api';
+import type AaveChain from './chain';
 
 import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import AaveProposal from './proposal';
-import AaveChain from './chain';
-import AaveApi from './api';
-import EthereumAccounts from '../accounts';
 
 export interface AaveProposalArgs {
   executor: Executor | string;
@@ -127,7 +130,9 @@ export default class AaveGovernance extends ProposalModule<
     // load server proposals
     console.log('Fetching aave proposals from backend.');
     await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.store.getByType(AaveTypes.EntityKind.Proposal);
+    const entities = this.app.chainEntities.store.getByType(
+      AaveTypes.EntityKind.Proposal
+    );
     entities.forEach((e) => this._entityConstructor(e));
     console.log(`Found ${entities.length} proposals!`);
 
@@ -135,7 +140,8 @@ export default class AaveGovernance extends ProposalModule<
 
     // register new chain-event handlers
     this.app.chainEntities.registerEntityHandler(
-      AaveTypes.EntityKind.Proposal, (entity, event) => {
+      AaveTypes.EntityKind.Proposal,
+      (entity, event) => {
         this.updateProposal(entity, event);
       }
     );
@@ -164,6 +170,7 @@ export default class AaveGovernance extends ProposalModule<
     this.store.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args: any[]): ITXModalData {
     throw new Error('Method not implemented.');
   }

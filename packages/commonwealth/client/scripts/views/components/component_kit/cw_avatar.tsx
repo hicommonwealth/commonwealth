@@ -1,10 +1,10 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import jdenticon from 'jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';
+import jdenticon from 'jdenticon';
+import m from 'mithril';
 
 import { ComponentType } from './types';
 

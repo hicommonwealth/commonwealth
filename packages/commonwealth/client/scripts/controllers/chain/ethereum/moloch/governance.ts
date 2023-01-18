@@ -1,19 +1,20 @@
+import type { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 import BN from 'bn.js';
-
-import { ProposalModule, ITXModalData } from 'models';
-
-import { IMolochProposalResponse } from 'adapters/chain/moloch/types';
 
 import { MolochEvents } from 'chain-events/src';
 
-import { IApp } from 'state';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+
+import type { IApp } from 'state';
+import { attachSigner } from '../contractApi';
+import type MolochAPI from './api';
+import type MolochChain from './chain';
+import type MolochMember from './member';
+import type MolochMembers from './members';
 
 import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
 import MolochProposal from './proposal';
-import MolochMembers from './members';
-import MolochAPI from './api';
-import MolochMember from './member';
-import MolochChain from './chain';
 
 export default class MolochGovernance extends ProposalModule<
   MolochAPI,
@@ -39,33 +40,43 @@ export default class MolochGovernance extends ProposalModule<
   public get proposalCount() {
     return this._proposalCount;
   }
+
   public get proposalDeposit() {
     return this._proposalDeposit;
   }
+
   public get gracePeriod() {
     return this._gracePeriod;
   }
+
   public get summoningTime() {
     return this._summoningTime;
   }
+
   public get votingPeriodLength() {
     return this._votingPeriodLength;
   }
+
   public get periodDuration() {
     return this._periodDuration;
   }
+
   public get abortWindow() {
     return this._abortWindow;
   }
+
   public get totalShares() {
     return this._totalShares;
   }
+
   public get totalSharesRequested() {
     return this._totalSharesRequested;
   }
+
   public get guildbank() {
     return this._guildBank;
   }
+
   public get currentPeriod() {
     return (
       (Date.now() / 1000 - this.summoningTime.toNumber()) /
@@ -73,7 +84,9 @@ export default class MolochGovernance extends ProposalModule<
     );
   }
 
-  public get api() { return this._api; }
+  public get api() {
+    return this._api;
+  }
 
   // INIT / DEINIT
   constructor(app: IApp) {
@@ -122,7 +135,9 @@ export default class MolochGovernance extends ProposalModule<
     // fetch all proposals
     console.log('Fetching moloch proposals from backend.');
     await this.app.chainEntities.refresh(this.app.chain.id);
-    const entities = this.app.chainEntities.store.getByType(MolochEvents.Types.EntityKind.Proposal);
+    const entities = this.app.chainEntities.store.getByType(
+      MolochEvents.Types.EntityKind.Proposal
+    );
     entities.map((p) => this._entityConstructor(p));
     this._proposalCount = new BN(this.store.getAll().length);
     this._initialized = true;
@@ -132,6 +147,7 @@ export default class MolochGovernance extends ProposalModule<
     this.store.clear();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public createTx(...args: any[]): ITXModalData {
     throw new Error('Method not implemented.');
   }

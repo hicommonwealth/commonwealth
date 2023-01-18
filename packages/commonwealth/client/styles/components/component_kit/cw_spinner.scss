@@ -1,4 +1,4 @@
-@import 'shared';
+@import '../../shared';
 
 .Spinner {
   animation: loading-spinner 0.9s ease-in-out infinite;
@@ -7,13 +7,13 @@
 
   @keyframes loading-spinner {
     0% {
-      transform: translate(-6px,0);
+      transform: translate(-6px, 0);
     }
     50% {
-      transform: translate(6px,0);
+      transform: translate(6px, 0);
     }
     100% {
-      transform: translate(-6px,0);
+      transform: translate(-6px, 0);
     }
   }
 }

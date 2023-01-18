@@ -1,25 +1,23 @@
-import { BrokerConfig } from 'rascal';
-import {
-  RabbitMQSubscription,
-  ServiceConsumer,
-} from 'common-common/src/serviceConsumer';
-import EventStorageHandler from './ChainEventHandlers/storage';
-import NotificationsHandler from './ChainEventHandlers/notification';
-import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
+import type { BrokerConfig } from 'rascal';
+import type { RabbitMQSubscription } from 'common-common/src/serviceConsumer';
+import { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import { factory, formatFilename } from 'common-common/src/logging';
 import {
   RabbitMQController,
   getRabbitMQConfig,
   RascalSubscriptions,
 } from 'common-common/src/rabbitmq';
+import Rollbar from 'rollbar';
+import { SubstrateTypes } from 'chain-events/src/types';
+
 import models from '../database/database';
 import { RABBITMQ_URI, ROLLBAR_SERVER_TOKEN } from '../config';
-import {
-  Ithis as ChainEventsProcessorContextType,
-  processChainEvents,
-} from './MessageProcessors/ChainEventsQueue';
-import { SubstrateTypes } from '../../src';
-import Rollbar from 'rollbar';
+
+import EventStorageHandler from './ChainEventHandlers/storage';
+import NotificationsHandler from './ChainEventHandlers/notification';
+import EntityArchivalHandler from './ChainEventHandlers/entityArchival';
+import type { Ithis as ChainEventsProcessorContextType } from './MessageProcessors/ChainEventsQueue';
+import { processChainEvents } from './MessageProcessors/ChainEventsQueue';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -29,7 +27,7 @@ const log = factory.getLogger(formatFilename(__filename));
  * subscriptions. The function also runs RepublishMessages which periodically republishes data stored in the database
  * that was previously unsuccessfully published.
  */
-export async function setupChainEventConsumer() {
+export async function setupChainEventConsumer(): Promise<ServiceConsumer> {
   let rollbar;
   if (ROLLBAR_SERVER_TOKEN) {
     rollbar = new Rollbar({
@@ -88,7 +86,7 @@ export async function setupChainEventConsumer() {
     msgProcessorContext: chainEventsProcessorContext,
   };
 
-  let subscriptions: RabbitMQSubscription[] = [chainEventsProcessorRmqSub];
+  const subscriptions: RabbitMQSubscription[] = [chainEventsProcessorRmqSub];
 
   const serviceConsumer = new ServiceConsumer(
     'ChainEventsConsumer',

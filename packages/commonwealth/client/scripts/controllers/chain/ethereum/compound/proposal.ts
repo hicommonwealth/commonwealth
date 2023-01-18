@@ -1,34 +1,34 @@
-import moment from 'moment';
+import type { ICompoundProposalResponse } from 'adapters/chain/compound/types';
+
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import BN from 'bn.js';
-import { capitalize } from 'lodash';
-import { ContractTransaction, utils } from 'ethers';
-import { GovernorCompatibilityBravo, GovernorMock, GovernorMock__factory } from 'common-common/src/eth/types';
 
-import { CompoundTypes } from 'chain-events/src';
+import { CompoundTypes } from 'chain-events/src/types';
+import type { GovernorCompatibilityBravo } from 'common-common/src/eth/types';
+import { GovernorMock__factory } from 'common-common/src/eth/types';
 import { ProposalType } from 'common-common/src/types';
+import type { ContractTransaction } from 'ethers';
+import { utils } from 'ethers';
+import { blocknumToTime } from 'helpers';
+import { capitalize } from 'lodash';
 
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import { ICompoundProposalResponse } from 'adapters/chain/compound/types';
-
-import {
-  Proposal,
-  IVote,
-  ITXModalData,
-  VotingType,
-  VotingUnit,
-  ProposalStatus,
-  ProposalEndTime,
+import type {
   ChainEntity,
   ChainEvent,
+  ITXModalData,
+  IVote,
+  ProposalEndTime,
 } from 'models';
-import { blocknumToTime } from 'helpers';
+import { Proposal, ProposalStatus, VotingType, VotingUnit } from 'models';
+import moment from 'moment';
+import type EthereumAccount from '../account';
+import type EthereumAccounts from '../accounts';
+import { attachSigner } from '../contractApi';
 
-import { attachSigner } from 'controllers/chain/ethereum/commonwealth/contractApi';
-import CompoundAPI, { GovernorType } from './api';
-import CompoundGovernance from './governance';
-import EthereumAccount from '../account';
-import EthereumAccounts from '../accounts';
-import CompoundChain from './chain';
+import type CompoundAPI from './api';
+import { GovernorType } from './api';
+import type CompoundChain from './chain';
+import type CompoundGovernance from './governance';
 
 export enum BravoVote {
   NO = 0,
@@ -90,6 +90,7 @@ export default class CompoundProposal extends Proposal<
       this.data.identifier
     }`;
   }
+
   public get title(): string {
     try {
       const parsed = JSON.parse(this.data.description);
@@ -107,6 +108,7 @@ export default class CompoundProposal extends Proposal<
       }
     }
   }
+
   public get description(): string {
     try {
       const parsed = JSON.parse(this.data.description);
@@ -168,6 +170,7 @@ export default class CompoundProposal extends Proposal<
       ? VotingType.CompoundYesNoAbstain
       : VotingType.CompoundYesNo;
   }
+
   public get votingUnit() {
     return VotingUnit.CoinVote;
   }
@@ -175,6 +178,7 @@ export default class CompoundProposal extends Proposal<
   public get startingPeriod() {
     return +this.data.startBlock;
   }
+
   public get votingPeriodEnd() {
     return this.startingPeriod + +this._Gov.votingPeriod;
   }
@@ -359,6 +363,7 @@ export default class CompoundProposal extends Proposal<
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public canVoteFrom(account: EthereumAccount) {
     // We need to check the delegate of account to perform voting checks. Delegates must
     // be fetched from chain, which requires async calls, making this impossible to implement.

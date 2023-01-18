@@ -25,5 +25,5 @@ module.exports = {
         type: 'RAW',
       }
     );
-  }
+  },
 };

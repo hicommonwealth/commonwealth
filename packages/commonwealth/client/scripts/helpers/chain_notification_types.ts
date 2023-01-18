@@ -33,15 +33,10 @@ export const EdgewareChainNotificationTypes = {
     'edgeware-treasury-proposed',
     'edgeware-treasury-rejected',
     'edgeware-treasury-reward-minting',
-    'edgeware-treasury-reward-minting-v2'
+    'edgeware-treasury-reward-minting-v2',
   ],
-  Validator: [
-    'edgeware-reward',
-    'edgeware-slash',
-  ],
-  VotingDelegation: [
-    'edgeware-vote-delegated',
-  ],
+  Validator: ['edgeware-reward', 'edgeware-slash'],
+  VotingDelegation: ['edgeware-vote-delegated'],
 };
 
 export const PolkadotChainNotificationTypes = {
@@ -79,13 +74,8 @@ export const PolkadotChainNotificationTypes = {
     'polkadot-treasury-proposed',
     'polkadot-treasury-rejected',
   ],
-  Validator: [
-    'polkadot-reward',
-    'polkadot-slash',
-  ],
-  VotingDelegation: [
-    'polkadot-vote-delegated',
-  ],
+  Validator: ['polkadot-reward', 'polkadot-slash'],
+  VotingDelegation: ['polkadot-vote-delegated'],
 };
 
 export const KusamaChainNotificationTypes = {
@@ -123,13 +113,8 @@ export const KusamaChainNotificationTypes = {
     'kusama-treasury-proposed',
     'kusama-treasury-rejected',
   ],
-  Validator: [
-    'kusama-reward',
-    'kusama-slash',
-  ],
-  VotingDelegation: [
-    'kusama-vote-delegated',
-  ],
+  Validator: ['kusama-reward', 'kusama-slash'],
+  VotingDelegation: ['kusama-vote-delegated'],
 };
 
 export const KulupuChainNotificationTypes = {
@@ -167,13 +152,8 @@ export const KulupuChainNotificationTypes = {
     'kulupu-treasury-proposed',
     'kulupu-treasury-rejected',
   ],
-  Validator: [
-    'kulupu-reward',
-    'kulupu-slash',
-  ],
-  VotingDelegation: [
-    'kulupu-vote-delegated',
-  ],
+  Validator: ['kulupu-reward', 'kulupu-slash'],
+  VotingDelegation: ['kulupu-vote-delegated'],
 };
 
 export const DydxChainNotificationTypes = {
@@ -189,7 +169,7 @@ export const DydxChainNotificationTypes = {
     'delegated-power-changed',
     'transfer',
     'approval',
-  ]
+  ],
 };
 
 export const AaveChainNotificationTypes = {
@@ -205,5 +185,5 @@ export const AaveChainNotificationTypes = {
     'delegated-power-changed',
     'transfer',
     'approval',
-  ]
+  ],
 };

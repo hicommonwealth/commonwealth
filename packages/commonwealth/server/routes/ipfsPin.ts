@@ -1,10 +1,10 @@
-import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from 'common-common/src/errors';
 import axios from 'axios';
+import { AppError, ServerError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
 import FormData from 'form-data';
-import { DB } from '../models';
-import { TypedRequestBody, TypedResponse, success } from '../types';
-import lookupAddressIsOwnedByUser from '../middleware/lookupAddressIsOwnedByUser';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
