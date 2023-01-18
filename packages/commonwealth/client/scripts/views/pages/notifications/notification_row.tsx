@@ -96,7 +96,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       return (
         <div
-          onclick={navigateToSubpage(`/notifications?id=${notification.id}`)}
+          onclick={() => navigateToSubpage(`/notifications?id=${notification.id}`)}
         >
           <div class="comment-body">
             <div class="comment-body-top chain-event-notification-top">
@@ -162,7 +162,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       //   route,
 
       return (
-        <div onclick={navigateToSubpage(route)}>
+        <div onclick={() => navigateToSubpage(route)}>
           {m(User, {
             user: author,
             avatarOnly: true,
@@ -251,7 +251,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       //   path.replace(/ /g, '%20'),
 
       return (
-        <div onclick={navigateToSubpage(path.replace(/ /g, '%20'))}>
+        <div onclick={() => navigateToSubpage(path.replace(/ /g, '%20'))}>
           {authorInfo.length === 1
             ? m(User, {
                 user: new AddressInfo(
