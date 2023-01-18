@@ -1,10 +1,11 @@
-import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError } from 'common-common/src/errors';
+import { factory, formatFilename } from 'common-common/src/logging';
+import { Op } from 'sequelize';
+import { DB } from '../models';
 import { AddressAttributes } from '../models/address';
 import { CommentAttributes } from '../models/comment';
 import { ThreadAttributes } from '../models/thread';
 import { success, TypedRequestQuery, TypedResponse } from '../types';
-import { DB } from '../models';
 
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -36,16 +37,9 @@ const getProfile = async (
       address,
       chain,
     },
-    include: [ models.OffchainProfile, ],
+    include: [models.OffchainProfile,],
   });
   if (!addressModel) throw new AppError(Errors.NoAddressFound);
-
-  const threads = await models.Thread.findAll({
-    where: {
-      address_id: addressModel.id,
-    },
-    include: [ { model: models.Address, as: 'Address' } ],
-  });
 
   const comments = await models.Comment.findAll({
     where: {
@@ -53,11 +47,21 @@ const getProfile = async (
     },
   });
 
+  const threads = await models.Thread.findAll({
+    where: {
+      [Op.or]: [{
+        id: { [Op.in]: comments.map(c => c.root_id.split('_')[1]) },
+        address_id: addressModel.id
+      }]
+    },
+    include: [{ model: models.Address, as: 'Address' }],
+  });
+
   return success(res, {
     account: addressModel.toJSON(),
     threads: threads.map((t) => t.toJSON()),
     comments: comments.map((c) => c.toJSON())
-  })
+  });
 };
 
 export default getProfile;
