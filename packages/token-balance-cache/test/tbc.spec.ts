@@ -120,4 +120,32 @@ describe('TBC unit tests', () => {
     });
     tbc.close();
   });
+
+  it('should return token balances for erc1155 token id', async () => {
+    const tbc = new TokenBalanceCache(
+      0,
+      0,
+      [new MockBalanceProvider()],
+      mockNodesProvider
+    );
+    await tbc.start();
+    const addresses = ['abcd', '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'];
+    const testBalance = '12345678912345678910';
+    const testTokenId = '123456789'
+    const tokenBalances = await tbc.getBalancesForAddresses(
+      1,
+      addresses,
+      'test-provider',
+      { testBalance, testTokenId }
+    );
+    assert.deepEqual(tokenBalances, {
+      balances: {
+        [addresses[1]]: testBalance,
+      },
+      errors: {
+        [addresses[0]]: 'Invalid address!',
+      },
+    });
+    tbc.close();
+  });
 });
