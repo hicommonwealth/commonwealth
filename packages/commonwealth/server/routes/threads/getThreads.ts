@@ -1,25 +1,30 @@
-import type {
+import Sequelize from 'sequelize';
+import {
   GetThreadsReq,
   GetThreadsResp,
 } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import Sequelize from 'sequelize';
-import type { DB } from '../../models';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { failure, success } from '../../types';
+import {
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+  failure,
+} from '../../types';
+import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
+import { paginationValidation } from '../../util/helperValidations';
 
 const { Op } = Sequelize;
 
 export const getThreadsValidation = [
   query('community_id').isString().trim(),
   query('topic_id').optional().isNumeric(),
-  query('count_only').optional().isBoolean().toBoolean(),
   query('address_ids').optional().toArray(),
   query('addresses').optional().toArray(),
   query('no_body').optional().isBoolean().toBoolean(),
   query('include_comments').optional().isBoolean().toBoolean(),
   query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
 ];
 
 export const getThreads = async (
@@ -67,15 +72,13 @@ export const getThreads = async (
   let threads, count;
   if (!count_only) {
     ({ rows: threads, count } = await models.Thread.findAndCountAll({
-      logging: console.log,
       where,
       include,
       attributes,
       ...pagination,
     }));
   } else {
-    count = <any>await models.Thread.count({
-      logging: console.log,
+    count = await models.Thread.count({
       where,
       include,
       attributes,
