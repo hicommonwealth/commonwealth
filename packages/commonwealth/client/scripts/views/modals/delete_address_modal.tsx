@@ -14,7 +14,6 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
-import { formatAnonymousUsername } from '../../../../shared/utils';
 
 type DeleteAddressModalAttrs = {
   profile: Profile;
@@ -38,7 +37,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
 
       if (response?.status === 'Success') {
         const { name, username } = profile;
-        const displayName = name || formatAnonymousUsername(username);
+        const displayName = name || username;
         setTimeout(() => {
           notifySuccess(`Address has been successfully removed from profile '${displayName}'`);
         }, 1000);
@@ -83,7 +82,7 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
               />
             )}
             <CWText fontWeight="bold">
-              {name || formatAnonymousUsername(username)}
+              {name || username}
             </CWText>
           </div>
           <div className="confirmation">

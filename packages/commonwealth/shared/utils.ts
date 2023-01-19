@@ -330,7 +330,3 @@ export function aggregatePermissions(
   );
   return permission;
 }
-
-export function formatAnonymousUsername(username: string) {
-  return `Anonymous (${username.length > 5 ? username.slice(0, 5).concat('...') : username})`;
-}

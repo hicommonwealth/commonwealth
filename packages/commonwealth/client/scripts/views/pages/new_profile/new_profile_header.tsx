@@ -13,7 +13,6 @@ import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { SocialAccounts } from '../../components/social_accounts';
-import { formatAnonymousUsername } from '../../../../../shared/utils';
 
 type NewProfileHeaderAttrs = {
   profile: Profile;
@@ -63,7 +62,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
         </div>
         <div class="profile-name-and-bio">
           <CWText type="h3" className={name ? 'name hasMargin' : 'name'}>
-            {name || formatAnonymousUsername(username)}
+            {name || username}
           </CWText>
           <div class="buttons">
             {/* TODO: Add delegate and follow buttons */}

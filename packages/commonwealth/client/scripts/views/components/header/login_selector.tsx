@@ -19,7 +19,6 @@ import {
 } from 'controllers/app/login';
 import { addressSwapper } from 'commonwealth/shared/utils';
 import User, { UserBlock } from 'views/components/widgets/user';
-import { EditProfileModal } from 'views/modals/edit_profile_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
 import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
@@ -80,7 +79,8 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             onclick={() => {
               const pf = app.user.activeAccount.profile;
               if (pf) {
-                m.route.set(`/profile/${pf.address}`)
+                // TODO: switch to profile.username once PR4 is merged
+                m.route.set(`/profile/a/${pf.address}`)
               }
             }}
           >
@@ -90,15 +90,12 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         {activeAddressesWithRole.length > 0 && app.activeChainId() && (
           <div
             class="login-menu-item"
-            onclick={(e) => {
-              e.preventDefault();
-              app.modals.create({
-                modal: EditProfileModal,
-                data: {
-                  account: app.user.activeAccount,
-                  refreshCallback: () => m.redraw(),
-                },
-              });
+            onclick={() => {
+              const pf = app.user.activeAccount.profile;
+              if (pf) {
+                // TODO: switch to profile.username once PR4 is merged
+                m.route.set(`/profile/a/${pf.address}/edit`)
+              }
             }}
           >
             <CWText type="caption">Edit profile</CWText>

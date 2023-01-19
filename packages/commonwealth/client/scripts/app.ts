@@ -880,7 +880,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: false,
               hideSidebar: false,
             }),
+            // TODO: remove route when PR4 is merged
+            // should be able to use /profile/:username instead
             '/profile/a/:address': importRoute('views/pages/new_profile_redirect', {
+              scoped: false,
+              hideSidebar: false,
+            }),
+            // TODO: remove route when PR4 is merged
+            // should be able to use /profile/:username/edit instead
+            '/profile/a/:address/edit': importRoute('views/pages/new_profile_redirect', {
               scoped: false,
               hideSidebar: false,
             }),

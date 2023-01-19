@@ -14,7 +14,6 @@ import { CWButton } from '../components/component_kit/cw_button';
 import { CWText } from '../components/component_kit/cw_text';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
 import { CWTruncatedAddress } from '../components/component_kit/cw_truncated_address';
-import { formatAnonymousUsername } from '../../../../shared/utils';
 
 type MoveAddressModalAttrs = {
   profile: Profile;
@@ -44,7 +43,7 @@ export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
           />
         )}
         <CWText type="b2">
-          {name || formatAnonymousUsername(username)}
+          {name || username}
         </CWText>
       </div>
     );
@@ -68,7 +67,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
       });
       if (response?.status === 'Success') {
         const { name, username } = this.selectedProfile;
-        const displayName = name || formatAnonymousUsername(username);
+        const displayName = name || username;
         setTimeout(() => {
           notifySuccess(`Address has been successfully moved to profile '${displayName}'`);
         }, 1000);

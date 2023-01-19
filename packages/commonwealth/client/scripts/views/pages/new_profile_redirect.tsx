@@ -10,6 +10,8 @@ import { NewProfile as Profile } from 'models';
 import { PageLoading } from './loading';
 import { PageNotFound } from './404';
 
+// TODO: this is a temporary solution to redirect old profile links (using address)
+// to new profile links (using username). this should be removed once PR4 is merged
 class NewProfileRedirect extends ClassComponent {
   private profile: Profile;
   private loading: boolean;
@@ -45,7 +47,11 @@ class NewProfileRedirect extends ClassComponent {
     }
 
     if (this.profile) {
-      navigateToSubpage(`/profile/${this.profile.username}`);
+      if (m.route.get().includes('/edit')) {
+        navigateToSubpage(`/profile/${this.profile.username}/edit`);
+      } else {
+        navigateToSubpage(`/profile/${this.profile.username}`);
+      }
     }
   }
 }
