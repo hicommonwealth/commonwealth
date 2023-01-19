@@ -1,8 +1,5 @@
 import Sequelize from 'sequelize';
-import {
-  GetCommentsReq,
-  GetCommentsResp,
-} from 'common-common/src/api/extApiTypes';
+import { GetRolesReq, GetRolesResp } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
 import {
   TypedRequestQuery,
@@ -16,17 +13,17 @@ import { paginationValidation } from '../../util/helperValidations';
 
 const { Op } = Sequelize;
 
-export const getCommentsValidation = [
+export const getRolesValidation = [
   query('community_id').isString().trim(),
   query('addresses').optional().toArray(),
   query('count_only').optional().isBoolean().toBoolean(),
   ...paginationValidation,
 ];
 
-export const getComments = async (
+export const getRoles = async (
   models: DB,
-  req: TypedRequestQuery<GetCommentsReq>,
-  res: TypedResponse<GetCommentsResp>
+  req: TypedRequestQuery<GetRolesReq>,
+  res: TypedResponse<GetRolesResp>
 ) => {
   const errors = validationResult(req).array();
   if (errors.length !== 0) {
@@ -35,7 +32,7 @@ export const getComments = async (
 
   const { community_id, addresses, count_only } = req.query;
 
-  const where = { chain: community_id };
+  const where = { chain_id: community_id };
 
   const include = [];
   if (addresses)
@@ -45,20 +42,20 @@ export const getComments = async (
       required: true,
     });
 
-  let comments, count;
+  let roles, count;
   if (!count_only) {
-    ({ rows: comments, count } = await models.Comment.findAndCountAll({
+    ({ rows: roles, count } = await models.Role.findAndCountAll({
       where,
       include,
       ...formatPagination(req.query),
     }));
   } else {
-    count = await models.Comment.count({
+    count = await models.Role.count({
       where,
       include,
       ...formatPagination(req.query),
     });
   }
 
-  return success(res, { comments, count });
+  return success(res, { roles, count });
 };
