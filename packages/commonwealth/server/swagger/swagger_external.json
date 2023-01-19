@@ -744,56 +744,6 @@
           }
         }
       },
-      "post": {
-        "summary": "Creates roles.",
-        "parameters": [
-          {
-            "in": "body",
-            "name": "jwt",
-            "description": "The jwt token of the user.",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "in": "body",
-            "name": "roles",
-            "description": "List of roles to create.",
-            "required": true,
-            "type": "object",
-            "properties": {
-              "roles": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "community_id": {
-                      "type": "string",
-                      "required": true
-                    },
-                    "address_id": {
-                      "type": "integer",
-                      "required": true
-                    },
-                    "permission": {
-                      "type": "string",
-                      "required": true,
-                      "default": "member"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "A list of potential errors (may be empty)."
-          },
-          "400": {
-            "description": "Bad Request"
-          }
-        }
-      },
       "delete": {
         "summary": "Deletes roles.",
         "parameters": [

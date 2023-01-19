@@ -133,17 +133,6 @@ export function addExternalRoutes(
     getProfilesValidation,
     getProfiles.bind(this, models)
   );
-  router.post(
-    '/profiles',
-    postProfilesValidation,
-    addEntities.bind(
-      this,
-      'chain',
-      models,
-      (a) => models.Profile.bulkCreate(a),
-      (req: TypedRequest<PostProfilesReq>) => req.body.profiles
-    )
-  );
 
   router.get('/topics', getTopicsValidation, getTopics.bind(this, models));
   router.post(
