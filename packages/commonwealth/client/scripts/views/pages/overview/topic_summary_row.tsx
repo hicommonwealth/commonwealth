@@ -112,8 +112,8 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                     setRoute(discussionLink);
                   }}
                 >
-                  <div class="row-top">
-                    <div class="user-and-date-row">
+                  <div className="row-top">
+                    <div className="user-and-date-row">
                       <User
                         user={user}
                         showAddressWithDisplayName
