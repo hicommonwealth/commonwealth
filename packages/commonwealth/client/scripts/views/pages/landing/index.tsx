@@ -67,10 +67,9 @@ class LandingPage extends ClassComponent {
   //   }
   // }
 
-  oninit() {
+  oncreate() {
     this.hiddenInputTokenList = true;
     this.inputTokenValue = '';
-    this.chains = [];
 
     const sortedChains = app.config.chains
       .getAll()
@@ -116,42 +115,44 @@ class LandingPage extends ClassComponent {
               ]}
             />
           </div>
-          <TokensCommunityComponent chains={this.chains} />
-          <TokensChainsComponent
-            oncreateSlider={() => {
-              return new (Glide as any)('.glide', {
-                type: 'carousel',
-                focusAt: 'center',
-                perView: 3,
-                gap: 40,
-                autoplay: 3000,
-                hoverpause: true,
-                peek: {
-                  before: 100,
-                  after: 100,
-                },
-                breakpoints: {
-                  1024: {
-                    perView: 2,
-                    gap: 40,
+          {<TokensCommunityComponent chains={this.chains} />}
+          {/* {this.chains && (
+            <TokensChainsComponent
+              oncreateSlider={() => {
+                return new (Glide as any)('.glide', {
+                  type: 'carousel',
+                  focusAt: 'center',
+                  perView: 3,
+                  gap: 40,
+                  autoplay: 3000,
+                  hoverpause: true,
+                  peek: {
+                    before: 100,
+                    after: 100,
                   },
-                  768: {
-                    perView: 2,
-                    gap: 20,
-                  },
-                  640: {
-                    perView: 1,
-                    gap: 16,
-                    peek: {
-                      before: 50,
-                      after: 50,
+                  breakpoints: {
+                    1024: {
+                      perView: 2,
+                      gap: 40,
+                    },
+                    768: {
+                      perView: 2,
+                      gap: 20,
+                    },
+                    640: {
+                      perView: 1,
+                      gap: 16,
+                      peek: {
+                        before: 50,
+                        after: 50,
+                      },
                     },
                   },
-                },
-              });
-            }}
-            chains={this.chains}
-          />
+                });
+              }}
+              chains={this.chains}
+            />
+          )} */}
           <TokensCreatorComponent
             creators={[
               {
@@ -214,7 +215,7 @@ class LandingPage extends ClassComponent {
               },
             ]}
           />
-          <TokenHoldersComponent
+          {/* <TokenHoldersComponent
             holders={[
               {
                 img: 'static/img/circleCrowd.svg',
@@ -243,7 +244,7 @@ class LandingPage extends ClassComponent {
                 text: ' Participate in events like upcoming votes, new projects and community initiatives. ',
               },
             ]}
-          />
+          /> */}
           <ChainsCrowdfundingComponent
             chains={[
               {
