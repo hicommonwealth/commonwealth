@@ -5,9 +5,6 @@ const common = require('./webpack.base.config.js');
 const { DuplicatesPlugin } = require('inspectpack/plugin');
 
 module.exports = merge(common, {
-  entry: {
-    app: ['webpack-hot-middleware/client?path=/__webpack_hmr&reload=true'],
-  },
   mode: 'development',
   devtool: 'eval-cheap-source-map',
   stats: {
