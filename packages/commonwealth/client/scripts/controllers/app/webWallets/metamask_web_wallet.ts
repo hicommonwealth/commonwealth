@@ -97,6 +97,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',
       });
+      // @ts-ignore
       const chainIdHex = `0x${chainId.toString(16)}`;
       try {
         await this._web3.givenProvider.request({
