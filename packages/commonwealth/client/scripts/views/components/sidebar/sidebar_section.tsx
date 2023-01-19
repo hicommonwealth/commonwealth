@@ -1,9 +1,10 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
 import 'components/sidebar/sidebar_section.scss';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import {
@@ -15,12 +16,12 @@ import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { CWText } from '../component_kit/cw_text';
 
 class SubSection extends ClassComponent<SubSectionAttrs> {
-  view(vnode: m.Vnode<SubSectionAttrs>) {
+  view(vnode: ResultNode<SubSectionAttrs>) {
     const {
       isActive,
       isUpdated,
       isVisible,
-      onclick,
+      onClick,
       rightIcon,
       rowIcon,
       title,
@@ -31,7 +32,7 @@ class SubSection extends ClassComponent<SubSectionAttrs> {
     }
 
     const clickHandler = (e) => {
-      onclick(e);
+      onClick(e);
     };
 
     let titleTextClass = '';
@@ -44,14 +45,14 @@ class SubSection extends ClassComponent<SubSectionAttrs> {
 
     return (
       <div
-        class={`SubSection${isActive ? ' active' : ''}`}
-        onclick={(e) => clickHandler(e)}
+        className={`SubSection${isActive ? ' active' : ''}`}
+        onClick={(e) => clickHandler(e)}
       >
         {isNotUndefined(rowIcon) && <CWIcon iconName="hash" iconSize="small" />}
-        <div class={titleTextClass} title={title}>
+        <div className={titleTextClass} title={title}>
           {title}
         </div>
-        {isNotUndefined(rightIcon) && <div class="right-icon">{rightIcon}</div>}
+        {isNotUndefined(rightIcon) && <div className="right-icon">{rightIcon}</div>}
       </div>
     );
   }
@@ -60,20 +61,20 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
   private toggled: boolean;
   private hoverOn: boolean;
 
-  oninit(vnode: m.Vnode<SectionGroupAttrs>) {
+  oninit(vnode: ResultNode<SectionGroupAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
   }
 
-  view(vnode: m.Vnode<SectionGroupAttrs>) {
+  view(vnode: ResultNode<SectionGroupAttrs>) {
     const {
       containsChildren,
       displayData,
       isActive,
       isUpdated,
       isVisible,
-      onclick,
+      onClick,
       rightIcon,
       title,
     } = vnode.attrs;
@@ -89,7 +90,7 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
 
       app.sidebarToggled = false;
 
-      onclick(e, this.toggled);
+      onClick(e, this.toggled);
     };
 
     const carat = this.toggled ? (
@@ -131,28 +132,28 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
 
     return (
       <div
-        class="SubSectionGroup"
-        onmouseenter={(e) => mouseEnterHandler(e)}
-        onmouseleave={() => mouseLeaveHandler()}
+        className="SubSectionGroup"
+        onMouseEnter={(e) => mouseEnterHandler(e)}
+        onMouseLeave={() => mouseLeaveHandler()}
       >
         <div
-          class={`sub-section-group-title ${
+          className={`sub-section-group-title ${
             this.hoverOn ? 'background' : backgroundColorClass
           }`}
-          onclick={(e) => clickHandler(e)}
+          onClick={(e) => clickHandler(e)}
         >
           {containsChildren ? (
-            <div class="carat">{carat}</div>
+            <div className="carat">{carat}</div>
           ) : (
-            <div class="no-carat" />
+            <div className="no-carat" />
           )}
           <CWText type="b2" className={`title-text ${titleTextClass}`}>
             {title}
           </CWText>
-          {rightIcon && <div class="right-icon">{rightIcon}</div>}
+          {rightIcon && <div className="right-icon">{rightIcon}</div>}
         </div>
         {containsChildren && this.toggled && (
-          <div class="subsections">
+          <div className="subsections">
             {displayData.map((subsection) => (
               <SubSection {...subsection} />
             ))}
@@ -167,18 +168,18 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
   private toggled: boolean;
   private hoverColor: string;
 
-  oninit(vnode: m.Vnode<SidebarSectionAttrs>) {
+  oninit(vnode: ResultNode<SidebarSectionAttrs>) {
     const localStorageToggled =
       localStorage.getItem(`${vnode.attrs.title}-toggled`) === 'true';
     this.toggled = vnode.attrs.hasDefaultToggle || localStorageToggled;
     this.hoverColor = 'none';
   }
 
-  view(vnode: m.Vnode<SidebarSectionAttrs>) {
+  view(vnode: ResultNode<SidebarSectionAttrs>) {
     const {
       displayData,
       extraComponents,
-      onclick,
+      onClick,
       rightIcon,
       title,
       toggleDisabled,
@@ -200,7 +201,7 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
         this.hoverColor = 'none';
       }
 
-      onclick(e, this.toggled);
+      onClick(e, this.toggled);
     };
 
     const mouseEnterHandler = (e) => {
@@ -222,20 +223,20 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
 
     return (
       <div
-        class="SidebarSectionGroup"
-        onmouseenter={(e) => mouseEnterHandler(e)}
-        onmouseleave={() => mouseLeaveHandler()}
+        className="SidebarSectionGroup"
+        onMouseEnter={(e) => mouseEnterHandler(e)}
+        onMouseLeave={() => mouseLeaveHandler()}
       >
         <div
-          class="section-group-title-container"
-          onclick={(e) => clickHandler(e, title)}
+          className="section-group-title-container"
+          onClick={(e) => clickHandler(e, title)}
         >
           {carat}
           <CWText>{title}</CWText>
-          {rightIcon && <div class="right-icon">{rightIcon}</div>}
+          { /* rightIcon && <div className="right-icon">{rightIcon}</div> */}
         </div>
         {this.toggled && (
-          <div class="sections-container">
+          <div className="sections-container">
             {displayData.map((sectionGroup) => (
               <SubSectionGroup {...sectionGroup} />
             ))}

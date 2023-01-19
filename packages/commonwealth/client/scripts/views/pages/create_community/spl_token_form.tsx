@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import * as solw3 from '@solana/web3.js';
 
@@ -79,11 +80,11 @@ export class SplTokenForm extends ClassComponent {
         this.state.message = `Error: ${err.message}` || 'Failed to load token';
       }
       this.state.loading = false;
-      m.redraw();
+      redraw();
     };
 
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <CWDropdown
           label="Cluster"
           options={[
@@ -108,7 +109,7 @@ export class SplTokenForm extends ClassComponent {
         <CWButton
           label="Check address"
           disabled={this.state.saving || this.state.loading}
-          onclick={async () => {
+          onClick={async () => {
             await updateTokenForum();
           }}
         />
@@ -149,7 +150,7 @@ export class SplTokenForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving || !this.state.loaded}
-          onclick={async () => {
+          onClick={async () => {
             const { cluster, iconUrl, mint, symbol } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
@@ -178,7 +179,7 @@ export class SplTokenForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              m.route.set(`/${res.result.chain?.id}`);
+              setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error || 'Creating new SPL community failed'

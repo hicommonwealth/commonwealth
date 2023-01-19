@@ -1,7 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import 'footer.scss';
 
@@ -27,29 +38,35 @@ const footercontents = [
   },
 ];
 
-export class Footer extends ClassComponent {
+class FooterComponent extends ClassComponent {
   view() {
     const redirectClick = (route) => {
-      m.route.set(route);
+      this.setRoute(route);
     };
 
     return (
-      <div class="Footer">
+      <div className="Footer">
         <img src="/static/brand_assets/512x512.svg" alt="Commonwealth" />
-        <div class="footer-links-container">
+        <div className="footer-links-container">
           {footercontents.map((item) => {
             return isNotUndefined(item.redirectTo) ? (
               <a
-                class="footer-link"
-                onclick={(e) => {
+                className="footer-link"
+                onClick={(e) => {
                   e.preventDefault();
                   redirectClick(item.redirectTo);
                 }}
+                key={item.text}
               >
                 {item.text}
               </a>
             ) : (
-              <a class="footer-link" href={item.externalLink} target="_blank">
+              <a
+                className="footer-link"
+                key={item.text}
+                href={item.externalLink}
+                target="_blank"
+              >
                 {item.text}
               </a>
             );
@@ -59,3 +76,5 @@ export class Footer extends ClassComponent {
     );
   }
 }
+
+export const Footer = NavigationWrapper(FooterComponent);

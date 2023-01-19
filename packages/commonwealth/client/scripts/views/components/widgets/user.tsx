@@ -1,10 +1,10 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
+import React from 'react';
 
-import m from 'mithril';
 import { capitalize } from 'lodash';
 import { link } from 'helpers';
-import { Tag, Popover } from 'construct-ui';
+import { ClassComponent, render, redraw } from 'mithrilInterop';
 
 import app from 'state';
 import jdenticon from 'jdenticon';
@@ -23,25 +23,22 @@ export interface IAddressDisplayOptions {
   maxCharLength?: number;
 }
 
-const User: m.Component<
-  {
-    user: Account | AddressInfo | Profile;
-    avatarSize?: number;
-    avatarOnly?: boolean; // overrides most other properties
-    hideAvatar?: boolean;
-    hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
-    showAddressWithDisplayName?: boolean; // show address inline with the display name
-    addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
-    linkify?: boolean;
-    onclick?: any;
-    popover?: boolean;
-    showRole?: boolean;
-  },
-  {
-    identityWidgetLoading: boolean;
-  }
-> = {
-  view: (vnode) => {
+/* @FIXME @REACT need to refactor this state */
+class User extends ClassComponent<{
+  user: Account | AddressInfo | Profile;
+  avatarSize?: number;
+  avatarOnly?: boolean; // overrides most other properties
+  hideAvatar?: boolean;
+  hideIdentityIcon?: boolean; // applies to substrate identities, also hides councillor icons
+  showAddressWithDisplayName?: boolean; // show address inline with the display name
+  addressDisplayOptions?: IAddressDisplayOptions; // display full or truncated address
+  linkify?: boolean;
+  onClick?: any;
+  popover?: boolean;
+  showRole?: boolean;
+}> {
+  private identityWidgetLoading = false;
+  view(vnode) {
     // TODO: Fix showRole logic to fetch the role from chain
     const {
       avatarOnly,
@@ -86,18 +83,18 @@ const User: m.Component<
 
     if (
       app.chain?.base === ChainBase.Substrate &&
-      !vnode.state.identityWidgetLoading &&
+      !this.identityWidgetLoading &&
       !app.cachedIdentityWidget
     ) {
-      vnode.state.identityWidgetLoading = true;
+      this.identityWidgetLoading = true;
       import(
         /* webpackMode: "lazy" */
         /* webpackChunkName: "substrate-identity-widget" */
         './substrate_identity'
       ).then((mod) => {
         app.cachedIdentityWidget = mod.default;
-        vnode.state.identityWidgetLoading = false;
-        m.redraw();
+        this.identityWidgetLoading = false;
+        redraw();
       });
     }
 
@@ -116,6 +113,12 @@ const User: m.Component<
       }
 
       profile = app.profiles.getProfile(chainId.id, address);
+      const isInitialized = profile.initialized;
+      app.profiles.isFetched.once('redraw', () => {
+        if (!isInitialized && profile.initialized) {
+          this.redraw();
+        }
+      });
 
       role = adminsAndMods.find(
         (r) => r.address === address && r.address_chain === chainId.id
@@ -150,31 +153,32 @@ const User: m.Component<
       // 'long' makes role tags show as full length text
       profile.isCouncillor &&
         !hideIdentityIcon &&
-        m(
+        render(
+          // todo this is not valid for react.createElement
           '.role-icon.role-icon-councillor',
           {
-            class: long ? 'long' : '',
+            className: long ? 'long' : '',
           },
           long ? `${friendlyChainName} Councillor` : 'C'
         ),
       profile.isValidator &&
         !hideIdentityIcon &&
-        m(
+        render(
           '.role-icon.role-icon-validator',
           {
-            class: long ? 'long' : '',
+            className: long ? 'long' : '',
           },
           long ? `${friendlyChainName} Validator` : 'V'
         ),
       // role in commonwealth forum
-      showRole &&
-        role &&
-        m(Tag, {
-          class: 'role-tag',
-          label: role.permission,
-          rounded: true,
-          size: 'xs',
-        }),
+      // showRole &&
+      //   role &&
+      //   m(Tag, {
+      //     className: 'role-tag',
+      //     label: role.permission,
+      //     rounded: true,
+      //     size: 'xs',
+      //   }),
     ];
 
     const ghostAddress = app.user.addresses.some(
@@ -184,29 +188,33 @@ const User: m.Component<
     );
 
     const userFinal = avatarOnly
-      ? m(
+      ? render(
           '.User.avatar-only',
           {
             key: profile?.address || '-',
           },
           !profile
-            ? null
+            ? []
             : profile.avatarUrl
             ? profile.getAvatar(avatarSize)
             : profile.getAvatar(avatarSize - 4)
         )
-      : m(
+      : render(
           '.User',
           {
             key: profile?.address || '-',
-            class: linkify ? 'linkified' : '',
+            className: linkify ? 'linkified' : '',
           },
           [
             showAvatar &&
-              m(
+              render(
                 '.user-avatar',
                 {
-                  style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
+                  key: profile?.address || '-',
+                  style: {
+                    width: `${avatarSize}px`,
+                    height: ` ${avatarSize}px`,
+                  },
                 },
                 profile && profile.getAvatar(avatarSize)
               ),
@@ -214,7 +222,7 @@ const User: m.Component<
             app.chain.base === ChainBase.Substrate &&
             app.cachedIdentityWidget
               ? // substrate name
-                m(app.cachedIdentityWidget, {
+                render(app.cachedIdentityWidget, {
                   account,
                   linkify,
                   profile,
@@ -239,7 +247,7 @@ const User: m.Component<
                             ? profile.displayName
                             : [
                                 profile.displayName,
-                                m(
+                                render(
                                   '.id-short',
                                   formatAddressShort(
                                     profile.address,
@@ -250,14 +258,14 @@ const User: m.Component<
                           getRoleTags(false),
                         ]
                       )
-                    : m('a.user-display-name.username', [
+                    : render('a.user-display-name.username', [
                         !profile
                           ? addrShort
                           : !showAddressWithDisplayName
                           ? profile.displayName
                           : [
                               profile.displayName,
-                              m(
+                              render(
                                 '.id-short',
                                 formatAddressShort(
                                   profile.address,
@@ -268,7 +276,7 @@ const User: m.Component<
                         getRoleTags(false),
                       ]),
                   ghostAddress &&
-                    m('img', {
+                    render('img', {
                       src: '/static/img/ghost.svg',
                       width: '20px',
                       style: 'display: inline-block',
@@ -277,55 +285,44 @@ const User: m.Component<
           ]
         );
 
-    const userPopover = m(
+    const userPopover = render(
       '.UserPopover',
       {
-        onclick: (e) => {
+        onClick: (e) => {
           e.stopPropagation();
         },
       },
       [
-        m('.user-avatar', [
+        render('.user-avatar', [
           !profile
             ? null
             : profile.avatarUrl
             ? profile.getAvatar(36)
             : profile.getAvatar(32),
         ]),
-        m('.user-name', [
-          app.chain &&
-          app.chain.base === ChainBase.Substrate &&
-          app.cachedIdentityWidget
-            ? m(app.cachedIdentityWidget, {
-                account,
-                linkify: true,
-                profile,
-                hideIdentityIcon,
-                addrShort,
-                showAddressWithDisplayName: false,
-              })
-            : link(
-                'a.user-display-name',
-                profile
-                  ? `/${app.activeChainId() || profile.chain}/account/${
-                      profile.address
-                    }?base=${profile.chain}`
-                  : 'javascript:',
-                !profile
-                  ? addrShort
-                  : !showAddressWithDisplayName
-                  ? profile.displayName
-                  : [
-                      profile.displayName,
-                      m(
-                        '.id-short',
-                        formatAddressShort(profile.address, profile.chain)
-                      ),
-                    ]
-              ),
+        render('.user-name', [
+          link(
+            'a.user-display-name',
+            profile
+              ? `/${app.activeChainId() || profile.chain}/account/${
+                  profile.address
+                }?base=${profile.chain}`
+              : 'javascript:',
+            !profile
+              ? addrShort
+              : !showAddressWithDisplayName
+              ? profile.displayName
+              : [
+                  profile.displayName,
+                  render(
+                    '.id-short',
+                    formatAddressShort(profile.address, profile.chain)
+                  ),
+                ]
+          ),
         ]),
         profile?.address &&
-          m(
+          render(
             '.user-address',
             formatAddressShort(
               profile.address,
@@ -334,14 +331,14 @@ const User: m.Component<
               maxCharLength
             )
           ),
-        friendlyChainName && m('.user-chain', friendlyChainName),
+        friendlyChainName && render('.user-chain', friendlyChainName),
         getRoleTags(true), // always show roleTags in .UserPopover
 
         // If Admin Allow Banning
         loggedInUserIsAdmin &&
-          m('.ban-wrapper', [
-            m(CWButton, {
-              onclick: () => {
+          render('.ban-wrapper', [
+            render(CWButton, {
+              onClick: () => {
                 app.modals.create({
                   modal: BanUserModal,
                   data: { profile },
@@ -355,20 +352,21 @@ const User: m.Component<
     );
 
     return popover
-      ? m(Popover, {
-          interactionType: 'hover',
-          content: userPopover,
-          trigger: userFinal,
-          closeOnContentClick: true,
-          transitionDuration: 0,
-          hoverOpenDelay: 500,
-          key: profile?.address || '-',
-        })
+      ? null // @TODO @REACT FIX ME
+      // m(Popover, {
+      //     interactionType: 'hover',
+      //     content: userPopover,
+      //     trigger: userFinal,
+      //     closeOnContentClick: true,
+      //     transitionDuration: 0,
+      //     hoverOpenDelay: 500,
+      //     key: profile?.address || '-',
+      //   })
       : userFinal;
-  },
-};
+  }
+}
 
-export const UserBlock: m.Component<{
+export class UserBlock extends ClassComponent<{
   user: Account | AddressInfo | Profile;
   hideIdentityIcon?: boolean;
   popover?: boolean;
@@ -382,8 +380,8 @@ export const UserBlock: m.Component<{
   compact?: boolean;
   linkify?: boolean;
   avatarSize?: number;
-}> = {
-  view: (vnode) => {
+}> {
+  view(vnode) {
     const {
       user,
       hideIdentityIcon,
@@ -422,25 +420,25 @@ export const UserBlock: m.Component<{
           const queryEnd = queryStart + searchTerm.length;
 
           return [
-            m('span', profile.address.slice(0, queryStart)),
-            m('mark', profile.address.slice(queryStart, queryEnd)),
-            m('span', profile.address.slice(queryEnd, profile.address.length)),
+            render('span', profile.address.slice(0, queryStart)),
+            render('mark', profile.address.slice(queryStart, queryEnd)),
+            render('span', profile.address.slice(queryEnd, profile.address.length)),
           ];
         })()
       : null;
 
     const children = [
-      m('.user-block-left', [
-        m(User, {
+      render('.user-block-left', [
+        render(User, {
           user,
           avatarOnly: true,
           avatarSize: vnode.attrs.avatarSize || 28,
           popover,
         }),
       ]),
-      m('.user-block-center', [
-        m('.user-block-name', [
-          m(User, {
+      render('.user-block-center', [
+        render('.user-block-name', [
+          render(User, {
             user,
             hideAvatar: true,
             hideIdentityIcon,
@@ -450,13 +448,13 @@ export const UserBlock: m.Component<{
             showRole,
           }),
         ]),
-        m(
+        render(
           '.user-block-address',
           {
-            class: profile?.address ? '' : 'no-address',
+            className: profile?.address ? '' : 'no-address',
           },
           [
-            m(
+            render(
               '',
               highlightSearchTerm
                 ? highlightedAddress
@@ -464,9 +462,9 @@ export const UserBlock: m.Component<{
                 ? profile.address
                 : formatAddressShort(profile.address, profile.chain)
             ),
-            profile?.address && showChainName && m('.address-divider', ' · '),
+            profile?.address && showChainName && render('.address-divider', ' · '),
             showChainName &&
-              m(
+              render(
                 '',
                 typeof user.chain === 'string'
                   ? capitalize(user.chain)
@@ -475,10 +473,10 @@ export const UserBlock: m.Component<{
           ]
         ),
       ]),
-      m('.user-block-right', [
-        m(
+      render('.user-block-right', [
+        render(
           '.user-block-selected',
-          selected ? m(CWIcon, { iconName: 'check' }) : ''
+          selected ? render(CWIcon, { iconName: 'check' }) : ''
         ),
       ]),
     ];
@@ -491,27 +489,24 @@ export const UserBlock: m.Component<{
 
     return linkify
       ? link('.UserBlock', userLink, children)
-      : m(
+      : render(
           '.UserBlock',
           {
-            class: compact ? 'compact' : '',
+            className: compact ? 'compact' : '',
           },
           children
         );
-  },
-};
+  }
+}
 
-export const AnonymousUser: m.Component<
-  {
-    avatarSize?: number;
-    avatarOnly?: boolean;
-    hideAvatar?: boolean;
-    showAsDeleted?: boolean;
-    distinguishingKey: string; // To distinguish user from other anonymous users
-  },
-  {}
-> = {
-  view: (vnode) => {
+export class AnonymousUser extends ClassComponent<{
+  avatarSize?: number;
+  avatarOnly?: boolean;
+  hideAvatar?: boolean;
+  showAsDeleted?: boolean;
+  distinguishingKey: string; // To distinguish user from other anonymous users
+}> {
+  view(vnode) {
     const {
       avatarOnly,
       avatarSize,
@@ -527,7 +522,7 @@ export const AnonymousUser: m.Component<
     if (showAvatar) {
       const pseudoAddress = distinguishingKey;
 
-      profileAvatar = m('svg.Jdenticon', {
+      profileAvatar = render('svg.Jdenticon', {
         style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
         'data-address': pseudoAddress,
         oncreate: (vnode_) => {
@@ -540,13 +535,13 @@ export const AnonymousUser: m.Component<
     }
 
     return avatarOnly
-      ? m(
+      ? render(
           '.User.avatar-only',
           {
             key: '-',
           },
           [
-            m(
+            render(
               '.user-avatar-only',
               {
                 style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
@@ -555,14 +550,14 @@ export const AnonymousUser: m.Component<
             ),
           ]
         )
-      : m(
+      : render(
           '.User',
           {
             key: '-',
           },
           [
             showAvatar &&
-              m(
+              render(
                 '.user-avatar-only',
                 {
                   style: `width: ${avatarSize}px; height: ${avatarSize}px;`,
@@ -570,14 +565,14 @@ export const AnonymousUser: m.Component<
                 [profileAvatar]
               ),
             [
-              m(
+              render(
                 'a.user-display-name.username',
                 showAsDeleted ? 'Deleted' : 'Anonymous'
               ),
             ],
           ]
         );
-  },
-};
+  }
+}
 
 export default User;

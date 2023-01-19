@@ -1,6 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { StarredCommunity } from 'models';
 
 class CommunitiesController {
@@ -42,7 +43,7 @@ class CommunitiesController {
             app.user.removeStarredCommunity(star);
           }
           resolve();
-          m.redraw();
+          redraw();
         })
         .catch((err) => {
           reject();

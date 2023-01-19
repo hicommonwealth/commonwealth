@@ -1,6 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import app from 'state';
@@ -32,7 +34,7 @@ export const getDisplayedReactorsForPopup = (reactorAttrs: ReactorAttrs) => {
       return (
         <div style="display: flex; width: 120px;">
           <CWText noWrap>
-            {m(User, {
+            {render(User, {
               user: new AddressInfo(null, address, chain?.id || chain, null),
               linkify: true,
             })}

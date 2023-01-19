@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/new_proposal/index.scss';
 
@@ -15,7 +15,7 @@ import {
   chainToProposalSlug,
 } from 'identifiers';
 import { ProposalModule } from 'models';
-import { PageNotFound } from '../404';
+import PageNotFound from '../404';
 import { CWText } from '../../components/component_kit/cw_text';
 import { AaveProposalForm } from './aave_proposal_form';
 import { CompoundProposalForm } from './compound_proposal_form';
@@ -35,7 +35,7 @@ type NewProposalPageAttrs = {
 class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
   private typeEnum: ProposalType;
 
-  view(vnode: m.Vnode<NewProposalPageAttrs>) {
+  view(vnode: ResultNode<NewProposalPageAttrs>) {
     this.typeEnum = vnode.attrs.type;
 
     // wait for chain
@@ -117,7 +117,7 @@ class NewProposalPage extends ClassComponent<NewProposalPageAttrs> {
 
     return (
       <Sublayout>
-        <div class="NewProposalPage">
+        <div className="NewProposalPage">
           <CWText type="h3" fontWeight="medium">
             New {proposalSlugToFriendlyName.get(this.typeEnum)}
           </CWText>

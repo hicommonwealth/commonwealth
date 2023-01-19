@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { CWTextInput } from './component_kit/cw_text_input';
 import { CWLabel } from './component_kit/cw_label';
@@ -20,7 +20,7 @@ type InputRowAttrs = {
 };
 
 export class InputRow extends ClassComponent<InputRowAttrs> {
-  view(vnode: m.Vnode<InputRowAttrs>) {
+  view(vnode: ResultNode<InputRowAttrs>) {
     const {
       value,
       disabled,
@@ -32,7 +32,7 @@ export class InputRow extends ClassComponent<InputRowAttrs> {
     } = vnode.attrs;
 
     return (
-      <div class="InputRow">
+      <div className="InputRow">
         {textarea && <CWLabel label={title} />}
         {textarea ? (
           <CWTextArea
@@ -72,17 +72,17 @@ type ToggleRowAttrs = {
 export class ToggleRow extends ClassComponent<ToggleRowAttrs> {
   checked: boolean;
 
-  oninit(vnode: m.Vnode<ToggleRowAttrs>) {
+  oninit(vnode: ResultNode<ToggleRowAttrs>) {
     this.checked = vnode.attrs.defaultValue;
   }
 
-  view(vnode: m.Vnode<ToggleRowAttrs>) {
+  view(vnode: ResultNode<ToggleRowAttrs>) {
     const { caption, disabled, onToggle, title } = vnode.attrs;
 
     return (
-      <div class="ToggleRow">
+      <div className="ToggleRow">
         <CWLabel label={title} />
-        <div class="toggle-and-caption">
+        <div className="toggle-and-caption">
           <CWToggle
             checked={this.checked}
             disabled={!!disabled}
@@ -101,13 +101,13 @@ export class ToggleRow extends ClassComponent<ToggleRowAttrs> {
 type IdRowAttrs = { id: string };
 
 export class IdRow extends ClassComponent<IdRowAttrs> {
-  view(vnode: m.Vnode<IdRowAttrs>) {
+  view(vnode: ResultNode<IdRowAttrs>) {
     const { id } = vnode.attrs;
 
     return (
-      <div class="IDRow">
+      <div className="IDRow">
         <CWLabel label="ID" />
-        <div class={`id ${!id.length && 'placeholder'}`}>
+        <div className={`id ${!id.length && 'placeholder'}`}>
           {!id.length ? 'ID will show up here based on your name' : id}
         </div>
       </div>

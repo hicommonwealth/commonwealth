@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/view_thread/poll_cards.scss';
@@ -21,7 +22,7 @@ type ThreadPollEditorCardAttrs = {
 };
 
 export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAttrs> {
-  view(vnode: m.Vnode<ThreadPollEditorCardAttrs>) {
+  view(vnode: ResultNode<ThreadPollEditorCardAttrs>) {
     const { thread, threadAlreadyHasPolling } = vnode.attrs;
 
     return (
@@ -35,7 +36,7 @@ export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAtt
             <CWButton
               buttonType="mini-black"
               label="Create poll"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 app.modals.create({
                   modal: PollEditorModal,
@@ -57,7 +58,7 @@ type ThreadPollCardAttrs = {
 };
 
 export class ThreadPollCard extends ClassComponent<ThreadPollCardAttrs> {
-  view(vnode: m.Vnode<ThreadPollCardAttrs>) {
+  view(vnode: ResultNode<ThreadPollCardAttrs>) {
     const { poll } = vnode.attrs;
 
     return (

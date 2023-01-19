@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/comments/edit_comment.scss';
 
@@ -26,7 +27,7 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
   private quillEditorState: QuillEditor;
   private saving: boolean;
 
-  view(vnode: m.Vnode<EditCommentAttrs>) {
+  view(vnode: ResultNode<EditCommentAttrs>) {
     const {
       comment,
       savedEdits,
@@ -38,7 +39,7 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
     const body = shouldRestoreEdits && savedEdits ? savedEdits : comment.text;
 
     return (
-      <div class="EditComment">
+      <div className="EditComment">
         <QuillEditorComponent
           contentsDoc={body}
           oncreateBind={(state: QuillEditor) => {
@@ -48,12 +49,12 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
           theme="snow"
           editorNamespace={`edit-comment-${comment.id}`}
         />
-        <div class="buttons-row">
+        <div className="buttons-row">
           <CWButton
             label="Cancel"
             disabled={this.saving}
             buttonType="secondary-blue"
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
 
               let confirmed = true;
@@ -71,14 +72,14 @@ export class EditComment extends ClassComponent<EditCommentAttrs> {
               if (confirmed) {
                 setIsEditing(false);
                 clearEditingLocalStorage(comment.id, ContentType.Comment);
-                m.redraw();
+                redraw();
               }
             }}
           />
           <CWButton
             label="Save"
             disabled={this.saving}
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
 
               this.saving = true;

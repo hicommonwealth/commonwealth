@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, jsx, Component, rootRender } from 'mithrilInterop';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
 
@@ -31,7 +32,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
   private isTruncated: boolean;
   private truncatedDoc;
 
-  oninit(vnode: m.Vnode<QuillFormattedTextAttrs>) {
+  oninit(vnode: ResultNode<QuillFormattedTextAttrs>) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesQuill(vnode.attrs.doc.ops);
@@ -45,7 +46,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
     }
   }
 
-  view(vnode: m.Vnode<QuillFormattedTextAttrs>) {
+  view(vnode: ResultNode<QuillFormattedTextAttrs>) {
     const {
       doc,
       hideFormatting,
@@ -64,21 +65,21 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
         this.truncatedDoc = doc;
       }
 
-      m.redraw();
+      this.redraw();
     };
 
     // if we're showing highlighted search terms, render the doc once, and cache the result
     if (searchTerm) {
       if (JSON.stringify(this.truncatedDoc) !== this.cachedDocWithHighlights) {
-        const vnodes = renderQuillDelta(
+        const vnodes = this.truncatedDoc ? renderQuillDelta(
           this.truncatedDoc,
           hideFormatting,
           true
-        ); // collapse = true, to inline blocks
+        ) : []; // collapse = true, to inline blocks
 
         const root = document.createElement('div');
 
-        m.render(root, vnodes);
+        rootRender(root, vnodes);
 
         const textToHighlight = root.innerText
           .replace(/\n/g, ' ')
@@ -124,7 +125,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
 
       return (
         <div
-          class={getClasses<{ collapsed?: boolean }>(
+          className={getClasses<{ collapsed?: boolean }>(
             { collapsed: collapse },
             'QuillFormattedText'
           )}
@@ -135,7 +136,7 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
     } else {
       return (
         <div
-          class={getClasses<{ collapsed?: boolean }>(
+          className={getClasses<{ collapsed?: boolean }>(
             { collapsed: collapse },
             'QuillFormattedText'
           )}
@@ -146,17 +147,17 @@ export class QuillFormattedText extends ClassComponent<QuillFormattedTextAttrs> 
             //   })
           }}
         >
-          {renderQuillDelta(
+          {this.truncatedDoc && renderQuillDelta(
             this.truncatedDoc,
             hideFormatting,
             collapse,
             openLinksInNewTab
           )}
           {this.isTruncated && (
-            <div class="show-more-button-wrapper">
-              <div class="show-more-button" onclick={toggleDisplay}>
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
                 <CWIcon iconName="plus" iconSize="small" />
-                <div class="show-more-text">Show More</div>
+                <div className="show-more-text">Show More</div>
               </div>
             </div>
           )}

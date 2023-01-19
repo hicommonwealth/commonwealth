@@ -1,7 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+// import { ListItem, Icon, Icons } from 'construct-ui';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 
 import 'components/component_kit/cw_sidebar_menu.scss';
 
@@ -15,72 +17,23 @@ import { ComponentType, MenuItem } from './types';
 import { CommunityLabel } from '../community_label';
 import User from '../widgets/user';
 
-// TODO: Switch to new component kit system, migrate to more native setup
-const renderCommunity = (item: ChainInfo) => {
-  const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
-
-  return (
-    <div
-      class={getClasses<{ isSelected: boolean }>(
-        { isSelected: app.activeChainId() === item.id },
-        'SidebarMenuItem community'
-      )}
-      onclick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        app.sidebarToggled = false;
-        app.sidebarMenu = 'default';
-        m.route.set(item.id ? `/${item.id}` : '/');
-      }}
-    >
-      <CommunityLabel community={item} />
-      {app.isLoggedIn() && roles.length > 0 && (
-        <div class="roles-and-star">
-          {roles.map((role) => {
-            return m(User, {
-              avatarSize: 18,
-              avatarOnly: true,
-              user: new AddressInfo(
-                role.address_id,
-                role.address,
-                role.address_chain || role.chain_id,
-                null
-              ),
-            });
-          })}
-          <div
-            class={
-              app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
-            }
-            onclick={async (e) => {
-              e.stopPropagation();
-              await app.communities.setStarred(item.id);
-              m.redraw();
-            }}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
-
-class CWSidebarMenuItem extends ClassComponent<MenuItem> {
-  view(vnode: m.Vnode<MenuItem>) {
+class CWSidebarMenuItemComponent extends ClassComponent<MenuItem> {
+  view(vnode: ResultNode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
-      const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
+      const { disabled, iconLeft, iconRight, isSecondary, label, onClick } =
         vnode.attrs;
 
       return (
         <div
-          class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
+          className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
             { disabled, isSecondary },
             'SidebarMenuItem default'
           )}
-          onclick={(e) => {
-            if (onclick) onclick(e);
+          onClick={(e) => {
+            if (onClick) onClick(e);
           }}
         >
-          <div class="sidebar-menu-item-left">
+          <div className="sidebar-menu-item-left">
             {iconLeft && <CWIcon iconName={iconLeft} />}
             <CWText type="b2">{label}</CWText>
           </div>
@@ -89,36 +42,82 @@ class CWSidebarMenuItem extends ClassComponent<MenuItem> {
       );
     } else if (vnode.attrs.type === 'header') {
       return (
-        <div class="SidebarMenuItem header">
+        <div className="SidebarMenuItem header">
           <CWText type="caption">{vnode.attrs.label}</CWText>
         </div>
       );
     } else if (vnode.attrs.type === 'community') {
-      return renderCommunity(vnode.attrs.community);
+      const item = vnode.attrs.community;
+      const roles = app.roles.getAllRolesInCommunity({ chain: item.id });
+      return (
+        <div
+          className={getClasses<{ isSelected: boolean }>(
+            { isSelected: app.activeChainId() === item.id },
+            'SidebarMenuItem community'
+          )}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            app.sidebarToggled = false;
+            app.sidebarMenu = 'default';
+            setRoute(item.id ? `/${item.id}` : '/');
+          }}
+        >
+          <CommunityLabel community={item} />
+          {app.isLoggedIn() && roles.length > 0 && (
+            <div className="roles-and-star">
+              {roles.map((role) => {
+                return render(User, {
+                  avatarSize: 18,
+                  avatarOnly: true,
+                  user: new AddressInfo(
+                    role.address_id,
+                    role.address,
+                    role.address_chain || role.chain_id,
+                    null
+                  ),
+                });
+              })}
+              <div
+                className={
+                  app.communities.isStarred(item.id) ? 'star-filled' : 'star-empty'
+                }
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  await app.communities.setStarred(item.id);
+                  this.redraw();
+                }}
+              />
+            </div>
+          )}
+        </div>
+      );
     }
   }
 }
 
+const CWSidebarMenuItem = NavigationWrapper(CWSidebarMenuItemComponent);
+
 type SidebarMenuAttrs = {
   className?: string;
-  menuHeader?: { label: string; onclick: (e) => void };
+  menuHeader?: { label: string; onClick: (e) => void };
   menuItems: Array<MenuItem>;
 };
 
-export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
-  view(vnode: m.Vnode<SidebarMenuAttrs>) {
+class CWSidebarMenuComponent extends ClassComponent<SidebarMenuAttrs> {
+  view(vnode: ResultNode<SidebarMenuAttrs>) {
     const { className, menuHeader, menuItems } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ className: string }>(
+        className={getClasses<{ className: string }>(
           { className },
           ComponentType.SidebarMenu
         )}
       >
-        <div class="sidebar-top">
+        <div className="sidebar-top">
           {menuHeader && (
-            <div class="sidebar-menu-header" onclick={menuHeader.onclick}>
+            <div className="sidebar-menu-header" onClick={menuHeader.onClick}>
               <CWIcon iconName="chevronLeft" />
               <CWText type="h5" fontWeight="medium">
                 {menuHeader.label}
@@ -129,7 +128,7 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
             <CWSidebarMenuItem type={item.type || 'default'} {...item} />
           ))}
         </div>
-        <div class="sidebar-bottom">
+        <div className="sidebar-bottom">
           {[
             {
               type: 'header',
@@ -139,33 +138,33 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
               type: 'default',
               label: 'Explore communities',
               iconLeft: 'compass',
-              onclick: () => {
+              onClick: () => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
-                m.route.set('/communities');
+                this.setRoute('/communities');
               },
             },
             {
               type: 'default',
               label: 'Notification settings',
               iconLeft: 'person',
-              onclick: () => {
+              onClick: () => {
                 app.sidebarToggled = false;
                 app.sidebarMenu = 'default';
-                m.route.set('/notification-settings');
+                this.setRoute('/notification-settings');
               },
             },
             {
               type: 'default',
               label: 'Account settings',
               iconLeft: 'bell',
-              onclick: () => {
+              onClick: () => {
                 if (app.activeChainId()) {
                   navigateToSubpage('/settings');
                 } else {
                   app.sidebarToggled = false;
                   app.sidebarMenu = 'default';
-                  m.route.set('/settings');
+                  this.setRoute('/settings');
                 }
               },
             } as MenuItem,
@@ -179,3 +178,5 @@ export class CWSidebarMenu extends ClassComponent<SidebarMenuAttrs> {
     );
   }
 }
+
+export const CWSidebarMenu = NavigationWrapper(CWSidebarMenuComponent);

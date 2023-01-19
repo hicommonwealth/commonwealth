@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'components/quill/quill_editor.scss';
@@ -118,7 +119,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
 
   // LIFECYCLE HELPERS
 
-  oncreate(vnode: m.Vnode<QuillEditorComponentAttrs>) {
+  oncreate(vnode: ResultNode<QuillEditorComponentAttrs>) {
     // Only bind the alert if we are actually trying to persist the user's changes
     if (!vnode.attrs.contentsDoc) {
       this._beforeunloadHandler = () => {
@@ -130,13 +131,13 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
     }
   }
 
-  onremove(vnode: m.Vnode<QuillEditorComponentAttrs>) {
+  onremove(vnode: ResultNode<QuillEditorComponentAttrs>) {
     if (!vnode.attrs.contentsDoc) {
       $(window).off('beforeunload', this._beforeunloadHandler);
     }
   }
 
-  view(vnode: m.Vnode<QuillEditorComponentAttrs>) {
+  view(vnode: ResultNode<QuillEditorComponentAttrs>) {
     const {
       className,
       contentsDoc,
@@ -162,7 +163,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
 
     return (
       <div
-        class={editorClass}
+        className={editorClass}
         oncreate={(childVnode) => {
           this.$editor = $(childVnode.dom).find('.quill-editor');
           this.editor = new QuillEditor(
@@ -179,14 +180,14 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
           if (oncreateBind) oncreateBind(this.editor);
         }}
       >
-        <div class="quill-editor" />
+        <div className="quill-editor" />
         {this.activeMode === 'markdown' && (
           <CWText
             type="h5"
             fontWeight="semiBold"
             className="mode-switcher"
             title="Switch to RichText mode"
-            onclick={(e) => {
+            onClick={(e) => {
               this.activeMode = 'richText';
               this.editor.activeMode = this.activeMode;
             }}
@@ -200,7 +201,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
             fontWeight="semiBold"
             className="mode-switcher"
             title="Switch to Markdown mode"
-            onclick={async () => {
+            onClick={async () => {
               // Confirm before removing formatting and switching to Markdown mode.
               const confirmed = await this._confirmRemoveFormatting();
               if (!confirmed) return;
@@ -218,7 +219,7 @@ export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAtt
           iconName="search"
           iconSize="small"
           iconButtonTheme="primary"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
             app.modals.create({
               modal: PreviewModal,

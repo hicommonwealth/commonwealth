@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -62,7 +62,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
     const formState = { module: '', function: '', args: [] };
 
     return (
-      <>
+      <React.Fragment>
         <CWDropdown
           label="Motion"
           options={motions.map((m_) => ({
@@ -77,13 +77,13 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
           }}
         />
         {this.councilMotionDescription && (
-          <div class="council-motion-description">
+          <div className="council-motion-description">
             {this.councilMotionDescription}
           </div>
         )}
         {this.councilMotionType === 'createExternalProposal' ||
           (this.councilMotionType === 'createExternalProposalMajority' &&
-            m(EdgewareFunctionPicker, formState))}
+            render(EdgewareFunctionPicker, formState))}
         {hasExternalProposalSelector &&
           substrate.democracyProposals.nextExternal && (
             <CWDropdown
@@ -104,7 +104,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
           )}
         {this.councilMotionType === 'createFastTrack' ||
           (this.councilMotionType === 'createExternalProposalDefault' && (
-            <>
+            <React.Fragment>
               <CWTextInput
                 label="Voting Period"
                 placeholder="Blocks (minimum enforced)"
@@ -119,7 +119,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
                   this.enactmentDelay = +e.target.value;
                 }}
               />
-            </>
+            </React.Fragment>
           ))}
 
         {this.councilMotionType === 'createEmergencyCancellation' && (
@@ -160,7 +160,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
         <CWButton
           disabled={!author.isCouncillor}
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             if (!this.threshold) {
@@ -261,7 +261,7 @@ export class SubstrateCollectiveProposalForm extends ClassComponent {
             return createTXModal(createFunc(args));
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

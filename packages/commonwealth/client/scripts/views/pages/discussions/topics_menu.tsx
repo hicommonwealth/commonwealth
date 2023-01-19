@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 
@@ -33,7 +34,7 @@ type TopicsMenuAttrs = {
 };
 
 export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
-  view(vnode: m.Vnode<TopicsMenuAttrs>) {
+  view(vnode: ResultNode<TopicsMenuAttrs>) {
     const { featuredTopics, otherTopics, selectedTopic, topic } = vnode.attrs;
 
     return (
@@ -46,11 +47,11 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
           />
         }
         content={
-          <div class="threads-filter-menu-items">
+          <div className="threads-filter-menu-items">
             <ThreadsFilterMenuItem
               label="All Topics"
-              isSelected={m.route.get() === `/${app.activeChainId()}` || !topic}
-              onclick={() => {
+              isSelected={getRoute() === `/${app.activeChainId()}` || !topic}
+              onClick={() => {
                 navigateToSubpage('/discussions');
               }}
             />
@@ -66,9 +67,9 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                   featuredInSidebar,
                   featuredInNewPost,
                   defaultOffchainTemplate,
-                }) => {
+                }, i) => {
                   const active =
-                    m.route.get() ===
+                    getRoute() ===
                       `/${app.activeChainId()}/discussions/${encodeURI(
                         name.toString().trim()
                       )}` ||
@@ -76,9 +77,10 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
 
                   return (
                     <ThreadsFilterMenuItem
+                      key={`${i}`}
                       label={name}
                       isSelected={active}
-                      onclick={(e) => {
+                      onClick={(e) => {
                         e.preventDefault();
                         navigateToSubpage(`/discussions/${name}`);
                       }}
@@ -89,7 +91,7 @@ export class TopicsMenu extends ClassComponent<TopicsMenuAttrs> {
                           <CWIconButton
                             iconName="write"
                             iconSize="small"
-                            onclick={(e) => {
+                            onClick={(e) => {
                               e.preventDefault();
                               app.modals.create({
                                 modal: EditTopicModal,

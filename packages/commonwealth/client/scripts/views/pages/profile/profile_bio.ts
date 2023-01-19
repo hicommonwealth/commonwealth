@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import m from 'mithril';
+
+import _ from 'lodash';
 import { Account } from 'models';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { MarkdownFormattedText } from '../../components/quill/markdown_formatted_text';
 import User from '../../components/widgets/user';
@@ -25,16 +27,16 @@ const editIdentityAction = (
   return (
     (account.chain.id.indexOf('edgeware') !== -1 ||
       account.chain.id.indexOf('kusama') !== -1) &&
-    m(CWButton, {
+    render(CWButton, {
       // wait for info to load before making it clickable
       disabled: vnode.state.chainLoading,
-      onclick: async () => {
+      onClick: async () => {
         if (app.activeChainId() !== chainObj.id) {
           let confirmed = false;
           const msg = `Must switch to ${chainObj.name} to set on-chain identity. Continue?`;
           confirmed = await confirmationModalWithText(msg)();
           if (confirmed) {
-            m.route.set(`/${chainObj.id}/account/${account.address}`, {
+            setRoute(`/${chainObj.id}/account/${account.address}`, {
               setIdentity: true,
             });
           }
@@ -77,7 +79,7 @@ export interface IProfileHeaderState {
   showProfileRight: boolean;
 }
 
-const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
+const ProfileBio: Component<IProfileHeaderAttrs, IProfileHeaderState> = {
   oninit: (vnode) => {
     vnode.state.showProfileRight = false;
   },
@@ -92,13 +94,13 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       () => {
         if (window.scrollY > 142 && vnode.state.showProfileRight === false) {
           vnode.state.showProfileRight = true;
-          m.redraw();
+          redraw();
         } else if (
           window.scrollY < 142 &&
           vnode.state.showProfileRight === true
         ) {
           vnode.state.showProfileRight = false;
-          m.redraw();
+          redraw();
         }
       },
       { passive: true }
@@ -118,7 +120,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         });
         vnode.state.loading = false;
         await setActiveAccount(account);
-        m.redraw();
+        redraw();
         notifySuccess('Joined community');
       } catch (err) {
         vnode.state.loading = false;
@@ -126,24 +128,24 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       }
     };
 
-    return m('.ProfileBio', [
-      m(
+    return render('.ProfileBio', [
+      render(
         `.ProfileHeader${
           vnode.state.showProfileRight ? '.show-profile' : '.hide-profile'
         }`,
         [
-          m('.bio-main', [
+          render('.bio-main', [
             account.profile &&
-              m('.bio-left', [
+              render('.bio-left', [
                 // TODO: Rename class to non-bio to avoid confusion with Bio component
                 account.profile?.getAvatar(90),
               ]),
-            m('.bio-right', [
-              m('.name-row', [
-                m(
+            render('.bio-right', [
+              render('.name-row', [
+                render(
                   '.User',
                   account.profile
-                    ? m(User, {
+                    ? render(User, {
                         user: account,
                         hideAvatar: true,
                         showRole: true,
@@ -151,14 +153,14 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                     : account.address
                 ),
               ]),
-              m('.address-block-right', [
-                m(
+              render('.address-block-right', [
+                render(
                   '.address',
                   `${account.address.slice(0, 6)}...${account.address.slice(
                     account.address.length - 6
                   )}`
                 ),
-                m('img', {
+                render('img', {
                   src: !account.ghostAddress
                     ? '/static/img/copy_default.svg'
                     : '/static/img/ghost.svg',
@@ -166,7 +168,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                   width: '20px',
 
                   class: !account.ghostAddress ? 'cursor-pointer' : '',
-                  onclick: (e) => {
+                  onClick: (e) => {
                     if (!account.ghostAddress) {
                       window.navigator.clipboard
                         .writeText(account.address)
@@ -181,12 +183,12 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
           ]),
         ]
       ),
-      m('.bio-actions-right', [
+      render('.bio-actions-right', [
         onOwnProfile
           ? [
               editIdentityAction(account, vnode.state.identity, vnode),
-              m(CWButton, {
-                onclick: () => {
+              render(CWButton, {
+                onClick: () => {
                   app.modals.create({
                     modal: EditProfileModal,
                     data: { account, refreshCallback },
@@ -196,13 +198,13 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               }),
             ]
           : showJoinCommunityButton && app.activeChainId()
-          ? m(CWButton, {
-              onclick: async () => {
+          ? render(CWButton, {
+              onClick: async () => {
                 if (onLinkedProfile) {
                   vnode.state.loading = true;
                   try {
                     await setActiveAccount(account);
-                    m.redraw();
+                    redraw();
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);
@@ -210,7 +212,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
                 } else {
                   try {
                     await joinCommunity();
-                    m.redraw();
+                    redraw();
                   } catch (e) {
                     vnode.state.loading = false;
                     notifyError(e);
@@ -223,25 +225,25 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
               // TODO: actions for others' accounts
             ],
       ]),
-      m(
+      render(
         `.address-block-right${
           vnode.state.showProfileRight ? '.hide-address' : '.show-address'
         }`,
         [
-          m(
+          render(
             '.address',
             `${account.address.slice(0, 6)}...${account.address.slice(
               account.address.length - 6
             )}`
           ),
-          m('img', {
+          render('img', {
             src: !account.ghostAddress
               ? '/static/img/copy_default.svg'
               : '/static/img/ghost.svg',
             alt: '',
             width: '20px',
             class: !account.ghostAddress ? 'cursor-pointer' : '',
-            onclick: (e) => {
+            onClick: (e) => {
               if (!account.ghostAddress) {
                 window.navigator.clipboard
                   .writeText(account.address)
@@ -252,7 +254,7 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
         ]
       ),
       account.ghostAddress
-        ? m(
+        ? render(
             'div',
             {
               style: 'font-style: italic; font-size: 12px;',
@@ -265,10 +267,10 @@ const ProfileBio: m.Component<IProfileHeaderAttrs, IProfileHeaderState> = {
       `
           )
         : [],
-      m('.header', 'Bio'),
+      render('.header', 'Bio'),
       account.profile && account.profile.bio
-        ? m('p', [m(MarkdownFormattedText, { doc: account.profile.bio })])
-        : m('.no-items', [
+        ? render('p', [render(MarkdownFormattedText, { doc: account.profile.bio })])
+        : render('.no-items', [
             account.profile && account.profile.name
               ? account.profile.name
               : 'This account',

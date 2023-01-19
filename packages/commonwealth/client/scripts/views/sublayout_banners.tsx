@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import {
@@ -21,11 +21,11 @@ type SublayoutBannersAttrs = {
 };
 
 export class SublayoutBanners extends ClassComponent<SublayoutBannersAttrs> {
-  view(vnode: m.Vnode<SublayoutBannersAttrs>) {
+  view(vnode: ResultNode<SublayoutBannersAttrs>) {
     const { banner, chain, terms, tosStatus, bannerStatus } = vnode.attrs;
 
     return (
-      <>
+      <React.Fragment>
         {banner && bannerStatus !== 'off' && (
           <CWMessageBanner
             bannerContent={banner}
@@ -44,7 +44,7 @@ export class SublayoutBanners extends ClassComponent<SublayoutBannersAttrs> {
         {isNonEmptyString(terms) && tosStatus !== 'off' && (
           <TermsBanner terms={terms} />
         )}
-      </>
+      </React.Fragment>
     );
   }
 }

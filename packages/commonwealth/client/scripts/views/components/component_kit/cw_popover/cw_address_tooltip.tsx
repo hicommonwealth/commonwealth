@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_address_tooltip.scss';
 
@@ -13,11 +14,11 @@ import { CWTooltip } from './cw_tooltip';
 
 type AddressTooltipAttrs = {
   address: string;
-  trigger: m.Vnode;
+  trigger: ResultNode;
 };
 
 export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
-  view(vnode: m.Vnode<AddressTooltipAttrs>) {
+  view(vnode: ResultNode<AddressTooltipAttrs>) {
     const { address, trigger } = vnode.attrs;
 
     return (
@@ -25,13 +26,13 @@ export class CWAddressTooltip extends ClassComponent<AddressTooltipAttrs> {
         persistOnHover
         interactionType="hover"
         tooltipContent={
-          <div class={ComponentType.AddressTooltip}>
+          <div className={ComponentType.AddressTooltip}>
             <CWText type="caption">{address}</CWText>
             <CWIconButton
               iconName="copy"
               iconSize="small"
               iconButtonTheme="primary"
-              onclick={async () => {
+              onClick={async () => {
                 navigator.clipboard
                   .writeText(address)
                   .then(() => {

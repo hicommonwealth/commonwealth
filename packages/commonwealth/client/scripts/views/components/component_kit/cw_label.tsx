@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_label.scss';
 
@@ -13,7 +14,7 @@ type LabelAttrs = {
 };
 
 export class CWLabel extends ClassComponent<LabelAttrs> {
-  view(vnode: m.Vnode<LabelAttrs>) {
+  view(vnode: ResultNode<LabelAttrs>) {
     const { label } = vnode.attrs;
     return (
       <CWText type="caption" className={ComponentType.Label}>

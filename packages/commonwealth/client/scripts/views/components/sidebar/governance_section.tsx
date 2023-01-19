@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 
@@ -13,6 +14,7 @@ import {
   ChainType,
 } from 'common-common/src/types';
 import { handleRedirectClicks } from 'helpers';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { verifyCachedToggleTree } from './helpers';
@@ -40,7 +42,7 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
+class GovernanceSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   view() {
     // Conditional Render Details
     const hasProposals =
@@ -236,7 +238,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       p.startsWith(`/${app.activeChainId()}/members`) ||
       p.startsWith(`/${app.activeChainId()}/account/`);
 
-    if (onNotificationsPage(m.route.get())) return;
+    if (onNotificationsPage(getRoute())) return;
 
     // ---------- Build Section Props ---------- //
 
@@ -248,10 +250,10 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       isVisible: true,
       isUpdated: true,
       isActive:
-        onMembersPage(m.route.get()) &&
+        onMembersPage(getRoute()) &&
         (app.chain ? app.chain.serverLoaded : true),
-      onclick: (e, toggle: boolean) => {
-        handleRedirectClicks(e, '/members', app.activeChainId(), () => {
+      onClick: (e, toggle: boolean) => {
+        handleRedirectClicks(this, e, '/members', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Members.toggledState', toggle);
         });
       },
@@ -266,15 +268,16 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         ? toggleTreeState['children']['Snapshots']['toggledState']
         : false,
       isVisible: showSnapshotOptions,
-      isActive: onSnapshotProposal(m.route.get()),
+      isActive: onSnapshotProposal(getRoute()),
       isUpdated: true,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('children.Snapshots.toggledState', toggle);
         // Check if we have multiple snapshots for conditional redirect
         const snapshotSpaces = app.chain.meta.snapshot;
         if (snapshotSpaces.length > 1) {
           handleRedirectClicks(
+            this,
             e,
             '/multiple-snapshots?action=select-space',
             app.activeChainId(),
@@ -283,6 +286,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         } else {
           if (snapshotSpaces[0].lastIndexOf('/') > -1) {
             handleRedirectClicks(
+              this,
               e,
               `/snapshot/${snapshotSpaces[0]
                 .slice(snapshotSpaces[0].lastIndexOf('/') + 1)
@@ -292,6 +296,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
             );
           } else {
             handleRedirectClicks(
+              this,
               e,
               `/snapshot/${snapshotSpaces}`,
               app.activeChainId(),
@@ -310,15 +315,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showProposals
         ? toggleTreeState['children']['Proposals']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/proposals', app.activeChainId(), () => {
+        handleRedirectClicks(this, e, '/proposals', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Proposals.toggledState', toggle);
         });
       },
       isVisible: showProposals,
       isUpdated: true,
-      isActive: onProposalPage(m.route.get()),
+      isActive: onProposalPage(getRoute()),
       displayData: null,
     };
 
@@ -329,15 +334,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showTreasury
         ? toggleTreeState['children']['Treasury']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/treasury', app.activeChainId(), () => {
+        handleRedirectClicks(this, e, '/treasury', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Treasury.toggledState', toggle);
         });
       },
       isVisible: showTreasury,
       isUpdated: true,
-      isActive: onTreasuryPage(m.route.get()),
+      isActive: onTreasuryPage(getRoute()),
       displayData: null,
     };
 
@@ -347,15 +352,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showBounties
         ? toggleTreeState['children']['Bounties']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/bounties', app.activeChainId(), () => {
+        handleRedirectClicks(this, e, '/bounties', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Bounties.toggledState', toggle);
         });
       },
       isVisible: showBounties,
       isUpdated: true,
-      isActive: onBountiesPage(m.route.get()),
+      isActive: onBountiesPage(getRoute()),
       displayData: null,
     };
 
@@ -365,15 +370,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showReferenda
         ? toggleTreeState['children']['Referenda']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/referenda', app.activeChainId(), () => {
+        handleRedirectClicks(this, e, '/referenda', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Referenda.toggledState', toggle);
         });
       },
       isVisible: showReferenda,
       isUpdated: true,
-      isActive: onReferendaPage(m.route.get()),
+      isActive: onReferendaPage(getRoute()),
       displayData: null,
     };
 
@@ -383,15 +388,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showTips
         ? toggleTreeState['children']['Tips']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/tips', app.activeChainId(), () => {
+        handleRedirectClicks(this, e, '/tips', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Tips.toggledState', toggle);
         });
       },
       isVisible: showTips,
       isUpdated: true,
-      isActive: onTipsPage(m.route.get()),
+      isActive: onTipsPage(getRoute()),
       displayData: null,
     };
 
@@ -401,15 +406,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showCouncillors
         ? toggleTreeState['children']['Councillors']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/council', app.activeChainId(), () => {
+        handleRedirectClicks(this, e, '/council', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Councillors.toggledState', toggle);
         });
       },
       isVisible: showCouncillors,
       isUpdated: true,
-      isActive: onCouncilPage(m.route.get()),
+      isActive: onCouncilPage(getRoute()),
       displayData: null,
     };
 
@@ -419,15 +424,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       hasDefaultToggle: showValidators
         ? toggleTreeState['children']['Validators']['toggledState']
         : false,
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/validators', app.activeChainId(), () => {
+        handleRedirectClicks(this, e, '/validators', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Validators.toggledState', toggle);
         });
       },
       isVisible: showValidators,
       isUpdated: true,
-      isActive: onValidatorsPage(m.route.get()),
+      isActive: onValidatorsPage(getRoute()),
       displayData: null,
     };
 
@@ -440,10 +445,10 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
         : false,
       isVisible: showCompoundOptions,
       isUpdated: true,
-      isActive: m.route.get() === `/${app.activeChainId()}/delegate`,
-      onclick: (e, toggle: boolean) => {
+      isActive: getRoute() === `/${app.activeChainId()}/delegate`,
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
-        handleRedirectClicks(e, '/delegate', app.activeChainId(), () => {
+        handleRedirectClicks(this, e, '/delegate', app.activeChainId(), () => {
           setGovernanceToggleTree('children.Delegate.toggledState', toggle);
         });
       },
@@ -469,7 +474,7 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
       title: 'Governance',
       className: 'GovernanceSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setGovernanceToggleTree('toggledState', toggle);
       },
@@ -481,3 +486,5 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
     return <SidebarSectionGroup {...sidebarSectionData} />;
   }
 }
+
+export const GovernanceSection = NavigationWrapper(GovernanceSectionComponent);

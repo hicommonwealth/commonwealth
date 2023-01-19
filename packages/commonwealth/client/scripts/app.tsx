@@ -1,3 +1,6 @@
+/* jsx jsx */
+
+import React from 'react';
 /* eslint-disable @typescript-eslint/ban-types */
 
 import '../styles/normalize.css'; // reset
@@ -7,15 +10,24 @@ import 'construct.scss';
 import 'lity/dist/lity.min.css';
 import mixpanel from 'mixpanel-browser';
 
-import m from 'mithril';
 import $ from 'jquery';
 import moment from 'moment';
 
-import './fragment-fix';
 import app, { ApiStatus, LoginState } from 'state';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  rootRender,
+  jsx,
+} from 'mithrilInterop';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
-
 import {
   notifyError,
   notifyInfo,
@@ -24,11 +36,15 @@ import {
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import { Layout } from 'views/layout';
-import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
+// import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import { alertModalWithText } from 'views/modals/alert_modal';
 import { pathIsDiscussion } from './identifiers';
-import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
+import { isWindowMediumSmallInclusive } from 'views/components/component_kit/helpers';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import DiscussionsPage from 'views/pages/discussions';
+import { createRoutesFromElements, Route } from 'react-router';
+import { createRoot } from 'react-dom/client';
 
 
 // eslint-disable-next-line max-len
@@ -96,7 +112,7 @@ export async function initAppState(
           console.log('Initializing socket connection with JTW:', app.user.jwt);
           // init the websocket connection and the chain-events namespace
           app.socket.init(app.user.jwt);
-          app.user.notifications.refresh().then(() => m.redraw());
+          app.user.notifications.refresh().then(() => redraw());
         } else if (
           app.loginState == LoginState.LoggedOut &&
           app.socket.isConnected
@@ -149,12 +165,13 @@ export async function deinitChainOrCommunity() {
   document.title = 'Commonwealth';
 }
 
+/*
 export async function handleInviteLinkRedirect() {
-  const inviteMessage = m.route.param('invitemessage');
+  const inviteMessage = getRouteParam('invitemessage');
   if (inviteMessage) {
     if (
       inviteMessage === 'failure' &&
-      m.route.param('message') === 'Must be logged in to accept invites'
+      getRouteParam('message') === 'Must be logged in to accept invites'
     ) {
       notifyInfo('Log in to join a community with an invite link');
       app.modals.create({
@@ -167,7 +184,7 @@ export async function handleInviteLinkRedirect() {
         },
       });
     } else if (inviteMessage === 'failure') {
-      const message = m.route.param('message');
+      const message = getRouteParam('message');
       notifyError(message);
     } else if (inviteMessage === 'success') {
       if (app.config.invites.length === 0) return;
@@ -177,10 +194,11 @@ export async function handleInviteLinkRedirect() {
     }
   }
 }
+*/
 
 export async function handleUpdateEmailConfirmation() {
-  if (m.route.param('confirmation')) {
-    if (m.route.param('confirmation') === 'success') {
+  if (getRouteParam('confirmation')) {
+    if (getRouteParam('confirmation') === 'success') {
       notifySuccess('Email confirmed!');
     }
   }
@@ -214,7 +232,7 @@ export async function selectChain(
   await deinitChainOrCommunity();
   app.chainPreloading = true;
   document.title = `Commonwealth – ${chain.name}`;
-  setTimeout(() => m.redraw()); // redraw to show API status indicator
+  setTimeout(() => redraw()); // redraw to show API status indicator
 
   // Import top-level chain adapter lazily, to facilitate code split.
   let newChain;
@@ -367,6 +385,7 @@ export async function selectChain(
   } else {
     app.chain = newChain;
   }
+  console.log('init api');
   if (initApi) {
     await app.chain.initApi(); // required for loading NearAccounts
   }
@@ -374,27 +393,31 @@ export async function selectChain(
   app.chain.deferred = deferred;
 
   // Instantiate active addresses before chain fully loads
+  console.log('update active addrs');
   await updateActiveAddresses(chain);
 
   // Update default on server if logged in
   if (app.isLoggedIn()) {
+    console.log('select user chain');
     await app.user.selectChain({
       chain: chain.id,
     });
   }
 
   // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
-  handleInviteLinkRedirect();
+  // handleInviteLinkRedirect();
 
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
-  m.redraw();
+  redraw();
+  console.log('done selectChain');
   return true;
 }
 
 // Initializes a selected chain. Requires `app.chain` to be defined and valid
 // and not already initialized.
 export async function initChain(): Promise<void> {
+  console.log('initChain');
   if (!app.chain || !app.chain.meta || app.chain.loaded) return;
   if (!app.chain.apiInitialized) {
     await app.chain.initApi();
@@ -410,9 +433,6 @@ export async function initChain(): Promise<void> {
 
   // Instantiate (again) to create chain-specific Account<> objects
   await updateActiveAddresses(chain);
-
-  // Finish redraw to remove loading dialog
-  m.redraw();
 }
 
 export async function initNewTokenChain(address: string) {
@@ -424,7 +444,7 @@ export async function initNewTokenChain(address: string) {
   });
   if (response.status !== 'Success') {
     // TODO: better custom 404
-    m.route.set('/404');
+    setRoute('/404');
   }
   // TODO: check if this is valid
   const { chain, node } = response.result;
@@ -437,39 +457,17 @@ export async function initNewTokenChain(address: string) {
   await selectChain(chainInfo);
 }
 
-// set up route navigation
-m.route.prefix = '';
-const _updateRoute = m.route.set;
-export const updateRoute = (...args) => {
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
-  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
-};
-m.route.set = (...args) => {
-  // set app params that maintain global state for:
-  // - whether the user last clicked the back button
-  // - the last page the user was on
-  app._lastNavigatedBack = false;
-  app._lastNavigatedFrom = m.route.get();
-  // update route
-  if (args[0] !== m.route.get()) _updateRoute.apply(this, args);
-  // reset scroll position
-  const html = document.getElementsByTagName('html')[0];
-  if (html) html.scrollTo(0, 0);
-  const body = document.getElementsByTagName('body')[0];
-  if (body) body.scrollTo(0, 0);
-};
 export const navigateToSubpage = (...args) => {
   // prepend community if we are not on a custom domain
   if (!app.isCustomDomain() && app.activeChainId()) {
     args[0] = `/${app.activeChainId()}${args[0]}`;
   }
   app.sidebarMenu = 'default';
-  m.route.set.apply(this, args);
+  setRoute.apply(this, args);
 };
 
 /* Uncomment for redraw instrumentation
-const _redraw = m.redraw;
+const _redraw = redraw();
 function redrawInstrumented(...args) {
   console.log('redraw!');
   _redraw.apply(this, args);
@@ -478,13 +476,13 @@ redrawInstrumented.sync = (...args) => {
   console.log('redraw sync!');
   _redraw.sync.apply(this, args);
 };
-m.redraw = redrawInstrumented;
+redraw() = redrawInstrumented;
 */
 
 const _onpopstate = window.onpopstate;
 window.onpopstate = (...args) => {
   app._lastNavigatedBack = true;
-  app._lastNavigatedFrom = m.route.get();
+  app._lastNavigatedFrom = getRoute();
   if (_onpopstate) _onpopstate.apply(this, args);
 };
 
@@ -538,82 +536,13 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
       notifyError(`${errorMsg}`);
       return false;
     };
-
-    const redirectRoute = (path: string | Function) => ({
-      render: (vnode) => {
-        m.route.set(
-          typeof path === 'string' ? path : path(vnode.attrs),
-          {},
-          { replace: true }
-        );
-        return m(Layout);
-      },
-    });
-
-    interface RouteAttrs {
-      scoped: string | boolean;
-      hideSidebar?: boolean;
-      deferChain?: boolean;
-    }
-
-    let hasCompletedSuccessfulPageLoad = false;
-    const importRoute = (path: string, attrs: RouteAttrs) => ({
-      onmatch: async () => {
-        return import(
-          /* webpackMode: "lazy" */
-          /* webpackChunkName: "route-[request]" */
-          `./${path}`
-        )
-          .then((p) => {
-            hasCompletedSuccessfulPageLoad = true;
-            return p.default;
-          })
-          .catch((err) => {
-            // handle import() error
-            console.error(err);
-            if (err.name === 'ChunkLoadError') {
-              alertModalWithText(
-                APPLICATION_UPDATE_MESSAGE,
-                APPLICATION_UPDATE_ACTION
-              )();
-            }
-            // return to the last page, if it was on commonwealth
-            // eslint-disable-next-line no-restricted-globals
-            if (hasCompletedSuccessfulPageLoad) history.back();
-          });
-      },
-      render: (vnode) => {
-        const { scoped, hideSidebar } = attrs;
-        const scope =
-          typeof scoped === 'string'
-            ? // string => scope is defined by route
-              scoped
-            : scoped
-            ? // true => scope is derived from path
-              vnode.attrs.scope?.toString() || customDomain
-            : // false => scope is null
-              null;
-
-        // Special case to defer chain loading specifically for viewing an offchain thread. We need
-        // a special case because Threads and on-chain proposals are all viewed through the
-        // same "/:scope/proposal/:type/:id" route.
-        let deferChain = attrs.deferChain;
-        const isDiscussion =
-          vnode.attrs.type === 'discussion' ||
-          pathIsDiscussion(scope, window.location.pathname);
-        if (path === 'views/pages/view_proposal/index' && isDiscussion) {
-          deferChain = true;
-        }
-        if (app.chain?.meta.type === ChainType.Token) {
-          deferChain = false;
-        }
-        return m(Layout, { scope, deferChain, hideSidebar }, [vnode]);
-      },
-    });
-
+    /*
     const isCustomDomain = !!customDomain;
     const { activeAccount } = app.user;
-    m.route(document.body, '/', {
+    const routes: {[route: string]: {
+      onmatch?: () => Promise<any>,
+      render: (vnode: any) => ReturnType<render>
+    }} = {
       // Sitewide pages
       '/about': importRoute('views/pages/why_commonwealth', {
         scoped: false,
@@ -1058,19 +987,47 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               (attrs) => `/${attrs.scope}/new/snapshot/${attrs.snapshotId}`
             ),
           }),
-    });
+    };
 
+
+            '/:scope/discussions': importRoute('views/pages/discussions', {
+              scoped: true,
+              deferChain: true,
+            }),
+    */
+    // const createRouter = (initFn) => {
+    //   console.log('creating router...');
+    //   const LayoutComponent = (
+    //     <Layout deferChain={true} initFn={initFn}>
+    //       <DiscussionsPage />
+    //     </Layout>
+    //   );
+    //   const reactRouter = createBrowserRouter(
+    //     createRoutesFromElements(
+    //       <Route path="/:scope/discussions" element={LayoutComponent} />
+    //     )
+    //   );
+    // const rootElement = document.getElementById('react');
+    // const root = createRoot(rootElement);
+
+    // root.render(<div>hello there</div>);
+
+    // createRoot(document.body).render(<RouterProvider router={reactRouter} />);
+    // return LayoutComponent;
+    /*
     const script = document.createElement('noscript');
     // eslint-disable-next-line max-len
-    m.render(
+    rootRender(
       script,
-      m.trust(
+      render.trust(
         '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'
       )
     );
     document.body.insertBefore(script, document.body.firstChild);
-
+    */
+    // };
     // initialize mixpanel, before adding an alias or tracking identity
+    /*
     try {
       if (
         document.location.host.startsWith('localhost') ||
@@ -1087,28 +1044,27 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
 
     // handle login redirects
     if (
-      m.route.param('loggedin') &&
-      m.route.param('loggedin').toString() === 'true' &&
-      m.route.param('path') &&
-      !m.route.param('path').startsWith('/login')
+      getRouteParam('loggedin') &&
+      getRouteParam('loggedin').toString() === 'true' &&
+      getRouteParam('path') &&
+      !getRouteParam('path').startsWith('/login')
     ) {
-      // (we call toString() because m.route.param() returns booleans, even though the types don't reflect this)
+      // (we call toString() because getRouteParam() returns booleans, even though the types don't reflect this)
       // handle param-based redirect after email login
 
-      /* If we are creating a new account, then we alias to create a new mixpanel user
-       else we identify to associate mixpanel events
-    */
-      if (m.route.param('new') && m.route.param('new').toString() === 'true') {
+      // If we are creating a new account, then we alias to create a new mixpanel user
+      // else we identify to associate mixpanel events
+      if (getRouteParam('new') && getRouteParam('new').toString() === 'true') {
         console.log('creating account');
 
         try {
         } catch (err) {
           // Don't do anything... Just identify if there is an error
-          // mixpanel.identify(m.route.param('email').toString());
+          // mixpanel.identify(getRouteParam('email').toString());
         }
       } else {
       }
-      m.route.set(m.route.param('path'), {}, { replace: true });
+      setRoute(getRouteParam('path'), {}, { replace: true });
     } else if (
       localStorage &&
       localStorage.getItem &&
@@ -1120,7 +1076,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           localStorage.getItem('githubPostAuthRedirect')
         );
         if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-          m.route.set(postAuth.path, {}, { replace: true });
+          setRoute(postAuth.path, {}, { replace: true });
         }
         localStorage.removeItem('githubPostAuthRedirect');
       } catch (e) {
@@ -1136,38 +1092,25 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           localStorage.getItem('discordPostAuthRedirect')
         );
         if (postAuth.path && +new Date() - postAuth.timestamp < 30 * 1000) {
-          m.route.set(postAuth.path, {}, { replace: true });
+          setRoute(postAuth.path, {}, { replace: true });
         }
         localStorage.removeItem('discordPostAuthRedirect');
       } catch (e) {
         console.log('Error restoring path from localStorage');
       }
     }
-    if (m.route.param('loggedin')) {
+    if (getRouteParam('loggedin')) {
       notifySuccess('Logged in!');
-    } else if (m.route.param('loginerror')) {
+    } else if (getRouteParam('loginerror')) {
       notifyError('Could not log in');
-      console.error(m.route.param('loginerror'));
+      console.error(getRouteParam('loginerror'));
     }
+    */
 
     // initialize the app
-    initAppState(true, customDomain)
-      .then(async () => {
-        if (app.loginState === LoginState.LoggedIn) {
-          // refresh notifications once
-          // grab all discussion drafts
-          app.user.discussionDrafts.refreshAll().then(() => m.redraw());
-        }
-
-        handleInviteLinkRedirect();
-        // If the user updates their email
-        handleUpdateEmailConfirmation();
-
-        m.redraw();
-      })
-      .catch(() => {
-        m.redraw();
-      });
+    // createRouter(async () => {
+    //   return initAppState(true, customDomain);
+    // });
   }
 );
 
@@ -1178,7 +1121,7 @@ declare const module: any; // tslint:disable-line no-reserved-keywords
 if (module.hot) {
   module.hot.accept();
   // module.hot.dispose((data: any) => {
-  //   m.redraw();
+  //   redraw();
   // })
 }
 // /////////////////////////////////////////////////////////

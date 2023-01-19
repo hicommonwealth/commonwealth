@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/validators.scss';
 
@@ -37,13 +38,13 @@ type ValidatorAttrs = {
 };
 
 class Validator extends ClassComponent<ValidatorAttrs> {
-  view(vnode: m.Vnode<ValidatorAttrs>) {
+  view(vnode: ResultNode<ValidatorAttrs>) {
     const { info } = vnode.attrs;
 
     return (
       <CWCard className="ValidatorCard">
-        <div class="user-and-nominator">
-          {m(User, {
+        <div className="user-and-nominator">
+          {render(User, {
             user: new AddressInfo(null, info.stash, info.chain, null),
             popover: true,
             hideIdentityIcon: true,
@@ -111,7 +112,7 @@ class ValidatorsPage extends ClassComponent {
       });
       // TODO: handle error fetching vals
       this.validatorsInitialized = true;
-      m.redraw();
+      redraw();
     }
 
     const validators = this.validators;
@@ -140,7 +141,7 @@ class ValidatorsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Validators" />}
       >
-        <div class="ValidatorsPage">
+        <div className="ValidatorsPage">
           <GovExplainer
             statHeaders={[
               {

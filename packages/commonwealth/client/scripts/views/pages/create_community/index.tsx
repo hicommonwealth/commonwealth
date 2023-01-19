@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/create_community.scss';
@@ -74,7 +75,7 @@ class CreateCommunity extends ClassComponent {
         }
       }
       this.state.loadingEthChains = false;
-      m.redraw();
+      redraw();
     });
   }
 
@@ -115,7 +116,7 @@ class CreateCommunity extends ClassComponent {
       <Sublayout
       // title="Create Community"
       >
-        <div class="CreateCommunityIndex">
+        <div className="CreateCommunityIndex">
           <CWText type="h3" fontWeight="semiBold">
             New Commonwealth Community
           </CWText>
@@ -130,7 +131,7 @@ class CreateCommunity extends ClassComponent {
                     <CWTab
                       label={t.toString()}
                       isSelected={this.state.activeForm === t}
-                      onclick={() => {
+                      onClick={() => {
                         this.state.activeForm = t;
                         mixpanelBrowserTrack({
                           event:

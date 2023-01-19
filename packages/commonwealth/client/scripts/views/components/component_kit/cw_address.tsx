@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_address.scss';
 
@@ -14,10 +15,10 @@ type AddressAttrs = {
 };
 
 export class CWAddress extends ClassComponent<AddressAttrs> {
-  view(vnode: m.Vnode<AddressAttrs>) {
+  view(vnode: ResultNode<AddressAttrs>) {
     const { address, darkMode } = vnode.attrs;
     return (
-      <div class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'Address')}>
+      <div className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'Address')}>
         <CWText type="caption" className="address-text">
           {address}
         </CWText>

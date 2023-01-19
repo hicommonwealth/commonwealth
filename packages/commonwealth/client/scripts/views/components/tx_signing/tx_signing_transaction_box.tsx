@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/tx_signing/tx_signing_transaction_box.scss';
 
@@ -17,11 +18,11 @@ type TXSigningTransactionBoxAttrs = {
 };
 
 export class TXSigningTransactionBox extends ClassComponent<TXSigningTransactionBoxAttrs> {
-  view(vnode: m.Vnode<TXSigningTransactionBoxAttrs>) {
+  view(vnode: ResultNode<TXSigningTransactionBoxAttrs>) {
     const { blockHash, blockNum, status, success, timestamp } = vnode.attrs;
 
     return (
-      <div class="TXSigningTransactionBox">
+      <div className="TXSigningTransactionBox">
         <CWText fontWeight="medium">Status</CWText>
         <CWText
           className={getClasses<{ success?: boolean }>(

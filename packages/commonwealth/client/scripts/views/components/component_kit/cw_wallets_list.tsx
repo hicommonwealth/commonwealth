@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -27,7 +28,7 @@ import { CWSpinner } from './cw_spinner';
 
 // Copied over from the old wallet selector with modifications
 // TODO: This should eventually be replaced with a component native to the new flow
-const LinkAccountItem: m.Component<
+const LinkAccountItem: Component<
   {
     account: { address: string; meta?: { name: string } };
     walletNetwork: ChainNetwork;
@@ -60,17 +61,17 @@ const LinkAccountItem: m.Component<
       account.meta?.name ||
       `${capitalizedBaseName} address ${account.address.slice(0, 6)}...`;
 
-    return m(
+    return render(
       '.account-item',
       {
         class: `account-item-emphasized`,
-        onclick: () => onSelect(idx),
+        onClick: () => onSelect(idx),
       },
       [
-        m('.account-item-avatar', [
-          m(
+        render('.account-item-avatar', [
+          render(
             '.account-user',
-            m(User, {
+            render(User, {
               user: new AddressInfo(
                 null,
                 address,
@@ -81,12 +82,12 @@ const LinkAccountItem: m.Component<
             })
           ),
         ]),
-        m('.account-item-left', [
-          m('.account-item-name', `${name}`),
-          m('.account-item-address', [
-            m(
+        render('.account-item-left', [
+          render('.account-item-name', `${name}`),
+          render('.account-item-address', [
+            render(
               '.account-user',
-              m(User, {
+              render(User, {
                 user: new AddressInfo(
                   null,
                   address,
@@ -97,13 +98,13 @@ const LinkAccountItem: m.Component<
             ),
           ]),
           vnode.state.linking &&
-            m('p.small-text', 'Check your wallet for a confirmation prompt.'),
+            render('p.small-text', 'Check your wallet for a confirmation prompt.'),
         ]),
-        m('.account-item-right', [
+        render('.account-item-right', [
           vnode.state.linking &&
-            m('.account-waiting', [
+            render('.account-waiting', [
               // TODO: show a (?) icon with a tooltip explaining to check your wallet
-              m(CWSpinner, { size: 'small' }),
+              render(CWSpinner, { size: 'small' }),
             ]),
         ]),
       ]
@@ -119,23 +120,23 @@ type AccountSelectorAttrs = {
 };
 
 export class AccountSelector extends ClassComponent<AccountSelectorAttrs> {
-  view(vnode: m.Vnode<AccountSelectorAttrs>) {
+  view(vnode: ResultNode<AccountSelectorAttrs>) {
     const { accounts, walletNetwork, walletChain, onSelect } = vnode.attrs;
 
     return (
-      <div class="AccountSelector">
-        <div class="close-button-wrapper">
+      <div className="AccountSelector">
+        <div className="close-button-wrapper">
           <CWIconButton
             iconButtonTheme="primary"
             iconName="close"
             iconSize="small"
             className="close-icon"
-            onclick={() => $('.AccountSelector').trigger('modalexit')}
+            onClick={() => $('.AccountSelector').trigger('modalexit')}
           />
         </div>
 
         {accounts.map((account, idx) => {
-          return m(LinkAccountItem, {
+          return render(LinkAccountItem, {
             account,
             walletChain,
             walletNetwork,
@@ -165,7 +166,7 @@ type WalletsListAttrs = {
 };
 
 export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
-  view(vnode: m.Vnode<WalletsListAttrs>) {
+  view(vnode: ResultNode<WalletsListAttrs>) {
     const {
       connectAnotherWayOnclick,
       darkMode,
@@ -242,21 +243,21 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
         $('.LoginDesktop').trigger('modalexit');
       }
 
-      m.redraw();
+      this.redraw();
     };
 
     return (
-      <div class="WalletsList">
-        <div class="wallets-and-link-container">
+      <div className="WalletsList">
+        <div className="wallets-and-link-container">
           <div
-            class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'wallets')}
+            className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'wallets')}
           >
             {wallets.map((wallet: IWebWallet<any>) => (
               <CWWalletOptionRow
                 walletName={wallet.name}
                 walletLabel={wallet.label}
                 darkMode={darkMode}
-                onclick={async () => {
+                onClick={async () => {
                   await wallet.enable();
                   setSelectedWallet(wallet);
 
@@ -367,7 +368,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
               >
                 <a
                   href="#"
-                  onclick={resetWalletConnectOnclick.bind(this, wallets)}
+                  onClick={resetWalletConnectOnclick.bind(this, wallets)}
                 >
                   Reset WalletConnect
                 </a>
@@ -377,7 +378,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
               <CWTooltip
                 interactionType="click"
                 tooltipContent={
-                  <>
+                  <React.Fragment>
                     <CWText type="caption">
                       If you don’t see your wallet then make sure:
                     </CWText>
@@ -387,7 +388,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
                     <CWText type="caption">
                       • Your wallet chrome extension active?
                     </CWText>
-                  </>
+                  </React.Fragment>
                 }
                 tooltipType="solidArrow"
                 trigger={
@@ -412,7 +413,7 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
             'connect-another-way-link'
           )}
         >
-          <a onclick={connectAnotherWayOnclick}>Connect Another Way</a>
+          <a onClick={connectAnotherWayOnclick}>Connect Another Way</a>
         </CWText>
       </div>
     );

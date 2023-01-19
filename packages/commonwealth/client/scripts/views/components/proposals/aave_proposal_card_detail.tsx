@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/proposals/aave_proposal_card_detail.scss';
 
@@ -17,11 +18,11 @@ export const roundVote = (percentage) => {
 type AaveInfoRowAttrs = { aaveNum: number; aaveText: string };
 
 export class AaveInfoRow extends ClassComponent<AaveInfoRowAttrs> {
-  view(vnode: m.Vnode<AaveInfoRowAttrs>) {
+  view(vnode: ResultNode<AaveInfoRowAttrs>) {
     const { aaveNum, aaveText } = vnode.attrs;
 
     return (
-      <div class="AaveInfoRow">
+      <div className="AaveInfoRow">
         <CWText type="h5" fontWeight="semiBold" className="aave-num-text">
           {roundVote(aaveNum * 100)}%
         </CWText>
@@ -37,7 +38,7 @@ type AaveProposalCardDetailAttrs = {
 };
 
 export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetailAttrs> {
-  view(vnode: m.Vnode<AaveProposalCardDetailAttrs>) {
+  view(vnode: ResultNode<AaveProposalCardDetailAttrs>) {
     const { proposal } = vnode.attrs;
 
     const statusText = Array.isArray(vnode.attrs.statusText)
@@ -49,28 +50,28 @@ export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetai
     // const executor = proposal.Executor;
 
     return (
-      <div class="AaveProposalCardDetail">
-        <div class="aave-metadata-container">
-          <div class="aave-metadata-column">
+      <div className="AaveProposalCardDetail">
+        <div className="aave-metadata-container">
+          <div className="aave-metadata-column">
             <CWLabel label="Author" />
             {proposal.ipfsData?.author ? (
               <CWText title={proposal.ipfsData.author.split(' (')[0]} noWrap>
                 {proposal.ipfsData.author.split(' (')[0]}
               </CWText>
             ) : (
-              m(User, {
+              render(User, {
                 user: proposal.author,
                 hideAvatar: true,
                 linkify: true,
               })
             )}
           </div>
-          <div class="aave-metadata-column">
+          <div className="aave-metadata-column">
             <CWLabel label="Status" />
             <CWText noWrap>{statusText}</CWText>
           </div>
         </div>
-        <div class="aave-voting-section">
+        <div className="aave-voting-section">
           <CWLabel label="Voting" />
           <AaveInfoRow aaveNum={proposal.turnout} aaveText="of token holders" />
           <AaveInfoRow aaveNum={proposal.support} aaveText="in favor" />
@@ -79,7 +80,7 @@ export class AaveProposalCardDetail extends ClassComponent<AaveProposalCardDetai
             aaveText="differential"
           />
         </div>
-        <div class="aave-voting-section">
+        <div className="aave-voting-section">
           <CWLabel label="Required to pass" />
           <AaveInfoRow
             aaveNum={proposal.minimumQuorum}

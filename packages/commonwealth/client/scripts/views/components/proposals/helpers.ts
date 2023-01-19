@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { formatCoin } from 'adapters/currency';
@@ -51,16 +52,16 @@ export const getBalance = (proposal: AnyProposal, vote: IVote<any>) => {
       if (vote instanceof AaveProposalVote) {
         balance = vote.power;
         balancesCache[vote.account.address] = vote.format();
-        m.redraw();
+        redraw();
       } else if (vote instanceof CompoundProposalVote) {
         balance = formatCoin(app.chain.chain.coins(vote.power), true);
         balancesCache[vote.account.address] = balance;
-        m.redraw();
+        redraw();
       } else {
         vote.account.balance.then((b) => {
           balance = b;
           balancesCache[vote.account.address] = formatCoin(b, true);
-          m.redraw();
+          redraw();
         });
         balance = '--';
       }
@@ -84,7 +85,7 @@ export const cancelProposal = (
       .abortTx()
       .then(() => {
         onModalClose();
-        m.redraw();
+        redraw();
       })
       .catch((err) => {
         onModalClose();
@@ -95,7 +96,7 @@ export const cancelProposal = (
       .cancelTx()
       .then(() => {
         onModalClose();
-        m.redraw();
+        redraw();
       })
       .catch((err) => {
         onModalClose();
@@ -106,7 +107,7 @@ export const cancelProposal = (
       .cancelTx()
       .then(() => {
         onModalClose();
-        m.redraw();
+        redraw();
       })
       .catch((err) => {
         onModalClose();

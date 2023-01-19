@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/edit_identity_modal.scss';
@@ -35,13 +35,13 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
   private identity: SubstrateIdentity | null;
   private saving: boolean;
 
-  oninit(vnode: m.Vnode<EditIdentityModalAttrs>) {
+  oninit(vnode: ResultNode<EditIdentityModalAttrs>) {
     app.runWhenReady(async () => {
       this.identity = await (app.chain as Substrate).identities.load(
         vnode.attrs.account
       );
 
-      m.redraw();
+      redraw();
     });
   }
 
@@ -62,7 +62,7 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
     }
   }
 
-  view(vnode: m.VnodeDOM<EditIdentityModalAttrs>) {
+  view(vnode: ResultNode<EditIdentityModalAttrs>) {
     const updateIdentity = async () => {
       const data = {
         display: this.display.trim(),
@@ -133,16 +133,16 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
 
       this.saving = false;
 
-      m.redraw();
+      redraw();
     };
 
     return (
-      <div class="EditIdentityModal">
-        <div class="compact-modal-title">
+      <div className="EditIdentityModal">
+        <div className="compact-modal-title">
           <h3>Set on-chain identity</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWTextInput
             label="Display Name"
             placeholder="A reasonable display name for the controller of the account"
@@ -185,10 +185,10 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
               this.twitter = e.target.value;
             }}
           />
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               buttonType="secondary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
               }}
@@ -196,7 +196,7 @@ export class EditIdentityModal extends ClassComponent<EditIdentityModalAttrs> {
             />
             <CWButton
               disabled={this.saving || !app.chain?.loaded}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 updateIdentity().then(() => $(vnode.dom).trigger('modalexit'));
               }}

@@ -1,7 +1,8 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
 
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
 import { link } from 'helpers';
 
@@ -28,7 +29,7 @@ export interface ISubstrateIdentityState {
   identity: SubstrateIdentity | null;
 }
 
-const SubstrateOnlineIdentityWidget: m.Component<
+const SubstrateOnlineIdentityWidget: Component<
   ISubstrateIdentityAttrs,
   ISubstrateIdentityState
 > = {
@@ -40,7 +41,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
         (app.chain as Substrate).identities
           ? await (app.chain as Substrate).identities.load(vnode.attrs.account)
           : null;
-      m.redraw();
+      redraw();
     });
   },
   view: (vnode) => {
@@ -67,7 +68,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
       displayName = showAddressWithDisplayName
         ? [
             profile.displayName,
-            m('.id-short', formatAddressShort(profile.address, profile.chain)),
+            render('.id-short', formatAddressShort(profile.address, profile.chain)),
           ]
         : profile.displayName;
       quality = getIdentityQuality(Object.values(profile.judgements));
@@ -76,7 +77,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
       displayName = showAddressWithDisplayName
         ? [
             vnode.state.identity.username,
-            m('.id-short', formatAddressShort(profile.address, profile.chain)),
+            render('.id-short', formatAddressShort(profile.address, profile.chain)),
           ]
         : vnode.state.identity.username;
       quality = vnode.state.identity.quality;
@@ -86,7 +87,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
       const name = [
         displayName,
         !hideIdentityIcon &&
-          m(
+          render(
             `span.identity-icon${
               quality === IdentityQuality.Good
                 ? '.green'
@@ -116,7 +117,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
               : 'javascript:',
             name
           )
-        : m(
+        : render(
             `a.user-display-name.username.onchain-username${
               IdentityQuality.Good ? '.verified' : ''
             }`,
@@ -139,20 +140,20 @@ const SubstrateOnlineIdentityWidget: m.Component<
             ? profile.displayName
             : [
                 profile.displayName,
-                m(
+                render(
                   '.id-short',
                   formatAddressShort(profile.address, profile.chain)
                 ),
               ]
         )
-      : m('a.user-display-name.username', [
+      : render('a.user-display-name.username', [
           !profile
             ? addrShort
             : !showAddressWithDisplayName
             ? profile.displayName
             : [
                 profile.displayName,
-                m(
+                render(
                   '.id-short',
                   formatAddressShort(profile.address, profile.chain)
                 ),
@@ -161,7 +162,7 @@ const SubstrateOnlineIdentityWidget: m.Component<
   },
 };
 
-const SubstrateOfflineIdentityWidget: m.Component<
+const SubstrateOfflineIdentityWidget: Component<
   ISubstrateIdentityAttrs,
   ISubstrateIdentityState
 > = {
@@ -185,13 +186,13 @@ const SubstrateOfflineIdentityWidget: m.Component<
         showAddressWithDisplayName
           ? [
               profile.name,
-              m(
+              render(
                 '.id-short',
                 formatAddressShort(profile.address, profile.chain)
               ),
             ]
           : profile.name,
-        m(
+        render(
           `span.identity-icon${
             quality === IdentityQuality.Good
               ? '.green'
@@ -221,7 +222,7 @@ const SubstrateOfflineIdentityWidget: m.Component<
               : 'javascript:',
             name
           )
-        : m(
+        : render(
             `a.user-display-name.username.onchain-username${
               IdentityQuality.Good ? '.verified' : ''
             }`,
@@ -244,20 +245,20 @@ const SubstrateOfflineIdentityWidget: m.Component<
             ? profile.displayName
             : [
                 profile.displayName,
-                m(
+                render(
                   '.id-short',
                   formatAddressShort(profile.address, profile.chain)
                 ),
               ]
         )
-      : m('a.user-display-name.username', [
+      : render('a.user-display-name.username', [
           !profile
             ? addrShort
             : !showAddressWithDisplayName
             ? profile.displayName
             : [
                 profile.displayName,
-                m(
+                render(
                   '.id-short',
                   formatAddressShort(profile.address, profile.chain)
                 ),
@@ -266,7 +267,7 @@ const SubstrateOfflineIdentityWidget: m.Component<
   },
 };
 
-const SubstrateIdentityWidget: m.Component<
+const SubstrateIdentityWidget: Component<
   ISubstrateIdentityAttrs,
   ISubstrateIdentityState
 > = {
@@ -276,9 +277,9 @@ const SubstrateIdentityWidget: m.Component<
       vnode.attrs.account &&
       (app.chain as Substrate).identities?.initialized
     ) {
-      return m(SubstrateOnlineIdentityWidget, vnode.attrs);
+      return render(SubstrateOnlineIdentityWidget, vnode.attrs);
     } else {
-      return m(SubstrateOfflineIdentityWidget, vnode.attrs);
+      return render(SubstrateOfflineIdentityWidget, vnode.attrs);
     }
   },
 };

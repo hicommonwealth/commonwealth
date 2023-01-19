@@ -6,7 +6,7 @@ require('dotenv').config();
 
 module.exports = {
   entry: {
-    app: ['app.ts'],
+    app: ['app.new.tsx'],
   },
   context: __dirname,
   devServer: {
@@ -143,7 +143,7 @@ module.exports = {
         loader: 'esbuild-loader',
         options: {
           loader: 'tsx',
-          jsxFragment: 'm.Fragment',
+          jsxFragment: 'jsx.Fragment',
         },
       },
       {

@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import QuillEditorInternal from './quill_editor_internal';
 import { QuillActiveMode, QuillDelta, QuillTextContents } from './types';
 
@@ -144,6 +145,6 @@ export class QuillEditor extends QuillEditorInternal {
     this._alteredText = false;
     this._quill.setContents(doc);
     this._clearLocalStorage();
-    m.redraw();
+    redraw();
   }
 }

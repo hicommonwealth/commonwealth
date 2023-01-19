@@ -1,11 +1,13 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/sidebar/index.scss';
 
 import app from 'state';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { handleRedirectClicks } from '../../../helpers';
 import { SidebarSectionGroup } from './sidebar_section';
 import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
@@ -29,11 +31,11 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
+class DiscussionSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   view() {
     // Conditional Render Details +
     const onAllDiscussionPage = (p) => {
-      const identifier = m.route.param('identifier');
+      const identifier = getRouteParam('identifier');
       if (identifier) {
         const thread = app.threads.store.getByIdentifier(
           identifier.slice(0, identifier.indexOf('-'))
@@ -50,7 +52,7 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
     };
 
     const onOverviewDiscussionPage = (p) => {
-      const identifier = m.route.param('identifier');
+      const identifier = getRouteParam('identifier');
       if (identifier) {
         const thread = app.threads.store.getByIdentifier(
           identifier.slice(0, identifier.indexOf('-'))
@@ -64,7 +66,7 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
     };
 
     const onFeaturedDiscussionPage = (p, topic) => {
-      const identifier = m.route.param('identifier');
+      const identifier = getRouteParam('identifier');
       if (identifier) {
         const thread = app.threads.store.getByIdentifier(
           identifier.slice(0, identifier.indexOf('-'))
@@ -136,10 +138,10 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
         hasDefaultToggle: false,
         isVisible: true,
         isUpdated: true,
-        isActive: onAllDiscussionPage(m.route.get()),
-        onclick: (e, toggle: boolean) => {
+        isActive: onAllDiscussionPage(getRoute()),
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/discussions`, app.activeChainId(), () => {
+          handleRedirectClicks(this, e, `/discussions`, app.activeChainId(), () => {
             setDiscussionsToggleTree(`children.All.toggledState`, toggle);
           });
         },
@@ -151,10 +153,10 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
         hasDefaultToggle: false,
         isVisible: true,
         isUpdated: true,
-        isActive: onOverviewDiscussionPage(m.route.get()),
-        onclick: (e, toggle: boolean) => {
+        isActive: onOverviewDiscussionPage(getRoute()),
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/overview`, app.activeChainId(), () => {
+          handleRedirectClicks(this, e, `/overview`, app.activeChainId(), () => {
             setDiscussionsToggleTree(`children.Overview.toggledState`, toggle);
           });
         },
@@ -167,11 +169,11 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
         isVisible: true,
         isUpdated: true,
         isActive:
-          onSputnikDaosPage(m.route.get()) &&
+          onSputnikDaosPage(getRoute()) &&
           (app.chain ? app.chain.serverLoaded : true),
-        onclick: (e, toggle: boolean) => {
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/sputnik-daos`, app.activeChainId(), () => {
+          handleRedirectClicks(this, e, `/sputnik-daos`, app.activeChainId(), () => {
             setDiscussionsToggleTree(
               `children.SputnikDAOs.toggledState`,
               toggle
@@ -190,11 +192,12 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
           hasDefaultToggle: false,
           isVisible: true,
           isUpdated: true,
-          isActive: onFeaturedDiscussionPage(m.route.get(), topic.name),
+          isActive: onFeaturedDiscussionPage(getRoute(), topic.name),
           // eslint-disable-next-line no-loop-func
-          onclick: (e, toggle: boolean) => {
+          onClick: (e, toggle: boolean) => {
             e.preventDefault();
             handleRedirectClicks(
+              this,
               e,
               `/discussions/${encodeURI(topic.name)}`,
               app.activeChainId(),
@@ -216,7 +219,7 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
       title: discussionsLabel,
       className: 'DiscussionSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setDiscussionsToggleTree('toggledState', toggle);
       },
@@ -227,3 +230,5 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
     return <SidebarSectionGroup {...sidebarSectionData} />;
   }
 }
+
+export const DiscussionSection = NavigationWrapper(DiscussionSectionComponent);

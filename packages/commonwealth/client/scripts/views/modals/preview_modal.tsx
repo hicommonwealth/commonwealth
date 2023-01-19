@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'modals/preview_modal.scss';
 
@@ -13,7 +14,7 @@ import { CWText } from '../components/component_kit/cw_text';
 class PreviewModalEmptyState extends ClassComponent {
   view() {
     return (
-      <div class="empty-state-container">
+      <div className="empty-state-container">
         <CWText type="h5" fontWeight="semiBold" className="empty-text">
           Nothing to preview
         </CWText>
@@ -28,16 +29,16 @@ type PreviewModalAttrs = {
 };
 
 export class PreviewModal extends ClassComponent<PreviewModalAttrs> {
-  view(vnode: m.Vnode<PreviewModalAttrs>) {
+  view(vnode: ResultNode<PreviewModalAttrs>) {
     const { title } = vnode.attrs;
 
     return (
-      <div class="PreviewModal">
-        <div class="compact-modal-title">
+      <div className="PreviewModal">
+        <div className="compact-modal-title">
           <h3>{title ? `Preview: ${title}` : 'Preview'}</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           {(() => {
             try {
               const doc = JSON.parse(vnode.attrs.doc);
@@ -45,12 +46,12 @@ export class PreviewModal extends ClassComponent<PreviewModalAttrs> {
               if (doc.ops.length === 1 && doc.ops[0].insert === '\n') {
                 return <PreviewModalEmptyState />;
               }
-              return m(QuillFormattedText, { doc });
+              return render(QuillFormattedText, { doc });
             } catch (e) {
               if (vnode.attrs.doc.trim() === '') {
                 return <PreviewModalEmptyState />;
               }
-              return <MarkdownFormattedText doc={vnode.attrs.doc} />;
+              return vnode.attrs.doc && <MarkdownFormattedText doc={vnode.attrs.doc} />;
             }
           })()}
         </div>

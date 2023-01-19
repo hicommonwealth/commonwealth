@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 
@@ -10,7 +11,7 @@ import 'pages/web3login.scss';
 import { link } from 'helpers';
 import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
-import { PageNotFound } from './404';
+import PageNotFound from './404';
 import { CWText } from '../components/component_kit/cw_text';
 import { PageLoading } from './loading';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
@@ -21,7 +22,7 @@ class Web3LoginPage extends ClassComponent {
   private loading?: boolean;
 
   view() {
-    const token = m.route.param('connect');
+    const token = getRouteParam('connect');
     if (app.isCustomDomain() || !token) {
       // hide page if invalid arguments or via custom domain
       return <PageNotFound />;
@@ -55,19 +56,19 @@ class Web3LoginPage extends ClassComponent {
         }
       } catch (e) {
         this.error = e.responseJSON.error;
-        m.redraw();
+        redraw();
       }
     };
 
     return (
       <Sublayout>
-        <div class="Web3LoginPage">
-          <div class="web3-login-container">
+        <div className="Web3LoginPage">
+          <div className="web3-login-container">
             {/* <h3>{app.isLoggedIn() ? 'Connect to Commonwealth': 'Log into Commonwealth'}</h3> */}
             <CWButton
               label="Connect"
               buttonType="lg-primary-blue"
-              onclick={() => {
+              onClick={() => {
                 if (app.isLoggedIn()) {
                   onSuccess();
                 } else {
@@ -84,8 +85,8 @@ class Web3LoginPage extends ClassComponent {
                 }
               }}
             />
-            {m.route.param('prev')
-              ? link('a.web3login-go-home', m.route.param('prev'), 'Go back')
+            {getRouteParam('prev')
+              ? link('a.web3login-go-home', getRouteParam('prev'), 'Go back')
               : link(
                   'a.web3login-go-home',
                   app.isCustomDomain() ? '/' : `/${app.activeChainId()}`,

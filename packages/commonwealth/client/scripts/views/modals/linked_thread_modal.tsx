@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/linked_thread_modal.scss';
@@ -18,23 +19,23 @@ type LinkedThreadModalAttrs = {
 };
 
 export class LinkedThreadModal extends ClassComponent<LinkedThreadModalAttrs> {
-  view(vnode: m.Vnode<LinkedThreadModalAttrs>) {
+  view(vnode: ResultNode<LinkedThreadModalAttrs>) {
     const { linkingThread, linkedThreads, onclose } = vnode.attrs;
 
     return (
-      <div class="LinkedThreadModal">
-        <div class="compact-modal-title">
+      <div className="LinkedThreadModal">
+        <div className="compact-modal-title">
           <h3>Link to Existing Threads</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <ThreadSelector
             linkingThread={linkingThread}
             linkedThreads={linkedThreads}
           />
           <CWButton
             label="Close"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               if (onclose) onclose();
               $(e.target).trigger('modalexit');

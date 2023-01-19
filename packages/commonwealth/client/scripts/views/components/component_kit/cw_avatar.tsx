@@ -1,8 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import jdenticon from 'jdenticon';
+import { ClassComponent, ResultNode, jsx } from 'mithrilInterop';
+import Jdenticon from 'react-jdenticon';
 
 import 'components/component_kit/cw_avatar.scss';
 
@@ -15,13 +15,17 @@ type BaseAvatarAttrs = {
 type AvatarAttrs = BaseAvatarAttrs & { avatarUrl: string };
 
 export class CWAvatar extends ClassComponent<AvatarAttrs> {
-  view(vnode: m.Vnode<AvatarAttrs>) {
+  view(vnode: ResultNode<AvatarAttrs>) {
     const { avatarUrl, size } = vnode.attrs;
 
     return (
       <div
-        class={ComponentType.Avatar}
-        style={`width: ${size}px; height: ${size}px; background-image: url('${avatarUrl}');`}
+        className={ComponentType.Avatar}
+        style={{
+          width: `${size}px`,
+          height: `${size}px`,
+          backgroundImage: `url("${avatarUrl}")`,
+        }}
       />
     );
   }
@@ -30,22 +34,10 @@ export class CWAvatar extends ClassComponent<AvatarAttrs> {
 type JdenticonAttrs = BaseAvatarAttrs & { address?: string };
 
 export class CWJdenticon extends ClassComponent<JdenticonAttrs> {
-  view(vnode: m.Vnode<JdenticonAttrs>) {
+  view(vnode: ResultNode<JdenticonAttrs>) {
     const { address, size } = vnode.attrs;
     if (!address) return null;
 
-    return (
-      <svg
-        width={size}
-        height={size}
-        data-address={address.toString()}
-        oncreate={(vvnode) => {
-          jdenticon.update(vvnode.dom as HTMLElement, address);
-        }}
-        onupdate={(vvnode) => {
-          jdenticon.update(vvnode.dom as HTMLElement, address);
-        }}
-      />
-    );
+    return <Jdenticon value={address.toString()} height={size} width={size} />;
   }
 }

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_avatar_username_input.scss';
 
@@ -25,7 +26,7 @@ type AvatarUsernameInputAttrs = {
 };
 
 export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAttrs> {
-  view(vnode: m.Vnode<AvatarUsernameInputAttrs>) {
+  view(vnode: ResultNode<AvatarUsernameInputAttrs>) {
     const {
       account,
       address,
@@ -38,7 +39,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
 
     return (
       <div
-        class={getClasses<{ orientation?: Orientation }>(
+        className={getClasses<{ orientation?: Orientation }>(
           { orientation },
           'AvatarUsernameInput'
         )}
@@ -49,7 +50,7 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
           size={orientation === 'vertical' ? 'large' : 'small'}
           account={account}
           uploadStartedCallback={() => {
-            m.redraw();
+            this.redraw();
           }}
           uploadCompleteCallback={(files) => {
             files.forEach((f) => {
@@ -57,10 +58,10 @@ export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAtt
               const url = f.uploadURL.replace(/\?.*/, '');
               onAvatarChangeHandler(url.trim);
             });
-            m.redraw();
+            this.redraw();
           }}
         />
-        <div class="input-and-address-container">
+        <div className="input-and-address-container">
           <CWTextInput
             darkMode={darkMode}
             size="small"

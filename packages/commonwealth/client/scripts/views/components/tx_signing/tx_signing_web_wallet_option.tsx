@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { ITXModalData, IWebWallet } from 'models';
@@ -19,14 +20,14 @@ type TXSigningWebWalletOptionAttrs = {
   NextFn;
 
 export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletOptionAttrs> {
-  oncreate(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
+  oncreate(vnode: ResultNode<TXSigningWebWalletOptionAttrs>) {
     // try to enable web wallet
     if (vnode.attrs.wallet && !vnode.attrs.wallet.enabled) {
-      vnode.attrs.wallet.enable().then(() => m.redraw());
+      vnode.attrs.wallet.enable().then(() => redraw());
     }
   }
 
-  view(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
+  view(vnode: ResultNode<TXSigningWebWalletOptionAttrs>) {
     const { author, wallet } = vnode.attrs;
 
     const webWallet = wallet as PolkadotWebWalletController;
@@ -59,7 +60,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
       });
 
     return (
-      <>
+      <React.Fragment>
         <CWText>
           {/* extra div is for the link to flow with the text */}
           <div>
@@ -74,10 +75,10 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
           disabled={
             !webWallet || (webWallet?.enabled && !foundAuthorInWebWallet)
           }
-          onclick={async () => {
+          onClick={async () => {
             if (webWallet && !webWallet.available) {
               await vnode.attrs.wallet.enable();
-              m.redraw();
+              redraw();
             }
 
             await transact();
@@ -92,7 +93,7 @@ export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletO
               : 'Sign and send transaction'
           }
         />
-      </>
+      </React.Fragment>
     );
   }
 }

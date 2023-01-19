@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/index.scss';
@@ -63,11 +64,11 @@ class ManageCommunityPage extends ClassComponent {
         this.webhooks = webhooks.result;
         this.roleData = bulkMembers.result;
         this.loadingFinished = true;
-        m.redraw();
+        redraw();
       } catch (err) {
         this.roleData = [];
         this.loadingFinished = true;
-        m.redraw();
+        redraw();
         console.error(err);
       }
     };
@@ -135,11 +136,11 @@ class ManageCommunityPage extends ClassComponent {
         );
       }
 
-      m.redraw();
+      redraw();
     };
 
     const onSave = () => {
-      m.redraw();
+      redraw();
     };
 
     return !this.loadingFinished ? (
@@ -148,7 +149,7 @@ class ManageCommunityPage extends ClassComponent {
       <Sublayout
       // title="Manage Community"
       >
-        <div class="ManageCommunityPage">
+        <div className="ManageCommunityPage">
           <ChainMetadataRows
             admins={admins}
             chain={app.config.chains.getById(app.activeChainId())}

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_divider.scss';
 
@@ -13,12 +14,12 @@ type DividerAttrs = {
 };
 
 export class CWDivider extends ClassComponent<DividerAttrs> {
-  view(vnode: m.Vnode<DividerAttrs>) {
+  view(vnode: ResultNode<DividerAttrs>) {
     const { isVertical } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<DividerAttrs>({ isVertical }, ComponentType.Divider)}
+        className={getClasses<DividerAttrs>({ isVertical }, ComponentType.Divider)}
       />
     );
   }

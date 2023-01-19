@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_radio_button.scss';
 
@@ -27,7 +28,7 @@ type RadioButtonAttrs = {
   RadioButtonStyleAttrs;
 
 export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
-  view(vnode: m.Vnode<RadioButtonAttrs>) {
+  view(vnode: ResultNode<RadioButtonAttrs>) {
     const {
       disabled = false,
       groupName,
@@ -48,7 +49,7 @@ export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
 
     return (
       <label
-        class={getClasses<RadioButtonStyleAttrs>(
+        className={getClasses<RadioButtonStyleAttrs>(
           {
             checked,
             disabled,
@@ -56,8 +57,8 @@ export class CWRadioButton extends ClassComponent<RadioButtonAttrs> {
           ComponentType.RadioButton
         )}
       >
-        <input class="radio-input" {...params} />
-        <div class="radio-control" />
+        <input className="radio-input" {...params} />
+        <div className="radio-control" />
         <CWText>{label || value}</CWText>
       </label>
     );

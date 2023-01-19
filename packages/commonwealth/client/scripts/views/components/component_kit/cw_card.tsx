@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_card.scss';
 
@@ -18,28 +19,28 @@ type CardStyleAttrs = {
 };
 
 type CardAttrs = {
-  onclick?: (e?: MouseEvent) => void;
+  onClick?: (e?: MouseEvent) => void;
   onmouseover?: (e?: MouseEvent) => void;
-  onmouseenter?: (e?: MouseEvent) => void;
-  onmouseleave?: (e?: MouseEvent) => void;
+  onMouseEnter?: (e?: MouseEvent) => void;
+  onMouseLeave?: (e?: MouseEvent) => void;
 } & CardStyleAttrs;
 
 export class CWCard extends ClassComponent<CardAttrs> {
-  view(vnode: m.Vnode<CardAttrs>) {
+  view(vnode: ResultNode<CardAttrs>) {
     const {
       className,
       elevation,
       fullWidth,
       interactive = false,
-      onclick,
-      onmouseenter,
-      onmouseleave,
+      onClick,
+      onMouseEnter,
+      onMouseLeave,
       onmouseover,
     } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<CardStyleAttrs>(
+        className={getClasses<CardStyleAttrs>(
           {
             elevation,
             fullWidth,
@@ -48,10 +49,10 @@ export class CWCard extends ClassComponent<CardAttrs> {
           },
           ComponentType.Card
         )}
-        onclick={onclick}
-        onmouseover={onmouseover}
-        onmouseenter={onmouseenter}
-        onmouseleave={onmouseleave}
+        onClick={onClick}
+        onMouseOver={onmouseover}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
       >
         {vnode.children}
       </div>

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/change_topic_modal.scss';
@@ -20,21 +21,21 @@ type ChangeTopicModalAttrs = {
 export class ChangeTopicModal extends ClassComponent<ChangeTopicModalAttrs> {
   private activeTopic: Topic;
 
-  oninit(vnode: m.Vnode<ChangeTopicModalAttrs>) {
+  oninit(vnode: ResultNode<ChangeTopicModalAttrs>) {
     if (!vnode.attrs.thread.topic) return;
     this.activeTopic = vnode.attrs.thread.topic;
   }
 
-  view(vnode: m.Vnode<ChangeTopicModalAttrs>) {
+  view(vnode: ResultNode<ChangeTopicModalAttrs>) {
     const { thread } = vnode.attrs;
 
     return (
-      <div class="ChangeTopicModal">
-        <div class="compact-modal-title">
+      <div className="ChangeTopicModal">
+        <div className="compact-modal-title">
           <h3>Change topic</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <TopicSelector
             defaultTopic={this.activeTopic}
             topics={app.topics.getByCommunity(app.activeChainId())}
@@ -43,17 +44,17 @@ export class ChangeTopicModal extends ClassComponent<ChangeTopicModalAttrs> {
               this.activeTopic = topic;
             }}
           />
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               buttonType="secondary-blue"
               label="Cancel"
-              onclick={(e) => {
+              onClick={(e) => {
                 $(e.target).trigger('modalexit');
               }}
             />
             <CWButton
               label="Save changes"
-              onclick={async (e) => {
+              onClick={async (e) => {
                 const { activeTopic } = this;
                 try {
                   const topic: Topic = await app.topics.update(

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/overview/topic_summary_row.scss';
@@ -29,7 +30,7 @@ type TopicSummaryRowAttrs = {
 };
 
 export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
-  view(vnode: m.Vnode<TopicSummaryRowAttrs>) {
+  view(vnode: ResultNode<TopicSummaryRowAttrs>) {
     const { monthlyThreads, topic } = vnode.attrs;
 
     const topFiveSortedThreads = monthlyThreads
@@ -54,16 +55,16 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
     //   });
 
     return (
-      <div class="TopicSummaryRow">
-        <div class="topic-column">
-          <div class="name-and-count">
+      <div className="TopicSummaryRow">
+        <div className="topic-column">
+          <div className="name-and-count">
             <CWText
               type="h4"
               fontWeight="semiBold"
               className="topic-name-text"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
-                m.route.set(
+                setRoute(
                   `/${app.activeChainId()}/discussions/${encodeURI(topic.name)}`
                 );
               }}
@@ -80,7 +81,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
           </div>
           {topic.description && <CWText type="b2">{topic.description}</CWText>}
         </div>
-        <div class="recent-threads-column">
+        <div className="recent-threads-column">
           {topFiveSortedThreads.map((thread, idx) => {
             const discussionLink = getProposalUrlPath(
               thread.slug,
@@ -91,20 +92,20 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
             // const commentsCount = app.comments.nComments(thread);
 
             return (
-              <>
+              <React.Fragment>
                 <div
-                  class={getClasses<{ isPinned?: boolean }>(
+                  className={getClasses<{ isPinned?: boolean }>(
                     { isPinned: thread.pinned },
                     'recent-thread-row'
                   )}
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.stopPropagation();
-                    m.route.set(discussionLink);
+                    setRoute(discussionLink);
                   }}
                 >
-                  <div class="row-top">
-                    <div class="user-and-date-row">
-                      {m(User, {
+                  <div className="row-top">
+                    <div className="user-and-date-row">
+                      {render(User, {
                         user,
                         showAddressWithDisplayName: true,
                         avatarSize: 24,
@@ -122,8 +123,8 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                         <CWIcon iconName="lock" iconSize="small" />
                       )}
                     </div>
-                    <div class="row-top-icons">
-                      {isHot(thread) && <div class="flame" />}
+                    <div className="row-top-icons">
+                      {isHot(thread) && <div className="flame" />}
                       {thread.pinned && <CWIcon iconName="pin" />}
                     </div>
                   </div>
@@ -136,25 +137,25 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                     {thread.plaintext}
                   </CWText>
 
-                  <div class="row-bottom">
-                    <div class="comments-and-users">
-                      <div class="comments-count">
+                  <div className="row-bottom">
+                    <div className="comments-and-users">
+                      <div className="comments-count">
                         <CWIcon iconName="feedback" iconSize="small" />
                         <CWText type="caption">
                           {pluralize(thread.numberOfComments, 'comment')}
                         </CWText>
                       </div>
                       {/* TODO Gabe 10/3/22 - user gallery blocked by changes to user model */}
-                      {/* <div class="user-gallery">
-                        <div class="avatars-row">
+                      {/* <div className="user-gallery">
+                        <div className="avatars-row">
                           {gallery.map((u) => u.profile.getAvatar(16))}
                         </div>
                         <CWText type="caption">+4 others</CWText>
                       </div> */}
                     </div>
-                    <div class="row-bottom-menu">
+                    <div className="row-bottom-menu">
                       <div
-                        onclick={(e) => {
+                        onClick={(e) => {
                           // prevent clicks from propagating to discussion row
                           e.preventDefault();
                           e.stopPropagation();
@@ -165,7 +166,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                       {/* TODO Gabe 12/7/22 - Commenting out menu until we figure out fetching bug */}
                       {/* {isAdminOrMod && (
                         <div
-                          onclick={(e) => {
+                          onClick={(e) => {
                             // prevent clicks from propagating to discussion row
                             e.preventDefault();
                             e.stopPropagation();
@@ -176,7 +177,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                               {
                                 label: 'Delete',
                                 iconLeft: 'trash',
-                                onclick: async (e) => {
+                                onClick: async (e) => {
                                   e.preventDefault();
 
                                   const confirmed =
@@ -196,7 +197,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                                   ? 'Unlock thread'
                                   : 'Lock thread',
                                 iconLeft: 'lock',
-                                onclick: (e) => {
+                                onClick: (e) => {
                                   e.preventDefault();
                                   app.threads
                                     .setPrivacy({
@@ -204,7 +205,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                                       readOnly: !thread.readOnly,
                                     })
                                     .then(() => {
-                                      m.redraw();
+                                      redraw();
                                     });
                                 },
                               },
@@ -222,7 +223,7 @@ export class TopicSummaryRow extends ClassComponent<TopicSummaryRowAttrs> {
                   </div>
                 </div>
                 {idx !== topFiveSortedThreads.length - 1 && <CWDivider />}
-              </>
+              </React.Fragment>
             );
           })}
         </div>

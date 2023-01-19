@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_form_section.scss';
 
@@ -12,11 +12,11 @@ import { CWDivider } from './cw_divider';
 type FormSectionAttrs = {
   description: string;
   title: string;
-  topRightElement?: m.Vnode;
+  topRightElement?: ResultNode;
 };
 
 export class CWFormSection extends ClassComponent<FormSectionAttrs> {
-  view(vnode: m.Vnode<FormSectionAttrs>) {
+  view(vnode: ResultNode<FormSectionAttrs>) {
     const {  description, title } = vnode.attrs;
 
     return (

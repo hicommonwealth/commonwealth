@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _, { capitalize } from 'lodash';
 import moment from 'moment';
 
@@ -22,7 +23,7 @@ import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { CWTab, CWTabBar } from '../../components/component_kit/cw_tabs';
 import { CWText } from '../../components/component_kit/cw_text';
 import { renderQuillTextBody } from '../../components/quill/helpers';
-import { PageNotFound } from '../404';
+import PageNotFound from '../404';
 import ErrorPage from '../error';
 import { CommunityLabel } from '../../components/community_label';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -37,19 +38,19 @@ const getDiscussionResult = (thread, searchTerm) => {
 
   return (
     <div
-      class="search-result-row"
-      onclick={() => {
-        m.route.set(`/${chain}/discussion/${proposalId}`);
+      className="search-result-row"
+      onClick={() => {
+        setRoute(`/${chain}/discussion/${proposalId}`);
       }}
     >
       <CWIcon iconName="feedback" />
-      <div class="inner-container">
+      <div className="inner-container">
         <CWText fontStyle="uppercase" type="caption" className="thread-header">
           {`discussion - ${thread.chain}`}
         </CWText>
         <CWText fontWeight="medium">{decodeURIComponent(thread.title)}</CWText>
-        <div class="search-results-thread-subtitle">
-          {m(User, {
+        <div className="search-results-thread-subtitle">
+          {render(User, {
             user: new AddressInfo(
               thread.address_id,
               thread.address,
@@ -81,9 +82,9 @@ const getCommentResult = (comment, searchTerm) => {
 
   return (
     <div
-      class="search-result-row"
-      onclick={() => {
-        m.route.set(
+      className="search-result-row"
+      onClick={() => {
+        setRoute(
           `/${chain}/discussion/${proposalId.split('_')[0]}/${
             proposalId.split('_')[1]
           }`
@@ -91,14 +92,14 @@ const getCommentResult = (comment, searchTerm) => {
       }}
     >
       <CWIcon iconName="feedback" />
-      <div class="inner-container">
+      <div className="inner-container">
         <CWText fontWeight="medium">{`comment - ${
           comment.chain || comment.community
         }`}</CWText>
-        {/* <div class="search-results-thread-title">
+        {/* <div className="search-results-thread-title">
           {decodeURIComponent(comment.title)}
         </div> */}
-        <div class="search-results-thread-subtitle">
+        <div className="search-results-thread-subtitle">
           {m(User, {
             user: new AddressInfo(
               comment.address_id,
@@ -133,14 +134,14 @@ const getCommunityResult = (community) => {
 
   const onSelect = () => {
     if (params.community) {
-      m.route.set(params.community.id ? `/${params.community.id}` : '/');
+      setRoute(params.community.id ? `/${params.community.id}` : '/');
     } else {
-      m.route.set(community.id ? `/${community.id}` : '/');
+      setRoute(community.id ? `/${community.id}` : '/');
     }
   };
 
   return (
-    <div class="community-result-row" onclick={onSelect}>
+    <div className="community-result-row" onClick={onSelect}>
       <CommunityLabel {...params} />
     </div>
   );
@@ -153,7 +154,7 @@ const getMemberResult = (addr) => {
   if (app.isCustomDomain() && app.customDomainId() !== addr.chain) return;
 
   return (
-    <div class="member-result-row">
+    <div className="member-result-row">
       {m(User, {
         user: profile,
         showRole: true,
@@ -203,7 +204,7 @@ const search = async (searchQuery: SearchQuery, state) => {
 
   app.search.addToHistory(searchQuery);
 
-  m.redraw();
+  redraw();
 };
 
 type SearchPageAttrs = {
@@ -219,7 +220,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
   private searchQuery: SearchQuery;
 
   view() {
-    const searchQuery = SearchQuery.fromUrlParams(m.route.param());
+    const searchQuery = SearchQuery.fromUrlParams(getRouteParam());
 
     const { chainScope, searchTerm } = searchQuery;
     const scope = app.isCustomDomain() ? app.customDomainId() : chainScope;
@@ -263,7 +264,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
         <CWTab
           label={searchScope}
           isSelected={this.activeTab === searchScope}
-          onclick={() => {
+          onClick={() => {
             this.pageCount = 1;
             this.activeTab = searchScope;
           }}
@@ -306,12 +307,12 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
       />
     ) : (
       <Sublayout>
-        <div class="SearchPage">
-          <>
+        <div className="SearchPage">
+          <React.Fragment>
             {!app.search.getByQuery(searchQuery)?.loaded ? (
               <CWSpinner size="xl" />
             ) : (
-              <div class="search-results">
+              <div className="search-results">
                 <CWTabBar>{tabs}</CWTabBar>
                 <CWText isCentered className="search-results-caption">
                   {resultCount} matching '{this.searchQuery.searchTerm}'{' '}
@@ -319,10 +320,10 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                   {scope && !app.isCustomDomain() && (
                     <a
                       href="#"
-                      class="search-all-communities"
-                      onclick={() => {
+                      className="search-all-communities"
+                      onClick={() => {
                         searchQuery.chainScope = undefined;
-                        m.route.set(`/search?${searchQuery.toUrlParams()}`);
+                        setRoute(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);
@@ -333,7 +334,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                   )}
                 </CWText>
                 {tabScopedListing.length > 0 && this.activeTab === 'Threads' && (
-                  <div class="search-results-filters">
+                  <div className="search-results-filters">
                     <CWText type="h5">Sort By:</CWText>
                     <CWDropdown
                       label=""
@@ -348,7 +349,7 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                       ]}
                       onSelect={(o) => {
                         searchQuery.sort = SearchSort[o.value];
-                        m.route.set(`/search?${searchQuery.toUrlParams()}`);
+                        setRoute(`/search?${searchQuery.toUrlParams()}`);
                         setTimeout(() => {
                           this.refreshResults = true;
                         }, 0);
@@ -356,10 +357,10 @@ class SearchPage extends ClassComponent<SearchPageAttrs> {
                     />
                   </div>
                 )}
-                <div class="search-results-list">{tabScopedListing}</div>
+                <div className="search-results-list">{tabScopedListing}</div>
               </div>
             )}
-          </>
+          </React.Fragment>
         </div>
       </Sublayout>
     );

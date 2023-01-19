@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import breakpoints from 'mixins/breakpoints.scss';
 
@@ -57,6 +58,6 @@ export const breakpointFnValidator = (
 
   if (widthState !== breakPointState) {
     setWidthState(breakPointState);
-    m.redraw();
+    redraw();
   }
 };

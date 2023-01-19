@@ -1,5 +1,14 @@
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { InputTokenOptionComponent } from './input_token_option';
 import { Chain, Token } from './index';
@@ -96,9 +105,9 @@ export class InputTokenList extends ClassComponent<InputTokenListAttrs> {
 
     return (
       <ul
-        class="absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10"
+        className="absolute left-0 right-0 shadow-xl bg-white rounded top-full mt-16 text-xl p-3 z-10"
         id="tokens-list"
-        style="overflow-y: scroll; max-height: 16rem;"
+        style={{ overflowY: 'scroll', maxHeight: '16rem' }}
       >
         {this.options.slice(0, vnode.attrs.maxOptions).map(renderResults)}
       </ul>

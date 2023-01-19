@@ -3,7 +3,8 @@ import { ApiStatus, IApp, LoginState } from 'state';
 import { Coin } from 'adapters/currency';
 import { clearLocalStorage } from 'stores/PersistentStore';
 import $ from 'jquery';
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { ChainBase } from 'common-common/src/types';
 
 import ChainEntityController from 'controllers/server/chain_entities';
@@ -57,11 +58,12 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
     // If user is no longer on the initializing chain, abort initialization
     // and return false, so that the invoking selectChain fn can similarly
     // break, rather than complete.
-    if (
-      this.meta.id !== (this.app.customDomainId() || m.route.param('scope'))
-    ) {
-      return false;
-    }
+    // if (
+    //   this.meta.id !== (this.app.customDomainId() || getRouteParam('scope'))
+    // ) {
+    //   console.log(this.meta.id, getRouteParam('scope'));
+    //   return false;
+    // }
 
     const {
       pinnedThreads,
@@ -150,7 +152,7 @@ abstract class IChainAdapter<C extends Coin, A extends Account> {
         modules.map((mod) => mod.init(this.chain, this.accounts))
       );
     }
-    m.redraw();
+    redraw();
   }
 
   public abstract base: ChainBase;

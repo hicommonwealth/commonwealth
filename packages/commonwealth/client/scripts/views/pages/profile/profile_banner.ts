@@ -1,5 +1,6 @@
-import m from 'mithril';
+
 import app from 'state';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { confirmationModalWithText } from 'views/modals/confirm_modal';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
@@ -8,7 +9,7 @@ import { Account, AddressInfo } from 'models';
 import { formatAddressShort } from '../../../../../shared/utils';
 import { CWButton } from '../../components/component_kit/cw_button';
 
-const ProfileBanner: m.Component<
+const ProfileBanner: Component<
   { account: Account; addressInfo: AddressInfo },
   { loading: boolean }
 > = {
@@ -28,7 +29,7 @@ const ProfileBanner: m.Component<
       )();
       if (!confirmed) {
         vnode.state.loading = false;
-        m.redraw();
+        redraw();
         return;
       }
 
@@ -39,28 +40,28 @@ const ProfileBanner: m.Component<
         })
         .then(() => {
           vnode.state.loading = false;
-          m.redraw();
+          redraw();
           notifySuccess(`Joined with ${addrShort}`); // ${addrShort} is now a member of the [Edgeware] community!
           setActiveAccount(account).then(() => {
-            m.redraw();
+            redraw();
             $(e.target).trigger('modalexit');
           });
         })
         .catch((err: any) => {
           vnode.state.loading = false;
-          m.redraw();
+          redraw();
           notifyError(err.responseJSON.error);
         });
     };
 
-    return m('.ProfileBanner', [
-      m('.banner-text', [
+    return render('.ProfileBanner', [
+      render('.banner-text', [
         'You are already logged in with this address', // but have not joined the [Edgeware] community
       ]),
-      m(CWButton, {
+      render(CWButton, {
         label: 'Join community',
         disabled: vnode.state.loading,
-        onclick: createRole.bind(this),
+        onClick: createRole.bind(this),
       }),
     ]);
   },

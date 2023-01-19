@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import { RegisteredTypes } from '@polkadot/types/types';
@@ -15,7 +16,7 @@ import { ChainInfo, RolePermission } from 'models';
 import { constructSubstrateUrl } from 'substrate';
 import Sublayout from '../sublayout';
 import { PageLoading } from './loading';
-import { PageNotFound } from './404';
+import PageNotFound from './404';
 import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWButton } from '../components/component_kit/cw_button';
@@ -75,7 +76,7 @@ class SpecSettingsPage extends ClassComponent {
 
     return (
       <Sublayout>
-        <div class="SpecSettingsPage">
+        <div className="SpecSettingsPage">
           <CWText type="h3">Substrate Spec Settings</CWText>
           <CWDropdown
             label="Chains"
@@ -91,7 +92,7 @@ class SpecSettingsPage extends ClassComponent {
               this.error = '';
 
               // update spec display
-              m.redraw();
+              redraw();
             }}
           />
           <CWTextArea
@@ -111,7 +112,7 @@ class SpecSettingsPage extends ClassComponent {
                   return;
                 }
                 this.spec = specJson;
-                m.redraw();
+                redraw();
               }
             }}
           />
@@ -121,7 +122,7 @@ class SpecSettingsPage extends ClassComponent {
           <CWButton
             label="Test"
             disabled={this.isLoading || !!this.error}
-            onclick={async () => {
+            onClick={async () => {
               this.error = '';
 
               // deinit substrate API if one exists
@@ -163,13 +164,13 @@ class SpecSettingsPage extends ClassComponent {
                 this.error = 'API initialization failed.';
               }
               this.isLoading = false;
-              m.redraw();
+              redraw();
             }}
           />
           <CWButton
             label="Submit"
             disabled={!this.isSpecValid || this.isLoading || !!this.error}
-            onclick={async () => {
+            onClick={async () => {
               this.isLoading = true;
               let response;
               try {
@@ -185,7 +186,7 @@ class SpecSettingsPage extends ClassComponent {
               } catch (err) {
                 this.error = err.message || 'Spec update failure.';
                 this.isLoading = false;
-                m.redraw();
+                redraw();
                 return;
               }
 
@@ -202,7 +203,7 @@ class SpecSettingsPage extends ClassComponent {
               }
 
               this.isLoading = false;
-              m.redraw();
+              redraw();
             }}
           />
         </div>

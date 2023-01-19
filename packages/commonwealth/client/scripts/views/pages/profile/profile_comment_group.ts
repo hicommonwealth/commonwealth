@@ -1,6 +1,7 @@
-import m from 'mithril';
+
 import _ from 'lodash';
 
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 import { link } from 'helpers';
 import { Thread, Comment, Account } from 'models';
@@ -13,7 +14,7 @@ interface IProfileCommentGroupAttrs {
   account: Account;
 }
 
-const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
+const ProfileCommentGroup: Component<IProfileCommentGroupAttrs> = {
   view: (vnode) => {
     const { proposal, comments, account } = vnode.attrs;
     if (!proposal) return;
@@ -23,9 +24,9 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
     // hide rows from communities that don't match
     if (app.isCustomDomain() && proposal.chain !== app.customDomainId()) return;
 
-    return m('.ProfileCommentGroup', [
-      m('.summary', [
-        m('.summary-group', [
+    return render('.ProfileCommentGroup', [
+      render('.summary', [
+        render('.summary-group', [
           'Commented',
           proposal.chain && [
             ' on a ',
@@ -42,12 +43,12 @@ const ProfileCommentGroup: m.Component<IProfileCommentGroupAttrs> = {
         ]),
         comments[0] &&
           comments[0].createdAt &&
-          m('span', comments[0].createdAt.fromNow()),
+          render('span', comments[0].createdAt.fromNow()),
       ]),
-      m('.activity', [
+      render('.activity', [
         comments.map((comment) =>
-          m('.proposal-comment', [
-            m(
+          render('.proposal-comment', [
+            render(
               '.comment-text',
               renderQuillTextBody(comment.text, {
                 collapse: true,

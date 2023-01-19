@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_spinner.scss';
 
@@ -14,7 +15,7 @@ type SpinnerAttrs = {
 };
 
 export class CWSpinner extends ClassComponent<SpinnerAttrs> {
-  view(vnode: m.Vnode<SpinnerAttrs>) {
+  view(vnode: ResultNode<SpinnerAttrs>) {
     const { size = 'xl' } = vnode.attrs;
 
     return (

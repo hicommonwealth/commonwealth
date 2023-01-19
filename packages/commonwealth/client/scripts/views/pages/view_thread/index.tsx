@@ -1,8 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
 import $ from 'jquery';
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/view_thread/index.scss';
 
@@ -24,7 +25,7 @@ import {
 import { ContentType } from 'types';
 import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { PageLoading } from 'views/pages/loading';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
 import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
 import { activeQuillEditorHasText } from './helpers';
@@ -98,7 +99,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     });
   }
 
-  view(vnode: m.Vnode<ViewThreadPageAttrs>) {
+  view(vnode: ResultNode<ViewThreadPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
@@ -172,7 +173,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
             .fetchThreadsFromId([+threadId])
             .then((res) => {
               this.thread = res[0];
-              m.redraw();
+              this.redraw();
             })
             .catch(() => {
               notifyError('Thread not found');
@@ -210,7 +211,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
 
     // load proposal
     if (!this.prefetch[threadIdAndType]['threadReactionsStarted']) {
-      app.threads.fetchReactionsCount([thread]).then(() => m.redraw);
+      app.threads.fetchReactionsCount([thread]).then(() => this.redraw());
       this.prefetch[threadIdAndType]['threadReactionsStarted'] = true;
     }
 
@@ -251,12 +252,12 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               modelReactionCountFromServer({ ...rc, id })
             );
           }
-          m.redraw();
+          this.redraw();
         })
         .catch(() => {
           notifyError('Failed to load comments');
           this.comments = [];
-          m.redraw();
+          this.redraw();
         });
 
       this.prefetch[threadIdAndType]['commentsStarted'] = true;
@@ -275,21 +276,29 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     const updatedCommentsCallback = () => {
       this.comments = app.comments
         .getByProposal(thread)
-        .filter((c) => c.parentComment === null);
-      m.redraw();
+        .filter((c) => c.parentComment === null) || [];
+      this.redraw();
     };
+    if (!this.initializedComments) {
+      this.initializedComments = true;
+      updatedCommentsCallback();
+    }
 
     // load polls
     if (!this.prefetch[threadIdAndType]['pollsStarted']) {
       app.polls.fetchPolls(app.activeChainId(), thread.id).catch(() => {
         notifyError('Failed to load comments');
         this.comments = [];
-        m.redraw();
+        this.polls = app.polls.getByThreadId(thread.id);
+        this.redraw();
       });
 
       this.prefetch[threadIdAndType]['pollsStarted'] = true;
-    } else {
+    }
+    if (!this.initializedPolls) {
+      this.initializedPolls = true;
       this.polls = app.polls.getByThreadId(thread.id);
+      this.redraw();
     }
 
     // load view count
@@ -304,7 +313,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
             throw new Error(`got unsuccessful status: ${response.status}`);
           } else {
             this.viewCount = response.result.view_count;
-            m.redraw();
+            this.redraw();
           }
         })
         .catch(() => {
@@ -398,7 +407,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
         this.recentlyEdited = true;
       }
 
-      m.redraw();
+      this.redraw();
     };
 
     const setIsEditingBody = (status: boolean) => {
@@ -407,9 +416,9 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
     };
 
     const reactionsAndReplyButtons = (
-      <div class="thread-footer-row">
+      <div className="thread-footer-row">
         <ThreadReactionButton thread={thread} />
-        <div class="comments-count">
+        <div className="comments-count">
           <CWIcon iconName="feedback" iconSize="small" />
           <CWText type="caption">{commentCount} Comments</CWText>
         </div>
@@ -425,7 +434,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Edit',
                 iconLeft: 'write' as const,
-                onclick: async (e) => {
+                onClick: async (e) => {
                   e.preventDefault();
                   this.savedEdits = localStorage.getItem(
                     `${app.activeChainId()}-edit-thread-${thread.id}-storedText`
@@ -450,7 +459,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Edit collaborators',
                 iconLeft: 'write' as const,
-                onclick: async (e) => {
+                onClick: async (e) => {
                   e.preventDefault();
                   app.modals.create({
                     modal: EditCollaboratorsModal,
@@ -467,14 +476,14 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Change topic',
                 iconLeft: 'write' as const,
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   app.modals.create({
                     modal: ChangeTopicModal,
                     data: {
                       onChangeHandler: (topic: Topic) => {
                         thread.topic = topic;
-                        m.redraw();
+                        this.redraw();
                       },
                       thread,
                     },
@@ -488,7 +497,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Delete',
                 iconLeft: 'trash' as const,
-                onclick: async (e) => {
+                onClick: async (e) => {
                   e.preventDefault();
 
                   const confirmed = await confirmationModalWithText(
@@ -509,7 +518,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                 iconLeft: 'lock' as const,
-                onclick: (e) => {
+                onClick: (e) => {
                   e.preventDefault();
                   app.threads
                     .setPrivacy({
@@ -518,7 +527,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     })
                     .then(() => {
                       setIsEditingBody(false);
-                      m.redraw();
+                      this.redraw();
                     });
                 },
               },
@@ -529,7 +538,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
               {
                 label: 'Snapshot proposal from thread',
                 iconLeft: 'democraticProposal' as const,
-                onclick: () => {
+                onClick: () => {
                   const snapshotSpaces = app.chain.meta.snapshot;
 
                   if (snapshotSpaces.length > 1) {
@@ -589,9 +598,9 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
             getActionMenuItems()
           }
           body={
-            <div class="thread-content">
+            <div className="thread-content">
               {this.isEditingBody ? (
-                <>
+                <React.Fragment>
                   {reactionsAndReplyButtons}
                   <EditBody
                     thread={thread}
@@ -600,16 +609,16 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     setIsEditing={setIsEditingBody}
                     title={this.title}
                   />
-                </>
+                </React.Fragment>
               ) : (
-                <>
+                <React.Fragment>
                   <CollapsibleThreadBody thread={thread} />
                   {thread.readOnly ? (
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
                   ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
-                    <>
+                    <React.Fragment>
                       {reactionsAndReplyButtons}
                       <CreateComment
                         updatedCommentsCallback={updatedCommentsCallback}
@@ -618,9 +627,9 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                         parentComment={null}
                         rootProposal={thread}
                       />
-                    </>
+                    </React.Fragment>
                   ) : null}
-                </>
+                </React.Fragment>
               )}
             </div>
           }
@@ -639,7 +648,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     {
                       label: 'Links',
                       item: (
-                        <div class="cards-column">
+                        <div className="cards-column">
                           {showLinkedProposalOptions && (
                             <LinkedProposalsCard
                               onChangeHandler={(
@@ -656,7 +665,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                                 app.threads.fetchThreadsFromId([
                                   thread.identifier,
                                 ]);
-                                m.redraw();
+                                this.redraw();
                               }}
                               thread={thread}
                               showAddProposalButton={isAuthor || isAdminOrMod}
@@ -679,7 +688,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     {
                       label: 'Polls',
                       item: (
-                        <div class="cards-column">
+                        <div className="cards-column">
                           {[
                             ...new Map(
                               this.polls?.map((poll) => [poll.id, poll])

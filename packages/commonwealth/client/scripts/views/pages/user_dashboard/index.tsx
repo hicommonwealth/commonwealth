@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
 import $ from 'jquery';
 
@@ -37,12 +38,12 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
   private globalCount: number;
   private globalNotifications: DashboardActivityNotification[];
   private loadingData: boolean;
-  private onscroll;
+  private onScroll;
 
   // Helper to load activity conditional on the selected tab
   handleToggle = () => {
     this.loadingData = false;
-    m.redraw();
+    redraw();
     const tab = this.activePage;
     if (tab === DashboardViews.ForYou) {
       if (this.fyNotifications.length === 0) this.loadingData = true;
@@ -51,7 +52,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
           DashboardActivityNotification.fromJSON(notification)
         );
         this.loadingData = false;
-        m.redraw();
+        redraw();
       });
     } else if (tab === DashboardViews.Global) {
       if (this.globalNotifications.length === 0) this.loadingData = true;
@@ -60,7 +61,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
           DashboardActivityNotification.fromJSON(notification)
         );
         this.loadingData = false;
-        m.redraw();
+        redraw();
       });
     } else if (tab === DashboardViews.Chain) {
       if (this.chainEvents.length === 0) this.loadingData = true;
@@ -69,7 +70,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
           DashboardActivityNotification.fromJSON(notification)
         );
         this.loadingData = false;
-        m.redraw();
+        redraw();
       });
     }
     this.activePage = tab;
@@ -85,7 +86,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     this.chainEvents = [];
   }
 
-  view(vnode: m.Vnode<UserDashboardAttrs>) {
+  view(vnode: ResultNode<UserDashboardAttrs>) {
     const {
       activePage,
       fyNotifications,
@@ -98,9 +99,9 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     const loggedIn = app.loginState === LoginState.LoggedIn;
 
     if (!vnode.attrs.type) {
-      m.route.set(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
+      setRoute(`/dashboard/${loggedIn ? 'for-you' : 'global'}`);
     } else if (vnode.attrs.type === 'for-you' && !loggedIn) {
-      m.route.set('/dashboard/global');
+      setRoute('/dashboard/global');
     }
 
     const subpage: DashboardViews =
@@ -118,7 +119,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
     }
 
     // Scroll
-    this.onscroll = _.debounce(async () => {
+    this.onScroll = _.debounce(async () => {
       if (this.activePage === DashboardViews.ForYou) {
         if (!notificationsRemaining(fyNotifications.length, this.fyCount))
           return;
@@ -126,7 +127,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > scrollHeight - 400) {
           this.fyCount += 10;
-          m.redraw();
+          redraw();
         }
       } else if (this.activePage === DashboardViews.Global) {
         if (
@@ -137,7 +138,7 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > scrollHeight - 400) {
           this.globalCount += 10;
-          m.redraw();
+          redraw();
         }
       } else {
         if (!notificationsRemaining(chainEvents.length, this.chainEventCount))
@@ -146,16 +147,16 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
         const scrollPos = $(window).height() + $(window).scrollTop();
         if (scrollPos > scrollHeight - 400) {
           this.chainEventCount += 10;
-          m.redraw();
+          redraw();
         }
       }
     }, 400);
 
     return (
-      <Sublayout onscroll={this.onscroll}>
-        <div class="UserDashboard">
-          <div class="dashboard-column">
-            <div class="dashboard-header">
+      <Sublayout onScroll={this.onScroll}>
+        <div className="UserDashboard">
+          <div className="dashboard-column">
+            <div className="dashboard-header">
               <CWText type="h3" fontWeight="semiBold">
                 Activity
               </CWText>
@@ -163,42 +164,42 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                 <CWTab
                   label={DashboardViews.ForYou}
                   isSelected={activePage === DashboardViews.ForYou}
-                  onclick={() => {
+                  onClick={() => {
                     if (!loggedIn) {
                       notifyInfo(
                         'Log in or create an account for custom activity feed'
                       );
                       return;
                     }
-                    m.route.set('/dashboard/for-you');
-                    m.redraw();
+                    setRoute('/dashboard/for-you');
+                    redraw();
                   }}
                 />
                 <CWTab
                   label={DashboardViews.Global}
                   isSelected={activePage === DashboardViews.Global}
-                  onclick={() => {
-                    m.route.set('/dashboard/global');
-                    m.redraw();
+                  onClick={() => {
+                    setRoute('/dashboard/global');
+                    redraw();
                   }}
                 />
                 <CWTab
                   label={DashboardViews.Chain}
                   isSelected={activePage === DashboardViews.Chain}
-                  onclick={() => {
-                    m.route.set('/dashboard/chain-events');
-                    m.redraw();
+                  onClick={() => {
+                    setRoute('/dashboard/chain-events');
+                    redraw();
                   }}
                 />
               </CWTabBar>
               {loadingData && <CWSpinner />}
             </div>
             {!loadingData && (
-              <>
+              <React.Fragment>
                 {activePage === DashboardViews.ForYou && (
-                  <>
+                  <React.Fragment>
                     {fyNotifications && fyNotifications.length > 0 ? (
-                      <>
+                      <React.Fragment>
                         {fyNotifications.slice(0, this.fyCount).map((data) => {
                           return <UserDashboardRow notification={data} />;
                         })}
@@ -206,15 +207,15 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                           fyNotifications.length,
                           this.fyCount
                         ) && <CWSpinner />}
-                      </>
+                      </React.Fragment>
                     ) : (
                       <CWText>Join some communities to see Activity!</CWText>
                     )}
-                  </>
+                  </React.Fragment>
                 )}
                 {activePage === DashboardViews.Global && [
                   globalNotifications && globalNotifications.length > 0 ? (
-                    <>
+                    <React.Fragment>
                       {globalNotifications
                         .slice(0, this.globalCount)
                         .map((data) => (
@@ -224,15 +225,15 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                         globalNotifications.length,
                         this.globalCount
                       ) && <CWSpinner />}
-                    </>
+                    </React.Fragment>
                   ) : (
                     <CWText>No Activity</CWText>
                   ),
                 ]}
                 {activePage === DashboardViews.Chain && (
-                  <>
+                  <React.Fragment>
                     {chainEvents && chainEvents.length > 0 ? (
-                      <>
+                      <React.Fragment>
                         {chainEvents
                           .slice(0, this.chainEventCount)
                           .map((data) => {
@@ -242,16 +243,16 @@ class UserDashboard extends ClassComponent<UserDashboardAttrs> {
                           chainEvents.length,
                           this.chainEventCount
                         ) && <CWSpinner />}
-                      </>
+                      </React.Fragment>
                     ) : (
                       <CWText>
                         Join some communities that have governance to see Chain
                         Events!
                       </CWText>
                     )}
-                  </>
+                  </React.Fragment>
                 )}
-              </>
+              </React.Fragment>
             )}
           </div>
           <DashboardCommunitiesPreview />

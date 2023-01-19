@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
@@ -14,11 +15,11 @@ const gethelpMenuItems = (): Array<MenuItem> => {
   return [
     {
       label: 'Send Feedback',
-      onclick: () => app.modals.create({ modal: FeedbackModal }),
+      onClick: () => app.modals.create({ modal: FeedbackModal }),
     },
     {
       label: 'Help',
-      onclick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
+      onClick: () => window.open('https://docs.commonwealth.im/commonwealth/'),
     },
   ];
 };
@@ -30,7 +31,7 @@ export class HelpMenu extends ClassComponent {
         className="HelpMenu"
         menuHeader={{
           label: 'Help',
-          onclick: () => {
+          onClick: () => {
             app.mobileMenu = 'MainMenu';
           },
         }}

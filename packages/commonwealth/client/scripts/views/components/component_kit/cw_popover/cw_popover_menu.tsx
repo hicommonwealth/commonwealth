@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_popover/cw_popover_menu.scss';
 
@@ -12,7 +13,7 @@ import { CWIcon } from '../cw_icons/cw_icon';
 import { CWText } from '../cw_text';
 
 export class CWPopoverMenuItem extends ClassComponent<MenuItem> {
-  view(vnode: m.Vnode<MenuItem>) {
+  view(vnode: ResultNode<MenuItem>) {
     if (vnode.attrs.type === 'header') {
       return (
         <CWText className="menu-section-header-text" type="caption">
@@ -20,16 +21,16 @@ export class CWPopoverMenuItem extends ClassComponent<MenuItem> {
         </CWText>
       );
     } else if (vnode.attrs.type === 'divider') {
-      return <div class="menu-section-divider" />;
+      return <div className="menu-section-divider" />;
     } else if (vnode.attrs.type === 'default') {
-      const { disabled, isSecondary, iconLeft, label, onclick } = vnode.attrs;
+      const { disabled, isSecondary, iconLeft, label, onClick } = vnode.attrs;
       return (
         <div
-          class={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
+          className={getClasses<{ disabled?: boolean; isSecondary?: boolean }>(
             { disabled, isSecondary },
             'PopoverMenuItem'
           )}
-          onclick={onclick}
+          onClick={onClick}
         >
           {iconLeft && (
             <CWIcon
@@ -52,15 +53,15 @@ type PopoverMenuAttrs = {
 } & SharedPopoverAttrs;
 
 export class CWPopoverMenu extends ClassComponent<PopoverMenuAttrs> {
-  view(vnode: m.Vnode<PopoverMenuAttrs>) {
+  view(vnode: ResultNode<PopoverMenuAttrs>) {
     const { menuItems, trigger } = vnode.attrs;
 
     return (
       <CWPopover
         content={
-          <div class={ComponentType.PopoverMenu}>
-            {menuItems.map((item) => (
-              <CWPopoverMenuItem type={item.type || 'default'} {...item} />
+          <div className={ComponentType.PopoverMenu}>
+            {menuItems.map((item, i) => (
+              <CWPopoverMenuItem key={`${i}`} type={item.type || 'default'} {...item} />
             ))}
           </div>
         }

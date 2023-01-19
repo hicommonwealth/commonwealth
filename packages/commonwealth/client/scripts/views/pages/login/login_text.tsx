@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/login/login_text.scss';
 
@@ -19,14 +20,14 @@ type LoginTextAttrs = {
 };
 
 export class LoginText extends ClassComponent<LoginTextAttrs> {
-  view(vnode: m.Vnode<LoginTextAttrs>) {
+  view(vnode: ResultNode<LoginTextAttrs>) {
     const { bodyText, className, headerText, isMobile = false } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ className?: string }>({ className }, 'LoginText')}
+        className={getClasses<{ className?: string }>({ className }, 'LoginText')}
       >
-        <div class="header-container">
+        <div className="header-container">
           <CWText
             type={
               isWindowExtraSmall(window.innerWidth)

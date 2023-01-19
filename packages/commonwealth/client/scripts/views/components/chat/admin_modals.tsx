@@ -1,8 +1,9 @@
 /* eslint-disable max-classes-per-file */
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -29,7 +30,7 @@ export class CreateCategory extends ClassComponent<ChannelAttrs> {
     this.channel = '';
   }
 
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.createChatChannel(
         this.channel,
@@ -55,9 +56,9 @@ export class CreateCategory extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Create Category</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>A new category will be added to chat.</CWText>
         <CWTextInput
@@ -70,17 +71,17 @@ export class CreateCategory extends ClassComponent<ChannelAttrs> {
           placeholder="Enter a channel title"
           oninput={handleChannelChange}
         />
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-blue"
             disabled={!this.category.length || !this.channel.length}
             label="Submit"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -95,7 +96,7 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
     this.channel = '';
   }
 
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.createChatChannel(
         this.channel,
@@ -112,9 +113,9 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Create Channel</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           A new channel will be added to the <b>{vnode.attrs.category}</b>{' '}
@@ -125,17 +126,17 @@ export class CreateChannel extends ClassComponent<ChannelAttrs> {
           placeholder="Enter a channel title"
           oninput={handleChannelChange}
         />
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-blue"
             disabled={!this.channel.length}
             label="Submit"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -150,7 +151,7 @@ export class RenameChannel extends ClassComponent<ChannelAttrs> {
     this.channelName = '';
   }
 
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       vnode.attrs.handleClose();
       await app.socket.chatNs.editChatChannel(
@@ -165,9 +166,9 @@ export class RenameChannel extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Rename Channel</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           Give a new name to <b>{vnode.attrs.channel.name}</b>
@@ -177,17 +178,17 @@ export class RenameChannel extends ClassComponent<ChannelAttrs> {
           placeholder="Enter a new channel name"
           oninput={handleChange}
         />
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-blue"
             disabled={!this.channelName.length}
             label="Submit"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -202,7 +203,7 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
     this.newCategory = '';
   }
 
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.editChatCategory(
         vnode.attrs.category,
@@ -217,9 +218,9 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Rename Category</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           Give a new name to <b>{vnode.attrs.category}</b>
@@ -229,17 +230,17 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
           placeholder="Enter a category name"
           oninput={handleChange}
         />
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-blue"
             disabled={!this.newCategory.length}
             label="Submit"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -248,7 +249,7 @@ export class RenameCategory extends ClassComponent<ChannelAttrs> {
 }
 
 export class DeleteChannel extends ClassComponent<ChannelAttrs> {
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.deleteChatChannel(vnode.attrs.channel.id);
       vnode.attrs.handleClose();
@@ -256,24 +257,24 @@ export class DeleteChannel extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Delete Channel</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           The <b>{vnode.attrs.channel.name} </b> channel will be deleted.
           <b> All messages within will be lost forever.</b> Ok?
         </CWText>
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-red"
             label="Yes, Delete"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>
@@ -282,7 +283,7 @@ export class DeleteChannel extends ClassComponent<ChannelAttrs> {
 }
 
 export class DeleteCategory extends ClassComponent<ChannelAttrs> {
-  view(vnode: m.Vnode<ChannelAttrs>) {
+  view(vnode: ResultNode<ChannelAttrs>) {
     const handleSubmit = async () => {
       await app.socket.chatNs.deleteChatCategory(vnode.attrs.category);
       vnode.attrs.handleClose();
@@ -290,25 +291,25 @@ export class DeleteCategory extends ClassComponent<ChannelAttrs> {
 
     return (
       <CWCard elevation="elevation-1" interactive={false}>
-        <div class="header">
+        <div className="header">
           <CWText type="h5">Delete Category</CWText>
-          <CWIcon iconName="close" onclick={vnode.attrs.handleClose} />
+          <CWIcon iconName="close" onClick={vnode.attrs.handleClose} />
         </div>
         <CWText>
           Deleting the <b>{vnode.attrs.category}</b> category will delete all
           channels inside.
           <b> All messages inside all the channels will be lost forever.</b> Ok?
         </CWText>
-        <div class="button-bar">
+        <div className="button-bar">
           <CWButton
             buttonType="secondary-black"
             label="Cancel"
-            onclick={vnode.attrs.handleClose}
+            onClick={vnode.attrs.handleClose}
           />
           <CWButton
             buttonType="primary-red"
             label="Yes, Delete"
-            onclick={handleSubmit}
+            onClick={handleSubmit}
           />
         </div>
       </CWCard>

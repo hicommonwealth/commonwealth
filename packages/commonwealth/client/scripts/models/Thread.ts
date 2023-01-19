@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import m from 'mithril';
+
 import app from 'state';
 import moment from 'moment';
 import { ProposalType } from 'common-common/src/types';

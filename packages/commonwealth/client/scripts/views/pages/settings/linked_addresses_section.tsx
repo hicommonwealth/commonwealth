@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import _ from 'lodash';
 
 import 'pages/settings/linked_addresses_section.scss';
@@ -20,13 +21,13 @@ import { getClasses } from '../../components/component_kit/helpers';
 
 type AccountRowAttrs = {
   account: AddressInfo;
-  onclick?: (e: Event) => any;
+  onClick?: (e: Event) => any;
 };
 
 class AccountRow extends ClassComponent<AccountRowAttrs> {
   private removing: boolean;
 
-  view(vnode: m.Vnode<AccountRowAttrs>) {
+  view(vnode: ResultNode<AccountRowAttrs>) {
     const { account } = vnode.attrs;
     const isActiveAccount =
       app.user.activeAccount &&
@@ -35,22 +36,22 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
 
     return (
       <div
-        class={getClasses<{ isSelected?: boolean }>(
+        className={getClasses<{ isSelected?: boolean }>(
           { isSelected: isActiveAccount },
           'AccountRow'
         )}
         key={`${account.chain.id}#${account.address}`}
-        onclick={vnode.attrs.onclick}
+        onClick={vnode.attrs.onClick}
       >
-        {m(User, {
+        {render(User, {
           user: account,
           avatarOnly: true,
           avatarSize: 32,
           linkify: true,
           popover: true,
         })}
-        <div class="info-col">
-          {m(User, {
+        <div className="info-col">
+          {render(User, {
             user: account,
             hideAvatar: true,
             linkify: true,
@@ -82,7 +83,7 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
         </div>
         <CWButton
           buttonType="primary-red"
-          onclick={async () => {
+          onClick={async () => {
             const confirmed = await confirmationModalWithText(
               'Are you sure you want to remove this account?'
             )();
@@ -96,7 +97,7 @@ class AccountRow extends ClassComponent<AccountRowAttrs> {
               }
               unlinkLogin(account).then(() => {
                 this.removing = false;
-                m.redraw();
+                redraw();
               });
             }
           }}
@@ -119,14 +120,14 @@ export class LinkedAddressesSection extends ClassComponent {
     );
 
     return (
-      <div class="LinkedAddressesSection">
+      <div className="LinkedAddressesSection">
         <CWText type="h5" fontWeight="semiBold">
           Linked addresses
         </CWText>
         {addressGroups.map(([chain_id, addresses]) =>
           addresses
             .sort(orderAccountsByAddress)
-            .map((account) => m(AccountRow, { account }))
+            .map((account) => render(AccountRow, { account }))
         )}
         {app.user.addresses.length === 0 && <CWText>No addresses</CWText>}
       </div>

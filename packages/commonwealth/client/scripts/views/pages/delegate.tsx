@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/delegate.scss';
 
@@ -12,7 +13,7 @@ import { PageLoading } from 'views/pages/loading';
 import Compound from 'controllers/chain/ethereum/compound/adapter';
 import Aave from 'controllers/chain/ethereum/aave/adapter';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import { PageNotFound } from './404';
+import PageNotFound from './404';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { CWText } from '../components/component_kit/cw_text';
@@ -50,7 +51,7 @@ class DelegateForm extends ClassComponent {
       );
     }
 
-    m.redraw();
+    redraw();
   }
 
   async setDelegate(address: string) {
@@ -81,7 +82,7 @@ class DelegateForm extends ClassComponent {
     const hasValue = app.chain.network === ChainNetwork.Compound;
 
     return (
-      <div class="DelegateForm">
+      <div className="DelegateForm">
         <GovExplainer
           statHeaders={[
             {
@@ -103,7 +104,7 @@ class DelegateForm extends ClassComponent {
           oninput={(e) => {
             const result = (e.target as any).value;
             this.form.address = result;
-            m.redraw();
+            redraw();
           }}
         />
         {hasValue && (
@@ -114,19 +115,19 @@ class DelegateForm extends ClassComponent {
             oninput={(e) => {
               const result = (e.target as any).value;
               this.form.amount = result;
-              m.redraw();
+              redraw();
             }}
           />
         )}
         <CWButton
           disabled={form.address === '' || loading}
           label="Delegate!"
-          onclick={async (e) => {
+          onClick={async (e) => {
             e.preventDefault();
             this.loading = true;
             await this.setDelegate(form.address);
             this.loading = false;
-            m.redraw();
+            redraw();
           }}
         />
       </div>

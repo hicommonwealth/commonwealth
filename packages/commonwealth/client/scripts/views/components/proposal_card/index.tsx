@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/proposal_card/index.scss';
 
@@ -27,12 +28,12 @@ import { CWDivider } from '../component_kit/cw_divider';
 import { ProposalTag } from './proposal_tag';
 
 type ProposalCardAttrs = {
-  injectedContent?: m.Vnode;
+  injectedContent?: ResultNode;
   proposal: AnyProposal;
 };
 
 export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
-  view(vnode: m.Vnode<ProposalCardAttrs>) {
+  view(vnode: ResultNode<ProposalCardAttrs>) {
     const { proposal, injectedContent } = vnode.attrs;
 
     const secondaryTagText = getSecondaryTagText(proposal);
@@ -42,7 +43,7 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
         elevation="elevation-2"
         interactive
         className="ProposalCard"
-        onclick={(e) => {
+        onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
 
@@ -58,8 +59,8 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
           navigateToSubpage(path); // avoid resetting scroll point
         }}
       >
-        <div class="proposal-card-metadata">
-          <div class="tag-row">
+        <div className="proposal-card-metadata">
+          <div className="tag-row">
             <ProposalTag label={getPrimaryTagText(proposal)} />
             {isNotNil(secondaryTagText) && (
               <ProposalTag label={secondaryTagText} />
@@ -86,10 +87,10 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
             )}
         </div>
         {injectedContent ? (
-          <>
+          <React.Fragment>
             <CWDivider />
-            <div class="proposal-injected">{injectedContent}</div>
-          </>
+            <div className="proposal-injected">{injectedContent}</div>
+          </React.Fragment>
         ) : proposal.isPassing !== 'none' ? (
           <CWText
             fontWeight="medium"
@@ -105,7 +106,7 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
                 ProposalType.Thread,
                 `${proposal.threadId}`
               )}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.stopPropagation();
                 e.preventDefault();
 
@@ -135,11 +136,11 @@ export class ProposalCard extends ClassComponent<ProposalCardAttrs> {
 //  linked treasury proposals
 //   proposal instanceof SubstrateDemocracyReferendum && proposal.preimage?.section === 'treasury'
 //      && proposal.preimage?.method === 'approveProposal'
-//     && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+//     && render('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
 //    proposal instanceof SubstrateDemocracyProposal && proposal.preimage?.section === 'treasury'
 //     && proposal.preimage?.method === 'approveProposal'
-//     && m('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
+//     && render('.proposal-action', [ 'Approves TRES-', proposal.preimage?.args[0] ]),
 //    proposal instanceof SubstrateCollectiveProposal && proposal.call?.section === 'treasury'
 //      && proposal.call?.method === 'approveProposal'
-//      && m('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
+//      && render('.proposal-action', [ 'Approves TRES-', proposal.call?.args[0] ]),
 //    linked referenda

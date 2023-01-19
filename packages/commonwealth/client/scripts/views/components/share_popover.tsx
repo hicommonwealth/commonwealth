@@ -1,15 +1,15 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { CWIconButton } from './component_kit/cw_icon_button';
 import { CWPopoverMenu } from './component_kit/cw_popover/cw_popover_menu';
 
-type SharePopoverAttrs = { commentId?: number; trigger?: m.Vnode };
+type SharePopoverAttrs = { commentId?: number; trigger?: ResultNode };
 
 export class SharePopover extends ClassComponent<SharePopoverAttrs> {
-  view(vnode: m.Vnode<SharePopoverAttrs>) {
+  view(vnode: ResultNode<SharePopoverAttrs>) {
     const { commentId, trigger } = vnode.attrs;
     const domain = document.location.origin;
 
@@ -19,9 +19,8 @@ export class SharePopover extends ClassComponent<SharePopoverAttrs> {
           {
             iconLeft: 'copy',
             label: 'Copy URL',
-            onclick: async () => {
-              const currentRouteSansCommentParam = m.route
-                .get()
+            onClick: async () => {
+              const currentRouteSansCommentParam = getRoute()
                 .split('?comment=')[0];
               if (!commentId) {
                 await navigator.clipboard.writeText(
@@ -37,15 +36,15 @@ export class SharePopover extends ClassComponent<SharePopoverAttrs> {
           {
             iconLeft: 'twitter',
             label: 'Share on Twitter',
-            onclick: async () => {
+            onClick: async () => {
               if (!commentId) {
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}`,
+                  `https://twitter.com/intent/tweet?text=${domain}${getRoute()}`,
                   '_blank'
                 );
               } else {
                 await window.open(
-                  `https://twitter.com/intent/tweet?text=${domain}${m.route.get()}?comment=${commentId}`,
+                  `https://twitter.com/intent/tweet?text=${domain}${getRoute()}?comment=${commentId}`,
                   '_blank'
                 );
               }

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_profiles_list.scss';
 
@@ -16,23 +17,23 @@ type ProfileRowStyleAttrs = {
 
 export type ProfileRowAttrs = {
   name: string;
-  onclick?: () => void;
+  onClick?: () => void;
 } & ProfileRowStyleAttrs;
 
 export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
-  view(vnode: m.Vnode<ProfileRowAttrs>) {
-    const { darkMode, isSelected, onclick, name } = vnode.attrs;
+  view(vnode: ResultNode<ProfileRowAttrs>) {
+    const { darkMode, isSelected, onClick, name } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<ProfileRowStyleAttrs>(
+        className={getClasses<ProfileRowStyleAttrs>(
           { darkMode, isSelected },
           'ProfileRow'
         )}
-        onclick={onclick}
+        onClick={onClick}
       >
-        <div class="avatar-and-name">
-          <div class="avatar" />
+        <div className="avatar-and-name">
+          <div className="avatar" />
           <CWText
             type="b1"
             fontWeight="bold"
@@ -50,20 +51,20 @@ export class CWProfileRow extends ClassComponent<ProfileRowAttrs> {
 
 type ProfilesListAttrs = {
   darkMode?: boolean;
-  onclick?: () => void;
+  onClick?: () => void;
   profiles: Array<ProfileRowAttrs>;
 };
 
 export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
-  view(vnode: m.Vnode<ProfilesListAttrs>) {
-    const { darkMode, onclick, profiles } = vnode.attrs;
+  view(vnode: ResultNode<ProfilesListAttrs>) {
+    const { darkMode, onClick, profiles } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ darkMode?: boolean }>({ darkMode }, 'ProfilesList')}
+        className={getClasses<{ darkMode?: boolean }>({ darkMode }, 'ProfilesList')}
       >
         <div
-          class={getClasses<{ darkMode?: boolean }>(
+          className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
             'profile-rows-container'
           )}
@@ -73,7 +74,7 @@ export class CWProfilesList extends ClassComponent<ProfilesListAttrs> {
               darkMode={darkMode}
               isSelected={profile.isSelected}
               name={profile.name}
-              onclick={onclick}
+              onClick={onClick}
             />
           ))}
         </div>

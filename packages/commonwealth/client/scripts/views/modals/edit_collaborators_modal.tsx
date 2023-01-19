@@ -1,9 +1,10 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
-import { QueryList, ListItem } from 'construct-ui';
+// import { QueryList, ListItem } from 'construct-ui';
 
 import 'modals/edit_collaborators_modal.scss';
 
@@ -31,7 +32,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
   private membersFetched: boolean;
   private removedEditors: any;
 
-  view(vnode: m.Vnode<EditCollaboratorsModalAttrs>) {
+  view(vnode: ResultNode<EditCollaboratorsModalAttrs>) {
     const { thread } = vnode.attrs;
 
     // TODO Graham 4/4/21: We should begin developing boilerplate around fetching toggles, state
@@ -48,10 +49,10 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
           this.items = response.result.filter((role) => {
             return role.Address.address !== app.user.activeAccount?.address;
           });
-          m.redraw();
+          redraw();
         })
         .catch((err) => {
-          m.redraw();
+          redraw();
           console.error(err);
         });
     }
@@ -73,15 +74,15 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
       .filter((c) => !Object.keys(this.removedEditors).includes(c.address));
 
     return (
-      <div class="EditCollaboratorsModal">
-        <div class="compact-modal-title">
+      <div className="EditCollaboratorsModal">
+        <div className="compact-modal-title">
           <h3>Edit collaborators</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
-          <div class="user-list-container">
+        <div className="compact-modal-body">
+          <div className="user-list-container">
             <CWLabel label="Users" />
-            {m(QueryList, {
+            {/* {m(QueryList, { // @TODO @REACT FIX ME
               checkmark: true,
               items,
               inputAttrs: {
@@ -97,8 +98,8 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   this.addedEditors[role.Address.address]
                 );
 
-                return m(ListItem, {
-                  label: m(User, { user }),
+                return render(ListItem, {
+                  label: render(User, { user }),
                   selected: recentlyAdded,
                   key: role.Address.address,
                 });
@@ -135,12 +136,12 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   notifyInfo('Already an editor');
                 }
               },
-            })}
+            })} */}
           </div>
           {allCollaborators.length > 0 ? (
-            <div class="selected-collaborators-section">
+            <div className="selected-collaborators-section">
               <CWLabel label="Selected collaborators" />
-              <div class="collaborator-rows-container">
+              <div className="collaborator-rows-container">
                 {allCollaborators.map((c) => {
                   const user: Profile = app.profiles.getProfile(
                     c.chain,
@@ -148,12 +149,12 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                   );
 
                   return (
-                    <div class="collaborator-row">
-                      {m(User, { user })}
+                    <div className="collaborator-row">
+                      {render(User, { user })}
                       <CWIconButton
                         iconName="close"
                         iconSize="small"
-                        onclick={async () => {
+                        onClick={async () => {
                           // If already scheduled for addition, un-schedule
                           if (this.addedEditors[c.address]) {
                             delete this.addedEditors[c.address];
@@ -169,17 +170,17 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
               </div>
             </div>
           ) : (
-            <div class="no-collaborators">
+            <div className="no-collaborators">
               <CWText className="no-collaborators-text">
                 No collaborators selected
               </CWText>
             </div>
           )}
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               label="Cancel"
               buttonType="secondary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 $(e.target).trigger('modalexit');
               }}
             />
@@ -189,7 +190,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                 $.isEmptyObject(this.removedEditors)
               }
               label="Save changes"
-              onclick={async (e) => {
+              onClick={async (e) => {
                 if (!$.isEmptyObject(this.addedEditors)) {
                   try {
                     // TODO Graham 4/4/22: Break off into proper controller methods
@@ -240,7 +241,7 @@ export class EditCollaboratorsModal extends ClassComponent<EditCollaboratorsModa
                     } else {
                       throw new Error('Failed to remove collaborators');
                     }
-                    m.redraw();
+                    redraw();
                   } catch (err) {
                     const errMsg =
                       err.responseJSON?.error ||

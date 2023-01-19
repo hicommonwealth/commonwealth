@@ -1,10 +1,11 @@
 import 'pages/profile.scss';
 
-import m from 'mithril';
+
 import _ from 'lodash';
 import $ from 'jquery';
 import { checkAddressChecksum, toChecksumAddress } from 'web3-utils';
 import bs58 from 'bs58';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -12,7 +13,7 @@ import { ChainBase } from 'common-common/src/types';
 import { Thread, Comment, Profile } from 'models';
 
 import Sublayout from 'views/sublayout';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { PageLoading } from 'views/pages/loading';
 import { CWTab, CWTabBar } from 'views/components/component_kit/cw_tabs';
 
@@ -104,7 +105,7 @@ interface IProfilePageState {
   loading: boolean;
   refreshProfile: boolean;
   tabSelected: number;
-  onscroll: any;
+  onScroll: any;
   allContentCount: number;
   proposalsContentCount: number;
   commentsContentCount: number;
@@ -135,7 +136,7 @@ const loadProfile = async (
   state: IProfilePageState
 ) => {
   const chain =
-    m.route.param('base') || app.customDomainId() || m.route.param('scope');
+    getRouteParam('base') || app.customDomainId() || getRouteParam('scope');
   const { address } = attrs;
   const chainInfo = app.config.chains.getById(chain);
   let valid = false;
@@ -212,7 +213,7 @@ const loadProfile = async (
     state.account = account;
     state.threads = result.threads.map((t) => modelThreadFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
-    m.redraw();
+    redraw();
   } catch (err) {
     // for certain chains, display addresses not in db if formatted properly
     if (chainInfo?.base === ChainBase.Substrate) {
@@ -265,7 +266,7 @@ const loadProfile = async (
     }
     state.loaded = true;
     state.loading = false;
-    m.redraw();
+    redraw();
     if (!state.account)
       throw new Error(
         err.responseJSON && err.responseJSON.error
@@ -279,7 +280,7 @@ const postsRemaining = (contentLength, count) => {
   return contentLength > 10 && count < contentLength;
 };
 
-const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
+const ProfilePage: Component<IProfilePageAttrs, IProfilePageState> = {
   oninit: (vnode) => {
     vnode.state.account = null;
     vnode.state.tabSelected = 0;
@@ -290,10 +291,10 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
     vnode.state.comments = [];
     vnode.state.refreshProfile = false;
     const chain =
-      m.route.param('base') || app.customDomainId() || m.route.param('scope');
+      getRouteParam('base') || app.customDomainId() || getRouteParam('scope');
     const { address } = vnode.attrs;
     const chainInfo = app.config.chains.getById(chain);
-    const baseSuffix = m.route.param('base');
+    const baseSuffix = getRouteParam('base');
 
     if (chainInfo?.base === ChainBase.Substrate) {
       const decodedAddress = decodeAddress(address);
@@ -338,11 +339,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       vnode.state.loaded = false;
       loadProfile(vnode.attrs, vnode.state);
     }
-    if (loading) return m(PageLoading);
+    if (loading) return render(PageLoading);
     if (!account && !vnode.state.initialized) {
-      return m(PageNotFound, { message: 'Invalid address provided' });
+      return render(PageNotFound, { message: 'Invalid address provided' });
     } else if (!account) {
-      return m(PageLoading);
+      return render(PageLoading);
     }
 
     if (!vnode.state.allContentCount) {
@@ -365,14 +366,14 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       vnode.state.refreshProfile = false;
       if (onOwnProfile) {
         setActiveAccount(account).then(() => {
-          m.redraw();
+          redraw();
         });
       } else {
-        m.redraw();
+        redraw();
       }
     }
 
-    const onscroll = _.debounce(() => {
+    const onScroll = _.debounce(() => {
       const tab = vnode.state.tabSelected;
       if (tab === 0) {
         if (!postsRemaining(allContent.length, vnode.state.allContentCount))
@@ -391,21 +392,21 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       if (scrollPos > scrollHeight - 400) {
         if (tab === 0) {
           vnode.state.allContentCount += 20;
-          const thisUrl = m.route.get();
-          if (m.route.get() === thisUrl)
+          const thisUrl = getRoute();
+          if (getRoute() === thisUrl)
             window.location.hash = vnode.state.allContentCount.toString();
         } else if (tab === 1) {
           vnode.state.proposalsContentCount += 20;
-          const thisUrl = m.route.get();
-          if (m.route.get() === thisUrl)
+          const thisUrl = getRoute();
+          if (getRoute() === thisUrl)
             window.location.hash = vnode.state.proposalsContentCount.toString();
         } else {
           vnode.state.commentsContentCount += 20;
-          const thisUrl = m.route.get();
-          if (m.route.get() === thisUrl)
+          const thisUrl = getRoute();
+          if (getRoute() === thisUrl)
             window.location.hash = vnode.state.commentsContentCount.toString();
         }
-        m.redraw();
+        redraw();
       }
     }, 400);
 
@@ -432,21 +433,21 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       ? `Comments ${comments.length}`
       : 'Comments';
 
-    return m(
+    return render(
       Sublayout,
       {
-        onscroll,
+        onScroll,
       },
       [
-        m('.ProfilePage', [
+        render('.ProfilePage', [
           displayBanner &&
-            m(ProfileBanner, {
+            render(ProfileBanner, {
               account,
               addressInfo: currentAddressInfo,
             }),
-          m('.row.row-narrow.forum-row', [
-            m('.col-xs-12 .col-md-8', [
-              m(ProfileHeader, {
+          render('.row.row-narrow.forum-row', [
+            render('.col-xs-12 .col-md-8', [
+              render(ProfileHeader, {
                 account,
                 setIdentity,
                 onOwnProfile,
@@ -455,31 +456,31 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   vnode.state.refreshProfile = true;
                 },
               }),
-              m(CWTabBar, [
-                m(CWTab, {
+              render(CWTabBar, [
+                render(CWTab, {
                   label: allTabTitle,
-                  onclick: () => {
+                  onClick: () => {
                     vnode.state.tabSelected = 0;
                   },
                   isSelected: vnode.state.tabSelected === 0,
                 }),
-                m(CWTab, {
+                render(CWTab, {
                   label: threadsTabTitle,
-                  onclick: () => {
+                  onClick: () => {
                     vnode.state.tabSelected = 1;
                   },
                   isSelected: vnode.state.tabSelected === 1,
                 }),
-                m(CWTab, {
+                render(CWTab, {
                   label: commentsTabTitle,
-                  onclick: () => {
+                  onClick: () => {
                     vnode.state.tabSelected = 2;
                   },
                   isSelected: vnode.state.tabSelected === 2,
                 }),
               ]),
               vnode.state.tabSelected === 0 &&
-                m(ProfileContent, {
+                render(ProfileContent, {
                   account,
                   type: UserContent.All,
                   content: allContent,
@@ -487,10 +488,10 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 1 &&
-                m(ProfileContent, {
+                render(ProfileContent, {
                   account,
                   type: UserContent.Threads,
                   content: proposals,
@@ -498,10 +499,10 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
                 }),
               vnode.state.tabSelected === 2 &&
-                m(ProfileContent, {
+                render(ProfileContent, {
                   account,
                   type: UserContent.Comments,
                   content: comments,
@@ -509,11 +510,11 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
                   // eslint-disable-next-line max-len
                   localStorageScrollYKey: `profile-${
                     vnode.attrs.address
-                  }-${m.route.param('base')}-${app.activeChainId()}-scrollY`,
+                  }-${getRouteParam('base')}-${app.activeChainId()}-scrollY`,
                 }),
             ]),
-            m('.xs-display-none .col-md-4', [
-              m(ProfileBio, {
+            render('.xs-display-none .col-md-4', [
+              render(ProfileBio, {
                 account,
                 setIdentity,
                 onOwnProfile,

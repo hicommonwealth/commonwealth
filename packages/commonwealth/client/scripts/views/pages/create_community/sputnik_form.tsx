@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import { connect as nearConnect, ConnectConfig, keyStores } from 'near-api-js';
 import { CodeResult } from 'near-api-js/lib/providers/provider';
@@ -40,7 +41,7 @@ export class SputnikForm extends ClassComponent {
 
   view() {
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         <InputRow
           title="DAO Name"
           value={this.state.form.name}
@@ -73,7 +74,7 @@ export class SputnikForm extends ClassComponent {
         <CWButton
           label="Save changes"
           disabled={this.state.saving}
-          onclick={async () => {
+          onClick={async () => {
             const { iconUrl, name } = this.state.form;
 
             this.state.saving = true;
@@ -153,7 +154,7 @@ export class SputnikForm extends ClassComponent {
                 );
               }
               await initAppState(false);
-              m.route.set(`${window.location.origin}/${res.result.chain.id}`);
+              setRoute(`${window.location.origin}/${res.result.chain.id}`);
             } catch (err) {
               notifyError(err.responseJSON?.error || 'Adding DAO failed.');
               console.error(err.responseJSON?.error || err.message);

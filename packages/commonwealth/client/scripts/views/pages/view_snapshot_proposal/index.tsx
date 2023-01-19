@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 // import 'pages/snapshot/index.scss';
 
@@ -48,7 +49,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private validatedAgainstStrategies: boolean;
   private votes: Array<SnapshotProposalVote>;
 
-  oninit(vnode: m.Vnode<ViewProposalPageAttrs>) {
+  oninit(vnode: ResultNode<ViewProposalPageAttrs>) {
     this.fetchedPower = false;
     this.proposal = null;
     this.scores = [];
@@ -70,7 +71,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         this.totals = res.results;
       });
 
-      m.redraw();
+      redraw();
 
       getPower(
         this.space,
@@ -80,7 +81,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
         this.validatedAgainstStrategies = vals.totalScore > 0;
         this.totalScore = vals.totalScore;
         this.fetchedPower = true;
-        m.redraw();
+        redraw();
       });
 
       try {
@@ -88,7 +89,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           .fetchThreadIdsForSnapshot({ snapshot: this.proposal.id })
           .then((res) => {
             this.threads = res;
-            m.redraw();
+            redraw();
           });
       } catch (e) {
         console.error(`Failed to fetch threads: ${e}`);
@@ -116,7 +117,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
+  view(vnode: ResultNode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     return !this.votes || !this.totals || !this.proposal ? (
@@ -130,7 +131,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={
             <CWText>
-              {m(User, {
+              {render(User, {
                 user: new AddressInfo(
                   null,
                   this.proposal.author,

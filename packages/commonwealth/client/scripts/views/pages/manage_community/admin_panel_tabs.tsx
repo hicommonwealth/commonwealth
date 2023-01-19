@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/manage_community/admin_panel_tabs.scss';
 
@@ -20,25 +21,25 @@ type AdminPanelTabsAttrs = {
 export class AdminPanelTabs extends ClassComponent<AdminPanelTabsAttrs> {
   private index: number;
 
-  oninit(vnode: m.Vnode<AdminPanelTabsAttrs>) {
+  oninit(vnode: ResultNode<AdminPanelTabsAttrs>) {
     this.index = vnode.attrs.defaultTab;
   }
 
-  view(vnode: m.Vnode<AdminPanelTabsAttrs>) {
+  view(vnode: ResultNode<AdminPanelTabsAttrs>) {
     return (
-      <div class="AdminPanelTabs">
+      <div className="AdminPanelTabs">
         <CWTabBar>
           <CWTab
             label="Admins"
             isSelected={this.index === 1}
-            onclick={() => {
+            onClick={() => {
               this.index = 1;
             }}
           />
           <CWTab
             label="Webhooks"
             isSelected={this.index === 2}
-            onclick={() => {
+            onClick={() => {
               this.index = 2;
             }}
           />

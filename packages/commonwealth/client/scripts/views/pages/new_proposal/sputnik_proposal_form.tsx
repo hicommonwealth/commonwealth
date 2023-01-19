@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { NearSputnikProposalKind } from 'controllers/chain/near/sputnik/types';
@@ -43,7 +43,7 @@ export class SputnikProposalForm extends ClassComponent {
 
   view() {
     return (
-      <>
+      <React.Fragment>
         <CWDropdown
           label="Proposal Type"
           defaultValue={sputnikProposalOptions[0]}
@@ -88,7 +88,7 @@ export class SputnikProposalForm extends ClassComponent {
         )}
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             // TODO: make type of proposal switchable
@@ -131,11 +131,11 @@ export class SputnikProposalForm extends ClassComponent {
 
             (app.chain as NearSputnik).dao
               .proposeTx(description, propArgs)
-              .then(() => m.redraw())
+              .then(() => redraw())
               .catch((err) => notifyError(err.message));
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

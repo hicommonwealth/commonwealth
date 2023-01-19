@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_thread_vote_button.scss';
 
@@ -21,11 +22,11 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
   private isHoveringDownvote: boolean;
   private initialVoteCount: number;
 
-  oninit(vnode: m.Vnode<ThreadVoteButtonAttrs>) {
+  oninit(vnode: ResultNode<ThreadVoteButtonAttrs>) {
     this.initialVoteCount = vnode.attrs.voteCount;
   }
 
-  view(vnode: m.Vnode<ThreadVoteButtonAttrs>) {
+  view(vnode: ResultNode<ThreadVoteButtonAttrs>) {
     const { updateVoteCount, voteCount } = vnode.attrs;
 
     const handleVoteChange = (newCount: number) => {
@@ -34,7 +35,7 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
 
     return (
       <div
-        class={getClasses<{
+        className={getClasses<{
           isHoveringUpvote: boolean;
           isHoveringDownvote: boolean;
           hasUpvoted: boolean;
@@ -52,16 +53,16 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
         <CWIcon
           iconName="upvote"
           iconSize="small"
-          onclick={() => {
+          onClick={() => {
             voteCount === this.initialVoteCount + 1
               ? handleVoteChange(this.initialVoteCount)
               : handleVoteChange(voteCount + 1);
           }}
           className="upvote-button"
-          onmouseenter={() => {
+          onMouseEnter={() => {
             this.isHoveringUpvote = true;
           }}
-          onmouseleave={() => {
+          onMouseLeave={() => {
             this.isHoveringUpvote = false;
           }}
         />
@@ -76,15 +77,15 @@ export class CWThreadVoteButton extends ClassComponent<ThreadVoteButtonAttrs> {
         <CWIcon
           iconName="downvote"
           iconSize="small"
-          onclick={() => {
+          onClick={() => {
             voteCount === this.initialVoteCount - 1
               ? handleVoteChange(this.initialVoteCount)
               : handleVoteChange(voteCount - 1);
           }}
-          onmouseenter={() => {
+          onMouseEnter={() => {
             this.isHoveringDownvote = true;
           }}
-          onmouseleave={() => {
+          onMouseLeave={() => {
             this.isHoveringDownvote = false;
           }}
           className="downvote-button"

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -19,7 +20,7 @@ import Substrate from 'controllers/chain/substrate/adapter';
 import { notifyError } from 'controllers/app/notifications';
 import { Comment, Account, ProposalModule, AnyProposal } from 'models';
 import { PageLoading } from 'views/pages/loading';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { SubstrateTreasuryTip } from 'controllers/chain/substrate/treasury_tip';
 import { TipDetail } from '../tip_detail';
 import { CWContentPage } from '../../components/component_kit/cw_content_page';
@@ -61,7 +62,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
   private tipAmount: number;
   private votingModalOpen: boolean;
 
-  view(vnode: m.Vnode<ViewProposalPageAttrs>) {
+  view(vnode: ResultNode<ViewProposalPageAttrs>) {
     const { identifier } = vnode.attrs;
 
     if (!app.chain?.meta) {
@@ -180,12 +181,12 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             .getByProposal(this.proposal)
             .filter((c) => c.parentComment === null);
 
-          m.redraw();
+          redraw();
         })
         .catch(() => {
           notifyError('Failed to load comments');
           this.comments = [];
-          m.redraw();
+          redraw();
         });
 
       this.prefetch[proposalIdAndType]['commentsStarted'] = true;
@@ -205,7 +206,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
       this.comments = app.comments
         .getByProposal(this.proposal)
         .filter((c) => c.parentComment === null);
-      m.redraw();
+      redraw();
     };
 
     if (this.comments === undefined) {
@@ -261,12 +262,12 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
 
     const toggleVotingModal = (newModalState: boolean) => {
       this.votingModalOpen = newModalState;
-      m.redraw();
+      redraw();
     };
 
     const onModalClose = () => {
       this.votingModalOpen = false;
-      m.redraw();
+      redraw();
     };
 
     return (
@@ -277,7 +278,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
           title={this.proposal.title}
           author={
             !!this.proposal.author &&
-            m(User, {
+            render(User, {
               avatarSize: 24,
               user: this.proposal.author,
               popover: true,
@@ -298,7 +299,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
             )
           }
           subBody={
-            <>
+            <React.Fragment>
               <LinkedProposalsEmbed
                 proposal={this.proposal as LinkedSubstrateProposal}
               />
@@ -312,7 +313,7 @@ class ViewProposalPage extends ClassComponent<ViewProposalPageAttrs> {
                 toggleVotingModal={toggleVotingModal}
                 votingModalOpen={this.votingModalOpen}
               />
-            </>
+            </React.Fragment>
           }
           comments={
             <CommentsTree

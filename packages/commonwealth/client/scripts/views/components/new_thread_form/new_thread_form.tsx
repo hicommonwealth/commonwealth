@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { capitalize } from 'lodash';
 import $ from 'jquery';
 
@@ -103,7 +104,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
       this.quillEditorState.alteredText = false;
     }
 
-    m.redraw();
+    redraw();
   }
 
   private async _saveDraft(
@@ -178,7 +179,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.form.topic = topic;
   }
 
-  oninit(vnode: m.Vnode<NewThreadFormAttrs>) {
+  oninit(vnode: ResultNode<NewThreadFormAttrs>) {
     const { isModal } = vnode.attrs;
     this.form = {
       topic: null,
@@ -190,7 +191,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     this.overwriteConfirmationModal = false;
     try {
       this.activeTopic = isModal
-        ? m.route.param('topic')
+        ? getRouteParam('topic')
         : app.lastNavigatedFrom().split('/').indexOf('discussions') !== -1
         ? app.lastNavigatedFrom().split('/')[
             app.lastNavigatedFrom().split('/').indexOf('discussions') + 1
@@ -256,7 +257,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
     }
   }
 
-  view(vnode: m.Vnode<NewThreadFormAttrs>) {
+  view(vnode: ResultNode<NewThreadFormAttrs>) {
     if (!app.chain) return;
     const { isModal, hasTopics } = vnode.attrs;
     const { fromDraft, saving, form } = this;
@@ -290,13 +291,13 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
 
     return (
       <div
-        class={getClasses<{ isModal?: boolean }>({ isModal }, 'NewThreadForm')}
+        className={getClasses<{ isModal?: boolean }>({ isModal }, 'NewThreadForm')}
       >
-        <div class="new-thread-header">
+        <div className="new-thread-header">
           <CWTabBar>
             <CWTab
               label={capitalize(ThreadKind.Discussion)}
-              onclick={() => {
+              onClick={() => {
                 this._saveToLocalStorage();
                 this.form.kind = ThreadKind.Discussion;
                 localStorage.setItem(
@@ -309,7 +310,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
             />
             <CWTab
               label={capitalize(ThreadKind.Link)}
-              onclick={() => {
+              onClick={() => {
                 this._saveToLocalStorage();
                 this.form.kind = ThreadKind.Link;
                 localStorage.setItem(`${chainId}-post-type`, ThreadKind.Link);
@@ -318,12 +319,12 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
               isSelected={this.form.kind === ThreadKind.Link}
             />
           </CWTabBar>
-          {isModal && m.route.get() !== `${chainId}/new/discussion` && (
+          {isModal && getRoute() !== `${chainId}/new/discussion` && (
             <CWButton
               label="Full editor"
               iconLeft="expand"
               buttonType="tertiary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 this.overwriteConfirmationModal = true;
                 localStorage.setItem(`${chainId}-from-draft`, `${fromDraft}`);
                 navigateToSubpage('/new/discussion');
@@ -332,20 +333,20 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
             />
           )}
         </div>
-        <div class="new-thread-body">
-          <div class="new-thread-form-inputs">
+        <div className="new-thread-body">
+          <div className="new-thread-form-inputs">
             {author?.profile && !author.profile.name && (
-              <div class="set-display-name-callout">
+              <div className="set-display-name-callout">
                 <CWText>You haven't set a display name yet.</CWText>
                 <a
                   href={`/${chainId}/account/${author.address}?base=${author.chain.id}`}
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     app.modals.create({
                       modal: EditProfileModal,
                       data: {
                         account: author,
-                        refreshCallback: () => m.redraw(),
+                        refreshCallback: () => redraw(),
                       },
                     });
                   }}
@@ -355,9 +356,9 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
               </div>
             )}
             {this.form.kind === ThreadKind.Discussion && (
-              <>
+              <React.Fragment>
                 {!!fromDraft && <CWText className="draft-text">Draft</CWText>}
-                <div class="topics-and-title-row">
+                <div className="topics-and-title-row">
                   {hasTopics && (
                     <TopicSelector
                       defaultTopic={
@@ -418,10 +419,10 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                   imageUploader
                   tabindex={3}
                 />
-                <div class="buttons-row">
+                <div className="buttons-row">
                   <CWButton
                     disabled={disableSubmission}
-                    onclick={async (e) => {
+                    onClick={async (e) => {
                       this.saving = true;
 
                       try {
@@ -462,7 +463,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                   <CWButton
                     disabled={disableSubmission}
                     buttonType="tertiary-blue"
-                    onclick={async (e) => {
+                    onClick={async (e) => {
                       // TODO Graham 7-19-22: This needs to be reduced / cleaned up / broken out
                       this.saving = true;
 
@@ -481,7 +482,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                         if (isModal) {
                           notifySuccess('Draft saved');
                         }
-                        m.redraw();
+                        redraw();
                       } catch (err) {
                         this.saving = false;
                         notifyError(err.message);
@@ -492,11 +493,11 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                     tabindex={5}
                   />
                 </div>
-              </>
+              </React.Fragment>
             )}
             {this.form.kind === ThreadKind.Link && hasTopics && (
-              <>
-                <div class="topics-and-title-row">
+              <React.Fragment>
+                <div className="topics-and-title-row">
                   <TopicSelector
                     defaultTopic={
                       this.activeTopic ||
@@ -563,7 +564,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                   label="Create thread"
                   name="submit"
                   disabled={disableSubmission}
-                  onclick={async (e) => {
+                  onClick={async (e) => {
                     if (!detectURL(this.form.url)) {
                       notifyError('Must provide a valid URL.');
                       return;
@@ -595,12 +596,12 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                     }
                   }}
                 />
-              </>
+              </React.Fragment>
             )}
           </div>
           {!!discussionDrafts.length &&
             this.form.kind === ThreadKind.Discussion && (
-              <div class="drafts-list-container">
+              <div className="drafts-list-container">
                 <CWText
                   type="h5"
                   fontWeight="semiBold"
@@ -608,7 +609,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                 >
                   Drafts
                 </CWText>
-                <div class="drafts-list">
+                <div className="drafts-list">
                   {discussionDrafts
                     .sort((a, b) => a.createdAt.unix() - b.createdAt.unix())
                     .map((draft) => {
@@ -616,11 +617,11 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
 
                       return (
                         <div
-                          class={getClasses<{ isSelected: boolean }>(
+                          className={getClasses<{ isSelected: boolean }>(
                             { isSelected: fromDraft === draft.id },
                             'draft-item'
                           )}
-                          onclick={async (e) => {
+                          onClick={async (e) => {
                             e.preventDefault();
                             if (
                               !this.quillEditorState.isBlank() ||
@@ -634,9 +635,9 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                             this._loadDraft(draft);
                           }}
                         >
-                          <div class="draft-title">
+                          <div className="draft-title">
                             {fromDraft === draft.id ? (
-                              <>
+                              <React.Fragment>
                                 <CWIcon iconName="write" iconSize="small" />
                                 <CWText
                                   fontWeight="semiBold"
@@ -645,7 +646,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                                 >
                                   {title}
                                 </CWText>
-                              </>
+                              </React.Fragment>
                             ) : (
                               <CWText
                                 fontWeight="semiBold"
@@ -663,7 +664,7 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                             })}
                           <CWText
                             className="draft-delete-text"
-                            onclick={async (e) => {
+                            onClick={async (e) => {
                               e.preventDefault();
                               e.stopPropagation();
                               const confirmed = await confirmationModalWithText(
@@ -677,12 +678,12 @@ export class NewThreadForm extends ClassComponent<NewThreadFormAttrs> {
                                   this.recentlyDeletedDrafts.push(draft.id);
                                   if (this.fromDraft === draft.id) {
                                     delete this.fromDraft;
-                                    m.redraw();
+                                    redraw();
                                   }
                                 } catch (err) {
                                   notifyError(err.message);
                                 }
-                                m.redraw();
+                                redraw();
                               }
                             }}
                           >

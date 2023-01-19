@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/view_proposal/proposal_header_links.scss';
 
@@ -17,11 +18,11 @@ type ProposalHeaderLinkAttrs = {
 
 // "View in Subscan"
 export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
+  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {externalLink('a', proposal['blockExplorerLink'], [
           proposal['blockExplorerLinkLabel'] ||
             extractDomain(proposal['blockExplorerLink']),
@@ -34,11 +35,11 @@ export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
 
 // "Vote on polkadot-js"
 export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
+  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {externalLink('a', proposal['votingInterfaceLink'], [
           proposal['votingInterfaceLinkLabel'] ||
             extractDomain(proposal['votingInterfaceLink']),
@@ -51,7 +52,7 @@ export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs>
 
 // "Go to discussion"
 export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {
-  view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
+  view(vnode: ResultNode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
     const path = getProposalUrlPath(
@@ -62,7 +63,7 @@ export class ThreadLink extends ClassComponent<ProposalHeaderLinkAttrs> {
     );
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {link('a', path, ['Go to discussion'])}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>
@@ -75,13 +76,13 @@ type SnapshotThreadLinkAttrs = {
 };
 
 export class SnapshotThreadLink extends ClassComponent<SnapshotThreadLinkAttrs> {
-  view(vnode: m.Vnode<SnapshotThreadLinkAttrs>) {
+  view(vnode: ResultNode<SnapshotThreadLinkAttrs>) {
     const { id, title } = vnode.attrs.thread;
 
     const proposalLink = getProposalUrlPath(ProposalType.Thread, id);
 
     return (
-      <div class="HeaderLink">
+      <div className="HeaderLink">
         {link('a', proposalLink, [decodeURIComponent(title)])}
         <CWIcon iconName="externalLink" iconSize="small" />
       </div>

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'modals/edit_topic_thresholds_modal.scss';
 
@@ -21,7 +22,7 @@ type EditTopicThresholdsRowAttrs = {
 class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs> {
   private newTokenThresholdInWei: string;
 
-  view(vnode: m.Vnode<EditTopicThresholdsRowAttrs>) {
+  view(vnode: ResultNode<EditTopicThresholdsRowAttrs>) {
     const { topic } = vnode.attrs;
 
     if (typeof this.newTokenThresholdInWei !== 'string') {
@@ -37,9 +38,9 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
       : 18;
 
     return (
-      <div class="EditTopicThresholdsRow">
+      <div className="EditTopicThresholdsRow">
         <CWText>{topic.name}</CWText>
-        <div class="input-and-button-row">
+        <div className="input-and-button-row">
           <TokenDecimalInput
             decimals={decimals}
             defaultValueInWei={topic.tokenThreshold.toString()}
@@ -50,7 +51,7 @@ class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs>
           <CWButton
             label="Update"
             disabled={!this.newTokenThresholdInWei}
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
               try {
                 const status = await app.topics.setTopicThreshold(
@@ -90,7 +91,7 @@ type EditTopicThresholdsModalAttrs = {
 export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholdsModalAttrs> {
   private form: NewTopicModalForm;
 
-  view(vnode: m.Vnode<EditTopicThresholdsModalAttrs>) {
+  view(vnode: ResultNode<EditTopicThresholdsModalAttrs>) {
     if (
       !app.user.isSiteAdmin &&
       !app.roles.isAdminOfEntity({ chain: app.activeChainId() })
@@ -105,12 +106,12 @@ export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholds
     const topics = app.topics.getByCommunity(app.activeChainId());
 
     return (
-      <div class="EditTopicThresholdsModal">
-        <div class="compact-modal-title">
+      <div className="EditTopicThresholdsModal">
+        <div className="compact-modal-title">
           <h3>Edit topic thresholds</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           {topics.length > 0 ? (
             topics
               .sort((a, b) => {

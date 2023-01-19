@@ -1,8 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 /* eslint-disable max-len */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/privacy_and_terms.scss';
 
@@ -121,8 +121,8 @@ class PrivacyPage extends ClassComponent {
   view() {
     return (
       <Sublayout>
-        <div class="PrivacyPage">
-          <div class="forum-container">
+        <div className="PrivacyPage">
+          <div className="forum-container">
             <CWText type="h3">Privacy Policy</CWText>
             {renderMultilineText(PrivacyPolicy)}
           </div>

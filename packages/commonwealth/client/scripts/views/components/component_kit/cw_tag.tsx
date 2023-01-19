@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_tag.scss';
 
@@ -26,7 +27,7 @@ export type TagAttrs = {
 };
 
 export class CWTag extends ClassComponent<TagAttrs> {
-  view(vnode: m.Vnode<TagAttrs>) {
+  view(vnode: ResultNode<TagAttrs>) {
     const { iconName, label, type } = vnode.attrs;
 
     return (

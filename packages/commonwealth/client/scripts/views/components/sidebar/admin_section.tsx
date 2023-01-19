@@ -1,9 +1,11 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 import { handleRedirectClicks } from 'helpers';
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import { SectionGroupAttrs, SidebarSectionAttrs, ToggleTree } from './types';
 import { SidebarSectionGroup } from './sidebar_section';
 import { OrderTopicsModal } from '../../modals/order_topics_modal';
@@ -29,7 +31,7 @@ function setAdminToggleTree(path: string, toggle: boolean) {
     JSON.stringify(newTree);
 }
 
-export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
+class AdminSectionComponent extends ClassComponent<SidebarSectionAttrs> {
   private editTopicThresholdsModalActive: boolean;
   private orderTopicsModalActive: boolean;
   private newTopicModalActive: boolean;
@@ -54,12 +56,12 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         containsChildren: false,
         displayData: null,
         hasDefaultToggle: false,
-        isActive: m.route.get().includes('/manage'),
+        isActive: getRoute().includes('/manage'),
         isVisible: true,
         isUpdated: false,
-        onclick: (e, toggle: boolean) => {
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/manage`, app.activeChainId(), () => {
+          handleRedirectClicks(this, e, `/manage`, app.activeChainId(), () => {
             setAdminToggleTree(`children.manageCommunity.toggledState`, toggle);
           });
         },
@@ -69,12 +71,12 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         containsChildren: false,
         displayData: null,
         hasDefaultToggle: false,
-        isActive: m.route.get().includes('/analytics'),
+        isActive: getRoute().includes('/analytics'),
         isVisible: true,
         isUpdated: false,
-        onclick: (e, toggle: boolean) => {
+        onClick: (e, toggle: boolean) => {
           e.preventDefault();
-          handleRedirectClicks(e, `/analytics`, app.activeChainId(), () => {
+          handleRedirectClicks(this, e, `/analytics`, app.activeChainId(), () => {
             setAdminToggleTree(`children.analytics.toggledState`, toggle);
           });
         },
@@ -87,7 +89,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         displayData: null,
         isUpdated: false,
         hasDefaultToggle: false,
-        onclick: (e) => {
+        onClick: (e) => {
           e.preventDefault();
           this.newTopicModalActive = true;
           app.modals.create({
@@ -107,7 +109,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         displayData: null,
         isUpdated: false,
         hasDefaultToggle: false,
-        onclick: (e) => {
+        onClick: (e) => {
           e.preventDefault();
           this.orderTopicsModalActive = true;
           app.modals.create({
@@ -127,7 +129,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
         displayData: null,
         isUpdated: false,
         hasDefaultToggle: false,
-        onclick: (e) => {
+        onClick: (e) => {
           e.preventDefault();
           this.editTopicThresholdsModalActive = true;
           app.modals.create({
@@ -165,7 +167,7 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
       title: 'Admin Capabilities',
       className: 'AdminSection',
       hasDefaultToggle: toggleTreeState['toggledState'],
-      onclick: (e, toggle: boolean) => {
+      onClick: (e, toggle: boolean) => {
         e.preventDefault();
         setAdminToggleTree('toggledState', toggle);
       },
@@ -177,3 +179,5 @@ export class AdminSection extends ClassComponent<SidebarSectionAttrs> {
     return <SidebarSectionGroup {...sidebarSectionData} />;
   }
 }
+
+export const AdminSection = NavigationWrapper(AdminSectionComponent);
