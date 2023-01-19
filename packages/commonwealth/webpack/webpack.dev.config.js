@@ -29,12 +29,6 @@ module.exports = merge(common, {
       'process.env.NODE_ENV': JSON.stringify('development'),
       CHAT_SERVER: JSON.stringify(process.env.CHAT_SERVER || 'localhost:3001'),
     }),
-    new DuplicatesPlugin({
-      // Emit compilation warning or error? (Default: `false`)
-      emitErrors: false,
-      // Display full duplicates information? (Default: `false`)
-      verbose: false,
-    }),
   ],
 });
 
@@ -46,6 +40,19 @@ if (!process.env.EXTERNAL_WEBPACK) {
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(), // used for hot reloading
+    ],
+  });
+}
+
+if (process.env.SHOW_DUPLICATE_DEPS) {
+  module.exports = merge(module.exports, {
+    plugins: [
+      new DuplicatesPlugin({
+        // Emit compilation warning or error? (Default: `false`)
+        emitErrors: false,
+        // Display full duplicates information? (Default: `false`)
+        verbose: false,
+      }),
     ],
   });
 }
