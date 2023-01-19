@@ -25,7 +25,11 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 
-import { createDefaultCommunityRoles, createRole } from '../util/roles';
+import {
+  createDefaultCommunityRoles,
+  createRole,
+  RoleInstanceWithPermission,
+} from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 
 const MAX_IMAGE_SIZE_KB = 500;
@@ -381,7 +385,7 @@ const createChain = async (
 
   // try to make admin one of the user's addresses
   // TODO: @Zak extend functionality here when we have Bases + Wallets refactored
-  let role: RoleInstance | undefined;
+  let role: RoleInstanceWithPermission | undefined;
   let addressToBeAdmin: AddressInstance | undefined;
 
   if (chain.base === ChainBase.Ethereum) {
@@ -436,7 +440,13 @@ const createChain = async (
   }
 
   if (addressToBeAdmin) {
-    await createRole(models, addressToBeAdmin.id, chain.id, 'admin', true);
+    role = await createRole(
+      models,
+      addressToBeAdmin.id,
+      chain.id,
+      'admin',
+      true
+    );
 
     await models.Subscription.findOrCreate({
       where: {

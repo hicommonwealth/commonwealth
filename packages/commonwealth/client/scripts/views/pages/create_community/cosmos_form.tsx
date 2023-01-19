@@ -103,6 +103,7 @@ export class CosmosForm extends ClassComponent {
               ethChainId,
               nodeUrl,
               symbol,
+              iconUrl,
             } = this.state.form;
             this.state.saving = true;
             mixpanelBrowserTrack({
@@ -121,6 +122,7 @@ export class CosmosForm extends ClassComponent {
                 jwt: app.user.jwt,
                 network: this.state.form.id,
                 node_url: nodeUrl,
+                icon_url: iconUrl,
                 type: ChainType.Chain,
                 default_symbol: symbol,
                 ...this.state.form,
