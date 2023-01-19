@@ -20,7 +20,7 @@ import type { DB } from '../models';
 import type { AddressInstance } from '../models/address';
 import type { ChainAttributes } from '../models/chain';
 import type { ChainNodeAttributes } from '../models/chain_node';
-import type { RoleAttributes, RoleInstance } from '../models/role';
+import type { RoleAttributes } from '../models/role';
 import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { mixpanelTrack } from '../util/mixpanelUtil';
