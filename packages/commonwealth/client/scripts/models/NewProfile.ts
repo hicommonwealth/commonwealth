@@ -39,6 +39,14 @@ class NewProfile {
     return this._slug;
   }
 
+  get socials() {
+    return this._socials;
+  }
+
+  get coverImage() {
+    return this._coverImage;
+  }
+
   constructor({
     profile_name,
     email,
