@@ -49,7 +49,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return app.chain?.meta.node?.ethChainId?.toString() || "1";
+    return app.chain?.meta.node?.ethChainId?.toString() || '1';
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -97,8 +97,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',
       });
-      // @ts-ignore
-      const chainIdHex = `0x${chainId.toString(16)}`;
+      const chainIdHex = `0x${parseInt(chainId, 10).toString(16)}`;
       try {
         await this._web3.givenProvider.request({
           method: 'wallet_switchEthereumChain',
