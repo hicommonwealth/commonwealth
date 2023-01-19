@@ -3,7 +3,6 @@ import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 import { actionToHash } from 'helpers/canvas';
 import {
-
   serializeActionPayload,
   serializeSessionPayload,
 } from '@canvas-js/interfaces';

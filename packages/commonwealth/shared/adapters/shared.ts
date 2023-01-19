@@ -60,7 +60,7 @@ export function chainBaseToCanvasChain(chainBase: ChainBase): CanvasChain {
   } else if (chainBase === ChainBase.NEAR) {
     return 'near';
   } else if (chainBase === ChainBase.Solana) {
-    return "solana";
+    return 'solana';
   } else if (chainBase === ChainBase.Substrate) {
     return 'substrate';
   }

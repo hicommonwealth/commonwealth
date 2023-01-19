@@ -92,9 +92,7 @@ export class CosmosSDKSessionController implements ISessionController {
     localStorage.setItem(authStorageKey, JSON.stringify(this.auths[chainId]));
   }
 
-  private async getOrCreateSigner(
-    chainId: string
-  ): Promise<{
+  private async getOrCreateSigner(chainId: string): Promise<{
     signer: Secp256k1Wallet;
     bech32Address: string;
     privkey: string;
