@@ -7,8 +7,7 @@ module.exports = {
     "prettier"
   ],
   plugins: [
-    "@typescript-eslint",
-    "unused-imports",
+    "@typescript-eslint"
   ],
   parser: "@typescript-eslint/parser",
   parserOptions: {
@@ -35,8 +34,6 @@ module.exports = {
   rules: {
     // this rule has not been updated to ESLint 8 so it is incompatible with our ESLint setup
     // Error: Rules with suggestions must set the `meta.hasSuggestions` property to `true`. `meta.docs.suggestion` is ignored by ESLint.
-    '@typescript-eslint/consistent-type-imports': 'error',
-    'unused-imports/no-unused-imports': 'error',
     "@typescript-eslint/no-explicit-any": "off",
     "@typescript-eslint/no-namespace": "off"
   }

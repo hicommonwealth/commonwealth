@@ -2,9 +2,12 @@ import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
 import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
-import app from 'state';
+import { Account, IWebWallet } from 'models';
+import {
+  Window as KeplrWindow,
+  EthSignType,
+} from '@keplr-wallet/types';
+import { CanvasData } from 'shared/adapters/shared';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface

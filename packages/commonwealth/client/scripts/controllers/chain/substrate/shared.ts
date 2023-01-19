@@ -1,5 +1,5 @@
 import type { SubmittableResult } from '@polkadot/api';
-import type { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
+import { ApiPromise, Keyring, WsProvider } from '@polkadot/api';
 import type {
   ApiOptions,
   Signer,

@@ -7,7 +7,7 @@ import $ from 'jquery';
 import type { Account, BlockInfo, IWebWallet } from 'models';
 import type { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
-import type Web3 from 'web3';
+import Web3 from 'web3';
 import type { provider } from 'web3-core';
 import { hexToNumber } from 'web3-utils';
 
@@ -86,8 +86,8 @@ class MetamaskWebWalletController implements IWebWallet<string> {
       // default to ETH
       const chainId = await this.getChainId();
 
-      const web3 = await import('web3');
-      this._web3 = new web3.default((window as any).ethereum);
+      // ensure we're on the correct chain
+      this._web3 = new Web3((window as any).ethereum);
       // TODO: does this come after?
       await this._web3.givenProvider.request({
         method: 'eth_requestAccounts',

@@ -27,9 +27,8 @@ const getSupportedEthChains = async (
       },
     });
 
-    const results: {
-      [id: number]: { url: string; alt_wallet_url: string };
-    } = {};
+    const results: { [id: number]: { url: string; alt_wallet_url: string } } =
+      {};
     for (const { eth_chain_id, url, alt_wallet_url } of supportedChainIds) {
       results[eth_chain_id] = { url, alt_wallet_url };
     }

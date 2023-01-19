@@ -57,7 +57,6 @@
     "eslint-config-prettier": "^8.5.0",
     "eslint-import-resolver-typescript": "^3.5.2",
     "eslint-import-resolver-webpack": "^0.13.2",
-    "eslint-plugin-unused-imports": "^2.0.0",
     "prettier": "2.7.1"
   }
 }

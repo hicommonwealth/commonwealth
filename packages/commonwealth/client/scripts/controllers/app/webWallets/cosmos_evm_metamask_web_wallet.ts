@@ -3,7 +3,7 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { Address } from 'ethereumjs-util';
 import type { Account, IWebWallet } from 'models';
-import type { CanvasData } from 'shared/adapters/shared';
+import { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 import Web3 from 'web3';
 import type { provider } from 'web3-core';
