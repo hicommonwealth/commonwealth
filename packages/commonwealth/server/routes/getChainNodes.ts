@@ -1,13 +1,12 @@
-import type {
+import { DB } from 'server/models';
+import {
   GetChainNodesReq,
   GetChainNodesResp,
+  needParamErrMsg,
 } from 'common-common/src/api/extApiTypes';
-import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
+import { ChainNodeResp, TokenBalanceCache } from 'token-balance-cache/src';
 import { oneOf, query, validationResult } from 'express-validator';
-import type { DB } from 'server/models';
-import type { ChainNodeResp, TokenBalanceCache } from 'token-balance-cache/src';
-import type { TypedRequestQuery, TypedResponse } from '../types';
-import { failure, success } from '../types';
+import { failure, success, TypedRequestQuery, TypedResponse } from '../types';
 
 export const getChainNodesValidation = [
   oneOf(

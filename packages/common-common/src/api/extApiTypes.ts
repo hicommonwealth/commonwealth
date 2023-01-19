@@ -1,15 +1,15 @@
 // contains types for external api
 
-import type { ThreadAttributes } from 'commonwealth/server/models/thread';
-import type { CommentAttributes } from 'commonwealth/server/models/comment';
-import type { ReactionAttributes } from 'commonwealth/server/models/reaction';
-import type { ChainAttributes } from 'commonwealth/server/models/chain';
-import type { ProfileAttributes } from 'commonwealth/server/models/profile';
-import type { AddressAttributes } from 'commonwealth/server/models/address';
-import type {
-  BalanceProviderResp,
-  ChainNodeResp,
-} from 'token-balance-cache/src';
+import { ThreadAttributes } from 'commonwealth/server/models/thread';
+import { CommentAttributes } from 'commonwealth/server/models/comment';
+import { ReactionAttributes } from 'commonwealth/server/models/reaction';
+import { ChainAttributes } from 'commonwealth/server/models/chain';
+import { ProfileAttributes } from 'commonwealth/server/models/profile';
+import { BalanceProviderResp, ChainNodeResp } from 'token-balance-cache/src';
+import { TopicAttributes } from 'commonwealth/server/models/topic';
+import { RoleAttributes } from 'commonwealth/server/models/role';
+import { RuleAttributes } from 'commonwealth/server/models/rule';
+import { AddressAttributes } from 'commonwealth/server/models/address';
 
 export enum OrderByOptions {
   UPDATED = 'updated_at',
@@ -29,6 +29,12 @@ export type GetCommentsReq = {
 } & IPagination;
 
 export type GetCommentsResp = { comments?: CommentAttributes[]; count: number };
+
+export type PutCommentsReq = {
+  comments: (CommentAttributes & { community_id: string })[];
+};
+
+export type DeleteReq = { ids: number[] };
 
 export type GetThreadsReq = {
   community_id: string;
@@ -50,6 +56,10 @@ export type GetReactionsReq = {
   count_only?: boolean;
 } & IPagination;
 
+export type PostReactionsReq = {
+  reactions: (ReactionAttributes & { community_id: string })[];
+};
+
 export type GetReactionsResp = {
   reactions?: ReactionAttributes[];
   count: number;
@@ -63,6 +73,14 @@ export type GetCommunitiesReq = {
   page?: number;
 };
 
+export type PutCommunitiesReq = {
+  community: ChainAttributes;
+  contract: { token_type: string; address: string };
+  admin_addresses: string[];
+};
+
+export type PutCommunitiesResp = { url: string; error?: string };
+
 export type GetCommunitiesResp = {
   communities?: ChainAttributes[];
   count: number;
@@ -73,6 +91,10 @@ export type GetProfilesReq = {
   profile_ids?: number[];
   count_only?: boolean;
 } & IPagination;
+
+export type PostProfilesReq = {
+  profiles: (ProfileAttributes[] & { community_id: string })[];
+};
 
 export type GetProfilesResp = { profiles?: ProfileAttributes[]; count: number };
 
@@ -98,6 +120,43 @@ export type GetTokenBalanceReq = {
   balance_provider: string;
   opts: Record<string, string | undefined>;
 };
+
+export type GetTopicsReq = {
+  community_id: string;
+  count_only?: boolean;
+} & IPagination;
+
+export type PostTopicsReq = {
+  topics: (TopicAttributes & { community_id: string })[];
+};
+
+export type GetTopicsResp = { topics?: TopicAttributes[]; count: number };
+
+export type GetRolesReq = {
+  community_id: string;
+  addresses?: string[];
+  count_only?: boolean;
+} & IPagination;
+
+export type GetRolesResp = { roles?: RoleAttributes[]; count: number };
+
+export type PostRolesReq = {
+  roles: (RoleAttributes & { community_id: string })[];
+};
+
+export type GetRulesReq = {
+  community_id?: string;
+  ids?: number[];
+  count_only?: boolean;
+} & IPagination;
+
+export type GetRulesResp = { rules?: RuleAttributes[]; count: number };
+
+export type PostRulesReq = {
+  rules: (RuleAttributes & { community_id: string })[];
+};
+
+export type OnlyErrorResp = { error?: string | object };
 
 export type GetNewProfilesReq = {
   jwt: string;
