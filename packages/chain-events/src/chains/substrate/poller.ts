@@ -1,16 +1,13 @@
 /**
  * Fetches historical events from substrate chain.
  */
-import { ApiPromise } from '@polkadot/api';
+import type { ApiPromise } from '@polkadot/api';
 
-import {
-  IEventPoller,
-  IDisconnectedRange,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { IDisconnectedRange } from '../../interfaces';
+import { IEventPoller, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { Block } from './types';
+import type { Block } from './types';
 
 export class Poller extends IEventPoller<ApiPromise, Block> {
   protected readonly log;

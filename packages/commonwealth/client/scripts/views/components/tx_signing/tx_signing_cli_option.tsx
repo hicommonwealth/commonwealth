@@ -1,19 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { ChainBase } from 'common-common/src/types';
 
 import 'components/tx_signing/tx_signing_cli_option.scss';
+import type { ISubstrateTXData } from 'controllers/chain/substrate/shared';
+import m from 'mithril';
+import type { ITXModalData } from 'models';
 
 import app from 'state';
-import { ChainBase } from 'common-common/src/types';
-import { ITXModalData } from 'models';
-import { ISubstrateTXData } from 'controllers/chain/substrate/shared';
 import { CodeBlock } from 'views/components/code_block';
-import { NextFn } from './types';
-import { setupEventListeners } from './helpers';
 import { CWButton } from '../component_kit/cw_button';
 import { CWTextArea } from '../component_kit/cw_text_area';
+import { setupEventListeners } from './helpers';
+import type { NextFn } from './types';
 
 type TXSigningCLIOptionAttrs = ITXModalData & NextFn;
 

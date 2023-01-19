@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 require('dotenv').config();
 
@@ -14,6 +13,12 @@ module.exports = {
     headers: {
       P3P: 'CP="Commonwealth does not have a P3P compact privacy policy"',
     },
+  },
+  output: {
+    publicPath: '/build/',
+    path: path.join(__dirname, '../build'),
+    filename: 'js/[name].[contenthash:8].js',
+    chunkFilename: 'js/[name].[chunkhash:8].chunk.js',
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -42,23 +47,31 @@ module.exports = {
       process: 'process/browser',
       Buffer: ['buffer', 'Buffer'],
     }),
-    new webpack.IgnorePlugin({resourceRegExp: /\.md$/}),
-    new MiniCssExtractPlugin({
-      filename: 'styles/[name].[contenthash].css',
-      ignoreOrder: true,
-    }),
+    new webpack.IgnorePlugin({ resourceRegExp: /\.md$/ }),
   ],
   optimization: {
     splitChunks: {
       chunks: 'all',
       cacheGroups: {
-        bitcoin: {
-          test: /[\\/]node_modules[\\/](bip39)[\\/]/,
-          name: 'bitcoin',
+        bnjs: {
+          test: /[\\/]node_modules[\\/]bn.js[\\/]/,
+          name: 'bnjs',
+          chunks: 'all',
+          minSize: 0,
+        },
+        quill: {
+          test: /[\\/]node_modules[\\/]quill[\\/]/,
+          name: 'quilljs',
           chunks: 'all',
         },
+        secp256k1: {
+          test: /[\\/]node_modules[\\/]secp256k1[\\/]/,
+          name: 'secp256k1',
+          chunks: 'all',
+          minSize: 0,
+        },
         ethereum: {
-          test: /[\\/]node_modules[\\/](web3|@audius|ethers|@walletconnect|@ethersproject|ethereumjs-abi|web3-eth-accounts|)[\\/]/,
+          test: /[\\/]node_modules[\\/](web3|ethers|@walletconnect|@ethersproject|ethereumjs-abi|web3-eth-accounts|)[\\/]/,
           name: 'ethereum',
           chunks: 'all',
         },
@@ -88,7 +101,7 @@ module.exports = {
           chunks: 'all',
         },
         snapshot: {
-          test: /[\\/]node_modules[\\/](@snapshot-labs|@apollo)[\\/]/,
+          test: /[\\/]node_modules[\\/](@apollo)[\\/]/,
           name: 'snapshot',
           chunks: 'all',
         },
@@ -157,7 +170,7 @@ module.exports = {
       },
       {
         test: /\.s?css$/i,
-        use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'fast-sass-loader'],
+        use: ['style-loader', 'css-loader', 'fast-sass-loader'],
         sideEffects: true,
       },
       {

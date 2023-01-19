@@ -1,14 +1,15 @@
 import BN from 'bn.js';
-import { Near as NearApi, Account as NearApiAccount } from 'near-api-js';
-import { ITXModalData, ProposalModule } from 'models';
-import { NearAccounts } from 'controllers/chain/near/account';
-import NearChain from 'controllers/chain/near/chain';
-import { ProposalType } from 'common-common/src/types';
+import type { NearAccounts } from 'controllers/chain/near/account';
+import type NearChain from 'controllers/chain/near/chain';
+import type { ITXModalData } from 'models';
+import { ProposalModule } from 'models';
+import type { Near as NearApi } from 'near-api-js';
+import { Account as NearApiAccount } from 'near-api-js';
 import NearSputnikProposal from './proposal';
-import {
+import type {
   INearSputnikProposal,
-  NearSputnikPolicy,
   NearSputnikGetProposalResponse,
+  NearSputnikPolicy,
   NearSputnikProposalKind,
 } from './types';
 

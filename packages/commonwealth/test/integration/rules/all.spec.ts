@@ -1,9 +1,9 @@
 import { assert } from 'chai';
-import { validateRule } from '../../../server/util/rules/ruleParser';
-import AllRule from '../../../server/ruleTypes/all';
-import * as modelUtils from '../../util/modelUtils';
 import models from '../../../server/database';
-import { DefaultSchemaT } from '../../../server/util/rules/ruleTypes';
+import AllRule from '../../../server/ruleTypes/all';
+import { validateRule } from '../../../server/util/rules/ruleParser';
+import type { DefaultSchemaT } from '../../../server/util/rules/ruleTypes';
+import * as modelUtils from '../../util/modelUtils';
 
 describe('All rule tests', () => {
   let loggedInAddr: string;

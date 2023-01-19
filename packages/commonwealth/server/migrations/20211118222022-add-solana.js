@@ -123,5 +123,5 @@ module.exports = {
         { transaction: t }
       );
     });
-  }
+  },
 };

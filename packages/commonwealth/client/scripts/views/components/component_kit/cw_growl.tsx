@@ -1,9 +1,9 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_growl.scss';
+import m from 'mithril';
 
 import { CWCard } from './cw_card';
 import { getClasses } from './helpers';

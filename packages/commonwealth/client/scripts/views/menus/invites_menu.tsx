@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { pluralize } from 'helpers';
+import m from 'mithril';
 
 import app from 'state';
-import { pluralize } from 'helpers';
+import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
 import { ConfirmInviteModal } from '../modals/confirm_invite_modal';
 import { NewLoginModal } from '../modals/login_modal';
-import { CWIconButton } from '../components/component_kit/cw_icon_button';
-import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 
 export const handleEmailInvites = (state) => {
   if (!state.modalAutoTriggered && app.user) {

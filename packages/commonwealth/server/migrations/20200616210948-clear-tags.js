@@ -9,5 +9,5 @@ DELETE FROM "OffchainTags" WHERE community_id != 'internal' OR community_id IS N
 
   down: (queryInterface, Sequelize) => {
     return new Promise((resolve, reject) => resolve());
-  }
+  },
 };

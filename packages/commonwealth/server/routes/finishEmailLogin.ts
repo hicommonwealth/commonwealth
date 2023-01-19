@@ -1,15 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
-import { NotificationCategories } from 'common-common/src/types';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelLoginEvent,
-  MixpanelLoginPayload,
-} from '../../shared/analytics/types';
 import { StatsDController } from 'common-common/src/statsd';
-
-const log = factory.getLogger(formatFilename(__filename));
+import { NotificationCategories } from 'common-common/src/types';
+import type { Request, Response } from 'express';
+import { MixpanelLoginEvent } from '../../shared/analytics/types';
+import type { DB } from '../models';
+import { mixpanelTrack } from '../util/mixpanelUtil';
 
 export const redirectWithLoginSuccess = (
   res,
@@ -34,12 +28,7 @@ export const redirectWithLoginError = (res, message) => {
   return res.redirect(url);
 };
 
-const finishEmailLogin = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
+const finishEmailLogin = async (models: DB, req: Request, res: Response) => {
   const previousUser = req.user;
   if (req.user && req.user.email && req.user.emailVerified) {
     return redirectWithLoginSuccess(res, req.user.email);

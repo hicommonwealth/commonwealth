@@ -1,5 +1,4 @@
-import { Request } from 'express';
-import { Permission } from '../models/role';
+import type { Permission } from '../models/role';
 import { findOneRole } from './roles';
 
 // Roles hierarchically encompass the roles below them.
@@ -16,7 +15,6 @@ const validateRoles = async (
   minimum_role: 'admin' | 'moderator' | 'member',
   chain_id: string
 ): Promise<boolean> => {
-
   if (!user) return false;
 
   if (user.isAdmin) return true;
@@ -26,16 +24,18 @@ const validateRoles = async (
     .map((addr) => addr.id);
 
   const allowedRoles: Permission[] =
-    (minimum_role === 'member') ? ['admin', 'moderator', 'member']
-    : (minimum_role === 'moderator') ? ['admin', 'moderator']
-    : ['admin'];
+    minimum_role === 'member'
+      ? ['admin', 'moderator', 'member']
+      : minimum_role === 'moderator'
+      ? ['admin', 'moderator']
+      : ['admin'];
 
   const userRole = await findOneRole(
     models,
     { where: { address_id: userOwnedAddressIds } },
     chain_id,
     allowedRoles
-  )
+  );
 
   return !!userRole;
 };

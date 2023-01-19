@@ -1,9 +1,11 @@
 import BN from 'bn.js';
 
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { TypedEventFilter } from '../../../contractTypes/commons';
-import { ERC20 } from '../../../contractTypes';
-import { EventKind, RawEvent, IEventData, IErc20Contracts } from '../types';
+import type { CWEvent } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { TypedEventFilter } from '../../../contractTypes/commons';
+import type { ERC20 } from '../../../contractTypes';
+import type { RawEvent, IEventData, IErc20Contracts } from '../types';
+import { EventKind } from '../types';
 
 /**
  * This is an "enricher" function, whose goal is to augment the initial event data
@@ -32,7 +34,7 @@ export async function Enrich(
   rawData: RawEvent,
   config: EnricherConfig = {}
 ): Promise<CWEvent<IEventData>> {
-  const { totalSupply, tokenName } = api.tokens.find(
+  const { totalSupply } = api.tokens.find(
     ({ contract }) =>
       contract.address.toLowerCase() === rawData.address.toLowerCase()
   );
@@ -74,9 +76,11 @@ export async function Enrich(
       };
     }
     case EventKind.Transfer: {
-      const { from, to, value: valueBigNumber } = rawData.args as GetArgType<
-        'Transfer'
-      >;
+      const {
+        from,
+        to,
+        value: valueBigNumber,
+      } = rawData.args as GetArgType<'Transfer'>;
       const contractAddress = rawData.address;
       const value = new BN(valueBigNumber.toString());
 

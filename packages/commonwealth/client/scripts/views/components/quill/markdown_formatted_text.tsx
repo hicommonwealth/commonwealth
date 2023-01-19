@@ -1,17 +1,17 @@
 /* @jsx m */
 /* eslint-disable no-useless-escape */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import DOMPurify from 'dompurify';
-import { findAll } from 'highlight-words-core';
-import smartTruncate from 'smart-truncate';
-import { marked } from 'marked';
 
 import 'components/quill/markdown_formatted_text.scss';
+import DOMPurify from 'dompurify';
+import { findAll } from 'highlight-words-core';
+import { marked } from 'marked';
+import m from 'mithril';
+import smartTruncate from 'smart-truncate';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 
 import { getClasses } from '../component_kit/helpers';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
 import { countLinesMarkdown } from './helpers';
 
 const renderer = new marked.Renderer();

@@ -1,8 +1,8 @@
-import {QueryTypes} from "sequelize";
+import { QueryTypes } from 'sequelize';
 import models from '../database';
 
 async function main() {
-  console.log("Starting Query")
+  console.log('Starting Query');
   const query = `
       WITH allChains AS (SELECT "Chains".id,
                                 "Chains".substrate_spec,
@@ -35,11 +35,12 @@ async function main() {
       WHERE MOD(allChains.index, ${1}) = ${0};
   `;
 
-  const result = await models.sequelize.query(
-    query, {type: QueryTypes.SELECT, raw: true}
-  );
+  const result = await models.sequelize.query(query, {
+    type: QueryTypes.SELECT,
+    raw: true,
+  });
   console.log(result);
-  console.log("Execution Finished")
+  console.log('Execution Finished');
 }
 
 main()
@@ -49,4 +50,4 @@ main()
   .catch((e) => {
     console.error(e);
     process.exit(1);
-  })
+  });

@@ -3,7 +3,9 @@ const Web3 = require('web3');
 const provider = new Web3.providers.HttpProvider('http://localhost:9545');
 const web3 = new Web3(provider);
 
-const Moloch1Contract = truffleContract(require('../build/contracts/Moloch1.json'));
+const Moloch1Contract = truffleContract(
+  require('../build/contracts/Moloch1.json')
+);
 Moloch1Contract.setProvider(provider);
 
 const TokenContract = truffleContract(require('../build/contracts/Token.json'));
@@ -48,7 +50,10 @@ async function updateDelegateKey(moloch1, newKey, who) {
 // eslint-disable-next-line func-names
 module.exports = async function (callback) {
   try {
-    const [ moloch1, token ] = await Promise.all([ Moloch1Contract.deployed(), TokenContract.deployed() ]);
+    const [moloch1, token] = await Promise.all([
+      Moloch1Contract.deployed(),
+      TokenContract.deployed(),
+    ]);
     await submitProposal(moloch1, token);
     await submitVote(moloch1, 0);
     console.log('Done!');

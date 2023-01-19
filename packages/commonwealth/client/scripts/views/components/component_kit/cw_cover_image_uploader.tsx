@@ -1,19 +1,19 @@
 /* @jsx m */
+import ClassComponent from 'class_component';
 import 'components/component_kit/cw_cover_image_uploader.scss';
+import $ from 'jquery';
 
 import m from 'mithril';
-import ClassComponent from 'class_component';
-import $ from 'jquery';
 import app from 'state';
 
 import { CWIcon } from './cw_icons/cw_icon';
-import { CWText } from './cw_text';
 import { CWSpinner } from './cw_spinner';
 import { getClasses } from './helpers';
 import { CWTextInput, MessageRow } from './cw_text_input';
 import { ValidationStatus } from './cw_validation_text';
 import { CWButton } from './cw_button';
 import { CWIconButton } from './cw_icon_button';
+import { CWText } from './cw_text';
 
 type CoverImageUploaderAttrs = {
   headerText?: string;

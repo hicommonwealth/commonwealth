@@ -1,24 +1,28 @@
-import 'chai/register-should';
-import models from 'server/database';
 import chai from 'chai';
 import 'chai/register-should';
-import { req, res } from 'test/unit/unitHelpers';
-import { GetThreadsReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
-import 'test/integration/api/external/dbEntityHooks.spec';
-import { testComments, testThreads } from 'test/integration/api/external/dbEntityHooks.spec';
-import { ThreadAttributes } from 'server/models/thread';
+import type { GetThreadsReq } from 'common-common/src/api/extApiTypes';
+import { OrderByOptions } from 'common-common/src/api/extApiTypes';
+import type { ThreadAttributes } from 'server/models/thread';
 import { get } from 'test/integration/api/external/appHook.spec';
+import 'test/integration/api/external/dbEntityHooks.spec';
+import {
+  testComments,
+  testThreads,
+} from 'test/integration/api/external/dbEntityHooks.spec';
 
 describe('getThreads Tests', () => {
   it('should return threads with specified community_id correctly', async () => {
     const r: GetThreadsReq = { community_id: testThreads[0].chain };
-    let resp = await get('/api/threads', r);
+    const resp = await get('/api/threads', r);
 
     chai.assert.lengthOf(resp.result.threads, 5);
   });
 
   it('should return threads with specified address_ids correctly', async () => {
-    const r: GetThreadsReq = { community_id: testThreads[0].chain, address_ids: ['-1'] };
+    const r: GetThreadsReq = {
+      community_id: testThreads[0].chain,
+      address_ids: ['-1'],
+    };
     let resp = await get('/api/threads', r);
 
     chai.assert.lengthOf(resp.result.threads, 2);
@@ -30,7 +34,10 @@ describe('getThreads Tests', () => {
   });
 
   it('should return threads with specified addresses correctly', async () => {
-    const r: GetThreadsReq = { community_id: testThreads[0].chain, addresses: ['testAddress-1'] };
+    const r: GetThreadsReq = {
+      community_id: testThreads[0].chain,
+      addresses: ['testAddress-1'],
+    };
     let resp = await get('/api/threads', r);
 
     chai.assert.lengthOf(resp.result.threads, 2);
@@ -42,7 +49,10 @@ describe('getThreads Tests', () => {
   });
 
   it('should return threads with specified topic_id correctly', async () => {
-    const r: GetThreadsReq = { community_id: testThreads[0].chain, topic_id: -1 };
+    const r: GetThreadsReq = {
+      community_id: testThreads[0].chain,
+      topic_id: -1,
+    };
     let resp = await get('/api/threads', r);
 
     chai.assert.lengthOf(resp.result.threads, 2);
@@ -54,7 +64,11 @@ describe('getThreads Tests', () => {
   });
 
   it('should paginate correctly', async () => {
-    const r: GetThreadsReq = { community_id: testThreads[0].chain, address_ids: ['-2'], limit: 2 };
+    const r: GetThreadsReq = {
+      community_id: testThreads[0].chain,
+      address_ids: ['-2'],
+      limit: 2,
+    };
     let resp = await get('/api/threads', r);
 
     chai.assert.lengthOf(resp.result.threads, 2);
@@ -74,7 +88,7 @@ describe('getThreads Tests', () => {
     const r: GetThreadsReq = {
       community_id: testThreads[0].chain,
       address_ids: ['-2'],
-      sort: OrderByOptions.CREATED
+      sort: OrderByOptions.CREATED,
     };
     let resp = await get('/api/threads', r);
 
@@ -82,7 +96,8 @@ describe('getThreads Tests', () => {
     chai.assert.deepEqual(
       resp.result.threads,
       ([...resp.result.threads] as ThreadAttributes[]).sort(
-        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
     );
 
@@ -93,7 +108,8 @@ describe('getThreads Tests', () => {
     chai.assert.deepEqual(
       resp.result.threads,
       ([...resp.result.threads] as ThreadAttributes[]).sort(
-        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
     );
   });
@@ -105,7 +121,11 @@ describe('getThreads Tests', () => {
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
     chai.assert.equal(resp.result[0].param, 'community_id');
 
-    resp = await get('/api/threads', { community_id: testComments[0].chain, count_only: 3 }, true);
+    resp = await get(
+      '/api/threads',
+      { community_id: testComments[0].chain, count_only: 3 },
+      true
+    );
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

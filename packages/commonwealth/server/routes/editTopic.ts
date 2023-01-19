@@ -1,13 +1,11 @@
 /* eslint-disable no-restricted-syntax */
-import { NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction } from 'express';
+import type { DB } from '../models';
+import type { TopicAttributes } from '../models/topic';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 import validateRoles from '../util/validateRoles';
-import { DB } from '../models';
-import { TopicAttributes } from '../models/topic';
-import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from 'common-common/src/errors';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 // TODO Graham 8-12-22: This route has high redundancy with createTopic, and has fallen out of sync.
 // We should consider merging or consolidating somehow, to prevent checks diverging again.

@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import {
   PROFILE_BIO_MAX_CHARS,
   PROFILE_HEADLINE_MAX_CHARS,
   PROFILE_NAME_MAX_CHARS,
   PROFILE_NAME_MIN_CHARS,
 } from '../../shared/types';
-import { DB } from '../models';
-import { AppError } from 'common-common/src/errors';
+import type { DB } from '../models';
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',
