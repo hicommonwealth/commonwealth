@@ -14,7 +14,7 @@ class AddressInfo extends Account {
     keytype?: string,
     walletId?: WalletId,
     ghostAddress?: boolean,
-    profileId?: number,
+    profileId?: number
   ) {
     const chain = app.config.chains.getById(chainId);
     if (!chain) throw new Error(`Failed to locate chain: ${chainId}`);

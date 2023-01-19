@@ -36,7 +36,8 @@
     margin-bottom: 16px;
 
     .MoveAddressRow {
-      &.selected, &:hover {
+      &.selected,
+      &:hover {
         background: none;
         border-radius: 0;
         cursor: default;
@@ -47,6 +48,10 @@
   .move-to-address {
     border: 1px solid $neutral-200;
     border-radius: 5px;
+
+    .no-options {
+      padding: 16px;
+    }
   }
 
   .actions {

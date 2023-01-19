@@ -19,13 +19,13 @@ type MoveAddressModalAttrs = {
   profile: Profile;
   profiles: Profile[];
   address: string;
-}
+};
 
 type MoveAddressRowAttrs = {
   profile: Profile;
   selected?: boolean;
   onclick?: (e: Event) => void;
-}
+};
 
 export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
   view(vnode: m.Vnode<MoveAddressRowAttrs>) {
@@ -34,7 +34,10 @@ export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
     const defaultAvatar = jdenticon.toSvg(vnode.attrs.profile.id, 90);
 
     return (
-      <div class={selected ? 'MoveAddressRow selected': 'MoveAddressRow'} onclick={onclick}>
+      <div
+        class={selected ? 'MoveAddressRow selected' : 'MoveAddressRow'}
+        onclick={onclick}
+      >
         {profile.avatarUrl ? (
           <img src={profile.avatarUrl} />
         ) : (
@@ -42,9 +45,7 @@ export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
             src={`data:image/svg+xml;utf8,${encodeURIComponent(defaultAvatar)}`}
           />
         )}
-        <CWText type="b2">
-          {name || username}
-        </CWText>
+        <CWText type="b2">{name || username}</CWText>
       </div>
     );
   }
@@ -53,7 +54,10 @@ export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
 export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
   private selectedProfile: Profile;
 
-  private onMoveAddress = async (e: Event, vnode: m.Vnode<MoveAddressModalAttrs>) => {
+  private onMoveAddress = async (
+    e: Event,
+    vnode: m.Vnode<MoveAddressModalAttrs>
+  ) => {
     const { address, profile } = vnode.attrs;
 
     e.preventDefault();
@@ -69,12 +73,16 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
         const { name, username } = this.selectedProfile;
         const displayName = name || username;
         setTimeout(() => {
-          notifySuccess(`Address has been successfully moved to profile '${displayName}'`);
+          notifySuccess(
+            `Address has been successfully moved to profile '${displayName}'`
+          );
         }, 1000);
       }
     } catch (err) {
       setTimeout(() => {
-        notifyError('Address was not successfully transferred, please try again.');
+        notifyError(
+          'Address was not successfully transferred, please try again.'
+        );
       }, 1000);
     }
 
@@ -84,7 +92,9 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
 
   view(vnode: m.Vnode<MoveAddressModalAttrs>) {
     const { profile, profiles, address } = vnode.attrs;
-    const moveToOptions = profiles.filter((p) => { return p.id !== profile.id; });
+    const moveToOptions = profiles.filter((p) => {
+      return p.id !== profile.id;
+    });
 
     return (
       <div class="MoveAddressModal">
@@ -99,24 +109,16 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
           />
         </div>
         <div class="body">
-          <CWText type="caption">
-            Address to be moved
-          </CWText>
+          <CWText type="caption">Address to be moved</CWText>
           <CWTruncatedAddress address={address} />
-          <CWText type="caption">
-            Currently In
-          </CWText>
+          <CWText type="caption">Currently In</CWText>
           <div className="current-address">
-            <MoveAddressRow
-              profile={profile}
-            />
+            <MoveAddressRow profile={profile} />
           </div>
-          <CWText type="caption">
-            Move To
-          </CWText>
+          <CWText type="caption">Move To</CWText>
           <div className="move-to-address">
             {moveToOptions.length === 0 ? (
-              <CWText type="b2">
+              <CWText type="b2" className="no-options">
                 No other profiles available
               </CWText>
             ) : (

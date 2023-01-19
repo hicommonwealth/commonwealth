@@ -19,7 +19,7 @@ type AddressAttrs = {
   profile: Profile;
   addressInfo: AddressInfo;
   refreshProfiles: () => Promise<void>;
-}
+};
 
 type LinkedAddressesAttrs = {
   profiles: Profile[];
@@ -29,7 +29,7 @@ type LinkedAddressesAttrs = {
 };
 
 class Address extends ClassComponent<AddressAttrs> {
-  view (vnode: m.Vnode<AddressAttrs>) {
+  view(vnode: m.Vnode<AddressAttrs>) {
     const { profiles, profile, addressInfo, refreshProfiles } = vnode.attrs;
     const { address, chain } = addressInfo;
 
@@ -57,7 +57,7 @@ class Address extends ClassComponent<AddressAttrs> {
                     refreshProfiles();
                   },
                 });
-              }
+              },
             },
             {
               label: 'Remove',
@@ -74,8 +74,8 @@ class Address extends ClassComponent<AddressAttrs> {
                   completeCallback: () => {
                     refreshProfiles();
                   },
-                })
-              }
+                });
+              },
             },
           ]}
           trigger={<CWIconButton iconName="dotsVertical" />}
@@ -99,7 +99,7 @@ export class LinkedAddresses extends ClassComponent<LinkedAddressesAttrs> {
               addressInfo={address}
               refreshProfiles={refreshProfiles}
             />
-          )
+          );
         })}
       </div>
     );

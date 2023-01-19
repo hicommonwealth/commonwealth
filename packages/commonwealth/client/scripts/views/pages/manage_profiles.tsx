@@ -30,7 +30,9 @@ export class ManageProfiles extends ClassComponent {
         jwt: app.user.jwt,
       });
 
-      this.profiles = response.result.profiles?.map((profile) => new Profile(profile));
+      this.profiles = response.result.profiles?.map(
+        (profile) => new Profile(profile)
+      );
       this.addresses = response.result.addresses?.map(
         (a) =>
           new AddressInfo(
@@ -40,7 +42,7 @@ export class ManageProfiles extends ClassComponent {
             a.keytype,
             a.wallet_id,
             a.ghost_address,
-            a.profile_id,
+            a.profile_id
           )
       );
     } catch (err) {
@@ -56,15 +58,17 @@ export class ManageProfiles extends ClassComponent {
   }
 
   view() {
-    if (this.loading) return (
-      <div class="ManageProfiles full-height">
-        <div className="loading-spinner">
-          <CWSpinner />
+    if (this.loading)
+      return (
+        <div class="ManageProfiles full-height">
+          <div className="loading-spinner">
+            <CWSpinner />
+          </div>
         </div>
-      </div>
-    );
+      );
 
-    if (this.error) return <PageNotFound message="We cannot find any profiles." />
+    if (this.error)
+      return <PageNotFound message="We cannot find any profiles." />;
 
     if (!this.profiles) return;
 
@@ -73,8 +77,12 @@ export class ManageProfiles extends ClassComponent {
         <div class="ManageProfiles">
           <div className="title-container">
             <div>
-              <CWText type="h3" className="title">Manage Profiles and Addresses</CWText>
-              <CWText className="description">Create and edit profiles and manage your connected addresses.</CWText>
+              <CWText type="h3" className="title">
+                Manage Profiles and Addresses
+              </CWText>
+              <CWText className="description">
+                Create and edit profiles and manage your connected addresses.
+              </CWText>
             </div>
             <CWButton
               label="Create Profile"
@@ -92,7 +100,9 @@ export class ManageProfiles extends ClassComponent {
             <ProfilePreview
               profiles={this.profiles}
               profile={profile}
-              addresses={this.addresses?.filter((a) => a.profileId === profile.id)}
+              addresses={this.addresses?.filter(
+                (a) => a.profileId === profile.id
+              )}
               refreshProfiles={this.getProfiles}
             />
           ))}

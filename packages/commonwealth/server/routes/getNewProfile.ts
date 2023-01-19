@@ -14,7 +14,8 @@ const getNewProfile = async (
   next: NextFunction
 ) => {
   const { username, address } = req.query;
-  if (!username && !address) return next(new Error(Errors.NoIdentifierProvided));
+  if (!username && !address)
+    return next(new Error(Errors.NoIdentifierProvided));
 
   let profile;
 
@@ -31,7 +32,7 @@ const getNewProfile = async (
       where: {
         address,
       },
-      include: [models.Profile]
+      include: [models.Profile],
     });
 
     if (!addressModel) return next(new Error(Errors.NoProfileFound));

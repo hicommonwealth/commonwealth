@@ -1,6 +1,5 @@
 /* @jsx m */
 
-import { navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
 import _ from 'lodash';
@@ -208,11 +207,12 @@ class MembersPage extends ClassComponent {
           </div>
           <div class="members-container">
             {profilesLoaded.map((profileInfo) => {
-              const { address, chain } = profileInfo.profile;
+              const { address } = profileInfo.profile;
               return (
                 <div class="member-row">
                   <a
-                    href={`/${app.activeChainId()}/account/${address}?base=${chain}`}
+                    // TODO: switch to profile.username once PR4 is merged
+                    href={`/profile/a/${address}`}
                     onclick={(e) => {
                       e.preventDefault();
                       localStorage[`${app.activeChainId()}-members-scrollY`] =
@@ -220,7 +220,8 @@ class MembersPage extends ClassComponent {
                       localStorage[
                         `${app.activeChainId()}-members-numProfilesLoaded`
                       ] = numProfilesLoaded;
-                      navigateToSubpage(`/account/${address}?base=${chain}`);
+                      // TODO: switch to profile.username once PR4 is merged
+                      m.route.set(`/profile/a/${address}`);
                     }}
                   >
                     {m(User, { user: profileInfo.profile, showRole: true })}

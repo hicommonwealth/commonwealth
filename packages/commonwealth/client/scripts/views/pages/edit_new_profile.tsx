@@ -13,7 +13,12 @@ import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
 import { notifyError } from 'controllers/app/notifications';
-import { NewProfile as Profile, Account, Profile as OldProfile, AddressInfo } from '../../models';
+import {
+  NewProfile as Profile,
+  Account,
+  Profile as OldProfile,
+  AddressInfo,
+} from '../../models';
 import { CWButton } from '../components/component_kit/cw_button';
 import { CWTextInput } from '../components/component_kit/cw_text_input';
 import { AvatarUpload } from '../components/avatar_upload';
@@ -23,7 +28,10 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
-import CWCoverImageUploader, { ImageAs, ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
+import CWCoverImageUploader, {
+  ImageAs,
+  ImageBehavior,
+} from '../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from './404';
 
 enum EditProfileError {
@@ -39,7 +47,7 @@ export type CoverImage = {
   url: string;
   imageAs: ImageAs;
   imageBehavior: ImageBehavior;
-}
+};
 
 export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
   private email: string;
@@ -63,7 +71,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       const response: any = await $.get(`${app.serverUrl()}/profile/v2`, {
         username,
         jwt: app.user.jwt,
-      })
+      });
 
       this.profile = new Profile(response.profile);
       this.name = this.profile.name;
@@ -97,11 +105,14 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
   private updateProfile = async () => {
     try {
-      const response: any = await $.post(`${app.serverUrl()}/updateProfile/v2`, {
-        profileId: this.profile.id,
-        ...this.profileUpdate,
-        jwt: app.user.jwt,
-      })
+      const response: any = await $.post(
+        `${app.serverUrl()}/updateProfile/v2`,
+        {
+          profileId: this.profile.id,
+          ...this.profileUpdate,
+          jwt: app.user.jwt,
+        }
+      );
 
       if (response?.status === 'Success') {
         setTimeout(() => {
@@ -157,7 +168,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
   private handleDeleteProfile = async () => {
     if (this.addresses.length > 0) {
-      notifyError('You must unlink all addresses before deleting your profile.');
+      notifyError(
+        'You must unlink all addresses before deleting your profile.'
+      );
       return;
     }
 
@@ -167,7 +180,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       const response: any = await $.post(`${app.serverUrl()}/deleteProfile`, {
         profileId: this.profile.id,
         jwt: app.user.jwt,
-      })
+      });
       if (response?.status === 'Success') {
         // Redirect
         setTimeout(() => {
@@ -209,36 +222,44 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     }
 
     if (this.error === EditProfileError.NoProfileFound)
-      return <PageNotFound message="We cannot find this profile." />
+      return <PageNotFound message="We cannot find this profile." />;
 
     if (this.error === EditProfileError.None) {
       if (!this.isOwner) {
         navigateToSubpage(`/profile/${this.username}`);
       }
 
-      const oldProfile = new OldProfile(
-        app.user.addresses[0].profile.name,
-        app.user.addresses[0].profile.address,
-      );
+      // need to create an account to pass to AvatarUpload to see last upload
+      // not the best solution because address is not always available
+      // should refactor AvatarUpload to make it work with new profiles
+      let account: Account | null;
+      if (this.addresses.length > 0) {
+        const oldProfile = new OldProfile(
+          this.addresses[0].chain.name,
+          this.addresses[0].address
+        );
 
-      oldProfile.initialize(
-        this.username,
-        null,
-        this.bio,
-        this.avatarUrl,
-        null,
-      );
+        oldProfile.initialize(
+          this.username,
+          null,
+          this.bio,
+          this.avatarUrl,
+          null
+        );
 
-      const account = new Account({
-        chain: app.user.addresses[0].chain,
-        address: app.user.addresses[0].address,
-        profile: oldProfile,
-      });
+        account = new Account({
+          chain: this.addresses[0].chain,
+          address: this.addresses[0].address,
+          profile: oldProfile,
+        });
+      } else {
+        account = null;
+      }
 
       return (
         <Sublayout class="Homepage">
           <div class="EditProfilePage">
-           <CWForm
+            <CWForm
               title="Edit Profile"
               description="Create and edit profiles and manage your connected addresses."
               actions={
@@ -274,7 +295,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   <div className="status">
                     <div
                       className={
-                        this.failed ? 'save-button-message show' : 'save-button-message'
+                        this.failed
+                          ? 'save-button-message show'
+                          : 'save-button-message'
                       }
                     >
                       <CWText> No changes saved.</CWText>
@@ -287,9 +310,13 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 title="General Info"
                 description="Some helpful text that makes the user feel welcome. This process will be quick and easy."
               >
-                 <div className="profile-image-section">
-                  <CWText type="caption" fontWeight="medium">Profile Image</CWText>
-                  <CWText type="caption" className="description">Select an image from your files to upload</CWText>
+                <div className="profile-image-section">
+                  <CWText type="caption" fontWeight="medium">
+                    Profile Image
+                  </CWText>
+                  <CWText type="caption" className="description">
+                    Select an image from your files to upload
+                  </CWText>
                   <div className="image-upload">
                     <AvatarUpload
                       scope="user"
@@ -370,13 +397,13 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <div className="socials-section">
                   <CWText type="b1">Social Links</CWText>
                   <CWText type="caption">
-                    Add any of your community's links (Websites, social platforms, etc)
-                    These can be added and edited later.
+                    Add any of your community's links (Websites, social
+                    platforms, etc) These can be added and edited later.
                   </CWText>
                   <CWSocials
                     socials={this.profile?.socials}
                     handleInputChange={(e) => {
-                      this.socials = e
+                      this.socials = e;
                     }}
                   />
                 </div>
@@ -386,7 +413,11 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 description="Express yourself through imagery."
               >
                 <CWCoverImageUploader
-                  uploadCompleteCallback={(url: string, imageAs: ImageAs, imageBehavior: ImageBehavior) => {
+                  uploadCompleteCallback={(
+                    url: string,
+                    imageAs: ImageAs,
+                    imageBehavior: ImageBehavior
+                  ) => {
                     this.coverImage = {
                       url,
                       imageAs,

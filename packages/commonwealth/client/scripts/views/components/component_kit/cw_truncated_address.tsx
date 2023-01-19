@@ -16,9 +16,7 @@ export class CWTruncatedAddress extends ClassComponent<TruncatedAddressAttrs> {
     const { address } = vnode.attrs;
 
     return (
-      <div className="TruncatedAddress">
-        {formatAddressShort(address)}
-      </div>
+      <div className="TruncatedAddress">{formatAddressShort(address)}</div>
     );
   }
 }

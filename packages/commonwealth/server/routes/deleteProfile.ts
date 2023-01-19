@@ -36,15 +36,15 @@ const deleteProfile = async (
   }
 
   const existingProfiles = await req.user.getProfiles();
-  const newProfiles = existingProfiles.filter((p) => p.id !== parseInt(profileId, 10));
-
-  const updateProfileStatus = await models.Profile.destroy(
-    {
-      where: {
-        id: profileId,
-      }
-    }
+  const newProfiles = existingProfiles.filter(
+    (p) => p.id !== parseInt(profileId, 10)
   );
+
+  const updateProfileStatus = await models.Profile.destroy({
+    where: {
+      id: profileId,
+    },
+  });
 
   const updateUserStatus = await models.User.update(
     {

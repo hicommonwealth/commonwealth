@@ -80,7 +80,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               const pf = app.user.activeAccount.profile;
               if (pf) {
                 // TODO: switch to profile.username once PR4 is merged
-                m.route.set(`/profile/a/${pf.address}`)
+                m.route.set(`/profile/a/${pf.address}`);
               }
             }}
           >
@@ -94,7 +94,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               const pf = app.user.activeAccount.profile;
               if (pf) {
                 // TODO: switch to profile.username once PR4 is merged
-                m.route.set(`/profile/a/${pf.address}/edit`)
+                m.route.set(`/profile/a/${pf.address}/edit`);
               }
             }}
           >

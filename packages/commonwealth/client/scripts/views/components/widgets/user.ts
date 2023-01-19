@@ -230,8 +230,8 @@ const User: m.Component<
                     ? link(
                         'a.user-display-name.username',
                         profile
-                          // TODO: switch to profile.username once PR4 is merged
-                          ? `/profile/a/${profile.address}`
+                          ? // TODO: switch to profile.username once PR4 is merged
+                            `/profile/a/${profile.address}`
                           : 'javascript:',
                         [
                           !profile
@@ -308,8 +308,8 @@ const User: m.Component<
             : link(
                 'a.user-display-name',
                 profile
-                  // TODO: switch to profile.username once PR4 is merged
-                  ? `/profile/a/${profile.address}`
+                  ? // TODO: switch to profile.username once PR4 is merged
+                    `/profile/a/${profile.address}`
                   : 'javascript:',
                 !profile
                   ? addrShort
@@ -484,8 +484,8 @@ export const UserBlock: m.Component<{
     ];
 
     const userLink = profile
-      // TODO: switch to profile.username once PR4 is merged
-      ? `/profile/a/${profile.address}`
+      ? // TODO: switch to profile.username once PR4 is merged
+        `/profile/a/${profile.address}`
       : 'javascript:';
 
     return linkify

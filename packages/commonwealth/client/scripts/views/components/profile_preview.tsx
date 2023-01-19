@@ -49,32 +49,22 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
             )}
           </div>
           <div className="content">
-            <CWText type="h4">
-              {name || username}
-            </CWText>
+            <CWText type="h4">{name || username}</CWText>
             <div className="actions">
               <CWButton
                 label="View"
                 buttonType="mini-white"
                 iconLeft="views"
-                onclick={() =>
-                  navigateToSubpage(`/profile/${username}`)
-                }
+                onclick={() => navigateToSubpage(`/profile/${username}`)}
               />
               <CWButton
                 label="Edit"
                 buttonType="mini-white"
                 iconLeft="write"
-                onclick={() =>
-                  navigateToSubpage(`/profile/${username}/edit`)
-                }
+                onclick={() => navigateToSubpage(`/profile/${username}/edit`)}
               />
             </div>
-            {bio && (
-              <CWText>
-                {renderQuillTextBody(bio)}
-              </CWText>
-            )}
+            {bio && <CWText>{renderQuillTextBody(bio)}</CWText>}
             <SocialAccounts profile={profile} />
           </div>
           <div className="desktop-actions">
@@ -82,25 +72,19 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               label="View"
               buttonType="mini-white"
               iconLeft="views"
-              onclick={() =>
-                navigateToSubpage(`/profile/${username}`)
-              }
+              onclick={() => navigateToSubpage(`/profile/${username}`)}
             />
             <CWButton
               label="Edit"
               buttonType="mini-white"
               iconLeft="write"
-              onclick={() =>
-                navigateToSubpage(`/profile/${username}/edit`)
-              }
+              onclick={() => navigateToSubpage(`/profile/${username}/edit`)}
             />
           </div>
         </div>
         <div className="addresses">
           <div className={addresses.length === 0 ? 'title no-margin' : 'title'}>
-            <CWText type="h5">
-              Linked Addresses
-            </CWText>
+            <CWText type="h5">Linked Addresses</CWText>
             <CWButton
               label="Connect Address"
               buttonType="mini-white"
@@ -109,7 +93,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
                   modal: NewLoginModal,
                   exitCallback: () => {
                     refreshProfiles();
-                  }
+                  },
                 });
               }}
               iconLeft="plus"

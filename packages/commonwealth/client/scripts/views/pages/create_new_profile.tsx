@@ -7,6 +7,7 @@ import $ from 'jquery';
 import 'pages/create_new_profile.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
@@ -21,7 +22,10 @@ import { CWDivider } from '../components/component_kit/cw_divider';
 import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
-import CWCoverImageUploader, { ImageAs, ImageBehavior } from '../components/component_kit/cw_cover_image_uploader';
+import CWCoverImageUploader, {
+  ImageAs,
+  ImageBehavior,
+} from '../components/component_kit/cw_cover_image_uploader';
 import { CoverImage } from './edit_new_profile';
 import { ConfirmCancelNewProfileModal } from '../modals/confirm_cancel_new_profile_modal';
 
@@ -66,24 +70,13 @@ export default class CreateNewProfile extends ClassComponent {
   private populateNewProfileFields = () => {
     this.newProfile = {};
 
-    if (this.username)
-      this.newProfile.username = this.username;
-
-    if (this.name)
-      this.newProfile.name = this.name;
-
-    if (this.email)
-      this.newProfile.email = this.email;
-
+    if (this.username) this.newProfile.username = this.username;
+    if (this.name) this.newProfile.name = this.name;
+    if (this.email) this.newProfile.email = this.email;
+    if (this.avatarUrl) this.newProfile.avatarUrl = this.avatarUrl;
+    if (this.socials) this.newProfile.socials = JSON.stringify(this.socials);
     if (this.bio.textContentsAsString)
       this.newProfile.bio = this.bio.textContentsAsString;
-
-    if (this.avatarUrl)
-      this.newProfile.avatarUrl = this.avatarUrl;
-
-    if (this.socials)
-      this.newProfile.socials = JSON.stringify(this.socials);
-
     if (this.coverImage)
       this.newProfile.coverImage = JSON.stringify(this.coverImage);
   };
@@ -96,7 +89,7 @@ export default class CreateNewProfile extends ClassComponent {
 
   oninit() {
     if (!app.isLoggedIn()) {
-      // TODO: where to redirect
+      navigateToSubpage('/profile/manage');
     }
 
     this.loading = false;
@@ -117,7 +110,7 @@ export default class CreateNewProfile extends ClassComponent {
     return (
       <Sublayout class="Homepage">
         <div class="CreateProfilePage">
-         <CWForm
+          <CWForm
             title="Create Profile"
             description="Add general info and customize your profile."
             actions={
@@ -144,9 +137,13 @@ export default class CreateNewProfile extends ClassComponent {
               title="General Info"
               description="Let your community get to know you by sharing a bit about yourself."
             >
-               <div className="profile-image-section">
-                <CWText type="caption" fontWeight="medium">Profile Image</CWText>
-                <CWText type="caption" className="description">Select an image from your files to upload</CWText>
+              <div className="profile-image-section">
+                <CWText type="caption" fontWeight="medium">
+                  Profile Image
+                </CWText>
+                <CWText type="caption" className="description">
+                  Select an image from your files to upload
+                </CWText>
                 <div className="image-upload">
                   <AvatarUpload
                     scope="user"
@@ -232,13 +229,13 @@ export default class CreateNewProfile extends ClassComponent {
               <div className="socials-section">
                 <CWText type="b1">Social Links</CWText>
                 <CWText type="caption">
-                  Add any of your community's links (Websites, social platforms, etc)
-                  These can be added and edited later.
+                  Add any of your community's links (Websites, social platforms,
+                  etc) These can be added and edited later.
                 </CWText>
                 <CWSocials
                   socials={this.profile?.socials}
                   handleInputChange={(e) => {
-                    this.socials = e
+                    this.socials = e;
                   }}
                 />
               </div>
@@ -248,7 +245,11 @@ export default class CreateNewProfile extends ClassComponent {
               description="Express yourself through imagery."
             >
               <CWCoverImageUploader
-                uploadCompleteCallback={(url: string, imageAs: ImageAs, imageBehavior: ImageBehavior) => {
+                uploadCompleteCallback={(
+                  url: string,
+                  imageAs: ImageAs,
+                  imageBehavior: ImageBehavior
+                ) => {
                   this.coverImage = {
                     url,
                     imageAs,

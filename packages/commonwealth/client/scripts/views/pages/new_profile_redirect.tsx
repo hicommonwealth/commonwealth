@@ -43,7 +43,7 @@ class NewProfileRedirect extends ClassComponent {
     }
 
     if (this.error) {
-      return <PageNotFound message="We cannot find this profile." />
+      return <PageNotFound message="We cannot find this profile." />;
     }
 
     if (this.profile) {

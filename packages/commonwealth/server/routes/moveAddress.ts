@@ -32,7 +32,7 @@ const moveAddress = async (
   const address = await models.Address.findOne({
     where: {
       address: addressHash,
-    }
+    },
   });
 
   const oldProfile = await models.Profile.findOne({

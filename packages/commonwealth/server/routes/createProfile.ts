@@ -21,7 +21,17 @@ const createProfile = async (
     return next(new Error(Errors.NoUsernameProvided));
   }
 
-  const { username, email, slug, name, bio, website, avatarUrl, socials, coverImage } = req.body;
+  const {
+    username,
+    email,
+    slug,
+    name,
+    bio,
+    website,
+    avatarUrl,
+    socials,
+    coverImage,
+  } = req.body;
 
   const existingProfile = await models.Profile.findOne({
     where: {
@@ -35,20 +45,18 @@ const createProfile = async (
 
   const userProfiles = await req.user.getProfiles();
 
-  const profile = await models.Profile.create(
-    {
-      user_id: req.user.id,
-      username,
-      ...(email && { email }),
-      ...(slug && { slug }),
-      ...(name && { profile_name: name }),
-      ...(bio && { bio }),
-      ...(website && { website }),
-      ...(avatarUrl && { avatar_url: avatarUrl }),
-      ...(socials && { socials: JSON.parse(socials) }),
-      ...(coverImage && { cover_image: JSON.parse(coverImage) }),
-    },
-  );
+  const profile = await models.Profile.create({
+    user_id: req.user.id,
+    username,
+    ...(email && { email }),
+    ...(slug && { slug }),
+    ...(name && { profile_name: name }),
+    ...(bio && { bio }),
+    ...(website && { website }),
+    ...(avatarUrl && { avatar_url: avatarUrl }),
+    ...(socials && { socials: JSON.parse(socials) }),
+    ...(coverImage && { cover_image: JSON.parse(coverImage) }),
+  });
   const newProfiles = [...userProfiles, profile];
 
   const updateStatus = await models.User.update(

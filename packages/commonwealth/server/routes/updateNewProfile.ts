@@ -33,7 +33,18 @@ const updateNewProfile = async (
     return next(new Error(Errors.InvalidUpdate));
   }
 
-  const { profileId, username, email, slug, name, bio, website, avatarUrl, socials, coverImage } = req.body;
+  const {
+    profileId,
+    username,
+    email,
+    slug,
+    name,
+    bio,
+    website,
+    avatarUrl,
+    socials,
+    coverImage,
+  } = req.body;
 
   const profile = await models.Profile.findOne({
     where: {
@@ -57,7 +68,6 @@ const updateNewProfile = async (
       return next(new Error(Errors.UsernameAlreadyExists));
     }
   }
-
 
   const updateStatus = await models.Profile.update(
     {

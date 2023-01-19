@@ -16,18 +16,18 @@
     gap: 40px;
     border-bottom: 1px solid $neutral-200;
     width: 100%;
-  
+
     @include smallInclusive {
       flex-direction: column;
       gap: 24px;
     }
-  
+
     .avatar {
       @include smallInclusive {
         display: flex;
         justify-content: center;
       }
-  
+
       img {
         height: 160px;
         width: 160px;
@@ -42,13 +42,13 @@
 
       .h4 {
         margin-bottom: 16px;
-  
+
         @include smallInclusive {
           display: flex;
           justify-content: center;
         }
       }
-  
+
       .b1 {
         margin-bottom: 16px;
       }
@@ -67,13 +67,13 @@
           justify-content: center;
         }
       }
-  
+
       .SocialAccounts {
         max-width: none;
         justify-content: flex-start;
         margin-bottom: 0;
-  
-        >:first-child {
+
+        > :first-child {
           svg {
             margin-left: 0;
           }
@@ -94,7 +94,7 @@
       }
     }
   }
- 
+
   .addresses {
     padding: 24px;
 

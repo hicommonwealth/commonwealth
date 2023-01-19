@@ -19,11 +19,13 @@ type DeleteAddressModalAttrs = {
   profile: Profile;
   address: string;
   chain: string;
-}
+};
 
 export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> {
-
-  private onDeleteAddress = async (e: Event, vnode: m.Vnode<DeleteAddressModalAttrs>) => {
+  private onDeleteAddress = async (
+    e: Event,
+    vnode: m.Vnode<DeleteAddressModalAttrs>
+  ) => {
     const { address, chain, profile } = vnode.attrs;
 
     e.preventDefault();
@@ -39,7 +41,9 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
         const { name, username } = profile;
         const displayName = name || username;
         setTimeout(() => {
-          notifySuccess(`Address has been successfully removed from profile '${displayName}'`);
+          notifySuccess(
+            `Address has been successfully removed from profile '${displayName}'`
+          );
         }, 1000);
       }
     } catch (err) {
@@ -60,7 +64,9 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
     return (
       <div class="DeleteAddressModal">
         <div class="title">
-          <CWText type="h4" fontWeight="semiBold">Delete Address</CWText>
+          <CWText type="h4" fontWeight="semiBold">
+            Delete Address
+          </CWText>
           <CWIconButton
             iconName="close"
             onclick={(e) => {
@@ -78,17 +84,15 @@ export class DeleteAddressModal extends ClassComponent<DeleteAddressModalAttrs> 
               <img src={profile.avatarUrl} />
             ) : (
               <img
-                src={`data:image/svg+xml;utf8,${encodeURIComponent(defaultAvatar)}`}
+                src={`data:image/svg+xml;utf8,${encodeURIComponent(
+                  defaultAvatar
+                )}`}
               />
             )}
-            <CWText fontWeight="bold">
-              {name || username}
-            </CWText>
+            <CWText fontWeight="bold">{name || username}</CWText>
           </div>
           <div className="confirmation">
-            <CWText>
-              Are you sure you want to remove this address?
-            </CWText>
+            <CWText>Are you sure you want to remove this address?</CWText>
             <CWTruncatedAddress address={address} />
           </div>
           <div className="actions">
