@@ -9,6 +9,16 @@
   "basePath": "/api",
   "schemes": ["http"],
   "paths": {
+    "/jwt": {
+      "get": {
+        "summary": "Returns your JWT (must be logged in to the site).",
+        "responses": {
+          "200": {
+            "description": "Your JWT."
+          }
+        }
+      }
+    },
     "/threads": {
       "get": {
         "summary": "Returns a list of threads.",

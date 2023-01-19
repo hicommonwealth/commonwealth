@@ -6,6 +6,7 @@ import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { StatsDController } from 'common-common/src/statsd';
 
 import domain from '../routes/domain';
+import { getJwt } from '../routes/getJwt';
 import status from '../routes/status';
 import createAddress from '../routes/createAddress';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
@@ -955,6 +956,7 @@ function setupRouter(
   router.post('/getChainNode', getChainNode.bind(this, models));
   router.post('/getChainContracts', getChainContracts.bind(this, models));
   router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
+  router.get('/jwt', getJwt.bind(this));
 
   // new API
   addExternalRoutes(router, app, models, tokenBalanceCache);
