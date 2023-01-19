@@ -19,10 +19,10 @@ import 'pages/landing/crowdfunding_card_section.scss';
 import { ICardListItem } from 'models/interfaces';
 import { ItemListsMapper } from './list_mapper_with_item';
 
-export class ChainsCrowdfundingComponent extends ClassComponent<{
-  chains: ICardListItem[];
-}> {
-  view(vnode) {
+type ChainsCrowdfundingComponentAttrs = { chains: ICardListItem[] };
+
+export class ChainsCrowdfundingComponent extends ClassComponent<ChainsCrowdfundingComponentAttrs> {
+  view(vnode: ResultNode<ChainsCrowdfundingComponentAttrs>) {
     const { chains } = vnode.attrs;
 
     return (

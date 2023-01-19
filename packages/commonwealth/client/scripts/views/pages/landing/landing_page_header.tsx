@@ -89,9 +89,12 @@ export class HeaderLandingPage extends ClassComponent<HeaderLandingPageAttrs> {
           />
           <nav className="lg:block hidden">
             <ul className="lg:flex lg:flex-row lg:items-center">
-              {vnode.attrs.navs.map((nav: any) => {
+              {vnode.attrs.navs.map((nav: any, i) => {
                 return (
-                  <li className="LandingPageHeaderLinks ml-10 py-8 lg:flex">
+                  <li
+                    className="LandingPageHeaderLinks ml-10 py-8 lg:flex"
+                    key={i}
+                  >
                     <a
                       className="text-2xl lg:text-base text-gray-500 leading-none"
                       onClick={() => redirectClick(nav.redirectTo)}

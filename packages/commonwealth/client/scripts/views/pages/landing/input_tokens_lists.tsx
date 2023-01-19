@@ -29,7 +29,7 @@ export class InputTokenList extends ClassComponent<InputTokenListAttrs> {
   private oldValue: string;
   private options: Array<any>;
 
-  view(vnode) {
+  view(vnode: ResultNode<InputTokenListAttrs>) {
     const { optionList, refilterResults, inputValue } = vnode.attrs;
 
     if (inputValue.length < 3) return;

@@ -39,7 +39,7 @@ export class ItemListsMapper extends ClassComponent<ItemListsMapperAttrs> {
     this.cardImageActiveById = cardItems[0].card.id;
   }
 
-  view(vnode) {
+  view(vnode: ResultNode<ItemListsMapperAttrs>) {
     const {
       cardItems,
       tabHoverColorClick,
