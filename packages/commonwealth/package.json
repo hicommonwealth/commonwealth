@@ -77,7 +77,7 @@
     "@canvas-js/verifiers": "^0.0.39",
     "@cosmjs/amino": "^0.26.1",
     "@cosmjs/proto-signing": "^0.26.1",
-    "@ethersproject/abi": "^5.7.1",
+    "@ethersproject/abi": "^5.7.0",
     "@ethersproject/address": "^5.7.0",
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/constants": "^5.7.0",
