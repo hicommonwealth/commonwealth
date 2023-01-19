@@ -58,263 +58,265 @@ class LandingPage extends ClassComponent {
   private inputTokenValue: string;
   private modalAutoTriggered: boolean;
 
-  oncreate() {
-    // console.log('oncreate');
-    if (!app.isLoggedIn()) {
-      mixpanelBrowserTrack({
-        event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
-        isCustomDomain: app.isCustomDomain(),
-      });
-    }
-  }
+  // oncreate() {
+  //   if (!app.isLoggedIn()) {
+  //     mixpanelBrowserTrack({
+  //       event: MixpanelPageViewEvent.LANDING_PAGE_VIEW,
+  //       isCustomDomain: app.isCustomDomain(),
+  //     });
+  //   }
+  // }
 
   oninit() {
-    // this.hiddenInputTokenList = true;
-    // this.inputTokenValue = '';
-    // this.chains = [];
-    // const sortedChains = app.config.chains
-    //   .getAll()
-    //   .sort((a, b) => {
-    //     const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
-    //     const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
-    //     return threadCountB - threadCountA;
-    //   })
-    //   .map((chain) => {
-    //     return {
-    //       img: chain.iconUrl,
-    //       id: chain.id,
-    //       chainInfo: chain,
-    //       name: chain.name,
-    //     };
-    //   });
-    // const sortedChainsAndCommunities = sortedChains.filter(
-    //   (c) => !c.chainInfo.collapsedOnHomepage
-    // );
-    // const betaChainsAndCommunities = sortedChains.filter(
-    //   (c) => c.chainInfo.collapsedOnHomepage
-    // );
-    // this.chains = [...sortedChainsAndCommunities, ...betaChainsAndCommunities];
+    this.hiddenInputTokenList = true;
+    this.inputTokenValue = '';
+    this.chains = [];
+
+    const sortedChains = app.config.chains
+      .getAll()
+      .sort((a, b) => {
+        const threadCountA = app.recentActivity.getCommunityThreadCount(a.id);
+        const threadCountB = app.recentActivity.getCommunityThreadCount(b.id);
+        return threadCountB - threadCountA;
+      })
+      .map((chain) => {
+        return {
+          img: chain.iconUrl,
+          id: chain.id,
+          chainInfo: chain,
+          name: chain.name,
+        };
+      });
+
+    const sortedChainsAndCommunities = sortedChains.filter(
+      (c) => !c.chainInfo.collapsedOnHomepage
+    );
+
+    const betaChainsAndCommunities = sortedChains.filter(
+      (c) => c.chainInfo.collapsedOnHomepage
+    );
+
+    this.chains = [...sortedChainsAndCommunities, ...betaChainsAndCommunities];
   }
 
   view() {
-    return <div></div>;
-    // if (getRouteParam('triggerInvite') === 't') {
-    //   setTimeout(() => handleEmailInvites(this), 0);
-    // }
+    console.log('this', this.chains);
+    if (getRouteParam('triggerInvite') === 't') {
+      setTimeout(() => handleEmailInvites(this), 0);
+    }
 
-    //   if (app.loginState !== LoginState.LoggedIn) {
-    //     return (
-    //       <div className="LandingPage bg-primary">
-    //         <div className="absolute w-screen z-20">
-    //           <HeaderLandingPage
-    //             scrollHeader
-    //             navs={[
-    //               { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
-    //             ]}
-    //           />
-    //         </div>
-    //         <TokensCommunityComponent chains={this.chains} />
-    //         <TokensChainsComponent
-    //           oncreateSlider={() => {
-    //             return new (Glide as any)('.glide', {
-    //               type: 'carousel',
-    //               focusAt: 'center',
-    //               perView: 3,
-    //               gap: 40,
-    //               autoplay: 3000,
-    //               hoverpause: true,
-    //               peek: {
-    //                 before: 100,
-    //                 after: 100,
-    //               },
-    //               breakpoints: {
-    //                 1024: {
-    //                   perView: 2,
-    //                   gap: 40,
-    //                 },
-    //                 768: {
-    //                   perView: 2,
-    //                   gap: 20,
-    //                 },
-    //                 640: {
-    //                   perView: 1,
-    //                   gap: 16,
-    //                   peek: {
-    //                     before: 50,
-    //                     after: 50,
-    //                   },
-    //                 },
-    //               },
-    //             });
-    //           }}
-    //           chains={this.chains}
-    //         />
-    //         <TokensCreatorComponent
-    //           creators={[
-    //             {
-    //               button: {
-    //                 id: 'first-section-button1',
-    //               },
-    //               texts: {
-    //                 title: 'On-chain notifications',
-    //                 text: 'Stay up-to-date on chain events like votes and large transfers.',
-    //               },
-    //               card: {
-    //                 id: 'tab-codepen',
-    //                 imgSrc: 'static/img/tab1.svg',
-    //                 imgAlt: '',
-    //               },
-    //             },
-    //             {
-    //               button: {
-    //                 id: 'first-section-button2',
-    //               },
-    //               texts: {
-    //                 title: 'Off-chain polling & on-chain voting',
-    //                 text: `Whether you use Snapshot, COMP governance contracts, or
-    //                native Layer 1 voting, access everything from one place.`,
-    //               },
-    //               card: {
-    //                 id: 'tab2-codepen',
-    //                 imgSrc: 'static/img/tab2.svg',
-    //                 imgAlt: '',
-    //               },
-    //             },
-    //             {
-    //               button: {
-    //                 id: 'first-section-button3',
-    //               },
-    //               texts: {
-    //                 title: 'Crowdfunding',
-    //                 text: 'Fund new tokens and community initiatives with Kickstarter-like raises from a thread.',
-    //               },
-    //               card: {
-    //                 id: 'tab3-codepen',
-    //                 imgSrc: 'static/img/tab3.svg',
-    //                 imgAlt: '',
-    //               },
-    //             },
-    //             {
-    //               button: {
-    //                 id: 'first-section-button4',
-    //               },
-    //               texts: {
-    //                 title: 'A rich forum experience',
-    //                 text: `Discuss memes or key decisions, in a Discourse-style forum.
-    //                Enhance your posts with built in Markdown and fun reactions.`,
-    //               },
-    //               card: {
-    //                 id: 'tab4-codepen',
-    //                 imgSrc: 'static/img/tab4.svg',
-    //                 imgAlt: '',
-    //               },
-    //             },
-    //           ]}
-    //         />
-    //         <TokenHoldersComponent
-    //           holders={[
-    //             {
-    //               img: 'static/img/circleCrowd.svg',
-    //               alt: '',
-    //               title: 'Your community is here.',
-    //               text: 'Stop bouncing between 10 tabs at once - everything you need to know about your token is here.',
-    //             },
-    //             {
-    //               img: 'static/img/1stButtonToken.svg',
-    //               alt: '',
-    //               title: 'Claim your token',
-    //               text: `We generate pages for your favorite community and address
-    //              from real-time chain activity. Claim yours.`,
-    //             },
-    //             {
-    //               img: 'static/img/bell.svg',
-    //               alt: '',
-    //               title: 'Stay updated',
-    //               text: `Be the first to know when community events are happening
-    //              with in-app, email, and mobile push notifications.`,
-    //             },
-    //             {
-    //               img: 'static/img/calendar.svg',
-    //               alt: '',
-    //               title: 'Participate in events.',
-    //               text: ' Participate in events like upcoming votes, new projects and community initiatives. ',
-    //             },
-    //           ]}
-    //         />
-    //         <ChainsCrowdfundingComponent
-    //           chains={[
-    //             {
-    //               button: {
-    //                 id: 'second-section-button1',
-    //               },
-    //               texts: {
-    //                 title: 'Fund new projects',
-    //                 text: `Anyone from within your community can easily
-    //                turn a conversation thread into a Kickstarter-like campaign.`,
-    //               },
-    //               card: {
-    //                 id: 'tab-card',
-    //                 imgSrc: 'static/img/card1.png',
-    //                 imgAlt: '',
-    //               },
-    //             },
-    //             {
-    //               button: {
-    //                 id: 'second-section-button2',
-    //               },
-    //               texts: {
-    //                 title: 'Create Community Endowments',
-    //                 text: `Pool funds with other like-minded folks, and fund
-    //                interesting projects within your community or across the web.`,
-    //               },
-    //               card: {
-    //                 id: 'tab2-card',
-    //                 imgSrc: 'static/img/card2.png',
-    //                 imgAlt: '',
-    //               },
-    //             },
-    //             {
-    //               button: {
-    //                 id: 'second-section-button3',
-    //               },
-    //               texts: {
-    //                 title: 'Launch New Tokens',
-    //                 text: `Use a project to raise funds for a new DeFi token or NFT.
-    //                Optionally plug in an allowlist for KYC compliance.`,
-    //               },
-    //               card: {
-    //                 id: 'tab3-card',
-    //                 imgSrc: 'static/img/card3.png',
-    //                 imgAlt: '',
-    //               },
-    //             },
-    //           ]}
-    //         />
-    //         <JoinCommonWealthSection />
-    //         <Footer />
-    //         <script
-    //           src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js"
-    //           integrity="sha512-IkLiryZhI6G4pnA3bBZzYCT9Ewk87U4DGEOz+TnRD3MrKqaUitt+ssHgn2X/sxoM7FxCP/ROUp6wcxjH/GcI5Q=="
-    //           crossOrigin="anonymous"
-    //         />
-    //         <link
-    //           rel="stylesheet"
-    //           href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.core.min.css"
-    //           integrity="sha512-YQlbvfX5C6Ym6fTUSZ9GZpyB3F92hmQAZTO5YjciedwAaGRI9ccNs4iw2QTCJiSPheUQZomZKHQtuwbHkA9lgw=="
-    //           crossOrigin="anonymous"
-    //         />
-    //         <link
-    //           rel="stylesheet"
-    //           href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.theme.min.css"
-    //           integrity="sha512-wCwx+DYp8LDIaTem/rpXubV/C1WiNRsEVqoztV0NZm8tiTvsUeSlA/Uz02VTGSiqfzAHD4RnqVoevMcRZgYEcQ=="
-    //           crossOrigin="anonymous"
-    //         />
-    //       </div>
-    //     );
-    //   } else {
-    //     return <UserDashboard />;
-    //   }
-    // }
+    if (app.loginState !== LoginState.LoggedIn) {
+      return (
+        <div className="LandingPage bg-primary">
+          <div className="absolute w-screen z-20">
+            <HeaderLandingPage
+              scrollHeader
+              navs={[
+                { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
+              ]}
+            />
+          </div>
+          <TokensCommunityComponent chains={this.chains} />
+          <TokensChainsComponent
+            oncreateSlider={() => {
+              return new (Glide as any)('.glide', {
+                type: 'carousel',
+                focusAt: 'center',
+                perView: 3,
+                gap: 40,
+                autoplay: 3000,
+                hoverpause: true,
+                peek: {
+                  before: 100,
+                  after: 100,
+                },
+                breakpoints: {
+                  1024: {
+                    perView: 2,
+                    gap: 40,
+                  },
+                  768: {
+                    perView: 2,
+                    gap: 20,
+                  },
+                  640: {
+                    perView: 1,
+                    gap: 16,
+                    peek: {
+                      before: 50,
+                      after: 50,
+                    },
+                  },
+                },
+              });
+            }}
+            chains={this.chains}
+          />
+          <TokensCreatorComponent
+            creators={[
+              {
+                button: {
+                  id: 'first-section-button1',
+                },
+                texts: {
+                  title: 'On-chain notifications',
+                  text: 'Stay up-to-date on chain events like votes and large transfers.',
+                },
+                card: {
+                  id: 'tab-codepen',
+                  imgSrc: 'static/img/tab1.svg',
+                  imgAlt: '',
+                },
+              },
+              {
+                button: {
+                  id: 'first-section-button2',
+                },
+                texts: {
+                  title: 'Off-chain polling & on-chain voting',
+                  text: `Whether you use Snapshot, COMP governance contracts, or
+                 native Layer 1 voting, access everything from one place.`,
+                },
+                card: {
+                  id: 'tab2-codepen',
+                  imgSrc: 'static/img/tab2.svg',
+                  imgAlt: '',
+                },
+              },
+              {
+                button: {
+                  id: 'first-section-button3',
+                },
+                texts: {
+                  title: 'Crowdfunding',
+                  text: 'Fund new tokens and community initiatives with Kickstarter-like raises from a thread.',
+                },
+                card: {
+                  id: 'tab3-codepen',
+                  imgSrc: 'static/img/tab3.svg',
+                  imgAlt: '',
+                },
+              },
+              {
+                button: {
+                  id: 'first-section-button4',
+                },
+                texts: {
+                  title: 'A rich forum experience',
+                  text: `Discuss memes or key decisions, in a Discourse-style forum.
+                 Enhance your posts with built in Markdown and fun reactions.`,
+                },
+                card: {
+                  id: 'tab4-codepen',
+                  imgSrc: 'static/img/tab4.svg',
+                  imgAlt: '',
+                },
+              },
+            ]}
+          />
+          <TokenHoldersComponent
+            holders={[
+              {
+                img: 'static/img/circleCrowd.svg',
+                alt: '',
+                title: 'Your community is here.',
+                text: 'Stop bouncing between 10 tabs at once - everything you need to know about your token is here.',
+              },
+              {
+                img: 'static/img/1stButtonToken.svg',
+                alt: '',
+                title: 'Claim your token',
+                text: `We generate pages for your favorite community and address
+               from real-time chain activity. Claim yours.`,
+              },
+              {
+                img: 'static/img/bell.svg',
+                alt: '',
+                title: 'Stay updated',
+                text: `Be the first to know when community events are happening
+               with in-app, email, and mobile push notifications.`,
+              },
+              {
+                img: 'static/img/calendar.svg',
+                alt: '',
+                title: 'Participate in events.',
+                text: ' Participate in events like upcoming votes, new projects and community initiatives. ',
+              },
+            ]}
+          />
+          <ChainsCrowdfundingComponent
+            chains={[
+              {
+                button: {
+                  id: 'second-section-button1',
+                },
+                texts: {
+                  title: 'Fund new projects',
+                  text: `Anyone from within your community can easily
+                 turn a conversation thread into a Kickstarter-like campaign.`,
+                },
+                card: {
+                  id: 'tab-card',
+                  imgSrc: 'static/img/card1.png',
+                  imgAlt: '',
+                },
+              },
+              {
+                button: {
+                  id: 'second-section-button2',
+                },
+                texts: {
+                  title: 'Create Community Endowments',
+                  text: `Pool funds with other like-minded folks, and fund
+                 interesting projects within your community or across the web.`,
+                },
+                card: {
+                  id: 'tab2-card',
+                  imgSrc: 'static/img/card2.png',
+                  imgAlt: '',
+                },
+              },
+              {
+                button: {
+                  id: 'second-section-button3',
+                },
+                texts: {
+                  title: 'Launch New Tokens',
+                  text: `Use a project to raise funds for a new DeFi token or NFT.
+                 Optionally plug in an allowlist for KYC compliance.`,
+                },
+                card: {
+                  id: 'tab3-card',
+                  imgSrc: 'static/img/card3.png',
+                  imgAlt: '',
+                },
+              },
+            ]}
+          />
+          <JoinCommonWealthSection />
+          <Footer />
+          <script
+            src="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js"
+            integrity="sha512-IkLiryZhI6G4pnA3bBZzYCT9Ewk87U4DGEOz+TnRD3MrKqaUitt+ssHgn2X/sxoM7FxCP/ROUp6wcxjH/GcI5Q=="
+            crossOrigin="anonymous"
+          />
+          <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.core.min.css"
+            integrity="sha512-YQlbvfX5C6Ym6fTUSZ9GZpyB3F92hmQAZTO5YjciedwAaGRI9ccNs4iw2QTCJiSPheUQZomZKHQtuwbHkA9lgw=="
+            crossOrigin="anonymous"
+          />
+          <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.theme.min.css"
+            integrity="sha512-wCwx+DYp8LDIaTem/rpXubV/C1WiNRsEVqoztV0NZm8tiTvsUeSlA/Uz02VTGSiqfzAHD4RnqVoevMcRZgYEcQ=="
+            crossOrigin="anonymous"
+          />
+        </div>
+      );
+    } else {
+      return <UserDashboard />;
+    }
   }
 }
 
