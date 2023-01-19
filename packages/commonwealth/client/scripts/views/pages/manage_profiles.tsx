@@ -7,6 +7,7 @@ import ClassComponent from 'class_component';
 import 'pages/manage_profiles.scss';
 
 import app from 'state';
+import { navigateToSubpage } from 'app';
 import { AddressInfo, NewProfile as Profile } from 'models';
 import { CWText } from '../components/component_kit/cw_text';
 import Sublayout from '../sublayout';
@@ -46,6 +47,7 @@ export class ManageProfiles extends ClassComponent {
       this.error = true;
     }
     this.loading = false;
+    m.redraw();
   };
 
   oninit() {
@@ -81,7 +83,7 @@ export class ManageProfiles extends ClassComponent {
               onclick={() => {
                 this.loading = true;
                 setTimeout(() => {
-                  m.route.set('/profile/new');
+                  navigateToSubpage('/profile/new');
                 }, 1000);
               }}
             />
@@ -91,6 +93,7 @@ export class ManageProfiles extends ClassComponent {
               profiles={this.profiles}
               profile={profile}
               addresses={this.addresses?.filter((a) => a.profileId === profile.id)}
+              refreshProfiles={this.getProfiles}
             />
           ))}
         </div>

@@ -21,6 +21,7 @@ type ProfilePreviewAttrs = {
   profiles: Profile[];
   profile: Profile;
   addresses?: AddressInfo[];
+  refreshProfiles: () => Promise<void>;
 };
 
 export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
@@ -31,7 +32,7 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
   }
 
   view(vnode: m.Vnode<ProfilePreviewAttrs>) {
-    const { profiles, profile, addresses } = vnode.attrs;
+    const { profiles, profile, addresses, refreshProfiles } = vnode.attrs;
     const { bio, avatarUrl, username, name } = profile;
 
     return (
@@ -107,13 +108,21 @@ export class ProfilePreview extends ClassComponent<ProfilePreviewAttrs> {
               onclick={() => {
                 app.modals.create({
                   modal: NewLoginModal,
+                  exitCallback: () => {
+                    refreshProfiles();
+                  }
                 });
               }}
               iconLeft="plus"
             />
           </div>
           {addresses && addresses.length > 0 && (
-            <LinkedAddresses profiles={profiles} profile={profile} addresses={addresses} />
+            <LinkedAddresses
+              profiles={profiles}
+              profile={profile}
+              addresses={addresses}
+              refreshProfiles={refreshProfiles}
+            />
           )}
         </div>
       </div>

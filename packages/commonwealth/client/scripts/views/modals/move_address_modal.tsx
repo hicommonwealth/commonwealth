@@ -53,7 +53,6 @@ export class MoveAddressRow extends ClassComponent<MoveAddressRowAttrs> {
 
 export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
   private selectedProfile: Profile;
-  private error: boolean;
 
   private onMoveAddress = async (e: Event, vnode: m.Vnode<MoveAddressModalAttrs>) => {
     const { address, profile } = vnode.attrs;
@@ -70,19 +69,19 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
       if (response?.status === 'Success') {
         const { name, username } = this.selectedProfile;
         const displayName = name || formatAnonymousUsername(username);
-        notifySuccess(`Address has been successfully moved to profile '${displayName}'`);
+        setTimeout(() => {
+          notifySuccess(`Address has been successfully moved to profile '${displayName}'`);
+        }, 1000);
       }
     } catch (err) {
-      notifyError('Address was not successfully transferred, please try again.');
+      setTimeout(() => {
+        notifyError('Address was not successfully transferred, please try again.');
+      }, 1000);
     }
 
     $(e.target).trigger('modalcomplete');
     $(e.target).trigger('modalexit');
   };
-
-  oninit() {
-    this.error = false;
-  }
 
   view(vnode: m.Vnode<MoveAddressModalAttrs>) {
     const { profile, profiles, address } = vnode.attrs;
@@ -96,10 +95,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
             iconName="close"
             onclick={(e) => {
               e.preventDefault();
-              $(e.target).trigger('modalcomplete');
-              setTimeout(() => {
-                $(e.target).trigger('modalexit');
-              }, 0);
+              $(e.target).trigger('modalexit');
             }}
           />
         </div>
@@ -144,10 +140,7 @@ export class MoveAddressModal extends ClassComponent<MoveAddressModalAttrs> {
               buttonType="secondary-black"
               onclick={(e) => {
                 e.preventDefault();
-                $(e.target).trigger('modalcomplete');
-                setTimeout(() => {
-                  $(e.target).trigger('modalexit');
-                }, 0);
+                $(e.target).trigger('modalexit');
               }}
             />
             <CWButton
