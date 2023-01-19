@@ -30,14 +30,8 @@ export class CWForm extends ClassComponent<FormAttrs> {
           </div>
         </div>
         <CWDivider />
-        <div className="content">
-          {vnode.children}
-        </div>
-        {actions && (
-          <div className="actions">
-            {actions}
-          </div>
-        )}
+        <div className="content">{vnode.children}</div>
+        {actions && <div className="actions">{actions}</div>}
       </div>
     );
   }

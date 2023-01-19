@@ -22,7 +22,7 @@ enum ProfileActivity {
 
 export type CommentWithAssociatedThread = Comment<IUniqueId> & {
   thread: Thread;
-}
+};
 
 type NewProfileActivityAttrs = {
   addresses: AddressInfo[];
@@ -54,7 +54,8 @@ export class NewProfileActivity extends ClassComponent<NewProfileActivityAttrs> 
             />
             <CWTab
               label={
-                <div className="tab-header">Threads
+                <div className="tab-header">
+                  Threads
                   <div className="count">{vnode.attrs.threads.length}</div>
                 </div>
               }

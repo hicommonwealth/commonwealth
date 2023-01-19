@@ -32,7 +32,17 @@ const updateNewProfile = async (
     return next(new Error(Errors.InvalidUpdate));
   }
 
-  const { address, email, slug, name, bio, website, avatarUrl, socials, coverImage } = req.body;
+  const {
+    address,
+    email,
+    slug,
+    name,
+    bio,
+    website,
+    avatarUrl,
+    socials,
+    coverImage,
+  } = req.body;
 
   const addressModel = await models.Address.findOne({
     where: {

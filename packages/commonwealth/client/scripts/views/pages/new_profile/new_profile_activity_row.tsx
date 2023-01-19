@@ -33,9 +33,8 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
       <div className="ProfileActivityRow">
         <div className="chain-info">
           <img src={chainInfo.iconUrl} />
-          <CWText fontWeight="semiBold" className="link">{link('a', `/${chain}/discussions`, [
-            `${chain}`,
-          ])}
+          <CWText fontWeight="semiBold" className="link">
+            {link('a', `/${chain}/discussions`, [`${chain}`])}
           </CWText>
           <div className="dot">.</div>
           <CWTag label={author.slice(0, 5)} />
@@ -49,30 +48,24 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
         <div className="title">
           <CWText fontWeight="semiBold" className="link" noWrap>
             <span>
-              {isThread
-                ? 'Created a thread'
-                : 'Commented on the thread'
-              }
+              {isThread ? 'Created a thread' : 'Commented on the thread'}
               &nbsp;
             </span>
             {isThread
-              ? link('a', `/${chain}/discussion/${id}`, [
-                  `${title}`,
-                ])
-              : link('a',`/${chain}/discussion/${comment.thread?.id}`,[
-                `${decodeURIComponent(comment.thread?.title)}`,
-              ])
-            }
+              ? link('a', `/${chain}/discussion/${id}`, [`${title}`])
+              : link('a', `/${chain}/discussion/${comment.thread?.id}`, [
+                  `${decodeURIComponent(comment.thread?.title)}`,
+                ])}
           </CWText>
         </div>
         <div className="content">
           <CWText type="b2" className="gray-text">
-            {isThread ? (
-              renderQuillTextBody(body, { collapse: true })
-            ) : renderQuillTextBody(comment.text, { collapse: true })}
+            {isThread
+              ? renderQuillTextBody(body, { collapse: true })
+              : renderQuillTextBody(comment.text, { collapse: true })}
           </CWText>
           <div className="actions">
-            <SharePopover commentId={id}/>
+            <SharePopover commentId={id} />
           </div>
         </div>
       </div>

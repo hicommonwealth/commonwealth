@@ -1,4 +1,4 @@
-import { CoverImage } from "../views/pages/edit_new_profile";
+import { CoverImage } from '../views/pages/edit_new_profile';
 
 class NewProfile {
   private _name: string;
@@ -56,7 +56,7 @@ class NewProfile {
     avatar_url,
     slug,
     socials,
-    cover_image
+    cover_image,
   }) {
     this._name = profile_name;
     this._email = email;
@@ -69,7 +69,17 @@ class NewProfile {
     this._coverImage = cover_image;
   }
 
-  public initialize(name, email, website, bio, isDefault, avatarUrl, slug, socials, coverImage) {
+  public initialize(
+    name,
+    email,
+    website,
+    bio,
+    isDefault,
+    avatarUrl,
+    slug,
+    socials,
+    coverImage
+  ) {
     this._name = name;
     this._email = email;
     this._website = website;

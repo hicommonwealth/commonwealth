@@ -80,7 +80,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
             onclick={() => {
               const pf = app.user.activeAccount.profile;
               if (pf) {
-                m.route.set(`/profile/${pf.address}`)
+                m.route.set(`/profile/${pf.address}`);
               }
             }}
           >

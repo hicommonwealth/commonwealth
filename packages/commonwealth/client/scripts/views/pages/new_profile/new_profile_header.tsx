@@ -31,9 +31,11 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
     if (!profile) return;
     const bio = profile.bio;
 
-    const isCurrentUser = app.isLoggedIn() && app.user.addresses
-      .map((addressInfo) => addressInfo.address)
-      .includes(address);
+    const isCurrentUser =
+      app.isLoggedIn() &&
+      app.user.addresses
+        .map((addressInfo) => addressInfo.address)
+        .includes(address);
 
     return (
       <div class="ProfileHeader">
@@ -47,8 +49,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
                 m.route.set(`/profile/${m.route.param('address')}/edit`)
               }
             />
-          )
-        }
+          )}
         </div>
         <div class="profile-image">
           {profile.avatarUrl ? (
@@ -62,8 +63,13 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
           )}
         </div>
         <div class="profile-name-and-bio">
-          <CWText type="h3" className={profile.name ? 'name hasMargin' : 'name'}>
-            {profile.name ? profile.name : `Anonymous (${address.slice(0, 5)}...)` }
+          <CWText
+            type="h3"
+            className={profile.name ? 'name hasMargin' : 'name'}
+          >
+            {profile.name
+              ? profile.name
+              : `Anonymous (${address.slice(0, 5)}...)`}
           </CWText>
           <div class="buttons">
             {/* TODO: Add delegate and follow buttons */}
@@ -74,9 +80,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
           {bio && (
             <div>
               <CWText type="h4">Bio</CWText>
-              <CWText className="bio">
-                {renderQuillTextBody(bio)}
-              </CWText>
+              <CWText className="bio">{renderQuillTextBody(bio)}</CWText>
             </div>
           )}
         </div>

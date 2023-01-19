@@ -22,12 +22,15 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
 
   private addInputRow = () => {
     this.socials = [...this.socials, ''];
-  }
+  };
 
-  private deleteInputRow = (index: number, handleInputChange: (value: string[]) => void) => {
+  private deleteInputRow = (
+    index: number,
+    handleInputChange: (value: string[]) => void
+  ) => {
     this.socials = this.socials.filter((_, i) => i !== index);
-    handleInputChange(this.socials)
-  }
+    handleInputChange(this.socials);
+  };
 
   oninit(vnode: m.Vnode<SocialsAttrs>) {
     this.socials = vnode.attrs.socials ? [...vnode.attrs.socials] : [];
@@ -85,26 +88,20 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
           <CWIconButton
             iconButtonTheme="primary"
             iconName="trash"
-            onclick={(e: MouseEvent) => this.deleteInputRow(i, handleInputChange)}
+            onclick={() =>
+              this.deleteInputRow(i, handleInputChange)
+            }
           />
         </div>
-      )
+      );
     });
 
     return (
       <div className={ComponentType.Socials}>
         {socialsList}
-        <div
-          className="add-social-link"
-          onclick={this.addInputRow}
-        >
-          <CWIcon
-            iconName="plus"
-            iconSize="small"
-          />
-          <CWText>
-            Add social link
-          </CWText>
+        <div className="add-social-link" onclick={this.addInputRow}>
+          <CWIcon iconName="plus" iconSize="small" />
+          <CWText>Add social link</CWText>
         </div>
       </div>
     );

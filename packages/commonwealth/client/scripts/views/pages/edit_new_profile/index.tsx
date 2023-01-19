@@ -11,7 +11,11 @@ import app from 'state';
 import Sublayout from 'views/sublayout';
 import { QuillEditorComponent } from 'views/components/quill/quill_editor_component';
 import { QuillEditor } from 'views/components/quill/quill_editor';
-import { NewProfile as Profile, Account, Profile as OldProfile } from '../../../models';
+import {
+  NewProfile as Profile,
+  Account,
+  Profile as OldProfile,
+} from '../../../models';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { AvatarUpload } from '../../components/avatar_upload';
@@ -21,7 +25,10 @@ import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWForm } from '../../components/component_kit/cw_form';
 import { CWFormSection } from '../../components/component_kit/cw_form_section';
 import { CWSocials } from '../../components/component_kit/cw_socials';
-import CWCoverImageUploader, { ImageAs, ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
+import CWCoverImageUploader, {
+  ImageAs,
+  ImageBehavior,
+} from '../../components/component_kit/cw_cover_image_uploader';
 
 enum EditProfileError {
   None,
@@ -38,7 +45,7 @@ export type CoverImage = {
   url: string;
   imageAs: ImageAs;
   imageBehavior: ImageBehavior;
-}
+};
 
 export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> {
   private address: string;
@@ -183,16 +190,10 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
     const oldProfile = new OldProfile(
       app.user.addresses[0].profile.name,
-      app.user.addresses[0].profile.address,
+      app.user.addresses[0].profile.address
     );
 
-    oldProfile.initialize(
-      this.username,
-      null,
-      this.bio,
-      this.avatarUrl,
-      null,
-    );
+    oldProfile.initialize(this.username, null, this.bio, this.avatarUrl, null);
 
     const account = new Account({
       chain: app.user.addresses[0].chain,
@@ -203,7 +204,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     return (
       <Sublayout class="Homepage">
         <div class="EditProfilePage">
-         <CWForm
+          <CWForm
             title="Edit Profile"
             description="Create and edit profiles and manage your connected addresses."
             actions={
@@ -241,7 +242,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 <div className="status">
                   <div
                     className={
-                      this.failed ? 'save-button-message show' : 'save-button-message'
+                      this.failed
+                        ? 'save-button-message show'
+                        : 'save-button-message'
                     }
                   >
                     <CWText> No changes saved.</CWText>
@@ -254,9 +257,13 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
               title="General Info"
               description="Some helpful text that makes the user feel welcome. This process will be quick and easy."
             >
-               <div className="profile-image-section">
-                <CWText type="caption" fontWeight="medium">Profile Image</CWText>
-                <CWText type="caption" className="description">Select an image from your files to upload</CWText>
+              <div className="profile-image-section">
+                <CWText type="caption" fontWeight="medium">
+                  Profile Image
+                </CWText>
+                <CWText type="caption" className="description">
+                  Select an image from your files to upload
+                </CWText>
                 <div className="image-upload">
                   <AvatarUpload
                     scope="user"
@@ -324,13 +331,13 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
               <div className="socials-section">
                 <CWText type="b1">Social Links</CWText>
                 <CWText type="caption">
-                  Add any of your community's links (Websites, social platforms, etc)
-                  These can be added and edited later.
+                  Add any of your community's links (Websites, social platforms,
+                  etc) These can be added and edited later.
                 </CWText>
                 <CWSocials
                   socials={this.profile?.socials}
                   handleInputChange={(e) => {
-                    this.socials = e
+                    this.socials = e;
                   }}
                 />
               </div>
@@ -340,7 +347,11 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
               description="Express yourself through imagery."
             >
               <CWCoverImageUploader
-                uploadCompleteCallback={(url: string, imageAs: ImageAs, imageBehavior: ImageBehavior) => {
+                uploadCompleteCallback={(
+                  url: string,
+                  imageAs: ImageAs,
+                  imageBehavior: ImageBehavior
+                ) => {
                   this.coverImage = {
                     url,
                     imageAs,

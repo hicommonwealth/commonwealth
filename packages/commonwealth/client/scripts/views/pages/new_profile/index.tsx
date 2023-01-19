@@ -7,17 +7,15 @@ import ClassComponent from 'class_component';
 import 'pages/new_profile/index.scss';
 
 import app from 'state';
-import {
-  Thread,
-  ChainInfo,
-  AddressInfo,
-  NewProfile as Profile,
-} from 'models';
+import { Thread, ChainInfo, AddressInfo, NewProfile as Profile } from 'models';
 import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
 
 import { NewProfileHeader } from './new_profile_header';
-import { CommentWithAssociatedThread, NewProfileActivity } from './new_profile_activity';
+import {
+  CommentWithAssociatedThread,
+  NewProfileActivity,
+} from './new_profile_activity';
 import Sublayout from '../../sublayout';
 import { CWSpinner } from '../../components/component_kit/cw_spinner';
 import { ImageBehavior } from '../../components/component_kit/cw_cover_image_uploader';
@@ -59,12 +57,16 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       const comments = response.comments.map((c) => modelCommentFromServer(c));
       const commentsWithAssociatedThread = comments.map((c) => {
         const thread = response.commentThreads.find(
-          (t) => t.id === parseInt(c.rootProposal.replace('discussion_', ''), 10)
+          (t) =>
+            t.id === parseInt(c.rootProposal.replace('discussion_', ''), 10)
         );
         return { ...c, thread };
-      })
+      });
       this.comments = commentsWithAssociatedThread;
-      this.chains = response.chains.map((c) => ({ ...new ChainInfo(c), iconUrl: c.icon_url }));
+      this.chains = response.chains.map((c) => ({
+        ...new ChainInfo(c),
+        iconUrl: c.icon_url,
+      }));
       this.addresses = response.addresses.map(
         (a) =>
           new AddressInfo(
@@ -114,10 +116,10 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       );
 
     if (this.error === ProfileError.NoAddressFound)
-      return <PageNotFound message="We cannot find this profile." />
+      return <PageNotFound message="We cannot find this profile." />;
 
     if (this.error === ProfileError.NoProfileFound)
-      return <PageNotFound message="We cannot find this profile." />
+      return <PageNotFound message="We cannot find this profile." />;
 
     if (this.error === ProfileError.None) {
       if (!this.profile) return;
@@ -125,37 +127,53 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
       if (this.profile.coverImage) {
         const { url, imageBehavior, imageAs } = this.profile.coverImage;
         this.content = (
-          <div className="ProfilePage"
+          <div
+            className="ProfilePage"
             style={
-              imageAs === 'background' ? (
-                  {
+              imageAs === 'background'
+                ? {
                     backgroundImage: `url(${url})`,
-                    backgroundRepeat: `${imageBehavior === ImageBehavior.Fill ? 'no-repeat' : 'repeat'}`,
-                    backgroundSize: imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
-                    backgroundPosition: imageBehavior === ImageBehavior.Fill ? 'center' : '56px 56px',
+                    backgroundRepeat: `${
+                      imageBehavior === ImageBehavior.Fill
+                        ? 'no-repeat'
+                        : 'repeat'
+                    }`,
+                    backgroundSize:
+                      imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
+                    backgroundPosition:
+                      imageBehavior === ImageBehavior.Fill
+                        ? 'center'
+                        : '56px 56px',
                     backgroundAttachment: 'fixed',
                   }
-              ) : {}
+                : {}
             }
           >
-            { imageAs === 'cover' && (
+            {imageAs === 'cover' && (
               <div
-                style={
-                  {
-                    backgroundImage: `url(${url})`,
-                    backgroundRepeat: `${imageBehavior === ImageBehavior.Fill ? 'no-repeat' : 'repeat'}`,
-                    backgroundSize: imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
-                    backgroundPosition: imageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
-                    height: '240px',
-                  }
-                }
+                style={{
+                  backgroundImage: `url(${url})`,
+                  backgroundRepeat: `${
+                    imageBehavior === ImageBehavior.Fill
+                      ? 'no-repeat'
+                      : 'repeat'
+                  }`,
+                  backgroundSize:
+                    imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
+                  backgroundPosition:
+                    imageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
+                  height: '240px',
+                }}
               />
             )}
-            <div className={imageAs === 'background' ? 'ProfilePageContainer' : 'ProfilePageContainer smaller-margins'}>
-              <NewProfileHeader
-                profile={this.profile}
-                address={this.address}
-              />
+            <div
+              className={
+                imageAs === 'background'
+                  ? 'ProfilePageContainer'
+                  : 'ProfilePageContainer smaller-margins'
+              }
+            >
+              <NewProfileHeader profile={this.profile} address={this.address} />
               <NewProfileActivity
                 threads={this.threads}
                 comments={this.comments}
@@ -169,10 +187,7 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
         this.content = (
           <div className="ProfilePage">
             <div className="ProfilePageContainer">
-              <NewProfileHeader
-                profile={this.profile}
-                address={this.address}
-              />
+              <NewProfileHeader profile={this.profile} address={this.address} />
               <NewProfileActivity
                 threads={this.threads}
                 comments={this.comments}

@@ -229,9 +229,7 @@ const User: m.Component<
                   linkify
                     ? link(
                         'a.user-display-name.username',
-                        profile
-                          ? `/profile/${profile.address}`
-                          : 'javascript:',
+                        profile ? `/profile/${profile.address}` : 'javascript:',
                         [
                           !profile
                             ? addrShort
@@ -306,9 +304,7 @@ const User: m.Component<
               })
             : link(
                 'a.user-display-name',
-                profile
-                  ? `/profile/${profile.address}`
-                  : 'javascript:',
+                profile ? `/profile/${profile.address}` : 'javascript:',
                 !profile
                   ? addrShort
                   : !showAddressWithDisplayName
@@ -481,9 +477,7 @@ export const UserBlock: m.Component<{
       ]),
     ];
 
-    const userLink = profile
-      ? `/profile/${profile.address}`
-      : 'javascript:';
+    const userLink = profile ? `/profile/${profile.address}` : 'javascript:';
 
     return linkify
       ? link('.UserBlock', userLink, children)

@@ -23,12 +23,12 @@ type CoverImageUploaderAttrs = {
 
 export enum ImageAs {
   Cover = 'cover',
-  Background = 'background'
+  Background = 'background',
 }
 
 export enum ImageBehavior {
   Fill = 'cover',
-  Tiled = 'repeat'
+  Tiled = 'repeat',
 }
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
@@ -93,7 +93,11 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
         this.imageURL = imageURL;
         attachButton.style.display = 'none';
         if (vnode.attrs.options) {
-          vnode.attrs.uploadCompleteCallback(imageURL, this.imageAs, this.imageBehavior);
+          vnode.attrs.uploadCompleteCallback(
+            imageURL,
+            this.imageAs,
+            this.imageBehavior
+          );
         } else {
           vnode.attrs.uploadCompleteCallback(imageURL);
         }
@@ -146,17 +150,24 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
   }
 
   view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
-    const { imageURL, isUploading, uploadStatus, imageAs, imageBehavior} = this;
-    const { headerText, subheaderText, uploadCompleteCallback, options } = vnode.attrs;
+    const { imageURL, isUploading, uploadStatus, imageAs, imageBehavior } =
+      this;
+    const { headerText, subheaderText, uploadCompleteCallback, options } =
+      vnode.attrs;
 
     const backgroundStyles = {
       backgroundImage: imageURL ? `url(${imageURL})` : 'none',
-      ...(options ? {
-        backgroundSize: imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
-        backgroundRepeat: imageBehavior === ImageBehavior.Fill ? 'no-repeat' : 'repeat',
-        backgroundPosition: imageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
-      } : {}),
-    }
+      ...(options
+        ? {
+            backgroundSize:
+              imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
+            backgroundRepeat:
+              imageBehavior === ImageBehavior.Fill ? 'no-repeat' : 'repeat',
+            backgroundPosition:
+              imageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
+          }
+        : {}),
+    };
 
     return (
       <div class="CoverImageUploader">
@@ -201,20 +212,30 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
               {!this.isUploading && (
                 <CWIcon iconName="imageUpload" iconSize="medium" />
               )}
-                <CWText type="caption" fontWeight="medium">
-                  Drag or upload your image here
-                </CWText>
+              <CWText type="caption" fontWeight="medium">
+                Drag or upload your image here
+              </CWText>
             </div>
           </div>
         </div>
         {vnode.attrs.options && (
           <div className="options">
-            <CWText type="caption" fontWeight="medium" className="cover-image-title">Set as</CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="cover-image-title"
+            >
+              Set as
+            </CWText>
             <CWRadioGroup
               name="image-as"
               onchange={(e) => {
                 this.imageAs = e.target.value;
-                uploadCompleteCallback(imageURL, this.imageAs, this.imageBehavior);
+                uploadCompleteCallback(
+                  imageURL,
+                  this.imageAs,
+                  this.imageBehavior
+                );
               }}
               toggledOption={imageAs}
               options={[
@@ -225,15 +246,25 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
                 {
                   label: 'Background',
                   value: ImageAs.Background,
-                }
+                },
               ]}
             />
-            <CWText type="caption" fontWeight="medium" className="cover-image-title">Choose Image Behavior</CWText>
+            <CWText
+              type="caption"
+              fontWeight="medium"
+              className="cover-image-title"
+            >
+              Choose Image Behavior
+            </CWText>
             <CWRadioGroup
               name="image-behaviour"
               onchange={(e) => {
                 this.imageBehavior = e.target.value;
-                uploadCompleteCallback(imageURL, this.imageAs, this.imageBehavior);
+                uploadCompleteCallback(
+                  imageURL,
+                  this.imageAs,
+                  this.imageBehavior
+                );
               }}
               toggledOption={imageBehavior}
               options={[
@@ -244,7 +275,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
                 {
                   label: 'Tile',
                   value: ImageBehavior.Tiled,
-                }
+                },
               ]}
             />
           </div>
