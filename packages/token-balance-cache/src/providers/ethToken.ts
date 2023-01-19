@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { providers } from 'ethers';
-import type { ERC20, ERC721 } from 'common-common/src/eth/types';
-import { ERC20__factory, ERC721__factory } from 'common-common/src/eth/types';
+import type { ERC20, ERC721, ERC1155 } from 'common-common/src/eth/types';
+import { ERC20__factory, ERC721__factory, ERC1155__factory } from 'common-common/src/eth/types';
 
 import type { IChainNode } from '../types';
 import { BalanceProvider } from '../types';
@@ -10,6 +10,7 @@ import { BalanceType } from 'common-common/src/types';
 type EthBPOpts = {
   tokenAddress?: string;
   contractType?: string;
+  tokenId?: string;
 };
 
 export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> {
@@ -17,6 +18,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
   public opts = {
     contractType: 'string?',
     tokenAddress: 'string?',
+    tokenId: 'string?',
   };
   public validBases = [BalanceType.Ethereum];
 
@@ -34,7 +36,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
     opts: EthBPOpts
   ): Promise<string> {
     const url = node.private_url || node.url;
-    const { tokenAddress, contractType } = opts;
+    const { tokenAddress, contractType, tokenId } = opts;
     if (!tokenAddress && !contractType) {
       // use native token if no args provided
       const provider = new Web3.providers.WebsocketProvider(url);
@@ -43,6 +45,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
       provider.disconnect(1000, 'finished');
       return balance;
     }
+    
     if (contractType !== 'erc20' && contractType !== 'erc721' && contractType !== 'erc1155') {
       throw new Error('Invalid contract type');
     }
@@ -52,8 +55,22 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
     if (!Web3.utils.isAddress(address)) {
       throw new Error('Invalid address');
     }
-
+    
+    if (contractType === 'erc1155' && !tokenId) {
+      throw new Error('Token Id Required For ERC-1155')
+    }
     const provider = new Web3.providers.WebsocketProvider(url);
+    if (contractType === 'erc1155') {
+      const api: ERC1155 = ERC1155__factory.connect(
+        tokenAddress,
+        new providers.Web3Provider(provider as any)
+      )
+      await api.deployed();
+      const balanceBigNum = await api.balanceOf(address, tokenId);
+      provider.disconnect(1000, 'finished');
+      return balanceBigNum.toString();
+    }
+
     let api: ERC20 | ERC721;
     if (contractType === 'erc20') {
       api = ERC20__factory.connect(
@@ -65,15 +82,11 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
         tokenAddress,
         new providers.Web3Provider(provider as any)
       );
-    } else if (contractType === 'erc1155') {
-      api = ERC1155__factory.connect(
-        tokenAddress,
-        new providers.Web3Provider(provider as any)
-      )
     }
      else {
       throw new Error('Invalid token chain network');
     }
+
     await api.deployed();
     const balanceBigNum = await api.balanceOf(address);
     provider.disconnect(1000, 'finished');
