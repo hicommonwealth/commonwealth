@@ -198,7 +198,7 @@ async function main() {
 
   let compiler;
   try {
-     compiler = DEV
+    compiler = DEV
       ? webpack(devWebpackConfig as any)
       : webpack(prodWebpackConfig as any);
   } catch (e) {

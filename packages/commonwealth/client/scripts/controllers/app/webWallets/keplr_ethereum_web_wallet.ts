@@ -3,11 +3,8 @@ import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { Account, IWebWallet } from 'models';
-import {
-  Window as KeplrWindow,
-  EthSignType,
-} from '@keplr-wallet/types';
 import { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface

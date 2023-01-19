@@ -104,7 +104,9 @@ const verifySignature = async (
         keyringOptions.type = addressModel.keytype as KeypairType;
       }
       keyringOptions.ss58Format = chain.ss58_prefix ?? 42;
-      const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(address);
+      const signerKeyring = new polkadot.Keyring(keyringOptions).addFromAddress(
+        address
+      );
       const message = stringToHex(JSON.stringify(canvasMessage));
 
       const signatureU8a =
