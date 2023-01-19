@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { providers } from 'ethers';
+import { BigNumber, providers } from 'ethers';
 import type { ERC20, ERC721, ERC1155 } from 'common-common/src/eth/types';
 import { ERC20__factory, ERC721__factory, ERC1155__factory } from 'common-common/src/eth/types';
 
@@ -15,6 +15,7 @@ type EthBPOpts = {
 
 export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> {
   public name = 'eth-token';
+  // Added Token Id as String because it can be a BigNumber (uint256 on solidity)
   public opts = {
     contractType: 'string?',
     tokenAddress: 'string?',
@@ -46,50 +47,58 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
       return balance;
     }
     
-    if (contractType !== 'erc20' && contractType !== 'erc721' && contractType !== 'erc1155') {
-      throw new Error('Invalid contract type');
-    }
     if (!Web3.utils.isAddress(tokenAddress)) {
       throw new Error('Invalid token address');
     }
     if (!Web3.utils.isAddress(address)) {
       throw new Error('Invalid address');
     }
-    
+
     if (contractType === 'erc1155' && !tokenId) {
       throw new Error('Token Id Required For ERC-1155')
     }
     const provider = new Web3.providers.WebsocketProvider(url);
-    if (contractType === 'erc1155') {
-      const api: ERC1155 = ERC1155__factory.connect(
-        tokenAddress,
-        new providers.Web3Provider(provider as any)
-      )
-      await api.deployed();
-      const balanceBigNum = await api.balanceOf(address, tokenId);
+    switch (contractType) {
+      case 'erc20':
+        // eslint-disable-next-line no-case-declarations
+        const erc20Api: ERC20 = ERC20__factory.connect(
+          tokenAddress,
+          new providers.Web3Provider(provider as any)
+        );
+        return await this.fetchBalance(erc20Api, provider, address);
+
+      case 'erc721':
+        // eslint-disable-next-line no-case-declarations
+        const erc721Api: ERC721 = ERC721__factory.connect(
+          tokenAddress,
+          new providers.Web3Provider(provider as any)
+        );
+        return await this.fetchBalance(erc721Api, provider, address);
+      
+      case 'erc1155':
+        // eslint-disable-next-line no-case-declarations
+        const erc1155Api: ERC1155 = ERC1155__factory.connect(
+          tokenAddress,
+          new providers.Web3Provider(provider as any)
+        )
+        return await this.fetchBalance(erc1155Api, provider, address, tokenId);
+      
+      default:
+        throw new Error('Invalid contract type');
+    }
+    
+  }
+
+  private async fetchBalance(api: any, provider: any, address: string,  tokenId?: string) {
+    await api.deployed();
+    if (tokenId) {
+      const balanceBigNum: BigNumber = await api.balanceOf(address, tokenId);
+      provider.disconnect(1000, 'finished');
+      return balanceBigNum.toString();
+    } else {
+      const balanceBigNum: BigNumber = await api.balanceOf(address);
       provider.disconnect(1000, 'finished');
       return balanceBigNum.toString();
     }
-
-    let api: ERC20 | ERC721;
-    if (contractType === 'erc20') {
-      api = ERC20__factory.connect(
-        tokenAddress,
-        new providers.Web3Provider(provider as any)
-      );
-    } else if (contractType === 'erc721') {
-      api = ERC721__factory.connect(
-        tokenAddress,
-        new providers.Web3Provider(provider as any)
-      );
-    }
-     else {
-      throw new Error('Invalid token chain network');
-    }
-
-    await api.deployed();
-    const balanceBigNum = await api.balanceOf(address);
-    provider.disconnect(1000, 'finished');
-    return balanceBigNum.toString();
   }
 }

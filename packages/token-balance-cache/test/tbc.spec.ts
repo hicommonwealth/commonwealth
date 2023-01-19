@@ -8,12 +8,12 @@ import { BalanceProvider } from '../src/types';
 
 class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
   public readonly name = 'test-provider';
-  public readonly opts = { testBalance: 'string' };
+  public readonly opts = { testBalance: 'string', testTokenId: 'string?' };
   public readonly validBases = [BalanceType.Ethereum];
   public async getBalance(
     _node: IChainNode,
     address: string,
-    opts: { testBalance: string }
+    opts: { testBalance: string, testTokenId?: string }
   ): Promise<string> {
     if (Web3.utils.isAddress(address)) {
       return opts.testBalance;
@@ -69,7 +69,7 @@ describe('TBC unit tests', () => {
     assert.sameDeepMembers(bps, [
       {
         bp: 'test-provider',
-        opts: { testBalance: 'string' },
+        opts: { testBalance: 'string' , testTokenId: 'string?' },
       },
     ]);
     tbc.close();
