@@ -16,6 +16,7 @@ type TokenBalanceReq = {
   address: string;
   chain: string;
   contract_address?: string;
+  tokenId?: string; //for ERC1155 balance requests
 };
 type TokenBalanceResp = string;
 
@@ -54,7 +55,8 @@ const tokenBalance = async (
       chain.network,
       chain_node_id,
       req.body.address,
-      req.body.contract_address
+      req.body?.contract_address,
+      req.body?.tokenId
     );
     return success(res, balance);
   } catch (e) {

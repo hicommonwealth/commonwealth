@@ -211,7 +211,8 @@ export class TokenBalanceCache
     network: ChainNetwork,
     nodeId: number,
     userAddress: string,
-    contractAddress?: string
+    contractAddress?: string,
+    tokenId?: string
   ): Promise<string> {
     let bp: string;
     try {
@@ -224,13 +225,20 @@ export class TokenBalanceCache
     // grab contract if provided, otherwise query native token
     let opts = {};
     if (contractAddress) {
-      if (network !== ChainNetwork.ERC20 && network !== ChainNetwork.ERC721) {
+      if (
+        network !== ChainNetwork.ERC20 &&
+        network !== ChainNetwork.ERC721 &&
+        network !== ChainNetwork.ERC1155
+      ) {
         throw new Error(FetchTokenBalanceErrors.UnsupportedContractType);
       }
       opts = {
         tokenAddress: contractAddress,
         contractType: network,
       };
+      if (network === ChainNetwork.ERC1155) {
+        opts['tokenId'] = tokenId;
+      }
     }
 
     let balancesResp: TokenBalanceResp;

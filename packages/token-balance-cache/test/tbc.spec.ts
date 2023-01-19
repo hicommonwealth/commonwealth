@@ -13,7 +13,7 @@ class MockBalanceProvider extends BalanceProvider<{ testBalance: string }> {
   public async getBalance(
     _node: IChainNode,
     address: string,
-    opts: { testBalance: string, testTokenId?: string }
+    opts: { testBalance: string; testTokenId?: string }
   ): Promise<string> {
     if (Web3.utils.isAddress(address)) {
       return opts.testBalance;
@@ -69,7 +69,7 @@ describe('TBC unit tests', () => {
     assert.sameDeepMembers(bps, [
       {
         bp: 'test-provider',
-        opts: { testBalance: 'string' , testTokenId: 'string?' },
+        opts: { testBalance: 'string', testTokenId: 'string?' },
       },
     ]);
     tbc.close();
@@ -131,7 +131,7 @@ describe('TBC unit tests', () => {
     await tbc.start();
     const addresses = ['abcd', '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'];
     const testBalance = '12345678912345678910';
-    const testTokenId = '123456789'
+    const testTokenId = '123456789';
     const tokenBalances = await tbc.getBalancesForAddresses(
       1,
       addresses,
