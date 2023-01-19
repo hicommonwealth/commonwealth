@@ -49,8 +49,8 @@ const getProfile = async (
   const threads = await models.Thread.findAll({
     where: {
       [Op.or]: [
-        { id: { [Op.in]: commentThreadIds }, },
-        { address_id: addressModel.id, },
+        { id: { [Op.in]: commentThreadIds } },
+        { address_id: addressModel.id },
       ],
     },
     include: [{ model: models.Address, as: 'Address' }],
