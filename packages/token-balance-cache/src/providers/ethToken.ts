@@ -42,9 +42,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
       // use native token if no args provided
       const provider = new Web3.providers.WebsocketProvider(url);
       const web3 = new Web3(provider);
-      const balance = await web3.eth.getBalance(address);
-      provider.disconnect(1000, 'finished');
-      return balance;
+      return await this.fetchBalance(web3, provider, 'eth', address);
     }
     
     if (!Web3.utils.isAddress(tokenAddress)) {
@@ -65,7 +63,8 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
           tokenAddress,
           new providers.Web3Provider(provider as any)
         );
-        return await this.fetchBalance(erc20Api, provider, address);
+        await erc20Api.deployed();
+        return await this.fetchBalance(erc20Api, provider, contractType, address);
 
       case 'erc721':
         // eslint-disable-next-line no-case-declarations
@@ -73,7 +72,8 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
           tokenAddress,
           new providers.Web3Provider(provider as any)
         );
-        return await this.fetchBalance(erc721Api, provider, address);
+        await erc721Api.deployed();
+        return await this.fetchBalance(erc721Api, provider, contractType, address);
       
       case 'erc1155':
         // eslint-disable-next-line no-case-declarations
@@ -81,7 +81,8 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
           tokenAddress,
           new providers.Web3Provider(provider as any)
         )
-        return await this.fetchBalance(erc1155Api, provider, address, tokenId);
+        await erc1155Api.deployed();
+        return await this.fetchBalance(erc1155Api, provider, contractType, address, tokenId);
       
       default:
         throw new Error('Invalid contract type');
@@ -89,16 +90,19 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
     
   }
 
-  private async fetchBalance(api: any, provider: any, address: string,  tokenId?: string) {
-    await api.deployed();
-    if (tokenId) {
-      const balanceBigNum: BigNumber = await api.balanceOf(address, tokenId);
+  private async fetchBalance(api: any, provider: any, tokenType: string, address: string,  tokenId?: string): Promise<string> {
+    if (tokenType === 'erc1155') {
+      const balanceBigNum: BigNumber = await (api as ERC1155).balanceOf(address, tokenId);
       provider.disconnect(1000, 'finished');
       return balanceBigNum.toString();
-    } else {
-      const balanceBigNum: BigNumber = await api.balanceOf(address);
+    } else if (tokenType === 'erc20' || tokenType === 'erc721') {
+      const balanceBigNum: BigNumber = await (api as ERC20 | ERC721).balanceOf(address);
       provider.disconnect(1000, 'finished');
       return balanceBigNum.toString();
+    } else if (tokenType === 'eth') {
+      const balance = await (api as Web3).eth.getBalance(address);
+      provider.disconnect(1000, 'finished');
+      return balance;
     }
   }
 }
