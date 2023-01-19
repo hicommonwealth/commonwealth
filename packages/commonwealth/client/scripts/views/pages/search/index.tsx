@@ -100,7 +100,7 @@ const getCommentResult = (comment, searchTerm) => {
           {decodeURIComponent(comment.title)}
         </div> */}
         <div className="search-results-thread-subtitle">
-          {m(User, {
+          {render(User, {
             user: new AddressInfo(
               comment.address_id,
               comment.address,
@@ -155,7 +155,7 @@ const getMemberResult = (addr) => {
 
   return (
     <div className="member-result-row">
-      {m(User, {
+      {render(User, {
         user: profile,
         showRole: true,
         linkify: true,

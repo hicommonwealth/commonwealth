@@ -64,7 +64,7 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
               this.redraw();
             }}
           >
-            {m(UserBlock, {
+            {render(UserBlock, {
               user: account,
               selected: isSameAccount(account, app.user.activeAccount),
               showRole: false,
@@ -502,7 +502,7 @@ export class LoginSelector extends ClassComponent {
             <CWPopover
               trigger={
                 <div className="left-button">
-                  {m(User, {
+                  {render(User, {
                     user: app.user.activeAccount,
                     hideIdentityIcon: true,
                   })}
