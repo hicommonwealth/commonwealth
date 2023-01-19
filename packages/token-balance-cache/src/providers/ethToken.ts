@@ -43,7 +43,7 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
       provider.disconnect(1000, 'finished');
       return balance;
     }
-    if (contractType !== 'erc20' && contractType !== 'erc721') {
+    if (contractType !== 'erc20' && contractType !== 'erc721' && contractType !== 'erc1155') {
       throw new Error('Invalid contract type');
     }
     if (!Web3.utils.isAddress(tokenAddress)) {
@@ -65,7 +65,13 @@ export default class EthTokenBalanceProvider extends BalanceProvider<EthBPOpts> 
         tokenAddress,
         new providers.Web3Provider(provider as any)
       );
-    } else {
+    } else if (contractType === 'erc1155') {
+      api = ERC1155__factory.connect(
+        tokenAddress,
+        new providers.Web3Provider(provider as any)
+      )
+    }
+     else {
       throw new Error('Invalid token chain network');
     }
     await api.deployed();
