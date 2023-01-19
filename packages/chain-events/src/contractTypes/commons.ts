@@ -5,7 +5,8 @@
 import type { EventFilter, Event } from "ethers";
 import type { Result } from "@ethersproject/abi";
 
-export type TypedEventFilter<_EventArgsArray, _EventArgsObject> = EventFilter
+export interface TypedEventFilter<_EventArgsArray, _EventArgsObject>
+  extends EventFilter {}
 
 export interface TypedEvent<EventArgs extends Result> extends Event {
   args: EventArgs;
