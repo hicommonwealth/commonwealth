@@ -20,10 +20,7 @@ export class ConfirmCancelNewProfileModal extends ClassComponent {
             iconName="close"
             onclick={(e) => {
               e.preventDefault();
-              $(e.target).trigger('modalcomplete');
-              setTimeout(() => {
-                $(e.target).trigger('modalexit');
-              }, 0);
+              $(e.target).trigger('modalexit');
             }}
           />
         </div>
@@ -34,10 +31,7 @@ export class ConfirmCancelNewProfileModal extends ClassComponent {
             buttonType="secondary-black"
             onclick={(e) => {
               e.preventDefault();
-              $(e.target).trigger('modalcomplete');
-              setTimeout(() => {
-                $(e.target).trigger('modalexit');
-              }, 0);
+              $(e.target).trigger('modalexit');
             }}
           />
           <CWButton
@@ -46,10 +40,8 @@ export class ConfirmCancelNewProfileModal extends ClassComponent {
             onclick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
-              setTimeout(() => {
-                $(e.target).trigger('modalexit');
-              }, 0);
-              m.route.set(`/profile/manage`);
+              $(e.target).trigger('modalexit');
+              m.route.set('/profile/manage');
             }}
           />
         </div>
