@@ -1,7 +1,6 @@
 'use strict';
 const { query } = require('@polkadot/api-derive/staking');
-const {toChecksumAddress} = require('web3-utils');
-
+const { toChecksumAddress } = require('web3-utils');
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
@@ -30,7 +29,9 @@ module.exports = {
       );
 
       console.log(JSON.stringify(addressesToDelete));
-      for (const [idToDelete, idToUpdate] of Object.entries(addressesToDelete)) {
+      for (const [idToDelete, idToUpdate] of Object.entries(
+        addressesToDelete
+      )) {
         await queryInterface.sequelize.query(
           `UPDATE "Collaborations" SET address_id=${idToUpdate} WHERE address_id=${idToDelete};`,
           { transaction }
@@ -86,7 +87,7 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     /**
-    * Nothing to be done :)
-    */
-  }
+     * Nothing to be done :)
+     */
+  },
 };

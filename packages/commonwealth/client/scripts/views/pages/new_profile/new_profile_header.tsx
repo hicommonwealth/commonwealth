@@ -46,8 +46,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
                 navigateToSubpage(`/profile/${username}/edit`)
               }
             />
-          )
-        }
+          )}
         </div>
         <div class="profile-image">
           {profile.avatarUrl ? (
@@ -73,9 +72,7 @@ export class NewProfileHeader extends ClassComponent<NewProfileHeaderAttrs> {
           {bio && (
             <div>
               <CWText type="h4">Bio</CWText>
-              <CWText className="bio">
-                {renderQuillTextBody(bio)}
-              </CWText>
+              <CWText className="bio">{renderQuillTextBody(bio)}</CWText>
             </div>
           )}
         </div>

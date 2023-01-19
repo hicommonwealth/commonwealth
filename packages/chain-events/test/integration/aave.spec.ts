@@ -3,39 +3,37 @@
 /* eslint-disable no-unused-expressions */
 import { EventEmitter } from 'events';
 
-import { BigNumber, providers, utils } from 'ethers';
+import type { BigNumber } from 'ethers';
+import { providers, utils } from 'ethers';
 import { assert } from 'chai';
 
-import {
-  AaveTokenV2Mock__factory as AaveTokenV2Factory,
+import type {
   AaveTokenV2Mock as AaveTokenV2,
-  GovernanceStrategy__factory as GovernanceStrategyFactory,
   GovernanceStrategy,
-  Executor__factory as ExecutorFactory,
   Executor,
-  AaveGovernanceV2__factory as AaveGovernanceV2Factory,
 } from '../../src/contractTypes';
 import {
+  AaveTokenV2Mock__factory as AaveTokenV2Factory,
+  GovernanceStrategy__factory as GovernanceStrategyFactory,
+  Executor__factory as ExecutorFactory,
+  AaveGovernanceV2__factory as AaveGovernanceV2Factory,
+} from '../../src/contractTypes';
+import type {
   Api,
   IEventData,
-  EventKind,
   IProposalCreated,
   IProposalCanceled,
   IVoteEmitted,
-  ProposalState,
   IProposalQueued,
   IProposalExecuted,
   IDelegateChanged,
   IDelegatedPowerChanged,
   ITransfer,
 } from '../../src/chains/aave/types';
+import { EventKind, ProposalState } from '../../src/chains/aave/types';
 import { subscribeEvents } from '../../src/chains/aave/subscribeFunc';
-import {
-  IEventHandler,
-  CWEvent,
-  IChainEventData,
-  SupportedNetwork,
-} from '../../src/interfaces';
+import type { CWEvent, IChainEventData } from '../../src/interfaces';
+import { IEventHandler, SupportedNetwork } from '../../src/interfaces';
 import { StorageFetcher } from '../../src/chains/aave/storageFetcher';
 
 function getProvider(): providers.Web3Provider {

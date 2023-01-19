@@ -1,7 +1,7 @@
 import chai from 'chai';
 
 import { Subscriber } from '../../../src/chains/cosmos/subscriber';
-import { RawEvent } from '../../../src/chains/cosmos/types';
+import type { RawEvent } from '../../../src/chains/cosmos/types';
 
 import { getApi } from './util';
 
@@ -52,6 +52,5 @@ describe('Cosmos Event Subscriber Tests', () => {
   });
 
   xit('should callback with historical event data', async () => {});
-
   xit('should fail gracefully on inaccessible old blocks', () => {});
 });

@@ -42,15 +42,15 @@ export class SocialAccounts extends ClassComponent<SocialAccountsAttrs> {
         {email && <SocialAccount link={`mailto:${email}`} iconName="mail" />}
         {socials?.map((social) => {
           if (social.includes('twitter')) {
-          return <SocialAccount link={social} iconName="twitter" />
+            return <SocialAccount link={social} iconName="twitter" />;
           } else if (social.includes('discord')) {
-            return <SocialAccount link={social} iconName="discord" />
+            return <SocialAccount link={social} iconName="discord" />;
           } else if (social.includes('telegram')) {
-            return <SocialAccount link={social} iconName="telegram" />
+            return <SocialAccount link={social} iconName="telegram" />;
           } else if (social.includes('github')) {
-            return <SocialAccount link={social} iconName="github" />
+            return <SocialAccount link={social} iconName="github" />;
           } else {
-            return <SocialAccount link={social} iconName="website" />
+            return <SocialAccount link={social} iconName="website" />;
           }
         })}
       </div>

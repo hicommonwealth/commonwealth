@@ -1,4 +1,6 @@
-import {
+import type { Logger } from 'typescript-logging';
+
+import type {
   IEventHandler,
   IChainEventKind,
   IEventSubscriber,
@@ -10,7 +12,6 @@ import {
   SupportedNetwork,
 } from './interfaces';
 import { addPrefix, factory } from './logging';
-import {Logger} from "typescript-logging";
 
 let log;
 
@@ -35,6 +36,7 @@ export abstract class Listener<
 
   public storageFetcher: StorageFetcher;
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   public discoverReconnectRange: (chain: string) => Promise<IDisconnectedRange>;
 
   protected _subscriber: Subscriber;
@@ -105,6 +107,7 @@ export abstract class Listener<
     }
   }
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   protected abstract processBlock(block: any): Promise<void>;
 
   public get chain(): string {
@@ -123,7 +126,9 @@ export abstract class Listener<
 
   public abstract getLatestBlockNumber(): Promise<number>;
 
-  public async processOfflineRange(log: Logger): Promise<{startBlock: number, endBlock: number} | undefined> {
+  public async processOfflineRange(
+    log: Logger
+  ): Promise<{ startBlock: number; endBlock: number } | undefined> {
     log.info(`Detected offline time, polling missed blocks...`);
 
     if (!this.discoverReconnectRange) {
@@ -135,12 +140,13 @@ export abstract class Listener<
     // fetch the block number of the last event from database
     let offlineRange = await this.discoverReconnectRange(this._chain);
 
-    if (this._lastCachedBlockNumber && (
-      !offlineRange.startBlock ||
-      offlineRange.startBlock < this._lastCachedBlockNumber)
+    if (
+      this._lastCachedBlockNumber &&
+      (!offlineRange.startBlock ||
+        offlineRange.startBlock < this._lastCachedBlockNumber)
     ) {
       log.info(`Using cached block number ${this._lastCachedBlockNumber}`);
-      offlineRange = {startBlock: this._lastCachedBlockNumber}
+      offlineRange = { startBlock: this._lastCachedBlockNumber };
     }
 
     // do nothing if we don't have an existing event in the database/cache
@@ -165,7 +171,7 @@ export abstract class Listener<
       offlineRange.startBlock = offlineRange.endBlock - 500;
     }
 
-    return <{startBlock: number, endBlock: number}>offlineRange;
+    return <{ startBlock: number; endBlock: number }>offlineRange;
   }
 
   public abstract isConnected(): Promise<boolean>;

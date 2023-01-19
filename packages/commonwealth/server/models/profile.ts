@@ -1,15 +1,15 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { AddressAttributes, AddressInstance } from './address';
+import type { ModelInstance, ModelStatic } from './types';
 
-import { UserAttributes, UserInstance } from './user';
-import { ModelStatic, ModelInstance } from './types';
-import { AddressAttributes, AddressInstance } from './address';
+import type { UserAttributes, UserInstance } from './user';
 
 export type CoverImageAttributes = {
   url: string;
   imageAs: string;
   imageBehavior: string;
-}
+};
 
 export type ProfileAttributes = {
   id?: number;
@@ -60,12 +60,17 @@ export default (
       email: { type: dataTypes.STRING, allowNull: true },
       website: { type: dataTypes.STRING, allowNull: true },
       bio: { type: dataTypes.TEXT, allowNull: true },
-      is_default: { type: dataTypes.BOOLEAN, allowNull: false, defaultValue: false },
-      avatar_url: { type: dataTypes.STRING, allowNull: true},
-      slug: { type: dataTypes.STRING, allowNull: true},
+      is_default: {
+        type: dataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      avatar_url: { type: dataTypes.STRING, allowNull: true },
+      slug: { type: dataTypes.STRING, allowNull: true },
       socials: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: true },
       cover_image: { type: dataTypes.JSONB, allowNull: true },
-    }, {
+    },
+    {
       tableName: 'Profiles',
       underscored: true,
       timestamps: true,

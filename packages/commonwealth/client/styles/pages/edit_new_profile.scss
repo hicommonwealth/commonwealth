@@ -35,7 +35,7 @@
             background-color: green;
             color: white;
           }
-    
+
           &.fail {
             background-color: red;
             color: white;
@@ -57,7 +57,7 @@
       .save-button-message {
         opacity: 0;
         transition: opacity 0.25s ease;
-  
+
         &.show {
           opacity: 1;
         }
@@ -110,16 +110,16 @@
 
     .socials-section {
       margin-top: 24px;
-  
+
       .b1 {
         color: $neutral-600;
       }
-  
+
       .caption {
         color: $neutral-500;
         margin: 4px 0 16px 0;
       }
-  
+
       .input-row {
         display: flex;
         align-items: center;
@@ -152,7 +152,8 @@
           background-color: $neutral-200;
         }
 
-        svg, .Text {
+        svg,
+        .Text {
           color: $neutral-600;
         }
       }

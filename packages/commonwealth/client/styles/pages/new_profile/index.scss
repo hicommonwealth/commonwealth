@@ -12,17 +12,17 @@
     margin: 64px 80px;
     gap: 24px;
 
-    &.smaller-margins { 
+    &.smaller-margins {
       margin: 24px 80px;
 
       @include mediumInclusive {
         margin: 24px 72px;
       }
-  
+
       @include mediumSmallInclusive {
         margin: 24px 48px;
       }
-      
+
       @include smallInclusive {
         margin: 24px 32px;
       }
@@ -35,7 +35,7 @@
     @include mediumSmallInclusive {
       margin: 40px 48px;
     }
-    
+
     @include smallInclusive {
       flex-direction: column;
       margin: 40px 32px;

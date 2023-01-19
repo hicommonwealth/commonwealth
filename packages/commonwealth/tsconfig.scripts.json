@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "server/scripts/chainEventsConsumer.ts",
+    "server/scripts/dbNode.ts"
+  ]
+}

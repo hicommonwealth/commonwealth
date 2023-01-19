@@ -1,10 +1,9 @@
 import { factory, formatFilename } from 'common-common/src/logging';
 import { AppError } from 'common-common/src/errors';
-import { DB } from '../../database/database';
-import {
-  runEntityMigrations,
-} from '../../../scripts/migrateChainEntities';
-import {NextFunction, Request, Response} from "express";
+import type { NextFunction, Request, Response } from 'express';
+
+import type { DB } from '../../database/database';
+import { runEntityMigrations } from '../../../scripts/migrateChainEntities';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -15,7 +14,7 @@ enum MigrateEventErrors {
   ChainError = 'Failed to migrate chain events.',
 }
 
-const migrateEvent = async (
+const migrateEvent: any = async (
   models: DB,
   req: Request,
   res: Response,
@@ -37,7 +36,10 @@ const migrateEvent = async (
     } catch (e) {
       return next(new AppError(MigrateEventErrors.AllError));
     }
-    return res.json({status: 'Success', result: { message: 'Started migration for all events.' }});
+    return res.json({
+      status: 'Success',
+      result: { message: 'Started migration for all events.' },
+    });
   }
 
   if (!chain_id) {
@@ -51,7 +53,10 @@ const migrateEvent = async (
     return next(new AppError(MigrateEventErrors.ChainError));
   }
 
-  return res.json({status: 'Success', result: { message: `Started migration for ${chain_id}.` }});
+  return res.json({
+    status: 'Success',
+    result: { message: `Started migration for ${chain_id}.` },
+  });
 };
 
 export default migrateEvent;

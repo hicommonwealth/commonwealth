@@ -1,18 +1,20 @@
-import { Account } from 'models';
-import { IApp } from 'state';
-import _ from 'lodash';
 import * as solw3 from '@solana/web3.js';
+import _ from 'lodash';
+import { Account } from 'models';
+import type { IApp } from 'state';
+import type SolanaAccounts from './accounts';
 
 import SolanaChain from './chain';
-import SolanaAccounts from './accounts';
-import { SolanaToken } from './types';
+import type { SolanaToken } from './types';
 
 export default class SolanaAccount extends Account {
   private _Chain: SolanaChain;
   private _Accounts: SolanaAccounts;
 
   private _balance: SolanaToken;
-  public get balance() { return this.updateBalance().then(() => this._balance); }
+  public get balance() {
+    return this.updateBalance().then(() => this._balance);
+  }
 
   public get publicKey() {
     return new solw3.PublicKey(this.address);
@@ -30,7 +32,12 @@ export default class SolanaAccount extends Account {
     }
   });
 
-  constructor(app: IApp, ChainInfo: SolanaChain, Accounts: SolanaAccounts, address: string) {
+  constructor(
+    app: IApp,
+    ChainInfo: SolanaChain,
+    Accounts: SolanaAccounts,
+    address: string
+  ) {
     super({ chain: app.chain.meta, address });
     if (!app.isModuleReady) {
       // defer chain initialization

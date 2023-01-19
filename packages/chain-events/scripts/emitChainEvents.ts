@@ -1,24 +1,32 @@
 import * as fs from 'fs';
-import { IEventHandler, CWEvent } from 'chain-events/src';
+import type { IEventHandler, CWEvent } from 'chain-events/src';
 
 import ceModels, { sequelize } from '../services/database/database';
 import cwModels from '../../commonwealth/server/database';
 import { factory, formatFilename } from 'common-common/src/logging';
-import {ChainInstance} from 'commonwealth/server/models/chain';
-import {SubstrateTypes} from '../src'
+import type { ChainInstance } from 'commonwealth/server/models/chain';
+import { SubstrateTypes } from '../src/types';
+import type { StorageFilterConfig } from '../services/ChainEventsConsumer/ChainEventHandlers';
 import {
   EntityArchivalHandler,
-  NotificationHandler, StorageFilterConfig,
-  StorageHandler
-} from "../services/ChainEventsConsumer/ChainEventHandlers";
-import {BrokerConfig} from "rascal";
-import {MockRabbitMQController, getRabbitMQConfig} from 'common-common/src/rabbitmq'
-
+  NotificationHandler,
+  StorageHandler,
+} from '../services/ChainEventsConsumer/ChainEventHandlers';
+import type { BrokerConfig } from 'rascal';
+import {
+  MockRabbitMQController,
+  getRabbitMQConfig,
+} from 'common-common/src/rabbitmq';
 
 const log = factory.getLogger(formatFilename(__filename));
-const rmqController = new MockRabbitMQController(<BrokerConfig>getRabbitMQConfig('localhost'));
+const rmqController = new MockRabbitMQController(
+  <BrokerConfig>getRabbitMQConfig('localhost')
+);
 
-const handleEventFn = async (handlers: IEventHandler[], event: CWEvent<any>): Promise<void> => {
+const handleEventFn = async (
+  handlers: IEventHandler[],
+  event: CWEvent<any>
+): Promise<void> => {
   let prevResult = null;
   for (const handler of handlers) {
     try {
@@ -34,9 +42,14 @@ const handleEventFn = async (handlers: IEventHandler[], event: CWEvent<any>): Pr
 export const generateHandlers = (
   chain: ChainInstance,
   storageConfig: StorageFilterConfig = {}
-) => {
+): IEventHandler[] => {
   // writes events into the db as ChainEvents rows
-  const storageHandler = new StorageHandler(ceModels, rmqController, chain.id, storageConfig);
+  const storageHandler = new StorageHandler(
+    ceModels,
+    rmqController,
+    chain.id,
+    storageConfig
+  );
 
   // emits notifications by writing into the db's Notifications table, and also optionally
   // sending a notification to the client via websocket
@@ -48,13 +61,17 @@ export const generateHandlers = (
   );
 
   // creates and updates ChainEntity rows corresponding with entity-related events
-  const entityArchivalHandler = new EntityArchivalHandler(ceModels, rmqController, chain.id);
+  const entityArchivalHandler = new EntityArchivalHandler(
+    ceModels,
+    rmqController,
+    chain.id
+  );
 
   // the set of handlers, run sequentially on all incoming chain events
   const handlers: IEventHandler[] = [
     storageHandler,
     notificationHandler,
-    entityArchivalHandler
+    entityArchivalHandler,
   ];
 
   return handlers;
@@ -92,10 +109,12 @@ async function main(chain: string, eventsPath: string) {
     await sequelize.authenticate();
     const chainInstance = await cwModels.Chain.findOne({
       where: { id: chain, active: true },
-      include: [{
-        model: cwModels.ChainNode,
-        required: true,
-      }],
+      include: [
+        {
+          model: cwModels.ChainNode,
+          required: true,
+        },
+      ],
     });
     if (!chainInstance) {
       throw new Error(`Chain not found: ${chain}`);

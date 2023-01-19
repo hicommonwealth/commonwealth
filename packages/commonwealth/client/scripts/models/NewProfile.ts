@@ -1,4 +1,4 @@
-import { CoverImage } from "../views/pages/edit_new_profile";
+import { CoverImage } from '../views/pages/edit_new_profile';
 
 class NewProfile {
   private _name: string;
@@ -14,21 +14,67 @@ class NewProfile {
   private _id: number;
   private _isOwner: boolean;
 
-  get name() { return this._name; }
-  get username() { return this._username; }
-  get email() { return this._email; }
-  get website() { return this._website; }
-  get bio() { return this._bio; }
-  get isDefault() { return this._isDefault; }
-  get avatarUrl() { return this._avatarUrl; }
-  get slug() { return this._slug; }
-  get socials() { return this._socials; }
-  get coverImage() { return this._coverImage; }
-  get id() { return this._id; }
-  get isOwner() { return this._isOwner; }
+  get name() {
+    return this._name;
+  }
+
+  get username() {
+    return this._username;
+  }
+
+  get email() {
+    return this._email;
+  }
+
+  get website() {
+    return this._website;
+  }
+
+  get bio() {
+    return this._bio;
+  }
+
+  get isDefault() {
+    return this._isDefault;
+  }
+
+  get avatarUrl() {
+    return this._avatarUrl;
+  }
+
+  get slug() {
+    return this._slug;
+  }
+
+  get socials() {
+    return this._socials;
+  }
+
+  get coverImage() {
+    return this._coverImage;
+  }
+
+  get id() {
+    return this._id;
+  }
+
+  get isOwner() {
+    return this._isOwner;
+  }
 
   constructor({
-    profile_name, username, email, website, bio, is_default, avatar_url, slug, socials, cover_image, id, is_owner
+    profile_name,
+    username,
+    email,
+    website,
+    bio,
+    is_default,
+    avatar_url,
+    slug,
+    socials,
+    cover_image,
+    id,
+    is_owner,
   }) {
     this._name = profile_name;
     this._username = username;
@@ -44,7 +90,20 @@ class NewProfile {
     this._isOwner = is_owner;
   }
 
-  public initialize(name, username, email, website, bio, isDefault, avatarUrl, slug, socials, coverImage, id, isOwner) {
+  public initialize(
+    name,
+    username,
+    email,
+    website,
+    bio,
+    isDefault,
+    avatarUrl,
+    slug,
+    socials,
+    coverImage,
+    id,
+    isOwner
+  ) {
     this._name = name;
     this._username = username;
     this._email = email;
@@ -60,7 +119,7 @@ class NewProfile {
   }
 
   public static fromJSON(json) {
-    return new NewProfile(json)
+    return new NewProfile(json);
   }
 }
 

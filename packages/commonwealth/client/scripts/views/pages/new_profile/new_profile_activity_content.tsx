@@ -25,22 +25,24 @@ type NewProfileActivityContentAttrs = {
 
 export class NewProfileActivityContent extends ClassComponent<NewProfileActivityContentAttrs> {
   view(vnode: m.Vnode<NewProfileActivityContentAttrs>) {
-    const { option, address, comments, threads, chains } =
-      vnode.attrs;
+    const { option, address, comments, threads, chains } = vnode.attrs;
 
     if (option === ProfileActivity.Threads) {
-      return threads.sort(((a, b) => +b.createdAt - +a.createdAt)).map((thread) => (
-        <NewProfileActivityRow
-          activity={thread}
-          address={address}
-          chains={chains}
-        />
-      ));
+      return threads
+        .sort((a, b) => +b.createdAt - +a.createdAt)
+        .map((thread) => (
+          <NewProfileActivityRow
+            activity={thread}
+            address={address}
+            chains={chains}
+          />
+        ));
     }
 
-    const allActivities: Array<CommentWithAssociatedThread | Thread> = [...comments, ...threads].sort(
-      (a, b) => +b.createdAt - +a.createdAt
-    );
+    const allActivities: Array<CommentWithAssociatedThread | Thread> = [
+      ...comments,
+      ...threads,
+    ].sort((a, b) => +b.createdAt - +a.createdAt);
 
     return allActivities.map((activity) => {
       return (
