@@ -196,9 +196,14 @@ async function main() {
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
 
-  const compiler = DEV
-    ? webpack(devWebpackConfig as any)
-    : webpack(prodWebpackConfig as any);
+  let compiler;
+  try {
+    compiler = DEV
+      ? webpack(devWebpackConfig as any)
+      : webpack(prodWebpackConfig as any);
+  } catch (e) {
+    console.log(e);
+  }
   const devMiddleware = webpackDevMiddleware(compiler as any, {
     publicPath: '/build',
   });
@@ -221,8 +226,9 @@ async function main() {
 
   // Declare Validation Middleware Service
   // middleware to use for all requests
-  const dbValidationService: DatabaseValidationService =
-    new DatabaseValidationService(models);
+  const dbValidationService: DatabaseValidationService = new DatabaseValidationService(
+    models
+  );
 
   setupAPI(
     app,
