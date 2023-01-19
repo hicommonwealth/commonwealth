@@ -245,7 +245,7 @@ function setupRouter(
   );
 
   router.post(
-    '/createContract',
+    '/contract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
   );
@@ -354,7 +354,7 @@ function setupRouter(
   );
 
   router.post(
-    '/createContractAbi',
+    '/contractAbi',
     passport.authenticate('jwt', { session: false }),
     createContractAbi.bind(this, models)
   );

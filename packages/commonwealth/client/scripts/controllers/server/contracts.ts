@@ -40,7 +40,7 @@ class ContractsController {
     abi: string,
     nickname: string
   ) {
-    const response = await $.post(`${app.serverUrl()}/createContractAbi`, {
+    const response = await $.post(`${app.serverUrl()}/contractAbi`, {
       jwt: app.user.jwt,
       contractId: contract.id,
       abi,
@@ -132,7 +132,7 @@ class ContractsController {
     decimals: number;
     nickname: string;
   }) {
-    const response = await $.post(`${app.serverUrl()}/createContract`, {
+    const response = await $.post(`${app.serverUrl()}/contract`, {
       community,
       balance_type,
       chain_node_id,
