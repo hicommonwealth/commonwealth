@@ -1,8 +1,8 @@
 const path = require('path');
 const webpack = require('webpack');
-const {merge} = require('webpack-merge');
+const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
-const {BundleAnalyzerPlugin} = require('webpack-bundle-analyzer');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = merge(common, {
@@ -23,7 +23,7 @@ module.exports = merge(common, {
     new BundleAnalyzerPlugin({
       analyzerMode: 'disabled',
       generateStatsFile: true,
-      statsOptions: {source: false},
+      statsOptions: { source: false },
     }),
   ],
   module: {
@@ -42,11 +42,11 @@ module.exports = merge(common, {
           loader: 'babel-loader',
         },
       },
-    ]
+    ],
   },
   optimization: {
     minimizer: [
       new CssMinimizerPlugin({ minimizerOptions: { preset: ['default'] } }),
-    ]
-  }
+    ],
+  },
 });

@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import $ from 'jquery';
 
 import 'components/component_kit/cw_modal.scss';
+import $ from 'jquery';
+import m from 'mithril';
+import { CWIconButton } from './cw_icon_button';
+import type { IconButtonTheme } from './cw_icons/types';
+import { breakpointFnValidator, getClasses } from './helpers';
 
 import { ComponentType } from './types';
-import { CWIconButton } from './cw_icon_button';
-import { breakpointFnValidator, getClasses } from './helpers';
-import { IconButtonTheme } from './cw_icons/types';
 
 type ModalAttrs = {
   onclick: (

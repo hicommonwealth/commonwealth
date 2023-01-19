@@ -1,34 +1,34 @@
 /* @jsx m */
 
-import $ from 'jquery';
-import m from 'mithril';
+import { initAppState, navigateToSubpage } from 'app';
 import ClassComponent from 'class_component';
-import _ from 'lodash';
+import { ChainBase, ChainNetwork } from 'common-common/src/types';
+import { addressSwapper } from 'commonwealth/shared/utils';
 
 import 'components/header/login_selector.scss';
-
-import app from 'state';
-import { navigateToSubpage, initAppState } from 'app';
-import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { Account, AddressInfo, ITokenAdapter } from 'models';
-import { isSameAccount, pluralize } from 'helpers';
-import { notifySuccess } from 'controllers/app/notifications';
 import {
   linkExistingAddressToChainOrCommunity,
   setActiveAccount,
 } from 'controllers/app/login';
-import { addressSwapper } from 'commonwealth/shared/utils';
+import { notifySuccess } from 'controllers/app/notifications';
+import { isSameAccount, pluralize } from 'helpers';
+import $ from 'jquery';
+import _ from 'lodash';
+import m from 'mithril';
+import { Account, AddressInfo, ITokenAdapter } from 'models';
+
+import app from 'state';
 import User, { UserBlock } from 'views/components/widgets/user';
 import { EditProfileModal } from 'views/modals/edit_profile_modal';
-import { NewLoginModal } from 'views/modals/login_modal';
 import { FeedbackModal } from 'views/modals/feedback_modal';
-import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
-import { CWText } from '../component_kit/cw_text';
+import { NewLoginModal } from 'views/modals/login_modal';
+import { SelectAddressModal } from '../../modals/select_address_modal';
 import { CWButton } from '../component_kit/cw_button';
 import { CWIconButton } from '../component_kit/cw_icon_button';
-import { AccountSelector } from '../component_kit/cw_wallets_list';
-import { SelectAddressModal } from '../../modals/select_address_modal';
+import { CWText } from '../component_kit/cw_text';
 import { CWToggle } from '../component_kit/cw_toggle';
+import { AccountSelector } from '../component_kit/cw_wallets_list';
+import { isWindowMediumSmallInclusive } from '../component_kit/helpers';
 import { CWDivider } from '../component_kit/cw_divider';
 import { CWPopover } from '../component_kit/cw_popover/cw_popover';
 

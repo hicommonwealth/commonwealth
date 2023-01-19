@@ -3,16 +3,23 @@
 // this script will compress the images in the Chains.icon_url, and re-upload these compressed images to s3.
 // Then it will update the icon_url with the new compressed image link
 
-import { Op } from 'sequelize';
+import type { S3 } from 'aws-sdk';
+import AWS from 'aws-sdk';
 import fetch from 'node-fetch';
+import { Op } from 'sequelize';
 import sharp from 'sharp';
-import AWS, { S3 } from 'aws-sdk';
 import models, { sequelize } from '../server/database';
 
 const s3 = new AWS.S3();
 
-async function compressImage(data: Buffer, contentType: string, resolution: number) {
-  if (!contentType.includes('jpeg') && !contentType.includes('jpg') &&
+async function compressImage(
+  data: Buffer,
+  contentType: string,
+  resolution: number
+) {
+  if (
+    !contentType.includes('jpeg') &&
+    !contentType.includes('jpg') &&
     !contentType.includes('png') &&
     !contentType.includes('webp') &&
     !contentType.includes('gif')
@@ -21,7 +28,11 @@ async function compressImage(data: Buffer, contentType: string, resolution: numb
   }
   const originalImage = sharp(data).resize(200, 200).withMetadata();
   let finalImage;
-  if (contentType.includes('jpeg') || contentType.includes('jpg') || contentType.includes('gif')) {
+  if (
+    contentType.includes('jpeg') ||
+    contentType.includes('jpg') ||
+    contentType.includes('gif')
+  ) {
     finalImage = originalImage.jpeg({ quality: resolution * 10 });
   } else if (contentType.includes('png')) {
     finalImage = originalImage.png({ compressionLevel: resolution });
@@ -41,7 +52,9 @@ async function compressImage(data: Buffer, contentType: string, resolution: numb
 }
 
 async function main() {
-  const chains = await models.Chain.findAll({ where: { icon_url: { [Op.ne]: null } } });
+  const chains = await models.Chain.findAll({
+    where: { icon_url: { [Op.ne]: null } },
+  });
   const transaction = await sequelize.transaction();
 
   try {
@@ -73,7 +86,9 @@ async function main() {
 
       const data = await s3.upload(params).promise();
 
-      console.log(`Success for community ${chain.id} with new url ${data.Location}`);
+      console.log(
+        `Success for community ${chain.id} with new url ${data.Location}`
+      );
       await models.Chain.update(
         { icon_url: data.Location },
         { where: { id: chain.id }, transaction }
@@ -88,5 +103,6 @@ async function main() {
   }
 }
 
-main().then(() => console.log('done')).catch(e => console.error(e));
-
+main()
+  .then(() => console.log('done'))
+  .catch((e) => console.error(e));

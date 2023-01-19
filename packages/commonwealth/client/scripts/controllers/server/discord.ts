@@ -5,6 +5,7 @@ type getChannelsResp = {
   selectedChannel: { id: string; name: string };
   channels: { id: string; name: string }[];
 };
+
 class DiscordController {
   public async createConfig(verification_token: string) {
     try {

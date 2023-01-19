@@ -1,17 +1,18 @@
-import moment from 'moment';
 import JobRunner from 'common-common/src/cacheJobRunner';
 
+import moment from 'moment';
 import { factory, formatFilename } from 'common-common/src/logging';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 // map of rules-addresses to pass (fail always recheck)
 interface CacheT {
-  [cacheKey: string]: moment.Moment,
+  [cacheKey: string]: moment.Moment;
 }
 
 export default class RuleCache extends JobRunner<CacheT> {
   constructor(
-    private readonly _pruneTime: number = 5 * 60, // 5 minutes
+    private readonly _pruneTime: number = 5 * 60 // 5 minutes
   ) {
     super({}, _pruneTime);
   }
@@ -35,22 +36,22 @@ export default class RuleCache extends JobRunner<CacheT> {
   public async check(ruleId: number, address: string): Promise<boolean> {
     const key = `${ruleId}-${address}`;
     const fetchedAt = moment();
-    return this.access((async (c: CacheT): Promise<boolean> => {
+    return this.access(async (c: CacheT): Promise<boolean> => {
       if (c[key]) {
         c[key] = fetchedAt;
         return true;
       } else {
         return false;
       }
-    }));
+    });
   }
 
   public async add(ruleId: number, address: string): Promise<void> {
     const key = `${ruleId}-${address}`;
     const fetchedAt = moment();
-    await this.access((async (c: CacheT) => {
+    await this.access(async (c: CacheT) => {
       c[key] = fetchedAt;
-    }));
+    });
   }
 
   // prune cache job

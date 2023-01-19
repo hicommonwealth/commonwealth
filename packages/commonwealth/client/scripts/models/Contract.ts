@@ -1,5 +1,4 @@
-import moment from 'moment';
-
+import type moment from 'moment';
 
 class Contract {
   public readonly id: number;
@@ -14,7 +13,18 @@ class Contract {
   public readonly symbol?: string;
   public readonly abi?: Array<Record<string, unknown>>;
 
-  constructor(id, address, chainNodeId, type, createdAt, updatedAt, decimals?, tokenName?, symbol?, contractAbi?) {
+  constructor(
+    id,
+    address,
+    chainNodeId,
+    type,
+    createdAt,
+    updatedAt,
+    decimals?,
+    tokenName?,
+    symbol?,
+    contractAbi?
+  ) {
     this.id = id;
     this.address = address;
     this.chainNodeId = chainNodeId;
@@ -37,7 +47,7 @@ class Contract {
     decimals,
     token_name,
     symbol,
-    ContractAbi
+    ContractAbi,
   }) {
     return new Contract(
       id,
@@ -49,9 +59,9 @@ class Contract {
       decimals,
       token_name,
       symbol,
-      ContractAbi);
+      ContractAbi
+    );
   }
 }
 
 export default Contract;
-

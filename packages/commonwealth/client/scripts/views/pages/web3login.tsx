@@ -1,20 +1,20 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import $ from 'jquery';
-import app from 'state';
-
-import 'pages/web3login.scss';
 
 import { link } from 'helpers';
+import $ from 'jquery';
+import m from 'mithril';
+
+import 'pages/web3login.scss';
+import app from 'state';
 import Sublayout from 'views/sublayout';
 import { CWButton } from '../components/component_kit/cw_button';
-import { PageNotFound } from './404';
 import { CWText } from '../components/component_kit/cw_text';
-import { PageLoading } from './loading';
 import { isWindowMediumSmallInclusive } from '../components/component_kit/helpers';
 import { NewLoginModal } from '../modals/login_modal';
+import { PageNotFound } from './404';
+import { PageLoading } from './loading';
 
 class Web3LoginPage extends ClassComponent {
   private error?: string;

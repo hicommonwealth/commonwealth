@@ -1,24 +1,24 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { notifyError } from 'controllers/app/notifications';
+import m from 'mithril';
+import { SearchQuery } from 'models';
+import { SearchScope } from 'models/SearchQuery';
 
 import 'pages/search/search_bar.scss';
 
 import app from 'state';
-import { notifyError } from 'controllers/app/notifications';
-import { SearchQuery } from 'models';
-import { SearchScope } from 'models/SearchQuery';
+import { CWDivider } from '../../components/component_kit/cw_divider';
 import { CWIconButton } from '../../components/component_kit/cw_icon_button';
+import { CWText } from '../../components/component_kit/cw_text';
+import { getClasses } from '../../components/component_kit/helpers';
 import {
   SearchBarCommentPreviewRow,
   SearchBarCommunityPreviewRow,
   SearchBarMemberPreviewRow,
   SearchBarThreadPreviewRow,
 } from './search_bar_components';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWDivider } from '../../components/component_kit/cw_divider';
-import { getClasses } from '../../components/component_kit/helpers';
 
 const goToSearchPage = (query: SearchQuery) => {
   if (!query.searchTerm || !query.searchTerm.toString().trim()) {

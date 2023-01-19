@@ -1,12 +1,12 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/code_block.scss';
+import m from 'mithril';
+import { CWLabel } from './component_kit/cw_label';
 
 import { getClasses } from './component_kit/helpers';
-import { CWLabel } from './component_kit/cw_label';
 
 type CodeBlockAttrs = {
   clickToSelect: boolean;

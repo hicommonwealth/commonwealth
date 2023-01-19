@@ -1,14 +1,11 @@
-import app from 'state';
-
-import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
+import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
+import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
+import { EthSignType } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import {
-  Window as KeplrWindow,
-  EthSignType,
-} from '@keplr-wallet/types';
-import { CanvasData } from 'shared/adapters/shared';
+import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -32,18 +29,23 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   public get available() {
     return !!window.keplr;
   }
+
   public get enabling() {
     return this._enabling;
   }
+
   public get enabled() {
     return this.available && this._enabled;
   }
+
   public get accounts() {
     return this._accounts || [];
   }
+
   public get api() {
     return window.keplr;
   }
+
   public get offlineSigner() {
     return this._offlineSigner;
   }
@@ -53,10 +55,8 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const url = `${window.location.origin}/cosmosAPI/${
-      chainIdentifier
-    }`;
-    const cosm = await import('@cosmjs/stargate')
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const cosm = await import('@cosmjs/stargate');
     const client = await cosm.StargateClient.connect(url);
     const height = await client.getHeight();
     const block = await client.getBlock(height - 1);
@@ -65,11 +65,14 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
       number: block.header.height,
       hash: block.id,
       // seconds since epoch
-      timestamp: Math.floor((new Date(block.header.time)).getTime() / 1000)
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
     };
   }
 
-  public async signCanvasMessage(account: Account, canvasMessage: CanvasData): Promise<string> {
+  public async signCanvasMessage(
+    account: Account,
+    canvasMessage: CanvasData
+  ): Promise<string> {
     const signature = await window.keplr.signEthereum(
       this._chainId,
       account.address,
@@ -93,7 +96,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
     try {
       // fetch chain id from URL using stargate client
       const url = `${window.location.origin}/cosmosAPI/${app.chain.id}`;
-      const cosm = await import('@cosmjs/stargate')
+      const cosm = await import('@cosmjs/stargate');
       const client = await cosm.StargateClient.connect(url);
       const chainId = await client.getChainId();
       this._chainId = chainId;
@@ -107,7 +110,7 @@ class EVMKeplrWebWalletController implements IWebWallet<AccountData> {
         );
 
         const bech32Prefix = app.chain.meta.bech32Prefix;
-        const info = {
+        const info: ChainInfo = {
           chainId: this._chainId,
           chainName: app.chain.meta.name,
           rpc: url,

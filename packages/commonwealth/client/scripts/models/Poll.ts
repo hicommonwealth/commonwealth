@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import moment from 'moment';
+import type moment from 'moment';
 import { notifyError } from '../controllers/app/notifications';
 import app from '../state';
 import Vote from './Vote';

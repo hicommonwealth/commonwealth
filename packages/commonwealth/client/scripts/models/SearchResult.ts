@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 
-import { SearchQuery } from '.';
-import { IUniqueId } from './interfaces';
+import type { SearchQuery } from '.';
+import type { IUniqueId } from './interfaces';
 
 export default class SearchResult implements IUniqueId {
   public readonly query: SearchQuery;

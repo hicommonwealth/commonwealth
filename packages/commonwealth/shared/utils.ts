@@ -1,17 +1,17 @@
-import { isU8a, isHex } from '@polkadot/util';
+import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
+import type { Permissions } from 'common-common/src/permissions';
 import {
   BASE_PERMISSIONS,
   computePermissions,
-  Permissions,
 } from 'common-common/src/permissions';
 
 import { ProposalType } from 'common-common/src/types';
-import { Permission } from '../server/models/role';
+import type { Permission } from '../server/models/role';
 
 export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
@@ -74,7 +74,7 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
   );
 };
 
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable */
 export const getProposalUrl = (type, proposal, comment?) => {
   const aId = proposal.chain;
   const tId = proposal.type_id || proposal.id;
@@ -313,6 +313,7 @@ export function aggregatePermissions(
   function compare(o1: RoleObject, o2: RoleObject) {
     return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
   }
+
   roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{

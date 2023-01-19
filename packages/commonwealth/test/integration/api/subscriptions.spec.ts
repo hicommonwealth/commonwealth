@@ -3,15 +3,15 @@
 import chai from 'chai';
 import chaiHttp from 'chai-http';
 import 'chai/register-should';
-import jwt from 'jsonwebtoken';
 import { NotificationCategories } from 'common-common/src/types';
-import { NotificationSubscription } from 'models';
+import jwt from 'jsonwebtoken';
+import type { NotificationSubscription } from 'models';
 import app, { resetDatabase } from '../../../server-test';
 import { JWT_SECRET } from '../../../server/config';
-import * as modelUtils from '../../util/modelUtils';
 import models from '../../../server/database';
-import Errors from '../../../server/routes/subscription/errors';
 import { Errors as MarkNotifErrors } from '../../../server/routes/markNotificationsRead';
+import Errors from '../../../server/routes/subscription/errors';
+import * as modelUtils from '../../util/modelUtils';
 
 chai.use(chaiHttp);
 const { expect } = chai;

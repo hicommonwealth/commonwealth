@@ -26,6 +26,7 @@ export const enum MixpanelPageViewEvent {
 export interface MixpanelPageViewPayload extends BaseMixpanelPayload {
   event: MixpanelPageViewEvent;
 }
+
 // END PAGE VIEW EVENTS
 
 // COMMUNITY INTERACTION EVENTS
@@ -40,25 +41,30 @@ export interface MixpanelCommunityInteractionPayload
   event: MixpanelCommunityInteractionEvent;
   community: string;
 }
+
 // END COMMUNITY INTERACTION EVENTS
 
 // LOGIN EVENT - fake
 export const enum MixpanelLoginEvent {
   LOGIN = 'Login to Commonwealth',
 }
+
 export interface MixpanelLoginPayload extends BaseMixpanelPayload {
   event: MixpanelLoginEvent;
 }
+
 // END LOGIN EVENT
 
 // NEW USER SIGNUP EVENT
 export const enum MixpanelUserSignupEvent {
   NEW_USER_SIGNUP = 'New User Signup',
 }
+
 export interface MixpanelUserSignupPayload extends BaseMixpanelPayload {
   chain: string;
   event: MixpanelUserSignupEvent;
 }
+
 // END NEW USER SIGNUP EVENT
 
 // ERROR CAPTURE EVENTS
@@ -71,6 +77,7 @@ export interface MixpanelErrorCapturePayload extends BaseMixpanelPayload {
   community: string;
   event: MixpanelErrorCaptureEvent;
 }
+
 // END ERROR CAPTURE EVENTS
 
 // NEW COMMUNITY CREATION EVENT
@@ -83,6 +90,7 @@ export const enum MixpanelCommunityCreationEvent {
   NEW_COMMUNITY_CREATION = 'New Community Creation',
   CREATE_COMMUNITY_ATTEMPTED = 'Create Community Attempted',
 }
+
 // END NEW COMMUNITY CREATION EVENT
 
 // CHAT EVENTS
@@ -97,6 +105,7 @@ export interface MixpanelChatEventsPayload extends BaseMixpanelPayload {
   community: string;
   event: MixpanelChatEvents;
 }
+
 // END CHAT EVENTS
 
 // SNAPSHOT EVENTS
@@ -110,4 +119,5 @@ export interface MixpanelSnapshotEventsPayload extends BaseMixpanelPayload {
   event: MixpanelSnapshotEvents;
   space: string;
 }
+
 // END SNAPSHOT EVENTS
