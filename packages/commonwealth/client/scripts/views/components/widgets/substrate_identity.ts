@@ -1,18 +1,18 @@
 /* eslint-disable no-script-url */
 import 'components/widgets/user.scss';
-
-import m from 'mithril';
-import _ from 'lodash';
+import { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import type SubstrateIdentity from 'controllers/chain/substrate/identity';
+import {
+  getIdentityQuality,
+  IdentityQuality,
+} from 'controllers/chain/substrate/identity';
 import { link } from 'helpers';
 
+import m from 'mithril';
+import type { Account, Profile } from 'models';
+
 import app from 'state';
-import { Account, Profile } from 'models';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/adapter';
-import SubstrateIdentity, {
-  IdentityQuality,
-  getIdentityQuality,
-} from 'controllers/chain/substrate/identity';
 import { formatAddressShort } from '../../../../../shared/utils';
 
 export interface ISubstrateIdentityAttrs {
@@ -169,7 +169,6 @@ const SubstrateOfflineIdentityWidget: m.Component<
     const {
       profile,
       linkify,
-      account,
       addrShort,
       hideIdentityIcon,
       showAddressWithDisplayName,

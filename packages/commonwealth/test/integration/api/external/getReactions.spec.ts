@@ -1,8 +1,12 @@
-import 'chai/register-should';
 import chai from 'chai';
-import { GetReactionsReq, OrderByOptions } from 'common-common/src/api/extApiTypes';
-import { testComments, testReactions } from 'test/integration/api/external/dbEntityHooks.spec';
-import { ReactionAttributes } from 'server/models/reaction';
+import 'chai/register-should';
+import type { GetReactionsReq } from 'common-common/src/api/extApiTypes';
+import { OrderByOptions } from 'common-common/src/api/extApiTypes';
+import type { ReactionAttributes } from 'server/models/reaction';
+import {
+  testComments,
+  testReactions,
+} from 'test/integration/api/external/dbEntityHooks.spec';
 import { get } from './appHook.spec';
 
 describe('getReactions Tests', () => {
@@ -14,7 +18,10 @@ describe('getReactions Tests', () => {
   });
 
   it('should return reactions with specified addresses correctly', async () => {
-    const r: GetReactionsReq = { community_id: testReactions[0].chain, addresses: ['testAddress-1'] };
+    const r: GetReactionsReq = {
+      community_id: testReactions[0].chain,
+      addresses: ['testAddress-1'],
+    };
     let resp = await get('/api/reactions', r, true);
 
     chai.assert.lengthOf(resp.result.reactions, 2);
@@ -26,7 +33,11 @@ describe('getReactions Tests', () => {
   });
 
   it('should paginate correctly', async () => {
-    const r: GetReactionsReq = { community_id: testReactions[0].chain, addresses: ['testAddress-2'], limit: 2 };
+    const r: GetReactionsReq = {
+      community_id: testReactions[0].chain,
+      addresses: ['testAddress-2'],
+      limit: 2,
+    };
     let resp = await get('/api/reactions', r, true);
 
     chai.assert.lengthOf(resp.result.reactions, 2);
@@ -46,7 +57,7 @@ describe('getReactions Tests', () => {
     const r: GetReactionsReq = {
       community_id: testReactions[0].chain,
       addresses: ['testAddress-2'],
-      sort: OrderByOptions.CREATED
+      sort: OrderByOptions.CREATED,
     };
     let resp = await get('/api/reactions', r, true);
 
@@ -54,7 +65,8 @@ describe('getReactions Tests', () => {
     chai.assert.deepEqual(
       resp.result.reactions,
       ([...resp.result.reactions] as ReactionAttributes[]).sort(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       )
     );
 
@@ -65,7 +77,8 @@ describe('getReactions Tests', () => {
     chai.assert.deepEqual(
       resp.result.reactions,
       ([...resp.result.reactions] as ReactionAttributes[]).sort(
-        (a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+        (a, b) =>
+          new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
       )
     );
   });
@@ -77,7 +90,11 @@ describe('getReactions Tests', () => {
     chai.assert.equal(resp.result[0].msg, 'Invalid value');
     chai.assert.equal(resp.result[0].param, 'community_id');
 
-    resp = await get('/api/reactions', { community_id: testComments[0].chain, count_only: 3 }, true);
+    resp = await get(
+      '/api/reactions',
+      { community_id: testComments[0].chain, count_only: 3 },
+      true
+    );
 
     chai.assert.lengthOf(resp.result, 1);
     chai.assert.equal(resp.result[0].msg, 'Invalid value');

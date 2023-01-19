@@ -1,27 +1,25 @@
-import Sequelize, { DataTypes } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { WebhookContent } from '../webhookNotifier';
-import { UserAttributes } from './user';
-import { DB } from '../models';
-import { NotificationCategoryAttributes } from './notification_category';
-import { ModelInstance, ModelStatic } from './types';
-import {
-  ICommunityNotificationData,
+import type { DataTypes } from 'sequelize';
+import Sequelize from 'sequelize';
+import type {
   IChainEventNotificationData,
-  ISnapshotNotificationData,
-  IPostNotificationData,
   IChatNotification,
+  ICommunityNotificationData,
+  IPostNotificationData,
+  ISnapshotNotificationData,
 } from '../../shared/types';
-import { ChainAttributes } from './chain';
-import { ThreadAttributes } from './thread';
-import { CommentAttributes } from './comment';
-import {
+import type { DB } from '../models';
+import type { WebhookContent } from '../webhookNotifier';
+import type { ChainAttributes } from './chain';
+import type { CommentAttributes } from './comment';
+import type { NotificationInstance } from './notification';
+import type { NotificationCategoryAttributes } from './notification_category';
+import type {
   NotificationsReadAttributes,
   NotificationsReadInstance,
 } from './notifications_read';
-import { NotificationInstance } from './notification';
-
-const log = factory.getLogger(formatFilename(__filename));
+import type { ThreadAttributes } from './thread';
+import type { ModelInstance, ModelStatic } from './types';
+import type { UserAttributes } from './user';
 
 export type SubscriptionAttributes = {
   subscriber_id: number;

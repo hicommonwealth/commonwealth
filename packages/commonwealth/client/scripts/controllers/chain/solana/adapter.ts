@@ -1,21 +1,19 @@
 import { ChainBase } from 'common-common/src/types';
-import { ChainInfo, IChainAdapter, NodeInfo } from 'models';
-import { IApp } from 'state';
-
-import { SolanaToken } from './types';
-import SolanaAccount from './account';
+import type { ChainInfo } from 'models';
+import { IChainAdapter } from 'models';
+import type { IApp } from 'state';
+import type SolanaAccount from './account';
 import SolanaAccounts from './accounts';
 import SolanaChain from './chain';
+
+import type { SolanaToken } from './types';
 
 class Solana extends IChainAdapter<SolanaToken, SolanaAccount> {
   public chain: SolanaChain;
   public accounts: SolanaAccounts;
   public readonly base = ChainBase.Solana;
 
-  constructor(
-    meta: ChainInfo,
-    app: IApp,
-  ) {
+  constructor(meta: ChainInfo, app: IApp) {
     super(meta, app);
     this.chain = new SolanaChain(this.app);
     this.accounts = new SolanaAccounts(this.app);

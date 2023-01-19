@@ -1,7 +1,7 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes } from 'sequelize';
-import { SnapshotSpaceAttributes } from './snapshot_spaces';
-import { ModelStatic, ModelInstance } from './types';
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { SnapshotSpaceAttributes } from './snapshot_spaces';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunitySnapshotSpacesAttributes = {
   id: number;

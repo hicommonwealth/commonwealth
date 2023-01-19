@@ -1,6 +1,5 @@
-import fetch from "node-fetch";
-import {RascalQueues, RascalExchanges, RascalRoutingKeys} from './types';
-
+import fetch from 'node-fetch';
+import type { RascalQueues, RascalExchanges, RascalRoutingKeys } from './types';
 
 /*
 For more information on any of these routes and their behaviour/return values check:
@@ -22,21 +21,24 @@ export async function publishRmqMsg(
   exchangeName: RascalExchanges,
   routingKey: RascalRoutingKeys,
   data: any
-): Promise<{routed: boolean}> {
+): Promise<{ routed: boolean }> {
   const publishBody = JSON.stringify({
-    properties: {content_type: "application/json"},
+    properties: { content_type: 'application/json' },
     routing_key: routingKey,
     payload: JSON.stringify(data),
     props: {
-      "content_type": "application/json"
+      content_type: 'application/json',
     },
-    payload_encoding: "string"
+    payload_encoding: 'string',
   });
-  const publishResult = await fetch(`${rabbitMQUri}/exchanges/%2f/${exchangeName}/publish`, {
-    method: 'post',
-    body: publishBody,
-    headers: {'Content-Type': 'application/json'}
-  });
+  const publishResult = await fetch(
+    `${rabbitMQUri}/exchanges/%2f/${exchangeName}/publish`,
+    {
+      method: 'post',
+      body: publishBody,
+      headers: { 'Content-Type': 'application/json' },
+    }
+  );
   return await publishResult.json();
 }
 
@@ -46,8 +48,11 @@ export async function publishRmqMsg(
  * @param rabbitMQUri The URI of the RabbitMQ Management API instance to connect to
  * @param queueName
  */
-export async function getQueueStats(rabbitMQUri: string, queueName: RascalQueues): Promise<any> {
-  let result = await fetch(`${rabbitMQUri}/queues/%2f/${queueName}`);
+export async function getQueueStats(
+  rabbitMQUri: string,
+  queueName: RascalQueues
+): Promise<any> {
+  const result = await fetch(`${rabbitMQUri}/queues/%2f/${queueName}`);
   return await result.json();
 }
 
@@ -66,13 +71,23 @@ export async function getRmqMessage(
   numMessages = 1
 ): Promise<any[]> {
   let body: any;
-  if (requeue) body = {count: numMessages, ackmode: "ack_requeue_true", encoding: "auto"}
-  else body = {count: numMessages, ackmode: "ack_requeue_false", encoding: "auto"}
+  if (requeue)
+    body = {
+      count: numMessages,
+      ackmode: 'ack_requeue_true',
+      encoding: 'auto',
+    };
+  else
+    body = {
+      count: numMessages,
+      ackmode: 'ack_requeue_false',
+      encoding: 'auto',
+    };
 
   const result = await fetch(`${rabbitMQUri}/queues/%2f/${queueName}/get`, {
     method: 'post',
     body: JSON.stringify(body),
-    headers: {'Content-Type': 'application/json'}
+    headers: { 'Content-Type': 'application/json' },
   });
-  return await result.json()
+  return await result.json();
 }

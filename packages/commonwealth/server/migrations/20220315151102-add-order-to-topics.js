@@ -2,20 +2,13 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    return queryInterface.addColumn(
-      'OffchainTopics',
-      'order',
-      {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      }
-    );
+    return queryInterface.addColumn('OffchainTopics', 'order', {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
-    return queryInterface.removeColumn(
-      'OffchainTopics',
-      'order'
-    );
-  }
+    return queryInterface.removeColumn('OffchainTopics', 'order');
+  },
 };

@@ -3,19 +3,20 @@ import _ from 'underscore';
 import BN from 'bn.js';
 
 import { createProvider } from '../../eth';
-import {
+import type {
   CWEvent,
   SubscribeFunc,
   ISubscribeOptions,
-  SupportedNetwork,
 } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
-import { ERC20__factory as ERC20Factory, ERC20 } from '../../contractTypes';
+import type { ERC20 } from '../../contractTypes';
+import { ERC20__factory as ERC20Factory } from '../../contractTypes';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
-import { IEventData, RawEvent, IErc20Contracts } from './types';
-import { EnricherConfig } from './filters/enricher';
+import type { IEventData, RawEvent, IErc20Contracts } from './types';
+import type { EnricherConfig } from './filters/enricher';
 
 export interface IErc20SubscribeOptions
   extends ISubscribeOptions<IErc20Contracts> {

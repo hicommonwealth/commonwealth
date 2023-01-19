@@ -1,53 +1,50 @@
-import session from 'express-session';
-import express from 'express';
-import webpack from 'webpack';
-import webpackDevMiddleware from 'webpack-dev-middleware';
-import SessionSequelizeStore from 'connect-session-sequelize';
-import fs from 'fs';
-import Rollbar from 'rollbar';
-import passport from 'passport';
-import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import compression from 'compression';
-import webpackHotMiddleware from 'webpack-hot-middleware';
-import { redirectToHTTPS } from 'express-http-to-https';
-import favicon from 'serve-favicon';
-import logger from 'morgan';
-import prerenderNode from 'prerender-node';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
 import {
-  RabbitMQController,
   getRabbitMQConfig,
+  RabbitMQController,
 } from 'common-common/src/rabbitmq';
 import { StatsDController } from 'common-common/src/statsd';
-import { BrokerConfig } from 'rascal';
-import devWebpackConfig from './webpack/webpack.dev.config.js';
-import prodWebpackConfig from './webpack/webpack.prod.config.js';
-import ViewCountCache from './server/util/viewCountCache';
-import RuleCache from './server/util/rules/ruleCache';
-import BanCache from './server/util/banCheckCache';
+import compression from 'compression';
+import SessionSequelizeStore from 'connect-session-sequelize';
+import cookieParser from 'cookie-parser';
+import express from 'express';
+import { redirectToHTTPS } from 'express-http-to-https';
+import session from 'express-session';
+import logger from 'morgan';
+import passport from 'passport';
+import * as path from 'path';
+import prerenderNode from 'prerender-node';
+import type { BrokerConfig } from 'rascal';
+import Rollbar from 'rollbar';
+import favicon from 'serve-favicon';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import webpack from 'webpack';
+import webpackDevMiddleware from 'webpack-dev-middleware';
+import webpackHotMiddleware from 'webpack-hot-middleware';
+import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
 import {
   RABBITMQ_URI,
   ROLLBAR_SERVER_TOKEN,
   SESSION_SECRET,
 } from './server/config';
 import models from './server/database';
-import setupAppRoutes from './server/scripts/setupAppRoutes';
-import setupServer from './server/scripts/setupServer';
-import setupErrorHandlers from '../common-common/src/scripts/setupErrorHandlers';
-import setupPrerenderServer from './server/scripts/setupPrerenderService';
-import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import DatabaseValidationService from './server/middleware/databaseValidationService';
+import setupPassport from './server/passport';
 import setupAPI from './server/routing/router';
+import { sendBatchedNotificationEmails } from './server/scripts/emails';
+import setupAppRoutes from './server/scripts/setupAppRoutes';
+import expressStatsdInit from './server/scripts/setupExpressStats';
+import setupPrerenderServer from './server/scripts/setupPrerenderService';
+import setupServer from './server/scripts/setupServer';
+import BanCache from './server/util/banCheckCache';
 import setupCosmosProxy from './server/util/cosmosProxy';
 import setupEntityProxy from './server/util/entitiesProxy';
-import setupIpfsProxy from './server/util/ipfsProxy';
-import setupPassport from './server/passport';
-import expressStatsdInit from './server/scripts/setupExpressStats';
 import GlobalActivityCache from './server/util/globalActivityCache';
-import DatabaseValidationService from './server/middleware/databaseValidationService';
-
-const log = factory.getLogger(formatFilename(__filename));
+import setupIpfsProxy from './server/util/ipfsProxy';
+import RuleCache from './server/util/rules/ruleCache';
+import ViewCountCache from './server/util/viewCountCache';
+import devWebpackConfig from './webpack/webpack.dev.config.js';
+import prodWebpackConfig from './webpack/webpack.prod.config.js';
 
 // set up express async error handling hack
 require('express-async-errors');
@@ -86,25 +83,8 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
-  const compiler = DEV
-    ? webpack(devWebpackConfig as any)
-    : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
-  const devMiddleware =
-    DEV && !NO_CLIENT_SERVER
-      ? webpackDevMiddleware(compiler as any, {
-          publicPath: '/build',
-        })
-      : null;
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
-
-  const closeMiddleware = (): Promise<void> => {
-    if (!NO_CLIENT_SERVER) {
-      return new Promise((resolve) => devMiddleware.close(() => resolve()));
-    } else {
-      return Promise.resolve();
-    }
-  };
 
   const sessionStore = new SequelizeStore({
     db: models.sequelize,
@@ -141,32 +121,6 @@ async function main() {
     // dynamic compression settings used
     app.use(compression());
 
-    // static compression settings unused
-    // app.get('*.js', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
-    //   next();
-    // });
-
-    // // static compression settings unused
-    // app.get('bundle.**.css', (req, res, next) => {
-    //   req.url = req.url + '.gz';
-    //   res.set('Content-Encoding', 'gzip');
-    //   res.set('Content-Type', 'text/css');
-    //   next();
-    // });
-
-    // serve the compiled app
-    if (!NO_CLIENT_SERVER) {
-      if (DEV) {
-        app.use(devMiddleware);
-        app.use(webpackHotMiddleware(compiler));
-      } else {
-        app.use('/build', express.static('build'));
-      }
-    }
-
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
       res.set('X-Frame-Options', 'DENY');
@@ -189,16 +143,6 @@ async function main() {
     app.use(passport.session());
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
   };
-
-  const templateFile = (() => {
-    try {
-      return fs.readFileSync('./build/index.html');
-    } catch (e) {
-      console.error(`Failed to read template file: ${e.message}`);
-    }
-  })();
-
-  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
 
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.
@@ -237,7 +181,8 @@ async function main() {
 
   if (!rabbitMQController.initialized) {
     console.warn(
-      'The RabbitMQController is not initialized! Some services may be unavailable e.g. (Create/Delete chain and Websocket notifications'
+      'The RabbitMQController is not initialized! Some services may be unavailable e.g.' +
+        ' (Create/Delete chain and Websocket notifications)'
     );
     rollbar.critical('The main service RabbitMQController is not initialized!');
     // TODO: this requires an immediate response if in production
@@ -251,10 +196,39 @@ async function main() {
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
 
+  let compiler;
+  try {
+    compiler = DEV
+      ? webpack(devWebpackConfig as any)
+      : webpack(prodWebpackConfig as any);
+  } catch (e) {
+    console.log(e);
+  }
+  const devMiddleware = webpackDevMiddleware(compiler as any, {
+    publicPath: '/build',
+  });
+
+  // serve the compiled app
+  if (!NO_CLIENT_SERVER) {
+    if (DEV && !process.env.EXTERNAL_WEBPACK) {
+      app.use(devMiddleware);
+      app.use(webpackHotMiddleware(compiler));
+    } else if (process.env.EXTERNAL_WEBPACK) {
+      app.use('/build', express.static(path.join(__dirname, 'build')));
+
+      app.get('/', function (req, res) {
+        res.sendFile(path.join(__dirname, 'build', 'index.html'));
+      });
+    } else {
+      app.use('/', express.static('build'));
+    }
+  }
+
   // Declare Validation Middleware Service
   // middleware to use for all requests
-  const dbValidationService: DatabaseValidationService =
-    new DatabaseValidationService(models);
+  const dbValidationService: DatabaseValidationService = new DatabaseValidationService(
+    models
+  );
 
   setupAPI(
     app,
@@ -269,7 +243,8 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
-  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
+
+  setupAppRoutes(app, models, devMiddleware);
 
   setupErrorHandlers(app, rollbar);
 

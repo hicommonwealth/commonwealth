@@ -1,10 +1,10 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import moment from 'moment';
 
-import { formatDuration, blocknumToTime } from 'helpers';
+import { blocknumToTime, formatDuration } from 'helpers';
+import m from 'mithril';
+import moment from 'moment';
 
 type CountdownAttrs = {
   duration?: moment.Duration;

@@ -18,5 +18,5 @@ module.exports = {
         FOREIGN KEY ("subscription_id") 
         REFERENCES "public"."Subscriptions"("id");`;
     return queryInterface.sequelize.query(query);
-  }
+  },
 };

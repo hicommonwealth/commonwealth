@@ -1,7 +1,7 @@
 /**
  * Fetches events from ERC20 contract in real time.
  */
-import { Listener } from '@ethersproject/providers';
+import type { Listener } from '@ethersproject/providers';
 import sleep from 'sleep-promise';
 import BN from 'bn.js';
 
@@ -9,7 +9,7 @@ import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { ERC20__factory as ERC20Factory } from '../../contractTypes';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, IErc20Contracts } from './types';
+import type { RawEvent, IErc20Contracts } from './types';
 
 export class Subscriber extends IEventSubscriber<IErc20Contracts, RawEvent> {
   private _name: string;

@@ -5,24 +5,37 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       // create a new table called Profiles
       // NB: Profiles.email is public-facing, not duplicative of Users.email
-      await queryInterface.createTable('Profiles', {
-        id: { type: Sequelize.INTEGER, autoIncrement: true, allowNull: false, primaryKey: true },
-        user_id: { type: Sequelize.INTEGER, allowNull: false },
-        created_at: { type: Sequelize.DATE, allowNull: true },
-        updated_at: { type: Sequelize.DATE, allowNull: true },
-        profile_name: { type: Sequelize.STRING, allowNull: true },
-        email: { type: Sequelize.STRING, allowNull: true },
-        website: { type: Sequelize.STRING, allowNull: true },
-        bio: { type: Sequelize.TEXT, allowNull: true },
-        is_default: { type: Sequelize.BOOLEAN, allowNull: false, defaultValue: false },
-      }, { transaction: t });
+      await queryInterface.createTable(
+        'Profiles',
+        {
+          id: {
+            type: Sequelize.INTEGER,
+            autoIncrement: true,
+            allowNull: false,
+            primaryKey: true,
+          },
+          user_id: { type: Sequelize.INTEGER, allowNull: false },
+          created_at: { type: Sequelize.DATE, allowNull: true },
+          updated_at: { type: Sequelize.DATE, allowNull: true },
+          profile_name: { type: Sequelize.STRING, allowNull: true },
+          email: { type: Sequelize.STRING, allowNull: true },
+          website: { type: Sequelize.STRING, allowNull: true },
+          bio: { type: Sequelize.TEXT, allowNull: true },
+          is_default: {
+            type: Sequelize.BOOLEAN,
+            allowNull: false,
+            defaultValue: false,
+          },
+        },
+        { transaction: t }
+      );
 
       // adds new column to map Addresses to the new Profiles object
       await queryInterface.addColumn(
         'Addresses',
         'profile_id',
         { type: Sequelize.INTEGER, allowNull: true },
-        { transaction: t },
+        { transaction: t }
       );
 
       // creates a new Profile object for each User
@@ -61,7 +74,9 @@ module.exports = {
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.dropTable('Profiles', { transaction: t });
-      await queryInterface.removeColumn('Addresses','profile_id', { transaction: t });
+      await queryInterface.removeColumn('Addresses', 'profile_id', {
+        transaction: t,
+      });
     });
   },
 };

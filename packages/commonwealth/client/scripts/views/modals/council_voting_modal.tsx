@@ -1,25 +1,25 @@
 /* @jsx m */
 
-import m from 'mithril';
+import type { SubstrateCoin } from 'adapters/chain/substrate/types';
+import { formatCoin } from 'adapters/currency';
 import ClassComponent from 'class_component';
+import type { SubstrateAccount } from 'controllers/chain/substrate/account';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'modals/council_voting_modal.scss';
 
 import app from 'state';
-import { SubstrateCoin } from 'adapters/chain/substrate/types';
-import { formatCoin } from 'adapters/currency';
-import { SubstrateAccount } from 'controllers/chain/substrate/account';
-import Substrate from 'controllers/chain/substrate/adapter';
-import { PhragmenElectionVote } from 'controllers/chain/substrate/phragmen_election';
+import { ModalExitButton } from 'views/components/component_kit/cw_modal';
 import User from 'views/components/widgets/user';
 import { createTXModal } from 'views/modals/tx_signing_modal';
-import { ModalExitButton } from 'views/components/component_kit/cw_modal';
-import { CWValidationText } from '../components/component_kit/cw_validation_text';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWTextInput } from '../components/component_kit/cw_text_input';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWCheckbox } from '../components/component_kit/cw_checkbox';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWTextInput } from '../components/component_kit/cw_text_input';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
 
 type CouncilVotingModalAttrs = {
   candidates: Array<[SubstrateAccount, number]>;
