@@ -1,7 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
+
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/landing/tokens_community_hero.scss';
 
@@ -24,7 +35,7 @@ const initiateFullSearch = (searchTerm) => {
   const params = `q=${encodeURIComponent(
     searchTerm.toString().trim()
   )}&scope[]=Communities`;
-  m.route.set(`/search?${params}`);
+  setRoute(`/search?${params}`);
 };
 
 export const placeholderChain = {
@@ -53,7 +64,7 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
     this.chainsAndTokens = [];
   }
 
-  view(vnode: m.Vnode<TokensCommunityComponentAttrs>) {
+  view(vnode: ResultNode<TokensCommunityComponentAttrs>) {
     this.chainsAndTokens = [placeholderChain, ...vnode.attrs.chains];
 
     const mappedCommunities = [
@@ -81,7 +92,7 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
       .map((community) => {
         return (
           <img
-            class={community.variant}
+            className={community.variant}
             src={community.src}
             alt={community.alt}
           />
@@ -90,28 +101,27 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
       .filter((comm) => comm);
 
     return (
-      <section class="bg-gray-700">
-        <div class="relative mx-auto">
-          <div class="md:flex md:flex-row">
-            <div class="flex items-center justify-center md:w-2/4">
-              <div class="mt-32 mb-10 md:my-40 sm:px-8 md:px-8 lg:px-8 xl:px-16 px-8">
-                <h1 class="text-4xl font-bold mb-5 leading-10">
+      <section className="bg-gray-700">
+        <div className="relative mx-auto">
+          <div className="md:flex md:flex-row">
+            <div className="flex items-center justify-center md:w-2/4">
+              <div className="mt-32 mb-10 md:my-40 sm:px-8 md:px-8 lg:px-8 xl:px-16 px-8">
+                <h1 className="text-4xl font-bold mb-5 leading-10">
                   A
-                  <span class="bg-clip-text text-transparent gradient-0">
+                  <span className="bg-clip-text text-transparent gradient-0">
                     {' '}
                     community{' '}
                   </span>
                   for every token.
                 </h1>
-                <p class="text-xl text-gray-600 mb-5">
+                <p className="text-xl text-gray-600 mb-5">
                   Commonwealth is an all-in-one platform for on-chain
                   communities to discuss, vote, and fund projects together.
                   Never miss an on-chain event, proposal, or important
                   discussion again.
                 </p>
                 <div
-                  autocomplete="off"
-                  class={`token-search-wrap bg-white shadow-2xl rounded-xl
+                  className={`token-search-wrap bg-white shadow-2xl rounded-xl
                      p-2 flex flex-row justify-between mb-10 relative`}
                 >
                   <FindYourTokenInputComponent
@@ -121,7 +131,7 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
                       clearTimeout(this.inputTimeout);
                       this.inputTimeout = setTimeout(() => {
                         this.refilterResults = true;
-                        m.redraw();
+                        redraw();
                       }, 200);
                     }}
                     onkeyupValue={(event: any) => {
@@ -140,54 +150,54 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
                   )}
                   <button
                     type="button"
-                    class="btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36"
-                    style="padding: 8px 16px;"
-                    onclick={() => {
+                    className="btn-primary text-xl font-medium rounded-lg pb-2 pt-3 px-3 w-36"
+                    style={{ padding: '8px 16px' }}
+                    onClick={() => {
                       initiateFullSearch(this.inputTokenValue);
                     }}
                   >
                     Let's Go{' '}
                     <img
-                      class="inline ml-1.5"
+                      className="inline ml-1.5"
                       src="static/img/arrow-right.svg"
                       alt="Let's Go"
                     />
                   </button>
                 </div>
-                <div class="flex justify-center">
-                  <h1 class="font-bold mb-5 leading-10 md:text-xl lg:text-2xl xl:text-4xl">
+                <div className="flex justify-center">
+                  <h1 className="font-bold mb-5 leading-10 md:text-xl lg:text-2xl xl:text-4xl">
                     We’re also here
                   </h1>
-                  <div class="block flex">
+                  <div className="block flex">
                     <a
-                      class="ml-4"
+                      className="ml-4"
                       href="https://discord.gg/t9XscHdZrG"
                       target="_blank"
                     >
                       <img
-                        class="inline mr-1.5 h-8 w-8"
+                        className="inline mr-1.5 h-8 w-8"
                         src="static/img/discordIcon.svg"
                         alt="Discord"
                       />
                     </a>
                     <a
-                      class="mx-3 lg:mx-3"
+                      className="mx-3 lg:mx-3"
                       href="https://t.me/HiCommonwealth"
                       target="_blank"
                     >
                       <img
-                        class="inline mr-1.5 h-8 w-8"
+                        className="inline mr-1.5 h-8 w-8"
                         src="static/img/telegramIcon.svg"
                         alt="Telegram"
                       />
                     </a>
                     <a
-                      class="lg:mx-3"
+                      className="lg:mx-3"
                       href="https://twitter.com/hicommonwealth"
                       target="_blank"
                     >
                       <img
-                        class="inline mr-1.5 h-8 w-8"
+                        className="inline mr-1.5 h-8 w-8"
                         src="static/img/twitterIcon.svg"
                         alt="Twitter"
                       />
@@ -196,9 +206,9 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
                 </div>
               </div>
             </div>
-            <div class="h-556 md:h-auto md:w-2/4">
+            <div className="h-556 md:h-auto md:w-2/4">
               <div
-                class={`gradient-135 overflow-hidden relative h-full lg:min-h-desktop
+                className={`gradient-135 overflow-hidden relative h-full lg:min-h-desktop
                 lg:h-screen lg:w-50-screen lg:absolute lg:object-left xl:h-full xl:min-h-full`}
               >
                 {mappedCommunities}

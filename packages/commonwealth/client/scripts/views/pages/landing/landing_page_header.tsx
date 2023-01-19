@@ -1,7 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
+
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/landing/landing_page_header.scss';
 
@@ -48,53 +59,53 @@ type HeaderLandingPageAttrs = {
 };
 
 export class HeaderLandingPage extends ClassComponent<HeaderLandingPageAttrs> {
-  oninit(vnode: m.Vnode<HeaderLandingPageAttrs>) {
+  oninit(vnode: ResultNode<HeaderLandingPageAttrs>) {
     if (vnode.attrs.scrollHeader) {
       window.addEventListener('scroll', scrollingHeader);
     }
   }
 
-  onremove(vnode: m.Vnode<HeaderLandingPageAttrs>) {
+  onremove(vnode: ResultNode<HeaderLandingPageAttrs>) {
     if (vnode.attrs.scrollHeader) {
       window.removeEventListener('scroll', scrollingHeader);
     }
   }
 
-  view(vnode: m.Vnode<HeaderLandingPageAttrs>) {
+  view(vnode: ResultNode<HeaderLandingPageAttrs>) {
     const redirectClick = (route) => {
-      m.route.set(route);
+      setRoute(route);
     };
 
     return (
-      <div class="HeaderLandingPage container mx-auto">
+      <div className="HeaderLandingPage container mx-auto">
         <header
           id="landing-page"
-          class={`landing-header ${INITIAL_HEADER_STYLE} mt-8`}
+          className={`landing-header ${INITIAL_HEADER_STYLE} mt-8`}
         >
           <img
             src="static/img/commonLogoWithText.svg"
             alt="Commonwealth"
-            class="logoWithText"
+            className="logoWithText"
           />
-          <nav class="lg:block hidden">
-            <ul class="lg:flex lg:flex-row lg:items-center">
+          <nav className="lg:block hidden">
+            <ul className="lg:flex lg:flex-row lg:items-center">
               {vnode.attrs.navs.map((nav: any) => {
                 return (
-                  <li class="LandingPageHeaderLinks ml-10 py-8 lg:flex">
+                  <li className="LandingPageHeaderLinks ml-10 py-8 lg:flex">
                     <a
-                      class="text-2xl lg:text-base text-gray-500 leading-none"
-                      onclick={() => redirectClick(nav.redirectTo)}
+                      className="text-2xl lg:text-base text-gray-500 leading-none"
+                      onClick={() => redirectClick(nav.redirectTo)}
                     >
                       {nav.text}
                     </a>
                   </li>
                 );
               })}
-              <li class="LandingPageHeaderLoginButton ml-5 md:ml-10 lg:pt-0">
+              <li className="LandingPageHeaderLoginButton ml-5 md:ml-10 lg:pt-0">
                 <a
-                  class="block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline"
-                  style="padding: 8px 16px"
-                  onclick={() =>
+                  className="block text-lg text-center btn-primary md:pb-3 text-white text-xs md:text-base lg:inline"
+                  style={{ padding: '8px 16px' }}
+                  onClick={() =>
                     app.modals.create({
                       modal: NewLoginModal,
                       data: {
@@ -109,8 +120,8 @@ export class HeaderLandingPage extends ClassComponent<HeaderLandingPageAttrs> {
                   }
                 >
                   <img
-                    class="inline mr-1.5"
-                    style="padding: 0"
+                    className="inline mr-1.5"
+                    style={{ padding: '0' }}
                     src="static/img/user.svg"
                     alt="Login"
                   />{' '}
@@ -119,14 +130,17 @@ export class HeaderLandingPage extends ClassComponent<HeaderLandingPageAttrs> {
               </li>
             </ul>
           </nav>
-          <button class="menuButton lg:hidden" onclick={() => triggerMenu()}>
+          <button
+            className="menuButton lg:hidden"
+            onClick={() => triggerMenu()}
+          >
             <img
-              class="inline mr-1.5 menu"
+              className="inline mr-1.5 menu"
               src="static/img/menu.svg"
               alt="Menu icon"
             />
             <img
-              class="inline mr-1.5 close"
+              className="inline mr-1.5 close"
               src="static/img/close.svg"
               alt="Close icon"
             />

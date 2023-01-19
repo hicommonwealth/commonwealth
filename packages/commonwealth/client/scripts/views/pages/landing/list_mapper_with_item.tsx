@@ -1,7 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
+
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import { removeOrAddClasslistToAllElements } from 'helpers';
 import { ICardListItem } from 'models/interfaces';
@@ -21,7 +32,7 @@ export class ItemListsMapper extends ClassComponent<ItemListsMapperAttrs> {
   private buttonHoverActiveById: string;
   private cardImageActiveById: string;
 
-  oninit(vnode: m.Vnode<ItemListsMapperAttrs>) {
+  oninit(vnode: ResultNode<ItemListsMapperAttrs>) {
     const { cardItems } = vnode.attrs;
 
     this.buttonHoverActiveById = cardItems[0].button.id;

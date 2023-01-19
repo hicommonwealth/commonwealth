@@ -1,7 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
+
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/landing/creators_card_section.scss';
 
@@ -13,15 +24,15 @@ type TokensCreatorComponentAttrs = {
 };
 
 export class TokensCreatorComponent extends ClassComponent<TokensCreatorComponentAttrs> {
-  view(vnode: m.Vnode<TokensCreatorComponentAttrs>) {
+  view(vnode: ResultNode<TokensCreatorComponentAttrs>) {
     const { creators } = vnode.attrs;
 
     return (
-      <section class="container mx-auto pt-10">
-        <h2 class="text-3xl font-bold mb-5 text-center">
+      <section className="container mx-auto pt-10">
+        <h2 className="text-3xl font-bold mb-5 text-center">
           Token creators are empowered
         </h2>
-        <p class="text-2xl max-w-screen-sm mx-auto text-center mb-10">
+        <p className="text-2xl max-w-screen-sm mx-auto text-center mb-10">
           Commonwealth lets you simplify your community and governance, bringing
           four tools into one.
         </p>

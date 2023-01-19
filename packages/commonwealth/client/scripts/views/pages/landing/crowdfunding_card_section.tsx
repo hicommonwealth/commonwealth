@@ -1,7 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
+
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'pages/landing/crowdfunding_card_section.scss';
 
@@ -15,9 +26,13 @@ export class ChainsCrowdfundingComponent extends ClassComponent<{
     const { chains } = vnode.attrs;
 
     return (
-      <section class="ChainsCrowdfunding mx-auto pt-20 container">
-        <img class="mx-auto mb-3 w-32 h-32" src="static/img/misc.png" alt="" />
-        <h2 class="text-3xl font-bold mb-5 text-center mb-10">
+      <section className="ChainsCrowdfunding mx-auto pt-20 container">
+        <img
+          className="mx-auto mb-3 w-32 h-32"
+          src="static/img/misc.png"
+          alt=""
+        />
+        <h2 className="text-3xl font-bold mb-5 text-center mb-10">
           Leverage on-chain crowdfunding
         </h2>
         <ItemListsMapper

@@ -1,7 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
 
-import ClassComponent from 'class_component';
-import m from 'mithril';
+import React from 'react';
+
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 type FindYourTokenInputComponentAttrs = {
   onchangeValue: (event: any) => void;
@@ -9,16 +20,16 @@ type FindYourTokenInputComponentAttrs = {
 };
 
 export class FindYourTokenInputComponent extends ClassComponent<FindYourTokenInputComponentAttrs> {
-  view(vnode: m.Vnode<FindYourTokenInputComponentAttrs>) {
+  view(vnode: ResultNode<FindYourTokenInputComponentAttrs>) {
     return (
       <input
-        autocomplete="off"
-        class="p-2 flex-grow mr-2 text-xl text-gray-400 pt-3.5 focus:outline-none"
+        autoComplete="off"
+        className="p-2 flex-grow mr-2 text-xl text-gray-400 pt-3.5 focus:outline-none"
         id="token-input"
         type="text"
         placeholder="Find your favorite token"
-        oninput={vnode.attrs.onchangeValue}
-        onkeyup={vnode.attrs.onkeyupValue}
+        onInput={vnode.attrs.onchangeValue}
+        onKeyUp={vnode.attrs.onkeyupValue}
       />
     );
   }
