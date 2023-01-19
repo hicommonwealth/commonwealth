@@ -49,7 +49,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
-    return app.chain?.meta.node?.ethChainId || 1;
+    return app.chain?.meta.node?.ethChainId?.toString() || "1";
   }
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
