@@ -1,18 +1,30 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 // import Infinite from 'mithril-infinite';
-// import { Button, PopoverMenu } from 'construct-ui';
 
 import 'components/header/notifications_menu.scss';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
-import NotificationRow from '../components/notification_row';
 import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { NotificationRow } from '../pages/notifications/notification_row';
+import { CWButton } from '../components/component_kit/cw_button';
+import { CWPopover } from '../components/component_kit/cw_popover/cw_popover';
+import { CWDivider } from '../components/component_kit/cw_divider';
+import { CWText } from '../components/component_kit/cw_text';
 
 const MAX_NOTIFS = 40;
 
@@ -89,33 +101,26 @@ export class NotificationsMenu extends ClassComponent {
 
     return (
       <div className="NotificationsMenu">
-        <div className="NotificationsMenuHeader">
-          {/* {m(Button, { // @TODO @REACT FIX ME
-            label:
-              // discussionNotificationsCount
-              //   ? `Discussions (${discussionNotificationsCount})`
-              //   : 'Discussions'
-              'Discussions',
-            active: !this.selectedChainEvents,
-            onClick: (e) => {
+        <div className="header">
+          <CWButton
+            label="Discussions"
+            buttonType="tertiary-black"
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = false;
-            },
-          })}
-          {render(Button, {
-            label:
-              // chainNotificationsCount
-              //   ? `Chain events (${chainNotificationsCount})`
-              //   : 'Chain events'
-              'Chain events',
-            active: !!this.selectedChainEvents,
-            onClick: (e) => {
+            }}
+          />
+          <CWDivider isVertical />
+          <CWButton
+            label="Chain events"
+            buttonType="tertiary-black"
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
-              this.selectedChainEvents = true; // @TODO @REACT FIX ME
-            },
-          })} */}
+              this.selectedChainEvents = true;
+            }}
+          />
         </div>
         <div className="notification-list">
           {(() => {
@@ -140,8 +145,8 @@ export class NotificationsMenu extends ClassComponent {
               } else if (
                 app.user.notifications.chainEventNotifications.length === 0
               )
-                return 'No chain notifications';
-              else return 'No more chain notifications';
+                return <CWText>No chain notifications</CWText>;
+              else return <CWText>No more chain notifications</CWText>;
             } else {
               if (this.showingDiscussionNotifications.length > 0) {
                 return null; // @TODO @REACT FIX ME
@@ -163,22 +168,26 @@ export class NotificationsMenu extends ClassComponent {
               } else if (
                 app.user.notifications.discussionNotifications.length === 0
               )
-                return 'No discussion notifications';
-              else return 'No more discussion notifications';
+                return <CWText>No discussion notifications</CWText>;
+              else return <CWText>No more discussion notifications</CWText>;
             }
           })()}
         </div>
-        <div className="NotificationsMenuFooter">
-          {/* {m(Button, { // @TODO @REACT FIX ME
-            label: 'See all',
-            onClick: () =>
+        <div className="footer">
+          <CWButton
+            label="See all"
+            buttonType="tertiary-black"
+            onClick={() => {
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
-                : setRoute('/notifications'),
-          })}
-          {render(Button, {
-            label: 'Mark all read',
-            onClick: (e) => {
+                : setRoute('/notifications');
+            }}
+          />
+          <CWDivider isVertical />
+          <CWButton
+            label="Mark all read"
+            buttonType="tertiary-black"
+            onClick={(e) => {
               e.preventDefault();
               // e.stopPropagation();
               const typeNotif = this.selectedChainEvents
@@ -188,19 +197,23 @@ export class NotificationsMenu extends ClassComponent {
               app.user.notifications
                 .markAsRead(typeNotif)
                 ?.then(() => redraw());
-            },
-          })}
-          {render(Button, {
-            label: '<',
-            onClick: (e) => {
+            }}
+          />
+          <CWDivider isVertical />
+          <CWButton
+            label="<"
+            buttonType="tertiary-black"
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this._previousPage(this.selectedChainEvents);
-            },
-          })}
-          {render(Button, {
-            label: '>',
-            onClick: (e) => {
+            }}
+          />
+          <CWDivider isVertical />
+          <CWButton
+            label=">"
+            buttonType="tertiary-black"
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               // necessary since page refresh loads the first set of notifications for both but the min may not be set
@@ -212,8 +225,8 @@ export class NotificationsMenu extends ClassComponent {
                   app.user.notifications.chainEventNotifications.length;
               }
               this._nextPage(this.selectedChainEvents);
-            },
-          })} */}
+            }}
+          />
         </div>
       </div>
     );
@@ -223,22 +236,18 @@ export class NotificationsMenu extends ClassComponent {
 export class NotificationsMenuPopover extends ClassComponent {
   view() {
     return null;
-    // return m(PopoverMenu, {
-    //   closeOnContentClick: true,
-    //   closeOnOutsideClick: true,
-    //   hasArrow: false,
-    //   hoverCloseDelay: 0,
-    //   position: 'bottom-end',
-    //   transitionDuration: 0,
-    //   trigger:
+    // <CWPopover
+    //   content={<NotificationsMenu />}
+    //   interactionType="click"
+    //   trigger={
     //     app.user.notifications.numUnread > 0 ? (
     //       <div className="unreads-icon">
     //         <CWCustomIcon iconName="unreads" />
     //       </div>
     //     ) : (
     //       <CWIconButton iconButtonTheme="black" iconName="bell" />
-    //     ),
-    //   content: <NotificationsMenu />,
-    // });
+    //     )
+    //   }
+    // />
   }
 }
