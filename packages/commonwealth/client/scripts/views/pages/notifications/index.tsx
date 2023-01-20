@@ -1,8 +1,18 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
-import Infinite from 'mithril-infinite';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
+// import Infinite from 'mithril-infinite';
 
 import 'pages/notifications/index.scss';
 
@@ -49,21 +59,21 @@ const nextPage = () => {
   if (numChainEventNotif < minChainEventsNotification + MAX_NOTIFS) {
     app.user.notifications.getChainEventNotifications().then(() => {
       increment('chain-event');
-      m.redraw();
+      redraw();
     });
   } else {
     increment('chain-event');
-    m.redraw();
+    redraw();
   }
 
   if (numDiscussionNotif < minDiscussionNotification + MAX_NOTIFS) {
     app.user.notifications.getDiscussionNotifications().then(() => {
       increment('discussion');
-      m.redraw();
+      redraw();
     });
   } else {
     increment('discussion');
-    m.redraw();
+    redraw();
   }
 };
 
@@ -84,7 +94,7 @@ const previousPage = () => {
     minDiscussionNotification = 0;
     flag = true;
   }
-  if (flag) m.redraw();
+  if (flag) redraw();
 };
 
 class NotificationsPage extends ClassComponent {
@@ -106,11 +116,11 @@ class NotificationsPage extends ClassComponent {
 
     return (
       <Sublayout>
-        <div class="NotificationsPage">
-          <div class="notifications-buttons-row">
+        <div className="NotificationsPage">
+          <div className="notifications-buttons-row">
             <CWButton
               label="Previous Page"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 pageKey -= 1;
                 // console.log(
@@ -134,7 +144,7 @@ class NotificationsPage extends ClassComponent {
             />
             <CWButton
               label="Next Page"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 pageKey += 1;
 
@@ -166,24 +176,24 @@ class NotificationsPage extends ClassComponent {
             />
             <CWButton
               label="Mark all as read"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 app.user.notifications
                   .markAsRead(
                     discussionNotifications.concat(chainEventNotifications)
                   )
-                  .then(() => m.redraw());
+                  .then(() => redraw());
               }}
             />
             <CWPopover
               content={
                 <div>
-                  <div style="margin-bottom: 10px">
+                  <div style={{ marginBottom: '10px' }}>
                     Clear all chain notifications?
                   </div>
                   <CWButton
                     label="Confirm"
-                    onclick={async (e) => {
+                    onClick={async (e) => {
                       e.preventDefault();
                       if (
                         app.user.notifications.chainEventNotifications
@@ -192,7 +202,7 @@ class NotificationsPage extends ClassComponent {
                         return;
                       app.user.notifications
                         .delete(app.user.notifications.chainEventNotifications)
-                        .then(() => m.redraw());
+                        .then(() => redraw());
                     }}
                   />
                 </div>
@@ -200,7 +210,7 @@ class NotificationsPage extends ClassComponent {
               trigger={<CWButton label="Clear chain events" />}
             />
           </div>
-          <div class="NotificationsList">
+          <div className="NotificationsList">
             {(() => {
               const discussionNotif = discussionNotifications.slice(
                 minDiscussionNotification,
@@ -218,22 +228,22 @@ class NotificationsPage extends ClassComponent {
               const totalLength = allNotifications.length;
 
               if (totalLength > 0) {
-                return m(Infinite, {
-                  maxPages: 1, // prevents rollover/repeat
-                  key: totalLength,
-                  pageData: () => {
-                    return allNotifications;
-                  },
-                  pageKey: () => {
-                    return pageKey;
-                  },
-                  item: (data) => (
-                    <NotificationRow notifications={[data]} onListPage />
-                  ),
-                });
+                // return m(Infinite, {
+                //   maxPages: 1, // prevents rollover/repeat
+                //   key: totalLength,
+                //   pageData: () => {
+                //     return allNotifications;
+                //   },
+                //   pageKey: () => {
+                //     return pageKey;
+                //   },
+                //   item: (data) => (
+                //     <NotificationRow notifications={[data]} onListPage />
+                //   ),
+                // });
               } else
                 return (
-                  <div class="no-notifications">
+                  <div className="no-notifications">
                     <CWText>No Notifications</CWText>
                   </div>
                 );

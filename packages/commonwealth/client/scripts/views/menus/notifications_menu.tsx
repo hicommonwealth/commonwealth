@@ -100,12 +100,12 @@ export class NotificationsMenu extends ClassComponent {
       );
 
     return (
-      <div class="NotificationsMenu">
-        <div class="header">
+      <div className="NotificationsMenu">
+        <div className="header">
           <CWButton
             label="Discussions"
             buttonType="tertiary-black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = false;
@@ -115,7 +115,7 @@ export class NotificationsMenu extends ClassComponent {
           <CWButton
             label="Chain events"
             buttonType="tertiary-black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this.selectedChainEvents = true;
@@ -173,21 +173,21 @@ export class NotificationsMenu extends ClassComponent {
             }
           })()}
         </div>
-        <div class="footer">
+        <div className="footer">
           <CWButton
             label="See all"
             buttonType="tertiary-black"
-            onclick={() => {
+            onClick={() => {
               app.activeChainId()
                 ? navigateToSubpage('/notifications')
-                : m.route.set('/notifications');
+                : setRoute('/notifications');
             }}
           />
           <CWDivider isVertical />
           <CWButton
             label="Mark all read"
             buttonType="tertiary-black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               // e.stopPropagation();
               const typeNotif = this.selectedChainEvents
@@ -196,14 +196,14 @@ export class NotificationsMenu extends ClassComponent {
               if (typeNotif.length < 1) return;
               app.user.notifications
                 .markAsRead(typeNotif)
-                ?.then(() => m.redraw());
+                ?.then(() => redraw());
             }}
           />
           <CWDivider isVertical />
           <CWButton
             label="<"
             buttonType="tertiary-black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               this._previousPage(this.selectedChainEvents);
@@ -213,7 +213,7 @@ export class NotificationsMenu extends ClassComponent {
           <CWButton
             label=">"
             buttonType="tertiary-black"
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               // necessary since page refresh loads the first set of notifications for both but the min may not be set
@@ -235,20 +235,19 @@ export class NotificationsMenu extends ClassComponent {
 
 export class NotificationsMenuPopover extends ClassComponent {
   view() {
-    return (
-      <CWPopover
-        content={<NotificationsMenu />}
-        interactionType="click"
-        trigger={
-          app.user.notifications.numUnread > 0 ? (
-            <div class="unreads-icon">
-              <CWCustomIcon iconName="unreads" />
-            </div>
-          ) : (
-            <CWIconButton iconButtonTheme="black" iconName="bell" />
-          )
-        }
-      />
-    );
+    return null;
+    // <CWPopover
+    //   content={<NotificationsMenu />}
+    //   interactionType="click"
+    //   trigger={
+    //     app.user.notifications.numUnread > 0 ? (
+    //       <div className="unreads-icon">
+    //         <CWCustomIcon iconName="unreads" />
+    //       </div>
+    //     ) : (
+    //       <CWIconButton iconButtonTheme="black" iconName="bell" />
+    //     )
+    //   }
+    // />
   }
 }

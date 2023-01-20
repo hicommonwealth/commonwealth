@@ -1,6 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import _ from 'lodash';
 import moment from 'moment';
 
@@ -112,7 +123,7 @@ const getNotificationFields = (category, data: IPostNotificationData) => {
     notificationBody = null;
   }
 
-  const actorName = m(User, {
+  const actorName = render(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
     hideIdentityIcon: true,
@@ -225,7 +236,7 @@ export const getBatchNotificationFields = (
     notificationBody = null;
   }
 
-  const actorName = m(User, {
+  const actorName = render(User, {
     user: new AddressInfo(null, author_address, author_chain, null),
     hideAvatar: true,
     hideIdentityIcon: true,

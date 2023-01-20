@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 import { CWEvent, Label as ChainEventLabel } from 'chain-events/src';
 
@@ -28,17 +38,17 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
   private markingRead: boolean;
   private scrollOrStop: boolean;
 
-  oncreate(vnode: m.Vnode<NotificationRowAttrs>) {
+  oncreate(vnode: ResultNode<NotificationRowAttrs>) {
     if (
-      m.route.param('id') &&
+      getRouteParam('id') &&
       vnode.attrs.onListPage &&
-      m.route.param('id') === vnode.attrs.notifications[0].id.toString()
+      getRouteParam('id') === vnode.attrs.notifications[0].id.toString()
     ) {
       this.scrollOrStop = true;
     }
   }
 
-  view(vnode: m.Vnode<NotificationRowAttrs>) {
+  view(vnode: ResultNode<NotificationRowAttrs>) {
     const { notifications } = vnode.attrs;
 
     const notification = notifications[0];
@@ -66,7 +76,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       if (this.scrollOrStop) {
         setTimeout(() => {
-          const el = document.getElementById(m.route.param('id'));
+          const el = document.getElementById(getRouteParam('id'));
           if (el) el.scrollIntoView();
         }, 1);
 
@@ -76,15 +86,15 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       if (!label) {
         return (
           <li
-            class={getClasses<{ isUnread?: boolean }>(
+            className={getClasses<{ isUnread?: boolean }>(
               { isUnread: !notification.isRead },
               'NotificationRow'
             )}
             key={notification.id}
-            id={notification.id}
+            id={notification.id.toString()}
           >
-            <div class="comment-body">
-              <div class="comment-body-top">Loading...</div>
+            <div className="comment-body">
+              <div className="comment-body-top">Loading...</div>
             </div>
           </li>
         );
@@ -96,26 +106,28 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       return (
         <div
-          onclick={() => navigateToSubpage(`/notifications?id=${notification.id}`)}
+          onClick={() =>
+            navigateToSubpage(`/notifications?id=${notification.id}`)
+          }
         >
-          <div class="comment-body">
-            <div class="comment-body-top chain-event-notification-top">
+          <div className="comment-body">
+            <div className="comment-body-top chain-event-notification-top">
               {label.heading} on {chainName}
               {!vnode.attrs.onListPage && (
                 <CWIconButton
                   iconName="close"
-                  onclick={(e) => {
+                  onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     this.scrollOrStop = true;
                     app.user.notifications.delete([notification]).then(() => {
-                      m.redraw();
+                      redraw();
                     });
                   }}
                 />
               )}
             </div>
-            <div class="comment-body-bottom">
+            <div className="comment-body-bottom">
               Block {notification.chainEvent.blockNumber}
             </div>
             {/* <div class="comment-body-excerpt">{label.label}</div> */}
@@ -151,7 +163,7 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
 
       const author = new AddressInfo(null, author_address, chain_id, null);
 
-      const authorName = m(User, {
+      const authorName = render(User, {
         user: author,
         hideAvatar: true,
         hideIdentityIcon: true,
@@ -162,24 +174,24 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       //   route,
 
       return (
-        <div onclick={() => navigateToSubpage(route)}>
-          {m(User, {
+        <div onClick={() => navigateToSubpage(route)}>
+          {render(User, {
             user: author,
             avatarOnly: true,
             avatarSize: 26,
           })}
-          <div class="comment-body">
-            <div class="comment-body-title">
+          <div className="comment-body">
+            <div className="comment-body-title">
               {authorName} mentioned you in {chain_id} chat
             </div>
-            <div class="comment-body-bottom-wrap">
-              <div class="comment-body-created">
+            <div className="comment-body-bottom-wrap">
+              <div className="comment-body-created">
                 {moment(created_at).fromNow()}
               </div>
               {!notification.isRead && (
                 <div
-                  class="comment-body-mark-as-read"
-                  onclick={(e) => {
+                  className="comment-body-mark-as-read"
+                  onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     this.markingRead = true;
@@ -187,11 +199,11 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
                       .markAsRead(notifications)
                       ?.then(() => {
                         this.markingRead = false;
-                        m.redraw();
+                        redraw();
                       })
                       .catch(() => {
                         this.markingRead = false;
-                        m.redraw();
+                        redraw();
                       });
                   }}
                 >
@@ -251,9 +263,9 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
       //   path.replace(/ /g, '%20'),
 
       return (
-        <div onclick={() => navigateToSubpage(path.replace(/ /g, '%20'))}>
+        <div onClick={() => navigateToSubpage(path.replace(/ /g, '%20'))}>
           {authorInfo.length === 1
-            ? m(User, {
+            ? render(User, {
                 user: new AddressInfo(
                   null,
                   (authorInfo[0] as [string, string])[1],
@@ -263,27 +275,27 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
                 avatarOnly: true,
                 avatarSize: 26,
               })
-            : m(UserGallery, {
+            : render(UserGallery, {
                 users: authorInfo.map(
                   (auth) => new AddressInfo(null, auth[1], auth[0], null)
                 ),
                 avatarSize: 26,
               })}
-          <div class="comment-body">
-            <div class="comment-body-title">{notificationHeader}</div>
+          <div className="comment-body">
+            <div className="comment-body-title">{notificationHeader}</div>
             {notificationBody &&
               category !== `${NotificationCategories.NewReaction}` &&
               category !== `${NotificationCategories.NewThread}` && (
-                <div class="comment-body-excerpt">{notificationBody}</div>
+                <div className="comment-body-excerpt">{notificationBody}</div>
               )}
-            <div class="comment-body-bottom-wrap">
-              <div class="comment-body-created">
+            <div className="comment-body-bottom-wrap">
+              <div className="comment-body-created">
                 {moment(createdAt).fromNow()}
               </div>
               {!notification.isRead && (
                 <div
-                  class="comment-body-mark-as-read"
-                  onclick={(e) => {
+                  className="comment-body-mark-as-read"
+                  onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     this.markingRead = true;
@@ -291,11 +303,11 @@ export class NotificationRow extends ClassComponent<NotificationRowAttrs> {
                       .markAsRead(notifications)
                       ?.then(() => {
                         this.markingRead = false;
-                        m.redraw();
+                        redraw();
                       })
                       .catch(() => {
                         this.markingRead = false;
-                        m.redraw();
+                        redraw();
                       });
                   }}
                 >
