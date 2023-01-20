@@ -1,4 +1,3 @@
-import { LCDClient, TendermintAPI } from '@terra-money/terra.js';
 import type { ConnectedWallet } from '@terra-money/wallet-controller';
 import type { WalletController } from '@terra-money/wallet-controller';
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
@@ -20,6 +19,7 @@ class TerraWalletConnectWebWalletController
   private _accounts: TerraAddress[];
   private _controller: WalletController;
   private _wallet: ConnectedWallet;
+  private _terra;
 
   public readonly name = WalletId.TerraWalletConnect;
   public readonly label = 'WalletConnect';
@@ -46,11 +46,11 @@ class TerraWalletConnectWebWalletController
   }
 
   public async getRecentBlock(chainIdentifier: string) {
-    const client = new LCDClient({
+    const client = new this._terra.LCDClient({
       URL: app.chain.meta.ChainNode.url,
       chainID: chainIdentifier,
     });
-    const tmClient = new TendermintAPI(client);
+    const tmClient = new this._terra.TendermintAPI(client);
     const blockInfo = await tmClient.blockInfo();
 
     return {
@@ -100,6 +100,7 @@ class TerraWalletConnectWebWalletController
 
   public async enable() {
     console.log('Attempting to enable WalletConnect');
+    this._terra = import('@terra-money/terra.js');
     this._enabling = true;
     try {
       const terra = await import('@terra-money/wallet-controller');
