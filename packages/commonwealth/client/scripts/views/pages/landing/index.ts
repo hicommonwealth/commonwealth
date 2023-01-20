@@ -1,9 +1,10 @@
-import m from 'mithril';
+
 // Logged Out Homepage View
 import 'pages/landing/landing_page.scss';
 import Glide from '@glidejs/glide';
 
 import app, { LoginState } from 'state';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -47,7 +48,7 @@ interface IState {
   modalAutoTriggered: boolean;
 }
 
-const LandingPage: m.Component<{}, IState> = {
+const LandingPage: Component<{}, IState> = {
   oncreate: () => {
     if (!app.isLoggedIn()) {
       mixpanelBrowserTrack({
@@ -90,15 +91,15 @@ const LandingPage: m.Component<{}, IState> = {
     ];
   },
   view: (vnode) => {
-    if (m.route.param('triggerInvite') === 't') {
+    if (getRouteParam('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(vnode.state), 0);
     }
     if (app.loginState !== LoginState.LoggedIn) {
-      return m('.LandingPage', { class: 'bg-primary' }, [
-        m(
+      return render('.LandingPage', { class: 'bg-primary' }, [
+        render(
           'div',
           { class: 'absolute w-screen z-20' },
-          m(HeaderLandingPage, {
+          render(HeaderLandingPage, {
             scrollHeader: true,
             navs: [
               { text: 'Why Commonwealth?', redirectTo: '/whyCommonwealth' },
@@ -108,8 +109,8 @@ const LandingPage: m.Component<{}, IState> = {
             ],
           })
         ),
-        m(TokensCommunityComponent, { chains: vnode.state.chains }),
-        m(TokensChainsComponent, {
+        render(TokensCommunityComponent, { chains: vnode.state.chains }),
+        render(TokensChainsComponent, {
           oncreateSlider: () => {
             return new (Glide as any)('.glide', {
               type: 'carousel',
@@ -144,7 +145,7 @@ const LandingPage: m.Component<{}, IState> = {
           },
           chains: vnode.state.chains,
         }),
-        m(TokensCreatorComponent, {
+        render(TokensCreatorComponent, {
           creators: [
             {
               button: {
@@ -204,7 +205,7 @@ const LandingPage: m.Component<{}, IState> = {
             },
           ],
         }),
-        m(TokenHoldersComponent, {
+        render(TokenHoldersComponent, {
           holders: [
             {
               img: 'static/img/circleCrowd.svg',
@@ -232,7 +233,7 @@ const LandingPage: m.Component<{}, IState> = {
             },
           ],
         }),
-        m(ChainsCrowdfundingComponent, {
+        render(ChainsCrowdfundingComponent, {
           chains: [
             {
               button: {
@@ -278,22 +279,22 @@ const LandingPage: m.Component<{}, IState> = {
             },
           ],
         }),
-        m(JoinCommonWealthSection),
-        m(Footer),
-        m('script', {
+        render(JoinCommonWealthSection),
+        render(Footer),
+        render('script', {
           src: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js',
           integrity:
             'sha512-IkLiryZhI6G4pnA3bBZzYCT9Ewk87U4DGEOz+TnRD3MrKqaUitt+ssHgn2X/sxoM7FxCP/ROUp6wcxjH/GcI5Q==',
           crossorigin: 'anonymous',
         }),
-        m('link', {
+        render('link', {
           rel: 'stylesheet',
           href: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.core.min.css',
           integrity:
             'sha512-YQlbvfX5C6Ym6fTUSZ9GZpyB3F92hmQAZTO5YjciedwAaGRI9ccNs4iw2QTCJiSPheUQZomZKHQtuwbHkA9lgw==',
           crossorigin: 'anonymous',
         }),
-        m('link', {
+        render('link', {
           rel: 'stylesheet',
           href: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.theme.min.css',
           integrity:
@@ -302,7 +303,7 @@ const LandingPage: m.Component<{}, IState> = {
         }),
       ]);
     } else {
-      return m(UserDashboard);
+      return render(UserDashboard);
     }
   },
 };

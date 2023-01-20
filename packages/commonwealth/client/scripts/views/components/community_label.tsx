@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/community_label.scss';
 
@@ -15,11 +16,11 @@ type CommunityLabelAttrs = {
 };
 
 export class CommunityLabel extends ClassComponent<CommunityLabelAttrs> {
-  view(vnode: m.Vnode<CommunityLabelAttrs>) {
+  view(vnode: ResultNode<CommunityLabelAttrs>) {
     const { community, size = 'small' } = vnode.attrs;
 
     return (
-      <div class="CommunityLabel">
+      <div className="CommunityLabel">
         <CWCommunityAvatar community={community} size={size} />
         <CWText noWrap type="b1" fontWeight="medium" title={community.name}>
           {community.name}

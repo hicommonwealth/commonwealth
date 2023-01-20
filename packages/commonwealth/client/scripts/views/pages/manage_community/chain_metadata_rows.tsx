@@ -1,8 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
 import $ from 'jquery';
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/manage_community/chain_metadata_rows.scss';
 
@@ -83,7 +84,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   selectedSnapshotChannel: { id: string; name: string } | null;
   snapshotNotificationsEnabled: boolean;
 
-  oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
+  oninit(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
     this.name = chain.name;
     this.description = chain.description;
@@ -117,7 +118,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.snapshotNotificationsEnabled = false;
   }
 
-  view(vnode: m.VnodeDOM<ChainMetadataRowsAttrs, this>) {
+  view(vnode: ResultNode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
 
     const getChannels = async () => {
@@ -129,7 +130,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           this.snapshotNotificationsEnabled = true;
         }
         this.channelsLoaded = true;
-        m.redraw();
+        this.redraw();
       } catch (e) {
         console.log(e);
       }
@@ -139,13 +140,13 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     }
 
     return (
-      <div class="ChainMetadataRows">
-        <div class="AvatarUploadRow">
+      <div className="ChainMetadataRows">
+        <div className="AvatarUploadRow">
           <AvatarUpload
             scope="community"
             uploadStartedCallback={() => {
               this.uploadInProgress = true;
-              m.redraw();
+              redraw();
             }}
             uploadCompleteCallback={(files) => {
               files.forEach((f) => {
@@ -155,7 +156,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 $(vnode.dom).find('input[name=avatarUrl]').val(url.trim());
               });
               this.uploadInProgress = false;
-              m.redraw();
+              redraw();
             }}
           />
         </div>
@@ -309,9 +310,9 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
           tabindex={1}
           editorNamespace="new-banner"
         />
-        <div class="tag-row">
+        <div className="tag-row">
           <CWLabel label="Community Tags" />
-          <div class="tag-group">
+          <div className="tag-group">
             {Object.keys(this.selectedTags).map((key) => {
               return (
                 <CWButton
@@ -319,7 +320,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                   buttonType={
                     this.selectedTags[key] ? 'primary-black' : 'secondary-black'
                   }
-                  onclick={() => {
+                  onClick={() => {
                     this.selectedTags[key] = !this.selectedTags[key];
                   }}
                 />
@@ -347,7 +348,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
         <CWButton
           disabled={this.uploadInProgress}
           label="Save changes"
-          onclick={async () => {
+          onClick={async () => {
             const {
               name,
               description,
@@ -444,16 +445,16 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               notifyError(err || 'Chain update failed');
             }
 
-            m.redraw();
+            redraw();
           }}
         />
-        <div class="commonbot-section">
+        <div className="commonbot-section">
           <CWText type="h3">Commonbot Settings</CWText>
           {this.discordBotConnected ? (
             <>
-              <div class="connected-line">
+              <div className="connected-line">
                 <CWText type="h4">Connection Status</CWText>
-                <div class="connect-group">
+                <div className="connect-group">
                   <CWIcon iconName="check" iconSize="small" />
                   <CWText>Connected</CWText>
                 </div>
@@ -462,7 +463,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 label="reconnect"
                 buttonType="mini-black"
                 className="connect-button"
-                onclick={async () => {
+                onClick={async () => {
                   try {
                     const verification_token = uuidv4();
                     await app.discord.createConfig(verification_token);
@@ -481,24 +482,24 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                     );
                     this.discordBotConnected = false;
                     this.discordBotConnecting = true;
-                    m.redraw();
+                    this.redraw();
                   } catch (e) {
                     console.log(e);
                   }
                 }}
               />
-              <div class="snapshot-settings">
+              <div className="snapshot-settings">
                 <CWText type="h4">Snapshot Notifications</CWText>
                 <CWToggle
                   onchange={() => {
                     this.snapshotNotificationsEnabled =
                       !this.snapshotNotificationsEnabled;
-                    m.redraw();
+                    this.redraw();
                   }}
                   checked={this.snapshotNotificationsEnabled}
                 />
               </div>
-              <div class="connected-line">
+              <div className="connected-line">
                 {this.channelsLoaded && (
                   <CWDropdown
                     label={'Select Channel'}
@@ -519,7 +520,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                         id: item.value,
                         name: item.label,
                       };
-                      m.redraw();
+                      this.redraw();
                     }}
                   />
                 )}
@@ -529,7 +530,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 label="Save Commonbot Settings"
                 className="save-snapshot"
                 buttonType="primary-black"
-                onclick={async () => {
+                onClick={async () => {
                   if (
                     this.snapshotNotificationsEnabled &&
                     !this.selectedSnapshotChannel?.name
@@ -552,8 +553,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             </>
           ) : this.discordBotConnecting ? (
             <>
-              <div class="settings-row">
-                <div class="spinner-group">
+              <div className="settings-row">
+                <div className="spinner-group">
                   <CWSpinner />
                   <CWText>Connecting...</CWText>
                 </div>
@@ -561,11 +562,11 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
               </div>
             </>
           ) : (
-            <div class="settings-row">
+            <div className="settings-row">
               <CWButton
                 label="Connect"
                 buttonType="primary-black"
-                onclick={async () => {
+                onClick={async () => {
                   try {
                     const verification_token = uuidv4();
 
@@ -584,7 +585,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                       )}`
                     );
                     this.discordBotConnecting = true;
-                    m.redraw();
+                    this.redraw();
                   } catch (e) {
                     console.log(e);
                   }

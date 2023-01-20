@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import app from 'state';
@@ -45,7 +46,7 @@ function calculateTimeRemaining(proposal: SnapshotProposal) {
 }
 
 export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCardsAttrs> {
-  view(vnode: m.Vnode<SnapshotProposalCardsAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalCardsAttrs>) {
     const {
       identifier,
       proposal,
@@ -136,7 +137,7 @@ export class SnapshotPollCardContainer extends ClassComponent<SnapshotProposalCa
         voteInformation={buildVoteInformation(proposal?.choices, votes)}
         onVoteCast={(choice, callback) => {
           castSnapshotVote(choice, callback);
-          m.redraw();
+          redraw();
         }}
         incrementalVoteCast={totalScore}
         tooltipErrorMessage={voteErrorText}

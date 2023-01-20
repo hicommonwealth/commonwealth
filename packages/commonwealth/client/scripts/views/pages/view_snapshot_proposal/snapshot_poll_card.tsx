@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/poll_card.scss';
 
@@ -29,7 +30,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
   private voteDirectionString: string;
   private localVoteInformation: Array<VoteInformation>;
 
-  oninit(vnode: m.Vnode<SnapshotPollCardAttrs>) {
+  oninit(vnode: ResultNode<SnapshotPollCardAttrs>) {
     // Initialize state which can change during the lifecycle of the component.
     this.hasVoted = vnode.attrs.hasVoted;
     this.voteDirectionString = vnode.attrs.votedFor
@@ -40,7 +41,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
     this.localVoteInformation = vnode.attrs.voteInformation;
   }
 
-  view(vnode: m.Vnode<SnapshotPollCardAttrs>) {
+  view(vnode: ResultNode<SnapshotPollCardAttrs>) {
     const {
       disableVoteButton = false,
       incrementalVoteCast,
@@ -78,7 +79,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
           }
         });
       });
-      m.redraw();
+      redraw();
     };
 
     return (
@@ -86,9 +87,9 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
         <CWText type="b2" className="poll-title-text">
           {proposalTitle}
         </CWText>
-        <div class="poll-voting-section">
+        <div className="poll-voting-section">
           {!this.hasVoted && !pollEnded && !isPreview && (
-            <>
+            <React.Fragment>
               <PollOptions
                 multiSelect={false}
                 voteInformation={this.localVoteInformation}
@@ -103,7 +104,7 @@ export class SnapshotPollCard extends ClassComponent<SnapshotPollCardAttrs> {
                 tooltipErrorMessage={tooltipErrorMessage}
                 onVoteCast={castVote}
               />
-            </>
+            </React.Fragment>
           )}
           {((this.hasVoted && !isPreview) || pollEnded) && (
             <VoteDisplay

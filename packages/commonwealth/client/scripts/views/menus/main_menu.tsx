@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { CWMobileMenu } from '../components/component_kit/cw_mobile_menu';
@@ -15,8 +16,8 @@ export const getMainMenuItems = (): Array<MenuItem> => {
     //   label: 'Search',
     //   iconName: 'search',
     //   mobileCaret: true,
-    //   onclick: () => {
-    //     m.route.set('/search');
+    //   onClick: () => {
+    //     setRoute('/search');
     //   },
     // },
     ...((app.activeChainId()
@@ -25,7 +26,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             label: 'Create',
             iconLeft: 'plusCircle',
             iconRight: 'chevronRight',
-            onclick: () => {
+            onClick: () => {
               app.mobileMenu = 'CreateContentMenu';
             },
           },
@@ -35,7 +36,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
       label: 'Help',
       iconLeft: 'help',
       iconRight: 'chevronRight',
-      onclick: () => {
+      onClick: () => {
         app.mobileMenu = 'HelpMenu';
       },
     },
@@ -47,7 +48,7 @@ export const getMainMenuItems = (): Array<MenuItem> => {
             iconRight: 'chevronRight',
             type: 'notification',
             hasUnreads: !!app.user?.notifications.numUnread,
-            onclick: () => {
+            onClick: () => {
               app.mobileMenu = 'NotificationsMenu';
             },
           },

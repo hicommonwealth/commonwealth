@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/update_proposal_status_modal.scss';
@@ -29,7 +30,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
   private snapshotProposalsToSet: SnapshotProposal[];
   private stage: ThreadStage;
 
-  oninit(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
+  oninit(vnode: ResultNode<UpdateProposalStatusModalAttrs>) {
     this.stage = vnode.attrs.thread.stage;
 
     this.chainEntitiesToSet = [];
@@ -39,7 +40,7 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
     );
   }
 
-  view(vnode: m.Vnode<UpdateProposalStatusModalAttrs>) {
+  view(vnode: ResultNode<UpdateProposalStatusModalAttrs>) {
     if (!app.chain?.meta) return;
 
     const { customStages } = app.chain.meta;
@@ -56,19 +57,19 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
     const showSnapshot = !!app.chain.meta.snapshot?.length;
 
     return (
-      <div class="UpdateProposalStatusModal">
-        <div class="compact-modal-title">
+      <div className="UpdateProposalStatusModal">
+        <div className="compact-modal-title">
           <h3>Update proposal status</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           {stages.length > 0 && (
-            <div class="stage-options">
+            <div className="stage-options">
               {stages.map((targetStage) => (
                 <CWButton
                   iconLeft={this.stage === targetStage ? 'check' : undefined}
                   label={threadStageToLabel(targetStage)}
-                  onclick={() => {
+                  onClick={() => {
                     this.stage = targetStage;
                   }}
                 />
@@ -110,17 +111,17 @@ export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStat
               chainEntitiesToSet={this.chainEntitiesToSet}
             />
           )}
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               label="Cancel"
               buttonType="secondary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 $(e.target).trigger('modalexit');
               }}
             />
             <CWButton
               label="Save changes"
-              onclick={async (e) => {
+              onClick={async (e) => {
                 const { thread } = vnode.attrs;
                 // set stage
                 try {

@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
@@ -331,8 +332,8 @@ class ChainInfo {
 
   public getAvatar(size: number) {
     return this.iconUrl
-      ? m(CWAvatar, { avatarUrl: this.iconUrl, size })
-      : m(CWJdenticon, { address: undefined, size });
+      ? render(CWAvatar, { avatarUrl: this.iconUrl, size })
+      : render(CWJdenticon, { address: undefined, size });
   }
 }
 

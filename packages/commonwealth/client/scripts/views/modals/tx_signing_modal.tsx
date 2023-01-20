@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'modals/tx_signing_modal.scss';
 
@@ -29,7 +30,7 @@ class TXSigningModal extends ClassComponent<ITXModalData> {
     this.stageName = 'intro';
   }
 
-  view(vnode: m.Vnode<ITXModalData>) {
+  view(vnode: ResultNode<ITXModalData>) {
     const { author, txData, txType } = vnode.attrs;
 
     const txLabel = getTransactionLabel(txType);
@@ -41,16 +42,16 @@ class TXSigningModal extends ClassComponent<ITXModalData> {
     const next = (newStage: StageName, newData?: TxDataState) => {
       this.stageName = newStage;
       this.data = newData;
-      m.redraw();
+      redraw();
     };
 
     return (
-      <div class="TXSigningModal">
-        <div class="compact-modal-title">
+      <div className="TXSigningModal">
+        <div className="compact-modal-title">
           <h3>{getModalTitle(this.stageName, txLabel)}</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           {this.stageName === 'intro' && (
             <TxSigningModalIntroStage
               author={author}
@@ -108,7 +109,7 @@ export const createTXModal = async (
         data,
       });
 
-      m.redraw();
+      redraw();
     });
 
     return modalP;

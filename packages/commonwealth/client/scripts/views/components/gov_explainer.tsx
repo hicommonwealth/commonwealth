@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/gov_explainer.scss';
 import { CWText } from './component_kit/cw_text';
@@ -23,14 +24,14 @@ type GovExplainerAttrs = {
 };
 
 export class GovExplainer extends ClassComponent<GovExplainerAttrs> {
-  view(vnode: m.Vnode<GovExplainerAttrs>) {
+  view(vnode: ResultNode<GovExplainerAttrs>) {
     const { statHeaders, stats, statAction } = vnode.attrs;
 
     return (
-      <div class="GovExplainer">
-        <div class="emoji">💭</div>
-        <div class="main-container">
-          <div class="stat-headers-container">
+      <div className="GovExplainer">
+        <div className="emoji">💭</div>
+        <div className="main-container">
+          <div className="stat-headers-container">
             {statHeaders.map((s) => (
               <CWText>
                 <div>
@@ -39,9 +40,9 @@ export class GovExplainer extends ClassComponent<GovExplainerAttrs> {
               </CWText>
             ))}
           </div>
-          <div class="stats-container">
+          <div className="stats-container">
             {stats.map((s) => (
-              <div class="stat">
+              <div className="stat">
                 <CWText type="b1" fontWeight="medium" className="stat-text">
                   {s.statHeading}
                 </CWText>

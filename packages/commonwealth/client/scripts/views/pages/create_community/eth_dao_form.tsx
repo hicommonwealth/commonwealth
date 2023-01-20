@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import Web3 from 'web3';
 
@@ -73,11 +74,11 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
     },
   };
 
-  oninit(vnode: m.Vnode<EthChainAttrs>) {
+  oninit(vnode: ResultNode<EthChainAttrs>) {
     this.state.form.nodeUrl = vnode.attrs.ethChains[1].url;
   }
 
-  view(vnode: m.Vnode<EthChainAttrs>) {
+  view(vnode: ResultNode<EthChainAttrs>) {
     const validAddress = isAddress(this.state.form.address);
     const disableField = !validAddress || !this.state.loaded;
 
@@ -130,16 +131,16 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
         this.state.status = 'failure';
         this.state.message = e.message;
         this.state.loading = false;
-        m.redraw();
+        redraw();
         return;
       }
       this.state.loaded = true;
       this.state.loading = false;
-      m.redraw();
+      redraw();
     };
 
     return (
-      <div class="CreateCommunityForm">
+      <div className="CreateCommunityForm">
         {...ethChainRows(vnode.attrs, this.state.form)}
         <CWDropdown
           label="DAO Type"
@@ -172,7 +173,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
             !this.state.form.ethChainId ||
             this.state.loading
           }
-          onclick={async () => {
+          onClick={async () => {
             await updateDAO();
           }}
         />
@@ -205,7 +206,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
         <CWButton
           label="Save changes"
           disabled={this.state.saving || !validAddress || !this.state.loaded}
-          onclick={async () => {
+          onClick={async () => {
             const { chainString, ethChainId, nodeUrl, tokenName, symbol } =
               this.state.form;
             this.state.saving = true;
@@ -236,7 +237,7 @@ export class EthDaoForm extends ClassComponent<EthChainAttrs> {
               }
               await initAppState(false);
               // TODO: notify about needing to run event migration
-              m.route.set(`/${res.result.chain?.id}`);
+              setRoute(`/${res.result.chain?.id}`);
             } catch (err) {
               notifyError(
                 err.responseJSON?.error ||

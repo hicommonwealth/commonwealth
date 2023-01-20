@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_wallet_option_row.scss';
 
@@ -17,30 +18,30 @@ type WalletOptionRowStyleAttrs = {
 };
 
 type WalletOptionRowAttrs = {
-  onclick?: () => void;
+  onClick?: () => void;
   walletName: CustomIconName;
   walletLabel?: string;
 } & WalletOptionRowStyleAttrs;
 
 export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
-  view(vnode: m.Vnode<WalletOptionRowAttrs>) {
+  view(vnode: ResultNode<WalletOptionRowAttrs>) {
     const {
       disabled = false,
       darkMode,
-      onclick,
+      onClick,
       walletName,
       walletLabel,
     } = vnode.attrs;
     return (
       <div
-        class={getClasses<WalletOptionRowStyleAttrs>(
+        className={getClasses<WalletOptionRowStyleAttrs>(
           {
             disabled,
             darkMode,
           },
           ComponentType.WalletOptionRow
         )}
-        onclick={onclick}
+        onClick={onClick}
       >
         <CWCustomIcon size={32} iconName={walletName} iconSize="large" />
         <CWText
@@ -57,9 +58,9 @@ export class CWWalletOptionRow extends ClassComponent<WalletOptionRowAttrs> {
 }
 
 export class CWWalletMissingOptionRow extends ClassComponent<{ darkMode?: boolean }> {
-  view(vnode: m.Vnode<{ darkMode }>) {
+  view(vnode: ResultNode<{ darkMode }>) {
     return (
-      <div class={getClasses<WalletOptionRowStyleAttrs>(
+      <div className={getClasses<WalletOptionRowStyleAttrs>(
           {
             disabled: true,
             darkMode: vnode.attrs.darkMode,

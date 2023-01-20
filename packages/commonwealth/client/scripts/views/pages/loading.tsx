@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/loading.scss';
 
@@ -14,13 +15,13 @@ type PageLoadingAttrs = {
 };
 
 export class PageLoading extends ClassComponent<PageLoadingAttrs> {
-  view(vnode: m.Vnode<PageLoadingAttrs>) {
+  view(vnode: ResultNode<PageLoadingAttrs>) {
     const { message } = vnode.attrs;
 
     return (
       <Sublayout hideSearch>
-        <div class="LoadingPage">
-          <div class="inner-content">
+        <div className="LoadingPage">
+          <div className="inner-content">
             <CWSpinner size="xl" />
             <CWText>{message}</CWText>
           </div>

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/referenda.scss';
 
@@ -91,7 +92,7 @@ class ReferendaPage extends ClassComponent {
         .filter((p) => !p.completed);
 
     const activeProposalContent = !activeDemocracyReferenda?.length ? (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     ) : (
       (activeDemocracyReferenda || []).map((proposal) => (
         <ProposalCard proposal={proposal} />
@@ -106,7 +107,7 @@ class ReferendaPage extends ClassComponent {
         .filter((p) => p.completed);
 
     const inactiveProposalContent = !inactiveDemocracyReferenda?.length ? (
-      <div class="no-proposals">None</div>
+      <div className="no-proposals">None</div>
     ) : (
       (inactiveDemocracyReferenda || []).map((proposal) => (
         <ProposalCard proposal={proposal} />
@@ -117,7 +118,7 @@ class ReferendaPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Referenda" />}
       >
-        <div class="ReferendaPage">
+        <div className="ReferendaPage">
           {onSubstrate && (
             <GovExplainer
               statHeaders={[

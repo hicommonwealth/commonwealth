@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import numeral from 'numeral';
 
 import 'pages/communities.scss';
@@ -172,7 +173,7 @@ class CommunitiesPage extends ClassComponent {
           return threadCountB - threadCountA;
         })
         .map((chain: ChainInfo) => {
-          return m(CommunityCard, { chain });
+          return render(CommunityCard, { chain });
         });
 
       return res;
@@ -184,8 +185,8 @@ class CommunitiesPage extends ClassComponent {
 
     return (
       <Sublayout>
-        <div class="CommunitiesPage">
-          <div class="header-section">
+        <div className="CommunitiesPage">
+          <div className="header-section">
             <CWText
               type="h3"
               fontWeight="semiBold"
@@ -193,7 +194,7 @@ class CommunitiesPage extends ClassComponent {
             >
               {totalCommunitiesString}
             </CWText>
-            <div class="filter-buttons">
+            <div className="filter-buttons">
               {this.chainCategories.map((cat) => {
                 return (
                   <CWButton
@@ -201,7 +202,7 @@ class CommunitiesPage extends ClassComponent {
                     buttonType={
                       this.filterMap[cat] ? 'primary-black' : 'secondary-black'
                     }
-                    onclick={() => {
+                    onClick={() => {
                       this.filterMap[cat] = !this.filterMap[cat];
                     }}
                   />
@@ -216,7 +217,7 @@ class CommunitiesPage extends ClassComponent {
                         ? 'primary-black'
                         : 'secondary-black'
                     }
-                    onclick={() => {
+                    onClick={() => {
                       this.filterMap[network] = !this.filterMap[network];
                     }}
                   />
@@ -229,7 +230,7 @@ class CommunitiesPage extends ClassComponent {
                     buttonType={
                       this.filterMap[base] ? 'primary-black' : 'secondary-black'
                     }
-                    onclick={() => {
+                    onClick={() => {
                       this.filterMap[base] = !this.filterMap[base];
                     }}
                   />
@@ -237,7 +238,7 @@ class CommunitiesPage extends ClassComponent {
               })}
             </div>
           </div>
-          <div class="communities-list">
+          <div className="communities-list">
             {sortedChains}
             <NewCommunityCard />
           </div>

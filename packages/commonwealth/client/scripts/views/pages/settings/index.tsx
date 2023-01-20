@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 
 import 'pages/settings/index.scss';
@@ -15,7 +16,7 @@ import { ComposerSection } from './composer_section';
 class SettingsPage extends ClassComponent {
   view() {
     if (app.loginStatusLoaded() && !app.isLoggedIn()) {
-      m.route.set('/', {}, { replace: true });
+      setRoute('/', {}, { replace: true });
       return <PageLoading />;
     }
     if (!app.loginStatusLoaded()) return <PageLoading />;
@@ -24,7 +25,7 @@ class SettingsPage extends ClassComponent {
       <Sublayout
       // title="Account Settings"
       >
-        <div class="SettingsPage">
+        <div className="SettingsPage">
           <EmailSection />
           <LinkedAddressesSection />
           <ComposerSection />

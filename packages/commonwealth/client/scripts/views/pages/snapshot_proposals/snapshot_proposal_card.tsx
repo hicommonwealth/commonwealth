@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/proposal_card/index.scss';
@@ -20,7 +21,7 @@ type SnapshotProposalCardAttrs = {
 };
 
 export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAttrs> {
-  view(vnode: m.Vnode<SnapshotProposalCardAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalCardAttrs>) {
     const { proposal } = vnode.attrs;
 
     const proposalLink = `/snapshot/${vnode.attrs.snapshotId}/${proposal.id}`;
@@ -34,7 +35,7 @@ export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAtt
         elevation="elevation-2"
         interactive={true}
         className="ProposalCard"
-        onclick={(e) => {
+        onClick={(e) => {
           e.stopPropagation();
           e.preventDefault();
           localStorage[`${app.activeChainId()}-proposals-scrollY`] =
@@ -42,7 +43,7 @@ export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAtt
           navigateToSubpage(proposalLink);
         }}
       >
-        <div class="proposal-card-metadata">
+        <div className="proposal-card-metadata">
           <ProposalTag
             label={`${proposal.ipfs.slice(0, 6)}...${proposal.ipfs.slice(
               proposal.ipfs.length - 6

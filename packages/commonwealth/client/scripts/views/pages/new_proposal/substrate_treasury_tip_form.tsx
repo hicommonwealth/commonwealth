@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -36,9 +36,9 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWLabel label="Finder" />,
-        {m(User, {
+        {render(User, {
           user: author,
           linkify: true,
           popover: true,
@@ -60,7 +60,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
         />
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             if (!this.beneficiary) {
@@ -86,7 +86,7 @@ export class SubstrateTreasuryTipForm extends ClassComponent {
             );
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

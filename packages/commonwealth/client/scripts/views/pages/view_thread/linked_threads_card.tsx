@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/view_thread/linked_threads_card.scss';
 
@@ -24,7 +25,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
   private initialized: boolean;
   private linkedThreads: Thread[] = [];
 
-  view(vnode: m.Vnode<LinkedThreadsCardAttrs>) {
+  view(vnode: ResultNode<LinkedThreadsCardAttrs>) {
     const { allowLinking, threadId } = vnode.attrs;
 
     const thread = app.threads.getById(threadId);
@@ -52,9 +53,9 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
       <CWContentPageCard
         header="Linked Discussions"
         content={
-          <div class="LinkedThreadsCard">
+          <div className="LinkedThreadsCard">
             {thread.linkedThreads.length > 0 ? (
-              <div class="links-container">
+              <div className="links-container">
                 {this.linkedThreads.map((t) => {
                   const discussionLink = getProposalUrlPath(
                     t.slug,
@@ -73,7 +74,7 @@ export class LinkedThreadsCard extends ClassComponent<LinkedThreadsCardAttrs> {
               <CWButton
                 buttonType="mini-black"
                 label="Link discussion"
-                onclick={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   app.modals.create({
                     modal: LinkedThreadModal,

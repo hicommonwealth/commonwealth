@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import InputTokenOptionComponent from './input_token_option';
 import { Chain, Token } from './index';
 import { placeholderChain } from './tokens_community_hero';
@@ -10,7 +11,7 @@ interface IAttrs {
   refilterResults: boolean;
 }
 
-const InputTokenList: m.Component<
+const InputTokenList: Component<
   IAttrs,
   { options: any[]; oldValue: string }
 > = {
@@ -58,14 +59,14 @@ const InputTokenList: m.Component<
     const renderResults = (option) => {
       if ((option as Token).symbol) {
         option = option as Token;
-        return m(InputTokenOptionComponent, {
+        return render(InputTokenOptionComponent, {
           route: option.address,
           iconImg: option.logoURI,
           text: option.name,
         });
       } else {
         option = option as Chain;
-        return m(InputTokenOptionComponent, {
+        return render(InputTokenOptionComponent, {
           route: option.id,
           iconImg: option.img,
           text: option.name,
@@ -73,7 +74,7 @@ const InputTokenList: m.Component<
       }
     };
     if (!vnode.state.options) return;
-    return m(
+    return render(
       'ul.InputTokenList',
       {
         class:

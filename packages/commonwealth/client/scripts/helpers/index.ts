@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import m, { RouteOptions } from 'mithril';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
@@ -45,26 +45,26 @@ export function parseCustomStages(str) {
 export const modalRedirectClick = (e, route) => {
   e.preventDefault();
   $(e.target).trigger('modalexit');
-  m.route.set(route);
+  setRoute(route);
 };
 
 /*
  * mithril link helper
  */
 export function externalLink(selector, target, children) {
-  return m(
+  return render(
     selector,
     {
       href: target,
       target: '_blank',
       rel: 'noopener noreferrer',
-      onclick: (e) => {
+      onClick: (e) => {
         if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
         if (target.startsWith(`${document.location.origin}/`)) {
           // don't open a new window if the link is on Commonwealth
           e.preventDefault();
           e.stopPropagation();
-          m.route.set(target);
+          setRoute(target);
         }
       },
     },
@@ -83,7 +83,7 @@ export function link(
 ) {
   const attrs = {
     href: target,
-    onclick: (e) => {
+    onClick: (e) => {
       if (e.metaKey || e.altKey || e.shiftKey || e.ctrlKey) return;
       if (e.target.target === '_blank') return;
 
@@ -94,22 +94,22 @@ export function link(
         localStorage[saveScrollPositionAs] = window.scrollY;
       }
       if (beforeRouteSet) beforeRouteSet();
-      const routeArgs: [string, any?, RouteOptions?] =
+      const routeArgs: [string, any?, any?] =
         window.location.href.split('?')[0] === target.split('?')[0]
           ? [target, {}, { replace: true }]
           : [target];
       if (afterRouteSet) {
         (async () => {
-          await m.route.set(...routeArgs);
+          await setRoute(...routeArgs);
           afterRouteSet();
         })();
       } else {
-        m.route.set(...routeArgs);
+        setRoute(...routeArgs);
       }
     },
   };
   if (extraAttrs) Object.assign(attrs, extraAttrs);
-  return m(selector, attrs, children);
+  return render(selector, attrs, children);
 }
 
 /*
@@ -289,7 +289,7 @@ export function renderMultilineText(text: string) {
     .split('\n')
     .map((p) => p.trim())
     .filter((p) => p !== '');
-  return paragraphs.map((p) => m('p', p));
+  return paragraphs.map((p) => render('p', p));
 }
 
 /*
@@ -372,6 +372,7 @@ export const isCommandClick = (e: MouseEvent) => {
 
 // Handle command click and normal clicks
 export const handleRedirectClicks = (
+  _this,
   e: MouseEvent,
   redirectLink: string,
   activeChainId: string | null,
@@ -386,7 +387,7 @@ export const handleRedirectClicks = (
     return;
   }
 
-  navigateToSubpage(redirectLink);
+  _this.navigateToSubpage(redirectLink);
   if (callback) {
     callback();
   }

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/discussions/recent_threads_header.scss';
 
@@ -28,7 +29,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
 
   onResize() {
     this.isWindowExtraSmall = isWindowExtraSmall(window.innerWidth);
-    m.redraw();
+    redraw();
   }
 
   oninit() {
@@ -45,7 +46,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
     });
   }
 
-  view(vnode: m.Vnode<RecentThreadsHeaderAttrs>) {
+  view(vnode: ResultNode<RecentThreadsHeaderAttrs>) {
     const { topic, stage, totalThreadCount } = vnode.attrs;
 
     const { stagesEnabled, customStages } = app.chain?.meta;
@@ -76,14 +77,14 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
     const selectedStage = stages.find((s) => s === (stage as ThreadStage));
 
     return (
-      <div class="RecentThreadsHeader">
+      <div className="RecentThreadsHeader">
         {isUndefined(topic) && (
-          <>
-            <div class="header-row">
+          <React.Fragment>
+            <div className="header-row">
               <CWText type="h3" fontWeight="semiBold" className="header-text">
                 All Discussions
               </CWText>
-              <div class="count-and-button">
+              <div className="count-and-button">
                 <CWText
                   type="caption"
                   fontWeight="medium"
@@ -95,7 +96,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
                   <CWIconButton
                     iconName="plusCircle"
                     iconButtonTheme="black"
-                    onclick={() => {
+                    onClick={() => {
                       navigateToSubpage('/new/discussion');
                     }}
                   />
@@ -104,7 +105,7 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
                     buttonType="mini-black"
                     label="Create Thread"
                     iconName="plus"
-                    onclick={() => {
+                    onClick={() => {
                       navigateToSubpage('/new/discussion');
                     }}
                   />
@@ -116,10 +117,10 @@ export class RecentThreadsHeader extends ClassComponent<RecentThreadsHeaderAttrs
               community treasury and spending on contributor grants, community
               initiatives, liquidity mining and other programs.
             </CWText>
-          </>
+          </React.Fragment>
         )}
         {app.chain?.meta && (
-          <div class="buttons-row">
+          <div className="buttons-row">
             {topics.length > 0 && (
               <TopicsMenu
                 featuredTopics={featuredTopics}

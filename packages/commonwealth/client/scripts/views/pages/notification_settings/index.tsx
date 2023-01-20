@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/notification_settings/index.scss';
@@ -33,7 +34,7 @@ class NotificationSettingsPage extends ClassComponent {
         />
       );
     } else if (!app.isLoggedIn()) {
-      m.route.set('/', {}, { replace: true });
+      setRoute('/', {}, { replace: true });
       return <PageLoading />;
     }
 
@@ -43,7 +44,7 @@ class NotificationSettingsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Notification Settings" />}
       >
-        <div class="NotificationSettingsPage">
+        <div className="NotificationSettingsPage">
           <CWText type="h3" fontWeight="semiBold" className="page-header-text">
             Notification Management
           </CWText>
@@ -51,7 +52,7 @@ class NotificationSettingsPage extends ClassComponent {
             Notification settings for all new threads, comments, mentions,
             likes, and chain events in the following communities.
           </CWText>
-          <div class="column-header-row">
+          <div className="column-header-row">
             <CWText
               type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'h5'}
               fontWeight="medium"
@@ -80,12 +81,12 @@ class NotificationSettingsPage extends ClassComponent {
             const hasSomeInAppSubs = subs.some((s) => s.isActive);
 
             return (
-              <div class="notification-row">
+              <div className="notification-row">
                 <CWCollapsible
                   headerContent={
-                    <div class="notification-row-header">
+                    <div className="notification-row-header">
                       <div className="left-content-container">
-                        <div class="avatar-and-name">
+                        <div className="avatar-and-name">
                           <CWCommunityAvatar
                             size="medium"
                             community={chainInfo}
@@ -106,12 +107,12 @@ class NotificationSettingsPage extends ClassComponent {
                             ? app.user.notifications
                                 .disableImmediateEmails(subs)
                                 .then(() => {
-                                  m.redraw();
+                                  redraw();
                                 })
                             : app.user.notifications
                                 .enableImmediateEmails(subs)
                                 .then(() => {
-                                  m.redraw();
+                                  redraw();
                                 });
                         }}
                       />
@@ -122,20 +123,20 @@ class NotificationSettingsPage extends ClassComponent {
                             ? app.user.notifications
                                 .disableSubscriptions(subs)
                                 .then(() => {
-                                  m.redraw();
+                                  redraw();
                                 })
                             : app.user.notifications
                                 .enableSubscriptions(subs)
                                 .then(() => {
-                                  m.redraw();
+                                  redraw();
                                 });
                         }}
                       />
                     </div>
                   }
                   collapsibleContent={
-                    <div class="subscriptions-list-container">
-                      <div class="subscriptions-list-header">
+                    <div className="subscriptions-list-container">
+                      <div className="subscriptions-list-header">
                         <CWText
                           type="caption"
                           className="subscription-list-header-text"
@@ -158,7 +159,7 @@ class NotificationSettingsPage extends ClassComponent {
                       {subs.map((sub) => {
                         const getUser = () => {
                           if (sub.Thread) {
-                            return m(User, {
+                            return render(User, {
                               user: new AddressInfo(
                                 null,
                                 sub.Thread.author,
@@ -167,7 +168,7 @@ class NotificationSettingsPage extends ClassComponent {
                               ),
                             });
                           } else if (sub.Comment) {
-                            return m(User, {
+                            return render(User, {
                               user: new AddressInfo(
                                 null,
                                 sub.Comment.author,
@@ -193,8 +194,8 @@ class NotificationSettingsPage extends ClassComponent {
                         };
 
                         return (
-                          <>
-                            <div class="subscription-row-desktop">
+                          <React.Fragment>
+                            <div className="subscription-row-desktop">
                               <SubscriptionRowTextContainer
                                 subscription={sub}
                               />
@@ -202,14 +203,14 @@ class NotificationSettingsPage extends ClassComponent {
                               {getUser()}
                               <SubscriptionRowMenu subscription={sub} />
                             </div>
-                            <div class="subscription-row-mobile">
-                              <div class="subscription-row-mobile-top">
+                            <div className="subscription-row-mobile">
+                              <div className="subscription-row-mobile-top">
                                 <SubscriptionRowTextContainer
                                   subscription={sub}
                                 />
                                 <SubscriptionRowMenu subscription={sub} />
                               </div>
-                              <div class="subscription-row-mobile-bottom">
+                              <div className="subscription-row-mobile-bottom">
                                 {getUser()}
                                 {getTimeStamp() && (
                                   <CWText
@@ -228,7 +229,7 @@ class NotificationSettingsPage extends ClassComponent {
                                 </CWText>
                               </div>
                             </div>
-                          </>
+                          </React.Fragment>
                         );
                       })}
                     </div>

@@ -1,10 +1,10 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
 import $ from 'jquery';
-
 import app from 'state';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+
 import { initAppState } from 'app';
 import { PageLoading } from 'views/pages/loading';
 import { updateActiveAddresses } from 'controllers/app/login';
@@ -38,7 +38,7 @@ const validate = async (
     const selectedChainMeta = app.config.chains.getById('axie-infinity');
     await updateActiveAddresses(selectedChainMeta);
     console.log('Navigating to axie infinite community');
-    m.route.set('/axie-infinity');
+    setRoute('/axie-infinity');
   } else {
     console.error(`Got login error: ${JSON.stringify(result)}`);
     return `Login error: ${JSON.stringify(result)}`;
@@ -54,13 +54,13 @@ class FinishAxieLogin extends ClassComponent<Record<string, unknown>> {
   public oninit() {
     // grab token
     // TODO: how to use state id?
-    const token = m.route.param('token');
-    const stateId = m.route.param('stateId');
+    const token = getRouteParam('token');
+    const stateId = getRouteParam('stateId');
 
     validate(token, stateId, 'axie-infinity').then((res) => {
       if (typeof res === 'string') {
         this.state.error = res;
-        m.redraw();
+        redraw();
       }
     });
   }

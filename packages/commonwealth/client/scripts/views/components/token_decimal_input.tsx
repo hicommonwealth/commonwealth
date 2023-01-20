@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/token_decimal_input.scss';
 
@@ -22,7 +23,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
   private switchCaption: string;
   private valueInWei: string;
 
-  oninit(vnode: m.Vnode<TokenDecimalInputAttrs>) {
+  oninit(vnode: ResultNode<TokenDecimalInputAttrs>) {
     const { defaultValueInWei } = vnode.attrs;
 
     this.valueInWei = defaultValueInWei || '0';
@@ -31,11 +32,11 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
     this.switchCaption = 'Using base token value';
   }
 
-  view(vnode: m.Vnode<TokenDecimalInputAttrs>) {
+  view(vnode: ResultNode<TokenDecimalInputAttrs>) {
     const { onInputChange, decimals } = vnode.attrs;
 
     return (
-      <div class="TokenDecimalInput">
+      <div className="TokenDecimalInput">
         <CWTextInput
           value={this.displayValue}
           // type: 'number',
@@ -67,7 +68,7 @@ export class TokenDecimalInput extends ClassComponent<TokenDecimalInputAttrs> {
           }}
         />
         {decimals > 0 && (
-          <div class="token-settings">
+          <div className="token-settings">
             <CWToggle
               checked={!this.isInputInWei}
               onchange={() => {

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/comments/comments_tree.scss';
 
@@ -28,11 +29,11 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
   private isReplying: boolean;
   private parentCommentId: number;
 
-  oncreate(vnode: m.VnodeDOM<CommentsTreeAttrs, this>) {
+  oncreate(vnode: ResultNode<CommentsTreeAttrs>) {
     this.dom = vnode.dom;
   }
 
-  view(vnode: m.Vnode<CommentsTreeAttrs>) {
+  view(vnode: ResultNode<CommentsTreeAttrs>) {
     const {
       comments,
       proposal,
@@ -41,7 +42,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
     } = vnode.attrs;
 
     // Jump to the comment indicated in the URL upon page load. Avoid
-    // using m.route.param('comment') because it may return stale
+    // using getRouteParam('comment') because it may return stale
     // results from a previous page if route transition hasn't finished
 
     if (this.dom && comments?.length > 0 && !this.highlightedComment) {
@@ -114,7 +115,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
 
         if (isLivingCommentTree(comment, children)) {
           return (
-            <>
+            <React.Fragment key={comment.id}>
               <Comment
                 comment={comment}
                 handleIsReplying={handleIsReplying}
@@ -135,7 +136,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
                   updatedCommentsCallback={updatedCommentsCallback}
                 />
               )}
-            </>
+            </React.Fragment>
           );
         } else {
           return null;
@@ -144,7 +145,7 @@ export class CommentsTree extends ClassComponent<CommentsTreeAttrs> {
     };
 
     return (
-      <div class="ProposalComments">
+      <div className="ProposalComments">
         {recursivelyGatherComments(comments, comments[0], 0)}
         {this.commentError && (
           <CWValidationText message={this.commentError} status="failure" />

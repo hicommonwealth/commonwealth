@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { proposalSlugToClass } from 'identifiers';
@@ -31,7 +31,7 @@ export class SubstrateBountyProposalForm extends ClassComponent {
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWTextInput
           placeholder="Bounty title (stored on chain)"
           label="Title"
@@ -51,7 +51,7 @@ export class SubstrateBountyProposalForm extends ClassComponent {
         />
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             if (!this.title) {
@@ -78,7 +78,7 @@ export class SubstrateBountyProposalForm extends ClassComponent {
             return createTXModal(createFunc(args));
           }}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

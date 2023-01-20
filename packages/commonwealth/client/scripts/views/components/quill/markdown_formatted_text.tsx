@@ -1,8 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 /* eslint-disable no-useless-escape */
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx, rootRender } from 'mithrilInterop';
 import DOMPurify from 'dompurify';
 import { findAll } from 'highlight-words-core';
 import smartTruncate from 'smart-truncate';
@@ -39,7 +40,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
   truncatedDoc;
   isTruncated: boolean;
 
-  oninit(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
+  oninit(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
     this.isTruncated =
       vnode.attrs.cutoffLines &&
       vnode.attrs.cutoffLines < countLinesMarkdown(vnode.attrs.doc);
@@ -53,7 +54,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
     }
   }
 
-  view(vnode: m.Vnode<MarkdownFormattedTextAttrs>) {
+  view(vnode: ResultNode<MarkdownFormattedTextAttrs>) {
     const {
       doc,
       hideFormatting,
@@ -75,7 +76,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
       } else {
         this.truncatedDoc = doc;
       }
-      m.redraw();
+      redraw();
     };
 
     renderer.link = (href, title, text) => {
@@ -97,11 +98,11 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
           ADD_ATTR: ['target'],
         });
 
-        const vnodes = m.trust(sanitized);
+        const vnodes = render.trust(sanitized);
 
         const root = document.createElement('div');
 
-        m.render(root, vnodes);
+        rootRender(root, vnodes);
 
         const textToHighlight = root.innerText
           .replace(/\n/g, ' ')
@@ -147,7 +148,7 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
 
       return (
         <div
-          class={getClasses<{ collapsed?: boolean }>(
+          className={getClasses<{ collapsed?: boolean }>(
             { collapsed: !!collapse },
             'MarkdownFormattedText'
           )}
@@ -156,11 +157,14 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
         </div>
       );
     } else {
-      if (this.isTruncated)
+      if (!doc) return <React.Fragment></React.Fragment>;
+      if (this.isTruncated) {
         this.truncatedDoc = doc.slice(
           0,
           doc.split('\n', cutoffLines).join('\n').length
         );
+      }
+      if (!this.truncatedDoc) return <React.Fragment></React.Fragment>;
 
       const unsanitized = marked.parse(this.truncatedDoc.toString());
 
@@ -174,12 +178,12 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
             ADD_ATTR: ['target'],
           });
 
-      const results = m.trust(sanitized);
+      const results = render.trust(sanitized);
 
       return (
-        <>
+        <React.Fragment>
           <div
-            class={getClasses<{ collapsed?: boolean }>(
+            className={getClasses<{ collapsed?: boolean }>(
               { collapsed: !!collapse },
               'MarkdownFormattedText'
             )}
@@ -187,14 +191,14 @@ export class MarkdownFormattedText extends ClassComponent<MarkdownFormattedTextA
             {results}
           </div>
           {this.isTruncated && (
-            <div class="show-more-button-wrapper">
-              <div class="show-more-button" onclick={toggleDisplay}>
+            <div className="show-more-button-wrapper">
+              <div className="show-more-button" onClick={toggleDisplay}>
                 <CWIcon iconName="plus" iconSize="small" />
-                <div class="show-more-text">Show More</div>
+                <div className="show-more-text">Show More</div>
               </div>
             </div>
           )}
-        </>
+        </React.Fragment>
       );
     }
   }

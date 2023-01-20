@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import BN from 'bn.js';
 import moment from 'moment';
 
@@ -23,7 +24,7 @@ type SputnikDaoRowAttrs = {
 };
 
 class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
-  view(vnode: m.Vnode<SputnikDaoRowAttrs>) {
+  view(vnode: ResultNode<SputnikDaoRowAttrs>) {
     const { dao, clickable } = vnode.attrs;
 
     const amountString = (app.chain as Near).chain
@@ -46,14 +47,14 @@ class SputnikDaoRow extends ClassComponent<SputnikDaoRowAttrs> {
 
     return (
       <div
-        class={getClasses<{ clickable?: boolean }>(
+        className={getClasses<{ clickable?: boolean }>(
           { clickable },
           'sputnik-row'
         )}
-        onclick={(e) => {
+        onClick={(e) => {
           if (clickable) {
             e.preventDefault();
-            m.route.set(`/${dao.contractId}`);
+            setRoute(`/${dao.contractId}`);
           }
         }}
       >
@@ -75,7 +76,7 @@ class SputnikDAOsPage extends ClassComponent {
 
   view() {
     if (app.activeChainId() && app.activeChainId() !== 'near')
-      m.route.set(`/${app.activeChainId()}`);
+      setRoute(`/${app.activeChainId()}`);
 
     const activeEntity = app.chain;
     const allCommunities = app.config.chains.getAll();
@@ -118,7 +119,7 @@ class SputnikDAOsPage extends ClassComponent {
             return parseFloat(d2.amount) - parseFloat(d1.amount);
           }
         });
-        m.redraw();
+        redraw();
       });
     }
 
@@ -140,9 +141,9 @@ class SputnikDAOsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Sputnik DAOs" />}
       >
-        <div class="SputnikDAOsPage">
+        <div className="SputnikDAOsPage">
           <CWText type="h3">Sputnik DAOs</CWText>
-          <div class="sputnik-row">
+          <div className="sputnik-row">
             <CWText fontWeight="medium">Name</CWText>
             <CWText fontWeight="medium">Dao Funds Ⓝ</CWText>
             <CWText fontWeight="medium">Council Size</CWText>

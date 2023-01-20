@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'components/comments/comment.scss';
@@ -27,7 +28,7 @@ type CommentAuthorAttrs = {
 };
 
 class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
-  view(vnode: m.Vnode<CommentAuthorAttrs>) {
+  view(vnode: ResultNode<CommentAuthorAttrs>) {
     const { comment } = vnode.attrs;
 
     // Check for accounts on forums that originally signed up on a different base chain,
@@ -37,7 +38,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
         comment.authorChain !== app.chain.id &&
         comment.authorChain !== app.chain.base
       ) {
-        return m(AnonymousUser, {
+        return render(AnonymousUser, {
           distinguishingKey: comment.author,
         });
       }
@@ -48,7 +49,7 @@ class CommentAuthor extends ClassComponent<CommentAuthorAttrs> {
     return comment.deleted ? (
       <span>[deleted]</span>
     ) : (
-      m(User, {
+      render(User, {
         avatarSize: 24,
         user: author,
         popover: true,
@@ -74,7 +75,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
   private shouldRestoreEdits: boolean;
   private savedEdits: string;
 
-  view(vnode: m.Vnode<CommentAttrs>) {
+  view(vnode: ResultNode<CommentAttrs>) {
     const {
       comment,
       handleIsReplying,
@@ -109,18 +110,18 @@ export class Comment extends ClassComponent<CommentAttrs> {
       (comment.author === app.user.activeAccount?.address || isAdminOrMod);
 
     return (
-      <div class={`Comment comment-${comment.id}`}>
+      <div className={`Comment comment-${comment.id}`}>
         {threadLevel > 0 && (
-          <div class="thread-connectors-container">
+          <div className="thread-connectors-container">
             {Array(threadLevel)
               .fill(undefined)
               .map(() => (
-                <div class="thread-connector" />
+                <div className="thread-connector" />
               ))}
           </div>
         )}
-        <div class="comment-body">
-          <div class="comment-header">
+        <div className="comment-body">
+          <div className="comment-header">
             <CommentAuthor comment={comment} />
             {/* don't need this distinction yet since we aren't showing "edited at" */}
             {/* <CWText type="caption" className="published-text">
@@ -143,18 +144,18 @@ export class Comment extends ClassComponent<CommentAttrs> {
               updatedCommentsCallback={updatedCommentsCallback}
             />
           ) : (
-            <>
+            <React.Fragment>
               <CWText className="comment-text">
                 {renderQuillTextBody(comment.text)}
               </CWText>
               {!comment.deleted && (
-                <div class="comment-footer">
-                  <div class="menu-buttons-left">
+                <div className="comment-footer">
+                  <div className="menu-buttons-left">
                     <CommentReactionButton comment={comment} />
                     {canReply && (
                       <div
-                        class="reply-button"
-                        onclick={() => {
+                        className="reply-button"
+                        onClick={() => {
                           handleIsReplying(true, comment.id);
                         }}
                       >
@@ -165,7 +166,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                       </div>
                     )}
                   </div>
-                  <div class="menu-buttons-right">
+                  <div className="menu-buttons-right">
                     <SharePopover commentId={comment.id} />
                     {canEditAndDelete && (
                       <CWPopoverMenu
@@ -179,7 +180,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                           {
                             label: 'Edit',
                             iconLeft: 'write',
-                            onclick: async (e) => {
+                            onClick: async (e) => {
                               e.preventDefault();
                               this.savedEdits = localStorage.getItem(
                                 `${app.activeChainId()}-edit-comment-${
@@ -204,9 +205,9 @@ export class Comment extends ClassComponent<CommentAttrs> {
                           {
                             label: 'Delete',
                             iconLeft: 'trash',
-                            onclick: () => {
+                            onClick: () => {
                               app.comments.delete(comment).then(() => {
-                                m.redraw();
+                                redraw();
                               });
                             },
                           },
@@ -216,7 +217,7 @@ export class Comment extends ClassComponent<CommentAttrs> {
                   </div>
                 </div>
               )}
-            </>
+            </React.Fragment>
           )}
         </div>
       </div>

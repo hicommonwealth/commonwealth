@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import { uuidv4 } from 'lib/util';
 
 export class ModalStore {
@@ -10,7 +11,7 @@ export class ModalStore {
   public create(modalspec) {
     modalspec.id = uuidv4();
     this._modals.push(modalspec);
-    m.redraw();
+    redraw();
   }
 
   // name must be filename in the modals folder
@@ -30,7 +31,7 @@ export class ModalStore {
       throw new Error('Invalid modal');
     }
     this._modals.splice(index, 1);
-    m.redraw();
+    redraw();
   }
 
   public getList() {

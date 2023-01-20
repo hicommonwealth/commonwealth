@@ -1,5 +1,6 @@
 declare module '*.scss';
 
+/*
 declare namespace JSX {
   interface ElementClass {
     view: any;
@@ -13,3 +14,4 @@ declare namespace JSX {
     __props: any;
   }
 }
+*/

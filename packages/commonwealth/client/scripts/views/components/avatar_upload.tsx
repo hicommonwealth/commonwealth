@@ -1,8 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
 import $ from 'jquery';
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import Dropzone from 'dropzone';
 
 import 'components/avatar_upload.scss';
@@ -30,7 +31,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
   private dropzone?: any;
   private uploaded: boolean;
 
-  oncreate(vnode: m.VnodeDOM<AvatarUploadAttrs>) {
+  oncreate(vnode: ResultNode<AvatarUploadAttrs>) {
     $(vnode.dom).on('cleardropzone', () => {
       this.dropzone.files.map((file) => this.dropzone.removeFile(file));
     });
@@ -97,7 +98,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
     });
   }
 
-  view(vnode: m.Vnode<AvatarUploadAttrs>) {
+  view(vnode: ResultNode<AvatarUploadAttrs>) {
     const { account, darkMode, scope, size = 'small' } = vnode.attrs;
 
     const avatarSize = size === 'small' ? 60 : 108;
@@ -114,13 +115,13 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
 
     return (
       <div
-        class={getClasses<AvatarUploadStyleAttrs>(
+        className={getClasses<AvatarUploadStyleAttrs>(
           { size },
           ComponentType.AvatarUpload
         )}
       >
         <div
-          class={getClasses<{ darkMode?: boolean }>(
+          className={getClasses<{ darkMode?: boolean }>(
             { darkMode },
             'icon-button-container'
           )}
@@ -133,7 +134,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
         </div>
         {!this.uploaded && (
           <div
-            class={getClasses<{ hasNoAvatar: boolean }>(
+            className={getClasses<{ hasNoAvatar: boolean }>(
               { hasNoAvatar: isUndefined(avatar) },
               'dropzone-attach'
             )}
@@ -142,7 +143,7 @@ export class AvatarUpload extends ClassComponent<AvatarUploadAttrs> {
           </div>
         )}
         <div
-          class={getClasses<{ hidden: boolean }>(
+          className={getClasses<{ hidden: boolean }>(
             { hidden: !this.uploaded },
             'dropzone-preview-container'
           )}

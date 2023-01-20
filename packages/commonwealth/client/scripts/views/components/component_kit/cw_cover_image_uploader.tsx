@@ -1,8 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 import 'components/component_kit/cw_cover_image_uploader.scss';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 import app from 'state';
 
@@ -53,7 +54,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     }
   }
 
-  oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  oncreate(vnode: ResultNode<CoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
@@ -69,7 +70,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     const handleUpload = async (file: File) => {
       if (!file) return;
       this.isUploading = true;
-      m.redraw();
+      this.redraw();
 
       const [imageURL, uploadStatus] = await this.uploadImage(file);
       this.isUploading = false;
@@ -81,7 +82,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
         vnode.attrs.uploadCompleteCallback(imageURL);
       }
 
-      m.redraw();
+      this.redraw();
     };
 
     // Drag'n'Drop event handler declarations
@@ -123,12 +124,12 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     attachZone.addEventListener('click', clickHandler);
   }
 
-  view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  view(vnode: ResultNode<CoverImageUploaderAttrs>) {
     const { imageURL, isUploading, uploadStatus } = this;
     const { headerText, subheaderText } = vnode.attrs;
 
     return (
-      <div class="CoverImageUploader">
+      <div className="CoverImageUploader">
         {headerText && (
           <CWText type="caption" fontWeight="medium">
             {headerText}
@@ -147,7 +148,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
           validationStatus={this.uploadStatus}
         />
         <div
-          class={getClasses<{
+          className={getClasses<{
             isUploading: boolean;
             uploadStatus: ValidationStatus;
           }>(
@@ -165,7 +166,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
             id="pseudo-input"
           />
           {this.isUploading && <CWSpinner active="true" size="large" />}
-          <div class="attach-btn">
+          <div className="attach-btn">
             {!this.isUploading && (
               <CWIcon iconName="imageUpload" iconSize="medium" />
             )}

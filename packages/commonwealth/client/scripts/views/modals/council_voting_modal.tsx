@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/council_voting_modal.scss';
@@ -32,7 +33,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
   private phragmenStakeAmount: SubstrateCoin;
   private votes: Array<string>;
 
-  oninit(vnode: m.Vnode<CouncilVotingModalAttrs>) {
+  oninit(vnode: ResultNode<CouncilVotingModalAttrs>) {
     const candidates = vnode.attrs.candidates || [];
     // get currently set approvals
     const currentVote = (
@@ -61,7 +62,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
       .map(([candidate]) => candidate.address);
   }
 
-  view(vnode: m.Vnode<CouncilVotingModalAttrs>) {
+  view(vnode: ResultNode<CouncilVotingModalAttrs>) {
     const { candidates } = vnode.attrs;
 
     const submitVote = (e) => {
@@ -102,7 +103,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
         },
         (err) => {
           if (err) this.error = err;
-          m.redraw();
+          redraw();
         }
       );
     };
@@ -112,13 +113,13 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
     const votingBond = (app.chain as Substrate).phragmenElections.votingBond;
 
     return (
-      <div class="CouncilVotingModal">
-        <div class="compact-modal-title">
+      <div className="CouncilVotingModal">
+        <div className="compact-modal-title">
           <h3>Approval Voting</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
-          <div class="chooser">
+        <div className="compact-modal-body">
+          <div className="chooser">
             <CWText fontWeight="semiBold">
               Lock any amount of{' '}
               {(app.chain && app.chain.chain && app.chain.chain.denom) ||
@@ -141,13 +142,13 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                 );
               }}
             />
-            <div class="candidates-container">
+            <div className="candidates-container">
               {candidates.length > 0 ? (
                 candidates.map((candidateTuple) => {
                   const candidate = candidateTuple[0];
                   const address = candidateTuple[0].address;
 
-                  const onclick = (e) => {
+                  const onClick = (e) => {
                     e.preventDefault();
 
                     const index = this.votes.indexOf(address);
@@ -160,14 +161,14 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                   };
 
                   return (
-                    <div class="candidate-row" onclick={onclick}>
+                    <div className="candidate-row" onClick={onClick}>
                       <CWCheckbox
                         checked={this.votes.indexOf(address) !== -1}
-                        onchange={onclick}
+                        onchange={onClick}
                         label=""
                         value=""
                       />
-                      {m(User, { user: candidate })}
+                      {render(User, { user: candidate })}
                     </div>
                   );
                 })
@@ -180,15 +181,15 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
             )}
           </div>
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={submitVote}
+            onClick={submitVote}
             label={hasApprovals ? 'Update vote' : 'Submit vote'}
           />
           {hasApprovals && (
             <CWButton
               buttonType="primary-red"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 const account = app.user.activeAccount as SubstrateAccount;
                 createTXModal(
@@ -201,7 +202,7 @@ export class CouncilVotingModal extends ClassComponent<CouncilVotingModalAttrs> 
                   },
                   (err) => {
                     if (err) this.error = err;
-                    m.redraw();
+                    redraw();
                   }
                 );
               }}

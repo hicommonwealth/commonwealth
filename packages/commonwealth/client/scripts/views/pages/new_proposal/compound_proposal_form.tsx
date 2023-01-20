@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/new_proposal/compound_proposal_form.scss';
 
@@ -38,10 +38,10 @@ export class CompoundProposalForm extends ClassComponent {
     const { activeTabIndex, aaveProposalState } = this;
 
     return (
-      <div class="CompoundProposalForm">
-        <div class="row-with-label">
+      <div className="CompoundProposalForm">
+        <div className="row-with-label">
           <CWLabel label="Proposer (you)" />
-          {m(User, {
+          {render(User, {
             user: author,
             linkify: true,
             popover: true,
@@ -62,13 +62,13 @@ export class CompoundProposalForm extends ClassComponent {
             this.description = e.target.value;
           }}
         />
-        <div class="tab-selector">
+        <div className="tab-selector">
           <CWTabBar>
             {aaveProposalState.map((_, index) => (
               <CWTab
                 label={`Call ${index + 1}`}
                 isSelected={activeTabIndex === index}
-                onclick={() => {
+                onClick={() => {
                   this.activeTabIndex = index;
                 }}
               />
@@ -79,7 +79,7 @@ export class CompoundProposalForm extends ClassComponent {
               {
                 iconLeft: 'write',
                 label: 'Add',
-                onclick: () => {
+                onClick: () => {
                   this.tabCount++;
                   this.activeTabIndex = this.tabCount - 1;
                   this.aaveProposalState.push(defaultStateItem);
@@ -88,7 +88,7 @@ export class CompoundProposalForm extends ClassComponent {
               {
                 iconLeft: 'trash',
                 label: 'Delete',
-                onclick: () => {
+                onClick: () => {
                   this.tabCount--;
                   this.activeTabIndex = this.tabCount - 1;
                   this.aaveProposalState.pop();
@@ -132,7 +132,7 @@ export class CompoundProposalForm extends ClassComponent {
         />
         <CWButton
           label="Send transaction"
-          onclick={(e) => {
+          onClick={(e) => {
             e.preventDefault();
 
             this.proposer = app.user?.activeAccount?.address;
@@ -186,7 +186,7 @@ export class CompoundProposalForm extends ClassComponent {
               .propose(details)
               .then((result: string) => {
                 notifySuccess(`Proposal ${result} created successfully!`);
-                m.redraw();
+                redraw();
               })
               .catch((err) => notifyError(err.data?.message || err.message));
           }}

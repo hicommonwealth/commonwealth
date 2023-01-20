@@ -1,7 +1,17 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'index.scss'; // have to inject here instead of app.ts or else fonts don't load
 import 'layout.scss';
@@ -14,21 +24,27 @@ import {
 } from 'app';
 import app from 'state';
 import { AppToasts } from 'views/toast';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import { AppModals } from './app_modals';
 import { UserSurveyPopup } from './components/user_survey_popup';
 import { CWSpinner } from './components/component_kit/cw_spinner';
 import { CWEmptyState } from './components/component_kit/cw_empty_state';
 import { CWText } from './components/component_kit/cw_text';
+import { useParams } from 'react-router-dom';
+
+export const withRouter = (WrappedComponent) => (props) => {
+  const params = useParams();
+  return <WrappedComponent {...props} params={params} />;
+};
 
 class LoadingLayout extends ClassComponent {
   view() {
     return (
-      <div class="Layout">
-        <div class="spinner-container">
+      <div className="Layout">
+        <div className="spinner-container">
           <CWSpinner size="xl" />
         </div>
-        <AppModals />
+        {/*<AppModals />*/}
         <AppToasts />
       </div>
     );
@@ -38,17 +54,25 @@ class LoadingLayout extends ClassComponent {
 type LayoutAttrs = {
   deferChain?: boolean;
   hideSidebar?: boolean;
-  scope: string;
+  scope?: string;
+  initFn?: Function;
+  params?;
 };
 
-export class Layout extends ClassComponent<LayoutAttrs> {
+class LayoutComponent extends ClassComponent<LayoutAttrs> {
   private loadingScope: string;
   private deferred: boolean;
   private surveyDelayTriggered = false;
   private surveyReadyForDisplay = false;
 
-  view(vnode: m.Vnode<LayoutAttrs>) {
-    const { scope, deferChain } = vnode.attrs;
+  oninit(vnode: ResultNode<LayoutAttrs>) {
+    if (vnode.attrs.initFn) {
+      vnode.attrs.initFn().then(() => this.redraw());
+    }
+  }
+
+  view(vnode: ResultNode<LayoutAttrs>) {
+    const { deferChain, params: { scope } = {} } = vnode.attrs;
     const scopeIsEthereumAddress =
       scope && scope.startsWith('0x') && scope.length === 42;
     const scopeMatchesChain = app.config.chains.getById(scope);
@@ -63,17 +87,17 @@ export class Layout extends ClassComponent<LayoutAttrs> {
 
     if (app.loadingError) {
       return (
-        <div class="Layout">
+        <div className="Layout">
           <CWEmptyState
             iconName="cautionTriangle"
             content={
-              <div class="loading-error">
+              <div className="loading-error">
                 <CWText>Application error: {app.loadingError}</CWText>
                 <CWText>Please try again later</CWText>
               </div>
             }
           />
-          <AppModals />
+          {/*<AppModals />*/}
           <AppToasts />
         </div>
       );
@@ -88,9 +112,9 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       // If /api/status has returned, then app.config.nodes and app.config.communities
       // should both be loaded. If we match neither of them, then we can safely 404
       return (
-        <div class="Layout">
+        <div className="Layout">
           <PageNotFound />
-          <AppModals />
+          {/*<AppModals />*/}
           <AppToasts />
         </div>
       );
@@ -106,14 +130,16 @@ export class Layout extends ClassComponent<LayoutAttrs> {
         this.deferred = deferChain;
         selectChain(scopeMatchesChain, deferChain).then((response) => {
           if (!deferChain && response) {
-            initChain();
+            initChain().then(() => this.redraw());
+          } else {
+            this.redraw();
           }
         });
         return <LoadingLayout />;
       }
     } else if (scope && this.deferred && !deferChain) {
       this.deferred = false;
-      initChain();
+      initChain().then(() => this.redraw());
       return <LoadingLayout />;
     } else if (!scope && app.chain && app.chain.network) {
       // Handle the case where we unload the network or community, if we're
@@ -123,18 +149,21 @@ export class Layout extends ClassComponent<LayoutAttrs> {
       if (!app.isCustomDomain()) {
         deinitChainOrCommunity().then(() => {
           this.loadingScope = null;
-          m.redraw();
+          redraw();
         });
       }
       return <LoadingLayout />;
     }
     return (
-      <div class="Layout">
+      <div className="Layout">
         {vnode.children}
-        <AppModals />
+        {/*<AppModals />*/}
         <AppToasts />
-        <UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />
+        {/*<UserSurveyPopup surveyReadyForDisplay={this.surveyReadyForDisplay} />*/}
       </div>
     );
   }
 }
+
+export const Layout = LayoutComponent;
+// export const Layout = withRouter(LayoutComponent);

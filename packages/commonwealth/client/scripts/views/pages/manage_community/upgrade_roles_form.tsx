@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
@@ -22,7 +23,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
   private role: string;
   private user: string;
 
-  view(vnode: m.Vnode<UpgradeRolesFormAttrs>) {
+  view(vnode: ResultNode<UpgradeRolesFormAttrs>) {
     const { roleData, onRoleUpgrade } = vnode.attrs;
 
     const nonAdmins: RoleInfo[] = roleData.filter((role) => {
@@ -53,8 +54,8 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
     const chainOrCommObj = { chain: app.activeChainId() };
 
     return (
-      <div class="UpgradeRolesForm">
-        <div class="members-container">
+      <div className="UpgradeRolesForm">
+        <div className="members-container">
           <CWRadioGroup
             name="members/mods"
             options={nonAdminNames.map((n) => ({ label: n, value: n }))}
@@ -64,7 +65,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
             }}
           />
         </div>
-        <div class="upgrade-buttons-container">
+        <div className="upgrade-buttons-container">
           <CWRadioGroup
             name="roles"
             options={[
@@ -79,7 +80,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
           <CWButton
             label="Upgrade Member"
             disabled={!this.role || !this.user}
-            onclick={() => {
+            onClick={() => {
               const indexOfName = nonAdminNames.indexOf(this.user);
 
               const user = nonAdmins[indexOfName];
@@ -104,7 +105,7 @@ export class UpgradeRolesForm extends ClassComponent<UpgradeRolesFormAttrs> {
                   notifySuccess('Member upgraded');
                   delete this.user;
                   delete this.role;
-                  m.redraw();
+                  redraw();
                 } else {
                   notifyError('Upgrade failed');
                 }

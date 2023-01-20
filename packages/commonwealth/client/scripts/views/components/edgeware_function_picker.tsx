@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+
 import { blake2AsHex } from '@polkadot/util-crypto';
 
 import app from 'state';
@@ -29,7 +30,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
     }
   }
 
-  public view(vnode: m.Vnode<EdgewareFunctionPickerProps>) {
+  public view(vnode: ResultNode<EdgewareFunctionPickerProps>) {
     vnode.attrs = vnode.attrs || { module: '', function: '', args: [] };
     vnode.attrs.module =
       vnode.attrs.module || (app.chain as Substrate).chain.listApiModules()[0];
@@ -50,7 +51,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
     }
 
     return (
-      <>
+      <React.Fragment>
         <CWDropdown
           label="Module"
           options={(app.chain as Substrate).chain
@@ -64,9 +65,9 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
               app.chain as Substrate
             ).chain.listModuleFunctions(result.value)[0];
             vnode.attrs.args = [];
-            m.redraw();
+            redraw();
             setTimeout(() => {
-              m.redraw();
+              redraw();
             }, 0);
           }}
         />
@@ -81,7 +82,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
             vnode.attrs.function = result.value;
             vnode.attrs.args = [];
             setTimeout(() => {
-              m.redraw();
+              redraw();
             }, 0);
           }}
         />
@@ -97,7 +98,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
                     parseFloat(result),
                     true
                   );
-                  m.redraw(); // TODO: why is this needed?
+                  redraw(); // TODO: why is this needed?
                 }}
               />
             );
@@ -111,7 +112,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
                   vnode.attrs.args[index] = result
                     .split(',')
                     .map((str) => str.trim());
-                  m.redraw(); // TODO: why is this needed?
+                  redraw(); // TODO: why is this needed?
                 }}
               />
             );
@@ -123,7 +124,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
                 oninput={(e) => {
                   const result = (e.target as any).value;
                   vnode.attrs.args[index] = result;
-                  m.redraw(); // TODO: why is this needed?
+                  redraw(); // TODO: why is this needed?
                 }}
               />
             );
@@ -137,7 +138,7 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
             ? blake2AsHex(EdgewareFunctionPicker.getMethod(vnode.attrs).toHex())
             : ''}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

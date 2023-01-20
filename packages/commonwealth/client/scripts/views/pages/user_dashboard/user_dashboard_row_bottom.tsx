@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/user_dashboard/user_dashboard_row_bottom.scss';
 
@@ -22,7 +23,7 @@ type UserDashboardRowBottomAttrs = {
 };
 
 export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBottomAttrs> {
-  view(vnode: m.Vnode<UserDashboardRowBottomAttrs>) {
+  view(vnode: ResultNode<UserDashboardRowBottomAttrs>) {
     const { path, threadId, viewCount, likeCount, commentCount } = vnode.attrs;
 
     const adjustedId = `discussion_${threadId}`;
@@ -43,8 +44,8 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
       commentSubscription?.isActive && reactionSubscription?.isActive;
 
     return (
-      <div class="UserDashboardRowBottom">
-        <div class="buttons-row">
+      <div className="UserDashboardRowBottom">
+        <div className="buttons-row">
           <CWButton
             label="Discuss"
             iconLeft="plus"
@@ -54,7 +55,7 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
             label={bothActive ? 'Unsubscribe' : 'Subscribe'}
             iconLeft="bell"
             buttonType="secondary-blue"
-            onclick={(e) => {
+            onClick={(e) => {
               e.stopPropagation();
 
               subscribeToThread(
@@ -66,7 +67,7 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
             }}
           />
           <div
-            onclick={(e) => {
+            onClick={(e) => {
               e.stopPropagation();
             }}
           >
@@ -81,21 +82,21 @@ export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBotto
             />
           </div>
         </div>
-        <div class="interaction-counts">
+        <div className="interaction-counts">
           {viewCount && viewCount > 0 && (
-            <div class="icon-and-count">
+            <div className="icon-and-count">
               <CWIcon iconName="views" className="count-icon" />
               <CWText className="count-text">{viewCount}</CWText>
             </div>
           )}
           {likeCount && likeCount > 0 && (
-            <div class="icon-and-count">
+            <div className="icon-and-count">
               <CWIcon iconName="heartFilled" className="count-icon" />
               <CWText className="count-text">{likeCount}</CWText>
             </div>
           )}
           {commentCount && commentCount > 0 && (
-            <div class="icon-and-count">
+            <div className="icon-and-count">
               <CWIcon iconName="feedback" className="count-icon" />
               <CWText className="count-text">{commentCount}</CWText>
             </div>

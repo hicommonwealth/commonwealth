@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { CWText } from '../cw_text';
 import { SharedPopoverAttrs, CWPopover } from './cw_popover';
@@ -13,11 +14,11 @@ export type TooltipType =
   | 'solidNoArrow';
 
 type TooltipAttrs = {
-  tooltipContent: string | m.Vnode;
+  tooltipContent: string | ResultNode;
 } & SharedPopoverAttrs;
 
 export class CWTooltip extends ClassComponent<TooltipAttrs> {
-  view(vnode: m.Vnode<TooltipAttrs>) {
+  view(vnode: ResultNode<TooltipAttrs>) {
     const {
       hoverCloseDelay = 1500,
       hoverOpenDelay,

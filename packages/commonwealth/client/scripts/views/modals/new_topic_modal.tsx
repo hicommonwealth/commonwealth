@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 
@@ -64,12 +65,12 @@ export class NewTopicModal extends ClassComponent {
       : 18;
 
     return (
-      <div class="NewTopicModal">
-        <div class="compact-modal-title">
+      <div className="NewTopicModal">
+        <div className="compact-modal-title">
           <h3>New topic</h3>
           <ModalExitButton />
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <CWTextInput
             label="Name"
             name="name"
@@ -87,7 +88,7 @@ export class NewTopicModal extends ClassComponent {
               if (currentCommunityTopicNames.includes(text.toLowerCase())) {
                 errorMsg = 'Topic name already used within community.';
                 this.error = errorMsg;
-                m.redraw();
+                redraw();
                 return ['failure', errorMsg];
               }
 
@@ -100,7 +101,7 @@ export class NewTopicModal extends ClassComponent {
                 )} 
                 ${disallowedCharMatches.join(', ')} are not permitted`;
                 this.error = errorMsg;
-                m.redraw();
+                redraw();
                 return ['failure', errorMsg];
               }
 
@@ -126,7 +127,7 @@ export class NewTopicModal extends ClassComponent {
             }}
           />
           {app.activeChainId() && (
-            <>
+            <React.Fragment>
               <CWLabel
                 label={`Number of tokens needed to post (${app.chain?.meta.default_symbol})`}
               />
@@ -137,9 +138,9 @@ export class NewTopicModal extends ClassComponent {
                   this.form.tokenThreshold = newValue;
                 }}
               />
-            </>
+            </React.Fragment>
           )}
-          <div class="checkboxes">
+          <div className="checkboxes">
             <CWCheckbox
               label="Featured in Sidebar"
               checked={this.form.featuredInSidebar}
@@ -170,7 +171,7 @@ export class NewTopicModal extends ClassComponent {
           <CWButton
             label="Create topic"
             disabled={this.saving || !!this.error || disabled}
-            onclick={async (e: Event) => {
+            onClick={async (e: Event) => {
               e.preventDefault();
               const { form } = this;
               try {
@@ -191,7 +192,7 @@ export class NewTopicModal extends ClassComponent {
                 );
 
                 this.saving = false;
-                m.redraw();
+                redraw();
                 $(e.target).trigger('modalexit');
               } catch (err) {
                 this.error = 'Error creating topic';
@@ -199,7 +200,7 @@ export class NewTopicModal extends ClassComponent {
                 if (this.quillEditorState) {
                   this.quillEditorState.enable();
                 }
-                m.redraw();
+                redraw();
               }
             }}
           />

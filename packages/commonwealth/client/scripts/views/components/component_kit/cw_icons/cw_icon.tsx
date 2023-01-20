@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
 
@@ -10,14 +11,14 @@ import { IconComponentAttrs } from './types';
 import { ComponentType } from '../types';
 
 export class CWIcon extends ClassComponent<IconComponentAttrs> {
-  view(vnode: m.Vnode<IconComponentAttrs>) {
+  view(vnode: ResultNode<IconComponentAttrs>) {
     const {
       className,
       componentType = ComponentType.Icon,
       disabled = false,
       iconName,
       iconSize = 'medium',
-      onclick,
+      onClick,
       selected,
       ...otherAttrs
     } = vnode.attrs;
@@ -30,7 +31,7 @@ export class CWIcon extends ClassComponent<IconComponentAttrs> {
         componentType={componentType}
         disabled={disabled}
         iconSize={iconSize}
-        onclick={onclick}
+        onClick={onClick}
         selected={selected}
         {...otherAttrs}
       />

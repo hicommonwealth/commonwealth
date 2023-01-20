@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import app from 'state';
 import { navigateToSubpage } from 'app';
@@ -17,7 +18,7 @@ type ThreadPreviewMenuAttrs = {
 };
 
 export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
-  view(vnode: m.Vnode<ThreadPreviewMenuAttrs>) {
+  view(vnode: ResultNode<ThreadPreviewMenuAttrs>) {
     if (!app.isLoggedIn()) return;
 
     const { thread } = vnode.attrs;
@@ -41,8 +42,8 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
 
     return (
       <div
-        class="ThreadPreviewMenu"
-        onclick={(e) => {
+        className="ThreadPreviewMenu"
+        onClick={(e) => {
           // prevent clicks from propagating to discussion row
           e.preventDefault();
           e.stopPropagation();
@@ -53,12 +54,12 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
 
                       app.threads.pin({ proposal: thread }).then(() => {
                         navigateToSubpage('/discussions');
-                        m.redraw();
+                        this.redraw();
                       });
                     },
                     label: thread.pinned ? 'Unpin thread' : 'Pin thread',
@@ -69,7 +70,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
 
                       app.threads
@@ -77,7 +78,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
                           threadId: thread.id,
                           readOnly: !thread.readOnly,
                         })
-                        .then(() => m.redraw());
+                        .then(() => redraw());
                     },
                     label: thread.readOnly ? 'Unlock thread' : 'Lock thread',
                     iconLeft: 'lock' as const,
@@ -87,14 +88,14 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
                       app.modals.create({
                         modal: ChangeTopicModal,
                         data: {
                           onChangeHandler: (topic: Topic) => {
                             thread.topic = topic;
-                            m.redraw();
+                            redraw();
                           },
                           thread,
                         },
@@ -108,14 +109,14 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onclick: (e) => {
+                    onClick: (e) => {
                       e.preventDefault();
                       app.modals.create({
                         modal: UpdateProposalStatusModal,
                         data: {
                           onChangeHandler: (stage: ThreadStage) => {
                             thread.stage = stage;
-                            m.redraw();
+                            redraw();
                           },
                           thread,
                         },
@@ -129,7 +130,7 @@ export class ThreadPreviewMenu extends ClassComponent<ThreadPreviewMenuAttrs> {
             ...(isAuthor || hasAdminPermissions
               ? [
                   {
-                    onclick: async (e) => {
+                    onClick: async (e) => {
                       e.preventDefault();
 
                       const confirmed = await confirmationModalWithText(

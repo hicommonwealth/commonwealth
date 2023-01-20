@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_tabs.scss';
 
@@ -16,20 +17,20 @@ type TabStyleAttrs = {
 
 type TabAttrs = {
   label: string;
-  onclick: () => void;
+  onClick: () => void;
 } & TabStyleAttrs;
 
 export class CWTab extends ClassComponent<TabAttrs> {
-  view(vnode: m.Vnode<TabAttrs>) {
-    const { disabled, isSelected, label, onclick } = vnode.attrs;
+  view(vnode: ResultNode<TabAttrs>) {
+    const { disabled, isSelected, label, onClick } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<TabStyleAttrs>(
+        className={getClasses<TabStyleAttrs>(
           { isSelected, disabled },
           ComponentType.Tab
         )}
-        onclick={onclick}
+        onClick={onClick}
       >
         <CWText
           type="h4"
@@ -44,7 +45,7 @@ export class CWTab extends ClassComponent<TabAttrs> {
 }
 
 export class CWTabBar extends ClassComponent {
-  view(vnode: m.Vnode) {
-    return <div class={ComponentType.TabBar}>{vnode.children}</div>;
+  view(vnode: ResultNode) {
+    return <div className={ComponentType.TabBar}>{vnode.children}</div>;
   }
 }

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/proposals.scss';
 
@@ -17,7 +18,7 @@ import Sublayout from 'views/sublayout';
 import { PageLoading } from 'views/pages/loading';
 import { ProposalCard } from 'views/components/proposal_card';
 import { loadSubstrateModules } from 'views/components/load_substrate_modules';
-import { PageNotFound } from 'views/pages/404';
+import PageNotFound from 'views/pages/404';
 import ErrorPage from 'views/pages/error';
 import NearSputnik from 'controllers/chain/near/sputnik/adapter';
 import { AaveProposalCardDetail } from '../components/proposals/aave_proposal_card_detail';
@@ -163,7 +164,7 @@ class ProposalsPage extends ClassComponent {
       !activeCompoundProposals?.length &&
       !activeAaveProposals?.length &&
       !activeSputnikProposals?.length
-        ? [<div class="no-proposals">No active proposals</div>]
+        ? [<div className="no-proposals">No active proposals</div>]
         : (activeDemocracyProposals || [])
             .map((proposal) => <ProposalCard proposal={proposal} />)
             .concat(
@@ -262,7 +263,7 @@ class ProposalsPage extends ClassComponent {
       !inactiveCompoundProposals?.length &&
       !inactiveAaveProposals?.length &&
       !inactiveSputnikProposals?.length
-        ? [<div class="no-proposals">No past proposals</div>]
+        ? [<div className="no-proposals">No past proposals</div>]
         : (inactiveDemocracyProposals || [])
             .map((proposal) => <ProposalCard proposal={proposal} />)
             .concat(
@@ -308,7 +309,7 @@ class ProposalsPage extends ClassComponent {
       <Sublayout
       // title={<BreadcrumbsTitleTag title="Proposals" />}
       >
-        <div class="ProposalsPage">
+        <div className="ProposalsPage">
           {onSubstrate && (
             <SubstrateProposalStats
               nextLaunchBlock={

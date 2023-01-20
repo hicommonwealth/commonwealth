@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import app from 'state';
@@ -34,7 +35,7 @@ export const handlePollVote = async (
     .submitVote(...userInfo, option)
     .then(() => {
       callback();
-      m.redraw();
+      redraw();
     })
     .catch(async () => {
       await alertModalWithText(

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'pages/manage_community/manage_roles.scss';
@@ -21,16 +22,16 @@ type ManageRoleRowAttrs = {
 };
 
 export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
-  view(vnode: m.Vnode<ManageRoleRowAttrs>) {
+  view(vnode: ResultNode<ManageRoleRowAttrs>) {
     if (!vnode.attrs.roledata || vnode.attrs.roledata.length === 0) return;
 
     const chainOrCommObj = { chain: app.activeChainId() };
     const communityMeta = app.chain.meta;
 
     return (
-      <div class="ManageRoles">
+      <div className="ManageRoles">
         <CWLabel label={vnode.attrs.label} />
-        <div class="roles-container">
+        <div className="roles-container">
           {vnode.attrs.roledata?.map((role) => {
             const addr = role.Address;
 
@@ -42,8 +43,8 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
               (addr_) => addr_.id === (role.address_id || role.Address.id)
             ).length;
             return (
-              <div class="role-row">
-                {m(User, {
+              <div className="role-row">
+                {render(User, {
                   user: new AddressInfo(
                     addr.id,
                     addr.address,
@@ -59,7 +60,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                 <CWIcon
                   iconName="close"
                   iconSize="small"
-                  onclick={async () => {
+                  onClick={async () => {
                     const adminsAndMods = await communityMeta.getMembers(
                       app.activeChainId()
                     );
@@ -133,7 +134,7 @@ export class ManageRoles extends ClassComponent<ManageRoleRowAttrs> {
                       vnode.attrs.onRoleUpdate(role, newRole);
 
                       if (isLosingAdminPermissions) {
-                        m.route.set(`/${app.activeChainId()}`);
+                        setRoute(`/${app.activeChainId()}`);
                       }
                     } catch (err) {
                       const errMsg =

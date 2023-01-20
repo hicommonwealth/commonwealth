@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/discussions/stages_menu.scss';
 
@@ -16,23 +17,23 @@ import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWDivider } from '../../components/component_kit/cw_divider';
 
 type ThreadsFilterMenuItemAttrs = {
-  iconRight?: m.Vnode;
+  iconRight?: ResultNode;
   isSelected: boolean;
   label: string;
-  onclick: (e: any) => void;
+  onClick: (e: any) => void;
 };
 
 export class ThreadsFilterMenuItem extends ClassComponent<ThreadsFilterMenuItemAttrs> {
-  view(vnode: m.Vnode<ThreadsFilterMenuItemAttrs>) {
-    const { iconRight, isSelected, label, onclick } = vnode.attrs;
+  view(vnode: ResultNode<ThreadsFilterMenuItemAttrs>) {
+    const { iconRight, isSelected, label, onClick } = vnode.attrs;
 
     return (
       <div
-        class={getClasses<{ isSelected: boolean }>(
+        className={getClasses<{ isSelected: boolean }>(
           { isSelected },
           'ThreadsFilterMenuItem'
         )}
-        onclick={onclick}
+        onClick={onClick}
       >
         {isSelected && <CWIcon iconName="check" iconSize="small" />}
         {label}
@@ -49,7 +50,7 @@ type StagesMenuAttrs = {
 };
 
 export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
-  view(vnode: m.Vnode<StagesMenuAttrs>) {
+  view(vnode: ResultNode<StagesMenuAttrs>) {
     const { selectedStage, stage, stages } = vnode.attrs;
 
     return (
@@ -66,11 +67,11 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
           />
         }
         content={
-          <div class="threads-filter-menu-items">
+          <div className="threads-filter-menu-items">
             <ThreadsFilterMenuItem
               label="All Stages"
               isSelected={!stage}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 navigateToSubpage('/discussions');
               }}
@@ -78,8 +79,9 @@ export class StagesMenu extends ClassComponent<StagesMenuAttrs> {
             <CWDivider />
             {stages.map((targetStage) => (
               <ThreadsFilterMenuItem
+                key={stage}
                 isSelected={stage === targetStage}
-                onclick={(e) => {
+                onClick={(e) => {
                   e.preventDefault();
                   navigateToSubpage(`/discussions?stage=${targetStage}`);
                 }}

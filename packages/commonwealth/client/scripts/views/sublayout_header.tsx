@@ -1,7 +1,13 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import {
+  ClassComponent,
+  ResultNode,
+  setRoute,
+  redraw,
+  jsx,
+} from 'mithrilInterop';
 
 import 'sublayout_header.scss';
 
@@ -23,21 +29,21 @@ type SublayoutHeaderAttrs = {
 };
 
 export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
-  view(vnode: m.Vnode<SublayoutHeaderAttrs>) {
+  view(vnode: ResultNode<SublayoutHeaderAttrs>) {
     const { hideSearch, onMobile } = vnode.attrs;
 
     return (
-      <div class="SublayoutHeader">
-        <div class="header-left">
+      <div className="SublayoutHeader">
+        <div className="header-left">
           <CWIconButton
             iconName="commonLogo"
             iconButtonTheme="black"
             iconSize="xl"
-            onclick={() => {
+            onClick={() => {
               if (app.isCustomDomain()) {
-                m.route.set('/');
+                setRoute('/');
               } else {
-                m.route.set('/dashboard/for-you');
+                setRoute('/dashboard/for-you');
               }
             }}
           />
@@ -53,29 +59,29 @@ export class SublayoutHeader extends ClassComponent<SublayoutHeaderAttrs> {
               iconName={
                 app.sidebarToggled ? 'sidebarCollapse' : 'sidebarExpand'
               }
-              onclick={() => {
+              onClick={() => {
                 app.sidebarToggled = !app.sidebarToggled;
-                m.redraw();
+                redraw();
               }}
             />
           )}
         </div>
         {!hideSearch && <SearchBar />}
-        <div class="header-right">
-          <div class="MobileMenuContainer">
+        <div className="header-right">
+          <div className="MobileMenuContainer">
             <CWIconButton
               iconName="dotsVertical"
               iconButtonTheme="black"
-              onclick={() => {
+              onClick={() => {
                 app.sidebarToggled = false;
                 app.mobileMenu = app.mobileMenu ? null : 'MainMenu';
-                m.redraw();
+                redraw();
               }}
             />
           </div>
-          <div class="DesktopMenuContainer">
+          <div className="DesktopMenuContainer">
             <CreateContentPopover />
-            <HelpMenuPopover />
+            {/*<HelpMenuPopover />*/}
             {app.isLoggedIn() && <NotificationsMenuPopover />}
             {app.isLoggedIn() && app.config.invites?.length > 0 && (
               <InvitesMenuPopover />

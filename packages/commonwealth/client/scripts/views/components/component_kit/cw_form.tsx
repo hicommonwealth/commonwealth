@@ -1,7 +1,7 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_form.scss';
 
@@ -12,11 +12,11 @@ import { CWText } from './cw_text';
 type FormAttrs = {
   description: string;
   title: string;
-  topRightElement?: m.Vnode;
+  topRightElement?: ResultNode<any>;
 };
 
 export class CWForm extends ClassComponent<FormAttrs> {
-  view(vnode: m.Vnode<FormAttrs>) {
+  view(vnode: ResultNode<FormAttrs>) {
     const { description, title } = vnode.attrs;
 
     return (

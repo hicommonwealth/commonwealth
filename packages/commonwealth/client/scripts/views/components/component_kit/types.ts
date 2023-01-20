@@ -64,7 +64,7 @@ export type DefaultMenuItem = {
   iconRight?: IconName;
   isSecondary?: boolean;
   label?: string;
-  onclick?: (e?: Event) => void;
+  onClick?: (e?: Event) => void;
   type?: 'default';
 };
 
@@ -73,7 +73,7 @@ type NotificationMenuItem = {
   iconLeft?: IconName;
   iconRight?: IconName;
   label?: string;
-  onclick?: (e?: MouseEvent) => void;
+  onClick?: (e?: MouseEvent) => void;
   type?: 'notification';
 };
 

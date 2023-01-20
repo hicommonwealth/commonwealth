@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_progress_bar.scss';
 
@@ -22,14 +23,14 @@ type ProgressBarAttrs = {
 };
 
 export class CWProgressBar extends ClassComponent<ProgressBarAttrs> {
-  view(vnode: m.Vnode<ProgressBarAttrs>) {
+  view(vnode: ResultNode<ProgressBarAttrs>) {
     const { label, progress, progressStatus, subtext, iconName } = vnode.attrs;
 
     return (
-      <div class={ComponentType.ProgressBar}>
-        <div class="progress-label">
-          <div class="label-wrapper">
-            <div class="label-display">
+      <div className={ComponentType.ProgressBar}>
+        <div className="progress-label">
+          <div className="label-wrapper">
+            <div className="label-display">
               {!!iconName && (
                 <CWIcon
                   iconName={iconName}
@@ -50,7 +51,7 @@ export class CWProgressBar extends ClassComponent<ProgressBarAttrs> {
           </CWText>
         </div>
         <progress
-          class={getClasses<{ progressStatus: ProgressBarStatus }>({
+          className={getClasses<{ progressStatus: ProgressBarStatus }>({
             progressStatus,
           })}
           max="100"

@@ -1,11 +1,13 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/discussions/thread_preview.scss';
 
+import { NavigationWrapper } from 'mithrilInterop/helpers';
 import app from 'state';
 import {
   chainEntityTypeToProposalShortName,
@@ -33,18 +35,19 @@ import {
   isWindowSmallInclusive,
 } from '../../components/component_kit/helpers';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+// import { ThreadPreviewMenu } from './thread_preview_menu';
 import { ThreadPreviewMenu } from './thread_preview_menu';
 
 type ThreadPreviewAttrs = {
   thread: Thread;
 };
 
-export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
+class ThreadPreviewComponent extends ClassComponent<ThreadPreviewAttrs> {
   private isWindowSmallInclusive: boolean;
 
   onResize() {
     this.isWindowSmallInclusive = isWindowSmallInclusive(window.innerWidth);
-    m.redraw();
+    redraw();
   }
 
   oninit() {
@@ -61,7 +64,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
     });
   }
 
-  view(vnode: m.Vnode<ThreadPreviewAttrs>) {
+  view(vnode: ResultNode<ThreadPreviewAttrs>) {
     const { thread } = vnode.attrs;
 
     const isSubscribed =
@@ -70,11 +73,11 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
 
     return (
       <div
-        class={getClasses<{ isPinned?: boolean }>(
+        className={getClasses<{ isPinned?: boolean }>(
           { isPinned: thread.pinned },
           'ThreadPreview'
         )}
-        onclick={(e) => {
+        onClick={(e) => {
           const discussionLink = getProposalUrlPath(
             thread.slug,
             `${thread.identifier}-${slugify(thread.title)}`
@@ -92,17 +95,17 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
           localStorage[`${app.activeChainId()}-discussions-scrollY`] =
             scrollEle.scrollTop;
 
-          m.route.set(discussionLink);
+          this.props.navigate(discussionLink);
         }}
         key={thread.id}
       >
         {!this.isWindowSmallInclusive && (
           <ThreadPreviewReactionButton thread={thread} />
         )}
-        <div class="main-content">
-          <div class="top-row">
-            <div class="user-and-date">
-              {m(User, {
+        <div className="main-content">
+          <div className="top-row">
+            <div className="user-and-date">
+              {render(User, {
                 avatarSize: 24,
                 user: new AddressInfo(
                   null,
@@ -127,8 +130,8 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
               </CWText>
               {thread.readOnly && <CWIcon iconName="lock" iconSize="small" />}
             </div>
-            <div class="top-row-icons">
-              {isHot(thread) && <div class="flame" />}
+            <div className="top-row-icons">
+              {isHot(thread) && <div className="flame" />}
               {thread.pinned && (
                 <CWIcon
                   iconName="pin"
@@ -137,7 +140,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
               )}
             </div>
           </div>
-          <div class="title-row">
+          <div className="title-row">
             <CWText type="h5" fontWeight="semiBold">
               {thread.title}
             </CWText>
@@ -154,7 +157,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
             {thread.plaintext}
           </CWText>
           {thread.chainEntities?.length > 0 && (
-            <div class="tags-row">
+            <div className="tags-row">
               {thread.chainEntities
                 .sort((a, b) => {
                   return +a.typeId - +b.typeId;
@@ -175,8 +178,8 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 })}
             </div>
           )}
-          <div class="row-bottom">
-            <div class="comments-count">
+          <div className="row-bottom">
+            <div className="comments-count">
               {this.isWindowSmallInclusive && (
                 <ThreadReactionButton thread={thread} />
               )}
@@ -185,9 +188,9 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 {pluralize(thread.numberOfComments, 'comment')}
               </CWText>
             </div>
-            <div class="row-bottom-menu">
+            <div className="row-bottom-menu">
               <div
-                onclick={(e) => {
+                onClick={(e) => {
                   // prevent clicks from propagating to discussion row
                   e.preventDefault();
                   e.stopPropagation();
@@ -196,7 +199,7 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
                 <SharePopover />
               </div>
               <div
-                onclick={(e) => {
+                onClick={(e) => {
                   // prevent clicks from propagating to discussion row
                   e.preventDefault();
                   e.stopPropagation();
@@ -220,3 +223,5 @@ export class ThreadPreview extends ClassComponent<ThreadPreviewAttrs> {
     );
   }
 }
+
+export const ThreadPreview = NavigationWrapper(ThreadPreviewComponent);

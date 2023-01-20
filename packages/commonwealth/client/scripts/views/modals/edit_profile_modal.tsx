@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/edit_profile_modal.scss';
@@ -27,7 +28,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
   private name: string;
   private saving: boolean;
 
-  oninit(vnode: m.Vnode<EditProfileModalAttrs>) {
+  oninit(vnode: ResultNode<EditProfileModalAttrs>) {
     const { account } = vnode.attrs;
 
     this.avatarUrl = account.profile.avatarUrl;
@@ -36,20 +37,20 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
     this.name = account.profile.name;
   }
 
-  view(vnode: m.VnodeDOM<EditProfileModalAttrs>) {
+  view(vnode: ResultNode<EditProfileModalAttrs>) {
     const { account, refreshCallback } = vnode.attrs;
 
     return (
-      <div class="EditProfileModal">
-        <div class="compact-modal-title">
+      <div className="EditProfileModal">
+        <div className="compact-modal-title">
           <h3>Edit profile</h3>
         </div>
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <AvatarUpload
             scope="user"
             account={account}
             uploadStartedCallback={() => {
-              m.redraw();
+              redraw();
             }}
             uploadCompleteCallback={(files) => {
               files.forEach((f) => {
@@ -57,7 +58,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
                 const url = f.uploadURL.replace(/\?.*/, '');
                 this.avatarUrl = url.trim();
               });
-              m.redraw();
+              redraw();
             }}
           />
           <CWTextInput
@@ -96,10 +97,10 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
               }
             }}
           />
-          <div class="buttons-row">
+          <div className="buttons-row">
             <CWButton
               buttonType="secondary-blue"
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 $(vnode.dom).trigger('modalexit');
               }}
@@ -107,7 +108,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
             />
             <CWButton
               disabled={this.saving}
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
 
                 const data = {
@@ -123,7 +124,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
                   .updateProfileForAccount(account, data)
                   .then(() => {
                     this.saving = false;
-                    m.redraw();
+                    redraw();
                     refreshCallback();
                     $(vnode.dom).trigger('modalexit');
                   })
@@ -132,7 +133,7 @@ export class EditProfileModal extends ClassComponent<EditProfileModalAttrs> {
                     this.error = error.responseJSON
                       ? error.responseJSON.error
                       : error.responseText;
-                    m.redraw();
+                    redraw();
                   });
               }}
               label="Save Changes"

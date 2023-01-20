@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/view_thread/edit_body.scss';
 
@@ -28,14 +29,14 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
   private quillEditorState: QuillEditor;
   private saving: boolean;
 
-  view(vnode: m.Vnode<EditBodyAttrs>) {
+  view(vnode: ResultNode<EditBodyAttrs>) {
     const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } =
       vnode.attrs;
 
     const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
 
     return (
-      <div class="EditBody">
+      <div className="EditBody">
         <QuillEditorComponent
           contentsDoc={body}
           oncreateBind={(state: QuillEditor) => {
@@ -45,12 +46,12 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
           theme="snow"
           editorNamespace={`edit-thread-${thread.id}`}
         />
-        <div class="buttons-row">
+        <div className="buttons-row">
           <CWButton
             label="Cancel"
             disabled={this.saving}
             buttonType="secondary-blue"
-            onclick={async (e) => {
+            onClick={async (e) => {
               e.preventDefault();
 
               let confirmed = true;
@@ -68,14 +69,14 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
               if (confirmed) {
                 setIsEditing(false);
                 clearEditingLocalStorage(thread.id, ContentType.Thread);
-                m.redraw();
+                redraw();
               }
             }}
           />
           <CWButton
             label="Save"
             disabled={this.saving}
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
 
               this.saving = true;
@@ -89,7 +90,7 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
                 this.saving = false;
                 clearEditingLocalStorage(thread.id, ContentType.Thread);
                 setIsEditing(false);
-                m.redraw();
+                redraw();
                 notifySuccess('Thread successfully edited');
               });
             }}

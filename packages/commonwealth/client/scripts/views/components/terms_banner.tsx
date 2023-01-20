@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/terms_banner.scss';
 
@@ -12,7 +13,7 @@ import { CWText } from './component_kit/cw_text';
 type TermsBannerAttrs = { terms: string };
 
 export class TermsBanner extends ClassComponent<TermsBannerAttrs> {
-  view(vnode: m.Vnode<TermsBannerAttrs>) {
+  view(vnode: ResultNode<TermsBannerAttrs>) {
     const { terms } = vnode.attrs;
 
     return (

@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_text.scss';
 
@@ -45,7 +46,7 @@ type TextStyleAttrs = {
 };
 
 type TextAttrs = {
-  onclick?: (e?: MouseEvent) => void;
+  onClick?: (e?: MouseEvent) => void;
   title?: string | number;
 } & TextStyleAttrs;
 
@@ -60,13 +61,13 @@ const getFontWeight = (type: FontType) => {
 };
 
 export class CWText extends ClassComponent<TextAttrs> {
-  view(vnode: m.Vnode<TextAttrs>) {
+  view(vnode: ResultNode<TextAttrs>) {
     const {
       className,
       disabled = false,
       isCentered,
       fontStyle,
-      onclick,
+      onClick,
       noWrap = false,
       title,
       type = 'b1',
@@ -75,21 +76,21 @@ export class CWText extends ClassComponent<TextAttrs> {
 
     return (
       <div
-        class={getClasses<TextStyleAttrs & { onclick?: boolean }>(
+        className={getClasses<TextStyleAttrs & { onClick?: boolean }>(
           {
             type,
             fontWeight,
             disabled,
             fontStyle,
             noWrap,
-            onclick: !!onclick,
+            onClick: !!onClick,
             isCentered,
             className,
           },
           ComponentType.Text
         )}
         title={title}
-        onclick={onclick}
+        onClick={onClick}
       >
         {vnode.children}
       </div>

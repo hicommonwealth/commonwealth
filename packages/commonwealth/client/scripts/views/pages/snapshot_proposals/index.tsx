@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/snapshot_proposals.scss';
@@ -33,9 +34,9 @@ type SnapshotProposalStagesBarAttrs = {
 };
 
 class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
-  view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalStagesBarAttrs>) {
     return (
-      <div class="SnapshotProposalStagesBar">
+      <div className="SnapshotProposalStagesBar">
         {Object.values(SnapshotProposalFilter).map(
           (option: SnapshotProposalFilter) => (
             <CWButton
@@ -43,7 +44,7 @@ class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBar
                 option === SnapshotProposalFilter.Core ||
                 option === SnapshotProposalFilter.Community
               }
-              onclick={(e) => {
+              onClick={(e) => {
                 e.preventDefault();
                 vnode.attrs.onChangeFilter(option);
               }}
@@ -75,13 +76,13 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
     this.selectedFilter = SnapshotProposalFilter.Active;
   }
 
-  view(vnode: m.Vnode<SnapshotProposalsPageAttrs>) {
+  view(vnode: ResultNode<SnapshotProposalsPageAttrs>) {
     const { selectedFilter } = this;
     const { snapshotId } = vnode.attrs;
 
     if (!app.snapshot.initialized || app.snapshot?.space?.id !== snapshotId) {
       app.snapshot.init(snapshotId).then(() => {
-        m.redraw();
+        redraw();
       });
 
       return <PageLoading />;
@@ -119,7 +120,7 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
       // title="Proposals"
       >
         {app.chain && (
-          <div class="SnapshotProposalsPage">
+          <div className="SnapshotProposalsPage">
             <SnapshotProposalStagesBar
               selected={selectedFilter}
               onChangeFilter={onChangeFilter}

@@ -1,4 +1,5 @@
-import m from 'mithril';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import { removeOrAddClasslistToAllElements } from 'helpers';
 import { ICardListItem } from 'models/interfaces';
@@ -6,7 +7,7 @@ import { ICardListItem } from 'models/interfaces';
 import ListedCardWithImage from './listed_card_with_image';
 import ListContainer from './list_container';
 
-const ItemListsMapper: m.Component<
+const ItemListsMapper: Component<
   {
     cardItems: ICardListItem[];
     textType?: string;
@@ -45,7 +46,7 @@ const ItemListsMapper: m.Component<
     const mappedListItems = cardItems.map((item: ICardListItem) => {
       const { button, card, texts } = item;
       // eslint-disable-next-line no-return-assign
-      return m(ListedCardWithImage, {
+      return render(ListedCardWithImage, {
         handleClick: () => handleClickItem(item),
         isTabHoverActive: buttonHoverActiveById === button.id,
         title: texts.title,
@@ -61,7 +62,7 @@ const ItemListsMapper: m.Component<
       });
     });
 
-    return m(
+    return render(
       ListContainer,
       {
         bgColor,

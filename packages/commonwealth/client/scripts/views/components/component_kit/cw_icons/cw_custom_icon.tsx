@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'components/component_kit/cw_icon.scss';
 
@@ -10,7 +11,7 @@ import { CustomIconAttrs } from './types';
 import { ComponentType } from '../types';
 
 export class CWCustomIcon extends ClassComponent<CustomIconAttrs> {
-  view(vnode: m.Vnode<CustomIconAttrs>) {
+  view(vnode: ResultNode<CustomIconAttrs>) {
     const {
       componentType = ComponentType.CustomIcon,
       iconName,

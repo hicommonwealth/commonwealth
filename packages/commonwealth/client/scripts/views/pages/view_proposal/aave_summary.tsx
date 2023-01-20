@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/view_proposal/aave_summary.scss';
 
@@ -14,11 +15,11 @@ type AaveViewProposalDetailAttrs = {
 };
 
 export class AaveViewProposalDetail extends ClassComponent<AaveViewProposalDetailAttrs> {
-  view(vnode: m.Vnode<AaveViewProposalDetailAttrs>) {
+  view(vnode: ResultNode<AaveViewProposalDetailAttrs>) {
     const { proposal } = vnode.attrs;
 
     return (
-      <div class="AaveSummary">
+      <div className="AaveSummary">
         {proposal.ipfsData?.shortDescription && (
           <div>
             <CWText type="h4" fontWeight="semiBold">

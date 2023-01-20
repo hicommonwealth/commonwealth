@@ -1,6 +1,9 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 import $ from 'jquery';
 
 import 'modals/alert_modal.scss';
@@ -10,14 +13,14 @@ import { CWButton } from '../components/component_kit/cw_button';
 
 const AlertModal = {
   confirmExit: async () => true,
-  view(vnode: m.Vnode<{ text: string; primaryButton?: string }>) {
+  view(vnode: ResultNode<{ text: string; primaryButton?: string }>) {
     const alertText = vnode.attrs.text;
     const primaryButton = vnode.attrs.primaryButton || 'Continue';
 
     return (
       <div
-        class="ConfirmModal"
-        onclick={(e) => {
+        className="ConfirmModal"
+        onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
         }}
@@ -26,12 +29,12 @@ const AlertModal = {
           e.stopPropagation();
         }}
       >
-        <div class="compact-modal-body">
+        <div className="compact-modal-body">
           <h3>{alertText}</h3>
         </div>
-        <div class="compact-modal-actions">
+        <div className="compact-modal-actions">
           <CWButton
-            onclick={(e) => {
+            onClick={(e) => {
               e.preventDefault();
               $(e.target).trigger('modalcomplete');
               setTimeout(() => {

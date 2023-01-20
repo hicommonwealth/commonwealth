@@ -1,7 +1,8 @@
-/* @jsx m */
+/* @jsx jsx */
+import React from 'react';
 
-import m from 'mithril';
-import ClassComponent from 'class_component';
+
+import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
 
 import 'pages/notification_settings/helper_components.scss';
 
@@ -28,8 +29,8 @@ const getTextRows = (subscription: NotificationSubscription) => {
     );
 
     return (
-      <>
-        <div class="header-row" onclick={() => m.route.set(threadUrl)}>
+      <React.Fragment>
+        <div className="header-row" onClick={() => setRoute(threadUrl)}>
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             className="attribution-text"
@@ -52,7 +53,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
             hideFormatting: true,
           })}
         </CWText>
-      </>
+      </React.Fragment>
     );
   } else if (subscription.Comment) {
     // TODO Gabe 9/7/22 - comment headers should link to comments
@@ -68,8 +69,8 @@ const getTextRows = (subscription: NotificationSubscription) => {
     //   subscription.Chain.id
     // );
     return (
-      <>
-        <div class="header-row">
+      <React.Fragment>
+        <div className="header-row">
           <CWText
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             className="attribution-text"
@@ -80,7 +81,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
             type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
             fontWeight="bold"
           >
-            {m(User, {
+            {render(User, {
               hideAvatar: true,
               user: new AddressInfo(
                 null,
@@ -104,7 +105,7 @@ const getTextRows = (subscription: NotificationSubscription) => {
             hideFormatting: true,
           })}
         </CWText>
-      </>
+      </React.Fragment>
     );
   } else if (
     !subscription.Thread &&
@@ -113,8 +114,8 @@ const getTextRows = (subscription: NotificationSubscription) => {
   ) {
     return (
       <div
-        class="header-row"
-        onclick={() => m.route.set(subscription.Chain.id)}
+        className="header-row"
+        onClick={() => setRoute(subscription.Chain.id)}
       >
         <CWText
           type={isWindowExtraSmall(window.innerWidth) ? 'caption' : 'b2'}
@@ -140,11 +141,11 @@ type SubscriptionRowAttrs = {
 };
 
 export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRowAttrs> {
-  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
+  view(vnode: ResultNode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
 
     return (
-      <div class="SubscriptionRowTextContainer">
+      <div className="SubscriptionRowTextContainer">
         <CWIcon
           iconName={
             subscription.category === 'new-reaction'
@@ -153,14 +154,14 @@ export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRow
           }
           iconSize="small"
         />
-        <div class="title-and-body-container">{getTextRows(subscription)}</div>
+        <div className="title-and-body-container">{getTextRows(subscription)}</div>
       </div>
     );
   }
 }
 
 export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
-  view(vnode: m.Vnode<SubscriptionRowAttrs>) {
+  view(vnode: ResultNode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
     return (
       <CWPopoverMenu
@@ -170,11 +171,11 @@ export class SubscriptionRowMenu extends ClassComponent<SubscriptionRowAttrs> {
             label: 'Unsubscribe',
             iconLeft: 'close',
             isSecondary: true,
-            onclick: () =>
+            onClick: () =>
               app.user.notifications
                 .deleteSubscription(subscription)
                 .then(() => {
-                  m.redraw();
+                  redraw();
                 }),
           },
         ]}
