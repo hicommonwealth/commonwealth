@@ -26,7 +26,7 @@ import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { HeaderLandingPage } from './landing_page_header';
 import { JoinCommonWealthSection } from './landing_page_pre_footer';
-import { TokensCommunityComponent } from './tokens_community_hero';
+// import { TokensCommunityComponent } from './tokens_community_hero';
 import { TokensCreatorComponent } from './creators_card_section';
 import { TokensChainsComponent } from './chains_slider';
 import { TokenHoldersComponent } from './find_your_community_section';
@@ -115,7 +115,7 @@ class LandingPage extends ClassComponent {
               ]}
             />
           </div>
-          {<TokensCommunityComponent chains={this.chains} />}
+          {/* {<TokensCommunityComponent chains={this.chains} />} */}
           {/* {this.chains && (
             <TokensChainsComponent
               oncreateSlider={() => {
