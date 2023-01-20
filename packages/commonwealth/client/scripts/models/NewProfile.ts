@@ -1,4 +1,4 @@
-import { CoverImage } from '../views/pages/edit_new_profile';
+import { Image } from '../views/pages/edit_new_profile';
 
 class NewProfile {
   private _name: string;
@@ -10,9 +10,10 @@ class NewProfile {
   private _avatarUrl: string;
   private _slug: string;
   private _socials: string[];
-  private _coverImage: CoverImage;
   private _id: number;
   private _isOwner: boolean;
+  private _coverImage: Image;
+  private _backgroundImage: Image;
 
   get name() {
     return this._name;
@@ -50,16 +51,20 @@ class NewProfile {
     return this._socials;
   }
 
-  get coverImage() {
-    return this._coverImage;
-  }
-
   get id() {
     return this._id;
   }
 
   get isOwner() {
     return this._isOwner;
+  }
+
+  get coverImage() {
+    return this._coverImage;
+  }
+
+  get backgroundImage() {
+    return this._backgroundImage;
   }
 
   constructor({
@@ -72,9 +77,10 @@ class NewProfile {
     avatar_url,
     slug,
     socials,
-    cover_image,
     id,
     is_owner,
+    cover_image,
+    background_image,
   }) {
     this._name = profile_name;
     this._username = username;
@@ -85,9 +91,10 @@ class NewProfile {
     this._avatarUrl = avatar_url;
     this._slug = slug;
     this._socials = socials;
-    this._coverImage = cover_image;
     this._id = id;
     this._isOwner = is_owner;
+    this._coverImage = cover_image;
+    this._backgroundImage = background_image;
   }
 
   public initialize(
@@ -100,9 +107,10 @@ class NewProfile {
     avatarUrl,
     slug,
     socials,
-    coverImage,
     id,
-    isOwner
+    isOwner,
+    coverImage,
+    backgroundImage,
   ) {
     this._name = name;
     this._username = username;
@@ -113,9 +121,10 @@ class NewProfile {
     this._avatarUrl = avatarUrl;
     this._slug = slug;
     this._socials = socials;
-    this._coverImage = coverImage;
     this._id = id;
     this._isOwner = isOwner;
+    this._coverImage = coverImage;
+    this._backgroundImage = backgroundImage;
   }
 
   public static fromJSON(json) {

@@ -28,7 +28,8 @@ const updateNewProfile = async (
     !req.body.website &&
     !req.body.avatarUrl &&
     !req.body.socials &&
-    !req.body.coverImage
+    !req.body.coverImage &&
+    !req.body.backgroundImage
   ) {
     return next(new Error(Errors.InvalidUpdate));
   }
@@ -44,6 +45,7 @@ const updateNewProfile = async (
     avatarUrl,
     socials,
     coverImage,
+    backgroundImage,
   } = req.body;
 
   const profile = await models.Profile.findOne({
@@ -80,6 +82,7 @@ const updateNewProfile = async (
       ...(avatarUrl && { avatar_url: avatarUrl }),
       ...(socials && { socials: JSON.parse(socials) }),
       ...(coverImage && { cover_image: JSON.parse(coverImage) }),
+      ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
     },
     {
       where: {

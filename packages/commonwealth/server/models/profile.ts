@@ -5,9 +5,8 @@ import type { ModelInstance, ModelStatic } from './types';
 
 import type { UserAttributes, UserInstance } from './user';
 
-export type CoverImageAttributes = {
+export type ImageAttributes = {
   url: string;
-  imageAs: string;
   imageBehavior: string;
 };
 
@@ -25,7 +24,8 @@ export type ProfileAttributes = {
   avatar_url?: string;
   slug?: string;
   socials?: string[];
-  cover_image?: CoverImageAttributes;
+  cover_image?: ImageAttributes;
+  background_image?: ImageAttributes;
 
   // associations
   User?: UserAttributes;
@@ -69,6 +69,7 @@ export default (
       slug: { type: dataTypes.STRING, allowNull: true },
       socials: { type: dataTypes.ARRAY(dataTypes.STRING), allowNull: true },
       cover_image: { type: dataTypes.JSONB, allowNull: true },
+      background_image: { type: dataTypes.JSONB, allowNull: true },
     },
     {
       tableName: 'Profiles',

@@ -43,9 +43,8 @@ const NoProfileFoundError = 'No profile found';
 
 type EditNewProfileAttrs = { placeholder?: string };
 
-export type CoverImage = {
+export type Image = {
   url: string;
-  imageAs: ImageAs;
   imageBehavior: ImageBehavior;
 };
 
@@ -61,9 +60,10 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private name: string;
   private bio: QuillEditor;
   private avatarUrl: string;
-  private coverImage: CoverImage;
   private addresses: AddressInfo[];
   private isOwner: boolean;
+  private coverImage: Image;
+  private backgroundImage: Image;
 
   private getProfile = async (username: string) => {
     this.loading = true;
@@ -79,6 +79,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
       this.socials = this.profile.socials;
       this.avatarUrl = this.profile.avatarUrl;
       this.coverImage = this.profile.coverImage;
+      this.backgroundImage = this.profile.backgroundImage;
       this.addresses = response.addresses.map(
         (a) =>
           new AddressInfo(
@@ -151,6 +152,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
     if (!_.isEqual(this.coverImage, this.profile?.coverImage))
       this.profileUpdate.coverImage = JSON.stringify(this.coverImage);
+
+    if (!_.isEqual(this.backgroundImage, this.profile?.backgroundImage))
+      this.profileUpdate.backgroundImage = JSON.stringify(this.backgroundImage);
   };
 
   private handleSaveProfile = () => {
@@ -413,6 +417,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 description="Express yourself through imagery."
               >
                 <CWCoverImageUploader
+                  name="cover-image-uploader"
                   uploadCompleteCallback={(
                     url: string,
                     imageAs: ImageAs,
@@ -420,7 +425,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   ) => {
                     this.coverImage = {
                       url,
-                      imageAs,
                       imageBehavior,
                     };
                   }}
@@ -431,12 +435,41 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   ) => {
                     this.coverImage = {
                       url,
-                      imageAs,
                       imageBehavior,
                     };
                   }}
                   options
                   enableGenerativeAI
+                  defaultImageUrl={this.coverImage?.url}
+                  defaultImageBehavior={this.coverImage?.imageBehavior}
+                />
+                <CWDivider />
+                <CWText fontWeight="medium">Background Image</CWText>
+                <CWCoverImageUploader
+                  name="background-image-uploader"
+                  uploadCompleteCallback={(
+                    url: string,
+                    imageBehavior: ImageBehavior
+                  ) => {
+                    this.backgroundImage = {
+                      url,
+                      imageBehavior,
+                    };
+                  }}
+                  generatedImageCallback={(
+                    url: string,
+                    imageBehavior: ImageBehavior
+                  ) => {
+                    this.backgroundImage = {
+                      url,
+                      imageBehavior,
+                    };
+                  }}
+                  enableGenerativeAI
+                  defaultImageUrl={this.backgroundImage?.url}
+                  defaultImageBehavior={
+                    this.backgroundImage?.imageBehavior
+                  }
                 />
               </CWFormSection>
               {/* TODO: Add back in when we have a way to manage addresses */}
