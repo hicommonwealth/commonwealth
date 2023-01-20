@@ -424,7 +424,19 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                       imageBehavior,
                     };
                   }}
-                  options={true}
+                  generatedImageCallback={(
+                    url: string,
+                    imageAs: ImageAs,
+                    imageBehavior: ImageBehavior
+                  ) => {
+                    this.coverImage = {
+                      url,
+                      imageAs,
+                      imageBehavior,
+                    };
+                  }}
+                  options
+                  enableGenerativeAI
                 />
               </CWFormSection>
               {/* TODO: Add back in when we have a way to manage addresses */}
