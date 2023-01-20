@@ -10,6 +10,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { redirectToHTTPS } from 'express-http-to-https';
 import session from 'express-session';
+import fs from 'fs';
 import logger from 'morgan';
 import passport from 'passport';
 import * as path from 'path';
@@ -144,6 +145,16 @@ async function main() {
     app.use(prerenderNode.set('prerenderServiceUrl', 'http://localhost:3000'));
   };
 
+  const templateFile = (() => {
+    try {
+      return fs.readFileSync('./build/index.html');
+    } catch (e) {
+      console.error(`Failed to read template file: ${e.message}`);
+    }
+  })();
+
+  const sendFile = (res) => res.sendFile(`${__dirname}/build/index.html`);
+
   // Only run prerender in DEV environment if the WITH_PRERENDER flag is provided.
   // On the other hand, run prerender by default on production.
   if (DEV) {
@@ -242,8 +253,7 @@ async function main() {
   setupCosmosProxy(app, models);
   setupIpfsProxy(app);
   setupEntityProxy(app);
-
-  setupAppRoutes(app, models, devMiddleware);
+  setupAppRoutes(app, models, devMiddleware, templateFile, sendFile);
 
   setupErrorHandlers(app, rollbar);
 
