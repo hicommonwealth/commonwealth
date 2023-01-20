@@ -22,8 +22,10 @@ type NewProfileSocialAccountAttrs = {
 class SocialAccount extends ClassComponent<NewProfileSocialAccountAttrs> {
   view(vnode: m.Vnode<NewProfileSocialAccountAttrs>) {
     const { iconName, link } = vnode.attrs;
+    const formattedLink = link.includes('http') ? link : `https://${link}`;
+
     return (
-      <a href={link} target="_blank">
+      <a href={formattedLink} target="_blank">
         <CWIcon iconName={iconName} className="social-icon" />
       </a>
     );

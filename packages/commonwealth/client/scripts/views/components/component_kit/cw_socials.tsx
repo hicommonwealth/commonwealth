@@ -72,7 +72,7 @@ export class CWSocials extends ClassComponent<SocialsAttrs> {
             name={name}
             value={social}
             inputValidationFn={(val: string) => {
-              if (!val.match(/^(https:\/\/)([\da-z.-]+)\.([a-z.])/)) {
+              if (!val.match(/^(http(s)?:\/\/.)?([\da-z.-]+)\.([a-z.])/)) {
                 return ['failure', 'Must enter valid website'];
               } else {
                 return ['success', 'Input validated'];
