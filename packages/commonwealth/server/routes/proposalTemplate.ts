@@ -197,13 +197,12 @@ export async function updateCommunityContractTemplateMetadata(
         message: 'Must provide contract template metadata',
       });
     }
-    
-    const { 
-      cct_id, 
-      slug, 
-      nickname, 
-      display_name, 
-      display_options 
+    const {
+      cct_id,
+      slug,
+      nickname,
+      display_name,
+      display_options
     } = req.body.contract;
 
     if (!cct_id || !slug || !nickname || !display_name || !display_options) {
@@ -213,6 +212,18 @@ export async function updateCommunityContractTemplateMetadata(
           'Must provide cct_id, slug, nickname, display_name, and display_options',
       });
     }
+
+    const result = await models.sequelize.query(
+      `UPDATE CommunityContractTemplateMetadata SET
+      cct_id = :cct_id,
+      slug = :slug,
+      nickname = :nickname,
+      display_name = :display_name,
+      display_options = :display_options
+      WHERE cct_id = :cct_id`
+    );
+
+    return res.json({ status: 'Success', result });
   } catch (err) {
     throw new AppError('Error updating community contract template metadata');
   }
