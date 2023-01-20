@@ -1,15 +1,14 @@
 import cheerio from 'cheerio';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import fs from 'fs';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
 import { factory, formatFilename } from 'common-common/src/logging';
 
+const log = factory.getLogger(formatFilename(__filename));
+
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 function cleanMalformedUrl(str: string) {
   return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
@@ -24,29 +23,33 @@ const decodeTitle = (title: string) => {
   }
 };
 
-const setupAppRoutes = (app, models: DB, devMiddleware) => {
+const setupAppRoutes = (
+  app,
+  models: DB,
+  devMiddleware,
+  templateFile,
+  sendFile
+) => {
   if (NO_CLIENT_SERVER) {
     return;
   }
   log.info('setupAppRoutes');
+  // Development: serve everything through devMiddleware
   if (DEV) {
-    // Development: serve everything through devMiddleware
-    if (!process.env.EXTERNAL_WEBPACK) {
-      app.get('*', (req, res, next) => {
-        req.url = '/build/';
-        devMiddleware(req, res, next);
-      });
-    }
+    app.get('*', (req, res, next) => {
+      req.url = '/build/';
+      devMiddleware(req, res, next);
+    });
     return;
   }
 
-  const templateFile = (() => {
-    try {
-      return fs.readFileSync('../../build/index.html');
-    } catch (e) {
-      console.error(`Failed to read template file: ${e.message}`);
-    }
-  })();
+  // Production: serve SEO-optimized routes where possible
+  //
+  // Retrieve the default bundle from /build/index.html, and overwrite <meta>
+  // tags with data fetched from the backend.
+  if (!templateFile) {
+    throw new Error('Template not found, cannot start production server');
+  }
 
   const renderWithMetaTags = (res, title, description, author, image) => {
     if (image) {
@@ -223,7 +226,8 @@ const setupAppRoutes = (app, models: DB, devMiddleware) => {
   });
 
   app.get('*', (req, res) => {
-    res.sendFile(`${__dirname}/build/index.html`);
+    log.info(`setupAppRoutes sendFiles ${req.path}`);
+    sendFile(res);
   });
 };
 
