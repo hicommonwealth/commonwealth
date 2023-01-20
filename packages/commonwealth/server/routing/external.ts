@@ -196,6 +196,57 @@ export function addExternalRoutes(
     )
   );
 
+  router.get('/topics', getTopicsValidation, getTopics.bind(this, models));
+  router.post(
+    '/topics',
+    postTopicsValidation,
+    addEntities.bind(
+      this,
+      'chain_id',
+      models,
+      (a) => models.Topic.bulkCreate(a),
+      (req: TypedRequest<PostTopicsReq>) => req.body.topics
+    )
+  );
+  router.delete(
+    '/topics',
+    onlyIds,
+    deleteEntities.bind(this, 'chain_id', models, models.Topic)
+  );
+
+  router.get('/roles', getRolesValidation, getRoles.bind(this, models));
+  router.post(
+    '/roles',
+    passport.authenticate('jwt', { session: false }),
+    postRolesValidation,
+    addEntities.bind(
+      this,
+      'chain_id',
+      models,
+      (a) => models.Role.bulkCreate(a),
+      (req: TypedRequest<PostRolesReq>) => req.body.roles
+    )
+  );
+  router.delete(
+    '/roles',
+    passport.authenticate('jwt', { session: false }),
+    onlyIds,
+    deleteEntities.bind(this, 'chain_id', models, models.Role)
+  );
+
+  router.get('/rules', getRulesValidation, getRules.bind(this, models));
+  router.post(
+    '/rules',
+    postRulesValidation,
+    addEntities.bind(
+      this,
+      'chain_id',
+      models,
+      (a) => models.Rule.bulkCreate(a),
+      (req: TypedRequest<PostRulesReq>) => req.body.rules
+    )
+  );
+
   router.get(
     '/chainNodes',
     getChainNodesValidation,

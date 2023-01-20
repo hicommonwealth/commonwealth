@@ -1,3 +1,5 @@
+import { StatsDController } from 'common-common/src/statsd';
+import type { Express } from 'express';
 import express from 'express';
 import passport from 'passport';
 import type { Express } from 'express';
@@ -860,6 +862,12 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+
+  router.post(
+    '/generateImage',
+    passport.authenticate('jwt', { session: false }),
+    generateImage.bind(this, models)
+  );
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
