@@ -1,7 +1,6 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import { ListItem, QueryList } from 'construct-ui';
 import {
   notifyError,
   notifyInfo,
