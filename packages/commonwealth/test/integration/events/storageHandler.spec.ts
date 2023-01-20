@@ -132,7 +132,7 @@ describe('Event Storage Handler Tests', () => {
     const eventHandler = new StorageHandler(models, rmqController, chain);
 
     // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
+    const dbEvent = await eventHandler.handle((event as unknown) as CWEvent);
 
     // expect results
     assert.deepEqual(dbEvent.event_data, event.data);
@@ -166,7 +166,7 @@ describe('Event Storage Handler Tests', () => {
     });
 
     // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
+    const dbEvent = await eventHandler.handle((event as unknown) as CWEvent);
 
     // confirm no event emitted
     assert.isUndefined(dbEvent);
@@ -194,7 +194,7 @@ describe('Event Storage Handler Tests', () => {
     const eventHandler = new StorageHandler(models, rmqController, chain);
 
     // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
+    const dbEvent = await eventHandler.handle((event as unknown) as CWEvent);
 
     // confirm results
     assert.deepEqual(dbEvent.event_data, event.data);
@@ -223,7 +223,7 @@ describe('Event Storage Handler Tests', () => {
     const eventHandler = new StorageHandler(models, rmqController, chain);
 
     // process event
-    const dbEvent = await eventHandler.handle(event as unknown as CWEvent);
+    const dbEvent = await eventHandler.handle((event as unknown) as CWEvent);
 
     // confirm no event emitted
     assert.isUndefined(dbEvent);

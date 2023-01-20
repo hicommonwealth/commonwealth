@@ -113,8 +113,13 @@ export class SubstrateForm extends ClassComponent {
           label="Save changes"
           disabled={this.state.saving}
           onclick={async () => {
-            const { name, nodeUrl, iconUrl, substrateSpec, symbol } =
-              this.state.form;
+            const {
+              name,
+              nodeUrl,
+              iconUrl,
+              substrateSpec,
+              symbol,
+            } = this.state.form;
             mixpanelBrowserTrack({
               event: MixpanelCommunityCreationEvent.CREATE_COMMUNITY_ATTEMPTED,
               chainBase: null,

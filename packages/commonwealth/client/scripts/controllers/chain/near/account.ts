@@ -107,8 +107,8 @@ export class NearAccounts implements IAccountsModule<NearToken, NearAccount> {
 
   public async init(ChainInfo: NearChain): Promise<void> {
     this._Chain = ChainInfo;
-    const validators = ChainInfo.nodeStatus
-      .validators as unknown as INearValidator[];
+    const validators = (ChainInfo.nodeStatus
+      .validators as unknown) as INearValidator[];
     for (const validator of validators) {
       if (!this._validators[validator.account_id]) {
         this._validators[validator.account_id] = {

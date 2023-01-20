@@ -4,10 +4,8 @@ import { RabbitMQController } from 'common-common/src/rabbitmq';
 
 import type { CWEvent, IEventHandler } from 'chain-events/src';
 
-export class RabbitMqHandler
-  extends RabbitMQController
-  implements IEventHandler
-{
+export class RabbitMqHandler extends RabbitMQController
+  implements IEventHandler {
   protected publication: RascalPublications;
 
   constructor(

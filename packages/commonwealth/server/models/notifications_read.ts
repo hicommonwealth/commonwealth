@@ -14,11 +14,13 @@ export type NotificationsReadAttributes = {
   Notification?: NotificationAttributes;
 };
 
-export type NotificationsReadInstance =
-  ModelInstance<NotificationsReadAttributes>;
+export type NotificationsReadInstance = ModelInstance<
+  NotificationsReadAttributes
+>;
 
-export type NotificationsReadModelStatic =
-  ModelStatic<NotificationsReadInstance>;
+export type NotificationsReadModelStatic = ModelStatic<
+  NotificationsReadInstance
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,

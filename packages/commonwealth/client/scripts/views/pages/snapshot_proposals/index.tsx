@@ -32,7 +32,9 @@ type SnapshotProposalStagesBarAttrs = {
   onChangeFilter: (value: SnapshotProposalFilter) => void;
 };
 
-class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBarAttrs> {
+class SnapshotProposalStagesBar extends ClassComponent<
+  SnapshotProposalStagesBarAttrs
+> {
   view(vnode: m.Vnode<SnapshotProposalStagesBarAttrs>) {
     return (
       <div class="SnapshotProposalStagesBar">

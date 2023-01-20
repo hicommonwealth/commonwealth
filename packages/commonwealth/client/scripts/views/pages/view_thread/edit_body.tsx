@@ -29,8 +29,13 @@ export class EditBody extends ClassComponent<EditBodyAttrs> {
   private saving: boolean;
 
   view(vnode: m.Vnode<EditBodyAttrs>) {
-    const { shouldRestoreEdits, savedEdits, thread, setIsEditing, title } =
-      vnode.attrs;
+    const {
+      shouldRestoreEdits,
+      savedEdits,
+      thread,
+      setIsEditing,
+      title,
+    } = vnode.attrs;
 
     const body = shouldRestoreEdits && savedEdits ? savedEdits : thread.body;
 

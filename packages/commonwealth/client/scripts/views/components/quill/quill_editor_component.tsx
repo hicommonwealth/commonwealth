@@ -42,7 +42,9 @@ type QuillEditorComponentAttrs = {
 // - Audit and fix image, video, & Twitter blots as necessary
 // - Convert generic HTML tags to CWText components in QuillFormattedText
 
-export class QuillEditorComponent extends ClassComponent<QuillEditorComponentAttrs> {
+export class QuillEditorComponent extends ClassComponent<
+  QuillEditorComponentAttrs
+> {
   unsavedChanges;
   $editor: JQuery<HTMLElement>;
   editor: QuillEditor;

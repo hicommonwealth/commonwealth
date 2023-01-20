@@ -49,8 +49,13 @@ const createReaction = async (
 
   const author = req.address;
 
-  const { reaction, comment_id, proposal_id, thread_id, chain_entity_id } =
-    req.body;
+  const {
+    reaction,
+    comment_id,
+    proposal_id,
+    thread_id,
+    chain_entity_id,
+  } = req.body;
 
   if (!thread_id && !proposal_id && !comment_id) {
     return next(new AppError(Errors.NoPostId));

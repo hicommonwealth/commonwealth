@@ -117,8 +117,7 @@ class SubstrateDemocracyProposals extends ProposalModule<
       }
     );
 
-    const lastTabledWasExternal =
-      await ChainInfo.api.query.democracy.lastTabledWasExternal();
+    const lastTabledWasExternal = await ChainInfo.api.query.democracy.lastTabledWasExternal();
     const nextExternal = await ChainInfo.api.query.democracy.nextExternal();
     this._lastTabledWasExternal = lastTabledWasExternal.valueOf();
     this._nextExternal = nextExternal.unwrapOr(null);

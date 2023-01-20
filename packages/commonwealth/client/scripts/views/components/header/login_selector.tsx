@@ -50,7 +50,9 @@ type LoginSelectorMenuLeftAttrs = {
   nAccountsWithoutRole: number;
 };
 
-export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftAttrs> {
+export class LoginSelectorMenuLeft extends ClassComponent<
+  LoginSelectorMenuLeftAttrs
+> {
   view(vnode: m.Vnode<LoginSelectorMenuLeftAttrs>) {
     const { activeAddressesWithRole, nAccountsWithoutRole } = vnode.attrs;
 
@@ -274,9 +276,8 @@ export class LoginSelector extends ClassComponent {
 
     const activeAccountsByRole = app.roles.getActiveAccountsByRole();
 
-    const nAccountsWithoutRole = activeAccountsByRole.filter(
-      ([role]) => !role
-    ).length;
+    const nAccountsWithoutRole = activeAccountsByRole.filter(([role]) => !role)
+      .length;
 
     if (!this.profileLoadComplete && app.profiles.allLoaded()) {
       this.profileLoadComplete = true;
@@ -357,8 +358,11 @@ export class LoginSelector extends ClassComponent {
           );
 
           if (res && res.result) {
-            const { verification_token, addresses, encodedAddress } =
-              res.result;
+            const {
+              verification_token,
+              addresses,
+              encodedAddress,
+            } = res.result;
             app.user.setAddresses(
               addresses.map((a) => {
                 return new AddressInfo(

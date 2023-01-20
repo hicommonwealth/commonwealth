@@ -19,7 +19,9 @@ type SnapshotProposalCardAttrs = {
   proposal: SnapshotProposal;
 };
 
-export class SnapshotProposalCard extends ClassComponent<SnapshotProposalCardAttrs> {
+export class SnapshotProposalCard extends ClassComponent<
+  SnapshotProposalCardAttrs
+> {
   view(vnode: m.Vnode<SnapshotProposalCardAttrs>) {
     const { proposal } = vnode.attrs;
 

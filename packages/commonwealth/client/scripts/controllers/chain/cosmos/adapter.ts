@@ -10,10 +10,8 @@ import CosmosChain from './chain';
 import CosmosGovernance from './governance';
 import type { CosmosToken } from './types';
 
-class Cosmos
-  extends IChainAdapter<CosmosToken, CosmosAccount>
-  implements ITokenAdapter
-{
+class Cosmos extends IChainAdapter<CosmosToken, CosmosAccount>
+  implements ITokenAdapter {
   public chain: CosmosChain;
   public accounts: CosmosAccounts;
   public governance: CosmosGovernance;

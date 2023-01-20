@@ -359,8 +359,12 @@ const ProfilePage: m.Component<IProfilePageAttrs, IProfilePageState> = {
       vnode.state.commentsContentCount = 10;
     }
 
-    const { onOwnProfile, onLinkedProfile, displayBanner, currentAddressInfo } =
-      getProfileStatus(account);
+    const {
+      onOwnProfile,
+      onLinkedProfile,
+      displayBanner,
+      currentAddressInfo,
+    } = getProfileStatus(account);
 
     if (refreshProfile) {
       loadProfile(vnode.attrs, vnode.state);

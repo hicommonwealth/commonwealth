@@ -18,7 +18,9 @@ type TXSigningWebWalletOptionAttrs = {
 } & ITXModalData &
   NextFn;
 
-export class TXSigningWebWalletOption extends ClassComponent<TXSigningWebWalletOptionAttrs> {
+export class TXSigningWebWalletOption extends ClassComponent<
+  TXSigningWebWalletOptionAttrs
+> {
   oncreate(vnode: m.Vnode<TXSigningWebWalletOptionAttrs>) {
     // try to enable web wallet
     if (vnode.attrs.wallet && !vnode.attrs.wallet.enabled) {

@@ -17,7 +17,9 @@ type ChainEntitiesSelectorAttrs = {
   thread: Thread;
 };
 
-export class ChainEntitiesSelector extends ClassComponent<ChainEntitiesSelectorAttrs> {
+export class ChainEntitiesSelector extends ClassComponent<
+  ChainEntitiesSelectorAttrs
+> {
   private chainEntitiesLoaded: boolean;
   private initialized: boolean;
 

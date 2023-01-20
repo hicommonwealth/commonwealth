@@ -55,7 +55,9 @@ type LinkedProposalsCardAttrs = {
   thread: Thread;
 };
 
-export class LinkedProposalsCard extends ClassComponent<LinkedProposalsCardAttrs> {
+export class LinkedProposalsCard extends ClassComponent<
+  LinkedProposalsCardAttrs
+> {
   private initialized: boolean;
   private snapshot: SnapshotProposal;
   private snapshotProposalsLoaded: boolean;

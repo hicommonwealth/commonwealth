@@ -25,7 +25,9 @@ type UpdateProposalStatusModalAttrs = {
   thread: Thread;
 };
 
-export class UpdateProposalStatusModal extends ClassComponent<UpdateProposalStatusModalAttrs> {
+export class UpdateProposalStatusModal extends ClassComponent<
+  UpdateProposalStatusModalAttrs
+> {
   private chainEntitiesToSet: ChainEntity[];
   private snapshotProposalsToSet: SnapshotProposal[];
   private stage: ThreadStage;

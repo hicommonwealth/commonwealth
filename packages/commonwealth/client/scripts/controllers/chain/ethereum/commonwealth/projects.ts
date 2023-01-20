@@ -296,8 +296,12 @@ export default class ProjectsController {
       project.address
     );
 
-    const [threshold, deadline, beneficiary, acceptedToken] =
-      await contract.projectData();
+    const [
+      threshold,
+      deadline,
+      beneficiary,
+      acceptedToken,
+    ] = await contract.projectData();
     return [threshold, deadline, beneficiary, acceptedToken];
   }
 

@@ -52,7 +52,9 @@ export type UserInstance = ModelInstance<UserAttributes> & {
 
   getProfiles: Sequelize.HasManyGetAssociationsMixin<ProfileInstance>;
 
-  getSocialAccounts: Sequelize.HasManyGetAssociationsMixin<SocialAccountInstance>;
+  getSocialAccounts: Sequelize.HasManyGetAssociationsMixin<
+    SocialAccountInstance
+  >;
   setSocialAccounts: Sequelize.HasManySetAssociationsMixin<
     SocialAccountInstance,
     SocialAccountInstance['id']

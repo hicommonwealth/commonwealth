@@ -21,7 +21,9 @@ type UserDashboardRowBottomAttrs = {
   viewCount: number;
 };
 
-export class UserDashboardRowBottom extends ClassComponent<UserDashboardRowBottomAttrs> {
+export class UserDashboardRowBottom extends ClassComponent<
+  UserDashboardRowBottomAttrs
+> {
   view(vnode: m.Vnode<UserDashboardRowBottomAttrs>) {
     const { path, threadId, viewCount, likeCount, commentCount } = vnode.attrs;
 

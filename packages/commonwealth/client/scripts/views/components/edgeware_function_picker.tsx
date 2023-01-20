@@ -16,7 +16,9 @@ type EdgewareFunctionPickerProps = {
   args: any[];
 };
 
-class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps> {
+class EdgewareFunctionPicker extends ClassComponent<
+  EdgewareFunctionPickerProps
+> {
   public static getMethod(attrs: EdgewareFunctionPickerProps) {
     const mod = attrs.module;
     const func = attrs.function;
@@ -60,9 +62,9 @@ class EdgewareFunctionPicker extends ClassComponent<EdgewareFunctionPickerProps>
             })}
           onSelect={(result) => {
             vnode.attrs.module = result.value;
-            vnode.attrs.function = (
-              app.chain as Substrate
-            ).chain.listModuleFunctions(result.value)[0];
+            vnode.attrs.function = (app.chain as Substrate).chain.listModuleFunctions(
+              result.value
+            )[0];
             vnode.attrs.args = [];
             m.redraw();
             setTimeout(() => {

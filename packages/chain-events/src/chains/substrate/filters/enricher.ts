@@ -78,7 +78,7 @@ export async function Enrich(
   }> => {
     switch (kind) {
       case EventKind.BalanceTransfer: {
-        const [sender, dest, value] = event.data as unknown as [
+        const [sender, dest, value] = (event.data as unknown) as [
           AccountId,
           AccountId,
           Balance
@@ -118,7 +118,7 @@ export async function Enrich(
        * ImOnline Events
        */
       case EventKind.HeartbeatReceived: {
-        const [authorityId] = event.data as unknown as [AuthorityId] & Codec;
+        const [authorityId] = (event.data as unknown) as [AuthorityId] & Codec;
         return {
           data: {
             kind,
@@ -130,7 +130,7 @@ export async function Enrich(
       case EventKind.SomeOffline: {
         const hash = await api.rpc.chain.getBlockHash(blockNumber);
         const sessionIndex = await api.query.session.currentIndex.at(hash);
-        const [validators] = event.data as unknown as [
+        const [validators] = (event.data as unknown) as [
           Vec<IdentificationTuple>
         ];
         return {
@@ -158,14 +158,18 @@ export async function Enrich(
        * Offences Events
        */
       case EventKind.Offence: {
-        const [offenceKind, opaqueTimeSlot, applied] =
-          event.data as unknown as [Kind, OpaqueTimeSlot, bool];
+        const [
+          offenceKind,
+          opaqueTimeSlot,
+          applied,
+        ] = (event.data as unknown) as [Kind, OpaqueTimeSlot, bool];
         const reportIds = await api.query.offences.concurrentReportsIndex(
           offenceKind,
           opaqueTimeSlot
         );
-        const offenceDetails: Option<OffenceDetails>[] =
-          await api.query.offences.reports.multi(reportIds);
+        const offenceDetails: Option<
+          OffenceDetails
+        >[] = await api.query.offences.reports.multi(reportIds);
 
         const allOffenders: Array<ValidatorId> = offenceDetails.map(
           (offence) => {
@@ -302,7 +306,8 @@ export async function Enrich(
       case EventKind.Reward: {
         if (event.data.typeDef[0].type === 'Balance') {
           // edgeware/old event
-          const [amount] = event.data as unknown as [Balance, Balance] & Codec;
+          const [amount] = (event.data as unknown) as [Balance, Balance] &
+            Codec;
           return {
             data: {
               kind,
@@ -311,7 +316,7 @@ export async function Enrich(
           };
         }
         // kusama/new event
-        const [validator, amount] = event.data as unknown as [
+        const [validator, amount] = (event.data as unknown) as [
           AccountId,
           Balance
         ] &
@@ -326,7 +331,7 @@ export async function Enrich(
         };
       }
       case EventKind.Slash: {
-        const [validator, amount] = event.data as unknown as [
+        const [validator, amount] = (event.data as unknown) as [
           AccountId,
           Balance
         ] &
@@ -344,7 +349,10 @@ export async function Enrich(
       case EventKind.Bonded:
       case EventKind.Unbonded: {
         const hash = await api.rpc.chain.getBlockHash(blockNumber);
-        const [stash, amount] = event.data as unknown as [AccountId, Balance] &
+        const [stash, amount] = (event.data as unknown) as [
+          AccountId,
+          Balance
+        ] &
           Codec;
         const controllerOpt = await api.query.staking.bonded.at<
           Option<AccountId>
@@ -380,7 +388,10 @@ export async function Enrich(
        * Democracy Events
        */
       case EventKind.VoteDelegated: {
-        const [who, target] = event.data as unknown as [AccountId, AccountId] &
+        const [who, target] = (event.data as unknown) as [
+          AccountId,
+          AccountId
+        ] &
           Codec;
         return {
           includeAddresses: [target.toString()],
@@ -393,7 +404,7 @@ export async function Enrich(
       }
 
       case EventKind.DemocracyProposed: {
-        const [proposalIndex, deposit] = event.data as unknown as [
+        const [proposalIndex, deposit] = (event.data as unknown) as [
           PropIndex,
           Balance
         ] &
@@ -421,7 +432,7 @@ export async function Enrich(
       }
 
       case EventKind.DemocracyTabled: {
-        const [proposalIndex] = event.data as unknown as [
+        const [proposalIndex] = (event.data as unknown) as [
           PropIndex,
           Balance,
           Vec<AccountId>
@@ -436,7 +447,7 @@ export async function Enrich(
       }
 
       case EventKind.DemocracyStarted: {
-        const [referendumIndex, voteThreshold] = event.data as unknown as [
+        const [referendumIndex, voteThreshold] = (event.data as unknown) as [
           ReferendumIndex,
           VoteThreshold
         ] &
@@ -481,7 +492,7 @@ export async function Enrich(
       }
 
       case EventKind.DemocracyPassed: {
-        const [referendumIndex] = event.data as unknown as [ReferendumIndex] &
+        const [referendumIndex] = (event.data as unknown) as [ReferendumIndex] &
           Codec;
         // dispatch queue -- if not present, it was already executed
         const dispatchQueue = await api.derive.democracy.dispatchQueue();
@@ -499,7 +510,7 @@ export async function Enrich(
 
       case EventKind.DemocracyNotPassed:
       case EventKind.DemocracyCancelled: {
-        const [referendumIndex] = event.data as unknown as [ReferendumIndex] &
+        const [referendumIndex] = (event.data as unknown) as [ReferendumIndex] &
           Codec;
         return {
           data: {
@@ -510,7 +521,7 @@ export async function Enrich(
       }
 
       case EventKind.DemocracyExecuted: {
-        const [referendumIndex, executionOk] = event.data as unknown as [
+        const [referendumIndex, executionOk] = (event.data as unknown) as [
           ReferendumIndex,
           bool
         ] &
@@ -528,7 +539,7 @@ export async function Enrich(
        * Preimage Events
        */
       case EventKind.PreimageNoted: {
-        const [hash, noter] = event.data as unknown as [
+        const [hash, noter] = (event.data as unknown) as [
           Hash,
           AccountId,
           Balance
@@ -555,7 +566,7 @@ export async function Enrich(
         };
       }
       case EventKind.PreimageUsed: {
-        const [hash, noter] = event.data as unknown as [
+        const [hash, noter] = (event.data as unknown) as [
           Hash,
           AccountId,
           Balance
@@ -571,7 +582,7 @@ export async function Enrich(
       }
       case EventKind.PreimageInvalid:
       case EventKind.PreimageMissing: {
-        const [hash, referendumIndex] = event.data as unknown as [
+        const [hash, referendumIndex] = (event.data as unknown) as [
           Hash,
           ReferendumIndex
         ] &
@@ -585,7 +596,7 @@ export async function Enrich(
         };
       }
       case EventKind.PreimageReaped: {
-        const [hash, noter, , reaper] = event.data as unknown as [
+        const [hash, noter, , reaper] = (event.data as unknown) as [
           Hash,
           AccountId,
           Balance,
@@ -607,7 +618,7 @@ export async function Enrich(
        * Tip Events
        */
       case EventKind.NewTip: {
-        const [hash] = event.data as unknown as [Hash] & Codec;
+        const [hash] = (event.data as unknown) as [Hash] & Codec;
         const tip = await api.query.tips.tips(hash);
         if (!tip.isSome) {
           throw new Error(`Could not find tip: ${hash.toString()}`);
@@ -639,7 +650,7 @@ export async function Enrich(
         };
       }
       case EventKind.TipClosing: {
-        const [hash] = event.data as unknown as [Hash] & Codec;
+        const [hash] = (event.data as unknown) as [Hash] & Codec;
         const tip = await api.query.tips.tips(hash);
         if (!tip.isSome) {
           throw new Error(`Could not find tip: ${hash.toString()}`);
@@ -653,7 +664,7 @@ export async function Enrich(
         };
       }
       case EventKind.TipClosed: {
-        const [hash, accountId, balance] = event.data as unknown as [
+        const [hash, accountId, balance] = (event.data as unknown) as [
           Hash,
           AccountId,
           Balance
@@ -669,7 +680,7 @@ export async function Enrich(
         };
       }
       case EventKind.TipRetracted: {
-        const [hash] = event.data as unknown as [Hash] & Codec;
+        const [hash] = (event.data as unknown) as [Hash] & Codec;
         return {
           data: {
             kind,
@@ -678,7 +689,7 @@ export async function Enrich(
         };
       }
       case EventKind.TipSlashed: {
-        const [hash, accountId, balance] = event.data as unknown as [
+        const [hash, accountId, balance] = (event.data as unknown) as [
           Hash,
           AccountId,
           Balance
@@ -698,7 +709,7 @@ export async function Enrich(
        * Treasury Events
        */
       case EventKind.TreasuryProposed: {
-        const [proposalIndex] = event.data as unknown as [ProposalIndex] &
+        const [proposalIndex] = (event.data as unknown) as [ProposalIndex] &
           Codec;
         const proposalOpt = await api.query.treasury.proposals<
           Option<TreasuryProposal>
@@ -724,11 +735,11 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryAwarded: {
-        const [proposalIndex, amount, beneficiary] = event.data as unknown as [
-          ProposalIndex,
-          Balance,
-          AccountId
-        ] &
+        const [
+          proposalIndex,
+          amount,
+          beneficiary,
+        ] = (event.data as unknown) as [ProposalIndex, Balance, AccountId] &
           Codec;
         return {
           data: {
@@ -741,7 +752,7 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryRejected: {
-        const [proposalIndex] = event.data as unknown as [ProposalIndex] &
+        const [proposalIndex] = (event.data as unknown) as [ProposalIndex] &
           Codec;
         return {
           data: {
@@ -756,7 +767,7 @@ export async function Enrich(
        */
 
       case EventKind.TreasuryBountyProposed: {
-        const [bountyIndex] = event.data as unknown as [BountyIndex] & Codec;
+        const [bountyIndex] = (event.data as unknown) as [BountyIndex] & Codec;
         const bounties = await api.derive.bounties.bounties();
         if (!bounties) {
           throw new Error(`could not fetch bounties`);
@@ -780,7 +791,7 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryBountyAwarded: {
-        const [bountyIndex, beneficiary] = event.data as unknown as [
+        const [bountyIndex, beneficiary] = (event.data as unknown) as [
           BountyIndex,
           AccountId
         ] &
@@ -809,7 +820,7 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryBountyRejected: {
-        const [bountyIndex, bond] = event.data as unknown as [
+        const [bountyIndex, bond] = (event.data as unknown) as [
           BountyIndex,
           Balance
         ] &
@@ -824,7 +835,7 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryBountyClaimed: {
-        const [bountyIndex, payout, beneficiary] = event.data as unknown as [
+        const [bountyIndex, payout, beneficiary] = (event.data as unknown) as [
           BountyIndex,
           Balance,
           AccountId
@@ -841,7 +852,7 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryBountyCanceled: {
-        const [bountyIndex] = event.data as unknown as [BountyIndex] & Codec;
+        const [bountyIndex] = (event.data as unknown) as [BountyIndex] & Codec;
         return {
           data: {
             kind,
@@ -851,7 +862,7 @@ export async function Enrich(
       }
 
       case EventKind.TreasuryBountyBecameActive: {
-        const [bountyIndex] = event.data as unknown as [BountyIndex] & Codec;
+        const [bountyIndex] = (event.data as unknown) as [BountyIndex] & Codec;
 
         const bounties = await api.derive.bounties.bounties();
         if (!bounties) {
@@ -878,7 +889,7 @@ export async function Enrich(
        * Elections Events
        */
       case EventKind.ElectionNewTerm: {
-        const [newMembers] = event.data as unknown as [
+        const [newMembers] = (event.data as unknown) as [
           Vec<[AccountId, Balance] & Codec>
         ] &
           Codec;
@@ -916,7 +927,7 @@ export async function Enrich(
       }
       case EventKind.ElectionMemberKicked:
       case EventKind.ElectionMemberRenounced: {
-        const [who] = event.data as unknown as [AccountId] & Codec;
+        const [who] = (event.data as unknown) as [AccountId] & Codec;
         return {
           data: {
             kind,
@@ -929,7 +940,7 @@ export async function Enrich(
        * Collective Events
        */
       case EventKind.CollectiveProposed: {
-        const [proposer, index, hash, threshold] = event.data as unknown as [
+        const [proposer, index, hash, threshold] = (event.data as unknown) as [
           AccountId,
           ProposalIndex,
           Hash,
@@ -964,7 +975,7 @@ export async function Enrich(
         };
       }
       case EventKind.CollectiveVoted: {
-        const [voter, hash, vote] = event.data as unknown as [
+        const [voter, hash, vote] = (event.data as unknown) as [
           AccountId,
           Hash,
           bool
@@ -987,7 +998,7 @@ export async function Enrich(
       }
       case EventKind.CollectiveApproved:
       case EventKind.CollectiveDisapproved: {
-        const [hash] = event.data as unknown as [Hash] & Codec;
+        const [hash] = (event.data as unknown) as [Hash] & Codec;
         return {
           data: {
             kind,
@@ -1002,7 +1013,7 @@ export async function Enrich(
       }
       case EventKind.CollectiveExecuted:
       case EventKind.CollectiveMemberExecuted: {
-        const [hash, executionOk] = event.data as unknown as [Hash, bool] &
+        const [hash, executionOk] = (event.data as unknown) as [Hash, bool] &
           Codec;
         return {
           data: {
@@ -1022,7 +1033,7 @@ export async function Enrich(
        * Signaling Events
        */
       case EventKind.SignalingNewProposal: {
-        const [proposer, hash] = event.data as unknown as [AccountId, Hash] &
+        const [proposer, hash] = (event.data as unknown) as [AccountId, Hash] &
           Codec;
         const proposalInfoOpt = await api.query.signaling.proposalOf<
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1057,7 +1068,7 @@ export async function Enrich(
       }
       case EventKind.SignalingCommitStarted:
       case EventKind.SignalingVotingStarted: {
-        const [hash, voteId, endBlock] = event.data as unknown as [
+        const [hash, voteId, endBlock] = (event.data as unknown) as [
           Hash,
           u64,
           BlockNumber
@@ -1073,7 +1084,7 @@ export async function Enrich(
         };
       }
       case EventKind.SignalingVotingCompleted: {
-        const [hash, voteId] = event.data as unknown as [Hash, u64] & Codec;
+        const [hash, voteId] = (event.data as unknown) as [Hash, u64] & Codec;
         return {
           data: {
             kind,
@@ -1087,7 +1098,7 @@ export async function Enrich(
        * TreasuryReward events
        */
       case EventKind.TreasuryRewardMinting: {
-        const [pot, reward] = event.data as unknown as [
+        const [pot, reward] = (event.data as unknown) as [
           Balance,
           Balance,
           BlockNumber
@@ -1102,7 +1113,7 @@ export async function Enrich(
         };
       }
       case EventKind.TreasuryRewardMintingV2: {
-        const [pot, , potAddress] = event.data as unknown as [
+        const [pot, , potAddress] = (event.data as unknown) as [
           Balance,
           BlockNumber,
           AccountId
@@ -1121,7 +1132,7 @@ export async function Enrich(
        * Identity events
        */
       case EventKind.IdentitySet: {
-        const [who] = event.data as unknown as [AccountId] & Codec;
+        const [who] = (event.data as unknown) as [AccountId] & Codec;
         const registrationOpt = await api.query.identity.identityOf(who);
         if (!registrationOpt.isSome) {
           throw new Error(`unable to retrieve identity info`);
@@ -1135,18 +1146,19 @@ export async function Enrich(
         if (judgementInfo.length > 0) {
           const registrars = await api.query.identity.registrars();
           judgements.push(
-            ...judgementInfo.map(
-              ([id, judgement]): [string, IdentityJudgement] => {
-                const registrarOpt = registrars[+id];
-                if (!registrarOpt || !registrarOpt.isSome) {
-                  throw new Error(`invalid judgement!`);
-                }
-                return [
-                  registrarOpt.unwrap().account.toString(),
-                  parseJudgement(judgement),
-                ];
+            ...judgementInfo.map(([id, judgement]): [
+              string,
+              IdentityJudgement
+            ] => {
+              const registrarOpt = registrars[+id];
+              if (!registrarOpt || !registrarOpt.isSome) {
+                throw new Error(`invalid judgement!`);
               }
-            )
+              return [
+                registrarOpt.unwrap().account.toString(),
+                parseJudgement(judgement),
+              ];
+            })
           );
         }
         return {
@@ -1160,7 +1172,7 @@ export async function Enrich(
         };
       }
       case EventKind.JudgementGiven: {
-        const [who, registrarId] = event.data as unknown as [AccountId, u32] &
+        const [who, registrarId] = (event.data as unknown) as [AccountId, u32] &
           Codec;
 
         // convert registrar from id to address
@@ -1193,7 +1205,7 @@ export async function Enrich(
         };
       }
       case EventKind.IdentityCleared: {
-        const [who] = event.data as unknown as [AccountId] & Codec;
+        const [who] = (event.data as unknown) as [AccountId] & Codec;
         return {
           excludeAddresses: [who.toString()],
           data: {
@@ -1203,7 +1215,7 @@ export async function Enrich(
         };
       }
       case EventKind.IdentityKilled: {
-        const [who] = event.data as unknown as [AccountId] & Codec;
+        const [who] = (event.data as unknown) as [AccountId] & Codec;
         return {
           data: {
             kind,

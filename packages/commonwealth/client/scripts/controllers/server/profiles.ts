@@ -100,60 +100,62 @@ class ProfilesController {
     // refresh in chunks of 20 to avoid making the body too large
     const chunkedProfiles = _.chunk(profiles, 20);
     const ps = await Promise.all(
-      chunkedProfiles.map(async (chunk): Promise<Profile[]> => {
-        const fetchedProfiles = chunk; // keep a list of the profiles we just fetched
-        try {
-          // TODO: Change to GET /profiles
-          const result = await $.post(`${app.serverUrl()}/bulkProfiles`, {
-            'addresses[]': chunk.map((profile) => profile.address),
-            'chains[]': chunk.map((profile) => profile.chain),
-          });
-          fetchedProfiles.map((profile) => profile.initializeEmpty());
-          return result.result
-            .map((profileData) => {
-              const profile = fetchedProfiles.find(
-                (p) =>
-                  p.chain === profileData.Address.chain &&
-                  p.address === profileData.Address.address
-              );
-              if (!profile) return null;
-              const pInfo = profileData.data
-                ? JSON.parse(profileData.data)
-                : {};
-              const lastActive = profileData.Address.last_active;
-              const isCouncillor = profileData.Address.is_councillor;
-              const isValidator = profileData.Address.is_validator;
-              // ignore off-chain name if substrate id exists
-              if (profileData.identity) {
-                profile.initializeWithChain(
-                  profileData.identity,
-                  pInfo.headline,
-                  pInfo.bio,
-                  pInfo.avatarUrl,
-                  profileData.judgements,
-                  lastActive,
-                  isCouncillor,
-                  isValidator
+      chunkedProfiles.map(
+        async (chunk): Promise<Profile[]> => {
+          const fetchedProfiles = chunk; // keep a list of the profiles we just fetched
+          try {
+            // TODO: Change to GET /profiles
+            const result = await $.post(`${app.serverUrl()}/bulkProfiles`, {
+              'addresses[]': chunk.map((profile) => profile.address),
+              'chains[]': chunk.map((profile) => profile.chain),
+            });
+            fetchedProfiles.map((profile) => profile.initializeEmpty());
+            return result.result
+              .map((profileData) => {
+                const profile = fetchedProfiles.find(
+                  (p) =>
+                    p.chain === profileData.Address.chain &&
+                    p.address === profileData.Address.address
                 );
-              } else {
-                profile.initialize(
-                  pInfo.name,
-                  pInfo.headline,
-                  pInfo.bio,
-                  pInfo.avatarUrl,
-                  lastActive,
-                  isCouncillor,
-                  isValidator
-                );
-              }
-              return profile;
-            })
-            .filter((p) => p !== null);
-        } catch (e) {
-          console.error(e);
-          return [];
+                if (!profile) return null;
+                const pInfo = profileData.data
+                  ? JSON.parse(profileData.data)
+                  : {};
+                const lastActive = profileData.Address.last_active;
+                const isCouncillor = profileData.Address.is_councillor;
+                const isValidator = profileData.Address.is_validator;
+                // ignore off-chain name if substrate id exists
+                if (profileData.identity) {
+                  profile.initializeWithChain(
+                    profileData.identity,
+                    pInfo.headline,
+                    pInfo.bio,
+                    pInfo.avatarUrl,
+                    profileData.judgements,
+                    lastActive,
+                    isCouncillor,
+                    isValidator
+                  );
+                } else {
+                  profile.initialize(
+                    pInfo.name,
+                    pInfo.headline,
+                    pInfo.bio,
+                    pInfo.avatarUrl,
+                    lastActive,
+                    isCouncillor,
+                    isValidator
+                  );
+                }
+                return profile;
+              })
+              .filter((p) => p !== null);
+          } catch (e) {
+            console.error(e);
+            return [];
+          }
         }
-      })
+      )
     );
     m.redraw();
     return _.flatten(ps);

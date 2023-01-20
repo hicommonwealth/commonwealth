@@ -14,14 +14,16 @@ export type CommunityContractAttributes = {
   Chain?: ChainAttributes;
 };
 
-export type CommunityContractInstance =
-  ModelInstance<CommunityContractAttributes> & {
-    getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
-    getContract: Sequelize.BelongsToGetAssociationMixin<ContractInstance>;
-  };
+export type CommunityContractInstance = ModelInstance<
+  CommunityContractAttributes
+> & {
+  getChain: Sequelize.BelongsToGetAssociationMixin<ChainInstance>;
+  getContract: Sequelize.BelongsToGetAssociationMixin<ContractInstance>;
+};
 
-export type CommunityContractModelStatic =
-  ModelStatic<CommunityContractInstance>;
+export type CommunityContractModelStatic = ModelStatic<
+  CommunityContractInstance
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,

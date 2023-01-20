@@ -16,7 +16,7 @@ const constructEvent = (data, address?: string): RawEvent => {
 };
 
 const blockNumber = 10000;
-const api: Api = {} as unknown as Api;
+const api: Api = ({} as unknown) as Api;
 
 describe('Aave Event Enricher Filter Tests', () => {
   // ProposalCreated

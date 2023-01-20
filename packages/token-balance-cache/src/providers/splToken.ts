@@ -8,7 +8,9 @@ type SplTokenBPOpts = {
   tokenAddress: string;
 };
 
-export default class SplTokenBalanceProvider extends BalanceProvider<SplTokenBPOpts> {
+export default class SplTokenBalanceProvider extends BalanceProvider<
+  SplTokenBPOpts
+> {
   public name = 'spl-token';
   public opts = {
     tokenAddress: 'string',

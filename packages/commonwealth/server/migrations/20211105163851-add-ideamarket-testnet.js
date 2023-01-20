@@ -26,7 +26,8 @@ module.exports = {
         [
           {
             chain: 'ideamarket-testnet',
-            url: 'wss://arb-rinkeby.g.alchemy.com/v2/WLfTX_HT-26kIjsBaBx7CrTHEi45v212',
+            url:
+              'wss://arb-rinkeby.g.alchemy.com/v2/WLfTX_HT-26kIjsBaBx7CrTHEi45v212',
             address: '0x634a0900a5F90C9F2d42BF1d49d94B84Db0A260d',
             eth_chain_id: 421611,
           },

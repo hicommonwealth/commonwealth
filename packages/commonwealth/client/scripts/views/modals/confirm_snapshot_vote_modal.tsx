@@ -28,14 +28,22 @@ type ConfirmSnapshotVoteModalAttrs = {
   successCallback: () => any;
 };
 
-export class ConfirmSnapshotVoteModal extends ClassComponent<ConfirmSnapshotVoteModalAttrs> {
+export class ConfirmSnapshotVoteModal extends ClassComponent<
+  ConfirmSnapshotVoteModalAttrs
+> {
   private saving: boolean;
 
   view(vnode: m.Vnode<ConfirmSnapshotVoteModalAttrs>) {
     const author = app.user.activeAccount;
 
-    const { proposal, space, id, selectedChoice, totalScore, successCallback } =
-      vnode.attrs;
+    const {
+      proposal,
+      space,
+      id,
+      selectedChoice,
+      totalScore,
+      successCallback,
+    } = vnode.attrs;
 
     return (
       <div class="ConfirmSnapshotVoteModal">

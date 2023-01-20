@@ -11,8 +11,9 @@ export interface ChainCategoryTypeInstance
   extends Model<ChainCategoryTypeAttributes>,
     ChainCategoryTypeAttributes {}
 
-export type ChainCategoryTypeModelStatic =
-  ModelStatic<ChainCategoryTypeInstance>;
+export type ChainCategoryTypeModelStatic = ModelStatic<
+  ChainCategoryTypeInstance
+>;
 
 export default (
   sequelize: Sequelize.Sequelize,

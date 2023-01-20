@@ -105,11 +105,13 @@ module.exports = {
         },
         {
           name: 'Polygon (Mumbai)',
-          url: 'wss://polygon-mumbai.g.alchemy.com/v2/HaGTCcKYKQyX68DYEa9_6F5E7ASxhoAS',
+          url:
+            'wss://polygon-mumbai.g.alchemy.com/v2/HaGTCcKYKQyX68DYEa9_6F5E7ASxhoAS',
         },
         {
           name: 'Fantom',
-          url: 'wss://misty-rough-haze.fantom.quiknode.pro/cf2cf5b4d7fbf487e2ea8affcbd876219fe6576e/',
+          url:
+            'wss://misty-rough-haze.fantom.quiknode.pro/cf2cf5b4d7fbf487e2ea8affcbd876219fe6576e/',
         },
         {
           name: 'ChainX',
@@ -128,7 +130,8 @@ module.exports = {
         },
         {
           name: 'BSC',
-          url: 'wss://holy-spring-wave.bsc.quiknode.pro/a6955f0547ae82229a6379ca6f16fd672cb997eb/',
+          url:
+            'wss://holy-spring-wave.bsc.quiknode.pro/a6955f0547ae82229a6379ca6f16fd672cb997eb/',
         },
         {
           name: 'Centrifuge',
@@ -141,11 +144,13 @@ module.exports = {
         },
         {
           name: 'Ethereum (Ropsten)',
-          url: 'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
+          url:
+            'wss://eth-ropsten.alchemyapi.io/v2/2xXT2xx5AvA3GFTev3j_nB9LzWdmxPk7',
         },
         {
           name: 'Ethereum (Mainnet)',
-          url: 'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_',
+          url:
+            'wss://eth-mainnet.alchemyapi.io/v2/BCNLWCaGqaXwCDHlZymPy3HpjXSxK7j_',
           balance_type: 'ethereum',
         },
         {
@@ -156,7 +161,8 @@ module.exports = {
         },
         {
           name: 'Arbitrum (Mainnet)',
-          url: 'wss://arb-mainnet.g.alchemy.com/v2/wJE2b7MRNJgk7S8dfgb_1xZNUDq7SF7G',
+          url:
+            'wss://arb-mainnet.g.alchemy.com/v2/wJE2b7MRNJgk7S8dfgb_1xZNUDq7SF7G',
         },
         {
           name: 'Crust Network',

@@ -140,7 +140,9 @@ type SubscriptionRowAttrs = {
   subscription: NotificationSubscription;
 };
 
-export class SubscriptionRowTextContainer extends ClassComponent<SubscriptionRowAttrs> {
+export class SubscriptionRowTextContainer extends ClassComponent<
+  SubscriptionRowAttrs
+> {
   view(vnode: m.Vnode<SubscriptionRowAttrs>) {
     const { subscription } = vnode.attrs;
 

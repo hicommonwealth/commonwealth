@@ -6,7 +6,8 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'ChainNodes',
         {
-          url: 'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9',
+          url:
+            'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9',
         },
         {
           url: 'https://terra-rpc.cw-figment.workers.dev',
@@ -50,7 +51,8 @@ module.exports = {
           url: 'https://terra-rpc.cw-figment.workers.dev',
         },
         {
-          url: 'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9',
+          url:
+            'https://lcd.phoenix.terra.setten.io/5e351408cfc5460186aa77ff1f38fac9',
         },
         {
           transaction,

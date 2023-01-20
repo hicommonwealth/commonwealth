@@ -27,7 +27,9 @@ type WebhookSettingsModalAttrs = {
   webhook: Webhook;
 };
 
-export class WebhookSettingsModal extends ClassComponent<WebhookSettingsModalAttrs> {
+export class WebhookSettingsModal extends ClassComponent<
+  WebhookSettingsModalAttrs
+> {
   private selectedCategories: string[];
 
   oninit(vnode: m.Vnode<WebhookSettingsModalAttrs>) {

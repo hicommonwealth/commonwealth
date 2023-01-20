@@ -74,17 +74,15 @@ export class NotificationsMenu extends ClassComponent {
   }
 
   view() {
-    this.showingDiscussionNotifications =
-      app.user.notifications.discussionNotifications.slice(
-        this.minDiscussionNotification,
-        this.minDiscussionNotification + MAX_NOTIFS
-      );
+    this.showingDiscussionNotifications = app.user.notifications.discussionNotifications.slice(
+      this.minDiscussionNotification,
+      this.minDiscussionNotification + MAX_NOTIFS
+    );
 
-    this.showingChainEventNotifications =
-      app.user.notifications.chainEventNotifications.slice(
-        this.minChainEventsNotification,
-        this.minChainEventsNotification + MAX_NOTIFS
-      );
+    this.showingChainEventNotifications = app.user.notifications.chainEventNotifications.slice(
+      this.minChainEventsNotification,
+      this.minChainEventsNotification + MAX_NOTIFS
+    );
 
     return (
       <div class="NotificationsMenu">

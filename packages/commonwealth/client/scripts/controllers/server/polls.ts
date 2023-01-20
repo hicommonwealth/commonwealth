@@ -81,8 +81,14 @@ class PollsController {
     authorChain: string;
     address: string;
   }) {
-    const { threadId, prompt, options, customDuration, authorChain, address } =
-      args;
+    const {
+      threadId,
+      prompt,
+      options,
+      customDuration,
+      authorChain,
+      address,
+    } = args;
 
     await $.ajax({
       url: `${app.serverUrl()}/createPoll`,

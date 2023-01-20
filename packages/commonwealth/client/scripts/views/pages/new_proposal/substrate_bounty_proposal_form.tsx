@@ -65,11 +65,9 @@ export class SubstrateBountyProposalForm extends ClassComponent {
             let createFunc: (
               ...args
             ) => ITXModalData | Promise<ITXModalData> = (a) => {
-              return (
-                proposalSlugToClass().get(
-                  ProposalType.SubstrateBountyProposal
-                ) as ProposalModule<any, any, any>
-              ).createTx(...a);
+              return (proposalSlugToClass().get(
+                ProposalType.SubstrateBountyProposal
+              ) as ProposalModule<any, any, any>).createTx(...a);
             };
 
             const args = [author, this.value, this.title];

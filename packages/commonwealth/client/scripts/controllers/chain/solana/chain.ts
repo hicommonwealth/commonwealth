@@ -12,8 +12,7 @@ import { SolanaToken } from './types';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
 export default class SolanaChain
-  implements IChainModule<SolanaToken, SolanaAccount>
-{
+  implements IChainModule<SolanaToken, SolanaAccount> {
   private _denom: string;
   public get denom(): string {
     return this._denom;

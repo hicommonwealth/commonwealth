@@ -24,7 +24,9 @@ type AddressInputTypeaheadAttrs = {
   options: { placeholder: string; fluid: boolean };
 };
 
-export class AddressInputTypeahead extends ClassComponent<AddressInputTypeaheadAttrs> {
+export class AddressInputTypeahead extends ClassComponent<
+  AddressInputTypeaheadAttrs
+> {
   private initialized: boolean;
   private loading: boolean;
   private selectedItem: AddressInputTypeaheadItem;

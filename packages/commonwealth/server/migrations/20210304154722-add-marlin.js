@@ -37,12 +37,14 @@ module.exports = {
         [
           {
             chain: 'marlin',
-            url: 'wss://mainnet.infura.io/ws/v3/90de850aff68424ab8e7321017406586',
+            url:
+              'wss://mainnet.infura.io/ws/v3/90de850aff68424ab8e7321017406586',
             address: '0xfda6d91cbc6f6f69c15bbd85fed4e3b84f6bccd4', // MPOND Contract Address
           },
           {
             chain: 'marlin-testnet',
-            url: 'wss://ropsten.infura.io/ws/v3/90de850aff68424ab8e7321017406586',
+            url:
+              'wss://ropsten.infura.io/ws/v3/90de850aff68424ab8e7321017406586',
             address: '0xEa2923b099b4B588FdFAD47201d747e3b9599A5f', // MPOND Contract Address (Not Valid)
           },
         ],

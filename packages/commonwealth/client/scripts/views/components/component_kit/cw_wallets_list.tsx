@@ -220,14 +220,16 @@ export class CWWalletsList extends ClassComponent<WalletsListAttrs> {
         const validationBlockInfo =
           wallet.getRecentBlock &&
           (await wallet.getRecentBlock(chainIdentifier));
-        const { account: signerAccount, newlyCreated } =
-          await createUserWithAddress(
-            address,
-            wallet.name,
-            chainIdentifier,
-            sessionPublicAddress,
-            validationBlockInfo
-          );
+        const {
+          account: signerAccount,
+          newlyCreated,
+        } = await createUserWithAddress(
+          address,
+          wallet.name,
+          chainIdentifier,
+          sessionPublicAddress,
+          validationBlockInfo
+        );
         accountVerifiedCallback(signerAccount, newlyCreated, linking);
       } catch (err) {
         console.log(err);

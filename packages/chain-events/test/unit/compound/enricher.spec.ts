@@ -16,7 +16,7 @@ const constructEvent = (data, rawData?): RawEvent => {
 };
 
 const blockNumber = 10000;
-const api: Api = {} as unknown as Api;
+const api: Api = ({} as unknown) as Api;
 
 describe('Compound Event Enricher Filter Tests', () => {
   // Comp Events

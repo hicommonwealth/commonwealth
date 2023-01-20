@@ -81,20 +81,20 @@ export default class AaveGovernance extends ProposalModule<
       throw new Error('Executor not found.');
     }
     const executorContract = ex.contract;
-    const isExecutorAuthorized =
-      await this._api.Governance.isExecutorAuthorized(executorContract.address);
+    const isExecutorAuthorized = await this._api.Governance.isExecutorAuthorized(
+      executorContract.address
+    );
     if (!isExecutorAuthorized) {
       throw new Error('executor not authorized!');
     }
 
     // validate user
     const blockNumber = await this._api.Provider.getBlockNumber();
-    const isPropositionPowerEnough =
-      await executorContract.isPropositionPowerEnough(
-        this._api.Governance.address,
-        address,
-        blockNumber - 1
-      );
+    const isPropositionPowerEnough = await executorContract.isPropositionPowerEnough(
+      this._api.Governance.address,
+      address,
+      blockNumber - 1
+    );
     if (!isPropositionPowerEnough) {
       throw new Error('user does not have enough proposition power');
     }

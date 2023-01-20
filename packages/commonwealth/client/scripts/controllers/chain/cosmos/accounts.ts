@@ -6,8 +6,7 @@ import { AccountsStore } from 'stores';
 import CosmosAccount from './account';
 
 export default class CosmosAccounts
-  implements IAccountsModule<CosmosToken, CosmosAccount>
-{
+  implements IAccountsModule<CosmosToken, CosmosAccount> {
   private _initialized = false;
   public get initialized() {
     return this._initialized;

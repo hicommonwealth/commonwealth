@@ -97,8 +97,7 @@ export class MarkdownShortcuts {
       {
         // bolditalic now handles bold, italic, and bold italic
         name: 'bolditalic',
-        pattern:
-          /[^\S]?((?:\*|_){1,3})([^\s*_]{1,2}|[^\s_*][^_*]+?[^\s_*])((?:\*|_){1,3})[^\S]?/g,
+        pattern: /[^\S]?((?:\*|_){1,3})([^\s*_]{1,2}|[^\s_*][^_*]+?[^\s_*])((?:\*|_){1,3})[^\S]?/g,
         action: (text, selection, pattern, lineStart) => {
           const allMatches = text.matchAll(pattern);
           let indexOffset = 0;

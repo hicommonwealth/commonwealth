@@ -12,8 +12,7 @@ import MolochMember from './member';
 //   than extending it into a MolochMember. But this is our first-pass implementation,
 //   for now.
 export default class MolochMembers
-  implements IAccountsModule<EthereumCoin, MolochMember>
-{
+  implements IAccountsModule<EthereumCoin, MolochMember> {
   protected _store: AccountsStore<MolochMember> = new AccountsStore();
   private _api: MolochAPI;
   private _Chain: EthereumChain;

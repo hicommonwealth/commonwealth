@@ -13,7 +13,9 @@ type AaveViewProposalDetailAttrs = {
   proposal: AaveProposal;
 };
 
-export class AaveViewProposalDetail extends ClassComponent<AaveViewProposalDetailAttrs> {
+export class AaveViewProposalDetail extends ClassComponent<
+  AaveViewProposalDetailAttrs
+> {
   view(vnode: m.Vnode<AaveViewProposalDetailAttrs>) {
     const { proposal } = vnode.attrs;
 

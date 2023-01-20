@@ -47,15 +47,17 @@ export default class extends IEventHandler<ChainEventInstance> {
       fieldValue: string,
       eventType: EntityEventKind
     ) => {
-      const [dbEventType, created] =
-        await this._models.ChainEventType.findOrCreate({
-          where: {
-            id: `${chain}-${event.data.kind.toString()}`,
-            chain,
-            event_network: event.network,
-            event_name: event.data.kind.toString(),
-          },
-        });
+      const [
+        dbEventType,
+        created,
+      ] = await this._models.ChainEventType.findOrCreate({
+        where: {
+          id: `${chain}-${event.data.kind.toString()}`,
+          chain,
+          event_network: event.network,
+          event_name: event.data.kind.toString(),
+        },
+      });
       log.trace(
         `${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`
       );

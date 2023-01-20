@@ -98,13 +98,9 @@ export default class CompoundGovernance extends ProposalModule<
       const gasLimit = await contract.estimateGas[
         'propose(address[],uint256[],bytes[],string)'
       ](targets, values, calldatas, description);
-      tx = await contract['propose(address[],uint256[],bytes[],string)'](
-        targets,
-        values,
-        calldatas,
-        description,
-        { gasLimit }
-      );
+      tx = await contract[
+        'propose(address[],uint256[],bytes[],string)'
+      ](targets, values, calldatas, description, { gasLimit });
     } else {
       const gasLimit = await contract.estimateGas[
         'propose(address[],uint256[],string[],bytes[],string)'
@@ -162,9 +158,8 @@ export default class CompoundGovernance extends ProposalModule<
       );
     } else {
       // OZ we need to query and parse counting mode
-      const countingMode = await (
-        this.api.Contract as GovernorCompatibilityBravo
-      ).COUNTING_MODE();
+      const countingMode = await (this.api
+        .Contract as GovernorCompatibilityBravo).COUNTING_MODE();
       const params = new URLSearchParams(countingMode);
       this._supportsAbstain = params.get('support') === 'bravo';
       this._useAbstainInQuorum = params.get('quorum') !== 'bravo';

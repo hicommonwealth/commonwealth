@@ -30,7 +30,9 @@ type NewSnapshotProposalPageAttrs = {
   snapshotId: string;
 };
 
-export class NewSnapshotProposalPage extends ClassComponent<NewSnapshotProposalPageAttrs> {
+export class NewSnapshotProposalPage extends ClassComponent<
+  NewSnapshotProposalPageAttrs
+> {
   private form: ThreadForm;
   private initialized: boolean;
   private isFromExistingProposal: boolean;

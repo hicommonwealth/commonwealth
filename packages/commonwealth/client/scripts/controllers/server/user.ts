@@ -114,8 +114,7 @@ export class UserController {
     this._disableRichText = disableRichText;
   }
 
-  private _notifications: NotificationsController =
-    new NotificationsController();
+  private _notifications: NotificationsController = new NotificationsController();
   public get notifications(): NotificationsController {
     return this._notifications;
   }

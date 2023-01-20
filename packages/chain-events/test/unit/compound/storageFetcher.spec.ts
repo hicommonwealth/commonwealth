@@ -18,7 +18,7 @@ const constructEvent = (blockNumber: number, data, rawData?): RawEvent => {
 };
 
 const makeApi = (proposals, isBravo = false) => {
-  const governorAlpha = {
+  const governorAlpha = ({
     interface: {
       functions: {
         'guardian()': !isBravo,
@@ -80,7 +80,7 @@ const makeApi = (proposals, isBravo = false) => {
       ProposalQueued: () => 'ProposalQueued',
       ProposalExecuted: () => 'ProposalExecuted',
     },
-  } as unknown as GovernorAlpha;
+  } as unknown) as GovernorAlpha;
   return governorAlpha;
 };
 

@@ -551,7 +551,8 @@ class SubstrateChain implements IChainModule<SubstrateCoin, SubstrateAccount> {
                   });
                   if (unsubscribe) unsubscribe.then((u) => u());
                 } else if (this.api.events.system.ExtrinsicFailed.is(e.event)) {
-                  const errorData = e.event.data[0] as unknown as DispatchError;
+                  const errorData = (e.event
+                    .data[0] as unknown) as DispatchError;
                   let errorInfo;
                   if (errorData.isModule) {
                     const decoded = this.registry.findMetaError(

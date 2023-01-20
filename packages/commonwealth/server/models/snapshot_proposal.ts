@@ -14,10 +14,13 @@ export type SnapshotProposalAttributes = {
   is_upstream_deleted?: boolean;
 };
 
-export type SnapshotProposalInstance =
-  ModelInstance<SnapshotProposalAttributes> & {
-    getSnapshotProposal: Sequelize.BelongsToGetAssociationMixin<SnapshotProposalInstance>;
-  };
+export type SnapshotProposalInstance = ModelInstance<
+  SnapshotProposalAttributes
+> & {
+  getSnapshotProposal: Sequelize.BelongsToGetAssociationMixin<
+    SnapshotProposalInstance
+  >;
+};
 
 export type SnapshotProposalModelStatic = ModelStatic<SnapshotProposalInstance>;
 

@@ -40,8 +40,9 @@ function setGovernanceToggleTree(path: string, toggle: boolean) {
 
   const newTree = currentTree;
 
-  localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
-    JSON.stringify(newTree);
+  localStorage[
+    `${app.activeChainId()}-governance-toggle-tree`
+  ] = JSON.stringify(newTree);
 }
 
 export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
@@ -190,13 +191,15 @@ export class GovernanceSection extends ClassComponent<SidebarSectionAttrs> {
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-governance-toggle-tree`]) {
-      localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
-        JSON.stringify(governanceDefaultToggleTree);
+      localStorage[
+        `${app.activeChainId()}-governance-toggle-tree`
+      ] = JSON.stringify(governanceDefaultToggleTree);
     } else if (
       !verifyCachedToggleTree('governance', governanceDefaultToggleTree)
     ) {
-      localStorage[`${app.activeChainId()}-governance-toggle-tree`] =
-        JSON.stringify(governanceDefaultToggleTree);
+      localStorage[
+        `${app.activeChainId()}-governance-toggle-tree`
+      ] = JSON.stringify(governanceDefaultToggleTree);
     }
 
     const toggleTreeState = JSON.parse(

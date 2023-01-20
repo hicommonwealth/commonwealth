@@ -16,8 +16,14 @@ import { ComponentType } from './types';
 class CWMobileMenuItem extends ClassComponent<MenuItem> {
   view(vnode: m.Vnode<MenuItem>) {
     if (vnode.attrs.type === 'default') {
-      const { disabled, iconLeft, iconRight, isSecondary, label, onclick } =
-        vnode.attrs;
+      const {
+        disabled,
+        iconLeft,
+        iconRight,
+        isSecondary,
+        label,
+        onclick,
+      } = vnode.attrs;
 
       return (
         <div
