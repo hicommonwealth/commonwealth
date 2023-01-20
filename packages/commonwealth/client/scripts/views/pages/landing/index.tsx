@@ -26,7 +26,7 @@ import { MixpanelPageViewEvent } from 'analytics/types';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
 import { HeaderLandingPage } from './landing_page_header';
 import { JoinCommonWealthSection } from './landing_page_pre_footer';
-// import { TokensCommunityComponent } from './tokens_community_hero';
+import { TokensCommunityComponent } from './tokens_community_hero';
 import { TokensCreatorComponent } from './creators_card_section';
 import { TokensChainsComponent } from './chains_slider';
 import { TokenHoldersComponent } from './find_your_community_section';
@@ -99,7 +99,6 @@ class LandingPage extends ClassComponent {
   }
 
   view() {
-    console.log('this', this.chains);
     if (getRouteParam('triggerInvite') === 't') {
       setTimeout(() => handleEmailInvites(this), 0);
     }
@@ -115,7 +114,7 @@ class LandingPage extends ClassComponent {
               ]}
             />
           </div>
-          {/* {<TokensCommunityComponent chains={this.chains} />} */}
+          {<TokensCommunityComponent chains={this.chains} />}
           {/* {this.chains && (
             <TokensChainsComponent
               oncreateSlider={() => {
@@ -215,7 +214,7 @@ class LandingPage extends ClassComponent {
               },
             ]}
           />
-          {/* <TokenHoldersComponent
+          <TokenHoldersComponent
             holders={[
               {
                 img: 'static/img/circleCrowd.svg',
@@ -244,7 +243,7 @@ class LandingPage extends ClassComponent {
                 text: ' Participate in events like upcoming votes, new projects and community initiatives. ',
               },
             ]}
-          /> */}
+          />
           <ChainsCrowdfundingComponent
             chains={[
               {

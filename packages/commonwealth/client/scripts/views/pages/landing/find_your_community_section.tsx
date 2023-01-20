@@ -30,7 +30,7 @@ type TokenHoldersComponentAttrs = {
 export class TokenHoldersComponent extends ClassComponent<TokenHoldersComponentAttrs> {
   private holders: Array<Holder>;
 
-  oninit(vnode: ResultNode<TokenHoldersComponentAttrs>) {
+  oncreate(vnode: ResultNode<TokenHoldersComponentAttrs>) {
     this.holders = vnode.attrs.holders;
   }
 
@@ -44,9 +44,9 @@ export class TokenHoldersComponent extends ClassComponent<TokenHoldersComponentA
           Find your community and drive your token forward.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-20">
-          {this.holders.map((holder) => {
+          {this.holders.map((holder, i) => {
             return (
-              <div className="text-center lg:text-left">
+              <div className="text-center lg:text-left" key={i}>
                 <img
                   className="w-28 h-28 mx-auto lg:mx-0"
                   src={holder.img}

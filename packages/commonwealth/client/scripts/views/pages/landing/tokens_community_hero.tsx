@@ -89,9 +89,10 @@ export class TokensCommunityComponent extends ClassComponent<TokensCommunityComp
         alt: '',
       },
     ]
-      .map((community) => {
+      .map((community, i) => {
         return (
           <img
+            key={i}
             className={community.variant}
             src={community.src}
             alt={community.alt}
