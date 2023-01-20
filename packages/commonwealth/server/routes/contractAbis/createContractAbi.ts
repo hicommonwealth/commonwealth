@@ -1,5 +1,4 @@
-import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../../models';
 import { ContractAbiAttributes } from '../../models/contract_abi';
 import { ContractAttributes } from '../../models/contract';

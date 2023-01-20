@@ -1,13 +1,9 @@
 import { ChainBase } from 'common-common/src/types';
-import {
-  encodeFunctionSignature,
-  processAbiInputsToDataTypes,
-} from 'helpers/abi_form_helpers';
-import { parseAbiItemsFromABI } from 'abi_utils';
+import { processAbiInputsToDataTypes } from 'helpers/abi_form_helpers';
 import app from 'state';
 import Web3 from 'web3';
 import { TransactionConfig, TransactionReceipt } from 'web3-core/types';
-import { AbiItem, AbiOutput } from 'web3-utils';
+import { AbiItem } from 'web3-utils';
 import Contract from 'client/scripts/models/Contract';
 import { IWebWallet } from 'client/scripts/models';
 import { ethers } from 'ethers';
