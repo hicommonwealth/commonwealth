@@ -9,7 +9,6 @@ import bs58 from 'bs58';
 import { ChainBase } from 'common-common/src/types';
 import { setActiveAccount } from 'controllers/app/login';
 import { modelFromServer as modelCommentFromServer } from 'controllers/server/comments';
-import { modelFromServer as modelThreadFromServer } from 'controllers/server/threads';
 import $ from 'jquery';
 import _ from 'lodash';
 
@@ -211,7 +210,7 @@ const loadProfile = async (
       ghost_address: a.ghost_address,
     };
     state.account = account;
-    state.threads = result.threads.map((t) => modelThreadFromServer(t));
+    state.threads = result.threads.map((t) => app.threads.modelFromServer(t));
     state.comments = result.comments.map((c) => modelCommentFromServer(c));
     m.redraw();
   } catch (err) {
