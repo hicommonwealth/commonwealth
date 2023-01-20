@@ -242,7 +242,7 @@ function setupRouter(
   );
 
   router.post(
-    '/createContract',
+    '/contract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
   );
