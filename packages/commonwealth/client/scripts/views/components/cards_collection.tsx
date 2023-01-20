@@ -1,15 +1,24 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 
 import 'components/cards_collection.scss';
 
 import { CWText } from './component_kit/cw_text';
 
 type CardsCollectionAttrs = {
-  content: Array<ResultNode> | ResultNode;
+  content: Array<JSX.Element>;
   header?: string;
 };
 

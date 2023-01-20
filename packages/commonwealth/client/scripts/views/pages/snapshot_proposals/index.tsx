@@ -1,8 +1,17 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import moment from 'moment';
 
 import 'pages/snapshot_proposals.scss';
@@ -38,8 +47,9 @@ class SnapshotProposalStagesBar extends ClassComponent<SnapshotProposalStagesBar
     return (
       <div className="SnapshotProposalStagesBar">
         {Object.values(SnapshotProposalFilter).map(
-          (option: SnapshotProposalFilter) => (
+          (option: SnapshotProposalFilter, i) => (
             <CWButton
+              key={i}
               disabled={
                 option === SnapshotProposalFilter.Core ||
                 option === SnapshotProposalFilter.Community
@@ -66,14 +76,11 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
   private selectedFilter: SnapshotProposalFilter;
 
   oncreate() {
-    mixpanelBrowserTrack({
-      event: MixpanelSnapshotEvents.SNAPSHOT_PAGE_VISIT,
-      isCustomDomain: app.isCustomDomain(),
-    });
-  }
-
-  oninit() {
     this.selectedFilter = SnapshotProposalFilter.Active;
+    // mixpanelBrowserTrack({
+    //   event: MixpanelSnapshotEvents.SNAPSHOT_PAGE_VISIT,
+    //   isCustomDomain: app.isCustomDomain(),
+    // });
   }
 
   view(vnode: ResultNode<SnapshotProposalsPageAttrs>) {
@@ -127,8 +134,9 @@ class SnapshotProposalsPage extends ClassComponent<SnapshotProposalsPageAttrs> {
             />
             {proposals.length > 0 ? (
               <CardsCollection
-                content={proposals.map((proposal) => (
+                content={proposals.map((proposal, i) => (
                   <SnapshotProposalCard
+                    key={i}
                     snapshotId={snapshotId}
                     proposal={proposal}
                   />

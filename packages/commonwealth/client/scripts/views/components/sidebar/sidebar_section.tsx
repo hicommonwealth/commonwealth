@@ -3,8 +3,17 @@ import React from 'react';
 
 import 'components/sidebar/sidebar_section.scss';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import app from 'state';
 import { isNotUndefined } from 'helpers/typeGuards';
 import {
@@ -52,7 +61,9 @@ class SubSection extends ClassComponent<SubSectionAttrs> {
         <div className={titleTextClass} title={title}>
           {title}
         </div>
-        {isNotUndefined(rightIcon) && <div className="right-icon">{rightIcon}</div>}
+        {isNotUndefined(rightIcon) && (
+          <div className="right-icon">{rightIcon}</div>
+        )}
       </div>
     );
   }
@@ -154,8 +165,8 @@ class SubSectionGroup extends ClassComponent<SectionGroupAttrs> {
         </div>
         {containsChildren && this.toggled && (
           <div className="subsections">
-            {displayData.map((subsection) => (
-              <SubSection {...subsection} />
+            {displayData.map((subsection, i) => (
+              <SubSection key={i} {...subsection} />
             ))}
           </div>
         )}
@@ -233,7 +244,7 @@ export class SidebarSectionGroup extends ClassComponent<SidebarSectionAttrs> {
         >
           {carat}
           <CWText>{title}</CWText>
-          { /* rightIcon && <div className="right-icon">{rightIcon}</div> */}
+          {/* rightIcon && <div className="right-icon">{rightIcon}</div> */}
         </div>
         {this.toggled && (
           <div className="sections-container">

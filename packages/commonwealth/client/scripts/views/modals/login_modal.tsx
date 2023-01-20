@@ -1,13 +1,25 @@
 /* @jsx jsx */
 import React from 'react';
 
-
-import { ClassComponent, ResultNode, render, setRoute, getRoute, getRouteParam, redraw, Component, jsx } from 'mithrilInterop';
+import {
+  ClassComponent,
+  ResultNode,
+  render,
+  setRoute,
+  getRoute,
+  getRouteParam,
+  redraw,
+  Component,
+  jsx,
+} from 'mithrilInterop';
 import app from 'state';
 import $ from 'jquery';
 import _ from 'underscore';
 
-import { constructCanvasMessage, chainBasetoCanvasChain } from 'adapters/shared';
+import {
+  constructCanvasMessage,
+  chainBasetoCanvasChain,
+} from 'adapters/shared';
 import { initAppState } from 'app';
 import {
   completeClientLogin,
@@ -27,7 +39,6 @@ import { ProfileRowAttrs } from '../components/component_kit/cw_profiles_list';
 import { LoginDesktop } from '../pages/login/login_desktop';
 import { LoginMobile } from '../pages/login/login_mobile';
 import { LoginBodyType, LoginSidebarType } from '../pages/login/types';
-import { NumberList } from 'aws-sdk/clients/iot';
 
 type LoginModalAttrs = {
   initialBody?: LoginBodyType;
@@ -37,16 +48,22 @@ type LoginModalAttrs = {
   onSuccess?: () => void;
 };
 
-async function signWithWallet<T extends { address: string }>(wallet: IWebWallet<T>, account: Account) {
+async function signWithWallet<T extends { address: string }>(
+  wallet: IWebWallet<T>,
+  account: Account
+) {
   const chainId = wallet.getChainId();
-  const sessionPublicAddress = await app.sessions.getOrCreateAddress(wallet.chain, chainId);
+  const sessionPublicAddress = await app.sessions.getOrCreateAddress(
+    wallet.chain,
+    chainId
+  );
 
   const canvasMessage = constructCanvasMessage(
     chainBasetoCanvasChain(wallet.chain),
     chainId,
     account.address,
     sessionPublicAddress,
-    account.validationBlockInfo,
+    account.validationBlockInfo
   );
 
   return wallet.signCanvasMessage(account, canvasMessage);
@@ -265,7 +282,10 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
       } else {
         if (!linking) {
           try {
-            const signature = await signWithWallet(this.selectedWallet, account);
+            const signature = await signWithWallet(
+              this.selectedWallet,
+              account
+            );
             this.cachedWalletSignature = signature;
             this.cachedChainId = this.selectedWallet.getChainId();
           } catch (e) {
@@ -285,7 +305,10 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     const createNewAccountCallback = async () => {
       try {
         if (this.selectedWallet.chain !== 'near') {
-          await this.primaryAccount.validate(this.cachedWalletSignature, this.cachedChainId);
+          await this.primaryAccount.validate(
+            this.cachedWalletSignature,
+            this.cachedChainId
+          );
         }
         await logInWithAccount(this.primaryAccount, false);
       } catch (e) {
@@ -312,9 +335,17 @@ export class NewLoginModal extends ClassComponent<LoginModalAttrs> {
     const performLinkingCallback = async () => {
       try {
         const signature = await signWithWallet(
-          this.selectedLinkingWallet, this.secondaryLinkAccount);
-        await this.secondaryLinkAccount.validate(signature, this.secondaryChainId);
-        await this.primaryAccount.validate(this.cachedWalletSignature, this.cachedChainId);
+          this.selectedLinkingWallet,
+          this.secondaryLinkAccount
+        );
+        await this.secondaryLinkAccount.validate(
+          signature,
+          this.secondaryChainId
+        );
+        await this.primaryAccount.validate(
+          this.cachedWalletSignature,
+          this.cachedChainId
+        );
         await logInWithAccount(this.primaryAccount, true);
       } catch (e) {
         console.log(e);
