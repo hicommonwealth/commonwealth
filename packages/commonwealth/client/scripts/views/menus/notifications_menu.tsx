@@ -1,17 +1,17 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
-import Infinite from 'mithril-infinite';
-import { Button, PopoverMenu } from 'construct-ui';
 
 import 'components/header/notifications_menu.scss';
+import { Button, PopoverMenu } from 'construct-ui';
+import m from 'mithril';
+import Infinite from 'mithril-infinite';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
-import NotificationRow from '../components/notification_row';
-import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
 import { CWIconButton } from '../components/component_kit/cw_icon_button';
+import { CWCustomIcon } from '../components/component_kit/cw_icons/cw_custom_icon';
+import NotificationRow from '../components/notification_row';
 
 const MAX_NOTIFS = 40;
 

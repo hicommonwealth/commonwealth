@@ -1,20 +1,26 @@
+import type { EthereumCoin } from 'adapters/chain/ethereum/types';
 import assert from 'assert';
-import { IApp } from 'state';
-import { IAccountsModule } from 'models';
+import type { IAccountsModule } from 'models';
+import type { IApp } from 'state';
 import { AccountsStore } from 'stores';
-import { EthereumCoin } from 'adapters/chain/ethereum/types';
-import EthereumChain from './chain';
 import EthereumAccount from './account';
+import type EthereumChain from './chain';
 
 // NOTE: this is just a boilerplate class; not verified to work yet.
 // TODO: hook this up to rest of the application and verify that it works
-class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount> {
+class EthereumAccounts
+  implements IAccountsModule<EthereumCoin, EthereumAccount>
+{
   private _initialized = false;
-  public get initialized() { return this._initialized; }
+  public get initialized() {
+    return this._initialized;
+  }
 
   // STORAGE
   protected _store: AccountsStore<EthereumAccount> = new AccountsStore();
-  public get store() { return this._store; }
+  public get store() {
+    return this._store;
+  }
 
   private _Chain: EthereumChain;
 
@@ -23,7 +29,9 @@ class EthereumAccounts implements IAccountsModule<EthereumCoin, EthereumAccount>
   }
 
   private _app: IApp;
-  public get app() { return this._app; }
+  public get app() {
+    return this._app;
+  }
 
   constructor(app: IApp) {
     this._app = app;

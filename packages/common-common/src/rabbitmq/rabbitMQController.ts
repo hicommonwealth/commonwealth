@@ -1,21 +1,21 @@
 import * as Rascal from 'rascal';
-import { factory, formatFilename } from 'common-common/src/logging';
-import {
+import type {
   RascalPublications,
   RascalSubscriptions,
-  RmqMsgFormatError,
   TRmqMessages,
 } from './types';
-import Rollbar from 'rollbar';
-import {Sequelize} from 'sequelize';
-import {ChainEntityModelStatic} from 'chain-events/services/database/models/chain_entity';
-import {ChainEventModelStatic} from 'chain-events/services/database/models/chain_event';
-import {ChainEventTypeModelStatic} from 'chain-events/services/database/models/chain_event_type';
+import { RmqMsgFormatError } from './types';
+import type Rollbar from 'rollbar';
+import type { Sequelize } from 'sequelize';
+import type { ChainEntityModelStatic } from 'chain-events/services/database/models/chain_entity';
+import type { ChainEventModelStatic } from 'chain-events/services/database/models/chain_event';
+import type { ChainEventTypeModelStatic } from 'chain-events/services/database/models/chain_event_type';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 
 export type SafeRmqPublishSupported =
-  ChainEntityModelStatic
+  | ChainEntityModelStatic
   | ChainEventModelStatic
   | ChainEventTypeModelStatic;
 
@@ -43,12 +43,16 @@ export class RabbitMQController {
   public readonly subscribers: string[];
   public readonly publishers: string[];
   protected readonly _rawVhost: any;
-  protected _initialized: boolean = false;
+  protected _initialized = false;
   protected rollbar: Rollbar;
 
-  constructor(protected readonly _rabbitMQConfig: Rascal.BrokerConfig, rollbar?: Rollbar) {
+  constructor(
+    protected readonly _rabbitMQConfig: Rascal.BrokerConfig,
+    rollbar?: Rollbar
+  ) {
     // sets the first vhost config to _rawVhost
-    this._rawVhost = _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
+    this._rawVhost =
+      _rabbitMQConfig.vhosts[Object.keys(_rabbitMQConfig.vhosts)[0]];
 
     // array of subscribers
     this.subscribers = Object.keys(this._rawVhost.subscriptions);
@@ -60,9 +64,7 @@ export class RabbitMQController {
   }
 
   public async init(): Promise<void> {
-    log.info(
-      `Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`
-    );
+    log.info(`Rascal connecting to RabbitMQ: ${this._rawVhost.connection}`);
 
     this.broker = await Rascal.BrokerAsPromised.create(
       Rascal.withDefaultConfig(this._rabbitMQConfig)
@@ -79,12 +81,12 @@ export class RabbitMQController {
         `Vhost: ${vhost} was initialised using connection: ${connectionUrl}`
       );
     });
-    this.broker.on('blocked', (reason, {vhost, connectionUrl}) => {
+    this.broker.on('blocked', (reason, { vhost, connectionUrl }) => {
       log.warn(
         `Vhost: ${vhost} was blocked using connection: ${connectionUrl}. Reason: ${reason}`
       );
     });
-    this.broker.on('unblocked', ({vhost, connectionUrl}) => {
+    this.broker.on('unblocked', ({ vhost, connectionUrl }) => {
       log.info(
         `Vhost: ${vhost} was unblocked using connection: ${connectionUrl}.`
       );
@@ -107,23 +109,23 @@ export class RabbitMQController {
   ): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError(
-        "RabbitMQController is not initialized!"
+        'RabbitMQController is not initialized!'
       );
     }
 
     let subscription: Rascal.SubscriberSessionAsPromised;
     if (!this.subscribers.includes(subscriptionName))
-      throw new RabbitMQControllerError("Subscription does not exist");
+      throw new RabbitMQControllerError('Subscription does not exist');
 
     try {
       log.info(`Subscribing to ${subscriptionName}`);
       subscription = await this.broker.subscribe(subscriptionName);
 
-      subscription.on("message", (message, content, ackOrNack) => {
+      subscription.on('message', (message, content, ackOrNack) => {
         messageProcessor
           .call({ rmqController: this, ...msgProcessorContext }, content)
           .then(() => {
-            console.log("Message Acked");
+            console.log('Message Acked');
             ackOrNack();
           })
           .catch((e) => {
@@ -136,24 +138,24 @@ export class RabbitMQController {
             if (e instanceof RmqMsgFormatError) {
               log.error(`Invalid Message Format Error - ${errorMsg}`, e);
               this.rollbar?.warn(`Invalid Message Format - ${errorMsg}`, e);
-              ackOrNack(e, { strategy: "nack" });
+              ackOrNack(e, { strategy: 'nack' });
             } else {
               log.error(`Unknown Error - ${errorMsg}`, e);
               this.rollbar?.warn(`Unknown Error - ${errorMsg}`, e);
               ackOrNack(e, [
-                { strategy: "republish", defer: 2000, attempts: 3 },
-                { strategy: "nack" },
+                { strategy: 'republish', defer: 2000, attempts: 3 },
+                { strategy: 'nack' },
               ]);
             }
           });
       });
-      subscription.on("error", (err) => {
+      subscription.on('error', (err) => {
         log.error(`Subscriber error: ${err}`);
         this.rollbar?.warn(`Subscriber error: ${err}`);
       });
-      subscription.on("invalid_content", (err, message, ackOrNack) => {
+      subscription.on('invalid_content', (err, message, ackOrNack) => {
         log.error(`Invalid content`, err);
-        ackOrNack(err, { strategy: "nack" });
+        ackOrNack(err, { strategy: 'nack' });
         this.rollbar?.warn(`Invalid content`, err);
       });
     } catch (err) {
@@ -170,18 +172,18 @@ export class RabbitMQController {
   ): Promise<any> {
     if (!this._initialized) {
       throw new RabbitMQControllerError(
-        "RabbitMQController is not initialized!"
+        'RabbitMQController is not initialized!'
       );
     }
 
     if (!this.publishers.includes(publisherName))
-      throw new RabbitMQControllerError("Publisher is not defined");
+      throw new RabbitMQControllerError('Publisher is not defined');
 
     let publication;
     try {
       publication = await this.broker.publish(publisherName, data);
 
-      publication.on("error", (err, messageId) => {
+      publication.on('error', (err, messageId) => {
         log.error(`Publisher error ${messageId}`, err);
         this.rollbar?.warn(`Publisher error ${messageId}`, err);
         throw new PublishError(err.message);
@@ -212,10 +214,12 @@ export class RabbitMQController {
     publishData: TRmqMessages,
     objectId: number | string,
     publication: RascalPublications,
-    DB: { sequelize: Sequelize, model: SafeRmqPublishSupported }
+    DB: { sequelize: Sequelize; model: SafeRmqPublishSupported }
   ) {
     if (!this._initialized) {
-      throw new RabbitMQControllerError("RabbitMQController is not initialized!")
+      throw new RabbitMQControllerError(
+        'RabbitMQController is not initialized!'
+      );
     }
 
     try {
@@ -224,27 +228,40 @@ export class RabbitMQController {
         // We don't get types on the model anyway but at least this way the model above is typed to facilitate calling
         // this 'safPublish' function (arguably more important to ensure this function is not used with incompatible
         // models).
-        await (<any>(DB.model)).update({
-          queued: -1
-        }, {
-          where: {
-            id: objectId
+        await (<any>DB.model).update(
+          {
+            queued: -1,
           },
-          transaction: t
-        });
+          {
+            where: {
+              id: objectId,
+            },
+            transaction: t,
+          }
+        );
         await this.publish(publishData, publication);
       });
     } catch (e) {
       if (e instanceof RabbitMQControllerError) {
-        log.error(`RepublishMessages job failure for message: ${JSON.stringify(publishData)} to ${publication}.`, e);
+        log.error(
+          `RepublishMessages job failure for message: ${JSON.stringify(
+            publishData
+          )} to ${publication}.`,
+          e
+        );
         // if this fails once not much damage is done since the message is re-queued later again anyway
-        (<any>(await DB.model)).increment("queued", {where: {id: objectId}});
+        (<any>await DB.model).increment('queued', { where: { id: objectId } });
         this.rollbar?.warn(
-          `RepublishMessages job failure for message: ${JSON.stringify(publishData)} to ${publication}.`,
+          `RepublishMessages job failure for message: ${JSON.stringify(
+            publishData
+          )} to ${publication}.`,
           e
         );
       } else {
-        log.error(`Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`, e)
+        log.error(
+          `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
+          e
+        );
         this.rollbar?.warn(
           `Sequelize error occurred while setting queued to -1 for ${DB.model.getTableName()} with id: ${objectId}`,
           e

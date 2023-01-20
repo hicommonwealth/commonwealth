@@ -1,54 +1,46 @@
 /* @jsx m */
 
+import { navigateToSubpage } from 'router';
+import ClassComponent from 'class_component';
+import { ProposalType } from 'common-common/src/types';
+import { notifyError } from 'controllers/app/notifications';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import { getProposalUrlPath, idToProposal } from 'identifiers';
 import $ from 'jquery';
 import m from 'mithril';
-import ClassComponent from 'class_component';
+import type { ChainEntity, Comment, Poll, Thread, Topic } from 'models';
+import { ThreadStage as ThreadStageType } from 'models';
 
 import 'pages/view_thread/index.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
-import Sublayout from 'views/sublayout';
-import { ProposalType } from 'common-common/src/types';
-import { getProposalUrlPath, idToProposal } from 'identifiers';
-import { slugify } from 'utils';
-import { notifyError } from 'controllers/app/notifications';
-import {
-  ChainEntity,
-  Comment,
-  Poll,
-  Thread,
-  ThreadStage as ThreadStageType,
-  Topic,
-} from 'models';
 import { ContentType } from 'types';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
-import { PageLoading } from 'views/pages/loading';
+import { slugify } from 'utils';
 import { PageNotFound } from 'views/pages/404';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { activeQuillEditorHasText } from './helpers';
-import {
-  CWContentPage,
-  SidebarComponents,
-} from '../../components/component_kit/cw_content_page';
-import { CWTextInput } from '../../components/component_kit/cw_text_input';
-import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
-import { CommentsTree } from '../../components/comments/comments_tree';
-import { clearEditingLocalStorage } from '../../components/comments/helpers';
-import { confirmationModalWithText } from '../../modals/confirm_modal';
-import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
-import { ChangeTopicModal } from '../../modals/change_topic_modal';
+import { PageLoading } from 'views/pages/loading';
+import Sublayout from 'views/sublayout';
 import { CollapsibleThreadBody } from '../../components/collapsible_body_text';
+import { CommentsTree } from '../../components/comments/comments_tree';
 import { CreateComment } from '../../components/comments/create_comment';
+import { clearEditingLocalStorage } from '../../components/comments/helpers';
+import type { SidebarComponents } from '../../components/component_kit/cw_content_page';
+import { CWContentPage } from '../../components/component_kit/cw_content_page';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
 import { CWText } from '../../components/component_kit/cw_text';
+import { CWTextInput } from '../../components/component_kit/cw_text_input';
 import { ThreadReactionButton } from '../../components/reaction_button/thread_reaction_button';
+import { ChangeTopicModal } from '../../modals/change_topic_modal';
+import { confirmationModalWithText } from '../../modals/confirm_modal';
+import { EditCollaboratorsModal } from '../../modals/edit_collaborators_modal';
+import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
 import { EditBody } from './edit_body';
+import { activeQuillEditorHasText } from './helpers';
 import { LinkedProposalsCard } from './linked_proposals_card';
 import { LinkedThreadsCard } from './linked_threads_card';
 import { ThreadPollCard, ThreadPollEditorCard } from './poll_cards';
-import { getThreadSubScriptionMenuItem } from '../discussions/helpers';
+import { ExternalLink, ThreadAuthor, ThreadStage } from './thread_components';
 
 export type ThreadPrefetch = {
   [identifier: string]: {
@@ -549,6 +541,7 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
       ];
     };
 
+    // @ts-ignore
     return (
       <Sublayout
       //  title={headerTitle}
@@ -608,7 +601,9 @@ class ViewThreadPage extends ClassComponent<ViewThreadPageAttrs> {
                     <CWText type="h5" className="callout-text">
                       Commenting is disabled because this post has been locked.
                     </CWText>
-                  ) : !this.isGloballyEditing && canComment && app.isLoggedIn() ? (
+                  ) : !this.isGloballyEditing &&
+                    canComment &&
+                    app.isLoggedIn() ? (
                     <>
                       {reactionsAndReplyButtons}
                       <CreateComment

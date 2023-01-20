@@ -14,46 +14,30 @@ module.exports = {
       created_at: { type: Sequelize.DATE, allowNull: false },
       updated_at: { type: Sequelize.DATE, allowNull: false },
     });
-    await queryInterface.addColumn(
-      'OffchainThreads',
-      'private',
-      {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      }
-    );
-    await queryInterface.addColumn(
-      'OffchainThreads',
-      'read_only',
-      {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      }
-    );
+    await queryInterface.addColumn('OffchainThreads', 'private', {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    });
+    await queryInterface.addColumn('OffchainThreads', 'read_only', {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('readOnlyRolesThreads');
     await queryInterface.dropTable('privateThreadsRoles');
-    await queryInterface.removeColumn(
-      'OffchainThreads',
-      'private',
-      {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      }
-    );
-    await queryInterface.removeColumn(
-      'OffchainThreads',
-      'read_only',
-      {
-        type: Sequelize.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-      }
-    );
-  }
+    await queryInterface.removeColumn('OffchainThreads', 'private', {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    });
+    await queryInterface.removeColumn('OffchainThreads', 'read_only', {
+      type: Sequelize.BOOLEAN,
+      allowNull: false,
+      defaultValue: false,
+    });
+  },
 };

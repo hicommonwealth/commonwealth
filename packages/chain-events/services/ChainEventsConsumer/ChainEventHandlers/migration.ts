@@ -1,23 +1,24 @@
 /**
  * Processes events during migration, upgrading from simple notifications to entities.
  */
+import type { WhereOptions } from 'sequelize';
+import type {
+  RabbitMQController,
+  RmqCENotificationCUD,
+  RmqCETypeCUD,
+} from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
+
+import type { CWEvent } from '../../../src';
 import {
   IEventHandler,
-  CWEvent,
   eventToEntity,
   getUniqueEntityKey,
-  IChainEventData,
   EntityEventKind,
 } from '../../../src';
-import { WhereOptions } from 'sequelize';
-
-import {
-  RabbitMQController,
-  RascalPublications, RmqCENotificationCUD, RmqCETypeCUD,
-} from 'common-common/src/rabbitmq';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../../database/database';
-import {
+import type { DB } from '../../database/database';
+import type {
   ChainEventAttributes,
   ChainEventInstance,
 } from '../../database/models/chain_event';
@@ -36,7 +37,8 @@ export default class extends IEventHandler<ChainEventInstance> {
    * Handles an event during the migration process, by creating or updating existing
    * events depending whether we've seen them before.
    */
-  public async handle(event: CWEvent<IChainEventData>) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public async handle(event: CWEvent) {
     const chain = event.chain || this._chain;
 
     // case by entity type to determine what value to look for
@@ -45,17 +47,15 @@ export default class extends IEventHandler<ChainEventInstance> {
       fieldValue: string,
       eventType: EntityEventKind
     ) => {
-      const [
-        dbEventType,
-        created,
-      ] = await this._models.ChainEventType.findOrCreate({
-        where: {
-          id: `${chain}-${event.data.kind.toString()}`,
-          chain,
-          event_network: event.network,
-          event_name: event.data.kind.toString(),
-        },
-      });
+      const [dbEventType, created] =
+        await this._models.ChainEventType.findOrCreate({
+          where: {
+            id: `${chain}-${event.data.kind.toString()}`,
+            chain,
+            event_network: event.network,
+            event_name: event.data.kind.toString(),
+          },
+        });
       log.trace(
         `${created ? 'created' : 'found'} chain event type: ${dbEventType.id}`
       );

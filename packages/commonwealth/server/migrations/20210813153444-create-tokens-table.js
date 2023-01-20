@@ -14,5 +14,5 @@ module.exports = {
 
   down: async (queryInterface) => {
     return queryInterface.dropTable('Tokens');
-  }
+  },
 };

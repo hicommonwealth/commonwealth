@@ -3,13 +3,16 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-
-      await queryInterface.sequelize.query(`
+      await queryInterface.sequelize.query(
+        `
       ALTER TABLE "NotificationsRead"
         ADD COLUMN IF NOT EXISTS id integer;
-    `, {raw: true, transaction: t});
+    `,
+        { raw: true, transaction: t }
+      );
 
-      await queryInterface.sequelize.query(`
+      await queryInterface.sequelize.query(
+        `
         DO $$
             DECLARE userId INTEGER;
             DECLARE new_id INTEGER;
@@ -27,16 +30,21 @@ module.exports = {
             END LOOP;
         END;
         $$;
-    `, {transaction: t});
+    `,
+        { transaction: t }
+      );
 
-      await queryInterface.sequelize.query(`
+      await queryInterface.sequelize.query(
+        `
         ALTER TABLE "NotificationsRead"
         ALTER COLUMN id SET NOT NULL;
-      `, {transaction: t});
+      `,
+        { transaction: t }
+      );
     });
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.removeColumn('NotificationsRead', 'id');
-  }
+  },
 };

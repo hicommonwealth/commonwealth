@@ -12,7 +12,7 @@ module.exports = {
       address_id: {
         type: Sequelize.INTEGER,
         allowNull: false,
-        references: { model: 'Addresses', key: 'id' }
+        references: { model: 'Addresses', key: 'id' },
       },
       ipfs_hash: {
         type: Sequelize.STRING,

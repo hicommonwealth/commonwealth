@@ -16,7 +16,8 @@ interface IState {
 
 // eslint-disable-next-line max-len
 const INITIAL_HEADER_STYLE =
-  'bg-white static lg:flex lg:flex-row lg:justify-between lg:items-center p-4 lg:mx-auto lg:p-0 lg:px-20 px-10  shadow-lg ';
+  'bg-white static lg:flex lg:flex-row lg:justify-between' +
+  ' lg:items-center p-4 lg:mx-auto lg:p-0 lg:px-20 px-10  shadow-lg ';
 
 const triggerMenu = () => {
   const headerClass = document.getElementById('landing-page');

@@ -1,13 +1,7 @@
+import type { AnyProposal, Reaction } from 'models';
+import { AbridgedThread, Comment, Proposal, Thread } from 'models';
+import type ReactionCount from 'models/ReactionCount';
 import IdStore from 'stores/IdStore';
-import ReactionCount from 'models/ReactionCount';
-import {
-  AbridgedThread,
-  AnyProposal,
-  Comment,
-  Reaction,
-  Thread,
-  Proposal,
-} from 'models';
 
 class ReactionCountsStore extends IdStore<ReactionCount<any>> {
   private _storeRC: { [identifier: string]: ReactionCount<any> } = {};
@@ -70,10 +64,7 @@ class ReactionCountsStore extends IdStore<ReactionCount<any>> {
       | AnyProposal
       | Comment<any>
   ) {
-    if (
-      rxnOrPost instanceof Thread ||
-      rxnOrPost instanceof AbridgedThread
-    ) {
+    if (rxnOrPost instanceof Thread || rxnOrPost instanceof AbridgedThread) {
       return `discussion-${rxnOrPost.id}`;
     } else if (rxnOrPost instanceof Proposal) {
       return `${(rxnOrPost as AnyProposal).slug}_${

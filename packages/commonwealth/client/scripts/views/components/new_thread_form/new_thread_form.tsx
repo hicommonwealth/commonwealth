@@ -1,39 +1,35 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
-import { capitalize } from 'lodash';
-import $ from 'jquery';
 
 import 'components/new_thread_form.scss';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
+import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
+import type { DraftParams } from 'controllers/server/drafts';
+import { detectURL } from 'helpers/threads';
+import $ from 'jquery';
+import { capitalize } from 'lodash';
+import m from 'mithril';
+import type { Account, DiscussionDraft, Topic } from 'models';
+import { ThreadKind, ThreadStage } from 'models';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
-import { detectURL } from 'helpers/threads';
-import {
-  Topic,
-  DiscussionDraft,
-  Account,
-  ThreadStage,
-  ThreadKind,
-} from 'models';
-import { notifySuccess, notifyError } from 'controllers/app/notifications';
-import TopicGateCheck from 'controllers/chain/ethereum/gatedTopic';
-import { DraftParams } from 'controllers/server/drafts';
 import { confirmationModalWithText } from '../../modals/confirm_modal';
 import { EditProfileModal } from '../../modals/edit_profile_modal';
-import { TopicSelector } from '../topic_selector';
-import { QuillEditorComponent } from '../quill/quill_editor_component';
-import { CWIcon } from '../component_kit/cw_icons/cw_icon';
-import { QuillEditor } from '../quill/quill_editor';
-import { NewThreadFormType, NewDraftErrors } from './types';
-import { updateTopicList, checkNewThreadErrors } from './helpers';
-import { CWTabBar, CWTab } from '../component_kit/cw_tabs';
-import { CWTextInput } from '../component_kit/cw_text_input';
 import { CWButton } from '../component_kit/cw_button';
+import { CWIcon } from '../component_kit/cw_icons/cw_icon';
+import { CWTab, CWTabBar } from '../component_kit/cw_tabs';
 import { CWText } from '../component_kit/cw_text';
+import { CWTextInput } from '../component_kit/cw_text_input';
 import { getClasses } from '../component_kit/helpers';
 import { renderQuillTextBody } from '../quill/helpers';
+import type { QuillEditor } from '../quill/quill_editor';
+import { QuillEditorComponent } from '../quill/quill_editor_component';
+import { TopicSelector } from '../topic_selector';
+import { checkNewThreadErrors, updateTopicList } from './helpers';
+import type { NewThreadFormType } from './types';
+import { NewDraftErrors } from './types';
 
 type NewThreadFormAttrs = {
   hasTopics: boolean;

@@ -1,12 +1,13 @@
-import $ from 'jquery';
-import m, { RouteOptions } from 'mithril';
-import moment from 'moment';
 import BigNumber from 'bignumber.js';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
-import { ICardListItem } from 'models/interfaces';
-import app from 'state';
+import $ from 'jquery';
+import type { RouteOptions } from 'mithril';
+import m from 'mithril';
 import { ThreadStage } from 'models';
-import { navigateToSubpage } from '../router';
+import type { ICardListItem } from 'models/interfaces';
+import moment from 'moment';
+import app from 'state';
+import { router } from '../app';
 
 export async function sleep(msec) {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -78,8 +79,8 @@ export function link(
   children,
   extraAttrs?: object,
   saveScrollPositionAs?: string,
-  beforeRouteSet?: Function,
-  afterRouteSet?: Function
+  beforeRouteSet?: () => void,
+  afterRouteSet?: () => void
 ) {
   const attrs = {
     href: target,

@@ -1,18 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
+import m from 'mithril';
+import type { Webhook } from 'models';
+import { RoleInfo, RolePermission } from 'models';
 
 import 'pages/manage_community/index.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
-import { RoleInfo, RolePermission, Webhook } from 'models';
-import { ChainMetadataRows } from './chain_metadata_rows';
-import { AdminPanelTabs } from './admin_panel_tabs';
 import Sublayout from '../../sublayout';
 import { PageLoading } from '../loading';
+import { AdminPanelTabs } from './admin_panel_tabs';
+import { ChainMetadataRows } from './chain_metadata_rows';
 import { sortAdminsAndModsFirst } from './helpers';
 
 class ManageCommunityPage extends ClassComponent {

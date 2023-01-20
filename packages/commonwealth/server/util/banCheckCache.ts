@@ -1,10 +1,7 @@
 // Helper function to look up a scope, i.e. a chain XOR community.
-// If a community is found, also check that the user is allowed to see it.
-import { Op } from 'sequelize';
 import JobRunner from 'common-common/src/cacheJobRunner';
-
-import { DB } from '../models';
-
+// If a community is found, also check that the user is allowed to see it.
+import type { DB } from '../models';
 
 export const BanErrors = {
   NoAddress: 'Address not found',
@@ -16,16 +13,18 @@ type CacheT = { [chainAddressKey: string]: number };
 export default class BanCache extends JobRunner<CacheT> {
   constructor(
     private _models: DB,
-    private _ttlS: number = 60 * 15,   // 10 minutes
-    _pruningJobTimeS: number = 60 * 5, // 5 minutes
+    private _ttlS: number = 60 * 15, // 10 minutes
+    _pruningJobTimeS: number = 60 * 5 // 5 minutes
   ) {
     super({}, _pruningJobTimeS);
     this.start();
   }
 
-  public async checkBan(
-    params: { chain?: string; chain_id?: string; address: string }
-  ): Promise<[boolean, string?]> {
+  public async checkBan(params: {
+    chain?: string;
+    chain_id?: string;
+    address: string;
+  }): Promise<[boolean, string?]> {
     const chain_id = params.chain || params.chain_id;
     const { address } = params;
     const cacheKey = `${chain_id}-${address}`;
@@ -70,7 +69,7 @@ export default class BanCache extends JobRunner<CacheT> {
     const ban = await this._models.Ban.findOne({
       where: {
         chain_id,
-        address
+        address,
       },
     });
 
@@ -86,7 +85,7 @@ export default class BanCache extends JobRunner<CacheT> {
 
   // prunes all expired cache entries based on initialized time-to-live
   protected async _job(c: CacheT): Promise<void> {
-    const oldestPermittedTime = (Date.now() / 1000) - this._ttlS;
+    const oldestPermittedTime = Date.now() / 1000 - this._ttlS;
     for (const key of Object.keys(c)) {
       const banCheckDate = c[key];
       if (banCheckDate < oldestPermittedTime) {

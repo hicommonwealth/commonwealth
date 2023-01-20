@@ -1,12 +1,12 @@
-import * as Sequelize from 'sequelize';
-import { DataTypes, Model } from 'sequelize';
-import { ChainAttributes } from './chain';
-import { Permission } from './role';
-import {
+import type * as Sequelize from 'sequelize';
+import type { DataTypes } from 'sequelize';
+import type { ChainAttributes } from './chain';
+import type { Permission } from './role';
+import type {
   RoleAssignmentAttributes,
   RoleAssignmentInstance,
 } from './role_assignment';
-import { ModelStatic, ModelInstance } from './types';
+import type { ModelInstance, ModelStatic } from './types';
 
 export type CommunityRoleAttributes = {
   name: Permission;
@@ -70,7 +70,10 @@ export default (
     models.CommunityRole.hasMany(models.RoleAssignment, {
       foreignKey: 'community_role_id',
     });
-    models.CommunityRole.belongsTo(models.Chain, { foreignKey: 'chain_id', targetKey: 'id' });
+    models.CommunityRole.belongsTo(models.Chain, {
+      foreignKey: 'chain_id',
+      targetKey: 'id',
+    });
   };
 
   return CommunityRole;

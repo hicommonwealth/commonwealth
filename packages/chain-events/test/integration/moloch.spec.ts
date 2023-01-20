@@ -5,27 +5,26 @@ import { EventEmitter } from 'events';
 import { providers } from 'ethers';
 import chai from 'chai';
 
+import type { Moloch1, Token } from '../../src/contractTypes';
 import {
   Moloch1__factory as Moloch1Factory,
-  Moloch1,
   Token__factory as TokenFactory,
-  Token,
 } from '../../src/contractTypes';
-import {
+import type {
   Api,
   IEventData,
-  EventKind,
   ISubmitProposal,
   IProcessProposal,
   IAbort,
 } from '../../src/chains/moloch/types';
+import { EventKind } from '../../src/chains/moloch/types';
 import { subscribeEvents } from '../../src/chains/moloch/subscribeFunc';
-import {
-  IEventHandler,
+import type {
   CWEvent,
   IDisconnectedRange,
   IChainEventData,
 } from '../../src/interfaces';
+import { IEventHandler } from '../../src/interfaces';
 
 const { assert } = chai;
 
@@ -154,13 +153,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should create moloch1 proposal', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     const summonTime = await api.summoningTime();
     await submitProposal(provider, api, token, member, applicant);
@@ -186,13 +180,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should create moloch1 vote', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     await submitProposal(provider, api, token, member, applicant);
 
@@ -219,13 +208,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should process moloch1 proposal', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     await submitProposal(provider, api, token, member, applicant);
 
@@ -276,13 +260,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should abort moloch1 proposal', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     await submitProposal(provider, api, token, member, applicant);
 
@@ -315,13 +294,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should ragequit moloch1 member', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant] = addresses;
     await submitProposal(provider, api, token, member, applicant);
 
@@ -378,13 +352,8 @@ describe('Moloch Event Integration Tests', () => {
   });
 
   it('should migrate past proposal started/processed/aborted events', async () => {
-    const {
-      addresses,
-      handler,
-      api,
-      token,
-      provider,
-    } = await setupSubscription();
+    const { addresses, handler, api, token, provider } =
+      await setupSubscription();
     const [member, applicant1, applicant2] = addresses;
     const summonTime = +(await api.summoningTime());
     const periodDuration = +(await api.periodDuration());

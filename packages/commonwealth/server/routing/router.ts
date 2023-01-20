@@ -151,6 +151,7 @@ import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
 import { addExternalRoutes } from './external';
+import generateImage from '../routes/generateImage';
 import { getChainEventServiceData } from '../routes/getChainEventServiceData';
 import { getChain } from '../routes/getChain';
 import { getChainNode } from '../routes/getChainNode';
@@ -162,6 +163,7 @@ import createDiscordBotConfig from '../routes/createDiscordBotConfig';
 import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
+import { addSwagger } from './addSwagger';
 
 function setupRouter(
   app: Express,
@@ -300,7 +302,6 @@ function setupRouter(
   router.post(
     '/updateThreadStage',
     passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateAuthor,
     updateThreadStage.bind(this, models)
   );
   router.post(
@@ -358,11 +359,12 @@ function setupRouter(
     databaseValidationService.validateChain,
     updateLinkedThreads.bind(this, models)
   );
-  router.post('/addEditors',
+  router.post(
+    '/addEditors',
     passport.authenticate('jwt', { session: false }),
     databaseValidationService.validateAuthor,
     databaseValidationService.validateChain,
-    addEditors.bind(this, models),
+    addEditors.bind(this, models)
   );
   router.post(
     '/deleteEditors',
@@ -860,6 +862,12 @@ function setupRouter(
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
 
+  router.post(
+    '/generateImage',
+    passport.authenticate('jwt', { session: false }),
+    generateImage.bind(this, models)
+  );
+
   // login
   router.post('/login', startEmailLogin.bind(this, models));
   router.get('/finishLogin', finishEmailLogin.bind(this, models));
@@ -957,6 +965,7 @@ function setupRouter(
 
   // new API
   addExternalRoutes(router, app, models, tokenBalanceCache);
+  addSwagger(app);
 
   app.use('/api', router);
 }

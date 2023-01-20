@@ -1,16 +1,13 @@
 /**
  * Fetches events from Cosmos chain in real time.
  */
-import { Block } from '@cosmjs/tendermint-rpc/build/tendermint34/index';
+import type { Block } from '@cosmjs/tendermint-rpc';
 
-import {
-  IDisconnectedRange,
-  IEventSubscriber,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { IDisconnectedRange } from '../../interfaces';
+import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, Api } from './types';
+import type { RawEvent, Api } from './types';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;

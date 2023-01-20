@@ -1,19 +1,19 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
+import { ProposalType } from 'common-common/src/types';
+import type Substrate from 'controllers/chain/substrate/adapter';
+import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
+import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
+import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
+import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
+import { idToProposal } from 'identifiers';
+import m from 'mithril';
 
 import 'pages/view_proposal/linked_proposals_embed.scss';
 
 import app from 'state';
-import { navigateToSubpage } from 'router';
-import { ProposalType } from 'common-common/src/types';
-import { idToProposal } from 'identifiers';
-import { SubstrateDemocracyReferendum } from 'controllers/chain/substrate/democracy_referendum';
-import SubstrateDemocracyProposal from 'controllers/chain/substrate/democracy_proposal';
-import { SubstrateCollectiveProposal } from 'controllers/chain/substrate/collective_proposal';
-import { SubstrateTreasuryProposal } from 'controllers/chain/substrate/treasury_proposal';
-import Substrate from 'controllers/chain/substrate/adapter';
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWText } from '../../components/component_kit/cw_text';
 

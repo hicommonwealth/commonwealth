@@ -14,19 +14,19 @@ The first step is to configure all necessary processes in order for Commonwealth
 
 1. Load the frax page at http://localhost:8080/frax.
 2. Configure metamask:
-    1. If not already added, create a local chain via Settings -> Networks -> Add Network, at url http://localhost:8545 and chain id 31337. Ensure Metamask is set to use this chain.
-    2. If not already added, Add a new address using the private key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80. Ensure this account (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) is selected.
-    3. If the address already exists, reset its history using Settings -> Advanced -> Reset Account.
-    4. Metamask should display slightly less than 10000 ETH for the test account.
+   1. If not already added, create a local chain via Settings -> Networks -> Add Network, at url http://localhost:8545 and chain id 31337. Ensure Metamask is set to use this chain.
+   2. If not already added, Add a new address using the private key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80. Ensure this account (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) is selected.
+   3. If the address already exists, reset its history using Settings -> Advanced -> Reset Account.
+   4. Metamask should display slightly less than 10000 ETH for the test account.
 3. Delegate to yourself via the "Delegate" page from the sidebar. Use the same address as displayed in Metamask (0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266) and you can enter any numeric value (it is ignored).
-    - On loading this page, verify in the console that it correctly detects the type of token and governance based on the contract deployed earlier.
+   - On loading this page, verify in the console that it correctly detects the type of token and governance based on the contract deployed earlier.
 4. Navigate to the "Proposals" page from the sidebar. It should display a few parameters and no proposals.
 5. Click "New Proposal", and it should take you to the page to create a proposal.
-  a. Set whatever description you'd like.
-  b. Any acceptable target address will work (0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B).
-  c. Any value will work (0).
-  d. Any acceptable calldata will work (0x000000000000000000000000c11b1268c1a384e55c48c2391d8d480264a3a7f40000000000000000000000000000000000000000000000000853a0d2313c0000).
-  e. Signature is optional and can be any string.
+   a. Set whatever description you'd like.
+   b. Any acceptable target address will work (0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B).
+   c. Any value will work (0).
+   d. Any acceptable calldata will work (0x000000000000000000000000c11b1268c1a384e55c48c2391d8d480264a3a7f40000000000000000000000000000000000000000000000000853a0d2313c0000).
+   e. Signature is optional and can be any string.
 6. Click "Send Transaction" and then sign it on Metamask.
 7. Navigate to the "Proposals" page again via the sidebar and the proposal should appear, as "Pending".
 8. To advance the proposal to the voting stage, you will need to mine blocks. Open up a console window at "commonwealth/shared/eth" and run `ts-node scripts/mineBlocks.ts 2`. This will mine 2 blocks and advance the timestamp accordingly.

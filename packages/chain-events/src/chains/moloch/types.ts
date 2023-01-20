@@ -1,6 +1,6 @@
-import { ISubscribeOptions } from '../../interfaces';
-import { TypedEvent } from '../../contractTypes/commons';
-import { Moloch1, Moloch2 } from '../../contractTypes';
+import type { ISubscribeOptions } from '../../interfaces';
+import type { TypedEvent } from '../../contractTypes/commons';
+import type { Moloch1, Moloch2 } from '../../contractTypes';
 
 type UnPromisify<T> = T extends Promise<infer U> ? U : T;
 export type ProposalV1 = UnPromisify<
