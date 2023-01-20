@@ -9,14 +9,18 @@ import app from 'state';
 import { CWIcon } from './cw_icons/cw_icon';
 import { CWSpinner } from './cw_spinner';
 import { CWText } from './cw_text';
-import { MessageRow } from './cw_text_input';
 import { ValidationStatus } from './cw_validation_text';
 import { CWRadioGroup } from './cw_radio_group';
 import { getClasses } from './helpers';
+import { CWTextInput, MessageRow } from './cw_text_input';
+import { CWButton } from './cw_button';
+import { CWIconButton } from './cw_icon_button';
 
 type CoverImageUploaderAttrs = {
   headerText?: string;
   subheaderText?: string;
+  enableGenerativeAI?: boolean;
+  generatedImageCallback?: CallableFunction;
   uploadCompleteCallback: CallableFunction;
   options?: boolean;
 };
@@ -38,6 +42,9 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
   private uploadStatus: ValidationStatus;
   private imageAs: ImageAs;
   private imageBehavior: ImageBehavior;
+  private prompt: string;
+  private isPrompting: boolean;
+  private isGenerating: boolean;
 
   async uploadImage(file: File): Promise<[string, ValidationStatus]> {
     try {
@@ -67,10 +74,63 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
     }
   }
 
+  async generateImage(prompt: string, vnode: m.Vnode<CoverImageUploaderAttrs>) {
+    const attachButton = document.querySelector('.attach-btn') as HTMLElement;
+
+    try {
+      const res = await $.post(`${app.serverUrl()}/generateImage`, {
+        description: prompt,
+        jwt: app.user.jwt,
+      });
+
+      if (this.isPrompting) {
+        this.imageURL = res.result.imageUrl;
+        this.uploadStatus = 'success';
+        attachButton.style.display = 'none';
+        if (vnode.attrs.generatedImageCallback) {
+          if (vnode.attrs.options) {
+            vnode.attrs.generatedImageCallback(
+              this.imageURL,
+              this.imageAs,
+              this.imageBehavior
+            );
+          } else {
+            vnode.attrs.generatedImageCallback(this.imageURL);
+          }
+        }
+
+        if (vnode.attrs.options) {
+          vnode.attrs.uploadCompleteCallback(
+            this.imageURL,
+            this.imageAs,
+            this.imageBehavior
+          );
+        } else {
+          vnode.attrs.uploadCompleteCallback(this.imageURL);
+        }
+      }
+
+      this.isUploading = false;
+      this.isPrompting = false;
+      this.isGenerating = false;
+      m.redraw();
+
+      return res.result.imageUrl;
+    } catch (e) {
+      this.uploadStatus = 'failure';
+      this.isUploading = false;
+      this.isPrompting = false;
+      this.isGenerating = false;
+      throw new Error(e);
+    }
+  }
+
   oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
+
+    this.isPrompting = false;
 
     // Drag'n'Drop helper function
     const handleDragEvent = (event, hoverAttachZone?: boolean) => {
@@ -150,10 +210,22 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
   }
 
   view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
-    const { imageURL, isUploading, uploadStatus, imageAs, imageBehavior } =
-      this;
-    const { headerText, subheaderText, uploadCompleteCallback, options } =
-      vnode.attrs;
+    const {
+      imageURL,
+      isUploading,
+      uploadStatus,
+      isPrompting,
+      isGenerating,
+      imageAs,
+      imageBehavior,
+    } = this;
+    const {
+      headerText,
+      subheaderText,
+      enableGenerativeAI,
+      uploadCompleteCallback,
+      options,
+    } = vnode.attrs;
 
     const backgroundStyles = {
       backgroundImage: imageURL ? `url(${imageURL})` : 'none',
@@ -171,51 +243,129 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
 
     return (
       <div class="CoverImageUploader">
-        <div>
-          {headerText && (
-            <CWText type="caption" fontWeight="medium">
-              {headerText}
-            </CWText>
+        {headerText && (
+          <CWText type="caption" fontWeight="medium">
+            {headerText}
+          </CWText>
+        )}
+        <MessageRow
+          label={subheaderText || 'Accepts JPG and PNG files.'}
+          hasFeedback={true}
+          statusMessage={
+            this.uploadStatus === 'success'
+              ? 'Image upload succeeded.'
+              : this.uploadStatus === 'failure'
+              ? 'Image upload failed.'
+              : null
+          }
+          validationStatus={this.uploadStatus}
+        />
+        <div
+          class={getClasses<{
+            isUploading: boolean;
+            uploadStatus: ValidationStatus;
+          }>(
+            {
+              isUploading,
+              uploadStatus,
+            },
+            'attach-zone'
           )}
-          <MessageRow
-            label={subheaderText || 'Accepts JPG and PNG files.'}
-            hasFeedback={true}
-            statusMessage={
-              this.uploadStatus === 'success'
-                ? 'Image upload succeeded.'
-                : this.uploadStatus === 'failure'
-                ? 'Image upload failed.'
-                : null
-            }
-            validationStatus={this.uploadStatus}
-          />
-          <div
-            class={getClasses<{
-              isUploading: boolean;
-              uploadStatus: ValidationStatus;
-            }>(
-              {
-                isUploading,
-                uploadStatus,
-              },
-              'attach-zone'
-            )}
-            style={backgroundStyles}
-          >
+          style={!isPrompting && !isGenerating && backgroundStyles}
+        >
+          {this.uploadStatus === 'success' && enableGenerativeAI && (
+            <CWButton
+              label="retry"
+              buttonType="mini-black"
+              className="retry-button"
+              onclick={(e) => {
+                e.stopPropagation();
+                this.prompt = '';
+                this.isPrompting = true;
+              }}
+            />
+          )}
+
+          {isPrompting && (
+            <div
+              class="cover-image-overlay"
+              onclick={(e) => e.stopPropagation()}
+            >
+              <div class="icon-button-wrapper">
+                <CWIconButton
+                  onclick={(e) => {
+                    e.stopPropagation();
+                    this.isPrompting = false;
+                    this.isGenerating = false;
+                  }}
+                  iconName="close"
+                  iconSize="small"
+                />
+              </div>
+              {this.isGenerating ? (
+                <CWSpinner size="large" />
+              ) : (
+                <>
+                  <CWTextInput
+                    label="Prompt"
+                    size="small"
+                    value={this.prompt}
+                    placeholder="type a description here"
+                    oninput={(e) => {
+                      this.prompt = e.target.value;
+                    }}
+                    iconRight="trash"
+                    iconRightonclick={() => {
+                      this.prompt = '';
+                    }}
+                    containerClassName="prompt-input"
+                  />
+                  <CWButton
+                    label="Generate"
+                    buttonType="mini-black"
+                    className="generate-btn"
+                    onclick={async () => {
+                      if (this.prompt.length < 1) return;
+                      this.isGenerating = true;
+                      try {
+                        await this.generateImage(this.prompt, vnode);
+                      } catch (e) {
+                        console.error(e);
+                      }
+                    }}
+                  />
+                </>
+              )}
+            </div>
+          )}
+          {!isPrompting && (
             <input
               type="file"
               accept="image/jpeg, image/jpg, image/png"
               id="pseudo-input"
+              class="pseudo-input"
             />
-            {this.isUploading && <CWSpinner active="true" size="large" />}
-            <div class="attach-btn">
-              {!this.isUploading && (
-                <CWIcon iconName="imageUpload" iconSize="medium" />
-              )}
-              <CWText type="caption" fontWeight="medium">
-                Drag or upload your image here
-              </CWText>
-            </div>
+          )}
+          {this.isUploading && <CWSpinner active="true" size="large" />}
+          <div class="attach-btn">
+            {!this.isUploading && (
+              <CWIcon iconName="imageUpload" iconSize="medium" />
+            )}
+            <CWText type="caption" fontWeight="medium">
+              {headerText}
+            </CWText>
+            {enableGenerativeAI && !this.isUploading && (
+              <CWButton
+                buttonType="mini-white"
+                label="Generate Image"
+                className="generate-btn"
+                onclick={(e) => {
+                  this.prompt = '';
+                  e.stopPropagation();
+                  this.isPrompting = true;
+                }}
+              />
+            )}
           </div>
         </div>
         {vnode.attrs.options && (

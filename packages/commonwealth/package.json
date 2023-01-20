@@ -32,9 +32,6 @@
     "start-prerender": "ts-node --project tsconfig.json server/scripts/runPrerenderService.ts",
     "start-all": "concurrently -p '{name}' -c red,green -n app,consumer 'yarn start' 'yarn start-consumer'",
     "send-notification-digest-emails": "SEND_EMAILS=true ts-node --project tsconfig.json server.ts",
-    "webpack-dev": "rm -rf ./build && EXTERNAL_WEBPACK=true webpack --config webpack/webpack.dev.config.js --progress",
-    "start-webpack-external": "EXTERNAL_WEBPACK=true ts-node-dev --max-old-space-size=4096 --respawn --transpile-only --project tsconfig.json server.ts",
-    "build-and-start-webpack-external": "yarn webpack-dev && yarn start-webpack-external",
     "migrate-server": "heroku run npx sequelize db:migrate --debug",
     "start-ci": "FETCH_INTERVAL_MS=500 ts-node --project tsconfig.json server.ts",
     "profile": "NODE_OPTIONS=--max_old_space_size=4096 webpack --config webpack/webpack.dev.config.js --json --profile > webpack-stats.json",
@@ -135,6 +132,7 @@
     "babel-loader": "^8.0.4",
     "bcrypt-nodejs": "^0.0.3",
     "bech32": "^2.0.0",
+    "bip39": "^3.0.2",
     "bn.js": "^4.12.0",
     "bs58": "^4.0.1",
     "buffer": "^6.0.3",
@@ -170,7 +168,6 @@
     "html-minifier": "^4.0.0",
     "html-webpack-plugin": "^5.5.0",
     "https-browserify": "^1.0.0",
-    "inspectpack": "^4.7.1",
     "ignore-loader": "^0.1.2",
     "jdenticon": "^2.1.1",
     "jquery": "^3.3.1",
@@ -193,6 +190,7 @@
     "node-statsd": "^0.1.1",
     "numeral": "^2.0.6",
     "object-hash": "^3.0.0",
+    "openai": "^3.1.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "os-browserify": "^0.3.0",
     "parchment": "^1.1.4",
@@ -268,10 +266,6 @@
     "sync-request": "^6.1.0",
     "ts-node-dev": "^2.0.0",
     "webpack-dev-server": "^3.1.14"
-  },
-  "resolutions": {
-    "bn.js": "^5.2.1",
-    "secp256k1": "^4.0.2"
   },
   "optionalDependencies": {
     "esbuild-darwin-64": "^0.15.12"
