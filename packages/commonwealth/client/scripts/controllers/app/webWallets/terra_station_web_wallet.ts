@@ -42,7 +42,7 @@ class TerraStationWebWalletController implements IWebWallet<TerraAddress> {
 
   public async enable() {
     this._terra = await import('@terra-money/terra.js');
-    this._extension = new this._terra.Extension()
+    this._extension = new this._terra.Extension();
     console.log('Attempting to enable Terra Station');
     this._enabling = true;
 
