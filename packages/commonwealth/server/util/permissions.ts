@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 export enum AccessLevel {
   Admin = 'admin',
   Moderator = 'moderator',
