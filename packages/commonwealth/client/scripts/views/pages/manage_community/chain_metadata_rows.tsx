@@ -3,6 +3,7 @@
 import ClassComponent from 'class_component';
 import 'pages/manage_community/chain_metadata_rows.scss';
 
+import m from 'mithril';
 import app from 'state';
 import { uuidv4 } from 'lib/util';
 import {
@@ -19,6 +20,7 @@ import {
   PermissionManager,
   ToCheck,
 } from 'commonwealth/server/util/permissions';
+
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';

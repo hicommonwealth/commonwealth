@@ -10,11 +10,15 @@ import { Errors as CreateCommentErrors } from 'server/routes/createComment';
 import { Errors as ThreadErrors } from 'server/routes/createThread';
 import { Errors as EditThreadErrors } from 'server/routes/editThread';
 import { Errors as updateThreadPinnedErrors } from 'server/routes/updateThreadPinned';
+import { Errors as updateThreadPrivacyErrors } from 'server/routes/updateThreadPrivacy';
+import { Errors as ViewCountErrors } from 'server/routes/viewCount';
+import sleep from 'sleep-promise';
 import app, { resetDatabase } from 'commonwealth/server-test';
 import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
 import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
 import { Action } from 'commonwealth/server/util/permissions';
+import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
 const { expect } = chai;

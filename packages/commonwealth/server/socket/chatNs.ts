@@ -13,6 +13,7 @@ import {
   WebsocketMessageNames,
   WebsocketNamespaces,
 } from '../../shared/types';
+import type { Server } from 'socket.io';
 import type { DB } from '../models';
 import { parseUserMentions } from '../util/parseUserMentions';
 import { checkReadPermitted } from '../util/roles';

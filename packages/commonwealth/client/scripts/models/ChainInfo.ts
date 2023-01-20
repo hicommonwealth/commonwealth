@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
+import m from 'mithril';
 import app from 'state';
 import { RoleInfo, AccessLevel } from 'models';
 import { ChainNetwork, ChainBase } from 'common-common/src/types';
