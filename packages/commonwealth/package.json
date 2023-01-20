@@ -194,6 +194,7 @@
     "node-statsd": "^0.1.1",
     "numeral": "^2.0.6",
     "object-hash": "^3.0.0",
+    "openai": "^3.1.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "os-browserify": "^0.3.0",
     "parchment": "^1.1.4",
