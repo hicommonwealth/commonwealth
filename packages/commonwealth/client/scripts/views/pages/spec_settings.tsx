@@ -2,7 +2,6 @@
 
 import { ApiPromise, WsProvider } from '@polkadot/api';
 import type { RegisteredTypes } from '@polkadot/types/types';
-import { initChain, selectChain } from 'app';
 import ClassComponent from 'class_component';
 import { ChainBase } from 'common-common/src/types';
 import $ from 'jquery';
@@ -21,6 +20,7 @@ import { CWValidationText } from '../components/component_kit/cw_validation_text
 import Sublayout from '../sublayout';
 import { PageNotFound } from './404';
 import { PageLoading } from './loading';
+import { initChain, selectChain } from 'helpers/chain';
 
 class SpecSettingsPage extends ClassComponent {
   private chain: string;

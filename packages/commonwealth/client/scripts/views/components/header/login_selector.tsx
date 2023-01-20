@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { initAppState } from 'app';
+import { initAppState } from 'state';
 import { navigateToSubpage } from 'router';
 import ClassComponent from 'class_component';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
