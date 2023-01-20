@@ -23,10 +23,9 @@ import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
 import CWCoverImageUploader, {
-  ImageAs,
   ImageBehavior,
 } from '../components/component_kit/cw_cover_image_uploader';
-import { CoverImage } from './edit_new_profile';
+import { Image } from './edit_new_profile';
 import { ConfirmCancelNewProfileModal } from '../modals/confirm_cancel_new_profile_modal';
 
 export default class CreateNewProfile extends ClassComponent {
@@ -39,7 +38,8 @@ export default class CreateNewProfile extends ClassComponent {
   private name: string;
   private bio: QuillEditor;
   private avatarUrl: string;
-  private coverImage: CoverImage;
+  private coverImage: Image;
+  private backgroundImage: Image;
 
   private createProfile = async () => {
     this.loading = true;
@@ -79,6 +79,8 @@ export default class CreateNewProfile extends ClassComponent {
       this.newProfile.bio = this.bio.textContentsAsString;
     if (this.coverImage)
       this.newProfile.coverImage = JSON.stringify(this.coverImage);
+    if (this.backgroundImage)
+      this.newProfile.backgroundImage = JSON.stringify(this.backgroundImage);
   };
 
   private handleCreateProfile = () => {
@@ -225,7 +227,6 @@ export default class CreateNewProfile extends ClassComponent {
                 />
               </div>
               <CWDivider />
-
               <div className="socials-section">
                 <CWText type="b1">Social Links</CWText>
                 <CWText type="caption">
@@ -244,19 +245,56 @@ export default class CreateNewProfile extends ClassComponent {
               title="Personalize Your Profile"
               description="Express yourself through imagery."
             >
+              <CWText fontWeight="medium">Cover Image</CWText>
               <CWCoverImageUploader
+                name="cover-image-uploader"
                 uploadCompleteCallback={(
                   url: string,
-                  imageAs: ImageAs,
                   imageBehavior: ImageBehavior
                 ) => {
                   this.coverImage = {
                     url,
-                    imageAs,
                     imageBehavior,
                   };
                 }}
-                options={true}
+                generatedImageCallback={(
+                  url: string,
+                  imageBehavior: ImageBehavior
+                ) => {
+                  this.coverImage = {
+                    url,
+                    imageBehavior,
+                  };
+                }}
+                enableGenerativeAI
+                defaultImageUrl={this.coverImage?.url}
+                defaultImageBehavior={this.coverImage?.imageBehavior}
+              />
+              <CWDivider />
+              <CWText fontWeight="medium">Background Image</CWText>
+              <CWCoverImageUploader
+                name="background-image-uploader"
+                uploadCompleteCallback={(
+                  url: string,
+                  imageBehavior: ImageBehavior
+                ) => {
+                  this.backgroundImage = {
+                    url,
+                    imageBehavior,
+                  };
+                }}
+                generatedImageCallback={(
+                  url: string,
+                  imageBehavior: ImageBehavior
+                ) => {
+                  this.backgroundImage = {
+                    url,
+                    imageBehavior,
+                  };
+                }}
+                enableGenerativeAI
+                defaultImageUrl={this.backgroundImage?.url}
+                defaultImageBehavior={this.backgroundImage?.imageBehavior}
               />
             </CWFormSection>
           </CWForm>

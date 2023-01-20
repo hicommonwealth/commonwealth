@@ -110,7 +110,7 @@ class NewProfile {
     id,
     isOwner,
     coverImage,
-    backgroundImage,
+    backgroundImage
   ) {
     this._name = name;
     this._username = username;

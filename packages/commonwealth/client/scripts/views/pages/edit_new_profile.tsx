@@ -416,6 +416,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                 title="Personalize Your Profile"
                 description="Express yourself through imagery."
               >
+                <CWText fontWeight="medium">Cover Image</CWText>
                 <CWCoverImageUploader
                   name="cover-image-uploader"
                   uploadCompleteCallback={(
@@ -438,7 +439,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                       imageBehavior,
                     };
                   }}
-                  options
                   enableGenerativeAI
                   defaultImageUrl={this.coverImage?.url}
                   defaultImageBehavior={this.coverImage?.imageBehavior}
@@ -467,30 +467,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   }}
                   enableGenerativeAI
                   defaultImageUrl={this.backgroundImage?.url}
-                  defaultImageBehavior={
-                    this.backgroundImage?.imageBehavior
-                  }
+                  defaultImageBehavior={this.backgroundImage?.imageBehavior}
                 />
               </CWFormSection>
-              {/* TODO: Add back in when we have a way to manage addresses */}
-              {/* <CWFormSection
-                title="Linked Addresses"
-                description="Transfer, Edit and Delete addresses connected to this profile."
-              >
-                <div className="addresses-section">
-                  <div className="addresses">
-                    <Address address="0x1234567890" />
-                    <Address address="0x1234567890" />
-                    <Address address="0x1234567890" />
-                  </div>
-                  <CWButton
-                    iconName="plus"
-                    buttonType="mini-black"
-                    label="Connect a New Address"
-                    onclick={() => {}}
-                  />
-                </div>
-              </CWFormSection> */}
             </CWForm>
           </div>
         </Sublayout>

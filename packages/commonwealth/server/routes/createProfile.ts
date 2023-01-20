@@ -31,6 +31,7 @@ const createProfile = async (
     avatarUrl,
     socials,
     coverImage,
+    backgroundImage,
   } = req.body;
 
   const existingProfile = await models.Profile.findOne({
@@ -56,6 +57,7 @@ const createProfile = async (
     ...(avatarUrl && { avatar_url: avatarUrl }),
     ...(socials && { socials: JSON.parse(socials) }),
     ...(coverImage && { cover_image: JSON.parse(coverImage) }),
+    ...(backgroundImage && { background_image: JSON.parse(backgroundImage) }),
   });
   const newProfiles = [...userProfiles, profile];
 
