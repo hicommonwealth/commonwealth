@@ -1,25 +1,22 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import { CWEvent, IChainEventKind, IEventHandler } from 'chain-events/src';
-import * as Sequelize from 'sequelize';
-import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import {
+import { addPrefix, factory } from 'common-common/src/logging';
+import type {
   RabbitMQController,
-  RascalPublications,
   RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
 import { StatsDController } from 'common-common/src/statsd';
+
+import type { DB } from '../../database/database';
+import type { ChainEventInstance } from '../../database/models/chain_event';
+
+import type { CWEvent, IChainEventKind } from 'chain-events/src';
+import { IEventHandler } from 'chain-events/src';
 import { SubstrateTypes } from 'chain-events/src/types';
-
-import { DB } from '../../database/database';
-import { ChainEventInstance } from '../../database/models/chain_event';
-
-const log = factory.getLogger(formatFilename(__filename));
-
-const { Op } = Sequelize;
 
 export interface StorageFilterConfig {
   excludedEvents?: IChainEventKind[];
@@ -86,17 +83,15 @@ export default class extends IEventHandler {
     }
 
     // locate event type and add event (and event type if needed) to database
-    const [
-      dbEventType,
-      created,
-    ] = await this._models.ChainEventType.findOrCreate({
-      where: {
-        id: `${chain}-${event.data.kind.toString()}`,
-        chain,
-        event_network: event.network,
-        event_name: event.data.kind.toString(),
-      },
-    });
+    const [dbEventType, created] =
+      await this._models.ChainEventType.findOrCreate({
+        where: {
+          id: `${chain}-${event.data.kind.toString()}`,
+          chain,
+          event_network: event.network,
+          event_name: event.data.kind.toString(),
+        },
+      });
 
     if (created) {
       const publishData: RmqCETypeCUD.RmqMsgType = {
@@ -120,11 +115,12 @@ export default class extends IEventHandler {
     if (!dbEventType) {
       log.error(`unknown event type: ${event.data.kind}`);
       return;
-    }
-    if (created) {
-      log.info(`Created new ChainEventType: ${dbEventType.id}`);
     } else {
-      log.trace(`found chain event type: ${dbEventType.id}`);
+      if (created) {
+        log.info(`Created new ChainEventType: ${dbEventType.id}`);
+      } else {
+        log.trace(`found chain event type: ${dbEventType.id}`);
+      }
     }
 
     const eventData = {
@@ -152,17 +148,19 @@ export default class extends IEventHandler {
       StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
 
       return dbEvent;
+    } else {
+      // refresh ttl for the duplicated event
+      this.eventCache.ttl(eventKey, this.ttl);
+
+      StatsDController.get().increment('ce.event-cache-chain-hit', { chain });
+
+      const cacheStats = this.eventCache.getStats();
+      StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
+      StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
+      StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
+
+      // return nothing so following handlers ignore this event
+      return;
     }
-    // refresh ttl for the duplicated event
-    this.eventCache.ttl(eventKey, this.ttl);
-
-    StatsDController.get().increment('ce.event-cache-chain-hit', { chain });
-
-    const cacheStats = this.eventCache.getStats();
-    StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);
-    StatsDController.get().gauge('ce.event-cache-hits', cacheStats.hits);
-    StatsDController.get().gauge('ce.event-cache-misses', cacheStats.misses);
-
-    // return nothing so following handlers ignore this event
   }
 }

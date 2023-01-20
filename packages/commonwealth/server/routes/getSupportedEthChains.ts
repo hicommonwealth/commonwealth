@@ -1,13 +1,16 @@
 import { Op } from 'sequelize';
-import { success, TypedRequestQuery, TypedResponse } from '../types';
-import { DB } from '../models';
+import type { DB } from '../models';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { success } from '../types';
 
-type GetSupportedEthChainsResp = { [id: number]: { url: string, alt_wallet_url: string } };
+type GetSupportedEthChainsResp = {
+  [id: number]: { url: string; alt_wallet_url: string };
+};
 
 const getSupportedEthChains = async (
   models: DB,
   req: TypedRequestQuery<Record<string, never>>,
-  res: TypedResponse<GetSupportedEthChainsResp>,
+  res: TypedResponse<GetSupportedEthChainsResp>
 ) => {
   try {
     const supportedChainIds = await models.ChainNode.findAll({
@@ -19,12 +22,13 @@ const getSupportedEthChains = async (
           [Op.and]: {
             [Op.ne]: null,
             [Op.ne]: 0,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
-    const results: { [id: number]: { url: string, alt_wallet_url: string } } = {};
+    const results: { [id: number]: { url: string; alt_wallet_url: string } } =
+      {};
     for (const { eth_chain_id, url, alt_wallet_url } of supportedChainIds) {
       results[eth_chain_id] = { url, alt_wallet_url };
     }

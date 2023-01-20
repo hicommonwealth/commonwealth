@@ -1,16 +1,15 @@
 /* eslint-disable no-continue */
-import { NextFunction } from 'express';
-import { Op } from 'sequelize';
-import { factory, formatFilename } from 'common-common/src/logging';
+import { AppError } from 'common-common/src/errors';
 import { ChainBase } from 'common-common/src/types';
+import type { NextFunction } from 'express';
+import { Op } from 'sequelize';
+import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import { urlHasValidHTTPPrefix } from '../../shared/utils';
-import { DB } from '../models';
-import { ChainAttributes } from '../models/chain';
-import { TypedRequestBody, TypedResponse, success } from '../types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { DB } from '../models';
+import type { ChainAttributes } from '../models/chain';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 import { findOneRole } from '../util/roles';
-import { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
-const log = factory.getLogger(formatFilename(__filename));
 
 export const Errors = {
   NotLoggedIn: 'Not logged in',

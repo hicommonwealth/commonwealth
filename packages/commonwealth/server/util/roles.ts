@@ -19,7 +19,7 @@ export type RoleInstanceWithPermissionAttributes = RoleAssignmentAttributes & {
   permission: Permission;
   allow: bigint;
   deny: bigint;
-}
+};
 
 export class RoleInstanceWithPermission {
   _roleAssignmentAttributes: RoleAssignmentAttributes;

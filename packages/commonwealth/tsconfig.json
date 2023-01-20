@@ -4,6 +4,7 @@
     "jsx": "preserve",
     "outDir": "./build",
     "baseUrl": ".",
+    "skipLibCheck": true,
     "paths": {
       "common-common": ["../../packages/common-common"],
       "common-common/*": ["../../packages/common-common/*"],
@@ -12,11 +13,7 @@
       "token-balance-cache": ["../../packages/token-balance-cache"],
       "token-balance-cache/*": ["../../packages/token-balance-cache/*"],
       "*": ["./*", "shared/*", "client/scripts/*"]
-    },
-    "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
-    "traceResolution": false
+    }
   },
   "include": [
     "./client",
@@ -25,6 +22,8 @@
     "./test",
     "./globals.d.ts",
     "./server",
-    "./server.ts"],
+    "./server.ts",
+    "./scripts"
+  ],
   "exclude": ["./node_modules"]
 }

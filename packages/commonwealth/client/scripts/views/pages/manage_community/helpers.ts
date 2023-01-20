@@ -1,6 +1,5 @@
 import $ from 'jquery';
 import m from 'mithril';
-import app from 'state';
 
 import { AccessLevel } from 'models';
 import { ChainCategoryType } from 'common-common/src/types';

@@ -1,17 +1,17 @@
 import sleep from 'sleep-promise';
 
-import {
+import type {
   IDisconnectedRange,
   CWEvent,
   SubscribeFunc,
   ISubscribeOptions,
-  SupportedNetwork,
 } from '../../interfaces';
+import { SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
 import { Subscriber } from './subscriber';
 import { Processor } from './processor';
-import { Api, IEventData, RawEvent } from './types';
+import type { Api, IEventData, RawEvent } from './types';
 
 export interface ICosmosSubscribeOptions extends ISubscribeOptions<Api> {
   pollTime?: number;

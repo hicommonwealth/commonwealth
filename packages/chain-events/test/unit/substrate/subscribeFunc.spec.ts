@@ -16,7 +16,7 @@ describe.skip('Subscribe Func Tests', () => {
   it('should timeout on bad api connection', async () => {
     const INVALID_URL = 'ws://mainnet1.edgewa.re:9943';
     try {
-      await createApi(INVALID_URL, EdgewareSpec, 200);
+      await createApi(INVALID_URL, EdgewareSpec, 'edgeware');
       assert.fail('Should throw error on connect timeout');
     } catch (e) {
       // success

@@ -1,9 +1,6 @@
 /* @jsx m */
 
-import $ from 'jquery';
-import m from 'mithril';
 import ClassComponent from 'class_component';
-
 import 'pages/manage_community/chain_metadata_rows.scss';
 
 import app from 'state';
@@ -23,18 +20,18 @@ import {
   ToCheck,
 } from 'commonwealth/server/util/permissions';
 import { CWButton } from '../../components/component_kit/cw_button';
-import { ManageRoles } from './manage_roles';
+import { CWDropdown } from '../../components/component_kit/cw_dropdown';
+import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
+import { CWLabel } from '../../components/component_kit/cw_label';
+import { CWSpinner } from '../../components/component_kit/cw_spinner';
+import { CWText } from '../../components/component_kit/cw_text';
+import { CWToggle } from '../../components/component_kit/cw_toggle';
 import {
-  setSelectedTags,
   buildCategoryMap,
   setChainCategories,
+  setSelectedTags,
 } from './helpers';
-import { CWLabel } from '../../components/component_kit/cw_label';
-import { CWText } from '../../components/component_kit/cw_text';
-import { CWSpinner } from '../../components/component_kit/cw_spinner';
-import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
-import { CWDropdown } from '../../components/component_kit/cw_dropdown';
-import { CWToggle } from '../../components/component_kit/cw_toggle';
+import { ManageRoles } from './manage_roles';
 
 type ChainMetadataRowsAttrs = {
   admins: Array<RoleInfo>;

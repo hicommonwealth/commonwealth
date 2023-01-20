@@ -1,7 +1,8 @@
-import { success, TypedRequestBody, TypedResponse } from '../types';
-import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
 import { validURL } from '../../shared/utils';
+import type { DB } from '../models';
+import type { TypedRequestBody, TypedResponse } from '../types';
+import { success } from '../types';
 
 enum UpdateCustomDomainErrors {
   NoChainID = 'No chain_id provided.',

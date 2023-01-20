@@ -1,8 +1,8 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
+import m from 'mithril';
 
 import 'pages/manage_community/upgrade_roles_form.scss';
 

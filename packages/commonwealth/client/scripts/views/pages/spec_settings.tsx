@@ -1,10 +1,10 @@
 /* @jsx m */
 
-import m from 'mithril';
+import { ApiPromise, WsProvider } from '@polkadot/api';
+import type { RegisteredTypes } from '@polkadot/types/types';
 import ClassComponent from 'class_component';
 import $ from 'jquery';
-import { ApiPromise, WsProvider } from '@polkadot/api';
-import { RegisteredTypes } from '@polkadot/types/types';
+import m from 'mithril';
 
 import 'pages/spec_settings.scss';
 
@@ -13,14 +13,14 @@ import { initChain, selectChain } from 'app';
 import { ChainBase } from 'common-common/src/types';
 import { ChainInfo, AccessLevel } from 'models';
 import { constructSubstrateUrl } from 'substrate';
-import Sublayout from '../sublayout';
-import { PageLoading } from './loading';
-import { PageNotFound } from './404';
-import { CWValidationText } from '../components/component_kit/cw_validation_text';
-import { CWTextArea } from '../components/component_kit/cw_text_area';
 import { CWButton } from '../components/component_kit/cw_button';
-import { CWText } from '../components/component_kit/cw_text';
 import { CWDropdown } from '../components/component_kit/cw_dropdown';
+import { CWText } from '../components/component_kit/cw_text';
+import { CWTextArea } from '../components/component_kit/cw_text_area';
+import { CWValidationText } from '../components/component_kit/cw_validation_text';
+import Sublayout from '../sublayout';
+import { PageNotFound } from './404';
+import { PageLoading } from './loading';
 
 class SpecSettingsPage extends ClassComponent {
   private chain: string;

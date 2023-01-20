@@ -1,4 +1,3 @@
-import m from 'mithril';
 import $ from 'jquery';
 import { RegisteredTypes } from '@polkadot/types/types';
 import app from 'state';
@@ -10,7 +9,7 @@ import {
   CWAvatar,
   CWJdenticon,
 } from '../views/components/component_kit/cw_avatar';
-import CommunityRole from './CommunityRole';
+import type CommunityRole from './CommunityRole';
 
 class ChainInfo {
   public readonly id: string;

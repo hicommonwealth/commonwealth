@@ -1,12 +1,12 @@
-import { providers, Signer } from 'ethers';
-import { BigNumberish } from '@ethersproject/bignumber';
+import type { Signer } from 'ethers';
+import { providers } from 'ethers';
+import type { BigNumberish } from '@ethersproject/bignumber';
 import Web3 from 'web3';
 
+import type { ERC20VotesMock, TimelockController } from '../types';
 import {
   GovernorMock__factory as GovernorMockFactory,
-  ERC20VotesMock,
   ERC20VotesMock__factory as ERC20VotesMockFactory,
-  TimelockController,
   TimelockController__factory as TimelockControllerFactory,
 } from '../types';
 
@@ -33,14 +33,17 @@ async function deployTimelock(
 
 async function main() {
   // TODO: configure URL based on chain
-  const web3Provider = new Web3.providers.WebsocketProvider('http://localhost:8545', {
-    reconnect: {
-      auto: true,
-      delay: 5000,
-      maxAttempts: 10,
-      onTimeout: true,
-    },
-  });
+  const web3Provider = new Web3.providers.WebsocketProvider(
+    'http://localhost:8545',
+    {
+      reconnect: {
+        auto: true,
+        delay: 5000,
+        maxAttempts: 10,
+        onTimeout: true,
+      },
+    }
+  );
   const provider = new providers.Web3Provider(web3Provider as any);
   // 12s minute polling interval (default is 4s)
   provider.pollingInterval = 12000;

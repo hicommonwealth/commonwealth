@@ -1,6 +1,5 @@
-import m from 'mithril';
-
 import { loadScript } from 'helpers';
+import m from 'mithril';
 import { preprocessQuillDeltaForRendering } from '../../../../../shared/utils';
 
 export const renderQuillDelta = (
@@ -191,7 +190,7 @@ export const renderQuillDelta = (
             result = m(
               'span.mention',
               {
-                onclick: (e) => {
+                onclick: () => {
                   // alert(child.insert.mention.id)
                 },
               },

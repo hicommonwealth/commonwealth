@@ -7,7 +7,6 @@ the new models goes live.
 The main reference for how to run migrations is here:
 https://sequelize.org/master/manual/migrations.html
 
-
 ### Writing and running migrations
 
 Migrations use the queryInterface object to perform operations on tables. The
@@ -15,15 +14,16 @@ queryInterface documentation covers how to use most of those functions:
 https://sequelize.org/master/class/lib/query-interface.js~QueryInterface.html
 
 Here are some example migrations:
+
 - createTable: server/migrations/20190510184156-setup.js
 - addColumn: server/migrations/20190620211103-add-pinned-threads.js
 - changeColumn: server/migrations/20200204055813-allow-offchain-reaction-to-have-null-chain.js
 
 Important operations to be aware of are:
+
 - `npx sequelize migration:generate --name=create-addresses`
 - `npx sequelize db:migrate`
 - `npx sequelize db:migrate:undo`
-
 
 ### Transactions
 
@@ -32,7 +32,6 @@ Each operation within the migration must have this transaction object passed to 
 
 Doing this will prevent migrations from failing in a half-complete state in production,
 which will cause downtime and may cause data loss.
-
 
 ## Custom SQL
 

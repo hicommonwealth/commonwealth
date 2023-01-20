@@ -21,7 +21,7 @@ type GetChatChannelResp = ChatChannelAttributes;
 export default async (
   models: DB,
   req: TypedRequestQuery<GetChatChannelReq>,
-  res: TypedResponse<GetChatChannelResp>,
+  res: TypedResponse<GetChatChannelResp>
 ) => {
   if (!req.query.channel_id) {
     throw new AppError(Errors.NoChannelId);
@@ -34,7 +34,7 @@ export default async (
     models,
     req.query.chain_id,
     Action.VIEW_CHAT_CHANNELS,
-    req.user?.id,
+    req.user?.id
   );
 
   const channel = await models.ChatChannel.findOne({

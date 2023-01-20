@@ -1,4 +1,4 @@
-import { isU8a, isHex } from '@polkadot/util';
+import { isHex, isU8a } from '@polkadot/util';
 import {
   checkAddress,
   decodeAddress,
@@ -73,7 +73,7 @@ export const requiresTypeSlug = (type: ProposalType): boolean => {
   );
 };
 
-/* eslint-disable import/prefer-default-export */
+/* eslint-disable */
 export const getProposalUrl = (type, proposal, comment?) => {
   const aId = proposal.chain;
   const tId = proposal.type_id || proposal.id;
@@ -312,6 +312,7 @@ export function aggregatePermissions(
   function compare(o1: RoleObject, o2: RoleObject) {
     return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
   }
+
   roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{

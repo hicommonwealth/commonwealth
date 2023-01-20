@@ -1,22 +1,22 @@
 /* eslint-disable no-unused-expressions */
-import chai from 'chai';
-import 'chai/register-should';
-import Web3 from 'web3';
-import { ethers } from 'ethers';
-import BN from 'bn.js';
-import wallet from 'ethereumjs-wallet';
 import { signTypedData, SignTypedDataVersion } from '@metamask/eth-sig-util';
 import { Keyring } from '@polkadot/api';
-import { stringToU8a, u8aToHex } from '@polkadot/util';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { createRole, findOneRole } from 'server/util/roles';
+import { stringToU8a } from '@polkadot/util';
+import type BN from 'bn.js';
+import chai from 'chai';
+import 'chai/register-should';
 import { BalanceType, ChainNetwork } from 'common-common/src/types';
+import wallet from 'ethereumjs-wallet';
+import { ethers } from 'ethers';
+import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 import { constructCanvasMessage } from 'shared/adapters/shared';
 import { PermissionManager } from '../../server/util/permissions';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
+import Web3 from 'web3';
 import app from '../../server-test';
 import models from '../../server/database';
+import { factory, formatFilename } from 'common-common/src/logging';
 import { Permission } from '../../server/models/role';
 import {
   constructTypedMessage,
@@ -130,12 +130,21 @@ export const createAndVerifyAddress = async ({ chain }, mnemonic = 'Alice') => {
 
     // generate session wallet
     const sessionKeyring = new Keyring();
-    const sessionWallet = sessionKeyring.addFromUri(mnemonicGenerate(), {}, 'ed25519');
-    const chain_id = ChainNetwork.Edgeware
-    const timestamp = 1665083987891
-    const message = constructCanvasMessage("eth", chain_id, address, sessionWallet.address, TEST_BLOCK_INFO_STRING);
+    const sessionWallet = sessionKeyring.addFromUri(
+      mnemonicGenerate(),
+      {},
+      'ed25519'
+    );
+    const chain_id = ChainNetwork.Edgeware;
+    const message = constructCanvasMessage(
+      'eth',
+      chain_id,
+      address,
+      sessionWallet.address,
+      TEST_BLOCK_INFO_STRING
+    );
 
-    const signature = keyPair.sign(stringToU8a(JSON.stringify(message)))
+    const signature = keyPair.sign(stringToU8a(JSON.stringify(message)));
 
     const address_id = res.body.result.id;
     res = await chai.request
@@ -179,6 +188,7 @@ export interface ThreadArgs {
   attachments?: string[];
   readOnly?: boolean;
 }
+
 export const createThread = async (args: ThreadArgs) => {
   const {
     chainId,
@@ -414,6 +424,7 @@ export interface SubscriptionArgs {
   is_active: boolean;
   category: string;
 }
+
 export const createSubscription = async (args: SubscriptionArgs) => {
   const res = await chai
     .request(app)
@@ -467,7 +478,10 @@ export const createInvite = async (args: InviteArgs) => {
 };
 
 // always prune both token and non-token holders asap
-export class MockTokenBalanceProvider extends BalanceProvider<{ tokenAddress: string, contractType: string }> {
+export class MockTokenBalanceProvider extends BalanceProvider<{
+  tokenAddress: string;
+  contractType: string;
+}> {
   public name = 'eth-token';
   public opts = {
     tokenAddress: 'string',

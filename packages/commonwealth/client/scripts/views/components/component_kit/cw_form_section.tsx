@@ -1,13 +1,13 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_form_section.scss';
+import m from 'mithril';
+import { CWDivider } from './cw_divider';
+import { CWText } from './cw_text';
 
 import { ComponentType } from './types';
-import { CWText } from './cw_text';
-import { CWDivider } from './cw_divider';
 
 type FormSectionAttrs = {
   description: string;
@@ -17,7 +17,7 @@ type FormSectionAttrs = {
 
 export class CWFormSection extends ClassComponent<FormSectionAttrs> {
   view(vnode: m.Vnode<FormSectionAttrs>) {
-    const {  description, title } = vnode.attrs;
+    const { description, title } = vnode.attrs;
 
     return (
       <div className={ComponentType.FormSection}>
@@ -31,13 +31,9 @@ export class CWFormSection extends ClassComponent<FormSectionAttrs> {
         </div>
         <div className="columns">
           <div className="left-side">
-            <CWText type="b1">
-              {description}
-            </CWText>
+            <CWText type="b1">{description}</CWText>
           </div>
-          <div className="right-side">
-            {vnode.children}
-          </div>
+          <div className="right-side">{vnode.children}</div>
         </div>
         <CWDivider />
       </div>
