@@ -2,6 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'development',
@@ -32,4 +33,9 @@ module.exports = merge(common, {
     }),
     new webpack.HotModuleReplacementPlugin(), // used for hot reloading
   ],
+  optimization: {
+    minimizer: [
+      new CssMinimizerPlugin({ minimizerOptions: { preset: ['default'] } }),
+    ],
+  },
 });
