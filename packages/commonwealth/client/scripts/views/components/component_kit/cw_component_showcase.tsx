@@ -423,7 +423,6 @@ export class ComponentShowcase extends ClassComponent {
             name="Text field"
             label="Small"
             placeholder="Type here"
-            size="small"
           />
           <CWTextInput
             name="Form field"
@@ -490,8 +489,15 @@ export class ComponentShowcase extends ClassComponent {
           /> */}
           <CWCoverImageUploader
             uploadCompleteCallback={(url: string) => {
-              notifySuccess(`Image uploaded to ${url.slice(0, 18)}...`);
+              console.log(url);
             }}
+            generatedImageCallback={(url: string) => {
+              notifySuccess(
+                `Generated Image uploaded to ${url.slice(0, 18)}...`
+              );
+            }}
+            subheaderText="Upload or Generate"
+            enableGenerativeAI={true}
           />
         </div>
         <div class="button-gallery">

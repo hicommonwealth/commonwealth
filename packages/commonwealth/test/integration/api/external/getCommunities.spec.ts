@@ -1,6 +1,6 @@
-import chai from 'chai';
 import 'chai/register-should';
-import type { GetCommunitiesReq } from 'common-common/src/api/extApiTypes';
+import chai from 'chai';
+import { GetCommunitiesReq } from 'common-common/src/api/extApiTypes';
 import {
   testChains,
   testComments,
