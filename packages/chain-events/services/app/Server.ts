@@ -3,12 +3,15 @@ import bodyParser from 'body-parser';
 import passport from 'passport';
 import logger from 'morgan';
 import cors from 'cors';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 import models from '../database/database';
 import { DEFAULT_PORT } from '../config';
 
 import setupPassport from './passport';
 import setupRouter from './router';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 const port = process.env.PORT || DEFAULT_PORT;
 
