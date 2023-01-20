@@ -2,7 +2,7 @@ import bs58 from 'bs58';
 import { KeyPair } from 'near-api-js';
 import { PublicKey } from 'near-api-js/lib/utils';
 import { KeyPairEd25519 } from 'near-api-js/lib/utils';
-import { actionToHash } from 'helpers/canvas';
+import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { serializeActionPayload } from '@canvas-js/interfaces';
 import {
   Action,
@@ -12,7 +12,6 @@ import {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-import { verify as verifyCanvasSessionSignature } from 'views/modals/canvas_verify_data_modal';
 
 const getNearSignatureData = (payload: ActionPayload) => {
   return new TextEncoder().encode(serializeActionPayload(payload));

@@ -7,9 +7,8 @@ import {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { getActionSignatureData } from '@canvas-js/verifiers';
-import { actionToHash } from 'helpers/canvas';
+import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { ISessionController } from '.';
-import { verify as verifyCanvasSessionSignature } from 'views/modals/canvas_verify_data_modal';
 
 export class EthereumSessionController implements ISessionController {
   private signers: Record<number, ethers.Wallet> = {};

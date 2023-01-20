@@ -1,7 +1,7 @@
 import * as solw3 from '@solana/web3.js';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
-import { actionToHash } from 'helpers/canvas';
+import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import {
   serializeActionPayload,
   serializeSessionPayload,
@@ -14,7 +14,6 @@ import type {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-import { verify as verifyCanvasSessionSignature } from 'views/modals/canvas_verify_data_modal';
 
 const getSolanaSignatureData = (payload: ActionPayload) => {
   return new TextEncoder().encode(serializeActionPayload(payload));

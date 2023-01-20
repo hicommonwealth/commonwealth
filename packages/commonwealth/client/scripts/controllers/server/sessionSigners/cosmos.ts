@@ -1,4 +1,4 @@
-import { actionToHash } from 'helpers/canvas';
+import { actionToHash, verify as verifyCanvasSessionSignature } from 'helpers/canvas';
 import { AminoMsg, makeSignDoc, StdSignDoc, StdFee } from '@cosmjs/amino';
 import { Secp256k1Wallet, serializeSignDoc } from '@cosmjs/amino';
 import { Random, Sha256, Secp256k1 } from '@cosmjs/crypto';
@@ -11,7 +11,6 @@ import {
   SessionPayload,
 } from '@canvas-js/interfaces';
 import { ISessionController } from '.';
-import { verify as verifyCanvasSessionSignature } from 'views/modals/canvas_verify_data_modal';
 
 export const getCosmosSignatureData = (
   actionPayload: ActionPayload,
