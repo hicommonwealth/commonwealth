@@ -4,11 +4,7 @@ import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
 import 'construct.scss';
 import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-} from 'controllers/app/notifications';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import $ from 'jquery';
 import 'lity/dist/lity.min.css';
 
@@ -20,13 +16,11 @@ import app, { ApiStatus, LoginState } from 'state';
 
 import { Layout } from 'views/layout';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import { NewLoginModal } from 'views/modals/login_modal';
 import '../styles/normalize.css'; // reset
 import '../styles/shared.scss';
 import '../styles/tailwind_reset.css'; // for the landing page
 import './fragment-fix';
 import { pathIsDiscussion } from './identifiers';
-import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
 
 // eslint-disable-next-line max-len
 const APPLICATION_UPDATE_MESSAGE =
@@ -69,9 +63,10 @@ export async function initAppState(
             );
           });
         app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories = data.result.notificationCategories.map(
-          (json) => NotificationCategory.fromJSON(json)
-        );
+        app.config.notificationCategories =
+          data.result.notificationCategories.map((json) =>
+            NotificationCategory.fromJSON(json)
+          );
         app.config.chainCategories = data.result.chainCategories;
         app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 

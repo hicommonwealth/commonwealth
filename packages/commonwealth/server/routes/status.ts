@@ -88,8 +88,8 @@ const status = async (
 
     const chainsWithSnapshots = await Promise.all(
       chains.map(async (chain) => {
-        const snapshot_spaces: CommunitySnapshotSpaceWithSpaceAttached[] = await models.CommunitySnapshotSpaces.findAll(
-          {
+        const snapshot_spaces: CommunitySnapshotSpaceWithSpaceAttached[] =
+          await models.CommunitySnapshotSpaces.findAll({
             where: {
               chain_id: chain.id,
             },
@@ -97,8 +97,7 @@ const status = async (
               model: models.SnapshotSpace,
               as: 'snapshot_space',
             },
-          }
-        );
+          });
 
         const snapshot_space_names = snapshot_spaces.map((space) => {
           return space.snapshot_space?.snapshot_space;
@@ -117,8 +116,9 @@ const status = async (
     const { user } = req;
 
     if (!user) {
-      const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(
-        `
+      const threadCountQueryData: ThreadCountQueryData[] =
+        await models.sequelize.query(
+          `
         SELECT "Threads".chain, COUNT("Threads".id) 
         FROM "Threads"
         WHERE "Threads".created_at > :thirtyDaysAgo
@@ -126,8 +126,8 @@ const status = async (
         AND "Threads".chain IS NOT NULL
         GROUP BY "Threads".chain;
         `,
-        { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
-      );
+          { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
+        );
 
       return success(res, {
         chainsWithSnapshots,
@@ -177,8 +177,9 @@ const status = async (
       include: [models.Address, models.Attachment],
     });
 
-    const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(
-      `
+    const threadCountQueryData: ThreadCountQueryData[] =
+      await models.sequelize.query(
+        `
       SELECT "Threads".chain, COUNT("Threads".id) 
       FROM "Threads"
       WHERE "Threads".created_at > :thirtyDaysAgo
@@ -186,13 +187,13 @@ const status = async (
       AND "Threads".chain IS NOT NULL
       GROUP BY "Threads".chain;
       `,
-      {
-        replacements: {
-          thirtyDaysAgo,
-        },
-        type: QueryTypes.SELECT,
-      }
-    );
+        {
+          replacements: {
+            thirtyDaysAgo,
+          },
+          type: QueryTypes.SELECT,
+        }
+      );
 
     // get starred communities for user
     const starredCommunities = await models.StarredCommunity.findAll({
