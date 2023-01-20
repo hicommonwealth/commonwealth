@@ -121,3 +121,124 @@ export async function deleteCommunityContractTemplate(
     throw new AppError('Error deleting community contract template');
   }
 }
+
+export async function createCommunityContractTemplateMetadata(
+  models: DB,
+  req: Request,
+  res: Response
+) {
+  try {
+    if (!req.body) {
+      return res.status(400).json({
+        status: 'Failure',
+        message: 'Must provide contract template metadata',
+      });
+    }
+    const { cct_id, slug, nickname, display_name, display_options } =
+      req.body.contract;
+    if (!cct_id || !slug || !nickname || !display_name || !display_options) {
+      return res.status(400).json({
+        status: 'Failure',
+        message:
+          'Must provide cct_id, slug, nickname, display_name, and display_options',
+      });
+    }
+
+    const result = await models.sequelize.query(
+      `INSERT INTO CommunityContractTemplateMetadata (
+      cct_id,
+      slug,
+      nickname,
+      display_name,
+      display_options
+    ) VALUES (:cct_id, :slug, :nickname, :display_name, :display_options)`
+    );
+
+    return res.json({ status: 'Success', result });
+  } catch (err) {
+    throw new AppError('Error creating community contract template metadata');
+  }
+}
+
+export async function getCommunityContractTemplateMetadata(
+  models: DB,
+  req: Request,
+  res: Response
+) {
+  try {
+    const { cct_id } = req.body.contract;
+    if (!cct_id) {
+      return res.status(400).json({
+        status: 'Failure',
+        message: 'Must provide cct_id',
+      });
+    }
+
+    const result = await models.sequelize.query(
+      `SELECT * FROM CommunityContractTemplateMetadata 
+      WHERE cct_id = :cct_id`
+    );
+
+    return res.json({ status: 'Success', result });
+  } catch (err) {
+    throw new AppError('Error getting community contract template metadata');
+  }
+}
+
+export async function updateCommunityContractTemplateMetadata(
+  models: DB,
+  req: Request,
+  res: Response
+) {
+  try {
+    if (!req.body) {
+      return res.status(400).json({
+        status: 'Failure',
+        message: 'Must provide contract template metadata',
+      });
+    }
+    
+    const { 
+      cct_id, 
+      slug, 
+      nickname, 
+      display_name, 
+      display_options 
+    } = req.body.contract;
+
+    if (!cct_id || !slug || !nickname || !display_name || !display_options) {
+      return res.status(400).json({
+        status: 'Failure',
+        message:
+          'Must provide cct_id, slug, nickname, display_name, and display_options',
+      });
+    }
+  } catch (err) {
+    throw new AppError('Error updating community contract template metadata');
+  }
+}
+
+export async function deleteCommunityContractTemplateMetadata(
+  models: DB,
+  req: Request,
+  res: Response
+) {
+  try {
+    const { cct_id } = req.body.contract;
+    if (!cct_id) {
+      return res.status(400).json({
+        status: 'Failure',
+        message: 'Must provide cct_id',
+      });
+    }
+
+    const result = await models.sequelize.query(
+      `DELETE FROM CommunityContractTemplateMetadata 
+      WHERE cct_id = :cct_id`
+    );
+
+    return res.json({ status: 'Success', result });
+  } catch (err) {
+    throw new AppError('Error deleting community contract template metadata');
+  }
+}
