@@ -86,6 +86,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
 
       if (this.isPrompting) {
         this.imageURL = res.result.imageUrl;
+        if (!this.imageBehavior) this.imageBehavior = ImageBehavior.Fill;
         this.uploadStatus = 'success';
         attachButton.style.display = 'none';
         if (vnode.attrs.generatedImageCallback)
@@ -142,6 +143,7 @@ export default class CWCoverImageUploader extends ClassComponent<CoverImageUploa
 
       if (imageURL) {
         this.imageURL = imageURL;
+        if (!this.imageBehavior) this.imageBehavior = ImageBehavior.Fill;
         attachButton.style.display = 'none';
         vnode.attrs.uploadCompleteCallback(this.imageURL, this.imageBehavior);
       }

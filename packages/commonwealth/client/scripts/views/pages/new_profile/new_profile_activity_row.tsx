@@ -11,9 +11,10 @@ import Thread from 'client/scripts/models/Thread';
 import { ChainInfo } from 'client/scripts/models';
 import { CWText } from '../../components/component_kit/cw_text';
 import { CWTag } from '../../components/component_kit/cw_tag';
-import { SharePopover } from '../../components/share_popover';
 import { renderQuillTextBody } from '../../components/quill/helpers';
 import { CommentWithAssociatedThread } from './new_profile_activity';
+import { CWPopoverMenu } from '../../components/component_kit/cw_popover/cw_popover_menu';
+import { CWIconButton } from '../../components/component_kit/cw_icon_button';
 
 type NewProfileActivityRowAttrs = {
   activity: CommentWithAssociatedThread | Thread;
@@ -28,6 +29,7 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
     const isThread = !!(activity as Thread).kind;
     const comment = activity as CommentWithAssociatedThread;
     const chainInfo = chains.find((c) => c.id === chain);
+    const domain = document.location.origin;
 
     return (
       <div className="ProfileActivityRow">
@@ -65,7 +67,31 @@ export class NewProfileActivityRow extends ClassComponent<NewProfileActivityRowA
               : renderQuillTextBody(comment.text, { collapse: true })}
           </CWText>
           <div className="actions">
-            <SharePopover commentId={id} />
+            <CWPopoverMenu
+              trigger={<CWIconButton iconName="share" iconSize="small" />}
+              menuItems={[
+                {
+                  iconLeft: 'copy',
+                  label: 'Copy URL',
+                  onclick: async () => {
+                    await navigator.clipboard.writeText(
+                      `${domain}/${chain}/discussion/${comment.thread?.id}?comment=${comment.id}`
+                    );
+                  },
+                },
+                {
+                  iconLeft: 'twitter',
+                  label: 'Share on Twitter',
+                  onclick: async () => {
+                    await window.open(
+                      `https://twitter.com/intent/tweet?text=${domain}/${chain}/discussion/${comment.thread?.id}
+                        ?comment=${comment.id}`,
+                      '_blank'
+                    );
+                  },
+                },
+              ]}
+            />
           </div>
         </div>
       </div>

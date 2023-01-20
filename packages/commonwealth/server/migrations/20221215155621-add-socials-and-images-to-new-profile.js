@@ -5,36 +5,27 @@ module.exports = {
     return queryInterface.sequelize.transaction(async (t) => {
       await queryInterface.addColumn(
         'Profiles',
-        'github',
+        'socials',
         {
-          type: Sequelize.STRING,
+          type: Sequelize.ARRAY(Sequelize.STRING),
           allowNull: true,
         },
         { transaction: t }
       );
       await queryInterface.addColumn(
         'Profiles',
-        'twitter',
+        'cover_image',
         {
-          type: Sequelize.STRING,
+          type: Sequelize.JSONB,
           allowNull: true,
         },
         { transaction: t }
       );
       await queryInterface.addColumn(
         'Profiles',
-        'discord',
+        'background_image',
         {
-          type: Sequelize.STRING,
-          allowNull: true,
-        },
-        { transaction: t }
-      );
-      await queryInterface.addColumn(
-        'Profiles',
-        'telegram',
-        {
-          type: Sequelize.STRING,
+          type: Sequelize.JSONB,
           allowNull: true,
         },
         { transaction: t }
@@ -44,16 +35,13 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     return queryInterface.sequelize.transaction(async (t) => {
-      await queryInterface.removeColumn('Profiles', 'github', {
+      await queryInterface.removeColumn('Profiles', 'socials', {
         transaction: t,
       });
-      await queryInterface.removeColumn('Profiles', 'twitter', {
+      await queryInterface.removeColumn('Profiles', 'cover_image', {
         transaction: t,
       });
-      await queryInterface.removeColumn('Profiles', 'discord', {
-        transaction: t,
-      });
-      await queryInterface.removeColumn('Profiles', 'telegram', {
+      await queryInterface.removeColumn('Profiles', 'background_image', {
         transaction: t,
       });
     });
