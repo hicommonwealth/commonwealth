@@ -41,7 +41,7 @@ function useDefaultUserAuth(models: DB) {
   );
 }
 
-function setupPassport(models: DB) {
+export function setupPassport(models: DB) {
   useDefaultUserAuth(models);
   useSocialAccountAuth(models);
   useMagicAuth(models);

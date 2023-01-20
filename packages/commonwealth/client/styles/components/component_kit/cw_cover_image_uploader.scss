@@ -22,9 +22,11 @@
     border: 1px solid $neutral-200;
     border-radius: $border-radius-corners;
 
-    background-size: contain;
+    background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
+
+    position: relative;
 
     &.hovered {
       border: 1px solid $primary-500;
@@ -42,7 +44,7 @@
       cursor: default;
     }
 
-    input {
+    .pseudo-input {
       max-height: 0;
       max-width: 0;
     }
@@ -64,6 +66,39 @@
       .Text {
         color: inherit;
       }
+    }
+
+    .cover-image-overlay {
+      align-items: center;
+      background: rgba(255, 255, 255, 0.5);
+      backdrop-filter: blur(5px);
+      border-radius: $border-radius-corners;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: center;
+      position: absolute;
+      width: 100%;
+
+      .prompt-input {
+        width: 80%;
+      }
+    }
+
+    .generate-btn {
+      margin-top: 16px;
+    }
+
+    .icon-button-wrapper {
+      top: 8px;
+      right: 8px;
+      position: absolute;
+    }
+
+    .retry-button {
+      bottom: 8px;
+      right: 8px;
+      position: absolute;
     }
   }
 }
