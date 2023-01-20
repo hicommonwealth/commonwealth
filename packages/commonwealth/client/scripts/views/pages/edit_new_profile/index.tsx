@@ -26,7 +26,6 @@ import { CWForm } from '../../components/component_kit/cw_form';
 import { CWFormSection } from '../../components/component_kit/cw_form_section';
 import { CWSocials } from '../../components/component_kit/cw_socials';
 import CWCoverImageUploader, {
-  ImageAs,
   ImageBehavior,
 } from '../../components/component_kit/cw_cover_image_uploader';
 
@@ -41,9 +40,8 @@ const NoProfileFoundError = 'No profile found';
 
 type EditNewProfileAttrs = { placeholder?: string };
 
-export type CoverImage = {
+export type Image = {
   url: string;
-  imageAs: ImageAs;
   imageBehavior: ImageBehavior;
 };
 
@@ -59,7 +57,8 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
   private username: string;
   private bio: QuillEditor;
   private avatarUrl: string;
-  private coverImage: CoverImage;
+  private coverImage: Image;
+  private backgroundImage: Image;
 
   private getProfile = async (address: string) => {
     this.loading = true;
@@ -83,6 +82,7 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
     this.socials = this.profile.socials;
     this.avatarUrl = this.profile.avatarUrl;
     this.coverImage = this.profile.coverImage;
+    this.backgroundImage = this.profile.backgroundImage;
     this.loading = false;
     m.redraw();
   };
@@ -135,6 +135,9 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
 
     if (!_.isEqual(this.coverImage, this.profile?.coverImage))
       this.profileUpdate.coverImage = JSON.stringify(this.coverImage);
+
+    if (!_.isEqual(this.backgroundImage, this.profile?.backgroundImage))
+      this.profileUpdate.backgroundImage = JSON.stringify(this.backgroundImage);
   };
 
   private handleSaveProfile = (vnode: m.Vnode<EditNewProfileAttrs>) => {
@@ -346,31 +349,58 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
               title="Personalize Your Profile"
               description="Express yourself through imagery."
             >
+              <CWText fontWeight="medium">Cover Image</CWText>
               <CWCoverImageUploader
+                name="cover-image-uploader"
                 uploadCompleteCallback={(
                   url: string,
-                  imageAs: ImageAs,
                   imageBehavior: ImageBehavior
                 ) => {
                   this.coverImage = {
                     url,
-                    imageAs,
                     imageBehavior,
                   };
                 }}
                 generatedImageCallback={(
                   url: string,
-                  imageAs: ImageAs,
                   imageBehavior: ImageBehavior
                 ) => {
                   this.coverImage = {
                     url,
-                    imageAs,
                     imageBehavior,
                   };
                 }}
-                options
                 enableGenerativeAI
+                defaultImageUrl={this.profile?.coverImage?.url}
+                defaultImageBehavior={this.profile?.coverImage?.imageBehavior}
+              />
+              <CWDivider />
+              <CWText fontWeight="medium">Background Image</CWText>
+              <CWCoverImageUploader
+                name="background-image-uploader"
+                uploadCompleteCallback={(
+                  url: string,
+                  imageBehavior: ImageBehavior
+                ) => {
+                  this.backgroundImage = {
+                    url,
+                    imageBehavior,
+                  };
+                }}
+                generatedImageCallback={(
+                  url: string,
+                  imageBehavior: ImageBehavior
+                ) => {
+                  this.backgroundImage = {
+                    url,
+                    imageBehavior,
+                  };
+                }}
+                enableGenerativeAI
+                defaultImageUrl={this.profile?.backgroundImage?.url}
+                defaultImageBehavior={
+                  this.profile?.backgroundImage?.imageBehavior
+                }
               />
             </CWFormSection>
             {/* TODO: Add back in when we have a way to manage addresses */}

@@ -124,80 +124,96 @@ export default class NewProfile extends ClassComponent<NewProfileAttrs> {
     if (this.error === ProfileError.None) {
       if (!this.profile) return;
 
+      let coverUrl;
+      let coverImageBehavior;
+      let backgroundUrl;
+      let backgroundImageBehavior;
+
       if (this.profile.coverImage) {
-        const { url, imageBehavior, imageAs } = this.profile.coverImage;
-        this.content = (
-          <div
-            className="ProfilePage"
-            style={
-              imageAs === 'background'
-                ? {
-                    backgroundImage: `url(${url})`,
-                    backgroundRepeat: `${
-                      imageBehavior === ImageBehavior.Fill
-                        ? 'no-repeat'
-                        : 'repeat'
-                    }`,
-                    backgroundSize:
-                      imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
-                    backgroundPosition:
-                      imageBehavior === ImageBehavior.Fill
-                        ? 'center'
-                        : '56px 56px',
-                    backgroundAttachment: 'fixed',
-                  }
-                : {}
-            }
-          >
-            {imageAs === 'cover' && (
-              <div
-                style={{
-                  backgroundImage: `url(${url})`,
+        const { url, imageBehavior } = this.profile.coverImage;
+        coverUrl = url;
+        coverImageBehavior = imageBehavior;
+      }
+
+      if (this.profile.backgroundImage) {
+        const { url, imageBehavior } = this.profile.backgroundImage;
+        backgroundUrl = url;
+        backgroundImageBehavior = imageBehavior;
+      }
+
+      this.content = (
+        <div
+          className="ProfilePage"
+          style={
+            this.profile.backgroundImage
+              ? {
+                  backgroundImage: `url(${backgroundUrl})`,
                   backgroundRepeat: `${
-                    imageBehavior === ImageBehavior.Fill
+                    backgroundImageBehavior === ImageBehavior.Fill
                       ? 'no-repeat'
                       : 'repeat'
                   }`,
                   backgroundSize:
-                    imageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
+                    backgroundImageBehavior === ImageBehavior.Fill
+                      ? 'cover'
+                      : '100px',
                   backgroundPosition:
-                    imageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
-                  height: '240px',
-                }}
-              />
-            )}
+                    backgroundImageBehavior === ImageBehavior.Fill
+                      ? 'center'
+                      : '56px 56px',
+                  backgroundAttachment: 'fixed',
+                }
+              : {}
+          }
+        >
+          {this.profile.coverImage && (
             <div
-              className={
-                imageAs === 'background'
-                  ? 'ProfilePageContainer'
-                  : 'ProfilePageContainer smaller-margins'
-              }
-            >
-              <NewProfileHeader profile={this.profile} address={this.address} />
-              <NewProfileActivity
-                threads={this.threads}
-                comments={this.comments}
-                chains={this.chains}
-                addresses={this.addresses}
-              />
-            </div>
+              style={{
+                backgroundImage: `url(${coverUrl})`,
+                backgroundRepeat: `${
+                  coverImageBehavior === ImageBehavior.Fill
+                    ? 'no-repeat'
+                    : 'repeat'
+                }`,
+                backgroundSize:
+                  coverImageBehavior === ImageBehavior.Fill ? 'cover' : '100px',
+                backgroundPosition:
+                  coverImageBehavior === ImageBehavior.Fill ? 'center' : '0 0',
+                height: '240px',
+              }}
+            />
+          )}
+          <div
+            className={
+              this.profile.backgroundImage
+                ? 'ProfilePageContainer'
+                : 'ProfilePageContainer smaller-margins'
+            }
+          >
+            <NewProfileHeader profile={this.profile} address={this.address} />
+            <NewProfileActivity
+              threads={this.threads}
+              comments={this.comments}
+              chains={this.chains}
+              addresses={this.addresses}
+            />
           </div>
-        );
-      } else {
-        this.content = (
-          <div className="ProfilePage">
-            <div className="ProfilePageContainer">
-              <NewProfileHeader profile={this.profile} address={this.address} />
-              <NewProfileActivity
-                threads={this.threads}
-                comments={this.comments}
-                chains={this.chains}
-                addresses={this.addresses}
-              />
-            </div>
+        </div>
+      );
+    } else {
+      this.content = (
+        <div className="ProfilePage">
+          <div className="ProfilePageContainer">
+            <NewProfileHeader profile={this.profile} address={this.address} />
+            <NewProfileActivity
+              threads={this.threads}
+              comments={this.comments}
+              chains={this.chains}
+              addresses={this.addresses}
+            />
           </div>
-        );
-      }
+        </div>
+      );
     }
 
     return <Sublayout>{this.content}</Sublayout>;

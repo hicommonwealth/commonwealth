@@ -1,4 +1,4 @@
-import { CoverImage } from '../views/pages/edit_new_profile';
+import { Image } from '../views/pages/edit_new_profile';
 
 class NewProfile {
   private _name: string;
@@ -9,7 +9,8 @@ class NewProfile {
   private _avatarUrl: string;
   private _slug: string;
   private _socials: string[];
-  private _coverImage: CoverImage;
+  private _coverImage: Image;
+  private _backgroundImage: Image;
 
   get name() {
     return this._name;
@@ -47,6 +48,10 @@ class NewProfile {
     return this._coverImage;
   }
 
+  get backgroundImage() {
+    return this._backgroundImage;
+  }
+
   constructor({
     profile_name,
     email,
@@ -57,6 +62,7 @@ class NewProfile {
     slug,
     socials,
     cover_image,
+    background_image,
   }) {
     this._name = profile_name;
     this._email = email;
@@ -67,6 +73,7 @@ class NewProfile {
     this._slug = slug;
     this._socials = socials;
     this._coverImage = cover_image;
+    this._backgroundImage = background_image;
   }
 
   public initialize(
@@ -78,7 +85,8 @@ class NewProfile {
     avatarUrl,
     slug,
     socials,
-    coverImage
+    coverImage,
+    backgroundImage
   ) {
     this._name = name;
     this._email = email;
@@ -89,6 +97,7 @@ class NewProfile {
     this._slug = slug;
     this._socials = socials;
     this._coverImage = coverImage;
+    this._backgroundImage = backgroundImage;
   }
 
   public static fromJSON(json) {
