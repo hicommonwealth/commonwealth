@@ -2,12 +2,11 @@ import { StatsDController } from 'common-common/src/statsd';
 import type { Express } from 'express';
 import express from 'express';
 import passport from 'passport';
-import type { Express } from 'express';
 
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { StatsDController } from 'common-common/src/statsd';
 
 import domain from '../routes/domain';
+import generateImage from '../routes/generateImage';
 import status from '../routes/status';
 import createAddress from '../routes/createAddress';
 import linkExistingAddressToChain from '../routes/linkExistingAddressToChain';
