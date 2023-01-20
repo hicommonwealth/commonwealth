@@ -26,7 +26,7 @@ export enum DashboardViews {
 }
 
 type UserDashboardAttrs = {
-  type: string;
+  type?: string;
 };
 
 class UserDashboard extends ClassComponent<UserDashboardAttrs> {
