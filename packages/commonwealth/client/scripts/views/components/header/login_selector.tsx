@@ -15,7 +15,8 @@ import { isSameAccount, pluralize } from 'helpers';
 import $ from 'jquery';
 import _ from 'lodash';
 import m from 'mithril';
-import { Account, AddressInfo, ITokenAdapter } from 'models';
+import type { Account} from 'models';
+import { AddressInfo, ITokenAdapter } from 'models';
 
 import app from 'state';
 import User, { UserBlock } from 'views/components/widgets/user';

@@ -1,6 +1,6 @@
 /* @jsx m */
 
-import { Chain } from '@canvas-js/interfaces';
+import type { Chain } from '@canvas-js/interfaces';
 import { constructCanvasMessage } from 'adapters/shared';
 import { initAppState, navigateToSubpage } from 'app';
 import BN from 'bn.js';

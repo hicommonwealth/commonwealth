@@ -25,10 +25,11 @@ import type { TypedRequestBody, TypedResponse } from '../types';
 import { success } from '../types';
 import { mixpanelTrack } from '../util/mixpanelUtil';
 
+import type {
+  RoleInstanceWithPermission} from '../util/roles';
 import {
   createDefaultCommunityRoles,
-  createRole,
-  RoleInstanceWithPermission,
+  createRole
 } from '../util/roles';
 import testSubstrateSpec from '../util/testSubstrateSpec';
 

@@ -3,14 +3,14 @@ import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
 import { bech32 } from 'bech32';
 import Web3 from 'web3';
 import { PublicKey } from '@solana/web3.js';
-import { NextFunction } from 'express';
+import type { NextFunction } from 'express';
 import { AppError } from 'common-common/src/errors';
 import { ADDRESS_TOKEN_EXPIRES_IN } from '../config';
 import { createRole, findOneRole } from './roles';
 import { mixpanelTrack } from './mixpanelUtil';
 import { MixpanelUserSignupEvent } from '../../shared/analytics/types';
-import { UserInstance } from '../models/user';
-import { DB } from '../models';
+import type { UserInstance } from '../models/user';
+import type { DB } from '../models';
 import { addressSwapper } from '../../shared/utils';
 import { Errors } from '../routes/createAddress';
 

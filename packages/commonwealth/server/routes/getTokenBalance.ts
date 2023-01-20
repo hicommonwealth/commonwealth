@@ -1,8 +1,9 @@
-import { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
-import { TokenBalanceCache, TokenBalanceResp } from 'token-balance-cache/src';
+import type { GetTokenBalanceReq } from 'common-common/src/api/extApiTypes';
+import type { TokenBalanceCache, TokenBalanceResp } from 'token-balance-cache/src';
 import { query, validationResult } from 'express-validator';
-import { DB } from '../models';
-import { failure, success, TypedRequestQuery, TypedResponse } from '../types';
+import type { DB } from '../models';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { failure, success } from '../types';
 
 export const getTokenBalanceValidation = [
   query('chain_node_id').exists().toInt(),

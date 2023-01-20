@@ -1,12 +1,13 @@
-import { GetTopicsReq, GetTopicsResp } from 'common-common/src/api/extApiTypes';
+import type { GetTopicsReq, GetTopicsResp } from 'common-common/src/api/extApiTypes';
 import { query, validationResult } from 'express-validator';
-import {
+import type {
   TypedRequestQuery,
-  TypedResponse,
+  TypedResponse} from '../../types';
+import {
   success,
   failure,
 } from '../../types';
-import { DB } from '../../models';
+import type { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
 import { paginationValidation } from '../../util/helperValidations';
 
