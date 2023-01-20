@@ -151,6 +151,7 @@ import authCallback from '../routes/authCallback';
 import viewChainIcons from '../routes/viewChainIcons';
 
 import { addExternalRoutes } from './external';
+import generateImage from '../routes/generateImage';
 import { getChainEventServiceData } from '../routes/getChainEventServiceData';
 import { getChain } from '../routes/getChain';
 import { getChainNode } from '../routes/getChainNode';
@@ -860,6 +861,12 @@ function setupRouter(
   );
 
   router.post('/updateChainPriority', updateChainPriority.bind(this, models));
+
+  router.post(
+    '/generateImage',
+    passport.authenticate('jwt', { session: false }),
+    generateImage.bind(this, models)
+  );
 
   // login
   router.post('/login', startEmailLogin.bind(this, models));
