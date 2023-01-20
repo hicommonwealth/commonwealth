@@ -1,14 +1,19 @@
-import type {
+import Sequelize from 'sequelize';
+import {
   GetProfilesReq,
   GetProfilesResp,
+  needParamErrMsg,
 } from 'common-common/src/api/extApiTypes';
-import { needParamErrMsg } from 'common-common/src/api/extApiTypes';
 import { oneOf, query, validationResult } from 'express-validator';
-import Sequelize from 'sequelize';
-import type { DB } from '../../models';
-import type { TypedRequestQuery, TypedResponse } from '../../types';
-import { failure, success } from '../../types';
+import {
+  TypedRequestQuery,
+  TypedResponse,
+  success,
+  failure,
+} from '../../types';
+import { DB } from '../../models';
 import { formatPagination } from '../../util/queries';
+import { paginationValidation } from '../../util/helperValidations';
 
 const { Op } = Sequelize;
 
@@ -21,6 +26,7 @@ export const getProfilesValidation = [
     `${needParamErrMsg} (addresses, profile_ids)`
   ),
   query('count_only').optional().isBoolean().toBoolean(),
+  ...paginationValidation,
 ];
 
 const getProfiles = async (
@@ -50,7 +56,6 @@ const getProfiles = async (
   let profiles, count;
   if (!count_only) {
     ({ rows: profiles, count } = await models.Profile.findAndCountAll({
-      logging: console.log,
       where,
       include,
       attributes: { exclude: ['user_id'] },

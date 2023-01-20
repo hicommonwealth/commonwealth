@@ -175,6 +175,7 @@ export class StarterCommunityForm extends ClassComponent {
               await initAppState(false);
               m.route.set(`/${res.result.chain?.id}`);
             } catch (err) {
+              console.log(err);
               notifyError(
                 err.responseJSON?.error ||
                   'Creating new starter community failed'
