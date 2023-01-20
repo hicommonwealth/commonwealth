@@ -109,6 +109,13 @@ import starCommunity from '../routes/starCommunity';
 import startEmailLogin from '../routes/startEmailLogin';
 import startOAuthLogin from '../routes/startOAuthLogin';
 
+import { 
+  createCommunityContractTemplate,
+  getCommunityContractTemplate,
+  updateCommunityContractTemplate,
+  deleteCommunityContractTemplate,
+} from '../routes/proposalTemplate';
+
 import startSsoLogin from '../routes/startSsoLogin';
 import status from '../routes/status';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -224,7 +231,7 @@ function setupRouter(
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   router.post(
     '/selectChain',
-    passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', {session: false}),
     selectChain.bind(this, models)
   );
 
@@ -245,6 +252,27 @@ function setupRouter(
     '/contract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
+  );
+
+  //community contract
+  router.post(
+    '/contract/community_template',
+    passport.authenticate('jwt', { session: false }),
+    createCommunityContractTemplate.bind(this, models)
+  );
+  router.get(
+    '/contract/community_template',
+    getCommunityContractTemplate.bind(this, models)
+  );
+  router.put(
+    '/contract/community_template',
+    passport.authenticate('jwt', { session: false }),
+    updateCommunityContractTemplate.bind(this, models)
+  );
+  router.delete(
+    'contract/community_template',
+    passport.authenticate('jwt', { session: false }),
+    deleteCommunityContractTemplate.bind(this, models)
   );
 
   router.post(
