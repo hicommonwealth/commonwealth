@@ -196,7 +196,6 @@ describe('Thread Tests', () => {
         description: 'test enabled community',
         default_chain: chain,
         isAuthenticatedForum: 'false',
-        invitesEnabled: 'false',
         privacyEnabled: 'false',
       };
       const c = await modelUtils.createCommunity(communityArgs);
@@ -315,7 +314,6 @@ describe('Thread Tests', () => {
         jwt: userJWT,
         isAuthenticatedForum: 'false',
         privacyEnabled: 'true',
-        invitesEnabled: 'true',
         id: 'test',
         name: 'test community',
         creator_address: userAddress,

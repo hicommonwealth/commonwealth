@@ -13,7 +13,6 @@ import 'pages/landing/landing_page.scss';
 import app, { LoginState } from 'state';
 import { Footer } from '../../footer';
 
-import { handleEmailInvites } from '../../menus/invites_menu';
 import UserDashboard from '../user_dashboard';
 import TokensChainsComponent from './chains_slider';
 import TokensCreatorComponent from './creators_card_section';
@@ -90,9 +89,6 @@ const LandingPage: m.Component<{}, IState> = {
     ];
   },
   view: (vnode) => {
-    if (m.route.param('triggerInvite') === 't') {
-      setTimeout(() => handleEmailInvites(vnode.state), 0);
-    }
     if (app.loginState !== LoginState.LoggedIn) {
       return m('.LandingPage', { class: 'bg-primary' }, [
         m(
@@ -152,7 +148,8 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: ' On-chain notifications ',
-                text: ' Stay up-to-date on chain events like votes and large transfers. ',
+                text:
+                  ' Stay up-to-date on chain events like votes and large transfers. ',
               },
               card: {
                 id: 'tab-codepen',
@@ -182,7 +179,8 @@ const LandingPage: m.Component<{}, IState> = {
               },
               texts: {
                 title: ' Crowdfunding ',
-                text: ' Fund new tokens and community initiatives with Kickstarter-like raises from a thread. ',
+                text:
+                  ' Fund new tokens and community initiatives with Kickstarter-like raises from a thread. ',
               },
               card: {
                 id: 'tab3-codepen',
@@ -214,7 +212,8 @@ const LandingPage: m.Component<{}, IState> = {
               img: 'static/img/circleCrowd.svg',
               alt: '',
               title: 'Your community is here.',
-              text: ' Stop bouncing between 10 tabs at once - everything you need to know about your token is here. ',
+              text:
+                ' Stop bouncing between 10 tabs at once - everything you need to know about your token is here. ',
             },
             {
               img: 'static/img/1stButtonToken.svg',
@@ -236,7 +235,8 @@ const LandingPage: m.Component<{}, IState> = {
               img: 'static/img/calendar.svg',
               alt: '',
               title: 'Participate in events.',
-              text: ' Participate in events like upcoming votes, new projects and community initiatives. ',
+              text:
+                ' Participate in events like upcoming votes, new projects and community initiatives. ',
             },
           ],
         }),
@@ -295,21 +295,24 @@ const LandingPage: m.Component<{}, IState> = {
         m(JoinCommonWealthSection),
         m(Footer),
         m('script', {
-          src: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js',
+          src:
+            'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/glide.min.js',
           integrity:
             'sha512-IkLiryZhI6G4pnA3bBZzYCT9Ewk87U4DGEOz+TnRD3MrKqaUitt+ssHgn2X/sxoM7FxCP/ROUp6wcxjH/GcI5Q==',
           crossorigin: 'anonymous',
         }),
         m('link', {
           rel: 'stylesheet',
-          href: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.core.min.css',
+          href:
+            'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.core.min.css',
           integrity:
             'sha512-YQlbvfX5C6Ym6fTUSZ9GZpyB3F92hmQAZTO5YjciedwAaGRI9ccNs4iw2QTCJiSPheUQZomZKHQtuwbHkA9lgw==',
           crossorigin: 'anonymous',
         }),
         m('link', {
           rel: 'stylesheet',
-          href: 'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.theme.min.css',
+          href:
+            'https://cdnjs.cloudflare.com/ajax/libs/Glide.js/3.2.0/css/glide.theme.min.css',
           integrity:
             'sha512-wCwx+DYp8LDIaTem/rpXubV/C1WiNRsEVqoztV0NZm8tiTvsUeSlA/Uz02VTGSiqfzAHD4RnqVoevMcRZgYEcQ==',
           crossorigin: 'anonymous',

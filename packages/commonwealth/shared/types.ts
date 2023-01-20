@@ -59,18 +59,6 @@ export enum WebsocketEngineEvents {
   DeleteRoom = 'delete-room',
 }
 
-export interface InviteCodeAttributes {
-  id?: string;
-  community_name?: string;
-  chain_id?: string;
-  creator_id: number;
-  invited_email?: string;
-  used?: boolean;
-  created_at?: Date;
-  updated_at?: Date;
-  Chain?: ChainAttributes;
-}
-
 export interface IPostNotificationData {
   created_at: any;
   root_id: number | string;
@@ -140,7 +128,6 @@ export const DynamicTemplate = {
   BatchNotifications: 'd-468624f3c2d7434c86ae0ed0e1d2227e',
   SignIn: 'd-db52815b5f8647549d1fe6aa703d7274',
   SignUp: 'd-2b00abbf123e4b5981784d17151e86be',
-  EmailInvite: 'd-000c08160c07459798b46c927b638b9a',
   UpdateEmail: 'd-a0c28546fecc49fb80a3ba9e535bff48',
   VerifyAddress: 'd-292c161f1aec4d0e98a0bf8d6d8e42c2',
 };

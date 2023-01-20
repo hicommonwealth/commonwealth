@@ -8,7 +8,6 @@ import type { ChainCategoryTypeInstance } from 'server/models/chain_category_typ
 import type { ChainNodeInstance } from 'server/models/chain_node';
 import type { CommunitySnapshotSpaceWithSpaceAttached } from 'server/models/community_snapshot_spaces';
 import type { DiscussionDraftAttributes } from 'server/models/discussion_draft';
-import type { InviteCodeAttributes } from 'server/models/invite_code';
 import type { NotificationCategoryInstance } from 'server/models/notification_category';
 import type { SocialAccountInstance } from 'server/models/social_account';
 import type { StarredCommunityAttributes } from 'server/models/starred_community';
@@ -37,7 +36,6 @@ type StatusResp = {
   chainCategoryTypes: ChainCategoryTypeInstance[];
   recentThreads: ThreadCountQueryData[];
   roles?: RoleInstanceWithPermission[];
-  invites?: InviteCodeAttributes[];
   loggedIn?: boolean;
   user?: {
     email: string;
@@ -90,8 +88,8 @@ const status = async (
 
     const chainsWithSnapshots = await Promise.all(
       chains.map(async (chain) => {
-        const snapshot_spaces: CommunitySnapshotSpaceWithSpaceAttached[] =
-          await models.CommunitySnapshotSpaces.findAll({
+        const snapshot_spaces: CommunitySnapshotSpaceWithSpaceAttached[] = await models.CommunitySnapshotSpaces.findAll(
+          {
             where: {
               chain_id: chain.id,
             },
@@ -99,7 +97,8 @@ const status = async (
               model: models.SnapshotSpace,
               as: 'snapshot_space',
             },
-          });
+          }
+        );
 
         const snapshot_space_names = snapshot_spaces.map((space) => {
           return space.snapshot_space?.snapshot_space;
@@ -118,9 +117,8 @@ const status = async (
     const { user } = req;
 
     if (!user) {
-      const threadCountQueryData: ThreadCountQueryData[] =
-        await models.sequelize.query(
-          `
+      const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(
+        `
         SELECT "Threads".chain, COUNT("Threads".id) 
         FROM "Threads"
         WHERE "Threads".created_at > :thirtyDaysAgo
@@ -128,8 +126,8 @@ const status = async (
         AND "Threads".chain IS NOT NULL
         GROUP BY "Threads".chain;
         `,
-          { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
-        );
+        { replacements: { thirtyDaysAgo }, type: QueryTypes.SELECT }
+      );
 
       return success(res, {
         chainsWithSnapshots,
@@ -179,9 +177,8 @@ const status = async (
       include: [models.Address, models.Attachment],
     });
 
-    const threadCountQueryData: ThreadCountQueryData[] =
-      await models.sequelize.query(
-        `
+    const threadCountQueryData: ThreadCountQueryData[] = await models.sequelize.query(
+      `
       SELECT "Threads".chain, COUNT("Threads".id) 
       FROM "Threads"
       WHERE "Threads".created_at > :thirtyDaysAgo
@@ -189,25 +186,17 @@ const status = async (
       AND "Threads".chain IS NOT NULL
       GROUP BY "Threads".chain;
       `,
-        {
-          replacements: {
-            thirtyDaysAgo,
-          },
-          type: QueryTypes.SELECT,
-        }
-      );
+      {
+        replacements: {
+          thirtyDaysAgo,
+        },
+        type: QueryTypes.SELECT,
+      }
+    );
 
     // get starred communities for user
     const starredCommunities = await models.StarredCommunity.findAll({
       where: { user_id: user.id },
-    });
-
-    // get invites for user
-    const invites = await models.InviteCode.findAll({
-      where: {
-        invited_email: user.email,
-        used: false,
-      },
     });
 
     // TODO: Remove or guard JSON.parse calls since these could break the route if there was an error
@@ -358,7 +347,6 @@ const status = async (
       chainCategoryTypes,
       recentThreads: threadCountQueryData,
       roles,
-      invites,
       loggedIn: true,
       user: {
         email: user.email,

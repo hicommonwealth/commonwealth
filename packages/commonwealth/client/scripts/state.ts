@@ -10,7 +10,6 @@ import type { IChainAdapter, NotificationCategory } from 'models';
 import type { ChainCategoryAttributes } from 'server/models/chain_category';
 import type { ChainCategoryTypeAttributes } from 'server/models/chain_category_type';
 import { ChainStore, NodeStore } from 'stores';
-import type { InviteCodeAttributes } from 'types';
 import RecentActivityController from './controllers/app/recent_activity';
 import WebWalletController from './controllers/app/web_wallets';
 import SnapshotController from './controllers/chain/snapshot';
@@ -105,7 +104,6 @@ export interface IApp {
     nodes: NodeStore;
     notificationCategories?: NotificationCategory[];
     defaultChain: string;
-    invites: InviteCodeAttributes[];
     chainCategories?: ChainCategoryAttributes[];
     chainCategoryTypes?: ChainCategoryTypeAttributes[];
   };
@@ -206,7 +204,6 @@ const app: IApp = {
     chains: new ChainStore(),
     nodes: new NodeStore(),
     defaultChain: 'edgeware',
-    invites: [],
   },
   // TODO: Collect all getters into an object
   loginStatusLoaded: () => app.loginState !== LoginState.NotLoaded,

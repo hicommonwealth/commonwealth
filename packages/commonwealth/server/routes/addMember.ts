@@ -29,6 +29,7 @@ const addMember = async (
       user_id: req.user.id,
     },
   });
+
   const requesterIsAdminOrMod = await findAllRoles(
     models,
     { where: { address_id: adminAddress.id } },

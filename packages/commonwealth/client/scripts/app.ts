@@ -20,7 +20,6 @@ import app, { ApiStatus, LoginState } from 'state';
 
 import { Layout } from 'views/layout';
 import { alertModalWithText } from 'views/modals/alert_modal';
-import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
 import '../styles/normalize.css'; // reset
 import '../styles/shared.scss';
@@ -70,11 +69,9 @@ export async function initAppState(
             );
           });
         app.roles.setRoles(data.result.roles);
-        app.config.notificationCategories =
-          data.result.notificationCategories.map((json) =>
-            NotificationCategory.fromJSON(json)
-          );
-        app.config.invites = data.result.invites;
+        app.config.notificationCategories = data.result.notificationCategories.map(
+          (json) => NotificationCategory.fromJSON(json)
+        );
         app.config.chainCategories = data.result.chainCategories;
         app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 
@@ -145,35 +142,6 @@ export async function deinitChainOrCommunity() {
   app.user.setActiveAccounts([]);
   app.user.ephemerallySetActiveAccount(null);
   document.title = 'Commonwealth';
-}
-
-export async function handleInviteLinkRedirect() {
-  const inviteMessage = m.route.param('invitemessage');
-  if (inviteMessage) {
-    if (
-      inviteMessage === 'failure' &&
-      m.route.param('message') === 'Must be logged in to accept invites'
-    ) {
-      notifyInfo('Log in to join a community with an invite link');
-      app.modals.create({
-        modal: NewLoginModal,
-        data: {
-          modalType: isWindowMediumSmallInclusive(window.innerWidth)
-            ? 'fullScreen'
-            : 'centered',
-          breakpointFn: isWindowMediumSmallInclusive,
-        },
-      });
-    } else if (inviteMessage === 'failure') {
-      const message = m.route.param('message');
-      notifyError(message);
-    } else if (inviteMessage === 'success') {
-      if (app.config.invites.length === 0) return;
-      app.modals.create({ modal: ConfirmInviteModal });
-    } else {
-      notifyError('Unexpected error with invite link');
-    }
-  }
 }
 
 export async function handleUpdateEmailConfirmation() {
@@ -380,9 +348,6 @@ export async function selectChain(
       chain: chain.id,
     });
   }
-
-  // If the user was invited to a chain/community, we can now pop up a dialog for them to accept the invite
-  handleInviteLinkRedirect();
 
   // Redraw with not-yet-loaded chain and return true to indicate
   // initialization has finalized.
@@ -1152,7 +1117,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
           app.user.discussionDrafts.refreshAll().then(() => m.redraw());
         }
 
-        handleInviteLinkRedirect();
         // If the user updates their email
         handleUpdateEmailConfirmation();
 

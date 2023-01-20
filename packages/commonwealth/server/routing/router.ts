@@ -53,8 +53,6 @@ import clearReadNotifications from '../routes/clearReadNotifications';
 import clearNotifications from '../routes/clearNotifications';
 import bulkMembers from '../routes/bulkMembers';
 import bulkAddresses from '../routes/bulkAddresses';
-import createInvite from '../routes/createInvite';
-import acceptInvite from '../routes/acceptInvite';
 import addMember from '../routes/addMember';
 import upgradeMember from '../routes/upgradeMember';
 import deleteSocialAccount from '../routes/deleteSocialAccount';
@@ -538,17 +536,6 @@ function setupRouter(
     '/bulkMembers',
     databaseValidationService.validateChain,
     bulkMembers.bind(this, models)
-  );
-  router.post(
-    '/createInvite',
-    passport.authenticate('jwt', { session: false }),
-    databaseValidationService.validateChain,
-    createInvite.bind(this, models)
-  );
-  router.post(
-    '/acceptInvite',
-    passport.authenticate('jwt', { session: false }),
-    acceptInvite.bind(this, models)
   );
   router.post(
     '/addMember',
