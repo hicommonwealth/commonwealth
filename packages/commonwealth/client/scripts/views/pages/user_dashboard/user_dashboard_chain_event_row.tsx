@@ -17,9 +17,7 @@ type UserDashboardChainEventRowAttrs = {
   label: IEventLabel;
 };
 
-export class UserDashboardChainEventRow extends ClassComponent<
-  UserDashboardChainEventRowAttrs
-> {
+export class UserDashboardChainEventRow extends ClassComponent<UserDashboardChainEventRowAttrs> {
   view(vnode: m.Vnode<UserDashboardChainEventRowAttrs>) {
     const { blockNumber, chain, label } = vnode.attrs;
 

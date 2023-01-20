@@ -66,9 +66,8 @@ class SubstrateTreasuryTips extends ProposalModule<
     );
 
     // TODO: ensure council members === tippers for all chains
-    const members = (await ChainInfo.api.query.council.members()) as Vec<
-      AccountId
-    >;
+    const members =
+      (await ChainInfo.api.query.council.members()) as Vec<AccountId>;
     this._members = members
       .toArray()
       .map((v) => this._Accounts.fromAddress(v.toString()));

@@ -299,9 +299,10 @@ export default class AaveProposal extends Proposal<
       );
 
     try {
-      const totalVotingSupplyAtStart = await this._Gov.api.Strategy.getTotalVotingSupplyAt(
-        this.data.startBlock
-      );
+      const totalVotingSupplyAtStart =
+        await this._Gov.api.Strategy.getTotalVotingSupplyAt(
+          this.data.startBlock
+        );
       this._votingSupplyAtStart = new BN(totalVotingSupplyAtStart.toString());
     } catch (e2) {
       console.error(

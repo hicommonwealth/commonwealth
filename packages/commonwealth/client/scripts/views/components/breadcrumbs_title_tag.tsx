@@ -7,9 +7,7 @@ type BreadcrumbsTitleTagAttrs = {
   title: string;
 };
 
-export class BreadcrumbsTitleTag extends ClassComponent<
-  BreadcrumbsTitleTagAttrs
-> {
+export class BreadcrumbsTitleTag extends ClassComponent<BreadcrumbsTitleTagAttrs> {
   view(vnode: m.Vnode<BreadcrumbsTitleTagAttrs>) {
     const { title } = vnode.attrs;
 

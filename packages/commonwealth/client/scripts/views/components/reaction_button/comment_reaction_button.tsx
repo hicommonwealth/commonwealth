@@ -22,9 +22,7 @@ type CommentReactionButtonAttrs = {
   comment: Comment<any>;
 };
 
-export class CommentReactionButton extends ClassComponent<
-  CommentReactionButtonAttrs
-> {
+export class CommentReactionButton extends ClassComponent<CommentReactionButtonAttrs> {
   private loading: boolean;
   private reactors: any;
 

@@ -12,14 +12,8 @@ import app from 'state';
 import { ReactionCountsStore } from 'stores';
 
 export const modelFromServer = (reactionCount) => {
-  const {
-    id,
-    thread_id,
-    comment_id,
-    proposal_id,
-    has_reacted,
-    like,
-  } = reactionCount;
+  const { id, thread_id, comment_id, proposal_id, has_reacted, like } =
+    reactionCount;
   return new ReactionCount(
     id,
     thread_id,

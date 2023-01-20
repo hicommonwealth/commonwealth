@@ -17,15 +17,14 @@ import type { NextFn } from './types';
 
 type TXSigningCLIOptionAttrs = ITXModalData & NextFn;
 
-export class TXSigningCLIOption extends ClassComponent<
-  TXSigningCLIOptionAttrs
-> {
+export class TXSigningCLIOption extends ClassComponent<TXSigningCLIOptionAttrs> {
   private calldata?: ISubstrateTXData;
   private signedTx: string;
 
   async oncreate(vnode: m.Vnode<TXSigningCLIOptionAttrs>) {
     if (this.calldata === undefined) {
-      this.calldata = (await vnode.attrs.txData.unsignedData()) as ISubstrateTXData;
+      this.calldata =
+        (await vnode.attrs.txData.unsignedData()) as ISubstrateTXData;
       m.redraw();
     }
   }

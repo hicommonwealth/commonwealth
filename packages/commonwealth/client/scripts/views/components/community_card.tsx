@@ -88,7 +88,8 @@ export class NewCommunityCard extends ClassComponent {
         className="new-community-card"
         onclick={(e) => {
           e.preventDefault();
-          document.location = 'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
+          document.location =
+            'https://hicommonwealth.typeform.com/to/cRP27Rp5' as any;
         }}
       >
         <div class="new-community-card-body">

@@ -57,8 +57,7 @@ module.exports = {
       await queryInterface.bulkUpdate(
         'ChainNodes',
         {
-          url:
-            'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
+          url: 'wss://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
           alt_wallet_url:
             'https://eth-mainnet.alchemyapi.io/v2/cNC4XfxR7biwO2bfIO5aKcs9EMPxTQfr',
         },

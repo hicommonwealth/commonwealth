@@ -11,17 +11,16 @@ export type CommunitySnapshotSpacesAttributes = {
   updated_at?: Date;
 };
 
-export type CommunitySnapshotSpaceWithSpaceAttached = CommunitySnapshotSpacesAttributes & {
-  snapshot_space?: SnapshotSpaceAttributes;
-};
+export type CommunitySnapshotSpaceWithSpaceAttached =
+  CommunitySnapshotSpacesAttributes & {
+    snapshot_space?: SnapshotSpaceAttributes;
+  };
 
-export type CommunitySnapshotSpaceInstance = ModelInstance<
-  CommunitySnapshotSpacesAttributes
->;
+export type CommunitySnapshotSpaceInstance =
+  ModelInstance<CommunitySnapshotSpacesAttributes>;
 
-export type CommunitySnapshotSpaceModelStatic = ModelStatic<
-  CommunitySnapshotSpaceInstance
->;
+export type CommunitySnapshotSpaceModelStatic =
+  ModelStatic<CommunitySnapshotSpaceInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,

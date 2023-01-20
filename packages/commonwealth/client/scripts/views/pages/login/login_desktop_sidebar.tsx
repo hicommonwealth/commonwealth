@@ -45,9 +45,7 @@ type LoginDesktopSidebarAttrs = {
   wallets: Array<IWebWallet<any>>;
 };
 
-export class LoginDesktopSidebar extends ClassComponent<
-  LoginDesktopSidebarAttrs
-> {
+export class LoginDesktopSidebar extends ClassComponent<LoginDesktopSidebarAttrs> {
   view(vnode: m.Vnode<LoginDesktopSidebarAttrs>) {
     const {
       sidebarType,

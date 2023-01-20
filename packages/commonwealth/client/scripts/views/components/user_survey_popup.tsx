@@ -24,13 +24,8 @@ type UserSurveyViewAttrs = {
 
 class UserSurveyView extends ClassComponent<UserSurveyViewAttrs> {
   view(vnode: m.Vnode<UserSurveyViewAttrs>) {
-    const {
-      disabled,
-      checked,
-      onRedirectClick,
-      onClose,
-      onCheckboxClick,
-    } = vnode.attrs;
+    const { disabled, checked, onRedirectClick, onClose, onCheckboxClick } =
+      vnode.attrs;
     return (
       <CWGrowl position="bottom-right" disabled={disabled}>
         <div class="UserSurveyPopup">

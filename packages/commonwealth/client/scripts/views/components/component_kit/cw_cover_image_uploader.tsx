@@ -25,9 +25,7 @@ type ICWCoverImageUploaderAttrs = {
 };
 
 // TODO Graham 10/24/22: Synchronize avatar upload against new cover upload system
-export default class CWCoverImageUploader extends ClassComponent<
-  ICWCoverImageUploaderAttrs
-> {
+export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUploaderAttrs> {
   private imageURL: string;
   private isUploading: boolean;
   private uploadStatus: ValidationStatus;
@@ -62,7 +60,10 @@ export default class CWCoverImageUploader extends ClassComponent<
       return [null, 'failure'];
     }
   }
-  async generateImage(prompt: string, vnode: m.Vnode<CoverImageUploaderAttrs>) {
+  async generateImage(
+    prompt: string,
+    vnode: m.Vnode<ICWCoverImageUploaderAttrs>
+  ) {
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
 
     try {

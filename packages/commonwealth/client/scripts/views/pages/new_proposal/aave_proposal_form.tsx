@@ -160,8 +160,8 @@ export class AaveProposalForm extends ClassComponent {
         <CWCheckbox
           checked={this.aaveProposalState[activeTabIndex].withDelegateCall}
           onchange={() => {
-            this.aaveProposalState[activeTabIndex].withDelegateCall = !this
-              .aaveProposalState[activeTabIndex].withDelegateCall;
+            this.aaveProposalState[activeTabIndex].withDelegateCall =
+              !this.aaveProposalState[activeTabIndex].withDelegateCall;
           }}
           label="Delegate Call"
           value=""

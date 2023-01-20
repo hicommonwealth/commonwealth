@@ -166,7 +166,7 @@ describe('Edgeware Migration Event Handler Tests', () => {
 
     // process event
     const dbEvent = await eventHandler.handle(
-      (event as unknown) as CWEvent<SubstrateTypes.IEventData>
+      event as unknown as CWEvent<SubstrateTypes.IEventData>
     );
     assert.equal(dbEvent, null);
   });

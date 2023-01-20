@@ -33,9 +33,7 @@ export class BlockExplorerLink extends ClassComponent<ProposalHeaderLinkAttrs> {
 }
 
 // "Vote on polkadot-js"
-export class VotingInterfaceLink extends ClassComponent<
-  ProposalHeaderLinkAttrs
-> {
+export class VotingInterfaceLink extends ClassComponent<ProposalHeaderLinkAttrs> {
   view(vnode: m.Vnode<ProposalHeaderLinkAttrs>) {
     const { proposal } = vnode.attrs;
 
@@ -76,9 +74,7 @@ type SnapshotThreadLinkAttrs = {
   thread: { id: string; title: string };
 };
 
-export class SnapshotThreadLink extends ClassComponent<
-  SnapshotThreadLinkAttrs
-> {
+export class SnapshotThreadLink extends ClassComponent<SnapshotThreadLinkAttrs> {
   view(vnode: m.Vnode<SnapshotThreadLinkAttrs>) {
     const { id, title } = vnode.attrs.thread;
 

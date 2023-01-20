@@ -17,9 +17,7 @@ type SnapshotProposalSelectorAttrs = {
   thread: Thread;
 };
 
-export class SnapshotProposalSelector extends ClassComponent<
-  SnapshotProposalSelectorAttrs
-> {
+export class SnapshotProposalSelector extends ClassComponent<SnapshotProposalSelectorAttrs> {
   private allProposals: SnapshotProposal[];
   private initialized: boolean;
   private snapshotProposalsLoaded: boolean;

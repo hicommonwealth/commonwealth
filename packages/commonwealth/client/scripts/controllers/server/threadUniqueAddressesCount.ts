@@ -12,7 +12,8 @@ export const modelFromServer = (threadUniqueAddressesCount) => {
 };
 
 class ThreadUniqueAddressesCountController {
-  private _store: ThreadUniqueAddressesCountStore = new ThreadUniqueAddressesCountStore();
+  private _store: ThreadUniqueAddressesCountStore =
+    new ThreadUniqueAddressesCountStore();
   private _initializedPinned = false;
 
   public get store() {

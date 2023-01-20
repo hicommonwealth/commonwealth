@@ -16,9 +16,8 @@ export type StarredCommunityAttributes = {
   Chain?: ChainAttributes;
 };
 
-export type StarredCommunityInstance = ModelInstance<
-  StarredCommunityAttributes
->;
+export type StarredCommunityInstance =
+  ModelInstance<StarredCommunityAttributes>;
 
 export type StarredCommunityModelStatic = ModelStatic<StarredCommunityInstance>;
 

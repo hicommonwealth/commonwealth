@@ -20,9 +20,7 @@ type TxSigningModalIntroStageAttrs = ITXModalData &
     polkaWallet: IWebWallet<any>;
   };
 
-export class TxSigningModalIntroStage extends ClassComponent<
-  TxSigningModalIntroStageAttrs
-> {
+export class TxSigningModalIntroStage extends ClassComponent<TxSigningModalIntroStageAttrs> {
   private introTab: 'webWallet' | 'commandLine';
 
   oninit() {
@@ -149,9 +147,7 @@ export class TxSigningModalSuccessStage extends ClassComponent<TxDataState> {
 
 type TxSigningModalRejectedStageAttrs = TxDataState & NextFn;
 
-export class TxSigningModalRejectedStage extends ClassComponent<
-  TxSigningModalRejectedStageAttrs
-> {
+export class TxSigningModalRejectedStage extends ClassComponent<TxSigningModalRejectedStageAttrs> {
   view(vnode: m.VnodeDOM<TxSigningModalRejectedStageAttrs>) {
     const { blocknum, error, hash, timestamp, next } = vnode.attrs;
 

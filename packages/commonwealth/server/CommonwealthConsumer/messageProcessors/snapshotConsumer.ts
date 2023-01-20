@@ -117,11 +117,10 @@ export async function processSnapshotMessage(
     space,
   });
 
-  const associatedCommunities = await this.models.CommunitySnapshotSpaces.findAll(
-    {
+  const associatedCommunities =
+    await this.models.CommunitySnapshotSpaces.findAll({
       where: { snapshot_space_id: proposal?.space },
-    }
-  );
+    });
 
   this.log.info(
     `Found ${associatedCommunities.length} associated communities for snapshot space ${space} `

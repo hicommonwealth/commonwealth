@@ -63,9 +63,7 @@ type SnapshotInformationCardAttrs = {
   threads: Array<{ id: string; title: string }> | null;
 };
 
-export class SnapshotInformationCard extends ClassComponent<
-  SnapshotInformationCardAttrs
-> {
+export class SnapshotInformationCard extends ClassComponent<SnapshotInformationCardAttrs> {
   view(vnode: m.Vnode<SnapshotInformationCardAttrs>) {
     const { proposal, threads } = vnode.attrs;
 

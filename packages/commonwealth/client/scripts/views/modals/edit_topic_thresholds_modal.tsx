@@ -18,9 +18,7 @@ type EditTopicThresholdsRowAttrs = {
   topic: Topic;
 };
 
-class EditTopicThresholdsRow extends ClassComponent<
-  EditTopicThresholdsRowAttrs
-> {
+class EditTopicThresholdsRow extends ClassComponent<EditTopicThresholdsRowAttrs> {
   private newTokenThresholdInWei: string;
 
   view(vnode: m.Vnode<EditTopicThresholdsRowAttrs>) {
@@ -89,9 +87,7 @@ type EditTopicThresholdsModalAttrs = {
   tokenThreshold: number;
 };
 
-export class EditTopicThresholdsModal extends ClassComponent<
-  EditTopicThresholdsModalAttrs
-> {
+export class EditTopicThresholdsModal extends ClassComponent<EditTopicThresholdsModalAttrs> {
   private form: NewTopicModalForm;
 
   view(vnode: m.Vnode<EditTopicThresholdsModalAttrs>) {

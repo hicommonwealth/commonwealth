@@ -51,9 +51,7 @@ type CountdownUntilBlockAttrs = {
   includeSeconds?: boolean;
 };
 
-export class CountdownUntilBlock extends ClassComponent<
-  CountdownUntilBlockAttrs
-> {
+export class CountdownUntilBlock extends ClassComponent<CountdownUntilBlockAttrs> {
   view(vnode: m.Vnode<CountdownUntilBlockAttrs>) {
     let { includeSeconds } = vnode.attrs;
     if (!vnode.attrs.block) return;

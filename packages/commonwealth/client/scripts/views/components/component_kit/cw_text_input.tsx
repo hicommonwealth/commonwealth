@@ -181,10 +181,8 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                 this.inputTimeout = setTimeout(() => {
                   this.isTyping = false;
                   if (inputValidationFn && inputLength > 3) {
-                    [
-                      this.validationStatus,
-                      this.statusMessage,
-                    ] = inputValidationFn(e.target.value);
+                    [this.validationStatus, this.statusMessage] =
+                      inputValidationFn(e.target.value);
                     m.redraw();
                   }
                 }, timeout);
@@ -198,10 +196,8 @@ export class CWTextInput extends ClassComponent<TextInputAttrs> {
                   this.statusMessage = undefined;
                   m.redraw();
                 } else {
-                  [
-                    this.validationStatus,
-                    this.statusMessage,
-                  ] = inputValidationFn(e.target.value);
+                  [this.validationStatus, this.statusMessage] =
+                    inputValidationFn(e.target.value);
                 }
               }
             }}

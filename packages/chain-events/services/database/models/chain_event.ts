@@ -23,9 +23,7 @@ export type ChainEventAttributes = {
 };
 
 export type ChainEventInstance = ModelInstance<ChainEventAttributes> & {
-  getChainEventType: Sequelize.HasOneGetAssociationMixin<
-    ChainEventTypeInstance
-  >;
+  getChainEventType: Sequelize.HasOneGetAssociationMixin<ChainEventTypeInstance>;
 };
 
 export type ChainEventModelStatic = ModelStatic<ChainEventInstance>;

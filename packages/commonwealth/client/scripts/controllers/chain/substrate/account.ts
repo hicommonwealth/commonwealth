@@ -114,9 +114,9 @@ export class SubstrateAccount extends Account {
           this._Chain.api.query.staking.stakers
             ? [account]
             : [era.toString(), account];
-        return stakersCall(...stakersCallArgs(this.address)) as Promise<
-          Exposure
-        >;
+        return stakersCall(
+          ...stakersCallArgs(this.address)
+        ) as Promise<Exposure>;
       });
   }
 
@@ -327,7 +327,8 @@ export class SubstrateAccount extends Account {
 }
 
 class SubstrateAccounts
-  implements IAccountsModule<SubstrateCoin, SubstrateAccount> {
+  implements IAccountsModule<SubstrateCoin, SubstrateAccount>
+{
   private _initialized = false;
   private cachedValidators;
 
@@ -445,19 +446,22 @@ class SubstrateAccounts
       const exposures: Exposure[] = await stakersCall.multi(
         currentSet.map((elt) => stakersCallArgs(elt.toString()))
       );
-      const validatorPrefs = await this._Chain.api.query.staking.erasValidatorPrefs.multi(
-        currentSet.map((elt) => stakersCallArgs(elt.toString()))
-      );
+      const validatorPrefs =
+        await this._Chain.api.query.staking.erasValidatorPrefs.multi(
+          currentSet.map((elt) => stakersCallArgs(elt.toString()))
+        );
 
-      const nextUpControllers = await this._Chain.api.query.staking.bonded.multi(
-        toBeElected.map((elt) => elt.toString())
-      );
+      const nextUpControllers =
+        await this._Chain.api.query.staking.bonded.multi(
+          toBeElected.map((elt) => elt.toString())
+        );
       const nextUpExposures: Exposure[] = await stakersCall.multi(
         toBeElected.map((elt) => stakersCallArgs(elt.toString()))
       );
-      const nextUpValidatorPrefs = await this._Chain.api.query.staking.erasValidatorPrefs.multi(
-        toBeElected.map((elt) => stakersCallArgs(elt.toString()))
-      );
+      const nextUpValidatorPrefs =
+        await this._Chain.api.query.staking.erasValidatorPrefs.multi(
+          toBeElected.map((elt) => stakersCallArgs(elt.toString()))
+        );
 
       const result: IValidators = {};
       for (let i = 0; i < currentSet.length; ++i) {

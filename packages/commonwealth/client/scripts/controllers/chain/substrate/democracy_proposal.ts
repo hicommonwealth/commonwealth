@@ -259,10 +259,9 @@ class SubstrateDemocracyProposal extends Proposal<
       this.data.index
     );
     if (!depositOpt.isSome) return;
-    const depositorsTuple: ITuple<[
-      BalanceOf | Vec<AccountId>,
-      BalanceOf | Vec<AccountId>
-    ]> = depositOpt.unwrap();
+    const depositorsTuple: ITuple<
+      [BalanceOf | Vec<AccountId>, BalanceOf | Vec<AccountId>]
+    > = depositOpt.unwrap();
     let depositors: Vec<AccountId>;
     if (isFunction((depositorsTuple[1] as BalanceOf).mul)) {
       depositors = depositorsTuple[0] as Vec<AccountId>;

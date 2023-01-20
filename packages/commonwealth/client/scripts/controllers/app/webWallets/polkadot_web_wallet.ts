@@ -16,7 +16,8 @@ import { CanvasData } from 'shared/adapters/shared';
 import app from 'state';
 
 class PolkadotWebWalletController
-  implements IWebWallet<InjectedAccountWithMeta> {
+  implements IWebWallet<InjectedAccountWithMeta>
+{
   // GETTERS/SETTERS
   private _enabled: boolean;
   private _accounts: InjectedAccountWithMeta[];

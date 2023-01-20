@@ -26,8 +26,7 @@ module.exports = {
         [
           {
             chain: 'ideamarket',
-            url:
-              'wss://arb-mainnet.g.alchemy.com/v2/wJE2b7MRNJgk7S8dfgb_1xZNUDq7SF7G',
+            url: 'wss://arb-mainnet.g.alchemy.com/v2/wJE2b7MRNJgk7S8dfgb_1xZNUDq7SF7G',
             address: '0xC6C77506134cFc29E62cF35cEb2b964bE313FBC9',
             eth_chain_id: 42161,
           },

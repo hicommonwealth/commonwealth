@@ -27,9 +27,7 @@ type ProposalExtensionsAttrs = {
   setCosmosDepositAmount?;
 };
 
-export class ProposalExtensions extends ClassComponent<
-  ProposalExtensionsAttrs
-> {
+export class ProposalExtensions extends ClassComponent<ProposalExtensionsAttrs> {
   view(vnode: m.Vnode<ProposalExtensionsAttrs>) {
     const {
       proposal,

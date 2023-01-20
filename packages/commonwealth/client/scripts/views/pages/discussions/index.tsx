@@ -29,9 +29,8 @@ class DiscussionsPage extends ClassComponent<DiscussionPageAttrs> {
   }
 
   async onscroll() {
-    localStorage[
-      `${app.activeChainId()}-discussions-scrollY`
-    ] = this.scrollEle.scrollTop;
+    localStorage[`${app.activeChainId()}-discussions-scrollY`] =
+      this.scrollEle.scrollTop;
 
     const { fetchingThreads, topicName, stageName } = this;
 

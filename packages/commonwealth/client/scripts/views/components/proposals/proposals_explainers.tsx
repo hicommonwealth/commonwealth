@@ -11,9 +11,7 @@ import { GovExplainer } from '../gov_explainer';
 
 type SubstrateProposalStatsAttrs = { nextLaunchBlock: number };
 
-export class SubstrateProposalStats extends ClassComponent<
-  SubstrateProposalStatsAttrs
-> {
+export class SubstrateProposalStats extends ClassComponent<SubstrateProposalStatsAttrs> {
   view(vnode: m.Vnode<SubstrateProposalStatsAttrs>) {
     const { nextLaunchBlock } = vnode.attrs;
 
@@ -51,9 +49,7 @@ export class SubstrateProposalStats extends ClassComponent<
 
 type CompoundProposalStatsAttrs = { chain: Compound };
 
-export class CompoundProposalStats extends ClassComponent<
-  CompoundProposalStatsAttrs
-> {
+export class CompoundProposalStats extends ClassComponent<CompoundProposalStatsAttrs> {
   view(vnode: m.Vnode<CompoundProposalStatsAttrs>) {
     const { chain } = vnode.attrs;
 

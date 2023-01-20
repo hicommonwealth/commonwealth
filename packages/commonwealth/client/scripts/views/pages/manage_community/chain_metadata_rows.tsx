@@ -504,8 +504,8 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
                 <CWText type="h4">Snapshot Notifications</CWText>
                 <CWToggle
                   onchange={() => {
-                    this.snapshotNotificationsEnabled = !this
-                      .snapshotNotificationsEnabled;
+                    this.snapshotNotificationsEnabled =
+                      !this.snapshotNotificationsEnabled;
                     m.redraw();
                   }}
                   checked={this.snapshotNotificationsEnabled}

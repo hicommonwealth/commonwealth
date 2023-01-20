@@ -24,9 +24,7 @@ type AvatarUsernameInputAttrs = {
   orientation?: Orientation;
 };
 
-export class CWAvatarUsernameInput extends ClassComponent<
-  AvatarUsernameInputAttrs
-> {
+export class CWAvatarUsernameInput extends ClassComponent<AvatarUsernameInputAttrs> {
   view(vnode: m.Vnode<AvatarUsernameInputAttrs>) {
     const {
       account,

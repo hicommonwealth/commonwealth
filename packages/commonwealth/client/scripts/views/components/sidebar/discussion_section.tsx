@@ -29,9 +29,8 @@ function setDiscussionsToggleTree(path: string, toggle: boolean) {
   }
   currentTree[split[split.length - 1]] = toggle;
   const newTree = currentTree;
-  localStorage[
-    `${app.activeChainId()}-discussions-toggle-tree`
-  ] = JSON.stringify(newTree);
+  localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
+    JSON.stringify(newTree);
 }
 
 export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
@@ -122,15 +121,13 @@ export class DiscussionSection extends ClassComponent<SidebarSectionAttrs> {
 
     // Check if an existing toggle tree is stored
     if (!localStorage[`${app.activeChainId()}-discussions-toggle-tree`]) {
-      localStorage[
-        `${app.activeChainId()}-discussions-toggle-tree`
-      ] = JSON.stringify(discussionsDefaultToggleTree);
+      localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
+        JSON.stringify(discussionsDefaultToggleTree);
     } else if (
       !verifyCachedToggleTree('discussions', discussionsDefaultToggleTree)
     ) {
-      localStorage[
-        `${app.activeChainId()}-discussions-toggle-tree`
-      ] = JSON.stringify(discussionsDefaultToggleTree);
+      localStorage[`${app.activeChainId()}-discussions-toggle-tree`] =
+        JSON.stringify(discussionsDefaultToggleTree);
     }
     const toggleTreeState = JSON.parse(
       localStorage[`${app.activeChainId()}-discussions-toggle-tree`]

@@ -20,9 +20,7 @@ type ThreadPollEditorCardAttrs = {
   threadAlreadyHasPolling: boolean;
 };
 
-export class ThreadPollEditorCard extends ClassComponent<
-  ThreadPollEditorCardAttrs
-> {
+export class ThreadPollEditorCard extends ClassComponent<ThreadPollEditorCardAttrs> {
   view(vnode: m.Vnode<ThreadPollEditorCardAttrs>) {
     const { thread, threadAlreadyHasPolling } = vnode.attrs;
 

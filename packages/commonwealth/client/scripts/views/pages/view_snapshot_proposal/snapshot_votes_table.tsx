@@ -26,9 +26,7 @@ type SnapshotVotesTableAttrs = {
   voters: Array<SnapshotVoteType>;
 };
 
-export class SnapshotVotesTable extends ClassComponent<
-  SnapshotVotesTableAttrs
-> {
+export class SnapshotVotesTable extends ClassComponent<SnapshotVotesTableAttrs> {
   isVotersListExpanded: boolean;
 
   view(vnode: m.Vnode<SnapshotVotesTableAttrs>) {
