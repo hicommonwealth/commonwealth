@@ -77,16 +77,20 @@ class CWSidebarMenuItemComponent extends ClassComponent<MenuItem> {
           {app.isLoggedIn() && roles.length > 0 && (
             <div className="roles-and-star">
               {roles.map((role) => {
-                return render(User, {
-                  avatarSize: 18,
-                  avatarOnly: true,
-                  user: new AddressInfo(
-                    role.address_id,
-                    role.address,
-                    role.address_chain || role.chain_id,
-                    null
-                  ),
-                });
+                return (
+                  <User
+                    avatarSize={18}
+                    avatarOnly
+                    user={
+                      new AddressInfo(
+                        role.address_id,
+                        role.address,
+                        role.address_chain || role.chain_id,
+                        null
+                      )
+                    }
+                  />
+                );
               })}
               <div
                 className={

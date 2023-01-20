@@ -513,10 +513,7 @@ export class LoginSelector extends ClassComponent {
             <CWPopover
               trigger={
                 <div className="left-button">
-                  {render(User, {
-                    user: app.user.activeAccount,
-                    hideIdentityIcon: true,
-                  })}
+                  <User user={app.user.activeAccount} hideIdentityIcon />
                 </div>
               }
               content={

@@ -188,11 +188,7 @@ export class CreateComment extends ClassComponent<CreateCommmentAttrs> {
                   fontWeight="medium"
                   className="user-link-text"
                 >
-                  {render(User, {
-                    user: author,
-                    hideAvatar: true,
-                    linkify: true,
-                  })}
+                  <User user={author} hideAvatar linkify />
                 </CWText>
               </div>
               {error && <CWValidationText message={error} status="failure" />}
