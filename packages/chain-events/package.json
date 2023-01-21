@@ -9,7 +9,7 @@
   "main": "src/index.ts",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "rimraf dist/ && tsc --project tsconfig.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
+    "build": "rimraf dist/ && tsc --project tsconfig.src.json && copyfiles -u 1 \"./src/**/*.d.ts\" \"dist\"",
     "build-services": "tsc --project tsconfig.services.json && tsc-alias --project tsconfig.services.json",
     "compile-contracts": "cd eth && npx hardhat compile",
     "check-services-types": "tsc --noEmit --project tsconfig.services.json",
