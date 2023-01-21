@@ -33,6 +33,7 @@ const validateSupportAmount = (value: string): [ValidationStatus, string] => {
 
 export default class SupportCard extends ClassComponent<SupportCardAttrs> {
   private amount: string;
+  private isTokenApproved = false;
 
   async hasAcceptedTokenAllowance(
     projectId: string,
@@ -47,11 +48,12 @@ export default class SupportCard extends ClassComponent<SupportCardAttrs> {
 
   view(vnode: m.Vnode<SupportCardAttrs>) {
     const { project, supportType } = vnode.attrs;
-
-    const isTokenApproved = this.hasAcceptedTokenAllowance(
-      project.id,
-      project.token
-    );
+    this.hasAcceptedTokenAllowance(project.id, project.token).then((result) => {
+      if (this.isTokenApproved != result) {
+        this.isTokenApproved = result;
+        m.redraw();
+      }
+    });
 
     let headerText: string;
     let buttonLabel: string;
@@ -91,15 +93,19 @@ export default class SupportCard extends ClassComponent<SupportCardAttrs> {
               this.amount = e.target.value;
             }}
             tokenIconUrl={WethUrl}
+            disabled={!this.isTokenApproved}
           />
-          {isTokenApproved ? (
+          {this.isTokenApproved ? (
             <CWButton label={buttonLabel} onclick={onclick} />
           ) : (
             <CWButton
               label={'Approve'}
               onclick={() => {
-                app.projects.approveToken(project.id, project.token);
-                m.redraw();
+                app.projects
+                  .approveToken(project.id, project.token)
+                  .then(() => {
+                    m.redraw();
+                  });
               }}
             />
           )}
