@@ -264,7 +264,7 @@ function setupRouter(
   // community contract
   router.post(
     '/contract/community_template',
-    //passport.authenticate('jwt', { session: false }),
+    passport.authenticate('jwt', { session: false }),
     createCommunityContractTemplate.bind(this, models)
   );
   router.get(
