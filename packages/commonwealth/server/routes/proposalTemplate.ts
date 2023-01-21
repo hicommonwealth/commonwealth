@@ -1,6 +1,7 @@
 import { AppError } from 'common-common/src/errors';
 import { Request, Response } from 'express';
 import { DB } from '../models';
+import { CommunityContractTemplateAttributes } from '../models/community_contract_template';
 
 export async function createCommunityContractTemplate(
   models: DB,
@@ -15,24 +16,19 @@ export async function createCommunityContractTemplate(
       });
     }
 
-    const { community_id, contract_id, template_id } = req.body.contract;
-    if (!community_id || !contract_id || !template_id) {
+    const contractTemplate: CommunityContractTemplateAttributes = req.body.contract;
+    if (!contractTemplate) {
       return res.status(400).json({
         status: 'Failure',
         message: 'Must provide community_id, contract_id, and template_id',
       });
     }
 
-    const result = await models.sequelize.query(
-      `INSERT INTO CommunityContractTemplate (
-      community_id, 
-      contract_id, 
-      template_id
-    ) VALUES (:community_id, :contract_id, template_id)`
-    );
+    const created = await models.CommunityContractTemplate.create(contractTemplate);
 
-    return res.json({ status: 'Success', result });
+    return res.json({ status: 'Success', created });
   } catch (err) {
+    console.log({ err });
     throw new AppError('Error creating community contract template');
   }
 }

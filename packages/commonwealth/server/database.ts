@@ -52,6 +52,7 @@ import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
 import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
+import CommunityContractTemplate from './models/community_contract_template';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -80,7 +81,6 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   },
 });
 
-export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),
@@ -99,6 +99,7 @@ const models: Models = {
   CommunityBanner: CommunityBannerFactory(sequelize, DataTypes),
   CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
+  CommunityContractTemplate: CommunityContractTemplate(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),

@@ -50,6 +50,7 @@ import type { ViewCountModelStatic } from './models/viewcount';
 import type { VoteModelStatic } from './models/vote';
 import type { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
 import type { WebhookModelStatic } from './models/webhook';
+import type { CommunityContractTemplateStatic } from './models/community_contract_template';
 
 export type Models = {
   Address: AddressModelStatic;
@@ -65,6 +66,7 @@ export type Models = {
   Contract: ContractModelStatic;
   ContractAbi: ContractAbiModelStatic;
   CommunityContract: CommunityContractModelStatic;
+  CommunityContractTemplate: CommunityContractTemplateStatic;
   CommunityRole: CommunityRoleModelStatic;
   CommunitySnapshotSpaces: CommunitySnapshotSpaceModelStatic;
   Collaboration: CollaborationModelStatic;

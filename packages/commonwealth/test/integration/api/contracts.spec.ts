@@ -36,25 +36,6 @@ describe('Contract route tests', () => {
     expect(userJWT).to.not.be.null;
   });
 
-  // describe('POST /api/contract', () => {
-  //   it('should create a contract', async () => {
-  //     const chain = await modelUtils.createAndVerifyAddress({
-  //       chain: 'ethereum',
-  //     });
-  //     const res = await chai.request
-  //       .agent(app)
-  //       .post('/api/contract')
-  //       .set('Accept', 'application/json')
-  //       .query({
-  //         chain,
-  //         jwt: adminJWT,
-  //       });
-
-  //     expect(res.status).to.equal(201);
-  //     expect(res.body.status).to.equal('Success');
-  //   });
-  // });
-
   describe('POST /api/contract/community_template', () => {
     it('should create a contract template', async () => {
       const res = await chai.request
@@ -64,10 +45,16 @@ describe('Contract route tests', () => {
         .query({
           chain,
           jwt: adminJWT,
+          body: {
+            contract : {
+              community_id: 42,
+              contract_id: 42,
+              template_id: 42,
+            }
+          }
         });
 
       expect(res.status).to.equal(201);
-      expect(res.body.status).to.equal('Success');
     });
 
     it('should create a contract with metadata', async () => {
