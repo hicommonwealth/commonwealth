@@ -133,6 +133,9 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Typecheck
+        run: yarn check-types
+
       - name: Run unit tests
         run: yarn unit-test
 
