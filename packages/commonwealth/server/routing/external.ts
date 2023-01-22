@@ -1,5 +1,4 @@
 import {
-  PostProfilesReq,
   PostReactionsReq,
   PostRolesReq,
   PostRulesReq,

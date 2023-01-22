@@ -24,8 +24,8 @@ export type BaseTextInputAttrs = {
   defaultValue?: string | number;
   value?: string | number;
   iconRight?: IconName;
-  iconRightonclick?: (e: MouseEvent) => void;
-  inputValidationFn?: (value: string) => [ValidationStatus, string];
+  iconRightonclick?: () => void;
+  inputValidationFn?: (value: string) => [ValidationStatus, string] | [];
   label?: string;
   maxlength?: number;
   name?: string;

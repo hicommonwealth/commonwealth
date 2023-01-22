@@ -53,7 +53,6 @@ export default class WebWalletController {
       console.error('account must be active to set wallet id');
       return;
     }
-
     // do nothing on failure
     try {
       await $.post(`${app.serverUrl()}/setAddressWallet`, {
@@ -89,7 +88,6 @@ export default class WebWalletController {
       }
       // TODO: ensure that we can find any wallet, even if non-string accounts
       if (wallet.accounts.find((acc) => acc === account.address)) {
-        console.log(`Found wallet: ${wallet.name}`);
         await this._setWalletId(account, wallet.name);
         return wallet;
       }

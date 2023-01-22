@@ -28,9 +28,35 @@ class ContractsStore extends IdStore<Contract> {
     this._storeType[contract.type].splice(typeIndex, 1);
     return this;
   }
-
+  public getContractByNickname(nickname: string): Contract {
+    // filter through the _storeId map for a contract with a specified nickname
+    const contracts = this.getAll().filter((c) => c.nickname === nickname);
+    // if there is more than one contract with the same nickname, return the first one
+    if (contracts.length > 0) {
+      return contracts[0];
+    } else {
+      console.log('No contract found with nickname: ', nickname);
+      return null;
+    }
+  }
   public getContractByType(type: string): Array<Contract> {
     return this._storeType[type] || [];
+  }
+
+  public getCommunityContracts(): Array<Contract> {
+    // filter through the _storeId map for all contracts with a specified chain
+    return this.getAll();
+  }
+
+  public getContractFactories(): Array<Contract> {
+    // filter through the _storeId map for all contracts that are factories
+    const contractFactories = this.getAll().filter((c) => c.isFactory === true);
+    if (contractFactories.length > 0) {
+      return contractFactories;
+    } else {
+      console.log('No contract found with isFactory: ', true);
+      return [];
+    }
   }
 
   public getContractByAddress(address: string): Contract {

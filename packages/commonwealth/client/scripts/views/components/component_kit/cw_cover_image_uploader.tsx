@@ -66,6 +66,9 @@ export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUp
   ) {
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
 
+  async generateImage(prompt: string, vnode: m.Vnode<CoverImageUploaderAttrs>) {
+    const attachButton = document.querySelector('.attach-btn') as HTMLElement;
+
     try {
       const res = await $.post(`${app.serverUrl()}/generateImage`, {
         description: prompt,
@@ -96,7 +99,7 @@ export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUp
     }
   }
 
-  oncreate(vnode: m.Vnode<ICWCoverImageUploaderAttrs>) {
+  oncreate(vnode: m.Vnode<CoverImageUploaderAttrs>) {
     const attachZone = document.querySelector('.attach-zone') as HTMLElement;
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
     const pseudoInput = document.querySelector('#pseudo-input') as HTMLElement;
@@ -174,7 +177,7 @@ export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUp
     }
   }
 
-  view(vnode: m.Vnode<ICWCoverImageUploaderAttrs>) {
+  view(vnode: m.Vnode<CoverImageUploaderAttrs>) {
     const {
       imageURL,
       isUploading,

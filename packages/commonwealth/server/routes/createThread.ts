@@ -1,19 +1,19 @@
 import { AppError, ServerError } from 'common-common/src/errors';
 
-import { Action, PermissionError } from 'common-common/src/permissions';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from 'common-common/src/types';
+import { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { Action, PermissionError } from '../util/permissions';
 import {
   findAllRoles,
   isAddressPermitted,
 } from 'commonwealth/server/util/roles';
 import type { NextFunction, Request, Response } from 'express';
 import moment from 'moment';
-import type { TokenBalanceCache } from 'token-balance-cache/src/index';
 import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 import { getProposalUrl, renderQuillDeltaToText } from '../../shared/utils';
 import { sequelize } from '../database';
@@ -218,7 +218,7 @@ const createThread = async (
     chain.id,
     Action.CREATE_THREAD
   );
-  if (permission_error === PermissionError.NOT_PERMITTED) {
+  if (!permission_error) {
     return next(new AppError(PermissionError.NOT_PERMITTED));
   }
 
