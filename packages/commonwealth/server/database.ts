@@ -80,7 +80,6 @@ export const sequelize = new Sequelize(DATABASE_URI, {
   },
 });
 
-export const Address = AddressFactory(sequelize, DataTypes);
 const models: Models = {
   Address: AddressFactory(sequelize, DataTypes),
   Ban: BanFactory(sequelize, DataTypes),

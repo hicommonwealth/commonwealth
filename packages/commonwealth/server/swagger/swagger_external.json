@@ -1,0 +1,952 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "2.0.0",
+    "title": "Common API",
+    "description": "Apis to create or query entities"
+  },
+  "host": "localhost:3000",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "paths": {
+    "/threads": {
+      "get": {
+        "summary": "Returns a list of threads.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "community_id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the community."
+          },
+          {
+            "in": "query",
+            "name": "topic_id",
+            "type": "integer",
+            "description": "The ID of the topic."
+          },
+          {
+            "in": "query",
+            "name": "address_ids",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of address_ids."
+          },
+          {
+            "in": "query",
+            "name": "addresses",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of addresses."
+          },
+          {
+            "in": "query",
+            "name": "no_body",
+            "type": "boolean",
+            "description": "Exclude the body of the thread."
+          },
+          {
+            "in": "query",
+            "name": "include_comments",
+            "type": "boolean",
+            "description": "Also return associated comments with thread."
+          },
+          {
+            "in": "query",
+            "name": "count_only",
+            "type": "boolean",
+            "description": "Return only the number of entities found."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of threads."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/comments": {
+      "get": {
+        "summary": "Returns a list of comments.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "community_id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the community."
+          },
+          {
+            "in": "query",
+            "name": "address_ids",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of addresses that posted the comments."
+          },
+          {
+            "in": "query",
+            "name": "count_only",
+            "type": "boolean",
+            "description": "Return only the number of entities found."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of comments."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "put": {
+        "summary": "Creates comments.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "comments",
+            "description": "List of comment ids.",
+            "required": true,
+            "type": "object",
+            "properties": {
+              "comments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["address_id", "community_id", "text"],
+                  "properties": {
+                    "address_id": {
+                      "type": "integer"
+                    },
+                    "community_id": {
+                      "type": "string"
+                    },
+                    "text": {
+                      "type": "string"
+                    },
+                    "root_id": {
+                      "type": "string",
+                      "default": "discussion_${threadId}"
+                    },
+                    "parent_id": {
+                      "type": "integer",
+                      "default": "null"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes comments.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of comment ids."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/reactions": {
+      "get": {
+        "summary": "Returns a list of reactions.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "community_id",
+            "required": true,
+            "type": "string",
+            "description": "The ID of the community."
+          },
+          {
+            "in": "query",
+            "name": "thread_id",
+            "type": "integer",
+            "description": "The ID of the comment."
+          },
+          {
+            "in": "query",
+            "name": "comment_id",
+            "type": "integer",
+            "description": "The ID of the comment."
+          },
+          {
+            "in": "query",
+            "name": "address_ids",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of address_ids."
+          },
+          {
+            "in": "query",
+            "name": "addresses",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of addresses."
+          },
+          {
+            "in": "query",
+            "name": "count_only",
+            "type": "boolean",
+            "description": "Return only the number of entities found."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of reactions."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates reactions.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "reactions",
+            "description": "List of reactions to create.",
+            "required": true,
+            "type": "object",
+            "properties": {
+              "reactions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "address_id": {
+                      "type": "integer",
+                      "required": true
+                    },
+                    "community_id": {
+                      "type": "string",
+                      "required": true
+                    },
+                    "reaction": {
+                      "type": "string",
+                      "required": true,
+                      "default": "like"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes reactions.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of reaction ids."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/communities": {
+      "get": {
+        "summary": "Returns a list of communities.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "community_id",
+            "type": "string",
+            "description": "The ID of the community."
+          },
+          {
+            "in": "query",
+            "name": "network",
+            "type": "string",
+            "description": "The network the community runs on."
+          },
+          {
+            "in": "query",
+            "name": "comment_id",
+            "type": "integer",
+            "description": "The ID of the comment."
+          },
+          {
+            "in": "query",
+            "name": "address_ids",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of address_ids."
+          },
+          {
+            "in": "query",
+            "name": "addresses",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of addresses."
+          },
+          {
+            "in": "query",
+            "name": "count_only",
+            "type": "boolean",
+            "description": "Return only the number of entities found."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of communities."
+          },
+          "400": {
+            "description": "Please provide a parameter to query by (community_id, network, comment_id, address_ids, addresses)"
+          }
+        }
+      },
+      "put": {
+        "summary": "Creates communities.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "communities",
+            "description": "List of comment ids.",
+            "required": true,
+            "type": "object",
+            "properties": {
+              "comments": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer",
+                      "required": true
+                    },
+                    "name": {
+                      "type": "string",
+                      "required": true
+                    },
+                    "chain_node_id": {
+                      "type": "string",
+                      "required": true
+                    },
+                    "default_symbol": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "icon_url": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "network": {
+                      "type": "string",
+                      "default": "erc20"
+                    },
+                    "description": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "type": {
+                      "type": "string",
+                      "default": "token"
+                    },
+                    "website": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "discrod": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "telegram": {
+                      "type": "string",
+                      "default": ""
+                    },
+                    "github": {
+                      "type": "string",
+                      "default": ""
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/profiles": {
+      "get": {
+        "summary": "Returns a list of profiles.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "addresses",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of addresses."
+          },
+          {
+            "in": "query",
+            "name": "profile_ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of profile ids."
+          },
+          {
+            "in": "query",
+            "name": "count_only",
+            "type": "boolean",
+            "description": "Return only the number of entities found."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of profiles."
+          },
+          "400": {
+            "description": "Please provide a parameter to query by (addresses, profile_ids)"
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates profiles.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "profiles",
+            "description": "List of profiles to create.",
+            "required": true,
+            "type": "object",
+            "properties": {
+              "profiles": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": {
+                      "type": "integer",
+                      "required": true
+                    },
+                    "profile_name": {
+                      "type": "string",
+                      "default": null
+                    },
+                    "email": {
+                      "type": "integer",
+                      "default": null
+                    },
+                    "website": {
+                      "type": "string",
+                      "default": null
+                    },
+                    "bio": {
+                      "type": "string",
+                      "default": null
+                    },
+                    "avatar_url": {
+                      "type": "string",
+                      "default": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/topics": {
+      "get": {
+        "summary": "Returns a list of topics.",
+        "parameters": [
+          {
+            "name": "community_id",
+            "in": "query",
+            "type": "string",
+            "description": "The ID of the community."
+          },
+          {
+            "name": "count_only",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of topics."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates topics.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "topics",
+            "description": "List of topics to create.",
+            "required": true,
+            "type": "object",
+            "properties": {
+              "topics": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "community_id": {
+                      "type": "string",
+                      "required": true
+                    },
+                    "name": {
+                      "type": "string",
+                      "required": true
+                    },
+                    "description": {
+                      "type": "string",
+                      "default": null
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes topics.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of topic ids."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/roles": {
+      "get": {
+        "summary": "Returns a list of roles.",
+        "parameters": [
+          {
+            "name": "community_id",
+            "in": "query",
+            "type": "string",
+            "description": "The ID of the community."
+          },
+          {
+            "in": "query",
+            "name": "addresses",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of addresses."
+          },
+          {
+            "name": "count_only",
+            "in": "query",
+            "type": "string",
+            "description": "Return only the number of entities found."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of roles."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Deletes roles.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "jwt",
+            "description": "The jwt token of the user.",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "in": "body",
+            "name": "ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of role ids."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/rules": {
+      "get": {
+        "summary": "Returns a list of rules.",
+        "parameters": [
+          {
+            "name": "community_id",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "ids",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "count_only",
+            "in": "query",
+            "type": "string",
+            "description": "Return only the number of entities found."
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "type": "integer"
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of rules."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      },
+      "post": {
+        "summary": "Creates rules.",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "rules",
+            "description": "List of rules to create.",
+            "required": true,
+            "type": "object",
+            "properties": {
+              "rules": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "community_id": {
+                      "type": "string",
+                      "required": true
+                    },
+                    "rule": {
+                      "type": "string",
+                      "required": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of potential errors (may be empty)."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/chainNodes": {
+      "get": {
+        "summary": "Returns a list of chain nodes.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "chain_node_ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of chain node ids."
+          },
+          {
+            "in": "query",
+            "name": "names",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of chain node names."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of chain nodes."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/balanceProviders": {
+      "get": {
+        "summary": "Returns a list of balance providers.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "chain_node_ids",
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "List of chain node ids."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of balance providers."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
+    "/tokenBalance": {
+      "get": {
+        "summary": "Returns a list of token balances.",
+        "parameters": [
+          {
+            "name": "chain_node_id",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "addresses",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "balance_provider",
+            "in": "query",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "opts",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of token balances for provided addresses."
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    }
+  }
+}
