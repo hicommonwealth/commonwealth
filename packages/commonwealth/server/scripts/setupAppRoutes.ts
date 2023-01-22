@@ -1,15 +1,14 @@
 import cheerio from 'cheerio';
 import { ChainBase, ChainNetwork, ProposalType } from 'common-common/src/types';
-import fs from 'fs';
 import { DEFAULT_COMMONWEALTH_LOGO } from '../config';
 import type { DB } from '../models';
 import type { ChainInstance } from '../models/chain';
 import { factory, formatFilename } from 'common-common/src/logging';
 
+const log = factory.getLogger(formatFilename(__filename));
+
 const NO_CLIENT_SERVER = process.env.NO_CLIENT === 'true';
 const DEV = process.env.NODE_ENV !== 'production';
-
-const log = factory.getLogger(formatFilename(__filename));
 
 function cleanMalformedUrl(str: string) {
   return str.replace(/.*(https:\/\/.*https:\/\/)/, '$1');
@@ -37,13 +36,10 @@ const setupAppRoutes = (
   log.info('setupAppRoutes');
   // Development: serve everything through devMiddleware
   if (DEV) {
-    // Development: serve everything through devMiddleware
-    if (!process.env.EXTERNAL_WEBPACK) {
-      app.get('*', (req, res, next) => {
-        req.url = '/build/';
-        devMiddleware(req, res, next);
-      });
-    }
+    app.get('*', (req, res, next) => {
+      req.url = '/build/';
+      devMiddleware(req, res, next);
+    });
     return;
   }
 

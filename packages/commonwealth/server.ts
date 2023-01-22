@@ -13,7 +13,6 @@ import session from 'express-session';
 import fs from 'fs';
 import logger from 'morgan';
 import passport from 'passport';
-import * as path from 'path';
 import prerenderNode from 'prerender-node';
 import type { BrokerConfig } from 'rascal';
 import Rollbar from 'rollbar';
@@ -84,7 +83,16 @@ async function main() {
   const WITH_PRERENDER = process.env.WITH_PRERENDER;
   const NO_PRERENDER = process.env.NO_PRERENDER || NO_CLIENT_SERVER;
 
+  const compiler = DEV
+    ? webpack(devWebpackConfig as any)
+    : webpack(prodWebpackConfig as any);
   const SequelizeStore = SessionSequelizeStore(session.Store);
+  const devMiddleware =
+    DEV && !NO_CLIENT_SERVER
+      ? webpackDevMiddleware(compiler as any, {
+          publicPath: '/build',
+        })
+      : null;
   const viewCountCache = new ViewCountCache(2 * 60, 10 * 60);
 
   const sessionStore = new SequelizeStore({
@@ -121,6 +129,32 @@ async function main() {
 
     // dynamic compression settings used
     app.use(compression());
+
+    // static compression settings unused
+    // app.get('*.js', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'application/javascript; charset=UTF-8');
+    //   next();
+    // });
+
+    // // static compression settings unused
+    // app.get('bundle.**.css', (req, res, next) => {
+    //   req.url = req.url + '.gz';
+    //   res.set('Content-Encoding', 'gzip');
+    //   res.set('Content-Type', 'text/css');
+    //   next();
+    // });
+
+    // serve the compiled app
+    if (!NO_CLIENT_SERVER) {
+      if (DEV) {
+        app.use(devMiddleware);
+        app.use(webpackHotMiddleware(compiler));
+      } else {
+        app.use('/build', express.static('build'));
+      }
+    }
 
     // add security middleware
     app.use(function applyXFrameAndCSP(req, res, next) {
@@ -206,34 +240,6 @@ async function main() {
 
   // TODO: should we await this? it will block server startup -- but not a big deal locally
   if (!NO_GLOBAL_ACTIVITY_CACHE) await globalActivityCache.start();
-
-  let compiler;
-  try {
-    compiler = DEV
-      ? webpack(devWebpackConfig as any)
-      : webpack(prodWebpackConfig as any);
-  } catch (e) {
-    console.log(e);
-  }
-  const devMiddleware = webpackDevMiddleware(compiler as any, {
-    publicPath: '/build',
-  });
-
-  // serve the compiled app
-  if (!NO_CLIENT_SERVER) {
-    if (DEV && !process.env.EXTERNAL_WEBPACK) {
-      app.use(devMiddleware);
-      app.use(webpackHotMiddleware(compiler));
-    } else if (process.env.EXTERNAL_WEBPACK) {
-      app.use('/build', express.static(path.join(__dirname, 'build')));
-
-      app.get('/', function (req, res) {
-        res.sendFile(path.join(__dirname, 'build', 'index.html'));
-      });
-    } else {
-      app.use('/', express.static('build'));
-    }
-  }
 
   // Declare Validation Middleware Service
   // middleware to use for all requests
