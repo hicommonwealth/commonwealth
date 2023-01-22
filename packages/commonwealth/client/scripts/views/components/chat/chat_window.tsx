@@ -3,7 +3,6 @@
 import { MixpanelChatEvents } from 'analytics/types';
 import ClassComponent from 'class_component';
 
-import { Action } from 'common-common/src/permissions';
 import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { isActiveAddressPermitted } from 'controllers/server/roles';
 import { mixpanelBrowserTrack } from 'helpers/mixpanel_browser_util';
@@ -13,6 +12,8 @@ import { AddressInfo } from 'models';
 import moment from 'moment';
 
 import 'pages/chat.scss';
+
+import { Action } from 'commonwealth/server/util/permissions';
 import app from 'state';
 import { WebsocketMessageNames } from 'types';
 import User from 'views/components/widgets/user';
