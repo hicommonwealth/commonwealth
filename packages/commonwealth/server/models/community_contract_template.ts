@@ -18,13 +18,17 @@ export default (
   sequelize: Sequelize.Sequelize,
   dataTypes: typeof DataTypes
 ): CommunityContractTemplateStatic => {
-  const CommunityContractTemplate = <CommunityContractTemplateStatic>
+  const CommunityContractTemplate = <CommunityContractTemplateStatic>(
     sequelize.define(
       'CommunityContractTemplate',
       {
         community_id: { type: dataTypes.STRING, allowNull: false },
         contract_id: { type: dataTypes.INTEGER, allowNull: false },
-        template_id: { type: dataTypes.INTEGER, allowNull: false, primaryKey: true },
+        template_id: {
+          type: dataTypes.INTEGER,
+          allowNull: false,
+          primaryKey: true,
+        },
       },
       {
         tableName: 'CommunityContractTemplate',
@@ -32,6 +36,7 @@ export default (
         timestamps: false,
       }
     )
+  );
 
   return CommunityContractTemplate;
 };

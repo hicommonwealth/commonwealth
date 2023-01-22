@@ -238,7 +238,7 @@ function setupRouter(
   router.post('/getAddressStatus', getAddressStatus.bind(this, models));
   router.post(
     '/selectChain',
-    passport.authenticate('jwt', {session: false}),
+    passport.authenticate('jwt', { session: false }),
     selectChain.bind(this, models)
   );
 
@@ -287,22 +287,21 @@ function setupRouter(
     '/contract/community_template/metadata',
     passport.authenticate('jwt', { session: false }),
     createCommunityContractTemplateMetadata.bind(this, models)
-  )
+  );
   router.get(
     '/contract/community_template/metadata',
     getCommunityContractTemplateMetadata.bind(this, models)
-  )
+  );
   router.put(
     '/contract/community_template/metadata',
     passport.authenticate('jwt', { session: false }),
     updateCommunityContractTemplateMetadata.bind(this, models)
-  )
+  );
   router.delete(
     '/contract/community_template/metadata',
     passport.authenticate('jwt', { session: false }),
     deleteCommunityContractTemplateMetadata.bind(this, models)
-  )
-
+  );
 
   router.post(
     '/starCommunity',
