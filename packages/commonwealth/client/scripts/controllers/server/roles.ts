@@ -1,32 +1,33 @@
-import type { Action, Permissions } from 'common-common/src/permissions';
-import {
-  BASE_PERMISSIONS,
-  computePermissions,
-  isPermitted,
-} from 'common-common/src/permissions';
-import { aggregatePermissions } from 'commonwealth/shared/utils';
 import $ from 'jquery';
-import type { AddressInfo, ChainInfo, RoleInfo } from 'models';
-import { Account, RolePermission } from 'models';
 import app from 'state';
-import type { UserController } from './user';
 
-const getPermissionLevel = (permission: RolePermission | undefined) => {
-  switch (permission) {
-    case undefined:
-      return 0;
-    case RolePermission.member:
-      return 1;
-    case RolePermission.moderator:
-      return 2;
-    case RolePermission.admin:
-      return 3;
-    default:
-      return 4;
+import {
+  AddressInfo,
+  RoleInfo,
+  Account,
+  ChainInfo,
+} from 'models';
+import { aggregatePermissions } from 'commonwealth/shared/utils';
+import {
+  Action,
+  AccessLevel,
+  PermissionManager,
+  ToCheck,
+  everyonePermissions,
+} from 'commonwealth/server/util/permissions';
+import { RoleObject } from 'commonwealth/shared/types';
+import { UserController } from './user';
+
+const getPermissionLevel = (permission: AccessLevel | undefined) => {
+  if (permission === undefined) {
+    return AccessLevel.Everyone;
   }
-};
+  return permission;
+}
 
 export class RolesController {
+  private permissionManager = new PermissionManager();
+
   constructor(public readonly User: UserController) {}
 
   private _roles: RoleInfo[] = [];
@@ -254,7 +255,7 @@ export class RolesController {
     const adminRole = this.roles.find((role) => {
       return (
         role.address === this.User.activeAccount.address &&
-        role.permission === RolePermission.admin &&
+        role.permission === AccessLevel.Admin &&
         options.chain &&
         role.chain_id === options.chain
       );
@@ -317,11 +318,7 @@ export function isActiveAddressPermitted(
   );
 
   // populate permission assignment array with role allow and deny permissions
-  const roles: Array<{
-    permission: RolePermission;
-    allow: Permissions;
-    deny: Permissions;
-  }> = chainRoles.map((r) => {
+  const roles: Array<RoleObject> = chainRoles.map((r) => {
     const communityRole = chain_info.communityRoles.find(
       (cr) => cr.name === r.permission
     );
@@ -337,23 +334,27 @@ export function isActiveAddressPermitted(
       allow: chain_info.defaultAllowPermissions,
       deny: chain_info.defaultDenyPermissions,
     });
-    if (!isPermitted(permission, action)) {
+    if (!this.permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
     return true;
+
   }
   // If no roles are given for the chain, compute permissions with chain default permissions
   else {
     // compute permissions with chain default permissions
-    const permission = computePermissions(BASE_PERMISSIONS, [
+    const permission =
+      this.permissionsManager.computePermissions(
+        everyonePermissions, [
       {
         allow: chain_info.defaultAllowPermissions,
         deny: chain_info.defaultDenyPermissions,
       },
     ]);
-    if (!isPermitted(permission, action)) {
+    if (!this.permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
     return true;
+
   }
 }
