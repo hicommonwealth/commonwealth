@@ -53,6 +53,7 @@ import VoteFactory from './models/vote';
 import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
 import CommunityContractTemplate from './models/community_contract_template';
+import CommunityContractMetadata from './models/community_contract_metadata';
 import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -100,6 +101,7 @@ const models: Models = {
   CommunityRole: CommunityRoleFactory(sequelize, DataTypes),
   CommunitySnapshotSpaces: CommunitySnapshotSpaceFactory(sequelize, DataTypes),
   CommunityContractTemplate: CommunityContractTemplate(sequelize, DataTypes),
+  CommunityContractMetadata: CommunityContractMetadata(sequelize, DataTypes),
   DiscussionDraft: DiscussionDraftFactory(sequelize, DataTypes),
   DiscordBotConfig: DiscordBotConfigFactory(sequelize, DataTypes),
   IdentityCache: IdentityCacheFactory(sequelize, DataTypes),

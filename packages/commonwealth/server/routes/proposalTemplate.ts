@@ -2,6 +2,7 @@ import { AppError } from 'common-common/src/errors';
 import { Request, Response } from 'express';
 import { DB } from '../models';
 import { CommunityContractTemplateAttributes } from '../models/community_contract_template';
+import { CommunityContractMetadataAttributes } from '../models/community_contract_metadata';
 
 export async function createCommunityContractTemplate(
   models: DB,
@@ -29,8 +30,7 @@ export async function createCommunityContractTemplate(
       contractTemplate
     );
 
-
-    return res.status(201).json({ status: 'Success', created });
+    return res.status(201).json({ status: 'Success', data: created });
   } catch (err) {
     throw new AppError(
       'Unkown Server error creating community contract template'
@@ -60,7 +60,6 @@ export async function getCommunityContractTemplate(
       });
     }
 
-
     const contract = await models.CommunityContractTemplate.findOne({
       where: {
         template_id: contractTemplate.template_id,
@@ -74,7 +73,7 @@ export async function getCommunityContractTemplate(
       });
     }
 
-    return res.status(200).json({ status: 'Success', contract });
+    return res.status(200).json({ status: 'Success', data: contract });
   } catch (err) {
     throw new AppError('Error getting community contract template');
   }
@@ -93,23 +92,32 @@ export async function updateCommunityContractTemplate(
       });
     }
 
-    const { community_id, contract_id, template_id } = req.body.contract;
-    if (!community_id || !contract_id || !template_id) {
+    const contractTemplate: CommunityContractTemplateAttributes =
+      req.body.contract;
+
+    if (!contractTemplate) {
       return res.status(400).json({
         status: 'Failure',
         message: 'Must provide community_id, contract_id, and template_id',
       });
     }
 
-    const result = await models.sequelize.query(
-      `UPDATE CommunityContractTemplate SET
-      community_id = :community_id, 
-      contract_id = :contract_id, 
-      template_id = :template_id
-      WHERE community_id = :community_id AND contract_id = :contract_id`
-    );
+    const contract = await models.CommunityContractTemplate.findOne({
+      where: {
+        template_id: contractTemplate.template_id,
+      },
+    });
 
-    return res.json({ status: 'Success', result });
+    if (!contract) {
+      return res.status(404).json({
+        status: 'Failure',
+        message: 'Template not found',
+      });
+    }
+
+    const updated = await contract.update(contractTemplate);
+
+    return res.status(200).json({ status: 'Success', data: updated });
   } catch (err) {
     throw new AppError('Error updating community contract template');
   }
@@ -121,20 +129,39 @@ export async function deleteCommunityContractTemplate(
   res: Response
 ) {
   try {
-    const { community_id, contract_id } = req.body.contract;
-    if (!community_id || !contract_id) {
+    if (!req.body) {
       return res.status(400).json({
         status: 'Failure',
-        message: 'Must provide community_id and contract_id',
+        message: 'Must provide contract template',
       });
     }
 
-    const result = await models.sequelize.query(
-      `DELETE FROM CommunityContractTemplate 
-      WHERE community_id = :community_id AND contract_id = :contract_id`
-    );
+    const contractTemplate: CommunityContractTemplateAttributes =
+      req.body.contract;
 
-    return res.status(201).json({ status: 'Success', result });
+    if (!contractTemplate) {
+      return res.status(400).json({
+        status: 'Failure',
+        message: 'Must provide community_id, contract_id, and template_id',
+      });
+    }
+
+    const contract = await models.CommunityContractTemplate.findOne({
+      where: {
+        template_id: contractTemplate.template_id,
+      },
+    });
+
+    if (!contract) {
+      return res.status(404).json({
+        status: 'Failure',
+        message: 'Template not found',
+      });
+    }
+
+    await contract.destroy();
+
+    return res.status(200).json({ status: 'Success', data: contract });
   } catch (err) {
     throw new AppError('Error deleting community contract template');
   }
@@ -146,33 +173,31 @@ export async function createCommunityContractTemplateMetadata(
   res: Response
 ) {
   try {
+    console.log('createCommunityContractTemplateMetadata');
     if (!req.body) {
       return res.status(400).json({
         status: 'Failure',
         message: 'Must provide contract template metadata',
       });
     }
-    const { cct_id, slug, nickname, display_name, display_options } =
-      req.body.contract;
-    if (!cct_id || !slug || !nickname || !display_name || !display_options) {
+
+    const contractTemplateMetadata: CommunityContractMetadataAttributes =
+      req.body.contractMetadata;
+
+    console.log('contractTemplateMetadata', contractTemplateMetadata);
+
+    if (!contractTemplateMetadata) {
       return res.status(400).json({
         status: 'Failure',
-        message:
-          'Must provide cct_id, slug, nickname, display_name, and display_options',
+        message: 'Must provide community_id, contract_id, and template_id',
       });
     }
 
-    const result = await models.sequelize.query(
-      `INSERT INTO CommunityContractTemplateMetadata (
-      cct_id,
-      slug,
-      nickname,
-      display_name,
-      display_options
-    ) VALUES (:cct_id, :slug, :nickname, :display_name, :display_options)`
+    const created = await models.CommunityContractMetadata.create(
+      contractTemplateMetadata
     );
 
-    return res.json({ status: 'Success', result });
+    return res.status(201).json({ status: 'Success', data: created });
   } catch (err) {
     throw new AppError('Error creating community contract template metadata');
   }
@@ -184,7 +209,7 @@ export async function getCommunityContractTemplateMetadata(
   res: Response
 ) {
   try {
-    const { cct_id } = req.body.contract;
+    const { cct_id } = req.body.contractMetadata;
     if (!cct_id) {
       return res.status(400).json({
         status: 'Failure',
@@ -192,12 +217,13 @@ export async function getCommunityContractTemplateMetadata(
       });
     }
 
-    const result = await models.sequelize.query(
-      `SELECT * FROM CommunityContractTemplateMetadata 
-      WHERE cct_id = :cct_id`
-    );
+    const contract = await models.CommunityContractMetadata.findOne({
+      where: {
+        cct_id,
+      },
+    });
 
-    return res.json({ status: 'Success', result });
+    return res.status(200).json({ status: 'Success', data: contract });
   } catch (err) {
     throw new AppError('Error getting community contract template metadata');
   }
@@ -215,28 +241,31 @@ export async function updateCommunityContractTemplateMetadata(
         message: 'Must provide contract template metadata',
       });
     }
-    const { cct_id, slug, nickname, display_name, display_options } =
-      req.body.contract;
 
-    if (!cct_id || !slug || !nickname || !display_name || !display_options) {
+    const contractTemplateMetadata: CommunityContractMetadataAttributes =
+      req.body.contractMetadata;
+
+    if (!contractTemplateMetadata) {
       return res.status(400).json({
         status: 'Failure',
-        message:
-          'Must provide cct_id, slug, nickname, display_name, and display_options',
+        message: 'Must provide community_id, contract_id, and template_id',
       });
     }
 
-    const result = await models.sequelize.query(
-      `UPDATE CommunityContractTemplateMetadata SET
-      cct_id = :cct_id,
-      slug = :slug,
-      nickname = :nickname,
-      display_name = :display_name,
-      display_options = :display_options
-      WHERE cct_id = :cct_id`
-    );
+    const contract = await models.CommunityContractMetadata.findOne({
+      where: {
+        cct_id: contractTemplateMetadata.cct_id,
+      },
+    });
 
-    return res.json({ status: 'Success', result });
+    if (!contract) {
+      return res.status(404).json({
+        status: 'Failure',
+        message: 'Template not found',
+      });
+    }
+
+    return res.json({ status: 'Success', data: contract });
   } catch (err) {
     throw new AppError('Error updating community contract template metadata');
   }
@@ -248,20 +277,39 @@ export async function deleteCommunityContractTemplateMetadata(
   res: Response
 ) {
   try {
-    const { cct_id } = req.body.contract;
-    if (!cct_id) {
+    if (!req.body) {
       return res.status(400).json({
         status: 'Failure',
-        message: 'Must provide cct_id',
+        message: 'Must provide contract template metadata',
       });
     }
 
-    const result = await models.sequelize.query(
-      `DELETE FROM CommunityContractTemplateMetadata 
-      WHERE cct_id = :cct_id`
-    );
+    const contractTemplateMetadata: CommunityContractMetadataAttributes =
+      req.body.contractMetadata;
 
-    return res.json({ status: 'Success', result });
+    if (!contractTemplateMetadata) {
+      return res.status(400).json({
+        status: 'Failure',
+        message: 'Must provide community_id, contract_id, and template_id',
+      });
+    }
+
+    const contract = await models.CommunityContractMetadata.findOne({
+      where: {
+        cct_id: contractTemplateMetadata.cct_id,
+      },
+    });
+
+    if (!contract) {
+      return res.status(404).json({
+        status: 'Failure',
+        message: 'Template not found',
+      });
+    }
+
+    await contract.destroy();
+
+    return res.json({ status: 'Success', data: contract });
   } catch (err) {
     throw new AppError('Error deleting community contract template metadata');
   }

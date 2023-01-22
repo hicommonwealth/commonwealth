@@ -7,7 +7,7 @@ module.exports = {
         type: Sequelize.STRING,
         primaryKey: true,
       },
-      Slug: {
+      slug: {
         type: Sequelize.STRING,
         allowNull: false,
       },

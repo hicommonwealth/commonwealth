@@ -17,6 +17,14 @@ type Contract = {
   template_id: number;
 };
 
+type ContractMetadata = {
+  cct_id: string;
+  slug: string;
+  nickname: string;
+  display_name: string;
+  display_options: string;
+};
+
 function generateRandomString(): string {
   return Math.random().toString(36).substring(2, 15);
 }
@@ -57,7 +65,7 @@ describe('Contract route tests', () => {
         community_id: generateRandomString(),
         contract_id: generateRandomNumber(),
         template_id: generateRandomNumber(),
-      }
+      };
       const res = await chai.request
         .agent(app)
         .post('/api/contract/community_template')
@@ -76,7 +84,7 @@ describe('Contract route tests', () => {
         community_id: generateRandomString(),
         contract_id: generateRandomNumber(),
         template_id: generateRandomNumber(),
-      }
+      };
       const postResponse = await chai.request
         .agent(app)
         .post('/api/contract/community_template')
@@ -86,7 +94,6 @@ describe('Contract route tests', () => {
           jwt: adminJWT,
         })
         .send({ contract });
-
 
       expect(postResponse.status).to.equal(201);
 
@@ -99,7 +106,7 @@ describe('Contract route tests', () => {
           jwt: adminJWT,
         })
         .send({ contract });
-        
+
       expect(getResponse.status).to.equal(200);
       expect(getResponse.body.status).to.equal('Success');
     });
@@ -109,7 +116,7 @@ describe('Contract route tests', () => {
         community_id: generateRandomString(),
         contract_id: generateRandomNumber(),
         template_id: generateRandomNumber(),
-      }
+      };
       //post the contract template
       const postResponse = await chai.request
         .agent(app)
@@ -121,7 +128,6 @@ describe('Contract route tests', () => {
         })
         .send({ contract });
 
-      console.log('postResponse', postResponse.body);
       expect(postResponse.status).to.equal(201);
 
       contract.community_id = 'new_community_id';
@@ -136,11 +142,9 @@ describe('Contract route tests', () => {
         })
         .send({ contract });
 
-        console.log('res', res.body);
-
-      expect(res.status).to.equal(201);
+      expect(res.status).to.equal(200);
       expect(res.body.status).to.equal('Success');
-      expect(res.body.result.template_id).to.equal(contract.template_id);
+      expect(res.body.data.template_id).to.equal(contract.template_id);
     });
 
     it('should delete a contract template', async () => {
@@ -148,7 +152,7 @@ describe('Contract route tests', () => {
         community_id: generateRandomString(),
         contract_id: generateRandomNumber(),
         template_id: generateRandomNumber(),
-      }
+      };
       const postResponse = await chai.request
         .agent(app)
         .post('/api/contract/community_template')
@@ -158,8 +162,6 @@ describe('Contract route tests', () => {
           jwt: adminJWT,
         })
         .send({ contract });
-
-      console.log('postResponse!!!!', postResponse.body);
 
       expect(postResponse.status).to.equal(201);
 
@@ -173,88 +175,78 @@ describe('Contract route tests', () => {
         })
         .send({ contract });
 
-        console.log('res!!!!', res.body);
-
-      expect(res.status).to.equal(201);
-      expect(res.body.status).to.equal('Success');
-    });
-
-    it('should create a contract with metadata', async () => {
-      const res = await chai.request
-        .agent(app)
-        .post('/api/contract/template')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: adminJWT,
-        });
-
-      expect(res.status).to.equal(201);
-      expect(res.body.status).to.equal('Success');
-    });
-  });
-
-  describe('POST /api/contract/template/metadata', () => {
-    it('should create a contract template metadata', async () => {
-      const res = await chai.request
-        .agent(app)
-        .post('/api/contract/template/metadata')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: adminJWT,
-        });
-
-      expect(res.status).to.equal(201);
-      expect(res.body.status).to.equal('Success');
-    });
-  });
-
-  describe('DELETE /api/contract/template/metadata', () => {
-    it('should delete a contract template metadata', async () => {
-      const res = await chai.request
-        .agent(app)
-        .delete('/api/contract/template/metadata')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: adminJWT,
-        });
-
       expect(res.status).to.equal(200);
       expect(res.body.status).to.equal('Success');
     });
-  });
 
-  describe('DELETE /api/contract/template', () => {
-    it('should delete a contract template', async () => {
-      const res = await chai.request
-        .agent(app)
-        .delete('/api/contract/template')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: adminJWT,
-        });
+    describe('/api/contract/community_template/metadata', () => {
+      const contractMetadata: ContractMetadata = {
+        cct_id: generateRandomString(),
+        slug: generateRandomString(),
+        nickname: generateRandomString(),
+        display_name: generateRandomString(),
+        display_options: generateRandomString(),
+      };
 
-      expect(res.status).to.equal(200);
-      expect(res.body.status).to.equal('Success');
-    });
-  });
+      it('should create a contract with metadata', async () => {
+        const res = await chai.request
+          .agent(app)
+          .post('/api/contract/community_template/metadata')
+          .set('Accept', 'application/json')
+          .query({
+            chain,
+            jwt: adminJWT,
+          })
+          .send({ contractMetadata });
 
-  describe('DELETE /api/contract', () => {
-    it('should delete a contract', async () => {
-      const res = await chai.request
-        .agent(app)
-        .delete('/api/contract')
-        .set('Accept', 'application/json')
-        .query({
-          chain,
-          jwt: adminJWT,
-        });
+        expect(res.status).to.equal(201);
+        expect(res.body.status).to.equal('Success');
+      });
 
-      expect(res.status).to.equal(200);
-      expect(res.body.status).to.equal('Success');
+      it('should get a contract with metadata', async () => {
+        const res = await chai.request
+          .agent(app)
+          .get('/api/contract/community_template/metadata')
+          .set('Accept', 'application/json')
+          .query({
+            chain,
+            jwt: adminJWT,
+          })
+          .send({ contractMetadata });
+
+        expect(res.status).to.equal(200);
+        expect(res.body.status).to.equal('Success');
+      });
+
+      it('should update a contract with metadata', async () => {
+        const res = await chai.request
+          .agent(app)
+          .put('/api/contract/community_template/metadata')
+          .set('Accept', 'application/json')
+          .query({
+            chain,
+            jwt: adminJWT,
+          })
+          .send({ contractMetadata });
+
+        expect(res.status).to.equal(200);
+        expect(res.body.status).to.equal('Success');
+      });
+
+      it('should delete a contract with metadata', async () => {
+        const res = await chai.request
+          .agent(app)
+          .delete('/api/contract/community_template/metadata')
+          .set('Accept', 'application/json')
+          .query({
+            chain,
+            jwt: adminJWT,
+          })
+          .send({ contractMetadata });
+
+        expect(res.status).to.equal(200);
+        expect(res.body.status).to.equal('Success');
+      });
     });
   });
 });
