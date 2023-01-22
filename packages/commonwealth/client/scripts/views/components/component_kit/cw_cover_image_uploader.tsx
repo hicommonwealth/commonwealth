@@ -66,9 +66,6 @@ export default class CWCoverImageUploader extends ClassComponent<ICWCoverImageUp
   ) {
     const attachButton = document.querySelector('.attach-btn') as HTMLElement;
 
-  async generateImage(prompt: string, vnode: m.Vnode<CoverImageUploaderAttrs>) {
-    const attachButton = document.querySelector('.attach-btn') as HTMLElement;
-
     try {
       const res = await $.post(`${app.serverUrl()}/generateImage`, {
         description: prompt,
