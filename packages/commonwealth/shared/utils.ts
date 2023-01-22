@@ -4,14 +4,13 @@ import {
   decodeAddress,
   encodeAddress,
 } from '@polkadot/util-crypto';
-import type { Permissions } from 'common-common/src/permissions';
 import {
-  BASE_PERMISSIONS,
-  computePermissions,
-} from 'common-common/src/permissions';
-
+  AccessLevel,
+  PermissionManager,
+  everyonePermissions,
+} from '../server/util/permissions';
+import { RoleObject } from './types';
 import { ProposalType } from 'common-common/src/types';
-import type { Permission } from '../server/models/role';
 
 export const getNextPollEndingTime = (now) => {
   // Offchain polls should be open until 1st or 15th of the month,
@@ -140,10 +139,10 @@ export const smartTrim = (text, maxLength = 200) => {
 export const validURL = (str) => {
   const pattern = new RegExp(
     '^(https?:\\/\\/)?' + // protocol
-      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
-      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
-      '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
-      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+    '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+    '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+    '(\\:\\d+)?(\\/[-a-z\\d%_.~+:@]*)*' + // port and path
+    '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
       '(\\#[-a-z\\d_]*)?$',
     'i'
   ); // fragment locator
@@ -297,18 +296,18 @@ export const addressSwapper = (options: {
   }
 };
 
-type RoleObject = {
-  permission: Permission;
-  allow: Permissions;
-  deny: Permissions;
-};
 
 export function aggregatePermissions(
   roles: RoleObject[],
-  chain_permissions: { allow: Permissions; deny: Permissions }
+  chain_permissions: { allow: bigint; deny: bigint }
 ) {
-  // sort roles by roles with highest permissions last
-  const ORDER: Permission[] = ['member', 'moderator', 'admin'];
+  const permissionsManager = new PermissionManager();
+
+  const ORDER: AccessLevel[] = [
+    AccessLevel.Member,
+    AccessLevel.Moderator,
+    AccessLevel.Admin,
+  ];
 
   function compare(o1: RoleObject, o2: RoleObject) {
     return ORDER.indexOf(o1.permission) - ORDER.indexOf(o2.permission);
@@ -317,16 +316,16 @@ export function aggregatePermissions(
   roles = roles.sort(compare);
 
   const permissionsAllowDeny: Array<{
-    allow: Permissions;
-    deny: Permissions;
-  }> = roles;
+    allow: bigint;
+    deny: bigint;
+  }> = roles.map(({allow, deny}) => ({allow, deny}));
 
   // add chain default permissions to beginning of permissions array
   permissionsAllowDeny.unshift(chain_permissions);
 
   // compute permissions
-  const permission: bigint = computePermissions(
-    BASE_PERMISSIONS,
+  const permission: bigint = permissionsManager.computePermissions(
+    everyonePermissions,
     permissionsAllowDeny
   );
   return permission;
