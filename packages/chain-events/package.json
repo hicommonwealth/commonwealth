@@ -20,7 +20,6 @@
     "integration-test": "cd eth && hardhat test ../test/integration/*.spec.ts",
     "test-services": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/*.test.ts --timeout 20000",
     "test-app": "ts-mocha --project test/integration/service-tests/tsconfig.json test/integration/service-tests/chainEventsApp.test.ts",
-    "format": "prettier --ignore-path ../../.prettierignore --write .",
     "lint-all": "eslint './**/*.ts'",
     "listen": "ts-node -T ./scripts/listener.ts",
     "listenV2": "ts-node -T ./scripts/listenerV2.ts",

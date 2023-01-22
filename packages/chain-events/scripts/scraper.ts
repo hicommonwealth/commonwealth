@@ -1,6 +1,6 @@
 import fs from 'fs';
-import {createApi, ParseType, Subscriber} from "../src/chains/substrate";
-import {EventKind} from "../src/chains/substrate/types";
+import { createApi, ParseType, Subscriber } from '../src/chains/substrate';
+import { EventKind } from '../src/chains/substrate/types';
 
 const args = process.argv.slice(2);
 const chain = args[0] || 'edgeware';
