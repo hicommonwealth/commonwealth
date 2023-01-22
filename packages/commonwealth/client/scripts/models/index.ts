@@ -26,7 +26,7 @@ export { default as Profile } from './Profile';
 export { default as Proposal } from './Proposal';
 export { default as ProposalModule } from './ProposalModule';
 export { default as RoleInfo } from './RoleInfo';
-export { default as RolePermission } from './RolePermission';
+export { AccessLevel } from 'commonwealth/server/util/permissions';
 export { default as SearchQuery } from './SearchQuery';
 export { default as SearchResult } from './SearchResult';
 export { default as SocialAccount } from './SocialAccount';
