@@ -1,26 +1,26 @@
 /* @jsx m */
 
 import ClassComponent from 'class_component';
-import {
-  Action,
-  addPermission,
-  isPermitted,
-  removePermission,
-} from 'common-common/src/permissions';
-
-import type { ChainCategoryType, ChainNetwork } from 'common-common/src/types';
-import { ChainBase } from 'common-common/src/types';
-import { notifyError, notifySuccess } from 'controllers/app/notifications';
-import $ from 'jquery';
-import { uuidv4 } from 'lib/util';
-import m from 'mithril';
-import type { ChainInfo, RoleInfo } from 'models';
-
 import 'pages/manage_community/chain_metadata_rows.scss';
 
+import m from 'mithril';
 import app from 'state';
-import { AvatarUpload } from 'views/components/avatar_upload';
+import { uuidv4 } from 'lib/util';
+import {
+  ChainBase,
+  ChainCategoryType,
+  ChainNetwork,
+} from 'common-common/src/types';
+import { notifyError, notifySuccess } from 'controllers/app/notifications';
 import { InputRow, ToggleRow } from 'views/components/metadata_rows';
+import { AvatarUpload } from 'views/components/avatar_upload';
+import { ChainInfo, RoleInfo } from 'models';
+import {
+  Action,
+  PermissionManager,
+  ToCheck,
+} from 'commonwealth/server/util/permissions';
+
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
 import { CWIcon } from '../../components/component_kit/cw_icons/cw_icon';
@@ -79,6 +79,7 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
   snapshotChannels: { id: string; name: string }[];
   selectedSnapshotChannel: { id: string; name: string } | null;
   snapshotNotificationsEnabled: boolean;
+  permissionsManager = new PermissionManager();
 
   oninit(vnode: m.Vnode<ChainMetadataRowsAttrs>) {
     const chain: ChainInfo = vnode.attrs.chain;
@@ -91,9 +92,10 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
     this.github = chain.github;
     this.stagesEnabled = chain.stagesEnabled;
     this.customStages = chain.customStages;
-    this.chatEnabled = !isPermitted(
+    this.chatEnabled = !this.permissionsManager.hasPermission(
       chain.defaultDenyPermissions,
-      Action.VIEW_CHAT_CHANNELS
+      Action.VIEW_CHAT_CHANNELS,
+      ToCheck.Allow
     );
     this.default_allow_permissions = chain.defaultAllowPermissions;
     this.default_deny_permissions = chain.defaultDenyPermissions;
@@ -404,15 +406,14 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               console.log(err);
             }
-
-            try {
+           try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = removePermission(
+                this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
                   default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );
               } else {
-                this.default_deny_permissions = addPermission(
+                this.default_deny_permissions = this.permissionsManager.addDenyPermission(
                   default_deny_permissions,
                   Action.VIEW_CHAT_CHANNELS
                 );
@@ -440,7 +441,6 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               notifyError(err || 'Chain update failed');
             }
-
             m.redraw();
           }}
         />
