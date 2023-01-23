@@ -1,6 +1,6 @@
 import Web3 from 'web3';
 import { ContractType } from 'common-common/src/types';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
 import { DB } from '../../models';
 import { ContractAttributes, ContractInstance } from '../../models/contract';
 import { ChainNodeAttributes } from '../../models/chain_node';

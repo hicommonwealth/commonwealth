@@ -1,5 +1,4 @@
 import type {
-  Block,
   Chain as CanvasChain,
   SessionPayload,
 } from '@canvas-js/interfaces';
@@ -64,14 +63,6 @@ export function chainBaseToCanvasChain(chainBase: ChainBase): CanvasChain {
   } else if (chainBase === ChainBase.Substrate) {
     return 'substrate';
   }
-}
-
-interface IChainNodeish {
-  ethChainId?: string | number;
-}
-interface IChainish {
-  bech32Prefix: string;
-  node: IChainNodeish;
 }
 
 export function chainBaseToCanvasChainId(

@@ -245,8 +245,8 @@ export class PermissionManager {
     allowPermission: string,
     denyPermission: string
   ): allowDenyBigInt {
-    const allowPermissionAsBigInt: bigint = BigInt(allowPermission);
-    const denyPermissionAsBigInt: bigint = BigInt(denyPermission);
+    const allowPermissionAsBigInt = BigInt(allowPermission);
+    const denyPermissionAsBigInt = BigInt(denyPermission);
     return { allow: allowPermissionAsBigInt, deny: denyPermissionAsBigInt };
   }
 
