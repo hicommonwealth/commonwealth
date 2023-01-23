@@ -1,7 +1,7 @@
 // This is a const and not an enum because of a weird webpack error.
 // It has the same syntax, though, so it should be OK, as long as we don't
 // modify any of the values.
-// eslint-disable-next-line import/prefer-default-export
+// eslint-disable-next-line
 export const NotificationCategories = {
   NewComment: 'new-comment-creation',
   NewThread: 'new-thread-creation',
@@ -15,6 +15,8 @@ export const NotificationCategories = {
   ChainEvent: 'chain-event',
   EntityEvent: 'entity-event',
   NewChatMention: 'new-chat-mention',
+  NewSnapshot: 'new-snapshot',
+  SnapshotProposal: 'snapshot-proposal',
 };
 
 export enum ProposalType {
@@ -53,7 +55,7 @@ export enum ContractType {
   SPL = 'spl',
   MOLOCH1 = 'moloch1', // unused
   MOLOCH2 = 'moloch2', // unused
-  COMMONPROTOCOL = 'common-protocol'
+  COMMONPROTOCOL = 'common-protocol',
 }
 
 export enum ChainType {

@@ -1,10 +1,14 @@
-import ChainEntityFactory, {
-  ChainEntityModelStatic,
-} from './models/chain_entity';
-import ChainEventFactory, { ChainEventModelStatic } from './models/chain_event';
 import { Sequelize, DataTypes } from 'sequelize';
+
 import { DATABASE_URI } from '../config';
+
+import type { ChainEntityModelStatic } from './models/chain_entity';
+import ChainEntityFactory from './models/chain_entity';
+import type { ChainEventModelStatic } from './models/chain_event';
+import ChainEventFactory from './models/chain_event';
 import { factory, formatFilename } from 'common-common/src/logging';
+
+const log = factory.getLogger(formatFilename(__filename));
 
 export type Models = {
   ChainEntity: ChainEntityModelStatic;
@@ -15,8 +19,6 @@ export interface DB extends Models {
   sequelize: Sequelize;
   Sequelize: typeof Sequelize;
 }
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export const sequelize = new Sequelize(DATABASE_URI, {
   // disable string operators (https://github.com/sequelize/sequelize/issues/8417)

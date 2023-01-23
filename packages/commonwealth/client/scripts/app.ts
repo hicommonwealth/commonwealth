@@ -1,41 +1,33 @@
 /* eslint-disable @typescript-eslint/ban-types */
 
-import '../styles/normalize.css'; // reset
-import '../styles/tailwind_reset.css'; // for the landing page
-import '../styles/shared.scss';
-import 'construct.scss';
-import 'lity/dist/lity.min.css';
-import mixpanel from 'mixpanel-browser';
-
-import m from 'mithril';
-import $ from 'jquery';
-import moment from 'moment';
-
-import './fragment-fix';
-import app, { ApiStatus, LoginState } from 'state';
 import { ChainBase, ChainNetwork, ChainType } from 'common-common/src/types';
-import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import 'construct.scss';
+import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
 
 import {
   notifyError,
   notifyInfo,
   notifySuccess,
 } from 'controllers/app/notifications';
-import { updateActiveAddresses, updateActiveUser } from 'controllers/app/login';
+import $ from 'jquery';
+import 'lity/dist/lity.min.css';
+
+import m from 'mithril';
+import mixpanel from 'mixpanel-browser';
+import { ChainInfo, NodeInfo, NotificationCategory } from 'models';
+import moment from 'moment';
+import app, { ApiStatus, LoginState } from 'state';
 
 import { Layout } from 'views/layout';
+import { alertModalWithText } from 'views/modals/alert_modal';
 import { ConfirmInviteModal } from 'views/modals/confirm_invite_modal';
 import { NewLoginModal } from 'views/modals/login_modal';
-import { alertModalWithText } from 'views/modals/alert_modal';
+import '../styles/normalize.css'; // reset
+import '../styles/shared.scss';
+import '../styles/tailwind_reset.css'; // for the landing page
+import './fragment-fix';
 import { pathIsDiscussion } from './identifiers';
 import { isWindowMediumSmallInclusive } from './views/components/component_kit/helpers';
-
-// Prefetch commonly used pages
-import(/* webpackPrefetch: true */ 'views/pages/landing');
-// import(/* webpackPrefetch: true */ 'views/pages/why_commonwealth');
-import(/* webpackPrefetch: true */ 'views/pages/discussions/index');
-import(/* webpackPrefetch: true */ 'views/pages/view_proposal');
-import(/* webpackPrefetch: true */ 'views/pages/view_thread');
 
 // eslint-disable-next-line max-len
 const APPLICATION_UPDATE_MESSAGE =
@@ -69,39 +61,45 @@ export async function initAppState(
         app.config.nodes.clear();
         app.user.notifications.clear();
         app.user.notifications.clearSubscriptions();
-        data.nodes
+        data.result.nodes
           .sort((a, b) => a.id - b.id)
           .map((node) => {
             return app.config.nodes.add(NodeInfo.fromJSON(node));
           });
-        data.chains
-          .filter((chain) => chain.active)
-          .map((chain) => {
-            delete chain.ChainNode;
+        data.result.chainsWithSnapshots
+          .filter((chainsWithSnapshots) => chainsWithSnapshots.chain.active)
+          .map((chainsWithSnapshots) => {
+            delete chainsWithSnapshots.chain.ChainNode;
             return app.config.chains.add(
               ChainInfo.fromJSON({
-                ChainNode: app.config.nodes.getById(chain.chain_node_id),
-                ...chain,
+                ChainNode: app.config.nodes.getById(
+                  chainsWithSnapshots.chain.chain_node_id
+                ),
+                snapshot: chainsWithSnapshots.snapshot,
+                ...chainsWithSnapshots.chain,
               })
             );
           });
-        app.roles.setRoles(data.roles);
-        app.config.notificationCategories = data.notificationCategories.map(
-          (json) => NotificationCategory.fromJSON(json)
-        );
-        app.config.invites = data.invites;
-        app.config.chainCategories = data.chainCategories;
-        app.config.chainCategoryTypes = data.chainCategoryTypes;
+        app.roles.setRoles(data.result.roles);
+        app.config.notificationCategories =
+          data.result.notificationCategories.map((json) =>
+            NotificationCategory.fromJSON(json)
+          );
+        app.config.invites = data.result.invites;
+        app.config.chainCategories = data.result.chainCategories;
+        app.config.chainCategoryTypes = data.result.chainCategoryTypes;
 
         // add recentActivity
-        const { recentThreads } = data;
+        const { recentThreads } = data.result;
         recentThreads.forEach(({ chain, count }) => {
           app.recentActivity.setCommunityThreadCounts(chain, count);
         });
 
         // update the login status
-        updateActiveUser(data.user);
-        app.loginState = data.user ? LoginState.LoggedIn : LoginState.LoggedOut;
+        updateActiveUser(data.result.user);
+        app.loginState = data.result.user
+          ? LoginState.LoggedIn
+          : LoginState.LoggedOut;
 
         if (app.loginState == LoginState.LoggedIn) {
           console.log('Initializing socket connection with JTW:', app.user.jwt);
@@ -117,13 +115,17 @@ export async function initAppState(
         }
 
         app.user.setStarredCommunities(
-          data.user ? data.user.starredCommunities : []
+          data.result.user ? data.result.user.starredCommunities : []
         );
         // update the selectedChain, unless we explicitly want to avoid
         // changing the current state (e.g. when logging in through link_new_address_modal)
-        if (updateSelectedChain && data.user && data.user.selectedChain) {
+        if (
+          updateSelectedChain &&
+          data.result.user &&
+          data.result.user.selectedChain
+        ) {
           app.user.setSelectedChain(
-            ChainInfo.fromJSON(data.user.selectedChain)
+            ChainInfo.fromJSON(data.result.user.selectedChain)
           );
         }
 
@@ -525,13 +527,14 @@ moment.updateLocale('en', {
 });
 
 Promise.all([$.ready, $.get('/api/domain')]).then(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async ([ready, { customDomain }]) => {
     // set window error handler
     // ignore ResizeObserver error: https://stackoverflow.com/questions/49384120/resizeobserver-loop-limit-exceeded
     const resizeObserverLoopErrRe = /^ResizeObserver loop limit exceeded/;
     // replace chunk loading errors with a notification that the app has been updated
     const chunkLoadingErrRe = /^Uncaught SyntaxError: Unexpected token/;
-    window.onerror = (errorMsg, url, lineNumber, colNumber, error) => {
+    window.onerror = (errorMsg) => {
       if (
         typeof errorMsg === 'string' &&
         resizeObserverLoopErrRe.test(errorMsg)
@@ -665,6 +668,15 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
             '/finishaxielogin': importRoute('views/pages/finish_axie_login', {
               scoped: true,
             }),
+            // General Contracts
+            '/new/contract': importRoute('views/pages/new_contract', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/contract/:contractAddress': importRoute(
+              'views/pages/general_contract',
+              { scoped: true }
+            ),
             // Discussions
             '/home': redirectRoute((attrs) => `/${attrs.scope}/`),
             '/discussions': importRoute('views/pages/discussions', {
@@ -700,7 +712,7 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
-            '/account': redirectRoute((a) =>
+            '/account': redirectRoute(() =>
               activeAccount ? `/account/${activeAccount.address}` : '/'
             ),
             // Governance
@@ -930,6 +942,14 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
               scoped: true,
               deferChain: true,
             }),
+            '/:scope/new/contract': importRoute('views/pages/new_contract', {
+              scoped: true,
+              deferChain: true,
+            }),
+            '/:scope/contract/:contractAddress': importRoute(
+              'views/pages/general_contract',
+              { scoped: true }
+            ),
             '/:scope/discussions/:topic': importRoute(
               'views/pages/discussions',
               { scoped: true, deferChain: true }
@@ -1074,7 +1094,8 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     m.render(
       script,
       m.trust(
-        '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0" width="0" style="display:none;visibility:hidden"></iframe>'
+        '<iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KRWH69V" height="0"' +
+          ' width="0" style="display:none;visibility:hidden"></iframe>'
       )
     );
     document.body.insertBefore(script, document.body.firstChild);
@@ -1109,13 +1130,6 @@ Promise.all([$.ready, $.get('/api/domain')]).then(
     */
       if (m.route.param('new') && m.route.param('new').toString() === 'true') {
         console.log('creating account');
-
-        try {
-        } catch (err) {
-          // Don't do anything... Just identify if there is an error
-          // mixpanel.identify(m.route.param('email').toString());
-        }
-      } else {
       }
       m.route.set(m.route.param('path'), {}, { replace: true });
     } else if (

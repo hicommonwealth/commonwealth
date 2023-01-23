@@ -1,13 +1,12 @@
-import { Request, Response, NextFunction } from 'express';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import {
   PROFILE_BIO_MAX_CHARS,
   PROFILE_HEADLINE_MAX_CHARS,
   PROFILE_NAME_MAX_CHARS,
   PROFILE_NAME_MIN_CHARS,
 } from '../../shared/types';
-import { DB } from '../models';
-import validateChain from '../middleware/validateChain';
-import { AppError } from 'common-common/src/errors';
+import type { DB } from '../models';
 
 export const Errors = {
   MissingParams: 'Must specify chain, address, and data',
@@ -29,8 +28,6 @@ const updateProfile = async (
   if (!req.body.chain || !req.body.address || !req.body.data) {
     return next(new AppError(Errors.MissingParams));
   }
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
 
   let unpackedData;
   try {

@@ -1,18 +1,15 @@
-import {
-  ChainEventNotification,
-  WebsocketMessageNames,
-  WebsocketNamespaces,
-} from 'types';
+import type { NotificationSubscription } from 'models';
+import { Notification } from 'models';
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 import app from 'state';
-import { Notification, NotificationSubscription } from 'models';
-import { io, Socket } from 'socket.io-client';
+import type { ChainEventNotification } from 'types';
+import { WebsocketMessageNames, WebsocketNamespaces } from 'types';
 
 export class ChainEventsNamespace {
   private ceNs: Socket;
   private _isConnected = false;
   private subscriptionRoomsJoined = new Set();
-
-  constructor() {}
 
   public async init() {
     this.ceNs = io(`/${WebsocketNamespaces.ChainEvents}`, {
@@ -28,8 +25,7 @@ export class ChainEventsNamespace {
 
   public addChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const filteredSubs = subs
-        .filter((x) => !!x.chainEntityId)
+      const filteredSubs = subs.filter((x) => !!x.chainEntityId);
       const roomsToJoin = [];
       for (const sub of filteredSubs) {
         if (!this.subscriptionRoomsJoined.has(sub.chainEntityId)) {
@@ -48,8 +44,7 @@ export class ChainEventsNamespace {
 
   public deleteChainEventSubscriptions(subs: NotificationSubscription[]) {
     if (this._isConnected) {
-      const filteredSubs = subs
-        .filter((x) => !!x.chainEntityId)
+      const filteredSubs = subs.filter((x) => !!x.chainEntityId);
       const roomsToLeave = [];
       for (const sub of filteredSubs) {
         if (this.subscriptionRoomsJoined.has(sub.chainEntityId)) {

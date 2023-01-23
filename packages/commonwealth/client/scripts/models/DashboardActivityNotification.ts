@@ -1,4 +1,4 @@
-import { IChainEventData, SupportedNetwork } from 'chain-events/src';
+import type { IChainEventData, SupportedNetwork } from 'chain-events/src';
 import moment from 'moment';
 
 class DashboardActivityNotification {

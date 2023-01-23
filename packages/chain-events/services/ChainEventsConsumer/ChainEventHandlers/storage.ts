@@ -1,27 +1,21 @@
 /**
  * Generic handler that stores the event in the database.
  */
-import {
-  CWEvent,
-  IChainEventKind,
-  IEventHandler,
-  SubstrateTypes,
-} from 'chain-events/src';
-import * as Sequelize from 'sequelize';
-import { addPrefix, factory, formatFilename } from 'common-common/src/logging';
-import {
+import { addPrefix, factory } from 'common-common/src/logging';
+import type {
   RabbitMQController,
 } from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq';
 import NodeCache from 'node-cache';
 import hash from 'object-hash';
+import { StatsDController } from 'common-common/src/statsd';
 
-import { DB } from '../../database/database';
-import { ChainEventInstance } from '../../database/models/chain_event';
-import {StatsDController} from "common-common/src/statsd";
+import type { DB } from '../../database/database';
+import type { ChainEventInstance } from '../../database/models/chain_event';
 
-const log = factory.getLogger(formatFilename(__filename));
-
-const { Op } = Sequelize;
+import type { CWEvent, IChainEventKind } from 'chain-events/src';
+import { IEventHandler } from 'chain-events/src';
+import { SubstrateTypes } from 'chain-events/src/types';
 
 export interface StorageFilterConfig {
   excludedEvents?: IChainEventKind[];
@@ -115,9 +109,7 @@ export default class extends IEventHandler {
       // refresh ttl for the duplicated event
       this.eventCache.ttl(eventKey, this.ttl);
 
-      StatsDController.get().increment(
-        'ce.event-cache-chain-hit', {chain}
-      );
+      StatsDController.get().increment('ce.event-cache-chain-hit', { chain });
 
       const cacheStats = this.eventCache.getStats();
       StatsDController.get().gauge('ce.num-events-cached', cacheStats.keys);

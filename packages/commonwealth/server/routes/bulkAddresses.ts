@@ -1,12 +1,8 @@
 /* eslint-disable dot-notation */
 import Sequelize from 'sequelize';
-import validateChain from '../middleware/validateChain';
-const { Op } = Sequelize;
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { DB } from '../models';
 
-const log = factory.getLogger(formatFilename(__filename));
+const { Op } = Sequelize;
 
 // the bulkAddress route takes a chain/community (mandatory) and a limit & order (both optional)
 // If a chain is supplied, queried addresses are limited to being on said chain.
@@ -15,18 +11,14 @@ const log = factory.getLogger(formatFilename(__filename));
 // If an order is supplied (e.g. ['name', 'ASC'], the results will be first & accordingly sorted.
 // Otherwise, it defaults to returning them in order of ['created_at', 'DESC'] (following to /bulkMembers).
 
-const bulkAddresses = async (models: DB, req, res, next) => {
+const bulkAddresses = async (models: DB, req, res) => {
   const options = {
     order: req.query.order ? [[req.query.order]] : [['created_at', 'DESC']],
   };
 
   if (req.query.limit) options['limit'] = req.query.limit;
 
-  let chain;
-  let error;
   if (req.query.chain) {
-    [chain, error] = await validateChain(models, req.query);
-    if (error) return next(new AppError(error));
     options['where'] = { chain: req.query.chain };
   }
 

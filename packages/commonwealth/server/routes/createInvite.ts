@@ -1,14 +1,11 @@
-import crypto from 'crypto';
-import { Request, Response, NextFunction } from 'express';
 import sgMail from '@sendgrid/mail';
-import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../middleware/validateChain';
-import { SERVER_URL, SENDGRID_API_KEY } from '../config';
+import { AppError } from 'common-common/src/errors';
+import crypto from 'crypto';
+import type { NextFunction, Request, Response } from 'express';
 import { DynamicTemplate } from '../../shared/types';
-const log = factory.getLogger(formatFilename(__filename));
-import { AppError, ServerError } from 'common-common/src/errors';
+import { SENDGRID_API_KEY, SERVER_URL } from '../config';
+import type { DB } from '../models';
 import { createRole, findAllRoles, findOneRole } from '../util/roles';
-import { DB } from '../models';
 
 sgMail.setApiKey(SENDGRID_API_KEY);
 
@@ -28,8 +25,7 @@ const createInvite = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   if (!req.user) return next(new AppError('Not logged in'));
   if (!req.body.invitedAddress && !req.body.invitedEmail) {
     return next(new AppError(Errors.NoEmailOrAddress));

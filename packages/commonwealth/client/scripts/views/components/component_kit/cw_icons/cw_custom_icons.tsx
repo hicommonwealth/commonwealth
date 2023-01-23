@@ -3,13 +3,13 @@
 
 /* eslint-disable max-len */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
 import 'components/component_kit/cw_icon.scss';
+import m from 'mithril';
 
 import { getClasses } from '../helpers';
-import { CustomIconAttrs, CustomIconStyleAttrs } from './types';
+import type { CustomIconAttrs, CustomIconStyleAttrs } from './types';
 
 // ADDING CUSTOM ICONS: INSTRUCTIONS
 //

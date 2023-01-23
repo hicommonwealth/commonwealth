@@ -1,11 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import proposalIdToEntity from '../../util/proposalIdToEntity';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
+import type { DB } from '../../models';
 import Errors from './errors';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from "../../models";
-
-const log = factory.getLogger(formatFilename(__filename));
 
 export default async (
   models: DB,
@@ -45,6 +41,17 @@ export default async (
       }
       break;
     }
+    case 'snapshot-proposal': {
+      const proposal = await models.SnapshotProposal.findOne({
+        where: {
+          id: +p_id,
+        },
+      });
+      if (proposal) {
+        obj = { proposal_id: proposal.id };
+      }
+      break;
+    }
     case 'new-comment-creation':
     case 'new-reaction': {
       if (p_entity === 'discussion') {
@@ -62,6 +69,7 @@ export default async (
       }
       break;
     }
+
     case 'new-mention':
       return next(new AppError(Errors.NoMentions));
     case 'chain-event': {

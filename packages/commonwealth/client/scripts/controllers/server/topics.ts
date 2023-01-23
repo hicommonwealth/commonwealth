@@ -1,29 +1,34 @@
+import BN from 'bn.js';
 import $ from 'jquery';
-import _ from 'lodash';
-
-import { TopicStore } from 'stores';
 import { Topic } from 'models';
 import app from 'state';
-import BN from 'bn.js';
+
+import { TopicStore } from 'stores';
 
 class TopicsController {
   private _store: TopicStore = new TopicStore();
   private _initialized = false;
+
   public get store() {
     return this._store;
   }
+
   public get initialized() {
     return this._initialized;
   }
+
   public getByIdentifier(id) {
     return this._store.getById(id);
   }
+
   public getByCommunity(communityId) {
     return this._store.getByCommunity(communityId);
   }
+
   public getByName(name, communityId) {
     return this._store.getByName(name, communityId);
   }
+
   public addToStore(topic: Topic) {
     return this._store.add(topic);
   }
@@ -148,13 +153,12 @@ class TopicsController {
   public async remove(topic) {
     try {
       // TODO: Change to DELETE /topic
-      const response = await $.post(`${app.serverUrl()}/deleteTopic`, {
+      await $.post(`${app.serverUrl()}/deleteTopic`, {
         id: topic.id,
         chain: topic.chainId,
         jwt: app.user.jwt,
       });
       this._store.remove(this._store.getById(topic.id));
-      const activeEntity = topic.chainId;
       app.threads.listingStore.removeTopic(topic.name);
     } catch (err) {
       console.log('Failed to delete topic');

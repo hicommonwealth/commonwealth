@@ -1,9 +1,9 @@
-import BN from 'bn.js';
-
-import { CWEvent, SupportedNetwork } from '../../../interfaces';
-import { TypedEventFilter } from '../../../contractTypes/commons';
-import { ERC721 } from '../../../contractTypes';
-import { EventKind, RawEvent, IEventData, IErc721Contracts } from '../types';
+import type { CWEvent } from '../../../interfaces';
+import { SupportedNetwork } from '../../../interfaces';
+import type { TypedEventFilter } from '../../../contractTypes/commons';
+import type { ERC721 } from '../../../contractTypes';
+import type { RawEvent, IEventData, IErc721Contracts } from '../types';
+import { EventKind } from '../types';
 
 /**
  * This is an "enricher" function, whose goal is to augment the initial event data
@@ -27,9 +27,8 @@ export async function Enrich(
 ): Promise<CWEvent<IEventData>> {
   switch (kind) {
     case EventKind.Approval: {
-      const { owner, approved, tokenId } = rawData.args as GetArgType<
-        'Approval'
-      >;
+      const { owner, approved, tokenId } =
+        rawData.args as GetArgType<'Approval'>;
       const contractAddress = rawData.address;
 
       // should not notify sender or recipient
@@ -49,9 +48,8 @@ export async function Enrich(
       };
     }
     case EventKind.ApprovalForAll: {
-      const { owner, operator, approved } = rawData.args as GetArgType<
-        'ApprovalForAll'
-      >;
+      const { owner, operator, approved } =
+        rawData.args as GetArgType<'ApprovalForAll'>;
       const contractAddress = rawData.address;
 
       // should not notify sender or recipient

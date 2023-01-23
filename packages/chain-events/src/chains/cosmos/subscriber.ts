@@ -1,17 +1,13 @@
 /**
  * Fetches events from Cosmos chain in real time.
  */
-import { decodeTxRaw } from '@cosmjs/proto-signing';
-import { Block } from '@cosmjs/tendermint-rpc';
+import type { Block } from '@cosmjs/tendermint-rpc';
 
-import {
-  IDisconnectedRange,
-  IEventSubscriber,
-  SupportedNetwork,
-} from '../../interfaces';
+import type { IDisconnectedRange } from '../../interfaces';
+import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { RawEvent, Api } from './types';
+import type { RawEvent, Api } from './types';
 
 export class Subscriber extends IEventSubscriber<Api, RawEvent> {
   private _name: string;
@@ -60,7 +56,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     return results;
   }
 
-  private _blocksToEvents(blocks: Block[]): RawEvent[] {
+  private async _blocksToEvents(blocks: Block[]): Promise<RawEvent[]> {
     // parse all transactions
     const events: RawEvent[] = [];
     for (const block of blocks) {
@@ -68,7 +64,8 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
         header: { height },
       } = block;
       for (const tx of block.txs) {
-        const decodedTx = decodeTxRaw(tx);
+        const cosm = await import('@cosmjs/proto-signing');
+        const decodedTx = cosm.decodeTxRaw(tx);
         const {
           body: { messages },
         } = decodedTx;
@@ -96,7 +93,7 @@ export class Subscriber extends IEventSubscriber<Api, RawEvent> {
     }
     const listenFunc = async () => {
       const blocks = await this._queryBlocks();
-      const events = this._blocksToEvents(blocks);
+      const events = await this._blocksToEvents(blocks);
       for (const event of events) {
         cb(event);
       }

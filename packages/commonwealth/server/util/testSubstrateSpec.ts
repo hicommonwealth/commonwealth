@@ -1,9 +1,9 @@
 import { ApiPromise, WsProvider } from '@polkadot/api';
-import { RegisteredTypes } from '@polkadot/types/types';
+import type { RegisteredTypes } from '@polkadot/types/types';
+import { AppError, ServerError } from 'common-common/src/errors';
 
 import { constructSubstrateUrl } from '../../shared/substrate';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { AppError, ServerError } from 'common-common/src/errors';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -37,7 +37,11 @@ const testSubstrateSpec = async (specString: string, nodeUrl: string) => {
     const api = await ApiPromise.create({ provider, ...sanitizedSpec });
     const version = api.runtimeVersion;
     const props = await api.rpc.system.properties();
-    log.info(`Fetched version: ${version.specName}:${version.specVersion} and properties ${JSON.stringify(props)}`);
+    log.info(
+      `Fetched version: ${version.specName}:${
+        version.specVersion
+      } and properties ${JSON.stringify(props)}`
+    );
     log.info('Disconnecting from chain...');
     await api.disconnect();
     return sanitizedSpec;

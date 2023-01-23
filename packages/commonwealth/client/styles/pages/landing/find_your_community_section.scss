@@ -1,4 +1,4 @@
-@import 'client/styles/shared';
+@import '../../shared';
 
 section.LandingPageTokenHolders {
   .TokenHoldersButton {
@@ -6,6 +6,7 @@ section.LandingPageTokenHolders {
       color: $neutral-800;
       text-decoration: none;
       cursor: pointer;
+
       &:hover {
         opacity: 0.6;
       }

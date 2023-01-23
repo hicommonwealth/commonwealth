@@ -1,8 +1,11 @@
-import { Model, DataTypes } from 'sequelize';
+import type { DataTypes, Model } from 'sequelize';
 import * as Sequelize from 'sequelize';
-import { ModelStatic } from './types';
-import { ChatMessageAttributes, ChatMessageInstance } from './chat_message';
-import { RuleAttributes } from './rule';
+import type {
+  ChatMessageAttributes,
+  ChatMessageInstance,
+} from './chat_message';
+import type { RuleAttributes } from './rule';
+import type { ModelStatic } from './types';
 
 export interface ChatChannelAttributes {
   id?: number;
@@ -28,6 +31,7 @@ export type ChatChannelModelStatic = ModelStatic<ChatChannelInstance>;
 
 export default (
   sequelize: Sequelize.Sequelize,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   dataTypes: typeof DataTypes
 ): ChatChannelModelStatic => {
   const ChatChannel = <ChatChannelModelStatic>sequelize.define(
@@ -53,7 +57,7 @@ export default (
       },
       category: {
         type: Sequelize.STRING(255),
-        allowNull: false
+        allowNull: false,
       },
       rule_id: {
         type: Sequelize.INTEGER,
@@ -82,7 +86,7 @@ export default (
       foreignKey: 'chat_channel_id',
     });
     models.ChatChannel.belongsTo(models.Chain, {
-        onDelete: 'CASCADE'
+      onDelete: 'CASCADE',
     });
     models.ChatChannel.belongsTo(models.Rule, {
       foreignKey: 'rule_id',

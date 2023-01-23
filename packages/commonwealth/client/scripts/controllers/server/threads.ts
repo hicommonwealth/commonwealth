@@ -1,31 +1,28 @@
 /* eslint-disable no-restricted-globals */
-/* eslint-disable no-restricted-syntax */
-import _ from 'lodash';
-import moment from 'moment';
-import m from 'mithril';
+import { NotificationCategories } from 'common-common/src/types';
+import { updateLastVisited } from 'controllers/app/login';
+
+import { notifyError } from 'controllers/app/notifications';
+import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
+import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
 import $ from 'jquery';
+/* eslint-disable no-restricted-syntax */
+import m from 'mithril';
+import type { ChainEntity, Profile, Topic } from 'models';
+import {
+  Attachment,
+  NotificationSubscription,
+  Poll,
+  Thread,
+  ThreadStage,
+} from 'models';
+import moment from 'moment';
+import type { LinkedThreadAttributes } from 'server/models/linked_thread';
 
 import app from 'state';
 import { ProposalStore, RecentListingStore } from 'stores';
-import {
-  Thread,
-  Attachment,
-  ThreadStage,
-  NodeInfo,
-  Profile,
-  ChainEntity,
-  NotificationSubscription,
-  Poll,
-  Topic,
-} from 'models';
-import { NotificationCategories } from 'common-common/src/types';
-
-import { notifyError } from 'controllers/app/notifications';
-import { updateLastVisited } from 'controllers/app/login';
-import { modelFromServer as modelReactionFromServer } from 'controllers/server/reactions';
-import { modelFromServer as modelReactionCountFromServer } from 'controllers/server/reactionCounts';
-import { LinkedThreadAttributes } from 'server/models/linked_thread';
 import { orderDiscussionsbyLastComment } from 'views/pages/discussions/helpers';
+
 export const INITIAL_PAGE_SIZE = 10;
 export const DEFAULT_PAGE_SIZE = 20;
 
@@ -54,6 +51,7 @@ export const modelFromServer = (thread) => {
     reactions,
     last_commented_on,
     linked_threads,
+    numberOfComments,
   } = thread;
 
   const attachments = Attachments
@@ -87,7 +85,7 @@ export const modelFromServer = (thread) => {
     });
   }
 
-  let chainEntitiesProcessed: ChainEntity[] = [];
+  const chainEntitiesProcessed: ChainEntity[] = [];
   if (chain_entity_meta) {
     for (const meta of chain_entity_meta) {
       const full_entity = app.chainEntities.store.getById(meta.ce_id);
@@ -157,6 +155,7 @@ export const modelFromServer = (thread) => {
     polls: polls.map((p) => new Poll(p)),
     lastCommentedOn: last_commented_on ? moment(last_commented_on) : null,
     linkedThreads,
+    numberOfComments,
   });
 };
 
@@ -201,9 +200,11 @@ class ThreadsController {
   public get store() {
     return this._store;
   }
+
   public get listingStore() {
     return this._listingStore;
   }
+
   public get overviewStore() {
     return this._overviewStore;
   }
@@ -320,7 +321,7 @@ class ThreadsController {
         kind: proposal.kind,
         stage: proposal.stage,
         body: encodeURIComponent(newBody),
-        title: newTitle,
+        title: encodeURIComponent(newTitle),
         url,
         'attachments[]': attachments,
         jwt: app.user.jwt,
@@ -387,7 +388,7 @@ class ThreadsController {
         if (result.stage === ThreadStage.Voting) this.numVotingThreads++;
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._listingStore.update(result);
+        this._listingStore.add(result);
         return result;
       },
       error: (err) => {
@@ -414,7 +415,7 @@ class ThreadsController {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._listingStore.update(result);
+        this._listingStore.add(result);
         this._overviewStore.update(result);
         return result;
       },
@@ -437,7 +438,7 @@ class ThreadsController {
         const result = modelFromServer(response.result);
         // Post edits propagate to all thread stores
         this._store.update(result);
-        this._listingStore.update(result);
+        this._listingStore.add(result);
         return result;
       },
       error: (err) => {
@@ -520,7 +521,7 @@ class ThreadsController {
     linkingThreadId: number,
     linkedThreadId: number
   ) {
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.post(`${app.serverUrl()}/updateLinkedThreads`, {
         chain: app.activeChainId(),
         linking_thread_id: linkingThreadId,
@@ -529,7 +530,7 @@ class ThreadsController {
         author_chain: app.user.activeAccount.chain.id,
         jwt: app.user.jwt,
       }),
-    ])
+    ]);
     if (response.status !== 'Success') {
       throw new Error();
     }
@@ -540,7 +541,7 @@ class ThreadsController {
     linkingThreadId: number,
     linkedThreadId: number
   ) {
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.post(`${app.serverUrl()}/updateLinkedThreads`, {
         chain: app.activeChainId(),
         linking_thread_id: linkingThreadId,
@@ -550,7 +551,7 @@ class ThreadsController {
         remove_link: true,
         jwt: app.user.jwt,
       }),
-    ])
+    ]);
     if (response.status !== 'Success') {
       throw new Error();
     }
@@ -579,10 +580,10 @@ class ThreadsController {
       chain: app.activeChainId(),
       ids,
     };
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/getThreads`, params),
-      app.chainEntities.refreshRawEntities(app.activeChainId())
-    ])
+      app.chainEntities.refreshRawEntities(app.activeChainId()),
+    ]);
     if (response.status !== 'Success') {
       throw new Error(`Cannot fetch thread: ${response.status}`);
     }
@@ -653,9 +654,9 @@ class ThreadsController {
     if (stageName) params['stage'] = stageName;
 
     // fetch threads and refresh entities so we can join them together
-    const [response,] = await Promise.all([
+    const [response] = await Promise.all([
       $.get(`${app.serverUrl()}/bulkThreads`, params),
-      app.chainEntities.refreshRawEntities(chain)
+      app.chainEntities.refreshRawEntities(chain),
     ]);
     if (response.status !== 'Success') {
       throw new Error(`Unsuccessful refresh status: ${response.status}`);

@@ -1,6 +1,7 @@
-@import 'client/styles/shared';
+@import 'shared';
 
 .Footer {
+  margin-top: auto;
   background-image: url('/static/img/footer.png');
   background-size: cover;
   display: flex;

@@ -1,23 +1,11 @@
-import $ from 'jquery';
-import m from 'mithril';
-import app from 'state';
-import moment from 'moment';
 import { ProposalType } from 'common-common/src/types';
-import { IChainEntityKind } from 'chain-events/src';
-import { IUniqueId } from './interfaces';
-import { ThreadKind, ThreadStage } from './types';
-import Attachment from './Attachment';
-import Topic from './Topic';
-import Vote from './Vote';
-import { VersionHistory } from '../controllers/server/threads';
-import { ChainEntity } from '.';
-import Poll from './Poll';
-
-// field names copied from snapshot
-interface IOffchainVotingOptions {
-  name: string;
-  choices: string[];
-}
+import type moment from 'moment';
+import type { VersionHistory } from '../controllers/server/threads';
+import type Attachment from './Attachment';
+import type { IUniqueId } from './interfaces';
+import type Poll from './Poll';
+import type Topic from './Topic';
+import type { ThreadKind, ThreadStage } from './types';
 
 export interface LinkedThreadRelation {
   id: string;
@@ -29,6 +17,7 @@ interface IThreadCollaborator {
   address: string;
   chain: string;
 }
+
 class Thread implements IUniqueId {
   public readonly author: string;
   public collaborators?: IThreadCollaborator[];
@@ -59,6 +48,7 @@ class Thread implements IUniqueId {
   public readonly polls: Poll[];
   public readonly linkedThreads: LinkedThreadRelation[];
   public snapshotProposal: string;
+  public numberOfComments: number;
 
   public get uniqueIdentifier() {
     return `${this.slug}_${this.identifier}`;
@@ -89,6 +79,7 @@ class Thread implements IUniqueId {
     hasPoll,
     lastCommentedOn,
     linkedThreads,
+    numberOfComments,
   }: {
     author: string;
     title: string;
@@ -114,6 +105,7 @@ class Thread implements IUniqueId {
     hasPoll: boolean;
     linkedThreads: LinkedThreadRelation[];
     polls?: Poll[];
+    numberOfComments?: number;
   }) {
     this.author = author;
     this.title = title;
@@ -150,6 +142,7 @@ class Thread implements IUniqueId {
     this.snapshotProposal = snapshotProposal;
     this.lastEdited = lastEdited;
     this.linkedThreads = linkedThreads || [];
+    this.numberOfComments = numberOfComments || 0;
   }
 }
 

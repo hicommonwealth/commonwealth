@@ -1,20 +1,9 @@
-import { Request, Response, NextFunction } from 'express';
-import validateChain from '../middleware/validateChain';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../models';
-import { AppError, ServerError } from 'common-common/src/errors';
+import type { Request, Response } from 'express';
+import type { DB } from '../models';
 import { findAllRoles } from '../util/roles';
 
-const log = factory.getLogger(formatFilename(__filename));
-const bulkMembers = async (
-  models: DB,
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const [chain, error] = await validateChain(models, req.query);
-  if (error) return next(new AppError(error));
-
+const bulkMembers = async (models: DB, req: Request, res: Response) => {
+  const chain = req.chain;
   const members = await findAllRoles(
     models,
     {

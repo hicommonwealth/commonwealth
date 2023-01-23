@@ -1,26 +1,29 @@
 /**
  * Processes events during migration, upgrading from simple notifications to entities.
  */
+import type { WhereOptions } from 'sequelize';
+import type {
+  RabbitMQController,
+  RmqCENotificationCUD,
+  RmqCETypeCUD,
+} from 'common-common/src/rabbitmq';
+import { RascalPublications } from 'common-common/src/rabbitmq';
+import { factory, formatFilename } from 'common-common/src/logging';
+
+import type { CWEvent } from '../../../src';
 import {
   IEventHandler,
-  CWEvent,
   eventToEntity,
   getUniqueEntityKey,
-  IChainEventData,
   EntityEventKind,
 } from '../../../src';
-import { WhereOptions } from 'sequelize';
-
-import {
-  RabbitMQController,
-  RascalPublications, RmqCENotificationCUD,
-} from 'common-common/src/rabbitmq';
-import { factory, formatFilename } from 'common-common/src/logging';
-import { DB } from '../../database/database';
-import {
+import type { DB } from '../../database/database';
+import type {
   ChainEventAttributes,
   ChainEventInstance,
 } from '../../database/models/chain_event';
+import { WhereOptions } from 'sequelize';
+
 const log = factory.getLogger(formatFilename(__filename));
 
 export default class extends IEventHandler<ChainEventInstance> {
@@ -36,7 +39,8 @@ export default class extends IEventHandler<ChainEventInstance> {
    * Handles an event during the migration process, by creating or updating existing
    * events depending whether we've seen them before.
    */
-  public async handle(event: CWEvent<IChainEventData>) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  public async handle(event: CWEvent) {
     const chain = event.chain || this._chain;
 
     // case by entity type to determine what value to look for

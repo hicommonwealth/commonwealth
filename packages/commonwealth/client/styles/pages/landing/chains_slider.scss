@@ -1,4 +1,9 @@
-@import "client/styles/shared";
+@import '../../shared';
 
-.grow { transition: all .2s ease-in-out; }
-.grow:hover { transform: scale(1.1); }
+.grow {
+  transition: all 0.2s ease-in-out;
+}
+
+.grow:hover {
+  transform: scale(1.1);
+}

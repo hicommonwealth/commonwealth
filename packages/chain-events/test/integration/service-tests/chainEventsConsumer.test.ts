@@ -1,19 +1,11 @@
 import chai from 'chai';
-import { setupChainEventConsumer } from '../../../services/ChainEventsConsumer/chainEventsConsumer';
 import {
   RascalExchanges,
   RascalQueues,
-  RascalRoutingKeys, RmqCENotificationCUD, RmqEntityCUD,
+  RascalRoutingKeys, RmqCENotificationCUD,
+  RmqEntityCUD,
 } from 'common-common/src/rabbitmq';
-import { CWEvent, SupportedNetwork } from '../../../src';
-import * as AaveTypes from '../../../src/chains/aave/types';
-import {
-  EventKind,
-  IProposalCreated,
-  ITransfer,
-} from '../../../src/chains/aave/types';
-import models from '../../../services/database/database';
-import { ServiceConsumer } from 'common-common/src/ServiceConsumer';
+import type { ServiceConsumer } from 'common-common/src/serviceConsumer';
 import {
   getQueueStats,
   getRmqMessage,
@@ -21,6 +13,17 @@ import {
 } from 'common-common/src/rabbitmq/util';
 import { v4 as uuidv4 } from 'uuid';
 import { QueryTypes } from 'sequelize';
+
+import { setupChainEventConsumer } from '../../../services/ChainEventsConsumer/chainEventsConsumer';
+import type { CWEvent } from '../../../src';
+import { SupportedNetwork } from '../../../src';
+import type * as AaveTypes from '../../../src/chains/aave/types';
+import type {
+  IProposalCreated,
+  ITransfer,
+} from '../../../src/chains/aave/types';
+import { EventKind } from '../../../src/chains/aave/types';
+import models from '../../../services/database/database';
 import { RABBITMQ_API_URI } from '../../../services/config';
 
 const { expect } = chai;
@@ -245,8 +248,10 @@ describe('Tests for the ChainEventsConsumer service', () => {
     );
     expect(message).to.have.property('length');
     expect(message.length).to.equal(1);
-    expect(RmqCENotificationCUD.isValidMsgFormat(JSON.parse(message[0].payload)),
-      "NotificationCUD has an invalid format").to.be.true;
+    expect(
+      RmqCENotificationCUD.isValidMsgFormat(JSON.parse(message[0].payload)),
+      'NotificationCUD has an invalid format'
+    ).to.be.true;
 
     await models.ChainEvent.destroy({
       where: {

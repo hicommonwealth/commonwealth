@@ -1,31 +1,34 @@
+import { factory, formatFilename } from 'common-common/src/logging';
 import { Pool } from 'pg';
 import _ from 'underscore';
-import { BrokerConfig } from 'rascal';
+import type { BrokerConfig } from 'rascal';
 import { ChainBase, ChainNetwork } from 'common-common/src/types';
 import {
   RascalPublications,
   getRabbitMQConfig,
 } from 'common-common/src/rabbitmq';
+import Rollbar from 'rollbar';
+import fetch from 'node-fetch';
+import { StatsDController } from 'common-common/src/statsd';
+
 import { RabbitMqHandler } from '../ChainEventsConsumer/ChainEventHandlers';
-import { factory, formatFilename } from 'common-common/src/logging';
 import {
   CHAIN_EVENT_SERVICE_SECRET,
-  CW_DATABASE_URI, CW_SERVER_URL,
+  CW_DATABASE_URI,
+  CW_SERVER_URL,
   NUM_CHAIN_SUBSCRIBERS,
   RABBITMQ_URI,
   REPEAT_TIME,
   ROLLBAR_SERVER_TOKEN,
   CHAIN_SUBSCRIBER_INDEX,
 } from '../config';
+
 import {
   getListenerNames,
   manageErcListeners,
   manageRegularListeners,
 } from './util';
-import { ChainAttributes, IListenerInstances } from './types';
-import Rollbar from 'rollbar';
-import fetch from "node-fetch";
-import {StatsDController} from "common-common/src/statsd";
+import type { ChainAttributes, IListenerInstances } from './types';
 
 const log = factory.getLogger(formatFilename(__filename));
 
@@ -33,16 +36,20 @@ const listenerInstances: IListenerInstances = {};
 let allChainsAndTokens;
 
 // object used to keep track of listener error counts
-let listenerErrorCounts: {[chain: string]: number} = {};
+let listenerErrorCounts: { [chain: string]: number } = {};
 // an array of chain_ids that we will no longer create listeners for on every run
 let bannedListeners: string[] = [];
 // resets the error counts and banned listeners every 12 hours
 setInterval(() => {
-  listenerErrorCounts = {}
-  bannedListeners = []
+  listenerErrorCounts = {};
+  bannedListeners = [];
 }, 43200000);
 
-export function handleFatalListenerError(chain_id: string,  error: Error, rollbar?: Rollbar) {
+export function handleFatalListenerError(
+  chain_id: string,
+  error: Error,
+  rollbar?: Rollbar
+): void {
   log.error(`Listener for ${chain_id} threw an error`, error);
   rollbar?.critical(`Listener for ${chain_id} threw an error`, error);
 
@@ -101,22 +108,20 @@ async function mainProcess(
       const data = {
         secret: CHAIN_EVENT_SERVICE_SECRET,
         num_chain_subscribers: NUM_CHAIN_SUBSCRIBERS,
-        chain_subscriber_index: CHAIN_SUBSCRIBER_INDEX
-      }
-      const res = await fetch(
-        url,
-        {
-          method: 'POST',
-          body: JSON.stringify(data),
-          headers: { 'Content-Type': 'application/json' }
-        },
-      );
-      if (!res.ok) throw new Error(`HTTP Error Response: ${res.status} ${res.statusText}`);
+        chain_subscriber_index: CHAIN_SUBSCRIBER_INDEX,
+      };
+      const res = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      if (!res.ok)
+        throw new Error(`HTTP Error Response: ${res.status} ${res.statusText}`);
 
       const jsonRes = await res.json();
       log.info(`Fetched chain-event service data: ${JSON.stringify(jsonRes)}`);
       if (jsonRes?.status >= 400) {
-        throw new Error(jsonRes.error)
+        throw new Error(jsonRes.error);
       }
       allChainsAndTokens = jsonRes.result;
     } catch (e) {
@@ -137,10 +142,11 @@ async function mainProcess(
   for (const chain of allChainsAndTokens) {
     if (bannedListeners.includes(chain.id)) continue;
 
-    StatsDController.get().increment(
-      'ce.should-exist-listeners',
-      { chain: chain.id, network: chain.network, base: chain.base }
-    );
+    StatsDController.get().increment('ce.should-exist-listeners', {
+      chain: chain.id,
+      network: chain.network,
+      base: chain.base,
+    });
 
     if (
       chain.network === ChainNetwork.ERC20 &&
@@ -189,7 +195,9 @@ async function mainProcess(
   }
 
   for (const chain_id of bannedListeners) {
-    StatsDController.get().increment('ce.banned-listeners', { chain: chain_id });
+    StatsDController.get().increment('ce.banned-listeners', {
+      chain: chain_id,
+    });
   }
 
   log.info('Finished scheduled process.');
@@ -202,7 +210,11 @@ async function mainProcess(
   }
 }
 
-export async function chainEventsSubscriberInitializer(): Promise<{ rollbar: any; pool: any; producer: RabbitMqHandler }> {
+export async function chainEventsSubscriberInitializer(): Promise<{
+  rollbar: any;
+  pool: any;
+  producer: RabbitMqHandler;
+}> {
   // begin process
   log.info('Initializing ChainEventsSubscriber');
 
@@ -226,12 +238,12 @@ export async function chainEventsSubscriberInitializer(): Promise<{ rollbar: any
         process.env.NODE_ENV !== 'production'
           ? false
           : {
-            rejectUnauthorized: false,
-          },
+              rejectUnauthorized: false,
+            },
       max: 3,
     });
 
-    pool.on('error', (err, client) => {
+    pool.on('error', (err) => {
       log.error('Unexpected error on idle client', err);
     });
   }
@@ -254,13 +266,13 @@ export async function chainEventsSubscriberInitializer(): Promise<{ rollbar: any
     );
   }
 
-  return {producer, pool, rollbar}
+  return { producer, pool, rollbar };
 }
 
 if (process.argv[2] === 'run-as-script') {
   let producerInstance, poolInstance, rollbarInstance;
   chainEventsSubscriberInitializer()
-    .then(({producer, pool, rollbar}) => {
+    .then(({ producer, pool, rollbar }) => {
       producerInstance = producer;
       poolInstance = pool;
       rollbarInstance = rollbar;
@@ -268,7 +280,13 @@ if (process.argv[2] === 'run-as-script') {
     })
     .then(() => {
       // re-run this function every [REPEAT_TIME] minutes
-      setInterval(mainProcess, REPEAT_TIME * 60000, producerInstance, poolInstance, rollbarInstance);
+      setInterval(
+        mainProcess,
+        REPEAT_TIME * 60000,
+        producerInstance,
+        poolInstance,
+        rollbarInstance
+      );
     })
     .catch((err) => {
       log.error('Fatal error occurred', err);

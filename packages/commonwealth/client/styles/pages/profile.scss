@@ -1,4 +1,4 @@
-@import 'shared';
+@import '../shared';
 
 @mixin profile-listing {
   h3 {
@@ -11,23 +11,29 @@
   .QuillFormattedText,
   .MarkdownFormattedText {
     margin-top: 6px;
+
     &.collapsed {
       white-space: unset;
       margin-bottom: -6px;
+
       &.suppress-fadeout {
         margin-bottom: 0;
       }
     }
+
     ul,
     ol {
       margin: 6px 0;
     }
+
     p {
       margin: 6px 0;
     }
+
     > p:first-child {
       margin-top: 0;
     }
+
     > p:last-child {
       margin-bottom: 0;
     }
@@ -62,13 +68,16 @@
     .proposal-body {
       margin: 10px 0;
     }
+
     .proposal-timestamp,
     .proposal-author {
       color: $neutral-500;
     }
+
     .proposal-meta {
       padding-top: 2px;
       font-size: inherit;
+
       .username {
         color: $black !important;
       }
@@ -76,6 +85,7 @@
   }
   .proposal-comment {
     padding-bottom: 6px;
+
     .comment-meta,
     .comment-timestamp {
       color: $neutral-500;
@@ -91,6 +101,7 @@
     margin-top: 14px;
     min-height: 100%;
   }
+
   .Tabs {
     .tab-bar {
       flex-direction: row !important;
@@ -98,6 +109,7 @@
       border-bottom: none;
       background-color: $white;
     }
+
     a.tab-entry {
       padding: 12px 0 0 0;
       margin-right: 18px;
@@ -113,10 +125,12 @@
         font-weight: 600;
       }
     }
+
     a.tab-entry.active {
       color: $neutral-900;
     }
   }
+
   @include smallInclusive {
     .info-row {
       flex-direction: column;
@@ -126,11 +140,13 @@
     .ProfileHeader,
     .Tabs {
       padding: 0 17px 12px 17px !important;
+
       .tab-bar {
         display: flex;
         flex-direction: column;
         margin-top: 16px;
       }
+
       .bio-actions {
         padding: 0px;
       }
@@ -155,6 +171,7 @@
     margin-top: 32px;
     margin-bottom: 6px;
   }
+
   .no-items {
     color: $neutral-500;
     margin: 8px 0 20px;
@@ -225,6 +242,7 @@
   .QuillFormattedText,
   .MarkdownFormattedText {
     padding-bottom: 8px;
+
     p:last-child {
       margin-bottom: 0;
     }
@@ -239,9 +257,11 @@
   border: 1px solid $neutral-100;
   box-shadow: 0px 0px 1px 1px $neutral-100;
   margin-top: 24px;
+
   .banner-text {
     margin-right: 12px;
   }
+
   button {
     margin-left: 6px;
   }
@@ -255,9 +275,11 @@
     flex-wrap: wrap;
     align-items: center;
   }
+
   .bio-left {
     width: 94px;
   }
+
   .bio-right {
     flex: 1;
     margin-left: 20px;
@@ -265,15 +287,18 @@
     .User {
       font-size: 24px;
       font-weight: 600;
+
       .username {
         color: $neutral-900;
       }
     }
+
     .role-tag {
       position: relative;
       top: 0px;
     }
   }
+
   .bio-actions-breakpoint {
     display: none;
     @include mediumSmallInclusive {
@@ -282,6 +307,7 @@
       height: 0;
     }
   }
+
   .bio-actions {
     align-items: center;
     display: flex;
@@ -305,6 +331,7 @@
       display: none;
     }
   }
+
   .address-block-left {
     @include mediumSmallInclusive {
       display: flex;
@@ -319,21 +346,25 @@
       display: none;
     }
   }
+
   .name-row {
     .name,
     .no-verification,
     .verification {
       margin-right: 18px;
     }
+
     .no-verification,
     .verification {
       position: relative;
       top: -2px;
     }
+
     .no-verification {
       display: inline-block;
       color: $neutral-500;
     }
+
     .verification-icon {
       position: relative;
       top: 2px;
@@ -343,12 +374,14 @@
       height: 16px;
       border-radius: $border-radius-corners;
       margin-right: 6px;
+
       svg {
         position: relative;
         top: -1px;
         left: 2px;
       }
     }
+
     .verification-icon.none,
     .verification-icon.unverified {
       position: relative;
@@ -359,13 +392,16 @@
       padding-left: 4px;
       font-size: 95%;
     }
+
     .verification-icon.none {
       background: $neutral-500;
     }
+
     .verification-icon.unverified {
       background: $rorange-200;
     }
   }
+
   .info-row {
     @include mediumSmallInclusive {
       margin-bottom: 16px;
@@ -388,11 +424,13 @@
       display: none;
     }
   }
+
   .profile-headline {
     .no-headline {
       color: $neutral-500;
     }
   }
+
   .username,
   span.copy-done {
     color: $neutral-500;
@@ -401,9 +439,11 @@
 
 .ProfileContent {
   @include profile-listing;
+
   .btn-wrap {
     margin: 32px 0;
   }
+
   a.btn {
     background-color: $white !important;
     border: 1px solid $primary-500 !important;
@@ -411,9 +451,11 @@
     color: $primary-500;
     border-radius: $border-radius-corners;
   }
+
   .infinite-scroll {
     overflow-y: hidden;
   }
+
   .infinite-scroll-spinner-wrap {
     height: 70px;
     width: 100%;
@@ -421,6 +463,7 @@
     justify-content: center;
     align-items: center;
   }
+
   .infinite-scroll-reached-end,
   .no-content {
     padding: 20px 0 10px 0;
@@ -433,6 +476,7 @@
 .ProfileProposal {
   @include comment-level;
 }
+
 .ProfileCommentGroup {
   @include comment-level;
 }
@@ -441,15 +485,18 @@
   h4 {
     margin-top: 30px;
   }
+
   input,
   textarea,
   button {
     margin: 10px 0;
     margin-right: 8px;
   }
+
   button {
     margin-top: 16px;
   }
+
   .placeholder {
     color: $neutral-500;
   }

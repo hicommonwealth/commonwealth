@@ -1,37 +1,33 @@
-import moment from 'moment';
-import { Request, Response, NextFunction } from 'express';
+import sgMail from '@sendgrid/mail';
+import { AppError, ServerError } from 'common-common/src/errors';
 import {
   ChainNetwork,
   ChainType,
   NotificationCategories,
   ProposalType,
 } from 'common-common/src/types';
+import type { NextFunction, Request, Response } from 'express';
+import moment from 'moment';
 import { factory, formatFilename } from 'common-common/src/logging';
-import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import validateTopicThreshold from '../util/validateTopicThreshold';
-import { parseUserMentions } from '../util/parseUserMentions';
-import { DB } from '../models';
+import type { TokenBalanceCache } from 'token-balance-cache/src/index';
+import { MixpanelCommunityInteractionEvent } from '../../shared/analytics/types';
 
-import validateChain from '../middleware/validateChain';
 import {
   getProposalUrl,
   getProposalUrlWithoutObject,
   renderQuillDeltaToText,
 } from '../../shared/utils';
-import { mixpanelTrack } from '../util/mixpanelUtil';
-import {
-  MixpanelCommunityInteractionEvent,
-  MixpanelCommunityInteractionPayload,
-} from '../../shared/analytics/types';
 import { SENDGRID_API_KEY } from '../config';
-import checkRule from '../util/rules/checkRule';
-import RuleCache from '../util/rules/ruleCache';
-import BanCache from '../util/banCheckCache';
-import { AppError, ServerError } from 'common-common/src/errors';
-import { findAllRoles } from '../util/roles';
+import type { DB } from '../models';
+import type BanCache from '../util/banCheckCache';
 import emitNotifications from '../util/emitNotifications';
+import { mixpanelTrack } from '../util/mixpanelUtil';
+import { parseUserMentions } from '../util/parseUserMentions';
+import { findAllRoles } from '../util/roles';
+import checkRule from '../util/rules/checkRule';
+import type RuleCache from '../util/rules/ruleCache';
+import validateTopicThreshold from '../util/validateTopicThreshold';
 
-const sgMail = require('@sendgrid/mail');
 sgMail.setApiKey(SENDGRID_API_KEY);
 
 const log = factory.getLogger(formatFilename(__filename));
@@ -57,12 +53,11 @@ const createComment = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
 
   const author = req.address;
 
-  const { parent_id, root_id, chain_entity_id, text } = req.body;
+  const { parent_id, root_id, text } = req.body;
 
   if (!root_id || root_id.indexOf('_') === -1) {
     return next(new AppError(Errors.MissingRootId));
@@ -258,7 +253,8 @@ const createComment = async (
     proposal = await models.Thread.findOne({
       where: { id },
     });
-    // TODO: put this part on the front-end and pass in just the chain-entity id so we can check if it exists for the email part --- similar for reaction
+    // TODO: put this part on the front-end and pass in just the chain-entity id
+    //  so we can check if it exists for the email part --- similar for reaction
   } else if (
     prefix.includes('proposal') ||
     prefix.includes('referendum') ||

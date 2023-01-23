@@ -1,8 +1,8 @@
-import validateChain from '../middleware/validateChain';
-import { DB } from '../models';
 import { AppError, ServerError } from 'common-common/src/errors';
-import { VoteAttributes } from '../models/vote';
-import { TypedRequestQuery, TypedResponse, success } from '../types';
+import type { DB } from '../models';
+import type { VoteAttributes } from '../models/vote';
+import type { TypedRequestQuery, TypedResponse } from '../types';
+import { success } from '../types';
 
 export const Errors = {
   NoPollSpecified: 'No poll has been specified',
@@ -18,16 +18,7 @@ const viewVotes = async (
 ) => {
   // TODO: runtime validation based on params
   //   maybe something like https://www.npmjs.com/package/runtime-typescript-checker
-  let chain, error;
-  try {
-    [chain, error] = await validateChain(models, req.query);
-  } catch (err) {
-    throw new AppError(err);
-  }
-  if (error) {
-    console.log('It throws an AppError');
-    throw new AppError(error);
-  }
+  const chain = req.chain;
 
   if (!req.query.poll_id) {
     throw new AppError(Errors.NoPollSpecified);

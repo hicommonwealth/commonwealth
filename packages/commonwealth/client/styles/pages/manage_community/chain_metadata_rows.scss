@@ -1,4 +1,4 @@
-@import 'shared';
+@import '../../shared';
 
 .ChainMetadataRows {
   display: flex;
@@ -45,6 +45,61 @@
 
       > * {
         margin-right: 8px;
+      }
+    }
+  }
+
+  .commonbot-section {
+    margin-top: 24px;
+    margin-bottom: 24px;
+
+    .save-snapshot {
+      margin-top: 24px;
+    }
+
+    .notifications-copy {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .connect-button {
+      margin-top: 8px;
+    }
+
+    .connected-line {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+
+      .connect-group {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+        margin-left: 16px;
+      }
+    }
+
+    .snapshot-settings {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .settings-row {
+      display: flex;
+      flex-direction: column;
+      padding-top: 8px;
+      gap: 8px;
+
+      .spinner-group {
+        display: flex;
+        gap: 8px;
+        align-items: center;
       }
     }
   }

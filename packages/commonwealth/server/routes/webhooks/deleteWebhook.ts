@@ -1,11 +1,7 @@
-import { Request, Response, NextFunction } from 'express';
-import { factory, formatFilename } from 'common-common/src/logging';
-import validateChain from '../../middleware/validateChain';
-import Errors from './errors';
-import { AppError, ServerError } from 'common-common/src/errors';
+import { AppError } from 'common-common/src/errors';
+import type { NextFunction, Request, Response } from 'express';
 import { findAllRoles } from '../../util/roles';
-
-const log = factory.getLogger(formatFilename(__filename));
+import Errors from './errors';
 
 const deleteWebhook = async (
   models,
@@ -13,8 +9,7 @@ const deleteWebhook = async (
   res: Response,
   next: NextFunction
 ) => {
-  const [chain, error] = await validateChain(models, req.body);
-  if (error) return next(new AppError(error));
+  const chain = req.chain;
   // if chain is present we know we are dealing with a chain first community
 
   // only admins should be able to get webhooks

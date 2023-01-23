@@ -6,7 +6,7 @@ interface IAttrs {
   text: string;
 }
 
-const LandingPageButton: m.Component<IAttrs, {}> = {
+const LandingPageButton: m.Component<IAttrs> = {
   view: (vnode) => {
     return m(
       'a',
