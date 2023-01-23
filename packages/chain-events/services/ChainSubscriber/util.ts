@@ -220,11 +220,9 @@ async function setupNewListeners(
     let network: SupportedNetwork;
 
     try {
-      network = getChainEventNetwork(chain.base, chain.network);
+      network = getChainEventNetwork(chain.network, chain.base);
     } catch (e) {
-      log.error(`The given chain does not match any existing chain-event SupportedNetwork. Chain-events does not know \
-      which listener type to use so a listener will not be started for the following chain: ${JSON.stringify(chain)}`,
-      e);
+      log.error(`Unknown chain base: ${chain.base} \tand network: ${chain.network}`, e);
       continue;
     }
 
