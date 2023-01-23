@@ -45,8 +45,8 @@ import RuleCache from './server/util/rules/ruleCache';
 import ViewCountCache from './server/util/viewCountCache';
 import devWebpackConfig from './webpack/webpack.dev.config.js';
 import prodWebpackConfig from './webpack/webpack.prod.config.js';
-import * as v8 from "v8";
-import {factory, formatFilename} from "common-common/src/logging";
+import * as v8 from 'v8';
+import { factory, formatFilename } from 'common-common/src/logging';
 
 const log = factory.getLogger(formatFilename(__filename));
 // set up express async error handling hack
@@ -54,7 +54,11 @@ require('express-async-errors');
 
 const app = express();
 
-log.info(`Node Option max-old-space-size set to: ${JSON.stringify(v8.getHeapStatistics().heap_size_limit / 1000000000 )} GB`);
+log.info(
+  `Node Option max-old-space-size set to: ${JSON.stringify(
+    v8.getHeapStatistics().heap_size_limit / 1000000000
+  )} GB`
+);
 
 async function main() {
   const DEV = process.env.NODE_ENV !== 'production';
