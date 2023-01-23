@@ -6,7 +6,7 @@ import {
   PermissionError,
   ToCheck,
   everyonePermissions,
-} from './permissions';
+} from 'commonwealth/shared/permissions';
 import { DB } from '../models';
 import { CommunityRoleAttributes } from '../models/community_role';
 import { Permission } from '../models/role';

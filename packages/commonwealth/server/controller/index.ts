@@ -1,7 +1,7 @@
 import { QueryTypes } from 'sequelize';
 import { Request, Response } from 'express';
 import { DB } from '../models';
-import { PermissionManager, Action } from '../util/permissions';
+import { PermissionManager, Action } from 'commonwealth/shared/permissions';
 import { isAddressPermitted } from '../util/roles';
 
 export async function getRoles(models: DB, req: Request, res: Response) {
