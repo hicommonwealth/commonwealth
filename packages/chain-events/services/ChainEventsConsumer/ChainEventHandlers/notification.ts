@@ -36,14 +36,14 @@ export default class extends IEventHandler {
       return dbEvent;
     }
 
-    const [, eventEntityKind] = eventToEntity(event.network, event.data.kind);
-    if (eventEntityKind != EntityEventKind.Create && eventEntityKind != EntityEventKind.Complete) {
-      log.trace(`Event does not mark the creation or completion of an entity. Skipping event!`);
+    if (!dbEvent.entity_id) {
+      log.info(`No related entity, skipping!`);
       return dbEvent;
     }
 
-    if (!dbEvent.entity_id) {
-      log.trace(`No related entity, skipping!`);
+    const [, eventEntityKind] = eventToEntity(event.network, event.data.kind);
+    if (eventEntityKind != EntityEventKind.Create && eventEntityKind != EntityEventKind.Complete) {
+      log.trace(`Event does not mark the creation or completion of an entity. Skipping event!`);
       return dbEvent;
     }
 
