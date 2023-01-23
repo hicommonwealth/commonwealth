@@ -1,5 +1,5 @@
 import { AppError } from 'common-common/src/errors';
-import { Action } from '../../util/permissions';
+import { Action } from 'commonwealth/shared/permissions';
 import { checkReadPermitted } from '../../util/roles';
 import { DB } from '../../models';
 import { success, TypedRequestQuery, TypedResponse } from '../../types';

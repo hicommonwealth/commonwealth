@@ -13,7 +13,7 @@ import moment from 'moment';
 
 import 'pages/chat.scss';
 
-import { Action } from 'commonwealth/server/util/permissions';
+import { Action } from 'commonwealth/shared/permissions';
 import app from 'state';
 import { WebsocketMessageNames } from 'types';
 import User from 'views/components/widgets/user';
