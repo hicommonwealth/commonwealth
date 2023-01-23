@@ -4,7 +4,11 @@ import type { ModelInstance, ModelStatic } from './types';
 
 export type ContractAbiAttributes = {
   id: number;
+  nickname?: string;
   abi: Array<Record<string, unknown>>;
+  verified?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
 };
 
 export type ContractAbiInstance = ModelInstance<ContractAbiAttributes>;
@@ -19,6 +23,7 @@ export default (
     'ContractAbi',
     {
       id: { type: dataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+      nickname: { type: dataTypes.STRING, allowNull: true },
       abi: { type: dataTypes.JSONB, allowNull: false, unique: true },
       verified: {
         type: dataTypes.BOOLEAN,
