@@ -2,10 +2,6 @@ import type * as Sequelize from 'sequelize';
 import type { DataTypes } from 'sequelize';
 
 import type { ModelStatic, ModelInstance } from './types';
-import type {
-  ChainEventTypeAttributes,
-  ChainEventTypeInstance,
-} from './chain_event_type';
 import type { ChainEntityAttributes } from './chain_entity';
 import {SupportedNetwork} from "../../../src";
 
