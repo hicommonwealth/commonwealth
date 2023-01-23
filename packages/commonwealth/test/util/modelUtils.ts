@@ -11,7 +11,7 @@ import { ethers } from 'ethers';
 import { createRole, findOneRole } from 'server/util/roles';
 import { BalanceProvider, IChainNode } from 'token-balance-cache/src/index';
 import { constructCanvasMessage } from 'shared/adapters/shared';
-import { PermissionManager } from '../../server/util/permissions';
+import { PermissionManager } from 'commonwealth/shared/permissions';
 import { mnemonicGenerate } from '@polkadot/util-crypto';
 import Web3 from 'web3';
 import app from '../../server-test';
