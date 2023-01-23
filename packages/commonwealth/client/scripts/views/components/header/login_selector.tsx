@@ -104,6 +104,14 @@ export class LoginSelectorMenuLeft extends ClassComponent<LoginSelectorMenuLeftA
         <div
           class="login-menu-item"
           onclick={() => {
+            m.route.set(`/profile/manage`);
+          }}
+        >
+          <CWText type="caption">Manage profiles</CWText>
+        </div>
+        <div
+          class="login-menu-item"
+          onclick={() => {
             if (nAccountsWithoutRole > 0) {
               app.modals.create({
                 modal: SelectAddressModal,

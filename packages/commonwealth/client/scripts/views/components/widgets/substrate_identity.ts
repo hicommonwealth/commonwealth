@@ -129,9 +129,8 @@ const SubstrateOnlineIdentityWidget: m.Component<
       ? link(
           'a.user-display-name.username',
           profile
-            ? `/${app.activeChainId()}/account/${profile.address}?base=${
-                profile.chain
-              }`
+            ? // TODO: switch to profile.username once PR4 is merged
+              `/profile/a/${profile.address}`
             : 'javascript:',
           !profile
             ? addrShort
@@ -233,9 +232,8 @@ const SubstrateOfflineIdentityWidget: m.Component<
       ? link(
           'a.user-display-name.username',
           profile
-            ? `/${app.activeChainId()}/account/${profile.address}?base=${
-                profile.chain
-              }`
+            ? // TODO: switch to profile.username once PR4 is merged
+              `/profile/a/${profile.address}`
             : 'javascript:',
           !profile
             ? addrShort

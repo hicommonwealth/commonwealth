@@ -29,7 +29,6 @@ import { CWForm } from '../components/component_kit/cw_form';
 import { CWFormSection } from '../components/component_kit/cw_form_section';
 import { CWSocials } from '../components/component_kit/cw_socials';
 import CWCoverImageUploader, {
-  ImageAs,
   ImageBehavior,
 } from '../components/component_kit/cw_cover_image_uploader';
 import { PageNotFound } from './404';
@@ -421,7 +420,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   name="cover-image-uploader"
                   uploadCompleteCallback={(
                     url: string,
-                    imageAs: ImageAs,
                     imageBehavior: ImageBehavior
                   ) => {
                     this.coverImage = {
@@ -431,7 +429,6 @@ export default class EditNewProfile extends ClassComponent<EditNewProfileAttrs> 
                   }}
                   generatedImageCallback={(
                     url: string,
-                    imageAs: ImageAs,
                     imageBehavior: ImageBehavior
                   ) => {
                     this.coverImage = {
