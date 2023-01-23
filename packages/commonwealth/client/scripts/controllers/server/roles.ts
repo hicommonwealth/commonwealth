@@ -330,6 +330,7 @@ export function isActiveAddressPermitted(
       allow: chain_info.defaultAllowPermissions,
       deny: chain_info.defaultDenyPermissions,
     });
+
     if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
