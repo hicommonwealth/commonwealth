@@ -1,4 +1,3 @@
-import { Tendermint34Client } from '@cosmjs/tendermint-rpc';
 import type { Cluster } from '@solana/web3.js';
 import * as solw3 from '@solana/web3.js';
 import BN from 'bn.js';
@@ -229,7 +228,8 @@ const createChain = async (
       return next(new AppError(Errors.InvalidNodeUrl));
     }
     try {
-      const tmClient = await Tendermint34Client.connect(url);
+      const cosm = await import('@cosmjs/tendermint-rpc');
+      const tmClient = await cosm.Tendermint34Client.connect(url);
       await tmClient.block();
     } catch (err) {
       return next(new ServerError(Errors.InvalidNode));
