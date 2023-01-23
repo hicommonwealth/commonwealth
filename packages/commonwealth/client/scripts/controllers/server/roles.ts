@@ -1,12 +1,7 @@
 import $ from 'jquery';
 import app from 'state';
 
-import {
-  AddressInfo,
-  RoleInfo,
-  Account,
-  ChainInfo,
-} from 'models';
+import { AddressInfo, RoleInfo, Account, ChainInfo } from 'models';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
 import {
   Action,
@@ -23,7 +18,7 @@ const getPermissionLevel = (permission: AccessLevel | undefined) => {
     return AccessLevel.Everyone;
   }
   return permission;
-}
+};
 
 export class RolesController {
   private permissionManager = new PermissionManager();
@@ -329,32 +324,34 @@ export function isActiveAddressPermitted(
     };
   });
 
+  const permissionsManager = new PermissionManager();
   if (chainRoles.length > 0) {
     const permission = aggregatePermissions(roles, {
       allow: chain_info.defaultAllowPermissions,
       deny: chain_info.defaultDenyPermissions,
     });
-    if (!this.permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
+
+    if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
     return true;
-
   }
   // If no roles are given for the chain, compute permissions with chain default permissions
   else {
     // compute permissions with chain default permissions
-    const permission =
-      this.permissionsManager.computePermissions(
-        everyonePermissions, [
-      {
-        allow: chain_info.defaultAllowPermissions,
-        deny: chain_info.defaultDenyPermissions,
-      },
-    ]);
-    if (!this.permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
+
+    const permission = permissionsManager.computePermissions(
+      everyonePermissions,
+      [
+        {
+          allow: chain_info.defaultAllowPermissions,
+          deny: chain_info.defaultDenyPermissions,
+        },
+      ]
+    );
+    if (!permissionsManager.hasPermission(permission, action, ToCheck.Allow)) {
       return false;
     }
     return true;
-
   }
 }

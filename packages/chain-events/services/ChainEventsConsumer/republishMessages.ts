@@ -20,7 +20,7 @@ export class RepublishMessages extends RepublishFailedMessages<DB> {
     super(_rmqController, _models, 180000);
   }
 
-  protected async job(): void {
+  protected async job(): Promise<void> {
     const result = await this._models.ChainEventType.findAll({
       where: {
         queued: {
