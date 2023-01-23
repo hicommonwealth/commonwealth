@@ -35,6 +35,8 @@ import viewCount from '../routes/viewCount';
 import updateEmail from '../routes/updateEmail';
 import updateBanner from '../routes/updateBanner';
 import communityStats from '../routes/communityStats';
+import fetchEtherscanContract from '../routes/etherscanAPI';
+import createContractAbi from '../routes/contractAbis/createContractAbi';
 
 import viewSubscriptions from '../routes/subscription/viewSubscriptions';
 import createSubscription from '../routes/subscription/createSubscription';
@@ -164,6 +166,7 @@ import setDiscordBotConfig from '../routes/setDiscordBotConfig';
 import getDiscordChannels from '../routes/getDiscordChannels';
 import getSnapshotProposal from '../routes/getSnapshotProposal';
 import { addSwagger } from './addSwagger';
+import * as controllers from '../controller';
 
 function setupRouter(
   app: Express,
@@ -244,9 +247,15 @@ function setupRouter(
   );
 
   router.post(
-    '/createContract',
+    '/contract',
     passport.authenticate('jwt', { session: false }),
     createContract.bind(this, models)
+  );
+
+  router.post(
+    '/etherscanAPI/fetchEtherscanContract',
+    passport.authenticate('jwt', { session: false }),
+    fetchEtherscanContract.bind(this, models)
   );
 
   router.post(
@@ -344,6 +353,12 @@ function setupRouter(
   router.get(
     '/fetchThreadForSnapshot',
     fetchThreadForSnapshot.bind(this, models)
+  );
+
+  router.post(
+    '/contractAbi',
+    passport.authenticate('jwt', { session: false }),
+    createContractAbi.bind(this, models)
   );
 
   router.post(
@@ -533,7 +548,15 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models)
   );
 
-  // roles + permissions
+  // roles 
+  router.get('/roles', controllers.getRoles.bind(this, models));
+  router.post('/roles', controllers.createRole.bind(this, models));
+  router.patch('/roles', controllers.updateRole.bind(this, models));
+  // permissions
+  router.get('/permissions', controllers.getPermissions.bind(this, models));
+  router.post('/permissions', controllers.createPermission.bind(this, models));
+  router.patch('/permissions', controllers.updatePermission.bind(this, models));
+
   router.get(
     '/bulkMembers',
     databaseValidationService.validateChain,

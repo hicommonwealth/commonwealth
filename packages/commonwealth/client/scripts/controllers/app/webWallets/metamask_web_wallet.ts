@@ -46,6 +46,10 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     return this._accounts || [];
   }
 
+  public get api() {
+    return this._web3;
+  }
+
   public getChainId() {
     // We need app.chain? because the app might not be on a page with a chain (e.g homepage),
     // and node? because the chain might not have a node provided
@@ -88,7 +92,7 @@ class MetamaskWebWalletController implements IWebWallet<string> {
     this._enabling = true;
     try {
       // default to ETH
-      const chainId = await this.getChainId();
+      const chainId = this.getChainId();
 
       // ensure we're on the correct chain
       this._web3 = new Web3((window as any).ethereum);
@@ -127,7 +131,6 @@ class MetamaskWebWalletController implements IWebWallet<string> {
           throw switchError;
         }
       }
-
       // fetch active accounts
       this._accounts = await this._web3.eth.getAccounts();
       this._provider = this._web3.currentProvider;

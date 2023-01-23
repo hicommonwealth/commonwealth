@@ -5,26 +5,43 @@ class Contract {
   public readonly address: string;
   public readonly chainNodeId: number;
   public readonly type: string;
-  public readonly createdAt: moment.Moment;
-  public readonly updatedAt: moment.Moment;
+  public readonly createdAt?: moment.Moment;
+  public readonly updatedAt?: moment.Moment;
 
   public readonly decimals?: number;
   public readonly tokenName?: string;
   public readonly symbol?: string;
+  public readonly isFactory?: boolean;
+  public readonly nickname?: string;
   public readonly abi?: Array<Record<string, unknown>>;
 
-  constructor(
+  constructor({
     id,
     address,
     chainNodeId,
     type,
     createdAt,
     updatedAt,
-    decimals?,
-    tokenName?,
-    symbol?,
-    contractAbi?
-  ) {
+    decimals,
+    tokenName,
+    symbol,
+    isFactory,
+    nickname,
+    abi,
+  }: {
+    id: number;
+    address: string;
+    chainNodeId: number;
+    type: string;
+    createdAt?: moment.Moment;
+    updatedAt?: moment.Moment;
+    decimals?: number;
+    tokenName?: string;
+    symbol?: string;
+    isFactory?: boolean;
+    nickname?: string;
+    abi?: Array<Record<string, unknown>>;
+  }) {
     this.id = id;
     this.address = address;
     this.chainNodeId = chainNodeId;
@@ -34,7 +51,9 @@ class Contract {
     this.decimals = decimals;
     this.tokenName = tokenName;
     this.symbol = symbol;
-    this.abi = contractAbi;
+    this.isFactory = isFactory;
+    this.nickname = nickname;
+    this.abi = abi;
   }
 
   public static fromJSON({
@@ -42,25 +61,29 @@ class Contract {
     address,
     chain_node_id,
     type,
-    created_at,
-    updated_at,
+    createdAt,
+    updatedAt,
     decimals,
-    token_name,
+    tokenName,
     symbol,
-    ContractAbi,
+    isFactory,
+    nickname,
+    abi,
   }) {
-    return new Contract(
+    return new Contract({
       id,
       address,
-      chain_node_id,
+      chainNodeId: chain_node_id,
       type,
-      created_at,
-      updated_at,
+      createdAt,
+      updatedAt,
       decimals,
-      token_name,
+      tokenName,
       symbol,
-      ContractAbi
-    );
+      isFactory,
+      nickname,
+      abi,
+    });
   }
 }
 
