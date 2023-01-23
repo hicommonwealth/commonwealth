@@ -1,7 +1,7 @@
 import m from 'mithril';
 
-const JoinCommonWealthSection: m.Component<{}, {}> = {
-  view: (vnode) => {
+const JoinCommonWealthSection: m.Component = {
+  view: () => {
     return m(
       'section.JoinCommonWealthSection',
       { class: 'h-80 bg-gray-900 flex items-center mt-20 h-56' },
@@ -23,7 +23,7 @@ const JoinCommonWealthSection: m.Component<{}, {}> = {
           ]),
           m(
             'div',
-            { class: 'flex mt-10 md:justify-end md:mt-0' },
+            { class: 'flex mt-10 md:justify-end md:mt-0' }
             // m(
             //   'button',
             //   { class: 'btn-gradient pb-3' },

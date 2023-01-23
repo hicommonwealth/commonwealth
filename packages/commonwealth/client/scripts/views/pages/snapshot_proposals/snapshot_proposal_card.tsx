@@ -1,18 +1,18 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
-import moment from 'moment';
 
 import 'components/proposal_card/index.scss';
+import { formatLastUpdated, formatTimestamp } from 'helpers';
+import type { SnapshotProposal } from 'helpers/snapshot_utils';
+import m from 'mithril';
+import moment from 'moment';
 
 import app from 'state';
-import { formatLastUpdated, formatTimestamp } from 'helpers';
-import { SnapshotProposal } from 'helpers/snapshot_utils';
 import { navigateToSubpage } from '../../../app';
 import { CWCard } from '../../components/component_kit/cw_card';
-import { ProposalTag } from '../../components/proposal_card/proposal_tag';
 import { CWText } from '../../components/component_kit/cw_text';
+import { ProposalTag } from '../../components/proposal_card/proposal_tag';
 
 type SnapshotProposalCardAttrs = {
   snapshotId: string;

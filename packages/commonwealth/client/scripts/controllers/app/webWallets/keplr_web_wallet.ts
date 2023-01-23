@@ -1,19 +1,10 @@
-import app from 'state';
-
-import { OfflineDirectSigner, AccountData } from '@cosmjs/proto-signing';
+import type { AccountData, OfflineDirectSigner } from '@cosmjs/proto-signing';
+import type { ChainInfo, Window as KeplrWindow } from '@keplr-wallet/types';
 
 import { ChainBase, ChainNetwork, WalletId } from 'common-common/src/types';
-import { Account, IWebWallet } from 'models';
-import { Window as KeplrWindow, ChainInfo } from '@keplr-wallet/types';
-
-interface Pubkey {
-  readonly type: string;
-  readonly value: any;
-}
-interface StdSignature {
-  readonly pub_key: Pubkey;
-  readonly signature: string;
-}
+import type { Account, IWebWallet } from 'models';
+import type { CanvasData } from 'shared/adapters/shared';
+import app from 'state';
 
 declare global {
   // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -34,56 +25,60 @@ class KeplrWebWalletController implements IWebWallet<AccountData> {
   public readonly defaultNetwork = ChainNetwork.Osmosis;
   public readonly chain = ChainBase.CosmosSDK;
 
-  public get available() {
+  public get available(): boolean {
     return !!window.keplr;
   }
+
   public get enabling() {
     return this._enabling;
   }
+
   public get enabled() {
     return this.available && this._enabled;
   }
+
   public get accounts() {
     return this._accounts || [];
   }
+
   public get api() {
     return window.keplr;
   }
+
   public get offlineSigner() {
     return this._offlineSigner;
   }
 
-  public async signLoginToken(
-    message: string,
-    address: string
-  ): Promise<StdSignature> {
-    const signature = await window.keplr.signArbitrary(
-      this._chainId,
-      address,
-      message
-    );
-    return signature;
+  public getChainId() {
+    return this._chainId;
   }
 
-  public async signWithAccount(account: Account): Promise<string> {
-    const webWalletSignature = await this.signLoginToken(
-      account.validationToken.trim(),
-      account.address
-    );
-    const signature = {
-      signature: {
-        pub_key: webWalletSignature.pub_key,
-        signature: webWalletSignature.signature,
-      },
+  public async getRecentBlock(chainIdentifier: string) {
+    const url = `${window.location.origin}/cosmosAPI/${chainIdentifier}`;
+    const cosm = await import('@cosmjs/stargate');
+    const client = await cosm.StargateClient.connect(url);
+    const height = await client.getHeight();
+    const block = await client.getBlock(height);
+
+    return {
+      number: block.header.height,
+      hash: block.id,
+      // seconds since epoch
+      timestamp: Math.floor(new Date(block.header.time).getTime() / 1000),
     };
-    return JSON.stringify(signature);
   }
 
-  public async validateWithAccount(
+  public async signCanvasMessage(
     account: Account,
-    walletSignature: string
-  ): Promise<void> {
-    return account.validate(walletSignature);
+    canvasMessage: CanvasData
+  ): Promise<string> {
+    const chainId = this.getChainId();
+    const stdSignature = await window.keplr.signArbitrary(
+      chainId,
+      account.address,
+      JSON.stringify(canvasMessage)
+    );
+    return JSON.stringify({ signature: stdSignature });
   }
 
   // ACTIONS

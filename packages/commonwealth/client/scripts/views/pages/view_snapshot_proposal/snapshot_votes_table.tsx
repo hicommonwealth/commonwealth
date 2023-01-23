@@ -1,15 +1,15 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
+import { formatNumberLong } from 'helpers';
+import m from 'mithril';
+import { AddressInfo } from 'models';
 
 import 'pages/snapshot/snapshot_votes_table.scss';
 
 import app from 'state';
-import { AddressInfo } from 'models';
-import { formatNumberLong } from 'helpers';
-import User from '../../components/widgets/user';
 import { CWText } from '../../components/component_kit/cw_text';
+import User from '../../components/widgets/user';
 
 type SnapshotVoteType = {
   balance: number;

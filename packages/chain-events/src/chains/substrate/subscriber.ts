@@ -1,14 +1,14 @@
 /**
  * Fetches events from substrate chain in real time.
  */
-import { ApiPromise } from '@polkadot/api';
-import { VoidFn } from '@polkadot/api/types';
-import { Header, RuntimeVersion } from '@polkadot/types/interfaces';
+import type { ApiPromise } from '@polkadot/api';
+import type { VoidFn } from '@polkadot/api/types';
+import type { Header, RuntimeVersion } from '@polkadot/types/interfaces';
 
 import { IEventSubscriber, SupportedNetwork } from '../../interfaces';
 import { addPrefix, factory } from '../../logging';
 
-import { Block } from './types';
+import type { Block } from './types';
 
 export class Subscriber extends IEventSubscriber<ApiPromise, Block> {
   private _subscription: VoidFn;

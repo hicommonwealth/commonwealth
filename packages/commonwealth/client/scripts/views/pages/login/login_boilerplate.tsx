@@ -1,11 +1,11 @@
 /* @jsx m */
 
-import m from 'mithril';
 import ClassComponent from 'class_component';
 
-import 'pages/login/login_boilerplate.scss';
-
 import { modalRedirectClick } from 'helpers';
+import m from 'mithril';
+
+import 'pages/login/login_boilerplate.scss';
 import { CWText } from '../../components/component_kit/cw_text';
 import { getClasses } from '../../components/component_kit/helpers';
 

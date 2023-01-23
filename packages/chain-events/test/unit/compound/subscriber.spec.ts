@@ -3,7 +3,7 @@ import { EventEmitter } from 'events';
 import chai from 'chai';
 
 import { Subscriber } from '../../../src/chains/compound/subscriber';
-import { Api, RawEvent } from '../../../src/chains/compound/types';
+import type { Api, RawEvent } from '../../../src/chains/compound/types';
 
 const { assert } = chai;
 
@@ -17,7 +17,7 @@ describe('Compound Event Subscriber Tests', () => {
   it('should callback with event data', async (done) => {
     const compoundApi = new EventEmitter();
     const subscriber = new Subscriber(
-      (compoundApi as unknown) as Api,
+      compoundApi as unknown as Api,
       'compound-test'
     );
     const id = 5;
@@ -37,7 +37,7 @@ describe('Compound Event Subscriber Tests', () => {
   it('should no-op on unnecessary unsubscribe', (done) => {
     const compoundApi = new EventEmitter();
     const subscriber = new Subscriber(
-      (compoundApi as unknown) as Api,
+      compoundApi as unknown as Api,
       'compound-test'
     );
     subscriber.unsubscribe();
@@ -47,7 +47,7 @@ describe('Compound Event Subscriber Tests', () => {
   it('should unsubscribe successfully', (done) => {
     const compoundApi = new EventEmitter();
     const subscriber = new Subscriber(
-      (compoundApi as unknown) as Api,
+      compoundApi as unknown as Api,
       'compound-test'
     );
     const cb = () => {
