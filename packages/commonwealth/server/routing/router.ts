@@ -986,7 +986,10 @@ function setupRouter(
   router.post('/getChainContracts', getChainContracts.bind(this, models));
   router.post('/getSubscribedChains', getSubscribedChains.bind(this, models));
 
-  // new API
+
+  //permissions
+  router.get('/getPermissions', getPermissions.bind(this, models));
+
   addExternalRoutes(router, app, models, tokenBalanceCache);
   addSwagger(app);
 
