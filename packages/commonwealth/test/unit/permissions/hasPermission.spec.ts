@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import { PermissionManager, Action, ToCheck } from 'commonwealth/server/util/permissions';
+import { PermissionManager, Action, ToCheck } from 'commonwealth/shared/permissions';
 
 describe('hasPermissions() unit tests', () => {
   const permissionsManager = new PermissionManager();

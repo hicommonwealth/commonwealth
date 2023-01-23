@@ -4,7 +4,7 @@ import {
   AccessLevel,
   PermissionManager,
   ToCheck,
-} from 'commonwealth/server/util/permissions';
+} from 'commonwealth/shared/permissions';
 import { aggregatePermissions } from 'commonwealth/shared/utils';
 import { RoleObject } from 'commonwealth/shared/types';
 

@@ -7,7 +7,7 @@ import {
   ProposalType,
 } from 'common-common/src/types';
 import { TokenBalanceCache } from 'token-balance-cache/src/index';
-import { Action, PermissionError } from '../util/permissions';
+import { Action, PermissionError } from 'commonwealth/shared/permissions';
 import {
   findAllRoles,
   isAddressPermitted,
