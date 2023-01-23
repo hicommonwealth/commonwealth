@@ -9,7 +9,6 @@ import m from 'mithril';
 import 'pages/spec_settings.scss';
 
 import app from 'state';
-import { initChain, selectChain } from 'app';
 import { ChainBase } from 'common-common/src/types';
 import { ChainInfo, AccessLevel } from 'models';
 import { constructSubstrateUrl } from 'substrate';
@@ -38,7 +37,7 @@ class SpecSettingsPage extends ClassComponent {
     const substrateAdminChainIds = roles
       .filter(
         (r) =>
-          r.permission === AccessLevel.Admin&&
+          r.permission === AccessLevel.Admin &&
           app.config.chains.getById(r.chain_id).base === ChainBase.Substrate
       )
       .map((r) => r.chain_id);
