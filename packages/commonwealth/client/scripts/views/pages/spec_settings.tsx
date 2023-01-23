@@ -37,7 +37,7 @@ class SpecSettingsPage extends ClassComponent {
     const substrateAdminChainIds = roles
       .filter(
         (r) =>
-          r.permission === AccessLevel.Admin&&
+          r.permission === AccessLevel.Admin &&
           app.config.chains.getById(r.chain_id).base === ChainBase.Substrate
       )
       .map((r) => r.chain_id);
