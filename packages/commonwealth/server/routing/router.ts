@@ -546,7 +546,7 @@ function setupRouter(
     threadsUsersCountAndAvatars.bind(this, models)
   );
 
-  // roles 
+  // roles
   router.get('/roles', controllers.getRoles.bind(this, models));
   router.post('/roles', controllers.createRole.bind(this, models));
   router.patch('/roles', controllers.updateRole.bind(this, models));

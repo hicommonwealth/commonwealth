@@ -49,7 +49,6 @@ import TopicFactory from './models/topic';
 import UserModelFactory from './models/user';
 import ViewCountFactory from './models/viewcount';
 import VoteFactory from './models/vote';
-import WaitlistRegistrationFactory from './models/waitlist_registration';
 import WebhookFactory from './models/webhook';
 import { factory, formatFilename } from 'common-common/src/logging';
 
@@ -127,7 +126,6 @@ const models: Models = {
   Token: TokenFactory(sequelize, DataTypes),
   TaggedThread: TaggedThreadFactory(sequelize, DataTypes),
   User: UserModelFactory(sequelize, DataTypes),
-  WaitlistRegistration: WaitlistRegistrationFactory(sequelize, DataTypes),
   Webhook: WebhookFactory(sequelize, DataTypes),
 };
 

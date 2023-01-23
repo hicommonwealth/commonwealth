@@ -47,7 +47,6 @@ import type { TopicModelStatic } from './models/topic';
 import type { UserModelStatic } from './models/user';
 import type { ViewCountModelStatic } from './models/viewcount';
 import type { VoteModelStatic } from './models/vote';
-import type { WaitlistRegistrationModelStatic } from './models/waitlist_registration';
 import type { WebhookModelStatic } from './models/webhook';
 
 export type Models = {
@@ -98,7 +97,6 @@ export type Models = {
   Token: TokenModelStatic;
   TaggedThread: TaggedThreadModelStatic;
   User: UserModelStatic;
-  WaitlistRegistration: WaitlistRegistrationModelStatic;
   Webhook: WebhookModelStatic;
 };
 
