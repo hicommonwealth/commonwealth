@@ -3,7 +3,7 @@ import {
   PermissionManager,
   Action,
   ToCheck,
-} from 'commonwealth/server/util/permissions';
+} from 'commonwealth/shared/permissions';
 
 describe('computePermissions() unit tests', () => {
   let base_permission;
@@ -22,7 +22,6 @@ describe('computePermissions() unit tests', () => {
   });
 
   it('should correctly computePermissions for allowing createThread action with two roles overwrites', () => {
-
     const permission = permissionsManager.computePermissions(base_permission, [
       overwrite_moderator,
       overwrite_admin,

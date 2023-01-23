@@ -29,10 +29,15 @@ export const constructTypedCanvasMessage = (message) => {
   return { types, primaryType: 'Message', domain, message } as any;
 };
 
-export const constructTypedMessage = async (fromAddress: string, fromChainId: number, sessionPublicAddress: string, validationBlockInfoString: string) => {
+export const constructTypedMessage = async (
+  fromAddress: string,
+  fromChainId: number,
+  sessionPublicAddress: string,
+  validationBlockInfoString: string
+) => {
   const placeholderMultihash = '/commonwealth'; // TODO
 
-  const validationBlockInfo = JSON.parse(validationBlockInfoString)
+  const validationBlockInfo = JSON.parse(validationBlockInfoString);
   const block: Block = {
     chain: 'eth',
     chainId: fromChainId,
@@ -57,18 +62,16 @@ export const constructTypedMessage = async (fromAddress: string, fromChainId: nu
   // construct the signature data from scratch, since canvas' implementation doesn't
   // include an EIP712Domain
   const domain: TypedDataDomain = {
-    name: "Commonwealth",
+    name: 'Commonwealth',
   };
 
   const types: Record<string, TypedDataField[]> = {
-    EIP712Domain: [
-      { name: 'name', type: 'string' },
-    ],
+    EIP712Domain: [{ name: 'name', type: 'string' }],
     Message: [
-      { name: "loginTo", type: "string" },
-      { name: "registerSessionAddress", type: "string" },
-      { name: "registerSessionDuration", type: "uint256" },
-      { name: "timestamp", type: "uint256" },
+      { name: 'loginTo', type: 'string' },
+      { name: 'registerSessionAddress', type: 'string' },
+      { name: 'registerSessionDuration', type: 'uint256' },
+      { name: 'timestamp', type: 'uint256' },
     ],
   };
 

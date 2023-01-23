@@ -19,7 +19,7 @@ import {
   Action,
   PermissionManager,
   ToCheck,
-} from 'commonwealth/server/util/permissions';
+} from 'commonwealth/shared/permissions';
 
 import { CWButton } from '../../components/component_kit/cw_button';
 import { CWDropdown } from '../../components/component_kit/cw_dropdown';
@@ -406,17 +406,19 @@ export class ChainMetadataRows extends ClassComponent<ChainMetadataRowsAttrs> {
             } catch (err) {
               console.log(err);
             }
-           try {
+            try {
               if (this.chatEnabled) {
-                this.default_deny_permissions = this.permissionsManager.removeDenyPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.removeDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               } else {
-                this.default_deny_permissions = this.permissionsManager.addDenyPermission(
-                  default_deny_permissions,
-                  Action.VIEW_CHAT_CHANNELS
-                );
+                this.default_deny_permissions =
+                  this.permissionsManager.addDenyPermission(
+                    default_deny_permissions,
+                    Action.VIEW_CHAT_CHANNELS
+                  );
               }
               await chain.updateChainData({
                 name,

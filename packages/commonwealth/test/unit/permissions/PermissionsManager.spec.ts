@@ -6,7 +6,7 @@ import {
   Permissions,
   impliedDenyPermissionsByAction,
   impliedAllowPermissionsByAction,
-} from 'commonwealth/server/util/permissions';
+} from 'commonwealth/shared/permissions';
 
 describe('PermissionManager', () => {
   let permissionManager: PermissionManager;
@@ -73,9 +73,8 @@ describe('PermissionManager', () => {
       );
 
       const expectedPermissions =
-        BigInt(1 << Action.EDIT_COMMENT) |
-        BigInt(1 << Action.DELETE_COMMENT);
-        
+        BigInt(1 << Action.EDIT_COMMENT) | BigInt(1 << Action.DELETE_COMMENT);
+
       assert.equal(result, expectedPermissions);
     });
   });
