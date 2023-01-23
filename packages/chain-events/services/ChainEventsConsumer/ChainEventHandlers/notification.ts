@@ -7,7 +7,7 @@ import type {ChainEventInstance} from '../../database/models/chain_event';
 import type {DB} from '../../database/database';
 
 import type { CWEvent, IChainEventKind } from 'chain-events/src';
-import { IEventHandler } from 'chain-events/src';
+import {EntityEventKind, eventToEntity, IEventHandler} from 'chain-events/src';
 
 export default class extends IEventHandler {
   public readonly name = 'Notification Producer';

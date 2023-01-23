@@ -5,7 +5,6 @@ import type { WhereOptions } from 'sequelize';
 import type {
   RabbitMQController,
   RmqCENotificationCUD,
-  RmqCETypeCUD,
 } from 'common-common/src/rabbitmq';
 import { RascalPublications } from 'common-common/src/rabbitmq';
 import { factory, formatFilename } from 'common-common/src/logging';
@@ -22,7 +21,6 @@ import type {
   ChainEventAttributes,
   ChainEventInstance,
 } from '../../database/models/chain_event';
-import { WhereOptions } from 'sequelize';
 
 const log = factory.getLogger(formatFilename(__filename));
 
