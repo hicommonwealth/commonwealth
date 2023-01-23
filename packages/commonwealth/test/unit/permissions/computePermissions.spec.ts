@@ -22,7 +22,6 @@ describe('computePermissions() unit tests', () => {
   });
 
   it('should correctly computePermissions for allowing createThread action with two roles overwrites', () => {
-
     const permission = permissionsManager.computePermissions(base_permission, [
       overwrite_moderator,
       overwrite_admin,
