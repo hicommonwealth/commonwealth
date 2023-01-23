@@ -133,6 +133,9 @@ jobs:
       - name: Install dependencies
         run: yarn --ignore-engines
 
+      - name: Typecheck
+        run: yarn check-types
+
       - name: Run unit tests
         run: yarn unit-test
 
@@ -175,7 +178,7 @@ jobs:
         run: yarn --ignore-engines
 
       - name: Run linter
-        run: yarn lint-all
+        run: yarn lint-branch
 
       - name: Run formatter
         run: yarn format-check

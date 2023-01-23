@@ -17,7 +17,7 @@ import app, { resetDatabase } from 'commonwealth/server-test';
 import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
 import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
-import { Action } from 'commonwealth/server/util/permissions';
+import { Action } from 'commonwealth/shared/permissions';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);
@@ -83,7 +83,12 @@ describe('Thread Tests', () => {
     expect(userAddress2).to.not.be.null;
     expect(userJWT2).to.not.be.null;
 
-    addAllowDenyPermissionsForCommunityRole('member', chain2, 0, Action.CREATE_THREAD );
+    addAllowDenyPermissionsForCommunityRole(
+      'member',
+      chain2,
+      0,
+      Action.CREATE_THREAD
+    );
   });
 
   describe('/createThread', () => {
