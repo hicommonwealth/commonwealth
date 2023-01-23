@@ -17,7 +17,7 @@ import app, { resetDatabase } from 'commonwealth/server-test';
 import { JWT_SECRET } from 'commonwealth/server/config';
 import * as modelUtils from 'commonwealth/test/util/modelUtils';
 import { addAllowDenyPermissionsForCommunityRole } from 'commonwealth/test/util/modelUtils';
-import { Action } from 'commonwealth/server/util/permissions';
+import { Action } from 'commonwealth/shared/permissions';
 import { markdownComment } from '../../util/fixtures/markdownComment';
 
 chai.use(chaiHttp);

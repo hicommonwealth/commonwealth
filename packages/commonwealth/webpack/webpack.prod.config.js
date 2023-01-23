@@ -3,7 +3,6 @@ const webpack = require('webpack');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.base.config.js');
 const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
-const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -42,11 +41,6 @@ module.exports = merge(common, {
           loader: 'babel-loader',
         },
       },
-    ],
-  },
-  optimization: {
-    minimizer: [
-      new CssMinimizerPlugin({ minimizerOptions: { preset: ['default'] } }),
     ],
   },
 });
