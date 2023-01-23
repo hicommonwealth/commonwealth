@@ -16,6 +16,7 @@ import { PageLoading } from '../loading';
 import { CosmosForm } from './cosmos_form';
 import { ERC20Form } from './erc20_form';
 import { ERC721Form } from './erc721_form';
+import { ERC1155Form } from './erc1155_form';
 import { EthDaoForm } from './eth_dao_form';
 import { SplTokenForm } from './spl_token_form';
 import { SputnikForm } from './sputnik_form';
@@ -92,7 +93,7 @@ class CreateCommunity extends ClassComponent {
           );
         case CommunityType.Erc1155Community:
           return (
-            <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
+            <ERC1155Form ethChains={ethChains} ethChainNames={ethChainNames} />
           )
         case CommunityType.SputnikDao:
           return <SputnikForm />;
