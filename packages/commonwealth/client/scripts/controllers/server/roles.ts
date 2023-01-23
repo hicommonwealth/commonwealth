@@ -9,7 +9,7 @@ import {
   PermissionManager,
   ToCheck,
   everyonePermissions,
-} from 'commonwealth/server/util/permissions';
+} from 'commonwealth/shared/permissions';
 import { RoleObject } from 'commonwealth/shared/types';
 import { UserController } from './user';
 
