@@ -27,6 +27,7 @@ export enum CommunityType {
   StarterCommunity = 'Starter Community',
   Erc20Community = 'ERC20',
   Erc721Community = 'ERC721',
+  Erc1155Community = 'ERC1155',
   SubstrateCommunity = 'Substrate',
   SputnikDao = 'Sputnik (V2)',
   Cosmos = 'Cosmos',
@@ -89,6 +90,10 @@ class CreateCommunity extends ClassComponent {
           return (
             <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
           );
+        case CommunityType.Erc1155Community:
+          return (
+            <ERC721Form ethChains={ethChains} ethChainNames={ethChainNames} />
+          )
         case CommunityType.SputnikDao:
           return <SputnikForm />;
         case CommunityType.SubstrateCommunity:
