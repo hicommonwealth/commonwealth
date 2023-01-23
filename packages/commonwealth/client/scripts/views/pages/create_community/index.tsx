@@ -94,7 +94,7 @@ class CreateCommunity extends ClassComponent {
         case CommunityType.Erc1155Community:
           return (
             <ERC1155Form ethChains={ethChains} ethChainNames={ethChainNames} />
-          )
+          );
         case CommunityType.SputnikDao:
           return <SputnikForm />;
         case CommunityType.SubstrateCommunity:
